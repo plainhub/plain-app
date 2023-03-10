@@ -14,7 +14,7 @@ With Plain, your phone becomes more than just a plaything. It becomes a powerful
 - No Firebase Cloud Messaging/Analytics: We don't track your activity or use your data for advertising purposes. We only collect crash logs through Firebase Crashlytics.
 - User-friendly: Plain has a modern, customizable interface with multi-language support, light/dark theme options, and e-ink screen compatibility.
 - Desktop management: You can manage your phone from your desktop by visiting a self-hosted webpage wirelessly.
-- SMS, contacts, and calls management: You can manage these features on the self-hosted webpage as well.
+- Contacts management: You can manage these features on the self-hosted webpage as well.
 - File management: Manage files, images, videos, and audios on the self-hosted webpage.
 - Note-taking: Use Plain to manage your notes with a built-in Markdown editor.
 - RSS reader: Read articles in a clean UI.
