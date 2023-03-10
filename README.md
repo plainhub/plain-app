@@ -25,7 +25,7 @@ With Plain, your phone becomes more than just a plaything. It becomes a powerful
 
 Plain's minimalist design is intentional, so you can focus on what matters most: your valuable data.
 
-Watch the video: https://youtu.be/X-fNL04oQOg
+Watch the video: https://www.youtube.com/watch?v=RvO18j4r95o
 
 
 ## Compatibility
