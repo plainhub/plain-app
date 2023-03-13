@@ -27,6 +27,7 @@ Plain's minimalist design is intentional, so you can focus on what matters most:
 
 Watch the video: https://www.youtube.com/watch?v=RvO18j4r95o
 
+App link: https://github.com/ismartcoding/plain-app
 
 ## Compatibility
 
