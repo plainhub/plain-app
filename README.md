@@ -37,4 +37,30 @@ Plain app requires Android 9.0 or higher.
 
 If you encounter any issues, feel free to open an issue on GitHub. We're always happy to help.
 
+## Download GraphQL schema from PlainBox
 
+```bash
+./gradlew downloadApolloSchema \
+  --endpoint="http://<box-ip>:8080/graphql" \
+  --schema="app/src/main/graphql/com/ismartcoding/plain/schema.graphqls" \
+  --header="Authorization: Bearer <token>"
+```
+
+## Build
+
+1. Generate `release.jks` file under `$rootProject/app` folder.
+
+```bash
+keytool -genkey -v -keystore ./app/release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias plain
+```
+
+2. Create `keystore.properties` file with following content under `$rootProject` folder.
+
+```
+storePassword=
+keyPassword=
+keyAlias=plain
+storeFile=release.jks
+```
+
+3. Copy `google-services.json` file to `$rootProject/app` folder.
