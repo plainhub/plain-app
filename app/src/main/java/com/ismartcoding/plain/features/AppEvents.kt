@@ -1,7 +1,9 @@
 package com.ismartcoding.plain.features
 
+import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
+import androidx.core.content.ContextCompat
 import com.aallam.openai.api.BetaOpenAI
 import com.aallam.openai.api.chat.ChatCompletionRequest
 import com.aallam.openai.api.chat.ChatMessage
@@ -30,6 +32,7 @@ import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.exchange.DExchangeRates
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
+import com.ismartcoding.plain.web.HttpServerService
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import com.ismartcoding.plain.web.websocket.WebSocketHelper
@@ -49,6 +52,9 @@ class BoxConnectivityStateChangedEvent
 
 class UpdateLocaleEvent
 class HttpServerEnabledEvent(val enabled: Boolean)
+
+class StartHttpServerEvent
+
 
 class SendMessageEvent(val content: DMessageContent)
 class UpdateMessageEvent(var chatItem: DChat)
@@ -156,6 +162,10 @@ object AppEvents {
             if (event.permission == Permission.POST_NOTIFICATIONS.toSysPermission()) {
                 AudioPlayer.instance.showNotification()
             }
+        }
+
+        receiveEventHandler<StartHttpServerEvent> {
+            ContextCompat.startForegroundService(MainApp.instance, Intent(MainApp.instance, HttpServerService::class.java))
         }
 
         receiveEventHandler<AIChatCreatedEvent> { event ->

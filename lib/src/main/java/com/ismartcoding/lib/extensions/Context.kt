@@ -19,7 +19,6 @@ import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.ismartcoding.lib.logcat.LogCat
 import java.io.File
 
 

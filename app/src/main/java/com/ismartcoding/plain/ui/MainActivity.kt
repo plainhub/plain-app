@@ -142,6 +142,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.chatList.initView(lifecycle)
+        sendEvent(StartHttpServerEvent())
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
