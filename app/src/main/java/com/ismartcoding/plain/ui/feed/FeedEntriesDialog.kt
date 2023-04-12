@@ -102,7 +102,11 @@ class FeedEntriesDialog : BaseListDrawerDialog() {
             val uri = event.uris.first()
             InputStreamReader(contentResolver.openInputStream(uri)!!).use { reader ->
                 withIO {
-                    FeedHelper.import(reader)
+                    try {
+                        FeedHelper.import(reader)
+                    } catch (ex: Exception) {
+                        DialogHelper.showMessage(ex.toString())
+                    }
                 }
                 updateDrawerMenu()
                 refreshList()

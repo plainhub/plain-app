@@ -91,7 +91,7 @@ object FeedHelper {
     }
 
      suspend fun export(writer: Writer) {
-        val feeds = FeedHelper.getAll()
+        val feeds = getAll()
         val opml = Opml().apply {
             feedType = OPML20Generator().type
             encoding = "utf-8"
