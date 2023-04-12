@@ -19,6 +19,7 @@ import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.ismartcoding.lib.logcat.LogCat
 import java.io.File
 
 
@@ -211,6 +212,9 @@ fun Context.isWifiConnected(): Boolean {
 
 fun Context.isGestureNavigationBar(): Boolean {
     val resourceId = resources.getIdentifier("config_navBarInteractionMode", "integer", "android")
+    if (resourceId == 0) {
+        return false
+    }
     return resources.getInteger(resourceId) == 2
 }
 
