@@ -1,3 +1,3 @@
-rootProject.name = "Plain"
+rootProject.name = "PlainApp"
 include(":app")
 include(":lib")

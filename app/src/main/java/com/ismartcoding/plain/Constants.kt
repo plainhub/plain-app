@@ -1,7 +1,7 @@
 package com.ismartcoding.plain
 
 object Constants {
-    const val APP_NAME = "Plain"
+    const val SSL_NAME = "Plain"
     const val DATABASE_NAME = "plain.db"
     const val GRAY_OUT_ALPHA = 0.4F
     const val NOTIFICATION_CHANNEL_ID = "default"

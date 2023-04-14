@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Plain</string>
+    <string name="app_name">PlainApp</string>
     <string name="load_no_more">End</string>
     <string name="list_empty">List is empty</string>
     <string name="select_box_title">Select a box</string>

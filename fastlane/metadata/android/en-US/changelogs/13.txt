@@ -1,1 +1,1 @@
-- Fix crash issue at startup on some devices
+- Rename app name to PlainApp

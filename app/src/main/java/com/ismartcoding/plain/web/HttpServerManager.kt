@@ -21,7 +21,7 @@ import java.util.*
 import kotlin.collections.set
 
 object HttpServerManager {
-    private const val SSL_KEY_ALIAS = Constants.APP_NAME
+    private const val SSL_KEY_ALIAS = Constants.SSL_NAME
     var password = CryptoHelper.randomPassword(6)   // the password to login to web console
     var tokenCache = mutableMapOf<String, ByteArray>() // cache the session token, format: <client_id>:<token>
     val clientIpCache = mutableMapOf<String, String>()  // format: <client_id>:<client_ip>
@@ -50,7 +50,7 @@ object HttpServerManager {
     private fun getSSLKeyStore(context: Context): KeyStore {
         val file = File(context.filesDir, "keystore.jks")
         if (!file.exists()) {
-            val keyStore = JksHelper.genJksFile(SSL_KEY_ALIAS, LocalStorage.clientId, Constants.APP_NAME)
+            val keyStore = JksHelper.genJksFile(SSL_KEY_ALIAS, LocalStorage.clientId, Constants.SSL_NAME)
             val out = FileOutputStream(file)
             keyStore.store(out, null)
             out.close()
