@@ -26,7 +26,7 @@ android {
         applicationId = "com.ismartcoding.plain"
         minSdk = 28
         targetSdk = 33
-        versionCode = 13
+        versionCode = 14
         versionName = "1.0"
     }
 

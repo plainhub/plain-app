@@ -69,5 +69,3 @@ keyPassword=
 keyAlias=plain
 storeFile=release.jks
 ```
-
-3. Copy `google-services.json` file to `$rootProject/app` folder.
