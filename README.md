@@ -2,7 +2,7 @@
 
 ## Introduction
 
-PlainAPP is an all-in-one application that aims to offer various frequently-used features.
+PlainApp is an all-in-one application that aims to offer various frequently-used features.
 
 In a world where many apps are cluttered with ads and invasive tracking, PlainApp offers a refreshing alternative. PlainApp is designed to help you manage your private data with ease, without sacrificing your privacy or wasting your time.
 
@@ -35,6 +35,12 @@ Watch the video: https://www.youtube.com/watch?v=RvO18j4r95o
 App link: https://play.google.com/store/apps/details?id=com.ismartcoding.plain
 
 Reddit: https://www.reddit.com/r/plainapp
+
+## Screenshots
+
+| ![home](screenshots/1.jpeg)    | ![files](screenshots/2.jpeg)  | ![web](screenshots/3.jpeg)    | ![notes](screenshots/4.jpeg) |
+|--------------------------------|-------------------------------|-------------------------------|------------------------------|
+| ![audios](screenshots/5.jpeg) | ![images](screenshots/6.jpeg) | ![videos](screenshots/7.jpeg)  |                              |
 
 ## Compatibility
 

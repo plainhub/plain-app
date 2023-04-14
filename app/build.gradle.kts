@@ -26,8 +26,8 @@ android {
         applicationId = "com.ismartcoding.plain"
         minSdk = 28
         targetSdk = 33
-        versionCode = 14
-        versionName = "1.0"
+        versionCode = 15
+        versionName = "1.0.15"
     }
 
     signingConfigs {
