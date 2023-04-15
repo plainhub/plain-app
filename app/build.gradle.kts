@@ -106,10 +106,10 @@ dependencies {
     implementation("com.github.bmoliveira:snake-yaml:v1.18-android")
 
     // CameraX
-    implementation("androidx.camera:camera-camera2:1.3.0-alpha04")
-    implementation("androidx.camera:camera-lifecycle:1.3.0-alpha04")
-    implementation("androidx.camera:camera-view:1.3.0-alpha04")
-    implementation("com.google.mlkit:barcode-scanning:17.0.3")
+    implementation("androidx.camera:camera-camera2:1.3.0-alpha05")
+    implementation("androidx.camera:camera-lifecycle:1.3.0-alpha05")
+    implementation("androidx.camera:camera-view:1.3.0-alpha05")
+    implementation("com.google.mlkit:barcode-scanning:17.1.0")
 
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
@@ -140,7 +140,7 @@ dependencies {
     implementation("com.rometools:rome:1.18.0")
     implementation("com.rometools:rome-opml:1.18.0")
 
-    implementation("androidx.work:work-runtime-ktx:2.8.0")
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
 
 //    implementation("org.eclipse.jgit:org.eclipse.jgit:6.1.0.202203080745-r") // TODO: git support
     implementation("com.github.bumptech.glide:recyclerview-integration:4.11.0")

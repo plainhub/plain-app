@@ -40,10 +40,10 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.core:core-ktx:1.10.0")
     api("androidx.appcompat:appcompat:1.6.1")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     val ktorVersion = "2.0.3"
     val markwonVersion = "4.6.2"
 
@@ -55,21 +55,21 @@ dependencies {
 
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
-    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
-    api("org.jetbrains.kotlinx:kotlinx-datetime:0.3.1")
+    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
     api("com.google.android.material:material:1.9.0-alpha02")
-    api("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
+    api("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     api("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
-    api("androidx.fragment:fragment-ktx:1.5.5")
+    api("androidx.fragment:fragment-ktx:1.5.6")
     api("androidx.appcompat:appcompat:1.6.1")
-    api("androidx.core:core-ktx:1.9.0")
+    api("androidx.core:core-ktx:1.10.0")
     api("androidx.transition:transition:1.4.1")
 //    api("com.squareup.picasso:picasso:2.71828")
 
     api("com.github.bumptech.glide:glide:4.13.2")
     kapt("com.github.bumptech.glide:compiler:4.13.2")
-    api("com.google.android.exoplayer:exoplayer:2.18.3")
+    api("com.google.android.exoplayer:exoplayer:2.18.5")
     // https://github.com/davemorrissey/subsampling-scale-image-view
     api("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
 
