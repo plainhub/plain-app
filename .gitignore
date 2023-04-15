@@ -81,4 +81,3 @@ lint/tmp/
 
 .DS_Store
 /app/release/output-metadata.json
-/app/src/main/resources/web/
