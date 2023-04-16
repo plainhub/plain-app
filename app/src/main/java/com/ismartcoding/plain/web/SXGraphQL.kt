@@ -11,6 +11,7 @@ import com.apurebase.kgraphql.schema.dsl.SchemaConfigurationDSL
 import com.apurebase.kgraphql.schema.execution.Execution
 import com.apurebase.kgraphql.schema.execution.Executor
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.allowSensitivePermissions
 import com.ismartcoding.lib.extensions.newPath
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
@@ -424,7 +425,8 @@ class SXGraphQL(val schema: Schema) {
                             Permission.values().filter { it.isEnabled() && it.can() },
                             LocalStorage.audioPlaylist.map { it.toModel() },
                             LocalStorage.audioPlayMode,
-                            LocalStorage.audioPlaying?.path ?: ""
+                            LocalStorage.audioPlaying?.path ?: "",
+                            MainApp.instance.allowSensitivePermissions()
                         )
                     }
                 }

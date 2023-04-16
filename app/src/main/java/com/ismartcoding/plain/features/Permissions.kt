@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.features
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
@@ -11,6 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.allowSensitivePermissions
 import com.ismartcoding.lib.extensions.hasPermission
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.isTIRAMISUPlus
@@ -156,11 +158,14 @@ object Permissions {
     private lateinit var fileStorageActivityLauncher: ActivityResultLauncher<Intent>
     private lateinit var writeSettingsActivityLauncher: ActivityResultLauncher<Intent>
 
-    fun getWebList(): List<Permission> {
-        return listOf(
-            Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_CONTACTS, Permission.WRITE_CONTACTS,
-            Permission.CALL_PHONE
-        )
+    fun getWebList(context: Context): List<Permission> {
+        val permissions = mutableListOf(Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_CONTACTS, Permission.WRITE_CONTACTS)
+        if (context.allowSensitivePermissions()) {
+            permissions.addAll(listOf(Permission.READ_SMS, Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG))
+        }
+        permissions.addAll(listOf(Permission.CALL_PHONE, Permission.NONE))
+
+        return permissions
     }
 
     fun init(activity: AppCompatActivity) {

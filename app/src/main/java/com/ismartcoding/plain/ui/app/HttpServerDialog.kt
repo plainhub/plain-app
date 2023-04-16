@@ -141,7 +141,7 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
     }
 
     private fun updateUI() {
-        binding.list.page.addData(Permissions.getWebList().map {
+        binding.list.page.addData(Permissions.getWebList(requireContext()).map {
             PermissionModel(it).apply {
                 keyText = it.getText()
                 if (it == Permission.NONE) {

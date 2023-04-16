@@ -16,5 +16,6 @@ data class App(
     val permissions: List<Permission>,
     val audios: List<PlaylistAudio>,
     val audioMode: MediaPlayMode,
-    val audioCurrent: String
+    val audioCurrent: String,
+    val allowSensitivePermissions: Boolean,
 )

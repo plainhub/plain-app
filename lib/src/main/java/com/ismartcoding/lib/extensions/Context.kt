@@ -1,5 +1,6 @@
 package com.ismartcoding.lib.extensions
 
+import android.Manifest
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
@@ -19,6 +20,7 @@ import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.ismartcoding.lib.isTIRAMISUPlus
 import java.io.File
 
 
@@ -226,4 +228,18 @@ fun Context.hasPermissions(vararg permissions: String): Boolean {
     return permissions
         .map { permission -> ActivityCompat.checkSelfPermission(this, permission) }
         .all { result -> result == PackageManager.PERMISSION_GRANTED }
+}
+
+fun Context.hasPermissionInManifest(vararg permissions: String): Boolean {
+    val packageInfo = if (isTIRAMISUPlus()) {
+        packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong()))
+    } else {
+        @Suppress("DEPRECATION")
+        packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
+    }
+    return packageInfo.requestedPermissions?.any { permissions.contains(it) } ?: false
+}
+
+fun Context.allowSensitivePermissions(): Boolean {
+    return hasPermissionInManifest(Manifest.permission.READ_SMS)
 }

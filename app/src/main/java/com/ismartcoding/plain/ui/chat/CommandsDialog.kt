@@ -1,11 +1,13 @@
 package com.ismartcoding.plain.ui.chat
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import com.ismartcoding.lib.brv.utils.linear
 import com.ismartcoding.lib.brv.utils.models
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.allowSensitivePermissions
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.softinput.setWindowSoftInput
 import com.ismartcoding.plain.LocalStorage
@@ -54,19 +56,22 @@ class CommandsDialog() : BaseBottomSheetDialog<DialogCommandsBinding>() {
     }
 
     private fun search() {
-        binding.rv.models = getItems().filter { searchQ.isEmpty() || it.keyText.contains(searchQ, true) || it.subtitle.contains(searchQ, true) }
+        binding.rv.models = getItems(requireContext()).filter { searchQ.isEmpty() || it.keyText.contains(searchQ, true) || it.subtitle.contains(searchQ, true) }
     }
 
     companion object {
         private val itemsMap = mutableMapOf<String, MutableList<ItemModel>>()
-        fun getItems(): List<ItemModel> {
+        fun getItems(context: Context): List<ItemModel> {
             val lng = LocaleHelper.currentLocale().language
             val items = itemsMap[lng] ?: mutableListOf()
             if (items.isNotEmpty()) {
                 return items
             }
 
-            val ignore = if (LocalStorage.selectedBoxId.isEmpty()) setOf(ChatCommandType.NETWORK, ChatCommandType.EDUCATION, ChatCommandType.SOCIAL) else setOf()
+            val ignore = if (LocalStorage.selectedBoxId.isEmpty()) mutableSetOf(ChatCommandType.NETWORK, ChatCommandType.EDUCATION) else mutableSetOf()
+            if (!context.allowSensitivePermissions()) {
+                ignore.add(ChatCommandType.SOCIAL)
+            }
             items.addAll(ChatCommandType.values()
                 .filter { !ignore.contains(it) }
                 .map {
