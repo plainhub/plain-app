@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.app
 import android.os.Bundle
 import android.view.View
 import com.ismartcoding.lib.helpers.NetworkHelper
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.DialogDeveloperSettingsBinding
@@ -16,7 +15,6 @@ class DeveloperSettingsDialog : BaseBottomSheetDialog<DialogDeveloperSettingsBin
         if (LocalStorage.authDevToken.isEmpty()) {
             LocalStorage.resetAuthDevToken()
         }
-        LogCat.e(LocalStorage.authDevToken)
         binding.enable.setKeyText(R.string.enable_testing_token)
             .setSwitch(LocalStorage.authDevTokenEnabled) { _, isEnabled ->
             LocalStorage.authDevTokenEnabled = isEnabled

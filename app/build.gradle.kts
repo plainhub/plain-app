@@ -109,7 +109,6 @@ dependencies {
     implementation("androidx.camera:camera-camera2:1.3.0-alpha05")
     implementation("androidx.camera:camera-lifecycle:1.3.0-alpha05")
     implementation("androidx.camera:camera-view:1.3.0-alpha05")
-    implementation("com.google.mlkit:barcode-scanning:17.1.0")
 
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
@@ -135,6 +134,8 @@ dependencies {
     implementation("com.github.skydoves:balloon:1.5.2")
 
     implementation("com.aallam.openai:openai-client:3.2.0")
+
+    implementation("com.github.jenly1314:zxing-lite:2.4.0")
 
     // Feed
     implementation("com.rometools:rome:1.18.0")
