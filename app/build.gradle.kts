@@ -20,14 +20,29 @@ rootProject.file("keystore.properties").let {
     }
 }
 
+val hasNoSplits = hasProperty("noSplits")
+
 android {
     compileSdk = 33
     defaultConfig {
         applicationId = "com.ismartcoding.plain"
         minSdk = 28
         targetSdk = 33
-        versionCode = 15
+
+        val abiFilterList = if (hasProperty("abiFilters")) property("abiFilters").toString().split(';') else listOf()
+        val singleAbiNum = when (abiFilterList.takeIf { it.size == 1 }?.first()) {
+            "armeabi-v7a" -> 2
+            "arm64-v8a" -> 1
+            else -> 0
+        }
+
+        val vCode = 15
+        versionCode = vCode - singleAbiNum
         versionName = "1.0.15"
+
+        ndk {
+            abiFilters += abiFilterList
+        }
     }
 
     signingConfigs {
@@ -48,6 +63,15 @@ android {
                 debugSymbolLevel = "SYMBOL_TABLE"
             }
             setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
+        }
+    }
+
+    splits {
+        abi {
+            isEnable = !hasNoSplits
+            reset()
+            include("x86_64", "armeabi-v7a", "arm64-v8a")
+            isUniversalApk = true
         }
     }
 

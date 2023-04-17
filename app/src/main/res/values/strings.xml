@@ -424,7 +424,7 @@
     <string name="synced">Synced</string>
     <string name="create_folder">Create folder</string>
     <string name="create_file">Create file</string>
-    <string name="audio_notification_prompt">To stay up-to-date with your audio playback, please grant permission to receive push notifications from our app.</string>
+    <string name="audio_notification_prompt">To view media controls in the notifications center, kindly grant permission to receive push notifications from the app.</string>
     <string name="internal_storage">Internal storage</string>
     <string name="recommended_https">HTTPS (Recommended)</string>
     <string name="enter_this_address_tips">Enter this address in your PC web browser.</string>

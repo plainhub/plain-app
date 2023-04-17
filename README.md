@@ -26,6 +26,7 @@ With PlainApp, your phone becomes more than just a plaything. It becomes a power
 - Video and audio playback: Play videos and audios in the app and on the webpage.
 - Backup and export: Backup and export your app data for safekeeping.
 - ChatGPT conversation UI (web only)
+- SMS, Call logs: Read your SMS and call logs on webpage.(Apk only)
 - And more features are planned for the future.
 
 PlainApp's minimalist design is intentional, so you can focus on what matters most: your valuable data.

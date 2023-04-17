@@ -423,7 +423,7 @@
     <string name="synced">已同步</string>
     <string name="create_folder">创建目录</string>
     <string name="create_file">创建文件</string>
-    <string name="audio_notification_prompt">为了及时了解您的音频播放情况，请授予我们的音频播放器应用程序接收推送通知的权限。</string>
+    <string name="audio_notification_prompt">为了在通知中心查看媒体控制，请允许该应用接收推送通知。</string>
     <string name="internal_storage">内部存储</string>
     <string name="recommended_https">HTTPS（推荐）</string>
     <string name="enter_this_address_tips">在您的电脑浏览器中输入此地址。</string>
