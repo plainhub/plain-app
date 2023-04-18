@@ -1,1 +1,0 @@
-- Fix crash issue at startup on some devices

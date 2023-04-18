@@ -1,1 +1,1 @@
-PlainApp: Private Data Manager. Open Source, Encrypted, Device-Based.
+Manage your phone on the web! Access files, contacts, videos, music & more.

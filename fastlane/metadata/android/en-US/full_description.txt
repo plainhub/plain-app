@@ -1,4 +1,4 @@
-PlainAPP is an all-in-one application that aims to offer various frequently-used features.
+PlainApp is an open-source application that allows you to manage your phone through a web browser. Access files, videos, music, contacts, and more from your desktop using a secure, easy to use web interface!
 
 Features:
   - Privacy oriented: We take your privacy seriously and use TLS + AES256-GCM encryption to ensure your data is secure.
@@ -15,6 +15,7 @@ Features:
   - Video and audio playback: Play videos and audios in the app and on the webpage.
   - Backup and export: Backup and export your app data for safekeeping.
   - ChatGPT conversation UI (web only)
+  - SMS, Calls: Read your SMS and calls on webpage.
   - And more features are planned for the future.
 
 Github: https://github.com/ismartcoding/plain-app

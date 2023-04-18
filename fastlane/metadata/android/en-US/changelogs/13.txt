@@ -1,1 +1,0 @@
-- Rename app name to PlainApp

@@ -1,14 +1,6 @@
 # PlainApp
 
-## Introduction
-
-PlainApp is an all-in-one application that aims to offer various frequently-used features.
-
-In a world where many apps are cluttered with ads and invasive tracking, PlainApp offers a refreshing alternative. PlainApp is designed to help you manage your private data with ease, without sacrificing your privacy or wasting your time.
-
-My goal is ambitious. I want to integrate multiple features into the app that will prove beneficial for learning and work purposes. All the data saved on the app will be shared with each feature, enabling users to access their data easily.
-
-With PlainApp, your phone becomes more than just a plaything. It becomes a powerful tool for managing your digital life.
+PlainApp is an open-source application that allows you to manage your phone through a web browser. Access files, videos, music, contacts, sms, calls, and more from your desktop using a secure, easy to use web interface!
 
 ## Features
 
@@ -26,7 +18,7 @@ With PlainApp, your phone becomes more than just a plaything. It becomes a power
 - Video and audio playback: Play videos and audios in the app and on the webpage.
 - Backup and export: Backup and export your app data for safekeeping.
 - ChatGPT conversation UI (web only)
-- SMS, Call logs: Read your SMS and call logs on webpage.(Apk only)
+- SMS, Calls: Read your SMS and calls on webpage.(Apk only)
 - And more features are planned for the future.
 
 PlainApp's minimalist design is intentional, so you can focus on what matters most: your valuable data.
