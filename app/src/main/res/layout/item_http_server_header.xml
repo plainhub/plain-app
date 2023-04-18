@@ -47,6 +47,7 @@
             android:paddingStart="84dp"
             android:paddingEnd="0dp"
             android:textColor="#000000"
+            android:textIsSelectable="true"
             android:textSize="@dimen/text_size_lg" />
 
         <TextView
