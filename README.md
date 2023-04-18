@@ -27,13 +27,18 @@ Watch the video: https://www.youtube.com/watch?v=RvO18j4r95o
 
 App link: https://play.google.com/store/apps/details?id=com.ismartcoding.plain
 
+Apk link: https://github.com/ismartcoding/plain-app/releases
+
 Reddit: https://www.reddit.com/r/plainapp
 
 ## Screenshots
 
-| ![home](screenshots/1.jpeg)    | ![files](screenshots/2.jpeg)  | ![web](screenshots/3.jpeg)    | ![notes](screenshots/4.jpeg) |
-|--------------------------------|-------------------------------|-------------------------------|------------------------------|
-| ![audios](screenshots/5.jpeg) | ![images](screenshots/6.jpeg) | ![videos](screenshots/7.jpeg)  |                              |
+| ![home](screenshots/1.jpeg)          | ![files](screenshots/2.jpeg)            | ![web](screenshots/3.jpeg)                | ![notes](screenshots/4.jpeg)              |
+|--------------------------------------|-----------------------------------------|-------------------------------------------|-------------------------------------------|
+| ![audios](screenshots/5.jpeg)        | ![images](screenshots/6.jpeg)           | ![videos](screenshots/7.jpeg)             |                                           |
+| ![home](screenshots/web-home.png)    | ![images](screenshots/web-images.png)   | ![videos](screenshots/web-videos.png)     | ![notes](screenshots/web-notes.png)       |
+| ![files](screenshots/web-files.png)  | ![chatgpt](screenshots/web-chatgpt.png) | ![messages](screenshots/web-messages.png) | ![contacts](screenshots/web-contacts.png) |
+| ![audios](screenshots/web-audios.png) |                                         |                                           |                                           |
 
 ## Compatibility
 
