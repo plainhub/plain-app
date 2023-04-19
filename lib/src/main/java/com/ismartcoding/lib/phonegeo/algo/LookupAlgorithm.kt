@@ -17,10 +17,15 @@ abstract class LookupAlgorithm(val data: ByteArray) {
 
     abstract fun lookup(phoneNumber: String): PhoneNumberInfo?
 
-    protected fun validPhoneNumber(phoneNumber: String?): Boolean {
-        if (phoneNumber?.length !in 7..11) {
+    protected fun validPhoneNumber(phoneNumber: String): Boolean {
+        if (phoneNumber.length !in 7..11) {
             return false
         }
+
+        if (phoneNumber.substring(0, 7).toIntOrNull() == null) {
+            return false
+        }
+
         return true
     }
 
