@@ -135,7 +135,9 @@ class SendMessageDialog() : BaseBottomSheetDialog<DialogSendMessageBinding>() {
 
         Handler(Looper.getMainLooper()).postDelayed({
             // fix the glitch bug
-            setWindowSoftInput(binding.buttons)
+            if (isActive) {
+                setWindowSoftInput(binding.buttons)
+            }
         }, 200)
     }
 }
