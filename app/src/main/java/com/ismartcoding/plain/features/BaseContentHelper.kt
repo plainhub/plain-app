@@ -40,15 +40,26 @@ abstract class BaseContentHelper {
                 close()
             }
         } else {
-            context.contentResolver.query(
-                uriExternal, arrayOf("count(*) AS count"),
-                where.toSelection(), where.args.toTypedArray(), null
-            )?.run {
-                moveToFirst()
-                if (count > 0) {
-                    result = getInt(0)
+            try {
+                context.contentResolver.query(
+                    uriExternal, arrayOf("count(*) AS count"),
+                    where.toSelection(), where.args.toTypedArray(), null
+                )?.run {
+                    moveToFirst()
+                    if (count > 0) {
+                        result = getInt(0)
+                    }
+                    close()
                 }
-                close()
+            } catch (ex: Exception) {
+                // Fatal Exception: java.lang.IllegalArgumentException: Non-token detected in 'count(*) AS count'
+                context.contentResolver.query(uriExternal, null, Bundle().apply {
+                    where(where.toSelection(), where.args)
+                }, null)?.run {
+                    moveToFirst()
+                    result = count
+                    close()
+                }
             }
         }
 
