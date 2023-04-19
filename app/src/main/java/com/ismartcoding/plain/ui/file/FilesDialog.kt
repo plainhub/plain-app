@@ -235,6 +235,7 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
     private fun navigateTo(path: String) {
         viewModel.path = path
         updateBreadcrumb()
+        binding.list.rv.bindingAdapter.checkedPosition.clear()
         binding.list.page.showLoading()
     }
 

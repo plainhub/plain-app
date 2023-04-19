@@ -848,9 +848,14 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     /**
      * 返回被选中的条目对应的数据模型集合
      */
-    fun <M> getCheckedModels(): List<M> {
+    inline fun <reified M> getCheckedModels(): List<M> {
         val checkedModels = ArrayList<M>()
-        for (position in this.checkedPosition) checkedModels.add(getModel(position))
+        for (position in this.checkedPosition) {
+            val m = getModelOrNull(position) as? M
+            if (m != null) {
+                checkedModels.add(m)
+            }
+        }
         return checkedModels
     }
 
