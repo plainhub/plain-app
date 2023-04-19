@@ -47,10 +47,6 @@ class PageRefreshLayout : SmartRefreshLayout, OnRefreshLoadMoreListener {
         var preloadIndex = 3
     }
 
-    fun setRefreshHeaderCreator(creator: DefaultRefreshHeaderCreator) {
-        sHeaderCreator = creator
-    }
-
     /** 分页索引 */
     var index = startIndex
 

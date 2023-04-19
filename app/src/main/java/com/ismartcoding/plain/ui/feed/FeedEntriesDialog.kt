@@ -204,15 +204,13 @@ class FeedEntriesDialog : BaseListDrawerDialog() {
         }
 
         binding.list.page.run {
-            setRefreshHeaderCreator { context, layout ->
-                ClassicsHeader(context, layout).apply {
-                    pullText = { if (viewModel.data is DFeed) LocaleHelper.getString(R.string.pull_down_to_sync_current_feed) else LocaleHelper.getString(R.string.pull_down_to_sync_all_feeds) }
-                    refreshingText = { LocaleHelper.getString(R.string.syncing) }
-                    releaseText = { if (viewModel.data is DFeed) LocaleHelper.getString(R.string.release_to_sync_current_feed) else LocaleHelper.getString(R.string.release_to_sync_all_feeds) }
-                    finishText = { LocaleHelper.getString(R.string.synced) }
-                    failedText = { LocaleHelper.getString(R.string.sync_failed) }
-                }
-            }
+            setRefreshHeader(ClassicsHeader(context, this).apply {
+                pullText = { if (viewModel.data is DFeed) LocaleHelper.getString(R.string.pull_down_to_sync_current_feed) else LocaleHelper.getString(R.string.pull_down_to_sync_all_feeds) }
+                refreshingText = { LocaleHelper.getString(R.string.syncing) }
+                releaseText = { if (viewModel.data is DFeed) LocaleHelper.getString(R.string.release_to_sync_current_feed) else LocaleHelper.getString(R.string.release_to_sync_all_feeds) }
+                finishText = { LocaleHelper.getString(R.string.synced) }
+                failedText = { LocaleHelper.getString(R.string.sync_failed) }
+            })
 
             setOnRefreshListener {
                 viewModel.offset = 0

@@ -60,15 +60,13 @@ class FeedEntryDialog(private val feedEntry: DFeedEntry, val feed: DFeed?) : Bas
             }
         }
         binding.page.run {
-            setRefreshHeaderCreator { context, layout ->
-                ClassicsHeader(context, layout).apply {
-                    pullText = { getString(R.string.pull_down_to_fecth_content) }
-                    refreshingText = { getString(R.string.fetching_content) }
-                    releaseText = { getString(R.string.release_to_fetch) }
-                    finishText = { getString(R.string.fetched) }
-                    failedText = { getString(R.string.fetch_failed) }
-                }
-            }
+            setRefreshHeader(ClassicsHeader(context, this).apply {
+                pullText = { getString(R.string.pull_down_to_fecth_content) }
+                refreshingText = { getString(R.string.fetching_content) }
+                releaseText = { getString(R.string.release_to_fetch) }
+                finishText = { getString(R.string.fetched) }
+                failedText = { getString(R.string.fetch_failed) }
+            })
             onRefresh {
                 lifecycleScope.launch {
                     val r = withIO { feedEntry.fetchContentAsync() }
