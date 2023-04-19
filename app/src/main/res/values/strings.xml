@@ -57,7 +57,7 @@
     <string name="web_console">Open in PC web browser</string>
     <string name="backup_restore">Backup &amp; restore</string>
     <string name="backup">Backup</string>
-    <string name="backup_tips">This action will backup the plain app data.</string>
+    <string name="backup_tips">This action will backup the PlainApp data.</string>
     <string name="developer_settings">Developer settings</string>
     <string name="features">Features</string>
     <string name="system">System default</string>

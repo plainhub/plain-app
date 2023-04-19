@@ -57,9 +57,15 @@ abstract class BaseContentHelper {
 
     fun getSearchCursor(context: Context, query: String, limit: Int, offset: Int, sortBy: SortBy): Cursor? {
         return if (isRPlus()) {
+            // From Android 11, LIMIT and OFFSET should be retrieved using Bundle
             getSearchCursorWithBundle(context, query, limit, offset, sortBy)
         } else {
-            getSearchCursorWithSortOrder(context, query, limit, offset, sortBy)
+            try {
+                getSearchCursorWithSortOrder(context, query, limit, offset, sortBy)
+            } catch (ex: Exception) {
+                // Huawei OS android 10 may throw error `Invalid token LIMIT`
+                getSearchCursorWithBundle(context, query, limit, offset, sortBy)
+            }
         }
     }
 
