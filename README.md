@@ -33,12 +33,12 @@ Reddit: https://www.reddit.com/r/plainapp
 
 ## Screenshots
 
-| ![home](screenshots/1.jpeg)          | ![files](screenshots/2.jpeg)            | ![web](screenshots/3.jpeg)                | ![notes](screenshots/4.jpeg)              |
-|--------------------------------------|-----------------------------------------|-------------------------------------------|-------------------------------------------|
-| ![audios](screenshots/5.jpeg)        | ![images](screenshots/6.jpeg)           | ![videos](screenshots/7.jpeg)             |                                           |
-| ![home](screenshots/web-home.png)    | ![images](screenshots/web-images.png)   | ![videos](screenshots/web-videos.png)     | ![notes](screenshots/web-notes.png)       |
+| ![home](screenshots/1.jpeg)          | ![files](screenshots/2.jpeg)            | ![web](screenshots/3.jpeg)                | ![notes](screenshots/4.jpeg)             |
+|--------------------------------------|-----------------------------------------|-------------------------------------------|------------------------------------------|
+| ![audios](screenshots/5.jpeg)        | ![images](screenshots/6.jpeg)           | ![videos](screenshots/7.jpeg)             | ![rss](screenshots/8.jpeg)               |
+| ![home](screenshots/web-home.png)    | ![images](screenshots/web-images.png)   | ![videos](screenshots/web-videos.png)     | ![notes](screenshots/web-notes.png)      |
 | ![files](screenshots/web-files.png)  | ![chatgpt](screenshots/web-chatgpt.png) | ![messages](screenshots/web-messages.png) | ![contacts](screenshots/web-contacts.png) |
-| ![audios](screenshots/web-audios.png) |                                         |                                           |                                           |
+| ![audios](screenshots/web-audios.png) | ![rss](screenshots/web-rss.png)         |                                           |                                          |
 
 ## Compatibility
 

@@ -17,22 +17,22 @@ class SocialViewHelper(val view: TextView) {
     val hashtag: SuggestionView
         get() = SuggestionView(
             Pattern.compile("#(\\w+)"), false,
-            view.context.getColorStateList(R.color.chip_color_state_list), R.color.red, arrayListOf(), null, null
+            view.context.getColorStateList(R.color.chip_color_state_list), view.context.getColor(R.color.red), arrayListOf(), null, null
         )
     val mention: SuggestionView
         get() = SuggestionView(
             Pattern.compile("@(\\w+)"), false,
-            view.context.getColorStateList(R.color.chip_color_state_list), R.color.red, arrayListOf(), null, null
+            view.context.getColorStateList(R.color.chip_color_state_list),  view.context.getColor(R.color.red), arrayListOf(), null, null
         )
     val command: SuggestionView
         get() = SuggestionView(
             Pattern.compile(":(\\w+)"), false,
-            view.context.getColorStateList(R.color.chip_color_state_list), R.color.red, arrayListOf(), null, null
+            view.context.getColorStateList(R.color.chip_color_state_list),  view.context.getColor(R.color.red), arrayListOf(), null, null
         )
     val hyperlink: SuggestionView
         get() = SuggestionView(
             PatternsCompat.WEB_URL, false,
-            view.context.getColorStateList(R.color.chip_color_state_list), R.color.red, arrayListOf(), null, null
+            view.context.getColorStateList(R.color.chip_color_state_list),  view.context.getColor(R.color.red), arrayListOf(), null, null
         )
 
     //private var flags: Int
