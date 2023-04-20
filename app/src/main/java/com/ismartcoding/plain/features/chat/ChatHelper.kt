@@ -4,6 +4,8 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.features.DeleteChatItemViewEvent
 import com.ismartcoding.plain.db.*
+import com.ismartcoding.plain.helpers.FileHelper
+import java.io.File
 
 object ChatHelper {
     suspend fun createChatItemsAsync(message: DMessageContent): List<DChat> {
@@ -26,7 +28,19 @@ object ChatHelper {
     }
 
     suspend fun deleteAsync(chatItem: DChat) {
-        withIO { AppDatabase.instance.chatDao().delete(chatItem.id) }
+        withIO {
+            AppDatabase.instance.chatDao().delete(chatItem.id)
+            val v = chatItem.content.value
+            if (v is DMessageFiles) {
+                v.items.forEach {
+                    File(it.uri).delete()
+                }
+            } else if (v is DMessageImages) {
+                v.items.forEach {
+                    File(it.uri).delete()
+                }
+            }
+        }
         sendEvent(DeleteChatItemViewEvent(chatItem.id))
     }
 
