@@ -2,6 +2,8 @@
 
 PlainApp is an open-source application that allows you to manage your phone through a web browser. Access files, videos, music, contacts, sms, calls, and more from your desktop using a secure, easy to use web interface!
 
+[<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt='Get it on Google Play' height="80">](https://play.google.com/store/apps/details?id=com.ismartcoding.plain) [<img src="https://raw.githubusercontent.com/ismartcoding/plain-app/main/assets/get-it-on-github.png" alt='Get it on GitHub' height="80">](https://github.com/ismartcoding/plain-app/releases/latest)
+
 ## Features
 
 - Privacy oriented: We take your privacy seriously and use TLS + AES256-GCM encryption to ensure your data is secure.
@@ -23,11 +25,7 @@ PlainApp is an open-source application that allows you to manage your phone thro
 
 PlainApp's minimalist design is intentional, so you can focus on what matters most: your valuable data.
 
-Watch the video: https://www.youtube.com/watch?v=RvO18j4r95o
-
-App link: https://play.google.com/store/apps/details?id=com.ismartcoding.plain
-
-Apk link: https://github.com/ismartcoding/plain-app/releases
+Video: https://www.youtube.com/watch?v=RvO18j4r95o
 
 Reddit: https://www.reddit.com/r/plainapp
 
@@ -73,6 +71,12 @@ keyPassword=
 keyAlias=plain
 storeFile=release.jks
 ```
+
 ## Star history
 
 [![Star History Chart](https://api.star-history.com/svg?repos=ismartcoding/plain-app&type=Date)](https://star-history.com/#ismartcoding/plain-app&Date)
+
+## Donation
+
+Loved the project? [Consider buying me a cup of Ko-Fi!](https://ko-fi.com/ismartcoding)
+
