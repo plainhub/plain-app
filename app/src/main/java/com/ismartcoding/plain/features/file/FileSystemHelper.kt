@@ -36,15 +36,13 @@ object FileSystemHelper {
     }
 
     fun getInternalStoragePath(context: Context): String {
-        val v = storageManager.storageVolumes.find { it.isPrimary }
         return (if (isRPlus()) {
-            v?.directory?.path
+            storageManager.primaryStorageVolume.directory?.path
         } else null) ?: context.getExternalFilesDir(null)?.absolutePath?.trimEnd('/') ?: ""
     }
 
     fun getInternalStorageName(context: Context): String {
-        val v = storageManager.storageVolumes.find { it.isPrimary }
-        return v?.getDescription(context) ?: getString(R.string.internal_storage)
+        return storageManager.primaryStorageVolume.getDescription(context) ?: getString(R.string.internal_storage)
     }
 
     private fun convertFile(file: File, showHidden: Boolean): DFile {

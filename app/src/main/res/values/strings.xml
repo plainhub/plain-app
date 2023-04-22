@@ -69,6 +69,7 @@
     <string name="chat_input_hint">What\'s on your mind?</string>
     <string name="client_id">Client ID</string>
     <string name="app_version">APP version</string>
+    <string name="android_version">Android version</string>
     <string name="devices">Devices</string>
     <string name="devices_subtitle">Online {{online}} / {{total}}</string>
     <string name="online_total">Online {{online}} / {{total}}</string>

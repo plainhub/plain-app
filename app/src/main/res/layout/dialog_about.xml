@@ -21,6 +21,10 @@
             layout="@layout/view_list_item" />
 
         <include
+            android:id="@+id/android_version"
+            layout="@layout/view_list_item" />
+
+        <include
             android:id="@+id/demo_mode"
             layout="@layout/view_list_item" />
 

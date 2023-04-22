@@ -1,6 +1,7 @@
 package com.ismartcoding.plain
 
 import android.app.Application
+import android.os.Build
 import com.ismartcoding.lib.brv.utils.BRV
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.features.AppEvents
@@ -47,6 +48,10 @@ class MainApp : Application() {
 
         fun getAppVersion(): String {
             return BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")"
+        }
+
+        fun getAndroidVersion(): String {
+            return Build.VERSION.RELEASE + " (" + Build.VERSION.SDK_INT + ")"
         }
     }
 }

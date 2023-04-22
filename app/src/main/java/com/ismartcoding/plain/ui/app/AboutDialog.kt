@@ -24,6 +24,9 @@ class AboutDialog : BaseBottomSheetDialog<DialogAboutBinding>() {
             .setKeyText(R.string.app_version)
             .setValueText(MainApp.getAppVersion())
 
+        binding.androidVersion.setKeyText(R.string.android_version)
+            .setValueText(MainApp.getAndroidVersion())
+
         if (BuildConfig.DEBUG) {
             binding.demoMode
                 .setKeyText(R.string.demo_mode)

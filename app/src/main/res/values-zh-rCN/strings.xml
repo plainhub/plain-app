@@ -69,6 +69,7 @@
     <string name="chat_input_hint">您想说什么？</string>
     <string name="client_id">客户端ID</string>
     <string name="app_version">应用版本</string>
+    <string name="android_version">安卓版本</string>
     <string name="devices">设备</string>
     <string name="devices_subtitle">在线{{online}} / {{total}}</string>
     <string name="online_total">在线 {{online}} / {{total}}</string>
