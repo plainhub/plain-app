@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.app
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Intent
 import android.net.Uri
@@ -33,10 +34,8 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
     data class PermissionModel(val data: Permission) : ListItemModel()
     private val header = RvHeader()
     private fun updateNotification() {
-        binding.list.rv.bindingAdapter.removeHeader(header)
         if (wifiManager.isWifiEnabled) {
             binding.topAppBar.notification.isVisible = false
-            binding.list.rv.bindingAdapter.addHeader(header)
         } else {
             binding.topAppBar.notification.isVisible = true
             binding.topAppBar.notification.setBackgroundColor(requireContext().getColor(R.color.yellow))
@@ -44,6 +43,7 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.topAppBar.setScrollBehavior(false)
@@ -97,14 +97,14 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
 
                     b.types.initView(listOf(ChipItem(getString(R.string.recommended_https), "https"), ChipItem("HTTP", "http")), "https") { v ->
                         b.url.text = if (v == "https") {
-                            "https://${NetworkHelper.getDeviceIP4()}:8443"
+                            "https://${NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }}:8443"
                         } else {
-                            "http://${NetworkHelper.getDeviceIP4()}:8080"
+                            "http://${NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }}:8080"
                         }
                         b.tips.isVisible = v == "https"
                     }
 
-                    b.url.text = "https://${NetworkHelper.getDeviceIP4()}:8443"
+                    b.url.text = "https://${NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }}:8443"
                     b.tips.text = LocaleHelper.getString(R.string.open_website_on_desktop)
                 } else {
                     val b = getBinding<ItemRowBinding>()
@@ -127,6 +127,7 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
                 }
             }
         }
+        binding.list.rv.bindingAdapter.addHeader(header)
 
         binding.list.page.onRefresh {
             updateUI()
