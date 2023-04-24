@@ -2,6 +2,7 @@ package com.ismartcoding.plain.features.file
 
 import android.app.usage.StorageStatsManager
 import android.content.Context
+import android.os.Environment
 import android.os.storage.StorageManager
 import androidx.appcompat.app.AppCompatActivity
 import com.ismartcoding.lib.extensions.getDirectChildrenCount
@@ -17,19 +18,13 @@ import java.nio.file.attribute.PosixFileAttributes
 
 object FileSystemHelper {
     fun getMainStorageStats(context: Context): DStorageStats {
-        val externalDirs = context.getExternalFilesDirs(null)
-        val storageManager = context.getSystemService(AppCompatActivity.STORAGE_SERVICE) as StorageManager
-
         val stats = DStorageStats()
-        externalDirs.forEach { file ->
-            val storageVolume = storageManager.getStorageVolume(file) ?: return@forEach
-            if (storageVolume.isPrimary) {
-                // internal storage
-                val storageStatsManager = context.getSystemService(AppCompatActivity.STORAGE_STATS_SERVICE) as StorageStatsManager
-                val uuid = StorageManager.UUID_DEFAULT
-                stats.totalBytes = storageStatsManager.getTotalBytes(uuid)
-                stats.freeBytes = storageStatsManager.getFreeBytes(uuid)
-            }
+        storageManager.primaryStorageVolume.let {
+            // internal storage
+            val storageStatsManager = context.getSystemService(AppCompatActivity.STORAGE_STATS_SERVICE) as StorageStatsManager
+            val uuid = StorageManager.UUID_DEFAULT
+            stats.totalBytes = storageStatsManager.getTotalBytes(uuid)
+            stats.freeBytes = storageStatsManager.getFreeBytes(uuid)
         }
 
         return stats
@@ -38,7 +33,7 @@ object FileSystemHelper {
     fun getInternalStoragePath(context: Context): String {
         return (if (isRPlus()) {
             storageManager.primaryStorageVolume.directory?.path
-        } else null) ?: context.getExternalFilesDir(null)?.absolutePath?.trimEnd('/') ?: ""
+        } else null) ?: Environment.getExternalStorageDirectory()?.absolutePath?.trimEnd('/') ?: ""
     }
 
     fun getInternalStorageName(context: Context): String {
