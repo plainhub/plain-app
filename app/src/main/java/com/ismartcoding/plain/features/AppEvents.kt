@@ -41,11 +41,14 @@ import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.engine.*
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
+import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.seconds
 
 class BoxConnectivityStateChangedEvent
@@ -75,6 +78,7 @@ class VocabularyWordsDeletedEvent(val id: String)
 class VocabularyWordsUpdatedEvent(val id: String)
 
 class EnableWebConsoleEvent(val isEnabled: Boolean)
+
 class ConfirmToAcceptLoginEvent(
     val session: DefaultWebSocketServerSession, val clientId: String, val browserName: String,
     val browserVersion: String, val osName: String, val osVersion: String, val isMobile: Boolean

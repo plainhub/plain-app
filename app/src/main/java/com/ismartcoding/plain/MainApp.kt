@@ -13,8 +13,10 @@ import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import com.tencent.mmkv.MMKV
 import com.tencent.mmkv.MMKVLogLevel
+import io.ktor.server.netty.*
 
 class MainApp : Application() {
+    var httpServer: NettyApplicationEngine? = null
 
     override fun onCreate() {
         super.onCreate()

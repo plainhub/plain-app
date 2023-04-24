@@ -13,6 +13,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.ismartcoding.lib.brv.utils.linear
 import com.ismartcoding.lib.brv.utils.models
 import com.ismartcoding.lib.brv.utils.setup
+import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.upnp.UPnPController
 import com.ismartcoding.lib.upnp.UPnPDevice
@@ -20,10 +21,12 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.IMedia
 import com.ismartcoding.plain.databinding.DialogScreencastBinding
 import com.ismartcoding.plain.databinding.ViewListItemBinding
+import com.ismartcoding.plain.features.StartHttpServerEvent
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.ui.extensions.setClick
 import com.ismartcoding.plain.ui.extensions.setKeyText
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.CastViewModel
 import kotlinx.coroutines.launch
 
@@ -33,6 +36,7 @@ class CastDialog(val items: List<IMedia>, private val singlePath: String = "") :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[CastViewModel::class.java]
+        sendEvent(StartHttpServerEvent())
         binding.list.rv.isNestedScrollingEnabled = false
         binding.list.rv.linear().setup {
             addType<UPnPDevice>(R.layout.view_list_item)

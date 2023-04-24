@@ -88,6 +88,7 @@ android {
 
     packagingOptions {
         jniLibs {
+            useLegacyPackaging = true
             excludes += listOf("META-INF/*")
         }
         resources {
@@ -109,7 +110,7 @@ android {
 }
 
 dependencies {
-    val roomVersion = "2.5.0"
+    val roomVersion = "2.5.1"
     val apolloVersion = "3.2.1"
     val kgraphqlVersion = "0.18.1"
     val ktorVersion = "2.0.3"

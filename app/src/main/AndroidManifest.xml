@@ -104,6 +104,14 @@
                 <action android:name="android.hardware.usb.action.USB_STATE" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name=".receivers.HttpServerStopBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.ismartcoding.plain.action.stop_http_server" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

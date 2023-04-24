@@ -83,6 +83,7 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
                         sendEvent(HttpServerEnabledEvent(isEnabled))
                         if (isEnabled) {
                             requestIgnoreBatteryOptimization()
+                            sendEvent(StartHttpServerEvent())
                         }
                     }
                     b.password.run {
@@ -135,6 +136,10 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
         }.showLoading()
 
         receiveEvent<PermissionResultEvent> {
+            binding.list.page.refresh()
+        }
+
+        receiveEvent<HttpServerEnabledEvent> {
             binding.list.page.refresh()
         }
 
