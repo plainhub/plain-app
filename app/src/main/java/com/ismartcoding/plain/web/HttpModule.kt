@@ -144,7 +144,7 @@ fun Application.module() {
                     call.respondBytes(bytes!!)
                 } else {
                     val file = File(path)
-                    val fileName = URLEncoder.encode(file.name, "UTF-8")
+                    val fileName = URLEncoder.encode(q["name"] ?:file.name, "UTF-8")
                     if (q["dl"] == "1") {
                         call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
                     } else {

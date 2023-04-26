@@ -33,6 +33,7 @@ import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.features.*
 import com.ismartcoding.plain.features.aichat.AIChatHelper
+import com.ismartcoding.plain.features.application.ApplicationHelper
 import com.ismartcoding.plain.features.audio.AudioHelper
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
@@ -65,6 +66,7 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.application.Application
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -308,6 +310,16 @@ class SXGraphQL(val schema: Schema) {
                         SimHelper.getAll().map { it.toModel() }
                     }
                 }
+                query("apps") {
+                    resolver { offset: Int, limit: Int, query: String ->
+                        ApplicationHelper.search(query, limit, offset).map { it.toModel() }
+                    }
+                }
+                query("appCount") {
+                    resolver { query: String ->
+                        ApplicationHelper.count(query)
+                    }
+                }
                 query("storageStats") {
                     resolver { ->
                         FileSystemHelper.getMainStorageStats(MainApp.instance).toModel()
@@ -433,6 +445,14 @@ class SXGraphQL(val schema: Schema) {
                 query("fileIds") {
                     resolver { paths: List<String> ->
                         paths.map { FileHelper.getFileId(it) }
+                    }
+                }
+                mutation("uninstallApps") {
+                    resolver { ids: List<ID> ->
+                        ids.forEach {
+                            ApplicationHelper.uninstall(MainActivity.instance.get()!!, it.value)
+                        }
+                        true
                     }
                 }
                 mutation("updateAIChatConfig") {
