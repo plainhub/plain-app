@@ -9,19 +9,20 @@ import com.ismartcoding.lib.brv.utils.models
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.lib.helpers.FormatHelper
+import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.ChatItemFilesBinding
 import com.ismartcoding.plain.databinding.ItemChatFileBinding
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageFiles
-import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
-import com.ismartcoding.plain.features.audio.DPlaylistAudio
 import com.ismartcoding.plain.features.audio.AudioPlayerService
+import com.ismartcoding.plain.features.audio.DPlaylistAudio
 import com.ismartcoding.plain.ui.PdfViewerDialog
 import com.ismartcoding.plain.ui.TextEditorDialog
-import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
+import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import com.ismartcoding.plain.ui.preview.TransitionHelper
 
@@ -44,7 +45,11 @@ fun ChatItemFilesBinding.initView() {
                 AudioPlayerDialog().show()
                 Permissions.checkNotification()
             } else if (m.uri.isTextFile()) {
-                TextEditorDialog(m.uri).show()
+                if (m.size <= Constants.MAX_READABLE_TEXT_FILE_SIZE) {
+                    TextEditorDialog(m.uri).show()
+                } else {
+                    DialogHelper.showMessage(R.string.text_file_size_limit)
+                }
             } else if (m.uri.isPdfFile()) {
                 PdfViewerDialog(m.uri).show()
             }

@@ -16,6 +16,7 @@ import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
+import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.ActionSourceType
@@ -127,7 +128,11 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
                     AudioPlayerDialog().show()
                     Permissions.checkNotification()
                 } else if (m.data.path.isTextFile()) {
-                    TextEditorDialog(m.data.path).show()
+                    if (m.data.size <= Constants.MAX_READABLE_TEXT_FILE_SIZE) {
+                        TextEditorDialog(m.data.path).show()
+                    } else {
+                        DialogHelper.showMessage(R.string.text_file_size_limit)
+                    }
                 } else if (m.data.path.isPdfFile()) {
                     PdfViewerDialog(m.data.path).show()
                 }
