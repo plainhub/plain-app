@@ -2,9 +2,10 @@ package com.ismartcoding.lib.helpers
 
 import org.bouncycastle.asn1.x500.X500NameBuilder
 import org.bouncycastle.asn1.x500.style.BCStyle
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
 import org.bouncycastle.cert.X509CertificateHolder
+import org.bouncycastle.cert.X509v3CertificateBuilder
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
-import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
 import java.math.BigInteger
@@ -39,13 +40,16 @@ object JksHelper {
             .addRDN(BCStyle.CN, commonName)
             .addRDN(BCStyle.O, commonName)
             .build()
-        val certificateBuilder = JcaX509v3CertificateBuilder(
+        val certificateBuilder = X509v3CertificateBuilder(
             x500Name,
             BigInteger.valueOf(System.currentTimeMillis()),
             calculateDate(0),
             calculateDate(24 * 365 * 20),
+            Locale.ENGLISH,
             x500Name,
-            keyPair.public
+            SubjectPublicKeyInfo.getInstance(
+                keyPair.public.encoded
+            )
         )
         val contentSigner = JcaContentSignerBuilder(sigAlg).setProvider("BC").build(keyPair.private)
         return certificateBuilder.build(contentSigner)
