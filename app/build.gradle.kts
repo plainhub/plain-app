@@ -31,14 +31,14 @@ android {
 
         val abiFilterList = if (hasProperty("abiFilters")) property("abiFilters").toString().split(';') else listOf()
         val singleAbiNum = when (abiFilterList.takeIf { it.size == 1 }?.first()) {
-            "armeabi-v7a" -> 2
-            "arm64-v8a" -> 1
+            "x86_64" -> 2
+            "armeabi-v7a" -> 1
             else -> 0
         }
 
-        val vCode = 24
+        val vCode = 27
         versionCode = vCode - singleAbiNum
-        versionName = "1.0.18"
+        versionName = "1.0.19"
 
         ndk {
             abiFilters += abiFilterList
