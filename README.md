@@ -23,6 +23,7 @@ PlainApp is an open-source application that allows you to manage your phone thro
 - Backup and export: Backup and export your app data for safekeeping.
 - ChatGPT conversation UI (web only)
 - SMS, Calls: Read your SMS and calls on webpage.(Apk only)
+- Apps: View your apps and download apk from phone.(web only)
 - And more features are planned for the future.
 
 PlainApp's minimalist design is intentional, so you can focus on what matters most: your valuable data.

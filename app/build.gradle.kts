@@ -36,9 +36,9 @@ android {
             else -> 0
         }
 
-        val vCode = 21
+        val vCode = 24
         versionCode = vCode - singleAbiNum
-        versionName = "1.0.17"
+        versionName = "1.0.18"
 
         ndk {
             abiFilters += abiFilterList
