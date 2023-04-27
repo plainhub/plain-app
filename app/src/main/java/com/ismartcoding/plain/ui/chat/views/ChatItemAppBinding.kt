@@ -11,6 +11,7 @@ import com.ismartcoding.plain.features.theme.AppTheme
 import com.ismartcoding.plain.features.theme.AppThemeHelper
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.SelectOptionsDialog
+import com.ismartcoding.plain.ui.WebDialog
 import com.ismartcoding.plain.ui.app.AboutDialog
 import com.ismartcoding.plain.ui.app.BackupRestoreDialog
 import com.ismartcoding.plain.ui.extensions.*
@@ -48,6 +49,14 @@ fun ChatItemAppBinding.initView() {
         .setClick {
             BackupRestoreDialog().show()
         }
+
+    donation.initTheme()
+        .setKeyText(R.string.donation)
+        .showMore()
+        .setClick {
+            WebDialog("https://ko-fi.com/ismartcoding").show()
+        }
+
     about.initTheme()
         .setKeyText(R.string.about)
         .showMore()

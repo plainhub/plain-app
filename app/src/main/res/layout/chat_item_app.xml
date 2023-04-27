@@ -31,6 +31,10 @@
                 layout="@layout/view_list_item" />
 
             <include
+                android:id="@+id/donation"
+                layout="@layout/view_list_item" />
+
+            <include
                 android:id="@+id/about"
                 layout="@layout/view_list_item" />
         </com.ismartcoding.lib.roundview.RoundLinearLayout>

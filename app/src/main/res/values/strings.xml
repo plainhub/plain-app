@@ -435,6 +435,7 @@
     <string name="app_restored">APP data is restored, you need to force quit this app and start the app again as new.</string>
     <string name="welcome_text">Welcome to use this app, sending the command :app can get app settings menu. Learn more: https://youtu.be/RvO18j4r95o</string>
     <string name="demo_mode">Demo mode</string>
+    <string name="donation">Donation</string>
     <string name="keep_screen_on">Keep screen on</string>
     <string name="text_file_size_limit">Only files with a size of 10MB or less are permitted to be opened.</string>
     <string name="keep_screen_on_confirm">You have chosen to cast multiple items. To ensure smooth playback, we will keep your phone screen on during the casting process. You can cancel this at any time from the main screen menu.</string>
