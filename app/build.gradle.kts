@@ -31,8 +31,8 @@ android {
 
         val abiFilterList = if (hasProperty("abiFilters")) property("abiFilters").toString().split(';') else listOf()
         val singleAbiNum = when (abiFilterList.takeIf { it.size == 1 }?.first()) {
-            "x86_64" -> 2
-            "armeabi-v7a" -> 1
+            "armeabi-v7a" -> 2
+            "arm64-v8a" -> 1
             else -> 0
         }
 
@@ -127,13 +127,13 @@ dependencies {
     implementation("androidx.paging:paging-runtime-ktx:3.1.1")
     implementation("androidx.preference:preference-ktx:1.2.0")
 
-    implementation("androidx.core:core-splashscreen:1.0.0")
+    implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("com.github.bmoliveira:snake-yaml:v1.18-android")
 
     // CameraX
-    implementation("androidx.camera:camera-camera2:1.3.0-alpha05")
-    implementation("androidx.camera:camera-lifecycle:1.3.0-alpha05")
-    implementation("androidx.camera:camera-view:1.3.0-alpha05")
+    implementation("androidx.camera:camera-camera2:1.3.0-alpha06")
+    implementation("androidx.camera:camera-lifecycle:1.3.0-alpha06")
+    implementation("androidx.camera:camera-view:1.3.0-alpha06")
 
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")

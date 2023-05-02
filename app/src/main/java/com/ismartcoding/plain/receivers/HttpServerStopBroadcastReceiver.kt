@@ -6,7 +6,7 @@ import android.content.Intent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.features.HttpServerEnabledEvent
-import com.ismartcoding.plain.web.HttpServerService
+import com.ismartcoding.plain.services.HttpServerService
 
 class HttpServerStopBroadcastReceiver : BroadcastReceiver() {
 

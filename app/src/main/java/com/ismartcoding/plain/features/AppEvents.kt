@@ -32,7 +32,7 @@ import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.exchange.DExchangeRates
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
-import com.ismartcoding.plain.web.HttpServerService
+import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import com.ismartcoding.plain.web.websocket.WebSocketHelper
@@ -48,7 +48,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
-import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.seconds
 
 class BoxConnectivityStateChangedEvent
@@ -57,6 +56,7 @@ class UpdateLocaleEvent
 class HttpServerEnabledEvent(val enabled: Boolean)
 
 class StartHttpServerEvent
+class StartScreenCaptureEvent
 
 
 class SendMessageEvent(val content: DMessageContent)

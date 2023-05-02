@@ -15,7 +15,7 @@ import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.DialogSleepTimerBinding
 import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.features.audio.AudioPlayerService
+import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.features.audio.AudioServiceAction
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog

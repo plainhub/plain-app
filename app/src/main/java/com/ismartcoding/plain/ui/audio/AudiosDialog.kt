@@ -3,9 +3,7 @@ package com.ismartcoding.plain.ui.audio
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
 import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.brv.utils.getModelList
 import com.ismartcoding.lib.brv.utils.linear
@@ -21,7 +19,7 @@ import com.ismartcoding.plain.data.enums.TagType
 import com.ismartcoding.plain.features.*
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioHelper
-import com.ismartcoding.plain.features.audio.AudioPlayerService
+import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.features.file.MediaType
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.extensions.checkPermission

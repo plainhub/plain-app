@@ -10,6 +10,7 @@ import kotlinx.datetime.Instant
 import java.io.File
 
 object ApplicationHelper {
+    private val appLabelCache: MutableMap<String, String> = HashMap()
 
     fun search(query: String, limit: Int, offset: Int): List<DApplication> {
         val packages = packageManager.getInstalledPackages(0)
@@ -36,10 +37,11 @@ object ApplicationHelper {
             if (type.isNotEmpty() && appType != type) {
                 return@forEach
             }
+
             apps.add(
                 DApplication(
                     packageInfo.packageName,
-                    packageManager.getApplicationLabel(packageInfo).toString(),
+                    getLabel(packageInfo),
                     appType,
                     app.versionName,
                     packageInfo.sourceDir,
@@ -55,6 +57,15 @@ object ApplicationHelper {
 
     fun count(query: String): Int {
         return search(query, Int.MAX_VALUE, 0).count()
+    }
+
+    private fun getLabel(packageInfo: ApplicationInfo): String {
+        val key = packageInfo.packageName
+        if (!appLabelCache.containsKey(key)) {
+            appLabelCache[key] = packageInfo.loadLabel(packageManager).toString()
+        }
+
+        return appLabelCache[key] ?: ""
     }
 
     fun uninstall(context: Context, packageName: String) {

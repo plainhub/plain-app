@@ -92,13 +92,16 @@
         </activity>
 
         <service
-            android:name=".web.HttpServerService"
+            android:name=".services.HttpServerService"
             android:exported="false"
             android:stopWithTask="true" />
 
         <service
-            android:name=".features.audio.AudioPlayerService"
+            android:name=".services.AudioPlayerService"
             android:foregroundServiceType="mediaPlayback" />
+
+        <service
+            android:name=".services.ScreenMirroringService" android:foregroundServiceType="mediaProjection"  />
 
         <receiver
             android:name=".receivers.PlugInControlReceiver"

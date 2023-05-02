@@ -16,7 +16,7 @@ import com.ismartcoding.plain.databinding.ItemChatFileBinding
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.features.Permissions
-import com.ismartcoding.plain.features.audio.AudioPlayerService
+import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
 import com.ismartcoding.plain.ui.PdfViewerDialog
 import com.ismartcoding.plain.ui.TextEditorDialog

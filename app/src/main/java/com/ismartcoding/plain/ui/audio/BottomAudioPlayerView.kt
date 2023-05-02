@@ -11,7 +11,7 @@ import com.ismartcoding.plain.features.AudioActionEvent
 import com.ismartcoding.plain.databinding.ViewBottomAudioPlayerBinding
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.features.audio.AudioPlayerService
+import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.extensions.setSafeClick
 import com.ismartcoding.plain.ui.views.CustomViewBase
 

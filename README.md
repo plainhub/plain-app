@@ -8,7 +8,7 @@ PlainApp is an open-source application that allows you to manage your phone thro
 
 ## Features
 
-- Privacy oriented: We take your privacy seriously and use TLS + AES256-GCM encryption to ensure your data is secure.
+- Privacy oriented: We take your privacy seriously and use TLS + AES-GCM-256 encryption to ensure your data is secure.
 - Ad-free forever: You won't be bombarded with ads when using PlainApp.
 - No cloud services or third-party data storage: All data is kept on your device, so you have complete control over your information.
 - No Firebase Cloud Messaging/Analytics: We don't track your activity or use your data for advertising purposes. We only collect crash logs through Firebase Crashlytics.

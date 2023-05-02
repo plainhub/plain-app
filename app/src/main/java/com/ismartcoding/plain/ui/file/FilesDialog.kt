@@ -26,7 +26,7 @@ import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.Permissions
-import com.ismartcoding.plain.features.audio.AudioPlayerService
+import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper

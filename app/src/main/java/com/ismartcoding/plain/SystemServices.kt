@@ -5,6 +5,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.media.projection.MediaProjectionManager
 import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
 import android.os.PowerManager
@@ -46,3 +47,8 @@ val wifiManager: WifiManager by lazy {
 val connectivityManager: ConnectivityManager by lazy {
     MainApp.instance.getSystemServiceCompat(ConnectivityManager::class.java)
 }
+
+val mediaProjectionManager: MediaProjectionManager by lazy {
+    MainApp.instance.getSystemServiceCompat(MediaProjectionManager::class.java)
+}
+

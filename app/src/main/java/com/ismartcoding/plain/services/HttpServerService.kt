@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.web
+package com.ismartcoding.plain.services
 
 import android.app.Notification
 import android.app.PendingIntent
@@ -12,6 +12,7 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.receivers.HttpServerStopBroadcastReceiver
+import com.ismartcoding.plain.web.HttpServerManager
 import kotlin.concurrent.thread
 
 class HttpServerService : LifecycleService() {
