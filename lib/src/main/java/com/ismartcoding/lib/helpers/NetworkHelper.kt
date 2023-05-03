@@ -36,7 +36,7 @@ object NetworkHelper {
     fun getDeviceIP4(): String {
         try {
             val en = NetworkInterface.getNetworkInterfaces()
-            while (en.hasMoreElements()) {
+            while (en?.hasMoreElements() == true) {
                 val intf = en.nextElement()
                 val enumIpAddr = intf.inetAddresses
                 while (enumIpAddr.hasMoreElements()) {
