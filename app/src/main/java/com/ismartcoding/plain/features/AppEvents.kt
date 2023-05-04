@@ -56,7 +56,7 @@ class UpdateLocaleEvent
 class HttpServerEnabledEvent(val enabled: Boolean)
 
 class StartHttpServerEvent
-class StartScreenCaptureEvent
+class StartScreenMirrorEvent
 
 
 class SendMessageEvent(val content: DMessageContent)

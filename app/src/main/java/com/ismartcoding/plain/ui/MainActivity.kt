@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
-import android.hardware.display.DisplayManager
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
@@ -43,6 +42,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getStringF
 import com.ismartcoding.plain.features.theme.AppThemeHelper
 import com.ismartcoding.plain.mediaProjectionManager
+import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.chat.SendMessageDialog
 import com.ismartcoding.plain.ui.extensions.*
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -51,7 +51,6 @@ import com.ismartcoding.plain.ui.models.ShowMessageEvent
 import com.ismartcoding.plain.web.*
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
-import com.ismartcoding.plain.web.websocket.WebSocketHelper
 import io.ktor.server.request.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.launch
@@ -65,15 +64,16 @@ class MainActivity : AppCompatActivity() {
 
     private val screenCapture = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-            val mediaProjection = mediaProjectionManager.getMediaProjection(result.resultCode, result.data!!)
-            val metrics = resources.displayMetrics
-            val densityDpi = metrics.densityDpi
-            val width = metrics.widthPixels
-            val height = metrics.heightPixels
-            val virtualDisplay = mediaProjection.createVirtualDisplay(
-                "ScreenCapture", width, height, densityDpi,
-                DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, null, null, null
-            )
+            if (ScreenMirrorService.instance == null) {
+                val metrics = resources.displayMetrics
+                val service = Intent(this, ScreenMirrorService::class.java)
+                service.putExtra("code", result.resultCode)
+                service.putExtra("data", result.data!!)
+                service.putExtra("width", metrics.widthPixels)
+                service.putExtra("height", metrics.heightPixels)
+                service.putExtra("density", metrics.densityDpi)
+                startService(service)
+            }
         }
     }
 
@@ -254,7 +254,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        receiveEvent<StartScreenCaptureEvent> {
+        receiveEvent<StartScreenMirrorEvent> {
             screenCapture.launch(mediaProjectionManager.createScreenCaptureIntent())
         }
 
@@ -334,7 +334,7 @@ class MainActivity : AppCompatActivity() {
                             }
                             HttpServerManager.loadTokenCache()
                             session.send(
-                                WebSocketHelper.encrypt(
+                                CryptoHelper.aesEncrypt(
                                     HttpServerManager.passwordToToken(), JsonHelper.jsonEncode(
                                         AuthResponse(
                                             AuthStatus.COMPLETED,

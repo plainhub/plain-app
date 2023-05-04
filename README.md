@@ -24,6 +24,7 @@ PlainApp is an open-source application that allows you to manage your phone thro
 - ChatGPT conversation UI (web only)
 - SMS, Calls: Read your SMS and calls on webpage.(Apk only)
 - Apps: View your apps and download apk from phone.(web only)
+- Screen mirror: Mirror your phone on webpage.
 - And more features are planned for the future.
 
 PlainApp's minimalist design is intentional, so you can focus on what matters most: your valuable data.
@@ -31,6 +32,12 @@ PlainApp's minimalist design is intentional, so you can focus on what matters mo
 Video: https://www.youtube.com/watch?v=RvO18j4r95o
 
 Reddit: https://www.reddit.com/r/plainapp
+
+## Disclaimer
+
+- ⚠️ The project is under **very active** development.
+- ⚠️ Expect bugs and breaking changes.
+- ⚠️ It is not perfect, I am always looking for ways to improve. If you find that the app is missing a certain feature, please don't hesitate to submit a feature request.
 
 ## Screenshots
 

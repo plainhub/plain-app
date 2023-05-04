@@ -1,17 +1,12 @@
 package com.ismartcoding.plain.services
 
-import android.app.Notification
-import android.app.PendingIntent
 import android.content.Intent
-import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.helpers.NotificationHelper
-import com.ismartcoding.plain.receivers.HttpServerStopBroadcastReceiver
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlin.concurrent.thread
 
@@ -35,31 +30,13 @@ class HttpServerService : LifecycleService() {
                 LogCat.e(ex.toString())
             }
         }
-        startForeground(1, createNotification())
-        return START_STICKY
-    }
-
-    private fun createNotification(): Notification {
-        val stopPendingIntent = PendingIntent.getBroadcast(
-            this, 0,
-            Intent(this, HttpServerStopBroadcastReceiver::class.java).apply {
-                action = "com.ismartcoding.plain.action.stop_http_server"
-            }, PendingIntent.FLAG_IMMUTABLE
+        val notification = NotificationHelper.createServiceNotification(
+            this,
+            "com.ismartcoding.plain.action.stop_http_server",
+            getString(R.string.api_service_is_running)
         )
-
-        return NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL_ID).apply {
-            setSmallIcon(R.drawable.ic_notification)
-            setContentTitle(getString(R.string.app_name))
-            setContentText(getString(R.string.api_service_is_running))
-            setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            setOnlyAlertOnce(true)
-            setSilent(true)
-            setWhen(System.currentTimeMillis())
-            setAutoCancel(false)
-            setContentIntent(NotificationHelper.createContentIntent(this@HttpServerService))
-            addAction(-1, getString(R.string.stop_service), stopPendingIntent)
-            setStyle(NotificationCompat.DecoratedCustomViewStyle())
-        }.build()
+        startForeground(1, notification)
+        return START_STICKY
     }
 
     fun stop() {

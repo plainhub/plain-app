@@ -275,6 +275,7 @@
     <string name="system_permission_not_granted">System permission not granted</string>
     <string name="open_permission_settings">Open permission settings</string>
     <string name="api_service_is_running">API service is running</string>
+    <string name="screen_mirror_service_is_running">Screen mirror service is running</string>
     <string name="stop_service">Stop service</string>
     <string name="cast">Cast</string>
     <string name="images">Images</string>

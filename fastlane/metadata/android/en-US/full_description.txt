@@ -16,6 +16,7 @@ Features:
   - ChatGPT conversation UI (web only)
   - SMS, Calls: Read your SMS and calls on webpage.
   - Apps: View your apps and download apk from phone.(web only)
+  - Screen mirror: Mirror your phone on webpage.
   - And more features are planned for the future.
 
 Github: https://github.com/ismartcoding/plain-app

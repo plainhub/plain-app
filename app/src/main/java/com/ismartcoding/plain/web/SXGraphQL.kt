@@ -58,6 +58,7 @@ import com.ismartcoding.plain.features.theme.AppTheme
 import com.ismartcoding.plain.features.video.VideoHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
+import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.web.loaders.TagsLoader
 import com.ismartcoding.plain.web.models.*
@@ -325,6 +326,11 @@ class SXGraphQL(val schema: Schema) {
                         FileSystemHelper.getMainStorageStats(MainApp.instance).toModel()
                     }
                 }
+                query("screenMirrorImage") {
+                    resolver { ->
+                        ScreenMirrorService.instance?.getLatestImageBase64() ?: ""
+                    }
+                }
                 query("files") {
                     resolver { dir: String, showHidden: Boolean ->
                         Permission.WRITE_EXTERNAL_STORAGE.check()
@@ -574,6 +580,19 @@ class SXGraphQL(val schema: Schema) {
                             this.name = name
                         }
                         FeedHelper.getById(id.value)?.toModel()
+                    }
+                }
+                mutation("startScreenMirror") {
+                    resolver { ->
+                        sendEvent(StartScreenMirrorEvent())
+                        true
+                    }
+                }
+                mutation("stopScreenMirror") {
+                    resolver { ->
+                        ScreenMirrorService.instance?.stop()
+                        ScreenMirrorService.instance = null
+                        true
                     }
                 }
                 mutation("createContactGroup") {

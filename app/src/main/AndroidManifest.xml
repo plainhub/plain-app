@@ -101,7 +101,8 @@
             android:foregroundServiceType="mediaPlayback" />
 
         <service
-            android:name=".services.ScreenMirroringService" android:foregroundServiceType="mediaProjection"  />
+            android:name=".services.ScreenMirrorService"
+            android:foregroundServiceType="mediaProjection"  />
 
         <receiver
             android:name=".receivers.PlugInControlReceiver"
@@ -112,10 +113,11 @@
         </receiver>
 
         <receiver
-            android:name=".receivers.HttpServerStopBroadcastReceiver"
+            android:name=".receivers.ServiceStopBroadcastReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.ismartcoding.plain.action.stop_http_server" />
+                <action android:name="com.ismartcoding.plain.action.stop_screen_mirror" />
             </intent-filter>
         </receiver>
     </application>

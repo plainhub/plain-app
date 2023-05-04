@@ -275,6 +275,7 @@
     <string name="system_permission_not_granted">未获取系统权限</string>
     <string name="open_permission_settings">打开系统权限设置</string>
     <string name="api_service_is_running">API服务运行中</string>
+    <string name="screen_mirror_service_is_running">屏幕镜像服务运行中</string>
     <string name="stop_service">停止服务</string>
     <string name="cast">投屏</string>
     <string name="images">图片</string>

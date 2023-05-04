@@ -2,9 +2,10 @@ package com.ismartcoding.plain.web
 
 import android.net.Uri
 import android.os.Build
-import android.util.Base64
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.*
+import com.ismartcoding.lib.extensions.isImageFast
+import com.ismartcoding.lib.extensions.scanFileByConnection
+import com.ismartcoding.lib.extensions.toThumbBytes
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper
@@ -16,7 +17,6 @@ import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.UrlHelper
-import com.ismartcoding.plain.web.websocket.WebSocketHelper
 import com.ismartcoding.plain.web.websocket.WebSocketSession
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -270,17 +270,17 @@ fun Application.module() {
             try {
                 for (frame in incoming) {
                     when (frame) {
-                        is Frame.Text -> {
+                        is Frame.Binary -> {
                             if (q["auth"] == "1") {
                                 var r: AuthRequest? = null
                                 val hash = CryptoHelper.sha512(HttpServerManager.password.toByteArray())
                                 val token = HttpServerManager.hashToToken(hash)
-                                val decryptedBytes = CryptoHelper.aesDecrypt(token, Base64.decode(frame.readText(), Base64.NO_WRAP))
+                                val decryptedBytes = CryptoHelper.aesDecrypt(token, frame.readBytes())
                                 if (decryptedBytes != null) {
                                     r = Json.decodeFromString<AuthRequest>(decryptedBytes.decodeToString())
                                 }
                                 if (r?.password == hash) {
-                                    send(WebSocketHelper.encrypt(token, JsonHelper.jsonEncode(AuthResponse(AuthStatus.PENDING))))
+                                    send(CryptoHelper.aesEncrypt(token, JsonHelper.jsonEncode(AuthResponse(AuthStatus.PENDING))))
                                     sendEvent(ConfirmToAcceptLoginEvent(this, clientId, r.browserName, r.browserVersion, r.osName, r.osVersion, r.isMobile))
                                 } else {
                                     close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "invalid_password"))
@@ -288,7 +288,7 @@ fun Application.module() {
                             } else {
                                 val token = HttpServerManager.tokenCache[clientId]
                                 if (token != null) {
-                                    val decryptedBytes = CryptoHelper.aesDecrypt(token, Base64.decode(frame.readText(), Base64.NO_WRAP))
+                                    val decryptedBytes = CryptoHelper.aesDecrypt(token, frame.readBytes())
                                     if (decryptedBytes != null) {
                                         LogCat.d("add session ${session.id}, ts: ${decryptedBytes.decodeToString()}")
                                         HttpServerManager.wsSessions.add(session)

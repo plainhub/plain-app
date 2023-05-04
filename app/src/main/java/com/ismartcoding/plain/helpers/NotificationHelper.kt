@@ -1,15 +1,18 @@
 package com.ismartcoding.plain.helpers
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import androidx.core.app.NotificationCompat
+import com.ismartcoding.lib.extensions.notificationManager
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
-import com.ismartcoding.lib.extensions.notificationManager
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.receivers.ServiceStopBroadcastReceiver
 
 object NotificationHelper {
     fun createContentIntent(context: Context): PendingIntent {
@@ -27,5 +30,27 @@ object NotificationHelper {
                 setShowBadge(false)
             })
         }
+    }
+
+    fun createServiceNotification(context: Context, action: String, title: String): Notification {
+        val stopPendingIntent = PendingIntent.getBroadcast(
+            context, 0,
+            Intent(context, ServiceStopBroadcastReceiver::class.java).apply {
+                this.action = action
+            }, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        return NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID).apply {
+            setSmallIcon(R.drawable.ic_notification)
+            setContentTitle(title)
+            setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            setOnlyAlertOnce(true)
+            setSilent(true)
+            setWhen(System.currentTimeMillis())
+            setAutoCancel(false)
+            setContentIntent(NotificationHelper.createContentIntent(context))
+            addAction(-1, getString(R.string.stop_service), stopPendingIntent)
+            setStyle(NotificationCompat.DecoratedCustomViewStyle())
+        }.build()
     }
 }
