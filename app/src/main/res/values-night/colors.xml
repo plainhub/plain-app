@@ -16,6 +16,7 @@
     <color name="color_on_primary">#000000</color>
     <color name="color_placeholder">#343338</color>
     <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">#FFFFFF</color>
+    <color name="launcher_background">#FFFFFF</color>
     <color name="splash_icon">#FFFFFF</color>
     <color name="fast_scroll_handle">#512da8</color>
     <color name="control_highlight">#40FFFFFF</color>

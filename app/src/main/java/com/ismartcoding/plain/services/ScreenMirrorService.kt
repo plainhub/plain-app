@@ -105,7 +105,7 @@ class ScreenMirrorService : LifecycleService() {
     }
     private fun bitmapToBase64Image(bitmap: Bitmap): String {
         val maxSize = 100 * 1024 // 100KB
-        val maxWidth = 560
+        val maxWidth = 500
         var newBitmap = bitmap
         if (mScreenWidth > maxWidth) {
             val scaleRatio = maxWidth.toFloat() / mScreenWidth.toFloat()
