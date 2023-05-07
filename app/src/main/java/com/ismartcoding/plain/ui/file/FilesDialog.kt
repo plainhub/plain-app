@@ -124,9 +124,12 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
                         initKey = m.data.path,
                     )
                 } else if (m.data.path.isAudioFast()) {
-                    AudioPlayerService.play(requireContext(), DPlaylistAudio.fromPath(context, m.data.path))
-                    AudioPlayerDialog().show()
-                    Permissions.checkNotification()
+                    try {
+                        AudioPlayerService.play(requireContext(), DPlaylistAudio.fromPath(context, m.data.path))
+                        AudioPlayerDialog().show()
+                        Permissions.checkNotification()
+                    } catch (ex: Exception) {
+                    }
                 } else if (m.data.path.isTextFile()) {
                     if (m.data.size <= Constants.MAX_READABLE_TEXT_FILE_SIZE) {
                         TextEditorDialog(m.data.path).show()

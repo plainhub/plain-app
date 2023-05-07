@@ -32,6 +32,7 @@ import com.ismartcoding.plain.wifiManager
 
 class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
     data class PermissionModel(val data: Permission) : ListItemModel()
+
     private val header = RvHeader()
     private fun updateNotification() {
         if (wifiManager.isWifiEnabled) {
@@ -164,13 +165,17 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
     }
 
     private fun requestIgnoreBatteryOptimization() {
-        val packageName = BuildConfig.APPLICATION_ID
-        val pm = requireContext().getSystemService(Application.POWER_SERVICE) as PowerManager
-        if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-            val intent = Intent()
-            intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-            intent.data = Uri.parse("package:$packageName")
-            startActivity(intent)
+        try {
+            val packageName = BuildConfig.APPLICATION_ID
+            val pm = requireContext().getSystemService(Application.POWER_SERVICE) as PowerManager
+            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                val intent = Intent()
+                intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                intent.data = Uri.parse("package:$packageName")
+                startActivity(intent)
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
         }
     }
 }
