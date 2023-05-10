@@ -9,6 +9,7 @@ import com.ismartcoding.lib.extensions.toThumbBytes
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.lib.helpers.ZipHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.upnp.UPnPController
 import com.ismartcoding.plain.LocalStorage
@@ -46,6 +47,7 @@ import java.net.URLEncoder
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.*
+import java.util.zip.ZipOutputStream
 import kotlin.text.toByteArray
 
 
@@ -130,6 +132,31 @@ fun Application.module() {
             }
         }
 
+        get("/zip/dir") {
+            val q = call.request.queryParameters
+            val id = q["id"] ?: ""
+            if (id.isEmpty()) {
+                call.respond(HttpStatusCode.BadRequest)
+                return@get
+            }
+
+            val path = FileHelper.getFilePath(id)
+            val folder = File(path)
+            if (!folder.exists() || !folder.isDirectory) {
+                call.respond(HttpStatusCode.NotFound)
+                return@get
+            }
+
+            val fileName = URLEncoder.encode(q["name"] ?: (folder.name + ".zip"), "UTF-8")
+            call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
+            call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
+            call.respondOutputStream(ContentType.Application.Zip) {
+                ZipOutputStream(this).use { zip ->
+                    ZipHelper.zipFolderToStreamAsync(folder, zip)
+                }
+            }
+        }
+
         get("/fs") {
             val q = call.request.queryParameters
             val id = q["id"] ?: ""
@@ -144,7 +171,7 @@ fun Application.module() {
                     call.respondBytes(bytes!!)
                 } else {
                     val file = File(path)
-                    val fileName = URLEncoder.encode(q["name"] ?:file.name, "UTF-8")
+                    val fileName = URLEncoder.encode(q["name"] ?: file.name, "UTF-8")
                     if (q["dl"] == "1") {
                         call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
                     } else {

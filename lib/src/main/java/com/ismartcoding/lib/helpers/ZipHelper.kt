@@ -62,4 +62,17 @@ object ZipHelper {
         return true
     }
 
+    suspend fun zipFolderToStreamAsync(folder: File, zip: ZipOutputStream, path: String = "") {
+        folder.listFiles()?.forEach { file ->
+            val filePath = if (path.isNotEmpty()) "$path/${file.name}" else file.name
+            if (file.isDirectory) {
+                zip.putNextEntry(ZipEntry("$filePath/"))
+                zipFolderToStreamAsync(file, zip, filePath)
+            } else {
+                zip.putNextEntry(ZipEntry(filePath))
+                file.inputStream().copyTo(zip)
+            }
+            zip.closeEntry()
+        }
+    }
 }
