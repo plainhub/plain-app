@@ -57,6 +57,7 @@ import com.ismartcoding.plain.features.tag.TagRelationStub
 import com.ismartcoding.plain.features.theme.AppTheme
 import com.ismartcoding.plain.features.video.VideoHelper
 import com.ismartcoding.plain.helpers.FileHelper
+import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.MainActivity
@@ -451,6 +452,12 @@ class SXGraphQL(val schema: Schema) {
                 query("fileIds") {
                     resolver { paths: List<String> ->
                         paths.map { FileHelper.getFileId(it) }
+                    }
+                }
+                mutation("setTempValue") {
+                    resolver { key: String, value: String ->
+                        TempHelper.setValue(key, value)
+                        TempValue(key, value)
                     }
                 }
                 mutation("uninstallApps") {

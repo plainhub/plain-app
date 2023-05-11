@@ -51,6 +51,7 @@ object FileHelper {
     fun rename(filePath: String, newName: String): File? {
         return rename(File(filePath), newName)
     }
+
     fun rename(file: File, newName: String): File? {
         if (!file.exists()) return null
         if (newName.isBlank()) return null

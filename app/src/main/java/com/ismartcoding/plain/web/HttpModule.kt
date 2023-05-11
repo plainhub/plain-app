@@ -5,6 +5,7 @@ import android.os.Build
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.scanFileByConnection
+import com.ismartcoding.lib.extensions.toStringList
 import com.ismartcoding.lib.extensions.toThumbBytes
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
@@ -17,6 +18,7 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.FileHelper
+import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.web.websocket.WebSocketSession
 import io.ktor.http.*
@@ -41,12 +43,14 @@ import io.ktor.utils.io.core.*
 import io.ktor.websocket.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.net.URLEncoder
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import java.util.*
+import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.text.toByteArray
 
@@ -147,12 +151,53 @@ fun Application.module() {
                 return@get
             }
 
-            val fileName = URLEncoder.encode(q["name"] ?: (folder.name + ".zip"), "UTF-8")
+            val fileName = URLEncoder.encode(q["name"] ?: "${folder.name}.zip", "UTF-8")
             call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
             call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
             call.respondOutputStream(ContentType.Application.Zip) {
                 ZipOutputStream(this).use { zip ->
                     ZipHelper.zipFolderToStreamAsync(folder, zip)
+                }
+            }
+        }
+
+        get("/zip/files") {
+            val q = call.request.queryParameters
+            val id = q["id"] ?: ""
+            if (id.isEmpty()) {
+                call.respond(HttpStatusCode.BadRequest)
+                return@get
+            }
+
+            val value = TempHelper.getValue(id)
+            TempHelper.clearValue(id)
+            if (value.isEmpty()) {
+                call.respond(HttpStatusCode.NotFound)
+                return@get
+            }
+
+            val paths = JSONArray(value).toStringList()
+            val files = paths.map { File(it) }.filter { it.exists() }
+            val dirs = files.filter { it.isDirectory }
+            val fileName = URLEncoder.encode(q["name"] ?: "download.zip", "UTF-8")
+            call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
+            call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
+            call.respondOutputStream(ContentType.Application.Zip) {
+                ZipOutputStream(this).use { zip ->
+                    files.forEach { file ->
+                        if (dirs.any { file.absolutePath != it.absolutePath && file.absolutePath.startsWith(it.absolutePath) }) {
+                        } else {
+                            val filePath = file.name
+                            if (file.isDirectory) {
+                                zip.putNextEntry(ZipEntry("$filePath/"))
+                                ZipHelper.zipFolderToStreamAsync(file, zip, filePath)
+                            } else {
+                                zip.putNextEntry(ZipEntry(filePath))
+                                file.inputStream().copyTo(zip)
+                            }
+                            zip.closeEntry()
+                        }
+                    }
                 }
             }
         }
