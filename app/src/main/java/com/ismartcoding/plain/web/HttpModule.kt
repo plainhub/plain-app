@@ -3,10 +3,7 @@ package com.ismartcoding.plain.web
 import android.net.Uri
 import android.os.Build
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.isImageFast
-import com.ismartcoding.lib.extensions.scanFileByConnection
-import com.ismartcoding.lib.extensions.toStringList
-import com.ismartcoding.lib.extensions.toThumbBytes
+import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper
@@ -15,6 +12,8 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.upnp.UPnPController
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.data.DownloadFileItem
+import com.ismartcoding.plain.data.DownloadFileItemWrap
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.FileHelper
@@ -176,24 +175,24 @@ fun Application.module() {
                 return@get
             }
 
-            val paths = JSONArray(value).toStringList()
-            val files = paths.map { File(it) }.filter { it.exists() }
-            val dirs = files.filter { it.isDirectory }
+            val paths = JSONArray(value).parse { DownloadFileItem(it.optString("path"), it.optString("name")) }
+            val items = paths.map { DownloadFileItemWrap(File(it.path), it.name) }.filter { it.file.exists() }
+            val dirs = items.filter { it.file.isDirectory }
             val fileName = URLEncoder.encode(q["name"] ?: "download.zip", "UTF-8")
             call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
             call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
             call.respondOutputStream(ContentType.Application.Zip) {
                 ZipOutputStream(this).use { zip ->
-                    files.forEach { file ->
-                        if (dirs.any { file.absolutePath != it.absolutePath && file.absolutePath.startsWith(it.absolutePath) }) {
+                    items.forEach { item ->
+                        if (dirs.any { item.file.absolutePath != it.file.absolutePath && item.file.absolutePath.startsWith(it.file.absolutePath) }) {
                         } else {
-                            val filePath = file.name
-                            if (file.isDirectory) {
+                            val filePath = item.name.ifEmpty { item.file.name }
+                            if (item.file.isDirectory) {
                                 zip.putNextEntry(ZipEntry("$filePath/"))
-                                ZipHelper.zipFolderToStreamAsync(file, zip, filePath)
+                                ZipHelper.zipFolderToStreamAsync(item.file, zip, filePath)
                             } else {
                                 zip.putNextEntry(ZipEntry(filePath))
-                                file.inputStream().copyTo(zip)
+                                item.file.inputStream().copyTo(zip)
                             }
                             zip.closeEntry()
                         }

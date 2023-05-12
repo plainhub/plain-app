@@ -49,7 +49,6 @@ import kotlin.io.path.moveTo
 class FilesDialog : BaseDialog<DialogFilesBinding>() {
     val viewModel: FilesViewModel by viewModels()
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

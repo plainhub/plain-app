@@ -9,9 +9,8 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.DialogAboutBinding
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
-import com.ismartcoding.plain.ui.extensions.setKeyText
-import com.ismartcoding.plain.ui.extensions.setSwitch
-import com.ismartcoding.plain.ui.extensions.setValueText
+import com.ismartcoding.plain.ui.WebDialog
+import com.ismartcoding.plain.ui.extensions.*
 
 class AboutDialog : BaseBottomSheetDialog<DialogAboutBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -26,6 +25,13 @@ class AboutDialog : BaseBottomSheetDialog<DialogAboutBinding>() {
 
         binding.androidVersion.setKeyText(R.string.android_version)
             .setValueText(MainApp.getAndroidVersion())
+
+        binding.donation
+            .setKeyText(R.string.donation)
+            .showMore()
+            .setClick {
+                WebDialog("https://ko-fi.com/ismartcoding").show()
+            }
 
         if (BuildConfig.DEBUG) {
             binding.demoMode

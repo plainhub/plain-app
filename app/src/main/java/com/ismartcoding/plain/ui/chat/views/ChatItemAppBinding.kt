@@ -3,15 +3,14 @@ package com.ismartcoding.plain.ui.chat.views
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.UpdateLocaleEvent
 import com.ismartcoding.plain.databinding.ChatItemAppBinding
+import com.ismartcoding.plain.features.UpdateLocaleEvent
 import com.ismartcoding.plain.features.locale.AppLocale
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.theme.AppTheme
 import com.ismartcoding.plain.features.theme.AppThemeHelper
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.SelectOptionsDialog
-import com.ismartcoding.plain.ui.WebDialog
 import com.ismartcoding.plain.ui.app.AboutDialog
 import com.ismartcoding.plain.ui.app.BackupRestoreDialog
 import com.ismartcoding.plain.ui.extensions.*
@@ -48,13 +47,6 @@ fun ChatItemAppBinding.initView() {
         .showMore()
         .setClick {
             BackupRestoreDialog().show()
-        }
-
-    donation.initTheme()
-        .setKeyText(R.string.donation)
-        .showMore()
-        .setClick {
-            WebDialog("https://ko-fi.com/ismartcoding").show()
         }
 
     about.initTheme()
