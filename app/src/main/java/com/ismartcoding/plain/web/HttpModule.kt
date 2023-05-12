@@ -306,6 +306,7 @@ fun Application.module() {
                                 return@forEachPart
                             }
                             val file = File("${dir}/${fileName}")
+                            file.mkdirs()
                             Files.copy(part.streamProvider(), file.toPath(), StandardCopyOption.REPLACE_EXISTING)
                             MainApp.instance.scanFileByConnection(file, null)
                         }

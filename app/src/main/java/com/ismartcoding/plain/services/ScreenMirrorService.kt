@@ -82,7 +82,9 @@ class ScreenMirrorService : LifecycleService() {
                 val rowPadding = rowStride - pixelStride * mScreenWidth
                 mBitmap = Bitmap.createBitmap(mScreenWidth + rowPadding / pixelStride, mScreenHeight, Bitmap.Config.ARGB_8888)
                 mBitmap?.copyPixelsFromBuffer(buffer)
-                sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, bitmapToBase64Image(mBitmap!!), false))
+                if(mBitmap != null) {
+                    sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, bitmapToBase64Image(mBitmap!!), false))
+                }
                 image.close()
             }
         }, handler)
