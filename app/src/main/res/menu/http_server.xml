@@ -13,8 +13,8 @@
             android:title="@string/sessions" />
 
         <item
-            android:id="@+id/developer_settings"
-            android:title="@string/developer_settings" />
+            android:id="@+id/settings"
+            android:title="@string/settings" />
 
     </group>
 </menu>

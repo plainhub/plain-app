@@ -65,8 +65,8 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
                     R.id.sessions -> {
                         SessionsDialog().show()
                     }
-                    R.id.developer_settings -> {
-                        DeveloperSettingsDialog().show()
+                    R.id.settings -> {
+                        SettingsDialog().show()
                     }
                 }
             }
@@ -99,14 +99,14 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
 
                     b.types.initView(listOf(ChipItem(getString(R.string.recommended_https), "https"), ChipItem("HTTP", "http")), "https") { v ->
                         b.url.text = if (v == "https") {
-                            "https://${NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }}:8443"
+                            "https://${NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }}:${LocalStorage.httpsPort}"
                         } else {
-                            "http://${NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }}:8080"
+                            "http://${NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }}:${LocalStorage.httpPort}"
                         }
                         b.tips.isVisible = v == "https"
                     }
 
-                    b.url.text = "https://${NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }}:8443"
+                    b.url.text = "https://${NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }}:${LocalStorage.httpsPort}"
                     b.tips.text = LocaleHelper.getString(R.string.open_website_on_desktop)
                 } else {
                     val b = getBinding<ItemRowBinding>()

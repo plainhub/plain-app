@@ -8,6 +8,7 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.web.HttpServerManager
+import io.ktor.server.application.*
 import kotlin.concurrent.thread
 
 class HttpServerService : LifecycleService() {
@@ -44,10 +45,12 @@ class HttpServerService : LifecycleService() {
         stopSelf()
         coIO {
             try {
-                Runtime.getRuntime().addShutdownHook(Thread {
-                    MainApp.instance.httpServer?.stop(1000, 5000)
-                    MainApp.instance.httpServer = null
-                })
+                MainApp.instance.httpServer?.let { h ->
+                    val environment = h.environment
+                    environment.monitor.raise(ApplicationStopPreparing, environment)
+                    environment.stop()
+                }
+                MainApp.instance.httpServer = null
             } catch (ex: Exception) {
                 ex.printStackTrace()
             }

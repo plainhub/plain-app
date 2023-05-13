@@ -1,16 +1,17 @@
 package com.ismartcoding.plain.ui.extensions
 
-import android.util.TypedValue
 import android.view.View
-import android.widget.CompoundButton
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
-import com.ismartcoding.lib.extensions.*
+import com.ismartcoding.lib.extensions.delayOnLifecycle
+import com.ismartcoding.lib.extensions.px
+import com.ismartcoding.lib.extensions.setSelectableItemBackground
+import com.ismartcoding.lib.extensions.setTextSizePx
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.ViewListItemBinding
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.ui.views.ChipItem
 
 fun ViewListItemBinding.setKeyText(text: String): ViewListItemBinding {
     textKey.text = text
@@ -65,7 +66,7 @@ fun ViewListItemBinding.setStartIcon(@DrawableRes iconId: Int): ViewListItemBind
     return this
 }
 
-fun ViewListItemBinding.clearTextRows():ViewListItemBinding {
+fun ViewListItemBinding.clearTextRows(): ViewListItemBinding {
     rows.removeAllViews()
     return this
 }
@@ -168,4 +169,36 @@ fun ViewListItemBinding.showMore(): ViewListItemBinding {
     val p = container.context.px(R.dimen.size_normal)
     container.setPadding(p, p, container.context.px(R.dimen.size_mini), p)
     return this
+}
+
+fun ViewListItemBinding.setChips(items: List<ChipItem>, value: String, onChanged: ((String) -> Unit)? = null) {
+    chipGroup.run {
+        visibility = View.VISIBLE
+        initView(items, value, false) {
+            onChanged?.invoke(it)
+        }
+    }
+}
+
+fun ViewListItemBinding.setSpinners(items: List<String>, value: String, onChanged: ((String) -> Unit)? = null) {
+    spinner.run {
+        visibility = View.VISIBLE
+        val adapter = ArrayAdapter<String>(
+            this.context,
+            R.layout.simple_spinner_item, items
+        )
+        spinner.adapter = adapter
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+                val newValue = items[position]
+                if (value != newValue) {
+                    onChanged?.invoke(newValue)
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+            }
+        }
+        spinner.setSelection(items.indexOf(value))
+    }
 }

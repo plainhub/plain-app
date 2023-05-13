@@ -14,6 +14,8 @@ object LocalStorage {
     var endictShowWord: Boolean by serialLazy(true)
     var endictShowTranslation: Boolean by serialLazy(true)
     var webConsoleEnabled: Boolean by serialLazy(false)
+    var httpPort: Int by serialLazy(8080)
+    var httpsPort: Int by serialLazy(8443)
     var authDevToken: String by serialLazy("")
     var authDevTokenEnabled: Boolean by serialLazy(false)
     var clientId: String by serialLazy("")

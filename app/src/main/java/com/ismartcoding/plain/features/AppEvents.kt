@@ -57,6 +57,7 @@ class HttpServerEnabledEvent(val enabled: Boolean)
 
 class StartHttpServerEvent
 class StartScreenMirrorEvent
+class HttpServerPortChanged
 
 
 class SendMessageEvent(val content: DMessageContent)

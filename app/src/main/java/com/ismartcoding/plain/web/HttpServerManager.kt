@@ -67,14 +67,14 @@ object HttpServerManager {
         val environment = applicationEngineEnvironment {
             log = LoggerFactory.getLogger("ktor.application")
             connector {
-                port = 8080
+                port = LocalStorage.httpPort
             }
             sslConnector(
                 keyStore = getSSLKeyStore(context),
                 keyAlias = SSL_KEY_ALIAS,
                 keyStorePassword = { LocalStorage.clientId.toCharArray() },
                 privateKeyPassword = { LocalStorage.clientId.toCharArray() }) {
-                port = 8443
+                port = LocalStorage.httpsPort
             }
             module(Application::module)
         }

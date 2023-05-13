@@ -7,6 +7,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import com.ismartcoding.plain.databinding.DialogLoadingBinding
 
@@ -14,10 +15,8 @@ class LoadingDialog(val message: String = "") : DialogFragment() {
     private lateinit var binding: DialogLoadingBinding
 
     fun updateMessage(message: String) {
-        binding.message.run {
-            text = message
-            visibility = if (message.isNotEmpty()) View.VISIBLE else View.GONE
-        }
+        binding.message.text = message
+        binding.message.isVisible = message.isNotEmpty()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
