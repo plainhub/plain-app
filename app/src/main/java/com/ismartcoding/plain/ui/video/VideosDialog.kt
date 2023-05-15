@@ -23,11 +23,13 @@ import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.file.MediaType
 import com.ismartcoding.plain.features.video.VideoHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
+import com.ismartcoding.plain.ui.CastDialog
 import com.ismartcoding.plain.ui.extensions.checkPermission
 import com.ismartcoding.plain.ui.extensions.checkable
 import com.ismartcoding.plain.ui.extensions.highlightTitle
 import com.ismartcoding.plain.ui.extensions.setSafeClick
 import com.ismartcoding.plain.ui.helpers.FileSortHelper
+import com.ismartcoding.plain.ui.image.ImageModel
 import com.ismartcoding.plain.ui.models.DrawerMenuGroupType
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
@@ -88,10 +90,15 @@ class VideosDialog() : BaseListDrawerDialog() {
             }
 
             checkable(onItemClick = {
-                PreviewDialog().show(
-                    items = getModelList<VideoModel>().map { s -> PreviewItem(s.data.id, s.data.path) },
-                    initKey = getModel<VideoModel>().data.id,
-                )
+                val m = getModel<VideoModel>()
+                if (viewModel.castMode) {
+                    CastDialog(arrayListOf(), m.data.path).show()
+                } else {
+                    PreviewDialog().show(
+                        items = getModelList<VideoModel>().map { s -> PreviewItem(s.data.id, s.data.path) },
+                        initKey = getModel<VideoModel>().data.id,
+                    )
+                }
             }, onChecked = {
                 updateBottomActions()
                 updateTitle()

@@ -13,6 +13,7 @@ import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.extensions.isGestureNavigationBar
 import com.ismartcoding.lib.extensions.navigationBarHeight
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.data.enums.ActionSourceType
@@ -158,6 +159,10 @@ abstract class BaseListDrawerDialog : BaseDialog<DialogListDrawerBinding>() {
                             rv.bindingAdapter.checkedAll(false)
                         }
                     }
+                    R.id.cast_mode -> {
+                        viewModel.castMode = !this.isChecked
+                        this.isChecked = !this.isChecked
+                    }
                     else -> {
                         menuItemClick(this)
                     }
@@ -178,7 +183,6 @@ abstract class BaseListDrawerDialog : BaseDialog<DialogListDrawerBinding>() {
             binding.bottomAction.performShow()
             binding.bottomAction.menu.run {
                 findItem(R.id.cast)?.isVisible = if (viewModel.tagType == TagType.IMAGE) count == 1 else true
-                findItem(R.id.remove_from_tag)?.isVisible = count > 1
                 findItem(R.id.call)?.isVisible = count == 1 // for contactsDialog
             }
         } else {

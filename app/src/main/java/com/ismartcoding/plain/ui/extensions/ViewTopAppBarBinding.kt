@@ -9,19 +9,15 @@ import com.google.android.material.appbar.AppBarLayout
 import com.gyf.immersionbar.ImmersionBar
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.*
-import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.LocalStorage
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.ViewTopAppBarBinding
-import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.box.FetchInitDataEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.ScreenHelper
 import com.ismartcoding.plain.ui.app.HttpServerDialog
-import com.ismartcoding.plain.ui.box.SelectBoxDialog
 import com.ismartcoding.plain.ui.scan.ScanDialog
 import kotlin.math.abs
 

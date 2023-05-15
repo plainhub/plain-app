@@ -22,11 +22,13 @@ import com.ismartcoding.plain.features.audio.AudioHelper
 import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.features.file.MediaType
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
+import com.ismartcoding.plain.ui.CastDialog
 import com.ismartcoding.plain.ui.extensions.checkPermission
 import com.ismartcoding.plain.ui.extensions.checkable
 import com.ismartcoding.plain.ui.extensions.highlightTitle
 import com.ismartcoding.plain.ui.helpers.FileSortHelper
 import com.ismartcoding.plain.ui.models.DrawerMenuGroupType
+import com.ismartcoding.plain.ui.video.VideoModel
 import kotlinx.coroutines.launch
 
 class AudiosDialog() : BaseListDrawerDialog() {
@@ -130,8 +132,13 @@ class AudiosDialog() : BaseListDrawerDialog() {
             }
 
             checkable(onItemClick = {
-                AudioPlayerService.play(requireContext(), getModel<AudioModel>().data.toPlaylistAudio())
-                Permissions.checkNotification()
+                val m = getModel<AudioModel>()
+                if (viewModel.castMode) {
+                    CastDialog(arrayListOf(), m.data.path).show()
+                } else {
+                    AudioPlayerService.play(requireContext(), getModel<AudioModel>().data.toPlaylistAudio())
+                    Permissions.checkNotification()
+                }
             }, onChecked = {
                 updateBottomActions()
                 updateTitle()

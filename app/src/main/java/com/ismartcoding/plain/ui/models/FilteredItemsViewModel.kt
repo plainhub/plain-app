@@ -12,6 +12,7 @@ open class FilteredItemsViewModel : BaseItemsModel() {
     var data: IData? = null
     val trash = MutableLiveData(false)
     var tagType: TagType = TagType.DEFAULT
+    var castMode = false
 
     suspend fun getQuery(): String {
         var query = "$searchQ trash:${trash.value}"

@@ -20,8 +20,10 @@ import com.ismartcoding.plain.data.enums.TagType
 import com.ismartcoding.plain.databinding.ItemImageGridBinding
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.file.MediaType
+import com.ismartcoding.plain.features.image.DImage
 import com.ismartcoding.plain.features.image.ImageHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
+import com.ismartcoding.plain.ui.CastDialog
 import com.ismartcoding.plain.ui.extensions.checkPermission
 import com.ismartcoding.plain.ui.extensions.checkable
 import com.ismartcoding.plain.ui.extensions.highlightTitle
@@ -85,10 +87,15 @@ class ImagesDialog() : BaseListDrawerDialog() {
             }
 
             checkable(onItemClick = {
-                PreviewDialog().show(
-                    items = getModelList<ImageModel>().map { s -> PreviewItem(s.data.id, s.data.path) },
-                    initKey = getModel<ImageModel>().data.id,
-                )
+                val m = getModel<ImageModel>()
+                if (viewModel.castMode) {
+                    CastDialog(arrayListOf(), m.data.path).show()
+                } else {
+                    PreviewDialog().show(
+                        items = getModelList<ImageModel>().map { s -> PreviewItem(s.data.id, s.data.path) },
+                        initKey = m.data.id,
+                    )
+                }
             }, onChecked = {
                 updateBottomActions()
                 updateTitle()
