@@ -13,9 +13,7 @@ import com.ismartcoding.lib.brv.utils.*
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.NetworkHelper
-import com.ismartcoding.plain.BuildConfig
-import com.ismartcoding.plain.LocalStorage
-import com.ismartcoding.plain.R
+import com.ismartcoding.plain.*
 import com.ismartcoding.plain.databinding.DialogHttpServerBinding
 import com.ismartcoding.plain.databinding.ItemHttpServerHeaderBinding
 import com.ismartcoding.plain.databinding.ItemRowBinding
@@ -28,7 +26,6 @@ import com.ismartcoding.plain.ui.models.ListItemModel
 import com.ismartcoding.plain.ui.models.RvHeader
 import com.ismartcoding.plain.ui.views.ChipItem
 import com.ismartcoding.plain.web.HttpServerManager
-import com.ismartcoding.plain.wifiManager
 
 class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
     data class PermissionModel(val data: Permission) : ListItemModel()
@@ -36,11 +33,13 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
     private val header = RvHeader()
     private fun updateNotification() {
         if (wifiManager.isWifiEnabled) {
-            binding.topAppBar.notification.isVisible = false
+            if (MainApp.instance.httpServerError.isNotEmpty()) {
+                binding.topAppBar.showNotification(MainApp.instance.httpServerError, R.color.red)
+            } else {
+                binding.topAppBar.hideNotification()
+            }
         } else {
-            binding.topAppBar.notification.isVisible = true
-            binding.topAppBar.notification.setBackgroundColor(requireContext().getColor(R.color.yellow))
-            binding.topAppBar.notification.text = getString(R.string.wifi_required)
+            binding.topAppBar.showNotification(getString(R.string.wifi_required), R.color.yellow)
         }
     }
 
