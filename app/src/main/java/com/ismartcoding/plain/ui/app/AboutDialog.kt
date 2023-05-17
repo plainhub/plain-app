@@ -33,6 +33,13 @@ class AboutDialog : BaseBottomSheetDialog<DialogAboutBinding>() {
                 WebDialog("https://ko-fi.com/ismartcoding").show()
             }
 
+        binding.logs
+            .setKeyText(R.string.logs)
+            .showMore()
+            .setClick {
+                LogsDialog().show()
+            }
+
         if (BuildConfig.DEBUG) {
             binding.demoMode
                 .setKeyText(R.string.demo_mode)

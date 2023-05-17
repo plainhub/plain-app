@@ -37,6 +37,7 @@
     <string name="share_message">Share message</string>
     <string name="delete_message">Delete message</string>
     <string name="confirm_to_delete">Confirm to delete?</string>
+    <string name="confirm_to_clear_logs">Confirm to clear logs?</string>
     <string name="ok">OK</string>
     <string name="accept">Accept</string>
     <string name="request_to_connect">{{ip}} requests to connect</string>
@@ -77,6 +78,10 @@
     <string name="routes_title">Routes ({{total}})</string>
     <string name="unknown">Unknown</string>
     <string name="clear_history">Clear history</string>
+    <string name="clear_logs">Clear logs</string>
+    <string name="no_logs_error">No logs can be shared</string>
+    <string name="share_logs">Share logs</string>
+    <string name="file_size">File size</string>
     <string name="app_settings">App settings</string>
     <string name="settings">Settings</string>
     <string name="keywords">Keywords</string>
@@ -439,6 +444,7 @@
     <string name="welcome_text">Welcome to use this app, sending the command :app can get app settings menu. Learn more: https://youtu.be/RvO18j4r95o</string>
     <string name="demo_mode">Demo mode</string>
     <string name="donation">Donation</string>
+    <string name="logs">Logs</string>
     <string name="restart_app_title">Restart app</string>
     <string name="restart_app_message">You need to force quit the app and then open it again.</string>
     <string name="keep_screen_on">Keep screen on</string>

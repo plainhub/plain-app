@@ -58,7 +58,7 @@ operator fun String.times(x: Int): String {
 
 fun String.isTextFile(): Boolean {
     val mime = getMimeType()
-    if (mime.startsWith("text/") || mime.startsWith("application/")) {
+    if (mime.startsWith("text/")) {
         return true
     }
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Column">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/top_app_bar"
+        style="@style/TopAppBar.BottomSheet"
+        app:title="@string/logs" />
+
+    <include
+        android:id="@+id/file_size"
+        layout="@layout/view_list_item" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/share"
+        style="@style/Button"
+        android:layout_marginHorizontal="@dimen/size_normal"
+        android:layout_marginTop="@dimen/size_normal"
+        android:text="@string/share_logs" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/clear"
+        style="@style/Button.BottomSheet"
+        android:layout_marginTop="@dimen/size_normal"
+        android:text="@string/clear_logs" />
+
+</LinearLayout>
