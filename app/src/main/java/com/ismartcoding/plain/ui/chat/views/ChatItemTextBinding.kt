@@ -1,11 +1,11 @@
 package com.ismartcoding.plain.ui.chat.views
 
+import com.ismartcoding.lib.extensions.setTextWithLinkSupport
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.ChatItemTextBinding
-import com.ismartcoding.plain.db.*
-import com.ismartcoding.lib.extensions.*
-import com.ismartcoding.plain.ui.WebDialog
-import com.ismartcoding.plain.ui.extensions.initTheme
+import com.ismartcoding.plain.db.DChat
+import com.ismartcoding.plain.db.DMessageText
+import com.ismartcoding.plain.ui.helpers.WebHelper
 
 fun ChatItemTextBinding.initView(chatItem: DChat) {
     text.run {
@@ -13,7 +13,7 @@ fun ChatItemTextBinding.initView(chatItem: DChat) {
         setTextColor(this.context.getColor(R.color.primary))
         setLinkTextColor(this.context.getColor(R.color.purple_light))
         setTextWithLinkSupport((chatItem.content.value as DMessageText).text) {
-            WebDialog(it).show()
+            WebHelper.open(context, it)
         }
         // hashtagColor = context.getColor(R.color.color_blue)
         // isHashtagEnabled = true

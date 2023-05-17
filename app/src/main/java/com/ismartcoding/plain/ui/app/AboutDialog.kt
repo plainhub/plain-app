@@ -9,8 +9,8 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.DialogAboutBinding
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
-import com.ismartcoding.plain.ui.WebDialog
 import com.ismartcoding.plain.ui.extensions.*
+import com.ismartcoding.plain.ui.helpers.WebHelper
 
 class AboutDialog : BaseBottomSheetDialog<DialogAboutBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -30,7 +30,7 @@ class AboutDialog : BaseBottomSheetDialog<DialogAboutBinding>() {
             .setKeyText(R.string.donation)
             .showMore()
             .setClick {
-                WebDialog("https://ko-fi.com/ismartcoding").show()
+                WebHelper.open(requireContext(), "https://ko-fi.com/ismartcoding")
             }
 
         binding.logs

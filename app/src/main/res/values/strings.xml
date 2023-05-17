@@ -449,6 +449,7 @@
     <string name="restart_app_message">You need to force quit the app and then open it again.</string>
     <string name="keep_screen_on">Keep screen on</string>
     <string name="cast_mode">Cast mode</string>
+    <string name="no_browser_error">You don\'t have any browser to open web page.</string>
     <string name="text_file_size_limit">Only files with a size of 10MB or less are permitted to be opened.</string>
     <string name="keep_screen_on_confirm">You have chosen to cast multiple items. To ensure smooth playback, we will keep your phone screen on during the casting process. You can cancel this at any time from the main screen menu.</string>
     <string name="call_phone_permission_required">In order to make phone calls through the app, please allow phone access.</string>

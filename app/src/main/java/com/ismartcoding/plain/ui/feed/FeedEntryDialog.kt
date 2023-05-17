@@ -19,9 +19,9 @@ import com.ismartcoding.plain.features.feed.fetchContentAsync
 import com.ismartcoding.plain.features.tag.TagRelationStub
 import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.ui.PlainTextDialog
-import com.ismartcoding.plain.ui.WebDialog
 import com.ismartcoding.plain.ui.extensions.*
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.tag.SelectTagsDialog
 import com.ismartcoding.plain.ui.views.ClassicsHeader
 import kotlinx.coroutines.launch
@@ -48,7 +48,7 @@ class FeedEntryDialog(private val feedEntry: DFeedEntry, val feed: DFeed?) : Bas
             onMenuItemClick {
                 when (itemId) {
                     R.id.web -> {
-                        WebDialog(feedEntry.url).show()
+                        WebHelper.open(requireContext(), feedEntry.url)
                     }
                     R.id.add_to_tags -> {
                         SelectTagsDialog(TagType.FEED_ENTRY, arrayListOf(TagRelationStub.create(feedEntry))).show()

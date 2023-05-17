@@ -8,7 +8,7 @@ import com.google.android.material.button.MaterialButton
 import com.ismartcoding.lib.brv.utils.linear
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.ui.WebDialog
+import com.ismartcoding.plain.ui.helpers.WebHelper
 
 class Accessory2View(context: Context, attrs: AttributeSet?) : RecyclerView(context, attrs) {
     private data class AccessoryItem(val icon: Int = 0, val before: String = "", val after: String = "")
@@ -83,7 +83,7 @@ class Accessory2View(context: Context, attrs: AttributeSet?) : RecyclerView(cont
                         EditorSettingsDialog().show()
                     }
                     R.drawable.ic_help -> {
-                        WebDialog("https://www.markdownguide.org/basic-syntax").show()
+                        WebHelper.open(context, "https://www.markdownguide.org/basic-syntax")
                     }
                     else -> {
                         editor.insert(m.before, m.after)

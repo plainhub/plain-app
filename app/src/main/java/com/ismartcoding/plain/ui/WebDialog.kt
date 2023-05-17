@@ -50,7 +50,7 @@ class WebDialog(val url: String) : BaseDialog<DialogWebBinding>() {
                         try {
                             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
                         } catch (ex: java.lang.Exception) {
-                            DialogHelper.showMessage("You don't have any browser to open web page")
+                            DialogHelper.showMessage(R.string.no_browser_error)
                         }
                     }
                     R.id.refresh -> {

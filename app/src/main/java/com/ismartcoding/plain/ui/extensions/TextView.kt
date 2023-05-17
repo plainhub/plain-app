@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.core.view.GestureDetectorCompat
 import com.ismartcoding.lib.markdown.AppImageSchemeHandler
 import com.ismartcoding.lib.markdown.FontTagHandler
-import com.ismartcoding.plain.ui.WebDialog
+import com.ismartcoding.plain.ui.helpers.WebHelper
 import io.noties.markwon.*
 import io.noties.markwon.ext.latex.JLatexMathPlugin
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
@@ -85,7 +85,7 @@ fun TextView.markdown(content: String) {
         .usePlugin(object : AbstractMarkwonPlugin() {
             override fun configureConfiguration(builder: MarkwonConfiguration.Builder) {
                 builder.linkResolver { _, link ->
-                    WebDialog(link).show()
+                    WebHelper.open(context, link)
                 }
             }
         })

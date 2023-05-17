@@ -12,7 +12,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.content.FileProvider
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.ui.WebDialog
+import com.ismartcoding.plain.ui.helpers.WebHelper
 import java.io.File
 import java.io.IOException
 
@@ -70,7 +70,7 @@ class HtmlView(context: Context, attrs: AttributeSet? = null) : WebView(context,
                         intent.setDataAndType(contentUri, "image/jpeg")
                         context.startActivity(intent)
                     } else {
-                        WebDialog(url).show()
+                        WebHelper.open(context, url)
                     }
                 } catch (e: ActivityNotFoundException) {
 //                    Toast.makeText(context, R.string.cant_open_link, Toast.LENGTH_SHORT).show()

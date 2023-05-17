@@ -449,6 +449,7 @@
     <string name="restart_app_message">您需要退出当前应用并重新打开应用才能生效。</string>
     <string name="keep_screen_on">保持屏幕常亮</string>
     <string name="cast_mode">投屏模式</string>
+    <string name="no_browser_error">没有浏览器可以打开此页面。</string>
     <string name="text_file_size_limit">仅允许打开大小不超过10MB的文件。</string>
     <string name="keep_screen_on_confirm">您选择了投射多个{{type}}。为确保平稳播放，我们将在投射过程中保持您的手机屏幕开启。您可以随时从主屏幕菜单中取消此操作。</string>
     <string name="call_phone_permission_required">为了通过应用程序进行电话通话，请允许访问电话。</string>
