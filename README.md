@@ -38,6 +38,7 @@ Reddit: https://www.reddit.com/r/plainapp
 - ⚠️ The project is under **very active** development.
 - ⚠️ Expect bugs and breaking changes.
 - ⚠️ It is not perfect, I am always looking for ways to improve. If you find that the app is missing a certain feature, please don't hesitate to submit a feature request.
+- ⚠️ I have anxiety disorder and depression, so I kindly request everyone to ask questions and engage in discussions in a friendly manner.
 
 ## Screenshots
 

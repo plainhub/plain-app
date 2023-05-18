@@ -189,7 +189,7 @@ fun ViewListItemBinding.setSpinners(items: List<String>, value: String, onChange
         )
         spinner.adapter = adapter
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val newValue = items[position]
                 if (value != newValue) {
                     onChanged?.invoke(newValue)
