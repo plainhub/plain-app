@@ -167,7 +167,7 @@ fun Window.setWindowSoftInput(
     if (!isSPlus()) {
         return setWindowSoftInputCompatible(float, transition, editText, margin, onChanged)
     }
-    setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
+//    setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
     var matchEditText = false
     var hasSoftInput = false
     var floatInitialBottom = 0
