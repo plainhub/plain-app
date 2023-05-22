@@ -332,12 +332,17 @@ class SXGraphQL(val schema: Schema) {
                         ScreenMirrorService.instance?.getLatestImageBase64() ?: ""
                     }
                 }
+                query("recentFiles") {
+                    resolver { ->
+                        Permission.WRITE_EXTERNAL_STORAGE.check()
+                        FileSystemHelper.getRecents(MainApp.instance).map { it.toModel() }
+                    }
+                }
                 query("files") {
                     resolver { dir: String, showHidden: Boolean ->
                         Permission.WRITE_EXTERNAL_STORAGE.check()
-                        val p = dir.ifEmpty { FileSystemHelper.getInternalStoragePath(MainApp.instance) }
-                        val files = FileSystemHelper.getFilesList(p, showHidden, LocalStorage.fileSortBy).map { it.toModel() }
-                        Files(p, files)
+                        val files = FileSystemHelper.getFilesList(dir, showHidden, LocalStorage.fileSortBy).map { it.toModel() }
+                        Files(dir, files)
                     }
                 }
                 query("boxes") {
@@ -445,7 +450,9 @@ class SXGraphQL(val schema: Schema) {
                             LocalStorage.audioPlaylist.map { it.toModel() },
                             LocalStorage.audioPlayMode,
                             LocalStorage.audioPlaying?.path ?: "",
-                            MainApp.instance.allowSensitivePermissions()
+                            MainApp.instance.allowSensitivePermissions(),
+                            sdcardPath = FileSystemHelper.getSDCardPath(MainApp.instance),
+                            internalStoragePath = FileSystemHelper.getInternalStoragePath(MainApp.instance)
                         )
                     }
                 }

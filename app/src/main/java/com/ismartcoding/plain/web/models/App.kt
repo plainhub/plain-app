@@ -18,4 +18,6 @@ data class App(
     val audioMode: MediaPlayMode,
     val audioCurrent: String,
     val allowSensitivePermissions: Boolean,
+    val sdcardPath: String,
+    val internalStoragePath: String
 )
