@@ -22,4 +22,4 @@ fun Cursor.getLongValue(key: String): Long = getLongOrNull(getColumnIndex(key)) 
 
 fun Cursor.getLongValueOrNull(key: String): Long? = getLongOrNull(getColumnIndex(key))
 
-fun Cursor.getTimeValue(key: String): Instant = Instant.fromEpochMilliseconds(getLongValueOrNull(key) ?: 0L)
+fun Cursor.getTimeValue(key: String): Instant = Instant.fromEpochMilliseconds(getLongValue(key))

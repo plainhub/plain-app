@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
@@ -14,10 +15,12 @@ import com.ismartcoding.lib.brv.utils.linear
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.extensions.*
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.LocalStorage
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.databinding.DialogFilesBinding
@@ -26,22 +29,25 @@ import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.Permissions
-import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.theme.AppThemeHelper
+import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.BaseDialog
+import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.PdfViewerDialog
 import com.ismartcoding.plain.ui.TextEditorDialog
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
 import com.ismartcoding.plain.ui.extensions.*
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.FileSortHelper
+import com.ismartcoding.plain.ui.models.DrawerMenuItemClickedEvent
 import com.ismartcoding.plain.ui.models.IDataModel
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import com.ismartcoding.plain.ui.preview.TransitionHelper
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.io.path.Path
 import kotlin.io.path.moveTo
@@ -53,11 +59,15 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         immersionBar {
-            statusBarColor(R.color.canvas)
+            transparentBar()
             titleBar(binding.layout)
-            titleBarMarginTop(statusBarHeight)
-            transparentNavigationBar()
             statusBarDarkFont(!AppThemeHelper.isDarkMode())
+        }
+
+        if (!requireContext().isGestureNavigationBar()) {
+            binding.list.root.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                bottomMargin = navigationBarHeight
+            }
         }
 
         updatePasteAction()
@@ -137,6 +147,8 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
                     }
                 } else if (m.data.path.isPdfFile()) {
                     PdfViewerDialog(m.data.path).show()
+                } else {
+                    MainActivity.instance.get()?.openPathIntent(m.data.path)
                 }
             }, onChecked = {
                 updateBottomActions()
@@ -150,12 +162,23 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
         binding.breadcrumb.navigateTo = {
             navigateTo(it.path)
         }
+        binding.drawerContent.rv.initDrawerMenu()
+        updateDrawerMenu()
         updateBreadcrumb()
         checkPermission()
     }
 
+    private fun updateDrawerMenu() {
+        lifecycleScope.launch {
+            binding.drawerContent.rv.updateDrawerMenuAsync(viewModel)
+        }
+    }
+
     override fun onBackPressed() {
-        if (viewModel.toggleMode.value == true) {
+        if (binding.drawer.isOpen) {
+            binding.drawer.close()
+            return
+        } else if (viewModel.toggleMode.value == true) {
             viewModel.toggleMode.value = false
             return
         }
@@ -228,6 +251,24 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
         receiveEvent<PermissionResultEvent> {
             checkPermission()
         }
+        receiveEvent<DrawerMenuItemClickedEvent> { event ->
+            val m = event.model
+            viewModel.offset = 0
+            viewModel.type = when (m.iconId) {
+                R.drawable.ic_sd_card -> FilesType.SDCARD
+                R.drawable.ic_history -> FilesType.RECENTS
+                else -> FilesType.INTERNAL_STORAGE
+            }
+
+            binding.drawer.close()
+            binding.layout.setExpanded(true)
+            updateTitle()
+            updateBreadcrumb()
+            coMain {
+                delay(250) // wait until the drawer is closed to make sure the animation is smooth on some phones.
+                binding.list.page.showLoading()
+            }
+        }
         receiveEvent<ActionEvent> { event ->
             if (event.source == ActionSourceType.FILE) {
                 binding.list.page.refresh()
@@ -247,15 +288,16 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
     }
 
     private fun checkPermission() {
-        binding.list.checkPermission(Permission.WRITE_EXTERNAL_STORAGE)
         binding.breadcrumb.isVisible = Permission.WRITE_EXTERNAL_STORAGE.can()
+        binding.list.checkPermission(Permission.WRITE_EXTERNAL_STORAGE)
     }
 
     private fun updateList() {
         lifecycleScope.launch {
             val p = viewModel.path
             val items = withIO {
-                if (viewModel.searchQ.isNotEmpty()) FileSystemHelper.search(viewModel.searchQ, p, LocalStorage.showHiddenFiles) else FileSystemHelper.getFilesList(
+                if (viewModel.type == FilesType.RECENTS) FileSystemHelper.getRecents(MainApp.instance)
+                else if (viewModel.searchQ.isNotEmpty()) FileSystemHelper.search(viewModel.searchQ, p, LocalStorage.showHiddenFiles) else FileSystemHelper.getFilesList(
                     p,
                     LocalStorage.showHiddenFiles,
                     LocalStorage.fileSortBy
@@ -295,7 +337,12 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
     }
 
     fun updateTitle() {
-        binding.toolbar.updateFilesTitle(viewModel, binding.list.rv)
+        binding.toolbar.run {
+            updateFilesTitle(viewModel, binding.list.rv)
+            val isVisible = viewModel.type != FilesType.RECENTS
+            menu.findItem(R.id.more).isVisible = isVisible
+            menu.findItem(R.id.search).isVisible = isVisible
+        }
     }
 
     fun showPasteAction() {
@@ -310,15 +357,6 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
         val context = binding.list.page.context
         binding.list.page.updateLayoutParams<FrameLayout.LayoutParams> {
             bottomMargin = context.px(R.dimen.size_hhl)
-        }
-    }
-
-    private fun hidePasteAction() {
-        viewModel.cutFiles.clear()
-        viewModel.copyFiles.clear()
-        binding.pasteAction.performHide()
-        binding.list.page.updateLayoutParams<FrameLayout.LayoutParams> {
-            bottomMargin = 0
         }
     }
 

@@ -167,6 +167,14 @@ fun <T> Context.getSystemServiceCompat(serviceClass: Class<T>): T =
 
 fun Context.getCompatDrawable(@DrawableRes drawableId: Int) = ContextCompat.getDrawable(this, drawableId)
 
+fun Context.getUriMimeType(path: String, newUri: Uri): String {
+    var mimeType = path.getMimeType()
+    if (mimeType.isEmpty()) {
+        mimeType = getMimeTypeFromUri(newUri)
+    }
+    return mimeType
+}
+
 fun Context.getMimeTypeFromUri(uri: Uri): String {
     var mimetype = uri.path?.getMimeType() ?: ""
     if (mimetype.isEmpty()) {

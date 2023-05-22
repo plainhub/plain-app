@@ -289,6 +289,8 @@
     <string name="audios">音频</string>
     <string name="videos">视频</string>
     <string name="files">文件</string>
+    <string name="sdcard">存储卡</string>
+    <string name="recents">最近访问</string>
     <string name="send_message">发送消息</string>
     <string name="srl_footer_pulling">上拉加载更多</string>
     <string name="srl_footer_release">释放立即加载</string>

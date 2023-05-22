@@ -16,5 +16,6 @@ enum class DrawerMenuGroupType {
     FEEDS,
     CALL_TYPES,
     SMS_TYPES,
+    FILE_TYPES,
     TAGS;
 }

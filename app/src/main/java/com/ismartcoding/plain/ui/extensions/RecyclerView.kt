@@ -11,20 +11,23 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.onItemClick
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.ActionEvent
-import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.data.enums.TagType
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DTag
+import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.feed.FeedHelper
+import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.ui.feed.EditFeedDialog
 import com.ismartcoding.plain.ui.feed.FeedsHelper
+import com.ismartcoding.plain.ui.file.FilesType
+import com.ismartcoding.plain.ui.file.FilesViewModel
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.*
 import com.ismartcoding.plain.ui.tag.TagUIHelper
@@ -173,7 +176,32 @@ suspend fun RecyclerView.updateDrawerMenuAsync(
                     TagUIHelper.createMenuGroupAsync(viewModel)
                 })
             }
+            else -> {}
         }
+    }
+    models = groups
+}
+
+suspend fun RecyclerView.updateDrawerMenuAsync(
+    viewModel: FilesViewModel
+) {
+    val groups = mutableListOf<MenuItemModel>()
+    groups.add(MenuItemModel().apply {
+        isChecked = viewModel.type == FilesType.RECENTS
+        title = getString(R.string.recents)
+        iconId = R.drawable.ic_history
+    })
+    groups.add(MenuItemModel().apply {
+        isChecked = viewModel.type == FilesType.INTERNAL_STORAGE
+        title = FileSystemHelper.getInternalStorageName(MainApp.instance)
+        iconId = R.drawable.ic_storage
+    })
+    if (FileSystemHelper.hasExternalSDCard(MainApp.instance)) {
+        groups.add(MenuItemModel().apply {
+            isChecked = viewModel.type == FilesType.SDCARD
+            title = getString(R.string.sdcard)
+            iconId = R.drawable.ic_sd_card
+        })
     }
     models = groups
 }

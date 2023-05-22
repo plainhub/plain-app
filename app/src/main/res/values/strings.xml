@@ -289,6 +289,8 @@
     <string name="audios">Audios</string>
     <string name="videos">Videos</string>
     <string name="files">Files</string>
+    <string name="sdcard">SD card</string>
+    <string name="recents">Recents</string>
     <string name="send_message">Send message</string>
     <string name="srl_footer_pulling">Pull up to load more</string>
     <string name="srl_footer_release">Release to load more</string>
