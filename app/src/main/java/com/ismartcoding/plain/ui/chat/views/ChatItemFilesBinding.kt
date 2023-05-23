@@ -41,9 +41,10 @@ fun ChatItemFilesBinding.initView() {
                     initKey = m.id,
                 )
             } else if (m.uri.isAudioFast()) {
-                AudioPlayerService.play(context, DPlaylistAudio.fromPath(context, m.uri))
                 AudioPlayerDialog().show()
-                Permissions.checkNotification()
+                Permissions.checkNotification(R.string.audio_notification_prompt) {
+                    AudioPlayerService.play(context, DPlaylistAudio.fromPath(context, m.uri))
+                }
             } else if (m.uri.isTextFile()) {
                 if (m.size <= Constants.MAX_READABLE_TEXT_FILE_SIZE) {
                     TextEditorDialog(m.uri).show()

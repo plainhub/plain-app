@@ -158,7 +158,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.chatList.initView(lifecycle)
-        sendEvent(StartHttpServerEvent())
+        Permissions.checkNotification(R.string.foreground_service_notification_prompt) {
+            sendEvent(StartHttpServerEvent())
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

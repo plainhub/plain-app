@@ -134,9 +134,10 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
                     )
                 } else if (m.data.path.isAudioFast()) {
                     try {
-                        AudioPlayerService.play(requireContext(), DPlaylistAudio.fromPath(context, m.data.path))
                         AudioPlayerDialog().show()
-                        Permissions.checkNotification()
+                        Permissions.checkNotification(R.string.audio_notification_prompt) {
+                            AudioPlayerService.play(requireContext(), DPlaylistAudio.fromPath(context, m.data.path))
+                        }
                     } catch (ex: Exception) {
                     }
                 } else if (m.data.path.isTextFile()) {

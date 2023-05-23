@@ -435,6 +435,7 @@
     <string name="create_folder">创建目录</string>
     <string name="create_file">创建文件</string>
     <string name="audio_notification_prompt">为了在通知中心查看媒体控制，请允许该应用接收推送通知。</string>
+    <string name="foreground_service_notification_prompt">请允许此应用在后台运行并显示通知，以便提供必要的功能或服务。</string>
     <string name="internal_storage">内部存储</string>
     <string name="recommended_https">HTTPS（推荐）</string>
     <string name="enter_this_address_tips">在您的电脑浏览器中输入此地址。</string>

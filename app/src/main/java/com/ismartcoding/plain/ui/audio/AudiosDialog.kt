@@ -28,7 +28,6 @@ import com.ismartcoding.plain.ui.extensions.checkable
 import com.ismartcoding.plain.ui.extensions.highlightTitle
 import com.ismartcoding.plain.ui.helpers.FileSortHelper
 import com.ismartcoding.plain.ui.models.DrawerMenuGroupType
-import com.ismartcoding.plain.ui.video.VideoModel
 import kotlinx.coroutines.launch
 
 class AudiosDialog() : BaseListDrawerDialog() {
@@ -136,8 +135,9 @@ class AudiosDialog() : BaseListDrawerDialog() {
                 if (viewModel.castMode) {
                     CastDialog(arrayListOf(), m.data.path).show()
                 } else {
-                    AudioPlayerService.play(requireContext(), getModel<AudioModel>().data.toPlaylistAudio())
-                    Permissions.checkNotification()
+                    Permissions.checkNotification(R.string.audio_notification_prompt) {
+                        AudioPlayerService.play(requireContext(), getModel<AudioModel>().data.toPlaylistAudio())
+                    }
                 }
             }, onChecked = {
                 updateBottomActions()
