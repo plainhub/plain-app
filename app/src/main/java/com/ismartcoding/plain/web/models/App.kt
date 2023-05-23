@@ -19,5 +19,5 @@ data class App(
     val audioCurrent: String,
     val allowSensitivePermissions: Boolean,
     val sdcardPath: String,
-    val internalStoragePath: String
+    val internalStoragePath: String,
 )

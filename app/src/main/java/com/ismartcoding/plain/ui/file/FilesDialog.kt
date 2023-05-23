@@ -256,6 +256,7 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
             viewModel.offset = 0
             viewModel.type = when (m.iconId) {
                 R.drawable.ic_sd_card -> FilesType.SDCARD
+                R.drawable.ic_app_icon -> FilesType.APP
                 R.drawable.ic_history -> FilesType.RECENTS
                 else -> FilesType.INTERNAL_STORAGE
             }

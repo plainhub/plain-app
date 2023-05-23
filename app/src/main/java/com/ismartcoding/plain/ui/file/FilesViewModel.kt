@@ -31,6 +31,11 @@ class FilesViewModel : BaseItemsModel() {
                     path = root
                     breadcrumbs.add(BreadcrumbItem(FileSystemHelper.getInternalStorageName(MainApp.instance), root))
                 }
+                FilesType.APP -> {
+                    root = MainApp.instance.getExternalFilesDir(null)!!.absolutePath
+                    path = root
+                    breadcrumbs.add(BreadcrumbItem(LocaleHelper.getString(R.string.app_name), root))
+                }
                 FilesType.RECENTS -> {
                     breadcrumbs.add(BreadcrumbItem(LocaleHelper.getString(R.string.recents), root))
                 }
@@ -57,5 +62,6 @@ class FilesViewModel : BaseItemsModel() {
 enum class FilesType {
     INTERNAL_STORAGE,
     RECENTS,
-    SDCARD
+    SDCARD,
+    APP,
 }

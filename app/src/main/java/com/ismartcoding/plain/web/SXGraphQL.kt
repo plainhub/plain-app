@@ -438,21 +438,23 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("app") {
                     resolver { ->
+                        val context = MainApp.instance
                         App(
                             usbConnected = PlugInControlReceiver.isUSBConnected(),
                             fileIdToken = LocalStorage.fileIdToken,
-                            MainApp.instance.getExternalFilesDir(null)?.path ?: "",
-                            if (LocalStorage.demoMode) "Demo phone" else PhoneHelper.getDeviceName(MainApp.instance),
-                            PhoneHelper.getBatteryPercentage(MainApp.instance),
-                            LocalStorage.appLocale, LocalStorage.appTheme,
+                            externalFilesDir = context.getExternalFilesDir(null)?.path ?: "",
+                            if (LocalStorage.demoMode) "Demo phone" else PhoneHelper.getDeviceName(context),
+                            PhoneHelper.getBatteryPercentage(context),
+                            LocalStorage.appLocale,
+                            LocalStorage.appTheme,
                             MainApp.getAppVersion(),
                             Permission.values().filter { it.isEnabled() && it.can() },
                             LocalStorage.audioPlaylist.map { it.toModel() },
                             LocalStorage.audioPlayMode,
                             LocalStorage.audioPlaying?.path ?: "",
-                            MainApp.instance.allowSensitivePermissions(),
-                            sdcardPath = FileSystemHelper.getSDCardPath(MainApp.instance),
-                            internalStoragePath = FileSystemHelper.getInternalStoragePath(MainApp.instance)
+                            context.allowSensitivePermissions(),
+                            sdcardPath = FileSystemHelper.getSDCardPath(context),
+                            internalStoragePath = FileSystemHelper.getInternalStoragePath(context),
                         )
                     }
                 }

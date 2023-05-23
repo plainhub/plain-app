@@ -203,5 +203,10 @@ suspend fun RecyclerView.updateDrawerMenuAsync(
             iconId = R.drawable.ic_sd_card
         })
     }
+    groups.add(MenuItemModel().apply {
+        isChecked = viewModel.type == FilesType.APP
+        title = getString(R.string.app_name)
+        iconId = R.drawable.ic_app_icon
+    })
     models = groups
 }
