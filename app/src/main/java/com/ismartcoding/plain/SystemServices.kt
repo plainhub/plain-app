@@ -1,5 +1,6 @@
 package com.ismartcoding.plain
 
+import android.app.usage.StorageStatsManager
 import android.content.ClipboardManager
 import android.content.ContentResolver
 import android.content.Context
@@ -52,3 +53,6 @@ val mediaProjectionManager: MediaProjectionManager by lazy {
     MainApp.instance.getSystemServiceCompat(MediaProjectionManager::class.java)
 }
 
+val storageStatsManager: StorageStatsManager by lazy {
+    MainApp.instance.getSystemServiceCompat(StorageStatsManager::class.java)
+}

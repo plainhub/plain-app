@@ -324,7 +324,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("storageStats") {
                     resolver { ->
-                        FileSystemHelper.getMainStorageStats(MainApp.instance).toModel()
+                        StorageStats(FileSystemHelper.getInternalStorageStats().toModel(), FileSystemHelper.getSDCardStorageStats(MainApp.instance)?.toModel())
                     }
                 }
                 query("screenMirrorImage") {

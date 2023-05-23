@@ -1,19 +1,21 @@
 package com.ismartcoding.plain.features.file
 
-import android.app.usage.StorageStatsManager
 import android.content.ContentResolver
 import android.content.Context
 import android.os.Environment
+import android.os.StatFs
 import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.text.TextUtils
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
-import com.ismartcoding.lib.extensions.*
+import com.ismartcoding.lib.extensions.getDirectChildrenCount
+import com.ismartcoding.lib.extensions.getLongValue
+import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.storageManager
+import com.ismartcoding.plain.storageStatsManager
 import kotlinx.datetime.Instant
 import java.io.File
 import java.nio.file.Files
@@ -21,7 +23,7 @@ import java.nio.file.LinkOption
 import java.nio.file.attribute.PosixFileAttributes
 import java.util.*
 import java.util.regex.Pattern
-import kotlin.collections.ArrayList
+
 
 object FileSystemHelper {
     private val physicalPaths = arrayListOf(
@@ -41,17 +43,25 @@ object FileSystemHelper {
         "/storage/usbdisk2"
     )
 
-    fun getMainStorageStats(context: Context): DStorageStats {
-        val stats = DStorageStats()
-        storageManager.primaryStorageVolume.let {
-            // internal storage
-            val storageStatsManager = context.getSystemService(AppCompatActivity.STORAGE_STATS_SERVICE) as StorageStatsManager
-            val uuid = StorageManager.UUID_DEFAULT
-            stats.totalBytes = storageStatsManager.getTotalBytes(uuid)
-            stats.freeBytes = storageStatsManager.getFreeBytes(uuid)
-        }
+    fun getInternalStorageStats(): DStorageStatsItem {
+        val stats = DStorageStatsItem()
+        val uuid = StorageManager.UUID_DEFAULT
+        stats.totalBytes = storageStatsManager.getTotalBytes(uuid)
+        stats.freeBytes = storageStatsManager.getFreeBytes(uuid)
 
         return stats
+    }
+
+    fun getSDCardStorageStats(context: Context): DStorageStatsItem? {
+        val path = getSDCardPath(context)
+        if (path.isNotEmpty()) {
+            val stat = StatFs(getSDCardPath(context))
+            val availableBytes = stat.blockSizeLong * stat.availableBlocksLong
+            val totalBytes = stat.blockSizeLong * stat.blockCountLong
+            return DStorageStatsItem(totalBytes, availableBytes)
+        }
+
+        return null
     }
 
     fun getInternalStoragePath(context: Context): String {
