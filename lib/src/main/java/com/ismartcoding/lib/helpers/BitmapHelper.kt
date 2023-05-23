@@ -3,19 +3,35 @@ package com.ismartcoding.lib.helpers
 import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.net.Uri
 import androidx.exifinterface.media.ExifInterface
-import com.bumptech.glide.Glide
 import com.ismartcoding.lib.logcat.LogCat
 import java.io.IOException
 
+
 object BitmapHelper {
-    fun getBitmapFromContentUri(context: Context, imageUri: Uri): Bitmap? {
-        val decodedBitmap = Glide.with(context)
-            .asBitmap()
-            .load(imageUri)
-            .submit().get()
+    private const val MAX_BITMAP_SIZE = 1024 // Maximum allowed bitmap size (in pixels)
+
+    fun getBitmapFromContentUri(context: Context, imageUri: Uri): Bitmap {
+        val options = BitmapFactory.Options().apply {
+            // Set inJustDecodeBounds to true to retrieve the bitmap size without loading it into memory
+            inJustDecodeBounds = true
+        }
+
+        // Load the bitmap size information without actually loading the bitmap into memory
+        BitmapFactory.decodeFileDescriptor(context.contentResolver.openFileDescriptor(imageUri, "r")?.fileDescriptor, null, options)
+
+        // Calculate the sample size based on the desired maximum bitmap size
+        options.inSampleSize = calculateInSampleSize(options, MAX_BITMAP_SIZE, MAX_BITMAP_SIZE)
+
+        // Reset the options to load the bitmap
+        options.inJustDecodeBounds = false
+
+        // Load the bitmap with the calculated sample size
+        val bitmap = BitmapFactory.decodeFileDescriptor(context.contentResolver.openFileDescriptor(imageUri, "r")?.fileDescriptor, null, options)
+
         val orientation = getExifOrientationTag(context.contentResolver, imageUri)
         var rotationDegrees = 0
         var flipX = false
@@ -37,7 +53,7 @@ object BitmapHelper {
             ExifInterface.ORIENTATION_UNDEFINED, ExifInterface.ORIENTATION_NORMAL -> {}
             else -> {}
         }
-        return rotateBitmap(decodedBitmap, rotationDegrees, flipX, flipY)
+        return rotateBitmap(bitmap, rotationDegrees, flipX, flipY)
     }
 
     private fun getExifOrientationTag(resolver: ContentResolver, imageUri: Uri): Int {
@@ -62,6 +78,24 @@ object BitmapHelper {
             return 0
         }
         return exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+    }
+
+    private fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+        val imageHeight = options.outHeight
+        val imageWidth = options.outWidth
+        var inSampleSize = 1
+
+        if (imageHeight > reqHeight || imageWidth > reqWidth) {
+            val halfHeight = imageHeight / 2
+            val halfWidth = imageWidth / 2
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both height and width larger than the requested height and width
+            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+                inSampleSize *= 2
+            }
+        }
+
+        return inSampleSize
     }
 
     private fun rotateBitmap(

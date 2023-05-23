@@ -84,7 +84,6 @@ class ScanDialog() : BaseDialog<DialogScanBinding>(), OnScanResultCallback {
             }.show()
         }
 
-        binding.photos.isVisible = false
         binding.photos.setSafeClick {
             sendEvent(PickFileEvent(PickFileTag.SCAN, PickFileType.IMAGE, multiple = false))
         }
