@@ -4,24 +4,21 @@ import android.view.MenuItem
 import androidx.annotation.MenuRes
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
-import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.bottomappbar.BottomAppBar
 import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.brv.utils.getModelList
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.databinding.DialogListDrawerBinding
-import com.ismartcoding.plain.databinding.ViewTopAppBarBinding
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.file.FileModel
 import com.ismartcoding.plain.ui.models.BaseItemsModel
+import com.ismartcoding.plain.data.DMediaBucket
+import com.ismartcoding.plain.ui.models.DMediaFolders
 import com.ismartcoding.plain.ui.models.DType
 import com.ismartcoding.plain.ui.models.FilteredItemsViewModel
 
@@ -95,7 +92,13 @@ fun MaterialToolbar.updateTitle(vm: BaseItemsModel, rv: RecyclerView, title: Int
                     (vm.data as DFeed).name
                 }
                 is DType -> {
-                    LocaleHelper.getString((vm.data as DType).titleId)
+                    getString((vm.data as DType).titleId)
+                }
+                is DMediaFolders -> {
+                    getString(R.string.folders)
+                }
+                is DMediaBucket -> {
+                    (vm.data as DMediaBucket).name
                 }
                 else -> {
                     ""

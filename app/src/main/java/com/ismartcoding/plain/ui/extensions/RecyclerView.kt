@@ -164,6 +164,13 @@ suspend fun RecyclerView.updateDrawerMenuAsync(
                     iconId = R.drawable.ic_format_list_bulleted
                 })
             }
+            DrawerMenuGroupType.FOLDERS -> {
+                groups.add(MenuItemModel(DMediaFolders()).apply {
+                    isChecked = viewModel.data is DMediaFolders
+                    title = getString(R.string.folders)
+                    iconId = R.drawable.ic_folder
+                })
+            }
             DrawerMenuGroupType.TRASH -> {
                 groups.add(MenuItemModel().apply {
                     isChecked = viewModel.trash.value == true

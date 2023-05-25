@@ -73,7 +73,7 @@ dependencies {
     // https://github.com/davemorrissey/subsampling-scale-image-view
     api("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
 
-    api("com.tencent:mmkv:1.2.14")
+    api("com.tencent:mmkv:1.2.16")
 
     api("com.geyifeng.immersionbar:immersionbar:3.2.2")
 

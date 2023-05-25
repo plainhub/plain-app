@@ -355,6 +355,7 @@
     <string name="smallest_first">Smallest first</string>
     <string name="create">Create</string>
     <string name="folder">Folder</string>
+    <string name="folders">Folders</string>
     <string name="file">File</string>
     <string name="open_with">Open with</string>
     <string name="get_info">Get info</string>

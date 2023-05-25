@@ -7,8 +7,9 @@ import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.helpers.SearchHelper
-import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.features.BaseContentHelper
+import com.ismartcoding.plain.features.file.FileSortBy
 
 object ImageHelper : BaseContentHelper() {
     override val uriExternal: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
@@ -29,6 +30,8 @@ object ImageHelper : BaseContentHelper() {
             queryGroups.forEach {
                 if (it.name == "text") {
                     where.add("${MediaStore.Images.Media.TITLE} LIKE ?", "%${it.value}%")
+                } else if (it.name == "bucket_name") {
+                    where.add("${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ?", it.value)
                 } else if (it.name == "ids") {
                     val ids = it.value.split(",")
                     if (ids.isNotEmpty()) {
@@ -54,5 +57,44 @@ object ImageHelper : BaseContentHelper() {
             } while (cursor.moveToNext())
         }
         return result
+    }
+
+    fun getBuckets(context: Context): List<DMediaBucket> {
+        val bucketMap = mutableMapOf<String, DMediaBucket>()
+
+        // Columns to retrieve from the MediaStore query
+        val projection = arrayOf(
+            MediaStore.Images.Media.BUCKET_ID,
+            MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
+            MediaStore.Images.Media.DATA
+        )
+
+        // Querying the MediaStore for images
+        val cursor = context.contentResolver.query(
+            uriExternal,
+            projection,
+            "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} != ''",
+            null,
+            null
+        )
+
+        cursor?.use { c ->
+            while (c.moveToNext()) {
+                val bucketId = c.getStringValue(MediaStore.Images.Media.BUCKET_ID)
+                val bucketName = c.getStringValue(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
+                val path = c.getStringValue(MediaStore.Images.Media.DATA)
+                val bucket = bucketMap[bucketName]
+                if (bucket != null) {
+                    if (bucket.topItems.size < 4) {
+                        bucket.topItems.add(path)
+                    }
+                    bucket.itemCount++
+                } else {
+                    bucketMap[bucketName] = DMediaBucket(bucketId, bucketName, 1, mutableListOf(path))
+                }
+            }
+        }
+
+        return bucketMap.values.sortedBy { it.name.lowercase() }
     }
 }

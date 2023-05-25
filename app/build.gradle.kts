@@ -29,16 +29,16 @@ android {
         minSdk = 28
         targetSdk = 33
 
-        val abiFilterList = if (hasProperty("abiFilters")) property("abiFilters").toString().split(';') else listOf()
+        val abiFilterList = if (hasProperty("abiFilters")) property("abiFilters").toString().split(';') else listOf("arm64-v8a")
         val singleAbiNum = when (abiFilterList.takeIf { it.size == 1 }?.first()) {
             "armeabi-v7a" -> 2
             "arm64-v8a" -> 1
             else -> 0
         }
 
-        val vCode = 37
+        val vCode = 40
         versionCode = vCode - singleAbiNum
-        versionName = "1.0.22"
+        versionName = "1.0.23"
 
         ndk {
             abiFilters += abiFilterList

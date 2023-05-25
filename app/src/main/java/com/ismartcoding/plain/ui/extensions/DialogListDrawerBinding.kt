@@ -6,6 +6,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.enums.TagType
 import com.ismartcoding.plain.databinding.DialogListDrawerBinding
 import com.ismartcoding.plain.ui.models.FilteredItemsViewModel
@@ -27,13 +28,13 @@ fun DialogListDrawerBinding.initToggleMode(viewLifecycleOwner: LifecycleOwner, v
                 list.rv.setPadding(0, 0, 0, context.dp2px(32))
             }
             bottomAction.performHide()
-            drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+            drawer.setDrawerLockMode(if (viewModel.data is DMediaBucket) DrawerLayout.LOCK_MODE_LOCKED_CLOSED else DrawerLayout.LOCK_MODE_UNLOCKED)
         }
         topAppBar.toolbar.menu.run {
             findItem(R.id.select_all)?.isVisible = toggleMode
             findItem(R.id.select_all)?.setTitle(R.string.select_all)
             findItem(R.id.search)?.isVisible = !toggleMode
-            findItem(R.id.menu)?.isVisible = !toggleMode
+            findItem(R.id.menu)?.isVisible = !toggleMode && viewModel.data !is DMediaBucket
             findItem(R.id.sort)?.isVisible = !toggleMode
             findItem(R.id.more)?.isVisible = !toggleMode
         }

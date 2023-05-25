@@ -3,12 +3,11 @@ package com.ismartcoding.plain.ui.scan
 import android.app.Dialog
 import android.os.Bundle
 import android.view.View
-import androidx.core.view.isVisible
 import com.google.zxing.Result
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.*
-import com.ismartcoding.lib.helpers.BitmapHelper
+import com.ismartcoding.lib.helpers.QrCodeBitmapHelper
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.plain.LocalStorage
@@ -60,7 +59,7 @@ class ScanDialog() : BaseDialog<DialogScanBinding>(), OnScanResultCallback {
             coIO {
                 try {
                     DialogHelper.showLoading()
-                    val bitmap = BitmapHelper.getBitmapFromContentUri(requireContext(), event.uris.first())
+                    val bitmap = QrCodeBitmapHelper.getBitmapFromContentUri(requireContext(), event.uris.first())
                     // TODO: OOM needs to be fixed
                     val result = CodeUtils.parseQRCode(bitmap)
                     DialogHelper.hideLoading()

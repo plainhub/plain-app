@@ -354,6 +354,7 @@
     <string name="smallest_first">大小(从小到大)</string>
     <string name="create">创建</string>
     <string name="folder">目录</string>
+    <string name="folders">目录</string>
     <string name="file">文件</string>
     <string name="open_with">打开</string>
     <string name="get_info">获取详情</string>

@@ -8,19 +8,22 @@ import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.extensions.dp2px
+import com.ismartcoding.lib.helpers.BitmapHelper
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.lib.rv.GridSpacingItemDecoration
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.ActionEvent
-import com.ismartcoding.plain.features.PermissionResultEvent
+import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.TagType
 import com.ismartcoding.plain.databinding.ItemImageGridBinding
+import com.ismartcoding.plain.databinding.ItemMediaBucketGridBinding
+import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.file.MediaType
-import com.ismartcoding.plain.features.image.DImage
 import com.ismartcoding.plain.features.image.ImageHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.CastDialog
@@ -28,14 +31,15 @@ import com.ismartcoding.plain.ui.extensions.checkPermission
 import com.ismartcoding.plain.ui.extensions.checkable
 import com.ismartcoding.plain.ui.extensions.highlightTitle
 import com.ismartcoding.plain.ui.helpers.FileSortHelper
+import com.ismartcoding.plain.ui.models.DMediaFolders
 import com.ismartcoding.plain.ui.models.DrawerMenuGroupType
-import com.ismartcoding.plain.ui.models.IDataModel
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import com.ismartcoding.plain.ui.preview.TransitionHelper
+import com.ismartcoding.plain.ui.views.mergeimages.CombineBitmapTools
 import kotlinx.coroutines.launch
 
-class ImagesDialog() : BaseListDrawerDialog() {
+class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
     override val titleId: Int
         get() = R.string.images_title
 
@@ -43,6 +47,7 @@ class ImagesDialog() : BaseListDrawerDialog() {
         get() = TagType.IMAGE
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        viewModel.data = bucket
         super.onViewCreated(view, savedInstanceState)
         checkPermission()
         initBottomBar(R.menu.action_images) {
@@ -75,26 +80,52 @@ class ImagesDialog() : BaseListDrawerDialog() {
         rv.layoutManager = GridLayoutManager(context, spanCount)
         rv.setup {
             addType<ImageModel>(R.layout.item_image_grid)
+            addType<DMediaBucket>(R.layout.item_media_bucket_grid)
             onBind {
-                val m = getModel<ImageModel>()
-                val b = getBinding<ItemImageGridBinding>()
-                TransitionHelper.put(m.data.id, b.image)
+                if (itemViewType == R.layout.item_media_bucket_grid) {
+                    val m = getModel<DMediaBucket>()
+                    val b = getBinding<ItemMediaBucketGridBinding>()
+                    coMain {
+                        val bitmaps = withIO {
+                            m.topItems.map { path ->
+                                BitmapHelper.decodeBitmapFromFile(path, 200, 200)
+                            }
+                        }
+                        b.image.setImageBitmap(
+                            CombineBitmapTools.combineBitmap(
+                                200, 200,
+                                bitmaps
+                            )
+                        )
+                    }
+                } else {
+                    val m = getModel<ImageModel>()
+                    val b = getBinding<ItemImageGridBinding>()
+                    TransitionHelper.put(m.data.id, b.image)
+                }
             }
 
             R.id.container.onLongClick {
-                viewModel.toggleMode.value = true
-                rv.bindingAdapter.setChecked(bindingAdapterPosition, true)
+                if (itemViewType == R.layout.item_image_grid) {
+                    viewModel.toggleMode.value = true
+                    rv.bindingAdapter.setChecked(bindingAdapterPosition, true)
+                }
             }
 
             checkable(onItemClick = {
-                val m = getModel<ImageModel>()
-                if (viewModel.castMode) {
-                    CastDialog(arrayListOf(), m.data.path).show()
+                if (itemViewType == R.layout.item_media_bucket_grid) {
+                    val m = getModel<DMediaBucket>()
+                    ImagesDialog(m).show()
                 } else {
-                    PreviewDialog().show(
-                        items = getModelList<ImageModel>().map { s -> PreviewItem(s.data.id, s.data.path) },
-                        initKey = m.data.id,
-                    )
+                    val m = getModel<ImageModel>()
+                    if (viewModel.castMode) {
+                        CastDialog(arrayListOf(), m.data.path).show()
+                    } else {
+                        PreviewDialog().show(
+                            items = getModelList<ImageModel>().map { s -> PreviewItem(s.data.id, s.data.path) },
+                            initKey = m.data.id,
+                        )
+                    }
                 }
             }, onChecked = {
                 updateBottomActions()
@@ -112,29 +143,44 @@ class ImagesDialog() : BaseListDrawerDialog() {
 
     override fun updateList() {
         lifecycleScope.launch {
-            val query = viewModel.getQuery()
-            val items = withIO { ImageHelper.search(requireContext(), query, viewModel.limit, viewModel.offset, LocalStorage.imageSortBy) }
-            viewModel.total = withIO { ImageHelper.count(requireContext(), query) }
-
-            val bindingAdapter = binding.list.rv.bindingAdapter
-            val toggleMode = bindingAdapter.toggleMode
-            val checkedItems = bindingAdapter.getCheckedModels<ImageModel>()
-            binding.list.page.addData(items.map { a ->
-                ImageModel(a).apply {
-                    title = a.title
-                    this.toggleMode = toggleMode
-                    size = FormatHelper.formatBytes(a.size)
-                    isChecked = checkedItems.any { it.data.id == data.id }
-                }
-            }, hasMore = {
-                items.size == viewModel.limit
-            })
+            if (viewModel.data is DMediaFolders) {
+                updateFolders()
+            } else {
+                updateImages()
+            }
             updateTitle()
         }
     }
 
-    override fun updateDrawerMenu() {
-        updateDrawerMenu(DrawerMenuGroupType.ALL, DrawerMenuGroupType.TAGS)
+    private suspend fun updateImages() {
+        val query = viewModel.getQuery()
+        val items = withIO { ImageHelper.search(requireContext(), query, viewModel.limit, viewModel.offset, LocalStorage.imageSortBy) }
+        viewModel.total = withIO { ImageHelper.count(requireContext(), query) }
+
+        val bindingAdapter = binding.list.rv.bindingAdapter
+        val toggleMode = bindingAdapter.toggleMode
+        val checkedItems = bindingAdapter.getCheckedModels<ImageModel>()
+        binding.list.page.addData(items.map { a ->
+            ImageModel(a).apply {
+                title = a.title
+                this.toggleMode = toggleMode
+                size = FormatHelper.formatBytes(a.size)
+                isChecked = checkedItems.any { it.data.id == data.id }
+            }
+        }, hasMore = {
+            items.size == viewModel.limit
+        })
     }
+
+    private suspend fun updateFolders() {
+        val items = withIO { ImageHelper.getBuckets(requireContext()) }
+        viewModel.total = items.size
+        binding.list.page.addData(items, hasMore = { false })
+    }
+
+    override fun updateDrawerMenu() {
+        updateDrawerMenu(DrawerMenuGroupType.ALL, DrawerMenuGroupType.FOLDERS, DrawerMenuGroupType.TAGS)
+    }
+
 }
 

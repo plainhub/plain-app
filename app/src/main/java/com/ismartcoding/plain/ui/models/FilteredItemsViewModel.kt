@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.models
 
 import androidx.lifecycle.MutableLiveData
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.data.enums.TagType
 import com.ismartcoding.plain.db.DFeed
@@ -31,6 +32,9 @@ open class FilteredItemsViewModel : BaseItemsModel() {
                     val type = (data as DType).id
                     query += " type:${type}"
                 }
+                is DMediaBucket -> {
+                    query += " bucket_name:${(data as DMediaBucket).name}"
+                }
             }
         }
 
@@ -38,4 +42,5 @@ open class FilteredItemsViewModel : BaseItemsModel() {
     }
 }
 
-data class DType(override var id: String, val titleId: Int, val iconId: Int): IData
+data class DType(override var id: String, val titleId: Int, val iconId: Int) : IData
+data class DMediaFolders(override var id: String = ""): IData

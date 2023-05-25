@@ -6,6 +6,7 @@ import android.view.View
 import androidx.annotation.MenuRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updateLayoutParams
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.brv.utils.bindingAdapter
@@ -13,8 +14,8 @@ import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.extensions.isGestureNavigationBar
 import com.ismartcoding.lib.extensions.navigationBarHeight
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
@@ -23,10 +24,7 @@ import com.ismartcoding.plain.databinding.DialogListDrawerBinding
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.extensions.*
-import com.ismartcoding.plain.ui.models.DrawerMenuGroupType
-import com.ismartcoding.plain.ui.models.DrawerMenuItemClickedEvent
-import com.ismartcoding.plain.ui.models.FilteredItemsViewModel
-import com.ismartcoding.plain.ui.models.IDataModel
+import com.ismartcoding.plain.ui.models.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -95,6 +93,7 @@ abstract class BaseListDrawerDialog : BaseDialog<DialogListDrawerBinding>() {
             viewModel.data = m.data as? IData
             binding.drawer.close()
             binding.topAppBar.layout.setExpanded(true)
+            initTopAppBar()
             updateTitle()
             coMain {
                 delay(250) // wait until the drawer is closed to make sure the animation is smooth on some phones.
@@ -130,6 +129,10 @@ abstract class BaseListDrawerDialog : BaseDialog<DialogListDrawerBinding>() {
     protected fun initTopAppBar(@MenuRes menuId: Int, menuItemClick: MenuItem.() -> Unit) {
         binding.topAppBar.toolbar.run {
             initMenu(menuId)
+
+            val isVisible = viewModel.data == null || viewModel.data !is DMediaFolders
+            menu.findItem(R.id.search).isVisible = isVisible
+            menu.findItem(R.id.more).isVisible = isVisible
 
             onBack {
                 onBackPressed()
