@@ -1,10 +1,18 @@
 package com.ismartcoding.lib.helpers
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import com.ismartcoding.lib.extensions.getBitmap
+import com.ismartcoding.lib.extensions.isVideoFast
+import java.io.File
 
 object BitmapHelper {
-    fun decodeBitmapFromFile(filePath: String, reqWidth: Int, reqHeight: Int): Bitmap {
+    fun decodeBitmapFromFile(context: Context, filePath: String, reqWidth: Int, reqHeight: Int): Bitmap? {
+        if (filePath.isVideoFast()) {
+            return File(filePath).getBitmap(context, reqWidth, reqHeight, centerCrop = true)
+        }
+
         val options = BitmapFactory.Options()
         options.inJustDecodeBounds = true
         BitmapFactory.decodeFile(filePath, options)

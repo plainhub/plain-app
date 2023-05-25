@@ -33,7 +33,7 @@ open class FilteredItemsViewModel : BaseItemsModel() {
                     query += " type:${type}"
                 }
                 is DMediaBucket -> {
-                    query += " bucket_name:${(data as DMediaBucket).name}"
+                    query += " bucket_id:${(data as DMediaBucket).id}"
                 }
             }
         }

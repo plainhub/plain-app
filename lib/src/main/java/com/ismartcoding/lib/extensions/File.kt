@@ -68,7 +68,8 @@ fun File.getBitmap(context: Context, width: Int, height: Int, centerCrop: Boolea
         val d = Glide.with(context).load(this)
             .apply(options)
             .submit().get()
-        bitmap = (d as BitmapDrawable).bitmap
+        // https://stackoverflow.com/questions/58314397/java-lang-illegalstateexception-software-rendering-doesnt-support-hardware-bit
+        bitmap = (d as BitmapDrawable).bitmap.copy(Bitmap.Config.ARGB_8888, false)
     }
     return bitmap
 }

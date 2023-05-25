@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.image
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
@@ -12,6 +13,7 @@ import com.ismartcoding.lib.helpers.BitmapHelper
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.rv.GridSpacingItemDecoration
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
@@ -87,16 +89,25 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
                     val b = getBinding<ItemMediaBucketGridBinding>()
                     coMain {
                         val bitmaps = withIO {
-                            m.topItems.map { path ->
-                                BitmapHelper.decodeBitmapFromFile(path, 200, 200)
+                            val bms = mutableListOf<Bitmap>()
+                            m.topItems.forEach { path ->
+                                val bm = BitmapHelper.decodeBitmapFromFile(context, path, 200, 200)
+                                if (bm != null) {
+                                    bms.add(bm)
+                                }
                             }
+                            bms
                         }
-                        b.image.setImageBitmap(
-                            CombineBitmapTools.combineBitmap(
-                                200, 200,
-                                bitmaps
+                        try {
+                            b.image.setImageBitmap(
+                                CombineBitmapTools.combineBitmap(
+                                    200, 200,
+                                    bitmaps
+                                )
                             )
-                        )
+                        } catch (ex: Exception) {
+                            LogCat.e(ex.toString())
+                        }
                     }
                 } else {
                     val m = getModel<ImageModel>()

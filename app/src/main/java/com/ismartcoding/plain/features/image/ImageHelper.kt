@@ -30,8 +30,8 @@ object ImageHelper : BaseContentHelper() {
             queryGroups.forEach {
                 if (it.name == "text") {
                     where.add("${MediaStore.Images.Media.TITLE} LIKE ?", "%${it.value}%")
-                } else if (it.name == "bucket_name") {
-                    where.add("${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} = ?", it.value)
+                } else if (it.name == "bucket_id") {
+                    where.add("${MediaStore.Images.Media.BUCKET_ID} = ?", it.value)
                 } else if (it.name == "ids") {
                     val ids = it.value.split(",")
                     if (ids.isNotEmpty()) {
@@ -83,14 +83,14 @@ object ImageHelper : BaseContentHelper() {
                 val bucketId = c.getStringValue(MediaStore.Images.Media.BUCKET_ID)
                 val bucketName = c.getStringValue(MediaStore.Images.Media.BUCKET_DISPLAY_NAME)
                 val path = c.getStringValue(MediaStore.Images.Media.DATA)
-                val bucket = bucketMap[bucketName]
+                val bucket = bucketMap[bucketId]
                 if (bucket != null) {
                     if (bucket.topItems.size < 4) {
                         bucket.topItems.add(path)
                     }
                     bucket.itemCount++
                 } else {
-                    bucketMap[bucketName] = DMediaBucket(bucketId, bucketName, 1, mutableListOf(path))
+                    bucketMap[bucketId] = DMediaBucket(bucketId, bucketName, 1, mutableListOf(path))
                 }
             }
         }
