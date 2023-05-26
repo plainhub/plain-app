@@ -33,6 +33,8 @@ Video: https://www.youtube.com/watch?v=RvO18j4r95o
 
 Reddit: https://www.reddit.com/r/plainapp
 
+Discord: https://discord.gg/RQWcS6DEEe
+
 ## Disclaimer
 
 - ⚠️ The project is under **very active** development.
