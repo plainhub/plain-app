@@ -11,7 +11,6 @@ import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.helpers.BitmapHelper
-import com.ismartcoding.lib.helpers.CoroutinesHelper
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
@@ -28,7 +27,6 @@ import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.file.MediaType
-import com.ismartcoding.plain.features.image.ImageHelper
 import com.ismartcoding.plain.features.video.VideoHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.CastDialog
@@ -37,8 +35,6 @@ import com.ismartcoding.plain.ui.extensions.checkable
 import com.ismartcoding.plain.ui.extensions.highlightTitle
 import com.ismartcoding.plain.ui.extensions.setSafeClick
 import com.ismartcoding.plain.ui.helpers.FileSortHelper
-import com.ismartcoding.plain.ui.image.ImageModel
-import com.ismartcoding.plain.ui.image.ImagesDialog
 import com.ismartcoding.plain.ui.models.DMediaFolders
 import com.ismartcoding.plain.ui.models.DrawerMenuGroupType
 import com.ismartcoding.plain.ui.preview.PreviewDialog
@@ -47,7 +43,7 @@ import com.ismartcoding.plain.ui.preview.TransitionHelper
 import com.ismartcoding.plain.ui.views.mergeimages.CombineBitmapTools
 import kotlinx.coroutines.launch
 
-class VideosDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
+class VideosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
     override val titleId: Int
         get() = R.string.videos_title
 

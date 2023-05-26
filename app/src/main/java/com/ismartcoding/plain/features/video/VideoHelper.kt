@@ -49,15 +49,15 @@ object VideoHelper : BaseContentHelper() {
     fun search(context: Context, query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DVideo> {
         val cursor = getSearchCursor(context, query, limit, offset, sortBy.toSortBy())
         val result = mutableListOf<DVideo>()
-        if (cursor?.moveToFirst() == true) {
-            do {
+        cursor?.use { c ->
+            while (c.moveToNext()) {
                 val id = cursor.getStringValue(MediaStore.Video.Media._ID)
                 val title = cursor.getStringValue(MediaStore.Video.Media.TITLE)
                 val size = cursor.getLongValue(MediaStore.Video.Media.SIZE)
                 val duration = cursor.getLongValue(MediaStore.Video.Media.DURATION) / 1000
                 val path = cursor.getStringValue(MediaStore.Video.Media.DATA)
                 result.add(DVideo(id, title, path, duration, size))
-            } while (cursor.moveToNext())
+            }
         }
         return result
     }

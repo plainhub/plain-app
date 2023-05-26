@@ -1,36 +1,38 @@
 package com.ismartcoding.plain.ui.audio
 
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import com.ismartcoding.lib.brv.utils.bindingAdapter
-import com.ismartcoding.lib.brv.utils.getModelList
-import com.ismartcoding.lib.brv.utils.linear
-import com.ismartcoding.lib.brv.utils.setup
+import com.ismartcoding.lib.brv.utils.*
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
+import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.TagType
 import com.ismartcoding.plain.features.*
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioHelper
-import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.features.file.MediaType
+import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.CastDialog
 import com.ismartcoding.plain.ui.extensions.checkPermission
 import com.ismartcoding.plain.ui.extensions.checkable
 import com.ismartcoding.plain.ui.extensions.highlightTitle
 import com.ismartcoding.plain.ui.helpers.FileSortHelper
+import com.ismartcoding.plain.ui.models.DMediaFolders
 import com.ismartcoding.plain.ui.models.DrawerMenuGroupType
 import kotlinx.coroutines.launch
 
-class AudiosDialog() : BaseListDrawerDialog() {
+class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
     override val titleId: Int
         get() = R.string.audios_title
 
@@ -38,6 +40,7 @@ class AudiosDialog() : BaseListDrawerDialog() {
         get() = TagType.AUDIO
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        viewModel.data = bucket
         super.onViewCreated(view, savedInstanceState)
         binding.list.rv.setPadding(0, 0, 0, requireContext().dp2px(72))
         binding.player.isVisible = true
@@ -81,35 +84,25 @@ class AudiosDialog() : BaseListDrawerDialog() {
     }
 
     private fun updatePlayingState() {
-        binding.list.rv.getModelList<AudioModel>().forEach {
-            val old = it.isPlaying
-            it.checkIsPlaying(it.data.path)
-            if (old != it.isPlaying) {
-                it.notifyChange()
+        binding.list.rv.models?.forEach {
+            if (it is AudioModel) {
+                val old = it.isPlaying
+                it.checkIsPlaying(it.data.path)
+                if (old != it.isPlaying) {
+                    it.notifyChange()
+                }
             }
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun updateList() {
         lifecycleScope.launch {
-            val query = viewModel.getQuery()
-            val items = withIO { AudioHelper.search(requireContext(), query, viewModel.limit, viewModel.offset, LocalStorage.audioSortBy) }
-            viewModel.total = withIO { AudioHelper.count(requireContext(), query) }
-
-            val bindingAdapter = binding.list.rv.bindingAdapter
-            val toggleMode = bindingAdapter.toggleMode
-            val checkedItems = bindingAdapter.getCheckedModels<AudioModel>()
-            binding.list.page.addData(items.map { a ->
-                AudioModel(a).apply {
-                    title = a.title
-                    subtitle = a.artist + " " + FormatHelper.formatDuration(a.duration)
-                    this.toggleMode = toggleMode
-                    isChecked = checkedItems.any { it.data.id == data.id }
-                    checkIsPlaying(a.path)
-                }
-            }, hasMore = {
-                items.size == viewModel.limit
-            })
+            if (viewModel.data is DMediaFolders) {
+                updateFolders()
+            } else {
+                updateAudios()
+            }
             updateTitle()
         }
     }
@@ -125,18 +118,26 @@ class AudiosDialog() : BaseListDrawerDialog() {
         val rv = binding.list.rv
         rv.linear().setup {
             addType<AudioModel>(R.layout.item_audio)
+            addType<DMediaBucket>(R.layout.item_audio_bucket)
             R.id.container.onLongClick {
-                viewModel.toggleMode.value = true
-                rv.bindingAdapter.setChecked(bindingAdapterPosition, true)
+                if (itemViewType == R.layout.item_audio) {
+                    viewModel.toggleMode.value = true
+                    rv.bindingAdapter.setChecked(bindingAdapterPosition, true)
+                }
             }
 
             checkable(onItemClick = {
-                val m = getModel<AudioModel>()
-                if (viewModel.castMode) {
-                    CastDialog(arrayListOf(), m.data.path).show()
+                if (itemViewType == R.layout.item_audio_bucket) {
+                    val m = getModel<DMediaBucket>()
+                    AudiosDialog(m).show()
                 } else {
-                    Permissions.checkNotification(R.string.audio_notification_prompt) {
-                        AudioPlayerService.play(requireContext(), getModel<AudioModel>().data.toPlaylistAudio())
+                    val m = getModel<AudioModel>()
+                    if (viewModel.castMode) {
+                        CastDialog(arrayListOf(), m.data.path).show()
+                    } else {
+                        Permissions.checkNotification(R.string.audio_notification_prompt) {
+                            AudioPlayerService.play(requireContext(), getModel<AudioModel>().data.toPlaylistAudio())
+                        }
                     }
                 }
             }, onChecked = {
@@ -149,7 +150,39 @@ class AudiosDialog() : BaseListDrawerDialog() {
     }
 
     override fun updateDrawerMenu() {
-        updateDrawerMenu(DrawerMenuGroupType.ALL, DrawerMenuGroupType.TAGS)
+        if (isQPlus()) {
+            updateDrawerMenu(DrawerMenuGroupType.ALL, DrawerMenuGroupType.FOLDERS, DrawerMenuGroupType.TAGS)
+        } else {
+            updateDrawerMenu(DrawerMenuGroupType.ALL, DrawerMenuGroupType.TAGS)
+        }
+    }
+
+    private suspend fun updateAudios() {
+        val query = viewModel.getQuery()
+        val items = withIO { AudioHelper.search(requireContext(), query, viewModel.limit, viewModel.offset, LocalStorage.audioSortBy) }
+        viewModel.total = withIO { AudioHelper.count(requireContext(), query) }
+
+        val bindingAdapter = binding.list.rv.bindingAdapter
+        val toggleMode = bindingAdapter.toggleMode
+        val checkedItems = bindingAdapter.getCheckedModels<AudioModel>()
+        binding.list.page.addData(items.map { a ->
+            AudioModel(a).apply {
+                title = a.title
+                subtitle = a.artist + " " + FormatHelper.formatDuration(a.duration)
+                this.toggleMode = toggleMode
+                isChecked = checkedItems.any { it.data.id == data.id }
+                checkIsPlaying(a.path)
+            }
+        }, hasMore = {
+            items.size == viewModel.limit
+        })
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private suspend fun updateFolders() {
+        val items = withIO { AudioHelper.getBuckets(requireContext()) }
+        viewModel.total = items.size
+        binding.list.page.addData(items, hasMore = { false })
     }
 }
 
