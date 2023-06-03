@@ -131,8 +131,8 @@ abstract class BaseListDrawerDialog : BaseDialog<DialogListDrawerBinding>() {
             initMenu(menuId)
 
             val isVisible = viewModel.data == null || viewModel.data !is DMediaFolders
-            menu.findItem(R.id.search).isVisible = isVisible
-            menu.findItem(R.id.more).isVisible = isVisible
+            menu.findItem(R.id.search)?.isVisible = isVisible
+            menu.findItem(R.id.more)?.isVisible = isVisible
 
             onBack {
                 onBackPressed()
