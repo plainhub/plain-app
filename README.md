@@ -93,3 +93,5 @@ storeFile=release.jks
 
 Loved the project? [Consider buying me a cup of Ko-Fi!](https://ko-fi.com/ismartcoding)
 
+<img src="assets/donate-wechat.jpeg" width="200"/>
+
