@@ -193,6 +193,12 @@
         <item name="android:textSize">@dimen/text_size_lg</item>
     </style>
 
+    <style name="Button.Small">
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">@dimen/text_size_normal</item>
+    </style>
+
     <style name="ActionButton" parent="Widget.Material3.Button.OutlinedButton">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>

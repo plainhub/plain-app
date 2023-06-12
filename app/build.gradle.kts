@@ -20,8 +20,6 @@ rootProject.file("keystore.properties").let {
     }
 }
 
-val hasNoSplits = hasProperty("noSplits")
-
 android {
     compileSdk = 33
     defaultConfig {
@@ -63,15 +61,6 @@ android {
                 debugSymbolLevel = "SYMBOL_TABLE"
             }
             setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
-        }
-    }
-
-    splits {
-        abi {
-            isEnable = !hasNoSplits
-            reset()
-            include("x86_64", "armeabi-v7a", "arm64-v8a")
-            isUniversalApk = true
         }
     }
 
@@ -161,7 +150,6 @@ dependencies {
     implementation("com.aallam.openai:openai-client:3.2.0")
 
     implementation("com.github.jenly1314:zxing-lite:2.4.0")
-    implementation("com.getkeepsafe.relinker:relinker:1.4.5")
     // Feed
     implementation("com.rometools:rome:1.18.0")
     implementation("com.rometools:rome-opml:1.18.0")

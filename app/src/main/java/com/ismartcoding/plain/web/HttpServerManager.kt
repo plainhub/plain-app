@@ -22,18 +22,17 @@ import kotlin.collections.set
 
 object HttpServerManager {
     private const val SSL_KEY_ALIAS = Constants.SSL_NAME
-    var password = CryptoHelper.randomPassword(6)   // the password to login to web console
     var tokenCache = mutableMapOf<String, ByteArray>() // cache the session token, format: <client_id>:<token>
     val clientIpCache = mutableMapOf<String, String>()  // format: <client_id>:<client_ip>
     val wsSessions = Collections.synchronizedSet<WebSocketSession>(LinkedHashSet())
     val clientRequestTs = mutableMapOf<String, Long>()
 
     fun resetPassword() {
-        password = CryptoHelper.randomPassword(6)
+        LocalStorage.httpServerPassword = CryptoHelper.randomPassword(6)
     }
 
     fun passwordToToken(): ByteArray {
-        return hashToToken(CryptoHelper.sha512(password.toByteArray()))
+        return hashToToken(CryptoHelper.sha512(LocalStorage.httpServerPassword.toByteArray()))
     }
 
     fun hashToToken(hash: String): ByteArray {

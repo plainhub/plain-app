@@ -14,6 +14,7 @@ import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.DownloadFileItem
 import com.ismartcoding.plain.data.DownloadFileItemWrap
+import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.FileHelper
@@ -327,7 +328,12 @@ fun Application.module() {
                 return@post
             }
             HttpServerManager.clientIpCache[clientId] = call.request.origin.remoteHost
-            call.respond(HttpStatusCode.NoContent)
+            if (LocalStorage.httpServerPasswordType == PasswordType.NONE) {
+                HttpServerManager.resetPassword()
+                call.respondText(LocalStorage.httpServerPassword)
+            } else {
+                call.respond(HttpStatusCode.NoContent)
+            }
         }
 
         webSocket("/") {
@@ -345,7 +351,7 @@ fun Application.module() {
                         is Frame.Binary -> {
                             if (q["auth"] == "1") {
                                 var r: AuthRequest? = null
-                                val hash = CryptoHelper.sha512(HttpServerManager.password.toByteArray())
+                                val hash = CryptoHelper.sha512(LocalStorage.httpServerPassword.toByteArray())
                                 val token = HttpServerManager.hashToToken(hash)
                                 val decryptedBytes = CryptoHelper.aesDecrypt(token, frame.readBytes())
                                 if (decryptedBytes != null) {

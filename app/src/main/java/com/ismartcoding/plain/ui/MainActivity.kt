@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -61,6 +62,7 @@ class MainActivity : AppCompatActivity() {
     private var pickFileType = PickFileType.IMAGE
     private var pickFileTag = PickFileTag.SEND_MESSAGE
     private var exportFileType = ExportFileType.OPML
+    private var requestToConnectDialog: AlertDialog? = null
 
     private val screenCapture = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null) {
@@ -314,7 +316,11 @@ class MainActivity : AppCompatActivity() {
         receiveEvent<ConfirmToAcceptLoginEvent> { event ->
             val session = event.session
             val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
-            MaterialAlertDialogBuilder(instance.get()!!)
+            if (requestToConnectDialog?.isShowing == true) {
+                requestToConnectDialog?.dismiss()
+                requestToConnectDialog = null
+            }
+            requestToConnectDialog = MaterialAlertDialogBuilder(instance.get()!!)
                 .setTitle(getStringF(R.string.request_to_connect, "ip", clientIp))
                 .setMessage(
                     getStringF(
@@ -361,7 +367,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 .create()
-                .show()
+            requestToConnectDialog?.show()
         }
 
     }

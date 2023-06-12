@@ -9,12 +9,6 @@
         android:layout_height="wrap_content"
         app:keyText="@string/enable" />
 
-    <com.ismartcoding.plain.ui.views.ListItemView
-        android:id="@+id/password"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:keyText="@string/password" />
-
     <TextView
         style="@style/Tips.Bottom"
         android:text="@string/must_in_the_same_lan" />
@@ -66,5 +60,12 @@
     <TextView
         android:id="@+id/tips"
         style="@style/Tips.Bottom" />
+
+    <com.ismartcoding.plain.ui.views.ListItemView
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/size_normal"
+        app:keyText="@string/password" />
 
 </LinearLayout>

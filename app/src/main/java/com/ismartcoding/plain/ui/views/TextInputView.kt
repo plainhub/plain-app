@@ -13,6 +13,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.LinearLayout
 import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.textfield.TextInputLayout.EndIconMode
 import com.ismartcoding.lib.softinput.hideSoftInput
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.IFormItem
@@ -101,6 +102,12 @@ class TextInputView(context: Context, attrs: AttributeSet?) : LinearLayout(conte
         }
     }
 
+    fun setEndIconOnClick(callback: () -> Unit) {
+        binding.layout.setEndIconOnClickListener {
+            callback()
+        }
+    }
+
     private fun validate(value: String) {
         if (isRequired && text.isEmpty()) {
             error = getString(R.string.input_required)
@@ -123,6 +130,7 @@ class TextInputView(context: Context, attrs: AttributeSet?) : LinearLayout(conte
         isRequired = a.getBoolean(R.styleable.TextInputView_isRequired, false)
         val lines = a.getInt(R.styleable.TextInputView_lines, 1)
         val aEndIconMode = a.getInt(R.styleable.TextInputView_endIconMode, TextInputLayout.END_ICON_CLEAR_TEXT)
+        val aEndIconDrawable = a.getDrawable(R.styleable.TextInputView_endIconDrawable)
         val aInputType = a.getInt(R.styleable.TextInputView_android_inputType, -1)
 
         a.recycle()
@@ -158,6 +166,7 @@ class TextInputView(context: Context, attrs: AttributeSet?) : LinearLayout(conte
             placeholderText = aPlaceHolder
             helperText = aHelperText
             endIconMode = aEndIconMode
+            endIconDrawable = aEndIconDrawable
             editText?.run {
                 addTextChangedListener(object : TextWatcher {
                     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}

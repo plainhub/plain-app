@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.core.view.ViewCompat
 import com.google.android.material.chip.Chip
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.features.rule.RuleAction
 import com.ismartcoding.plain.features.rule.RuleDirection
 import com.ismartcoding.plain.features.TargetType
@@ -34,6 +35,14 @@ data class ChipItem(val text: String, val value: String) {
             val items = mutableListOf<ChipItem>()
             RuleDirection.values().forEach {
                 items.add(ChipItem(it.getText(), it.value))
+            }
+            return items
+        }
+
+        fun getPasswordTypes(): List<ChipItem> {
+            val items = mutableListOf<ChipItem>()
+            PasswordType.values().forEach {
+                items.add(ChipItem(it.getText(), it.name))
             }
             return items
         }

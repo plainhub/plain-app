@@ -41,6 +41,7 @@
         <attr name="helperText" format="string" />
         <attr name="lines" format="integer" />
         <attr name="endIconMode" />
+        <attr name="endIconDrawable" />
         <attr name="android:inputType" />
     </declare-styleable>
 </resources>

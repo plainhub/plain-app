@@ -9,6 +9,7 @@ import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.video.DVideo
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.StringHelper
+import com.ismartcoding.plain.data.enums.PasswordType
 
 object LocalStorage {
     var endictShowWord: Boolean by serialLazy(true)
@@ -50,6 +51,8 @@ object LocalStorage {
     var keepScreenOn: Boolean by serialLazy(false)
     var systemScreenTimeout: Int by serialLazy(0)
     var chatGPTApiKey: String by serialLazy("")
+    var httpServerPasswordType: PasswordType by serialLazy(PasswordType.RANDOM)
+    var httpServerPassword: String by serialLazy("")
 
     fun resetAuthDevToken() {
         authDevToken = CryptoHelper.randomPassword(128)

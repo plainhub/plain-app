@@ -61,19 +61,19 @@ dependencies {
     api("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     api("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
-    api("androidx.fragment:fragment-ktx:1.5.6")
+    api("androidx.fragment:fragment-ktx:1.5.7")
     api("androidx.appcompat:appcompat:1.6.1")
-    api("androidx.core:core-ktx:1.10.0")
+    api("androidx.core:core-ktx:1.10.1")
     api("androidx.transition:transition:1.4.1")
 //    api("com.squareup.picasso:picasso:2.71828")
 
     api("com.github.bumptech.glide:glide:4.15.1")
     kapt("com.github.bumptech.glide:compiler:4.15.1")
-    api("com.google.android.exoplayer:exoplayer:2.18.5")
+    api("com.google.android.exoplayer:exoplayer:2.18.7")
     // https://github.com/davemorrissey/subsampling-scale-image-view
     api("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
 
-    api("com.tencent:mmkv:1.2.16")
+    api("com.tencent:mmkv-static:1.2.16")
 
     api("com.geyifeng.immersionbar:immersionbar:3.2.2")
 

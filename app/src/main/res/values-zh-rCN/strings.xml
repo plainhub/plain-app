@@ -441,7 +441,7 @@
     <string name="recommended_https">HTTPS（推荐）</string>
     <string name="enter_this_address_tips">在您的电脑浏览器中输入此地址。</string>
     <string name="last_visit_at">最后访问时间</string>
-    <string name="must_in_the_same_lan">您的电脑和手机必须在同一Wi-Fi网络中。为了最大化手机的性能，请将 USB 适配器连接到电源插座。</string>
+    <string name="must_in_the_same_lan">您的电脑和手机必须在同一个子网中。为了最大化手机的性能，请将 USB 适配器连接到电源插座。</string>
     <string name="fetch_content_automatically">自动拉取正文内容</string>
     <string name="app_restored">应用数据已经恢复，您需要重启应用。</string>
     <string name="welcome_text">欢迎使用本应用，发送命令:app可以获取应用设置菜单。了解更多请看视频：https://youtu.be/RvO18j4r95o</string>
@@ -449,6 +449,11 @@
     <string name="demo_mode">Demo模式</string>
     <string name="donation">捐赠</string>
     <string name="logs">日志</string>
+    <string name="password_type">密码类型</string>
+    <string name="password_settings">密码设置</string>
+    <string name="password_type_random">随机</string>
+    <string name="password_type_fixed">固定</string>
+    <string name="password_type_none">无密码</string>
     <string name="restart_app_title">重启应用</string>
     <string name="restart_app_message">您需要退出当前应用并重新打开应用才能生效。</string>
     <string name="keep_screen_on">保持屏幕常亮</string>

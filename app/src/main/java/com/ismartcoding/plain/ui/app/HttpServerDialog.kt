@@ -32,14 +32,10 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
 
     private val header = RvHeader()
     private fun updateNotification() {
-        if (wifiManager.isWifiEnabled) {
-            if (MainApp.instance.httpServerError.isNotEmpty()) {
-                binding.topAppBar.showNotification(MainApp.instance.httpServerError, R.color.red)
-            } else {
-                binding.topAppBar.hideNotification()
-            }
+        if (MainApp.instance.httpServerError.isNotEmpty()) {
+            binding.topAppBar.showNotification(MainApp.instance.httpServerError, R.color.red)
         } else {
-            binding.topAppBar.showNotification(getString(R.string.wifi_required), R.color.yellow)
+            binding.topAppBar.hideNotification()
         }
     }
 
@@ -65,7 +61,7 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
                         SessionsDialog().show()
                     }
                     R.id.settings -> {
-                        SettingsDialog().show()
+                        HttpServerSettingsDialog().show()
                     }
                 }
             }
@@ -87,12 +83,13 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
                         }
                     }
                     b.password.run {
-                        setValueText(HttpServerManager.password)
+                        setValueText(LocalStorage.httpServerPassword)
                         setPasswordMode()
                         enableSwipeButton(true)
-                        setLeftSwipeButton(getString(R.string.reset)) {
-                            HttpServerManager.resetPassword()
-                            setValueText(HttpServerManager.password)
+                        setLeftSwipeButton(getString(R.string.settings)) {
+                            HttpServerPasswordSettingsDialog {
+                                setValueText(LocalStorage.httpServerPassword)
+                            }.show()
                         }
                     }
 

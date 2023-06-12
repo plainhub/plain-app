@@ -4,6 +4,9 @@ import android.view.View
 import android.widget.*
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
+import androidx.core.view.updateLayoutParams
+import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
+import com.google.android.material.button.MaterialButton
 import com.ismartcoding.lib.extensions.delayOnLifecycle
 import com.ismartcoding.lib.extensions.px
 import com.ismartcoding.lib.extensions.setSelectableItemBackground
@@ -78,12 +81,9 @@ fun ViewListItemBinding.addTextRow(text: String): ViewListItemBinding {
     textView.setSelectableTextClickable {
         performClickRow()
     }
-    val layoutParams = LinearLayout.LayoutParams(
-        LinearLayout.LayoutParams.MATCH_PARENT,
-        LinearLayout.LayoutParams.WRAP_CONTENT
-    )
-    layoutParams.topMargin = context.px(R.dimen.size_mini)
-    textView.layoutParams = layoutParams
+    textView.updateLayoutParams<LinearLayout.LayoutParams> {
+        topMargin = context.px(R.dimen.size_mini)
+    }
     textView.setTextIsSelectable(true)
     textView.setTextSizePx(context.px(R.dimen.text_size_lg))
     rows.addView(textView)
@@ -94,6 +94,11 @@ fun ViewListItemBinding.enableSwipeMenu(enable: Boolean): ViewListItemBinding {
     swipeMenu.isSwipeEnable = enable
     return this
 }
+
+fun ViewListItemBinding.setButton(block: MaterialButton.() -> Unit) {
+    block(button)
+}
+
 
 fun ViewListItemBinding.setLeftSwipeButton(buttonText: String, buttonCallback: () -> Unit): ViewListItemBinding {
     leftSwipeButton.let {
@@ -166,8 +171,9 @@ fun ViewListItemBinding.setEndIcon(@DrawableRes iconId: Int, clickCallback: (() 
 
 fun ViewListItemBinding.showMore(): ViewListItemBinding {
     setEndIcon(R.drawable.ic_chevron_right)
-    val p = container.context.px(R.dimen.size_normal)
-    container.setPadding(p, p, container.context.px(R.dimen.size_mini), p)
+    val p8 = container.context.px(R.dimen.size_sm)
+    val p16 = container.context.px(R.dimen.size_normal)
+    container.setPadding(p16, p8, container.context.px(R.dimen.size_mini), p8)
     return this
 }
 

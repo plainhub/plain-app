@@ -8,13 +8,13 @@ import android.view.View
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.databinding.DialogDeveloperSettingsBinding
+import com.ismartcoding.plain.databinding.DialogHttpServerSettingsBinding
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.*
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 
 
-class SettingsDialog : BaseBottomSheetDialog<DialogDeveloperSettingsBinding>() {
+class HttpServerSettingsDialog : BaseBottomSheetDialog<DialogHttpServerSettingsBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (LocalStorage.authDevToken.isEmpty()) {

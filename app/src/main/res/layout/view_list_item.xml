@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?android:attr/selectableItemBackground"
-        android:padding="@dimen/size_normal">
+        android:paddingHorizontal="@dimen/size_normal"
+        android:paddingVertical="@dimen/size_sm">
 
         <LinearLayout
             android:id="@+id/cb_container"
@@ -60,6 +61,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:layout_marginVertical="@dimen/size_sm"
                     android:ellipsize="end"
                     android:gravity="start"
                     android:singleLine="true"
@@ -72,6 +74,7 @@
                 <TextView
                     android:id="@+id/text_value"
                     android:layout_width="0dp"
+                    android:layout_marginVertical="@dimen/size_sm"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="@dimen/size_normal"
@@ -103,6 +106,15 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:singleSelection="true" />
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/button"
+                    style="@style/Button.Small"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <Spinner
                     android:id="@+id/spinner"
