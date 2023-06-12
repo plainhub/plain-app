@@ -28,7 +28,7 @@ class PreviewDialog : DialogFragment() {
     private val viewModel: PreviewViewModel by viewModels()
     private val adapter by lazy { PreviewAdapter(initKey) }
     private var lastVideoVH: RecyclerView.ViewHolder? = null
-    lateinit var list: List<PreviewItem>
+    private lateinit var list: List<PreviewItem>
     private var initKey: String = ""
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

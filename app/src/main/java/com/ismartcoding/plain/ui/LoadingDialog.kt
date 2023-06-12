@@ -20,7 +20,7 @@ class LoadingDialog(val message: String = "") : DialogFragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = DialogLoadingBinding.inflate(LayoutInflater.from(context))
+        binding = DialogLoadingBinding.inflate(inflater, container, false)
         dialog?.window?.run {
             setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
             setGravity(Gravity.CENTER)
@@ -35,6 +35,8 @@ class LoadingDialog(val message: String = "") : DialogFragment() {
     }
 
     fun show() {
-        super.show(MainActivity.instance.get()!!.supportFragmentManager, this.javaClass.simpleName)
+        MainActivity.instance.get()?.supportFragmentManager?.let {
+            super.show(it, this.javaClass.simpleName)
+        }
     }
 }

@@ -23,6 +23,7 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.FileHelper
+import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Job
@@ -213,9 +214,13 @@ object Permissions {
                 }
             } else if (event.permission == Manifest.permission.WRITE_SETTINGS) {
                 val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-                intent.addCategory("android.intent.category.DEFAULT")
+                intent.addCategory(Intent.CATEGORY_DEFAULT)
                 intent.data = Uri.parse("package:${MainApp.instance.packageName}")
-                writeSettingsActivityLauncher.launch(intent)
+                if (intent.resolveActivity(packageManager) != null) {
+                    writeSettingsActivityLauncher.launch(intent)
+                } else {
+                    DialogHelper.showMessage("ActivityNotFoundException: No Activity found to handle Intent act=android.settings.action.MANAGE_WRITE_SETTINGS")
+                }
             } else if (event.permission == Manifest.permission.POST_NOTIFICATIONS) {
                 if (isTIRAMISUPlus()) {
                     val context = MainActivity.instance.get()!!

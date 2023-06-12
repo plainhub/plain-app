@@ -54,7 +54,9 @@ object DialogHelper {
 
     fun hideLoading() {
         coMain {
-            loadingDialog?.dismissNow()
+            if (loadingDialog?.isAdded == true) {
+                loadingDialog?.dismissNow()
+            }
             loadingDialog = null
         }
     }
