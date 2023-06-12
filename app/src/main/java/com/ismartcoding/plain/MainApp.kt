@@ -31,18 +31,19 @@ class MainApp : Application() {
         LogCat.addLogAdapter(DiskLogAdapter(DiskLogFormatStrategy.getInstance(this)))
 
         MMKV.initialize(this)
+
         LocalStorage.init()
+
         BRV.modelId = BR.m
+
+        PageHelper.init()
+
+        BluetoothEvents.register()
+        AppEvents.register()
+        BoxEvents.register()
 
         coIO {
             AppThemeHelper.init()
-
-            PageHelper.init()
-
-            BluetoothEvents.register()
-            AppEvents.register()
-            BoxEvents.register()
-
             if (LocalStorage.httpServerPasswordType == PasswordType.RANDOM) {
                 HttpServerManager.resetPassword()
             }

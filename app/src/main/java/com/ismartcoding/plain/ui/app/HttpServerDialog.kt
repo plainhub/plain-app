@@ -14,6 +14,7 @@ import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.*
+import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.databinding.DialogHttpServerBinding
 import com.ismartcoding.plain.databinding.ItemHttpServerHeaderBinding
 import com.ismartcoding.plain.databinding.ItemRowBinding
@@ -52,10 +53,11 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
             onMenuItemClick {
                 when (itemId) {
                     R.id.signature -> {
+                        val context = requireContext()
                         DialogHelper.showConfirmDialog(
-                            requireContext(),
+                            context,
                             getString(R.string.https_certificate_signature),
-                            HttpServerManager.getSSLSignature(requireContext()).joinToString(" ") { "%02x".format(it).uppercase() })
+                            HttpServerManager.getSSLSignature(context).joinToString(" ") { "%02x".format(it).uppercase() })
                     }
                     R.id.sessions -> {
                         SessionsDialog().show()
@@ -83,12 +85,19 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
                         }
                     }
                     b.password.run {
-                        setValueText(LocalStorage.httpServerPassword)
-                        setPasswordMode()
-                        enableSwipeButton(true)
-                        setLeftSwipeButton(getString(R.string.settings)) {
+                        setValueText(
+                            if (LocalStorage.httpServerPasswordType != PasswordType.NONE) LocalStorage.httpServerPassword + " (" + LocalStorage.httpServerPasswordType.getText() + ")" else getString(
+                                R.string.password_type_none
+                            )
+                        )
+                        showMore()
+                        setClick {
                             HttpServerPasswordSettingsDialog {
-                                setValueText(LocalStorage.httpServerPassword)
+                                setValueText(
+                                    if (LocalStorage.httpServerPasswordType != PasswordType.NONE) LocalStorage.httpServerPassword + " (" + LocalStorage.httpServerPasswordType.getText() + ")" else getString(
+                                        R.string.password_type_none
+                                    )
+                                )
                             }.show()
                         }
                     }

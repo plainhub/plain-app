@@ -19,6 +19,7 @@ class HttpServerPasswordSettingsDialog(val updateCallback: () -> Unit) : BaseBot
         binding.type.initView(ChipItem.getPasswordTypes(), LocalStorage.httpServerPasswordType.name, false) {
             LocalStorage.httpServerPasswordType = PasswordType.valueOf(it)
             updateByType(LocalStorage.httpServerPasswordType)
+            updateCallback()
         }
         updateByType(LocalStorage.httpServerPasswordType)
     }
