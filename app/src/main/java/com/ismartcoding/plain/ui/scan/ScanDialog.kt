@@ -60,7 +60,6 @@ class ScanDialog() : BaseDialog<DialogScanBinding>(), OnScanResultCallback {
                 try {
                     DialogHelper.showLoading()
                     val bitmap = QrCodeBitmapHelper.getBitmapFromContentUri(requireContext(), event.uris.first())
-                    // TODO: OOM needs to be fixed
                     val result = CodeUtils.parseQRCode(bitmap)
                     DialogHelper.hideLoading()
                     addScanResult(result)

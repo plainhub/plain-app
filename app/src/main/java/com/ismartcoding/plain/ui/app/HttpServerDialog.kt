@@ -116,7 +116,7 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
                 } else {
                     val b = getBinding<ItemRowBinding>()
                     val m = getModel<PermissionModel>()
-                    if (m.data != Permission.NONE) {
+                    if (!setOf(Permission.NONE, Permission.SYSTEM_ALERT_WINDOW).contains(m.data)) {
                         b.setSwitch(m.data.isEnabled(), onChanged = { _, isEnabled ->
                             m.data.setEnabled(isEnabled)
                             if (isEnabled) {
@@ -129,6 +129,8 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
                             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                             intent.data = Uri.fromParts("package", requireContext().packageName, null)
                             startActivity(intent)
+                        } else if (m.data == Permission.SYSTEM_ALERT_WINDOW) {
+                            m.data.grant()
                         }
                     }
                 }
@@ -156,14 +158,22 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
         binding.list.page.addData(Permissions.getWebList(requireContext()).map {
             PermissionModel(it).apply {
                 keyText = it.getText()
-                if (it == Permission.NONE) {
-                    showSwitch = false
-                    subtitle = ""
-                    showMore(true)
-                } else {
-                    showSwitch = true
-                    subtitle = getString(if (it.can()) R.string.system_permission_granted else R.string.system_permission_not_granted)
-                    showMore(false)
+                when (it) {
+                    Permission.NONE -> {
+                        showSwitch = false
+                        subtitle = ""
+                        showMore(true)
+                    }
+                    Permission.SYSTEM_ALERT_WINDOW -> {
+                        showSwitch = false
+                        subtitle = getString(if (it.can()) R.string.system_permission_granted else R.string.system_permission_not_granted)
+                        showMore(true)
+                    }
+                    else -> {
+                        showSwitch = true
+                        subtitle = getString(if (it.can()) R.string.system_permission_granted else R.string.system_permission_not_granted)
+                        showMore(false)
+                    }
                 }
             }
         })

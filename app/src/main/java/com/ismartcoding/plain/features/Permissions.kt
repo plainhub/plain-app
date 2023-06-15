@@ -41,6 +41,7 @@ enum class Permission {
     POST_NOTIFICATIONS,
     WRITE_SETTINGS,
     CAMERA,
+    SYSTEM_ALERT_WINDOW,
     NONE;
 
     fun getText(): String {
@@ -157,16 +158,14 @@ enum class Permission {
 object Permissions {
     private val map = mutableMapOf<String, ActivityResultLauncher<String>>()
     private val events = mutableListOf<Job>()
-    private lateinit var fileStorageActivityLauncher: ActivityResultLauncher<Intent>
-    private lateinit var pushNotificationActivityLauncher: ActivityResultLauncher<Intent>
-    private lateinit var writeSettingsActivityLauncher: ActivityResultLauncher<Intent>
+    private val intentLauncherMap = mutableMapOf<String, ActivityResultLauncher<Intent>>()
 
     fun getWebList(context: Context): List<Permission> {
         val permissions = mutableListOf(Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_CONTACTS, Permission.WRITE_CONTACTS)
         if (context.allowSensitivePermissions()) {
             permissions.addAll(listOf(Permission.READ_SMS, Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG))
         }
-        permissions.addAll(listOf(Permission.CALL_PHONE, Permission.NONE))
+        permissions.addAll(listOf(Permission.CALL_PHONE, Permission.SYSTEM_ALERT_WINDOW, Permission.NONE))
 
         return permissions
     }
@@ -188,49 +187,50 @@ object Permissions {
             }
         }
 
-        fileStorageActivityLauncher = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            sendEvent(PermissionResultEvent(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+        setOf(
+            Manifest.permission.WRITE_SETTINGS, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.SYSTEM_ALERT_WINDOW, Manifest.permission.POST_NOTIFICATIONS
+        ).forEach { permission ->
+            intentLauncherMap[permission] = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                canContinue = true
+                sendEvent(PermissionResultEvent(permission))
+            }
         }
 
-        pushNotificationActivityLauncher = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            canContinue = true
-            sendEvent(PermissionResultEvent(Manifest.permission.POST_NOTIFICATIONS))
-        }
-
-        writeSettingsActivityLauncher = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            sendEvent(PermissionResultEvent(Manifest.permission.WRITE_SETTINGS))
-        }
         events.add(receiveEventHandler<RequestPermissionEvent> { event ->
             if (event.permission == Manifest.permission.WRITE_EXTERNAL_STORAGE && isRPlus()) {
                 try {
                     val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
                     intent.addCategory("android.intent.category.DEFAULT")
                     intent.data = Uri.parse("package:${MainApp.instance.packageName}")
-                    fileStorageActivityLauncher.launch(intent)
+                    intentLauncherMap[event.permission]?.launch(intent)
                 } catch (e: Exception) {
                     val intent = Intent()
                     intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
-                    fileStorageActivityLauncher.launch(intent)
+                    intentLauncherMap[event.permission]?.launch(intent)
                 }
             } else if (event.permission == Manifest.permission.WRITE_SETTINGS) {
                 val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
                 intent.addCategory(Intent.CATEGORY_DEFAULT)
                 intent.data = Uri.parse("package:${MainApp.instance.packageName}")
                 if (intent.resolveActivity(packageManager) != null) {
-                    writeSettingsActivityLauncher.launch(intent)
+                    intentLauncherMap[event.permission]?.launch(intent)
                 } else {
                     DialogHelper.showMessage("ActivityNotFoundException: No Activity found to handle Intent act=android.settings.action.MANAGE_WRITE_SETTINGS")
                 }
+            } else if (event.permission == Manifest.permission.SYSTEM_ALERT_WINDOW) {
+                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${MainApp.instance.packageName}"))
+                intentLauncherMap[event.permission]?.launch(intent)
             } else if (event.permission == Manifest.permission.POST_NOTIFICATIONS) {
                 if (isTIRAMISUPlus()) {
                     val context = MainActivity.instance.get()!!
                     if (!ActivityCompat.shouldShowRequestPermissionRationale(context, event.permission)) {
-                        pushNotificationActivityLauncher.launch(Permission.getEnableNotificationIntent())
+                        intentLauncherMap[event.permission]?.launch(Permission.getEnableNotificationIntent())
                     } else {
                         map[event.permission]?.launch(event.permission)
                     }
                 } else {
-                    pushNotificationActivityLauncher.launch(Permission.getEnableNotificationIntent())
+                    intentLauncherMap[event.permission]?.launch(Permission.getEnableNotificationIntent())
                 }
             } else {
                 map[event.permission]?.launch(event.permission)

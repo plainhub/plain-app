@@ -1,8 +1,8 @@
-package com.ismartcoding.plain.features.application
+package com.ismartcoding.plain.features.pkg
 
 import kotlinx.datetime.Instant
 
-data class DApplication(
+data class DPackage(
     val id: String,
     val name: String,
     val type: String,

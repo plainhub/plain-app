@@ -33,7 +33,7 @@ import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.features.*
 import com.ismartcoding.plain.features.aichat.AIChatHelper
-import com.ismartcoding.plain.features.application.ApplicationHelper
+import com.ismartcoding.plain.features.pkg.PackageHelper
 import com.ismartcoding.plain.features.audio.AudioHelper
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
@@ -312,14 +312,19 @@ class SXGraphQL(val schema: Schema) {
                         SimHelper.getAll().map { it.toModel() }
                     }
                 }
-                query("apps") {
+                query("packages") {
                     resolver { offset: Int, limit: Int, query: String ->
-                        ApplicationHelper.search(query, limit, offset).map { it.toModel() }
+                        PackageHelper.search(query, limit, offset).map { it.toModel() }
                     }
                 }
-                query("appCount") {
+                query("packageStatuses") {
+                    resolver { ids: List<ID> ->
+                        PackageHelper.getPackageStatuses(ids.map { it.value }).map { PackageStatus(ID(it.key), it.value) }
+                    }
+                }
+                query("packageCount") {
                     resolver { query: String ->
-                        ApplicationHelper.count(query)
+                        PackageHelper.count(query)
                     }
                 }
                 query("storageStats") {
@@ -469,10 +474,10 @@ class SXGraphQL(val schema: Schema) {
                         TempValue(key, value)
                     }
                 }
-                mutation("uninstallApps") {
+                mutation("uninstallPackages") {
                     resolver { ids: List<ID> ->
                         ids.forEach {
-                            ApplicationHelper.uninstall(MainActivity.instance.get()!!, it.value)
+                            PackageHelper.uninstall(MainActivity.instance.get()!!, it.value)
                         }
                         true
                     }

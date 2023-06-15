@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.web.models
 
-import com.ismartcoding.plain.features.application.DApplication
+import com.ismartcoding.plain.features.pkg.DPackage
 import kotlinx.datetime.Instant
 
-data class Application(
+data class Package(
     val id: ID,
     val name: String,
     val type: String,
@@ -14,6 +14,9 @@ data class Application(
     val updatedAt: Instant
 )
 
-fun DApplication.toModel(): Application {
-    return Application(ID(id), name, type, version, path, size, installedAt, updatedAt)
+fun DPackage.toModel(): Package {
+    return Package(ID(id), name, type, version, path, size, installedAt, updatedAt)
 }
+
+
+data class PackageStatus(val id: ID, val exist: Boolean)

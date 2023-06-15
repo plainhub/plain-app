@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.features.application
+package com.ismartcoding.plain.features.pkg
 
 import android.content.Context
 import android.content.Intent
@@ -9,12 +9,22 @@ import com.ismartcoding.plain.packageManager
 import kotlinx.datetime.Instant
 import java.io.File
 
-object ApplicationHelper {
+object PackageHelper {
     private val appLabelCache: MutableMap<String, String> = HashMap()
 
-    fun search(query: String, limit: Int, offset: Int): List<DApplication> {
+    fun getPackageStatuses(ids: List<String>): Map<String, Boolean> {
         val packages = packageManager.getInstalledPackages(0)
-        val apps = mutableListOf<DApplication>()
+        val map = mutableMapOf<String, Boolean>()
+        ids.forEach { id ->
+            map[id] = packages.any { it.packageName == id }
+        }
+
+        return map
+    }
+
+    fun search(query: String, limit: Int, offset: Int): List<DPackage> {
+        val packages = packageManager.getInstalledPackages(0)
+        val apps = mutableListOf<DPackage>()
         var type = ""
         var text = ""
         if (query.isNotEmpty()) {
@@ -39,7 +49,7 @@ object ApplicationHelper {
             }
 
             apps.add(
-                DApplication(
+                DPackage(
                     packageInfo.packageName,
                     getLabel(packageInfo),
                     appType,
@@ -69,6 +79,8 @@ object ApplicationHelper {
     }
 
     fun uninstall(context: Context, packageName: String) {
-        context.startActivity(Intent(Intent.ACTION_DELETE, Uri.parse("package:$packageName")))
+        context.startActivity(Intent(Intent.ACTION_DELETE, Uri.parse("package:$packageName")).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        })
     }
 }

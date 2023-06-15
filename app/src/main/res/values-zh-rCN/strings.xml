@@ -269,6 +269,7 @@
     <string name="web_url">网站地址</string>
     <string name="auth_dev_token_tips">令牌仅用于api请求测试，返回明文数据。\n将\"Authorization: Bearer &lt;token&gt;\"放在请求头部即可。</string>
     <string name="open_website_on_desktop">如果Chrome浏览器显示\"您的连接不是私密连接\"，请点击页面"高级"按钮继续。</string>
+    <string name="feature_SYSTEM_ALERT_WINDOW">允许后台弹窗</string>
     <string name="feature_READ_EXTERNAL_STORAGE">允许网页读设备文件</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">允许网页管理设备文件</string>
     <string name="feature_READ_SMS">允许网页读取短信数据</string>
