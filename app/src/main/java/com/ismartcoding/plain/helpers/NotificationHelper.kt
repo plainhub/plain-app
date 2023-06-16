@@ -13,14 +13,23 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.receivers.ServiceStopBroadcastReceiver
+import com.ismartcoding.plain.ui.MainActivity
 
 object NotificationHelper {
     fun createContentIntent(context: Context): PendingIntent {
-        return PendingIntent.getActivity(
-            context, 0, context.packageManager.getLaunchIntentForPackage(context.packageName)
-                ?.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED),
-            PendingIntent.FLAG_IMMUTABLE
-        )
+        val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+        return if (launchIntent != null) {
+            launchIntent.flags =
+                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
+            PendingIntent.getActivity(
+                context, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE
+            )
+        } else {
+            val fallbackIntent = Intent(context, MainActivity::class.java)
+            PendingIntent.getActivity(
+                context, 0, fallbackIntent, PendingIntent.FLAG_IMMUTABLE
+            )
+        }
     }
 
     fun ensureDefaultChannel() {
