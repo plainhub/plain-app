@@ -25,7 +25,7 @@
                 app:hint="@string/name" />
 
             <com.ismartcoding.plain.ui.views.LoadingButtonView
-                android:id="@+id/button"
+                android:id="@+id/btn"
                 style="@style/SaveButton" />
         </LinearLayout>
 

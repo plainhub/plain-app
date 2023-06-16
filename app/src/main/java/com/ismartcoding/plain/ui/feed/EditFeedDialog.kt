@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 
 class EditFeedDialog(val data: DFeed) : BaseBottomSheetDialog<DialogEditFeedBinding>() {
     override fun getSubmitButton(): LoadingButtonView {
-        return binding.button
+        return binding.btn
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -35,7 +35,7 @@ class EditFeedDialog(val data: DFeed) : BaseBottomSheetDialog<DialogEditFeedBind
         binding.name.text = data.name
         binding.url.setKeyText(R.string.url)
         binding.url.addTextRow(data.url)
-        binding.button.setSafeClick {
+        binding.btn.setSafeClick {
             if (hasInputError()) {
                 return@setSafeClick
             }
