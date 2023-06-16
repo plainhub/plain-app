@@ -40,7 +40,7 @@ class SendMessageDialog() : BaseBottomSheetDialog<DialogSendMessageBinding>() {
             }
         }
         receiveEvent<SendMessageEvent> {
-            dismiss()
+            dismissAllowingStateLoss()
         }
 
         receiveEvent<PickFileResultEvent> { event ->
