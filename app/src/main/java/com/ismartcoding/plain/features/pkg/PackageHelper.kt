@@ -53,7 +53,7 @@ object PackageHelper {
                     packageInfo.packageName,
                     getLabel(packageInfo),
                     appType,
-                    app.versionName,
+                    app.versionName ?: "",
                     packageInfo.sourceDir,
                     file.length(),
                     Instant.fromEpochMilliseconds(app.firstInstallTime),

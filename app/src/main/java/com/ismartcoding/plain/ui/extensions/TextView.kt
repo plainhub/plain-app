@@ -10,6 +10,7 @@ import androidx.core.view.GestureDetectorCompat
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.markdown.AppImageSchemeHandler
 import com.ismartcoding.lib.markdown.FontTagHandler
+import com.ismartcoding.lib.markdown.NetworkSchemeHandler
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import io.noties.markwon.*
 import io.noties.markwon.core.MarkwonTheme
@@ -76,13 +77,16 @@ fun TextView.setDoubleCLick(click: () -> Unit) {
 fun TextView.markdown(content: String) {
     this.movementMethod = LinkMovementMethod.getInstance()
     Markwon.builder(context)
-        .usePlugin(object :AbstractMarkwonPlugin() {
-           override fun configureTheme(  builder: MarkwonTheme.Builder) {
+        .usePlugin(object : AbstractMarkwonPlugin() {
+            override fun configureTheme(builder: MarkwonTheme.Builder) {
                 builder
                     .bulletWidth(context.dp2px(5))
             }
         })
-        .usePlugin(ImagesPlugin.create { plugin -> plugin.addSchemeHandler(AppImageSchemeHandler(context)) })
+        .usePlugin(ImagesPlugin.create { plugin ->
+            plugin.addSchemeHandler(AppImageSchemeHandler(context))
+            plugin.addSchemeHandler(NetworkSchemeHandler())
+        })
         .usePlugin(HtmlPlugin.create { plugin -> plugin.addHandler(FontTagHandler()) })
         .usePlugin(LinkifyPlugin.create(Linkify.EMAIL_ADDRESSES or Linkify.PHONE_NUMBERS))
         .usePlugin(StrikethroughPlugin.create())
