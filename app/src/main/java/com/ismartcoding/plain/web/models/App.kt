@@ -20,4 +20,5 @@ data class App(
     val allowSensitivePermissions: Boolean,
     val sdcardPath: String,
     val internalStoragePath: String,
+    val downloadsDir: String
 )

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.web
 
+import android.os.Environment
 import com.apurebase.kgraphql.GraphQLError
 import com.apurebase.kgraphql.GraphqlRequest
 import com.apurebase.kgraphql.KGraphQL
@@ -460,6 +461,7 @@ class SXGraphQL(val schema: Schema) {
                             context.allowSensitivePermissions(),
                             sdcardPath = FileSystemHelper.getSDCardPath(context),
                             internalStoragePath = FileSystemHelper.getInternalStoragePath(context),
+                            downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
                         )
                     }
                 }
