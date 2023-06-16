@@ -12,16 +12,21 @@ import com.ismartcoding.lib.markdown.AppImageSchemeHandler
 import com.ismartcoding.lib.markdown.FontTagHandler
 import com.ismartcoding.lib.markdown.NetworkSchemeHandler
 import com.ismartcoding.plain.ui.helpers.WebHelper
+import com.ismartcoding.plain.ui.preview.PreviewDialog
+import com.ismartcoding.plain.ui.preview.PreviewItem
 import io.noties.markwon.*
 import io.noties.markwon.core.MarkwonTheme
+import io.noties.markwon.core.spans.LinkSpan
 import io.noties.markwon.ext.latex.JLatexMathPlugin
 import io.noties.markwon.ext.strikethrough.StrikethroughPlugin
 import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.ext.tasklist.TaskListPlugin
 import io.noties.markwon.html.HtmlPlugin
+import io.noties.markwon.image.ImageProps
 import io.noties.markwon.image.ImagesPlugin
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
+import org.commonmark.node.Image
 import org.commonmark.node.SoftLineBreak
 
 @SuppressLint("ClickableViewAccessibility")
@@ -102,9 +107,25 @@ fun TextView.markdown(content: String) {
             }
         })
         .usePlugin(object : AbstractMarkwonPlugin() {
+            override fun configureSpansFactory(builder: MarkwonSpansFactory.Builder) {
+                builder.appendFactory(Image::class.java) { configuration, props ->
+                    LinkSpan(
+                        configuration.theme(),
+                        ImageProps.DESTINATION.require(props)
+                    ) { _, link ->
+                        PreviewDialog().show(
+                            items = arrayListOf(PreviewItem(link, link)),
+                            initKey = link,
+                        )
+                    }
+                }
+            }
+        })
+        .usePlugin(object : AbstractMarkwonPlugin() {
             override fun configureVisitor(builder: MarkwonVisitor.Builder) {
                 builder.on(SoftLineBreak::class.java) { visitor, _ -> visitor.forceNewLine() }
             }
         })
         .build().setMarkdown(this, content)
 }
+

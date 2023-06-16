@@ -1,9 +1,14 @@
 package com.ismartcoding.plain.ui.preview.viewholders
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
@@ -30,7 +35,21 @@ class SubsamplingViewHolder(
             coMain {
                 delay(100)
                 binding.loading.isVisible = false
-                setImage(ImageSource.uri(item.uri))
+                if (item.uri.startsWith("http://") || item.uri.startsWith("https://")) {
+                    Glide.with(context)
+                        .asBitmap()
+                        .load(item.uri)
+                        .into(object : CustomTarget<Bitmap>() {
+                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                                setImage(ImageSource.bitmap(resource))
+                            }
+
+                            override fun onLoadCleared(placeholder: Drawable?) {
+                            }
+                        })
+                } else {
+                    setImage(ImageSource.uri(item.uri))
+                }
             }
         }
     }
