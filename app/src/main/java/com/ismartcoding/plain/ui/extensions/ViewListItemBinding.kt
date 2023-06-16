@@ -81,9 +81,12 @@ fun ViewListItemBinding.addTextRow(text: String): ViewListItemBinding {
     textView.setSelectableTextClickable {
         performClickRow()
     }
-    textView.updateLayoutParams<LinearLayout.LayoutParams> {
-        topMargin = context.px(R.dimen.size_mini)
-    }
+    val layoutParams = LinearLayout.LayoutParams(
+        LinearLayout.LayoutParams.MATCH_PARENT,
+        LinearLayout.LayoutParams.WRAP_CONTENT
+    )
+    layoutParams.topMargin = context.px(R.dimen.size_mini)
+    textView.layoutParams = layoutParams
     textView.setTextIsSelectable(true)
     textView.setTextSizePx(context.px(R.dimen.text_size_lg))
     rows.addView(textView)
