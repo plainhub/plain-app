@@ -11,6 +11,7 @@ import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.extensions.navigationBarHeight
 import com.ismartcoding.lib.extensions.px
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.lib.softinput.setWindowSoftInput
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
@@ -33,7 +34,10 @@ class NoteDialog(var note: DNote?, var tag: DTag? = null) : BaseDialog<DialogNot
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setTransparentBar(view)
+        if (isSPlus()) {
+            // immersionBar won't work well with setWindowSoftInputCompatible
+            setTransparentBar(view)
+        }
 
         binding.topAppBar.toolbar.run {
             initMenu(R.menu.note_edit)
@@ -54,7 +58,6 @@ class NoteDialog(var note: DNote?, var tag: DTag? = null) : BaseDialog<DialogNot
         val context = requireContext()
 
         binding.markdown.updatePadding(bottom = navigationBarHeight + context.px(R.dimen.list_bottom_padding))
-
         setWindowSoftInput(binding.editor)
         binding.editor.initView(lifecycle, note?.content ?: "")
         binding.editor.onTextChanged = {
