@@ -130,7 +130,7 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
                             intent.data = Uri.fromParts("package", requireContext().packageName, null)
                             startActivity(intent)
                         } else if (m.data == Permission.SYSTEM_ALERT_WINDOW) {
-                            m.data.grant()
+                            sendEvent(RequestPermissionEvent(m.data.toSysPermission()))
                         }
                     }
                 }

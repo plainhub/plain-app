@@ -72,21 +72,25 @@ enum class Permission {
 
     fun can(): Boolean {
         val context = MainApp.instance
-        if (this == WRITE_EXTERNAL_STORAGE) {
-            return FileHelper.hasStoragePermission(context)
-        } else if (this == WRITE_SETTINGS) {
-            return Settings.System.canWrite(context)
-        }
-
-        if (this == POST_NOTIFICATIONS) {
-            return if (isTIRAMISUPlus()) {
-                context.hasPermission(this.toSysPermission())
-            } else {
-                NotificationManagerCompat.from(context).areNotificationsEnabled()
+        return when {
+            this == WRITE_EXTERNAL_STORAGE -> {
+                FileHelper.hasStoragePermission(context)
             }
+            this == WRITE_SETTINGS -> {
+                Settings.System.canWrite(context)
+            }
+            this == POST_NOTIFICATIONS -> {
+                if (isTIRAMISUPlus()) {
+                    context.hasPermission(this.toSysPermission())
+                } else {
+                    NotificationManagerCompat.from(context).areNotificationsEnabled()
+                }
+            }
+            this == SYSTEM_ALERT_WINDOW -> {
+                Settings.canDrawOverlays(context)
+            }
+            else -> context.hasPermission(this.toSysPermission())
         }
-
-        return context.hasPermission(this.toSysPermission())
     }
 
     fun grant(): Boolean {
