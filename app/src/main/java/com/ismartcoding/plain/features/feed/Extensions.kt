@@ -3,6 +3,7 @@ package com.ismartcoding.plain.features.feed
 import android.os.Environment
 import androidx.core.text.HtmlCompat
 import com.ismartcoding.lib.Readability4JPreprocessor
+import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.isOk
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.html2md.MDConverter
@@ -104,7 +105,11 @@ suspend fun DFeedEntry.fetchContentAsync(): ApiResult {
                         if (r.isOk()) {
                             val dir = MainApp.instance.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!.path + "/feeds"
                             File(dir).mkdirs()
-                            val path = "$dir/main-${CryptoHelper.sha1(image.toByteArray())}"
+                            var path = "$dir/main-${CryptoHelper.sha1(image.toByteArray())}"
+                            val extension = image.getFilenameExtension()
+                            if (extension.isNotEmpty()) {
+                                path += ".$extension"
+                            }
                             val file = File(path)
                             file.createNewFile()
                             r.bodyAsChannel().copyAndClose(file.writeChannel())

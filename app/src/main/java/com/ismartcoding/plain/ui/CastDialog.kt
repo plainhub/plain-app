@@ -75,7 +75,7 @@ class CastDialog(val items: List<IMedia>, private val singlePath: String = "") :
                                 CastPlayer.sid = ""
                             }
                         }
-                        dismiss()
+                        dismissAllowingStateLoss()
                     }
                 }
             }

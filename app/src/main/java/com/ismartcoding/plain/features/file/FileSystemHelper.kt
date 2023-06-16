@@ -217,7 +217,7 @@ object FileSystemHelper {
         )
 
         val queryArgs = bundleOf(
-            ContentResolver.QUERY_ARG_LIMIT to 50,
+            ContentResolver.QUERY_ARG_LIMIT to 100,
             ContentResolver.QUERY_ARG_SORT_COLUMNS to arrayOf(MediaStore.Files.FileColumns.DATE_MODIFIED),
             ContentResolver.QUERY_ARG_SORT_DIRECTION to ContentResolver.QUERY_SORT_DIRECTION_DESCENDING
         )
