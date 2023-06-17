@@ -344,8 +344,8 @@ class Editor(context: Context, attrs: AttributeSet?) : AppCompatEditText(context
         editorHeight = height
         if (!newText && editorHeight > 0) {
             verticalScroll?.let {
-                firstVisibleIndex = layout.getLineStart(LineUtils.getFirstVisibleLine(it, editorHeight, lineCount))
-                lastVisibleIndex = layout.getLineEnd(LineUtils.getLastVisibleLine(it, editorHeight, lineCount, deviceHeight) - 1)
+                firstVisibleIndex = layout?.getLineStart(LineUtils.getFirstVisibleLine(it, editorHeight, lineCount)) ?: 0
+                lastVisibleIndex = layout?.getLineEnd(LineUtils.getLastVisibleLine(it, editorHeight, lineCount, deviceHeight) - 1) ?: 0
             }
         } else {
             firstVisibleIndex = 0
