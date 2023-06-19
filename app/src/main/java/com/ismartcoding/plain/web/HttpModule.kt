@@ -94,6 +94,10 @@ fun Application.module() {
             vue("web")
         }
 
+        get("/health_check") {
+            call.respond(HttpStatusCode.OK, "Server is running well")
+        }
+
         get("/media/{id}") {
             val id = call.parameters["id"]?.split(".")?.get(0) ?: ""
             if (id.isEmpty()) {

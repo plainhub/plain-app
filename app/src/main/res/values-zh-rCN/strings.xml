@@ -262,6 +262,7 @@
     <string name="allow_new_login">允许新的登录</string>
     <string name="https_certificate_signature">HTTPS证书签名</string>
     <string name="sessions">会话列表</string>
+    <string name="diagnostics">诊断</string>
     <string name="reset_password">重置密码</string>
     <string name="token">令牌</string>
     <string name="testing_token">测试令牌</string>
@@ -456,6 +457,7 @@
     <string name="password_type_fixed">固定</string>
     <string name="password_type_none">无密码</string>
     <string name="restart_app_title">重启应用</string>
+    <string name="http_server_failed">HTTP服务器启动失败，请强制退出应用并重新打开。</string>
     <string name="restart_app_message">您需要退出当前应用并重新打开应用才能生效。</string>
     <string name="keep_screen_on">保持屏幕常亮</string>
     <string name="cast_mode">投屏模式</string>

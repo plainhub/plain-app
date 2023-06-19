@@ -13,6 +13,10 @@
             android:title="@string/sessions" />
 
         <item
+            android:id="@+id/diagnostics"
+            android:title="@string/diagnostics" />
+
+        <item
             android:id="@+id/settings"
             android:title="@string/settings" />
 

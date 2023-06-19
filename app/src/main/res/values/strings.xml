@@ -262,6 +262,7 @@
     <string name="allow_new_login">Allow new login</string>
     <string name="https_certificate_signature">HTTPS certificate signature</string>
     <string name="sessions">Sessions</string>
+    <string name="diagnostics">Diagnostics</string>
     <string name="reset_password">Reset password</string>
     <string name="token">Token</string>
     <string name="testing_token">Token</string>
@@ -456,6 +457,7 @@
     <string name="password_type_fixed">Fixed</string>
     <string name="password_type_none">No password</string>
     <string name="restart_app_title">Restart app</string>
+    <string name="http_server_failed">Http server started failed, You need to force quit the app and then open it again.</string>
     <string name="restart_app_message">You need to force quit the app and then open it again.</string>
     <string name="keep_screen_on">Keep screen on</string>
     <string name="cast_mode">Cast mode</string>

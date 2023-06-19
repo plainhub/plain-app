@@ -12,8 +12,11 @@ import androidx.core.view.isVisible
 import com.ismartcoding.lib.brv.utils.*
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.*
+import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.databinding.DialogHttpServerBinding
 import com.ismartcoding.plain.databinding.ItemHttpServerHeaderBinding
@@ -27,6 +30,8 @@ import com.ismartcoding.plain.ui.models.ListItemModel
 import com.ismartcoding.plain.ui.models.RvHeader
 import com.ismartcoding.plain.ui.views.ChipItem
 import com.ismartcoding.plain.web.HttpServerManager
+import io.ktor.client.request.*
+import io.ktor.http.*
 
 class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
     data class PermissionModel(val data: Permission) : ListItemModel()
@@ -35,6 +40,8 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
     private fun updateNotification() {
         if (MainApp.instance.httpServerError.isNotEmpty()) {
             binding.topAppBar.showNotification(MainApp.instance.httpServerError, R.color.red)
+        } else if (LocalStorage.webConsoleEnabled && MainApp.instance.httpServer == null) {
+            binding.topAppBar.showNotification(getString(R.string.http_server_failed), R.color.red)
         } else {
             binding.topAppBar.hideNotification()
         }
@@ -61,6 +68,20 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
                     }
                     R.id.sessions -> {
                         SessionsDialog().show()
+                    }
+                    R.id.diagnostics -> {
+                        coMain {
+                            val client = HttpClientManager.httpClient()
+                            DialogHelper.showLoading()
+                            val r = withIO { client.get("http://127.0.0.1:${LocalStorage.httpPort}/health_check") }
+                            DialogHelper.hideLoading()
+                            val context = requireContext()
+                            if (r.status == HttpStatusCode.OK) {
+                                DialogHelper.showConfirmDialog(context, getString(R.string.confirm), "Http server is running well.")
+                            } else {
+                                DialogHelper.showConfirmDialog(context, getString(R.string.error), "Http server is not started. Kill all apps on your phone and start the PlainApp again. Make sure that there are no other apps occupying the HTTP or HTTPS ports.If the problem persists, please provide more details about the issue by contacting ismartcoding@gmail.com.")
+                            }
+                        }
                     }
                     R.id.settings -> {
                         HttpServerSettingsDialog().show()
