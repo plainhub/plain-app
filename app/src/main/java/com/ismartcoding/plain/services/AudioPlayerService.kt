@@ -16,6 +16,7 @@ import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleService
 import com.ismartcoding.lib.Weak
 import com.ismartcoding.lib.channel.receiveEvent
+import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.LocalStorage
@@ -124,7 +125,7 @@ class AudioPlayerService : LifecycleService() {
         super.onStartCommand(intent, flags, startId)
         when (intent?.action) {
             AudioServiceAction.PLAY.name -> {
-                intent.getParcelableExtra<DPlaylistAudio>("audio")?.let {
+                intent.parcelable<DPlaylistAudio>("audio")?.let {
                     coIO { playAudio(it) }
                 }
             }

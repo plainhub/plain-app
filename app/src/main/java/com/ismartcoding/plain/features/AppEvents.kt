@@ -114,6 +114,7 @@ class FetchLatestExchangeRatesEvent
 class AIChatCreatedEvent(val item: DAIChat)
 
 class ChatItemClickEvent
+class HttpServerPasswordChangedEvent
 
 object AppEvents {
     private val mediaPlayer = MediaPlayer()

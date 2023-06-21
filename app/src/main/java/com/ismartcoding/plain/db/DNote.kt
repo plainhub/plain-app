@@ -1,15 +1,18 @@
 package com.ismartcoding.plain.db
 
+import android.os.Parcelable
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.data.IData
 import kotlinx.datetime.*
+import kotlinx.parcelize.Parcelize
 
 @Entity(tableName = "notes")
+@Parcelize
 data class DNote(
     @PrimaryKey override var id: String = StringHelper.shortUUID()
-) : IData, DEntityBase() {
+) : IData, Parcelable, DEntityBase() {
     var title: String = ""
 
     @ColumnInfo(name = "deleted_at")

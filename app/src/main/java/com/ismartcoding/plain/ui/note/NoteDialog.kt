@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.extensions.navigationBarHeight
+import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.extensions.px
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.isSPlus
@@ -29,10 +30,20 @@ import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.ui.extensions.*
 import kotlinx.coroutines.launch
 
-class NoteDialog(var note: DNote?, var tag: DTag? = null) : BaseDialog<DialogNoteBinding>() {
-    private var id = note?.id ?: ""
+class NoteDialog() : BaseDialog<DialogNoteBinding>() {
+    private val ARG_NOTE = "note"
+    private val ARG_TAG = "tag"
+
+    private var note: DNote? = null
+    private var tag: DTag? = null
+    private var id: String = ""
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        note = arguments?.parcelable(ARG_NOTE)
+        tag = arguments?.parcelable(ARG_TAG)
+        id = note?.id ?: ""
 
         if (isSPlus()) {
             // immersionBar won't work well with setWindowSoftInputCompatible
@@ -103,5 +114,13 @@ class NoteDialog(var note: DNote?, var tag: DTag? = null) : BaseDialog<DialogNot
             binding.markdown.markdown(binding.editor.getText())
             binding.editor.hideSoftInput()
         }
+    }
+
+    fun show(note: DNote?, tag: DTag? = null) {
+        arguments = Bundle().apply {
+            putParcelable(ARG_NOTE, note)
+            putParcelable(ARG_TAG, tag)
+        }
+        show()
     }
 }

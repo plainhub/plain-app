@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.Checkable
 import com.ismartcoding.plain.R
 import com.ismartcoding.lib.extensions.dp2px
+import com.ismartcoding.lib.extensions.parcelable
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
@@ -63,7 +64,7 @@ class SmoothCheckBox(context: Context, attrs: AttributeSet? = null) : View(conte
             val bundle = state
             val isChecked = bundle.getBoolean(KEY_INSTANCE_STATE)
             setChecked(isChecked)
-            super.onRestoreInstanceState(bundle.getParcelable(KEY_INSTANCE_STATE))
+            super.onRestoreInstanceState(bundle.parcelable(KEY_INSTANCE_STATE))
             return
         }
         super.onRestoreInstanceState(state)

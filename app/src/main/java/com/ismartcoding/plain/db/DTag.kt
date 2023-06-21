@@ -1,14 +1,17 @@
 package com.ismartcoding.plain.db
 
+import android.os.Parcelable
 import androidx.room.*
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.data.IData
 import kotlinx.datetime.*
+import kotlinx.parcelize.Parcelize
 
 @Entity(tableName = "tags")
+@Parcelize
 data class DTag(
     @PrimaryKey override var id: String = StringHelper.shortUUID()
-) : IData, DEntityBase() {
+) : IData, Parcelable, DEntityBase() {
     var name: String = ""
     var type: Int = 0
     var count: Int = 0

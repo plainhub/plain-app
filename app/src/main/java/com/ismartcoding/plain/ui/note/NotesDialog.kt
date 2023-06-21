@@ -140,7 +140,7 @@ class NotesDialog : BaseListDrawerDialog() {
 
             checkable(onItemClick = {
                 val m = getModel<DataModel>()
-                NoteDialog(m.data as DNote).show()
+                NoteDialog().show(m.data as DNote)
             }, onChecked = {
                 updateBottomActions()
                 updateTitle()
@@ -184,7 +184,7 @@ class NotesDialog : BaseListDrawerDialog() {
             setImageResource(R.drawable.ic_add)
             setSafeClick {
                 LocalStorage.noteIsEditMode = true
-                NoteDialog(null, viewModel.data as? DTag).show()
+                NoteDialog().show(null, viewModel.data as? DTag)
             }
         }
     }

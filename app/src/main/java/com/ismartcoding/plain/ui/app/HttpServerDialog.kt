@@ -113,13 +113,7 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
                         )
                         showMore()
                         setClick {
-                            HttpServerPasswordSettingsDialog {
-                                setValueText(
-                                    if (LocalStorage.httpServerPasswordType != PasswordType.NONE) LocalStorage.httpServerPassword + " (" + LocalStorage.httpServerPasswordType.getText() + ")" else getString(
-                                        R.string.password_type_none
-                                    )
-                                )
-                            }.show()
+                            HttpServerPasswordSettingsDialog().show()
                         }
                     }
 
@@ -165,6 +159,10 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
         }.showLoading()
 
         receiveEvent<PermissionResultEvent> {
+            binding.list.page.refresh()
+        }
+
+        receiveEvent<HttpServerPasswordChangedEvent> {
             binding.list.page.refresh()
         }
 

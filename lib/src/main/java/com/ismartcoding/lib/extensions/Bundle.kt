@@ -2,8 +2,11 @@ package com.ismartcoding.lib.extensions
 
 import android.content.ContentResolver
 import android.os.Bundle
+import android.os.Parcelable
 import com.ismartcoding.lib.data.SortBy
 import com.ismartcoding.lib.data.enums.SortDirection
+import com.ismartcoding.lib.isRPlus
+import com.ismartcoding.lib.isTIRAMISUPlus
 
 fun Bundle.sort(sortBy: SortBy) {
     putStringArray(
@@ -30,4 +33,9 @@ fun Bundle.where(selection: String, args: List<String>) {
 fun Bundle.paging(offset: Int, limit: Int) {
     putInt(ContentResolver.QUERY_ARG_OFFSET, offset)
     putInt(ContentResolver.QUERY_ARG_LIMIT, limit)
+}
+
+inline fun <reified T : Parcelable> Bundle.parcelable(key: String): T? = when {
+    isTIRAMISUPlus() -> getParcelable(key, T::class.java)
+    else -> @Suppress("DEPRECATION") getParcelable(key) as? T
 }

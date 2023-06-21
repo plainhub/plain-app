@@ -15,6 +15,7 @@ import android.util.Base64
 import androidx.core.graphics.scale
 import androidx.lifecycle.LifecycleService
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.helpers.NotificationHelper
@@ -58,7 +59,7 @@ class ScreenMirrorService : LifecycleService() {
         }
         if (intent != null) {
             mResultCode = intent.getIntExtra("code", -1)
-            mResultData = intent.getParcelableExtra("data")
+            mResultData = intent.parcelable("data")
             mScreenWidth = intent.getIntExtra("width", 720)
             mScreenHeight = intent.getIntExtra("height", 1280)
             mScreenDensity = intent.getIntExtra("density", 1)
