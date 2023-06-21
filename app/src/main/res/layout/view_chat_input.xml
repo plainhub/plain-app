@@ -22,7 +22,7 @@
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/input_container">
+        app:layout_constraintTop_toBottomOf="@+id/input">
 
         <ImageView
             android:id="@+id/images"
