@@ -4,10 +4,14 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.view.ViewGroup.LayoutParams
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.immersionBar
+import com.ismartcoding.lib.extensions.isGestureNavigationBar
+import com.ismartcoding.lib.extensions.navigationBarHeight
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.softinput.setWindowSoftInput
 import com.ismartcoding.plain.R
@@ -44,6 +48,12 @@ class ChatDialog() : BaseDialog<DialogChatBinding>() {
             titleBar(binding.topAppBar.toolbar)
             statusBarColor(R.color.canvas)
             statusBarDarkFont(!AppThemeHelper.isDarkMode())
+        }
+
+        if (!requireContext().isGestureNavigationBar()) {
+            binding.page.updateLayoutParams<android.widget.FrameLayout.LayoutParams> {
+                bottomMargin = navigationBarHeight
+            }
         }
 
         initEvents()

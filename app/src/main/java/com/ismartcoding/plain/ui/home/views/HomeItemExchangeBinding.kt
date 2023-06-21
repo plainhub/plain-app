@@ -39,7 +39,6 @@ fun HomeItemExchangeBinding.bindData(context: Context) {
 }
 
 fun HomeItemExchangeBinding.initView() {
-    title.setTextColor(title.context.getColor(R.color.primary))
     title.setText(R.string.home_item_title_exchange)
     rv.linear().setup {
         addType<RateModel>(R.layout.item_row)
@@ -68,6 +67,7 @@ fun HomeItemExchangeBinding.initView() {
 }
 
 fun HomeItemExchangeBinding.updateUI(context: Context) {
+    title.setTextColor(title.context.getColor(R.color.primary))
     UIDataCache.current().latestExchangeRates?.let { exchangeRates ->
         this.subtitle
             .initTheme()
