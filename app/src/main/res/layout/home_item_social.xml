@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    style="@style/HomeItemContainer">
+
+    <TextView
+        android:id="@+id/title"
+        style="@style/HomeItemTitle"
+        android:text="@string/home_item_title_social" />
+
+    <com.ismartcoding.lib.roundview.RoundLinearLayout
+        android:id="@+id/section"
+        style="@style/HomeItemContent.Section">
+
+        <include
+            android:id="@+id/messages"
+            layout="@layout/view_list_item" />
+
+        <include
+            android:id="@+id/contacts"
+            layout="@layout/view_list_item" />
+
+        <include
+            android:id="@+id/calls"
+            layout="@layout/view_list_item" />
+
+    </com.ismartcoding.lib.roundview.RoundLinearLayout>
+
+</LinearLayout>

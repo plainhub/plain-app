@@ -19,6 +19,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.ScreenHelper
 import com.ismartcoding.plain.ui.app.HttpServerDialog
+import com.ismartcoding.plain.ui.app.SettingsDialog
 import com.ismartcoding.plain.ui.scan.ScanDialog
 import kotlin.math.abs
 
@@ -66,6 +67,9 @@ fun ViewTopAppBarBinding.mainRefresh() {
                     if (ScreenHelper.keepScreenOn(enable)) {
                         this.isChecked = enable
                     }
+                }
+                R.id.settings -> {
+                    SettingsDialog().show()
                 }
             }
         }

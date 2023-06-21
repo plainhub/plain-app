@@ -13,12 +13,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.*
@@ -36,23 +36,18 @@ import com.ismartcoding.plain.db.*
 import com.ismartcoding.plain.features.*
 import com.ismartcoding.plain.features.bluetooth.BluetoothPermission
 import com.ismartcoding.plain.features.box.BoxHelper
-import com.ismartcoding.plain.features.box.CancelActiveJobEvent
 import com.ismartcoding.plain.features.box.FetchInitDataEvent
 import com.ismartcoding.plain.features.box.InitDataResultEvent
-import com.ismartcoding.plain.features.chat.ChatHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getStringF
 import com.ismartcoding.plain.features.theme.AppThemeHelper
 import com.ismartcoding.plain.mediaProjectionManager
 import com.ismartcoding.plain.services.ScreenMirrorService
-import com.ismartcoding.plain.ui.chat.SendMessageDialog
+import com.ismartcoding.plain.ui.chat.ChatDialog
 import com.ismartcoding.plain.ui.extensions.*
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
 import com.ismartcoding.plain.ui.models.ShowMessageEvent
 import com.ismartcoding.plain.web.*
-import com.ismartcoding.plain.web.websocket.EventType
-import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import io.ktor.server.request.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.launch
@@ -128,6 +123,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         installSplashScreen()
 
+        LocaleHelper.setLocale(this, LocalStorage.appLocale)
+
+        instance = WeakReference(this)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        initStatusBar()
+
         // https://stackoverflow.com/questions/51959944/sqliteblobtoobigexception-row-too-big-to-fit-into-cursorwindow-requiredpos-0-t
         try {
             val field = CursorWindow::class.java.getDeclaredField("sCursorWindowSize")
@@ -137,14 +140,6 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
         }
 
-        LocaleHelper.setLocale(this, LocalStorage.appLocale)
-
-        instance = WeakReference(this)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        initStatusBar()
-
         if (!isGestureNavigationBar()) {
             binding.page.updateLayoutParams<CoordinatorLayout.LayoutParams> {
                 bottomMargin = navigationBarHeight
@@ -153,13 +148,14 @@ class MainActivity : AppCompatActivity() {
 
         binding.topAppBar.quickNav.updatePadding(0, statusBarHeight, 0, 0)
         binding.topAppBar.autoStatusBar(window)
+        binding.topAppBar.mainRefresh()
 
         BluetoothPermission.init(this)
         Permissions.init(this)
         initEvents()
 
         binding.fab.setSafeClick {
-            SendMessageDialog().show()
+            ChatDialog().show()
         }
 
         binding.page.pageName = javaClass.simpleName
@@ -170,7 +166,7 @@ class MainActivity : AppCompatActivity() {
             setEnableRefresh(false)
         }
 
-        binding.chatList.initView(lifecycle)
+        binding.home.initView(lifecycle)
         Permissions.checkNotification(R.string.foreground_service_notification_prompt) {
             sendEvent(StartHttpServerEvent())
         }
@@ -197,28 +193,13 @@ class MainActivity : AppCompatActivity() {
                 }
                 sendEvent(FetchInitDataEvent.createDefault())
                 binding.topAppBar.mainRefresh()
-                binding.chatList.refreshAsync()
+                binding.home.refreshUI()
             }
         }
     }
 
     @SuppressLint("CheckResult")
     private fun initEvents() {
-        receiveEvent<CurrentBoxChangedEvent> {
-            lifecycleScope.launch {
-                UIDataCache.current().clearConnectivityState()
-                binding.topAppBar.mainRefresh()
-                sendEvent(
-                    CancelActiveJobEvent(
-                        LocalStorage.selectedBoxId,
-                        FetchInitDataEvent.javaClass
-                    )
-                )
-                sendEvent(FetchInitDataEvent.createDefault())
-                binding.chatList.refreshAsync()
-            }
-        }
-
         receiveEvent<HttpServerEnabledEvent> {
             binding.topAppBar.mainRefresh()
         }
@@ -233,26 +214,6 @@ class MainActivity : AppCompatActivity() {
 
         receiveEvent<ShowMessageEvent> { event ->
             Toast.makeText(instance.get()!!, event.message, event.duration).show()
-        }
-
-        receiveEvent<DeleteChatItemViewEvent> { event ->
-            binding.chatList.remove(event.id)
-            if (!binding.chatList.isScrollable()) {
-                binding.fab.isVisible = true
-            }
-        }
-
-        receiveEvent<SendMessageEvent> { event ->
-            lifecycleScope.launch {
-                val items = withIO { ChatHelper.createChatItemsAsync(event.content) }
-                sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED))
-                binding.chatList.addAll(items)
-                DialogHelper.hideLoading()
-            }
-        }
-
-        receiveEvent<HttpServerEvents.MessageCreatedEvent> { event ->
-            binding.chatList.addAll(event.items)
         }
 
         receiveEvent<PermissionResultEvent> { event ->
@@ -273,14 +234,8 @@ class MainActivity : AppCompatActivity() {
             screenCapture.launch(mediaProjectionManager.createScreenCaptureIntent())
         }
 
-        receiveEvent<UpdateMessageEvent> { event ->
-            lifecycleScope.launch {
-                val update = ChatItemDataUpdate(event.chatItem.id, event.chatItem.content)
-                withIO {
-                    AppDatabase.instance.chatDao().updateData(update)
-                }
-                binding.chatList.update(event.chatItem)
-            }
+        receiveEvent<UpdateHomeItemEvent> { event ->
+            binding.home.update(event.type)
         }
 
         receiveEvent<BoxConnectivityStateChangedEvent> {
@@ -393,12 +348,12 @@ class MainActivity : AppCompatActivity() {
         window.decorView.setBackgroundColor(context.getColor(R.color.canvas))
         binding.topAppBar.mainRefresh()
         binding.topAppBar.refreshUI()
-        binding.chatList.refreshUI()
+        binding.home.bindingAdapter.notifyDataSetChanged()
     }
 
     private fun refreshUIForLocaleChanged() {
         binding.topAppBar.mainRefresh()
-        binding.chatList.refreshUI()
+        binding.home.bindingAdapter.notifyDataSetChanged()
     }
 
     companion object {

@@ -220,10 +220,12 @@ fun Window.setWindowSoftInput(
                     transitionY = offset
                 }
             } else if (!hasSoftInput) {
-                if (setPadding) {
-                    transition.setPadding(0, 0, 0, max((transitionY - transitionY * (fraction + 0.5f)), 0f).toInt())
-                } else {
-                    transition.translationY = min(transitionY - transitionY * (fraction + 0.5f), 0f)
+                if (editText == null || editText.hasFocus()) {
+                    if (setPadding) {
+                        transition.setPadding(0, 0, 0, max((transitionY - transitionY * (fraction + 0.5f)), 0f).toInt())
+                    } else {
+                        transition.translationY = min(transitionY - transitionY * (fraction + 0.5f), 0f)
+                    }
                 }
             }
             return insets

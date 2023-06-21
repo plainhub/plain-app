@@ -10,6 +10,7 @@ import com.ismartcoding.plain.features.video.DVideo
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.data.enums.PasswordType
+import com.ismartcoding.plain.features.exchange.ExchangeConfig
 
 object LocalStorage {
     var endictShowWord: Boolean by serialLazy(true)
@@ -53,6 +54,7 @@ object LocalStorage {
     var chatGPTApiKey: String by serialLazy("")
     var httpServerPasswordType: PasswordType by serialLazy(PasswordType.RANDOM)
     var httpServerPassword: String by serialLazy("")
+    var exchange: ExchangeConfig by serialLazy(ExchangeConfig())
 
     fun resetAuthDevToken() {
         authDevToken = CryptoHelper.randomPassword(128)

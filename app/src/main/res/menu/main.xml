@@ -34,6 +34,11 @@
                 android:id="@+id/scan"
                 android:title="@string/scan_qrcode"
                 tools:ignore="AlwaysShowAction" />
+
+            <item
+                android:id="@+id/settings"
+                android:title="@string/settings"
+                tools:ignore="AlwaysShowAction" />
         </menu>
     </item>
 </menu>

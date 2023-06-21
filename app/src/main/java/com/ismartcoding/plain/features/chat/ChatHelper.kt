@@ -4,7 +4,6 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.features.DeleteChatItemViewEvent
 import com.ismartcoding.plain.db.*
-import com.ismartcoding.plain.helpers.FileHelper
 import java.io.File
 
 object ChatHelper {
@@ -17,9 +16,6 @@ object ChatHelper {
             AppDatabase.instance.chatDao().insert(item)
         }
         items.add(item)
-        replyAsync(message)?.let {
-            items.add(it)
-        }
         return items
     }
 
@@ -42,25 +38,6 @@ object ChatHelper {
             }
         }
         sendEvent(DeleteChatItemViewEvent(chatItem.id))
-    }
-
-    private suspend fun replyAsync(input: DMessageContent): DChat? {
-        if (input.value is DMessageText) {
-            val commandType = ChatCommandType.parse((input.value as DMessageText).text.removePrefix(":"))
-            if (commandType != null) {
-                val item = DChat()
-                item.content = DMessageContent(commandType.value)
-                if (commandType == ChatCommandType.EXCHANGE) {
-                    item.content.value = DMessageExchange()
-                }
-                withIO {
-                    AppDatabase.instance.chatDao().insert(item)
-                }
-                return item
-            }
-        }
-
-        return null
     }
 
 }

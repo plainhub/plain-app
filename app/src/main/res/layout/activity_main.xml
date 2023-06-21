@@ -16,10 +16,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:srlHeaderTranslationViewId="@id/chat_list">
+        app:srlHeaderTranslationViewId="@id/home">
 
-        <com.ismartcoding.plain.ui.chat.views.ChatListView
-            android:id="@+id/chat_list"
+        <com.ismartcoding.plain.ui.home.HomeView
+            android:id="@+id/home"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
@@ -29,6 +29,6 @@
     <com.ismartcoding.plain.ui.views.MovableFloatingActionButton
         android:id="@+id/fab"
         style="@style/Fab"
-        android:src="@drawable/ic_send" />
+        android:src="@drawable/ic_chat" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

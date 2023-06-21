@@ -26,9 +26,6 @@ fun DMessageContent.toJSONString(): String {
             DMessageType.FILES.value -> {
                 valueJSON = jsonEncode(value as DMessageFiles)
             }
-            DMessageType.EXCHANGE.value -> {
-                valueJSON = jsonEncode(value as DMessageExchange)
-            }
         }
         obj.put("value", JSONObject(valueJSON))
     }
@@ -41,7 +38,6 @@ enum class DMessageType(val value: String) {
     TEXT("text"),
     IMAGES("images"),
     FILES("files"),
-    EXCHANGE("exchange"),
 }
 
 @Serializable
@@ -52,9 +48,6 @@ class DMessageFile(val uri: String, val size: Long, val duration: Long = 0)
 
 @Serializable
 class DMessageImages(val items: List<DMessageFile>)
-
-@Serializable
-class DMessageExchange(var base: String = "USD", var value: Double = 100.0, val selected: MutableSet<String> = mutableSetOf("USD", "CNY", "EUR"))
 
 @Serializable
 class DMessageFiles(val items: List<DMessageFile>)
@@ -93,9 +86,6 @@ data class DChat(
                 DMessageType.FILES.value -> {
                     message.value = Json.decodeFromString<DMessageFiles>(valueJson)
                 }
-                DMessageType.EXCHANGE.value -> {
-                    message.value = Json.decodeFromString<DMessageExchange>(valueJson)
-                }
             }
 
             return message
@@ -130,5 +120,8 @@ interface ChatDao {
 
     @Query("DELETE FROM chats WHERE id = :id")
     fun delete(id: String)
+
+    @Query("DELETE FROM chats WHERE id in (:ids)")
+    fun deleteByIds(ids: List<String>)
 }
 

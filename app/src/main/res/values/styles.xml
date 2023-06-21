@@ -282,7 +282,6 @@
         <item name="android:textSize">@dimen/text_size_lg</item>
     </style>
 
-
     <style name="ChatItemDate">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -308,6 +307,31 @@
     </style>
 
     <style name="ChatItemContent.Section" parent="ChatItemContent">
+        <item name="rRadius">@dimen/section_radius</item>
+        <item name="rStrokeColor">@color/primary</item>
+        <item name="rStrokeWidth">@dimen/border_width</item>
+    </style>
+
+    <style name="HomeItemContainer" parent="Column">
+        <item name="android:paddingTop">@dimen/size_sm</item>
+        <item name="android:paddingBottom">@dimen/size_sm</item>
+    </style>
+
+    <style name="HomeItemTitle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">@dimen/size_normal</item>
+        <item name="android:fontFamily">@font/noto_medium</item>
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:textSize">@dimen/text_size_normal</item>
+    </style>
+
+    <style name="HomeItemContent" parent="Column">
+        <item name="android:layout_marginHorizontal">@dimen/size_normal</item>
+        <item name="android:layout_marginTop">@dimen/size_sm</item>
+    </style>
+
+    <style name="HomeItemContent.Section" parent="HomeItemContent">
         <item name="rRadius">@dimen/section_radius</item>
         <item name="rStrokeColor">@color/primary</item>
         <item name="rStrokeWidth">@dimen/border_width</item>

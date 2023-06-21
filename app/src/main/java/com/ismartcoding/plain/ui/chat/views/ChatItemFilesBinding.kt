@@ -7,6 +7,7 @@ import com.bumptech.glide.Glide
 import com.ismartcoding.lib.brv.utils.linear
 import com.ismartcoding.lib.brv.utils.models
 import com.ismartcoding.lib.brv.utils.setup
+import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.plain.Constants
@@ -15,6 +16,7 @@ import com.ismartcoding.plain.databinding.ChatItemFilesBinding
 import com.ismartcoding.plain.databinding.ItemChatFileBinding
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageFiles
+import com.ismartcoding.plain.features.ChatItemClickEvent
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
@@ -34,6 +36,7 @@ fun ChatItemFilesBinding.initView() {
     rv.linear().setup {
         addType<FileModel>(R.layout.item_chat_file)
         R.id.container.onClick {
+            sendEvent(ChatItemClickEvent())
             val m = getModel<FileModel>()
             if (m.uri.isImageFast() || m.uri.isVideoFast()) {
                 PreviewDialog().show(

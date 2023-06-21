@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.ismartcoding.lib.brv.PageRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/page"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:srlHeaderTranslationViewId="@id/chat_list">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/top_app_bar"
+            layout="@layout/view_top_app_bar"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.ismartcoding.plain.ui.chat.views.ChatListView
+            android:id="@+id/chat_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            app:layout_constraintBottom_toTopOf="@id/chat_input"
+            app:layout_constraintTop_toBottomOf="@id/top_app_bar" />
+
+        <com.ismartcoding.plain.ui.chat.views.ChatInputView
+            android:id="@+id/chat_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/canvas"
+            android:paddingStart="@dimen/size_normal"
+            android:paddingTop="@dimen/size_sm"
+            android:paddingEnd="@dimen/size_normal"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.ismartcoding.lib.brv.PageRefreshLayout>

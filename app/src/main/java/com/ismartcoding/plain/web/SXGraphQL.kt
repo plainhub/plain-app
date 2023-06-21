@@ -121,7 +121,13 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("chatItems") {
                     resolver { ->
-                        val items = AppDatabase.instance.chatDao().getAll()
+                        var items = AppDatabase.instance.chatDao().getAll()
+                        val types = setOf("app", "storage", "work", "social", "exchange")
+                        val ids = items.filter { types.contains(it.content.type) }.map { it.id }
+                        if (ids.isNotEmpty()) {
+                            AppDatabase.instance.chatDao().deleteByIds(ids)
+                            items = items.filter { !types.contains(it.content.type) }
+                        }
                         items.map { it.toModel() }
                     }
                 }

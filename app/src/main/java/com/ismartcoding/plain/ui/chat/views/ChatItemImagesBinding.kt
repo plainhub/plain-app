@@ -5,6 +5,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.ismartcoding.lib.brv.utils.models
 import com.ismartcoding.lib.brv.utils.setup
+import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.rv.GridSpacingItemDecoration
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
@@ -17,6 +18,7 @@ import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.extensions.glide
+import com.ismartcoding.plain.features.ChatItemClickEvent
 import com.ismartcoding.plain.ui.extensions.setSafeClick
 
 
@@ -34,6 +36,7 @@ fun ChatItemImagesBinding.initView() {
             b.image.glide(m.uri)
             TransitionHelper.put(m.id, b.image)
             b.image.setSafeClick {
+                sendEvent(ChatItemClickEvent())
                 PreviewDialog().show(
                     items = getMediaItems(m.chatItem).map { s -> PreviewItem(s.id, s.uri) },
                     initKey = m.id,
