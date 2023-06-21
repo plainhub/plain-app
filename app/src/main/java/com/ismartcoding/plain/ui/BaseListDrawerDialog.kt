@@ -62,13 +62,12 @@ abstract class BaseListDrawerDialog : BaseDialog<DialogListDrawerBinding>() {
         binding.list.page.pageName = this.javaClass.simpleName
         binding.initToggleMode(viewLifecycleOwner, viewModel, titleId)
         initBasicEvents()
+        initList()
         initEvents()
         initTopAppBar()
 
         initDrawerMenu()
         updateDrawerMenu()
-
-        initList()
     }
 
     override fun onBackPressed() {
