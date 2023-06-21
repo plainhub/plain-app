@@ -104,7 +104,7 @@ dependencies {
     val roomVersion = "2.5.1"
     val apolloVersion = "3.2.1"
     val kgraphqlVersion = "0.18.1"
-    val ktorVersion = "2.0.3"
+    val ktorVersion = "2.3.1"
 
     implementation(platform("com.google.firebase:firebase-bom:31.2.1"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")

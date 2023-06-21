@@ -40,11 +40,11 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.10.0")
+    implementation("androidx.core:core-ktx:1.10.1")
     api("androidx.appcompat:appcompat:1.6.1")
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-    val ktorVersion = "2.0.3"
+    val ktorVersion = "2.3.1"
     val markwonVersion = "4.6.2"
 
 //    api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
