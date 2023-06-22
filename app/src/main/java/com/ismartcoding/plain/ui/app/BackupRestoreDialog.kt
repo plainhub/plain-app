@@ -69,13 +69,25 @@ class BackupRestoreDialog : BaseBottomSheetDialog<DialogBackupRestoreBinding>() 
                             ZipUtil.unpack(stream, destFile)
 
                             // restore database
-                            File(destFile.path + "/databases").copyRecursively(File(context.dataDir.path + "/databases"), true)
+                            File(destFile.path + "/databases").let {
+                                if (it.exists()) {
+                                    it.copyRecursively(File(context.dataDir.path + "/databases"), true)
+                                }
+                            }
 
                             // restore local storage
-                            File(destFile.path + "/files").copyRecursively(context.filesDir, true)
+                            File(destFile.path + "/files").let {
+                                if (it.exists()) {
+                                    it.copyRecursively(context.filesDir, true)
+                                }
+                            }
 
                             // restore external files
-                            File(destFile.path + "/external/files").copyRecursively(context.getExternalFilesDir(null)!!, true)
+                            File(destFile.path + "/external/files").let {
+                                if (it.exists()) {
+                                    it.copyRecursively(context.getExternalFilesDir(null)!!, true)
+                                }
+                            }
 
                             destFile.delete()
                         }
@@ -102,7 +114,11 @@ class BackupRestoreDialog : BaseBottomSheetDialog<DialogBackupRestoreBinding>() 
                     try {
                         DialogHelper.showLoading()
                         withIO {
-                            val files = arrayListOf(ExportItem("/", File(context.dataDir.path + "/databases")), ExportItem("/", context.filesDir), ExportItem("/external/", context.getExternalFilesDir(null)!!))
+                            val files = arrayListOf(
+                                ExportItem("/", File(context.dataDir.path + "/databases")),
+                                ExportItem("/", context.filesDir),
+                                ExportItem("/external/", context.getExternalFilesDir(null)!!)
+                            )
                             for (i in files.indices) {
                                 val item = files[i]
                                 appendFile(out, item.dir, item.file)

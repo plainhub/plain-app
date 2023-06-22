@@ -73,13 +73,18 @@ class HttpServerDialog : BaseDialog<DialogHttpServerBinding>() {
                         coMain {
                             val client = HttpClientManager.httpClient()
                             DialogHelper.showLoading()
-                            val r = withIO { client.get("http://127.0.0.1:${LocalStorage.httpPort}/health_check") }
-                            DialogHelper.hideLoading()
-                            val context = requireContext()
-                            if (r.status == HttpStatusCode.OK) {
-                                DialogHelper.showConfirmDialog(context, getString(R.string.confirm), "Http server is running well.")
-                            } else {
-                                DialogHelper.showConfirmDialog(context, getString(R.string.error), "Http server is not started. Kill all apps on your phone and start the PlainApp again. Make sure that there are no other apps occupying the HTTP or HTTPS ports.If the problem persists, please provide more details about the issue by contacting ismartcoding@gmail.com.")
+                            try {
+                                val r = withIO { client.get("http://127.0.0.1:${LocalStorage.httpPort}/health_check") }
+                                DialogHelper.hideLoading()
+                                val context = requireContext()
+                                if (r.status == HttpStatusCode.OK) {
+                                    DialogHelper.showConfirmDialog(context, getString(R.string.confirm), "Http server is running well.")
+                                } else {
+                                    DialogHelper.showConfirmDialog(context, getString(R.string.error), "Http server is not started. Kill all apps on your phone and start the PlainApp again. Make sure that there are no other apps occupying the HTTP or HTTPS ports. If the problem persists, please provide more details about the issue by contacting ismartcoding@gmail.com.")
+                                }
+                            } catch (ex: Exception) {
+                                DialogHelper.hideLoading()
+                                DialogHelper.showConfirmDialog(context, getString(R.string.error), "Http server is not started. Kill all apps on your phone and start the PlainApp again. Make sure that there are no other apps occupying the HTTP or HTTPS ports. If the problem persists, please provide more details about the issue by contacting ismartcoding@gmail.com.")
                             }
                         }
                     }
