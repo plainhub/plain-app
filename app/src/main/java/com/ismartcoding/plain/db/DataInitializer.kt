@@ -60,8 +60,6 @@ class DataInitializer(val context: Context, val db: SupportSQLiteDatabase) {
     fun insertWelcome() {
         setOf<MessageItem>(
             MessageItem("""{"type":"text","value":{"text":"${context.resources.getString(R.string.welcome_text)}"}}""", false),
-            MessageItem("""{"type":"text","value":{"text":":app"}}""", true),
-            MessageItem("""{"type":"app"}""", false)
         ).forEach {
             db.insert("chats", SQLiteDatabase.CONFLICT_NONE, ContentValues().apply {
                 put("id", StringHelper.shortUUID())
