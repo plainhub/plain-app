@@ -10,7 +10,7 @@ plugins {
     id("kotlin-parcelize")
     kotlin("android")
     kotlin("kapt")
-    kotlin("plugin.serialization") version "1.7.0"
+    kotlin("plugin.serialization") version "1.8.21"
 }
 
 val keystoreProperties = Properties()
@@ -21,11 +21,11 @@ rootProject.file("keystore.properties").let {
 }
 
 android {
-    compileSdk = 33
+    compileSdk = 34
     defaultConfig {
         applicationId = "com.ismartcoding.plain"
         minSdk = 28
-        targetSdk = 33
+        targetSdk = 34
 
         val abiFilterList = if (hasProperty("abiFilters")) property("abiFilters").toString().split(';') else listOf()
         val singleAbiNum = when (abiFilterList.takeIf { it.size == 1 }?.first()) {
@@ -67,17 +67,23 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
 //        isCoreLibraryDesugaringEnabled = true
     }
 
     buildFeatures {
+        buildConfig = true
         viewBinding = true
         dataBinding = true
+        compose = true
     }
 
-    packagingOptions {
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.7"
+    }
+
+    packaging {
         jniLibs {
             useLegacyPackaging = true
             excludes += listOf("META-INF/*")
@@ -95,7 +101,7 @@ android {
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_11.toString()
+            jvmTarget = JavaVersion.VERSION_17.toString()
         }
     }
 }
@@ -105,6 +111,19 @@ dependencies {
     val apolloVersion = "3.2.1"
     val kgraphqlVersion = "0.18.1"
     val ktorVersion = "2.3.1"
+
+    implementation(platform("androidx.compose:compose-bom:2023.06.00"))
+
+
+    implementation("androidx.compose.runtime:runtime")
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.foundation:foundation")
+    implementation("androidx.compose.foundation:foundation-layout")
+//    implementation("androidx.compose.material:material")
+    implementation("androidx.compose.material3:material3:1.2.0-alpha03")
+    implementation("androidx.compose.runtime:runtime-livedata")
+    implementation("androidx.compose.ui:ui-tooling")
+    implementation("com.google.accompanist:accompanist-themeadapter-material:0.30.1")
 
     implementation(platform("com.google.firebase:firebase-bom:31.2.1"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
@@ -122,9 +141,9 @@ dependencies {
     implementation("com.github.bmoliveira:snake-yaml:v1.18-android")
 
     // CameraX
-    implementation("androidx.camera:camera-camera2:1.3.0-alpha06")
-    implementation("androidx.camera:camera-lifecycle:1.3.0-alpha06")
-    implementation("androidx.camera:camera-view:1.3.0-alpha06")
+    implementation("androidx.camera:camera-camera2:1.3.0-beta01")
+    implementation("androidx.camera:camera-lifecycle:1.3.0-beta01")
+    implementation("androidx.camera:camera-view:1.3.0-beta01")
 
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")

@@ -5,11 +5,14 @@ import android.view.View
 import androidx.core.view.isVisible
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.LocalStorage
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.databinding.DialogHttpServerPasswordSettingsBinding
 import com.ismartcoding.plain.features.HttpServerPasswordChangedEvent
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.initView
+import com.ismartcoding.plain.ui.extensions.setKeyText
+import com.ismartcoding.plain.ui.extensions.setSwitch
 import com.ismartcoding.plain.ui.views.ChipItem
 import com.ismartcoding.plain.web.HttpServerManager
 
@@ -24,6 +27,10 @@ class HttpServerPasswordSettingsDialog() : BaseBottomSheetDialog<DialogHttpServe
             sendEvent(HttpServerPasswordChangedEvent())
         }
         updateByType(LocalStorage.httpServerPasswordType)
+        binding.twoFactor.setKeyText(R.string.require_confirmation)
+            .setSwitch(LocalStorage.authTwoFactor) { _, isEnabled ->
+                LocalStorage.authTwoFactor = isEnabled
+            }
     }
 
     private fun updateByType(type: PasswordType) {
@@ -39,6 +46,7 @@ class HttpServerPasswordSettingsDialog() : BaseBottomSheetDialog<DialogHttpServe
                 }
                 binding.password.isVisible = false
             }
+
             PasswordType.FIXED -> {
                 binding.passwordView.isVisible = false
                 binding.password.text = LocalStorage.httpServerPassword
@@ -50,6 +58,7 @@ class HttpServerPasswordSettingsDialog() : BaseBottomSheetDialog<DialogHttpServe
                 }
                 binding.password.isVisible = true
             }
+
             else -> {
                 binding.passwordView.isVisible = false
                 binding.password.isVisible = false

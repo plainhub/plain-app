@@ -123,10 +123,10 @@ internal class DragPinchManager(private val pdfView: PDFView, private val animat
         return false
     }
 
-    override fun onScroll(e1: MotionEvent, e2: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+    override fun onScroll(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean {
         scrolling = true
         if (pdfView.isZooming || pdfView.isSwipeEnabled) {
-            pdfView.moveRelativeTo(-distanceX, -distanceY)
+            pdfView.moveRelativeTo(-p2, -p3)
         }
         if (!scaling || pdfView.doRenderDuringScale()) {
             pdfView.loadPageByOffset()
@@ -146,15 +146,15 @@ internal class DragPinchManager(private val pdfView: PDFView, private val animat
         pdfView.callbacks.callOnLongPress(e)
     }
 
-    override fun onFling(e1: MotionEvent, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+    override fun onFling(p0: MotionEvent?, p1: MotionEvent, p2: Float, p3: Float): Boolean {
         if (!pdfView.isSwipeEnabled) {
             return false
         }
         if (pdfView.isPageFlingEnabled) {
             if (pdfView.pageFillsScreen()) {
-                onBoundedFling(velocityX, velocityY)
+                onBoundedFling(p2, p3)
             } else {
-                startPageFling(e1, e2, velocityX, velocityY)
+                startPageFling(p0!!, p1, p2, p3)
             }
             return true
         }
@@ -170,7 +170,7 @@ internal class DragPinchManager(private val pdfView: PDFView, private val animat
             minX = -(pdfFile.getDocLen(pdfView.zoom) - pdfView.width)
             minY = -(pdfView.toCurrentScale(pdfFile.maxPageHeight) - pdfView.height)
         }
-        animationManager.startFlingAnimation(xOffset, yOffset, velocityX.toInt(), velocityY.toInt(), minX.toInt(), 0, minY.toInt(), 0)
+        animationManager.startFlingAnimation(xOffset, yOffset, p2.toInt(), p3.toInt(), minX.toInt(), 0, minY.toInt(), 0)
         return true
     }
 

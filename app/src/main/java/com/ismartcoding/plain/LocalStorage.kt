@@ -20,6 +20,7 @@ object LocalStorage {
     var httpsPort: Int by serialLazy(8443)
     var authDevToken: String by serialLazy("")
     var authDevTokenEnabled: Boolean by serialLazy(false)
+    var authTwoFactor: Boolean by serialLazy(true)
     var clientId: String by serialLazy("")
     var fileIdToken: String by serialLazy("") // use to generate file path to id or decrypt file id to path
     var appLocale: String by serialLazy("")

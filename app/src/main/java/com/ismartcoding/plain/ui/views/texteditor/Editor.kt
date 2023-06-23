@@ -138,17 +138,17 @@ class Editor(context: Context, attrs: AttributeSet?) : AppCompatEditText(context
                 KeyEvent.KEYCODE_V -> onTextContextMenuItem(ID_PASTE)
                 KeyEvent.KEYCODE_Z -> {
                     if (canUndo) {
-                        return onTextContextMenuItem(ID_UNDO)
+                        return onTextContextMenuItem(R.id.undo)
                     }
                     if (canRedo) {
-                        return onTextContextMenuItem(ID_REDO)
+                        return onTextContextMenuItem(R.id.redo)
                     }
                     //mainActivity.saveTheFile(false)
                     true
                 }
                 KeyEvent.KEYCODE_Y -> {
                     if (canRedo) {
-                        return onTextContextMenuItem(ID_REDO)
+                        return onTextContextMenuItem(R.id.redo)
                     }
                     // mainActivity.saveTheFile(false)
                     true
@@ -194,11 +194,11 @@ class Editor(context: Context, attrs: AttributeSet?) : AppCompatEditText(context
         id: Int
     ): Boolean {
         return when (id) {
-            ID_UNDO -> {
+            R.id.undo -> {
                 undo()
                 true
             }
-            ID_REDO -> {
+            R.id.redo -> {
                 redo()
                 true
             }
@@ -597,8 +597,6 @@ class Editor(context: Context, attrs: AttributeSet?) : AppCompatEditText(context
         private const val ID_CUT = android.R.id.cut
         private const val ID_COPY = android.R.id.copy
         private const val ID_PASTE = android.R.id.paste
-        private const val ID_UNDO = R.id.undo
-        private const val ID_REDO = R.id.redo
         private const val CHARS_TO_COLOR = 2500
     }
 }

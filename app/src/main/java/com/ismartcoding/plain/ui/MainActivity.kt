@@ -254,9 +254,11 @@ class MainActivity : AppCompatActivity() {
                 PickFileType.IMAGE_VIDEO -> {
                     type = ActivityResultContracts.PickVisualMedia.ImageAndVideo
                 }
+
                 PickFileType.IMAGE -> {
                     type = ActivityResultContracts.PickVisualMedia.ImageOnly
                 }
+
                 else -> {}
             }
             if (type != null) {
@@ -280,8 +282,16 @@ class MainActivity : AppCompatActivity() {
         }
 
         receiveEvent<ConfirmToAcceptLoginEvent> { event ->
-            val session = event.session
             val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
+            if (!LocalStorage.authTwoFactor) {
+                launch {
+                    withIO {
+                        respondTokenAsync(event, clientIp)
+                    }
+                }
+                return@receiveEvent
+            }
+
             if (requestToConnectDialog?.isShowing == true) {
                 requestToConnectDialog?.dismiss()
                 requestToConnectDialog = null
@@ -296,34 +306,13 @@ class MainActivity : AppCompatActivity() {
                 )
                 .setPositiveButton(getString(R.string.accept)) { _, _ ->
                     launch {
-                        val token = CryptoHelper.generateAESKey()
-                        withIO {
-                            SessionList.addOrUpdateAsync(event.clientId) {
-                                it.clientIP = clientIp
-                                it.osName = event.osName
-                                it.osVersion = event.osVersion
-                                it.browserName = event.browserName
-                                it.browserVersion = event.browserVersion
-                                it.token = token
-                            }
-                            HttpServerManager.loadTokenCache()
-                            session.send(
-                                CryptoHelper.aesEncrypt(
-                                    HttpServerManager.passwordToToken(), JsonHelper.jsonEncode(
-                                        AuthResponse(
-                                            AuthStatus.COMPLETED,
-                                            token
-                                        )
-                                    )
-                                )
-                            )
-                        }
+                        withIO { respondTokenAsync(event, clientIp) }
                     }
                 }
                 .setNegativeButton(getString(R.string.reject)) { _, _ ->
                     launch {
                         withIO {
-                            session.close(
+                            event.session.close(
                                 CloseReason(
                                     CloseReason.Codes.TRY_AGAIN_LATER,
                                     "rejected"
@@ -335,7 +324,29 @@ class MainActivity : AppCompatActivity() {
                 .create()
             requestToConnectDialog?.show()
         }
+    }
 
+    private suspend fun respondTokenAsync(event: ConfirmToAcceptLoginEvent, clientIp: String) {
+        val token = CryptoHelper.generateAESKey()
+        SessionList.addOrUpdateAsync(event.clientId) {
+            it.clientIP = clientIp
+            it.osName = event.osName
+            it.osVersion = event.osVersion
+            it.browserName = event.browserName
+            it.browserVersion = event.browserVersion
+            it.token = token
+        }
+        HttpServerManager.loadTokenCache()
+        event.session.send(
+            CryptoHelper.aesEncrypt(
+                HttpServerManager.passwordToToken(), JsonHelper.jsonEncode(
+                    AuthResponse(
+                        AuthStatus.COMPLETED,
+                        token
+                    )
+                )
+            )
+        )
     }
 
     private fun doPickFile(event: PickFileEvent) {

@@ -55,6 +55,7 @@
     <string name="sort">Sort</string>
     <string name="language">Language</string>
     <string name="about">About</string>
+    <string name="require_confirmation">Require confirmation</string>
     <string name="web_console">Open in PC web browser</string>
     <string name="backup_restore">Backup &amp; restore</string>
     <string name="backup">Backup</string>

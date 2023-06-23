@@ -61,24 +61,24 @@ class EqualizerView @JvmOverloads constructor(
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
         computeRects()
 
         colPaint.color = barColor
 
-        canvas?.drawRect(col1Rect, colPaint)
-        canvas?.drawRect(col2Rect, colPaint)
-        canvas?.drawRect(col3Rect, colPaint)
+        canvas.drawRect(col1Rect, colPaint)
+        canvas.drawRect(col2Rect, colPaint)
+        canvas.drawRect(col3Rect, colPaint)
 
-        canvas?.drawOval(col1CircleRect, colPaint)
-        canvas?.drawOval(col2CircleRect, colPaint)
-        canvas?.drawOval(col3CircleRect, colPaint)
+        canvas.drawOval(col1CircleRect, colPaint)
+        canvas.drawOval(col2CircleRect, colPaint)
+        canvas.drawOval(col3CircleRect, colPaint)
 
-        canvas?.drawOval(col1BottomRect, colPaint)
-        canvas?.drawOval(col2BottomRect, colPaint)
-        canvas?.drawOval(col3BottomRect, colPaint)
+        canvas.drawOval(col1BottomRect, colPaint)
+        canvas.drawOval(col2BottomRect, colPaint)
+        canvas.drawOval(col3BottomRect, colPaint)
 
     }
 

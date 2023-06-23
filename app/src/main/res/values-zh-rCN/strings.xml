@@ -59,6 +59,7 @@
     <string name="ip_address_asc">IP地址(0到9)</string>
     <string name="last_active_desc">活跃时间</string>
     <string name="about">关于</string>
+    <string name="require_confirmation">Require confirmation</string>
     <string name="web_console">电脑浏览器访问手机</string>
     <string name="backup_restore">备份与恢复</string>
     <string name="backup">备份</string>

@@ -111,7 +111,7 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
         updateUI()
     }
 
-    private fun makeTimerPendingIntent(flag: Int): PendingIntent? {
+    private fun makeTimerPendingIntent(flag: Int): PendingIntent {
         return PendingIntent.getService(
             requireActivity(), 0, makeTimerIntent(), flag or PendingIntent.FLAG_IMMUTABLE
         )
