@@ -36,19 +36,24 @@ object NetworkHelper {
     fun getDeviceIP4(): String {
         try {
             val en = NetworkInterface.getNetworkInterfaces()
+            val map = mutableMapOf<String, String>()
             while (en?.hasMoreElements() == true) {
                 val intf = en.nextElement()
                 val enumIpAddr = intf.inetAddresses
                 while (enumIpAddr.hasMoreElements()) {
                     val inetAddress = enumIpAddr.nextElement()
                     if (!inetAddress.isLoopbackAddress && inetAddress is Inet4Address) {
-                        return inetAddress.getHostAddress() ?: ""
+                        map[intf.name] = inetAddress.getHostAddress() ?: ""
                     }
                 }
+            }
+            if (map.isNotEmpty()) {
+                return map["wlan0"] ?: map.values.first()
             }
         } catch (ex: SocketException) {
             ex.printStackTrace()
         }
+
         return ""
     }
 
