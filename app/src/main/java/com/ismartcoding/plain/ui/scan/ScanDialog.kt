@@ -45,7 +45,7 @@ class ScanDialog() : BaseDialog<DialogScanBinding>(), OnScanResultCallback {
         }
 
         receiveEvent<PermissionResultEvent> { event ->
-            if (Permission.CAMERA.can()) {
+            if (Permission.CAMERA.can(requireContext())) {
                 startCamera()
             } else {
                 DialogHelper.showMessage(getString(R.string.scan_needs_camera_warning))
@@ -86,10 +86,10 @@ class ScanDialog() : BaseDialog<DialogScanBinding>(), OnScanResultCallback {
             sendEvent(PickFileEvent(PickFileTag.SCAN, PickFileType.IMAGE, multiple = false))
         }
 
-        if (Permission.CAMERA.can()) {
+        if (Permission.CAMERA.can(requireContext())) {
             startCamera()
         } else {
-            Permission.CAMERA.grant()
+            Permission.CAMERA.grant(requireContext())
         }
     }
 

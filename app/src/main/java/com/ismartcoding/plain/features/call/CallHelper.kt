@@ -13,6 +13,7 @@ import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.getTimeValue
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.LocalStorage
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.features.BaseContentHelper
 import kotlinx.datetime.Instant
 import kotlin.random.Random
@@ -57,7 +58,7 @@ object CallHelper : BaseContentHelper() {
     }
 
     override fun count(context: Context, query: String): Int {
-        if (LocalStorage.demoMode) {
+        if (TempData.demoMode) {
             if (demoItems.isEmpty()) {
                 demoSearch()
             }
@@ -75,7 +76,7 @@ object CallHelper : BaseContentHelper() {
     }
 
     fun search(context: Context, query: String, limit: Int, offset: Int): List<DCall> {
-        if (LocalStorage.demoMode) {
+        if (TempData.demoMode) {
             if (demoItems.isEmpty()) {
                 demoSearch()
             }

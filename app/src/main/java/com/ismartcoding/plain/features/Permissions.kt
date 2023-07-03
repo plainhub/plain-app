@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.features
 
-import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -18,9 +17,9 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.isTIRAMISUPlus
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.preference.ApiPermissionsPreference
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.packageManager
@@ -52,26 +51,16 @@ enum class Permission {
         return getString("feature_$name")
     }
 
-    fun isEnabled(): Boolean {
-        return LocalStorage.apiPermissions.contains(this.toString())
+    fun isEnabled(context: Context): Boolean {
+        val apiPermissions = ApiPermissionsPreference.get(context)
+        return apiPermissions.contains(this.toString())
     }
 
-    fun setEnabled(enabled: Boolean) {
-        val mutate = LocalStorage.apiPermissions.toMutableSet()
-        if (enabled) {
-            mutate.add(this.toString())
-        } else {
-            mutate.remove(this.toString())
-        }
-        LocalStorage.apiPermissions = mutate
-    }
-
-    fun toSysPermission(): String {
+    private fun toSysPermission(): String {
         return "android.permission.${this.name}"
     }
 
-    fun can(): Boolean {
-        val context = MainApp.instance
+    fun can(context: Context): Boolean {
         return when {
             this == WRITE_EXTERNAL_STORAGE -> {
                 FileHelper.hasStoragePermission(context)
@@ -93,22 +82,22 @@ enum class Permission {
         }
     }
 
-    fun grant(): Boolean {
-        if (can()) {
+    fun grant(context: Context): Boolean {
+        if (can(context)) {
             return true
         } else {
             if (this == POST_NOTIFICATIONS) {
                 if (isTIRAMISUPlus()) {
                     if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.instance.get()!!, this.toSysPermission())) {
-                        getEnableNotificationIntent()
+                        getEnableNotificationIntent(context)
                     } else {
-                        sendEvent(RequestPermissionEvent(this.toSysPermission()))
+                        sendEvent(RequestPermissionEvent(this))
                     }
                 } else {
-                    getEnableNotificationIntent()
+                    getEnableNotificationIntent(context)
                 }
             } else {
-                sendEvent(RequestPermissionEvent(this.toSysPermission()))
+                sendEvent(RequestPermissionEvent(this))
             }
         }
 
@@ -116,8 +105,7 @@ enum class Permission {
     }
 
     companion object {
-        fun getEnableNotificationIntent(): Intent {
-            val context = MainActivity.instance.get()!!
+        fun getEnableNotificationIntent(context: Context): Intent {
             val intent = Intent()
             try {
                 intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
@@ -134,8 +122,8 @@ enum class Permission {
         }
     }
 
-    fun check() {
-        if (!isEnabled()) {
+    fun check(context: Context) {
+        if (!isEnabled(context)) {
             throw Exception("no_permission")
         }
     }
@@ -157,33 +145,79 @@ enum class Permission {
             else -> ""
         }
     }
+
+    fun request(context: Context, launcher: ActivityResultLauncher<String>?, intentLauncher: ActivityResultLauncher<Intent>?) {
+        if (this == WRITE_EXTERNAL_STORAGE && isRPlus()) {
+            try {
+                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                intent.addCategory("android.intent.category.DEFAULT")
+                intent.data = Uri.parse("package:${context.packageName}")
+                intentLauncher?.launch(intent)
+            } catch (e: Exception) {
+                val intent = Intent()
+                intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+                intentLauncher?.launch(intent)
+            }
+        } else if (this == WRITE_SETTINGS) {
+            val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
+            intent.addCategory(Intent.CATEGORY_DEFAULT)
+            intent.data = Uri.parse("package:${context.packageName}")
+            if (intent.resolveActivity(packageManager) != null) {
+                intentLauncher?.launch(intent)
+            } else {
+                DialogHelper.showMessage("ActivityNotFoundException: No Activity found to handle Intent act=android.settings.action.MANAGE_WRITE_SETTINGS")
+            }
+        } else if (this == SYSTEM_ALERT_WINDOW) {
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}"))
+            intentLauncher?.launch(intent)
+        } else if (this == POST_NOTIFICATIONS) {
+            val permission = this.toSysPermission()
+            if (isTIRAMISUPlus()) {
+                val activity = MainActivity.instance.get()!!
+                if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+                    intentLauncher?.launch(Permission.getEnableNotificationIntent(context))
+                } else {
+                    launcher?.launch(permission)
+                }
+            } else {
+                intentLauncher?.launch(Permission.getEnableNotificationIntent(context))
+            }
+        } else {
+            launcher?.launch(this.toSysPermission())
+        }
+    }
 }
 
-object Permissions {
-    private val map = mutableMapOf<String, ActivityResultLauncher<String>>()
-    private val events = mutableListOf<Job>()
-    private val intentLauncherMap = mutableMapOf<String, ActivityResultLauncher<Intent>>()
+data class PermissionItem(val permission: Permission, val granted: Boolean)
 
-    fun getWebList(context: Context): List<Permission> {
+object Permissions {
+    private val map = mutableMapOf<Permission, ActivityResultLauncher<String>>()
+    private val events = mutableListOf<Job>()
+    private val intentLauncherMap = mutableMapOf<Permission, ActivityResultLauncher<Intent>>()
+
+    fun getWebList(context: Context): List<PermissionItem> {
         val permissions = mutableListOf(Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_CONTACTS, Permission.WRITE_CONTACTS)
         if (context.allowSensitivePermissions()) {
             permissions.addAll(listOf(Permission.READ_SMS, Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG))
         }
         permissions.addAll(listOf(Permission.CALL_PHONE, Permission.SYSTEM_ALERT_WINDOW, Permission.NONE))
 
-        return permissions
+        return permissions.map { PermissionItem(it, it.can(context)) }
     }
 
     fun init(activity: AppCompatActivity) {
         setOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.CALL_PHONE,
-            Manifest.permission.WRITE_SETTINGS,
-            Manifest.permission.READ_CALL_LOG, Manifest.permission.WRITE_CALL_LOG,
-            Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS,
-            Manifest.permission.READ_SMS, Manifest.permission.SEND_SMS,
-            Manifest.permission.POST_NOTIFICATIONS,
+            Permission.CAMERA,
+            Permission.WRITE_EXTERNAL_STORAGE,
+            Permission.CALL_PHONE,
+            Permission.WRITE_SETTINGS,
+            Permission.READ_CALL_LOG,
+            Permission.WRITE_CALL_LOG,
+            Permission.READ_CONTACTS,
+            Permission.WRITE_CONTACTS,
+            Permission.READ_SMS,
+            Permission.SEND_SMS,
+            Permission.POST_NOTIFICATIONS,
         ).forEach { permission ->
             map[permission] = activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
                 canContinue = true
@@ -192,8 +226,8 @@ object Permissions {
         }
 
         setOf(
-            Manifest.permission.WRITE_SETTINGS, Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.SYSTEM_ALERT_WINDOW, Manifest.permission.POST_NOTIFICATIONS
+            Permission.WRITE_SETTINGS, Permission.WRITE_EXTERNAL_STORAGE,
+            Permission.SYSTEM_ALERT_WINDOW, Permission.POST_NOTIFICATIONS
         ).forEach { permission ->
             intentLauncherMap[permission] = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 canContinue = true
@@ -202,57 +236,21 @@ object Permissions {
         }
 
         events.add(receiveEventHandler<RequestPermissionEvent> { event ->
-            if (event.permission == Manifest.permission.WRITE_EXTERNAL_STORAGE && isRPlus()) {
-                try {
-                    val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                    intent.addCategory("android.intent.category.DEFAULT")
-                    intent.data = Uri.parse("package:${MainApp.instance.packageName}")
-                    intentLauncherMap[event.permission]?.launch(intent)
-                } catch (e: Exception) {
-                    val intent = Intent()
-                    intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
-                    intentLauncherMap[event.permission]?.launch(intent)
-                }
-            } else if (event.permission == Manifest.permission.WRITE_SETTINGS) {
-                val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-                intent.addCategory(Intent.CATEGORY_DEFAULT)
-                intent.data = Uri.parse("package:${MainApp.instance.packageName}")
-                if (intent.resolveActivity(packageManager) != null) {
-                    intentLauncherMap[event.permission]?.launch(intent)
-                } else {
-                    DialogHelper.showMessage("ActivityNotFoundException: No Activity found to handle Intent act=android.settings.action.MANAGE_WRITE_SETTINGS")
-                }
-            } else if (event.permission == Manifest.permission.SYSTEM_ALERT_WINDOW) {
-                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${MainApp.instance.packageName}"))
-                intentLauncherMap[event.permission]?.launch(intent)
-            } else if (event.permission == Manifest.permission.POST_NOTIFICATIONS) {
-                if (isTIRAMISUPlus()) {
-                    val context = MainActivity.instance.get()!!
-                    if (!ActivityCompat.shouldShowRequestPermissionRationale(context, event.permission)) {
-                        intentLauncherMap[event.permission]?.launch(Permission.getEnableNotificationIntent())
-                    } else {
-                        map[event.permission]?.launch(event.permission)
-                    }
-                } else {
-                    intentLauncherMap[event.permission]?.launch(Permission.getEnableNotificationIntent())
-                }
-            } else {
-                map[event.permission]?.launch(event.permission)
-            }
+            event.permission.request(MainApp.instance, map[event.permission], intentLauncherMap[event.permission])
         })
     }
 
     private var canContinue = false
 
-    private suspend fun ensureNotificationAsync(): Boolean {
+    private suspend fun ensureNotificationAsync(context: Context): Boolean {
         val permission = Permission.POST_NOTIFICATIONS
-        val ready = isNotificationPermissionReadyWithRequest()
+        val ready = isNotificationPermissionReadyWithRequest(context)
         if (!ready) {
             canContinue = false
             while (true) {
                 LogCat.d("waiting for push notification permission accepted or denied")
                 if (canContinue) {
-                    return permission.can()
+                    return permission.can(context)
                 }
                 delay(500)
             }
@@ -261,25 +259,24 @@ object Permissions {
         return true
     }
 
-    private fun isNotificationPermissionReadyWithRequest(): Boolean {
+    private fun isNotificationPermissionReadyWithRequest(context: Context): Boolean {
         val permission = Permission.POST_NOTIFICATIONS
-        if (!permission.can()) {
-            sendEvent(RequestPermissionEvent(permission.toSysPermission()))
+        if (!permission.can(context)) {
+            sendEvent(RequestPermissionEvent(permission))
             return false
         }
 
         return true
     }
 
-    fun checkNotification(stringKey: Int, callback: () -> Unit) {
+    fun checkNotification(context: Context, stringKey: Int, callback: () -> Unit) {
         val permission = Permission.POST_NOTIFICATIONS
-        if (permission.can()) {
+        if (permission.can(context)) {
             callback()
         } else {
-            val context = MainActivity.instance.get()!!
             DialogHelper.showConfirmDialog(context, getString(R.string.confirm), getString(stringKey)) {
                 coIO {
-                    ensureNotificationAsync()
+                    ensureNotificationAsync(context)
                     callback()
                 }
             }

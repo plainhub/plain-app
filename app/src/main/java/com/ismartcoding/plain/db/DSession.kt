@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.db
 
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.*
 
 @Entity(tableName = "sessions")
@@ -8,7 +9,7 @@ data class DSession(
     @PrimaryKey
     @ColumnInfo(name = "client_id")
     var clientId: String = "",
-): DEntityBase() {
+) : DEntityBase() {
     @ColumnInfo(name = "client_ip")
     var clientIP: String = ""
 
@@ -30,6 +31,9 @@ data class DSession(
 
 @Dao
 interface SessionDao {
+    @Query("SELECT * FROM sessions ORDER BY updated_at DESC")
+    fun getAllFlow(): Flow<List<DSession>>
+
     @Query("SELECT * FROM sessions")
     fun getAll(): List<DSession>
 

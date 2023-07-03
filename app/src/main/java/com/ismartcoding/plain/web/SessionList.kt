@@ -2,10 +2,11 @@ package com.ismartcoding.plain.web
 
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DSession
+import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Clock
 
 object SessionList {
-    fun getItemsAsync(): List<DSession> {
+    fun getItems(): List<DSession> {
         return AppDatabase.instance.sessionDao().getAll()
     }
 

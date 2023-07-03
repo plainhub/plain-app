@@ -45,7 +45,7 @@ fun ChatItemFilesBinding.initView() {
                 )
             } else if (m.uri.isAudioFast()) {
                 AudioPlayerDialog().show()
-                Permissions.checkNotification(R.string.audio_notification_prompt) {
+                Permissions.checkNotification(context, R.string.audio_notification_prompt) {
                     AudioPlayerService.play(context, DPlaylistAudio.fromPath(context, m.uri))
                 }
             } else if (m.uri.isTextFile()) {

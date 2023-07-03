@@ -10,11 +10,13 @@ import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.helpers.ZipHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.upnp.UPnPController
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.DownloadFileItem
 import com.ismartcoding.plain.data.DownloadFileItemWrap
 import com.ismartcoding.plain.data.enums.PasswordType
+import com.ismartcoding.plain.data.preference.PasswordPreference
+import com.ismartcoding.plain.data.preference.PasswordTypePreference
+import com.ismartcoding.plain.data.preference.WebPreference
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.FileHelper
@@ -41,7 +43,6 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.utils.io.core.*
 import io.ktor.websocket.*
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONObject
@@ -89,7 +90,7 @@ fun Application.module() {
         singlePageApplication {
             useResources = true
             ignoreFiles {
-                !LocalStorage.webConsoleEnabled
+                !WebPreference.get(MainApp.instance)
             }
             vue("web")
         }
@@ -303,6 +304,7 @@ fun Application.module() {
                             val json = JSONObject(requestStr)
                             dir = json.optString("dir")
                         }
+
                         "file" -> {
                             val fileName = part.originalFileName as String
                             if (dir.isEmpty() || fileName.isEmpty()) {
@@ -314,6 +316,7 @@ fun Application.module() {
                             Files.copy(part.streamProvider(), file.toPath(), StandardCopyOption.REPLACE_EXISTING)
                             MainApp.instance.scanFileByConnection(file, null)
                         }
+
                         else -> {}
                     }
                 }
@@ -332,9 +335,8 @@ fun Application.module() {
                 return@post
             }
             HttpServerManager.clientIpCache[clientId] = call.request.origin.remoteHost
-            if (LocalStorage.httpServerPasswordType == PasswordType.NONE) {
-                HttpServerManager.resetPassword()
-                call.respondText(LocalStorage.httpServerPassword)
+            if (PasswordTypePreference.get(MainApp.instance) == PasswordType.NONE.value) {
+                call.respondText(HttpServerManager.resetPassword())
             } else {
                 call.respond(HttpStatusCode.NoContent)
             }
@@ -355,7 +357,7 @@ fun Application.module() {
                         is Frame.Binary -> {
                             if (q["auth"] == "1") {
                                 var r: AuthRequest? = null
-                                val hash = CryptoHelper.sha512(LocalStorage.httpServerPassword.toByteArray())
+                                val hash = CryptoHelper.sha512(PasswordPreference.get(MainApp.instance).toByteArray())
                                 val token = HttpServerManager.hashToToken(hash)
                                 val decryptedBytes = CryptoHelper.aesDecrypt(token, frame.readBytes())
                                 if (decryptedBytes != null) {
@@ -382,6 +384,7 @@ fun Application.module() {
                                 }
                             }
                         }
+
                         else -> {}
                     }
                 }

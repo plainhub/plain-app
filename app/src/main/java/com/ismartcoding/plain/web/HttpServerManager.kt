@@ -7,17 +7,27 @@ import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JksHelper
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.LocalStorage
+import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.data.preference.HttpPortPreference
+import com.ismartcoding.plain.data.preference.HttpsPortPreference
+import com.ismartcoding.plain.data.preference.PasswordPreference
 import com.ismartcoding.plain.web.websocket.WebSocketSession
-import io.ktor.server.application.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+import io.ktor.server.application.Application
+import io.ktor.server.engine.applicationEngineEnvironment
+import io.ktor.server.engine.connector
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.engine.sslConnector
+import io.ktor.server.netty.Netty
+import io.ktor.server.netty.NettyApplicationEngine
 import kotlinx.datetime.Instant
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileOutputStream
 import java.security.KeyStore
 import java.security.cert.X509Certificate
-import java.util.*
+import java.util.Collections
+import java.util.Timer
+import java.util.TimerTask
 import kotlin.collections.set
 
 object HttpServerManager {
@@ -27,21 +37,23 @@ object HttpServerManager {
     val wsSessions = Collections.synchronizedSet<WebSocketSession>(LinkedHashSet())
     val clientRequestTs = mutableMapOf<String, Long>()
 
-    fun resetPassword() {
-        LocalStorage.httpServerPassword = CryptoHelper.randomPassword(6)
+    fun resetPassword(): String {
+        val password = CryptoHelper.randomPassword(6)
+        PasswordPreference.put(MainApp.instance, MainApp.instance.ioScope, password)
+        return password
     }
 
     fun passwordToToken(): ByteArray {
-        return hashToToken(CryptoHelper.sha512(LocalStorage.httpServerPassword.toByteArray()))
+        return hashToToken(CryptoHelper.sha512(PasswordPreference.get(MainApp.instance).toByteArray()))
     }
 
     fun hashToToken(hash: String): ByteArray {
         return hash.substring(0, 32).toByteArray()
     }
 
-    fun loadTokenCache() {
+    suspend fun loadTokenCache() {
         tokenCache.clear()
-        SessionList.getItemsAsync().forEach {
+        SessionList.getItems().forEach {
             tokenCache[it.clientId] = Base64.decode(it.token, Base64.NO_WRAP)
         }
     }
@@ -66,14 +78,14 @@ object HttpServerManager {
         val environment = applicationEngineEnvironment {
             log = LoggerFactory.getLogger("ktor.application")
             connector {
-                port = LocalStorage.httpPort
+                port = HttpPortPreference.get(context)
             }
             sslConnector(
                 keyStore = getSSLKeyStore(context),
                 keyAlias = SSL_KEY_ALIAS,
                 keyStorePassword = { LocalStorage.clientId.toCharArray() },
                 privateKeyPassword = { LocalStorage.clientId.toCharArray() }) {
-                port = LocalStorage.httpsPort
+                port = HttpsPortPreference.get(context)
             }
             module(Application::module)
         }

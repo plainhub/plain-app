@@ -8,20 +8,23 @@ import com.ismartcoding.lib.logcat.DiskLogAdapter
 import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.data.enums.PasswordType
+import com.ismartcoding.plain.data.preference.PasswordTypePreference
 import com.ismartcoding.plain.features.AppEvents
 import com.ismartcoding.plain.features.bluetooth.BluetoothEvents
 import com.ismartcoding.plain.features.box.BoxEvents
-import com.ismartcoding.plain.features.theme.AppThemeHelper
 import com.ismartcoding.plain.ui.helpers.PageHelper
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import com.tencent.mmkv.MMKV
-import com.tencent.mmkv.MMKVLogLevel
-import io.ktor.server.netty.*
+import io.ktor.server.netty.NettyApplicationEngine
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 
 class MainApp : Application() {
     var httpServer: NettyApplicationEngine? = null
     var httpServerError: String = ""
+    val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()
@@ -43,8 +46,7 @@ class MainApp : Application() {
         BoxEvents.register()
 
         coIO {
-            AppThemeHelper.init()
-            if (LocalStorage.httpServerPasswordType == PasswordType.RANDOM) {
+            if (PasswordTypePreference.get(instance) == PasswordType.RANDOM.value) {
                 HttpServerManager.resetPassword()
             }
             HttpServerManager.loadTokenCache()

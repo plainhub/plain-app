@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.viewModels
@@ -14,7 +13,14 @@ import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.brv.utils.linear
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
-import com.ismartcoding.lib.extensions.*
+import com.ismartcoding.lib.extensions.getFilenameFromPath
+import com.ismartcoding.lib.extensions.isAudioFast
+import com.ismartcoding.lib.extensions.isImageFast
+import com.ismartcoding.lib.extensions.isPdfFile
+import com.ismartcoding.lib.extensions.isTextFile
+import com.ismartcoding.lib.extensions.isVideoFast
+import com.ismartcoding.lib.extensions.newPath
+import com.ismartcoding.lib.extensions.px
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
@@ -32,14 +38,25 @@ import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.features.theme.AppThemeHelper
 import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.PdfViewerDialog
 import com.ismartcoding.plain.ui.TextEditorDialog
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
-import com.ismartcoding.plain.ui.extensions.*
+import com.ismartcoding.plain.ui.extensions.checkPermission
+import com.ismartcoding.plain.ui.extensions.checkable
+import com.ismartcoding.plain.ui.extensions.highlightTitle
+import com.ismartcoding.plain.ui.extensions.initDrawerMenu
+import com.ismartcoding.plain.ui.extensions.initMenu
+import com.ismartcoding.plain.ui.extensions.initToggleMode
+import com.ismartcoding.plain.ui.extensions.onBack
+import com.ismartcoding.plain.ui.extensions.onMenuItemClick
+import com.ismartcoding.plain.ui.extensions.onSearch
+import com.ismartcoding.plain.ui.extensions.openPathIntent
+import com.ismartcoding.plain.ui.extensions.setSafeClick
+import com.ismartcoding.plain.ui.extensions.updateDrawerMenuAsync
+import com.ismartcoding.plain.ui.extensions.updateFilesTitle
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.FileSortHelper
 import com.ismartcoding.plain.ui.models.DrawerMenuItemClickedEvent
@@ -57,18 +74,6 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        immersionBar {
-            transparentBar()
-            titleBar(binding.layout)
-            statusBarDarkFont(!AppThemeHelper.isDarkMode())
-        }
-
-        if (!requireContext().isGestureNavigationBar()) {
-            binding.list.root.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                bottomMargin = navigationBarHeight
-            }
-        }
 
         updatePasteAction()
 
@@ -135,7 +140,7 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
                 } else if (m.data.path.isAudioFast()) {
                     try {
                         AudioPlayerDialog().show()
-                        Permissions.checkNotification(R.string.audio_notification_prompt) {
+                        Permissions.checkNotification(requireContext(), R.string.audio_notification_prompt) {
                             AudioPlayerService.play(requireContext(), DPlaylistAudio.fromPath(context, m.data.path))
                         }
                     } catch (ex: Exception) {
@@ -290,8 +295,8 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
     }
 
     private fun checkPermission() {
-        binding.breadcrumb.isVisible = Permission.WRITE_EXTERNAL_STORAGE.can()
-        binding.list.checkPermission(Permission.WRITE_EXTERNAL_STORAGE)
+        binding.breadcrumb.isVisible = Permission.WRITE_EXTERNAL_STORAGE.can(requireContext())
+        binding.list.checkPermission(requireContext(), Permission.WRITE_EXTERNAL_STORAGE)
     }
 
     private fun updateList() {

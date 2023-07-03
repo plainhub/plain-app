@@ -11,8 +11,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.channel.receiveEvent
-import com.ismartcoding.lib.extensions.isGestureNavigationBar
-import com.ismartcoding.lib.extensions.navigationBarHeight
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
@@ -48,16 +46,6 @@ abstract class BaseListDrawerDialog : BaseDialog<DialogListDrawerBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.tagType = tagType
-
-        setTransparentBar(view)
-        if (!requireContext().isGestureNavigationBar()) {
-            binding.list.root.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                bottomMargin = navigationBarHeight
-            }
-            binding.player.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                bottomMargin = navigationBarHeight
-            }
-        }
 
         binding.list.page.pageName = this.javaClass.simpleName
         binding.initToggleMode(viewLifecycleOwner, viewModel, titleId)

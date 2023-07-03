@@ -58,6 +58,7 @@ class HttpServerEnabledEvent(val enabled: Boolean)
 
 class StartHttpServerEvent
 class StartScreenMirrorEvent
+class RestartAppEvent
 class HttpServerPortChanged
 
 
@@ -84,15 +85,13 @@ class VocabularyDeletedEvent(val id: String)
 class VocabularyWordsDeletedEvent(val id: String)
 class VocabularyWordsUpdatedEvent(val id: String)
 
-class EnableWebConsoleEvent(val isEnabled: Boolean)
-
 class ConfirmToAcceptLoginEvent(
     val session: DefaultWebSocketServerSession, val clientId: String, val browserName: String,
     val browserVersion: String, val osName: String, val osVersion: String, val isMobile: Boolean
 )
 
-class PermissionResultEvent(val permission: String)
-class RequestPermissionEvent(val permission: String)
+class PermissionResultEvent(val permission: Permission)
+class RequestPermissionEvent(val permission: Permission)
 class PickFileEvent(val tag: PickFileTag, val type: PickFileType, val multiple: Boolean)
 class PickFileResultEvent(val tag: PickFileTag, val type: PickFileType, val uris: Set<Uri>)
 class ExportFileEvent(val type: ExportFileType, val fileName: String)
@@ -114,7 +113,6 @@ class FetchLatestExchangeRatesEvent
 class AIChatCreatedEvent(val item: DAIChat)
 
 class ChatItemClickEvent
-class HttpServerPasswordChangedEvent
 
 object AppEvents {
     private val mediaPlayer = MediaPlayer()
@@ -173,7 +171,7 @@ object AppEvents {
         }
 
         receiveEventHandler<PermissionResultEvent> { event ->
-            if (event.permission == Permission.POST_NOTIFICATIONS.toSysPermission()) {
+            if (event.permission == Permission.POST_NOTIFICATIONS) {
                 AudioPlayer.instance.showNotification()
             }
         }

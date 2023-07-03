@@ -1,33 +1,23 @@
 package com.ismartcoding.plain
 
-import com.ismartcoding.lib.serialize.serialLazy
-import com.ismartcoding.plain.features.audio.DPlaylistAudio
-import com.ismartcoding.plain.features.theme.AppTheme
-import com.ismartcoding.plain.features.device.DeviceSortBy
-import com.ismartcoding.plain.features.audio.MediaPlayMode
-import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.features.video.DVideo
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.StringHelper
-import com.ismartcoding.plain.data.enums.PasswordType
+import com.ismartcoding.lib.serialize.serialLazy
+import com.ismartcoding.plain.features.audio.DPlaylistAudio
+import com.ismartcoding.plain.features.audio.MediaPlayMode
+import com.ismartcoding.plain.features.device.DeviceSortBy
 import com.ismartcoding.plain.features.exchange.ExchangeConfig
+import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.features.video.DVideo
 
 object LocalStorage {
     var endictShowWord: Boolean by serialLazy(true)
     var endictShowTranslation: Boolean by serialLazy(true)
-    var webConsoleEnabled: Boolean by serialLazy(false)
-    var httpPort: Int by serialLazy(8080)
-    var httpsPort: Int by serialLazy(8443)
-    var authDevToken: String by serialLazy("")
-    var authDevTokenEnabled: Boolean by serialLazy(false)
-    var authTwoFactor: Boolean by serialLazy(true)
     var clientId: String by serialLazy("")
     var fileIdToken: String by serialLazy("") // use to generate file path to id or decrypt file id to path
-    var appLocale: String by serialLazy("")
-    var appTheme: AppTheme by serialLazy(AppTheme.SYSTEM)
+
     var selectedBoxId: String by serialLazy("")
     var deviceSortBy: DeviceSortBy by serialLazy(DeviceSortBy.LAST_ACTIVE)
-    var apiPermissions: Set<String> by serialLazy(setOf())
     var audioPlayMode: MediaPlayMode by serialLazy(MediaPlayMode.REPEAT)
     var audioPlaylist: List<DPlaylistAudio> by serialLazy(listOf())
     var audioPlaying: DPlaylistAudio? by serialLazy(null)
@@ -49,17 +39,9 @@ object LocalStorage {
     var feedAutoRefresh: Boolean by serialLazy(true)
     var feedAutoRefreshInterval: Int by serialLazy(7200) // seconds
     var feedAutoRefreshOnlyWifi: Boolean by serialLazy(false)
-    var demoMode: Boolean by serialLazy(false)
-    var keepScreenOn: Boolean by serialLazy(false)
-    var systemScreenTimeout: Int by serialLazy(0)
     var chatGPTApiKey: String by serialLazy("")
-    var httpServerPasswordType: PasswordType by serialLazy(PasswordType.RANDOM)
-    var httpServerPassword: String by serialLazy("")
     var exchange: ExchangeConfig by serialLazy(ExchangeConfig())
 
-    fun resetAuthDevToken() {
-        authDevToken = CryptoHelper.randomPassword(128)
-    }
 
     fun deletePlaylistAudio(path: String) {
         audioPlaylist = audioPlaylist.toMutableList().apply {

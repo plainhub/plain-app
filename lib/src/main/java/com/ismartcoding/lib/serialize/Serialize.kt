@@ -7,19 +7,6 @@ import java.io.ByteArrayOutputStream
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 
-/**
- * 将键值数据序列化存储到磁盘
- * @throws IllegalStateException MMKV.defaultMMKV() == null
- */
-fun serialize(vararg params: Pair<String, Any?>) {
-    val mmkv = MMKV.defaultMMKV()
-        ?: throw IllegalStateException("MMKV.defaultMMKV() == null, handle == 0 ")
-    mmkv.serialize(*params)
-}
-
-/**
- * 将键值数据序列化存储到磁盘
- */
 fun MMKV.serialize(vararg params: Pair<String, Any?>) {
     params.forEach {
         when (val value = it.second) {
@@ -31,35 +18,6 @@ fun MMKV.serialize(vararg params: Pair<String, Any?>) {
     }
 }
 
-/**
- * 根据[name]读取磁盘数据, 即使读取的是基础类型磁盘不存在的话也会返回null
- * @throws IllegalStateException MMKV.defaultMMKV() == null
- */
-inline fun <reified T> deserialize(name: String): T {
-    val mmkv = MMKV.defaultMMKV()
-        ?: throw IllegalStateException("MMKV.defaultMMKV() == null, handle == 0 ")
-    return mmkv.deserialize(name, T::class.java)
-}
-
-/**
- * 根据[name]读取磁盘数据, 假设磁盘没有则返回[defValue]指定的默认值
- * @throws IllegalStateException MMKV.defaultMMKV() == null
- */
-inline fun <reified T> deserialize(name: String, defValue: T?): T {
-    val mmkv = MMKV.defaultMMKV()
-        ?: throw IllegalStateException("MMKV.defaultMMKV() == null, handle == 0 ")
-    return mmkv.deserialize(name, T::class.java, defValue)
-}
-
-/** 根据[name]读取磁盘数据, 即使读取的是基础类型磁盘不存在的话也会返回null */
-inline fun <reified T> MMKV.deserialize(name: String): T {
-    return this.deserialize(name, T::class.java)
-}
-
-/** 根据[name]读取磁盘数据, 假设磁盘没有则返回[defValue]指定的默认值 */
-inline fun <reified T> MMKV.deserialize(name: String, defValue: T?): T {
-    return this.deserialize(name, T::class.java, defValue)
-}
 
 @PublishedApi
 internal fun <T> MMKV.deserialize(name: String, clazz: Class<T>): T {

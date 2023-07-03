@@ -3,10 +3,7 @@ package com.ismartcoding.plain.features
 import com.ismartcoding.plain.features.locale.LocaleHelper
 
 enum class HomeItemType(val value: String) {
-    STORAGE("storage"),
     EDUCATION("education"),
-    WORK("work"),
-    SOCIAL("social"),
     NETWORK("network"),
     EXCHANGE("exchange");
 

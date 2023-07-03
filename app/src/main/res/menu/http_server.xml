@@ -14,7 +14,7 @@
 
         <item
             android:id="@+id/diagnostics"
-            android:title="@string/diagnostics" />
+            android:title="@string/http_server_diagnostics" />
 
         <item
             android:id="@+id/settings"

@@ -2,11 +2,7 @@ package com.ismartcoding.plain.ui.feed
 
 import android.os.Bundle
 import android.view.View
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
-import com.ismartcoding.lib.extensions.isGestureNavigationBar
-import com.ismartcoding.lib.extensions.navigationBarHeight
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.ShareHelper
 import com.ismartcoding.plain.R
@@ -19,7 +15,11 @@ import com.ismartcoding.plain.features.feed.fetchContentAsync
 import com.ismartcoding.plain.features.tag.TagRelationStub
 import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.ui.PlainTextDialog
-import com.ismartcoding.plain.ui.extensions.*
+import com.ismartcoding.plain.ui.extensions.initMenu
+import com.ismartcoding.plain.ui.extensions.markdown
+import com.ismartcoding.plain.ui.extensions.onBack
+import com.ismartcoding.plain.ui.extensions.onMenuItemClick
+import com.ismartcoding.plain.ui.extensions.setDoubleCLick
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.tag.SelectTagsDialog
@@ -29,14 +29,6 @@ import kotlinx.coroutines.launch
 class FeedEntryDialog(private val feedEntry: DFeedEntry, val feed: DFeed?) : BaseDialog<DialogFeedEntryBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        setTransparentBar(view)
-
-        if (!requireContext().isGestureNavigationBar()) {
-            binding.page.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                bottomMargin = navigationBarHeight
-            }
-        }
 
         binding.topAppBar.toolbar.run {
             initMenu(R.menu.feed_entry_view)

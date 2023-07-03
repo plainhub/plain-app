@@ -4,14 +4,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import android.view.ViewGroup.LayoutParams
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.immersionBar
-import com.ismartcoding.lib.extensions.isGestureNavigationBar
-import com.ismartcoding.lib.extensions.navigationBarHeight
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.softinput.setWindowSoftInput
 import com.ismartcoding.plain.R
@@ -23,7 +18,6 @@ import com.ismartcoding.plain.features.DeleteChatItemViewEvent
 import com.ismartcoding.plain.features.SendMessageEvent
 import com.ismartcoding.plain.features.UpdateMessageEvent
 import com.ismartcoding.plain.features.chat.ChatHelper
-import com.ismartcoding.plain.features.theme.AppThemeHelper
 import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.ui.extensions.onBack
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -40,19 +34,6 @@ class ChatDialog() : BaseDialog<DialogChatBinding>() {
             title = getString(R.string.my_phone)
             onBack {
                 onBackPressed()
-            }
-        }
-
-        immersionBar {
-            transparentNavigationBar()
-            titleBar(binding.topAppBar.toolbar)
-            statusBarColor(R.color.canvas)
-            statusBarDarkFont(!AppThemeHelper.isDarkMode())
-        }
-
-        if (!requireContext().isGestureNavigationBar()) {
-            binding.page.updateLayoutParams<android.widget.FrameLayout.LayoutParams> {
-                bottomMargin = navigationBarHeight
             }
         }
 

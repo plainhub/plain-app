@@ -57,7 +57,7 @@ class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
             addType<AudioModel>(R.layout.item_audio)
             R.id.container.onClick {
                 val m = getModel<AudioModel>()
-                Permissions.checkNotification(R.string.audio_notification_prompt) {
+                Permissions.checkNotification(requireContext(), R.string.audio_notification_prompt) {
                     AudioPlayerService.play(requireContext(), m.audio)
                 }
             }

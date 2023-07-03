@@ -80,7 +80,7 @@ class SmsDialog : BaseListDrawerDialog() {
     }
 
     private fun checkPermission() {
-        binding.list.checkPermission(Permission.READ_SMS)
+        binding.list.checkPermission(requireContext(), Permission.READ_SMS)
     }
 
     override fun updateList() {

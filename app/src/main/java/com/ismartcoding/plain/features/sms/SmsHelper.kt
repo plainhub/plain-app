@@ -14,6 +14,7 @@ import com.ismartcoding.lib.helpers.AssetsHelper
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.features.BaseContentHelper
 import kotlinx.datetime.Instant
 import org.json.JSONArray
@@ -58,7 +59,7 @@ object SmsHelper : BaseContentHelper() {
     }
 
     override fun count(context: Context, query: String): Int {
-        if (LocalStorage.demoMode) {
+        if (TempData.demoMode) {
             if (demoItems.isEmpty()) {
                 demoSearch()
             }
@@ -76,7 +77,7 @@ object SmsHelper : BaseContentHelper() {
     }
 
     fun search(context: Context, query: String, limit: Int, offset: Int): List<DMessage> {
-        if (LocalStorage.demoMode) {
+        if (TempData.demoMode) {
             if (demoItems.isEmpty()) {
                 demoSearch()
             }

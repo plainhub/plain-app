@@ -34,9 +34,9 @@ android {
             else -> 0
         }
 
-        val vCode = 61
+        val vCode = 64
         versionCode = vCode - singleAbiNum
-        versionName = "1.0.30"
+        versionName = "1.1.0"
 
         ndk {
             if (abiFilterList.isNotEmpty()) {
@@ -111,19 +111,30 @@ dependencies {
     val apolloVersion = "3.2.1"
     val kgraphqlVersion = "0.18.1"
     val ktorVersion = "2.3.1"
+    val accompanist = "0.31.4-beta"
+    val coil = "2.4.0"
 
-    implementation(platform("androidx.compose:compose-bom:2023.06.00"))
+    implementation(platform("androidx.compose:compose-bom:2023.06.01"))
 
+    implementation("com.caverock:androidsvg-aar:1.4")
 
+    implementation("androidx.activity:activity-compose:1.7.2")
     implementation("androidx.compose.runtime:runtime")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.foundation:foundation-layout")
-//    implementation("androidx.compose.material:material")
     implementation("androidx.compose.material3:material3:1.2.0-alpha03")
+    implementation("androidx.compose.material:material-icons-extended:1.6.0‑alpha01")
     implementation("androidx.compose.runtime:runtime-livedata")
     implementation("androidx.compose.ui:ui-tooling")
-    implementation("com.google.accompanist:accompanist-themeadapter-material:0.30.1")
+
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha10")
+
+    // https://github.com/google/accompanist/releases
+    implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanist")
+
+    // https://developer.android.com/jetpack/androidx/releases/navigation
+    implementation("androidx.navigation:navigation-compose:2.6.0")
 
     implementation(platform("com.google.firebase:firebase-bom:31.2.1"))
     implementation("com.google.firebase:firebase-crashlytics-ktx")
@@ -176,6 +187,16 @@ dependencies {
     implementation("com.rometools:rome-opml:1.18.0")
 
     implementation("androidx.work:work-runtime-ktx:2.8.1")
+
+    // https://coil-kt.github.io/coil/changelog/
+    implementation("io.coil-kt:coil-base:$coil")
+    implementation("io.coil-kt:coil-compose:$coil")
+    implementation("io.coil-kt:coil-svg:$coil")
+    implementation("io.coil-kt:coil-gif:$coil")
+
+
+    // https://developer.android.com/jetpack/androidx/releases/datastore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
 //    implementation("org.eclipse.jgit:org.eclipse.jgit:6.1.0.202203080745-r") // TODO: git support
     implementation("com.github.bumptech.glide:recyclerview-integration:4.11.0")

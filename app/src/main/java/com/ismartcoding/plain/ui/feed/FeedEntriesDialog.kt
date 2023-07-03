@@ -276,7 +276,7 @@ class FeedEntriesDialog : BaseListDrawerDialog() {
         if (viewModel.data == null) {
             if (FeedFetchWorker.errorMap.any()) {
                 binding.topAppBar.notification.isVisible = true
-                binding.topAppBar.notification.text = FeedFetchWorker.errorMap.values.joinToString("\n")
+                binding.topAppBar.notification.text = FeedFetchWorker.errorMap.values.toList().joinToString("\n")
             }
         } else if (viewModel.data is DFeed) {
             val feed = viewModel.data as DFeed

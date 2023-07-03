@@ -4,8 +4,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updateLayoutParams
-import com.ismartcoding.lib.extensions.isGestureNavigationBar
-import com.ismartcoding.lib.extensions.navigationBarHeight
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.TagType
 import com.ismartcoding.plain.databinding.DialogFeedEntryBinding
@@ -20,14 +18,6 @@ import com.ismartcoding.plain.ui.tag.SelectTagsDialog
 class BookDialog(private val book: DBook) : BaseDialog<DialogFeedEntryBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        setTransparentBar(view)
-
-        if (!requireContext().isGestureNavigationBar()) {
-            binding.page.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                bottomMargin = navigationBarHeight
-            }
-        }
 
         binding.topAppBar.toolbar.run {
             initMenu(R.menu.feed_entry_view)

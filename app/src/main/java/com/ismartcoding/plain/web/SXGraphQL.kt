@@ -21,6 +21,7 @@ import com.ismartcoding.lib.helpers.PhoneHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.BoxProxyApi
 import com.ismartcoding.plain.api.HttpApiTimeout
 import com.ismartcoding.plain.api.HttpClientManager
@@ -28,6 +29,8 @@ import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.preference.AuthDevTokenPreference
+import com.ismartcoding.plain.data.preference.WebPreference
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageText
@@ -55,7 +58,6 @@ import com.ismartcoding.plain.features.note.NoteHelper
 import com.ismartcoding.plain.features.sms.SmsHelper
 import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.features.tag.TagRelationStub
-import com.ismartcoding.plain.features.theme.AppTheme
 import com.ismartcoding.plain.features.video.VideoHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.TempHelper
@@ -146,7 +148,7 @@ class SXGraphQL(val schema: Schema) {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
-                        Permission.READ_SMS.check()
+                        Permission.READ_SMS.check(MainApp.instance)
                         SmsHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
                     }
                     type<Message> {
@@ -160,7 +162,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("messageCount") {
                     resolver { query: String ->
-                        if (Permission.READ_SMS.can()) {
+                        if (Permission.READ_SMS.can(MainApp.instance)) {
                             SmsHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
                             -1
@@ -172,7 +174,7 @@ class SXGraphQL(val schema: Schema) {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check()
+                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
                         ImageHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset, LocalStorage.imageSortBy).map { it.toModel() }
                     }
                     type<Image> {
@@ -186,7 +188,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("imageCount") {
                     resolver { query: String ->
-                        if (Permission.WRITE_EXTERNAL_STORAGE.can()) {
+                        if (Permission.WRITE_EXTERNAL_STORAGE.can(MainApp.instance)) {
                             ImageHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
                             -1
@@ -198,7 +200,7 @@ class SXGraphQL(val schema: Schema) {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check()
+                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
                         VideoHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset, LocalStorage.videoSortBy).map { it.toModel() }
                     }
                     type<Video> {
@@ -212,7 +214,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("videoCount") {
                     resolver { query: String ->
-                        if (Permission.WRITE_EXTERNAL_STORAGE.can()) {
+                        if (Permission.WRITE_EXTERNAL_STORAGE.can(MainApp.instance)) {
                             VideoHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
                             -1
@@ -224,7 +226,7 @@ class SXGraphQL(val schema: Schema) {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check()
+                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
                         AudioHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset, LocalStorage.audioSortBy).map { it.toModel() }
                     }
                     type<Audio> {
@@ -238,7 +240,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("audioCount") {
                     resolver { query: String ->
-                        if (Permission.WRITE_EXTERNAL_STORAGE.can()) {
+                        if (Permission.WRITE_EXTERNAL_STORAGE.can(MainApp.instance)) {
                             AudioHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
                             -1
@@ -250,7 +252,7 @@ class SXGraphQL(val schema: Schema) {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
-                        Permission.READ_CONTACTS.check()
+                        Permission.READ_CONTACTS.check(MainApp.instance)
                         ContactHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
                     }
                     type<Contact> {
@@ -264,7 +266,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("contactCount") {
                     resolver { query: String ->
-                        if (Permission.READ_CONTACTS.can()) {
+                        if (Permission.READ_CONTACTS.can(MainApp.instance)) {
                             ContactHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
                             -1
@@ -273,13 +275,13 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("contactSources") {
                     resolver { ->
-                        Permission.READ_CONTACTS.check()
+                        Permission.READ_CONTACTS.check(MainApp.instance)
                         SourceHelper.getAll().map { it.toModel() }
                     }
                 }
                 query("contactGroups") {
                     resolver { node: Execution.Node ->
-                        Permission.READ_CONTACTS.check()
+                        Permission.READ_CONTACTS.check(MainApp.instance)
                         val groups = GroupHelper.getAll().map { it.toModel() }
                         val fields = node.getFields()
                         if (fields.contains(ContactGroup::contactCount.name)) {
@@ -293,7 +295,7 @@ class SXGraphQL(val schema: Schema) {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
-                        Permission.READ_CALL_LOG.check()
+                        Permission.READ_CALL_LOG.check(MainApp.instance)
                         CallHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
                     }
                     type<Call> {
@@ -307,7 +309,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("callCount") {
                     resolver { query: String ->
-                        if (Permission.READ_CALL_LOG.can()) {
+                        if (Permission.READ_CALL_LOG.can(MainApp.instance)) {
                             CallHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
                             -1
@@ -346,13 +348,13 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("recentFiles") {
                     resolver { ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check()
+                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
                         FileSystemHelper.getRecents(MainApp.instance).map { it.toModel() }
                     }
                 }
                 query("files") {
                     resolver { dir: String, showHidden: Boolean ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check()
+                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
                         val files = FileSystemHelper.getFilesList(dir, showHidden, LocalStorage.fileSortBy).map { it.toModel() }
                         Files(dir, files)
                     }
@@ -455,12 +457,10 @@ class SXGraphQL(val schema: Schema) {
                             usbConnected = PlugInControlReceiver.isUSBConnected(),
                             fileIdToken = LocalStorage.fileIdToken,
                             externalFilesDir = context.getExternalFilesDir(null)?.path ?: "",
-                            if (LocalStorage.demoMode) "Demo phone" else PhoneHelper.getDeviceName(context),
+                            if (TempData.demoMode) "Demo phone" else PhoneHelper.getDeviceName(context),
                             PhoneHelper.getBatteryPercentage(context),
-                            LocalStorage.appLocale,
-                            LocalStorage.appTheme,
                             MainApp.getAppVersion(),
-                            Permission.values().filter { it.isEnabled() && it.can() },
+                            Permission.values().filter { it.isEnabled(MainApp.instance) && it.can(MainApp.instance) },
                             LocalStorage.audioPlaylist.map { it.toModel() },
                             LocalStorage.audioPlayMode,
                             LocalStorage.audioPlaying?.path ?: "",
@@ -545,7 +545,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("deleteContacts") {
                     resolver { ids: List<ID> ->
-                        Permission.WRITE_CONTACTS.check()
+                        Permission.WRITE_CONTACTS.check(MainApp.instance)
                         val newIds = ids.map { it.value }.toSet()
                         TagHelper.deleteTagRelationByKeys(newIds, TagType.CONTACT)
                         ContactHelper.deleteByIds(MainApp.instance, newIds)
@@ -561,14 +561,14 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("updateContact") {
                     resolver { id: ID, input: ContactInput ->
-                        Permission.WRITE_CONTACTS.check()
+                        Permission.WRITE_CONTACTS.check(MainApp.instance)
                         ContactHelper.update(id.value, input)
                         ContactHelper.get(MainApp.instance, id.value)?.toModel()
                     }
                 }
                 mutation("createContact") {
                     resolver { input: ContactInput ->
-                        Permission.WRITE_CONTACTS.check()
+                        Permission.WRITE_CONTACTS.check(MainApp.instance)
                         val id = ContactHelper.create(input)
                         if (id.isEmpty()) null else ContactHelper.get(MainApp.instance, id)?.toModel()
                     }
@@ -626,28 +626,28 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("createContactGroup") {
                     resolver { name: String, accountName: String, accountType: String ->
-                        Permission.WRITE_CONTACTS.check()
+                        Permission.WRITE_CONTACTS.check(MainApp.instance)
                         GroupHelper.create(name, accountName, accountType).toModel()
                     }
                 }
 
                 mutation("call") {
                     resolver { number: String ->
-                        Permission.CALL_PHONE.check()
+                        Permission.CALL_PHONE.check(MainApp.instance)
                         CallHelper.call(MainActivity.instance.get()!!, number)
                         true
                     }
                 }
                 mutation("updateContactGroup") {
                     resolver { id: ID, name: String ->
-                        Permission.WRITE_CONTACTS.check()
+                        Permission.WRITE_CONTACTS.check(MainApp.instance)
                         GroupHelper.update(id.value, name)
                         ContactGroup(id, name)
                     }
                 }
                 mutation("deleteContactGroup") {
                     resolver { id: ID ->
-                        Permission.WRITE_CONTACTS.check()
+                        Permission.WRITE_CONTACTS.check(MainApp.instance)
                         GroupHelper.delete(id.value)
                         true
                     }
@@ -655,7 +655,7 @@ class SXGraphQL(val schema: Schema) {
 
                 mutation("deleteCalls") {
                     resolver { ids: List<ID> ->
-                        Permission.WRITE_CALL_LOG.check()
+                        Permission.WRITE_CALL_LOG.check(MainApp.instance)
                         val newIds = ids.map { it.value }.toSet()
                         TagHelper.deleteTagRelationByKeys(newIds, TagType.CALL)
                         CallHelper.deleteByIds(MainApp.instance, newIds)
@@ -664,7 +664,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("deleteFiles") {
                     resolver { paths: List<String> ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check()
+                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
                         paths.forEach {
                             java.io.File(it).deleteRecursively()
                         }
@@ -674,13 +674,13 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("createDir") {
                     resolver { path: String ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check()
+                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
                         FileSystemHelper.createDirectory(path).toModel()
                     }
                 }
                 mutation("renameFile") {
                     resolver { path: String, name: String ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check()
+                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
                         val dst = FileHelper.rename(path, name)
                         if (dst != null) {
                             MainApp.instance.scanFileByConnection(path)
@@ -691,7 +691,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("copyFile") {
                     resolver { src: String, dst: String, overwrite: Boolean ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check()
+                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
                         val dstFile = java.io.File(dst)
                         if (overwrite || !dstFile.exists()) {
                             java.io.File(src).copyRecursively(dstFile, overwrite)
@@ -861,7 +861,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("moveFile") {
                     resolver { src: String, dst: String, overwrite: Boolean ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check()
+                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
                         val dstFile = java.io.File(dst)
                         if (overwrite || !dstFile.exists()) {
                             Path(src).moveTo(Path(dst), overwrite)
@@ -892,7 +892,6 @@ class SXGraphQL(val schema: Schema) {
                         feedEntry?.toModel()
                     }
                 }
-                enum<AppTheme>()
                 enum<MediaPlayMode>()
                 enum<TagType>()
                 enum<Permission>()
@@ -939,7 +938,7 @@ class SXGraphQL(val schema: Schema) {
             val routing: Routing.() -> Unit = {
                 route("/graphql") {
                     post {
-                        if (!LocalStorage.webConsoleEnabled) {
+                        if (!WebPreference.get(MainApp.instance)) {
                             call.response.status(HttpStatusCode.BadRequest)
                             return@post
                         }
@@ -968,7 +967,8 @@ class SXGraphQL(val schema: Schema) {
                             call.respondBytes(CryptoHelper.aesEncrypt(token, r))
                         } else {
                             val authStr = call.request.header("authorization")?.split(" ")
-                            if (!LocalStorage.authDevTokenEnabled || authStr == null || authStr.size != 2 || authStr[1] != LocalStorage.authDevToken) {
+                            val token = AuthDevTokenPreference.get(MainApp.instance)
+                            if (token.isNotEmpty() || authStr == null || authStr.size != 2 || authStr[1] != token) {
                                 call.respondText(
                                     """{"errors":[{"message":"Unauthorized"}]}""",
                                     contentType = ContentType.Application.Json

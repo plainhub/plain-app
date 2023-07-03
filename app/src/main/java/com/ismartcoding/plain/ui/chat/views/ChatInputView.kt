@@ -67,28 +67,23 @@ class ChatInputView(context: Context, attrs: AttributeSet? = null) : CustomViewB
                     context.contentResolver.query(uri, null, null, null, null)
                         ?.use { cursor ->
                             cursor.moveToFirst()
-                            var fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME)
+                            val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME)
                             val size = cursor.getLongValue(OpenableColumns.SIZE)
-                            val type = context.contentResolver.getType(uri) ?: ""
-                            var extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(type)
-                            if (extension.isNullOrEmpty()) {
-                                extension = fileName.getFilenameExtension()
-                            }
-                            if (extension.isNotEmpty()) {
-                                fileName = fileName.getFilenameWithoutExtension() + "." + extension
-                            }
                             cursor.close()
                             try {
                                 val dir = when {
                                     fileName.isVideoFast() -> {
                                         Environment.DIRECTORY_MOVIES
                                     }
+
                                     fileName.isImageFast() -> {
                                         Environment.DIRECTORY_PICTURES
                                     }
+
                                     fileName.isAudioFast() -> {
                                         Environment.DIRECTORY_MUSIC
                                     }
+
                                     else -> {
                                         Environment.DIRECTORY_DOCUMENTS
                                     }

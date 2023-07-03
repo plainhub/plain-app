@@ -47,16 +47,16 @@ class CallsDialog : BaseListDrawerDialog() {
                     binding.list.rv.ensureSelect { items ->
                         val m = items[0]
                         phoneNumberToCall = (m.data as DCall).number
-                        if (Permission.CALL_PHONE.can()) {
+                        if (Permission.CALL_PHONE.can(requireContext())) {
                             CallHelper.call(requireContext(), phoneNumberToCall)
                         } else {
-                            Permission.CALL_PHONE.grant()
+                            Permission.CALL_PHONE.grant(requireContext())
                         }
                     }
                 }
                 R.id.delete -> {
-                    if (!Permission.WRITE_CALL_LOG.can()) {
-                        Permission.WRITE_CALL_LOG.grant()
+                    if (!Permission.WRITE_CALL_LOG.can(requireContext())) {
+                        Permission.WRITE_CALL_LOG.grant(requireContext())
                         return@initBottomBar
                     }
                     binding.list.rv.ensureSelect { items ->
@@ -84,10 +84,10 @@ class CallsDialog : BaseListDrawerDialog() {
 
     override fun initEvents() {
         receiveEvent<PermissionResultEvent> { event ->
-            if (event.permission == Permission.READ_CALL_LOG.toSysPermission()) {
+            if (event.permission == Permission.READ_CALL_LOG) {
                 checkPermission()
-            } else if (event.permission == Permission.CALL_PHONE.toSysPermission()) {
-                if (Permission.CALL_PHONE.can()) {
+            } else if (event.permission == Permission.CALL_PHONE) {
+                if (Permission.CALL_PHONE.can(requireContext())) {
                     CallHelper.call(requireContext(), phoneNumberToCall)
                 } else {
                     DialogHelper.showMessage(R.string.call_phone_permission_required)
@@ -107,7 +107,7 @@ class CallsDialog : BaseListDrawerDialog() {
     }
 
     private fun checkPermission() {
-        binding.list.checkPermission(Permission.READ_CALL_LOG)
+        binding.list.checkPermission(requireContext(), Permission.READ_CALL_LOG)
     }
 
     override fun updateList() {

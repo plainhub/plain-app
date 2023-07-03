@@ -64,7 +64,6 @@ object BoxEvents {
     fun register() {
         receiveEventHandler<FetchInitDataEvent> { event ->
             safeRun(event) {
-                LogCat.d("FetchInitDataEvent")
                 launch {
                     val r: GraphqlApiResult<InitQuery.Data>
                     val t = measureTimeMillis {

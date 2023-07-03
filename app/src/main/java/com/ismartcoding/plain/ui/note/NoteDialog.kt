@@ -8,21 +8,19 @@ import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.cut
-import com.ismartcoding.lib.extensions.navigationBarHeight
 import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.extensions.px
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.lib.softinput.setWindowSoftInput
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.data.enums.TagType
 import com.ismartcoding.plain.databinding.DialogNoteBinding
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
+import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.note.NoteHelper
 import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.features.tag.TagRelationStub
@@ -45,11 +43,6 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
         tag = arguments?.parcelable(ARG_TAG)
         id = note?.id ?: ""
 
-        if (isSPlus()) {
-            // immersionBar won't work well with setWindowSoftInputCompatible
-            setTransparentBar(view)
-        }
-
         binding.topAppBar.toolbar.run {
             initMenu(R.menu.note_edit)
 
@@ -68,7 +61,7 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
         }
         val context = requireContext()
 
-        binding.markdown.updatePadding(bottom = navigationBarHeight + context.px(R.dimen.list_bottom_padding))
+        binding.markdown.updatePadding(bottom = context.px(R.dimen.list_bottom_padding))
         setWindowSoftInput(binding.editor)
         binding.editor.initView(lifecycle, note?.content ?: "")
         binding.editor.onTextChanged = {

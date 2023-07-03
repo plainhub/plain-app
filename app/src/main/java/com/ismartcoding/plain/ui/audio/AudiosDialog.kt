@@ -58,7 +58,7 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     }
 
     private fun checkPermission() {
-        binding.list.checkPermission(Permission.WRITE_EXTERNAL_STORAGE)
+        binding.list.checkPermission(requireContext(), Permission.WRITE_EXTERNAL_STORAGE)
     }
 
     override fun initEvents() {
@@ -135,7 +135,7 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
                     if (viewModel.castMode) {
                         CastDialog(arrayListOf(), m.data.path).show()
                     } else {
-                        Permissions.checkNotification(R.string.audio_notification_prompt) {
+                        Permissions.checkNotification(requireContext(), R.string.audio_notification_prompt) {
                             AudioPlayerService.play(requireContext(), getModel<AudioModel>().data.toPlaylistAudio())
                         }
                     }

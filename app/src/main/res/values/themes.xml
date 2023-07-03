@@ -1,11 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!--    <style name="Widget.App.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">-->
-    <!--        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Switch</item>-->
-    <!--    </style>-->
-
-    <!--    <style name="ThemeOverlay.App.Switch" parent="">-->
-    <!--        <item name="colorPrimary">@color/purple</item>-->
-    <!--    </style>-->
+    <style name="Theme.PlainActivity" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="windowActionModeOverlay">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowContentOverlay">@color/canvas</item>
+        <item name="android:windowBackground">@color/canvas</item>
+    </style>
 
     <style name="Theme.FullScreen" parent="@android:style/Theme.Dialog">
         <item name="android:windowBackground">@android:color/transparent</item>
@@ -33,7 +34,6 @@
         <item name="materialAlertDialogTheme">@style/PlainMaterialAlertDialog</item>
         <item name="popupMenuBackground">@drawable/popup_menu_background</item>
         <item name="actionModeCloseDrawable">@drawable/ic_close</item>
-        <!--        <item name="materialSwitchStyle">@style/Widget.App.Switch</item>-->
     </style>
 
     <style name="Theme.Plain" parent="Theme.PlainBase">
@@ -44,16 +44,11 @@
         <item name="android:windowIsTranslucent">true</item>
     </style>
 
-    <style name="ActivityTheme" parent="Theme.Plain">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
     <style name="Theme.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/canvas</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_foreground</item>
         <item name="windowSplashScreenAnimationDuration">200</item>
-        <item name="postSplashScreenTheme">@style/ActivityTheme</item>
+        <item name="postSplashScreenTheme">@style/Theme.PlainActivity</item>
     </style>
 
     <style name="PlainBottomSheetDialogTheme" parent="@style/ThemeOverlay.Material3.BottomSheetDialog">

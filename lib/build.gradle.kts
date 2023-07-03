@@ -53,8 +53,8 @@ dependencies {
 
     implementation("com.google.code.gson:gson:2.9.1")
 
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
     api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
     api("com.google.android.material:material:1.10.0-alpha04")
@@ -74,8 +74,6 @@ dependencies {
     api("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
 
     api("com.tencent:mmkv:1.3.0")
-
-    api("com.geyifeng.immersionbar:immersionbar:3.2.2")
 
     implementation("org.ahocorasick:ahocorasick:0.6.3") // For pinyin
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")

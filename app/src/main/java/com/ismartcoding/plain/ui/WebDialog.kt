@@ -10,7 +10,6 @@ import android.view.View
 import android.webkit.*
 import android.webkit.WebSettings.*
 import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
 import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
@@ -26,16 +25,8 @@ class WebDialog(val url: String) : BaseDialog<DialogWebBinding>() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setTransparentBar(view)
 
         val context = requireContext()
-        if (!context.isGestureNavigationBar()) {
-            binding.webView.updatePadding(0, 0, 0, navigationBarHeight)
-        }
-//        binding.webView.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-//            height = context.getWindowHeight() - statusBarHeight - context.dp2px(64)
-//        }
-
         binding.topAppBar.toolbar.run {
             subtitle = url
             initMenu(R.menu.web)

@@ -64,9 +64,6 @@ class HomeView(context: Context, attrs: AttributeSet? = null) : RecyclerView(con
         }.apply {
             addType<HomeItemModel> {
                 when (type) {
-                    HomeItemType.STORAGE -> {
-                        R.layout.home_item_storage
-                    }
                     HomeItemType.EXCHANGE -> {
                         R.layout.home_item_exchange
                     }
@@ -75,12 +72,6 @@ class HomeView(context: Context, attrs: AttributeSet? = null) : RecyclerView(con
                     }
                     HomeItemType.EDUCATION -> {
                         R.layout.home_item_education
-                    }
-                    HomeItemType.WORK -> {
-                        R.layout.home_item_work
-                    }
-                    HomeItemType.SOCIAL -> {
-                        R.layout.home_item_social
                     }
                 }
             }
@@ -97,10 +88,6 @@ class HomeView(context: Context, attrs: AttributeSet? = null) : RecyclerView(con
                 val m = getModel<HomeItemModel>()
                 val b: ViewBinding
                 when (m.type) {
-                    HomeItemType.STORAGE -> {
-                        b = getBinding<HomeItemStorageBinding>()
-                        b.initView()
-                    }
                     HomeItemType.NETWORK -> {
                         b = getBinding<HomeItemNetworkBinding>()
                         b.initEvents(m)
@@ -113,14 +100,6 @@ class HomeView(context: Context, attrs: AttributeSet? = null) : RecyclerView(con
                     }
                     HomeItemType.EDUCATION -> {
                         b = getBinding<HomeItemEducationBinding>()
-                        b.initView()
-                    }
-                    HomeItemType.WORK -> {
-                        b = getBinding<HomeItemWorkBinding>()
-                        b.initView()
-                    }
-                    HomeItemType.SOCIAL -> {
-                        b = getBinding<HomeItemSocialBinding>()
                         b.initView()
                     }
                 }
@@ -169,9 +148,6 @@ class HomeView(context: Context, attrs: AttributeSet? = null) : RecyclerView(con
 
     fun getItems(): List<HomeItemModel> {
         val ignore = if (LocalStorage.selectedBoxId.isEmpty()) mutableSetOf(HomeItemType.NETWORK, HomeItemType.EDUCATION) else mutableSetOf()
-        if (!context.allowSensitivePermissions()) {
-            ignore.add(HomeItemType.SOCIAL)
-        }
         val items  = mutableListOf<HomeItemModel>()
         items.addAll(
             HomeItemType.values()

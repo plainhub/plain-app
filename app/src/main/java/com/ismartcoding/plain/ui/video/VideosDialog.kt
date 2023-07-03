@@ -72,7 +72,7 @@ class VideosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     }
 
     private fun checkPermission() {
-        binding.list.checkPermission(Permission.WRITE_EXTERNAL_STORAGE)
+        binding.list.checkPermission(requireContext(), Permission.WRITE_EXTERNAL_STORAGE)
     }
 
 

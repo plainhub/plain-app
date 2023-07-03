@@ -51,17 +51,17 @@ class ContactsDialog : BaseListDrawerDialog() {
                         val contact = m.data as DContact
                         if (contact.phoneNumbers.isNotEmpty()) {
                             phoneNumberToCall = contact.phoneNumbers[0].value
-                            if (Permission.CALL_PHONE.can()) {
+                            if (Permission.CALL_PHONE.can(requireContext())) {
                                 CallHelper.call(requireContext(), phoneNumberToCall)
                             } else {
-                                Permission.CALL_PHONE.grant()
+                                Permission.CALL_PHONE.grant(requireContext())
                             }
                         }
                     }
                 }
                 R.id.delete -> {
-                    if (!Permission.WRITE_CONTACTS.can()) {
-                        Permission.WRITE_CONTACTS.grant()
+                    if (!Permission.WRITE_CONTACTS.can(requireContext())) {
+                        Permission.WRITE_CONTACTS.grant(requireContext())
                         return@initBottomBar
                     }
                     binding.list.rv.ensureSelect { items ->
@@ -94,10 +94,10 @@ class ContactsDialog : BaseListDrawerDialog() {
 
     override fun initEvents() {
         receiveEvent<PermissionResultEvent> { event ->
-            if (event.permission == Permission.READ_CONTACTS.toSysPermission()) {
+            if (event.permission == Permission.READ_CONTACTS) {
                 checkPermission()
-            } else if (event.permission == Permission.CALL_PHONE.toSysPermission()) {
-                if (Permission.CALL_PHONE.can()) {
+            } else if (event.permission == Permission.CALL_PHONE) {
+                if (Permission.CALL_PHONE.can(requireContext())) {
                     CallHelper.call(requireContext(), phoneNumberToCall)
                 } else {
                     DialogHelper.showMessage(R.string.call_phone_permission_required)
@@ -112,7 +112,7 @@ class ContactsDialog : BaseListDrawerDialog() {
     }
 
     private fun checkPermission() {
-        binding.list.checkPermission(Permission.READ_CONTACTS)
+        binding.list.checkPermission(requireContext(), Permission.READ_CONTACTS)
     }
 
     override fun updateList() {

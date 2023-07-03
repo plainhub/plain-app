@@ -2,11 +2,10 @@ package com.ismartcoding.plain.ui.helpers
 
 import android.content.Intent
 import android.net.Uri
-import com.ismartcoding.plain.data.enums.PickFileType
 
 // https://developer.android.com/training/data-storage/shared/photopicker
 object FilePickHelper {
-    fun getPickFileIntent(type: PickFileType, multiple: Boolean): Intent {
+    fun getPickFileIntent(multiple: Boolean): Intent {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, multiple)
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
