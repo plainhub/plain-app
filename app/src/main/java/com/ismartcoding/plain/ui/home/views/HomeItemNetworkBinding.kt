@@ -1,21 +1,18 @@
 package com.ismartcoding.plain.ui.home.views
 
-import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.*
-import com.ismartcoding.plain.data.enums.ActionSourceType
+import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.HomeItemNetworkBinding
-import com.ismartcoding.plain.features.ActionEvent
-import com.ismartcoding.plain.features.ChatItemRefreshEvent
-import com.ismartcoding.plain.features.HomeItemType
 import com.ismartcoding.plain.features.box.FetchNetworksEvent
-import com.ismartcoding.plain.features.box.NetworksResultEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.device.DevicesDialog
-import com.ismartcoding.plain.ui.extensions.*
-import com.ismartcoding.plain.ui.home.HomeItemModel
+import com.ismartcoding.plain.ui.extensions.initTheme
+import com.ismartcoding.plain.ui.extensions.setClick
+import com.ismartcoding.plain.ui.extensions.setKeyText
+import com.ismartcoding.plain.ui.extensions.setValueText
+import com.ismartcoding.plain.ui.extensions.showMore
 import com.ismartcoding.plain.ui.hostapd.HostapdDialog
 import com.ismartcoding.plain.ui.network.NetworkConfigDialog
 import com.ismartcoding.plain.ui.route.RoutesDialog
@@ -86,26 +83,4 @@ private fun HomeItemNetworkBinding.updateUI() {
         .setClick {
             DevicesDialog().show()
         }
-}
-
-fun HomeItemNetworkBinding.initEvents(m: HomeItemModel) {
-    m.events.add(receiveEventHandler<ChatItemRefreshEvent> { event ->
-        if (event.data.type == HomeItemType.NETWORK.value) {
-            state.showLoading()
-            sendEvent(FetchNetworksEvent(LocalStorage.selectedBoxId))
-        }
-    })
-
-    m.events.add(receiveEventHandler<ActionEvent> { event ->
-        if (setOf(ActionSourceType.ROUTE, ActionSourceType.RULE, ActionSourceType.DEVICE).contains(event.source)) {
-            updateUI()
-        }
-    })
-
-    m.events.add(receiveEventHandler<NetworksResultEvent> { event ->
-        state.update(event.result) {
-            sendEvent(FetchNetworksEvent(LocalStorage.selectedBoxId))
-        }
-        updateUI()
-    })
 }

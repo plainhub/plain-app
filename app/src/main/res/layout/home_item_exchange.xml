@@ -6,8 +6,7 @@
 
     <TextView
         android:id="@+id/title"
-        style="@style/HomeItemTitle"
-        android:text="@string/home_item_title_exchange" />
+        style="@style/HomeItemTitle" />
 
     <FrameLayout
         style="@style/HomeItemContent">

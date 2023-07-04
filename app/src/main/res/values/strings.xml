@@ -192,11 +192,12 @@
     <string name="unreachable_via_network_except_bluetooth">{{box_name}} is only accessible via bluetooth</string>
     <string name="home_item_title_network">Network</string>
     <string name="home_item_title_education">Education</string>
-    <string name="home_item_title_exchange">Exchange rate</string>
+    <string name="exchange_rates">Exchange rates</string>
     <string name="home_item_title_shipping">Shipping</string>
     <string name="home_item_title_shopping">Shopping</string>
     <string name="home_item_title_storage">Storage</string>
     <string name="home_item_title_social">Social</string>
+    <string name="home_item_title_tools">Tools</string>
     <string name="home_item_title_work">Work</string>
     <string name="wireguard">WireGuard</string>
     <string name="permissions">Permissions</string>
@@ -430,7 +431,6 @@
     <string name="release_to_sync_all_feeds">Release to sync all feeds</string>
     <string name="pull_down_to_sync_current_feed">Pull down to sync current feed</string>
     <string name="release_to_sync_current_feed">Release to sync current feed</string>
-    <string name="wifi_required">This feature requires your device to be connected to a Wi-Fi network.</string>
     <string name="synced">Synced</string>
     <string name="create_folder">Create folder</string>
     <string name="create_file">Create file</string>
@@ -472,6 +472,7 @@
     <string name="style">Style</string>
     <string name="other">Other</string>
     <string name="clear">Clear</string>
+    <string name="tools">Tools</string>
     <string name="checked">Checked</string>
     <string name="use_device_language">Use device language</string>
     <string name="english" translatable="false">English</string>

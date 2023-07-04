@@ -33,7 +33,6 @@ import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.exchange.DExchangeRates
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.services.HttpServerService
-import com.ismartcoding.plain.ui.home.HomeItemModel
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import com.ismartcoding.plain.web.websocket.WebSocketHelper
@@ -75,8 +74,6 @@ class CurrentBoxChangedEvent
 
 class ChatInputEditEvent(val content: String)
 class ChatItemRefreshEvent(val data: DMessageContent)
-
-class HomeItemRefreshEvent(val data: HomeItemModel)
 
 class VocabularyCreatedEvent
 class VocabularyUpdatedEvent

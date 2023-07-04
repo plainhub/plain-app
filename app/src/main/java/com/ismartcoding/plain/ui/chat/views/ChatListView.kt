@@ -159,9 +159,6 @@ class ChatListView(context: Context, attrs: AttributeSet? = null) : RecyclerView
                         addMenuItem(popupMenu, PopupMenuItemType.DELETE, R.string.delete)
                         popup.setOnMenuItemClickListener {
                             when (it.itemId) {
-                                PopupMenuItemType.REFRESH.ordinal -> {
-                                    sendEvent(ChatItemRefreshEvent(c))
-                                }
                                 PopupMenuItemType.VIEW_DETAIL.ordinal -> {
                                     ChatItemDetailDialog(chatItem).show()
                                 }
@@ -233,7 +230,6 @@ class ChatListView(context: Context, attrs: AttributeSet? = null) : RecyclerView
     }
 
     private enum class PopupMenuItemType {
-        REFRESH,
         VIEW_DETAIL,
         COPY_TEXT,
         EDIT_TEXT,

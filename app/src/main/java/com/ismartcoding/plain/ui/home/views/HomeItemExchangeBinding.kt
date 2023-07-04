@@ -24,7 +24,6 @@ import com.ismartcoding.plain.ui.extensions.setEndIcon
 import com.ismartcoding.plain.ui.extensions.setKeyText
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.ResourceHelper
-import com.ismartcoding.plain.ui.home.HomeItemModel
 import com.ismartcoding.plain.ui.models.ListItemModel
 
 data class RateModel(val rate: DExchangeRate, val value: Double) : ListItemModel()
@@ -39,7 +38,6 @@ fun HomeItemExchangeBinding.bindData(context: Context) {
 }
 
 fun HomeItemExchangeBinding.initView() {
-    title.setText(R.string.home_item_title_exchange)
     rv.linear().setup {
         addType<RateModel>(R.layout.item_row)
         onBind {
@@ -108,18 +106,3 @@ fun HomeItemExchangeBinding.updateUI(context: Context) {
     }
 }
 
-fun HomeItemExchangeBinding.initEvents(context: Context, m: HomeItemModel) {
-    m.events.add(receiveEventHandler<LatestExchangeRatesResultEvent> { event ->
-        state.update(event.result) {
-            sendEvent(FetchLatestExchangeRatesEvent())
-        }
-        bindData(context)
-    })
-
-    m.events.add(receiveEventHandler<HomeItemRefreshEvent> { event ->
-        if (event.data.type == HomeItemType.EXCHANGE) {
-            state.showLoading()
-            sendEvent(FetchLatestExchangeRatesEvent())
-        }
-    })
-}

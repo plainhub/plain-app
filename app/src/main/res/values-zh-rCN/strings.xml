@@ -192,12 +192,13 @@
     <string name="unreachable_via_network_except_bluetooth">当前无法通过网络连接盒子{{box_name}}，只能通过蓝牙访问。</string>
     <string name="home_item_title_network">网络</string>
     <string name="home_item_title_education">教育</string>
-    <string name="home_item_title_exchange">汇率</string>
+    <string name="exchange_rates">汇率</string>
     <string name="home_item_title_shipping">快递物流</string>
     <string name="home_item_title_shopping">购物</string>
     <string name="home_item_title_storage">存储</string>
     <string name="home_item_title_social">社交</string>
     <string name="home_item_title_work">工作</string>
+    <string name="home_item_title_tools">工具</string>
     <string name="wireguard">WireGuard</string>
     <string name="permissions">访问权限</string>
     <string name="add_peer">添加节点</string>
@@ -429,7 +430,6 @@
     <string name="release_to_sync_all_feeds">释放立即同步所有订阅</string>
     <string name="pull_down_to_sync_current_feed">下拉同步当前订阅</string>
     <string name="release_to_sync_current_feed">释放立即同步当前订阅</string>
-    <string name="wifi_required">手机需连接Wi-Fi网络才能使用此功能。</string>
     <string name="synced">已同步</string>
     <string name="create_folder">创建目录</string>
     <string name="create_file">创建文件</string>
@@ -472,6 +472,7 @@
     <string name="style">样式</string>
     <string name="other">其他</string>
     <string name="clear">清空</string>
+    <string name="tools">工具</string>
     <string name="checked">选中</string>
     <string name="use_device_language">跟随系统设置</string>
     <string name="amoled_dark_theme">AMOLED 深色主题</string>
