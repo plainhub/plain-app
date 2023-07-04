@@ -111,7 +111,6 @@ dependencies {
     val apolloVersion = "3.2.1"
     val kgraphqlVersion = "0.18.1"
     val ktorVersion = "2.3.1"
-    val accompanist = "0.31.4-beta"
     val coil = "2.4.0"
 
     implementation(platform("androidx.compose:compose-bom:2023.06.01"))
@@ -131,7 +130,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha10")
 
     // https://github.com/google/accompanist/releases
-    implementation("com.google.accompanist:accompanist-systemuicontroller:$accompanist")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.4-beta")
 
     // https://developer.android.com/jetpack/androidx/releases/navigation
     implementation("androidx.navigation:navigation-compose:2.6.0")

@@ -145,7 +145,7 @@ fun ColorAndStylePage(
                             DarkThemePreference.put(context, scope, if (it) DarkTheme.ON else DarkTheme.OFF)
                         }
                     }
-                    BottomSpacer()
+                    BottomSpace()
                 }
             }
         }
@@ -216,7 +216,6 @@ fun Palettes(
     TextFieldDialog(
         visible = addDialogVisible,
         title = stringResource(R.string.primary_color),
-        icon = Icons.Outlined.Palette,
         value = customColorValue,
         placeholder = stringResource(R.string.primary_color_hint),
         onValueChange = {

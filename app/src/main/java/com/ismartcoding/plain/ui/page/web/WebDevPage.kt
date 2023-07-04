@@ -69,7 +69,7 @@ fun WebDevPage(
                             Spacer(modifier = Modifier.height(16.dp))
                             Tips(text = stringResource(id = R.string.auth_dev_token_tips))
                         }
-                        BottomSpacer()
+                        BottomSpace()
                     }
                 }
             }

@@ -5,9 +5,7 @@ import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -20,13 +18,11 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.formatName
 import com.ismartcoding.plain.ui.base.BlockOutlineButton
-import com.ismartcoding.plain.ui.base.BottomSpacer
+import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.DisplayText
-import com.ismartcoding.plain.ui.base.OutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
 import com.ismartcoding.plain.ui.models.BackupRestoreViewModel
-import org.commonmark.node.Block
 import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,7 +72,7 @@ fun BackupRestorePage(
                             restoreLauncher.launch(FilePickHelper.getPickFileIntent(false))
                         },
                     )
-                    BottomSpacer()
+                    BottomSpace()
                 }
             }
         }

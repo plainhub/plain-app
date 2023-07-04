@@ -1,10 +1,13 @@
 package com.ismartcoding.plain.data.preference
 
 import android.content.Context
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.data.enums.DarkTheme
 import com.ismartcoding.plain.data.enums.Language
 import com.ismartcoding.plain.data.enums.PasswordType
@@ -12,6 +15,7 @@ import com.ismartcoding.plain.features.Permission
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 object PasswordPreference : BasePreference<String>() {
     override val default = ""
@@ -117,3 +121,19 @@ object WebPreference : BasePreference<Boolean>() {
     override val key = booleanPreferencesKey("web")
 }
 
+object ExchangeRatePreference : BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("exchange")
+
+    fun getConfig(preferences: Preferences): ExchangeConfig {
+        val str = get(preferences)
+        if (str.isEmpty()) {
+            return ExchangeConfig()
+        }
+        return Json.decodeFromString(str)
+    }
+
+    fun put(context: Context, scope: CoroutineScope, value: ExchangeConfig) {
+        put(context, scope, jsonEncode(value))
+    }
+}

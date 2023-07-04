@@ -20,14 +20,14 @@ import kotlinx.coroutines.launch
 
 class CreateVocabularyDialog : BaseBottomSheetDialog<DialogCreateVocabularyBinding>() {
     override fun getSubmitButton(): LoadingButtonView {
-        return binding.button
+        return binding.button2
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.template.selectValue = "none"
         updateTemplateRow()
-        binding.button.setSafeClick {
+        binding.button2.setSafeClick {
             if (hasInputError()) {
                 return@setSafeClick
             }

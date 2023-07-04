@@ -6,7 +6,6 @@ import com.ismartcoding.lib.serialize.serialLazy
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
 import com.ismartcoding.plain.features.audio.MediaPlayMode
 import com.ismartcoding.plain.features.device.DeviceSortBy
-import com.ismartcoding.plain.features.exchange.ExchangeConfig
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.video.DVideo
 
@@ -40,7 +39,6 @@ object LocalStorage {
     var feedAutoRefreshInterval: Int by serialLazy(7200) // seconds
     var feedAutoRefreshOnlyWifi: Boolean by serialLazy(false)
     var chatGPTApiKey: String by serialLazy("")
-    var exchange: ExchangeConfig by serialLazy(ExchangeConfig())
 
 
     fun deletePlaylistAudio(path: String) {

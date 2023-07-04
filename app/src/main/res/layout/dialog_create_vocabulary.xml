@@ -31,7 +31,7 @@
                 app:requiredErrorText="@string/select_a_template" />
 
             <com.ismartcoding.plain.ui.views.LoadingButtonView
-                android:id="@+id/button"
+                android:id="@+id/button2"
                 style="@style/SaveButton" />
         </LinearLayout>
 

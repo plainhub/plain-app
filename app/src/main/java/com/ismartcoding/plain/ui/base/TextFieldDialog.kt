@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,7 +35,10 @@ fun TextFieldDialog(
     onValueChange: (String) -> Unit = {},
     onDismissRequest: () -> Unit = {},
     onConfirm: (String) -> Unit = {},
-    imeAction: ImeAction = if (singleLine) ImeAction.Done else ImeAction.Default,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(
+        imeAction = if (singleLine) ImeAction.Done else ImeAction.Default
+    ),
+
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -63,7 +67,7 @@ fun TextFieldDialog(
                 placeholder = placeholder,
                 isPassword = isPassword,
                 errorText = errorText,
-                imeAction = imeAction,
+                keyboardOptions = keyboardOptions,
                 focusManager = focusManager,
                 onConfirm = onConfirm,
             )

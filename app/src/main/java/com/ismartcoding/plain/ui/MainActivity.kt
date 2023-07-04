@@ -169,10 +169,6 @@ class MainActivity : AppCompatActivity() {
             screenCapture.launch(mediaProjectionManager.createScreenCaptureIntent())
         }
 
-        receiveEvent<UpdateHomeItemEvent> { event ->
-//            binding.home.update(event.type)
-        }
-
         receiveEvent<RestartAppEvent> {
             val intent = Intent(this@MainActivity, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK

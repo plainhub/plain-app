@@ -9,7 +9,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.DialogSelectItemBinding
 import com.ismartcoding.plain.databinding.ViewListItemBinding
-import com.ismartcoding.plain.features.exchange.DExchangeRate
+import com.ismartcoding.plain.features.DExchangeRate
 import com.ismartcoding.plain.ui.helpers.ResourceHelper
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.*

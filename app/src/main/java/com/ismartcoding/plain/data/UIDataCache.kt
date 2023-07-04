@@ -8,7 +8,7 @@ import com.ismartcoding.plain.data.enums.ConfigType
 import com.ismartcoding.plain.db.DBox
 import com.ismartcoding.plain.extensions.toRoute
 import com.ismartcoding.plain.extensions.toRule
-import com.ismartcoding.plain.features.exchange.DExchangeRates
+import com.ismartcoding.plain.features.DExchangeRates
 import com.ismartcoding.plain.features.route.Route
 import com.ismartcoding.plain.features.route.getMessage
 import com.ismartcoding.plain.features.route.getTitle
@@ -16,7 +16,6 @@ import com.ismartcoding.plain.features.rule.Rule
 import com.ismartcoding.plain.features.wireguard.WireGuard
 import com.ismartcoding.plain.features.wireguard.toWireGuard
 import com.ismartcoding.plain.fragment.*
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 class UIDataCache {

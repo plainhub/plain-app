@@ -16,7 +16,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.Language
 import com.ismartcoding.plain.data.preference.LanguagePreference
 import com.ismartcoding.plain.data.preference.LocalLanguage
-import com.ismartcoding.plain.ui.base.BottomSpacer
+import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -51,7 +51,7 @@ fun LanguagePage(
                             })
                         }
                     }
-                    BottomSpacer()
+                    BottomSpace()
                 }
             }
         }

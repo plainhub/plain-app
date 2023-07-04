@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.home.views
+package com.ismartcoding.plain.ui.components
 
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.LocalStorage

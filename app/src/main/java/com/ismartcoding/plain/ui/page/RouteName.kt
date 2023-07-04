@@ -13,5 +13,6 @@ enum class RouteName {
     PASSWORD,
     TEXT,
     SESSIONS,
-    WEB_DEV
+    WEB_DEV,
+    EXCHANGE_RATE,
 }

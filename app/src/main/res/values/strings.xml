@@ -192,7 +192,7 @@
     <string name="unreachable_via_network_except_bluetooth">{{box_name}} is only accessible via bluetooth</string>
     <string name="home_item_title_network">Network</string>
     <string name="home_item_title_education">Education</string>
-    <string name="exchange_rates">Exchange rates</string>
+    <string name="exchange_rate">Exchange rate</string>
     <string name="home_item_title_shipping">Shipping</string>
     <string name="home_item_title_shopping">Shopping</string>
     <string name="home_item_title_storage">Storage</string>

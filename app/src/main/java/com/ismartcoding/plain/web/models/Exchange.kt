@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.web.models
 
-import com.ismartcoding.plain.features.exchange.DExchangeRates
+import com.ismartcoding.plain.features.DExchangeRates
 
 data class ExchangeRate(
     val k: String = "",

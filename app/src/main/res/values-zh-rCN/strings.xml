@@ -192,7 +192,7 @@
     <string name="unreachable_via_network_except_bluetooth">当前无法通过网络连接盒子{{box_name}}，只能通过蓝牙访问。</string>
     <string name="home_item_title_network">网络</string>
     <string name="home_item_title_education">教育</string>
-    <string name="exchange_rates">汇率</string>
+    <string name="exchange_rate">汇率</string>
     <string name="home_item_title_shipping">快递物流</string>
     <string name="home_item_title_shopping">购物</string>
     <string name="home_item_title_storage">存储</string>

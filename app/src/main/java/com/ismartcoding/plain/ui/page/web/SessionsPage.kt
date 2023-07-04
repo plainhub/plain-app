@@ -31,7 +31,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.extensions.formatDateTime
-import com.ismartcoding.plain.ui.base.BottomSpacer
+import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -107,7 +107,7 @@ fun SessionsPage(
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                     }
-                    BottomSpacer()
+                    BottomSpace()
                 }
             }
         }

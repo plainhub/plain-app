@@ -29,11 +29,14 @@ fun ClipboardTextField(
     placeholder: String = "",
     isPassword: Boolean = false,
     errorText: String = "",
-    imeAction: ImeAction = ImeAction.Done,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(
+        imeAction = ImeAction.Done
+    ),
     focusManager: FocusManager? = null,
     requestFocus: Boolean = false,
     onConfirm: (String) -> Unit = {},
 ) {
+    val imeAction = keyboardOptions.imeAction
     Column(modifier = modifier) {
         PTextField(
             readOnly = readOnly,
@@ -58,9 +61,7 @@ fun ClipboardTextField(
                 onSend = if (imeAction == ImeAction.Send)
                     action(focusManager, onConfirm, value) else null,
             ),
-            keyboardOptions = KeyboardOptions(
-                imeAction = imeAction
-            ),
+            keyboardOptions = keyboardOptions,
         )
         if (errorText.isNotEmpty()) {
             SelectionContainer {

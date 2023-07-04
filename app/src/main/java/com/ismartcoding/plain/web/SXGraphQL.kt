@@ -24,7 +24,6 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.BoxProxyApi
 import com.ismartcoding.plain.api.HttpApiTimeout
-import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
@@ -35,9 +34,13 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
-import com.ismartcoding.plain.features.*
+import com.ismartcoding.plain.features.AIChatCreatedEvent
+import com.ismartcoding.plain.features.ActionEvent
+import com.ismartcoding.plain.features.ClearAudioPlaylistEvent
+import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.features.QueryHelper
+import com.ismartcoding.plain.features.StartScreenMirrorEvent
 import com.ismartcoding.plain.features.aichat.AIChatHelper
-import com.ismartcoding.plain.features.pkg.PackageHelper
 import com.ismartcoding.plain.features.audio.AudioHelper
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
@@ -48,40 +51,85 @@ import com.ismartcoding.plain.features.chat.ChatHelper
 import com.ismartcoding.plain.features.contact.ContactHelper
 import com.ismartcoding.plain.features.contact.GroupHelper
 import com.ismartcoding.plain.features.contact.SourceHelper
-import com.ismartcoding.plain.features.exchange.DExchangeRates
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.features.feed.fetchContentAsync
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.image.ImageHelper
 import com.ismartcoding.plain.features.note.NoteHelper
+import com.ismartcoding.plain.features.pkg.PackageHelper
 import com.ismartcoding.plain.features.sms.SmsHelper
 import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.features.tag.TagRelationStub
 import com.ismartcoding.plain.features.video.VideoHelper
+import com.ismartcoding.plain.helpers.ExchangeHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.web.loaders.TagsLoader
-import com.ismartcoding.plain.web.models.*
+import com.ismartcoding.plain.web.models.AIChat
+import com.ismartcoding.plain.web.models.AIChatConfig
+import com.ismartcoding.plain.web.models.App
+import com.ismartcoding.plain.web.models.Audio
+import com.ismartcoding.plain.web.models.Call
+import com.ismartcoding.plain.web.models.ChatItem
+import com.ismartcoding.plain.web.models.Contact
+import com.ismartcoding.plain.web.models.ContactGroup
+import com.ismartcoding.plain.web.models.ContactInput
+import com.ismartcoding.plain.web.models.FeedEntry
+import com.ismartcoding.plain.web.models.Files
+import com.ismartcoding.plain.web.models.ID
+import com.ismartcoding.plain.web.models.Image
+import com.ismartcoding.plain.web.models.Message
+import com.ismartcoding.plain.web.models.Note
+import com.ismartcoding.plain.web.models.NoteInput
+import com.ismartcoding.plain.web.models.PackageStatus
+import com.ismartcoding.plain.web.models.StorageStats
+import com.ismartcoding.plain.web.models.TempValue
+import com.ismartcoding.plain.web.models.Video
+import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.workers.FeedFetchWorker
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import io.ktor.server.application.*
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import io.ktor.util.*
+import io.ktor.server.application.ApplicationCallPipeline
+import io.ktor.server.application.BaseApplicationPlugin
+import io.ktor.server.application.call
+import io.ktor.server.application.install
+import io.ktor.server.application.pluginOrNull
+import io.ktor.server.request.header
+import io.ktor.server.request.receive
+import io.ktor.server.request.receiveText
+import io.ktor.server.response.respond
+import io.ktor.server.response.respondBytes
+import io.ktor.server.response.respondText
+import io.ktor.server.routing.Routing
+import io.ktor.server.routing.post
+import io.ktor.server.routing.route
+import io.ktor.util.AttributeKey
 import kotlinx.coroutines.coroutineScope
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toInstant
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.addJsonObject
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import java.io.StringReader
 import java.io.StringWriter
+import kotlin.collections.List
+import kotlin.collections.any
+import kotlin.collections.arrayListOf
+import kotlin.collections.filter
+import kotlin.collections.forEach
+import kotlin.collections.isNotEmpty
+import kotlin.collections.map
+import kotlin.collections.set
+import kotlin.collections.setOf
+import kotlin.collections.toSet
+import kotlin.collections.toTypedArray
 import kotlin.io.path.Path
 import kotlin.io.path.moveTo
 
@@ -436,16 +484,7 @@ class SXGraphQL(val schema: Schema) {
                 query("latestExchangeRates") {
                     resolver { live: Boolean ->
                         if (live || UIDataCache.current().latestExchangeRates == null) {
-                            val client = HttpClientManager.httpClient()
-                            val r = withIO { client.get("https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml") }
-                            if (r.status == HttpStatusCode.OK) {
-                                val xml = r.body<String>()
-                                UIDataCache.current().run {
-                                    val ex = DExchangeRates()
-                                    ex.fromXml(xml)
-                                    latestExchangeRates = ex
-                                }
-                            }
+                            ExchangeHelper.getRates()
                         }
                         UIDataCache.current().latestExchangeRates?.toModel()
                     }

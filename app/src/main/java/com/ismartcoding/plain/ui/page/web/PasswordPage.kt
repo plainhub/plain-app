@@ -45,7 +45,7 @@ import com.ismartcoding.plain.data.preference.PasswordTypePreference
 import com.ismartcoding.plain.data.preference.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BlockRadioButton
 import com.ismartcoding.plain.ui.base.BlockRadioGroupButtonItem
-import com.ismartcoding.plain.ui.base.BottomSpacer
+import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.OutlineButton
 import com.ismartcoding.plain.ui.base.PListItem
@@ -122,7 +122,7 @@ fun PasswordPage(
                                 AuthTwoFactorPreference.put(context, scope, it)
                             }
                         }
-                        BottomSpacer()
+                        BottomSpace()
                     }
                 }
             }

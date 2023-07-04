@@ -28,21 +28,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.allowSensitivePermissions
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.preference.LocalKeepScreenOn
 import com.ismartcoding.plain.data.preference.LocalWeb
 import com.ismartcoding.plain.helpers.ScreenHelper
 import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.ActionButtonSettings
-import com.ismartcoding.plain.ui.base.BottomSpacer
+import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.chat.ChatDialog
+import com.ismartcoding.plain.ui.components.HomeItemEducation
 import com.ismartcoding.plain.ui.extensions.navigate
-import com.ismartcoding.plain.ui.home.views.HomeItemSocial
-import com.ismartcoding.plain.ui.home.views.HomeItemStorage
-import com.ismartcoding.plain.ui.home.views.HomeItemWork
+import com.ismartcoding.plain.ui.components.HomeItemSocial
+import com.ismartcoding.plain.ui.components.HomeItemStorage
+import com.ismartcoding.plain.ui.components.HomeItemTools
+import com.ismartcoding.plain.ui.components.HomeItemWork
 import com.ismartcoding.plain.ui.scan.ScanDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,15 +113,21 @@ fun HomePage(
                 DisplayText(
                     text = stringResource(R.string.app_name)
                 )
-                HomeItemStorage()
+                HomeItemStorage(navController)
                 Spacer(modifier = Modifier.height(16.dp))
                 HomeItemWork()
                 Spacer(modifier = Modifier.height(16.dp))
                 if (context.allowSensitivePermissions()) {
-                    HomeItemSocial()
+                    HomeItemSocial(navController)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
-                BottomSpacer()
+                if (BuildConfig.DEBUG) {
+                    HomeItemEducation(navController)
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                HomeItemTools(navController)
+                Spacer(modifier = Modifier.height(16.dp))
+                BottomSpace()
             }
         }
     }

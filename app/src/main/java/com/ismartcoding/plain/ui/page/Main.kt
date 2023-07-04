@@ -21,6 +21,7 @@ import com.ismartcoding.plain.ui.page.settings.DarkThemePage
 import com.ismartcoding.plain.ui.page.settings.LanguagePage
 import com.ismartcoding.plain.ui.page.settings.LogsPage
 import com.ismartcoding.plain.ui.page.settings.SettingsPage
+import com.ismartcoding.plain.ui.page.tools.ExchangeRatePage
 import com.ismartcoding.plain.ui.page.web.PasswordPage
 import com.ismartcoding.plain.ui.page.web.SessionsPage
 import com.ismartcoding.plain.ui.page.web.WebConsolePage
@@ -61,6 +62,7 @@ fun Main(
                 RouteName.PASSWORD to { PasswordPage(navController) },
                 RouteName.SESSIONS to { SessionsPage(navController) },
                 RouteName.WEB_DEV to { WebDevPage(navController) },
+                RouteName.EXCHANGE_RATE to { ExchangeRatePage(navController) },
             ).forEach { (routeName, content) ->
                 composable(routeName.name) {
                     content()

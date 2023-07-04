@@ -1,11 +1,6 @@
 package com.ismartcoding.plain.ui.page.settings
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RadioButton
@@ -22,7 +17,7 @@ import com.ismartcoding.plain.data.enums.DarkTheme
 import com.ismartcoding.plain.data.preference.DarkThemePreference
 import com.ismartcoding.plain.data.preference.LocalAmoledDarkTheme
 import com.ismartcoding.plain.data.preference.LocalDarkTheme
-import com.ismartcoding.plain.ui.base.BottomSpacer
+import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -71,7 +66,7 @@ fun DarkThemePage(
                             AmoledDarkThemePreference.put(context, scope, !amoledDarkTheme)
                         }
                     }
-                    BottomSpacer()
+                    BottomSpace()
                 }
             }
         }

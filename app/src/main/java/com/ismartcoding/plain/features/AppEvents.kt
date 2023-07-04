@@ -30,7 +30,6 @@ import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.features.aichat.AIChatHelper
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.features.exchange.DExchangeRates
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.web.websocket.EventType
@@ -63,8 +62,6 @@ class HttpServerPortChanged
 
 class SendMessageEvent(val content: DMessageContent)
 class UpdateMessageEvent(var chatItem: DChat)
-
-class UpdateHomeItemEvent(var type: HomeItemType)
 
 class DeleteChatItemViewEvent(val id: String)
 
@@ -103,9 +100,6 @@ class FeedStatusEvent(val feedId: String, val status: FeedWorkerStatus)
 
 data class PlayAudioEvent(val uri: Uri)
 data class PlayAudioResultEvent(val uri: Uri)
-
-data class LatestExchangeRatesResultEvent(val result: ApiResult)
-class FetchLatestExchangeRatesEvent
 
 class AIChatCreatedEvent(val item: DAIChat)
 
@@ -147,24 +141,6 @@ object AppEvents {
 
         receiveEventHandler<WebSocketEvent> { event ->
             WebSocketHelper.sendEventAsync(event)
-        }
-
-        receiveEventHandler<FetchLatestExchangeRatesEvent> {
-            val client = HttpClientManager.httpClient()
-            try {
-                val r = withIO { client.get("https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml") }
-                if (r.status == HttpStatusCode.OK) {
-                    val xml = r.body<String>()
-                    UIDataCache.current().run {
-                        val ex = DExchangeRates()
-                        ex.fromXml(xml)
-                        latestExchangeRates = ex
-                    }
-                }
-                sendEvent(LatestExchangeRatesResultEvent(ApiResult(r)))
-            } catch (ex: Exception) {
-                sendEvent(LatestExchangeRatesResultEvent(ApiResult(null, ex)))
-            }
         }
 
         receiveEventHandler<PermissionResultEvent> { event ->

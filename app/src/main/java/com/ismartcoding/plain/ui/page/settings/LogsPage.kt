@@ -21,7 +21,7 @@ import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.base.BlockOutlineButton
-import com.ismartcoding.plain.ui.base.BottomSpacer
+import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -72,7 +72,7 @@ fun LogsPage(
                             }
                         }
                     )
-                    BottomSpacer()
+                    BottomSpace()
                 }
             }
         }

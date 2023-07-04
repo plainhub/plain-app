@@ -265,7 +265,7 @@ fun WebConsolePage(
                             }
                         }
                     }
-                    BottomSpacer()
+                    BottomSpace()
                 }
             }
         })
