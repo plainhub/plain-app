@@ -1,2 +1,0 @@
-- Add SMS feature
-- Add Calls feature
