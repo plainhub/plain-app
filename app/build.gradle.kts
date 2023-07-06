@@ -34,9 +34,9 @@ android {
             else -> 0
         }
 
-        val vCode = 70
+        val vCode = 73
         versionCode = vCode - singleAbiNum
-        versionName = "1.1.2"
+        versionName = "1.1.3"
 
         ndk {
             if (abiFilterList.isNotEmpty()) {
@@ -110,7 +110,7 @@ dependencies {
     val roomVersion = "2.5.1"
     val apolloVersion = "3.2.1"
     val kgraphqlVersion = "0.18.1"
-    val ktorVersion = "2.3.1"
+    val ktorVersion = "2.0.3" // don't upgrade, TLS handshake failed
     val coil = "2.4.0"
 
     implementation(platform("androidx.compose:compose-bom:2023.06.01"))
