@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.data.preference
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -32,7 +33,7 @@ object PasswordTypePreference : BasePreference<Int>() {
 }
 
 object AuthTwoFactorPreference : BasePreference<Boolean>() {
-    override val default = false
+    override val default = true
     override val key = booleanPreferencesKey("auth_two_factor")
 }
 
@@ -73,6 +74,21 @@ object DarkThemePreference : BasePreference<Int>() {
 
     fun put(context: Context, scope: CoroutineScope, value: DarkTheme) {
         put(context, scope, value.value)
+        setDarkMode(value)
+    }
+
+    fun setDarkMode(theme: DarkTheme) {
+        when (theme) {
+            DarkTheme.ON -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            }
+            DarkTheme.OFF -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+            else -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            }
+        }
     }
 }
 

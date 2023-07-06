@@ -21,15 +21,15 @@ import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.plain.LocalStorage
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.*
+import com.ismartcoding.plain.data.enums.DarkTheme
 import com.ismartcoding.plain.data.enums.ExportFileType
+import com.ismartcoding.plain.data.enums.Language
 import com.ismartcoding.plain.data.enums.PickFileTag
 import com.ismartcoding.plain.data.enums.PickFileType
-import com.ismartcoding.plain.data.enums.Language
 import com.ismartcoding.plain.data.preference.AuthTwoFactorPreference
+import com.ismartcoding.plain.data.preference.DarkThemePreference
 import com.ismartcoding.plain.data.preference.KeepScreenOnPreference
 import com.ismartcoding.plain.data.preference.LanguagePreference
 import com.ismartcoding.plain.data.preference.SettingsProvider
@@ -102,8 +102,8 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("ClickableViewAccessibility", "DiscouragedPrivateApi")
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         installSplashScreen()
+        super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val language = LanguagePreference.get(this)

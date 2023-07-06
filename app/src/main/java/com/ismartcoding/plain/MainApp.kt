@@ -7,7 +7,9 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.logcat.DiskLogAdapter
 import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.data.enums.DarkTheme
 import com.ismartcoding.plain.data.enums.PasswordType
+import com.ismartcoding.plain.data.preference.DarkThemePreference
 import com.ismartcoding.plain.data.preference.PasswordTypePreference
 import com.ismartcoding.plain.features.AppEvents
 import com.ismartcoding.plain.features.bluetooth.BluetoothEvents
@@ -46,6 +48,8 @@ class MainApp : Application() {
         BoxEvents.register()
 
         coIO {
+            DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(instance)))
+
             if (PasswordTypePreference.get(instance) == PasswordType.RANDOM.value) {
                 HttpServerManager.resetPassword()
             }
