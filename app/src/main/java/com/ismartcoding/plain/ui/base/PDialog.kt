@@ -1,32 +1,39 @@
 package com.ismartcoding.plain.ui.base
 
-import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.ismartcoding.plain.ui.theme.palette.onLight
 
 @Composable
 fun PDialog(
-    modifier: Modifier = Modifier,
-    visible: Boolean,
-    properties: DialogProperties = DialogProperties(),
-    onDismissRequest: () -> Unit = {},
-    icon: @Composable (() -> Unit)? = null,
-    title: @Composable (() -> Unit)? = null,
-    text: @Composable (() -> Unit)? = null,
-    confirmButton: @Composable () -> Unit,
-    dismissButton: @Composable (() -> Unit)? = null,
+    onClose: () -> Unit,
+    content: @Composable () -> Unit
 ) {
-    if (visible) {
-        AlertDialog(
-            properties = properties,
-            modifier = modifier,
-            onDismissRequest = onDismissRequest,
-            icon = icon,
-            title = title,
-            text = text,
-            confirmButton = confirmButton,
-            dismissButton = dismissButton,
+    Dialog(
+        onDismissRequest = onClose,
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
         )
+    ) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(32.dp))
+                .background(MaterialTheme.colorScheme.surface onLight MaterialTheme.colorScheme.inverseOnSurface)
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            content()
+        }
     }
 }

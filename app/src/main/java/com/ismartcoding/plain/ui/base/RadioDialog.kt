@@ -30,7 +30,7 @@ fun RadioDialog(
     options: List<RadioDialogOption> = emptyList(),
     onDismissRequest: () -> Unit = {},
 ) {
-    PDialog(
+    PAlertDialog(
         modifier = modifier,
         visible = visible,
         onDismissRequest = onDismissRequest,

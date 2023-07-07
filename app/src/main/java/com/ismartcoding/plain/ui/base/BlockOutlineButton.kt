@@ -36,7 +36,7 @@ fun BlockOutlineButton(
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
+            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 20.sp),
         )
     }
 }

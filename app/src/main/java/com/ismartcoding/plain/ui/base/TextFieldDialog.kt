@@ -8,7 +8,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -42,7 +41,7 @@ fun TextFieldDialog(
 ) {
     val focusManager = LocalFocusManager.current
 
-    PDialog(
+    PAlertDialog(
         modifier = modifier,
         visible = visible,
         onDismissRequest = onDismissRequest,

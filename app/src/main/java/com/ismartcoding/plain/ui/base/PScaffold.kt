@@ -19,32 +19,21 @@ import com.ismartcoding.plain.ui.theme.palette.onLight
 fun PScaffold(
     navController: NavHostController,
     containerColor: Color = MaterialTheme.colorScheme.surface onLight MaterialTheme.colorScheme.inverseOnSurface,
-    topBarTonalElevation: Dp = 0.dp,
-    containerTonalElevation: Dp = 0.dp,
     navigationIcon: (@Composable () -> Unit)? = {
         NavigationBackIcon(navController)
     },
+    topBarTitle: String = "",
     actions: (@Composable RowScope.() -> Unit)? = null,
     bottomBar: (@Composable () -> Unit)? = null,
     floatingActionButton: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit = {},
 ) {
     Scaffold(
-        modifier = Modifier
-            .background(
-                MaterialTheme.colorScheme.surfaceColorAtElevation(
-                    topBarTonalElevation,
-                    color = containerColor
-                )
-            ),
-        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
-            containerTonalElevation,
-            color = containerColor
-        ) onDark MaterialTheme.colorScheme.surface,
+        containerColor = containerColor,
         topBar = {
             if (navigationIcon != null || actions != null) {
                 TopAppBar(
-                    title = {},
+                    title = { Text(topBarTitle) },
                     navigationIcon = { navigationIcon?.invoke() },
                     actions = { actions?.invoke(this) },
                     colors = TopAppBarDefaults.topAppBarColors(

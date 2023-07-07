@@ -193,6 +193,7 @@
     <string name="home_item_title_network">Network</string>
     <string name="home_item_title_education">Education</string>
     <string name="exchange_rate">Exchange rate</string>
+    <string name="sound_meter">Sound meter</string>
     <string name="home_item_title_shipping">Shipping</string>
     <string name="home_item_title_shopping">Shopping</string>
     <string name="home_item_title_storage">Storage</string>
@@ -474,6 +475,26 @@
     <string name="clear">Clear</string>
     <string name="tools">Tools</string>
     <string name="checked">Checked</string>
+    <string name="min">MIN</string>
+    <string name="avg">AVG</string>
+    <string name="max">MAX</string>
+    <string name="decibel_values">Decibel value reference</string>
+    <string-array name="decibel_values">
+        <item>10 dB: Breathing, Almost quiet</item>
+        <item>20 dB: Mosquito, Rustling leaves</item>
+        <item>30 dB: Quiet library, Soft background music</item>
+        <item>40 dB: Quiet conversation, Refrigerator humming</item>
+        <item>50 dB: Moderate rainfall, Light traffic noise</item>
+        <item>60 dB: Normal conversation, Office environment</item>
+        <item>70 dB: Vacuum cleaner, Busy street traffic</item>
+        <item>80 dB: Car horn, Garbage disposal</item>
+        <item>90 dB: Motorcycle, Subway train</item>
+        <item>100 dB: Chainsaw, Concert music</item>
+        <item>110 dB: Rock concert, Thunderclap</item>
+        <item>120 dB: Jet engine at takeoff, Ambulance siren</item>
+        <item>130 dB: Shotgun blast, Jackhammer</item>
+        <item>140 dB: Military jet aircraft, Fireworks</item>
+    </string-array>
     <string name="use_device_language">Use device language</string>
     <string name="english" translatable="false">English</string>
     <string name="chinese_simplified" translatable="false">简体中文</string>

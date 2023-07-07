@@ -41,6 +41,7 @@ enum class Permission {
     WRITE_SETTINGS,
     CAMERA,
     SYSTEM_ALERT_WINDOW,
+    RECORD_AUDIO,
     NONE;
 
     fun getText(): String {
@@ -56,7 +57,7 @@ enum class Permission {
         return apiPermissions.contains(this.toString())
     }
 
-    private fun toSysPermission(): String {
+    fun toSysPermission(): String {
         return "android.permission.${this.name}"
     }
 
@@ -65,9 +66,11 @@ enum class Permission {
             this == WRITE_EXTERNAL_STORAGE -> {
                 FileHelper.hasStoragePermission(context)
             }
+
             this == WRITE_SETTINGS -> {
                 Settings.System.canWrite(context)
             }
+
             this == POST_NOTIFICATIONS -> {
                 if (isTIRAMISUPlus()) {
                     context.hasPermission(this.toSysPermission())
@@ -75,9 +78,11 @@ enum class Permission {
                     NotificationManagerCompat.from(context).areNotificationsEnabled()
                 }
             }
+
             this == SYSTEM_ALERT_WINDOW -> {
                 Settings.canDrawOverlays(context)
             }
+
             else -> context.hasPermission(this.toSysPermission())
         }
     }
@@ -133,15 +138,19 @@ enum class Permission {
             this == READ_SMS -> {
                 getString(R.string.need_sms_permission)
             }
+
             this == READ_CALL_LOG -> {
                 getString(R.string.need_call_permission)
             }
+
             this == READ_CONTACTS -> {
                 getString(R.string.need_contact_permission)
             }
+
             this == WRITE_EXTERNAL_STORAGE -> {
                 getString(R.string.need_storage_permission)
             }
+
             else -> ""
         }
     }

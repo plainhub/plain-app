@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CurrencyExchange
+import androidx.compose.material.icons.outlined.GraphicEq
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -42,8 +43,16 @@ fun HomeItemTools(
             ) {
                 navController.navigate(RouteName.EXCHANGE_RATE)
             }
-            Spacer(modifier = Modifier.width(16.dp))
-            Spacer(modifier = Modifier.weight(3f))
+            Spacer(modifier = Modifier.width(8.dp))
+            GridItem(
+                icon = Icons.Outlined.GraphicEq,
+                stringResource(id = R.string.sound_meter),
+                modifier = Modifier.weight(1f)
+            ) {
+                navController.navigate(RouteName.SOUND_METER)
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.weight(2f))
         }
     }
 }

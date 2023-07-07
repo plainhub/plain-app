@@ -193,6 +193,7 @@
     <string name="home_item_title_network">网络</string>
     <string name="home_item_title_education">教育</string>
     <string name="exchange_rate">汇率</string>
+    <string name="sound_meter">分贝仪</string>
     <string name="home_item_title_shipping">快递物流</string>
     <string name="home_item_title_shopping">购物</string>
     <string name="home_item_title_storage">存储</string>
@@ -474,6 +475,26 @@
     <string name="clear">清空</string>
     <string name="tools">工具</string>
     <string name="checked">选中</string>
+    <string name="min">最小值</string>
+    <string name="avg">平均值</string>
+    <string name="max">最大值</string>
+    <string name="decibel_values">分贝值参考</string>
+    <string-array name="decibel_values">
+        <item>10 dB: 呼吸声，几乎无声</item>
+        <item>20 dB: 蚊子，树叶沙沙声</item>
+        <item>30 dB: 安静的图书馆，轻柔的背景音乐</item>
+        <item>40 dB: 轻声交谈，冰箱嗡嗡声</item>
+        <item>50 dB: 中等雨声，轻度交通噪音</item>
+        <item>60 dB: 正常对话，办公室环境</item>
+        <item>70 dB: 吸尘器声音，繁忙的街道交通</item>
+        <item>80 dB: 车喇叭声，垃圾处理器</item>
+        <item>90 dB: 摩托车声音，地铁列车</item>
+        <item>100 dB: 链锯声音，音乐会音乐</item>
+        <item>110 dB: 摇滚音乐会，雷声</item>
+        <item>120 dB: 起飞的喷气发动机声音，救护车警报</item>
+        <item>130 dB: 霰弹枪声，手提钻机</item>
+        <item>140 dB: 军用喷气飞机声音，烟花</item>
+    </string-array>
     <string name="use_device_language">跟随系统设置</string>
     <string name="amoled_dark_theme">AMOLED 深色主题</string>
     <string name="no_browser_error">没有浏览器可以打开此页面。</string>

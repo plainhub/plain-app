@@ -15,4 +15,5 @@ enum class RouteName {
     SESSIONS,
     WEB_DEV,
     EXCHANGE_RATE,
+    SOUND_METER,
 }

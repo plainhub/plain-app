@@ -32,6 +32,15 @@ object FormatHelper {
         return format.format(value)
     }
 
+    fun formatFloat(value: Float, digits: Int = 2, isGroupingUsed: Boolean = true): String {
+        val format = DecimalFormat()
+        format.minimumFractionDigits = digits
+        format.maximumFractionDigits = digits
+        format.isGroupingUsed = isGroupingUsed
+        format.roundingMode = RoundingMode.HALF_UP
+        return format.format(value)
+    }
+
     fun formatDuration(totalSeconds: Long, alwaysShowHour: Boolean = false): String {
         val seconds = totalSeconds % 60
         val minutes = totalSeconds / 60 % 60

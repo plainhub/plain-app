@@ -505,7 +505,7 @@ class SXGraphQL(val schema: Schema) {
                             LocalStorage.audioPlaying?.path ?: "",
                             context.allowSensitivePermissions(),
                             sdcardPath = FileSystemHelper.getSDCardPath(context),
-                            internalStoragePath = FileSystemHelper.getInternalStoragePath(context),
+                             internalStoragePath = FileSystemHelper.getInternalStoragePath(context),
                             downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
                         )
                     }
