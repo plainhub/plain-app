@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.FormatHelper
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.helpers.SoundMeterHelper
@@ -92,12 +93,13 @@ fun SoundMeterPage(
                 val readSize = audioRecord!!.read(buffer, 0, bufferSize)
                 if (readSize > 0) {
                     val amplitudeValue = SoundMeterHelper.getMaxAmplitude(buffer, readSize)
-                    decibel = abs(SoundMeterHelper.amplitudeToDecibel(amplitudeValue))
-                    if (decibel < 500) {
+                    val value = abs(SoundMeterHelper.amplitudeToDecibel(amplitudeValue))
+                    if (value.isFinite()) {
+                        decibel = value
                         decibelValues.add(decibel)
                         avg = decibelValues.average().toFloat()
-                        max = decibelValues.max()
-                        min = decibelValues.min()
+                        max = decibelValues.maxOrNull() ?: 0f
+                        min = decibelValues.minOrNull() ?: 0f
                     }
                 }
                 delay(100)
