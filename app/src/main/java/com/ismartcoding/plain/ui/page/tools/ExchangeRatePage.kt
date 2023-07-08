@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -54,7 +55,7 @@ fun ExchangeRatePage(
     ExchangeRateProvider {
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
-        var updatedTs by remember { mutableStateOf<Long>(0L) }
+        var updatedTs by remember { mutableLongStateOf(0L) }
         var rateItems by remember { mutableStateOf<List<RateItem>?>(null) }
         val config = LocalExchangeRate.current
         var editValueDialogVisible by remember { mutableStateOf(false) }
