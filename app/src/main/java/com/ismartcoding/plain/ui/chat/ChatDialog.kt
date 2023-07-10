@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.softinput.setWindowSoftInput
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.DialogChatBinding
@@ -22,6 +23,8 @@ import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.ui.extensions.onBack
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.web.HttpServerEvents
+import com.ismartcoding.plain.web.models.ChatItem
+import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import kotlinx.coroutines.launch
@@ -72,7 +75,13 @@ class ChatDialog() : BaseDialog<DialogChatBinding>() {
         receiveEvent<SendMessageEvent> { event ->
             lifecycleScope.launch {
                 val items = withIO { ChatHelper.createChatItemsAsync(event.content) }
-                sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED))
+                val models = mutableListOf<ChatItem>()
+                items.forEach {
+                    models.add(it.toModel().apply {
+                        data = this.getContentData()
+                    })
+                }
+                sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, jsonEncode(models)))
                 binding.chatList.addAll(items)
                 DialogHelper.hideLoading()
             }
@@ -89,6 +98,9 @@ class ChatDialog() : BaseDialog<DialogChatBinding>() {
                     AppDatabase.instance.chatDao().updateData(update)
                 }
                 binding.chatList.update(event.chatItem)
+                sendEvent(WebSocketEvent(EventType.MESSAGE_UPDATED, jsonEncode(listOf(event.chatItem.toModel().apply {
+                    data = this.getContentData()
+                }))))
             }
         }
     }

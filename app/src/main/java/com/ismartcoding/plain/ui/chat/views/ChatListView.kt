@@ -21,6 +21,7 @@ import com.ismartcoding.lib.brv.utils.mutable
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.setSelectableItemBackground
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.databinding.ChatItemFilesBinding
@@ -39,8 +40,11 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.chat.ChatItemDetailDialog
 import com.ismartcoding.plain.ui.chat.EditChatTextDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.web.websocket.EventType
+import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 
 class ChatListView(context: Context, attrs: AttributeSet? = null) : RecyclerView(context, attrs), LifecycleObserver {
     private val pool = RecycledViewPool()
@@ -174,6 +178,9 @@ class ChatListView(context: Context, attrs: AttributeSet? = null) : RecyclerView
                                     DialogHelper.confirmToAction(context, R.string.confirm_to_delete) {
                                         lifecycle.coroutineScope.launch {
                                             ChatHelper.deleteAsync(chatItem)
+                                            val json = JSONArray()
+                                            json.put(chatItem.id)
+                                            sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, json.toString()))
                                         }
                                     }
                                 }

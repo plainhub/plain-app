@@ -187,7 +187,7 @@ class SXGraphQL(val schema: Schema) {
                     }
                     property("data") {
                         resolver { c: ChatItem ->
-                            c.getData()
+                            c.getContentData()
                         }
                     }
                 }
