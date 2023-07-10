@@ -87,19 +87,23 @@ fun SoundMeterPage(
             AudioFormat.ENCODING_PCM_16BIT,
             bufferSize
         )
-        audioRecord?.startRecording()
+        if (audioRecord?.state == AudioRecord.STATE_INITIALIZED) {
+            audioRecord?.startRecording()
+        }
         scope.launch(Dispatchers.IO) {
             while (isRunning) {
-                val readSize = audioRecord!!.read(buffer, 0, bufferSize)
-                if (readSize > 0) {
-                    val amplitudeValue = SoundMeterHelper.getMaxAmplitude(buffer, readSize)
-                    val value = abs(SoundMeterHelper.amplitudeToDecibel(amplitudeValue))
-                    if (value.isFinite()) {
-                        decibel = value
-                        decibelValues.add(decibel)
-                        avg = decibelValues.average().toFloat()
-                        max = decibelValues.maxOrNull() ?: 0f
-                        min = decibelValues.minOrNull() ?: 0f
+                if (audioRecord != null) {
+                    val readSize = audioRecord!!.read(buffer, 0, bufferSize)
+                    if (readSize > 0) {
+                        val amplitudeValue = SoundMeterHelper.getMaxAmplitude(buffer, readSize)
+                        val value = abs(SoundMeterHelper.amplitudeToDecibel(amplitudeValue))
+                        if (value.isFinite()) {
+                            decibel = value
+                            decibelValues.add(decibel)
+                            avg = decibelValues.average().toFloat()
+                            max = decibelValues.maxOrNull() ?: 0f
+                            min = decibelValues.minOrNull() ?: 0f
+                        }
                     }
                 }
                 delay(100)

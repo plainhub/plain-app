@@ -57,8 +57,6 @@ class HttpServerEnabledEvent(val enabled: Boolean)
 class StartHttpServerEvent
 class StartScreenMirrorEvent
 class RestartAppEvent
-class HttpServerPortChanged
-
 
 class SendMessageEvent(val content: DMessageContent)
 class UpdateMessageEvent(var chatItem: DChat)

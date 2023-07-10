@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.pm.ShortcutManager
+import android.content.res.Configuration
 import android.database.Cursor
 import android.media.MediaScannerConnection
 import android.net.ConnectivityManager
@@ -20,6 +21,7 @@ import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.isTIRAMISUPlus
 import java.io.File
 
@@ -33,7 +35,7 @@ fun Context.getTextWidth(text: String): Float = TextView(this).paint.measureText
 fun Context.dp2px(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
 
 fun Context.getWindowHeight(): Int {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+    if (isRPlus()) {
         return getSystemService(WindowManager::class.java).currentWindowMetrics.bounds.height()
     }
 
@@ -45,7 +47,7 @@ fun Context.getWindowHeight(): Int {
 }
 
 fun Context.getWindowWidth(): Int {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+    if (isRPlus()) {
         return getSystemService(WindowManager::class.java).currentWindowMetrics.bounds.width()
     }
 
@@ -250,4 +252,8 @@ fun Context.hasPermissionInManifest(vararg permissions: String): Boolean {
 
 fun Context.allowSensitivePermissions(): Boolean {
     return hasPermissionInManifest(Manifest.permission.READ_SMS)
+}
+
+fun Context.isPortrait(): Boolean {
+    return resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 }
