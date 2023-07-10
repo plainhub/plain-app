@@ -5,8 +5,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import com.ismartcoding.lib.data.SortBy
 import com.ismartcoding.lib.data.enums.SortDirection
-import com.ismartcoding.lib.isRPlus
-import com.ismartcoding.lib.isTIRAMISUPlus
+import com.ismartcoding.lib.isTPlus
 
 fun Bundle.sort(sortBy: SortBy) {
     putStringArray(
@@ -36,6 +35,6 @@ fun Bundle.paging(offset: Int, limit: Int) {
 }
 
 inline fun <reified T : Parcelable> Bundle.parcelable(key: String): T? = when {
-    isTIRAMISUPlus() -> getParcelable(key, T::class.java)
+    isTPlus() -> getParcelable(key, T::class.java)
     else -> @Suppress("DEPRECATION") getParcelable(key) as? T
 }

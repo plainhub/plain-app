@@ -16,4 +16,7 @@ fun isSPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 fun isSV2Plus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S_V2
 
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.TIRAMISU)
-fun isTIRAMISUPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+fun isTPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+
+@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+fun isUPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE

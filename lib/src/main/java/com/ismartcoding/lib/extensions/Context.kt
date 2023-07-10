@@ -11,7 +11,6 @@ import android.media.MediaScannerConnection
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
-import android.os.Build
 import android.provider.MediaStore
 import android.telecom.TelecomManager
 import android.util.DisplayMetrics
@@ -22,7 +21,7 @@ import androidx.annotation.DrawableRes
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.ismartcoding.lib.isRPlus
-import com.ismartcoding.lib.isTIRAMISUPlus
+import com.ismartcoding.lib.isTPlus
 import java.io.File
 
 
@@ -241,7 +240,7 @@ fun Context.hasPermissions(vararg permissions: String): Boolean {
 }
 
 fun Context.hasPermissionInManifest(vararg permissions: String): Boolean {
-    val packageInfo = if (isTIRAMISUPlus()) {
+    val packageInfo = if (isTPlus()) {
         packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong()))
     } else {
         @Suppress("DEPRECATION")

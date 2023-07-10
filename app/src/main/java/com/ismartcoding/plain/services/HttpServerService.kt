@@ -1,8 +1,10 @@
 package com.ismartcoding.plain.services
 
 import android.content.Intent
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import androidx.lifecycle.LifecycleService
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.lib.isUPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
@@ -39,7 +41,11 @@ class HttpServerService : LifecycleService() {
             "com.ismartcoding.plain.action.stop_http_server",
             getString(R.string.api_service_is_running)
         )
-        startForeground(1, notification)
+        if (isUPlus()) {
+            startForeground(1, notification, FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+        } else {
+            startForeground(1, notification)
+        }
         return START_STICKY
     }
 

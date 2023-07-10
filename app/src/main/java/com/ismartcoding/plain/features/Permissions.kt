@@ -15,7 +15,7 @@ import com.ismartcoding.lib.extensions.allowSensitivePermissions
 import com.ismartcoding.lib.extensions.hasPermission
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.isRPlus
-import com.ismartcoding.lib.isTIRAMISUPlus
+import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
@@ -72,7 +72,7 @@ enum class Permission {
             }
 
             this == POST_NOTIFICATIONS -> {
-                if (isTIRAMISUPlus()) {
+                if (isTPlus()) {
                     context.hasPermission(this.toSysPermission())
                 } else {
                     NotificationManagerCompat.from(context).areNotificationsEnabled()
@@ -92,7 +92,7 @@ enum class Permission {
             return true
         } else {
             if (this == POST_NOTIFICATIONS) {
-                if (isTIRAMISUPlus()) {
+                if (isTPlus()) {
                     if (!ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.instance.get()!!, this.toSysPermission())) {
                         getEnableNotificationIntent(context)
                     } else {
@@ -181,7 +181,7 @@ enum class Permission {
             intentLauncher?.launch(intent)
         } else if (this == POST_NOTIFICATIONS) {
             val permission = this.toSysPermission()
-            if (isTIRAMISUPlus()) {
+            if (isTPlus()) {
                 val activity = MainActivity.instance.get()!!
                 if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
                     intentLauncher?.launch(Permission.getEnableNotificationIntent(context))

@@ -45,6 +45,8 @@ import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.ShowMessageEvent
 import com.ismartcoding.plain.ui.page.Main
 import com.ismartcoding.plain.web.*
+import com.ismartcoding.plain.web.websocket.EventType
+import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import io.ktor.server.request.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.launch
@@ -63,6 +65,10 @@ class MainActivity : AppCompatActivity() {
                 service.putExtra("code", result.resultCode)
                 service.putExtra("data", result.data!!)
                 startService(service)
+            } else {
+                ScreenMirrorService.instance?.getLatestImageBase64()?.let {
+                    sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, it, false))
+                }
             }
         }
     }

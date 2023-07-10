@@ -201,7 +201,7 @@ class AudioPlayerService : LifecycleService() {
         intentFilter.addAction(NOTIFICATION_PLAY)
         intentFilter.addAction(NOTIFICATION_NEXT)
         intentFilter.addAction(NOTIFICATION_CANCEL)
-        registerReceiver(receiver, intentFilter)
+        registerReceiver(receiver, intentFilter, RECEIVER_NOT_EXPORTED)
     }
 
     private fun createNotification(): Notification {
