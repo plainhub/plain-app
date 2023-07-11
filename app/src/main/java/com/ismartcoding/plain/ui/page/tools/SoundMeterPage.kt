@@ -113,8 +113,10 @@ fun SoundMeterPage(
 
     DisposableEffect(Unit) {
         onDispose {
-            audioRecord?.stop()
-            audioRecord?.release()
+            if (audioRecord?.state == AudioRecord.STATE_INITIALIZED) {
+                audioRecord?.stop()
+                audioRecord?.release()
+            }
         }
     }
 
