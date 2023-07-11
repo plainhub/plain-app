@@ -50,7 +50,7 @@ object NetworkHelper {
             if (map.isNotEmpty()) {
                 return map["wlan0"] ?: map.values.first()
             }
-        } catch (ex: SocketException) {
+        } catch (ex: Exception) {
             ex.printStackTrace()
         }
 
