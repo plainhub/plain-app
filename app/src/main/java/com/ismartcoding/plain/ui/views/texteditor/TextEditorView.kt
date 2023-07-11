@@ -24,7 +24,6 @@ class TextEditorView(context: Context, attrs: AttributeSet?) : CustomViewBase(co
     private val pageSystemButtons = PageSystemButtons(context, this, binding.fabPrev, binding.fabNext)
 
     private val updateHandler = Handler(Looper.getMainLooper())
-    private val colorRunnableDuringEditing = Runnable { binding.editor.replaceTextKeepCursor(null) }
     private val colorRunnableDuringScroll = Runnable { binding.editor.replaceTextKeepCursor(null) }
     private var isInitialized = false
     private var oldText = ""
@@ -77,7 +76,7 @@ class TextEditorView(context: Context, attrs: AttributeSet?) : CustomViewBase(co
 
         binding.editor.onTextChanged = {
             onTextChanged?.invoke()
-            updateTextSyntax()
+           // updateTextSyntax()
         }
 
         binding.accessory.getEditor = {
@@ -175,7 +174,6 @@ class TextEditorView(context: Context, attrs: AttributeSet?) : CustomViewBase(co
     }
 
     private fun updateTextSyntax() {
-        updateHandler.removeCallbacks(colorRunnableDuringEditing)
         updateHandler.removeCallbacks(colorRunnableDuringScroll)
         updateHandler.postDelayed(colorRunnableDuringScroll, SYNTAX_DELAY_MILLIS_SHORT.toLong())
     }
