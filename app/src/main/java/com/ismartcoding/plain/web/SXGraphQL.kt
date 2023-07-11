@@ -493,7 +493,7 @@ class SXGraphQL(val schema: Schema) {
                     resolver { ->
                         val context = MainApp.instance
                         App(
-                            usbConnected = PlugInControlReceiver.isUSBConnected(),
+                            usbConnected = PlugInControlReceiver.isUSBConnected(context),
                             fileIdToken = LocalStorage.fileIdToken,
                             externalFilesDir = context.getExternalFilesDir(null)?.path ?: "",
                             if (TempData.demoMode) "Demo phone" else PhoneHelper.getDeviceName(context),

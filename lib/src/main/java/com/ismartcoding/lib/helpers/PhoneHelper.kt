@@ -7,6 +7,7 @@ import android.os.BatteryManager
 import android.os.Build
 import android.provider.Settings
 import com.ismartcoding.lib.extensions.capitalize
+import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.lib.logcat.LogCat
 
 object PhoneHelper {
@@ -40,6 +41,10 @@ object PhoneHelper {
 
     private fun getBatteryStatusIntent(context: Context): Intent? {
         val batFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        if (isTPlus()) {
+            return context.registerReceiver(null, batFilter, Context.RECEIVER_NOT_EXPORTED)
+        }
+
         return context.registerReceiver(null, batFilter)
     }
 }

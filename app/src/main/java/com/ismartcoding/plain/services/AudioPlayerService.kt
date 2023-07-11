@@ -18,6 +18,7 @@ import com.ismartcoding.lib.Weak
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
@@ -201,7 +202,11 @@ class AudioPlayerService : LifecycleService() {
         intentFilter.addAction(NOTIFICATION_PLAY)
         intentFilter.addAction(NOTIFICATION_NEXT)
         intentFilter.addAction(NOTIFICATION_CANCEL)
-        registerReceiver(receiver, intentFilter, RECEIVER_NOT_EXPORTED)
+        if (isTPlus()) {
+            registerReceiver(receiver, intentFilter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(receiver, intentFilter)
+        }
     }
 
     private fun createNotification(): Notification {
