@@ -47,6 +47,8 @@ import com.ismartcoding.plain.ui.theme.palette.onDark
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.web.SessionList
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.lazy.items
+import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,7 +56,8 @@ fun SessionsPage(
     navController: NavHostController,
 ) {
     val context = LocalContext.current
-    val sessions by AppDatabase.instance.sessionDao().getAllFlow().collectAsState(initial = emptyList())
+    val sessionDao = AppDatabase.instance.sessionDao()
+    val sessions by sessionDao.getAllFlow().collectAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
     var updatedTs by remember { mutableLongStateOf(0L) }
 
@@ -75,59 +78,57 @@ fun SessionsPage(
                     item {
                         DisplayText(text = stringResource(id = R.string.sessions))
                     }
-                    item(updatedTs) {
-                        sessions.forEach { m ->
-                            Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 40.dp, end = 24.dp),
-                                verticalAlignment = Alignment.CenterVertically,
+                    items(sessions, key = { it.token + updatedTs }) { m ->
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(start = 40.dp, end = 24.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.last_visit_at) + " " + m.updatedAt.formatDateTime(),
+                                modifier = Modifier
+                                    .weight(1f),
+                                color = MaterialTheme.colorScheme.primary,
+                                style = MaterialTheme.typography.labelLarge
+                            )
+                            PIconButton(
+                                imageVector = Icons.Outlined.Delete,
+                                contentDescription = stringResource(R.string.delete),
+                                tint = MaterialTheme.colorScheme.onSurface,
                             ) {
-                                Text(
-                                    text = stringResource(R.string.last_visit_at) + " " + m.updatedAt.formatDateTime(),
-                                    modifier = Modifier
-                                        .weight(1f),
-                                    color = MaterialTheme.colorScheme.primary,
-                                    style = MaterialTheme.typography.labelLarge
-                                )
-                                PIconButton(
-                                    imageVector = Icons.Outlined.Delete,
-                                    contentDescription = stringResource(R.string.delete),
-                                    tint = MaterialTheme.colorScheme.onSurface,
-                                ) {
-                                    DialogHelper.confirmToAction(context, R.string.confirm_to_delete) {
-                                        scope.launch {
-                                            withIO {
-                                                SessionList.deleteAsync(m)
-                                                HttpServerManager.loadTokenCache()
-                                            }
+                                DialogHelper.confirmToAction(context, R.string.confirm_to_delete) {
+                                    scope.launch {
+                                        withIO {
+                                            SessionList.deleteAsync(m)
+                                            HttpServerManager.loadTokenCache()
                                         }
                                     }
                                 }
                             }
+                        }
+                        Column(
+                            modifier = Modifier
+                                .padding(horizontal = 24.dp)
+                                .fillMaxWidth()
+                                .background(
+                                    color = MaterialTheme.colorScheme.surface onDark MaterialTheme.colorScheme.inverseOnSurface,
+                                    shape = RoundedCornerShape(16.dp)
+                                )
+                        ) {
                             Column(
                                 modifier = Modifier
-                                    .padding(horizontal = 24.dp)
-                                    .fillMaxWidth()
-                                    .background(
-                                        color = MaterialTheme.colorScheme.surface onDark MaterialTheme.colorScheme.inverseOnSurface,
-                                        shape = RoundedCornerShape(16.dp)
-                                    )
+                                    .padding(16.dp, 16.dp, 16.dp, 8.dp)
                             ) {
-                                Column(
-                                    modifier = Modifier
-                                        .padding(16.dp, 16.dp, 16.dp, 8.dp)
-                                ) {
-                                    SubItem(R.string.client_id, m.clientId)
-                                    SubItem(R.string.ip_address, m.clientIP)
-                                    SubItem(R.string.created_at, m.createdAt.formatDateTime())
-                                    SubItem(R.string.os, m.osName.capitalize() + " " + m.osVersion)
-                                    SubItem(R.string.browser, m.browserName.capitalize() + " " + m.browserVersion)
-                                    SubItem(R.string.status, stringResource(id = if (HttpServerManager.wsSessions.any { it.clientId == m.clientId }) R.string.online else R.string.offline))
-                                }
+                                SubItem(R.string.client_id, m.clientId)
+                                SubItem(R.string.ip_address, m.clientIP)
+                                SubItem(R.string.created_at, m.createdAt.formatDateTime())
+                                SubItem(R.string.os, m.osName.capitalize() + " " + m.osVersion)
+                                SubItem(R.string.browser, m.browserName.capitalize() + " " + m.browserVersion)
+                                SubItem(R.string.status, stringResource(id = if (HttpServerManager.wsSessions.any { it.clientId == m.clientId }) R.string.online else R.string.offline))
                             }
-                            Spacer(modifier = Modifier.height(16.dp))
                         }
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                     item {
                         BottomSpace()

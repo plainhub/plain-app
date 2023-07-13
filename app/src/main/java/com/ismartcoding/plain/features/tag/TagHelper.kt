@@ -76,14 +76,20 @@ object TagHelper {
     }
 
     fun deleteTagRelationByKeys(keys: Set<String>, tagType: TagType) {
-        tagRelationDao.deleteByKeys(keys, tagType.value)
+        keys.chunked(50).forEach { chunk ->
+            tagRelationDao.deleteByKeys(chunk.toSet(), tagType.value)
+        }
     }
 
     fun deleteTagRelationByKeysTagId(keys: Set<String>, tagId: String) {
-        tagRelationDao.deleteByKeysTagId(keys, tagId)
+        keys.chunked(50).forEach { chunk ->
+            tagRelationDao.deleteByKeysTagId(chunk.toSet(), tagId)
+        }
     }
 
     fun deleteTagRelationByKeysTagIds(keys: Set<String>, tagIds: Set<String>) {
-        tagRelationDao.deleteByKeysTagIds(keys, tagIds)
+        keys.chunked(50).forEach { chunk ->
+            tagRelationDao.deleteByKeysTagIds(chunk.toSet(), tagIds)
+        }
     }
 }
