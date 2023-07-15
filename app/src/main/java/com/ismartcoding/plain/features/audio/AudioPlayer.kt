@@ -20,10 +20,10 @@ class AudioPlayer : IMediaPlayer {
     }
 
     override fun isPlaying(): Boolean {
-        return mediaPlayer.isPlaying
+        return mediaPlayer?.isPlaying == true
     }
 
-    private val mediaPlayer: MediaPlayer = MediaPlayer()
+    private var mediaPlayer: MediaPlayer? = null
     private val audioManager by lazy { MainApp.instance.applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
     override var isPausedByTransientLossOfFocus = false
     private val audioFocusRequest = AudioFocusHelper.createRequest(this)
@@ -31,35 +31,35 @@ class AudioPlayer : IMediaPlayer {
 
     var pendingQuit: Boolean = false
 
-    init {
-        setListen()
-    }
-
     fun setPlayerProgress(progress: Int) {
         playerProgress = progress * 1000
     }
 
     fun getPlayerProgress(): Int {
-        return if (mediaPlayer.isPlaying) {
-            mediaPlayer.currentPosition / 1000
+        return if (mediaPlayer?.isPlaying == true) {
+            mediaPlayer!!.currentPosition / 1000
         } else {
             playerProgress / 1000
         }
     }
 
     fun play(path: String) {
-        if (mediaPlayer.isPlaying) {
-            mediaPlayer.stop()
+        if (mediaPlayer == null) {
+            mediaPlayer = MediaPlayer()
+            setListen()
         }
-        mediaPlayer.reset()
-        mediaPlayer.setAudioAttributes(
+        if (mediaPlayer?.isPlaying == true) {
+            mediaPlayer?.stop()
+        }
+        mediaPlayer?.reset()
+        mediaPlayer?.setAudioAttributes(
             AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_MEDIA)
                 .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                 .build()
         )
-        mediaPlayer.setDataSource(MainApp.instance, Uri.parse(path))
-        mediaPlayer.prepareAsync()
+        mediaPlayer?.setDataSource(MainApp.instance, Uri.parse(path))
+        mediaPlayer?.prepareAsync()
         requestFocus()
     }
 
@@ -76,9 +76,9 @@ class AudioPlayer : IMediaPlayer {
     }
 
     fun seekTo(progress: Int) {
-        if (mediaPlayer.isPlaying) {
+        if (mediaPlayer?.isPlaying == true) {
             playerProgress = progress * 1000
-            mediaPlayer.seekTo(playerProgress)
+            mediaPlayer?.seekTo(playerProgress)
         } else {
             setPlayerProgress(progress)
             play()
@@ -132,10 +132,10 @@ class AudioPlayer : IMediaPlayer {
     }
 
     override fun pause() {
-        playerProgress = mediaPlayer.currentPosition
+        playerProgress = mediaPlayer?.currentPosition ?: 0
 
-        if (mediaPlayer.isPlaying) {
-            mediaPlayer.pause()
+        if (mediaPlayer?.isPlaying == true) {
+            mediaPlayer?.pause()
         }
 
         setChangedNotify(AudioAction.PAUSE)
@@ -146,29 +146,29 @@ class AudioPlayer : IMediaPlayer {
     }
 
     override fun stop() {
-        if (mediaPlayer.isPlaying) {
-            mediaPlayer.stop()
-            mediaPlayer.release()
+        if (mediaPlayer?.isPlaying == true) {
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
             abandonFocus()
         }
     }
 
     override fun setVolume(volume: Float) {
-        mediaPlayer.setVolume(volume, volume)
+        mediaPlayer?.setVolume(volume, volume)
     }
 
     private fun setListen() {
-        mediaPlayer.setOnPreparedListener {
-            mediaPlayer.seekTo(playerProgress)
-            mediaPlayer.start()
+        mediaPlayer?.setOnPreparedListener {
+            mediaPlayer?.seekTo(playerProgress)
+            mediaPlayer?.start()
             setChangedNotify(AudioAction.PLAY)
         }
 
-        mediaPlayer.setOnCompletionListener {
+        mediaPlayer?.setOnCompletionListener {
             setChangedNotify(AudioAction.COMPLETE)
         }
 
-        mediaPlayer.setOnErrorListener { mp, what, extra ->
+        mediaPlayer?.setOnErrorListener { mp, what, extra ->
             LogCat.e("MediaPlayer error type:$what, code:$extra, currentPosition:${mp.currentPosition}")
             return@setOnErrorListener false
         }

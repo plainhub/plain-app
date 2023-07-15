@@ -20,6 +20,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isPortrait
 import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.isQPlus
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.helpers.NotificationHelper
@@ -164,20 +165,24 @@ class ScreenMirrorService : LifecycleService() {
         )
 
         mImageReader?.setOnImageAvailableListener({
-            val image = mImageReader?.acquireLatestImage()
-            if (image != null) {
-                val planes = image.planes
-                val pixelStride = planes[0].pixelStride
-                val buffer = planes[0].buffer
-                val rowStride = planes[0].rowStride
-                val newWidth = rowStride / pixelStride
+            try {
+                val image = mImageReader?.acquireLatestImage()
+                if (image != null) {
+                    val planes = image.planes
+                    val pixelStride = planes[0].pixelStride
+                    val buffer = planes[0].buffer
+                    val rowStride = planes[0].rowStride
+                    val newWidth = rowStride / pixelStride
 
-                mBitmap = Bitmap.createBitmap(newWidth, height, Bitmap.Config.ARGB_8888)
-                mBitmap?.copyPixelsFromBuffer(buffer)
-                if (mBitmap != null) {
-                    sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, bitmapToBase64Image(mBitmap!!, newWidth, height), false))
+                    mBitmap = Bitmap.createBitmap(newWidth, height, Bitmap.Config.ARGB_8888)
+                    mBitmap?.copyPixelsFromBuffer(buffer)
+                    if (mBitmap != null) {
+                        sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, bitmapToBase64Image(mBitmap!!, newWidth, height), false))
+                    }
+                    image.close()
                 }
-                image.close()
+            } catch (ex: Exception) {
+                LogCat.e(ex)
             }
         }, handler!!)
     }

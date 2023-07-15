@@ -68,9 +68,11 @@ fun SoundMeterPage(
 
     LaunchedEffect(isRunning) {
         if (!isRunning) {
-            audioRecord?.stop()
-            audioRecord?.release()
-            audioRecord = null
+            if (audioRecord?.state == AudioRecord.STATE_INITIALIZED) {
+                audioRecord?.stop()
+                audioRecord?.release()
+                audioRecord = null
+            }
             return@LaunchedEffect
         }
 

@@ -3,6 +3,7 @@ package com.ismartcoding.plain.services
 import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.coroutineScope
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.isUPlus
 import com.ismartcoding.lib.logcat.LogCat
@@ -10,8 +11,9 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.web.HttpServerManager
-import io.ktor.server.application.*
-import kotlin.concurrent.thread
+import io.ktor.server.application.ApplicationStopPreparing
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class HttpServerService : LifecycleService() {
     override fun onCreate() {
@@ -22,7 +24,18 @@ class HttpServerService : LifecycleService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        thread {
+        val notification = NotificationHelper.createServiceNotification(
+            this,
+            "com.ismartcoding.plain.action.stop_http_server",
+            getString(R.string.api_service_is_running)
+        )
+        if (isUPlus()) {
+            startForeground(1, notification, FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+        } else {
+            startForeground(1, notification)
+        }
+
+        lifecycle.coroutineScope.launch(Dispatchers.IO) {
             try {
                 if (MainApp.instance.httpServer == null) {
                     MainApp.instance.httpServer = HttpServerManager.createHttpServer(MainApp.instance)
@@ -36,16 +49,7 @@ class HttpServerService : LifecycleService() {
                 LogCat.e(ex.toString())
             }
         }
-        val notification = NotificationHelper.createServiceNotification(
-            this,
-            "com.ismartcoding.plain.action.stop_http_server",
-            getString(R.string.api_service_is_running)
-        )
-        if (isUPlus()) {
-            startForeground(1, notification, FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
-        } else {
-            startForeground(1, notification)
-        }
+
         return START_STICKY
     }
 

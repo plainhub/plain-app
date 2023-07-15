@@ -60,6 +60,7 @@ import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.theme.palette.onDark
 import com.ismartcoding.plain.ui.theme.palette.onLight
 import com.ismartcoding.plain.web.HttpServerManager
+import androidx.compose.foundation.lazy.items
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -220,51 +221,51 @@ fun WebConsolePage(
                         text = stringResource(R.string.permissions),
                     )
                 }
-                item {
-                    permissionList.forEach { m ->
-                        val permission = m.permission
-                        if (permission == Permission.NONE) {
-                            PListItem(
-                                title = permission.getText(),
-                                showMore = true,
-                                onClick = {
-                                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                                    intent.data = Uri.fromParts("package", context.packageName, null)
-                                    context.startActivity(intent)
-                                })
-                        } else {
-                            PListItem(
-                                title = permission.getText(),
-                                desc = stringResource(if (m.granted) R.string.system_permission_granted else R.string.system_permission_not_granted),
-                                showMore = permission == Permission.SYSTEM_ALERT_WINDOW,
-                                onClick = {
-                                    val enable = !permission.isEnabled(context)
-                                    ApiPermissionsPreference.put(context, scope, permission, enable)
-                                    if (permission == Permission.SYSTEM_ALERT_WINDOW) {
-                                        intentLauncherMap[permission]?.launch(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}")))
-                                    } else {
-                                        if (enable) {
-                                            if (m.granted) {
-                                                return@PListItem
-                                            }
-                                            permission.request(context, launcher = launcherMap[permission], intentLauncher = intentLauncherMap[permission])
+                items(permissionList) { m ->
+                    val permission = m.permission
+                    if (permission == Permission.NONE) {
+                        PListItem(
+                            title = permission.getText(),
+                            showMore = true,
+                            onClick = {
+                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                intent.data = Uri.fromParts("package", context.packageName, null)
+                                context.startActivity(intent)
+                            })
+                    } else {
+                        PListItem(
+                            title = permission.getText(),
+                            desc = stringResource(if (m.granted) R.string.system_permission_granted else R.string.system_permission_not_granted),
+                            showMore = permission == Permission.SYSTEM_ALERT_WINDOW,
+                            onClick = {
+                                val enable = !permission.isEnabled(context)
+                                ApiPermissionsPreference.put(context, scope, permission, enable)
+                                if (permission == Permission.SYSTEM_ALERT_WINDOW) {
+                                    intentLauncherMap[permission]?.launch(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}")))
+                                } else {
+                                    if (enable) {
+                                        if (m.granted) {
+                                            return@PListItem
                                         }
+                                        permission.request(context, launcher = launcherMap[permission], intentLauncher = intentLauncherMap[permission])
                                     }
-                                }) {
-                                if (permission != Permission.SYSTEM_ALERT_WINDOW) {
-                                    PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
-                                        ApiPermissionsPreference.put(context, scope, permission, enable)
-                                        if (enable) {
-                                            if (m.granted) {
-                                                return@PSwitch
-                                            }
-                                            permission.request(context, launcher = launcherMap[permission], intentLauncher = intentLauncherMap[permission])
+                                }
+                            }) {
+                            if (permission != Permission.SYSTEM_ALERT_WINDOW) {
+                                PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
+                                    ApiPermissionsPreference.put(context, scope, permission, enable)
+                                    if (enable) {
+                                        if (m.granted) {
+                                            return@PSwitch
                                         }
+                                        permission.request(context, launcher = launcherMap[permission], intentLauncher = intentLauncherMap[permission])
                                     }
                                 }
                             }
                         }
                     }
+                }
+                item {
                     BottomSpace()
                 }
             }

@@ -48,7 +48,6 @@ import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.web.SessionList
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.items
-import kotlinx.coroutines.flow.first
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

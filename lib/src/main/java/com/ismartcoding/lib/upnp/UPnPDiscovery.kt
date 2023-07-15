@@ -64,13 +64,18 @@ MAN: "ssdp:discover"
                         trySend(device)
                     }
                 }
-            } catch (e: IOException) {
+            } catch (e: Exception) {
+                LogCat.e(e)
                 e.printStackTrace()
             } finally {
             }
             awaitClose {
-                socket?.leaveGroup(group)
-                socket?.close()
+                try {
+                    socket?.leaveGroup(group)
+                    socket?.close()
+                } catch (e: Exception) {
+                    LogCat.e(e)
+                }
                 lock.release()
             }
         }
