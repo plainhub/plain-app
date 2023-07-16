@@ -66,11 +66,11 @@ class ChatInputView(context: Context, attrs: AttributeSet? = null) : CustomViewB
                 event.uris.forEach { uri ->
                     context.contentResolver.query(uri, null, null, null, null)
                         ?.use { cursor ->
-                            cursor.moveToFirst()
-                            val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME)
-                            val size = cursor.getLongValue(OpenableColumns.SIZE)
-                            cursor.close()
                             try {
+                                cursor.moveToFirst()
+                                val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME)
+                                val size = cursor.getLongValue(OpenableColumns.SIZE)
+                                cursor.close()
                                 val dir = when {
                                     fileName.isVideoFast() -> {
                                         Environment.DIRECTORY_MOVIES
@@ -98,6 +98,7 @@ class ChatInputView(context: Context, attrs: AttributeSet? = null) : CustomViewB
                                 items.add(DMessageFile(dst, size, dstFile.getDuration(context)))
                             } catch (ex: Exception) {
                                 // the picked file could be deleted
+                                DialogHelper.showMessage(ex)
                                 ex.printStackTrace()
                             }
                         }
