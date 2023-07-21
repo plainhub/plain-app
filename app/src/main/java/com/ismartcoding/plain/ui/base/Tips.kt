@@ -19,7 +19,7 @@ fun Tips(
         Text(
             modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(horizontal = 16.dp, vertical = 16.dp),
             text = text,
             style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Light),
             color = MaterialTheme.colorScheme.onSurfaceVariant,

@@ -1,13 +1,14 @@
 package com.ismartcoding.plain.features.vocabulary
 
 import com.ismartcoding.plain.LocalStorage
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DVocabulary
 import kotlinx.datetime.Clock
 
 object VocabularyList {
     fun getItemsAsync(): List<DVocabulary> {
-        return AppDatabase.instance.vocabularyDao().getAll(LocalStorage.selectedBoxId)
+        return AppDatabase.instance.vocabularyDao().getAll(TempData.selectedBoxId)
     }
 
     fun addOrUpdateAsync(id: String, updateItem: DVocabulary.() -> Unit) {

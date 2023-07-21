@@ -8,6 +8,7 @@ import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.AllItemsOption
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.DialogSelectItemBinding
@@ -127,6 +128,6 @@ class SelectItemDialog(val search: (String) -> List<Any>, val onSelect: (ApplyTo
     }
 
     private fun fetch() {
-        sendEvent(FetchNetworksEvent(LocalStorage.selectedBoxId))
+        sendEvent(FetchNetworksEvent(TempData.selectedBoxId))
     }
 }

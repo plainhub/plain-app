@@ -10,12 +10,9 @@ import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.video.DVideo
 
 object LocalStorage {
-    var endictShowWord: Boolean by serialLazy(true)
-    var endictShowTranslation: Boolean by serialLazy(true)
     var clientId: String by serialLazy("")
     var fileIdToken: String by serialLazy("") // use to generate file path to id or decrypt file id to path
 
-    var selectedBoxId: String by serialLazy("")
     var deviceSortBy: DeviceSortBy by serialLazy(DeviceSortBy.LAST_ACTIVE)
     var audioPlayMode: MediaPlayMode by serialLazy(MediaPlayMode.REPEAT)
     var audioPlaylist: List<DPlaylistAudio> by serialLazy(listOf())

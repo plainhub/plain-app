@@ -23,6 +23,7 @@ import com.ismartcoding.plain.extensions.*
 import com.ismartcoding.plain.features.box.FetchNetworksEvent
 import com.ismartcoding.plain.features.box.NetworksResultEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
@@ -148,6 +149,6 @@ class DevicesDialog : BaseDialog<DialogDevicesBinding>() {
     }
 
     private fun fetch() {
-        sendEvent(FetchNetworksEvent(LocalStorage.selectedBoxId))
+        sendEvent(FetchNetworksEvent(TempData.selectedBoxId))
     }
 }

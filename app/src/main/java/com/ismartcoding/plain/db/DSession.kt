@@ -32,9 +32,6 @@ data class DSession(
 @Dao
 interface SessionDao {
     @Query("SELECT * FROM sessions ORDER BY updated_at DESC")
-    fun getAllFlow(): Flow<List<DSession>>
-
-    @Query("SELECT * FROM sessions")
     fun getAll(): List<DSession>
 
     @Query("SELECT * FROM sessions WHERE client_id=:clientId")

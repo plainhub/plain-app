@@ -11,6 +11,7 @@ import com.ismartcoding.lib.softinput.setWindowSoftInput
 import com.ismartcoding.plain.ApplyNetplanAndNetmixMutation
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.BoxApi
 import com.ismartcoding.plain.api.HttpApiTimeout
 import com.ismartcoding.plain.data.UIDataCache
@@ -132,6 +133,6 @@ class NetworkConfigDialog : BaseDialog<DialogNetworkConfigBinding>() {
     }
 
     private fun fetch() {
-        sendEvent(FetchNetworkConfigEvent(LocalStorage.selectedBoxId))
+        sendEvent(FetchNetworkConfigEvent(TempData.selectedBoxId))
     }
 }

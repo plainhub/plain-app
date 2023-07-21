@@ -18,6 +18,7 @@ import com.ismartcoding.plain.features.box.NetworkConfigResultEvent
 import com.ismartcoding.plain.features.hostapd.HostapdConfig
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.softinput.setWindowSoftInput
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.extensions.initMenu
 import com.ismartcoding.plain.ui.extensions.onBack
@@ -72,7 +73,7 @@ class HostapdConfigDialog : BaseDialog<DialogHostapdConfigBinding>() {
                             r.response?.data?.applyHostapd?.hostapdFragment?.let {
                                 UIDataCache.current().hostapd = it
                             }
-                            sendEvent(ApplyHostapdResultEvent(LocalStorage.selectedBoxId, r))
+                            sendEvent(ApplyHostapdResultEvent(TempData.selectedBoxId, r))
                             dismiss()
                         }
                     }
@@ -110,6 +111,6 @@ class HostapdConfigDialog : BaseDialog<DialogHostapdConfigBinding>() {
     }
 
     private fun fetch() {
-        sendEvent(FetchNetworkConfigEvent(LocalStorage.selectedBoxId))
+        sendEvent(FetchNetworkConfigEvent(TempData.selectedBoxId))
     }
 }

@@ -15,6 +15,7 @@ import com.ismartcoding.lib.brv.utils.linear
 import com.ismartcoding.lib.brv.utils.models
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.plain.LocalStorage
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.features.box.FetchNetworksEvent
 import com.ismartcoding.plain.features.box.NetworksResultEvent
 import com.ismartcoding.plain.ui.extensions.clearTextRows
@@ -81,6 +82,6 @@ class SelectNetworkDialog(val onSelect: (String) -> Unit) : BaseBottomSheetDialo
     }
 
     private fun fetch() {
-        sendEvent(FetchNetworksEvent(LocalStorage.selectedBoxId))
+        sendEvent(FetchNetworksEvent(TempData.selectedBoxId))
     }
 }

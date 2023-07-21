@@ -62,7 +62,7 @@ fun SelectableGroupItem(
                 Icon(
                     imageVector = it,
                     contentDescription = title,
-                    modifier = Modifier.padding(start = 8.dp, end = 16.dp),
+                    modifier = Modifier.padding(start = 0.dp, end = 16.dp),
                     tint = if (selected) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

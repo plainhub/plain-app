@@ -16,6 +16,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.lib.brv.utils.linear
 import com.ismartcoding.lib.brv.utils.models
 import com.ismartcoding.lib.brv.utils.setup
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ui.extensions.setClick
 import com.ismartcoding.plain.ui.extensions.setKeyText
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -74,6 +75,6 @@ class SelectTemplateDialog(val onSelect: (String) -> Unit) : BaseBottomSheetDial
     }
 
     private fun fetch() {
-        sendEvent(FetchVocabulariesEvent(LocalStorage.selectedBoxId))
+        sendEvent(FetchVocabulariesEvent(TempData.selectedBoxId))
     }
 }

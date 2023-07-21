@@ -21,6 +21,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.route.Route
 import com.ismartcoding.plain.features.route.bindRoute
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.features.ActionEvent
@@ -117,7 +118,7 @@ class RoutesDialog : BaseDialog<DialogRoutesBinding>() {
     }
 
     private fun fetch() {
-        sendEvent(FetchNetworksEvent(LocalStorage.selectedBoxId))
+        sendEvent(FetchNetworksEvent(TempData.selectedBoxId))
     }
 }
 

@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Build
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.*
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper
@@ -14,6 +15,7 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.DownloadFileItem
 import com.ismartcoding.plain.data.DownloadFileItemWrap
 import com.ismartcoding.plain.data.enums.PasswordType
+import com.ismartcoding.plain.data.preference.AuthTwoFactorPreference
 import com.ismartcoding.plain.data.preference.PasswordPreference
 import com.ismartcoding.plain.data.preference.PasswordTypePreference
 import com.ismartcoding.plain.data.preference.WebPreference
@@ -43,6 +45,7 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.utils.io.core.*
 import io.ktor.websocket.*
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONObject
@@ -364,8 +367,16 @@ fun Application.module() {
                                     r = Json.decodeFromString<AuthRequest>(decryptedBytes.decodeToString())
                                 }
                                 if (r?.password == hash) {
-                                    send(CryptoHelper.aesEncrypt(token, JsonHelper.jsonEncode(AuthResponse(AuthStatus.PENDING))))
-                                    sendEvent(ConfirmToAcceptLoginEvent(this, clientId, r.browserName, r.browserVersion, r.osName, r.osVersion, r.isMobile))
+                                    val event = ConfirmToAcceptLoginEvent(this, clientId, r)
+                                    if (AuthTwoFactorPreference.get(MainApp.instance)) {
+                                        send(CryptoHelper.aesEncrypt(token, JsonHelper.jsonEncode(AuthResponse(AuthStatus.PENDING))))
+                                        sendEvent(event)
+                                    } else {
+                                        coIO {
+                                            val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
+                                            HttpServerManager.respondTokenAsync(event, clientIp)
+                                        }
+                                    }
                                 } else {
                                     close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "invalid_password"))
                                 }

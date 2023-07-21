@@ -22,6 +22,7 @@ import com.ismartcoding.plain.features.box.WireGuardsResultEvent
 import com.ismartcoding.plain.features.wireguard.WireGuard
 import com.ismartcoding.plain.features.wireguard.bindWireGuard
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ui.extensions.*
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.scwang.smart.refresh.layout.constant.RefreshState
@@ -100,7 +101,7 @@ class WireGuardsDialog : BaseDialog<DialogWireguardsBinding>() {
     }
 
     private fun fetch() {
-        sendEvent(FetchWireGuardsEvent(LocalStorage.selectedBoxId))
+        sendEvent(FetchWireGuardsEvent(TempData.selectedBoxId))
     }
 }
 

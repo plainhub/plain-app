@@ -5,12 +5,14 @@ import android.util.Base64
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JksHelper
+import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.preference.HttpPortPreference
 import com.ismartcoding.plain.data.preference.HttpsPortPreference
 import com.ismartcoding.plain.data.preference.PasswordPreference
+import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.web.websocket.WebSocketSession
 import io.ktor.server.application.Application
 import io.ktor.server.engine.applicationEngineEnvironment
@@ -19,6 +21,7 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.engine.sslConnector
 import io.ktor.server.netty.Netty
 import io.ktor.server.netty.NettyApplicationEngine
+import io.ktor.websocket.send
 import kotlinx.datetime.Instant
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -113,5 +116,28 @@ object HttpServerManager {
                 }
             }
         }, 0, 5000)
+    }
+
+    suspend fun respondTokenAsync(event: ConfirmToAcceptLoginEvent, clientIp: String) {
+        val token = CryptoHelper.generateAESKey()
+        SessionList.addOrUpdateAsync(event.clientId) {
+            val r = event.request
+            it.clientIP = clientIp
+            it.osName = r.osName
+            it.osVersion = r.osVersion
+            it.browserName = r.browserName
+            it.browserVersion = r.browserVersion
+            it.token = token
+        }
+        HttpServerManager.loadTokenCache()
+        event.session.send(
+            CryptoHelper.aesEncrypt(
+                HttpServerManager.passwordToToken(), JsonHelper.jsonEncode(
+                    AuthResponse(
+                        AuthStatus.COMPLETED, token
+                    )
+                )
+            )
+        )
     }
 }

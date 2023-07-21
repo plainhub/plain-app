@@ -11,8 +11,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun Subtitle(
-    modifier: Modifier = Modifier.padding(horizontal = 24.dp),
     text: String,
+    modifier: Modifier = Modifier.padding(horizontal = 16.dp),
     color: Color = MaterialTheme.colorScheme.primary,
 ) {
     Text(

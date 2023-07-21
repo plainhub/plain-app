@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.components
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.HomeItemNetworkBinding
 import com.ismartcoding.plain.features.box.FetchNetworksEvent
@@ -22,7 +23,7 @@ import com.ismartcoding.plain.ui.wireguard.WireGuardsDialog
 fun HomeItemNetworkBinding.initView() {
     val network = UIDataCache.current().devices
     if (network == null) {
-        sendEvent(FetchNetworksEvent(LocalStorage.selectedBoxId))
+        sendEvent(FetchNetworksEvent(TempData.selectedBoxId))
         state.showLoading()
     }
     updateUI()

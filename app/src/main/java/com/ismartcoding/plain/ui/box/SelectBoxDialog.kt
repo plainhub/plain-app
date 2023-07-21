@@ -18,6 +18,7 @@ import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.extensions.*
 import com.ismartcoding.plain.features.box.BoxHelper
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ui.extensions.*
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.launch
@@ -35,7 +36,7 @@ class SelectBoxDialog() : BaseBottomSheetDialog<DialogSelectBoxBinding>() {
                     binding.setKeyText(m.name)
                     binding.addTextRow(if (m.ips.isEmpty()) getString(R.string.unknown_ip) else m.ips.joinToString(", "))
                     binding.addTextRow(getString(R.string.added_at) + " " + m.createdAt.formatDateTime())
-                    if (LocalStorage.selectedBoxId == m.id) {
+                    if (TempData.selectedBoxId == m.id) {
                         binding.showSelected()
                     } else {
                         binding.hideEndIcon()
@@ -57,8 +58,8 @@ class SelectBoxDialog() : BaseBottomSheetDialog<DialogSelectBoxBinding>() {
                     }
                     binding.setClick {
                         lifecycleScope.launch {
-                            val isChanged = LocalStorage.selectedBoxId != m.id
-                            LocalStorage.selectedBoxId = m.id
+                            val isChanged = TempData.selectedBoxId != m.id
+                            TempData.selectedBoxId = m.id
                             UIDataCache.current().box = withIO {
                                 BoxHelper.getSelectedBoxAsync()
                             }

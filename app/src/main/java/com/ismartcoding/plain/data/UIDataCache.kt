@@ -3,6 +3,7 @@ package com.ismartcoding.plain.data
 import com.ismartcoding.plain.InitQuery
 import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.NetworkQuery
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.VocabulariesQuery
 import com.ismartcoding.plain.data.enums.ConfigType
 import com.ismartcoding.plain.db.DBox
@@ -107,7 +108,7 @@ class UIDataCache {
         private val cacheMap = mutableMapOf<String, UIDataCache>()
 
         fun current(): UIDataCache {
-            return get(LocalStorage.selectedBoxId)
+            return get(TempData.selectedBoxId)
         }
 
         fun get(boxId: String): UIDataCache {

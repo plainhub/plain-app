@@ -53,7 +53,6 @@ fun DarkThemePage(
                         }
                     }
                     Subtitle(
-                        modifier = Modifier.padding(horizontal = 24.dp),
                         text = stringResource(R.string.other),
                     )
                     PListItem(

@@ -32,6 +32,7 @@ import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.services.HttpServerService
+import com.ismartcoding.plain.web.AuthRequest
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import com.ismartcoding.plain.web.websocket.WebSocketHelper
@@ -78,8 +79,7 @@ class VocabularyWordsDeletedEvent(val id: String)
 class VocabularyWordsUpdatedEvent(val id: String)
 
 class ConfirmToAcceptLoginEvent(
-    val session: DefaultWebSocketServerSession, val clientId: String, val browserName: String,
-    val browserVersion: String, val osName: String, val osVersion: String, val isMobile: Boolean
+    val session: DefaultWebSocketServerSession, val clientId: String, val request: AuthRequest
 )
 
 class PermissionResultEvent(val permission: Permission)

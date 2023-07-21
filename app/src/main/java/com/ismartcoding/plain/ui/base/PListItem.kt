@@ -58,7 +58,7 @@ fun PListItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp, 16.dp, 16.dp, 16.dp),
+                .padding(16.dp, 16.dp, 8.dp, 16.dp),
             verticalAlignment = Alignment.CenterVertically
 
         ) {
@@ -106,7 +106,11 @@ fun PListItem(
 
             if (value != null || action != null) {
                 Box(Modifier.padding(start = 16.dp)) {
-                    action?.invoke()
+                    if (action != null) {
+                        Box(Modifier.padding(end = 8.dp)) {
+                            action.invoke()
+                        }
+                    }
                     value?.let {
                         Box(Modifier.padding(end = if (showMore) 0.dp else 8.dp)) {
                             SelectionContainer {

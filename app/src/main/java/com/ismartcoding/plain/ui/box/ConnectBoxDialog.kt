@@ -16,6 +16,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.softinput.setWindowSoftInput
+import com.ismartcoding.plain.TempData
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
@@ -89,8 +90,8 @@ class ConnectBoxDialog(private val device: BTDevice, val updateCallback: () -> U
                     item.ips.clear()
                     item.ips.addAll(ips)
                 }
-                if (LocalStorage.selectedBoxId.isEmpty()) {
-                    LocalStorage.selectedBoxId = boxId
+                if (TempData.selectedBoxId.isEmpty()) {
+                    TempData.selectedBoxId = boxId
                 }
                 UIDataCache.current().box = BoxHelper.getSelectedBoxAsync()
             }

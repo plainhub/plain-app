@@ -21,6 +21,7 @@ import com.ismartcoding.lib.extensions.px
 import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.fragment.EndictItemFragment
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.features.vocabulary.VocabularyList
 import com.ismartcoding.plain.ui.extensions.*
@@ -59,8 +60,8 @@ class VocabularyDialog(val vocabulary: DVocabulary) : BaseDialog<DialogVocabular
                         val popupMenu = popup.menu
                         addMenuItem(popupMenu, PopupMenuItemType.SELECT, R.string.select)
                         addMenuItem(popupMenu, PopupMenuItemType.SORT_RANDOM, R.string.sort_by_random)
-                        addMenuItem(popupMenu, PopupMenuItemType.TOGGLE_WORD, if (LocalStorage.endictShowWord) R.string.hide_word else R.string.show_word)
-                        addMenuItem(popupMenu, PopupMenuItemType.TOGGLE_TRANSLATION, if (LocalStorage.endictShowTranslation) R.string.hide_translation else R.string.show_translation)
+                        addMenuItem(popupMenu, PopupMenuItemType.TOGGLE_WORD, if (TempData.endictShowWord) R.string.hide_word else R.string.show_word)
+                        addMenuItem(popupMenu, PopupMenuItemType.TOGGLE_TRANSLATION, if (TempData.endictShowTranslation) R.string.hide_translation else R.string.show_translation)
                         popup.setOnMenuItemClickListener {
                             when (it.itemId) {
                                 PopupMenuItemType.SELECT.ordinal -> {
@@ -81,15 +82,15 @@ class VocabularyDialog(val vocabulary: DVocabulary) : BaseDialog<DialogVocabular
                                     }
                                 }
                                 PopupMenuItemType.TOGGLE_WORD.ordinal -> {
-                                    LocalStorage.endictShowWord = !LocalStorage.endictShowWord
+                                    TempData.endictShowWord = !TempData.endictShowWord
                                     popupMenu.removeItem(PopupMenuItemType.TOGGLE_WORD.ordinal)
-                                    addMenuItem(popupMenu, PopupMenuItemType.TOGGLE_WORD, if (LocalStorage.endictShowWord) R.string.hide_word else R.string.show_word)
+                                    addMenuItem(popupMenu, PopupMenuItemType.TOGGLE_WORD, if (TempData.endictShowWord) R.string.hide_word else R.string.show_word)
                                     binding.list.rv.bindingAdapter.notifyDataSetChanged()
                                 }
                                 PopupMenuItemType.TOGGLE_TRANSLATION.ordinal -> {
                                     popupMenu.removeItem(PopupMenuItemType.TOGGLE_TRANSLATION.ordinal)
-                                    addMenuItem(popupMenu, PopupMenuItemType.TOGGLE_TRANSLATION, if (LocalStorage.endictShowTranslation) R.string.hide_translation else R.string.show_translation)
-                                    LocalStorage.endictShowTranslation = !LocalStorage.endictShowTranslation
+                                    addMenuItem(popupMenu, PopupMenuItemType.TOGGLE_TRANSLATION, if (TempData.endictShowTranslation) R.string.hide_translation else R.string.show_translation)
+                                    TempData.endictShowTranslation = !TempData.endictShowTranslation
                                     binding.list.rv.bindingAdapter.notifyDataSetChanged()
                                 }
                             }
@@ -115,13 +116,13 @@ class VocabularyDialog(val vocabulary: DVocabulary) : BaseDialog<DialogVocabular
                 bindingItem.clearTextRows()
                 bindingItem.addTextRow(m.translation.joinToString("\n"))
 
-                bindingItem.textKey.visibility = if (LocalStorage.endictShowWord) {
+                bindingItem.textKey.visibility = if (TempData.endictShowWord) {
                     View.VISIBLE
                 } else {
                     View.INVISIBLE
                 }
 
-                bindingItem.rows.visibility = if (LocalStorage.endictShowTranslation) {
+                bindingItem.rows.visibility = if (TempData.endictShowTranslation) {
                     View.VISIBLE
                 } else {
                     View.INVISIBLE

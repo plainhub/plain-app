@@ -137,7 +137,7 @@ fun PasswordTextField(
     onValueChange: (String) -> Unit = {},
     onConfirm: (String) -> Unit = {},
 ) {
-    Box(modifier = Modifier.padding(24.dp, 0.dp, 16.dp, 0.dp)) {
+    Box(modifier = Modifier.padding(16.dp, 0.dp, 16.dp, 0.dp)) {
         val clipboardManager = LocalClipboardManager.current
         val focusRequester = remember { FocusRequester() }
         TextField(

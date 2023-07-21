@@ -29,7 +29,6 @@ fun HomeItemSocial(
 ) {
     Column {
         Subtitle(
-            modifier = Modifier.padding(horizontal = 24.dp),
             text = stringResource(R.string.home_item_title_social)
         )
         Row(

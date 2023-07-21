@@ -24,7 +24,6 @@ import com.ismartcoding.plain.ui.note.NotesDialog
 fun HomeItemWork() {
     Column {
         Subtitle(
-            modifier = Modifier.padding(horizontal = 24.dp),
             text = stringResource(R.string.home_item_title_work)
         )
         Row(

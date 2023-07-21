@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 fun BlockOutlineButton(
     text: String,
     modifier: Modifier = Modifier
-        .padding(horizontal = 24.dp)
+        .padding(horizontal = 16.dp)
         .height(56.dp)
         .fillMaxWidth(),
     onClick: () -> Unit,

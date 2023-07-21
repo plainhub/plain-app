@@ -12,6 +12,7 @@ import com.ismartcoding.plain.ui.wireguard.WireGuardDialog
 import com.ismartcoding.plain.features.box.ApplyWireGuardResultEvent
 import com.ismartcoding.plain.fragment.WireGuardFragment
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.extensions.*
 import kotlinx.coroutines.launch
@@ -64,7 +65,7 @@ fun ViewListItemBinding.bindWireGuard(context: Context, lifecycleScope: Lifecycl
                     }
                 }
             }
-            sendEvent(ApplyWireGuardResultEvent(LocalStorage.selectedBoxId, r))
+            sendEvent(ApplyWireGuardResultEvent(TempData.selectedBoxId, r))
         }
     })
 }

@@ -6,6 +6,7 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DBox
 import com.ismartcoding.plain.fragment.InterfaceFragment
 import com.ismartcoding.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.BoxDao
 import kotlinx.datetime.Clock
 
@@ -50,10 +51,10 @@ object BoxHelper {
 
     fun unpairAsync(item: DBox) {
         boxDao.delete(item)
-        LocalStorage.selectedBoxId = ""
+        TempData.selectedBoxId = ""
     }
 
     fun getSelectedBoxAsync(): DBox? {
-        return boxDao.getById(LocalStorage.selectedBoxId)
+        return boxDao.getById(TempData.selectedBoxId)
     }
 }

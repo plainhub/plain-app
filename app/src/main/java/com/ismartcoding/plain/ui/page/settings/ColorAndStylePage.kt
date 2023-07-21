@@ -69,7 +69,7 @@ fun ColorAndStylePage(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp)
+                            .padding(horizontal = 16.dp)
                             .aspectRatio(1.38f)
                             .clip(RoundedCornerShape(24.dp))
                             .background(
@@ -128,7 +128,6 @@ fun ColorAndStylePage(
                 }
                 item {
                     Subtitle(
-                        modifier = Modifier.padding(horizontal = 24.dp),
                         text = stringResource(R.string.appearance),
                     )
                     PListItem(
@@ -168,7 +167,7 @@ fun Palettes(
     if (palettes.isEmpty()) {
         Row(
             modifier = Modifier
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = 16.dp)
                 .fillMaxWidth()
                 .height(80.dp)
                 .clip(RoundedCornerShape(16.dp))
@@ -190,7 +189,7 @@ fun Palettes(
         Row(
             modifier = Modifier
                 .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             palettes.forEachIndexed { index, palette ->

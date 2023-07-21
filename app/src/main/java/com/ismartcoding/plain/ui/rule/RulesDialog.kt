@@ -20,6 +20,7 @@ import com.ismartcoding.plain.features.rule.Rule
 import com.ismartcoding.plain.features.rule.bindRule
 import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.*
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
@@ -117,7 +118,7 @@ class RulesDialog : BaseDialog<DialogRulesBinding>() {
     }
 
     private fun fetch() {
-        sendEvent(FetchNetworksEvent(LocalStorage.selectedBoxId))
+        sendEvent(FetchNetworksEvent(TempData.selectedBoxId))
     }
 }
 

@@ -28,7 +28,7 @@ fun TextPage(
                     DisplayText(text = title)
                 }
                 item {
-                    Box(modifier = Modifier.padding(horizontal = 24.dp)) {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                         SelectionContainer {
                             Text(text = content)
                         }

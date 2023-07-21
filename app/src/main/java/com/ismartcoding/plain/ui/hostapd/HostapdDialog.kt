@@ -19,6 +19,7 @@ import com.ismartcoding.plain.features.box.NetworkConfigResultEvent
 import com.ismartcoding.plain.features.hostapd.HostapdConfig
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.softinput.setWindowSoftInput
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.extensions.initMenu
 import com.ismartcoding.plain.ui.extensions.onMenuItemClick
@@ -144,6 +145,6 @@ class HostapdDialog : BaseBottomSheetDialog<DialogHostapdBinding>() {
     }
 
     private fun fetch() {
-        sendEvent(FetchNetworkConfigEvent(LocalStorage.selectedBoxId))
+        sendEvent(FetchNetworkConfigEvent(TempData.selectedBoxId))
     }
 }

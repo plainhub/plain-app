@@ -27,7 +27,7 @@ interface IBoxEvent {
 data class FetchInitDataEvent(override val boxId: String) : IBoxEvent {
     companion object {
         fun createDefault(): FetchInitDataEvent {
-            return FetchInitDataEvent(LocalStorage.selectedBoxId)
+            return FetchInitDataEvent(TempData.selectedBoxId)
         }
     }
 }
@@ -71,7 +71,7 @@ object BoxEvents {
                             BoxApi.mixQueryAsync(InitQuery())
                         }
                         if (r.isSuccess()) {
-                            UIDataCache.get(LocalStorage.selectedBoxId).initData(r.response?.data!!)
+                            UIDataCache.get(TempData.selectedBoxId).initData(r.response?.data!!)
                         }
                     }
                     if (t < 500) {

@@ -152,7 +152,7 @@ fun WebConsolePage(
                     if (errorMessage.isNotEmpty()) {
                         Box(
                             modifier = Modifier
-                                .padding(horizontal = 24.dp)
+                                .padding(horizontal = 16.dp)
                                 .fillMaxWidth()
                                 .background(
                                     color = MaterialTheme.colorScheme.surface onDark MaterialTheme.colorScheme.inverseOnSurface, shape = RoundedCornerShape(16.dp)
@@ -217,7 +217,6 @@ fun WebConsolePage(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Subtitle(
-                        modifier = Modifier.padding(horizontal = 24.dp),
                         text = stringResource(R.string.permissions),
                     )
                 }
@@ -298,50 +297,41 @@ fun WebConsolePage(
 fun BrowserPreview(isHttps: Boolean, httpPort: Int, httpsPort: Int, onEditPort: () -> Unit) {
     Column(
         modifier = Modifier
-            .padding(horizontal = 24.dp)
+            .padding(horizontal = 16.dp)
             .background(
                 color = MaterialTheme.colorScheme.surface onDark MaterialTheme.colorScheme.inverseOnSurface, shape = RoundedCornerShape(16.dp)
             )
     ) {
         Row(
-            modifier = Modifier
-                .padding(vertical = 8.dp, horizontal = 16.dp)
-                .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.surface onLight MaterialTheme.colorScheme.inverseOnSurface, shape = RoundedCornerShape(8.dp)
+                ), verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Rounded.ArrowBack, contentDescription = stringResource(R.string.back), tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Row(
-                Modifier
-                    .padding(start = 16.dp, top = 4.dp)
-                    .weight(1f)
-                    .background(
-                        color = MaterialTheme.colorScheme.surface onLight MaterialTheme.colorScheme.inverseOnSurface, shape = RoundedCornerShape(8.dp)
-                    ), verticalAlignment = Alignment.CenterVertically
-            ) {
-                SelectionContainer {
-                    Text(
-                        text = "${if (isHttps) "https" else "http"}://${NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }}:${if (isHttps) httpsPort else httpPort}",
-                        modifier = Modifier.padding(start = 8.dp),
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 16.sp),
-                        textAlign = TextAlign.Start,
-                    )
-                }
-                PIconButton(imageVector = Icons.Rounded.Edit,
-                    modifier = Modifier
-                        .height(16.dp)
-                        .width(16.dp),
-                    contentDescription = stringResource(id = R.string.edit),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    onClick = {
-                        onEditPort()
-                    })
+            SelectionContainer {
+                Text(
+                    text = "${if (isHttps) "https" else "http"}://${NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }}:${if (isHttps) httpsPort else httpPort}",
+                    modifier = Modifier.padding(start = 16.dp),
+                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 16.sp),
+                    textAlign = TextAlign.Start,
+                )
             }
+            PIconButton(imageVector = Icons.Rounded.Edit,
+                modifier = Modifier
+                    .height(16.dp)
+                    .width(16.dp),
+                contentDescription = stringResource(id = R.string.edit),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                onClick = {
+                    onEditPort()
+                })
         }
         Text(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
+                .padding(16.dp),
             text = stringResource(id = R.string.enter_this_address_tips),
             style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Light),
             color = MaterialTheme.colorScheme.onSurfaceVariant,

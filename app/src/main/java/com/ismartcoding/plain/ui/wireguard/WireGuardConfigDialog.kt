@@ -19,6 +19,7 @@ import com.ismartcoding.plain.features.wireguard.WireGuard
 import com.ismartcoding.plain.features.wireguard.toWireGuard
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.softinput.setWindowSoftInput
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.extensions.initMenu
 import com.ismartcoding.plain.ui.extensions.onBack
@@ -93,7 +94,7 @@ class WireGuardConfigDialog(val wireGuard: WireGuard) : BaseDialog<DialogWiregua
     }
 
     private fun fetch() {
-        sendEvent(FetchWireGuardsEvent(LocalStorage.selectedBoxId))
+        sendEvent(FetchWireGuardsEvent(TempData.selectedBoxId))
     }
 
     private fun doSave() {
@@ -128,7 +129,7 @@ class WireGuardConfigDialog(val wireGuard: WireGuard) : BaseDialog<DialogWiregua
                     }
                 }
             }
-            sendEvent(ApplyWireGuardResultEvent(LocalStorage.selectedBoxId, r))
+            sendEvent(ApplyWireGuardResultEvent(TempData.selectedBoxId, r))
             dismiss()
         }
     }

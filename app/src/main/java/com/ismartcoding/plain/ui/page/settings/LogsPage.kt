@@ -46,9 +46,9 @@ fun LogsPage(
                     DisplayText(text = stringResource(R.string.logs))
                     PListItem(
                         title = stringResource(R.string.file_size),
-                        desc = FormatHelper.formatBytes(fileSize)
+                        value = FormatHelper.formatBytes(fileSize)
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
                     BlockOutlineButton(
                         text = stringResource(R.string.share_logs),
                         onClick = {

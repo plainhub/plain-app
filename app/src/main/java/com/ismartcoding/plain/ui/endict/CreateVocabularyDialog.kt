@@ -13,6 +13,7 @@ import com.ismartcoding.plain.ui.extensions.setSafeClick
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.vocabulary.VocabularyList
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.features.VocabularyCreatedEvent
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.views.LoadingButtonView
@@ -69,7 +70,7 @@ class CreateVocabularyDialog : BaseBottomSheetDialog<DialogCreateVocabularyBindi
     private suspend fun addOrUpdateDbAsync(words: Set<String>) {
         withIO {
             VocabularyList.addOrUpdateAsync("") {
-                boxId = LocalStorage.selectedBoxId
+                boxId = TempData.selectedBoxId
                 name = binding.name.text
                 this.words = words.distinct().toMutableList()
             }

@@ -213,26 +213,19 @@ class MainActivity : AppCompatActivity() {
 
         receiveEvent<ConfirmToAcceptLoginEvent> { event ->
             val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
-            if (!AuthTwoFactorPreference.get(this@MainActivity)) {
-                launch {
-                    withIO {
-                        respondTokenAsync(event, clientIp)
-                    }
-                }
-                return@receiveEvent
-            }
-
             if (requestToConnectDialog?.isShowing == true) {
                 requestToConnectDialog?.dismiss()
                 requestToConnectDialog = null
             }
+
+            val r = event.request
             requestToConnectDialog = MaterialAlertDialogBuilder(instance.get()!!).setTitle(getStringF(R.string.request_to_connect, "ip", clientIp)).setMessage(
                 getStringF(
-                    R.string.client_ua, "os_name", event.osName.capitalize(), "os_version", event.osVersion, "browser_name", event.browserName.capitalize(), "browser_version", event.browserVersion
+                    R.string.client_ua, "os_name", r.osName.capitalize(), "os_version", r.osVersion, "browser_name", r.browserName.capitalize(), "browser_version", r.browserVersion
                 )
             ).setPositiveButton(getString(R.string.accept)) { _, _ ->
                 launch {
-                    withIO { respondTokenAsync(event, clientIp) }
+                    withIO { HttpServerManager.respondTokenAsync(event, clientIp) }
                 }
             }.setNegativeButton(getString(R.string.reject)) { _, _ ->
                 launch {
@@ -247,28 +240,6 @@ class MainActivity : AppCompatActivity() {
             }.create()
             requestToConnectDialog?.show()
         }
-    }
-
-    private suspend fun respondTokenAsync(event: ConfirmToAcceptLoginEvent, clientIp: String) {
-        val token = CryptoHelper.generateAESKey()
-        SessionList.addOrUpdateAsync(event.clientId) {
-            it.clientIP = clientIp
-            it.osName = event.osName
-            it.osVersion = event.osVersion
-            it.browserName = event.browserName
-            it.browserVersion = event.browserVersion
-            it.token = token
-        }
-        HttpServerManager.loadTokenCache()
-        event.session.send(
-            CryptoHelper.aesEncrypt(
-                HttpServerManager.passwordToToken(), JsonHelper.jsonEncode(
-                    AuthResponse(
-                        AuthStatus.COMPLETED, token
-                    )
-                )
-            )
-        )
     }
 
     private fun doPickFile(event: PickFileEvent) {
