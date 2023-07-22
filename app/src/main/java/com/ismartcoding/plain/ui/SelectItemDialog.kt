@@ -3,26 +3,38 @@ package com.ismartcoding.plain.ui
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
-import com.ismartcoding.lib.brv.utils.*
+import androidx.lifecycle.lifecycleScope
+import com.ismartcoding.lib.brv.utils.linear
+import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.LocalStorage
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.AllItemsOption
 import com.ismartcoding.plain.data.UIDataCache
+import com.ismartcoding.plain.data.preference.DeviceSortByPreference
 import com.ismartcoding.plain.databinding.DialogSelectItemBinding
 import com.ismartcoding.plain.databinding.ViewListItemBinding
-import com.ismartcoding.plain.features.device.*
-import com.ismartcoding.plain.features.network.bindNetwork
 import com.ismartcoding.plain.features.ApplyToType
 import com.ismartcoding.plain.features.box.FetchNetworksEvent
 import com.ismartcoding.plain.features.box.NetworksResultEvent
+import com.ismartcoding.plain.features.device.DeviceSortBy
+import com.ismartcoding.plain.features.device.bindDevice
+import com.ismartcoding.plain.features.network.bindNetwork
 import com.ismartcoding.plain.fragment.DeviceFragment
 import com.ismartcoding.plain.fragment.NetworkFragment
-import com.ismartcoding.plain.ui.extensions.*
+import com.ismartcoding.plain.ui.extensions.clearTextRows
+import com.ismartcoding.plain.ui.extensions.highlightTitle
+import com.ismartcoding.plain.ui.extensions.initMenu
+import com.ismartcoding.plain.ui.extensions.onMenuItemClick
+import com.ismartcoding.plain.ui.extensions.onSearch
+import com.ismartcoding.plain.ui.extensions.setClick
+import com.ismartcoding.plain.ui.extensions.setKeyText
+import com.ismartcoding.plain.ui.extensions.unhighlightTitle
 import com.ismartcoding.plain.ui.helpers.DeviceSortHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import kotlinx.coroutines.launch
 
 class SelectItemDialog(val search: (String) -> List<Any>, val onSelect: (ApplyToType, String) -> Unit) : BaseBottomSheetDialog<DialogSelectItemBinding>() {
     private var searchQ: String = ""
@@ -31,20 +43,23 @@ class SelectItemDialog(val search: (String) -> List<Any>, val onSelect: (ApplyTo
 
         binding.topAppBar.run {
             initMenu(R.menu.select_item)
-
-            DeviceSortHelper.getSelectedSortItem(menu).highlightTitle(requireContext())
+            val context = requireContext()
+            DeviceSortHelper.getSelectedSortItem(context, menu).highlightTitle(context)
 
             onMenuItemClick {
                 when (itemId) {
                     R.id.sort_name_asc -> {
                         sort(menu, DeviceSortBy.NAME_ASC)
                     }
+
                     R.id.sort_name_desc -> {
                         sort(menu, DeviceSortBy.NAME_DESC)
                     }
+
                     R.id.sort_ip_address -> {
                         sort(menu, DeviceSortBy.IP_ADDRESS)
                     }
+
                     R.id.sort_last_active_desc -> {
                         sort(menu, DeviceSortBy.LAST_ACTIVE)
                     }
@@ -75,11 +90,13 @@ class SelectItemDialog(val search: (String) -> List<Any>, val onSelect: (ApplyTo
                         value = m.mac
                         binding.bindDevice(requireContext(), m)
                     }
+
                     is AllItemsOption -> {
                         value = ""
                         binding.setKeyText(m.name)
                         binding.clearTextRows()
                     }
+
                     is NetworkFragment -> {
                         type = ApplyToType.INTERFACE
                         value = m.ifName
@@ -117,10 +134,13 @@ class SelectItemDialog(val search: (String) -> List<Any>, val onSelect: (ApplyTo
 
 
     private fun sort(menu: Menu, sortBy: DeviceSortBy) {
-        DeviceSortHelper.getSelectedSortItem(menu).unhighlightTitle()
-        LocalStorage.deviceSortBy = sortBy
-        DeviceSortHelper.getSelectedSortItem(menu).highlightTitle(requireContext())
-        updateList()
+        lifecycleScope.launch {
+            val context = requireContext()
+            DeviceSortHelper.getSelectedSortItem(context, menu).unhighlightTitle()
+            withIO { DeviceSortByPreference.putAsync(context, sortBy) }
+            DeviceSortHelper.getSelectedSortItem(context, menu).highlightTitle(context)
+            updateList()
+        }
     }
 
     private fun updateList() {

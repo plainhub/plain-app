@@ -5,8 +5,8 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import com.ismartcoding.lib.channel.receiveEventHandler
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.preference.AudioPlayingPreference
 import com.ismartcoding.plain.features.AudioActionEvent
 import com.ismartcoding.plain.databinding.ViewBottomAudioPlayerBinding
 import com.ismartcoding.plain.features.audio.AudioAction
@@ -44,12 +44,12 @@ class BottomAudioPlayerView(context: Context, attrs: AttributeSet?) : CustomView
 
     fun updateUI() {
         binding.audioProgress.removeCallbacks(seekBarUpdateRunnable)
-        val audio = LocalStorage.audioPlaying
+        val audio = AudioPlayingPreference.getValue(context)
         if (audio == null) {
-            binding.playerControls.visibility = View.GONE
+            this.visibility = View.GONE
             return
         } else {
-            binding.playerControls.visibility = View.VISIBLE
+            this.visibility = View.VISIBLE
         }
 
         binding.audioProgress.apply {

@@ -4,30 +4,40 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.View
 import androidx.lifecycle.lifecycleScope
-import com.ismartcoding.lib.brv.utils.*
+import com.ismartcoding.lib.brv.utils.linear
+import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.DeleteDeviceMutation
-import com.ismartcoding.plain.LocalStorage
-import com.ismartcoding.plain.R
-import com.ismartcoding.plain.api.BoxApi
-import com.ismartcoding.plain.features.DeviceNameUpdatedEvent
-import com.ismartcoding.plain.data.UIDataCache
-import com.ismartcoding.plain.features.device.*
-import com.ismartcoding.plain.databinding.DialogDevicesBinding
-import com.ismartcoding.plain.databinding.ViewListItemBinding
-import com.ismartcoding.plain.ui.BaseDialog
-import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.fragment.DeviceFragment
-import com.ismartcoding.plain.extensions.*
-import com.ismartcoding.plain.features.box.FetchNetworksEvent
-import com.ismartcoding.plain.features.box.NetworksResultEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.DeleteDeviceMutation
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.features.ActionEvent
+import com.ismartcoding.plain.api.BoxApi
+import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
-import com.ismartcoding.plain.ui.extensions.*
+import com.ismartcoding.plain.data.preference.DeviceSortByPreference
+import com.ismartcoding.plain.databinding.DialogDevicesBinding
+import com.ismartcoding.plain.databinding.ViewListItemBinding
+import com.ismartcoding.plain.extensions.sorted
+import com.ismartcoding.plain.features.ActionEvent
+import com.ismartcoding.plain.features.DeviceNameUpdatedEvent
+import com.ismartcoding.plain.features.box.FetchNetworksEvent
+import com.ismartcoding.plain.features.box.NetworksResultEvent
+import com.ismartcoding.plain.features.device.DeviceSortBy
+import com.ismartcoding.plain.features.device.bindDevice
+import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.fragment.DeviceFragment
+import com.ismartcoding.plain.ui.BaseDialog
+import com.ismartcoding.plain.ui.extensions.enableSwipeMenu
+import com.ismartcoding.plain.ui.extensions.highlightTitle
+import com.ismartcoding.plain.ui.extensions.initMenu
+import com.ismartcoding.plain.ui.extensions.onBack
+import com.ismartcoding.plain.ui.extensions.onMenuItemClick
+import com.ismartcoding.plain.ui.extensions.onSearch
+import com.ismartcoding.plain.ui.extensions.setRightSwipeButton
+import com.ismartcoding.plain.ui.extensions.setScrollBehavior
+import com.ismartcoding.plain.ui.extensions.unhighlightTitle
 import com.ismartcoding.plain.ui.helpers.DeviceSortHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.launch
@@ -73,19 +83,22 @@ class DevicesDialog : BaseDialog<DialogDevicesBinding>() {
                 dismiss()
             }
 
-            DeviceSortHelper.getSelectedSortItem(menu).highlightTitle(requireContext())
+            DeviceSortHelper.getSelectedSortItem(requireContext(), menu).highlightTitle(requireContext())
 
             onMenuItemClick {
                 when (itemId) {
                     R.id.sort_name_asc -> {
                         sort(menu, DeviceSortBy.NAME_ASC)
                     }
+
                     R.id.sort_name_desc -> {
                         sort(menu, DeviceSortBy.NAME_DESC)
                     }
+
                     R.id.sort_ip_address -> {
                         sort(menu, DeviceSortBy.IP_ADDRESS)
                     }
+
                     R.id.sort_last_active_desc -> {
                         sort(menu, DeviceSortBy.LAST_ACTIVE)
                     }
@@ -128,15 +141,17 @@ class DevicesDialog : BaseDialog<DialogDevicesBinding>() {
 
 
     private fun sort(menu: Menu, sortBy: DeviceSortBy) {
-        DeviceSortHelper.getSelectedSortItem(menu).unhighlightTitle()
-        LocalStorage.deviceSortBy = sortBy
-        DeviceSortHelper.getSelectedSortItem(menu).highlightTitle(requireContext())
-        search()
+        lifecycleScope.launch {
+            DeviceSortHelper.getSelectedSortItem(requireContext(), menu).unhighlightTitle()
+            withIO { DeviceSortByPreference.putAsync(requireContext(), sortBy) }
+            DeviceSortHelper.getSelectedSortItem(requireContext(), menu).highlightTitle(requireContext())
+            search()
+        }
     }
 
     private fun search() {
         val devices = UIDataCache.current().getDevices(searchQ)
-        binding.list.page.replaceData(devices.sorted(LocalStorage.deviceSortBy))
+        binding.list.page.replaceData(devices.sorted(DeviceSortByPreference.getValue(requireContext())))
         binding.topAppBar.toolbar.run {
             title = LocaleHelper.getString(R.string.devices)
             val total = devices.size

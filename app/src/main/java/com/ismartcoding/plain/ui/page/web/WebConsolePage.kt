@@ -21,12 +21,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,6 +59,8 @@ import com.ismartcoding.plain.ui.theme.palette.onDark
 import com.ismartcoding.plain.ui.theme.palette.onLight
 import com.ismartcoding.plain.web.HttpServerManager
 import androidx.compose.foundation.lazy.items
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -142,8 +142,8 @@ fun WebConsolePage(
         }, content = {
             LazyColumn {
                 item {
-                    val errorMessage = if (MainApp.instance.httpServerError.isNotEmpty()) {
-                        MainApp.instance.httpServerError
+                    val errorMessage = if (HttpServerManager.httpServerError.isNotEmpty()) {
+                        HttpServerManager.httpServerError
                     } else if (webConsole && MainApp.instance.httpServer == null) {
                         stringResource(id = R.string.http_server_failed)
                     } else {
@@ -176,7 +176,7 @@ fun WebConsolePage(
                         PSwitch(
                             activated = webConsole
                         ) {
-                            viewModel.enableWebConsole(context, scope, !webConsole)
+                            viewModel.enableWebConsole(context, !webConsole)
                         }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -237,27 +237,33 @@ fun WebConsolePage(
                             desc = stringResource(if (m.granted) R.string.system_permission_granted else R.string.system_permission_not_granted),
                             showMore = permission == Permission.SYSTEM_ALERT_WINDOW,
                             onClick = {
-                                val enable = !permission.isEnabled(context)
-                                ApiPermissionsPreference.put(context, scope, permission, enable)
-                                if (permission == Permission.SYSTEM_ALERT_WINDOW) {
-                                    intentLauncherMap[permission]?.launch(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}")))
-                                } else {
-                                    if (enable) {
-                                        if (m.granted) {
-                                            return@PListItem
+                                scope.launch {
+                                    val enable = !permission.isEnabled(context)
+                                    withIO { ApiPermissionsPreference.putAsync(context, permission, enable) }
+                                    if (permission == Permission.SYSTEM_ALERT_WINDOW) {
+                                        intentLauncherMap[permission]?.launch(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}")))
+                                    } else {
+                                        if (enable) {
+                                            if (m.granted) {
+                                                return@launch
+                                            }
+                                            permission.request(context, launcher = launcherMap[permission], intentLauncher = intentLauncherMap[permission])
                                         }
-                                        permission.request(context, launcher = launcherMap[permission], intentLauncher = intentLauncherMap[permission])
                                     }
                                 }
                             }) {
                             if (permission != Permission.SYSTEM_ALERT_WINDOW) {
                                 PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
-                                    ApiPermissionsPreference.put(context, scope, permission, enable)
-                                    if (enable) {
-                                        if (m.granted) {
-                                            return@PSwitch
+                                    scope.launch {
+                                        withIO {
+                                            ApiPermissionsPreference.putAsync(context, permission, enable)
                                         }
-                                        permission.request(context, launcher = launcherMap[permission], intentLauncher = intentLauncherMap[permission])
+                                        if (enable) {
+                                            if (m.granted) {
+                                                return@launch
+                                            }
+                                            permission.request(context, launcher = launcherMap[permission], intentLauncher = intentLauncherMap[permission])
+                                        }
                                     }
                                 }
                             }
@@ -278,9 +284,9 @@ fun WebConsolePage(
                     selected = if (isHttps) it == httpsPort else it == httpPort,
                 ) {
                     if (isHttps) {
-                        HttpsPortPreference.put(context, scope, it)
+                        HttpsPortPreference.put(context, it)
                     } else {
-                        HttpPortPreference.put(context, scope, it)
+                        HttpPortPreference.put(context, it)
                     }
                     DialogHelper.showConfirmDialog(context, context.getString(R.string.restart_app_title), context.getString(R.string.restart_app_message)) {
                         triggerRebirth(context)

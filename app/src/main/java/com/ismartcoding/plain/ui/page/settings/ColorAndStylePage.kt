@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -31,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.DarkTheme
 import com.ismartcoding.plain.data.preference.*
@@ -46,6 +46,7 @@ import com.ismartcoding.plain.ui.theme.palette.dynamic.extractTonalPalettesFromU
 import com.ismartcoding.plain.ui.theme.palette.onDark
 import com.ismartcoding.plain.ui.theme.palette.onLight
 import com.ismartcoding.plain.ui.theme.palette.safeHexToColor
+import kotlinx.coroutines.launch
 
 @Composable
 fun ColorAndStylePage(
@@ -141,7 +142,11 @@ fun ColorAndStylePage(
                         PSwitch(
                             activated = DarkTheme.isDarkTheme(darkTheme)
                         ) {
-                            DarkThemePreference.put(context, scope, if (it) DarkTheme.ON else DarkTheme.OFF)
+                            scope.launch {
+                                withIO {
+                                    DarkThemePreference.putAsync(context, if (it) DarkTheme.ON else DarkTheme.OFF)
+                                }
+                            }
                         }
                     }
                     BottomSpace()
@@ -203,7 +208,7 @@ fun Palettes(
                             customColorValue = customPrimaryColor
                             addDialogVisible = true
                         } else {
-                            ThemeIndexPreference.put(context, scope, themeIndexPrefix + index)
+                            ThemeIndexPreference.put(context, themeIndexPrefix + index)
                         }
                     },
                     palette = if (isCustom) tonalPalettes else palette
@@ -225,8 +230,8 @@ fun Palettes(
         },
         onConfirm = {
             it.checkColorHex()?.let { h ->
-                CustomPrimaryColorPreference.put(context, scope, h)
-                ThemeIndexPreference.put(context, scope, 4)
+                CustomPrimaryColorPreference.put(context, h)
+                ThemeIndexPreference.put(context, 4)
                 addDialogVisible = false
             }
         }

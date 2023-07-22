@@ -14,18 +14,24 @@ import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.Weak
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.LocalStorage
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.preference.AudioPlayModePreference
+import com.ismartcoding.plain.data.preference.AudioPlayingPreference
+import com.ismartcoding.plain.data.preference.AudioPlaylistPreference
 import com.ismartcoding.plain.features.AudioActionEvent
 import com.ismartcoding.plain.features.audio.*
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 // https://developer.android.com/guide/topics/media/media3
 class AudioPlayerService : LifecycleService() {
@@ -47,6 +53,7 @@ class AudioPlayerService : LifecycleService() {
                         AudioPlayer.instance.play()
                     }
                 }
+
                 NOTIFICATION_NEXT -> AudioPlayer.instance.skipToNext()
                 NOTIFICATION_CANCEL -> {
                     AudioPlayer.instance.pause()
@@ -74,36 +81,45 @@ class AudioPlayerService : LifecycleService() {
         registerReceiver()
 
         receiveEvent<AudioActionEvent> { event ->
-            when (event.action) {
-                AudioAction.COMPLETE -> {
-                    if (AudioPlayer.instance.pendingQuit) {
-                        AudioPlayer.instance.pendingQuit = false
-                        quit()
-                        return@receiveEvent
+            lifecycleScope.launch(Dispatchers.IO) {
+                when (event.action) {
+                    AudioAction.COMPLETE -> {
+                        if (AudioPlayer.instance.pendingQuit) {
+                            AudioPlayer.instance.pendingQuit = false
+                            quit()
+                            return@launch
+                        }
+                        AudioPlayer.instance.setPlayerProgress(0)
+                        when (AudioPlayModePreference.getValue(MainApp.instance)) {
+                            MediaPlayMode.REPEAT_ONE -> {
+                                AudioPlayer.instance.play()
+                            }
+
+                            MediaPlayMode.REPEAT -> {
+                                AudioPlayer.instance.skipToNext()
+                            }
+
+                            MediaPlayMode.SHUFFLE -> {
+                                val context = MainApp.instance
+                                AudioPlayingPreference.putAsync(context, AudioPlaylistPreference.getValue(context).random())
+                                AudioPlayer.instance.play()
+                            }
+                        }
                     }
-                    AudioPlayer.instance.setPlayerProgress(0)
-                    when (LocalStorage.audioPlayMode) {
-                        MediaPlayMode.REPEAT_ONE -> {
-                            AudioPlayer.instance.play()
-                        }
-                        MediaPlayMode.REPEAT -> {
-                            AudioPlayer.instance.skipToNext()
-                        }
-                        MediaPlayMode.SHUFFLE -> {
-                            LocalStorage.audioPlaying = LocalStorage.audioPlaylist.random()
-                            AudioPlayer.instance.play()
-                        }
+
+                    AudioAction.PLAY, AudioAction.PAUSE, AudioAction.NOTIFICATION -> {
+                        startForeground(2, createNotification())
                     }
+
+                    AudioAction.STOP -> {
+                    }
+
+                    AudioAction.NOT_FOUND -> {
+                        DialogHelper.showMessage("No audio found")
+                    }
+
+                    else -> {}
                 }
-                AudioAction.PLAY, AudioAction.PAUSE, AudioAction.NOTIFICATION -> {
-                    startForeground(2, createNotification())
-                }
-                AudioAction.STOP -> {
-                }
-                AudioAction.NOT_FOUND -> {
-                    DialogHelper.showMessage("No audio found")
-                }
-                else -> {}
             }
         }
 
@@ -130,21 +146,27 @@ class AudioPlayerService : LifecycleService() {
                     coIO { playAudio(it) }
                 }
             }
+
             AudioServiceAction.PAUSE.name -> {
                 AudioPlayer.instance.pause()
             }
+
             AudioServiceAction.SKIP_NEXT.name -> {
                 AudioPlayer.instance.skipToNext()
             }
+
             AudioServiceAction.SKIP_PREVIOUS.name -> {
                 AudioPlayer.instance.skipToPrevious()
             }
+
             AudioServiceAction.SEEK.name -> {
                 AudioPlayer.instance.seekTo(intent.getIntExtra("progress", 0))
             }
+
             AudioServiceAction.QUIT.name -> {
                 quit()
             }
+
             AudioServiceAction.PENDING_QUIT.name -> {
                 AudioPlayer.instance.pendingQuit = true
             }
@@ -210,7 +232,9 @@ class AudioPlayerService : LifecycleService() {
     }
 
     private fun createNotification(): Notification {
-        smallRemoteView.setTextViewText(R.id.tv_name, LocalStorage.audioPlaying?.title)
+        val context = MainApp.instance
+        val playing = AudioPlayingPreference.getValue(context)
+        smallRemoteView.setTextViewText(R.id.tv_name, playing?.title)
         smallRemoteView.setImageViewResource(
             R.id.img_play,
             if (AudioPlayer.instance.isPlaying()) R.drawable.ic_pause else R.drawable.ic_play
@@ -219,7 +243,7 @@ class AudioPlayerService : LifecycleService() {
         smallRemoteView.setOnClickPendingIntent(R.id.img_play, intentPlay)
         smallRemoteView.setOnClickPendingIntent(R.id.img_next, intentNext)
 
-        largeRemoteView.setTextViewText(R.id.tv_name, LocalStorage.audioPlaying?.title)
+        largeRemoteView.setTextViewText(R.id.tv_name, playing?.title)
         largeRemoteView.setImageViewResource(
             R.id.img_play,
             if (AudioPlayer.instance.isPlaying()) R.drawable.ic_pause else R.drawable.ic_play
@@ -231,8 +255,8 @@ class AudioPlayerService : LifecycleService() {
 
         return NotificationCompat.Builder(this, Constants.NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(LocalStorage.audioPlaying?.title)
-            .setContentText(LocalStorage.audioPlaying?.artist)
+            .setContentTitle(playing?.title)
+            .setContentText(playing?.artist)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setOnlyAlertOnce(true)
             .setSilent(true)
@@ -242,9 +266,11 @@ class AudioPlayerService : LifecycleService() {
             .setCustomBigContentView(largeRemoteView).build()
     }
 
-    private fun playAudio(playlistAudio: DPlaylistAudio) {
-        if (LocalStorage.audioPlaying?.path != playlistAudio.path) {
-            LocalStorage.audioPlaying = playlistAudio
+    private suspend fun playAudio(playlistAudio: DPlaylistAudio) {
+        val context = MainApp.instance
+        val playing = AudioPlayingPreference.getValue(context)
+        if (playing?.path != playlistAudio.path) {
+            AudioPlayingPreference.putAsync(context, playlistAudio)
             AudioPlayer.instance.setPlayerProgress(0)
             AudioPlayer.instance.play()
         } else {
@@ -253,8 +279,8 @@ class AudioPlayerService : LifecycleService() {
             }
         }
 
-        if (!LocalStorage.audioPlaylist.any { it.path == playlistAudio.path }) {
-            LocalStorage.addPlaylistAudio(playlistAudio)
+        if (!AudioPlaylistPreference.getValue(context).any { it.path == playlistAudio.path }) {
+            AudioPlaylistPreference.addAsync(context, listOf(playlistAudio))
         }
     }
 
@@ -274,7 +300,7 @@ class AudioPlayerService : LifecycleService() {
 
         fun play(context: Context, playlistAudio: DPlaylistAudio? = null) {
             doAction(context, AudioServiceAction.PLAY) {
-                val audio: Parcelable? = playlistAudio ?: LocalStorage.audioPlaying
+                val audio: Parcelable? = playlistAudio ?: AudioPlayingPreference.getValue(context)
                 putExtra("audio", audio)
             }
         }

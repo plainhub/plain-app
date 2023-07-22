@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.features.vocabulary
 
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DVocabulary

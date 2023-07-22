@@ -12,7 +12,6 @@ import com.ismartcoding.lib.extensions.getIntValue
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.getTimeValue
 import com.ismartcoding.lib.helpers.SearchHelper
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.features.BaseContentHelper
 import kotlinx.datetime.Instant

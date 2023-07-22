@@ -15,15 +15,11 @@ import com.aallam.openai.client.OpenAIConfig
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.SslHelper
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.api.ApiResult
-import com.ismartcoding.plain.api.HttpClientManager
-import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.data.enums.*
+import com.ismartcoding.plain.data.preference.ChatGPTApiKeyPreference
 import com.ismartcoding.plain.db.DAIChat
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
@@ -155,7 +151,7 @@ object AppEvents {
             coIO {
                 val openAI = OpenAI(
                     OpenAIConfig(
-                        token = LocalStorage.chatGPTApiKey,
+                        token = ChatGPTApiKeyPreference.get(MainApp.instance),
                         timeout = Timeout(socket = 60.seconds),
                     )
                 )

@@ -25,10 +25,11 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.ActionSourceType
+import com.ismartcoding.plain.data.preference.FileSortByPreference
+import com.ismartcoding.plain.data.preference.ShowHiddenFilesPreference
 import com.ismartcoding.plain.databinding.DialogFilesBinding
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.ActionEvent
@@ -89,8 +90,9 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
 
         binding.toolbar.run {
             initMenu(R.menu.files)
-            menu.findItem(R.id.show_hidden).isChecked = LocalStorage.showHiddenFiles
-            FileSortHelper.getSelectedSortItem(menu, LocalStorage.fileSortBy).highlightTitle(requireContext())
+            val context = requireContext()
+            menu.findItem(R.id.show_hidden).isChecked = ShowHiddenFilesPreference.get(context)
+            FileSortHelper.getSelectedSortItem(menu, FileSortByPreference.getValue(context)).highlightTitle(context)
             onBack {
                 onBackPressed()
             }
@@ -102,7 +104,7 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
             }
 
             onMenuItemClick {
-                FilesTopMenuHelper.onMenuItemClick(lifecycleScope, requireContext(), viewModel, binding, this)
+                FilesTopMenuHelper.onMenuItemClick(lifecycleScope, context, viewModel, binding, this)
             }
         }
 
@@ -302,13 +304,19 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
     private fun updateList() {
         lifecycleScope.launch {
             val p = viewModel.path
+            val context = requireContext()
             val items = withIO {
-                if (viewModel.type == FilesType.RECENTS) FileSystemHelper.getRecents(MainApp.instance)
-                else if (viewModel.searchQ.isNotEmpty()) FileSystemHelper.search(viewModel.searchQ, p, LocalStorage.showHiddenFiles) else FileSystemHelper.getFilesList(
-                    p,
-                    LocalStorage.showHiddenFiles,
-                    LocalStorage.fileSortBy
-                )
+                if (viewModel.type == FilesType.RECENTS) {
+                    FileSystemHelper.getRecents(context)
+                } else if (viewModel.searchQ.isNotEmpty()) {
+                    FileSystemHelper.search(viewModel.searchQ, p, ShowHiddenFilesPreference.get(context))
+                } else {
+                    FileSystemHelper.getFilesList(
+                        p,
+                        ShowHiddenFilesPreference.get(context),
+                        FileSortByPreference.getValue(context)
+                    )
+                }
             }
             if (p != viewModel.path) {
                 updateList()

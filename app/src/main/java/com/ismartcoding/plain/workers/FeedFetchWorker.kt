@@ -6,8 +6,9 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isWifiConnected
 import com.ismartcoding.lib.helpers.CoroutinesHelper.pmap
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.data.preference.FeedAutoRefreshIntervalPreference
+import com.ismartcoding.plain.data.preference.FeedAutoRefreshOnlyWifiPreference
 import com.ismartcoding.plain.features.FeedStatusEvent
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.features.feed.*
@@ -31,7 +32,7 @@ class FeedFetchWorker(
     override suspend fun doWork(): Result {
         supervisorScope {
             val autoRefresh = inputData.getBoolean("auto_refresh", false)
-            if (autoRefresh && LocalStorage.feedAutoRefreshOnlyWifi && context.isWifiConnected()) {
+            if (autoRefresh && FeedAutoRefreshOnlyWifiPreference.get(context)  && context.isWifiConnected()) {
                 return@supervisorScope
             }
 
@@ -123,16 +124,16 @@ class FeedFetchWorker(
             errorMap.clear()
         }
 
-        fun startRepeatWorker() {
+        fun startRepeatWorker(context: Context) {
             val data = Data.Builder()
             data.putBoolean("auto_refresh", true)
             val request = PeriodicWorkRequestBuilder<FeedFetchWorker>(
-                LocalStorage.feedAutoRefreshInterval.toLong(), TimeUnit.SECONDS
+                FeedAutoRefreshIntervalPreference.get(context).toLong(), TimeUnit.SECONDS
             ).setInputData(data.build()).setConstraints(
                 Constraints.Builder().build()
             ).addTag(REPEAT_WORK_NAME)
 
-            WorkManager.getInstance(MainApp.instance).enqueueUniquePeriodicWork(
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 REPEAT_WORK_NAME,
                 ExistingPeriodicWorkPolicy.REPLACE,
                 request.build()

@@ -7,6 +7,7 @@ import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
 @Parcelize
+@kotlinx.serialization.Serializable
 data class DVideo(
     override var id: String,
     val title: String,

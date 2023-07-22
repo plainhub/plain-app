@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.features.box
 
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.api.BoxApi
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DBox

@@ -11,6 +11,7 @@ import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
 @Parcelize
+@kotlinx.serialization.Serializable
 data class DPlaylistAudio(
     val title: String,
     val path: String,

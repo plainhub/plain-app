@@ -96,11 +96,13 @@ fun ExchangeRatePage(
                         tint = MaterialTheme.colorScheme.onSurface,
                         onClick = {
                             SelectCurrencyDialog { rate ->
-                                val selected = config.selected
-                                if (!selected.contains(rate.currency)) {
-                                    selected.add(rate.currency)
-                                    ExchangeRatePreference.put(context, scope, config)
-                                    updatedTs = System.currentTimeMillis()
+                                scope.launch {
+                                    val selected = config.selected
+                                    if (!selected.contains(rate.currency)) {
+                                        selected.add(rate.currency)
+                                        withIO { ExchangeRatePreference.putAsync(context, config) }
+                                        updatedTs = System.currentTimeMillis()
+                                    }
                                 }
                             }.show()
                         }
@@ -148,11 +150,15 @@ fun ExchangeRatePage(
                                             onDismissRequest = { showContextMenu.value = false }
                                         ) {
                                             DropdownMenuItem(text = { Text(stringResource(id = R.string.delete)) }, onClick = {
-                                                showContextMenu.value = false
-                                                val selected = config.selected
-                                                selected.remove(rate.rate.currency)
-                                                ExchangeRatePreference.put(context, scope, config)
-                                                updatedTs = System.currentTimeMillis()
+                                                scope.launch {
+                                                    showContextMenu.value = false
+                                                    val selected = config.selected
+                                                    selected.remove(rate.rate.currency)
+                                                    withIO {
+                                                        ExchangeRatePreference.putAsync(context, config)
+                                                    }
+                                                    updatedTs = System.currentTimeMillis()
+                                                }
                                             })
                                         }
                                     }
@@ -182,11 +188,13 @@ fun ExchangeRatePage(
                         imeAction = ImeAction.Done,
                     ),
                     onConfirm = {
-                        config.base = selectedItem!!.currency
-                        config.value = editValue.toDoubleOrNull() ?: 100.0
-                        ExchangeRatePreference.put(context, scope, config)
-                        updatedTs = System.currentTimeMillis()
-                        editValueDialogVisible = false
+                        scope.launch {
+                            config.base = selectedItem!!.currency
+                            config.value = editValue.toDoubleOrNull() ?: 100.0
+                            withIO { ExchangeRatePreference.putAsync(context, config) }
+                            updatedTs = System.currentTimeMillis()
+                            editValueDialogVisible = false
+                        }
                     }
                 )
             }

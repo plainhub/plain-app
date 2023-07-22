@@ -40,12 +40,12 @@ class HttpServerService : LifecycleService() {
                 if (MainApp.instance.httpServer == null) {
                     MainApp.instance.httpServer = HttpServerManager.createHttpServer(MainApp.instance)
                     MainApp.instance.httpServer?.start(wait = true)
-                    MainApp.instance.httpServerError = ""
+                    HttpServerManager.httpServerError = ""
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
                 MainApp.instance.httpServer = null
-                MainApp.instance.httpServerError = ex.toString()
+                HttpServerManager.httpServerError = ex.toString()
                 LogCat.e(ex.toString())
             }
         }

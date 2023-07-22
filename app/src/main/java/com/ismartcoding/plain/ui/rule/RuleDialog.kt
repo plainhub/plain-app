@@ -16,9 +16,9 @@ import com.ismartcoding.plain.ui.extensions.setSafeClick
 import com.ismartcoding.plain.extensions.toRule
 import com.ismartcoding.plain.features.rule.*
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
+import com.ismartcoding.plain.data.preference.DeviceSortByPreference
 import com.ismartcoding.plain.extensions.sorted
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -151,11 +151,11 @@ class RuleDialog(private var mItem: Rule?) : BaseBottomSheetDialog<DialogRuleBin
         binding.applyTo.run {
             setValueText(ruleEdit.applyTo.getText(UIDataCache.current().getDevices(), UIDataCache.current().getNetworks()))
             setClick {
-                SelectItemDialog(search = { q->
+                SelectItemDialog(search = { q ->
                     val items = mutableListOf<Any>()
                     items.add(AllItemsOption(getString(R.string.all_devices)))
                     items.addAll(UIDataCache.current().getSelectableNetworks(q))
-                    items.addAll(UIDataCache.current().getDevices(q).sorted(LocalStorage.deviceSortBy))
+                    items.addAll(UIDataCache.current().getDevices(q).sorted(DeviceSortByPreference.getValue(requireContext())))
                     items
                 }) { type, value ->
                     ruleEdit.applyTo.type = type

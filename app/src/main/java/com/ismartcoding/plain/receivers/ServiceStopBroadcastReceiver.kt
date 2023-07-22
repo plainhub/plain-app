@@ -14,7 +14,7 @@ class ServiceStopBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == "com.ismartcoding.plain.action.stop_http_server") {
-            WebPreference.put(MainApp.instance, MainApp.instance.ioScope, false)
+            WebPreference.put(MainApp.instance, false)
             sendEvent(HttpServerEnabledEvent(false))
             HttpServerService.instance?.stop()
             HttpServerService.instance = null

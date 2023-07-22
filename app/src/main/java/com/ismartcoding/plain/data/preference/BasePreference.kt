@@ -2,9 +2,7 @@ package com.ismartcoding.plain.data.preference
 
 import android.content.Context
 import androidx.datastore.preferences.core.Preferences
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 
 abstract class BasePreference<T> {
     abstract val default: T
@@ -18,12 +16,17 @@ abstract class BasePreference<T> {
         return context.dataStore.get(key) ?: default
     }
 
-    fun put(context: Context, scope: CoroutineScope, value: T) {
-        scope.launch(Dispatchers.IO) {
-            context.dataStore.put(
-                key,
-                value
-            )
+    @Deprecated("Use putAsync instead", ReplaceWith("putAsync(context, value)"))
+    fun put(context: Context, value: T) {
+        coIO {
+            putAsync(context, value)
         }
+    }
+
+    suspend fun putAsync(context: Context, value: T) {
+        context.dataStore.put(
+            key,
+            value
+        )
     }
 }

@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.plain.InitQuery
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.*
 import com.ismartcoding.plain.databinding.DialogConnectBoxBinding

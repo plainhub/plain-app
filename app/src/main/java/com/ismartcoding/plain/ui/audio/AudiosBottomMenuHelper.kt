@@ -7,11 +7,11 @@ import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.ShareHelper
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.preference.AudioPlaylistPreference
 import com.ismartcoding.plain.databinding.DialogListDrawerBinding
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.audio.AudioHelper
@@ -47,9 +47,13 @@ object AudiosBottomMenuHelper {
             }
             R.id.add_to_playlist -> {
                 rv.ensureSelect { items ->
-                    LocalStorage.addPlaylistAudios(items.map { (it.data as DAudio).toPlaylistAudio() })
-                    rv.bindingAdapter.checkedAll(false)
-                    DialogHelper.showMessage(R.string.added_to_playlist)
+                    lifecycleScope.launch {
+                        withIO {
+                            AudioPlaylistPreference.addAsync(context, items.map { (it.data as DAudio).toPlaylistAudio() })
+                        }
+                        rv.bindingAdapter.checkedAll(false)
+                        DialogHelper.showMessage(R.string.added_to_playlist)
+                    }
                 }
             }
             R.id.delete -> {
@@ -66,9 +70,7 @@ object AudiosBottomMenuHelper {
                                     context,
                                     ids
                                 )
-                                items.forEach {
-                                    LocalStorage.deletePlaylistAudio((it.data as DAudio).path)
-                                }
+                                AudioPlaylistPreference.deleteAsync(context, items.map { (it.data as DAudio).path }.toSet())
                             }
                             list.rv.bindingAdapter.checkedAll(false)
                             sendEvent(ActionEvent(ActionSourceType.AUDIO, ActionType.DELETED, ids))

@@ -7,11 +7,11 @@ import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.ShareHelper
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.preference.VideoPlaylistPreference
 import com.ismartcoding.plain.databinding.DialogListDrawerBinding
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.tag.TagHelper
@@ -40,18 +40,23 @@ object VideosBottomMenuHelper {
                     ShareHelper.share(context, ArrayList(items.map { VideoHelper.getItemUri(it.data.id) }))
                 }
             }
+
             R.id.cast -> {
                 rv.ensureSelect { items ->
                     CastDialog(items.map { it.data as DVideo }).show()
                 }
             }
+
             R.id.add_to_playlist -> {
                 rv.ensureSelect { items ->
-                    LocalStorage.addVideos(items.map { it.data as DVideo })
-                    rv.bindingAdapter.checkedAll(false)
-                    DialogHelper.showMessage(R.string.added_to_playlist)
+                    lifecycleScope.launch {
+                        withIO { VideoPlaylistPreference.addAsync(context, items.map { it.data as DVideo }) }
+                        rv.bindingAdapter.checkedAll(false)
+                        DialogHelper.showMessage(R.string.added_to_playlist)
+                    }
                 }
             }
+
             R.id.delete -> {
                 rv.ensureSelect { items ->
                     DialogHelper.confirmToDelete(context) {
@@ -66,9 +71,7 @@ object VideosBottomMenuHelper {
                                     context,
                                     ids
                                 )
-                                ids.forEach { id ->
-                                    LocalStorage.deleteVideo(VideoHelper.getItemUri(id).toString())
-                                }
+                                VideoPlaylistPreference.deleteAsync(context, ids.map { VideoHelper.getItemUri(it).toString() }.toSet())
                             }
                             list.rv.bindingAdapter.checkedAll(false)
                             sendEvent(ActionEvent(ActionSourceType.VIDEO, ActionType.DELETED, ids))
@@ -76,6 +79,7 @@ object VideosBottomMenuHelper {
                     }
                 }
             }
+
             else -> {
                 BottomMenuHelper.onMenuItemClick(viewModel, binding, menuItem)
             }

@@ -1,16 +1,14 @@
 package com.ismartcoding.plain.ui.page.settings
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RadioButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.preference.AmoledDarkThemePreference
 import com.ismartcoding.plain.data.enums.DarkTheme
@@ -23,6 +21,7 @@ import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.Subtitle
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,11 +43,19 @@ fun DarkThemePage(
                         PListItem(
                             title = it.getText(context),
                             onClick = {
-                                DarkThemePreference.put(context, scope, it)
+                                scope.launch {
+                                    withIO {
+                                        DarkThemePreference.putAsync(context, it)
+                                    }
+                                }
                             },
                         ) {
                             RadioButton(selected = it.value == darkTheme, onClick = {
-                                DarkThemePreference.put(context, scope, it)
+                                scope.launch {
+                                    withIO {
+                                        DarkThemePreference.putAsync(context, it)
+                                    }
+                                }
                             })
                         }
                     }
@@ -58,11 +65,11 @@ fun DarkThemePage(
                     PListItem(
                         title = stringResource(R.string.amoled_dark_theme),
                         onClick = {
-                            AmoledDarkThemePreference.put(context, scope, !amoledDarkTheme)
+                            AmoledDarkThemePreference.put(context, !amoledDarkTheme)
                         },
                     ) {
                         PSwitch(activated = amoledDarkTheme) {
-                            AmoledDarkThemePreference.put(context, scope, !amoledDarkTheme)
+                            AmoledDarkThemePreference.put(context, !amoledDarkTheme)
                         }
                     }
                     BottomSpace()

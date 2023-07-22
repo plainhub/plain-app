@@ -8,14 +8,20 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.coroutineScope
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.extensions.getWindowWidth
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.softinput.hideSoftInput
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.preference.EditorAccessoryLevelPreference
+import com.ismartcoding.plain.data.preference.EditorShowLineNumbersPreference
+import com.ismartcoding.plain.data.preference.EditorSyntaxHighlightPreference
+import com.ismartcoding.plain.data.preference.EditorWrapContentPreference
 import com.ismartcoding.plain.databinding.ViewTextEditorBinding
 import com.ismartcoding.plain.ui.extensions.setSafeClick
 import com.ismartcoding.plain.ui.views.CustomViewBase
+import kotlinx.coroutines.launch
 import kotlin.math.abs
 
 class TextEditorView(context: Context, attrs: AttributeSet?) : CustomViewBase(context, attrs), PageSystemButtons.PageButtonsInterface {
@@ -53,12 +59,12 @@ class TextEditorView(context: Context, attrs: AttributeSet?) : CustomViewBase(co
 
         isInitialized = true
 
-        val wrapContent = LocalStorage.editorWrapContent
-        val syntaxHighlight = LocalStorage.editorSyntaxHighlight
+        val wrapContent = EditorWrapContentPreference.get(context)
+        val syntaxHighlight = EditorSyntaxHighlightPreference.get(context)
         binding.editor.apply {
             verticalScroll = binding.verticalScroll
             fileExtension = extension
-            showLineNumbers = LocalStorage.editorShowLineNumbers
+            showLineNumbers = EditorShowLineNumbersPreference.get(context)
             this.syntaxHighlight = syntaxHighlight
             this.wrapContent = wrapContent
             minWidth = context.getWindowWidth()
@@ -76,7 +82,7 @@ class TextEditorView(context: Context, attrs: AttributeSet?) : CustomViewBase(co
 
         binding.editor.onTextChanged = {
             onTextChanged?.invoke()
-           // updateTextSyntax()
+            // updateTextSyntax()
         }
 
         binding.accessory.getEditor = {
@@ -88,12 +94,15 @@ class TextEditorView(context: Context, attrs: AttributeSet?) : CustomViewBase(co
         }
 
         binding.toggle.setSafeClick {
-            if (LocalStorage.editorAccessoryLevel == 0) {
-                LocalStorage.editorAccessoryLevel = 1
-            } else {
-                LocalStorage.editorAccessoryLevel = 0
+            lifecycle.coroutineScope.launch {
+                if (EditorAccessoryLevelPreference.get(context) == 0) {
+                    withIO { EditorAccessoryLevelPreference.putAsync(context, 1) }
+                } else {
+                    withIO { EditorAccessoryLevelPreference.putAsync(context, 0) }
+                }
+                updateAccessoryVisible()
             }
-            updateAccessoryVisible()
+
         }
 
         updateAccessoryVisible()
@@ -115,18 +124,20 @@ class TextEditorView(context: Context, attrs: AttributeSet?) : CustomViewBase(co
                 EditorSettingsType.WRAP_CONTENT -> {
                     updateWrapContent()
                 }
+
                 EditorSettingsType.LINE_NUMBERS -> {
                     binding.editor.apply {
-                        showLineNumbers = LocalStorage.editorShowLineNumbers
+                        showLineNumbers = EditorShowLineNumbersPreference.get(context)
                         disableTextChangedListener()
                         replaceTextKeepCursor(null)
                         enableTextChangedListener()
                         updatePadding()
                     }
                 }
+
                 EditorSettingsType.SYNTAX_HIGHLIGHT -> {
                     binding.editor.apply {
-                        this.syntaxHighlight = LocalStorage.editorSyntaxHighlight
+                        this.syntaxHighlight = EditorSyntaxHighlightPreference.get(context)
                         disableTextChangedListener()
                         replaceTextKeepCursor(text.toString())
                         enableTextChangedListener()
@@ -148,7 +159,7 @@ class TextEditorView(context: Context, attrs: AttributeSet?) : CustomViewBase(co
     }
 
     private fun updateWrapContent() {
-        val wrapContent = LocalStorage.editorWrapContent
+        val wrapContent = EditorWrapContentPreference.get(context)
         binding.editor.wrapContent = wrapContent
         if (wrapContent) {
             binding.horizontalScroll.removeView(binding.editor)
@@ -162,7 +173,7 @@ class TextEditorView(context: Context, attrs: AttributeSet?) : CustomViewBase(co
     }
 
     private fun updateAccessoryVisible() {
-        if (LocalStorage.editorAccessoryLevel == 0) {
+        if (EditorAccessoryLevelPreference.get(context) == 0) {
             binding.toggle.setIconResource(R.drawable.ic_one)
             binding.accessory.isVisible = true
             binding.accessory2.isVisible = false

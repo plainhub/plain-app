@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.audio
 
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.ismartcoding.lib.brv.BindingAdapter
 import com.ismartcoding.lib.brv.annotaion.ItemOrientation
@@ -10,9 +11,11 @@ import com.ismartcoding.lib.brv.listener.DefaultItemTouchCallback
 import com.ismartcoding.lib.brv.utils.*
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.preference.AudioPlayingPreference
+import com.ismartcoding.plain.data.preference.AudioPlaylistPreference
 import com.ismartcoding.plain.databinding.DialogPlaylistBinding
 import com.ismartcoding.plain.features.*
 import com.ismartcoding.plain.features.audio.*
@@ -20,6 +23,8 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
     data class AudioModel(val audio: DPlaylistAudio, override var itemOrientationDrag: Int = ItemOrientation.ALL) : BaseAudioModel(), ItemDrag
@@ -37,10 +42,15 @@ class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
             onMenuItemClick {
                 when (itemId) {
                     R.id.clear_list -> {
-                        AudioPlayer.instance.pause()
-                        LocalStorage.audioPlaying = null
-                        LocalStorage.audioPlaylist = arrayListOf()
-                        sendEvent(ClearAudioPlaylistEvent())
+                        lifecycleScope.launch {
+                            val context = requireContext()
+                            withIO {
+                                AudioPlayer.instance.pause()
+                                AudioPlayingPreference.putAsync(context, null)
+                                AudioPlaylistPreference.putAsync(context, arrayListOf())
+                                sendEvent(ClearAudioPlaylistEvent())
+                            }
+                        }
                     }
                 }
             }
@@ -67,7 +77,9 @@ class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
                     source: BindingAdapter.BindingViewHolder,
                     target: BindingAdapter.BindingViewHolder
                 ) {
-                    LocalStorage.audioPlaylist = getModelList<AudioModel>().map { it.audio }
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        AudioPlaylistPreference.putAsync(requireContext(), getModelList<AudioModel>().map { it.audio })
+                    }
                 }
             })
         }
@@ -99,9 +111,10 @@ class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
     }
 
     private fun updatePlayingState() {
+        val context = requireContext()
         binding.list.rv.getModelList<AudioModel>().forEach {
             val old = it.isPlaying
-            it.checkIsPlaying(it.audio.path)
+            it.checkIsPlaying(context, it.audio.path)
             if (old != it.isPlaying) {
                 it.notifyChange()
             }
@@ -109,24 +122,29 @@ class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
     }
 
     private fun search() {
-        binding.list.page.addData(LocalStorage.audioPlaylist
+        val context = requireContext()
+        binding.list.page.addData(AudioPlaylistPreference.getValue(context)
             .filter { searchQ.isEmpty() || it.title.contains(searchQ, true) || it.artist.contains(searchQ, true) }
             .map { audio ->
                 AudioModel(audio).apply {
                     title = audio.title
                     subtitle = audio.artist + " " + FormatHelper.formatDuration(audio.duration)
-                    checkIsPlaying(audio.path)
+                    checkIsPlaying(context, audio.path)
                     swipeEnable = true
                     rightSwipeText = getString(R.string.remove)
                     rightSwipeClick = {
-                        LocalStorage.deletePlaylistAudio(audio.path)
-                        binding.list.rv.apply {
-                            val index = getModelList<AudioModel>().indexOfFirst { it.audio.path == audio.path }
-                            if (index != -1) {
-                                removeModel(index)
+                        lifecycleScope.launch {
+                            val context = requireContext()
+                            withIO { AudioPlaylistPreference.deleteAsync(context, setOf(audio.path)) }
+                            binding.list.rv.apply {
+                                val index = getModelList<AudioModel>().indexOfFirst { it.audio.path == audio.path }
+                                if (index != -1) {
+                                    removeModel(index)
+                                }
                             }
+                            updateTitle()
                         }
-                        updateTitle()
+
                     }
                 }
             })
@@ -134,7 +152,7 @@ class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
     }
 
     private fun updateTitle() {
-        val total = LocalStorage.audioPlaylist.size
+        val total = AudioPlaylistPreference.getValue(requireContext()).size
         binding.topAppBar.title = if (total > 0) LocaleHelper.getStringF(R.string.playlist_title, "total", total) else getString(R.string.playlist)
     }
 }

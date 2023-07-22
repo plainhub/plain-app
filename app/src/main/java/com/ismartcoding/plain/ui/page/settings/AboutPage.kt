@@ -12,7 +12,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.BuildConfig
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
@@ -43,7 +42,7 @@ fun AboutPage(
                     DisplayText(text = stringResource(R.string.about))
                     PListItem(
                         title = stringResource(R.string.client_id),
-                        value = LocalStorage.clientId
+                        value = TempData.clientId
                     )
                     PListItem(
                         title = stringResource(R.string.app_version),

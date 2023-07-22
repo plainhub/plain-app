@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.features.bluetooth
 
 import android.content.Context
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.lib.helpers.PhoneHelper
+import com.ismartcoding.plain.TempData
 import org.json.JSONObject
 
 data class BleAuthData(val password: String) {
@@ -31,7 +31,7 @@ data class BleRequestData(val headers: MutableMap<String, String> = mutableMapOf
         fun create(context: Context): BleRequestData {
             val data = BleRequestData()
             data.headers.run {
-                this["c-id"] = LocalStorage.clientId
+                this["c-id"] = TempData.clientId
                 this["c-platform"] = "android"
                 this["c-name"] = PhoneHelper.getDeviceName(context)
                 this["c-version"] = MainApp.getAppVersion()

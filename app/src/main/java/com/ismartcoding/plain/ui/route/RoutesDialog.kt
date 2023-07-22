@@ -8,7 +8,6 @@ import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.DeleteConfigMutation
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.BoxApi
 import com.ismartcoding.plain.data.*

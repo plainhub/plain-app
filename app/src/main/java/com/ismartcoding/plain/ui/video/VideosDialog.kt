@@ -16,11 +16,11 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.rv.GridSpacingItemDecoration
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.preference.VideoSortByPreference
 import com.ismartcoding.plain.databinding.ItemMediaBucketGridBinding
 import com.ismartcoding.plain.databinding.ItemVideoGridBinding
 import com.ismartcoding.plain.features.ActionEvent
@@ -165,10 +165,11 @@ class VideosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     }
 
     override fun initTopAppBar() {
+        val context = requireContext()
         initTopAppBar(R.menu.media_items_top) {
-            FileSortHelper.bindSortMenuItemClick(requireContext(), binding.topAppBar.toolbar.menu, this, MediaType.VIDEO, viewModel, binding.list)
+            FileSortHelper.bindSortMenuItemClick(context, lifecycleScope, binding.topAppBar.toolbar.menu, this, MediaType.VIDEO, viewModel, binding.list)
         }
-        FileSortHelper.getSelectedSortItem(binding.topAppBar.toolbar.menu, LocalStorage.videoSortBy).highlightTitle(requireContext())
+        FileSortHelper.getSelectedSortItem(binding.topAppBar.toolbar.menu, VideoSortByPreference.getValue(context)).highlightTitle(context)
     }
 
     private fun initFab() {
@@ -183,8 +184,9 @@ class VideosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
 
     private suspend fun updateVideos() {
         val query = viewModel.getQuery()
-        val items = withIO { VideoHelper.search(requireContext(), query, viewModel.limit, viewModel.offset, LocalStorage.videoSortBy) }
-        viewModel.total = withIO { VideoHelper.count(requireContext(), query) }
+        val context = requireContext()
+        val items = withIO { VideoHelper.search(context, query, viewModel.limit, viewModel.offset, VideoSortByPreference.getValue(context)) }
+        viewModel.total = withIO { VideoHelper.count(context, query) }
 
         val bindingAdapter = binding.list.rv.bindingAdapter
         val toggleMode = bindingAdapter.toggleMode

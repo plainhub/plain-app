@@ -5,8 +5,9 @@ import android.view.MenuItem
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.preference.FileSortByPreference
+import com.ismartcoding.plain.data.preference.ShowHiddenFilesPreference
 import com.ismartcoding.plain.databinding.DialogFilesBinding
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.FileSystemHelper
@@ -25,7 +26,7 @@ object FilesTopMenuHelper {
     ) {
         when (menuItem.itemId) {
             R.id.create_folder -> {
-                EditValueDialog(getString(R.string.create_folder), hint= getString(R.string.name)) {
+                EditValueDialog(getString(R.string.create_folder), hint = getString(R.string.name)) {
                     val name = this.binding.value.text
                     lifecycleScope.launch {
                         blockFormUI()
@@ -35,6 +36,7 @@ object FilesTopMenuHelper {
                     }
                 }.show()
             }
+
             R.id.create_file -> {
                 EditValueDialog(getString(R.string.create_file), hint = getString(R.string.name)) {
                     val name = this.binding.value.text
@@ -46,28 +48,37 @@ object FilesTopMenuHelper {
                     }
                 }.show()
             }
+
             R.id.show_hidden -> {
-                LocalStorage.showHiddenFiles = !menuItem.isChecked
-                menuItem.isChecked = !menuItem.isChecked
-                binding.list.page.refresh()
+                lifecycleScope.launch {
+                    withIO { ShowHiddenFilesPreference.putAsync(context, !menuItem.isChecked) }
+                    menuItem.isChecked = !menuItem.isChecked
+                    binding.list.page.refresh()
+                }
             }
+
             R.id.sort_newest_first -> {
-                sort(context, binding, FileSortBy.DATE_DESC)
+                sort(context, lifecycleScope, binding, FileSortBy.DATE_DESC)
             }
+
             R.id.sort_oldest_first -> {
-                sort(context, binding, FileSortBy.DATE_ASC)
+                sort(context, lifecycleScope, binding, FileSortBy.DATE_ASC)
             }
+
             R.id.sort_largest_first -> {
-                sort(context, binding, FileSortBy.SIZE_DESC)
+                sort(context, lifecycleScope, binding, FileSortBy.SIZE_DESC)
             }
+
             R.id.sort_smallest_first -> {
-                sort(context, binding, FileSortBy.SIZE_ASC)
+                sort(context, lifecycleScope, binding, FileSortBy.SIZE_ASC)
             }
+
             R.id.sort_name_asc -> {
-                sort(context, binding, FileSortBy.NAME_ASC)
+                sort(context, lifecycleScope, binding, FileSortBy.NAME_ASC)
             }
+
             R.id.sort_name_desc -> {
-                sort(context, binding, FileSortBy.NAME_DESC)
+                sort(context, lifecycleScope, binding, FileSortBy.NAME_DESC)
             }
             // select mode menu
             R.id.select_all -> {
@@ -85,13 +96,16 @@ object FilesTopMenuHelper {
 
     private fun sort(
         context: Context,
+        lifecycleScope: LifecycleCoroutineScope,
         binding: DialogFilesBinding,
         sortBy: FileSortBy
     ) {
-        val menu = binding.toolbar.menu
-        FileSortHelper.getSelectedSortItem(menu, LocalStorage.fileSortBy).unhighlightTitle()
-        LocalStorage.fileSortBy = sortBy
-        FileSortHelper.getSelectedSortItem(menu, LocalStorage.fileSortBy).highlightTitle(context)
-        binding.list.page.refresh()
+        lifecycleScope.launch {
+            val menu = binding.toolbar.menu
+            FileSortHelper.getSelectedSortItem(menu, FileSortByPreference.getValue(context)).unhighlightTitle()
+            withIO { FileSortByPreference.putAsync(context, sortBy) }
+            FileSortHelper.getSelectedSortItem(menu, FileSortByPreference.getValue(context)).highlightTitle(context)
+            binding.list.page.refresh()
+        }
     }
 }

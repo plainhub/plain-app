@@ -3,11 +3,14 @@ package com.ismartcoding.plain.ui.audio
 import android.os.Bundle
 import android.view.View
 import android.widget.SeekBar
+import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.receiveEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.preference.AudioPlayModePreference
+import com.ismartcoding.plain.data.preference.AudioPlayingPreference
 import com.ismartcoding.plain.features.AudioActionEvent
 import com.ismartcoding.plain.features.ClearAudioPlaylistEvent
 import com.ismartcoding.plain.databinding.DialogAudioPlayerBinding
@@ -15,6 +18,7 @@ import com.ismartcoding.plain.features.audio.*
 import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.setSafeClick
+import kotlinx.coroutines.launch
 
 class AudioPlayerDialog() : BaseBottomSheetDialog<DialogAudioPlayerBinding>() {
 
@@ -34,6 +38,7 @@ class AudioPlayerDialog() : BaseBottomSheetDialog<DialogAudioPlayerBinding>() {
                 AudioAction.PLAY, AudioAction.PAUSE -> {
                     updateUI()
                 }
+
                 else -> {}
             }
         }
@@ -66,7 +71,7 @@ class AudioPlayerDialog() : BaseBottomSheetDialog<DialogAudioPlayerBinding>() {
         binding.seekBar.removeCallbacks(seekBarUpdateRunnable)
         val process = AudioPlayer.instance.getPlayerProgress()
         binding.process.text = FormatHelper.formatDuration(process.toLong())
-        LocalStorage.audioPlaying?.let { audio ->
+        AudioPlayingPreference.getValue(requireContext())?.let { audio ->
             binding.seekBar.max = audio.duration.toInt()
             binding.seekBar.progress = process
             binding.duration.text = FormatHelper.formatDuration(audio.duration)
@@ -85,7 +90,7 @@ class AudioPlayerDialog() : BaseBottomSheetDialog<DialogAudioPlayerBinding>() {
 
     private fun updatePlayMode() {
         binding.repeat.setImageResource(
-            when (LocalStorage.audioPlayMode) {
+            when (AudioPlayModePreference.getValue(requireContext())) {
                 MediaPlayMode.REPEAT -> R.drawable.ic_repeat
                 MediaPlayMode.REPEAT_ONE -> R.drawable.ic_repeat_one
                 MediaPlayMode.SHUFFLE -> R.drawable.ic_shuffle
@@ -95,12 +100,15 @@ class AudioPlayerDialog() : BaseBottomSheetDialog<DialogAudioPlayerBinding>() {
 
     private fun setListen() {
         binding.repeat.setSafeClick {
-            when (LocalStorage.audioPlayMode) {
-                MediaPlayMode.REPEAT -> LocalStorage.audioPlayMode = MediaPlayMode.REPEAT_ONE
-                MediaPlayMode.REPEAT_ONE -> LocalStorage.audioPlayMode = MediaPlayMode.SHUFFLE
-                MediaPlayMode.SHUFFLE -> LocalStorage.audioPlayMode = MediaPlayMode.REPEAT
+            lifecycleScope.launch {
+                val newMode = when (AudioPlayModePreference.getValue(requireContext())) {
+                    MediaPlayMode.REPEAT -> MediaPlayMode.REPEAT_ONE
+                    MediaPlayMode.REPEAT_ONE -> MediaPlayMode.SHUFFLE
+                    MediaPlayMode.SHUFFLE -> MediaPlayMode.REPEAT
+                }
+                withIO { AudioPlayModePreference.putAsync(requireContext(), newMode) }
+                updatePlayMode()
             }
-            updatePlayMode()
         }
 
         binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {

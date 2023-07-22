@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.PasswordType
@@ -52,6 +53,7 @@ import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.models.PasswordViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,7 +82,9 @@ fun PasswordPage(
                         BlockRadioButton(
                             selected = passwordType,
                             onSelected = {
-                                PasswordTypePreference.put(context, scope, PasswordType.parse(it))
+                                scope.launch {
+                                    withIO { PasswordTypePreference.putAsync(context, PasswordType.parse(it)) }
+                                }
                             },
                             itemRadioGroups = PasswordType.values().map {
                                 BlockRadioGroupButtonItem(
@@ -95,7 +99,7 @@ fun PasswordPage(
                                 title = password,
                             ) {
                                 OutlineButton(text = stringResource(id = R.string.reset), onClick = {
-                                    PasswordPreference.put(context, scope, CryptoHelper.randomPassword(6))
+                                    PasswordPreference.put(context, CryptoHelper.randomPassword(6))
                                 })
                             }
                         } else if (passwordType == PasswordType.FIXED.value) {
@@ -108,7 +112,7 @@ fun PasswordPage(
                                     editPassword.value = it
                                 },
                                 onConfirm = {
-                                    PasswordPreference.put(context, scope, it)
+                                    PasswordPreference.put(context, it)
                                 },
                             )
                             Spacer(modifier = Modifier.height(16.dp))
@@ -119,7 +123,7 @@ fun PasswordPage(
                             PSwitch(
                                 activated = authTwoFactor
                             ) {
-                                AuthTwoFactorPreference.put(context, scope, it)
+                                AuthTwoFactorPreference.put(context, it)
                             }
                         }
                         BottomSpace()

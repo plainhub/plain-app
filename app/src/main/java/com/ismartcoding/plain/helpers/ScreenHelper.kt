@@ -30,10 +30,10 @@ object ScreenHelper {
     }
 
     fun saveTimeout(value: Int) {
-        SystemScreenTimeoutPreference.put(MainApp.instance, MainApp.instance.ioScope, value)
+        SystemScreenTimeoutPreference.put(MainApp.instance, value)
     }
 
     fun saveOn(value: Boolean) {
-        KeepScreenOnPreference.put(MainApp.instance, MainApp.instance.ioScope, value)
+        KeepScreenOnPreference.put(MainApp.instance, value)
     }
 }

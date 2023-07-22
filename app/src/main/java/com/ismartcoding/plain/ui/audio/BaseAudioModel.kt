@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.audio
 
-import com.ismartcoding.plain.LocalStorage
+import android.content.Context
+import com.ismartcoding.plain.data.preference.AudioPlayingPreference
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.ui.models.BaseItemModel
 
@@ -9,7 +10,7 @@ open class BaseAudioModel : BaseItemModel() {
     var subtitle: String = ""
     var isPlaying = false
 
-    fun checkIsPlaying(path: String) {
-        isPlaying = LocalStorage.audioPlaying?.path == path && AudioPlayer.instance.isPlaying()
+    fun checkIsPlaying(context: Context, path: String) {
+        isPlaying = AudioPlayingPreference.getValue(context)?.path == path && AudioPlayer.instance.isPlaying()
     }
 }

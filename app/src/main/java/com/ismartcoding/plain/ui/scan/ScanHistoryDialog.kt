@@ -3,15 +3,18 @@ package com.ismartcoding.plain.ui.scan
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.brv.utils.*
 import com.ismartcoding.lib.extensions.cut
-import com.ismartcoding.plain.LocalStorage
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.preference.ScanHistoryPreference
 import com.ismartcoding.plain.databinding.DialogScanHistoryBinding
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.initMenu
 import com.ismartcoding.plain.ui.extensions.onSearch
 import com.ismartcoding.plain.ui.models.ListItemModel
+import kotlinx.coroutines.launch
 
 
 class ScanHistoryDialog(val callback: () -> Unit) : BaseBottomSheetDialog<DialogScanHistoryBinding>() {
@@ -48,17 +51,20 @@ class ScanHistoryDialog(val callback: () -> Unit) : BaseBottomSheetDialog<Dialog
     }
 
     private fun search() {
-        binding.rv.models = LocalStorage.scanResults.filter { searchQ.isEmpty() || it.contains(searchQ, true) }.map { d ->
+        val context = requireContext()
+        binding.rv.models = ScanHistoryPreference.getValue(context).filter { searchQ.isEmpty() || it.contains(searchQ, true) }.map { d ->
             ItemModel(d).apply {
                 keyTextMaxLines = 2
                 keyText = d.cut(100)
                 swipeEnable = true
                 rightSwipeText = getString(R.string.remove)
                 rightSwipeClick = {
-                    val results = LocalStorage.scanResults.toMutableList()
-                    results.remove(d)
-                    LocalStorage.scanResults = results
-                    search()
+                    lifecycleScope.launch {
+                        val results = ScanHistoryPreference.getValue(context).toMutableList()
+                        results.remove(d)
+                        withIO { ScanHistoryPreference.putAsync(context, results) }
+                        search()
+                    }
                 }
             }
         }

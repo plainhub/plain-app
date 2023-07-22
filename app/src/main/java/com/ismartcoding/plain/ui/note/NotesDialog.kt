@@ -11,11 +11,11 @@ import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.preference.NoteEditModePreference
 import com.ismartcoding.plain.databinding.ItemRowBinding
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
@@ -183,8 +183,10 @@ class NotesDialog : BaseListDrawerDialog() {
             isVisible = viewModel.trash.value == false
             setImageResource(R.drawable.ic_add)
             setSafeClick {
-                LocalStorage.noteIsEditMode = true
-                NoteDialog().show(null, viewModel.data as? DTag)
+                lifecycleScope.launch {
+                    withIO { NoteEditModePreference.putAsync(requireContext(), true) }
+                    NoteDialog().show(null, viewModel.data as? DTag)
+                }
             }
         }
     }

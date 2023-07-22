@@ -15,11 +15,11 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.rv.GridSpacingItemDecoration
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.preference.ImageSortByPreference
 import com.ismartcoding.plain.databinding.ItemImageGridBinding
 import com.ismartcoding.plain.databinding.ItemMediaBucketGridBinding
 import com.ismartcoding.plain.features.ActionEvent
@@ -69,10 +69,11 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
     }
 
     override fun initTopAppBar() {
+        val context = requireContext()
         initTopAppBar(R.menu.media_items_top) {
-            FileSortHelper.bindSortMenuItemClick(requireContext(), binding.topAppBar.toolbar.menu, this, MediaType.IMAGE, viewModel, binding.list)
+            FileSortHelper.bindSortMenuItemClick(context, lifecycleScope, binding.topAppBar.toolbar.menu, this, MediaType.IMAGE, viewModel, binding.list)
         }
-        FileSortHelper.getSelectedSortItem(binding.topAppBar.toolbar.menu, LocalStorage.imageSortBy).highlightTitle(requireContext())
+        FileSortHelper.getSelectedSortItem(binding.topAppBar.toolbar.menu, ImageSortByPreference.getValue(context)).highlightTitle(context)
     }
 
     override fun initList() {
@@ -165,8 +166,9 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
 
     private suspend fun updateImages() {
         val query = viewModel.getQuery()
-        val items = withIO { ImageHelper.search(requireContext(), query, viewModel.limit, viewModel.offset, LocalStorage.imageSortBy) }
-        viewModel.total = withIO { ImageHelper.count(requireContext(), query) }
+        val context = requireContext()
+        val items = withIO { ImageHelper.search(context, query, viewModel.limit, viewModel.offset, ImageSortByPreference.getValue(context)) }
+        viewModel.total = withIO { ImageHelper.count(context, query) }
 
         val bindingAdapter = binding.list.rv.bindingAdapter
         val toggleMode = bindingAdapter.toggleMode

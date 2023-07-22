@@ -1,8 +1,9 @@
 package com.ismartcoding.plain.features.device
 
-import com.ismartcoding.plain.LocalStorage
+import android.content.Context
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.ISelectOption
+import com.ismartcoding.plain.data.preference.DeviceSortByPreference
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 
 enum class DeviceSortBy : ISelectOption {
@@ -17,7 +18,7 @@ enum class DeviceSortBy : ISelectOption {
         }
     }
 
-    override fun isSelected(): Boolean {
-        return LocalStorage.deviceSortBy == this
+    override fun isSelected(context: Context): Boolean {
+        return DeviceSortByPreference.getValue(context) == this
     }
 }

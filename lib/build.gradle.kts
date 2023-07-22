@@ -73,8 +73,6 @@ dependencies {
     // https://github.com/davemorrissey/subsampling-scale-image-view
     api("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
 
-    api("com.tencent:mmkv:1.3.0")
-
     implementation("org.ahocorasick:ahocorasick:0.6.3") // For pinyin
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")

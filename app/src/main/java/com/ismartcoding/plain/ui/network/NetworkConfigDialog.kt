@@ -9,7 +9,6 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.softinput.setWindowSoftInput
 import com.ismartcoding.plain.ApplyNetplanAndNetmixMutation
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.BoxApi

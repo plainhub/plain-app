@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.ApplyWireGuardMutation
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.api.BoxApi
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.ViewListItemBinding

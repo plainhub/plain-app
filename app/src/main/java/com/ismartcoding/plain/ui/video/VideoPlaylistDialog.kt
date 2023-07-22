@@ -4,15 +4,17 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import com.ismartcoding.lib.brv.BindingAdapter
 import com.ismartcoding.lib.brv.annotaion.ItemOrientation
 import com.ismartcoding.lib.brv.item.ItemDrag
 import com.ismartcoding.lib.brv.listener.DefaultItemTouchCallback
 import com.ismartcoding.lib.brv.utils.*
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.preference.VideoPlaylistPreference
 import com.ismartcoding.plain.databinding.DialogPlaylistBinding
 import com.ismartcoding.plain.databinding.ItemVideoBinding
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -26,6 +28,8 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import com.ismartcoding.plain.ui.preview.TransitionHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class VideoPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
     data class SortableVideoModel(override val data: DVideo, override var itemOrientationDrag: Int = ItemOrientation.ALL) : VideoModel(data), ItemDrag
@@ -40,16 +44,23 @@ class VideoPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
             onMenuItemClick {
                 when (itemId) {
                     R.id.clear_list -> {
-                        LocalStorage.videoPlayerList = arrayListOf()
-                        dismiss()
-                    }
-                    R.id.cast -> {
-                        val items = LocalStorage.videoPlayerList
-                        if (items.isEmpty()) {
-                            DialogHelper.showMessage(R.string.add_videos_to_playlist)
-                            return@onMenuItemClick
+                        val context = requireContext()
+                        lifecycleScope.launch {
+                            withIO { VideoPlaylistPreference.putAsync(context, arrayListOf()) }
+                            dismiss()
                         }
-                        CastDialog(items).show()
+                    }
+
+                    R.id.cast -> {
+                        val context = requireContext()
+                        lifecycleScope.launch {
+                            val items = withIO { VideoPlaylistPreference.getValue(context) }
+                            if (items.isEmpty()) {
+                                DialogHelper.showMessage(R.string.add_videos_to_playlist)
+                                return@launch
+                            }
+                            CastDialog(items).show()
+                        }
                     }
                 }
             }
@@ -83,7 +94,9 @@ class VideoPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
                     source: BindingAdapter.BindingViewHolder,
                     target: BindingAdapter.BindingViewHolder
                 ) {
-                    LocalStorage.videoPlayerList = getModelList<SortableVideoModel>().map { it.data }
+                    lifecycleScope.launch (Dispatchers.IO){
+                        VideoPlaylistPreference.putAsync(requireContext(),getModelList<SortableVideoModel>().map { it.data } )
+                    }
                 }
             })
         }
@@ -110,7 +123,8 @@ class VideoPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
     }
 
     private fun search() {
-        binding.list.page.addData(LocalStorage.videoPlayerList
+        val context = requireContext()
+        binding.list.page.addData(VideoPlaylistPreference.getValue(context)
             .filter { searchQ.isEmpty() || it.title.contains(searchQ, true) }
             .map { v ->
                 SortableVideoModel(v).apply {
@@ -119,14 +133,16 @@ class VideoPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
                     swipeEnable = true
                     rightSwipeText = getString(R.string.remove)
                     rightSwipeClick = {
-                        LocalStorage.deleteVideo(v.path)
-                        binding.list.rv.apply {
-                            val index = getModelList<SortableVideoModel>().indexOfFirst { it.data.path == v.path }
-                            if (index != -1) {
-                                removeModel(index)
+                        lifecycleScope.launch {
+                            withIO { VideoPlaylistPreference.deleteAsync(context, setOf(v.path)) }
+                            binding.list.rv.apply {
+                                val index = getModelList<SortableVideoModel>().indexOfFirst { it.data.path == v.path }
+                                if (index != -1) {
+                                    removeModel(index)
+                                }
                             }
+                            updateTitle()
                         }
-                        updateTitle()
                     }
                     leftSwipeText = getString(R.string.cast)
                     leftSwipeClick = {
@@ -138,7 +154,7 @@ class VideoPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
     }
 
     private fun updateTitle() {
-        val total = LocalStorage.videoPlayerList.size
+        val total = VideoPlaylistPreference.getValue(requireContext()).size
         binding.topAppBar.title = if (total > 0) LocaleHelper.getStringF(R.string.playlist_title, "total", total) else getString(R.string.playlist)
     }
 }

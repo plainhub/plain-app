@@ -12,11 +12,11 @@ import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.extensions.px
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.softinput.setWindowSoftInput
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.preference.NoteEditModePreference
 import com.ismartcoding.plain.databinding.DialogNoteBinding
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
@@ -53,8 +53,12 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
             onMenuItemClick {
                 when (itemId) {
                     R.id.preview -> {
-                        LocalStorage.noteIsEditMode = !LocalStorage.noteIsEditMode
-                        updateModeUI()
+                        lifecycleScope.launch {
+                            val context = requireContext()
+                            val editMode = !NoteEditModePreference.get(context)
+                            withIO { NoteEditModePreference.putAsync(context, editMode) }
+                            updateModeUI(editMode)
+                        }
                     }
                 }
             }
@@ -83,12 +87,13 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
                 sendEvent(ActionEvent(ActionSourceType.NOTE, if (isNew) ActionType.CREATED else ActionType.UPDATED, setOf(id)))
             }
         }
-        updateModeUI()
+        val editMode = NoteEditModePreference.get(context)
+        updateModeUI(editMode)
     }
 
-    private fun updateModeUI() {
+    private fun updateModeUI(editMode: Boolean) {
         val context = requireContext()
-        if (LocalStorage.noteIsEditMode) {
+        if (editMode) {
             binding.topAppBar.apply {
                 toolbar.setTitle(R.string.edit_mode)
                 toolbar.menu.findItem(R.id.preview).icon = ContextCompat.getDrawable(context, R.drawable.ic_markdown)

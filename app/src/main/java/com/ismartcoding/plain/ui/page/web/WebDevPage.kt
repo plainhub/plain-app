@@ -50,7 +50,7 @@ fun WebDevPage(
                             PSwitch(
                                 activated = enable
                             ) {
-                                AuthDevTokenPreference.put(context, scope, if (it) CryptoHelper.randomPassword(128) else "")
+                                AuthDevTokenPreference.put(context, if (it) CryptoHelper.randomPassword(128) else "")
                             }
                         }
                         if (enable) {
@@ -64,7 +64,7 @@ fun WebDevPage(
                             BlockOutlineButton(
                                 text = stringResource(id = R.string.reset_token),
                                 onClick = {
-                                    AuthDevTokenPreference.put(context, scope, CryptoHelper.randomPassword(128))
+                                    AuthDevTokenPreference.put(context, CryptoHelper.randomPassword(128))
                                 })
                             Spacer(modifier = Modifier.height(16.dp))
                             Tips(text = stringResource(id = R.string.auth_dev_token_tips))

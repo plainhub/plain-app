@@ -12,11 +12,11 @@ import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.lib.isQPlus
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.preference.AudioSortByPreference
 import com.ismartcoding.plain.features.*
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioHelper
@@ -75,6 +75,7 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
                 AudioAction.PLAY, AudioAction.PAUSE -> {
                     updatePlayingState()
                 }
+
                 else -> {}
             }
         }
@@ -84,10 +85,11 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     }
 
     private fun updatePlayingState() {
+        val context = requireContext()
         binding.list.rv.models?.forEach {
             if (it is AudioModel) {
                 val old = it.isPlaying
-                it.checkIsPlaying(it.data.path)
+                it.checkIsPlaying(context, it.data.path)
                 if (old != it.isPlaying) {
                     it.notifyChange()
                 }
@@ -108,10 +110,12 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     }
 
     override fun initTopAppBar() {
+        val context = requireContext()
         initTopAppBar(R.menu.media_items_top) {
-            FileSortHelper.bindSortMenuItemClick(requireContext(), binding.topAppBar.toolbar.menu, this, MediaType.AUDIO, viewModel, binding.list)
+            FileSortHelper.bindSortMenuItemClick(context, lifecycleScope, binding.topAppBar.toolbar.menu, this, MediaType.AUDIO, viewModel, binding.list)
         }
-        FileSortHelper.getSelectedSortItem(binding.topAppBar.toolbar.menu, LocalStorage.audioSortBy).highlightTitle(requireContext())
+        val sortBy = AudioSortByPreference.getValue(context)
+        FileSortHelper.getSelectedSortItem(binding.topAppBar.toolbar.menu, sortBy).highlightTitle(context)
     }
 
     override fun initList() {
@@ -159,8 +163,10 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
 
     private suspend fun updateAudios() {
         val query = viewModel.getQuery()
-        val items = withIO { AudioHelper.search(requireContext(), query, viewModel.limit, viewModel.offset, LocalStorage.audioSortBy) }
-        viewModel.total = withIO { AudioHelper.count(requireContext(), query) }
+        val context = requireContext()
+        val sortBy = AudioSortByPreference.getValue(context)
+        val items = withIO { AudioHelper.search(context, query, viewModel.limit, viewModel.offset, sortBy) }
+        viewModel.total = withIO { AudioHelper.count(context, query) }
 
         val bindingAdapter = binding.list.rv.bindingAdapter
         val toggleMode = bindingAdapter.toggleMode
@@ -171,7 +177,7 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
                 subtitle = a.artist + " " + FormatHelper.formatDuration(a.duration)
                 this.toggleMode = toggleMode
                 isChecked = checkedItems.any { it.data.id == data.id }
-                checkIsPlaying(a.path)
+                checkIsPlaying(context, a.path)
             }
         }, hasMore = {
             items.size == viewModel.limit

@@ -41,7 +41,7 @@ class SelectOptionsDialog<T : ISelectOption>(
         binding.rv.models = options.map {  opt ->
             ItemModel(opt).apply {
                 keyText = opt.getText()
-                showSelected(opt.isSelected())
+                showSelected(opt.isSelected(requireContext()))
             }
         }
     }

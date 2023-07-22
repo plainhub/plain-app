@@ -12,7 +12,6 @@ import com.ismartcoding.lib.extensions.getTimeValue
 import com.ismartcoding.lib.extensions.toStringList
 import com.ismartcoding.lib.helpers.AssetsHelper
 import com.ismartcoding.lib.helpers.SearchHelper
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.features.BaseContentHelper

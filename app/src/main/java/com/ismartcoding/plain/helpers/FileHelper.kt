@@ -8,7 +8,7 @@ import android.util.Base64
 import com.ismartcoding.lib.extensions.hasPermission
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.isRPlus
-import com.ismartcoding.plain.LocalStorage
+import com.ismartcoding.plain.TempData
 import java.io.*
 
 
@@ -40,12 +40,12 @@ object FileHelper {
         if (path.startsWith("https://", true) || path.startsWith("http://", true)) {
             return path
         }
-        return Base64.encodeToString(CryptoHelper.aesEncrypt(LocalStorage.fileIdToken, path), Base64.NO_WRAP)
+        return Base64.encodeToString(CryptoHelper.aesEncrypt(TempData.fileIdToken, path), Base64.NO_WRAP)
     }
 
     fun getFilePath(id: String): String {
         val bytes = Base64.decode(id, Base64.NO_WRAP)
-        return CryptoHelper.aesDecrypt(LocalStorage.fileIdToken, bytes)?.decodeToString() ?: ""
+        return CryptoHelper.aesDecrypt(TempData.fileIdToken, bytes)?.decodeToString() ?: ""
     }
 
     fun rename(filePath: String, newName: String): File? {

@@ -4,28 +4,29 @@ import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.brv.utils.linear
-import com.ismartcoding.lib.brv.utils.models
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.DeleteWireGuardMutation
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.BoxApi
-import com.ismartcoding.plain.data.*
+import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.DialogWireguardsBinding
 import com.ismartcoding.plain.databinding.ViewListItemBinding
-import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.features.box.ApplyWireGuardResultEvent
 import com.ismartcoding.plain.features.box.FetchWireGuardsEvent
 import com.ismartcoding.plain.features.box.WireGuardsResultEvent
 import com.ismartcoding.plain.features.wireguard.WireGuard
 import com.ismartcoding.plain.features.wireguard.bindWireGuard
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.ui.extensions.*
+import com.ismartcoding.plain.ui.BaseDialog
+import com.ismartcoding.plain.ui.extensions.enableSwipeMenu
+import com.ismartcoding.plain.ui.extensions.onBack
+import com.ismartcoding.plain.ui.extensions.setRightSwipeButton
+import com.ismartcoding.plain.ui.extensions.setSafeClick
+import com.ismartcoding.plain.ui.extensions.setScrollBehavior
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.scwang.smart.refresh.layout.constant.RefreshState
 import kotlinx.coroutines.launch
 
 class WireGuardsDialog : BaseDialog<DialogWireguardsBinding>() {

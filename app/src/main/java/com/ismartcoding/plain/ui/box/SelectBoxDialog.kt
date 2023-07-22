@@ -7,7 +7,6 @@ import com.ismartcoding.lib.brv.utils.linear
 import com.ismartcoding.lib.brv.utils.models
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DBox
 import com.ismartcoding.plain.features.CurrentBoxChangedEvent

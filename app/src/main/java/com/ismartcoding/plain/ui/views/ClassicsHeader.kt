@@ -13,7 +13,6 @@ import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.scwang.smart.refresh.layout.api.RefreshHeader
 import com.scwang.smart.refresh.layout.api.RefreshLayout
 import com.scwang.smart.refresh.layout.constant.RefreshState
-import com.tencent.mmkv.MMKV
 import java.util.*
 
 class ClassicsHeader(context: Context, private val refreshLayout: RefreshLayout) : ClassicsAbstract(context, null, 0), RefreshHeader {
@@ -80,7 +79,7 @@ class ClassicsHeader(context: Context, private val refreshLayout: RefreshLayout)
     private fun setLastUpdateTime(time: Date): ClassicsHeader {
         mLastTime = time
         binding.update.text = LocaleHelper.getStringF(R.string.last_update, "time", time.formatDateTime())
-        MMKV.defaultMMKV().encode(KEY_LAST_UPDATE_TIME, time.time)
+        //MMKV.defaultMMKV().encode(KEY_LAST_UPDATE_TIME, time.time)
         return this
     }
 
@@ -88,6 +87,6 @@ class ClassicsHeader(context: Context, private val refreshLayout: RefreshLayout)
         binding.update.isVisible = mEnableLastTime
         binding.title.text = pullText()
         KEY_LAST_UPDATE_TIME += (refreshLayout as PageRefreshLayout).pageName
-        setLastUpdateTime(Date(MMKV.defaultMMKV().decodeLong(KEY_LAST_UPDATE_TIME, System.currentTimeMillis())))
+       // setLastUpdateTime(Date(MMKV.defaultMMKV().decodeLong(KEY_LAST_UPDATE_TIME, System.currentTimeMillis())))
     }
 }

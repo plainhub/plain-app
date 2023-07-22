@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.components
 
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.UIDataCache

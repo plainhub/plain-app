@@ -5,21 +5,17 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import com.ismartcoding.lib.logcat.LogCat
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import java.io.IOException
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 suspend fun <T> DataStore<Preferences>.put(key: Preferences.Key<T>, value: T) {
     this.edit {
-        withContext(Dispatchers.IO) {
-            it[key] = value
-        }
+        it[key] = value
     }
 }
 

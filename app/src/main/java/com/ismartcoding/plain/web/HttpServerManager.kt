@@ -7,8 +7,8 @@ import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JksHelper
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.preference.HttpPortPreference
 import com.ismartcoding.plain.data.preference.HttpsPortPreference
 import com.ismartcoding.plain.data.preference.PasswordPreference
@@ -39,10 +39,11 @@ object HttpServerManager {
     val clientIpCache = mutableMapOf<String, String>()  // format: <client_id>:<client_ip>
     val wsSessions = Collections.synchronizedSet<WebSocketSession>(LinkedHashSet())
     val clientRequestTs = mutableMapOf<String, Long>()
+    var httpServerError: String = ""
 
     fun resetPassword(): String {
         val password = CryptoHelper.randomPassword(6)
-        PasswordPreference.put(MainApp.instance, MainApp.instance.ioScope, password)
+        PasswordPreference.put(MainApp.instance, password)
         return password
     }
 
@@ -62,9 +63,9 @@ object HttpServerManager {
     }
 
     private fun getSSLKeyStore(context: Context): KeyStore {
-        val file = File(context.filesDir, "keystore.jks")
+        val file = File(context.filesDir, "keystore2.jks")
         if (!file.exists()) {
-            val keyStore = JksHelper.genJksFile(SSL_KEY_ALIAS, LocalStorage.clientId, Constants.SSL_NAME)
+            val keyStore = JksHelper.genJksFile(SSL_KEY_ALIAS, TempData.keyStorePassword, Constants.SSL_NAME)
             val out = FileOutputStream(file)
             keyStore.store(out, null)
             out.close()
@@ -78,6 +79,7 @@ object HttpServerManager {
     }
 
     fun createHttpServer(context: Context): NettyApplicationEngine {
+        val password = TempData.keyStorePassword.toCharArray()
         val environment = applicationEngineEnvironment {
             log = LoggerFactory.getLogger("ktor.application")
             connector {
@@ -86,8 +88,8 @@ object HttpServerManager {
             sslConnector(
                 keyStore = getSSLKeyStore(context),
                 keyAlias = SSL_KEY_ALIAS,
-                keyStorePassword = { LocalStorage.clientId.toCharArray() },
-                privateKeyPassword = { LocalStorage.clientId.toCharArray() }) {
+                keyStorePassword = { password },
+                privateKeyPassword = { password }) {
                 port = HttpsPortPreference.get(context)
             }
             module(Application::module)

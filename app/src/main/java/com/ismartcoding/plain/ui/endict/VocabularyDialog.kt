@@ -8,7 +8,6 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.brv.utils.*
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.SearchEndictByWordsQuery
 import com.ismartcoding.plain.api.BoxApi

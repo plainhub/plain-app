@@ -19,7 +19,6 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.PhoneHelper
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.BoxProxyApi
@@ -28,7 +27,16 @@ import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.preference.AudioPlayModePreference
+import com.ismartcoding.plain.data.preference.AudioPlayingPreference
+import com.ismartcoding.plain.data.preference.AudioPlaylistPreference
+import com.ismartcoding.plain.data.preference.AudioSortByPreference
 import com.ismartcoding.plain.data.preference.AuthDevTokenPreference
+import com.ismartcoding.plain.data.preference.ChatGPTApiKeyPreference
+import com.ismartcoding.plain.data.preference.FileSortByPreference
+import com.ismartcoding.plain.data.preference.ImageSortByPreference
+import com.ismartcoding.plain.data.preference.VideoPlaylistPreference
+import com.ismartcoding.plain.data.preference.VideoSortByPreference
 import com.ismartcoding.plain.data.preference.WebPreference
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DMessageContent
@@ -161,7 +169,8 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("aiChatConfig") {
                     resolver { ->
-                        AIChatConfig(LocalStorage.chatGPTApiKey)
+
+                        AIChatConfig(ChatGPTApiKeyPreference.get(MainApp.instance))
                     }
                 }
                 query("aiChat") {
@@ -222,8 +231,9 @@ class SXGraphQL(val schema: Schema) {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
-                        ImageHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset, LocalStorage.imageSortBy).map { it.toModel() }
+                        val context = MainApp.instance
+                        Permission.WRITE_EXTERNAL_STORAGE.check(context)
+                        ImageHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, ImageSortByPreference.getValue(context)).map { it.toModel() }
                     }
                     type<Image> {
                         dataProperty("tags") {
@@ -248,8 +258,9 @@ class SXGraphQL(val schema: Schema) {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
-                        VideoHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset, LocalStorage.videoSortBy).map { it.toModel() }
+                        val context = MainApp.instance
+                        Permission.WRITE_EXTERNAL_STORAGE.check(context)
+                        VideoHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, VideoSortByPreference.getValue(context)).map { it.toModel() }
                     }
                     type<Video> {
                         dataProperty("tags") {
@@ -274,8 +285,9 @@ class SXGraphQL(val schema: Schema) {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
-                        AudioHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset, LocalStorage.audioSortBy).map { it.toModel() }
+                        val context = MainApp.instance
+                        Permission.WRITE_EXTERNAL_STORAGE.check(context)
+                        AudioHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, AudioSortByPreference.getValue(context)).map { it.toModel() }
                     }
                     type<Audio> {
                         dataProperty("tags") {
@@ -402,8 +414,9 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("files") {
                     resolver { dir: String, showHidden: Boolean ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
-                        val files = FileSystemHelper.getFilesList(dir, showHidden, LocalStorage.fileSortBy).map { it.toModel() }
+                        val context = MainApp.instance
+                        Permission.WRITE_EXTERNAL_STORAGE.check(context)
+                        val files = FileSystemHelper.getFilesList(dir, showHidden, FileSortByPreference.getValue(context)).map { it.toModel() }
                         Files(dir, files)
                     }
                 }
@@ -494,18 +507,18 @@ class SXGraphQL(val schema: Schema) {
                         val context = MainApp.instance
                         App(
                             usbConnected = PlugInControlReceiver.isUSBConnected(context),
-                            fileIdToken = LocalStorage.fileIdToken,
+                            fileIdToken = TempData.fileIdToken,
                             externalFilesDir = context.getExternalFilesDir(null)?.path ?: "",
                             if (TempData.demoMode) "Demo phone" else PhoneHelper.getDeviceName(context),
                             PhoneHelper.getBatteryPercentage(context),
                             MainApp.getAppVersion(),
                             Permission.values().filter { it.isEnabled(MainApp.instance) && it.can(MainApp.instance) },
-                            LocalStorage.audioPlaylist.map { it.toModel() },
-                            LocalStorage.audioPlayMode,
-                            LocalStorage.audioPlaying?.path ?: "",
+                            AudioPlaylistPreference.getValue(context).map { it.toModel() },
+                            AudioPlayModePreference.getValue(context),
+                            AudioPlayingPreference.getValue(context)?.path ?: "",
                             context.allowSensitivePermissions(),
                             sdcardPath = FileSystemHelper.getSDCardPath(context),
-                             internalStoragePath = FileSystemHelper.getInternalStoragePath(context),
+                            internalStoragePath = FileSystemHelper.getInternalStoragePath(context),
                             downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
                         )
                     }
@@ -531,8 +544,9 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("updateAIChatConfig") {
                     resolver { chatGPTApiKey: String ->
-                        LocalStorage.chatGPTApiKey = chatGPTApiKey
-                        AIChatConfig(LocalStorage.chatGPTApiKey)
+                        val context = MainApp.instance
+                        ChatGPTApiKeyPreference.putAsync(context, chatGPTApiKey)
+                        AIChatConfig(chatGPTApiKey)
                     }
                 }
                 mutation("createChatItem") {
@@ -558,7 +572,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("createAIChat") {
                     resolver { id: ID, message: String, isMe: Boolean ->
-                        if (LocalStorage.chatGPTApiKey.isEmpty()) {
+                        if (ChatGPTApiKeyPreference.get(MainApp.instance).isEmpty()) {
                             throw Exception("no_api_key")
                         }
                         val items = AIChatHelper.createChatItemsAsync(id.value, isMe, message)
@@ -744,32 +758,34 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("playAudio") {
                     resolver { path: String ->
-                        val audio = DPlaylistAudio.fromPath(MainApp.instance, path)
-                        LocalStorage.audioPlaying = audio
-                        if (!LocalStorage.audioPlaylist.any { it.path == audio.path }) {
-                            LocalStorage.addPlaylistAudio(audio)
+                        val context = MainApp.instance
+                        val audio = DPlaylistAudio.fromPath(context, path)
+                        AudioPlayingPreference.putAsync(context, audio)
+                        if (!AudioPlaylistPreference.getValue(context).any { it.path == audio.path }) {
+                            AudioPlaylistPreference.addAsync(context, listOf(audio))
                         }
                         audio.toModel()
                     }
                 }
                 mutation("updateAudioPlayMode") {
                     resolver { mode: MediaPlayMode ->
-                        LocalStorage.audioPlayMode = mode
+                        AudioPlayModePreference.putAsync(MainApp.instance, mode)
                         true
                     }
                 }
                 mutation("clearAudioPlaylist") {
                     resolver { ->
+                        val context = MainApp.instance
                         AudioPlayer.instance.pause()
-                        LocalStorage.audioPlaying = null
-                        LocalStorage.audioPlaylist = arrayListOf()
+                        AudioPlayingPreference.putAsync(context, null)
+                        AudioPlaylistPreference.putAsync(context, arrayListOf())
                         sendEvent(ClearAudioPlaylistEvent())
                         true
                     }
                 }
                 mutation("deletePlaylistAudio") {
                     resolver { path: String ->
-                        LocalStorage.deletePlaylistAudio(path)
+                        AudioPlaylistPreference.deleteAsync(MainApp.instance, setOf(path))
                         true
                     }
                 }
@@ -813,7 +829,7 @@ class SXGraphQL(val schema: Schema) {
                 mutation("addPlaylistAudios") {
                     resolver { paths: List<String> ->
                         val context = MainApp.instance
-                        LocalStorage.addPlaylistAudios(paths.map { DPlaylistAudio.fromPath(context, it) })
+                        AudioPlaylistPreference.addAsync(context, paths.map { DPlaylistAudio.fromPath(context, it) })
                         true
                     }
                 }
@@ -883,15 +899,18 @@ class SXGraphQL(val schema: Schema) {
                         when (tagType) {
                             TagType.AUDIO -> {
                                 val paths = AudioHelper.deleteRecordsAndFilesByIds(context, newIds)
-                                LocalStorage.deletePlaylistAudios(paths)
+                                AudioPlaylistPreference.deleteAsync(context, paths)
                             }
+
                             TagType.VIDEO -> {
                                 val paths = VideoHelper.deleteRecordsAndFilesByIds(context, newIds)
-                                LocalStorage.deleteVideos(paths)
+                                VideoPlaylistPreference.deleteAsync(context, paths)
                             }
+
                             TagType.IMAGE -> {
                                 ImageHelper.deleteRecordsAndFilesByIds(context, newIds)
                             }
+
                             else -> {
                             }
                         }

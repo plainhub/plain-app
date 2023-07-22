@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.VocabularyQuery
 import com.ismartcoding.plain.api.BoxApi
 import com.ismartcoding.plain.databinding.DialogCreateVocabularyBinding

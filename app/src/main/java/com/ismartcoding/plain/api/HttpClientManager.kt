@@ -4,8 +4,8 @@ import android.util.Base64
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.PhoneHelper
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.TempData
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
@@ -71,7 +71,7 @@ object HttpClientManager {
                 LogCat.d("[Request] $requestBodyStr")
                 val response = chain.proceed(
                     request.newBuilder()
-                        .addHeader("c-id", LocalStorage.clientId)
+                        .addHeader("c-id", TempData.clientId)
                         .addHeader("c-platform", "android")
                         .addHeader("c-name", Base64.encodeToString(PhoneHelper.getDeviceName(MainApp.instance).toByteArray(), Base64.NO_WRAP))
                         .addHeader("c-version", MainApp.getAppVersion())

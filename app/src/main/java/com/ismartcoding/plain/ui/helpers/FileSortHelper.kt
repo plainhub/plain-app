@@ -3,14 +3,20 @@ package com.ismartcoding.plain.ui.helpers
 import android.content.Context
 import android.view.Menu
 import android.view.MenuItem
-import com.ismartcoding.plain.LocalStorage
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.preference.AudioSortByPreference
+import com.ismartcoding.plain.data.preference.FileSortByPreference
+import com.ismartcoding.plain.data.preference.ImageSortByPreference
+import com.ismartcoding.plain.data.preference.VideoSortByPreference
 import com.ismartcoding.plain.databinding.ViewPageListBinding
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.MediaType
 import com.ismartcoding.plain.ui.extensions.highlightTitle
 import com.ismartcoding.plain.ui.extensions.unhighlightTitle
 import com.ismartcoding.plain.ui.models.FilteredItemsViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 object FileSortHelper {
     fun getSelectedSortItem(menu: Menu, sortBy: FileSortBy): MenuItem {
@@ -18,75 +24,90 @@ object FileSortHelper {
             FileSortBy.DATE_ASC -> {
                 menu.findItem(R.id.sort_oldest_first)
             }
+
             FileSortBy.DATE_DESC -> {
                 menu.findItem(R.id.sort_newest_first)
             }
+
             FileSortBy.NAME_ASC -> {
                 menu.findItem(R.id.sort_name_asc)
             }
+
             FileSortBy.NAME_DESC -> {
                 menu.findItem(R.id.sort_name_desc)
             }
+
             FileSortBy.SIZE_ASC -> {
                 menu.findItem(R.id.sort_smallest_first)
             }
+
             FileSortBy.SIZE_DESC -> {
                 menu.findItem(R.id.sort_largest_first)
             }
         }
     }
 
-    private fun getSortBy(mediaType: MediaType): FileSortBy {
+    private fun getSortBy(context: Context, mediaType: MediaType): FileSortBy {
         return when (mediaType) {
             MediaType.VIDEO -> {
-                LocalStorage.videoSortBy
+                VideoSortByPreference.getValue(context)
             }
+
             MediaType.IMAGE -> {
-                LocalStorage.imageSortBy
+                ImageSortByPreference.getValue(context)
             }
+
             MediaType.AUDIO -> {
-                LocalStorage.audioSortBy
+                AudioSortByPreference.getValue(context)
             }
+
             MediaType.FILE -> {
-                LocalStorage.fileSortBy
+                FileSortByPreference.getValue(context)
             }
         }
     }
 
-    private fun setSortBy(mediaType: MediaType, sortBy: FileSortBy) {
+    private suspend fun setSortByAsync(context: Context, mediaType: MediaType, sortBy: FileSortBy) {
         when (mediaType) {
             MediaType.VIDEO -> {
-                LocalStorage.videoSortBy = sortBy
+                VideoSortByPreference.putAsync(context, sortBy)
             }
+
             MediaType.IMAGE -> {
-                LocalStorage.imageSortBy = sortBy
+                ImageSortByPreference.putAsync(context, sortBy)
             }
+
             MediaType.AUDIO -> {
-                LocalStorage.audioSortBy = sortBy
+                AudioSortByPreference.putAsync(context, sortBy)
             }
+
             MediaType.FILE -> {
-                LocalStorage.fileSortBy = sortBy
+                FileSortByPreference.putAsync(context, sortBy)
             }
         }
     }
 
     fun sort(
         context: Context,
+        scope: CoroutineScope,
         menu: Menu,
         mediaType: MediaType,
         viewModel: FilteredItemsViewModel,
         list: ViewPageListBinding,
         sortBy: FileSortBy
     ) {
-        getSelectedSortItem(menu, getSortBy(mediaType)).unhighlightTitle()
-        setSortBy(mediaType, sortBy)
-        getSelectedSortItem(menu, getSortBy(mediaType)).highlightTitle(context)
-        viewModel.offset = 0
-        list.page.refresh()
+        scope.launch {
+            getSelectedSortItem(menu, getSortBy(context, mediaType)).unhighlightTitle()
+            withIO { setSortByAsync(context, mediaType, sortBy) }
+            getSelectedSortItem(menu, getSortBy(context, mediaType)).highlightTitle(context)
+            viewModel.offset = 0
+            list.page.refresh()
+        }
     }
 
     fun bindSortMenuItemClick(
         context: Context,
+        scope: CoroutineScope,
         menu: Menu,
         menuItem: MenuItem,
         mediaType: MediaType,
@@ -95,22 +116,27 @@ object FileSortHelper {
     ) {
         when (menuItem.itemId) {
             R.id.sort_newest_first -> {
-                sort(context, menu, mediaType, viewModel, list, FileSortBy.DATE_DESC)
+                sort(context, scope, menu, mediaType, viewModel, list, FileSortBy.DATE_DESC)
             }
+
             R.id.sort_oldest_first -> {
-                sort(context, menu, mediaType, viewModel, list, FileSortBy.DATE_ASC)
+                sort(context, scope, menu, mediaType, viewModel, list, FileSortBy.DATE_ASC)
             }
+
             R.id.sort_largest_first -> {
-                sort(context, menu, mediaType, viewModel, list, FileSortBy.SIZE_DESC)
+                sort(context, scope, menu, mediaType, viewModel, list, FileSortBy.SIZE_DESC)
             }
+
             R.id.sort_smallest_first -> {
-                sort(context, menu, mediaType, viewModel, list, FileSortBy.SIZE_ASC)
+                sort(context, scope, menu, mediaType, viewModel, list, FileSortBy.SIZE_ASC)
             }
+
             R.id.sort_name_asc -> {
-                sort(context, menu, mediaType, viewModel, list, FileSortBy.NAME_ASC)
+                sort(context, scope, menu, mediaType, viewModel, list, FileSortBy.NAME_ASC)
             }
+
             R.id.sort_name_desc -> {
-                sort(context, menu, mediaType, viewModel, list, FileSortBy.NAME_DESC)
+                sort(context, scope, menu, mediaType, viewModel, list, FileSortBy.NAME_DESC)
             }
         }
     }

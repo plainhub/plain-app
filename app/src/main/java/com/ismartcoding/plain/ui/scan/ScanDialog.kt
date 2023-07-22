@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.scan
 import android.app.Dialog
 import android.os.Bundle
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import com.google.zxing.Result
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
@@ -10,10 +11,11 @@ import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.lib.helpers.QrCodeBitmapHelper
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
-import com.ismartcoding.plain.LocalStorage
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.PickFileTag
 import com.ismartcoding.plain.data.enums.PickFileType
+import com.ismartcoding.plain.data.preference.ScanHistoryPreference
 import com.ismartcoding.plain.databinding.DialogScanBinding
 import com.ismartcoding.plain.features.*
 import com.ismartcoding.plain.ui.BaseDialog
@@ -28,6 +30,7 @@ import com.king.zxing.DefaultCameraScan
 import com.king.zxing.analyze.MultiFormatAnalyzer
 import com.king.zxing.config.ResolutionCameraConfig
 import com.king.zxing.util.CodeUtils
+import kotlinx.coroutines.launch
 
 class ScanDialog() : BaseDialog<DialogScanBinding>(), OnScanResultCallback {
     private var mCameraScan: CameraScan? = null
@@ -114,10 +117,13 @@ class ScanDialog() : BaseDialog<DialogScanBinding>(), OnScanResultCallback {
     }
 
     private fun addScanResult(value: String) {
-        val results = LocalStorage.scanResults.toMutableList()
-        results.remove(value)
-        results.add(0, value)
-        LocalStorage.scanResults = results
+        lifecycleScope.launch {
+            val context = requireContext()
+            val results = ScanHistoryPreference.getValue(context).toMutableList()
+            results.remove(value)
+            results.add(0, value)
+            withIO { ScanHistoryPreference.putAsync(context, results) }
+        }
     }
 
     override fun onScanResultCallback(result: Result): Boolean {

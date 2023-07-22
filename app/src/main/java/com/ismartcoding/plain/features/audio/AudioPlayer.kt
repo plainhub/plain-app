@@ -7,11 +7,14 @@ import android.media.MediaPlayer
 import android.net.Uri
 import androidx.media.AudioManagerCompat
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.media.AudioFocusHelper
 import com.ismartcoding.lib.media.IMediaPlayer
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.data.preference.AudioPlayModePreference
+import com.ismartcoding.plain.data.preference.AudioPlayingPreference
+import com.ismartcoding.plain.data.preference.AudioPlaylistPreference
 import com.ismartcoding.plain.features.AudioActionEvent
 
 class AudioPlayer : IMediaPlayer {
@@ -64,12 +67,17 @@ class AudioPlayer : IMediaPlayer {
     }
 
     override fun play() {
+        val context = MainApp.instance
+        val playing = AudioPlayingPreference.getValue(context)
+        if (playing == null) {
+            return
+        }
         try {
-            play(LocalStorage.audioPlaying!!.path)
+            play(playing.path)
         } catch (e: Exception) {
             LogCat.e(e.toString())
-            LocalStorage.audioPlaying?.let {
-                LocalStorage.deletePlaylistAudio(it.path)
+            coIO {
+                AudioPlaylistPreference.deleteAsync(context, setOf(playing.path))
             }
             setChangedNotify(AudioAction.NOT_FOUND)
         }
@@ -95,40 +103,45 @@ class AudioPlayer : IMediaPlayer {
     }
 
     private fun skipTo(isNext: Boolean) {
-        var playerAudioList = LocalStorage.audioPlaylist
-        if (playerAudioList.isEmpty()) {
-            if (LocalStorage.audioPlaying != null) {
-                LocalStorage.addPlaylistAudio(LocalStorage.audioPlaying!!)
-                playerAudioList = LocalStorage.audioPlaylist
-            } else {
-                return
-            }
-        }
-
-        if (LocalStorage.audioPlayMode == MediaPlayMode.SHUFFLE) {
-            LocalStorage.audioPlaying = playerAudioList.random()
-        } else {
-            if (LocalStorage.audioPlaying != null) {
-                var index = playerAudioList.indexOfFirst { it.path == LocalStorage.audioPlaying?.path }
-                if (isNext) {
-                    index++
-                    if (index > playerAudioList.size - 1) {
-                        index = 0
-                    }
+        val context = MainApp.instance
+        coIO {
+            var playerAudioList = AudioPlaylistPreference.getValue(context)
+            if (playerAudioList.isEmpty()) {
+                val playing = AudioPlayingPreference.getValue(context)
+                if (playing != null) {
+                    AudioPlaylistPreference.addAsync(context, listOf(playing))
+                    playerAudioList = AudioPlaylistPreference.getValue(context)
                 } else {
-                    index--
-                    if (index < 0) {
-                        index = playerAudioList.size - 1
-                    }
+                    return@coIO
                 }
-                LocalStorage.audioPlaying = playerAudioList[index]
-            } else {
-                LocalStorage.audioPlaying = playerAudioList[if (isNext) 0 else (playerAudioList.size - 1)]
             }
-        }
 
-        playerProgress = 0
-        play()
+            if (AudioPlayModePreference.getValue(context) == MediaPlayMode.SHUFFLE) {
+                AudioPlayingPreference.putAsync(context, playerAudioList.random())
+            } else {
+                val playing = AudioPlayingPreference.getValue(context)
+                if (playing != null) {
+                    var index = playerAudioList.indexOfFirst { it.path == playing.path }
+                    if (isNext) {
+                        index++
+                        if (index > playerAudioList.size - 1) {
+                            index = 0
+                        }
+                    } else {
+                        index--
+                        if (index < 0) {
+                            index = playerAudioList.size - 1
+                        }
+                    }
+                    AudioPlayingPreference.putAsync(context, playerAudioList[index])
+                } else {
+                    AudioPlayingPreference.putAsync(context, playerAudioList[if (isNext) 0 else (playerAudioList.size - 1)])
+                }
+            }
+
+            playerProgress = 0
+            play()
+        }
     }
 
     override fun pause() {

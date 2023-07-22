@@ -23,8 +23,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class WebConsoleViewModel : ViewModel() {
-    fun enableWebConsole(context: Context, scope: CoroutineScope, enable: Boolean) {
-        WebPreference.put(context, scope, enable)
+    fun enableWebConsole(context: Context, enable: Boolean) {
+        WebPreference.put(context, enable)
         sendEvent(HttpServerEnabledEvent(enable))
         if (enable) {
             requestIgnoreBatteryOptimization(context)

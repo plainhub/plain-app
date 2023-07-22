@@ -14,7 +14,6 @@ import com.ismartcoding.plain.fragment.NetworkFragment
 import com.ismartcoding.lib.brv.utils.linear
 import com.ismartcoding.lib.brv.utils.models
 import com.ismartcoding.lib.brv.utils.setup
-import com.ismartcoding.plain.LocalStorage
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.features.box.FetchNetworksEvent
 import com.ismartcoding.plain.features.box.NetworksResultEvent
