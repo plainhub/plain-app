@@ -2,7 +2,6 @@ package com.ismartcoding.lib.extensions
 
 import android.Manifest
 import android.app.NotificationManager
-import android.app.UiModeManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.pm.ShortcutManager
