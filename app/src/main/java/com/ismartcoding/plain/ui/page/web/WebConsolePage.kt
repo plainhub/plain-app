@@ -59,6 +59,7 @@ import com.ismartcoding.plain.ui.theme.palette.onDark
 import com.ismartcoding.plain.ui.theme.palette.onLight
 import com.ismartcoding.plain.web.HttpServerManager
 import androidx.compose.foundation.lazy.items
+import com.ismartcoding.lib.extensions.isTV
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import kotlinx.coroutines.launch
 
@@ -227,7 +228,8 @@ fun WebConsolePage(
                             title = permission.getText(),
                             showMore = true,
                             onClick = {
-                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                val intent = Intent(if (context.isTV()) Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS else Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                intent.addCategory(Intent.CATEGORY_DEFAULT)
                                 intent.data = Uri.fromParts("package", context.packageName, null)
                                 context.startActivity(intent)
                             })

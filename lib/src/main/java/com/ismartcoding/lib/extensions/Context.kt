@@ -2,6 +2,7 @@ package com.ismartcoding.lib.extensions
 
 import android.Manifest
 import android.app.NotificationManager
+import android.app.UiModeManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.pm.ShortcutManager
@@ -11,6 +12,7 @@ import android.media.MediaScannerConnection
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
+import android.os.Build
 import android.provider.MediaStore
 import android.telecom.TelecomManager
 import android.util.DisplayMetrics
@@ -255,4 +257,8 @@ fun Context.allowSensitivePermissions(): Boolean {
 
 fun Context.isPortrait(): Boolean {
     return resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+}
+
+fun Context.isTV(): Boolean {
+    return packageManager.hasSystemFeature("android.hardware.type.television")
 }
