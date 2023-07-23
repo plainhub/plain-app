@@ -30,7 +30,9 @@ fun Bundle.where(selection: String, args: List<String>) {
 }
 
 fun Bundle.paging(offset: Int, limit: Int) {
-    putInt(ContentResolver.QUERY_ARG_OFFSET, offset)
+    if (offset > 0) {
+        putInt(ContentResolver.QUERY_ARG_OFFSET, offset)
+    }
     putInt(ContentResolver.QUERY_ARG_LIMIT, limit)
 }
 

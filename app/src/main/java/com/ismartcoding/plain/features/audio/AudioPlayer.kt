@@ -40,7 +40,7 @@ class AudioPlayer : IMediaPlayer {
 
     fun getPlayerProgress(): Int {
         return if (mediaPlayer?.isPlaying == true) {
-            mediaPlayer!!.currentPosition / 1000
+            (mediaPlayer?.currentPosition ?: 0) / 1000
         } else {
             playerProgress / 1000
         }
