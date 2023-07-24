@@ -75,8 +75,9 @@ object FileSystemHelper {
     }
 
     fun getSDCardPath(context: Context): String {
+        val internalPath = getInternalStoragePath(context)
         val directories = getStorageDirectories(context).filter {
-            it != getInternalStoragePath(context) && !it.equals(
+            it != internalPath && !it.equals(
                 "/storage/emulated/0",
                 true
             )
@@ -253,18 +254,23 @@ fun List<DFile>.sort(sortBy: FileSortBy): List<DFile> {
         FileSortBy.NAME_ASC -> {
             this.sortedWith(comparator.thenBy { it.name.lowercase() })
         }
+
         FileSortBy.NAME_DESC -> {
             this.sortedWith(comparator.thenByDescending { it.name.lowercase() })
         }
+
         FileSortBy.SIZE_ASC -> {
             this.sortedWith(comparator.thenBy { it.size })
         }
+
         FileSortBy.SIZE_DESC -> {
             this.sortedWith(comparator.thenByDescending { it.size })
         }
+
         FileSortBy.DATE_ASC -> {
             this.sortedWith(comparator.thenBy { it.updatedAt })
         }
+
         FileSortBy.DATE_DESC -> {
             this.sortedWith(comparator.thenByDescending { it.updatedAt })
         }

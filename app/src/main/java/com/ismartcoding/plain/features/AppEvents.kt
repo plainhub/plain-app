@@ -48,7 +48,6 @@ import kotlin.time.Duration.Companion.seconds
 
 class BoxConnectivityStateChangedEvent
 
-class UpdateLocaleEvent
 class HttpServerEnabledEvent(val enabled: Boolean)
 
 class StartHttpServerEvent
@@ -63,9 +62,6 @@ class DeleteChatItemViewEvent(val id: String)
 class DeviceNameUpdatedEvent(val id: String, val name: String?)
 
 class CurrentBoxChangedEvent
-
-class ChatInputEditEvent(val content: String)
-class ChatItemRefreshEvent(val data: DMessageContent)
 
 class VocabularyCreatedEvent
 class VocabularyUpdatedEvent
@@ -100,11 +96,12 @@ class AIChatCreatedEvent(val item: DAIChat)
 class ChatItemClickEvent
 
 object AppEvents {
-    private val mediaPlayer = MediaPlayer()
+    private lateinit var mediaPlayer: MediaPlayer
     private var mediaPlayingUri: Uri? = null
 
     @OptIn(BetaOpenAI::class)
     fun register() {
+        mediaPlayer = MediaPlayer()
         receiveEventHandler<PlayAudioEvent> { event ->
             launch {
                 try {

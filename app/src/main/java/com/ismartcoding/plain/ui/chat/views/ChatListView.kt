@@ -34,7 +34,6 @@ import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.extensions.formatDate
 import com.ismartcoding.plain.features.ChatItemClickEvent
-import com.ismartcoding.plain.features.ChatItemRefreshEvent
 import com.ismartcoding.plain.features.chat.ChatHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.chat.ChatItemDetailDialog
