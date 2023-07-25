@@ -21,7 +21,6 @@ import com.ismartcoding.lib.brv.utils.mutable
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.setSelectableItemBackground
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.databinding.ChatItemFilesBinding

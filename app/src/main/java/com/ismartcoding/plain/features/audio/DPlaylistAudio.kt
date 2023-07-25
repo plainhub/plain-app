@@ -21,20 +21,28 @@ data class DPlaylistAudio(
     companion object {
         fun fromPath(context: Context, path: String): DPlaylistAudio {
             val retriever = MediaMetadataRetriever()
-            retriever.setDataSource(context, Uri.parse(path))
-            var title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: ""
-            if (title.isEmpty()) {
-                title = path.getFilenameWithoutExtensionFromPath()
+            var title = path.getFilenameWithoutExtensionFromPath()
+            var duration = 0L
+            var artist = getString(R.string.unknown)
+            try {
+                retriever.setDataSource(context, Uri.parse(path))
+                val keyTitle = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: ""
+                if (keyTitle.isNotEmpty()) {
+                    title = keyTitle
+                }
+                duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0L
+                val keyArtist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) ?: ""
+                if (keyArtist.isNotEmpty()) {
+                    artist = keyArtist
+                }
+                retriever.release()
+            } catch (ex: Throwable) {
+                ex.printStackTrace()
+            } finally {
             }
-            val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: 0L
-            var artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) ?: ""
-            if (artist.isEmpty()) {
-                artist = getString(R.string.unknown)
-            }
-            retriever.release()
             return DPlaylistAudio(title, path, artist, duration / 1000)
         }
 
-        private const  val serialVersionUID = -11L
+        private const val serialVersionUID = -11L
     }
 }
