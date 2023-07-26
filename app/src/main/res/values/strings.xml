@@ -286,7 +286,7 @@
     <string name="stop_service">Stop service</string>
     <string name="cast">Cast</string>
     <string name="images">Images</string>
-    <string name="audios">Audios</string>
+    <string name="audios">Audio</string>
     <string name="videos">Videos</string>
     <string name="files">Files</string>
     <string name="sdcard">SD card</string>
@@ -315,7 +315,7 @@
     <string name="select_all">Select all</string>
     <string name="unselect_all">Unselect all</string>
     <string name="files_title">Files ({{count}})</string>
-    <string name="audios_title">Audios ({{count}})</string>
+    <string name="audios_title">Audio ({{count}})</string>
     <string name="videos_title">Videos ({{count}})</string>
     <string name="images_title">Images ({{count}})</string>
     <string name="messages_title">Messages ({{count}})</string>
