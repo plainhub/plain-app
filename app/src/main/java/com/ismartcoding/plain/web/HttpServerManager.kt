@@ -57,7 +57,7 @@ object HttpServerManager {
 
     suspend fun loadTokenCache() {
         tokenCache.clear()
-        SessionList.getItems().forEach {
+        SessionList.getItemsAsync().forEach {
             tokenCache[it.clientId] = Base64.decode(it.token, Base64.NO_WRAP)
         }
     }

@@ -192,6 +192,7 @@
     <string name="unreachable_via_network_except_bluetooth">当前无法通过网络连接盒子{{box_name}}，只能通过蓝牙访问。</string>
     <string name="home_item_title_network">网络</string>
     <string name="home_item_title_education">教育</string>
+    <string name="home_item_title_hardware">硬件</string>
     <string name="exchange_rate">汇率</string>
     <string name="sound_meter">分贝仪</string>
     <string name="home_item_title_shipping">快递物流</string>
@@ -496,6 +497,7 @@
         <item>140 dB: 军用喷气飞机声音，烟花</item>
     </string-array>
     <string name="use_device_language">跟随系统设置</string>
+    <string name="not_supported_error">不支持此设备。</string>
     <string name="amoled_dark_theme">AMOLED 深色主题</string>
     <string name="no_browser_error">没有浏览器可以打开此页面。</string>
     <string name="text_file_size_limit">仅允许打开大小不超过10MB的文件。</string>

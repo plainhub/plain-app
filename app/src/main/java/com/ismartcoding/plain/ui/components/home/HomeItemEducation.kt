@@ -1,13 +1,14 @@
-package com.ismartcoding.plain.ui.components
+package com.ismartcoding.plain.ui.components.home
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.GridItem
@@ -18,6 +19,7 @@ import com.ismartcoding.plain.ui.endict.VocabulariesDialog
 @Composable
 fun HomeItemEducation(
     navController: NavHostController,
+    itemWidth: Dp,
 ) {
     Column {
         Subtitle(
@@ -28,11 +30,10 @@ fun HomeItemEducation(
                 icon = Icons.Outlined.Language,
                 stringResource(id = R.string.memorize_words),
                 modifier = Modifier
-                    .weight(1f)
+                    .width(itemWidth)
             ) {
                 VocabulariesDialog().show()
             }
-            Spacer(modifier = Modifier.weight(3f))
         }
     }
 }

@@ -12,25 +12,25 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.models.SharedViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextPage(
     navController: NavHostController,
-    title: String,
-    content: String,
+    sharedViewModel: SharedViewModel,
 ) {
     PScaffold(
         navController,
         content = {
             LazyColumn {
                 item {
-                    DisplayText(text = title)
+                    DisplayText(text = sharedViewModel.textTitle.value)
                 }
                 item {
                     Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                         SelectionContainer {
-                            Text(text = content)
+                            Text(text = sharedViewModel.textContent.value)
                         }
                     }
                 }

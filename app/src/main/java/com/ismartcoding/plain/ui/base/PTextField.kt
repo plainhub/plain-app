@@ -72,7 +72,7 @@ fun PTextField(
         placeholder = {
             Text(
                 text = placeholder,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.7f),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f),
                 style = MaterialTheme.typography.bodyMedium
             )
         },

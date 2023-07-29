@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.components
+package com.ismartcoding.plain.ui.components.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi

@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.database.CursorWindow
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.PickVisualMediaRequest
@@ -105,7 +106,6 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
         val language = LanguagePreference.get(this)
         Language.values().find { it.value == language }?.let {
             if (it == Language.UseDeviceLanguage) return@let

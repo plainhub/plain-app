@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -52,8 +51,7 @@ fun SessionsPage(
     viewModel: SessionsViewModel = viewModel(),
 ) {
     val context = LocalContext.current
-    val sessionsState by viewModel.sessions.collectAsState()
-    val scope = rememberCoroutineScope()
+    val sessionsState by viewModel.itemsFlow.collectAsState()
 
     val refreshState = rememberRefreshLayoutState {
         viewModel.fetch()
@@ -76,7 +74,7 @@ fun SessionsPage(
                     item {
                         DisplayText(text = stringResource(id = R.string.sessions))
                     }
-                    items(sessionsState, key = { it.token }) { m ->
+                    items(sessionsState) { m ->
                         Row(
                             Modifier
                                 .fillMaxWidth()
@@ -96,7 +94,7 @@ fun SessionsPage(
                                 tint = MaterialTheme.colorScheme.onSurface,
                             ) {
                                 DialogHelper.confirmToAction(context, R.string.confirm_to_delete) {
-                                    viewModel.delete(m)
+                                    viewModel.delete(m.clientId)
                                 }
                             }
                         }

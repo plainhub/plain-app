@@ -68,10 +68,7 @@ class AudioPlayer : IMediaPlayer {
 
     override fun play() {
         val context = MainApp.instance
-        val playing = AudioPlayingPreference.getValue(context)
-        if (playing == null) {
-            return
-        }
+        val playing = AudioPlayingPreference.getValue(context) ?: return
         try {
             play(playing.path)
         } catch (e: Exception) {
@@ -162,6 +159,7 @@ class AudioPlayer : IMediaPlayer {
         if (mediaPlayer?.isPlaying == true) {
             mediaPlayer?.stop()
             mediaPlayer?.release()
+            mediaPlayer = null
             abandonFocus()
         }
     }

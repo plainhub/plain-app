@@ -6,27 +6,21 @@ import android.os.Looper
 import android.view.View
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.softinput.setWindowSoftInput
-import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.features.UpdateMessageEvent
 import com.ismartcoding.plain.databinding.DialogEditChatTextBinding
-import com.ismartcoding.plain.db.DMessageContent
-import com.ismartcoding.plain.db.DMessageText
-import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.features.UpdateMessageEvent
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.setSafeClick
 
-class EditChatTextDialog(val chatItem: DChat) : BaseBottomSheetDialog<DialogEditChatTextBinding>() {
+class EditChatTextDialog(val id: String, val content: String) : BaseBottomSheetDialog<DialogEditChatTextBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val c = chatItem.content.value as? DMessageText
-        binding.input.setText(c?.text ?: "")
+        binding.input.setText(content)
         binding.send.setSafeClick {
-            val content = binding.input.text.toString()
-            if (content.isEmpty()) {
+            val c = binding.input.text.toString()
+            if (c.isEmpty()) {
                 return@setSafeClick
             }
-            chatItem.content = DMessageContent(DMessageType.TEXT.value, DMessageText(content))
-            sendEvent(UpdateMessageEvent(chatItem))
+            sendEvent(UpdateMessageEvent(id, c))
             dismiss()
         }
 

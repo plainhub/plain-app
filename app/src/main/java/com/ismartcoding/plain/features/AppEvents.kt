@@ -55,7 +55,7 @@ class StartScreenMirrorEvent
 class RestartAppEvent
 
 class SendMessageEvent(val content: DMessageContent)
-class UpdateMessageEvent(var chatItem: DChat)
+class UpdateMessageEvent(val id: String, val content: String)
 
 class DeleteChatItemViewEvent(val id: String)
 

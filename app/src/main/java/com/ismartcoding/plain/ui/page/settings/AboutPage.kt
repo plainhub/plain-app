@@ -53,17 +53,17 @@ fun AboutPage(
                         value = MainApp.getAndroidVersion(),
                     )
                     PListItem(
-                        title = stringResource(R.string.donation),
-                        showMore = true,
-                        onClick = {
-                            WebHelper.open(context, "https://ko-fi.com/ismartcoding")
-                        }
-                    )
-                    PListItem(
                         title = stringResource(R.string.logs),
                         showMore = true,
                         onClick = {
                             navController.navigate(RouteName.LOGS)
+                        }
+                    )
+                    PListItem(
+                        title = stringResource(R.string.donation),
+                        showMore = true,
+                        onClick = {
+                            WebHelper.open(context, "https://ko-fi.com/ismartcoding")
                         }
                     )
                     if (BuildConfig.DEBUG) {

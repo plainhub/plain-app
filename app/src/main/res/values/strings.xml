@@ -3,8 +3,8 @@
     <string name="load_no_more">End</string>
     <string name="list_empty">List is empty</string>
     <string name="select_box_title">Select a box</string>
-    <string name="add_new_box_button">Add a box</string>
-    <string name="add_new_box_title">Add a box</string>
+    <string name="add_new_box_button">Add box</string>
+    <string name="add_new_box_title">Add box</string>
     <string name="bluetooth">Bluetooth</string>
     <string name="qrcode">QRCode</string>
     <string name="scanner">Scanner</string>
@@ -192,6 +192,7 @@
     <string name="unreachable_via_network_except_bluetooth">{{box_name}} is only accessible via bluetooth</string>
     <string name="home_item_title_network">Network</string>
     <string name="home_item_title_education">Education</string>
+    <string name="home_item_title_hardware">Hardware</string>
     <string name="exchange_rate">Exchange rate</string>
     <string name="sound_meter">Sound meter</string>
     <string name="home_item_title_shipping">Shipping</string>
@@ -496,6 +497,7 @@
         <item>140 dB: Military jet aircraft, Fireworks</item>
     </string-array>
     <string name="use_device_language">Use device language</string>
+    <string name="not_supported_error">Not supported on this device.</string>
     <string name="english" translatable="false">English</string>
     <string name="chinese_simplified" translatable="false">简体中文</string>
     <string name="amoled_dark_theme">AMOLED dark theme</string>

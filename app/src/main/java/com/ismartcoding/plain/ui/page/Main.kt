@@ -6,6 +6,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -14,6 +15,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ismartcoding.plain.data.enums.DarkTheme
 import com.ismartcoding.plain.data.preference.LocalDarkTheme
 import com.ismartcoding.plain.ui.models.MainViewModel
+import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.page.settings.AboutPage
 import com.ismartcoding.plain.ui.page.settings.BackupRestorePage
 import com.ismartcoding.plain.ui.page.settings.ColorAndStylePage
@@ -37,6 +39,7 @@ fun Main(
 ) {
     val navController = rememberNavController()
     val useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current)
+    val sharedViewModel: SharedViewModel = viewModel()
 
     AppTheme(useDarkTheme = useDarkTheme) {
         rememberSystemUiController().run {
@@ -51,7 +54,7 @@ fun Main(
             startDestination = RouteName.HOME.name,
         ) {
             mapOf<RouteName, @Composable () -> Unit>(
-                RouteName.HOME to { HomePage(navController) },
+                RouteName.HOME to { HomePage(navController, viewModel) },
                 RouteName.SETTINGS to { SettingsPage(navController) },
                 RouteName.COLOR_AND_STYLE to { ColorAndStylePage(navController) },
                 RouteName.DARK_THEME to { DarkThemePage(navController) },
@@ -59,25 +62,19 @@ fun Main(
                 RouteName.BACKUP_RESTORE to { BackupRestorePage(navController) },
                 RouteName.ABOUT to { AboutPage(navController) },
                 RouteName.LOGS to { LogsPage(navController) },
-                RouteName.WEB_CONSOLE to { WebConsolePage(navController) },
+                RouteName.WEB_CONSOLE to { WebConsolePage(navController, sharedViewModel) },
                 RouteName.PASSWORD to { PasswordPage(navController) },
                 RouteName.SESSIONS to { SessionsPage(navController) },
                 RouteName.WEB_DEV to { WebDevPage(navController) },
                 RouteName.EXCHANGE_RATE to { ExchangeRatePage(navController) },
                 RouteName.SOUND_METER to { SoundMeterPage(navController) },
+                RouteName.CHAT to { ChatPage(navController, sharedViewModel) },
+                RouteName.CHAT_TEXT to { ChatTextPage(navController, sharedViewModel) },
+                RouteName.TEXT to { TextPage(navController, sharedViewModel) },
             ).forEach { (routeName, content) ->
                 composable(routeName.name) {
                     content()
                 }
-            }
-            composable(
-                "${RouteName.TEXT.name}?title={title}&content={content}",
-                arguments = listOf(navArgument("title") { }, navArgument("content") {})
-            ) { backStackEntry ->
-                val arguments = requireNotNull(backStackEntry.arguments)
-                val title = arguments.getString("title", "")
-                val content = arguments.getString("content", "")
-                TextPage(navController, title, content)
             }
         }
     }

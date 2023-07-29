@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.components
+package com.ismartcoding.plain.ui.components.home
 
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.R

@@ -551,21 +551,21 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("createChatItem") {
                     resolver { message: String ->
-                        val items = ChatHelper.createChatItemsAsync(
+                        val item = ChatHelper.sendAsync(
                             DMessageContent(
                                 DMessageType.TEXT.value,
                                 DMessageText(message)
                             )
                         )
-                        sendEvent(HttpServerEvents.MessageCreatedEvent(items))
-                        items.map { it.toModel() }
+                        sendEvent(HttpServerEvents.MessageCreatedEvent(arrayListOf(item)))
+                        arrayListOf(item).map { it.toModel() }
                     }
                 }
                 mutation("deleteChatItem") {
                     resolver { id: ID ->
                         val item = ChatHelper.getAsync(id.value)
                         if (item != null) {
-                            ChatHelper.deleteAsync(item)
+                            ChatHelper.deleteAsync(item.id, item.content.value)
                         }
                         true
                     }

@@ -127,7 +127,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata")
     implementation("androidx.compose.ui:ui-tooling")
 
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha10")
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha11")
 
     // https://github.com/google/accompanist/releases
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.4-beta")
@@ -192,6 +192,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:$coil")
     implementation("io.coil-kt:coil-svg:$coil")
     implementation("io.coil-kt:coil-gif:$coil")
+    implementation("io.coil-kt:coil-video:$coil")
 
 
     // https://developer.android.com/jetpack/androidx/releases/datastore

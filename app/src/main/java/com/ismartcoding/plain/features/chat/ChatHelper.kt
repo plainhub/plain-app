@@ -7,37 +7,33 @@ import com.ismartcoding.plain.db.*
 import java.io.File
 
 object ChatHelper {
-    suspend fun createChatItemsAsync(message: DMessageContent): List<DChat> {
-        val items = mutableListOf<DChat>()
+    suspend fun sendAsync(message: DMessageContent): DChat {
         val item = DChat()
         item.isMe = true
         item.content = message
         withIO {
             AppDatabase.instance.chatDao().insert(item)
         }
-        items.add(item)
-        return items
+        return item
     }
 
     suspend fun getAsync(id: String): DChat? {
         return withIO { AppDatabase.instance.chatDao().getById(id) }
     }
 
-    suspend fun deleteAsync(chatItem: DChat) {
+    suspend fun deleteAsync(id: String, value: Any?) {
         withIO {
-            AppDatabase.instance.chatDao().delete(chatItem.id)
-            val v = chatItem.content.value
-            if (v is DMessageFiles) {
-                v.items.forEach {
+            AppDatabase.instance.chatDao().delete(id)
+            if (value is DMessageFiles) {
+                value.items.forEach {
                     File(it.uri).delete()
                 }
-            } else if (v is DMessageImages) {
-                v.items.forEach {
+            } else if (value is DMessageImages) {
+                value.items.forEach {
                     File(it.uri).delete()
                 }
             }
         }
-        sendEvent(DeleteChatItemViewEvent(chatItem.id))
+        sendEvent(DeleteChatItemViewEvent(id))
     }
-
 }

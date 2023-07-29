@@ -61,12 +61,15 @@ import com.ismartcoding.plain.web.HttpServerManager
 import androidx.compose.foundation.lazy.items
 import com.ismartcoding.lib.extensions.isTV
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.packageManager
+import com.ismartcoding.plain.ui.models.SharedViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WebConsolePage(
     navController: NavHostController,
+    sharedViewModel: SharedViewModel,
     viewModel: WebConsoleViewModel = viewModel(),
 ) {
     WebSettingsProvider {
@@ -121,9 +124,9 @@ fun WebConsolePage(
             DropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }, content = {
                 DropdownMenuItem(onClick = {
                     isMenuOpen = false
-                    val title = context.getString(R.string.https_certificate_signature)
-                    val content = HttpServerManager.getSSLSignature(context).joinToString(" ") { "%02x".format(it).uppercase() }
-                    navController.navigate("${RouteName.TEXT.name}?title=${title}&content=${content}")
+                    sharedViewModel.textTitle.value = context.getString(R.string.https_certificate_signature)
+                    sharedViewModel.textContent.value = HttpServerManager.getSSLSignature(context).joinToString(" ") { "%02x".format(it).uppercase() }
+                    navController.navigate(RouteName.TEXT)
                 }, text = {
                     Text(text = stringResource(R.string.https_certificate_signature))
                 })
@@ -231,7 +234,11 @@ fun WebConsolePage(
                                 val intent = Intent(if (context.isTV()) Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS else Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                                 intent.addCategory(Intent.CATEGORY_DEFAULT)
                                 intent.data = Uri.fromParts("package", context.packageName, null)
-                                context.startActivity(intent)
+                                if (intent.resolveActivity(packageManager) != null) {
+                                    context.startActivity(intent)
+                                } else {
+                                    DialogHelper.showMessage(R.string.not_supported_error)
+                                }
                             })
                     } else {
                         PListItem(

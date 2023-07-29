@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.helpers
 
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.features.DExchangeRates
@@ -24,6 +25,7 @@ object ExchangeHelper {
                 return rates
             }
         } catch (ex: Exception) {
+            LogCat.e(ex.toString())
         }
 
         return null

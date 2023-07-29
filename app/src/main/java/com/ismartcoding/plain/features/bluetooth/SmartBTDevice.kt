@@ -40,7 +40,7 @@ class SmartBTDevice(val device: BTDevice) {
     }
 
     suspend fun requestAsync(api: BluetoothApi, requestData: BleRequestData): BluetoothResult {
-        val chunked = requestData.toJSON().toString().chunked(490)
+        val chunked = requestData.toJSON().toString().chunked(460)
         chunked.forEachIndexed { index, value ->
             val r = writeCharacteristicAsync(device, api, BleSegmentData.build(value, start = index == 0, end = index == chunked.size - 1).toJSON().toString())
             if (!r.isSuccess()) {

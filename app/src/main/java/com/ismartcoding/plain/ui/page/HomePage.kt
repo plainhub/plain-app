@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -39,24 +40,28 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.chat.ChatDialog
-import com.ismartcoding.plain.ui.components.HomeItemEducation
+import com.ismartcoding.plain.ui.components.home.HomeItemEducation
+import com.ismartcoding.plain.ui.components.home.HomeItemHardware
+import com.ismartcoding.plain.ui.components.home.HomeItemSocial
+import com.ismartcoding.plain.ui.components.home.HomeItemStorage
+import com.ismartcoding.plain.ui.components.home.HomeItemTools
+import com.ismartcoding.plain.ui.components.home.HomeItemWork
 import com.ismartcoding.plain.ui.extensions.navigate
-import com.ismartcoding.plain.ui.components.HomeItemSocial
-import com.ismartcoding.plain.ui.components.HomeItemStorage
-import com.ismartcoding.plain.ui.components.HomeItemTools
-import com.ismartcoding.plain.ui.components.HomeItemWork
+import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.scan.ScanDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomePage(
     navController: NavHostController,
+    viewModel: MainViewModel,
 ) {
     val context = LocalContext.current
     var isMenuOpen by remember { mutableStateOf(false) }
     val webConsole = LocalWeb.current
     val keepScreenOn = LocalKeepScreenOn.current
+    val configuration = LocalConfiguration.current
+    val itemWidth = (configuration.screenWidthDp.dp - 40.dp) / 4
 
     PScaffold(navController,
         navigationIcon = {
@@ -101,7 +106,7 @@ fun HomePage(
         },
         floatingActionButton = {
             FloatingActionButton(modifier = Modifier.navigationBarsPadding(), onClick = {
-                ChatDialog().show()
+                navController.navigate(RouteName.CHAT)
             }) {
                 Icon(
                     Icons.Outlined.Chat, stringResource(R.string.my_phone)
@@ -113,20 +118,37 @@ fun HomePage(
                 DisplayText(
                     text = stringResource(R.string.app_name)
                 )
-                HomeItemStorage(navController)
+            }
+            item {
+                HomeItemStorage(navController, itemWidth)
                 Spacer(modifier = Modifier.height(16.dp))
-                HomeItemWork()
+            }
+            item {
+                HomeItemWork(itemWidth)
                 Spacer(modifier = Modifier.height(16.dp))
-                if (context.allowSensitivePermissions()) {
-                    HomeItemSocial(navController)
+            }
+            if (context.allowSensitivePermissions()) {
+                item {
+                    HomeItemSocial(navController, itemWidth)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
-                if (BuildConfig.DEBUG) {
-                    HomeItemEducation(navController)
+            }
+            if (BuildConfig.DEBUG) {
+                item {
+                    HomeItemEducation(navController, itemWidth)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
-                HomeItemTools(navController)
+            }
+            item {
+                HomeItemTools(navController, itemWidth)
                 Spacer(modifier = Modifier.height(16.dp))
+            }
+            if (BuildConfig.DEBUG) {
+                item {
+                    HomeItemHardware(navController, itemWidth, viewModel)
+                }
+            }
+            item {
                 BottomSpace()
             }
         }

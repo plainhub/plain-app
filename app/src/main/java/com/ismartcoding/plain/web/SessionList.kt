@@ -2,11 +2,10 @@ package com.ismartcoding.plain.web
 
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DSession
-import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Clock
 
 object SessionList {
-    fun getItems(): List<DSession> {
+    fun getItemsAsync(): List<DSession> {
         return AppDatabase.instance.sessionDao().getAll()
     }
 
@@ -30,7 +29,7 @@ object SessionList {
         }
     }
 
-    fun deleteAsync(item: DSession) {
-        AppDatabase.instance.sessionDao().delete(item)
+    fun deleteAsync(clientId: String) {
+        AppDatabase.instance.sessionDao().delete(clientId)
     }
 }

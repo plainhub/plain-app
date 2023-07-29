@@ -43,6 +43,6 @@ interface SessionDao {
     @Update
     fun update(vararg item: DSession)
 
-    @Delete
-    fun delete(item: DSession)
+    @Query("DELETE FROM sessions WHERE client_id=:clientId")
+    fun delete(clientId: String)
 }
