@@ -57,7 +57,7 @@ object NotificationHelper {
             setSilent(true)
             setWhen(System.currentTimeMillis())
             setAutoCancel(false)
-            setContentIntent(NotificationHelper.createContentIntent(context))
+            setContentIntent(createContentIntent(context))
             addAction(-1, getString(R.string.stop_service), stopPendingIntent)
             setStyle(NotificationCompat.DecoratedCustomViewStyle())
         }.build()

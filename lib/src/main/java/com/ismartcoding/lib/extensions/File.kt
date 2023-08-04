@@ -61,15 +61,19 @@ fun File.getBitmap(context: Context, width: Int, height: Int, centerCrop: Boolea
             LogCat.e(ex.toString())
         }
     } else {
-        var options = RequestOptions().set(Downsampler.ALLOW_HARDWARE_CONFIG, true).override(width, height)
-        if (centerCrop) {
-            options = options.centerCrop()
+        try {
+            var options = RequestOptions().set(Downsampler.ALLOW_HARDWARE_CONFIG, true).override(width, height)
+            if (centerCrop) {
+                options = options.centerCrop()
+            }
+            val d = Glide.with(context).load(this)
+                .apply(options)
+                .submit().get()
+            // https://stackoverflow.com/questions/58314397/java-lang-illegalstateexception-software-rendering-doesnt-support-hardware-bit
+            bitmap = (d as BitmapDrawable).bitmap.copy(Bitmap.Config.ARGB_8888, false)
+        } catch (ex: Exception) {
+            LogCat.e(ex.toString())
         }
-        val d = Glide.with(context).load(this)
-            .apply(options)
-            .submit().get()
-        // https://stackoverflow.com/questions/58314397/java-lang-illegalstateexception-software-rendering-doesnt-support-hardware-bit
-        bitmap = (d as BitmapDrawable).bitmap.copy(Bitmap.Config.ARGB_8888, false)
     }
     return bitmap
 }
