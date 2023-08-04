@@ -56,7 +56,7 @@
     <string name="theme">主题</string>
     <string name="sort">排序</string>
     <string name="language">语言</string>
-    <string name="language_desc">英语、简体中文</string>
+    <string name="language_desc">英语、简体中文等</string>
     <string name="name_asc">名称(从A到Z)</string>
     <string name="name_desc">名称(从Z到A)</string>
     <string name="ip_address_asc">IP地址(0到9)</string>

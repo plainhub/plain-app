@@ -58,9 +58,8 @@ fun PListItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp, 16.dp, 8.dp, 16.dp),
+                .padding(16.dp, 8.dp, 8.dp, 8.dp),
             verticalAlignment = Alignment.CenterVertically
-
         ) {
             if (icon != null) {
                 Icon(
@@ -80,7 +79,7 @@ fun PListItem(
                     )
                 }
             }
-            Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.weight(1f).padding(vertical = 8.dp)) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp)
@@ -112,7 +111,7 @@ fun PListItem(
                         }
                     }
                     value?.let {
-                        Box(Modifier.padding(end = if (showMore) 0.dp else 8.dp)) {
+                        Box(Modifier.padding(end = if (showMore) 0.dp else 8.dp, top = 8.dp, bottom = 8.dp)) {
                             SelectionContainer {
                                 Text(
                                     text = it,

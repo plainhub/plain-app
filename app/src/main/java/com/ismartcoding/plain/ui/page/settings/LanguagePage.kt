@@ -15,11 +15,14 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.Language
 import com.ismartcoding.plain.data.preference.LanguagePreference
-import com.ismartcoding.plain.data.preference.LocalLanguage
+import com.ismartcoding.plain.data.preference.LocalLocale
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,8 +30,11 @@ fun LanguagePage(
     navController: NavHostController,
 ) {
     val context = LocalContext.current
-    val language = LocalLanguage.current
+    val language = LocalLocale.current
     val scope = rememberCoroutineScope()
+    val list = mutableListOf<Locale?>()
+    list.add(null)
+    list.addAll(Language.locales)
 
     PScaffold(
         navController,
@@ -39,15 +45,19 @@ fun LanguagePage(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
                 item {
-                    Language.values().map {
+                    list.forEach {
                         PListItem(
-                            title = it.getText(context),
+                            title = it?.getDisplayLanguage(it) ?: stringResource(id = R.string.use_device_language),
                             onClick = {
-                                LanguagePreference.put(context, scope, it)
+                                scope.launch(Dispatchers.IO) {
+                                    LanguagePreference.putAsync(context, it)
+                                }
                             },
                         ) {
-                            RadioButton(selected = it.value == language, onClick = {
-                                LanguagePreference.put(context, scope, it)
+                            RadioButton(selected = (it == null && language == null) || (it?.language == language?.language && it?.country == language?.country), onClick = {
+                                scope.launch(Dispatchers.IO) {
+                                    LanguagePreference.putAsync(context, it)
+                                }
                             })
                         }
                     }

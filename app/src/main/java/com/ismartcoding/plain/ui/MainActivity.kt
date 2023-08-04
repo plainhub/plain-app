@@ -106,10 +106,9 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        val language = LanguagePreference.get(this)
-        Language.values().find { it.value == language }?.let {
-            if (it == Language.UseDeviceLanguage) return@let
-            it.setLocale(this)
+        val locale = LanguagePreference.getLocale(this)
+        if (locale != null) {
+            Language.setLocale(this, locale)
         }
 
         instance = WeakReference(this)

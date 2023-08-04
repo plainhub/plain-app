@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.data.preference
 
 import android.content.Context
+import android.os.LocaleList
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -21,10 +22,8 @@ import com.ismartcoding.plain.features.audio.MediaPlayMode
 import com.ismartcoding.plain.features.device.DeviceSortBy
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.video.DVideo
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import java.util.Locale
 
 object PasswordPreference : BasePreference<String>() {
     override val default = ""
@@ -131,18 +130,41 @@ object SystemScreenTimeoutPreference : BasePreference<Int>() {
     override val key = intPreferencesKey("system_screen_timeout")
 }
 
-object LanguagePreference : BasePreference<Int>() {
-    override val default = Language.UseDeviceLanguage.value
-    override val key = intPreferencesKey("language")
+object LanguagePreference : BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("locale")
 
-    fun put(context: Context, scope: CoroutineScope, value: Language) {
-        scope.launch(Dispatchers.IO) {
-            context.dataStore.put(
-                key,
-                value.value
-            )
-            value.setLocale(context)
+    fun getLocale(context: Context): Locale? {
+        return getLocale(get(context))
+    }
+
+    fun getLocale(preferences: Preferences): Locale? {
+        return getLocale(get(preferences))
+    }
+
+    private fun getLocale(value: String): Locale? {
+        if (value.isEmpty()) {
+            return null
         }
+
+        val s = value.split("-")
+        return if (s.size > 1) {
+            Locale(s[0], s[1])
+        } else {
+            Locale(value)
+        }
+    }
+
+    suspend fun putAsync(context: Context, locale: Locale?) {
+        var value = ""
+        if (locale != null) {
+            value = locale.language
+            if (locale.country.isNotEmpty()) {
+                value += "-${locale.country}"
+            }
+        }
+        putAsync(context, value)
+        Language.setLocale(context, locale ?: LocaleList.getDefault().get(0))
     }
 }
 

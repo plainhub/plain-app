@@ -105,7 +105,8 @@ fun HomePage(
             })
         },
         floatingActionButton = {
-            FloatingActionButton(modifier = Modifier.navigationBarsPadding(), onClick = {
+            FloatingActionButton(modifier = Modifier
+                .padding(bottom = 32.dp), onClick = {
                 navController.navigate(RouteName.CHAT)
             }) {
                 Icon(

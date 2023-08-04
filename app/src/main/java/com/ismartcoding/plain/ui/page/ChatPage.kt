@@ -317,7 +317,7 @@ fun ChatPage(
                 ChatInput(
                     value = inputValue,
                     modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
                     hint = stringResource(id = R.string.chat_input_hint),
                     onValueChange = { inputValue = it },
                     onSend = {
