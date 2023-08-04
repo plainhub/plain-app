@@ -79,9 +79,6 @@ class MainApp : Application(), ImageLoaderFactory {
 
         LogCat.addLogAdapter(DiskLogAdapter(DiskLogFormatStrategy.getInstance(this)))
 
-        ClientIdPreference.ensureValue(this)
-        KeyStorePasswordPreference.ensureValue(this)
-
         BRV.modelId = BR.m
 
         PageHelper.init()
@@ -91,6 +88,9 @@ class MainApp : Application(), ImageLoaderFactory {
         BoxEvents.register()
 
         coIO {
+            ClientIdPreference.ensureValue(instance)
+            KeyStorePasswordPreference.ensureValue(instance)
+
             DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(instance)))
 
             if (PasswordTypePreference.getValue(instance) == PasswordType.RANDOM) {
