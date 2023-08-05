@@ -2,6 +2,7 @@ package com.ismartcoding.plain.data.enums
 
 import android.content.Context
 import android.os.LocaleList
+import com.ismartcoding.plain.data.preference.LanguagePreference
 import java.util.*
 
 object Language {
@@ -28,6 +29,13 @@ object Language {
         appConfiguration.setLocales(LocaleList(locale))
         context.applicationContext.createConfigurationContext(appConfiguration)
         appResources.updateConfiguration(appConfiguration, appMetrics)
+    }
+
+    fun initLocale(context: Context) {
+        val locale = LanguagePreference.getLocale(context)
+        if (locale != null) {
+            setLocale(context, locale)
+        }
     }
 }
 

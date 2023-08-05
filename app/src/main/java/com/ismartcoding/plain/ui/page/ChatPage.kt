@@ -238,7 +238,7 @@ fun ChatPage(
                         reverseLayout = true,
                         verticalArrangement = Arrangement.Top,
                     ) {
-                        itemsIndexed(itemsState.value) { index, m ->
+                        itemsIndexed(itemsState.value, key = { _, a -> a.id }) { index, m ->
                             Column(modifier = Modifier.fillMaxSize()) {
                                 ChatDate(itemsState.value, m, index)
                                 Box(modifier = Modifier.fillMaxSize()) {

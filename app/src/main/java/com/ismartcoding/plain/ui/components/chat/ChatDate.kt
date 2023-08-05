@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -15,13 +16,15 @@ import com.ismartcoding.plain.ui.models.VChat
 
 @Composable
 fun ChatDate(items: List<VChat>, m: VChat, index: Int) {
-    val dateVisible = if (index == items.size - 1) {
-        true
-    } else {
-        if (index + 1 < items.size) {
-            items[index + 1].createdAt.formatDate() != m.createdAt.formatDate()
+    val dateVisible = remember {
+        if (index == items.size - 1) {
+            true
         } else {
-            false
+            if (index + 1 < items.size) {
+                items[index + 1].createdAt.formatDate() != m.createdAt.formatDate()
+            } else {
+                false
+            }
         }
     }
     if (dateVisible) {

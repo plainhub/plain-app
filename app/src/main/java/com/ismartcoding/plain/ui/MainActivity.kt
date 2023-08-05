@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.content.res.Configuration
 import android.database.CursorWindow
 import android.os.Bundle
 import android.view.WindowManager
@@ -106,10 +107,7 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        val locale = LanguagePreference.getLocale(this)
-        if (locale != null) {
-            Language.setLocale(this, locale)
-        }
+        Language.initLocale(this)
 
         instance = WeakReference(this)
 
@@ -239,6 +237,12 @@ class MainActivity : AppCompatActivity() {
             }.create()
             requestToConnectDialog?.show()
         }
+    }
+
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        Language.initLocale(this)
     }
 
     private fun doPickFile(event: PickFileEvent) {
