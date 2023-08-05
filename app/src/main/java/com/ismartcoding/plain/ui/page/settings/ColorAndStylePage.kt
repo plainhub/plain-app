@@ -46,6 +46,7 @@ import com.ismartcoding.plain.ui.theme.palette.dynamic.extractTonalPalettesFromU
 import com.ismartcoding.plain.ui.theme.palette.onDark
 import com.ismartcoding.plain.ui.theme.palette.onLight
 import com.ismartcoding.plain.ui.theme.palette.safeHexToColor
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
@@ -208,7 +209,9 @@ fun Palettes(
                             customColorValue = customPrimaryColor
                             addDialogVisible = true
                         } else {
-                            ThemeIndexPreference.put(context, themeIndexPrefix + index)
+                            scope.launch(Dispatchers.IO) {
+                                ThemeIndexPreference.putAsync(context, themeIndexPrefix + index)
+                            }
                         }
                     },
                     palette = if (isCustom) tonalPalettes else palette
@@ -230,9 +233,11 @@ fun Palettes(
         },
         onConfirm = {
             it.checkColorHex()?.let { h ->
-                CustomPrimaryColorPreference.put(context, h)
-                ThemeIndexPreference.put(context, 4)
-                addDialogVisible = false
+                scope.launch(Dispatchers.IO) {
+                    CustomPrimaryColorPreference.putAsync(context, h)
+                    ThemeIndexPreference.putAsync(context, 4)
+                    addDialogVisible = false
+                }
             }
         }
     )

@@ -112,47 +112,65 @@ class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
 
     private fun updatePlayingState() {
         val context = requireContext()
-        binding.list.rv.getModelList<AudioModel>().forEach {
-            val old = it.isPlaying
-            it.checkIsPlaying(context, it.audio.path)
-            if (old != it.isPlaying) {
-                it.notifyChange()
+        lifecycleScope.launch {
+            val currentPath = withIO { AudioPlayingPreference.getValueAsync(context)?.path }
+            val isAudioPlaying = AudioPlayer.instance.isPlaying()
+            binding.list.rv.getModelList<AudioModel>().forEach {
+                val old = it.isPlaying
+                it.isPlaying = isAudioPlaying && currentPath == it.audio.path
+                if (old != it.isPlaying) {
+                    it.notifyChange()
+                }
             }
         }
     }
 
     private fun search() {
-        val context = requireContext()
-        binding.list.page.addData(AudioPlaylistPreference.getValue(context)
-            .filter { searchQ.isEmpty() || it.title.contains(searchQ, true) || it.artist.contains(searchQ, true) }
-            .map { audio ->
-                AudioModel(audio).apply {
-                    title = audio.title
-                    subtitle = audio.artist + " " + FormatHelper.formatDuration(audio.duration)
-                    checkIsPlaying(context, audio.path)
-                    swipeEnable = true
-                    rightSwipeText = getString(R.string.remove)
-                    rightSwipeClick = {
-                        lifecycleScope.launch {
-                            val context = requireContext()
-                            withIO { AudioPlaylistPreference.deleteAsync(context, setOf(audio.path)) }
-                            binding.list.rv.apply {
-                                val index = getModelList<AudioModel>().indexOfFirst { it.audio.path == audio.path }
-                                if (index != -1) {
-                                    removeModel(index)
-                                }
-                            }
-                            updateTitle()
-                        }
-
+        lifecycleScope.launch {
+            val context = requireContext()
+            val audios = withIO {
+                AudioPlaylistPreference.getValueAsync(context)
+                    .filter {
+                        searchQ.isEmpty()
+                                || it.title.contains(searchQ, true)
+                                || it.artist.contains(searchQ, true)
                     }
-                }
-            })
-        updateTitle()
+            }
+            val currentPath = withIO {  AudioPlayingPreference.getValueAsync(context)?.path  }
+            val isAudioPlaying = AudioPlayer.instance.isPlaying()
+            binding.list.page.addData(
+                audios
+                    .map { audio ->
+                        AudioModel(audio).apply {
+                            title = audio.title
+                            subtitle = audio.artist + " " + FormatHelper.formatDuration(audio.duration)
+                            isPlaying = isAudioPlaying && currentPath == audio.path
+                            swipeEnable = true
+                            rightSwipeText = getString(R.string.remove)
+                            rightSwipeClick = {
+                                lifecycleScope.launch {
+                                    withIO { AudioPlaylistPreference.deleteAsync(requireContext(), setOf(audio.path)) }
+                                    binding.list.rv.apply {
+                                        val index = getModelList<AudioModel>().indexOfFirst { it.audio.path == audio.path }
+                                        if (index != -1) {
+                                            removeModel(index)
+                                        }
+                                    }
+                                    updateTitle()
+                                }
+
+                            }
+                        }
+                    })
+            updateTitle()
+        }
+
     }
 
     private fun updateTitle() {
-        val total = AudioPlaylistPreference.getValue(requireContext()).size
-        binding.topAppBar.title = if (total > 0) LocaleHelper.getStringF(R.string.playlist_title, "total", total) else getString(R.string.playlist)
+        lifecycleScope.launch {
+            val total = withIO { AudioPlaylistPreference.getValueAsync(requireContext()).size }
+            binding.topAppBar.title = if (total > 0) LocaleHelper.getStringF(R.string.playlist_title, "total", total) else getString(R.string.playlist)
+        }
     }
 }

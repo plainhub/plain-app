@@ -22,6 +22,8 @@ import com.ismartcoding.plain.data.preference.AuthDevTokenPreference
 import com.ismartcoding.plain.data.preference.LocalAuthDevToken
 import com.ismartcoding.plain.data.preference.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,7 +52,9 @@ fun WebDevPage(
                             PSwitch(
                                 activated = enable
                             ) {
-                                AuthDevTokenPreference.put(context, if (it) CryptoHelper.randomPassword(128) else "")
+                                scope.launch(Dispatchers.IO) {
+                                    AuthDevTokenPreference.putAsync(context, if (it) CryptoHelper.randomPassword(128) else "")
+                                }
                             }
                         }
                         if (enable) {
@@ -64,7 +68,9 @@ fun WebDevPage(
                             BlockOutlineButton(
                                 text = stringResource(id = R.string.reset_token),
                                 onClick = {
-                                    AuthDevTokenPreference.put(context, CryptoHelper.randomPassword(128))
+                                    scope.launch(Dispatchers.IO) {
+                                        AuthDevTokenPreference.putAsync(context, CryptoHelper.randomPassword(128))
+                                    }
                                 })
                             Spacer(modifier = Modifier.height(16.dp))
                             Tips(text = stringResource(id = R.string.auth_dev_token_tips))

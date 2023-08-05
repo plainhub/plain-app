@@ -6,12 +6,14 @@ import com.ismartcoding.plain.data.preference.LanguagePreference
 import java.util.*
 
 object Language {
-    val locales = listOf(Locale("en", "US"),
+    val locales = listOf(
+        Locale("en", "US"),
         Locale("zh", "CN"),
         Locale("es", ""),
         Locale("ja", ""),
         Locale("nl", ""),
-        Locale("it", ""))
+        Locale("it", "")
+    )
 
     fun setLocale(context: Context, locale: Locale) {
         val resources = context.resources
@@ -31,8 +33,8 @@ object Language {
         appResources.updateConfiguration(appConfiguration, appMetrics)
     }
 
-    fun initLocale(context: Context) {
-        val locale = LanguagePreference.getLocale(context)
+    suspend fun initLocaleAsync(context: Context) {
+        val locale = LanguagePreference.getLocaleAsync(context)
         if (locale != null) {
             setLocale(context, locale)
         }

@@ -41,14 +41,14 @@ object HttpServerManager {
     val clientRequestTs = mutableMapOf<String, Long>()
     var httpServerError: String = ""
 
-    fun resetPassword(): String {
+    suspend fun resetPasswordAsync(): String {
         val password = CryptoHelper.randomPassword(6)
-        PasswordPreference.put(MainApp.instance, password)
+        PasswordPreference.putAsync(MainApp.instance, password)
         return password
     }
 
-    fun passwordToToken(): ByteArray {
-        return hashToToken(CryptoHelper.sha512(PasswordPreference.get(MainApp.instance).toByteArray()))
+    private suspend fun passwordToToken(): ByteArray {
+        return hashToToken(CryptoHelper.sha512(PasswordPreference.getAsync(MainApp.instance).toByteArray()))
     }
 
     fun hashToToken(hash: String): ByteArray {
@@ -78,19 +78,21 @@ object HttpServerManager {
         }
     }
 
-    fun createHttpServer(context: Context): NettyApplicationEngine {
+    suspend fun createHttpServer(context: Context): NettyApplicationEngine {
         val password = TempData.keyStorePassword.toCharArray()
+        val httpPort = HttpPortPreference.getAsync(context)
+        val httpsPort = HttpsPortPreference.getAsync(context)
         val environment = applicationEngineEnvironment {
             log = LoggerFactory.getLogger("ktor.application")
             connector {
-                port = HttpPortPreference.get(context)
+                port = httpPort
             }
             sslConnector(
                 keyStore = getSSLKeyStore(context),
                 keyAlias = SSL_KEY_ALIAS,
                 keyStorePassword = { password },
                 privateKeyPassword = { password }) {
-                port = HttpsPortPreference.get(context)
+                port = httpsPort
             }
             module(Application::module)
         }

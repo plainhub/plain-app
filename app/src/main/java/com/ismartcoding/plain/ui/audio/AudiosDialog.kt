@@ -16,10 +16,12 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.preference.AudioPlayingPreference
 import com.ismartcoding.plain.data.preference.AudioSortByPreference
 import com.ismartcoding.plain.features.*
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioHelper
+import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.file.MediaType
 import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
@@ -86,15 +88,20 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
 
     private fun updatePlayingState() {
         val context = requireContext()
-        binding.list.rv.models?.forEach {
-            if (it is AudioModel) {
-                val old = it.isPlaying
-                it.checkIsPlaying(context, it.data.path)
-                if (old != it.isPlaying) {
-                    it.notifyChange()
+        lifecycleScope.launch {
+            val currentPath = withIO { AudioPlayingPreference.getValueAsync(context)?.path }
+            val isAudioPlaying = AudioPlayer.instance.isPlaying()
+            binding.list.rv.models?.forEach {
+                if (it is AudioModel) {
+                    val old = it.isPlaying
+                    it.isPlaying = isAudioPlaying && currentPath == it.data.path
+                    if (old != it.isPlaying) {
+                        it.notifyChange()
+                    }
                 }
             }
         }
+
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -110,12 +117,15 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     }
 
     override fun initTopAppBar() {
-        val context = requireContext()
-        initTopAppBar(R.menu.media_items_top) {
-            FileSortHelper.bindSortMenuItemClick(context, lifecycleScope, binding.topAppBar.toolbar.menu, this, MediaType.AUDIO, viewModel, binding.list)
+        lifecycleScope.launch {
+            val context = requireContext()
+            initTopAppBar(R.menu.media_items_top) {
+                FileSortHelper.bindSortMenuItemClick(context, lifecycleScope, binding.topAppBar.toolbar.menu, this, MediaType.AUDIO, viewModel, binding.list)
+            }
+            val sortBy = withIO { AudioSortByPreference.getValueAsync(context) }
+            FileSortHelper.getSelectedSortItem(binding.topAppBar.toolbar.menu, sortBy).highlightTitle(context)
         }
-        val sortBy = AudioSortByPreference.getValue(context)
-        FileSortHelper.getSelectedSortItem(binding.topAppBar.toolbar.menu, sortBy).highlightTitle(context)
+
     }
 
     override fun initList() {
@@ -164,20 +174,22 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     private suspend fun updateAudios() {
         val query = viewModel.getQuery()
         val context = requireContext()
-        val sortBy = AudioSortByPreference.getValue(context)
+        val sortBy = AudioSortByPreference.getValueAsync(context)
         val items = withIO { AudioHelper.search(context, query, viewModel.limit, viewModel.offset, sortBy) }
         viewModel.total = withIO { AudioHelper.count(context, query) }
 
         val bindingAdapter = binding.list.rv.bindingAdapter
         val toggleMode = bindingAdapter.toggleMode
         val checkedItems = bindingAdapter.getCheckedModels<AudioModel>()
+        val currentPath = withIO {  AudioPlayingPreference.getValueAsync(context)?.path  }
+        val isAudioPlaying = AudioPlayer.instance.isPlaying()
         binding.list.page.addData(items.map { a ->
             AudioModel(a).apply {
                 title = a.title
                 subtitle = a.artist + " " + FormatHelper.formatDuration(a.duration)
                 this.toggleMode = toggleMode
                 isChecked = checkedItems.any { it.data.id == data.id }
-                checkIsPlaying(context, a.path)
+                isPlaying = isAudioPlaying && currentPath == a.path
             }
         }, hasMore = {
             items.size == viewModel.limit

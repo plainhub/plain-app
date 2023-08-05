@@ -24,11 +24,13 @@ import kotlinx.coroutines.launch
 
 class WebConsoleViewModel : ViewModel() {
     fun enableWebConsole(context: Context, enable: Boolean) {
-        WebPreference.put(context, enable)
-        sendEvent(HttpServerEnabledEvent(enable))
-        if (enable) {
-            requestIgnoreBatteryOptimization(context)
-            sendEvent(StartHttpServerEvent())
+        viewModelScope.launch {
+            withIO { WebPreference.putAsync(context, enable) }
+            sendEvent(HttpServerEnabledEvent(enable))
+            if (enable) {
+                requestIgnoreBatteryOptimization(context)
+                sendEvent(StartHttpServerEvent())
+            }
         }
     }
 

@@ -102,9 +102,9 @@ object FilesTopMenuHelper {
     ) {
         lifecycleScope.launch {
             val menu = binding.toolbar.menu
-            FileSortHelper.getSelectedSortItem(menu, FileSortByPreference.getValue(context)).unhighlightTitle()
+            FileSortHelper.getSelectedSortItem(menu, FileSortByPreference.getValueAsync(context)).unhighlightTitle()
             withIO { FileSortByPreference.putAsync(context, sortBy) }
-            FileSortHelper.getSelectedSortItem(menu, FileSortByPreference.getValue(context)).highlightTitle(context)
+            FileSortHelper.getSelectedSortItem(menu, FileSortByPreference.getValueAsync(context)).highlightTitle(context)
             binding.list.page.refresh()
         }
     }

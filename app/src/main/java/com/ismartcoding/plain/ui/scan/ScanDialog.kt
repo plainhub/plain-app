@@ -119,7 +119,7 @@ class ScanDialog() : BaseDialog<DialogScanBinding>(), OnScanResultCallback {
     private fun addScanResult(value: String) {
         lifecycleScope.launch {
             val context = requireContext()
-            val results = ScanHistoryPreference.getValue(context).toMutableList()
+            val results = ScanHistoryPreference.getValueAsync(context).toMutableList()
             results.remove(value)
             results.add(0, value)
             withIO { ScanHistoryPreference.putAsync(context, results) }

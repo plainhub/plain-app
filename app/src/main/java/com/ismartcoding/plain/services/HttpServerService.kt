@@ -20,10 +20,6 @@ class HttpServerService : LifecycleService() {
         super.onCreate()
         instance = this
         NotificationHelper.ensureDefaultChannel()
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
         val notification = NotificationHelper.createServiceNotification(
             this,
             "com.ismartcoding.plain.action.stop_http_server",
@@ -34,7 +30,10 @@ class HttpServerService : LifecycleService() {
         } else {
             startForeground(1, notification)
         }
+    }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         lifecycle.coroutineScope.launch(Dispatchers.IO) {
             try {
                 if (MainApp.instance.httpServer == null) {

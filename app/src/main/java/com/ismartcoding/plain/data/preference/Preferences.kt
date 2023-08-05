@@ -9,7 +9,6 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.TempData
@@ -38,8 +37,12 @@ object PasswordTypePreference : BasePreference<Int>() {
         putAsync(context, value.value)
     }
 
-    fun getValue(context: Context): PasswordType {
-        return PasswordType.parse(get(context))
+    fun getValue(preferences: Preferences): PasswordType {
+        return PasswordType.parse(get(preferences))
+    }
+
+    suspend fun getValueAsync(context: Context): PasswordType {
+        return PasswordType.parse(getAsync(context))
     }
 }
 
@@ -58,7 +61,7 @@ object ApiPermissionsPreference : BasePreference<Set<String>>() {
     override val key = stringSetPreferencesKey("api_permissions")
 
     suspend fun putAsync(context: Context, permission: Permission, enable: Boolean) {
-        val permissions = get(context).toMutableSet()
+        val permissions = getAsync(context).toMutableSet()
         if (enable) {
             permissions.add(permission.name)
         } else {
@@ -134,8 +137,8 @@ object LanguagePreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("locale")
 
-    fun getLocale(context: Context): Locale? {
-        return getLocale(get(context))
+    suspend fun getLocaleAsync(context: Context): Locale? {
+        return getLocale(getAsync(context))
     }
 
     fun getLocale(preferences: Preferences): Locale? {
@@ -171,6 +174,10 @@ object LanguagePreference : BasePreference<String>() {
 object WebPreference : BasePreference<Boolean>() {
     override val default = false
     override val key = booleanPreferencesKey("web")
+    override suspend fun putAsync(context: Context, value: Boolean) {
+        TempData.webEnabled = value
+        super.putAsync(context, value)
+    }
 }
 
 object ExchangeRatePreference : BasePreference<String>() {
@@ -194,13 +201,11 @@ object ClientIdPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("client_id")
 
-    fun ensureValue(context: Context) {
-        TempData.clientId = get(context)
+    suspend fun ensureValueAsync(context: Context, preferences: Preferences) {
+        TempData.clientId = get(preferences)
         if (TempData.clientId.isEmpty()) {
             TempData.clientId = StringHelper.shortUUID()
-            coIO {
-                putAsync(context, TempData.clientId)
-            }
+            putAsync(context, TempData.clientId)
         }
     }
 }
@@ -209,13 +214,11 @@ object KeyStorePasswordPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("key_store_password")
 
-    fun ensureValue(context: Context) {
-        TempData.keyStorePassword = get(context)
+    suspend fun ensureValueAsync(context: Context, preferences: Preferences) {
+        TempData.keyStorePassword = get(preferences)
         if (TempData.keyStorePassword.isEmpty()) {
             TempData.keyStorePassword = StringHelper.shortUUID()
-            coIO {
-                putAsync(context, TempData.keyStorePassword)
-            }
+            putAsync(context, TempData.keyStorePassword)
         }
     }
 }
@@ -228,8 +231,8 @@ object DeviceSortByPreference : BasePreference<Int>() {
         putAsync(context, value.ordinal)
     }
 
-    fun getValue(context: Context): DeviceSortBy {
-        val value = get(context)
+    suspend fun getValueAsync(context: Context): DeviceSortBy {
+        val value = getAsync(context)
         return DeviceSortBy.values().find { it.ordinal == value } ?: DeviceSortBy.LAST_ACTIVE
     }
 }
@@ -242,8 +245,8 @@ object AudioPlayModePreference : BasePreference<Int>() {
         putAsync(context, value.ordinal)
     }
 
-    fun getValue(context: Context): MediaPlayMode {
-        val value = get(context)
+    suspend fun getValueAsync(context: Context): MediaPlayMode {
+        val value = getAsync(context)
         return MediaPlayMode.values().find { it.ordinal == value } ?: MediaPlayMode.REPEAT
     }
 }
@@ -256,8 +259,8 @@ object AudioSortByPreference : BasePreference<Int>() {
         putAsync(context, value.ordinal)
     }
 
-    fun getValue(context: Context): FileSortBy {
-        val value = get(context)
+    suspend fun getValueAsync(context: Context): FileSortBy {
+        val value = getAsync(context)
         return FileSortBy.values().find { it.ordinal == value } ?: FileSortBy.DATE_DESC
     }
 }
@@ -270,8 +273,8 @@ object VideoSortByPreference : BasePreference<Int>() {
         putAsync(context, value.ordinal)
     }
 
-    fun getValue(context: Context): FileSortBy {
-        val value = get(context)
+    suspend fun getValueAsync(context: Context): FileSortBy {
+        val value = getAsync(context)
         return FileSortBy.values().find { it.ordinal == value } ?: FileSortBy.DATE_DESC
     }
 }
@@ -284,8 +287,8 @@ object ImageSortByPreference : BasePreference<Int>() {
         putAsync(context, value.ordinal)
     }
 
-    fun getValue(context: Context): FileSortBy {
-        val value = get(context)
+    suspend fun getValueAsync(context: Context): FileSortBy {
+        val value = getAsync(context)
         return FileSortBy.values().find { it.ordinal == value } ?: FileSortBy.DATE_DESC
     }
 }
@@ -298,8 +301,8 @@ object FileSortByPreference : BasePreference<Int>() {
         putAsync(context, value.ordinal)
     }
 
-    fun getValue(context: Context): FileSortBy {
-        val value = get(context)
+    suspend fun getValueAsync(context: Context): FileSortBy {
+        val value = getAsync(context)
         return FileSortBy.values().find { it.ordinal == value } ?: FileSortBy.NAME_ASC
     }
 }
@@ -373,8 +376,8 @@ object ScanHistoryPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("scan_history")
 
-    fun getValue(context: Context): List<String> {
-        val str = get(context)
+    suspend fun getValueAsync(context: Context): List<String> {
+        val str = getAsync(context)
         if (str.isEmpty()) {
             return listOf()
         }
@@ -390,8 +393,8 @@ object AudioPlaylistPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("audio_playlist")
 
-    fun getValue(context: Context): List<DPlaylistAudio> {
-        val str = get(context)
+    suspend fun getValueAsync(context: Context): List<DPlaylistAudio> {
+        val str = getAsync(context)
         if (str.isEmpty()) {
             return listOf()
         }
@@ -403,13 +406,13 @@ object AudioPlaylistPreference : BasePreference<String>() {
     }
 
     suspend fun deleteAsync(context: Context, paths: Set<String>) {
-        putAsync(context, getValue(context).toMutableList().apply {
+        putAsync(context, getValueAsync(context).toMutableList().apply {
             removeIf { paths.contains(it.path) }
         })
     }
 
     suspend fun addAsync(context: Context, audios: List<DPlaylistAudio>) {
-        val items = getValue(context).toMutableList()
+        val items = getValueAsync(context).toMutableList()
         items.removeIf { i -> audios.any { it.path == i.path } }
         items.addAll(audios)
         putAsync(context, items)
@@ -420,8 +423,8 @@ object AudioPlayingPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("audio_playing")
 
-    fun getValue(context: Context): DPlaylistAudio? {
-        val str = get(context)
+    suspend fun getValueAsync(context: Context): DPlaylistAudio? {
+        val str = getAsync(context)
         if (str.isEmpty()) {
             return null
         }
@@ -437,8 +440,8 @@ object VideoPlaylistPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("video_playlist")
 
-    fun getValue(context: Context): List<DVideo> {
-        val str = get(context)
+    suspend fun getValueAsync(context: Context): List<DVideo> {
+        val str = getAsync(context)
         if (str.isEmpty()) {
             return listOf()
         }
@@ -450,13 +453,13 @@ object VideoPlaylistPreference : BasePreference<String>() {
     }
 
     suspend fun deleteAsync(context: Context, paths: Set<String>) {
-        putAsync(context, getValue(context).toMutableList().apply {
+        putAsync(context, getValueAsync(context).toMutableList().apply {
             removeIf { paths.contains(it.path) }
         })
     }
 
     suspend fun addAsync(context: Context, videos: List<DVideo>) {
-        val items = getValue(context).toMutableList()
+        val items = getValueAsync(context).toMutableList()
         items.removeIf { i -> videos.any { it.path == i.path } }
         items.addAll(videos)
         putAsync(context, items)

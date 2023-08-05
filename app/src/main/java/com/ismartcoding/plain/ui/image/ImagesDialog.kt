@@ -69,12 +69,15 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
     }
 
     override fun initTopAppBar() {
-        val context = requireContext()
-        initTopAppBar(R.menu.media_items_top) {
-            FileSortHelper.bindSortMenuItemClick(context, lifecycleScope, binding.topAppBar.toolbar.menu, this, MediaType.IMAGE, viewModel, binding.list)
+        lifecycleScope.launch {
+            val context = requireContext()
+            initTopAppBar(R.menu.media_items_top) {
+                FileSortHelper.bindSortMenuItemClick(context, lifecycleScope, binding.topAppBar.toolbar.menu, this, MediaType.IMAGE, viewModel, binding.list)
+            }
+            FileSortHelper.getSelectedSortItem(binding.topAppBar.toolbar.menu, withIO { ImageSortByPreference.getValueAsync(context) }).highlightTitle(context)
         }
-        FileSortHelper.getSelectedSortItem(binding.topAppBar.toolbar.menu, ImageSortByPreference.getValue(context)).highlightTitle(context)
     }
+
 
     override fun initList() {
         val spanCount = 3
@@ -167,7 +170,7 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
     private suspend fun updateImages() {
         val query = viewModel.getQuery()
         val context = requireContext()
-        val items = withIO { ImageHelper.search(context, query, viewModel.limit, viewModel.offset, ImageSortByPreference.getValue(context)) }
+        val items = withIO { ImageHelper.search(context, query, viewModel.limit, viewModel.offset, ImageSortByPreference.getValueAsync(context)) }
         viewModel.total = withIO { ImageHelper.count(context, query) }
 
         val bindingAdapter = binding.list.rv.bindingAdapter

@@ -39,11 +39,13 @@ object NetworkHelper {
             val map = mutableMapOf<String, String>()
             while (en?.hasMoreElements() == true) {
                 val intf = en.nextElement()
-                val enumIpAddr = intf.inetAddresses
-                while (enumIpAddr.hasMoreElements()) {
-                    val inetAddress = enumIpAddr.nextElement()
-                    if (!inetAddress.isLoopbackAddress && inetAddress is Inet4Address) {
-                        map[intf.name] = inetAddress.getHostAddress() ?: ""
+                if (intf.isUp) {
+                    val enumIpAddr = intf.inetAddresses
+                    while (enumIpAddr.hasMoreElements()) {
+                        val inetAddress = enumIpAddr.nextElement()
+                        if (!inetAddress.isLoopbackAddress && inetAddress is Inet4Address) {
+                            map[intf.name] = inetAddress.getHostAddress() ?: ""
+                        }
                     }
                 }
             }
@@ -55,6 +57,33 @@ object NetworkHelper {
         }
 
         return ""
+    }
+
+    fun getDeviceIP4s(): Set<String> {
+        val ips = mutableSetOf<String>()
+        try {
+            val en = NetworkInterface.getNetworkInterfaces()
+            val map = mutableMapOf<String, String>()
+            while (en?.hasMoreElements() == true) {
+                val intf = en.nextElement()
+                if (intf.isUp) {
+                    val enumIpAddr = intf.inetAddresses
+                    while (enumIpAddr.hasMoreElements()) {
+                        val inetAddress = enumIpAddr.nextElement()
+                        if (!inetAddress.isLoopbackAddress && inetAddress is Inet4Address) {
+                            val ip = inetAddress.getHostAddress() ?: ""
+                            if (ip.isNotEmpty()) {
+                                ips.add(ip)
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+
+        return ips
     }
 
     fun isVPNConnected(context: Context): Boolean {

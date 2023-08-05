@@ -32,7 +32,7 @@ class FeedFetchWorker(
     override suspend fun doWork(): Result {
         supervisorScope {
             val autoRefresh = inputData.getBoolean("auto_refresh", false)
-            if (autoRefresh && FeedAutoRefreshOnlyWifiPreference.get(context)  && context.isWifiConnected()) {
+            if (autoRefresh && FeedAutoRefreshOnlyWifiPreference.getAsync(context) && context.isWifiConnected()) {
                 return@supervisorScope
             }
 
@@ -124,11 +124,11 @@ class FeedFetchWorker(
             errorMap.clear()
         }
 
-        fun startRepeatWorker(context: Context) {
+        suspend fun startRepeatWorkerAsync(context: Context) {
             val data = Data.Builder()
             data.putBoolean("auto_refresh", true)
             val request = PeriodicWorkRequestBuilder<FeedFetchWorker>(
-                FeedAutoRefreshIntervalPreference.get(context).toLong(), TimeUnit.SECONDS
+                FeedAutoRefreshIntervalPreference.getAsync(context).toLong(), TimeUnit.SECONDS
             ).setInputData(data.build()).setConstraints(
                 Constraints.Builder().build()
             ).addTag(REPEAT_WORK_NAME)

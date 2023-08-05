@@ -52,8 +52,8 @@ enum class Permission {
         return getString("feature_$name")
     }
 
-    fun isEnabled(context: Context): Boolean {
-        val apiPermissions = ApiPermissionsPreference.get(context)
+    suspend fun isEnabledAsync(context: Context): Boolean {
+        val apiPermissions = ApiPermissionsPreference.getAsync(context)
         return apiPermissions.contains(this.toString())
     }
 
@@ -127,8 +127,8 @@ enum class Permission {
         }
     }
 
-    fun check(context: Context) {
-        if (!isEnabled(context)) {
+    suspend fun checkAsync(context: Context) {
+        if (!isEnabledAsync(context)) {
             throw Exception("no_permission")
         }
     }
@@ -178,7 +178,11 @@ enum class Permission {
             }
         } else if (this == SYSTEM_ALERT_WINDOW) {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}"))
-            intentLauncher?.launch(intent)
+            if (intent.resolveActivity(packageManager) != null) {
+                intentLauncher?.launch(intent)
+            } else {
+                DialogHelper.showMessage("ActivityNotFoundException: No Activity found to handle Intent act=android.settings.action.ACTION_MANAGE_OVERLAY_PERMISSION")
+            }
         } else if (this == POST_NOTIFICATIONS) {
             val permission = this.toSysPermission()
             if (isTPlus()) {

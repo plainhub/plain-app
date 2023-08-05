@@ -5,6 +5,8 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import com.ismartcoding.lib.channel.receiveEventHandler
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.preference.AudioPlayingPreference
 import com.ismartcoding.plain.features.AudioActionEvent
@@ -35,6 +37,7 @@ class BottomAudioPlayerView(context: Context, attrs: AttributeSet?) : CustomView
                 AudioAction.PLAY, AudioAction.PAUSE, AudioAction.SEEK -> {
                     updateUI()
                 }
+
                 else -> {}
             }
         })
@@ -43,26 +46,28 @@ class BottomAudioPlayerView(context: Context, attrs: AttributeSet?) : CustomView
     }
 
     fun updateUI() {
-        binding.audioProgress.removeCallbacks(seekBarUpdateRunnable)
-        val audio = AudioPlayingPreference.getValue(context)
-        if (audio == null) {
-            this.visibility = View.GONE
-            return
-        } else {
-            this.visibility = View.VISIBLE
-        }
+        coMain {
+            binding.audioProgress.removeCallbacks(seekBarUpdateRunnable)
+            val audio = withIO { AudioPlayingPreference.getValueAsync(context) }
+            if (audio == null) {
+                this@BottomAudioPlayerView.visibility = View.GONE
+                return@coMain
+            } else {
+                this@BottomAudioPlayerView.visibility = View.VISIBLE
+            }
 
-        binding.audioProgress.apply {
-            progress = AudioPlayer.instance.getPlayerProgress()
-            max = audio.duration.toInt()
+            binding.audioProgress.apply {
+                progress = AudioPlayer.instance.getPlayerProgress()
+                max = audio.duration.toInt()
+            }
+            binding.audioTitle.text = audio.title
+            binding.audioArtist.text = audio.artist
+            val isPlaying = AudioPlayer.instance.isPlaying()
+            if (isPlaying) {
+                binding.audioProgress.postDelayed(seekBarUpdateRunnable, seekBarUpdateDelayMillis)
+            }
+            binding.playPauseButton.setImageResource(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play)
         }
-        binding.audioTitle.text = audio.title
-        binding.audioArtist.text = audio.artist
-        val isPlaying = AudioPlayer.instance.isPlaying()
-        if (isPlaying) {
-            binding.audioProgress.postDelayed(seekBarUpdateRunnable, seekBarUpdateDelayMillis)
-        }
-        binding.playPauseButton.setImageResource(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play)
     }
 
     private fun setListen() {

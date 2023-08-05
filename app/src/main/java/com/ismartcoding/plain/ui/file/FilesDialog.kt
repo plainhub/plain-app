@@ -25,7 +25,6 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.preference.FileSortByPreference
@@ -91,8 +90,11 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
         binding.toolbar.run {
             initMenu(R.menu.files)
             val context = requireContext()
-            menu.findItem(R.id.show_hidden).isChecked = ShowHiddenFilesPreference.get(context)
-            FileSortHelper.getSelectedSortItem(menu, FileSortByPreference.getValue(context)).highlightTitle(context)
+            lifecycleScope.launch {
+                menu.findItem(R.id.show_hidden).isChecked = withIO { ShowHiddenFilesPreference.getAsync(context) }
+                FileSortHelper.getSelectedSortItem(menu, withIO { FileSortByPreference.getValueAsync(context) }).highlightTitle(context)
+            }
+
             onBack {
                 onBackPressed()
             }
@@ -309,12 +311,12 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
                 if (viewModel.type == FilesType.RECENTS) {
                     FileSystemHelper.getRecents(context)
                 } else if (viewModel.searchQ.isNotEmpty()) {
-                    FileSystemHelper.search(viewModel.searchQ, p, ShowHiddenFilesPreference.get(context))
+                    FileSystemHelper.search(viewModel.searchQ, p, ShowHiddenFilesPreference.getAsync(context))
                 } else {
                     FileSystemHelper.getFilesList(
                         p,
-                        ShowHiddenFilesPreference.get(context),
-                        FileSortByPreference.getValue(context)
+                        ShowHiddenFilesPreference.getAsync(context),
+                        FileSortByPreference.getValueAsync(context)
                     )
                 }
             }

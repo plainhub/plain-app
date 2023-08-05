@@ -124,7 +124,7 @@ fun ExchangeRatePage(
                         }
                         item {
                             rateItems?.forEach { rate ->
-                                BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                                Box(modifier = Modifier.fillMaxSize()) {
                                     PListItem(
                                         title = rate.rate.currency,
                                         value = FormatHelper.formatMoney(rate.value, rate.rate.currency),

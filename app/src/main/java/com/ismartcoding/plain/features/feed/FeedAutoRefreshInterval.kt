@@ -6,8 +6,8 @@ import com.ismartcoding.plain.data.preference.FeedAutoRefreshIntervalPreference
 import com.ismartcoding.plain.helpers.FormatHelper
 
 class FeedAutoRefreshInterval(val value: Int) : ISelectOption {
-    override fun isSelected(context: Context): Boolean {
-        return value == FeedAutoRefreshIntervalPreference.get(context)
+    override suspend fun isSelected(context: Context): Boolean {
+        return value == FeedAutoRefreshIntervalPreference.getAsync(context)
     }
 
     override fun getText(): String {

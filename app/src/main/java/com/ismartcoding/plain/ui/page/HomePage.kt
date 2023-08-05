@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -36,7 +37,6 @@ import com.ismartcoding.plain.helpers.ScreenHelper
 import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.ActionButtonSettings
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.components.home.HomeItemEducation
@@ -48,6 +48,8 @@ import com.ismartcoding.plain.ui.components.home.HomeItemWork
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.scan.ScanDialog
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,6 +58,7 @@ fun HomePage(
     viewModel: MainViewModel,
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var isMenuOpen by remember { mutableStateOf(false) }
     val webConsole = LocalWeb.current
     val keepScreenOn = LocalKeepScreenOn.current
@@ -83,7 +86,9 @@ fun HomePage(
             DropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }, content = {
                 DropdownMenuItem(onClick = {
                     isMenuOpen = false
-                    ScreenHelper.keepScreenOn(context, !keepScreenOn)
+                    scope.launch(Dispatchers.IO) {
+                        ScreenHelper.keepScreenOnAsync(context, !keepScreenOn)
+                    }
                 }, text = {
                     Row {
                         Text(
@@ -91,7 +96,9 @@ fun HomePage(
                         )
                         Checkbox(checked = keepScreenOn, onCheckedChange = {
                             isMenuOpen = false
-                            ScreenHelper.keepScreenOn(context, it)
+                            scope.launch(Dispatchers.IO) {
+                                ScreenHelper.keepScreenOnAsync(context, it)
+                            }
                         })
                     }
                 })

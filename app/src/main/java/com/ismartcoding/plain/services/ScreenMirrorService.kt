@@ -76,11 +76,6 @@ class ScreenMirrorService : LifecycleService() {
                 }
             }
         }
-    }
-
-    @SuppressLint("WrongConstant")
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
         val notification = NotificationHelper.createServiceNotification(
             this,
             "${BuildConfig.APPLICATION_ID}.action.stop_screen_mirror",
@@ -91,7 +86,11 @@ class ScreenMirrorService : LifecycleService() {
         } else {
             startForeground(3, notification)
         }
+    }
 
+    @SuppressLint("WrongConstant")
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
         if (intent != null) {
             mResultCode = intent.getIntExtra("code", -1)
             mResultData = intent.parcelable("data")

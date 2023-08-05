@@ -90,7 +90,7 @@ class AudioPlayerService : LifecycleService() {
                             return@launch
                         }
                         AudioPlayer.instance.setPlayerProgress(0)
-                        when (AudioPlayModePreference.getValue(MainApp.instance)) {
+                        when (AudioPlayModePreference.getValueAsync(MainApp.instance)) {
                             MediaPlayMode.REPEAT_ONE -> {
                                 AudioPlayer.instance.play()
                             }
@@ -101,7 +101,7 @@ class AudioPlayerService : LifecycleService() {
 
                             MediaPlayMode.SHUFFLE -> {
                                 val context = MainApp.instance
-                                AudioPlayingPreference.putAsync(context, AudioPlaylistPreference.getValue(context).random())
+                                AudioPlayingPreference.putAsync(context, AudioPlaylistPreference.getValueAsync(context).random())
                                 AudioPlayer.instance.play()
                             }
                         }
@@ -123,6 +123,10 @@ class AudioPlayerService : LifecycleService() {
             }
         }
 
+        lifecycleScope.launch(Dispatchers.IO) {
+            startForeground(2, createNotification())
+        }
+
         binder = LocalBinder()
     }
 
@@ -131,7 +135,7 @@ class AudioPlayerService : LifecycleService() {
         return binder
     }
 
-    fun quit() {
+    private fun quit() {
         AudioPlayer.instance.pause()
         stopForeground(STOP_FOREGROUND_REMOVE)
         getSystemService<NotificationManager>()?.cancel(2)
@@ -231,9 +235,9 @@ class AudioPlayerService : LifecycleService() {
         }
     }
 
-    private fun createNotification(): Notification {
+    private suspend fun createNotification(): Notification {
         val context = MainApp.instance
-        val playing = AudioPlayingPreference.getValue(context)
+        val playing = AudioPlayingPreference.getValueAsync(context)
         smallRemoteView.setTextViewText(R.id.tv_name, playing?.title)
         smallRemoteView.setImageViewResource(
             R.id.img_play,
@@ -268,7 +272,7 @@ class AudioPlayerService : LifecycleService() {
 
     private suspend fun playAudio(playlistAudio: DPlaylistAudio) {
         val context = MainApp.instance
-        val playing = AudioPlayingPreference.getValue(context)
+        val playing = AudioPlayingPreference.getValueAsync(context)
         if (playing?.path != playlistAudio.path) {
             AudioPlayingPreference.putAsync(context, playlistAudio)
             AudioPlayer.instance.setPlayerProgress(0)
@@ -279,7 +283,7 @@ class AudioPlayerService : LifecycleService() {
             }
         }
 
-        if (!AudioPlaylistPreference.getValue(context).any { it.path == playlistAudio.path }) {
+        if (!AudioPlaylistPreference.getValueAsync(context).any { it.path == playlistAudio.path }) {
             AudioPlaylistPreference.addAsync(context, listOf(playlistAudio))
         }
     }
@@ -291,17 +295,19 @@ class AudioPlayerService : LifecycleService() {
         const val NOTIFICATION_NEXT = "notification.NEXT"
         const val NOTIFICATION_CANCEL = "notification.CANCEL"
 
-        private fun doAction(context: Context, action: AudioServiceAction, block: Intent.() -> Unit) {
-            context.startService(Intent(context, AudioPlayerService::class.java).apply {
-                this.action = action.name
-                block()
-            })
+        private fun doAction(context: Context, action: AudioServiceAction, block: suspend (Intent) -> Unit) {
+            coIO {
+                val intent = Intent(context, AudioPlayerService::class.java)
+                intent.action = action.name
+                block(intent)
+                context.startService(intent)
+            }
         }
 
         fun play(context: Context, playlistAudio: DPlaylistAudio? = null) {
             doAction(context, AudioServiceAction.PLAY) {
-                val audio: Parcelable? = playlistAudio ?: AudioPlayingPreference.getValue(context)
-                putExtra("audio", audio)
+                val audio: Parcelable? = playlistAudio ?: AudioPlayingPreference.getValueAsync(context)
+                it.putExtra("audio", audio)
             }
         }
 
@@ -319,7 +325,7 @@ class AudioPlayerService : LifecycleService() {
 
         fun seek(context: Context, process: Int) {
             doAction(context, AudioServiceAction.SEEK) {
-                putExtra("progress", process)
+                it.putExtra("progress", process)
             }
         }
     }

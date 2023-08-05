@@ -83,7 +83,9 @@ class DevicesDialog : BaseDialog<DialogDevicesBinding>() {
                 dismiss()
             }
 
-            DeviceSortHelper.getSelectedSortItem(requireContext(), menu).highlightTitle(requireContext())
+            lifecycleScope.launch {
+                DeviceSortHelper.getSelectedSortItemAsync(requireContext(), menu).highlightTitle(requireContext())
+            }
 
             onMenuItemClick {
                 when (itemId) {
@@ -142,23 +144,26 @@ class DevicesDialog : BaseDialog<DialogDevicesBinding>() {
 
     private fun sort(menu: Menu, sortBy: DeviceSortBy) {
         lifecycleScope.launch {
-            DeviceSortHelper.getSelectedSortItem(requireContext(), menu).unhighlightTitle()
+            DeviceSortHelper.getSelectedSortItemAsync(requireContext(), menu).unhighlightTitle()
             withIO { DeviceSortByPreference.putAsync(requireContext(), sortBy) }
-            DeviceSortHelper.getSelectedSortItem(requireContext(), menu).highlightTitle(requireContext())
+            DeviceSortHelper.getSelectedSortItemAsync(requireContext(), menu).highlightTitle(requireContext())
             search()
         }
     }
 
     private fun search() {
-        val devices = UIDataCache.current().getDevices(searchQ)
-        binding.list.page.replaceData(devices.sorted(DeviceSortByPreference.getValue(requireContext())))
-        binding.topAppBar.toolbar.run {
-            title = LocaleHelper.getString(R.string.devices)
-            val total = devices.size
-            subtitle = if (total > 0) {
-                LocaleHelper.getStringF(R.string.devices_subtitle, "total", total, "online", devices.count { it.isOnline })
-            } else {
-                ""
+        lifecycleScope.launch {
+            val devices = UIDataCache.current().getDevices(searchQ)
+            val sort = withIO { DeviceSortByPreference.getValueAsync(requireContext()) }
+            binding.list.page.replaceData(devices.sorted(sort))
+            binding.topAppBar.toolbar.run {
+                title = LocaleHelper.getString(R.string.devices)
+                val total = devices.size
+                subtitle = if (total > 0) {
+                    LocaleHelper.getStringF(R.string.devices_subtitle, "total", total, "online", devices.count { it.isOnline })
+                } else {
+                    ""
+                }
             }
         }
     }

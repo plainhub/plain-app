@@ -166,10 +166,12 @@ class VideosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
 
     override fun initTopAppBar() {
         val context = requireContext()
-        initTopAppBar(R.menu.media_items_top) {
-            FileSortHelper.bindSortMenuItemClick(context, lifecycleScope, binding.topAppBar.toolbar.menu, this, MediaType.VIDEO, viewModel, binding.list)
+        lifecycleScope.launch {
+            initTopAppBar(R.menu.media_items_top) {
+                FileSortHelper.bindSortMenuItemClick(context, lifecycleScope, binding.topAppBar.toolbar.menu, this, MediaType.VIDEO, viewModel, binding.list)
+            }
+            FileSortHelper.getSelectedSortItem(binding.topAppBar.toolbar.menu, withIO { VideoSortByPreference.getValueAsync(context) }).highlightTitle(context)
         }
-        FileSortHelper.getSelectedSortItem(binding.topAppBar.toolbar.menu, VideoSortByPreference.getValue(context)).highlightTitle(context)
     }
 
     private fun initFab() {
@@ -185,7 +187,7 @@ class VideosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     private suspend fun updateVideos() {
         val query = viewModel.getQuery()
         val context = requireContext()
-        val items = withIO { VideoHelper.search(context, query, viewModel.limit, viewModel.offset, VideoSortByPreference.getValue(context)) }
+        val items = withIO { VideoHelper.search(context, query, viewModel.limit, viewModel.offset, VideoSortByPreference.getValueAsync(context)) }
         viewModel.total = withIO { VideoHelper.count(context, query) }
 
         val bindingAdapter = binding.list.rv.bindingAdapter

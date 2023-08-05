@@ -16,6 +16,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
@@ -51,6 +52,7 @@ import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import io.ktor.server.request.*
 import io.ktor.websocket.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
@@ -65,7 +67,7 @@ class MainActivity : AppCompatActivity() {
             if (ScreenMirrorService.instance == null) {
                 val service = Intent(this, ScreenMirrorService::class.java)
                 service.putExtra("code", result.resultCode)
-                service.putExtra("data", result.data!!)
+                service.putExtra("data", result.data)
                 startService(service)
             } else {
                 ScreenMirrorService.instance?.getLatestImageBase64()?.let {
@@ -107,7 +109,9 @@ class MainActivity : AppCompatActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        Language.initLocale(this)
+        lifecycleScope.launch(Dispatchers.IO) {
+            Language.initLocaleAsync(this@MainActivity)
+        }
 
         instance = WeakReference(this)
 
@@ -123,7 +127,6 @@ class MainActivity : AppCompatActivity() {
         BluetoothPermission.init(this)
         Permissions.init(this)
         initEvents()
-
 
         setContent {
             SettingsProvider {
@@ -150,13 +153,13 @@ class MainActivity : AppCompatActivity() {
 
         receiveEvent<PermissionResultEvent> { event ->
             if (event.permission == Permission.WRITE_SETTINGS && Permission.WRITE_SETTINGS.can(this@MainActivity)) {
-                val enable = !KeepScreenOnPreference.get(this@MainActivity)
-                ScreenHelper.saveOn(enable)
+                val enable = !KeepScreenOnPreference.getAsync(this@MainActivity)
+                ScreenHelper.saveOn(this@MainActivity, enable)
                 if (enable) {
-                    ScreenHelper.saveTimeout(contentResolver.getSystemScreenTimeout())
+                    ScreenHelper.saveTimeout(this@MainActivity, contentResolver.getSystemScreenTimeout())
                     contentResolver.setSystemScreenTimeout(Int.MAX_VALUE)
                 } else {
-                    val systemScreenTimeout = SystemScreenTimeoutPreference.get(this@MainActivity)
+                    val systemScreenTimeout = SystemScreenTimeoutPreference.getAsync(this@MainActivity)
                     contentResolver.setSystemScreenTimeout(if (systemScreenTimeout > 0) systemScreenTimeout else 5000 * 60) // default 5 minutes
                 }
             }
@@ -242,7 +245,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        Language.initLocale(this)
+        lifecycleScope.launch(Dispatchers.IO) {
+            Language.initLocaleAsync(this@MainActivity)
+        }
     }
 
     private fun doPickFile(event: PickFileEvent) {

@@ -36,7 +36,7 @@ import com.ismartcoding.plain.ui.helpers.DeviceSortHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.launch
 
-class SelectItemDialog(val search: (String) -> List<Any>, val onSelect: (ApplyToType, String) -> Unit) : BaseBottomSheetDialog<DialogSelectItemBinding>() {
+class SelectItemDialog(val search: suspend (String) -> List<Any>, val onSelect: (ApplyToType, String) -> Unit) : BaseBottomSheetDialog<DialogSelectItemBinding>() {
     private var searchQ: String = ""
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -44,7 +44,9 @@ class SelectItemDialog(val search: (String) -> List<Any>, val onSelect: (ApplyTo
         binding.topAppBar.run {
             initMenu(R.menu.select_item)
             val context = requireContext()
-            DeviceSortHelper.getSelectedSortItem(context, menu).highlightTitle(context)
+            lifecycleScope.launch {
+                DeviceSortHelper.getSelectedSortItemAsync(context, menu).highlightTitle(context)
+            }
 
             onMenuItemClick {
                 when (itemId) {
@@ -136,15 +138,17 @@ class SelectItemDialog(val search: (String) -> List<Any>, val onSelect: (ApplyTo
     private fun sort(menu: Menu, sortBy: DeviceSortBy) {
         lifecycleScope.launch {
             val context = requireContext()
-            DeviceSortHelper.getSelectedSortItem(context, menu).unhighlightTitle()
+            DeviceSortHelper.getSelectedSortItemAsync(context, menu).unhighlightTitle()
             withIO { DeviceSortByPreference.putAsync(context, sortBy) }
-            DeviceSortHelper.getSelectedSortItem(context, menu).highlightTitle(context)
+            DeviceSortHelper.getSelectedSortItemAsync(context, menu).highlightTitle(context)
             updateList()
         }
     }
 
     private fun updateList() {
-        binding.list.page.replaceData(search(searchQ))
+        lifecycleScope.launch {
+            binding.list.page.replaceData(withIO { search(searchQ) })
+        }
     }
 
     private fun fetch() {

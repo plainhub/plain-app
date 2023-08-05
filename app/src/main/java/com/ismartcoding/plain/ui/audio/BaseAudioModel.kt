@@ -9,8 +9,4 @@ open class BaseAudioModel : BaseItemModel() {
     var title: String = ""
     var subtitle: String = ""
     var isPlaying = false
-
-    fun checkIsPlaying(context: Context, path: String) {
-        isPlaying = AudioPlayingPreference.getValue(context)?.path == path && AudioPlayer.instance.isPlaying()
-    }
 }

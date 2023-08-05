@@ -68,40 +68,48 @@ class AudioPlayerDialog() : BaseBottomSheetDialog<DialogAudioPlayerBinding>() {
     }
 
     private fun updateUI() {
-        binding.seekBar.removeCallbacks(seekBarUpdateRunnable)
-        val process = AudioPlayer.instance.getPlayerProgress()
-        binding.process.text = FormatHelper.formatDuration(process.toLong())
-        AudioPlayingPreference.getValue(requireContext())?.let { audio ->
-            binding.seekBar.max = audio.duration.toInt()
-            binding.seekBar.progress = process
-            binding.duration.text = FormatHelper.formatDuration(audio.duration)
-            binding.title.text = audio.title
-            binding.title.isSelected = true // need for marquee
-            binding.artist.text = audio.artist
+        lifecycleScope.launch {
+            binding.seekBar.removeCallbacks(seekBarUpdateRunnable)
+            val process = AudioPlayer.instance.getPlayerProgress()
+            binding.process.text = FormatHelper.formatDuration(process.toLong())
+            val audio = withIO { AudioPlayingPreference.getValueAsync(requireContext()) }
+            if (audio != null) {
+                binding.seekBar.max = audio.duration.toInt()
+                binding.seekBar.progress = process
+                binding.duration.text = FormatHelper.formatDuration(audio.duration)
+                binding.title.text = audio.title
+                binding.title.isSelected = true // need for marquee
+                binding.artist.text = audio.artist
+            }
+
+            val isPlaying = AudioPlayer.instance.isPlaying()
+            if (isPlaying) {
+                binding.seekBar.postDelayed(seekBarUpdateRunnable, seekBarUpdateDelayMillis)
+            }
+            binding.play.setImageResource(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play)
+            updatePlayMode()
         }
 
-        val isPlaying = AudioPlayer.instance.isPlaying()
-        if (isPlaying) {
-            binding.seekBar.postDelayed(seekBarUpdateRunnable, seekBarUpdateDelayMillis)
-        }
-        binding.play.setImageResource(if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play)
-        updatePlayMode()
     }
 
     private fun updatePlayMode() {
-        binding.repeat.setImageResource(
-            when (AudioPlayModePreference.getValue(requireContext())) {
-                MediaPlayMode.REPEAT -> R.drawable.ic_repeat
-                MediaPlayMode.REPEAT_ONE -> R.drawable.ic_repeat_one
-                MediaPlayMode.SHUFFLE -> R.drawable.ic_shuffle
-            }
-        )
+        lifecycleScope.launch {
+            val mode = withIO { AudioPlayModePreference.getValueAsync(requireContext()) }
+            binding.repeat.setImageResource(
+                when (mode) {
+                    MediaPlayMode.REPEAT -> R.drawable.ic_repeat
+                    MediaPlayMode.REPEAT_ONE -> R.drawable.ic_repeat_one
+                    MediaPlayMode.SHUFFLE -> R.drawable.ic_shuffle
+                }
+            )
+        }
+
     }
 
     private fun setListen() {
         binding.repeat.setSafeClick {
             lifecycleScope.launch {
-                val newMode = when (AudioPlayModePreference.getValue(requireContext())) {
+                val newMode = when (AudioPlayModePreference.getValueAsync(requireContext())) {
                     MediaPlayMode.REPEAT -> MediaPlayMode.REPEAT_ONE
                     MediaPlayMode.REPEAT_ONE -> MediaPlayMode.SHUFFLE
                     MediaPlayMode.SHUFFLE -> MediaPlayMode.REPEAT

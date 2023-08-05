@@ -21,6 +21,7 @@ import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.Subtitle
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,11 +66,15 @@ fun DarkThemePage(
                     PListItem(
                         title = stringResource(R.string.amoled_dark_theme),
                         onClick = {
-                            AmoledDarkThemePreference.put(context, !amoledDarkTheme)
+                            scope.launch(Dispatchers.IO) {
+                                AmoledDarkThemePreference.putAsync(context, !amoledDarkTheme)
+                            }
                         },
                     ) {
                         PSwitch(activated = amoledDarkTheme) {
-                            AmoledDarkThemePreference.put(context, !amoledDarkTheme)
+                            scope.launch(Dispatchers.IO) {
+                                AmoledDarkThemePreference.putAsync(context, !amoledDarkTheme)
+                            }
                         }
                     }
                     BottomSpace()

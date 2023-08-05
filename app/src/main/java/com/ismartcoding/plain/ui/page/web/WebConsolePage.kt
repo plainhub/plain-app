@@ -1,33 +1,39 @@
 package com.ismartcoding.plain.ui.page.web
 
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.More
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,33 +43,47 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.ismartcoding.lib.channel.receiveEventHandler
+import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.isTV
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.data.preference.*
+import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.Permissions
+import com.ismartcoding.plain.features.RequestPermissionEvent
+import com.ismartcoding.plain.features.chat.ChatHelper
+import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.ui.base.*
+import com.ismartcoding.plain.ui.chat.EditChatTextDialog
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.models.WebConsoleViewModel
 import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.theme.palette.onDark
 import com.ismartcoding.plain.ui.theme.palette.onLight
 import com.ismartcoding.plain.web.HttpServerManager
-import androidx.compose.foundation.lazy.items
-import com.ismartcoding.lib.extensions.isTV
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.packageManager
-import com.ismartcoding.plain.ui.models.SharedViewModel
+import com.ismartcoding.plain.web.websocket.EventType
+import com.ismartcoding.plain.web.websocket.WebSocketEvent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.json.JSONArray
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,29 +105,18 @@ fun WebConsolePage(
         val enabledPermissions = LocalApiPermissions.current
         var permissionList by remember { mutableStateOf(Permissions.getWebList(context)) }
         var portDialogVisible by remember { mutableStateOf(false) }
+        val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
 
-        val launcherMap = mutableMapOf<Permission, ManagedActivityResultLauncher<String, Boolean>>()
-        val intentLauncherMap = mutableMapOf<Permission, ActivityResultLauncher<Intent>>()
-
-        setOf(
-            Permission.CAMERA,
-            Permission.WRITE_EXTERNAL_STORAGE,
-            Permission.CALL_PHONE,
-            Permission.WRITE_SETTINGS,
-            Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG,
-            Permission.READ_CONTACTS, Permission.WRITE_CONTACTS,
-            Permission.READ_SMS, Permission.SEND_SMS,
-        ).forEach { permission ->
-            launcherMap[permission] = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
-                permissionList = Permissions.getWebList(context)
-            }
+        LaunchedEffect(Unit) {
+            events.add(
+                receiveEventHandler<PermissionResultEvent> {
+                    permissionList = Permissions.getWebList(context)
+                })
         }
 
-        setOf(
-            Permission.WRITE_SETTINGS, Permission.WRITE_EXTERNAL_STORAGE, Permission.SYSTEM_ALERT_WINDOW
-        ).forEach { permission ->
-            intentLauncherMap[permission] = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                permissionList = Permissions.getWebList(context)
+        DisposableEffect(Unit) {
+            onDispose {
+                events.forEach { it.cancel() }
             }
         }
 
@@ -200,7 +209,7 @@ fun WebConsolePage(
                             ) {},
                         ),
                     )
-                    BrowserPreview(isHttps, httpPort, httpsPort, onEditPort = {
+                    BrowserPreview(context, isHttps, httpPort, httpsPort, onEditPort = {
                         portDialogVisible = true
                     })
                     if (isHttps) {
@@ -247,16 +256,16 @@ fun WebConsolePage(
                             showMore = permission == Permission.SYSTEM_ALERT_WINDOW,
                             onClick = {
                                 scope.launch {
-                                    val enable = !permission.isEnabled(context)
+                                    val enable = withIO { !permission.isEnabledAsync(context) }
                                     withIO { ApiPermissionsPreference.putAsync(context, permission, enable) }
                                     if (permission == Permission.SYSTEM_ALERT_WINDOW) {
-                                        intentLauncherMap[permission]?.launch(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}")))
+                                        sendEvent(RequestPermissionEvent(Permission.SYSTEM_ALERT_WINDOW))
                                     } else {
                                         if (enable) {
                                             if (m.granted) {
                                                 return@launch
                                             }
-                                            permission.request(context, launcher = launcherMap[permission], intentLauncher = intentLauncherMap[permission])
+                                            sendEvent(RequestPermissionEvent(permission))
                                         }
                                     }
                                 }
@@ -271,7 +280,7 @@ fun WebConsolePage(
                                             if (m.granted) {
                                                 return@launch
                                             }
-                                            permission.request(context, launcher = launcherMap[permission], intentLauncher = intentLauncherMap[permission])
+                                            sendEvent(RequestPermissionEvent(permission))
                                         }
                                     }
                                 }
@@ -292,10 +301,12 @@ fun WebConsolePage(
                     text = it.toString(),
                     selected = if (isHttps) it == httpsPort else it == httpPort,
                 ) {
-                    if (isHttps) {
-                        HttpsPortPreference.put(context, it)
-                    } else {
-                        HttpPortPreference.put(context, it)
+                    scope.launch(Dispatchers.IO) {
+                        if (isHttps) {
+                            HttpsPortPreference.putAsync(context, it)
+                        } else {
+                            HttpPortPreference.putAsync(context, it)
+                        }
                     }
                     DialogHelper.showConfirmDialog(context, context.getString(R.string.restart_app_title), context.getString(R.string.restart_app_message)) {
                         triggerRebirth(context)
@@ -309,7 +320,11 @@ fun WebConsolePage(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BrowserPreview(isHttps: Boolean, httpPort: Int, httpsPort: Int, onEditPort: () -> Unit) {
+fun BrowserPreview(context: Context, isHttps: Boolean, httpPort: Int, httpsPort: Int, onEditPort: () -> Unit) {
+    val ip4 = remember { NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" } }
+    val ip4s = remember { NetworkHelper.getDeviceIP4s().filter { it != ip4 } }
+    val showContextMenu = remember { mutableStateOf(false) }
+    val defaultUrl = "${if (isHttps) "https" else "http"}://${ip4}:${if (isHttps) httpsPort else httpPort}"
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
@@ -326,11 +341,15 @@ fun BrowserPreview(isHttps: Boolean, httpPort: Int, httpsPort: Int, onEditPort: 
                 ), verticalAlignment = Alignment.CenterVertically
         ) {
             SelectionContainer {
-                Text(
-                    text = "${if (isHttps) "https" else "http"}://${NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }}:${if (isHttps) httpsPort else httpPort}",
+                ClickableText(
+                    text = AnnotatedString(defaultUrl),
                     modifier = Modifier.padding(start = 16.dp),
                     style = MaterialTheme.typography.titleLarge.copy(fontSize = 16.sp),
-                    textAlign = TextAlign.Start,
+                    onClick = {
+                        val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), defaultUrl)
+                        clipboardManager.setPrimaryClip(clip)
+                        DialogHelper.showConfirmDialog(context, "", context.getString(R.string.copied_to_clipboard_format, defaultUrl))
+                    }
                 )
             }
             PIconButton(imageVector = Icons.Rounded.Edit,
@@ -342,6 +361,37 @@ fun BrowserPreview(isHttps: Boolean, httpPort: Int, httpsPort: Int, onEditPort: 
                 onClick = {
                     onEditPort()
                 })
+            if (ip4s.isNotEmpty()) {
+                Spacer(modifier = Modifier.weight(1f))
+                Box(
+                    modifier = Modifier
+                        .wrapContentSize(Alignment.TopEnd)
+                ) {
+                    PIconButton(imageVector = Icons.Rounded.MoreVert,
+                        modifier = Modifier
+                            .height(16.dp)
+                            .width(16.dp),
+                        contentDescription = stringResource(id = R.string.more),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        onClick = {
+                            showContextMenu.value = true
+                        })
+                    DropdownMenu(
+                        expanded = showContextMenu.value,
+                        onDismissRequest = { showContextMenu.value = false }
+                    ) {
+                        ip4s.forEach { ip ->
+                            val url = "${if (isHttps) "https" else "http"}://${ip}:${if (isHttps) httpsPort else httpPort}"
+                            DropdownMenuItem(text = { Text(url) }, onClick = {
+                                showContextMenu.value = false
+                                val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), url)
+                                clipboardManager.setPrimaryClip(clip)
+                                DialogHelper.showConfirmDialog(context, "", context.getString(R.string.copied_to_clipboard_format, url))
+                            })
+                        }
+                    }
+                }
+            }
         }
         Text(
             modifier = Modifier

@@ -80,17 +80,22 @@ abstract class BaseContentHelper {
         }
     }
 
-    protected fun getSearchCursorWithBundle(context: Context, query: String, limit: Int, offset: Int, sortBy: SortBy): Cursor? {
-        val where = getWhere(query)
-        val sourceUri = uriExternal.buildUpon()
-            .appendQueryParameter("limit", limit.toString())
-            .appendQueryParameter("offset", offset.toString())
-            .build()
-        return context.contentResolver.query(sourceUri, getProjection(), Bundle().apply {
-            paging(offset, limit)
-            sort(sortBy)
-            where(where.toSelection(), where.args)
-        }, null)
+    private fun getSearchCursorWithBundle(context: Context, query: String, limit: Int, offset: Int, sortBy: SortBy): Cursor? {
+        return try {
+            val where = getWhere(query)
+            val sourceUri = uriExternal.buildUpon()
+                .appendQueryParameter("limit", limit.toString())
+                .appendQueryParameter("offset", offset.toString())
+                .build()
+            context.contentResolver.query(sourceUri, getProjection(), Bundle().apply {
+                paging(offset, limit)
+                sort(sortBy)
+                where(where.toSelection(), where.args)
+            }, null)
+        } catch (ex: Exception) {
+            LogCat.e(ex.toString())
+            null
+        }
     }
 
     protected fun getSearchCursorWithSortOrder(context: Context, query: String, limit: Int, offset: Int, sortBy: SortBy?): Cursor? {
@@ -113,7 +118,7 @@ abstract class BaseContentHelper {
         context.contentResolver.delete(uriExternal, null, null)
     }
 
-    fun deleteRecordsAndFilesByIds(context: Context, ids: Set<String>):Set<String> {
+    fun deleteRecordsAndFilesByIds(context: Context, ids: Set<String>): Set<String> {
         val projection = arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.DATA)
         val where = ContentWhere()
         where.addIn(MediaStore.MediaColumns._ID, ids.toList())

@@ -155,7 +155,7 @@ class RuleDialog(private var mItem: Rule?) : BaseBottomSheetDialog<DialogRuleBin
                     val items = mutableListOf<Any>()
                     items.add(AllItemsOption(getString(R.string.all_devices)))
                     items.addAll(UIDataCache.current().getSelectableNetworks(q))
-                    items.addAll(UIDataCache.current().getDevices(q).sorted(DeviceSortByPreference.getValue(requireContext())))
+                    items.addAll(UIDataCache.current().getDevices(q).sorted(DeviceSortByPreference.getValueAsync(requireContext())))
                     items
                 }) { type, value ->
                     ruleEdit.applyTo.type = type

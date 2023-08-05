@@ -27,6 +27,7 @@ import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.preference.ApiPermissionsPreference
 import com.ismartcoding.plain.data.preference.AudioPlayModePreference
 import com.ismartcoding.plain.data.preference.AudioPlayingPreference
 import com.ismartcoding.plain.data.preference.AudioPlaylistPreference
@@ -169,8 +170,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("aiChatConfig") {
                     resolver { ->
-
-                        AIChatConfig(ChatGPTApiKeyPreference.get(MainApp.instance))
+                        AIChatConfig(ChatGPTApiKeyPreference.getAsync(MainApp.instance))
                     }
                 }
                 query("aiChat") {
@@ -205,7 +205,7 @@ class SXGraphQL(val schema: Schema) {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
-                        Permission.READ_SMS.check(MainApp.instance)
+                        Permission.READ_SMS.checkAsync(MainApp.instance)
                         SmsHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
                     }
                     type<Message> {
@@ -232,8 +232,8 @@ class SXGraphQL(val schema: Schema) {
                     }
                     resolver { offset: Int, limit: Int, query: String ->
                         val context = MainApp.instance
-                        Permission.WRITE_EXTERNAL_STORAGE.check(context)
-                        ImageHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, ImageSortByPreference.getValue(context)).map { it.toModel() }
+                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
+                        ImageHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, ImageSortByPreference.getValueAsync(context)).map { it.toModel() }
                     }
                     type<Image> {
                         dataProperty("tags") {
@@ -259,8 +259,8 @@ class SXGraphQL(val schema: Schema) {
                     }
                     resolver { offset: Int, limit: Int, query: String ->
                         val context = MainApp.instance
-                        Permission.WRITE_EXTERNAL_STORAGE.check(context)
-                        VideoHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, VideoSortByPreference.getValue(context)).map { it.toModel() }
+                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
+                        VideoHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, VideoSortByPreference.getValueAsync(context)).map { it.toModel() }
                     }
                     type<Video> {
                         dataProperty("tags") {
@@ -286,8 +286,8 @@ class SXGraphQL(val schema: Schema) {
                     }
                     resolver { offset: Int, limit: Int, query: String ->
                         val context = MainApp.instance
-                        Permission.WRITE_EXTERNAL_STORAGE.check(context)
-                        AudioHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, AudioSortByPreference.getValue(context)).map { it.toModel() }
+                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
+                        AudioHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, AudioSortByPreference.getValueAsync(context)).map { it.toModel() }
                     }
                     type<Audio> {
                         dataProperty("tags") {
@@ -312,7 +312,7 @@ class SXGraphQL(val schema: Schema) {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
-                        Permission.READ_CONTACTS.check(MainApp.instance)
+                        Permission.READ_CONTACTS.checkAsync(MainApp.instance)
                         ContactHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
                     }
                     type<Contact> {
@@ -335,13 +335,13 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("contactSources") {
                     resolver { ->
-                        Permission.READ_CONTACTS.check(MainApp.instance)
+                        Permission.READ_CONTACTS.checkAsync(MainApp.instance)
                         SourceHelper.getAll().map { it.toModel() }
                     }
                 }
                 query("contactGroups") {
                     resolver { node: Execution.Node ->
-                        Permission.READ_CONTACTS.check(MainApp.instance)
+                        Permission.READ_CONTACTS.checkAsync(MainApp.instance)
                         val groups = GroupHelper.getAll().map { it.toModel() }
                         val fields = node.getFields()
                         if (fields.contains(ContactGroup::contactCount.name)) {
@@ -355,7 +355,7 @@ class SXGraphQL(val schema: Schema) {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
-                        Permission.READ_CALL_LOG.check(MainApp.instance)
+                        Permission.READ_CALL_LOG.checkAsync(MainApp.instance)
                         CallHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
                     }
                     type<Call> {
@@ -408,15 +408,15 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("recentFiles") {
                     resolver { ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
+                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(MainApp.instance)
                         FileSystemHelper.getRecents(MainApp.instance).map { it.toModel() }
                     }
                 }
                 query("files") {
                     resolver { dir: String, showHidden: Boolean ->
                         val context = MainApp.instance
-                        Permission.WRITE_EXTERNAL_STORAGE.check(context)
-                        val files = FileSystemHelper.getFilesList(dir, showHidden, FileSortByPreference.getValue(context)).map { it.toModel() }
+                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
+                        val files = FileSystemHelper.getFilesList(dir, showHidden, FileSortByPreference.getValueAsync(context)).map { it.toModel() }
                         Files(dir, files)
                     }
                 }
@@ -505,6 +505,7 @@ class SXGraphQL(val schema: Schema) {
                 query("app") {
                     resolver { ->
                         val context = MainApp.instance
+                        val apiPermissions = ApiPermissionsPreference.getAsync(context)
                         App(
                             usbConnected = PlugInControlReceiver.isUSBConnected(context),
                             fileIdToken = TempData.fileIdToken,
@@ -512,10 +513,10 @@ class SXGraphQL(val schema: Schema) {
                             if (TempData.demoMode) "Demo phone" else PhoneHelper.getDeviceName(context),
                             PhoneHelper.getBatteryPercentage(context),
                             MainApp.getAppVersion(),
-                            Permission.values().filter { it.isEnabled(MainApp.instance) && it.can(MainApp.instance) },
-                            AudioPlaylistPreference.getValue(context).map { it.toModel() },
-                            AudioPlayModePreference.getValue(context),
-                            AudioPlayingPreference.getValue(context)?.path ?: "",
+                            Permission.values().filter { apiPermissions.contains(it.name) && it.can(MainApp.instance) },
+                            AudioPlaylistPreference.getValueAsync(context).map { it.toModel() },
+                            AudioPlayModePreference.getValueAsync(context),
+                            AudioPlayingPreference.getValueAsync(context)?.path ?: "",
                             context.allowSensitivePermissions(),
                             sdcardPath = FileSystemHelper.getSDCardPath(context),
                             internalStoragePath = FileSystemHelper.getInternalStoragePath(context),
@@ -572,7 +573,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("createAIChat") {
                     resolver { id: ID, message: String, isMe: Boolean ->
-                        if (ChatGPTApiKeyPreference.get(MainApp.instance).isEmpty()) {
+                        if (ChatGPTApiKeyPreference.getAsync(MainApp.instance).isEmpty()) {
                             throw Exception("no_api_key")
                         }
                         val items = AIChatHelper.createChatItemsAsync(id.value, isMe, message)
@@ -598,7 +599,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("deleteContacts") {
                     resolver { ids: List<ID> ->
-                        Permission.WRITE_CONTACTS.check(MainApp.instance)
+                        Permission.WRITE_CONTACTS.checkAsync(MainApp.instance)
                         val newIds = ids.map { it.value }.toSet()
                         TagHelper.deleteTagRelationByKeys(newIds, TagType.CONTACT)
                         ContactHelper.deleteByIds(MainApp.instance, newIds)
@@ -614,14 +615,14 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("updateContact") {
                     resolver { id: ID, input: ContactInput ->
-                        Permission.WRITE_CONTACTS.check(MainApp.instance)
+                        Permission.WRITE_CONTACTS.checkAsync(MainApp.instance)
                         ContactHelper.update(id.value, input)
                         ContactHelper.get(MainApp.instance, id.value)?.toModel()
                     }
                 }
                 mutation("createContact") {
                     resolver { input: ContactInput ->
-                        Permission.WRITE_CONTACTS.check(MainApp.instance)
+                        Permission.WRITE_CONTACTS.checkAsync(MainApp.instance)
                         val id = ContactHelper.create(input)
                         if (id.isEmpty()) null else ContactHelper.get(MainApp.instance, id)?.toModel()
                     }
@@ -679,28 +680,28 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("createContactGroup") {
                     resolver { name: String, accountName: String, accountType: String ->
-                        Permission.WRITE_CONTACTS.check(MainApp.instance)
+                        Permission.WRITE_CONTACTS.checkAsync(MainApp.instance)
                         GroupHelper.create(name, accountName, accountType).toModel()
                     }
                 }
 
                 mutation("call") {
                     resolver { number: String ->
-                        Permission.CALL_PHONE.check(MainApp.instance)
+                        Permission.CALL_PHONE.checkAsync(MainApp.instance)
                         CallHelper.call(MainActivity.instance.get()!!, number)
                         true
                     }
                 }
                 mutation("updateContactGroup") {
                     resolver { id: ID, name: String ->
-                        Permission.WRITE_CONTACTS.check(MainApp.instance)
+                        Permission.WRITE_CONTACTS.checkAsync(MainApp.instance)
                         GroupHelper.update(id.value, name)
                         ContactGroup(id, name)
                     }
                 }
                 mutation("deleteContactGroup") {
                     resolver { id: ID ->
-                        Permission.WRITE_CONTACTS.check(MainApp.instance)
+                        Permission.WRITE_CONTACTS.checkAsync(MainApp.instance)
                         GroupHelper.delete(id.value)
                         true
                     }
@@ -708,7 +709,7 @@ class SXGraphQL(val schema: Schema) {
 
                 mutation("deleteCalls") {
                     resolver { ids: List<ID> ->
-                        Permission.WRITE_CALL_LOG.check(MainApp.instance)
+                        Permission.WRITE_CALL_LOG.checkAsync(MainApp.instance)
                         val newIds = ids.map { it.value }.toSet()
                         TagHelper.deleteTagRelationByKeys(newIds, TagType.CALL)
                         CallHelper.deleteByIds(MainApp.instance, newIds)
@@ -717,7 +718,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("deleteFiles") {
                     resolver { paths: List<String> ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
+                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(MainApp.instance)
                         paths.forEach {
                             java.io.File(it).deleteRecursively()
                         }
@@ -727,13 +728,13 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("createDir") {
                     resolver { path: String ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
+                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(MainApp.instance)
                         FileSystemHelper.createDirectory(path).toModel()
                     }
                 }
                 mutation("renameFile") {
                     resolver { path: String, name: String ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
+                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(MainApp.instance)
                         val dst = FileHelper.rename(path, name)
                         if (dst != null) {
                             MainApp.instance.scanFileByConnection(path)
@@ -744,7 +745,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("copyFile") {
                     resolver { src: String, dst: String, overwrite: Boolean ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
+                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(MainApp.instance)
                         val dstFile = java.io.File(dst)
                         if (overwrite || !dstFile.exists()) {
                             java.io.File(src).copyRecursively(dstFile, overwrite)
@@ -761,7 +762,7 @@ class SXGraphQL(val schema: Schema) {
                         val context = MainApp.instance
                         val audio = DPlaylistAudio.fromPath(context, path)
                         AudioPlayingPreference.putAsync(context, audio)
-                        if (!AudioPlaylistPreference.getValue(context).any { it.path == audio.path }) {
+                        if (!AudioPlaylistPreference.getValueAsync(context).any { it.path == audio.path }) {
                             AudioPlaylistPreference.addAsync(context, listOf(audio))
                         }
                         audio.toModel()
@@ -919,7 +920,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("moveFile") {
                     resolver { src: String, dst: String, overwrite: Boolean ->
-                        Permission.WRITE_EXTERNAL_STORAGE.check(MainApp.instance)
+                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(MainApp.instance)
                         val dstFile = java.io.File(dst)
                         if (overwrite || !dstFile.exists()) {
                             Path(src).moveTo(Path(dst), overwrite)
@@ -996,8 +997,8 @@ class SXGraphQL(val schema: Schema) {
             val routing: Routing.() -> Unit = {
                 route("/graphql") {
                     post {
-                        if (!WebPreference.get(MainApp.instance)) {
-                            call.response.status(HttpStatusCode.BadRequest)
+                        if (!TempData.webEnabled) {
+                            call.response.status(HttpStatusCode.Forbidden)
                             return@post
                         }
                         val clientId = call.request.header("c-id") ?: ""
@@ -1025,7 +1026,7 @@ class SXGraphQL(val schema: Schema) {
                             call.respondBytes(CryptoHelper.aesEncrypt(token, r))
                         } else {
                             val authStr = call.request.header("authorization")?.split(" ")
-                            val token = AuthDevTokenPreference.get(MainApp.instance)
+                            val token = AuthDevTokenPreference.getAsync(MainApp.instance)
                             if (token.isNotEmpty() || authStr == null || authStr.size != 2 || authStr[1] != token) {
                                 call.respondText(
                                     """{"errors":[{"message":"Unauthorized"}]}""",

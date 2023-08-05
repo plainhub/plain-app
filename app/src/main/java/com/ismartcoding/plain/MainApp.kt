@@ -22,6 +22,8 @@ import com.ismartcoding.plain.data.preference.DarkThemePreference
 import com.ismartcoding.plain.data.preference.FeedAutoRefreshPreference
 import com.ismartcoding.plain.data.preference.KeyStorePasswordPreference
 import com.ismartcoding.plain.data.preference.PasswordTypePreference
+import com.ismartcoding.plain.data.preference.WebPreference
+import com.ismartcoding.plain.data.preference.dataStore
 import com.ismartcoding.plain.features.AppEvents
 import com.ismartcoding.plain.features.bluetooth.BluetoothEvents
 import com.ismartcoding.plain.features.box.BoxEvents
@@ -29,6 +31,7 @@ import com.ismartcoding.plain.ui.helpers.PageHelper
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import io.ktor.server.netty.NettyApplicationEngine
+import kotlinx.coroutines.flow.first
 import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
 
@@ -88,17 +91,19 @@ class MainApp : Application(), ImageLoaderFactory {
         BoxEvents.register()
 
         coIO {
-            ClientIdPreference.ensureValue(instance)
-            KeyStorePasswordPreference.ensureValue(instance)
+            TempData.webEnabled = WebPreference.getAsync(instance)
+            val preferences = dataStore.data.first()
+            ClientIdPreference.ensureValueAsync(instance, preferences)
+            KeyStorePasswordPreference.ensureValueAsync(instance, preferences)
 
-            DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(instance)))
+            DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(preferences)))
 
-            if (PasswordTypePreference.getValue(instance) == PasswordType.RANDOM) {
-                HttpServerManager.resetPassword()
+            if (PasswordTypePreference.getValue(preferences) == PasswordType.RANDOM) {
+                HttpServerManager.resetPasswordAsync()
             }
             HttpServerManager.loadTokenCache()
-            if (FeedAutoRefreshPreference.get(instance)) {
-                FeedFetchWorker.startRepeatWorker(instance)
+            if (FeedAutoRefreshPreference.get(preferences)) {
+                FeedFetchWorker.startRepeatWorkerAsync(instance)
             }
             HttpServerManager.clientTsInterval()
         }

@@ -19,7 +19,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.FormatHelper
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.helpers.SoundMeterHelper
@@ -55,7 +54,8 @@ fun SoundMeterPage(
     val scope = rememberCoroutineScope()
     var decibelValuesDialogVisible by remember { mutableStateOf(false) }
     var audioRecord by remember { mutableStateOf<AudioRecord?>(null) }
-    val decibelValues = remember { mutableStateListOf<Float>() }
+    var total by remember { mutableFloatStateOf(0f) }
+    var count by remember { mutableIntStateOf(0) }
     var min by remember { mutableFloatStateOf(0f) }
     var avg by remember { mutableFloatStateOf(0f) }
     var max by remember { mutableFloatStateOf(0f) }
@@ -101,14 +101,19 @@ fun SoundMeterPage(
                         val value = abs(SoundMeterHelper.amplitudeToDecibel(amplitudeValue))
                         if (value.isFinite()) {
                             decibel = value
-                            decibelValues.add(decibel)
-                            avg = decibelValues.average().toFloat()
-                            max = decibelValues.maxOrNull() ?: 0f
-                            min = decibelValues.minOrNull() ?: 0f
+                            total += value
+                            count++
+                            avg = total / count
+                            if (value > max) {
+                                max = value
+                            }
+                            if (value < min || min == 0f) {
+                                min = value
+                            }
                         }
                     }
                 }
-                delay(100)
+                delay(150)
             }
         }
     }
@@ -124,6 +129,7 @@ fun SoundMeterPage(
 
     PScaffold(
         navController,
+        topBarTitle = stringResource(id = R.string.sound_meter),
         actions = {
             PIconButton(
                 imageVector = Icons.Outlined.Info,
@@ -136,12 +142,10 @@ fun SoundMeterPage(
         content = {
             LazyColumn {
                 item {
-                    DisplayText(
-                        text = stringResource(id = R.string.sound_meter),
-                    )
-
                     Column(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 56.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Row(verticalAlignment = Alignment.Bottom) {
@@ -201,10 +205,11 @@ fun SoundMeterPage(
                             }
                         }
                     }
-                    if (decibelValues.isNotEmpty()) {
+                    if (count > 0) {
                         VerticalSpace(dp = 40.dp)
                         BlockOutlineButton(text = stringResource(id = R.string.reset)) {
-                            decibelValues.clear()
+                            total = 0f
+                            count = 0
                             decibel = 0f
                             min = 0f
                             max = 0f

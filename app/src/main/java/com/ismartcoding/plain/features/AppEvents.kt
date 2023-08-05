@@ -148,7 +148,7 @@ object AppEvents {
             coIO {
                 val openAI = OpenAI(
                     OpenAIConfig(
-                        token = ChatGPTApiKeyPreference.get(MainApp.instance),
+                        token = ChatGPTApiKeyPreference.getAsync(MainApp.instance),
                         timeout = Timeout(socket = 60.seconds),
                     )
                 )

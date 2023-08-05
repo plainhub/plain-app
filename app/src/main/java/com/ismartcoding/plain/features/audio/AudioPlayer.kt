@@ -67,16 +67,16 @@ class AudioPlayer : IMediaPlayer {
     }
 
     override fun play() {
-        val context = MainApp.instance
-        val playing = AudioPlayingPreference.getValue(context) ?: return
-        try {
-            play(playing.path)
-        } catch (e: Exception) {
-            LogCat.e(e.toString())
-            coIO {
+        coIO {
+            val context = MainApp.instance
+            val playing = AudioPlayingPreference.getValueAsync(context) ?: return@coIO
+            try {
+                play(playing.path)
+            } catch (e: Exception) {
+                LogCat.e(e.toString())
                 AudioPlaylistPreference.deleteAsync(context, setOf(playing.path))
+                setChangedNotify(AudioAction.NOT_FOUND)
             }
-            setChangedNotify(AudioAction.NOT_FOUND)
         }
     }
 
@@ -102,21 +102,21 @@ class AudioPlayer : IMediaPlayer {
     private fun skipTo(isNext: Boolean) {
         val context = MainApp.instance
         coIO {
-            var playerAudioList = AudioPlaylistPreference.getValue(context)
+            var playerAudioList = AudioPlaylistPreference.getValueAsync(context)
             if (playerAudioList.isEmpty()) {
-                val playing = AudioPlayingPreference.getValue(context)
+                val playing = AudioPlayingPreference.getValueAsync(context)
                 if (playing != null) {
                     AudioPlaylistPreference.addAsync(context, listOf(playing))
-                    playerAudioList = AudioPlaylistPreference.getValue(context)
+                    playerAudioList = AudioPlaylistPreference.getValueAsync(context)
                 } else {
                     return@coIO
                 }
             }
 
-            if (AudioPlayModePreference.getValue(context) == MediaPlayMode.SHUFFLE) {
+            if (AudioPlayModePreference.getValueAsync(context) == MediaPlayMode.SHUFFLE) {
                 AudioPlayingPreference.putAsync(context, playerAudioList.random())
             } else {
-                val playing = AudioPlayingPreference.getValue(context)
+                val playing = AudioPlayingPreference.getValueAsync(context)
                 if (playing != null) {
                     var index = playerAudioList.indexOfFirst { it.path == playing.path }
                     if (isNext) {

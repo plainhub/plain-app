@@ -18,7 +18,7 @@ enum class DeviceSortBy : ISelectOption {
         }
     }
 
-    override fun isSelected(context: Context): Boolean {
-        return DeviceSortByPreference.getValue(context) == this
+    override suspend fun isSelected(context: Context): Boolean {
+        return DeviceSortByPreference.getValueAsync(context) == this
     }
 }

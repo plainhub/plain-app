@@ -52,21 +52,27 @@ class ScanHistoryDialog(val callback: () -> Unit) : BaseBottomSheetDialog<Dialog
 
     private fun search() {
         val context = requireContext()
-        binding.rv.models = ScanHistoryPreference.getValue(context).filter { searchQ.isEmpty() || it.contains(searchQ, true) }.map { d ->
-            ItemModel(d).apply {
-                keyTextMaxLines = 2
-                keyText = d.cut(100)
-                swipeEnable = true
-                rightSwipeText = getString(R.string.remove)
-                rightSwipeClick = {
-                    lifecycleScope.launch {
-                        val results = ScanHistoryPreference.getValue(context).toMutableList()
-                        results.remove(d)
-                        withIO { ScanHistoryPreference.putAsync(context, results) }
-                        search()
+        lifecycleScope.launch {
+            binding.rv.models = withIO {
+                ScanHistoryPreference.getValueAsync(context).filter { searchQ.isEmpty() || it.contains(searchQ, true) }
+                    .map { d ->
+                        ItemModel(d).apply {
+                            keyTextMaxLines = 2
+                            keyText = d.cut(100)
+                            swipeEnable = true
+                            rightSwipeText = getString(R.string.remove)
+                            rightSwipeClick = {
+                                lifecycleScope.launch {
+                                    val results = ScanHistoryPreference.getValueAsync(context).toMutableList()
+                                    results.remove(d)
+                                    withIO { ScanHistoryPreference.putAsync(context, results) }
+                                    search()
+                                }
+                            }
+                        }
                     }
-                }
             }
         }
+
     }
 }

@@ -52,14 +52,13 @@ import com.ismartcoding.plain.ui.base.OutlineButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
-import com.ismartcoding.plain.ui.models.PasswordViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordPage(
     navController: NavHostController,
-    viewModel: PasswordViewModel = viewModel(),
 ) {
     WebSettingsProvider {
         val context = LocalContext.current
@@ -99,7 +98,9 @@ fun PasswordPage(
                                 title = password,
                             ) {
                                 OutlineButton(text = stringResource(id = R.string.reset), onClick = {
-                                    PasswordPreference.put(context, CryptoHelper.randomPassword(6))
+                                    scope.launch(Dispatchers.IO) {
+                                        PasswordPreference.putAsync(context, CryptoHelper.randomPassword(6))
+                                    }
                                 })
                             }
                         } else if (passwordType == PasswordType.FIXED.value) {
@@ -112,7 +113,9 @@ fun PasswordPage(
                                     editPassword.value = it
                                 },
                                 onConfirm = {
-                                    PasswordPreference.put(context, it)
+                                    scope.launch(Dispatchers.IO) {
+                                        PasswordPreference.putAsync(context, it)
+                                    }
                                 },
                             )
                             Spacer(modifier = Modifier.height(16.dp))
@@ -123,7 +126,9 @@ fun PasswordPage(
                             PSwitch(
                                 activated = authTwoFactor
                             ) {
-                                AuthTwoFactorPreference.put(context, it)
+                                scope.launch(Dispatchers.IO) {
+                                    AuthTwoFactorPreference.putAsync(context, it)
+                                }
                             }
                         }
                         BottomSpace()

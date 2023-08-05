@@ -3,6 +3,7 @@ package com.ismartcoding.plain
 import com.ismartcoding.lib.helpers.CryptoHelper
 
 object TempData {
+    var webEnabled = false
     var demoMode = false
     var selectedBoxId = ""
     var endictShowWord = true

@@ -169,7 +169,7 @@ class RouteDialog(private var mItem: Route?) : BaseBottomSheetDialog<DialogRoute
                     val items = mutableListOf<Any>()
                     items.add(AllItemsOption(getString(R.string.all_devices)))
                     items.addAll(UIDataCache.current().getNetworks(q).filter { !setOf("wan", "vpn").contains(it.type) })
-                    items.addAll(UIDataCache.current().getDevices(q).sorted(DeviceSortByPreference.getValue(requireContext())))
+                    items.addAll(UIDataCache.current().getDevices(q).sorted(DeviceSortByPreference.getValueAsync(requireContext())))
                     items
                 }) { type, value ->
                     routeEdit.applyTo.type = type

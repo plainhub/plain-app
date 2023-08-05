@@ -47,22 +47,22 @@ object FileSortHelper {
         }
     }
 
-    private fun getSortBy(context: Context, mediaType: MediaType): FileSortBy {
+    private suspend fun getSortByAsync(context: Context, mediaType: MediaType): FileSortBy {
         return when (mediaType) {
             MediaType.VIDEO -> {
-                VideoSortByPreference.getValue(context)
+                VideoSortByPreference.getValueAsync(context)
             }
 
             MediaType.IMAGE -> {
-                ImageSortByPreference.getValue(context)
+                ImageSortByPreference.getValueAsync(context)
             }
 
             MediaType.AUDIO -> {
-                AudioSortByPreference.getValue(context)
+                AudioSortByPreference.getValueAsync(context)
             }
 
             MediaType.FILE -> {
-                FileSortByPreference.getValue(context)
+                FileSortByPreference.getValueAsync(context)
             }
         }
     }
@@ -97,9 +97,9 @@ object FileSortHelper {
         sortBy: FileSortBy
     ) {
         scope.launch {
-            getSelectedSortItem(menu, getSortBy(context, mediaType)).unhighlightTitle()
+            getSelectedSortItem(menu, withIO { getSortByAsync(context, mediaType) }).unhighlightTitle()
             withIO { setSortByAsync(context, mediaType, sortBy) }
-            getSelectedSortItem(menu, getSortBy(context, mediaType)).highlightTitle(context)
+            getSelectedSortItem(menu, withIO { getSortByAsync(context, mediaType) }).highlightTitle(context)
             viewModel.offset = 0
             list.page.refresh()
         }

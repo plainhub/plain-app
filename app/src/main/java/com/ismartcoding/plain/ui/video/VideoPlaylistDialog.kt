@@ -54,7 +54,7 @@ class VideoPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
                     R.id.cast -> {
                         val context = requireContext()
                         lifecycleScope.launch {
-                            val items = withIO { VideoPlaylistPreference.getValue(context) }
+                            val items = withIO { VideoPlaylistPreference.getValueAsync(context) }
                             if (items.isEmpty()) {
                                 DialogHelper.showMessage(R.string.add_videos_to_playlist)
                                 return@launch
@@ -94,8 +94,8 @@ class VideoPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
                     source: BindingAdapter.BindingViewHolder,
                     target: BindingAdapter.BindingViewHolder
                 ) {
-                    lifecycleScope.launch (Dispatchers.IO){
-                        VideoPlaylistPreference.putAsync(requireContext(),getModelList<SortableVideoModel>().map { it.data } )
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        VideoPlaylistPreference.putAsync(requireContext(), getModelList<SortableVideoModel>().map { it.data })
                     }
                 }
             })
@@ -124,37 +124,44 @@ class VideoPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
 
     private fun search() {
         val context = requireContext()
-        binding.list.page.addData(VideoPlaylistPreference.getValue(context)
-            .filter { searchQ.isEmpty() || it.title.contains(searchQ, true) }
-            .map { v ->
-                SortableVideoModel(v).apply {
-                    title = v.title
-                    subtitle = FormatHelper.formatDuration(v.duration)
-                    swipeEnable = true
-                    rightSwipeText = getString(R.string.remove)
-                    rightSwipeClick = {
-                        lifecycleScope.launch {
-                            withIO { VideoPlaylistPreference.deleteAsync(context, setOf(v.path)) }
-                            binding.list.rv.apply {
-                                val index = getModelList<SortableVideoModel>().indexOfFirst { it.data.path == v.path }
-                                if (index != -1) {
-                                    removeModel(index)
+        lifecycleScope.launch {
+            binding.list.page.addData(
+                withIO {
+                    VideoPlaylistPreference.getValueAsync(context)
+                        .filter { searchQ.isEmpty() || it.title.contains(searchQ, true) }
+                        .map { v ->
+                            SortableVideoModel(v).apply {
+                                title = v.title
+                                subtitle = FormatHelper.formatDuration(v.duration)
+                                swipeEnable = true
+                                rightSwipeText = getString(R.string.remove)
+                                rightSwipeClick = {
+                                    lifecycleScope.launch {
+                                        withIO { VideoPlaylistPreference.deleteAsync(context, setOf(v.path)) }
+                                        binding.list.rv.apply {
+                                            val index = getModelList<SortableVideoModel>().indexOfFirst { it.data.path == v.path }
+                                            if (index != -1) {
+                                                removeModel(index)
+                                            }
+                                        }
+                                        updateTitle()
+                                    }
+                                }
+                                leftSwipeText = getString(R.string.cast)
+                                leftSwipeClick = {
+                                    CastDialog(arrayListOf(), v.path).show()
                                 }
                             }
-                            updateTitle()
                         }
-                    }
-                    leftSwipeText = getString(R.string.cast)
-                    leftSwipeClick = {
-                        CastDialog(arrayListOf(), v.path).show()
-                    }
-                }
-            })
-        updateTitle()
+                })
+            updateTitle()
+        }
     }
 
     private fun updateTitle() {
-        val total = VideoPlaylistPreference.getValue(requireContext()).size
-        binding.topAppBar.title = if (total > 0) LocaleHelper.getStringF(R.string.playlist_title, "total", total) else getString(R.string.playlist)
+        lifecycleScope.launch {
+            val total = withIO { VideoPlaylistPreference.getValueAsync(requireContext()).size }
+            binding.topAppBar.title = if (total > 0) LocaleHelper.getStringF(R.string.playlist_title, "total", total) else getString(R.string.playlist)
+        }
     }
 }

@@ -18,30 +18,32 @@ import kotlinx.coroutines.launch
 class EditorSettingsDialog : BaseBottomSheetDialog<DialogEditorSettingsBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val context = requireContext()
-        binding.lineNumbers.setKeyText(R.string.show_line_numbers)
-            .setSwitch(EditorShowLineNumbersPreference.get(context), onChanged = { _, isEnabled ->
-                lifecycleScope.launch {
-                    withIO {
-                        EditorShowLineNumbersPreference.putAsync(context, isEnabled)
+        lifecycleScope.launch {
+            val context = requireContext()
+            binding.lineNumbers.setKeyText(R.string.show_line_numbers)
+                .setSwitch(withIO { EditorShowLineNumbersPreference.getAsync(context) }, onChanged = { _, isEnabled ->
+                    lifecycleScope.launch {
+                        withIO {
+                            EditorShowLineNumbersPreference.putAsync(context, isEnabled)
+                        }
+                        sendEvent(EditorSettingsChangedEvent(EditorSettingsType.LINE_NUMBERS))
                     }
-                    sendEvent(EditorSettingsChangedEvent(EditorSettingsType.LINE_NUMBERS))
-                }
-            })
-        binding.wrapContent.setKeyText(R.string.wrap_content)
-            .setSwitch(EditorWrapContentPreference.get(context), onChanged = { _, isEnabled ->
-                lifecycleScope.launch {
-                    withIO { EditorWrapContentPreference.putAsync(context, isEnabled) }
-                    sendEvent(EditorSettingsChangedEvent(EditorSettingsType.WRAP_CONTENT))
-                }
-            })
+                })
+            binding.wrapContent.setKeyText(R.string.wrap_content)
+                .setSwitch(withIO { EditorWrapContentPreference.getAsync(context) }, onChanged = { _, isEnabled ->
+                    lifecycleScope.launch {
+                        withIO { EditorWrapContentPreference.putAsync(context, isEnabled) }
+                        sendEvent(EditorSettingsChangedEvent(EditorSettingsType.WRAP_CONTENT))
+                    }
+                })
 
-        binding.syntaxHighlight.setKeyText(R.string.syntax_highlight)
-            .setSwitch(EditorSyntaxHighlightPreference.get(context), onChanged = { _, isEnabled ->
-                lifecycleScope.launch {
-                    withIO { EditorSyntaxHighlightPreference.putAsync(context, isEnabled) }
-                    sendEvent(EditorSettingsChangedEvent(EditorSettingsType.SYNTAX_HIGHLIGHT))
-                }
-            })
+            binding.syntaxHighlight.setKeyText(R.string.syntax_highlight)
+                .setSwitch(withIO { EditorSyntaxHighlightPreference.getAsync(context) }, onChanged = { _, isEnabled ->
+                    lifecycleScope.launch {
+                        withIO { EditorSyntaxHighlightPreference.putAsync(context, isEnabled) }
+                        sendEvent(EditorSettingsChangedEvent(EditorSettingsType.SYNTAX_HIGHLIGHT))
+                    }
+                })
+        }
     }
 }

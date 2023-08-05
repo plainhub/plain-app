@@ -12,6 +12,7 @@ import com.ismartcoding.lib.helpers.ZipHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.upnp.UPnPController
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DownloadFileItem
 import com.ismartcoding.plain.data.DownloadFileItemWrap
 import com.ismartcoding.plain.data.enums.PasswordType
@@ -45,7 +46,6 @@ import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.utils.io.core.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONObject
@@ -92,9 +92,6 @@ fun Application.module() {
     routing {
         singlePageApplication {
             useResources = true
-            ignoreFiles {
-                !WebPreference.get(MainApp.instance)
-            }
             vue("web")
         }
 
@@ -337,9 +334,13 @@ fun Application.module() {
                 call.respond(HttpStatusCode.BadRequest, "`c-id` is missing in the headers")
                 return@post
             }
+            if (!TempData.webEnabled) {
+                call.respond(HttpStatusCode.Forbidden, "web_access_disabled)
+                return@post
+            }
             HttpServerManager.clientIpCache[clientId] = call.request.origin.remoteHost
-            if (PasswordTypePreference.get(MainApp.instance) == PasswordType.NONE.value) {
-                call.respondText(HttpServerManager.resetPassword())
+            if (PasswordTypePreference.getValueAsync(MainApp.instance) == PasswordType.NONE) {
+                call.respondText(HttpServerManager.resetPasswordAsync())
             } else {
                 call.respond(HttpStatusCode.NoContent)
             }
@@ -360,7 +361,7 @@ fun Application.module() {
                         is Frame.Binary -> {
                             if (q["auth"] == "1") {
                                 var r: AuthRequest? = null
-                                val hash = CryptoHelper.sha512(PasswordPreference.get(MainApp.instance).toByteArray())
+                                val hash = CryptoHelper.sha512(PasswordPreference.getAsync(MainApp.instance).toByteArray())
                                 val token = HttpServerManager.hashToToken(hash)
                                 val decryptedBytes = CryptoHelper.aesDecrypt(token, frame.readBytes())
                                 if (decryptedBytes != null) {
@@ -368,7 +369,7 @@ fun Application.module() {
                                 }
                                 if (r?.password == hash) {
                                     val event = ConfirmToAcceptLoginEvent(this, clientId, r)
-                                    if (AuthTwoFactorPreference.get(MainApp.instance)) {
+                                    if (AuthTwoFactorPreference.getAsync(MainApp.instance)) {
                                         send(CryptoHelper.aesEncrypt(token, JsonHelper.jsonEncode(AuthResponse(AuthStatus.PENDING))))
                                         sendEvent(event)
                                     } else {

@@ -55,7 +55,7 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
                     R.id.preview -> {
                         lifecycleScope.launch {
                             val context = requireContext()
-                            val editMode = !NoteEditModePreference.get(context)
+                            val editMode = withIO { !NoteEditModePreference.getAsync(context) }
                             withIO { NoteEditModePreference.putAsync(context, editMode) }
                             updateModeUI(editMode)
                         }
@@ -87,8 +87,10 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
                 sendEvent(ActionEvent(ActionSourceType.NOTE, if (isNew) ActionType.CREATED else ActionType.UPDATED, setOf(id)))
             }
         }
-        val editMode = NoteEditModePreference.get(context)
-        updateModeUI(editMode)
+        lifecycleScope.launch {
+            val editMode = withIO { NoteEditModePreference.getAsync(context) }
+            updateModeUI(editMode)
+        }
     }
 
     private fun updateModeUI(editMode: Boolean) {
