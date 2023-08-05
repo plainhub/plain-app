@@ -122,15 +122,15 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.foundation:foundation-layout")
-    implementation("androidx.compose.material3:material3:1.2.0-alpha03")
-    implementation("androidx.compose.material:material-icons-extended:1.6.0‑alpha01")
+    implementation("androidx.compose.material3:material3:1.2.0-alpha04")
+    implementation("androidx.compose.material:material-icons-extended:1.6.0‑alpha02")
     implementation("androidx.compose.runtime:runtime-livedata")
     implementation("androidx.compose.ui:ui-tooling")
 
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha11")
 
     // https://github.com/google/accompanist/releases
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.4-beta")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.6-rc")
 
     // https://developer.android.com/jetpack/androidx/releases/navigation
     implementation("androidx.navigation:navigation-compose:2.6.0")
@@ -144,16 +144,16 @@ dependencies {
     implementation("com.apollographql.apollo3:apollo-adapters:$apolloVersion")
 
     implementation("androidx.viewpager2:viewpager2:1.0.0")
-    implementation("androidx.paging:paging-runtime-ktx:3.1.1")
+    implementation("androidx.paging:paging-runtime-ktx:3.2.0")
     implementation("androidx.preference:preference-ktx:1.2.0")
 
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("com.github.bmoliveira:snake-yaml:v1.18-android")
 
     // CameraX
-    implementation("androidx.camera:camera-camera2:1.3.0-beta01")
-    implementation("androidx.camera:camera-lifecycle:1.3.0-beta01")
-    implementation("androidx.camera:camera-view:1.3.0-beta01")
+    implementation("androidx.camera:camera-camera2:1.3.0-beta02")
+    implementation("androidx.camera:camera-lifecycle:1.3.0-beta02")
+    implementation("androidx.camera:camera-view:1.3.0-beta02")
 
     implementation("io.ktor:ktor-server-core:$ktorVersion")
     implementation("io.ktor:ktor-server-netty:$ktorVersion")

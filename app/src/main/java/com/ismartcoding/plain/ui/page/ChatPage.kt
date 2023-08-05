@@ -5,11 +5,15 @@ import android.content.ClipData
 import android.os.Environment
 import android.provider.OpenableColumns
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,9 +21,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -32,9 +43,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -68,34 +76,34 @@ import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.features.DeleteChatItemViewEvent
 import com.ismartcoding.plain.features.PickFileResultEvent
-import com.ismartcoding.plain.features.SendMessageEvent
 import com.ismartcoding.plain.features.UpdateMessageEvent
 import com.ismartcoding.plain.features.chat.ChatHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FileHelper
+import com.ismartcoding.plain.ui.base.PDropdownMenu
+import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
-import com.ismartcoding.plain.ui.chat.EditChatTextDialog
 import com.ismartcoding.plain.ui.components.chat.ChatDate
 import com.ismartcoding.plain.ui.components.chat.ChatFiles
 import com.ismartcoding.plain.ui.components.chat.ChatImages
+import com.ismartcoding.plain.ui.components.chat.ChatInput
 import com.ismartcoding.plain.ui.components.chat.ChatName
 import com.ismartcoding.plain.ui.components.chat.ChatText
-import com.ismartcoding.plain.ui.components.chat.ChatInput
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChatViewModel
-import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.web.HttpServerEvents
-import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import java.io.File
@@ -120,10 +128,12 @@ fun ChatPage(
         viewModel.fetch()
         setRefreshState(RefreshContentState.Stop)
     }
+    val scrollState = rememberLazyListState()
     val focusManager = LocalFocusManager.current
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
     var selectedItem by remember { mutableStateOf<VChat?>(null) }
     val showContextMenu = remember { mutableStateOf(false) }
+    var showEditTextModal by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.fetch()
@@ -148,7 +158,7 @@ fun ChatPage(
                         data = this.getContentData()
                     }))))
                 }
-
+                focusManager.clearFocus()
             }
         })
 
@@ -157,7 +167,6 @@ fun ChatPage(
                 return@receiveEventHandler
             }
             val items = mutableListOf<DMessageFile>()
-            DialogHelper.showLoading()
             withIO {
                 event.uris.forEach { uri ->
                     context.contentResolver.query(uri, null, null, null, null)
@@ -184,10 +193,11 @@ fun ChatPage(
                                         Environment.DIRECTORY_DOCUMENTS
                                     }
                                 }
-                                val dst = context.getExternalFilesDir(dir)!!.path + "/$fileName"
+                                var dst = context.getExternalFilesDir(dir)!!.path + "/$fileName"
                                 val dstFile = File(dst)
                                 if (dstFile.exists()) {
-                                    FileHelper.copyFile(context, uri, dstFile.newPath())
+                                    dst = dstFile.newPath()
+                                    FileHelper.copyFile(context, uri, dst)
                                 } else {
                                     FileHelper.copyFile(context, uri, dst)
                                 }
@@ -208,7 +218,11 @@ fun ChatPage(
                 sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(arrayListOf(item.toModel().apply {
                     data = this.getContentData()
                 }))))
-                DialogHelper.hideLoading()
+                scope.launch {
+                    scrollState.scrollToItem(0)
+                    delay(200)
+                    focusManager.clearFocus()
+                }
             }
         })
     }
@@ -216,6 +230,12 @@ fun ChatPage(
     DisposableEffect(Unit) {
         onDispose {
             events.forEach { it.cancel() }
+        }
+    }
+
+    if (showEditTextModal) {
+        EditTextBottomSheet(selectedItem?.id ?: "", (selectedItem?.value as? DMessageText)?.text ?: "") {
+            showEditTextModal = false
         }
     }
 
@@ -235,6 +255,7 @@ fun ChatPage(
                         modifier = Modifier
                             .fillMaxWidth()
                             .fillMaxHeight(),
+                        state = scrollState,
                         reverseLayout = true,
                         verticalArrangement = Arrangement.Top,
                     ) {
@@ -282,31 +303,35 @@ fun ChatPage(
                                             .padding(top = 32.dp)
                                             .wrapContentSize(Alignment.Center)
                                     ) {
-                                        DropdownMenu(
+                                        PDropdownMenu(
                                             expanded = showContextMenu.value && selectedItem == m,
                                             onDismissRequest = { showContextMenu.value = false }
                                         ) {
                                             if (m.value is DMessageText) {
-                                                DropdownMenuItem(text = { Text(stringResource(id = R.string.copy_text)) }, onClick = {
-                                                    showContextMenu.value = false
-                                                    val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.message), (m.value as DMessageText).text)
-                                                    clipboardManager.setPrimaryClip(clip)
-                                                    DialogHelper.showMessage(R.string.copied)
-                                                })
-                                                DropdownMenuItem(text = { Text(stringResource(id = R.string.edit_text)) }, onClick = {
-                                                    showContextMenu.value = false
-                                                    EditChatTextDialog(m.id, (m.value as DMessageText).text).show()
-                                                })
+                                                DropdownMenuItem(text = { Text(stringResource(id = R.string.copy_text)) },
+                                                    onClick = {
+                                                        showContextMenu.value = false
+                                                        val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.message), (m.value as DMessageText).text)
+                                                        clipboardManager.setPrimaryClip(clip)
+                                                        DialogHelper.showMessage(R.string.copied)
+                                                    })
+                                                DropdownMenuItem(text = { Text(stringResource(id = R.string.edit_text)) },
+                                                    onClick = {
+                                                        showContextMenu.value = false
+                                                        showEditTextModal = true
+                                                    })
                                             }
-                                            DropdownMenuItem(text = { Text(stringResource(id = R.string.delete)) }, onClick = {
-                                                showContextMenu.value = false
-                                                scope.launch {
-                                                    ChatHelper.deleteAsync(m.id, m.value)
-                                                    val json = JSONArray()
-                                                    json.put(m.id)
-                                                    sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, json.toString()))
-                                                }
-                                            })
+                                            DropdownMenuItem(
+                                                text = { Text(stringResource(id = R.string.delete)) },
+                                                onClick = {
+                                                    showContextMenu.value = false
+                                                    scope.launch {
+                                                        ChatHelper.deleteAsync(m.id, m.value)
+                                                        val json = JSONArray()
+                                                        json.put(m.id)
+                                                        sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, json.toString()))
+                                                    }
+                                                })
                                         }
                                     }
                                 }
@@ -331,10 +356,54 @@ fun ChatPage(
                                 data = this.getContentData()
                             }))))
                             inputValue = ""
+                            scrollState.scrollToItem(0)
                         }
                     }
                 )
             }
         }
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+fun EditTextBottomSheet(id: String, value: String, onDismiss: () -> Unit) {
+    var inputValue by remember { mutableStateOf(value) }
+    PModalBottomSheet(
+        topBarTitle = stringResource(id = R.string.edit_text),
+        onDismissRequest = { onDismiss() },
+    ) {
+        OutlinedTextField(
+            value = inputValue,
+            onValueChange = { inputValue = it },
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(8.dp),
+                )
+                .fillMaxWidth(),
+            keyboardOptions = KeyboardOptions.Default,
+            shape = RoundedCornerShape(8.dp),
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp, end = 16.dp, bottom = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Spacer(modifier = Modifier.weight(1f))
+            PIconButton(
+                imageVector = Icons.Outlined.Send,
+                contentDescription = stringResource(R.string.send_message),
+                tint = MaterialTheme.colorScheme.primary
+            ) {
+                if (inputValue.isNotEmpty()) {
+                    onDismiss()
+                    sendEvent(UpdateMessageEvent(id, inputValue))
+                }
+            }
+        }
+    }
 }

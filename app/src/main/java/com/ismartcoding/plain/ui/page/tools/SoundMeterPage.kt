@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -30,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -65,7 +67,15 @@ fun SoundMeterPage(
     }
     var decibel by remember { mutableFloatStateOf(0f) }
     val decibelValueStrings = stringArrayResource(R.array.decibel_values)
+    val decibelValueString by remember {
+        derivedStateOf {
+            if (decibel > 0) {
+                return@derivedStateOf decibelValueStrings.getOrNull((decibel / 10).toInt() - 1) ?: ""
+            }
 
+            ""
+        }
+    }
     LaunchedEffect(isRunning) {
         if (!isRunning) {
             if (audioRecord?.state == AudioRecord.STATE_INITIALIZED) {
@@ -113,7 +123,7 @@ fun SoundMeterPage(
                         }
                     }
                 }
-                delay(150)
+                delay(180)
             }
         }
     }
@@ -193,7 +203,15 @@ fun SoundMeterPage(
                             Text(text = FormatHelper.formatFloat(max, digits = 1))
                         }
                     }
-                    VerticalSpace(dp = 40.dp)
+                    Text(
+                        text = decibelValueString,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(96.dp)
+                            .padding(16.dp),
+                        textAlign = TextAlign.Center
+                    )
                     BlockOutlineButton(text = stringResource(id = if (isRunning) R.string.stop else R.string.start)) {
                         if (isRunning) {
                             isRunning = false

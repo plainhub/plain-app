@@ -37,6 +37,7 @@ import com.ismartcoding.plain.helpers.ScreenHelper
 import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.ActionButtonSettings
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.components.home.HomeItemEducation
@@ -83,7 +84,7 @@ fun HomePage(
             ActionButtonMore {
                 isMenuOpen = !isMenuOpen
             }
-            DropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }, content = {
+            PDropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }, content = {
                 DropdownMenuItem(onClick = {
                     isMenuOpen = false
                     scope.launch(Dispatchers.IO) {

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.database.CursorWindow
 import android.os.Bundle
-import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.PickVisualMediaRequest
@@ -22,17 +21,13 @@ import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.*
 import com.ismartcoding.plain.data.enums.ExportFileType
 import com.ismartcoding.plain.data.enums.Language
 import com.ismartcoding.plain.data.enums.PickFileTag
 import com.ismartcoding.plain.data.enums.PickFileType
-import com.ismartcoding.plain.data.preference.AuthTwoFactorPreference
 import com.ismartcoding.plain.data.preference.KeepScreenOnPreference
-import com.ismartcoding.plain.data.preference.LanguagePreference
 import com.ismartcoding.plain.data.preference.SettingsProvider
 import com.ismartcoding.plain.data.preference.SystemScreenTimeoutPreference
 import com.ismartcoding.plain.db.*

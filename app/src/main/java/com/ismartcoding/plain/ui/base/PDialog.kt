@@ -29,7 +29,7 @@ fun PDialog(
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(32.dp))
-                .background(MaterialTheme.colorScheme.surface onLight MaterialTheme.colorScheme.inverseOnSurface)
+                .background(MaterialTheme.colorScheme.inverseOnSurface)
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {

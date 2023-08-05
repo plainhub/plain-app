@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -23,14 +22,12 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.More
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -60,16 +57,13 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.data.preference.*
-import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.RequestPermissionEvent
-import com.ismartcoding.plain.features.chat.ChatHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.ui.base.*
-import com.ismartcoding.plain.ui.chat.EditChatTextDialog
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.SharedViewModel
@@ -78,12 +72,9 @@ import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.theme.palette.onDark
 import com.ismartcoding.plain.ui.theme.palette.onLight
 import com.ismartcoding.plain.web.HttpServerManager
-import com.ismartcoding.plain.web.websocket.EventType
-import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.json.JSONArray
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -130,7 +121,7 @@ fun WebConsolePage(
             ActionButtonMore {
                 isMenuOpen = !isMenuOpen
             }
-            DropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }, content = {
+            PDropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }, content = {
                 DropdownMenuItem(onClick = {
                     isMenuOpen = false
                     sharedViewModel.textTitle.value = context.getString(R.string.https_certificate_signature)
@@ -376,7 +367,7 @@ fun BrowserPreview(context: Context, isHttps: Boolean, httpPort: Int, httpsPort:
                         onClick = {
                             showContextMenu.value = true
                         })
-                    DropdownMenu(
+                    PDropdownMenu(
                         expanded = showContextMenu.value,
                         onDismissRequest = { showContextMenu.value = false }
                     ) {

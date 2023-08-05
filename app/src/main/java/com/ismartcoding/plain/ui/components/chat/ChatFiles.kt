@@ -61,11 +61,11 @@ fun ChatFiles(context: Context, m: VChat) {
                 .fillMaxWidth()
                 .clickable {
                     if (item.uri.isImageFast() || item.uri.isVideoFast()) {
+                        val items = fileItems
+                            .filter { it.uri.isVideoFast() || it.uri.isImageFast() }
                         PreviewDialog().show(
-                            items = fileItems
-                                .filter { it.uri.isVideoFast() || it.uri.isImageFast() }
-                                .mapIndexed { i, s -> PreviewItem(m.id + "|" + i, s.uri) },
-                            initKey = m.id + "|" + index,
+                            items = items.mapIndexed { i, s -> PreviewItem(m.id + "|" + i, s.uri) },
+                            initKey = m.id + "|" + items.indexOf(item),
                         )
                     } else if (item.uri.isAudioFast()) {
                         AudioPlayerDialog().show()

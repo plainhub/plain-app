@@ -335,7 +335,7 @@ fun Application.module() {
                 return@post
             }
             if (!TempData.webEnabled) {
-                call.respond(HttpStatusCode.Forbidden, "web_access_disabled)
+                call.respond(HttpStatusCode.Forbidden, "web_access_disabled")
                 return@post
             }
             HttpServerManager.clientIpCache[clientId] = call.request.origin.remoteHost

@@ -145,7 +145,7 @@ fun ExchangeRatePage(
                                             .padding(top = 32.dp)
                                             .wrapContentSize(Alignment.Center)
                                     ) {
-                                        DropdownMenu(
+                                        PDropdownMenu(
                                             expanded = showContextMenu.value && selectedItem == rate.rate,
                                             onDismissRequest = { showContextMenu.value = false }
                                         ) {

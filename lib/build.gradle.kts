@@ -57,11 +57,11 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
     api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-    api("com.google.android.material:material:1.10.0-alpha04")
+    api("com.google.android.material:material:1.11.0-alpha01")
     api("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     api("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
-    api("androidx.fragment:fragment-ktx:1.6.0")
+    api("androidx.fragment:fragment-ktx:1.6.1")
     api("androidx.appcompat:appcompat:1.6.1")
     api("androidx.core:core-ktx:1.10.1")
     api("androidx.transition:transition:1.4.1")
@@ -69,7 +69,7 @@ dependencies {
 
     api("com.github.bumptech.glide:glide:4.15.1")
     kapt("com.github.bumptech.glide:compiler:4.15.1")
-    api("com.google.android.exoplayer:exoplayer:2.18.7")
+    api("com.google.android.exoplayer:exoplayer:2.19.0")
     // https://github.com/davemorrissey/subsampling-scale-image-view
     api("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
 

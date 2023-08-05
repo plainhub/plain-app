@@ -64,6 +64,7 @@ fun SessionsPage(
 
     PScaffold(
         navController,
+        topBarTitle = stringResource(id = R.string.sessions),
         content = {
             PullToRefresh(refreshLayoutState = refreshState) {
                 LazyColumn(
@@ -71,9 +72,6 @@ fun SessionsPage(
                         .fillMaxWidth()
                         .fillMaxHeight()
                 ) {
-                    item {
-                        DisplayText(text = stringResource(id = R.string.sessions))
-                    }
                     items(sessionsState) { m ->
                         Row(
                             Modifier
