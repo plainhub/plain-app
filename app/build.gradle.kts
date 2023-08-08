@@ -34,9 +34,9 @@ android {
             else -> 0
         }
 
-        val vCode = 92
+        val vCode = 95
         versionCode = vCode - singleAbiNum
-        versionName = "1.1.10"
+        versionName = "1.1.11"
 
         ndk {
             if (abiFilterList.isNotEmpty()) {
@@ -107,25 +107,24 @@ android {
 }
 
 dependencies {
-    val roomVersion = "2.5.1"
-    val apolloVersion = "3.2.1"
-    val kgraphqlVersion = "0.18.1"
-    val ktorVersion = "2.1.0" // don't upgrade, TLS handshake failed
+    val room = "2.5.1"
+    val apollo = "3.2.1"
+    val kgraphql = "0.18.1"
+    val ktor = "2.1.0" // don't upgrade, TLS handshake failed
     val coil = "2.4.0"
+    val compose = "1.6.0-alpha02"
 
     implementation(platform("androidx.compose:compose-bom:2023.06.01"))
 
     implementation("com.caverock:androidsvg-aar:1.4")
 
-    implementation("androidx.activity:activity-compose:1.7.2")
-    implementation("androidx.compose.runtime:runtime")
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.foundation:foundation")
-    implementation("androidx.compose.foundation:foundation-layout")
+//    implementation("androidx.activity:activity-compose:1.7.2")
+    implementation("androidx.compose.runtime:runtime:$compose")
+    implementation("androidx.compose.ui:ui:$compose")
+    implementation("androidx.compose.foundation:foundation:$compose")
+    implementation("androidx.compose.foundation:foundation-layout:$compose")
     implementation("androidx.compose.material3:material3:1.2.0-alpha04")
-    implementation("androidx.compose.material:material-icons-extended:1.6.0‑alpha02")
-    implementation("androidx.compose.runtime:runtime-livedata")
-    implementation("androidx.compose.ui:ui-tooling")
+    implementation("androidx.compose.material:material-icons-extended:$compose")
 
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha11")
 
@@ -136,12 +135,12 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.6.0")
 
     implementation(platform("com.google.firebase:firebase-bom:31.2.1"))
-    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-crashlytics-ktx:18.4.0")
 
-    implementation("com.apollographql.apollo3:apollo-runtime:$apolloVersion")
-    implementation("com.apollographql.apollo3:apollo-normalized-cache:$apolloVersion")
-    implementation("com.apollographql.apollo3:apollo-normalized-cache-sqlite:$apolloVersion")
-    implementation("com.apollographql.apollo3:apollo-adapters:$apolloVersion")
+    implementation("com.apollographql.apollo3:apollo-runtime:$apollo")
+    implementation("com.apollographql.apollo3:apollo-normalized-cache:$apollo")
+    implementation("com.apollographql.apollo3:apollo-normalized-cache-sqlite:$apollo")
+    implementation("com.apollographql.apollo3:apollo-adapters:$apollo")
 
     implementation("androidx.viewpager2:viewpager2:1.0.0")
     implementation("androidx.paging:paging-runtime-ktx:3.2.0")
@@ -155,27 +154,27 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.3.0-beta02")
     implementation("androidx.camera:camera-view:1.3.0-beta02")
 
-    implementation("io.ktor:ktor-server-core:$ktorVersion")
-    implementation("io.ktor:ktor-server-netty:$ktorVersion")
-    implementation("io.ktor:ktor-server-websockets:$ktorVersion")
-    implementation("io.ktor:ktor-server-compression:$ktorVersion")
-    implementation("io.ktor:ktor-server-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-network-tls-certificates:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
-    implementation("io.ktor:ktor-server-caching-headers:$ktorVersion")
-    implementation("io.ktor:ktor-server-cors:$ktorVersion")
-    implementation("io.ktor:ktor-server-forwarded-header:$ktorVersion")
-    implementation("io.ktor:ktor-server-partial-content:$ktorVersion")
-    implementation("io.ktor:ktor-server-auto-head-response:$ktorVersion")
-    implementation("io.ktor:ktor-server-conditional-headers:$ktorVersion")
+    implementation("io.ktor:ktor-server-core:$ktor")
+    implementation("io.ktor:ktor-server-netty:$ktor")
+    implementation("io.ktor:ktor-server-websockets:$ktor")
+    implementation("io.ktor:ktor-server-compression:$ktor")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktor")
+    implementation("io.ktor:ktor-network-tls-certificates:$ktor")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
+    implementation("io.ktor:ktor-server-caching-headers:$ktor")
+    implementation("io.ktor:ktor-server-cors:$ktor")
+    implementation("io.ktor:ktor-server-forwarded-header:$ktor")
+    implementation("io.ktor:ktor-server-partial-content:$ktor")
+    implementation("io.ktor:ktor-server-auto-head-response:$ktor")
+    implementation("io.ktor:ktor-server-conditional-headers:$ktor")
 
-    implementation("com.apurebase:kgraphql:$kgraphqlVersion")
-    implementation("com.apurebase:kgraphql-ktor:$kgraphqlVersion")
+    implementation("com.apurebase:kgraphql:$kgraphql")
+    implementation("com.apurebase:kgraphql-ktor:$kgraphql")
 
     // https://developer.android.com/jetpack/androidx/releases/room
-    implementation("androidx.room:room-common:$roomVersion")
-    kapt("androidx.room:room-compiler:$roomVersion")
-    implementation("androidx.room:room-ktx:$roomVersion")
+    implementation("androidx.room:room-common:$room")
+    kapt("androidx.room:room-compiler:$room")
+    implementation("androidx.room:room-ktx:$room")
     implementation("com.github.skydoves:balloon:1.5.2")
 
     implementation("com.aallam.openai:openai-client:3.2.0")
