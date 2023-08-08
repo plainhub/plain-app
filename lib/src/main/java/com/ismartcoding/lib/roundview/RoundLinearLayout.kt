@@ -5,7 +5,8 @@ import android.graphics.Canvas
 import android.util.AttributeSet
 import android.widget.LinearLayout
 
-open class RoundLinearLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = -1) : LinearLayout(context, attrs, defStyleAttr), RoundMethodInterface {
+open class RoundLinearLayout(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = -1)
+    : LinearLayout(context, attrs, defStyleAttr), RoundMethodInterface {
     override val helper: RoundHelper = RoundHelperImpl()
 
     init {

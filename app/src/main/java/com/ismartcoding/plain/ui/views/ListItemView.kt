@@ -5,17 +5,17 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.CompoundButton
+import android.widget.LinearLayout
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
-import com.ismartcoding.lib.roundview.RoundLinearLayout
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.IFormItem
 import com.ismartcoding.plain.databinding.ViewListItemBinding
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.extensions.*
 
-class ListItemView(context: Context, attrs: AttributeSet? = null) : RoundLinearLayout(context, attrs), IFormItem {
+class ListItemView(context: Context, attrs: AttributeSet? = null) : LinearLayout(context, attrs), IFormItem {
     private val binding = ViewListItemBinding.inflate(LayoutInflater.from(context), this, true)
 
     var isRequired = false

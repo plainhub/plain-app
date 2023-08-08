@@ -55,10 +55,18 @@ android {
     }
 
     buildTypes {
+        debug {
+            isShrinkResources = true
+            isMinifyEnabled = true
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
+            setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
+        }
         release {
             signingConfig = signingConfigs.getByName("release")
-            isShrinkResources = false
-            isMinifyEnabled = false
+            isShrinkResources = true
+            isMinifyEnabled = true
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"
             }
