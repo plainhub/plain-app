@@ -43,6 +43,9 @@ interface SessionDao {
     @Update
     fun update(vararg item: DSession)
 
+    @Query("UPDATE sessions SET updated_at=:updatedAt WHERE client_id=:clientId")
+    fun updateTs(clientId: String, updatedAt: Instant)
+
     @Query("DELETE FROM sessions WHERE client_id=:clientId")
     fun delete(clientId: String)
 }

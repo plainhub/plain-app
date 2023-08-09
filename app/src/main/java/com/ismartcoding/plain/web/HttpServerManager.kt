@@ -112,9 +112,7 @@ object HttpServerManager {
                 clientRequestTs.forEach { (clientId, ts) ->
                     if (ts + 5000 > now) {
                         coIO {
-                            SessionList.addOrUpdateAsync(clientId) {
-                                it.updatedAt = Instant.fromEpochMilliseconds(ts)
-                            }
+                            SessionList.updateTsAsync(clientId, Instant.fromEpochMilliseconds(ts))
                         }
                     }
                 }
