@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.Build
 import coil.ImageLoader
 import coil.ImageLoaderFactory
+import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import coil.decode.VideoFrameDecoder
@@ -42,6 +43,7 @@ class MainApp : Application(), ImageLoaderFactory {
         return ImageLoader.Builder(this)
             .components {
                 add(ImageDecoderDecoder.Factory())
+                add(GifDecoder.Factory())
                 add(SvgDecoder.Factory())
                 add(VideoFrameDecoder.Factory())
             }

@@ -121,7 +121,6 @@ dependencies {
     val apollo = "3.2.1"
     val kgraphql = "0.18.1"
     val ktor = "2.1.0" // don't upgrade, TLS handshake failed
-    val coil = "2.4.0"
     val compose = "1.6.0-alpha02"
 
     implementation(platform("androidx.compose:compose-bom:2023.06.01"))
@@ -196,12 +195,7 @@ dependencies {
 
     implementation("androidx.work:work-runtime-ktx:2.8.1")
 
-    // https://coil-kt.github.io/coil/changelog/
-    implementation("io.coil-kt:coil-base:$coil")
-    implementation("io.coil-kt:coil-compose:$coil")
-    implementation("io.coil-kt:coil-svg:$coil")
-    implementation("io.coil-kt:coil-gif:$coil")
-    implementation("io.coil-kt:coil-video:$coil")
+
 
 
     // https://developer.android.com/jetpack/androidx/releases/datastore

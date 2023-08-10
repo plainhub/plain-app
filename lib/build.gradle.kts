@@ -48,8 +48,9 @@ dependencies {
     api("androidx.appcompat:appcompat:1.6.1")
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-    val ktorVersion = "2.3.1"
-    val markwonVersion = "4.6.2"
+    val ktor = "2.3.1"
+    val markwon = "4.6.2"
+    val coil = "2.4.0"
 
 //    api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
@@ -80,19 +81,27 @@ dependencies {
     implementation("org.ahocorasick:ahocorasick:0.6.3") // For pinyin
     implementation("org.bouncycastle:bcprov-jdk15on:1.70")
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
-    api("io.ktor:ktor-client-core:$ktorVersion")
-    api("io.ktor:ktor-client-cio:$ktorVersion")
-    api("io.ktor:ktor-client-logging:$ktorVersion")
+    api("io.ktor:ktor-client-core:$ktor")
+    api("io.ktor:ktor-client-cio:$ktor")
+    api("io.ktor:ktor-client-logging:$ktor")
 
-    api("io.noties.markwon:core:$markwonVersion")
-    api("io.noties.markwon:html:$markwonVersion")
-    api("io.noties.markwon:ext-strikethrough:$markwonVersion")
-    api("io.noties.markwon:ext-tasklist:$markwonVersion")
-    api("io.noties.markwon:ext-tables:$markwonVersion")
-    api("io.noties.markwon:ext-latex:$markwonVersion")
-    api("io.noties.markwon:image:$markwonVersion")
-    api("io.noties.markwon:image-glide:$markwonVersion")
-    api("io.noties.markwon:linkify:$markwonVersion")
+    api("io.noties.markwon:core:$markwon")
+    api("io.noties.markwon:html:$markwon")
+    api("io.noties.markwon:ext-strikethrough:$markwon")
+    api("io.noties.markwon:ext-tasklist:$markwon")
+    api("io.noties.markwon:ext-tables:$markwon")
+    api("io.noties.markwon:ext-latex:$markwon")
+    api("io.noties.markwon:image:$markwon")
+    api("io.noties.markwon:image-glide:$markwon")
+    api("io.noties.markwon:linkify:$markwon")
+
+    // https://coil-kt.github.io/coil/changelog/
+    api("io.coil-kt:coil-base:$coil")
+    api("io.coil-kt:coil-compose:$coil")
+    api("io.coil-kt:coil-svg:$coil")
+    api("io.coil-kt:coil-gif:$coil")
+    api("io.coil-kt:coil-video:$coil")
+    api("com.github.Commit451.coil-transformations:transformations:2.0.2")
 
     api("net.dankito.readability4j:readability4j:1.0.8")
     api("org.jsoup:jsoup:1.15.3")

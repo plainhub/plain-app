@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.web
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import com.ismartcoding.lib.channel.sendEvent
@@ -19,7 +20,6 @@ import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.data.preference.AuthTwoFactorPreference
 import com.ismartcoding.plain.data.preference.PasswordPreference
 import com.ismartcoding.plain.data.preference.PasswordTypePreference
-import com.ismartcoding.plain.data.preference.WebPreference
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.FileHelper
@@ -49,6 +49,7 @@ import io.ktor.websocket.*
 import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.net.URLEncoder
 import java.nio.file.Files
@@ -233,7 +234,17 @@ fun Application.module() {
                     val centerCrop = q["cc"]?.toBooleanStrictOrNull()
                     // get video/image thumbnail
                     if (w != null && h != null) {
-                        call.respondBytes(file.toThumbBytes(MainApp.instance, w, h, centerCrop == true))
+                        val bitmap = file.getBitmapAsync(MainApp.instance, w, h)
+                        if (bitmap != null && file.name.endsWith(".gif", true)) {
+                            call.respondOutputStream(ContentType.Image.GIF) {
+                                bitmap.compress(Bitmap.CompressFormat.PNG, 100, this)
+                            }
+                            return@get
+                        }
+
+                        val stream = ByteArrayOutputStream()
+                        bitmap?.compress(Bitmap.CompressFormat.JPEG, 80, stream)
+                        call.respondBytes(stream.toByteArray())
                         return@get
                     }
 

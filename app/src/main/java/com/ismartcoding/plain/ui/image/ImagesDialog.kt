@@ -95,7 +95,7 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
                         val bitmaps = withIO {
                             val bms = mutableListOf<Bitmap>()
                             m.topItems.forEach { path ->
-                                val bm = BitmapHelper.decodeBitmapFromFile(context, path, 200, 200)
+                                val bm = BitmapHelper.decodeBitmapFromFileAsync(context, path, 200, 200)
                                 if (bm != null) {
                                     bms.add(bm)
                                 }
