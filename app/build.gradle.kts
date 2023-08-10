@@ -55,14 +55,16 @@ android {
     }
 
     buildTypes {
-//        debug {
+        debug {
+            applicationIdSuffix = ".debug"
+            resValue("string", "app_name", "PlainApp-Debug")
 //            isShrinkResources = true
 //            isMinifyEnabled = true
 //            ndk {
 //                debugSymbolLevel = "SYMBOL_TABLE"
 //            }
 //            setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
-//        }
+        }
         release {
             signingConfig = signingConfigs.getByName("release")
             isShrinkResources = true
@@ -142,8 +144,8 @@ dependencies {
     // https://developer.android.com/jetpack/androidx/releases/navigation
     implementation("androidx.navigation:navigation-compose:2.6.0")
 
-    implementation(platform("com.google.firebase:firebase-bom:31.2.1"))
-    implementation("com.google.firebase:firebase-crashlytics-ktx:18.4.0")
+    releaseImplementation(platform("com.google.firebase:firebase-bom:31.2.1"))
+    releaseImplementation("com.google.firebase:firebase-crashlytics-ktx:18.4.0")
 
     implementation("com.apollographql.apollo3:apollo-runtime:$apollo")
     implementation("com.apollographql.apollo3:apollo-normalized-cache:$apollo")
