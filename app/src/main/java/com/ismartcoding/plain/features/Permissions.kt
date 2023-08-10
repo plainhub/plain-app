@@ -165,7 +165,11 @@ enum class Permission {
             } catch (e: Exception) {
                 val intent = Intent()
                 intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
-                intentLauncher?.launch(intent)
+                if (intent.resolveActivity(packageManager) != null) {
+                    intentLauncher?.launch(intent)
+                } else {
+                    DialogHelper.showMessage("ActivityNotFoundException: No Activity found to handle Intent act=android.settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION")
+                }
             }
         } else if (this == WRITE_SETTINGS) {
             val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
