@@ -129,16 +129,10 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
                 val m = getModel<FileModel>()
                 if (m.data.isDir) {
                     navigateTo(m.data.path)
-                } else if (m.data.path.isVideoFast()) {
+                } else if (m.data.path.isVideoFast() || m.data.path.isImageFast()) {
                     val items = getModelList<FileModel>()
                     PreviewDialog().show(
-                        items = items.filter { !it.data.isDir && it.data.path.isVideoFast() }.map { s -> PreviewItem(s.data.path, s.data.path) },
-                        initKey = m.data.path,
-                    )
-                } else if (m.data.path.isImageFast()) {
-                    val items = getModelList<FileModel>()
-                    PreviewDialog().show(
-                        items = items.filter { !it.data.isDir && it.data.path.isImageFast() }.map { s -> PreviewItem(s.data.path, s.data.path) },
+                        items = items.filter { !it.data.isDir && (it.data.path.isVideoFast() || it.data.path.isImageFast()) }.map { s -> PreviewItem(s.data.path, s.data.path) },
                         initKey = m.data.path,
                     )
                 } else if (m.data.path.isAudioFast()) {
