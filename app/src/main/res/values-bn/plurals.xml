@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="posts">
+        <item quantity="one">%,d পোস্ট</item>
+        <item quantity="other">%,d পোস্টস</item>
+    </plurals>
+    <plurals name="items">
+        <item quantity="one">%,d আইটেম</item>
+        <item quantity="other">%,d আইটেমস</item>
+    </plurals>
+    <plurals name="x_folders">
+        <item quantity="one">%,d ফোল্ডার</item>
+        <item quantity="other">%,d ফোল্ডারস</item>
+    </plurals>
+    <plurals name="x_files">
+        <item quantity="one">%,d ফাইল</item>
+        <item quantity="other">%,d ফাইলস</item>
+    </plurals>
+    <plurals name="copying_items">
+        <item quantity="one">%,d আইটেম কপি করা হচ্ছে</item>
+        <item quantity="other">%,d আইটেমস কপি করা হচ্ছে</item>
+    </plurals>
+    <plurals name="moving_items">
+        <item quantity="one">%,d আইটেম সরানো হচ্ছে</item>
+        <item quantity="other">%,d আইটেমস সরানো হচ্ছে</item>
+    </plurals>
+    <plurals name="n_hours">
+        <item quantity="one">%,d ঘণ্টা</item>
+        <item quantity="other">%,d ঘণ্টা</item>
+    </plurals>
+    <plurals name="n_minutes">
+        <item quantity="one">%,d মিনিট</item>
+        <item quantity="other">%,d মিনিট</item>
+    </plurals>
+    <plurals name="n_seconds">
+        <item quantity="one">%,d সেকেন্ড</item>
+        <item quantity="other">%,d সেকেন্ড</item>
+    </plurals>
+</resources>

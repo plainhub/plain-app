@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="posts">
+        <item quantity="one">%,d запись</item>
+        <item quantity="few">%,d записи</item>
+        <item quantity="many">%,d записей</item>
+        <item quantity="other">%,d записей</item>
+    </plurals>
+    <plurals name="items">
+        <item quantity="one">%,d элемент</item>
+        <item quantity="few">%,d элемента</item>
+        <item quantity="many">%,d элементов</item>
+        <item quantity="other">%,d элементов</item>
+    </plurals>
+    <plurals name="x_folders">
+        <item quantity="one">%,d папка</item>
+        <item quantity="few">%,d папки</item>
+        <item quantity="many">%,d папок</item>
+        <item quantity="other">%,d папок</item>
+    </plurals>
+    <plurals name="x_files">
+        <item quantity="one">%,d файл</item>
+        <item quantity="few">%,d файла</item>
+        <item quantity="many">%,d файлов</item>
+        <item quantity="other">%,d файлов</item>
+    </plurals>
+    <plurals name="copying_items">
+        <item quantity="one">Копирование %,d элемента</item>
+        <item quantity="few">Копирование %,d элемента</item>
+        <item quantity="many">Копирование %,d элементов</item>
+        <item quantity="other">Копирование %,d элементов</item>
+    </plurals>
+    <plurals name="moving_items">
+        <item quantity="one">Перемещение %,d элемента</item>
+        <item quantity="few">Перемещение %,d элемента</item>
+        <item quantity="many">Перемещение %,d элементов</item>
+        <item quantity="other">Перемещение %,d элементов</item>
+    </plurals>
+    <plurals name="n_hours">
+        <item quantity="one">%,d час</item>
+        <item quantity="few">%,d часа</item>
+        <item quantity="many">%,d часов</item>
+        <item quantity="other">%,d часов</item>
+    </plurals>
+    <plurals name="n_minutes">
+        <item quantity="one">%,d минута</item>
+        <item quantity="few">%,d минуты</item>
+        <item quantity="many">%,d минут</item>
+        <item quantity="other">%,d минут</item>
+    </plurals>
+    <plurals name="n_seconds">
+        <item quantity="one">%,d секунда</item>
+        <item quantity="few">%,d секунды</item>
+        <item quantity="many">%,d секунд</item>
+        <item quantity="other">%,d секунд</item>
+    </plurals>
+</resources>
