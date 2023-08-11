@@ -91,9 +91,10 @@ dependencies {
     api("io.noties.markwon:ext-latex:$markwon")
     api("io.noties.markwon:image:$markwon")
     api("io.noties.markwon:linkify:$markwon")
+    api("io.noties.markwon:image-coil:$markwon")
 
     // https://coil-kt.github.io/coil/changelog/
-    api("io.coil-kt:coil-base:$coil")
+    api("io.coil-kt:coil:$coil")
     api("io.coil-kt:coil-compose:$coil")
     api("io.coil-kt:coil-svg:$coil")
     api("io.coil-kt:coil-gif:$coil")

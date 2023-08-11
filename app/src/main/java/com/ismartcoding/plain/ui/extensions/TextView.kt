@@ -8,6 +8,7 @@ import android.view.MotionEvent
 import android.widget.TextView
 import androidx.core.view.GestureDetectorCompat
 import com.ismartcoding.lib.extensions.dp2px
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.markdown.AppImageSchemeHandler
 import com.ismartcoding.lib.markdown.FontTagHandler
 import com.ismartcoding.lib.markdown.NetworkSchemeHandler
@@ -24,6 +25,7 @@ import io.noties.markwon.ext.tasklist.TaskListPlugin
 import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.image.ImageProps
 import io.noties.markwon.image.ImagesPlugin
+import io.noties.markwon.image.coil.CoilImagesPlugin
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import org.commonmark.node.Image
@@ -82,6 +84,7 @@ fun TextView.setDoubleCLick(click: () -> Unit) {
 fun TextView.markdown(content: String) {
     this.movementMethod = LinkMovementMethod.getInstance()
     Markwon.builder(context)
+        .usePlugin(CoilImagesPlugin.create(context))
         .usePlugin(object : AbstractMarkwonPlugin() {
             override fun configureTheme(builder: MarkwonTheme.Builder) {
                 builder
