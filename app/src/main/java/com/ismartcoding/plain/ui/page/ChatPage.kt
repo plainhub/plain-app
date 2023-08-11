@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.os.Environment
 import android.provider.OpenableColumns
+import android.webkit.MimeTypeMap
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -54,6 +55,7 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.getDuration
+import com.ismartcoding.lib.extensions.getFilenameWithoutExtension
 import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.isAudioFast
@@ -62,6 +64,7 @@ import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.extensions.newPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.enums.PickFileTag
@@ -173,7 +176,12 @@ fun ChatPage(
                         ?.use { cursor ->
                             try {
                                 cursor.moveToFirst()
-                                val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME)
+                                var fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME)
+                                val mimeType = context.contentResolver.getType(uri)
+                                val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
+                                if (extension.isNotEmpty()) {
+                                    fileName = fileName.getFilenameWithoutExtension() + "." + extension
+                                }
                                 val size = cursor.getLongValue(OpenableColumns.SIZE)
                                 cursor.close()
                                 val dir = when {
