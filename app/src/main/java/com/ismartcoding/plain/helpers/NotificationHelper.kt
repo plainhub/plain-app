@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import com.ismartcoding.lib.extensions.notificationManager
 import com.ismartcoding.plain.Constants
@@ -50,6 +51,7 @@ object NotificationHelper {
         )
 
         return NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID).apply {
+            setLargeIcon(BitmapFactory.decodeResource(context.resources, R.drawable.ic_app_icon))
             setSmallIcon(R.drawable.ic_notification)
             setContentTitle(title)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
