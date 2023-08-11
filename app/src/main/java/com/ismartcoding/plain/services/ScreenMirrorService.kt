@@ -161,7 +161,8 @@ class ScreenMirrorService : LifecycleService() {
         mVirtualDisplay = mMediaProjection?.createVirtualDisplay(
             "ScreenMirroringService", width, height, mScreenDensity,
             DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY or DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC,
-            mImageReader!!.surface, null, null
+            mImageReader!!.surface, object : VirtualDisplay.Callback() {
+            }, null
         )
 
         mImageReader?.setOnImageAvailableListener({
