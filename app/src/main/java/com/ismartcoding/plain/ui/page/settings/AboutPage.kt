@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.BuildConfig
@@ -20,6 +21,7 @@ import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.BackupRestoreViewModel
@@ -36,10 +38,13 @@ fun AboutPage(
 
     PScaffold(
         navController,
+        topBarTitle = stringResource(R.string.about),
         content = {
             LazyColumn {
                 item {
-                    DisplayText(text = stringResource(R.string.about))
+                    VerticalSpace(dp = 16.dp)
+                }
+                item {
                     PListItem(
                         title = stringResource(R.string.client_id),
                         value = TempData.clientId

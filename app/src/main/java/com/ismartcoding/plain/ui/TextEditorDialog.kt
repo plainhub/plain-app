@@ -58,7 +58,7 @@ class TextEditorDialog(val path: String) : BaseDialog<DialogTextEditorBinding>()
             val text = withIO {
                 file.readText()
             }
-            binding.editor.initView(
+            binding.editor.initViewAsync(
                 lifecycle,
                 text, path.getFilenameExtension()
             )

@@ -72,8 +72,6 @@ dependencies {
     api("androidx.transition:transition:1.4.1")
 //    api("com.squareup.picasso:picasso:2.71828")
 
-    api("com.github.bumptech.glide:glide:4.15.1")
-    kapt("com.github.bumptech.glide:compiler:4.15.1")
     api("com.google.android.exoplayer:exoplayer:2.19.0")
     // https://github.com/davemorrissey/subsampling-scale-image-view
     api("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
@@ -92,7 +90,6 @@ dependencies {
     api("io.noties.markwon:ext-tables:$markwon")
     api("io.noties.markwon:ext-latex:$markwon")
     api("io.noties.markwon:image:$markwon")
-    api("io.noties.markwon:image-glide:$markwon")
     api("io.noties.markwon:linkify:$markwon")
 
     // https://coil-kt.github.io/coil/changelog/

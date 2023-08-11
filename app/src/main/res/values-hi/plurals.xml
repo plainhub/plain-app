@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="posts">
+        <item quantity="one">%,d पोस्ट</item>
+        <item quantity="other">%,d पोस्ट</item>
+    </plurals>
+    <plurals name="items">
+        <item quantity="one">%,d आइटम</item>
+        <item quantity="other">%,d आइटम</item>
+    </plurals>
+    <plurals name="x_folders">
+        <item quantity="one">%,d फ़ोल्डर</item>
+        <item quantity="other">%,d फ़ोल्डर</item>
+    </plurals>
+    <plurals name="x_files">
+        <item quantity="one">%,d फ़ाइल</item>
+        <item quantity="other">%,d फ़ाइल</item>
+    </plurals>
+    <plurals name="copying_items">
+        <item quantity="one">%d आइटम की प्रतिलिपि बना रहा है</item>
+        <item quantity="other">%d आइटमों की प्रतिलिपि बना रहा है</item>
+    </plurals>
+    <plurals name="moving_items">
+        <item quantity="one">%d आइटम को ले जा रहा है</item>
+        <item quantity="other">%d आइटमों को ले जा रहा है</item>
+    </plurals>
+    <plurals name="n_hours">
+        <item quantity="one">%,d घंटा</item>
+        <item quantity="other">%,d घंटे</item>
+    </plurals>
+    <plurals name="n_minutes">
+        <item quantity="one">%,d मिनट</item>
+        <item quantity="other">%,d मिनट</item>
+    </plurals>
+    <plurals name="n_seconds">
+        <item quantity="one">%,d सेकंड</item>
+        <item quantity="other">%,d सेकंड</item>
+    </plurals>
+</resources>

@@ -125,9 +125,11 @@ class NetworkConfigDialog : BaseDialog<DialogNetworkConfigBinding>() {
     }
 
     private fun updateUI() {
-        UIDataCache.current().networkConfig?.let {
-            binding.netplan.initView(lifecycle, it.netplan, "yaml")
-            binding.netmix.initView(lifecycle, it.netmix, "yaml")
+        lifecycleScope.launch {
+            UIDataCache.current().networkConfig?.let {
+                binding.netplan.initViewAsync(lifecycle, it.netplan, "yaml")
+                binding.netmix.initViewAsync(lifecycle, it.netmix, "yaml")
+            }
         }
     }
 

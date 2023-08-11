@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="posts">
+        <item quantity="one">%,d 件の投稿</item>
+        <item quantity="other">%,d 件の投稿</item>
+    </plurals>
+    <plurals name="items">
+        <item quantity="one">%,d 件のアイテム</item>
+        <item quantity="other">%,d 件のアイテム</item>
+    </plurals>
+    <plurals name="x_folders">
+        <item quantity="one">%,d 個のフォルダ</item>
+        <item quantity="other">%,d 個のフォルダ</item>
+    </plurals>
+    <plurals name="x_files">
+        <item quantity="one">%,d 個のファイル</item>
+        <item quantity="other">%,d 個のファイル</item>
+    </plurals>
+    <plurals name="copying_items">
+        <item quantity="one">%d 個のアイテムをコピー中</item>
+        <item quantity="other">%d 個のアイテムをコピー中</item>
+    </plurals>
+    <plurals name="moving_items">
+        <item quantity="one">%d 個のアイテムを移動中</item>
+        <item quantity="other">%d 個のアイテムを移動中</item>
+    </plurals>
+    <plurals name="n_hours">
+        <item quantity="one">%,d 時間</item>
+        <item quantity="other">%,d 時間</item>
+    </plurals>
+    <plurals name="n_minutes">
+        <item quantity="one">%,d 分</item>
+        <item quantity="other">%,d 分</item>
+    </plurals>
+    <plurals name="n_seconds">
+        <item quantity="one">%,d 秒</item>
+        <item quantity="other">%,d 秒</item>
+    </plurals>
+</resources>

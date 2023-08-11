@@ -2,6 +2,7 @@ package com.ismartcoding.plain.helpers
 
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.TempData
 
 object UrlHelper {
     private val mediaPathMap = mutableMapOf<String, String>()  // format: <short_path>:<raw_path>
@@ -11,11 +12,11 @@ object UrlHelper {
         val id = System.currentTimeMillis().toString()
         mediaPathMap[id] = path
         val extension = path.getFilenameExtension()
-        return "http://${NetworkHelper.getDeviceIP4()}:8080/media/$id.$extension"
+        return "http://${NetworkHelper.getDeviceIP4()}:${TempData.httpPort}/media/$id.$extension"
     }
 
     fun getCastCallbackUrl(): String {
-        return "http://${NetworkHelper.getDeviceIP4()}:8080/callback/cast"
+        return "http://${NetworkHelper.getDeviceIP4()}:${TempData.httpPort}/callback/cast"
     }
 
     fun getMediaPath(id: String): String {

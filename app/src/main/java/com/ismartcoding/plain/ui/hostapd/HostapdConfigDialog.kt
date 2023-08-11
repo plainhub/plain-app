@@ -104,8 +104,10 @@ class HostapdConfigDialog : BaseDialog<DialogHostapdConfigBinding>() {
     }
 
     private fun updateUI() {
-        UIDataCache.current().hostapd?.let {
-            binding.editor.initView(lifecycle, it.config, "ini")
+        lifecycleScope.launch {
+            UIDataCache.current().hostapd?.let {
+                binding.editor.initViewAsync(lifecycle, it.config, "ini")
+            }
         }
     }
 

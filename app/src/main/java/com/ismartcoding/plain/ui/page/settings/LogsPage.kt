@@ -25,6 +25,7 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.LogsViewModel
 import java.io.File
@@ -40,10 +41,13 @@ fun LogsPage(
 
     PScaffold(
         navController,
+        topBarTitle = stringResource(R.string.logs),
         content = {
             LazyColumn {
                 item {
-                    DisplayText(text = stringResource(R.string.logs))
+                    VerticalSpace(dp = 16.dp)
+                }
+                item {
                     PListItem(
                         title = stringResource(R.string.file_size),
                         value = FormatHelper.formatBytes(fileSize)

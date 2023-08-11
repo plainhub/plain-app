@@ -21,6 +21,7 @@ import com.ismartcoding.plain.ui.base.BlockOutlineButton
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
 import com.ismartcoding.plain.ui.models.BackupRestoreViewModel
 import java.util.Date
@@ -51,10 +52,13 @@ fun BackupRestorePage(
 
     PScaffold(
         navController,
+        topBarTitle = stringResource(R.string.backup_restore),
         content = {
             LazyColumn {
                 item {
-                    DisplayText(text = stringResource(R.string.backup_restore))
+                    VerticalSpace(dp = 16.dp)
+                }
+                item {
                     BlockOutlineButton(
                         text = stringResource(R.string.backup),
                         onClick = {

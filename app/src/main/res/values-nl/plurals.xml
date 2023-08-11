@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="posts">
+        <item quantity="one">%,d bericht</item>
+        <item quantity="other">%,d berichten</item>
+    </plurals>
+    <plurals name="items">
+        <item quantity="one">%,d item</item>
+        <item quantity="other">%,d items</item>
+    </plurals>
+    <plurals name="x_folders">
+        <item quantity="one">%,d map</item>
+        <item quantity="other">%,d mappen</item>
+    </plurals>
+    <plurals name="x_files">
+        <item quantity="one">%,d bestand</item>
+        <item quantity="other">%,d bestanden</item>
+    </plurals>
+    <plurals name="copying_items">
+        <item quantity="one">Kopiëren van %,d item</item>
+        <item quantity="other">Kopiëren van %,d items</item>
+    </plurals>
+    <plurals name="moving_items">
+        <item quantity="one">Verplaatsen van %,d item</item>
+        <item quantity="other">Verplaatsen van %,d items</item>
+    </plurals>
+    <plurals name="n_hours">
+        <item quantity="one">%,d uur</item>
+        <item quantity="other">%,d uur</item>
+    </plurals>
+    <plurals name="n_minutes">
+        <item quantity="one">%,d minuut</item>
+        <item quantity="other">%,d minuten</item>
+    </plurals>
+    <plurals name="n_seconds">
+        <item quantity="one">%,d seconde</item>
+        <item quantity="other">%,d seconden</item>
+    </plurals>
+</resources>

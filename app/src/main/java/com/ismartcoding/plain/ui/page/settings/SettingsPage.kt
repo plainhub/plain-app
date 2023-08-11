@@ -9,11 +9,12 @@ import androidx.compose.material.icons.outlined.TipsAndUpdates
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.SelectableGroupItem
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.page.RouteName
 
@@ -24,10 +25,13 @@ fun SettingsPage(
 ) {
     PScaffold(
         navController,
+        topBarTitle = stringResource(R.string.settings),
         content = {
             LazyColumn {
                 item {
-                    DisplayText(text = stringResource(R.string.settings))
+                    VerticalSpace(dp = 16.dp)
+                }
+                item {
                     SelectableGroupItem(
                         title = stringResource(R.string.color_and_style),
                         desc = stringResource(R.string.color_and_style_desc),

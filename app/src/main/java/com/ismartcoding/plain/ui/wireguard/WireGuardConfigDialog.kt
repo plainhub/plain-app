@@ -52,11 +52,13 @@ class WireGuardConfigDialog(val wireGuard: WireGuard) : BaseDialog<DialogWiregua
                         doSave()
                     }
                     R.id.add_peer -> {
-                        val wg = WireGuard()
-                        wg.parse(binding.editor.getText())
-                        binding.editor.initView(
-                            lifecycle, "${wg.raw}\n\n" + wg.generateNewPeer().toString(), "ini"
-                        )
+                        lifecycleScope.launch {
+                            val wg = WireGuard()
+                            wg.parse(binding.editor.getText())
+                            binding.editor.initViewAsync(
+                                lifecycle, "${wg.raw}\n\n" + wg.generateNewPeer().toString(), "ini"
+                            )
+                        }
                     }
                 }
             }
@@ -89,7 +91,9 @@ class WireGuardConfigDialog(val wireGuard: WireGuard) : BaseDialog<DialogWiregua
     }
 
     private fun updateUI() {
-        binding.editor.initView(lifecycle, wireGuard.raw, "ini")
+        lifecycleScope.launch {
+            binding.editor.initViewAsync(lifecycle, wireGuard.raw, "ini")
+        }
     }
 
     private fun fetch() {

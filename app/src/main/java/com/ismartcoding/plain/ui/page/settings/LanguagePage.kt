@@ -20,6 +20,7 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -38,13 +39,11 @@ fun LanguagePage(
 
     PScaffold(
         navController,
+        topBarTitle = stringResource(R.string.language),
         content = {
             LazyColumn {
-                item(key = language) {
-                    DisplayText(text = stringResource(R.string.language))
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
                 item {
+                    VerticalSpace(dp = 16.dp)
                     list.forEach {
                         PListItem(
                             title = it?.getDisplayLanguage(it) ?: stringResource(id = R.string.use_device_language),

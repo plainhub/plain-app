@@ -10,5 +10,6 @@ object TempData {
     var endictShowTranslation = true
     var clientId = ""
     var keyStorePassword = ""
+    var httpPort: Int = 8080
     val fileIdToken = CryptoHelper.generateAESKey() // use to generate file path to id or decrypt file id to path
 }

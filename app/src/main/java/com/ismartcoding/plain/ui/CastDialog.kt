@@ -26,7 +26,6 @@ import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.ui.extensions.setClick
 import com.ismartcoding.plain.ui.extensions.setKeyText
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.CastViewModel
 import kotlinx.coroutines.launch
 

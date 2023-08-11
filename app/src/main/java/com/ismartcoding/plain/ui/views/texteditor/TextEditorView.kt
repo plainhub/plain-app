@@ -48,7 +48,7 @@ class TextEditorView(context: Context, attrs: AttributeSet?) : CustomViewBase(co
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    fun initView(lifecycle: Lifecycle, text: String = "", extension: String = "") {
+    suspend fun initViewAsync(lifecycle: Lifecycle, text: String = "", extension: String = "") {
         oldText = text
         if (isInitialized) {
             binding.editor.setText(text)
@@ -58,111 +58,108 @@ class TextEditorView(context: Context, attrs: AttributeSet?) : CustomViewBase(co
         registerLifecycleOwner(lifecycle)
 
         isInitialized = true
-        lifecycle.coroutineScope.launch {
 
-            val wrapContent = withIO { EditorWrapContentPreference.getAsync(context) }
-            val syntaxHighlight = withIO { EditorSyntaxHighlightPreference.getAsync(context) }
-            binding.editor.apply {
-                verticalScroll = binding.verticalScroll
-                fileExtension = extension
-                showLineNumbers = withIO { EditorShowLineNumbersPreference.getAsync(context) }
-                this.syntaxHighlight = syntaxHighlight
-                this.wrapContent = wrapContent
-                minWidth = context.getWindowWidth()
-                pageSystem.onPageChanged = {
-                    pageSystemButtons.updateVisibility(false)
-                    clearHistory()
-                }
+        val wrapContent = withIO { EditorWrapContentPreference.getAsync(context) }
+        val syntaxHighlight = withIO { EditorSyntaxHighlightPreference.getAsync(context) }
+        binding.editor.apply {
+            verticalScroll = binding.verticalScroll
+            fileExtension = extension
+            showLineNumbers = withIO { EditorShowLineNumbersPreference.getAsync(context) }
+            this.syntaxHighlight = syntaxHighlight
+            this.wrapContent = wrapContent
+            minWidth = context.getWindowWidth()
+            pageSystem.onPageChanged = {
+                pageSystemButtons.updateVisibility(false)
+                clearHistory()
             }
-            if (wrapContent) {
-                binding.horizontalScroll.removeView(binding.editor)
-                binding.verticalScroll.removeView(binding.horizontalScroll)
-                binding.verticalScroll.addView(binding.editor)
-            }
-
-            binding.editor.onTextChanged = {
-                onTextChanged?.invoke()
-                // updateTextSyntax()
-            }
-
-            binding.accessory.getEditor = {
-                binding.editor
-            }
-
-            binding.accessory2.getEditor = {
-                binding.editor
-            }
-
-            binding.toggle.setSafeClick {
-                lifecycle.coroutineScope.launch {
-                    if (withIO { EditorAccessoryLevelPreference.getAsync(context) } == 0) {
-                        withIO { EditorAccessoryLevelPreference.putAsync(context, 1) }
-                    } else {
-                        withIO { EditorAccessoryLevelPreference.putAsync(context, 0) }
-                    }
-                    updateAccessoryVisible()
-                }
-
-            }
-
-            updateAccessoryVisible()
-
-            binding.verticalScroll.onScrollChanged = { _: Int, t: Int, _: Int, _: Int ->
-                pageSystemButtons.updateVisibility(abs(t) > 10)
-                updateTextSyntax()
-            }
-            binding.editor.setup()
-            binding.editor.requestFocus()
-            binding.editor.setText(text)
-            binding.editor.enableTextChangedListener()
-            if (syntaxHighlight) {
-                updateTextSyntax()
-            }
-
-            events.add(receiveEventHandler<EditorSettingsChangedEvent> { event ->
-                when (event.type) {
-                    EditorSettingsType.WRAP_CONTENT -> {
-                        lifecycle.coroutineScope.launch {
-                            updateWrapContent()
-                        }
-                    }
-
-                    EditorSettingsType.LINE_NUMBERS -> {
-                        lifecycle.coroutineScope.launch {
-                            binding.editor.apply {
-                                showLineNumbers = withIO { EditorShowLineNumbersPreference.getAsync(context) }
-                                disableTextChangedListener()
-                                replaceTextKeepCursor(null)
-                                enableTextChangedListener()
-                                updatePadding()
-                            }
-                        }
-                    }
-
-                    EditorSettingsType.SYNTAX_HIGHLIGHT -> {
-                        lifecycle.coroutineScope.launch {
-                            binding.editor.apply {
-                                this.syntaxHighlight = withIO { EditorSyntaxHighlightPreference.getAsync(context) }
-                                disableTextChangedListener()
-                                replaceTextKeepCursor(text.toString())
-                                enableTextChangedListener()
-                            }
-                        }
-                    }
-                }
-            })
-
-            events.add(receiveEventHandler<EditorInsertImageEvent> { event ->
-                var html = "<img src=\"${event.url}\""
-                if (event.width.isNotEmpty()) {
-                    html += " width=\"${event.width}\""
-                }
-                if (event.description.isNotEmpty()) {
-                    html += " alt=\"${event.description}\""
-                }
-                binding.editor.insert("$html />")
-            })
         }
+        if (wrapContent) {
+            binding.horizontalScroll.removeView(binding.editor)
+            binding.verticalScroll.removeView(binding.horizontalScroll)
+            binding.verticalScroll.addView(binding.editor)
+        }
+
+        binding.editor.onTextChanged = {
+            onTextChanged?.invoke()
+            // updateTextSyntax()
+        }
+
+        binding.accessory.getEditor = {
+            binding.editor
+        }
+
+        binding.accessory2.getEditor = {
+            binding.editor
+        }
+
+        binding.toggle.setSafeClick {
+            lifecycle.coroutineScope.launch {
+                if (withIO { EditorAccessoryLevelPreference.getAsync(context) } == 0) {
+                    withIO { EditorAccessoryLevelPreference.putAsync(context, 1) }
+                } else {
+                    withIO { EditorAccessoryLevelPreference.putAsync(context, 0) }
+                }
+                updateAccessoryVisible()
+            }
+
+        }
+
+        updateAccessoryVisible()
+
+        binding.verticalScroll.onScrollChanged = { _: Int, t: Int, _: Int, _: Int ->
+            pageSystemButtons.updateVisibility(abs(t) > 10)
+            updateTextSyntax()
+        }
+        binding.editor.setup()
+        binding.editor.setText(text)
+        binding.editor.enableTextChangedListener()
+        if (syntaxHighlight) {
+            updateTextSyntax()
+        }
+
+        events.add(receiveEventHandler<EditorSettingsChangedEvent> { event ->
+            when (event.type) {
+                EditorSettingsType.WRAP_CONTENT -> {
+                    lifecycle.coroutineScope.launch {
+                        updateWrapContent()
+                    }
+                }
+
+                EditorSettingsType.LINE_NUMBERS -> {
+                    lifecycle.coroutineScope.launch {
+                        binding.editor.apply {
+                            showLineNumbers = withIO { EditorShowLineNumbersPreference.getAsync(context) }
+                            disableTextChangedListener()
+                            replaceTextKeepCursor(null)
+                            enableTextChangedListener()
+                            updatePadding()
+                        }
+                    }
+                }
+
+                EditorSettingsType.SYNTAX_HIGHLIGHT -> {
+                    lifecycle.coroutineScope.launch {
+                        binding.editor.apply {
+                            this.syntaxHighlight = withIO { EditorSyntaxHighlightPreference.getAsync(context) }
+                            disableTextChangedListener()
+                            replaceTextKeepCursor(text.toString())
+                            enableTextChangedListener()
+                        }
+                    }
+                }
+            }
+        })
+
+        events.add(receiveEventHandler<EditorInsertImageEvent> { event ->
+            var html = "<img src=\"${event.url}\""
+            if (event.width.isNotEmpty()) {
+                html += " width=\"${event.width}\""
+            }
+            if (event.description.isNotEmpty()) {
+                html += " alt=\"${event.description}\""
+            }
+            binding.editor.insert("$html />")
+        })
     }
 
     private suspend fun updateWrapContent() {

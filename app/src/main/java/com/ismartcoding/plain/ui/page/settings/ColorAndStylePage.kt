@@ -64,10 +64,13 @@ fun ColorAndStylePage(
 
     PScaffold(
         navController,
+        topBarTitle = stringResource(R.string.color_and_style),
         content = {
             LazyColumn {
                 item {
-                    DisplayText(text = stringResource(R.string.color_and_style))
+                    VerticalSpace(dp = 16.dp)
+                }
+                item {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()

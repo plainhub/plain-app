@@ -21,6 +21,7 @@ import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.data.preference.ClientIdPreference
 import com.ismartcoding.plain.data.preference.DarkThemePreference
 import com.ismartcoding.plain.data.preference.FeedAutoRefreshPreference
+import com.ismartcoding.plain.data.preference.HttpPortPreference
 import com.ismartcoding.plain.data.preference.KeyStorePasswordPreference
 import com.ismartcoding.plain.data.preference.PasswordTypePreference
 import com.ismartcoding.plain.data.preference.WebPreference
@@ -93,8 +94,9 @@ class MainApp : Application(), ImageLoaderFactory {
         BoxEvents.register()
 
         coIO {
-            TempData.webEnabled = WebPreference.getAsync(instance)
             val preferences = dataStore.data.first()
+            TempData.webEnabled = WebPreference.get(preferences)
+            TempData.httpPort = HttpPortPreference.get(preferences)
             ClientIdPreference.ensureValueAsync(instance, preferences)
             KeyStorePasswordPreference.ensureValueAsync(instance, preferences)
 

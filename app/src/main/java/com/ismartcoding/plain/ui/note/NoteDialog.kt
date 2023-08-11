@@ -63,31 +63,30 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
                 }
             }
         }
-        val context = requireContext()
-
-        binding.markdown.updatePadding(bottom = context.px(R.dimen.list_bottom_padding))
-        setWindowSoftInput(binding.editor)
-        binding.editor.initView(lifecycle, note?.content ?: "")
-        binding.editor.onTextChanged = {
-            lifecycleScope.launch {
-                val isNew = id.isEmpty()
-                withIO {
-                    id = NoteHelper.addOrUpdateAsync(id) {
-                        val text = binding.editor.getText()
-                        title = text.cut(100).replace("\n", "")
-                        content = text
-                    }
-                    if (isNew && tag != null) {
-                        // create note from tag items page.
-                        TagHelper.addTagRelations(arrayListOf(TagRelationStub(id).toTagRelation(tag!!.id, TagType.NOTE)))
-                        sendEvent(ActionEvent(ActionSourceType.TAG_RELATION, ActionType.DELETED, setOf(id)))
-                    }
-                }
-                binding.editor.resetChangedState()
-                sendEvent(ActionEvent(ActionSourceType.NOTE, if (isNew) ActionType.CREATED else ActionType.UPDATED, setOf(id)))
-            }
-        }
         lifecycleScope.launch {
+            val context = requireContext()
+            binding.markdown.updatePadding(bottom = context.px(R.dimen.list_bottom_padding))
+            setWindowSoftInput(binding.editor)
+            binding.editor.initViewAsync(lifecycle, note?.content ?: "")
+            binding.editor.onTextChanged = {
+                lifecycleScope.launch {
+                    val isNew = id.isEmpty()
+                    withIO {
+                        id = NoteHelper.addOrUpdateAsync(id) {
+                            val text = binding.editor.getText()
+                            title = text.cut(100).replace("\n", "")
+                            content = text
+                        }
+                        if (isNew && tag != null) {
+                            // create note from tag items page.
+                            TagHelper.addTagRelations(arrayListOf(TagRelationStub(id).toTagRelation(tag!!.id, TagType.NOTE)))
+                            sendEvent(ActionEvent(ActionSourceType.TAG_RELATION, ActionType.DELETED, setOf(id)))
+                        }
+                    }
+                    binding.editor.resetChangedState()
+                    sendEvent(ActionEvent(ActionSourceType.NOTE, if (isNew) ActionType.CREATED else ActionType.UPDATED, setOf(id)))
+                }
+            }
             val editMode = withIO { NoteEditModePreference.getAsync(context) }
             updateModeUI(editMode)
         }

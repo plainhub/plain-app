@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="posts">
+        <item quantity="one">%,d publicación</item>
+        <item quantity="other">%,d publicaciones</item>
+    </plurals>
+    <plurals name="items">
+        <item quantity="one">%,d elemento</item>
+        <item quantity="other">%,d elementos</item>
+    </plurals>
+    <plurals name="x_folders">
+        <item quantity="one">%,d carpeta</item>
+        <item quantity="other">%,d carpetas</item>
+    </plurals>
+    <plurals name="x_files">
+        <item quantity="one">%,d archivo</item>
+        <item quantity="other">%,d archivos</item>
+    </plurals>
+    <plurals name="copying_items">
+        <item quantity="one">Copiando %,d elemento</item>
+        <item quantity="other">Copiando %,d elementos</item>
+    </plurals>
+    <plurals name="moving_items">
+        <item quantity="one">Moviendo %,d elemento</item>
+        <item quantity="other">Moviendo %,d elementos</item>
+    </plurals>
+    <plurals name="n_hours">
+        <item quantity="one">%,d hora</item>
+        <item quantity="other">%,d horas</item>
+    </plurals>
+    <plurals name="n_minutes">
+        <item quantity="one">%,d minuto</item>
+        <item quantity="other">%,d minutos</item>
+    </plurals>
+    <plurals name="n_seconds">
+        <item quantity="one">%,d segundo</item>
+        <item quantity="other">%,d segundos</item>
+    </plurals>
+</resources>

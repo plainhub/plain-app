@@ -12,7 +12,9 @@ object Language {
         Locale("es", ""),
         Locale("ja", ""),
         Locale("nl", ""),
-        Locale("it", "")
+        Locale("it", ""),
+        Locale("hi", ""),
+        Locale("fr", "")
     )
 
     fun setLocale(context: Context, locale: Locale) {

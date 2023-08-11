@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
@@ -21,6 +22,7 @@ import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.Subtitle
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -36,10 +38,13 @@ fun DarkThemePage(
 
     PScaffold(
         navController,
+        topBarTitle = stringResource(R.string.dark_theme),
         content = {
             LazyColumn {
                 item {
-                    DisplayText(text = stringResource(R.string.dark_theme))
+                    VerticalSpace(dp = 16.dp)
+                }
+                item {
                     DarkTheme.values().map {
                         PListItem(
                             title = it.getText(context),

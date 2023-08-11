@@ -202,7 +202,6 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
 //    implementation("org.eclipse.jgit:org.eclipse.jgit:6.1.0.202203080745-r") // TODO: git support
-    implementation("com.github.bumptech.glide:recyclerview-integration:4.11.0")
     implementation("org.zeroturnaround:zt-zip:1.15")
     implementation(project(":lib"))
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.9.1")

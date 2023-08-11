@@ -1,14 +1,12 @@
 package com.ismartcoding.plain.ui.preview.viewholders
 
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
+import android.graphics.drawable.BitmapDrawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
+import coil.imageLoader
+import coil.request.ImageRequest
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
@@ -36,17 +34,22 @@ class SubsamplingViewHolder(
                 delay(100)
                 binding.loading.isVisible = false
                 if (item.uri.startsWith("http://") || item.uri.startsWith("https://")) {
-                    Glide.with(context)
-                        .asBitmap()
-                        .load(item.uri)
-                        .into(object : CustomTarget<Bitmap>() {
-                            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                                setImage(ImageSource.bitmap(resource))
+                    val request = ImageRequest.Builder(context)
+                        .data(item.uri)
+                        .target(
+                            onStart = { _ ->
+                            },
+                            onSuccess = { result ->
+                                val bitmap = (result as? BitmapDrawable)?.bitmap
+                                if (bitmap != null) {
+                                    setImage(ImageSource.bitmap(bitmap))
+                                }
+                            },
+                            onError = { _ ->
                             }
-
-                            override fun onLoadCleared(placeholder: Drawable?) {
-                            }
-                        })
+                        )
+                        .build()
+                    context.imageLoader.enqueue(request)
                 } else {
                     setImage(ImageSource.uri(item.uri))
                 }
