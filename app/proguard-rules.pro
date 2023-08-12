@@ -65,3 +65,11 @@
 -keep class com.ismartcoding.plain.databinding.** { *; }
 -keep class org.bouncycastle.** { *; }
 -keep interface org.bouncycastle.** { *; }
+
+-keep class io.ktor.server.netty.EngineMain { *; }
+-keep class io.ktor.server.config.HoconConfigLoader { *; }
+-keep class com.ismartcoding.plain.web.HttpModuleKt { *; }
+-keep class com.ismartcoding.plain.MainApp { *; }
+-keep class com.ismartcoding.plain.services.HttpServerService { *; }
+-keep class kotlin.reflect.jvm.internal.** { *; }
+-keep class kotlin.text.RegexOption { *; }

@@ -58,17 +58,16 @@ android {
         debug {
             applicationIdSuffix = ".debug"
             resValue("string", "app_name", "PlainApp-Debug")
-//            isShrinkResources = true
-//            isMinifyEnabled = true
-//            ndk {
-//                debugSymbolLevel = "SYMBOL_TABLE"
-//            }
-//            setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
+            isShrinkResources = false
+            isMinifyEnabled = false
+            ndk {
+                debugSymbolLevel = "SYMBOL_TABLE"
+            }
         }
         release {
             signingConfig = signingConfigs.getByName("release")
-            isShrinkResources = true
-            isMinifyEnabled = true
+            isShrinkResources = false
+            isMinifyEnabled = false
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"
             }
@@ -194,8 +193,6 @@ dependencies {
     implementation("com.rometools:rome-opml:2.1.0")
 
     implementation("androidx.work:work-runtime-ktx:2.8.1")
-
-
 
 
     // https://developer.android.com/jetpack/androidx/releases/datastore
