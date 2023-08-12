@@ -15,6 +15,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.allowSensitivePermissions
 import com.ismartcoding.lib.extensions.newPath
 import com.ismartcoding.lib.extensions.scanFileByConnection
+import com.ismartcoding.lib.extensions.toAppUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.PhoneHelper
@@ -41,6 +42,9 @@ import com.ismartcoding.plain.data.preference.VideoSortByPreference
 import com.ismartcoding.plain.data.preference.WebPreference
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DMessageContent
+import com.ismartcoding.plain.db.DMessageFile
+import com.ismartcoding.plain.db.DMessageFiles
+import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.features.AIChatCreatedEvent
@@ -180,12 +184,32 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("chatItems") {
                     resolver { ->
-                        var items = AppDatabase.instance.chatDao().getAll()
-                        val types = setOf("app", "storage", "work", "social", "exchange")
-                        val ids = items.filter { types.contains(it.content.type) }.map { it.id }
-                        if (ids.isNotEmpty()) {
-                            AppDatabase.instance.chatDao().deleteByIds(ids)
-                            items = items.filter { !types.contains(it.content.type) }
+                        val dao = AppDatabase.instance.chatDao()
+                        var items = dao.getAll()
+                        if (!TempData.chatItemsMigrated) {
+                            val context = MainApp.instance
+                            TempData.chatItemsMigrated = true
+                            val types = setOf("app", "storage", "work", "social", "exchange")
+                            val ids = items.filter { types.contains(it.content.type) }.map { it.id }
+                            if (ids.isNotEmpty()) {
+                                dao.deleteByIds(ids)
+                                items = items.filter { !types.contains(it.content.type) }
+                            }
+                            items.filter { setOf(DMessageType.IMAGES.value, DMessageType.FILES.value).contains(it.content.type) }.forEach {
+                                if (it.content.value is DMessageImages) {
+                                    val c = it.content.value as DMessageImages
+                                    if (c.items.any { i -> !i.uri.startsWith("app://") }) {
+                                        it.content.value = DMessageImages(c.items.map { i -> DMessageFile(i.uri.toAppUrl(context), i.size, i.duration) })
+                                        dao.update(it)
+                                    }
+                                } else if (it.content.value is DMessageFiles) {
+                                    val c = it.content.value as DMessageFiles
+                                    if (c.items.any { i -> !i.uri.startsWith("app://") }) {
+                                        it.content.value = DMessageFiles(c.items.map { i -> DMessageFile(i.uri.toAppUrl(context), i.size, i.duration) })
+                                        dao.update(it)
+                                    }
+                                }
+                            }
                         }
                         items.map { it.toModel() }
                     }
@@ -566,7 +590,7 @@ class SXGraphQL(val schema: Schema) {
                     resolver { id: ID ->
                         val item = ChatHelper.getAsync(id.value)
                         if (item != null) {
-                            ChatHelper.deleteAsync(item.id, item.content.value)
+                            ChatHelper.deleteAsync(MainApp.instance, item.id, item.content.value)
                         }
                         true
                     }

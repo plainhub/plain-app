@@ -1,11 +1,18 @@
 package com.ismartcoding.plain.ui.models
 
+import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.lib.extensions.toAppUrl
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
+import com.ismartcoding.plain.db.DMessageFile
+import com.ismartcoding.plain.db.DMessageFiles
+import com.ismartcoding.plain.db.DMessageImages
+import com.ismartcoding.plain.db.DMessageType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,9 +31,29 @@ class ChatViewModel : ViewModel() {
     private val _itemsFlow = MutableStateFlow(mutableStateListOf<VChat>())
     val itemsFlow: StateFlow<List<VChat>> get() = _itemsFlow
 
-    fun fetch() {
+    fun fetch(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
-            _itemsFlow.value = AppDatabase.instance.chatDao().getAll().sortedByDescending { it.createdAt }.map { VChat.from(it) }.toMutableStateList()
+            val dao = AppDatabase.instance.chatDao()
+            val list = dao.getAll()
+            if (!TempData.chatItemsMigrated) {
+                TempData.chatItemsMigrated = true
+                list.filter { setOf(DMessageType.IMAGES.value, DMessageType.FILES.value).contains(it.content.type) }.forEach {
+                    if (it.content.value is DMessageImages) {
+                        val c = it.content.value as DMessageImages
+                        if (c.items.any { i -> !i.uri.startsWith("app://") }) {
+                            it.content.value = DMessageImages(c.items.map { i -> DMessageFile(i.uri.toAppUrl(context), i.size, i.duration) })
+                            dao.update(it)
+                        }
+                    } else if (it.content.value is DMessageFiles) {
+                        val c = it.content.value as DMessageFiles
+                        if (c.items.any { i -> !i.uri.startsWith("app://") }) {
+                            it.content.value = DMessageFiles(c.items.map { i -> DMessageFile(i.uri.toAppUrl(context), i.size, i.duration) })
+                            dao.update(it)
+                        }
+                    }
+                }
+            }
+            _itemsFlow.value = list.sortedByDescending { it.createdAt }.map { VChat.from(it) }.toMutableStateList()
         }
     }
 

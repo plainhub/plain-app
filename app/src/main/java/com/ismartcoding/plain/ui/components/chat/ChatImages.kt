@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.size.Size
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.features.ChatItemClickEvent
@@ -44,16 +45,17 @@ fun ChatImages(context: Context, m: VChat, imageWidthDp: Dp, imageWidthPx: Int) 
         content = {
             val imageItems = (m.value as DMessageImages).items
             imageItems.forEachIndexed { index, item ->
+                val path = item.uri.getFinalPath(context)
                 Box(modifier = Modifier.clickable {
                     sendEvent(ChatItemClickEvent())
                     PreviewDialog().show(
-                        items = imageItems.mapIndexed { i, s -> PreviewItem(m.id + "|" + i, s.uri) },
+                        items = imageItems.mapIndexed { i, s -> PreviewItem(m.id + "|" + i, s.uri.getFinalPath(context)) },
                         initKey = m.id + "|" + index,
                     )
                 }) {
                     PAsyncImage(
                         modifier = Modifier.size(imageWidthDp),
-                        data = item.uri,
+                        data = path,
                         size = Size(imageWidthPx, imageWidthPx),
                         contentScale = ContentScale.Crop
                     )

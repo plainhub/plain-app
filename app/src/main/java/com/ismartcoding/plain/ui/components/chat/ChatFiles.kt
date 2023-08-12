@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import coil.size.Size
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.extensions.getFilenameFromPath
+import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isAudioFast
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isPdfFile
@@ -57,29 +58,30 @@ fun ChatFiles(context: Context, m: VChat) {
             )
     ) {
         fileItems.forEachIndexed { index, item ->
+            val path = item.uri.getFinalPath(context)
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    if (item.uri.isImageFast() || item.uri.isVideoFast()) {
+                    if (path.isImageFast() || path.isVideoFast()) {
                         val items = fileItems
                             .filter { it.uri.isVideoFast() || it.uri.isImageFast() }
                         PreviewDialog().show(
-                            items = items.mapIndexed { i, s -> PreviewItem(m.id + "|" + i, s.uri) },
+                            items = items.mapIndexed { i, s -> PreviewItem(m.id + "|" + i, s.uri.getFinalPath(context)) },
                             initKey = m.id + "|" + items.indexOf(item),
                         )
-                    } else if (item.uri.isAudioFast()) {
+                    } else if (path.isAudioFast()) {
                         AudioPlayerDialog().show()
                         Permissions.checkNotification(context, R.string.audio_notification_prompt) {
-                            AudioPlayerService.play(context, DPlaylistAudio.fromPath(context, item.uri))
+                            AudioPlayerService.play(context, DPlaylistAudio.fromPath(context, path))
                         }
-                    } else if (item.uri.isTextFile()) {
+                    } else if (path.isTextFile()) {
                         if (item.size <= Constants.MAX_READABLE_TEXT_FILE_SIZE) {
-                            TextEditorDialog(item.uri).show()
+                            TextEditorDialog(path).show()
                         } else {
                             DialogHelper.showMessage(R.string.text_file_size_limit)
                         }
-                    } else if (item.uri.isPdfFile()) {
-                        PdfViewerDialog(item.uri).show()
+                    } else if (path.isPdfFile()) {
+                        PdfViewerDialog(path).show()
                     }
                 }
             ) {
@@ -93,7 +95,7 @@ fun ChatFiles(context: Context, m: VChat) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 8.dp, end = 8.dp),
-                            text = item.uri.getFilenameFromPath(),
+                            text = path.getFilenameFromPath(),
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Normal),
                         )
                         Text(
@@ -105,12 +107,12 @@ fun ChatFiles(context: Context, m: VChat) {
                             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal),
                         )
                     }
-                    if (item.uri.isImageFast() || item.uri.isVideoFast()) {
+                    if (path.isImageFast() || path.isVideoFast()) {
                         PAsyncImage(
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(RoundedCornerShape(4.dp)),
-                            data = item.uri,
+                            data = path,
                             size = Size(context.dp2px(48), context.dp2px(48)),
                             contentScale = ContentScale.Crop
                         )

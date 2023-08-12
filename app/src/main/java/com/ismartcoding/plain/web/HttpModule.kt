@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Build
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.getBitmapAsync
+import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.parse
 import com.ismartcoding.lib.extensions.scanFileByConnection
@@ -251,9 +252,10 @@ fun Application.module() {
                 return@get
             }
             try {
-                val path = FileHelper.getFilePath(id)
+                val context = MainApp.instance
+                val path = FileHelper.getFilePath(id).getFinalPath(context)
                 if (path.startsWith("content://")) {
-                    val bytes = MainApp.instance.contentResolver.openInputStream(Uri.parse(path))?.buffered()?.use { it.readBytes() }
+                    val bytes = context.contentResolver.openInputStream(Uri.parse(path))?.buffered()?.use { it.readBytes() }
                     call.respondBytes(bytes!!)
                 } else {
                     val file = File(path)
@@ -269,7 +271,7 @@ fun Application.module() {
                     val centerCrop = q["cc"]?.toBooleanStrictOrNull()
                     // get video/image thumbnail
                     if (w != null && h != null) {
-                        val bitmap = file.getBitmapAsync(MainApp.instance, w, h)
+                        val bitmap = file.getBitmapAsync(context, w, h)
                         if (bitmap != null && file.name.endsWith(".gif", true)) {
                             call.respondOutputStream(ContentType.Image.GIF) {
                                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, this)

@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.features.chat
 
+import android.content.Context
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.features.DeleteChatItemViewEvent
 import com.ismartcoding.plain.db.*
@@ -21,16 +23,16 @@ object ChatHelper {
         return withIO { AppDatabase.instance.chatDao().getById(id) }
     }
 
-    suspend fun deleteAsync(id: String, value: Any?) {
+    suspend fun deleteAsync(context: Context, id: String, value: Any?) {
         withIO {
             AppDatabase.instance.chatDao().delete(id)
             if (value is DMessageFiles) {
                 value.items.forEach {
-                    File(it.uri).delete()
+                    File(it.uri.getFinalPath(context)).delete()
                 }
             } else if (value is DMessageImages) {
                 value.items.forEach {
-                    File(it.uri).delete()
+                    File(it.uri.getFinalPath(context)).delete()
                 }
             }
         }

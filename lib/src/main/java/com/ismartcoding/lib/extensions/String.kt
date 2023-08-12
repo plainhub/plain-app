@@ -1,5 +1,6 @@
 package com.ismartcoding.lib.extensions
 
+import android.content.Context
 import android.provider.MediaStore
 import android.telephony.PhoneNumberUtils
 import com.ismartcoding.lib.Constants
@@ -11,6 +12,20 @@ import kotlin.math.ceil
 
 fun String.getFilenameFromPath() = substring(lastIndexOf("/") + 1)
 fun String.getFilenameWithoutExtensionFromPath() = substring(lastIndexOf("/") + 1).substringBeforeLast(".")
+
+// handle URLs like `app://Pictures/test.png`
+fun String.getFinalPath(context: Context): String {
+    if (this.startsWith("app://", true)) {
+        return context.getExternalFilesDir(null)?.path?.removeSuffix("/") + "/" + this.substring("app://".length)
+    }
+
+    return this
+}
+
+fun String.toAppUrl(context: Context): String {
+    val prefix = context.getExternalFilesDir(null)?.path?.removeSuffix("/") + "/"
+    return this.replace(prefix, "app://")
+}
 
 fun String.getFilenameWithoutExtension() = substringBeforeLast(".")
 

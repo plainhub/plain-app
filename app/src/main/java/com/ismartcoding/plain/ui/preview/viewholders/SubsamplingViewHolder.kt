@@ -17,6 +17,7 @@ import coil.load
 import coil.request.ImageRequest
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
@@ -70,8 +71,7 @@ class SubsamplingViewHolder(
                             .build()
                         context.imageLoader.enqueue(request)
                     } else if (item.uri.startsWith("app://", true)) {
-                        val path = context.getExternalFilesDir(null)?.path?.removeSuffix("/") + "/" + item.uri.substring("app://".length)
-                        setImage(ImageSource.uri(path))
+                        setImage(ImageSource.uri(item.uri.getFinalPath(context)))
                     } else {
                         binding.loading.isVisible = true
                         delay(100)

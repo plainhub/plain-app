@@ -55,6 +55,7 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.getDuration
+import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.getFilenameWithoutExtension
 import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
@@ -128,7 +129,7 @@ fun ChatPage(
     val imageWidthDp = (configuration.screenWidthDp.dp - 34.dp) / 3
     val imageWidthPx = with(density) { imageWidthDp.toPx().toInt() }
     val refreshState = rememberRefreshLayoutState {
-        viewModel.fetch()
+        viewModel.fetch(context)
         setRefreshState(RefreshContentState.Stop)
     }
     val scrollState = rememberLazyListState()
@@ -139,7 +140,7 @@ fun ChatPage(
     var showEditTextModal by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        viewModel.fetch()
+        viewModel.fetch(context)
         events.add(receiveEventHandler<DeleteChatItemViewEvent> { event ->
             viewModel.remove(event.id)
         })
@@ -209,7 +210,7 @@ fun ChatPage(
                                 } else {
                                     FileHelper.copyFile(context, uri, dst)
                                 }
-                                items.add(DMessageFile(dst, size, dstFile.getDuration(context)))
+                                items.add(DMessageFile("app://$dir/${dst.getFilenameFromPath()}", size, dstFile.getDuration(context)))
                             } catch (ex: Exception) {
                                 // the picked file could be deleted
                                 DialogHelper.showMessage(ex)
@@ -334,7 +335,7 @@ fun ChatPage(
                                                 onClick = {
                                                     showContextMenu.value = false
                                                     scope.launch {
-                                                        ChatHelper.deleteAsync(m.id, m.value)
+                                                        ChatHelper.deleteAsync(context, m.id, m.value)
                                                         val json = JSONArray()
                                                         json.put(m.id)
                                                         sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, json.toString()))
