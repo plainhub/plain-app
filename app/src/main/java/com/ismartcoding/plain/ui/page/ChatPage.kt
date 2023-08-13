@@ -178,10 +178,12 @@ fun ChatPage(
                             try {
                                 cursor.moveToFirst()
                                 var fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME)
-                                val mimeType = context.contentResolver.getType(uri)
-                                val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
-                                if (extension.isNotEmpty()) {
-                                    fileName = fileName.getFilenameWithoutExtension() + "." + extension
+                                if (event.type == PickFileType.IMAGE_VIDEO) {
+                                    val mimeType = context.contentResolver.getType(uri)
+                                    val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
+                                    if (extension.isNotEmpty()) {
+                                        fileName = fileName.getFilenameWithoutExtension() + "." + extension
+                                    }
                                 }
                                 val size = cursor.getLongValue(OpenableColumns.SIZE)
                                 cursor.close()
