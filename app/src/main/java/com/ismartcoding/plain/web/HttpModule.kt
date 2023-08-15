@@ -7,6 +7,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.getBitmapAsync
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isImageFast
+import com.ismartcoding.lib.extensions.newFile
 import com.ismartcoding.lib.extensions.parse
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
@@ -88,12 +89,6 @@ import java.nio.file.StandardCopyOption
 import java.util.Date
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-import kotlin.collections.any
-import kotlin.collections.filter
-import kotlin.collections.forEach
-import kotlin.collections.indexOfFirst
-import kotlin.collections.isNotEmpty
-import kotlin.collections.map
 import kotlin.collections.set
 
 fun Application.module() {
@@ -336,6 +331,8 @@ fun Application.module() {
             }
             try {
                 var dir = ""
+                var replace = false
+                var fileName = ""
                 call.receiveMultipart().forEachPart { part ->
                     part as PartData.FileItem
                     when (part.name) {
@@ -351,24 +348,31 @@ fun Application.module() {
                             }
                             val json = JSONObject(requestStr)
                             dir = json.optString("dir")
+                            replace = json.optBoolean("replace")
                         }
 
                         "file" -> {
-                            val fileName = part.originalFileName as String
+                            fileName = part.originalFileName as String
                             if (dir.isEmpty() || fileName.isEmpty()) {
                                 call.respond(HttpStatusCode.BadRequest)
                                 return@forEachPart
                             }
                             val file = File("${dir}/${fileName}")
                             file.mkdirs()
-                            Files.copy(part.streamProvider(), file.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                            var path = file.toPath()
+                            if (!replace && file.exists()) {
+                                val newFile = file.newFile()
+                                fileName = newFile.name
+                                path = newFile.toPath()
+                            }
+                            Files.copy(part.streamProvider(), path, StandardCopyOption.REPLACE_EXISTING)
                             MainApp.instance.scanFileByConnection(file, null)
                         }
 
                         else -> {}
                     }
                 }
-                call.respond(HttpStatusCode.Created)
+                call.respond(HttpStatusCode.Created, fileName)
             } catch (ex: Exception) {
                 ex.printStackTrace()
                 call.respond(HttpStatusCode.BadRequest, ex.message ?: "")

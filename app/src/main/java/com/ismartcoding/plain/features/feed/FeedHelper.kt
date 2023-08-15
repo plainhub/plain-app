@@ -1,18 +1,20 @@
 package com.ismartcoding.plain.features.feed
 
+import com.ismartcoding.lib.opml.OpmlParser
+import com.ismartcoding.lib.opml.OpmlWriter
+import com.ismartcoding.lib.opml.entity.Body
+import com.ismartcoding.lib.opml.entity.Head
+import com.ismartcoding.lib.opml.entity.Opml
+import com.ismartcoding.lib.opml.entity.Outline
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.FeedDao
+import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.workers.FeedFetchWorker
-import com.rometools.opml.feed.opml.Attribute
-import com.rometools.opml.feed.opml.Opml
-import com.rometools.opml.feed.opml.Outline
-import com.rometools.opml.io.impl.OPML20Generator
 import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.io.SyndFeedInput
-import com.rometools.rome.io.WireFeedInput
-import com.rometools.rome.io.WireFeedOutput
 import com.rometools.rome.io.XmlReader
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -65,22 +67,22 @@ object FeedHelper {
 
     fun import(reader: Reader) {
         val feedList = mutableListOf<DFeed>()
-        val opml = WireFeedInput().build(reader) as Opml
-        opml.outlines.forEach { outline ->
-            if (!outline.xmlUrl.isNullOrEmpty()) {
-                feedList.add(DFeed().apply {
-                    name = outline.title
-                    url = outline.xmlUrl
-                    fetchContent = outline.getAttributeValue("fetchContent") == "true"
-                })
-            }
-
-            outline.children.forEach {
-                if (!outline.xmlUrl.isNullOrEmpty()) {
+        val opml = OpmlParser().parse(reader)
+        opml.body.outlines.forEach {
+            if (it.subElements.isEmpty()) {
+                if (it.attributes["xmlUrl"] != null) {
                     feedList.add(DFeed().apply {
-                        name = it.title
-                        url = it.xmlUrl
-                        fetchContent = it.getAttributeValue("fetchContent") == "true"
+                        name = it.getName()
+                        url = it.getUrl()
+                        fetchContent = it.attributes["fetchContent"] == "true"
+                    })
+                }
+            } else {
+                it.subElements.forEach { outline ->
+                    feedList.add(DFeed().apply {
+                        name = outline.getName()
+                        url = outline.getUrl()
+                        fetchContent = outline.attributes["fetchContent"] == "true"
                     })
                 }
             }
@@ -90,21 +92,31 @@ object FeedHelper {
         feedDao.insert(*feedList.filter { !urls.contains(it.url) }.toTypedArray())
     }
 
-     suspend fun export(writer: Writer) {
+    suspend fun export(writer: Writer) {
         val feeds = getAll()
-        val opml = Opml().apply {
-            feedType = OPML20Generator().type
-            encoding = "utf-8"
-            created = Date()
-            outlines = feeds.map {
-                Outline(it.name, URL(it.url), null).apply {
-                    if (it.fetchContent) {
-                        attributes.add(Attribute("fetchContent", "true"))
+        val result = OpmlWriter().write(
+            Opml(
+                "2.0",
+                Head(
+                    LocaleHelper.getString(R.string.app_name),
+                    Date().toString()
+                ),
+                Body(
+                    feeds.map { feed ->
+                        Outline(
+                            mapOf(
+                                "text" to feed.name,
+                                "title" to feed.name,
+                                "xmlUrl" to feed.url,
+                                "fetchContent" to feed.fetchContent.toString(),
+                            ),
+                            listOf()
+                        )
                     }
-                }
-            }
-        }
-        WireFeedOutput().output(opml, writer)
+                )
+            ))
+        writer.write(result)
+        writer.close()
     }
 
     suspend fun fetchAsync(url: String): SyndFeed {

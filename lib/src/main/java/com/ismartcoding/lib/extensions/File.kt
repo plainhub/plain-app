@@ -49,6 +49,10 @@ fun File.newPath(): String {
     return "$parent/" + newName()
 }
 
+fun File.newFile(): File {
+    return File(newPath())
+}
+
 suspend fun File.getBitmapAsync(context: Context, width: Int, height: Int): Bitmap? {
     var bitmap: Bitmap? = null
     if (this.path.isPartialSupportVideo()) {

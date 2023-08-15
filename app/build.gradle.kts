@@ -190,7 +190,6 @@ dependencies {
     implementation("com.github.jenly1314:zxing-lite:2.4.0")
     // Feed
     implementation("com.rometools:rome:2.1.0")
-    implementation("com.rometools:rome-opml:2.1.0")
 
     implementation("androidx.work:work-runtime-ktx:2.8.1")
 
