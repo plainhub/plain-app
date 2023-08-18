@@ -37,6 +37,7 @@ class FilesViewModel : BaseItemsModel() {
                     breadcrumbs.add(BreadcrumbItem(LocaleHelper.getString(R.string.app_name), root))
                 }
                 FilesType.RECENTS -> {
+                    path = root
                     breadcrumbs.add(BreadcrumbItem(LocaleHelper.getString(R.string.recents), root))
                 }
             }

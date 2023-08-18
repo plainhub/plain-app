@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.services
 
-import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.coroutineScope
@@ -30,10 +29,6 @@ class HttpServerService : LifecycleService() {
         } else {
             startForeground(1, notification)
         }
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        super.onStartCommand(intent, flags, startId)
         lifecycle.coroutineScope.launch(Dispatchers.IO) {
             try {
                 if (MainApp.instance.httpServer == null) {
@@ -48,8 +43,6 @@ class HttpServerService : LifecycleService() {
                 LogCat.e(ex.toString())
             }
         }
-
-        return START_STICKY
     }
 
     fun stop() {

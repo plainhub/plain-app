@@ -18,6 +18,7 @@ object FileHelper : BaseContentHelper() {
             MediaStore.Files.FileColumns.DATA,
             MediaStore.Files.FileColumns.SIZE,
             MediaStore.Files.FileColumns.DATE_MODIFIED,
+            MediaStore.Files.FileColumns.MEDIA_TYPE
         )
     }
 
@@ -49,7 +50,9 @@ object FileHelper : BaseContentHelper() {
                 val size = cursor.getLongValue(MediaStore.Files.FileColumns.SIZE)
                 val path = cursor.getStringValue(MediaStore.Files.FileColumns.DATA)
                 val updatedAt = cursor.getTimeValue(MediaStore.Files.FileColumns.DATE_MODIFIED)
-                result.add(DFile(title, path, "", updatedAt, size, size == 0L, 0))
+                val mediaType = cursor.getIntValue(MediaStore.Files.FileColumns.MEDIA_TYPE)
+                result.add(DFile(title, path, "", updatedAt, size,
+                    mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_NONE, 0))
             } while (cursor.moveToNext())
         }
         return result

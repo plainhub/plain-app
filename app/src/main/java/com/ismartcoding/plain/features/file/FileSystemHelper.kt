@@ -233,7 +233,7 @@ object FileSystemHelper {
                     val name = cursor.getStringValue(MediaStore.Files.FileColumns.DISPLAY_NAME)
                     val size = cursor.getLongValue(MediaStore.Files.FileColumns.SIZE)
                     val updatedAt = Instant.fromEpochMilliseconds(cursor.getLongValue(MediaStore.Files.FileColumns.DATE_MODIFIED) * 1000L)
-                    items.add(DFile(name, path, "", updatedAt, size, size == 0L, 0))
+                    items.add(DFile(name, path, "", updatedAt, size, false, 0))
                 } while (cursor.moveToNext())
             }
         }
