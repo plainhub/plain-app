@@ -131,7 +131,7 @@ dependencies {
     implementation("androidx.compose.ui:ui:$compose")
     implementation("androidx.compose.foundation:foundation:$compose")
     implementation("androidx.compose.foundation:foundation-layout:$compose")
-    implementation("androidx.compose.material3:material3:1.2.0-alpha04")
+    implementation("androidx.compose.material3:material3:1.2.0-alpha05")
     implementation("androidx.compose.material:material-icons-extended:$compose")
 
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha11")
@@ -158,6 +158,7 @@ dependencies {
     implementation("com.github.bmoliveira:snake-yaml:v1.18-android")
 
     // CameraX
+    implementation("androidx.camera:camera-core:1.3.0-beta02")
     implementation("androidx.camera:camera-camera2:1.3.0-beta02")
     implementation("androidx.camera:camera-lifecycle:1.3.0-beta02")
     implementation("androidx.camera:camera-view:1.3.0-beta02")
@@ -187,7 +188,7 @@ dependencies {
 
     implementation("com.aallam.openai:openai-client:3.2.0")
 
-    implementation("com.github.jenly1314:zxing-lite:2.4.0")
+    implementation("com.google.zxing:core:3.5.2")
     // Feed
     implementation("com.rometools:rome:2.1.0")
 

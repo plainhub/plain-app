@@ -48,7 +48,6 @@ import com.ismartcoding.plain.ui.components.home.HomeItemTools
 import com.ismartcoding.plain.ui.components.home.HomeItemWork
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.models.MainViewModel
-import com.ismartcoding.plain.ui.scan.ScanDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -105,7 +104,8 @@ fun HomePage(
                 })
                 DropdownMenuItem(onClick = {
                     isMenuOpen = false
-                    ScanDialog().show()
+                    navController.navigate(RouteName.SCAN)
+                    // ScanDialog().show()
                 }, text = {
                     Text(text = stringResource(R.string.scan_qrcode))
                 })

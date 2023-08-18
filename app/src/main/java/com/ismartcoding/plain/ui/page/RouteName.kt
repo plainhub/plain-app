@@ -17,5 +17,6 @@ enum class RouteName {
     EXCHANGE_RATE,
     SOUND_METER,
     CHAT,
-    CHAT_TEXT
+    CHAT_TEXT,
+    SCAN
 }

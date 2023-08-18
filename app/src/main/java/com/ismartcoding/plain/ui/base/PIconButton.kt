@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun PIconButton(
     modifier: Modifier = Modifier,
+    containerModifier: Modifier = Modifier,
     imageVector: ImageVector,
     contentDescription: String?,
     tint: Color = LocalContentColor.current,
@@ -31,6 +32,7 @@ fun PIconButton(
     val view = LocalView.current
 
     IconButton(
+        modifier = containerModifier,
         onClick = {
             if (isHaptic == true) view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             if (isSound == true) view.playSoundEffect(SoundEffectConstants.CLICK)

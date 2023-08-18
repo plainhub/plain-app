@@ -235,6 +235,7 @@ object Permissions {
             Permission.READ_SMS,
             Permission.SEND_SMS,
             Permission.POST_NOTIFICATIONS,
+            Permission.RECORD_AUDIO,
         ).forEach { permission ->
             map[permission] = activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
                 canContinue = true

@@ -10,12 +10,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ismartcoding.plain.data.enums.DarkTheme
 import com.ismartcoding.plain.data.preference.LocalDarkTheme
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.SharedViewModel
+import com.ismartcoding.plain.ui.page.scan.ScanPage
 import com.ismartcoding.plain.ui.page.settings.AboutPage
 import com.ismartcoding.plain.ui.page.settings.BackupRestorePage
 import com.ismartcoding.plain.ui.page.settings.ColorAndStylePage
@@ -40,14 +40,14 @@ fun Main(
     val navController = rememberNavController()
     val useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current)
     val sharedViewModel: SharedViewModel = viewModel()
+    val systemUiController = rememberSystemUiController()
+    systemUiController.run {
+        setStatusBarColor(Color.Transparent, !useDarkTheme)
+        setSystemBarsColor(Color.Transparent, !useDarkTheme)
+        setNavigationBarColor(MaterialTheme.colorScheme.surface onLight MaterialTheme.colorScheme.inverseOnSurface, !useDarkTheme)
+    }
 
     AppTheme(useDarkTheme = useDarkTheme) {
-        rememberSystemUiController().run {
-            setStatusBarColor(Color.Transparent, !useDarkTheme)
-            setSystemBarsColor(Color.Transparent, !useDarkTheme)
-            setNavigationBarColor(MaterialTheme.colorScheme.surface onLight MaterialTheme.colorScheme.inverseOnSurface, !useDarkTheme)
-        }
-
         NavHost(
             modifier = Modifier.background(MaterialTheme.colorScheme.surface),
             navController = navController,
@@ -71,6 +71,7 @@ fun Main(
                 RouteName.CHAT to { ChatPage(navController, sharedViewModel) },
                 RouteName.CHAT_TEXT to { ChatTextPage(navController, sharedViewModel) },
                 RouteName.TEXT to { TextPage(navController, sharedViewModel) },
+                RouteName.SCAN to { ScanPage(navController) },
             ).forEach { (routeName, content) ->
                 composable(routeName.name) {
                     content()

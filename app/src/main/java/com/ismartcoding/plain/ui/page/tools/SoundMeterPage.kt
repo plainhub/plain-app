@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -35,12 +33,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.ismartcoding.lib.channel.receiveEventHandler
+import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.features.PermissionResultEvent
+import com.ismartcoding.plain.features.RequestPermissionEvent
 import com.ismartcoding.plain.helpers.SoundMeterHelper
 import com.ismartcoding.plain.ui.base.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -62,9 +65,7 @@ fun SoundMeterPage(
     var avg by remember { mutableFloatStateOf(0f) }
     var max by remember { mutableFloatStateOf(0f) }
     var isRunning by remember { mutableStateOf(false) }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
-        isRunning = true
-    }
+    val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
     var decibel by remember { mutableFloatStateOf(0f) }
     val decibelValueStrings = stringArrayResource(R.array.decibel_values)
     val decibelValueString by remember {
@@ -76,6 +77,20 @@ fun SoundMeterPage(
             ""
         }
     }
+
+    LaunchedEffect(Unit) {
+        events.add(
+            receiveEventHandler<PermissionResultEvent> {
+                isRunning = Permission.RECORD_AUDIO.can(context)
+            })
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            events.forEach { it.cancel() }
+        }
+    }
+
     LaunchedEffect(isRunning) {
         if (!isRunning) {
             if (audioRecord?.state == AudioRecord.STATE_INITIALIZED) {
@@ -219,7 +234,7 @@ fun SoundMeterPage(
                             if (Permission.RECORD_AUDIO.can(context)) {
                                 isRunning = true
                             } else {
-                                launcher.launch(Permission.RECORD_AUDIO.toSysPermission())
+                                sendEvent(RequestPermissionEvent(Permission.RECORD_AUDIO))
                             }
                         }
                     }
