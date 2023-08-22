@@ -23,14 +23,14 @@ import com.ismartcoding.plain.ui.page.settings.DarkThemePage
 import com.ismartcoding.plain.ui.page.settings.LanguagePage
 import com.ismartcoding.plain.ui.page.settings.LogsPage
 import com.ismartcoding.plain.ui.page.settings.SettingsPage
-import com.ismartcoding.plain.ui.page.tools.SoundMeterPage
 import com.ismartcoding.plain.ui.page.tools.ExchangeRatePage
+import com.ismartcoding.plain.ui.page.tools.SoundMeterPage
 import com.ismartcoding.plain.ui.page.web.PasswordPage
 import com.ismartcoding.plain.ui.page.web.SessionsPage
 import com.ismartcoding.plain.ui.page.web.WebConsolePage
 import com.ismartcoding.plain.ui.page.web.WebDevPage
 import com.ismartcoding.plain.ui.theme.AppTheme
-import com.ismartcoding.plain.ui.theme.palette.onLight
+import com.ismartcoding.plain.ui.theme.windowBackground
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -46,7 +46,7 @@ fun Main(
         systemUiController.run {
             setStatusBarColor(Color.Transparent, !useDarkTheme)
             setSystemBarsColor(Color.Transparent, !useDarkTheme)
-            setNavigationBarColor(MaterialTheme.colorScheme.surface onLight MaterialTheme.colorScheme.inverseOnSurface, !useDarkTheme)
+            setNavigationBarColor(MaterialTheme.colorScheme.windowBackground(), !useDarkTheme)
         }
 
         NavHost(

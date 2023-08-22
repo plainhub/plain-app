@@ -74,6 +74,7 @@ import com.ismartcoding.plain.ui.models.WebConsoleViewModel
 import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.theme.palette.onDark
 import com.ismartcoding.plain.ui.theme.palette.onLight
+import com.ismartcoding.plain.ui.theme.windowBackground
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -331,7 +332,7 @@ fun BrowserPreview(context: Context, isHttps: Boolean, httpPort: Int, httpsPort:
                 .fillMaxWidth()
                 .padding(16.dp)
                 .background(
-                    color = MaterialTheme.colorScheme.surface onLight MaterialTheme.colorScheme.inverseOnSurface, shape = RoundedCornerShape(8.dp)
+                    color = MaterialTheme.colorScheme.windowBackground(), shape = RoundedCornerShape(8.dp)
                 ), verticalAlignment = Alignment.CenterVertically
         ) {
             SelectionContainer {
@@ -354,7 +355,7 @@ fun BrowserPreview(context: Context, isHttps: Boolean, httpPort: Int, httpsPort:
                     .height(16.dp)
                     .width(16.dp),
                 contentDescription = stringResource(id = R.string.edit),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                tint = MaterialTheme.colorScheme.onSurface,
                 onClick = {
                     onEditPort()
                 })

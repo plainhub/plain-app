@@ -1,24 +1,19 @@
 package com.ismartcoding.plain.ui.base
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.extensions.*
-import com.ismartcoding.plain.ui.theme.palette.onDark
-import com.ismartcoding.plain.ui.theme.palette.onLight
+import com.ismartcoding.plain.ui.theme.windowBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PScaffold(
     navController: NavHostController,
-    containerColor: Color = MaterialTheme.colorScheme.surface onLight MaterialTheme.colorScheme.inverseOnSurface,
+    containerColor: Color = MaterialTheme.colorScheme.windowBackground(),
     navigationIcon: (@Composable () -> Unit)? = {
         NavigationBackIcon(navController)
     },
