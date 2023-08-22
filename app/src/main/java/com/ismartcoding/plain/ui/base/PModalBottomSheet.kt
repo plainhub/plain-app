@@ -22,20 +22,21 @@ fun PModalBottomSheet(
     content: @Composable ColumnScope.() -> Unit = {},
 ) {
     ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
         windowInsets = WindowInsets(0, 0, 0, 0),
         dragHandle = null,
-        onDismissRequest = onDismissRequest,
-        containerColor = MaterialTheme.colorScheme.inverseOnSurface,
+        containerColor = MaterialTheme.colorScheme.surfaceVariant,
     ) {
-        TopAppBar(
-            modifier = Modifier.height(56.dp),
-            title = { Text(topBarTitle) },
-            actions = { actions?.invoke(this) },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Transparent,
+        Column(modifier = modifier) {
+            TopAppBar(
+                title = { Text(topBarTitle) },
+                actions = { actions?.invoke(this) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                )
             )
-        )
-        VerticalSpace(dp = 24.dp)
-        content()
+            VerticalSpace(dp = 16.dp)
+            content()
+        }
     }
 }

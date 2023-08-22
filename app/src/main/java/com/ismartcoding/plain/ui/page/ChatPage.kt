@@ -6,7 +6,6 @@ import android.os.Environment
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +26,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Send
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -65,7 +63,6 @@ import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.extensions.newPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.enums.PickFileTag
@@ -88,6 +85,7 @@ import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
@@ -137,7 +135,7 @@ fun ChatPage(
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
     var selectedItem by remember { mutableStateOf<VChat?>(null) }
     val showContextMenu = remember { mutableStateOf(false) }
-    var showEditTextModal by remember { mutableStateOf(false) }
+    var showEditTextSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.fetch(context)
@@ -244,9 +242,9 @@ fun ChatPage(
         }
     }
 
-    if (showEditTextModal) {
+    if (showEditTextSheet) {
         EditTextBottomSheet(selectedItem?.id ?: "", (selectedItem?.value as? DMessageText)?.text ?: "") {
-            showEditTextModal = false
+            showEditTextSheet = false
         }
     }
 
@@ -329,7 +327,7 @@ fun ChatPage(
                                                 DropdownMenuItem(text = { Text(stringResource(id = R.string.edit_text)) },
                                                     onClick = {
                                                         showContextMenu.value = false
-                                                        showEditTextModal = true
+                                                        showEditTextSheet = true
                                                     })
                                             }
                                             DropdownMenuItem(

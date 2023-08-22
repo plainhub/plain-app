@@ -81,7 +81,7 @@ fun ScanHistoryPage(
                                     }
                                 }
                             }
-                            TextCard(text = m)
+                            TextCard(context, text = m)
                         }
                         item {
                             BottomSpace()

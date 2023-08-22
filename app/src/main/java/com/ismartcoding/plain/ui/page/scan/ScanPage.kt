@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.ui.page.scan
 
+import android.content.ClipData
 import android.content.Context
 import android.graphics.ImageFormat
 import android.util.Size
-import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -11,17 +11,23 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Computer
+import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.CopyAll
 import androidx.compose.material.icons.rounded.Cancel
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -55,11 +61,11 @@ import com.google.zxing.qrcode.QRCodeReader
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.QrCodeBitmapHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.enums.PickFileTag
 import com.ismartcoding.plain.data.enums.PickFileType
 import com.ismartcoding.plain.data.preference.ScanHistoryPreference
@@ -69,12 +75,15 @@ import com.ismartcoding.plain.features.PickFileEvent
 import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.features.RequestPermissionEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.ui.base.ClipboardCard
 import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.TextCard
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.page.RouteName
-import com.ismartcoding.plain.ui.scan.ScanResultDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -87,7 +96,6 @@ fun ScanPage(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val view = LocalView.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
     var cameraProvider: ProcessCameraProvider? = null
@@ -97,6 +105,8 @@ fun ScanPage(
     var hasCamPermission by remember {
         mutableStateOf(Permission.CAMERA.can(context))
     }
+    var showScanResultSheet by remember { mutableStateOf(false) }
+    var scanResult by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         systemUiController.isSystemBarsVisible = false
@@ -126,12 +136,9 @@ fun ScanPage(
                         val reader = QRCodeReader()
                         val result = reader.decode(binaryBitmap)
                         DialogHelper.hideLoading()
-                        addScanResult(context, scope, result.text)
-                        coMain {
-                            ScanResultDialog(result.text) {
-                                cameraDetecting = true
-                            }.show()
-                        }
+                        scanResult = result.text
+                        addScanResult(context, scope, scanResult)
+                        showScanResultSheet = true
                     } catch (ex: Exception) {
                         DialogHelper.hideLoading()
                         cameraDetecting = true
@@ -150,6 +157,13 @@ fun ScanPage(
             systemUiController.isSystemBarsVisible = true
             events.forEach { it.cancel() }
             cameraProvider?.unbindAll()
+        }
+    }
+
+    if (showScanResultSheet) {
+        ScanResultBottomSheet(context, scanResult) {
+            showScanResultSheet = false
+            cameraDetecting = true
         }
     }
 
@@ -215,10 +229,9 @@ fun ScanPage(
                                                             )
                                                         )
                                                     }.decode(binaryBmp)
-                                                    addScanResult(context, scope, result.text)
-                                                    ScanResultDialog(result.text) {
-                                                        cameraDetecting = true
-                                                    }.show()
+                                                    scanResult = result.text
+                                                    addScanResult(context, scope, scanResult)
+                                                    showScanResultSheet = true
                                                 } catch (e: java.lang.Exception) {
                                                     cameraDetecting = true
                                                     e.printStackTrace()
@@ -308,8 +321,37 @@ fun ScanPage(
 private fun addScanResult(context: Context, scope: CoroutineScope, value: String) {
     scope.launch {
         val results = withIO { ScanHistoryPreference.getValueAsync(context).toMutableList() }
-        results.remove(value)
+        results.removeIf { it == value }
         results.add(0, value)
         withIO { ScanHistoryPreference.putAsync(context, results) }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+fun ScanResultBottomSheet(context: Context, value: String, onDismiss: () -> Unit) {
+    PModalBottomSheet(
+        modifier = Modifier
+            .padding(top = 16.dp)
+            .defaultMinSize(minHeight = 240.dp),
+        topBarTitle = stringResource(id = R.string.scan_result),
+        actions = {
+            PIconButton(
+                imageVector = Icons.Outlined.ContentCopy,
+                contentDescription = stringResource(R.string.copy),
+                tint = MaterialTheme.colorScheme.onSurface,
+            ) {
+                val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.scan_result), value)
+                clipboardManager.setPrimaryClip(clip)
+                DialogHelper.showMessage(R.string.copied)
+            }
+        },
+        onDismissRequest = {
+            onDismiss()
+        },
+    ) {
+        TextCard(context, text = value)
+        VerticalSpace(dp = 56.dp)
     }
 }

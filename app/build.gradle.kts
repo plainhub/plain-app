@@ -120,7 +120,7 @@ dependencies {
     val apollo = "3.2.1"
     val kgraphql = "0.18.1"
     val ktor = "2.1.0" // don't upgrade, TLS handshake failed
-    val compose = "1.6.0-alpha02"
+    val compose = "1.6.0-alpha03"
 
     implementation(platform("androidx.compose:compose-bom:2023.06.01"))
 
