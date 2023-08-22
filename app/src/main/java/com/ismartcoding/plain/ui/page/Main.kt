@@ -40,14 +40,15 @@ fun Main(
     val navController = rememberNavController()
     val useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current)
     val sharedViewModel: SharedViewModel = viewModel()
-    val systemUiController = rememberSystemUiController()
-    systemUiController.run {
-        setStatusBarColor(Color.Transparent, !useDarkTheme)
-        setSystemBarsColor(Color.Transparent, !useDarkTheme)
-        setNavigationBarColor(MaterialTheme.colorScheme.surface onLight MaterialTheme.colorScheme.inverseOnSurface, !useDarkTheme)
-    }
 
     AppTheme(useDarkTheme = useDarkTheme) {
+        val systemUiController = rememberSystemUiController()
+        systemUiController.run {
+            setStatusBarColor(Color.Transparent, !useDarkTheme)
+            setSystemBarsColor(Color.Transparent, !useDarkTheme)
+            setNavigationBarColor(MaterialTheme.colorScheme.surface onLight MaterialTheme.colorScheme.inverseOnSurface, !useDarkTheme)
+        }
+
         NavHost(
             modifier = Modifier.background(MaterialTheme.colorScheme.surface),
             navController = navController,

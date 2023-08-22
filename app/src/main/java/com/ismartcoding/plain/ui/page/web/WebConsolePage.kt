@@ -38,11 +38,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -335,7 +338,10 @@ fun BrowserPreview(context: Context, isHttps: Boolean, httpPort: Int, httpsPort:
                 ClickableText(
                     text = AnnotatedString(defaultUrl),
                     modifier = Modifier.padding(start = 16.dp),
-                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 16.sp),
+                    style = TextStyle(
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 16.sp
+                    ),
                     onClick = {
                         val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), defaultUrl)
                         clipboardManager.setPrimaryClip(clip)
