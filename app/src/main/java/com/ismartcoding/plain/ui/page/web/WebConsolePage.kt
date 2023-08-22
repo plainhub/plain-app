@@ -23,7 +23,6 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.MoreVert
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -38,14 +37,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -73,8 +70,8 @@ import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.models.WebConsoleViewModel
 import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.theme.palette.onDark
-import com.ismartcoding.plain.ui.theme.palette.onLight
-import com.ismartcoding.plain.ui.theme.windowBackground
+import com.ismartcoding.plain.ui.theme.backColor
+import com.ismartcoding.plain.ui.theme.cardBackColor
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -163,7 +160,7 @@ fun WebConsolePage(
                                 .padding(horizontal = 16.dp)
                                 .fillMaxWidth()
                                 .background(
-                                    color = MaterialTheme.colorScheme.surface onDark MaterialTheme.colorScheme.inverseOnSurface, shape = RoundedCornerShape(16.dp)
+                                    color = MaterialTheme.colorScheme.cardBackColor(), shape = RoundedCornerShape(16.dp)
                                 )
                         ) {
                             Text(
@@ -324,7 +321,7 @@ fun BrowserPreview(context: Context, isHttps: Boolean, httpPort: Int, httpsPort:
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .background(
-                color = MaterialTheme.colorScheme.surface onDark MaterialTheme.colorScheme.inverseOnSurface, shape = RoundedCornerShape(16.dp)
+                color = MaterialTheme.colorScheme.cardBackColor(), shape = RoundedCornerShape(16.dp)
             )
     ) {
         Row(
@@ -332,7 +329,7 @@ fun BrowserPreview(context: Context, isHttps: Boolean, httpPort: Int, httpsPort:
                 .fillMaxWidth()
                 .padding(16.dp)
                 .background(
-                    color = MaterialTheme.colorScheme.windowBackground(), shape = RoundedCornerShape(8.dp)
+                    color = MaterialTheme.colorScheme.backColor(), shape = RoundedCornerShape(8.dp)
                 ), verticalAlignment = Alignment.CenterVertically
         ) {
             SelectionContainer {

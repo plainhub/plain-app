@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.page.web
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -17,9 +18,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CryptoHelper
+import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.preference.AuthDevTokenPreference
 import com.ismartcoding.plain.data.preference.LocalAuthDevToken
+import com.ismartcoding.plain.data.preference.LocalHttpPort
 import com.ismartcoding.plain.data.preference.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.*
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +38,8 @@ fun WebDevPage(
         val scope = rememberCoroutineScope()
         val devToken = LocalAuthDevToken.current
         var enable by remember { mutableStateOf(false) }
+        val httpPort = LocalHttpPort.current
+        val ip4 = remember { NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" } }
 
         LaunchedEffect(devToken) {
             enable = devToken.isNotEmpty()
@@ -42,10 +47,13 @@ fun WebDevPage(
 
         PScaffold(
             navController,
+            topBarTitle = stringResource(R.string.testing_token),
             content = {
                 LazyColumn {
                     item {
-                        DisplayText(text = stringResource(R.string.testing_token))
+                        VerticalSpace(dp = 16.dp)
+                    }
+                    item {
                         PListItem(
                             title = stringResource(R.string.enable_testing_token),
                         ) {
@@ -60,10 +68,7 @@ fun WebDevPage(
                         if (enable) {
                             Spacer(modifier = Modifier.height(16.dp))
                             Subtitle(text = stringResource(id = R.string.token))
-                            PListItem(
-                                title = devToken,
-                            ) {
-                            }
+                            ClipboardCard(label = stringResource(id = R.string.token), devToken)
                             Spacer(modifier = Modifier.height(24.dp))
                             BlockOutlineButton(
                                 text = stringResource(id = R.string.reset_token),
@@ -74,6 +79,11 @@ fun WebDevPage(
                                 })
                             Spacer(modifier = Modifier.height(16.dp))
                             Tips(text = stringResource(id = R.string.auth_dev_token_tips))
+                            Subtitle(text = "CURL")
+                            ClipboardCard(
+                                label = "CURL",
+                                text = """curl --request POST --url http://${ip4}:${httpPort}/graphql --header 'Authorization: Bearer ${devToken}' --header 'Content-Type: application/json' --data '{"query":"{ chatItems { content } }"}'"""
+                            )
                         }
                         BottomSpace()
                     }

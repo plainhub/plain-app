@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.page.scan
 import android.content.Context
 import android.graphics.ImageFormat
 import android.util.Size
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
@@ -57,6 +58,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.QrCodeBitmapHelper
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.PickFileTag
 import com.ismartcoding.plain.data.enums.PickFileType
@@ -69,8 +71,9 @@ import com.ismartcoding.plain.features.RequestPermissionEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.scan.ScanHistoryDialog
+import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.scan.ScanResultDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -86,13 +89,11 @@ fun ScanPage(
     val scope = rememberCoroutineScope()
     val view = LocalView.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val cameraProviderFeature = remember {
-        ProcessCameraProvider.getInstance(context)
-    }
+
+    var cameraProvider: ProcessCameraProvider? = null
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
     val systemUiController = rememberSystemUiController()
     var cameraDetecting by remember { mutableStateOf(true) }
-
     var hasCamPermission by remember {
         mutableStateOf(Permission.CAMERA.can(context))
     }
@@ -148,6 +149,7 @@ fun ScanPage(
         onDispose {
             systemUiController.isSystemBarsVisible = true
             events.forEach { it.cancel() }
+            cameraProvider?.unbindAll()
         }
     }
 
@@ -239,13 +241,16 @@ fun ScanPage(
                                 }
                             )
                             try {
-                                cameraProviderFeature.get().bindToLifecycle(
+                                val cameraProviderFeature = ProcessCameraProvider.getInstance(context)
+                                cameraProvider = cameraProviderFeature.get()
+                                cameraProvider?.bindToLifecycle(
                                     lifecycleOwner,
                                     selector,
                                     preview,
                                     imageAnalysis
                                 )
                             } catch (e: Exception) {
+                                LogCat.e(e)
                                 e.printStackTrace()
                             }
                             previewView
@@ -282,10 +287,7 @@ fun ScanPage(
                         contentDescription = stringResource(R.string.scan_history),
                         tint = Color.White
                     ) {
-                        cameraDetecting = false
-                        ScanHistoryDialog() {
-                            cameraDetecting = true
-                        }.show()
+                        navController.navigate(RouteName.SCAN_HISTORY)
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     PIconButton(

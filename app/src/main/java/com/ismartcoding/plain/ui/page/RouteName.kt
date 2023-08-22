@@ -18,5 +18,6 @@ enum class RouteName {
     SOUND_METER,
     CHAT,
     CHAT_TEXT,
-    SCAN
+    SCAN,
+    SCAN_HISTORY,
 }

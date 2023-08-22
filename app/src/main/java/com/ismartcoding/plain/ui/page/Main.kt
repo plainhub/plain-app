@@ -15,6 +15,7 @@ import com.ismartcoding.plain.data.enums.DarkTheme
 import com.ismartcoding.plain.data.preference.LocalDarkTheme
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.SharedViewModel
+import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.page.scan.ScanPage
 import com.ismartcoding.plain.ui.page.settings.AboutPage
 import com.ismartcoding.plain.ui.page.settings.BackupRestorePage
@@ -30,7 +31,7 @@ import com.ismartcoding.plain.ui.page.web.SessionsPage
 import com.ismartcoding.plain.ui.page.web.WebConsolePage
 import com.ismartcoding.plain.ui.page.web.WebDevPage
 import com.ismartcoding.plain.ui.theme.AppTheme
-import com.ismartcoding.plain.ui.theme.windowBackground
+import com.ismartcoding.plain.ui.theme.backColor
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -46,7 +47,7 @@ fun Main(
         systemUiController.run {
             setStatusBarColor(Color.Transparent, !useDarkTheme)
             setSystemBarsColor(Color.Transparent, !useDarkTheme)
-            setNavigationBarColor(MaterialTheme.colorScheme.windowBackground(), !useDarkTheme)
+            setNavigationBarColor(MaterialTheme.colorScheme.backColor(), !useDarkTheme)
         }
 
         NavHost(
@@ -73,6 +74,7 @@ fun Main(
                 RouteName.CHAT_TEXT to { ChatTextPage(navController, sharedViewModel) },
                 RouteName.TEXT to { TextPage(navController, sharedViewModel) },
                 RouteName.SCAN to { ScanPage(navController) },
+                RouteName.SCAN_HISTORY to { ScanHistoryPage(navController) },
             ).forEach { (routeName, content) ->
                 composable(routeName.name) {
                     content()

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -95,7 +96,7 @@ fun PListItem(
                 }
             }
             if (separatedActions) {
-                Divider(
+                HorizontalDivider(
                     modifier = Modifier
                         .padding(start = 16.dp)
                         .size(1.dp, 32.dp),

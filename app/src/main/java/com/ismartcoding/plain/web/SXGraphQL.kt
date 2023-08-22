@@ -1051,7 +1051,7 @@ class SXGraphQL(val schema: Schema) {
                         } else {
                             val authStr = call.request.header("authorization")?.split(" ")
                             val token = AuthDevTokenPreference.getAsync(MainApp.instance)
-                            if (token.isNotEmpty() || authStr == null || authStr.size != 2 || authStr[1] != token) {
+                            if (token.isEmpty() || authStr?.get(1) != token) {
                                 call.respondText(
                                     """{"errors":[{"message":"Unauthorized"}]}""",
                                     contentType = ContentType.Application.Json

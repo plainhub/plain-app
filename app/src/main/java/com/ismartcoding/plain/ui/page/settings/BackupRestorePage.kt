@@ -56,7 +56,7 @@ fun BackupRestorePage(
         content = {
             LazyColumn {
                 item {
-                    VerticalSpace(dp = 16.dp)
+                    VerticalSpace(dp = 56.dp)
                 }
                 item {
                     BlockOutlineButton(
