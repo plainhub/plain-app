@@ -41,6 +41,7 @@ import com.ismartcoding.plain.data.preference.VideoPlaylistPreference
 import com.ismartcoding.plain.data.preference.VideoSortByPreference
 import com.ismartcoding.plain.data.preference.WebPreference
 import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
@@ -575,12 +576,9 @@ class SXGraphQL(val schema: Schema) {
                     }
                 }
                 mutation("createChatItem") {
-                    resolver { message: String ->
+                    resolver { content: String ->
                         val item = ChatHelper.sendAsync(
-                            DMessageContent(
-                                DMessageType.TEXT.value,
-                                DMessageText(message)
-                            )
+                            DChat.parseContent(content)
                         )
                         sendEvent(HttpServerEvents.MessageCreatedEvent(arrayListOf(item)))
                         arrayListOf(item).map { it.toModel() }

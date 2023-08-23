@@ -102,7 +102,7 @@ fun ChatFiles(context: Context, m: VChat) {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(end = 8.dp),
-                            text = FormatHelper.formatBytes(item.size),
+                            text = FormatHelper.formatBytes(item.size) + if (item.duration > 0) " / ${FormatHelper.formatDuration(item.duration)}" else "",
                             color = MaterialTheme.colorScheme.secondary,
                             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal),
                         )

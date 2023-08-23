@@ -145,6 +145,9 @@ fun ChatPage(
 
         events.add(receiveEventHandler<HttpServerEvents.MessageCreatedEvent> { event ->
             viewModel.addAll(event.items)
+            scope.launch {
+                scrollState.scrollToItem(0)
+            }
         })
 
         events.add(receiveEventHandler<UpdateMessageEvent> { event ->
