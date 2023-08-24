@@ -16,6 +16,7 @@ import android.view.OrientationEventListener
 import android.view.Surface
 import androidx.core.graphics.scale
 import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isPortrait
 import com.ismartcoding.lib.extensions.parcelable
@@ -27,6 +28,8 @@ import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.mediaProjectionManager
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.util.*
 

@@ -17,31 +17,6 @@ class FilesViewModel : BaseItemsModel() {
     var cutFiles = mutableListOf<DFile>()
     var copyFiles = mutableListOf<DFile>()
     var type: FilesType = FilesType.INTERNAL_STORAGE
-        set(value) {
-            field = value
-            breadcrumbs.clear()
-            when (value) {
-                FilesType.SDCARD -> {
-                    root = FileSystemHelper.getSDCardPath(MainApp.instance)
-                    path = root
-                    breadcrumbs.add(BreadcrumbItem(LocaleHelper.getString(R.string.sdcard), root))
-                }
-                FilesType.INTERNAL_STORAGE -> {
-                    root = FileSystemHelper.getInternalStoragePath(MainApp.instance)
-                    path = root
-                    breadcrumbs.add(BreadcrumbItem(FileSystemHelper.getInternalStorageName(MainApp.instance), root))
-                }
-                FilesType.APP -> {
-                    root = MainApp.instance.getExternalFilesDir(null)!!.absolutePath
-                    path = root
-                    breadcrumbs.add(BreadcrumbItem(LocaleHelper.getString(R.string.app_name), root))
-                }
-                FilesType.RECENTS -> {
-                    path = root
-                    breadcrumbs.add(BreadcrumbItem(LocaleHelper.getString(R.string.recents), root))
-                }
-            }
-        }
 
     fun getAndUpdateSelectedIndex(): Int {
         var index = breadcrumbs.indexOfFirst { it.path == path }
@@ -64,5 +39,6 @@ enum class FilesType {
     INTERNAL_STORAGE,
     RECENTS,
     SDCARD,
+    USB_STORAGE,
     APP,
 }

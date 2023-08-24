@@ -498,6 +498,7 @@
     <string name="use_device_language">Utiliser la langue de l\'appareil</string>
     <string name="not_supported_error">Non pris en charge sur cet appareil.</string>
     <string name="amoled_dark_theme">Thème sombre AMOLED</string>
+    <string name="usb_storage">Stockage USB</string>
     <string name="no_browser_error">Vous n\'avez aucun navigateur pour ouvrir la page Web.</string>
     <string name="text_file_size_limit">Seuls les fichiers de 10 Mo ou moins sont autorisés à être ouverts.</string>
     <string name="keep_screen_on_confirm">Vous avez choisi de diffuser plusieurs éléments. Pour assurer une lecture fluide, nous maintiendrons l\'écran de votre téléphone allumé pendant le processus de diffusion. Vous pouvez annuler cela à tout moment depuis le menu de l\'écran principal.</string>

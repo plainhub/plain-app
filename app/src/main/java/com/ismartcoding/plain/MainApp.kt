@@ -2,6 +2,9 @@ package com.ismartcoding.plain
 
 import android.app.Application
 import android.os.Build
+import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
+import android.os.StrictMode.VmPolicy
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
@@ -22,6 +25,7 @@ import com.ismartcoding.plain.data.preference.ClientIdPreference
 import com.ismartcoding.plain.data.preference.DarkThemePreference
 import com.ismartcoding.plain.data.preference.FeedAutoRefreshPreference
 import com.ismartcoding.plain.data.preference.HttpPortPreference
+import com.ismartcoding.plain.data.preference.HttpsPortPreference
 import com.ismartcoding.plain.data.preference.KeyStorePasswordPreference
 import com.ismartcoding.plain.data.preference.PasswordTypePreference
 import com.ismartcoding.plain.data.preference.WebPreference
@@ -36,6 +40,7 @@ import io.ktor.server.netty.NettyApplicationEngine
 import kotlinx.coroutines.flow.first
 import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
+
 
 class MainApp : Application(), ImageLoaderFactory {
     var httpServer: NettyApplicationEngine? = null
@@ -97,6 +102,7 @@ class MainApp : Application(), ImageLoaderFactory {
             val preferences = dataStore.data.first()
             TempData.webEnabled = WebPreference.get(preferences)
             TempData.httpPort = HttpPortPreference.get(preferences)
+            TempData.httpsPort = HttpsPortPreference.get(preferences)
             ClientIdPreference.ensureValueAsync(instance, preferences)
             KeyStorePasswordPreference.ensureValueAsync(instance, preferences)
 

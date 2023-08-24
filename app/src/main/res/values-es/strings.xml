@@ -498,6 +498,7 @@
     <string name="use_device_language">Usar idioma del dispositivo</string>
     <string name="not_supported_error">No es compatible con este dispositivo.</string>
     <string name="amoled_dark_theme">Tema oscuro AMOLED</string>
+    <string name="usb_storage">Almacenamiento USB</string>
     <string name="no_browser_error">No tiene ningún navegador para abrir la página web.</string>
     <string name="text_file_size_limit">Solo se permiten archivos con un tamaño de 10 MB o menos para abrir.</string>
     <string name="keep_screen_on_confirm">Ha elegido transmitir varios elementos. Para garantizar una reproducción fluida, mantendremos la pantalla de su teléfono encendida durante el proceso de transmisión. Puede cancelar esto en cualquier momento desde el menú de la pantalla principal.</string>

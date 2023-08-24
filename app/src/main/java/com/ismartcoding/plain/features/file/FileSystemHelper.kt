@@ -52,16 +52,23 @@ object FileSystemHelper {
         return stats
     }
 
-    fun getSDCardStorageStats(context: Context): DStorageStatsItem? {
-        val path = getSDCardPath(context)
+    fun getSDCardStorageStats(context: Context): DStorageStatsItem {
+        return getStorageStats(context, getSDCardPath(context))
+    }
+
+    fun getUSBStorageStats(context: Context): List<DStorageStatsItem> {
+        return getUsbDiskPaths().map { getStorageStats(context, it) }
+    }
+
+    private fun getStorageStats(context: Context, path: String): DStorageStatsItem {
         if (path.isNotEmpty()) {
-            val stat = StatFs(getSDCardPath(context))
+            val stat = StatFs(path)
             val availableBytes = stat.blockSizeLong * stat.availableBlocksLong
             val totalBytes = stat.blockSizeLong * stat.blockCountLong
             return DStorageStatsItem(totalBytes, availableBytes)
         }
 
-        return null
+        return DStorageStatsItem(0, 0)
     }
 
     fun getInternalStoragePath(context: Context): String {
@@ -102,9 +109,32 @@ object FileSystemHelper {
         return sdCardPath.trimEnd('/')
     }
 
-    fun hasExternalSDCard(context: Context) = getSDCardPath(context).isNotEmpty()
+    fun getUsbDiskPaths(): List<String> {
+        val storageVolumes = storageManager.storageVolumes
+        val paths = mutableListOf<String>()
+        var rootDirs: Array<File>? = null
+        for (storageVolume in storageVolumes) {
+            if (storageVolume.isRemovable) {
+                var path = ""
+                path = if (isRPlus()) {
+                    storageVolume.directory.toString()
+                } else {
+                    val uuid = storageVolume.uuid ?: continue
+                    if (rootDirs == null) {
+                        rootDirs = File("/storage").listFiles()
+                    }
+                    rootDirs?.find { it.name.contains(uuid) }?.absolutePath ?: ""
+                }
+                if (path.isNotEmpty() && !path.contains("storage")) {
+                    paths.add(path)
+                }
+            }
+        }
 
-    fun getStorageDirectories(context: Context): Array<String> {
+        return paths
+    }
+
+    private fun getStorageDirectories(context: Context): Array<String> {
         val paths = HashSet<String>()
         val rawExternalStorage = System.getenv("EXTERNAL_STORAGE")
         val rawSecondaryStoragesStr = System.getenv("SECONDARY_STORAGE")

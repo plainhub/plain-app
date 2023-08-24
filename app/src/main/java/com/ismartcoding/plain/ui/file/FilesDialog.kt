@@ -64,6 +64,7 @@ import com.ismartcoding.plain.ui.models.IDataModel
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import com.ismartcoding.plain.ui.preview.TransitionHelper
+import com.ismartcoding.plain.ui.views.BreadcrumbItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.io.path.Path
@@ -258,8 +259,13 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
         receiveEvent<DrawerMenuItemClickedEvent> { event ->
             val m = event.model
             viewModel.offset = 0
+            viewModel.root = m.data as String
+            viewModel.breadcrumbs.clear()
+            viewModel.breadcrumbs.add(BreadcrumbItem(m.title, viewModel.root))
+            viewModel.path = viewModel.root
             viewModel.type = when (m.iconId) {
                 R.drawable.ic_sd_card -> FilesType.SDCARD
+                R.drawable.ic_usb -> FilesType.USB_STORAGE
                 R.drawable.ic_app_icon -> FilesType.APP
                 R.drawable.ic_history -> FilesType.RECENTS
                 else -> FilesType.INTERNAL_STORAGE

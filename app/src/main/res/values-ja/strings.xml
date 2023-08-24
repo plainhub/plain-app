@@ -498,6 +498,7 @@
     <string name="use_device_language">デバイスの言語を使用</string>
     <string name="not_supported_error">このデバイスではサポートされていません。</string>
     <string name="amoled_dark_theme">AMOLEDダークテーマ</string>
+    <string name="usb_storage">USBストレージ</string>
     <string name="no_browser_error">ウェブページを開くためのブラウザがありません。</string>
     <string name="text_file_size_limit">サイズが10MB以下のファイルのみを開くことが許可されています。</string>
     <string name="keep_screen_on_confirm">複数のアイテムをキャストすることを選択しました。キャストプロセス中にスマートフォンの画面をオンにしてスムーズな再生を確保します。キャストプロセスをメイン画面のメニューからいつでもキャンセルできます。</string>

@@ -193,24 +193,36 @@ suspend fun RecyclerView.updateDrawerMenuAsync(
     viewModel: FilesViewModel
 ) {
     val groups = mutableListOf<MenuItemModel>()
-    groups.add(MenuItemModel().apply {
+    groups.add(MenuItemModel("").apply {
         isChecked = viewModel.type == FilesType.RECENTS
         title = getString(R.string.recents)
         iconId = R.drawable.ic_history
     })
-    groups.add(MenuItemModel().apply {
+    val context = MainApp.instance
+    groups.add(MenuItemModel(FileSystemHelper.getInternalStoragePath(context)).apply {
         isChecked = viewModel.type == FilesType.INTERNAL_STORAGE
-        title = FileSystemHelper.getInternalStorageName(MainApp.instance)
+        title = FileSystemHelper.getInternalStorageName(context)
         iconId = R.drawable.ic_storage
     })
-    if (FileSystemHelper.hasExternalSDCard(MainApp.instance)) {
-        groups.add(MenuItemModel().apply {
+    val sdCardPath = FileSystemHelper.getSDCardPath(context)
+    if (sdCardPath.isNotEmpty()) {
+        groups.add(MenuItemModel(sdCardPath).apply {
             isChecked = viewModel.type == FilesType.SDCARD
             title = getString(R.string.sdcard)
             iconId = R.drawable.ic_sd_card
         })
     }
-    groups.add(MenuItemModel().apply {
+    val usbPaths = FileSystemHelper.getUsbDiskPaths()
+    if (usbPaths.isNotEmpty()) {
+        usbPaths.forEachIndexed { index, path ->
+            groups.add(MenuItemModel(path).apply {
+                isChecked = viewModel.root == path
+                title = getString(R.string.usb_storage) + " ${index + 1}"
+                iconId = R.drawable.ic_usb
+            })
+        }
+    }
+    groups.add(MenuItemModel(context.getExternalFilesDir(null)!!.absolutePath).apply {
         isChecked = viewModel.type == FilesType.APP
         title = getString(R.string.app_name)
         iconId = R.drawable.ic_app_icon

@@ -498,6 +498,7 @@
     <string name="use_device_language">Utilizza la lingua del dispositivo</string>
     <string name="not_supported_error">Non supportato su questo dispositivo.</string>
     <string name="amoled_dark_theme">Tema scuro AMOLED</string>
+    <string name="usb_storage">Archiviazione USB</string>
     <string name="no_browser_error">Nessun browser disponibile per aprire la pagina web.</string>
     <string name="text_file_size_limit">Sono consentiti solo file con una dimensione di 10 MB o meno.</string>
     <string name="keep_screen_on_confirm">Hai scelto di inviare più elementi. Per garantire una riproduzione fluida, manterremo il tuo schermo del telefono acceso durante il processo di invio. Puoi annullare questa opzione in qualsiasi momento dal menu principale.</string>

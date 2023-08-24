@@ -39,14 +39,11 @@ import com.ismartcoding.plain.data.preference.FileSortByPreference
 import com.ismartcoding.plain.data.preference.ImageSortByPreference
 import com.ismartcoding.plain.data.preference.VideoPlaylistPreference
 import com.ismartcoding.plain.data.preference.VideoSortByPreference
-import com.ismartcoding.plain.data.preference.WebPreference
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
-import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.features.AIChatCreatedEvent
 import com.ismartcoding.plain.features.ActionEvent
@@ -423,7 +420,12 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("storageStats") {
                     resolver { ->
-                        StorageStats(FileSystemHelper.getInternalStorageStats().toModel(), FileSystemHelper.getSDCardStorageStats(MainApp.instance)?.toModel())
+                        val context = MainApp.instance
+                        StorageStats(
+                            FileSystemHelper.getInternalStorageStats().toModel(),
+                            FileSystemHelper.getSDCardStorageStats(context).toModel(),
+                            FileSystemHelper.getUSBStorageStats(context).map { it.toModel() }
+                        )
                     }
                 }
                 query("screenMirrorImage") {
@@ -544,6 +546,7 @@ class SXGraphQL(val schema: Schema) {
                             AudioPlayingPreference.getValueAsync(context)?.path ?: "",
                             context.allowSensitivePermissions(),
                             sdcardPath = FileSystemHelper.getSDCardPath(context),
+                            usbDiskPaths = FileSystemHelper.getUsbDiskPaths(),
                             internalStoragePath = FileSystemHelper.getInternalStoragePath(context),
                             downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
                         )

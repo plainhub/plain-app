@@ -499,6 +499,7 @@
     <string name="use_device_language">跟随系统设置</string>
     <string name="not_supported_error">不支持此设备。</string>
     <string name="amoled_dark_theme">AMOLED 深色主题</string>
+    <string name="usb_storage">USB存储</string>
     <string name="no_browser_error">没有浏览器可以打开此页面。</string>
     <string name="text_file_size_limit">仅允许打开大小不超过10MB的文件。</string>
     <string name="keep_screen_on_confirm">您选择了投射多个{{type}}。为确保平稳播放，我们将在投射过程中保持您的手机屏幕开启。您可以随时从主屏幕菜单中取消此操作。</string>

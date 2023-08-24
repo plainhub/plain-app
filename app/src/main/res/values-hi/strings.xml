@@ -498,6 +498,7 @@
     <string name="use_device_language">डिवाइस भाषा का उपयोग करें</string>
     <string name="not_supported_error">इस डिवाइस पर समर्थित नहीं है।</string>
     <string name="amoled_dark_theme">AMOLED डार्क थीम</string>
+    <string name="usb_storage">यूएसबी स्टोरेज</string>
     <string name="no_browser_error">आपके पास कोई ब्राउज़र नहीं है जिससे वेब पेज खोल सकें।</string>
     <string name="text_file_size_limit">केवल 10MB या उससे कम आकार की फ़ाइलें खोलने की अनुमति है।</string>
     <string name="keep_screen_on_confirm">आपने कई आइटम कास्ट करने का चयन किया है। सुनिश्चित करने के लिए कि प्लेबैक सहज हो, हम कास्टिंग प्रक्रिया के दौरान आपके फोन की स्क्रीन को चालित रखेंगे। आप इसे मुख्य स्क्रीन मेनू से किसी भी समय रद्द कर सकते हैं।</string>

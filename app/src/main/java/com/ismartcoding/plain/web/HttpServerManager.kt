@@ -80,8 +80,8 @@ object HttpServerManager {
 
     suspend fun createHttpServer(context: Context): NettyApplicationEngine {
         val password = TempData.keyStorePassword.toCharArray()
-        val httpPort = HttpPortPreference.getAsync(context)
-        val httpsPort = HttpsPortPreference.getAsync(context)
+        val httpPort = TempData.httpPort
+        val httpsPort = TempData.httpsPort
         val environment = applicationEngineEnvironment {
             log = LoggerFactory.getLogger("ktor.application")
             connector {

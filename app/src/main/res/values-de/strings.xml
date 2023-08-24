@@ -498,6 +498,7 @@
     <string name="use_device_language">Gerätesprache verwenden</string>
     <string name="not_supported_error">Nicht auf diesem Gerät unterstützt.</string>
     <string name="amoled_dark_theme">AMOLED-Dunkelthema</string>
+    <string name="usb_storage">USB-Speicher</string>
     <string name="no_browser_error">Sie haben keinen Browser, um die Webseite zu öffnen.</string>
     <string name="text_file_size_limit">Nur Dateien mit einer Größe von 10 MB oder weniger können geöffnet werden.</string>
     <string name="keep_screen_on_confirm">Sie haben sich dafür entschieden, mehrere Elemente zu übertragen. Um reibungslose Wiedergabe zu gewährleisten, wird der Bildschirm während des Übertragungsvorgangs eingeschaltet. Sie können dies jederzeit im Hauptmenü abbrechen.</string>

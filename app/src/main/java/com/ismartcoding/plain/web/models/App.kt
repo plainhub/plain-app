@@ -16,6 +16,7 @@ data class App(
     val audioCurrent: String,
     val allowSensitivePermissions: Boolean,
     val sdcardPath: String,
+    val usbDiskPaths: List<String>,
     val internalStoragePath: String,
     val downloadsDir: String
 )

@@ -498,6 +498,7 @@
     <string name="use_device_language">ডিভাইস ভাষা ব্যবহার করুন</string>
     <string name="not_supported_error">এই ডিভাইসে সমর্থিত নয়।</string>
     <string name="amoled_dark_theme">AMOLED ডার্ক থিম</string>
+    <string name="usb_storage">ইউএসবি সংরক্ষণ</string>
     <string name="no_browser_error">আপনার কোনও ব্রাউজার নেই ওয়েব পৃষ্ঠা খোলার জন্য।</string>
     <string name="text_file_size_limit">10MB বা তার নিচের আকারের ফাইলগুলি খোলার অনুমতি দেওয়া হয়।</string>
     <string name="keep_screen_on_confirm">আপনি একাধিক আইটেম কাস্ট করতে চয়ন করেছেন। সম্রম প্রতিটি চলাচল নিশ্চিত করতে, আমরা আপনার ফোন স্ক্রীনটি কাস্টিং প্রক্রিয়ার সময় চালিয়ে রাখব। আপনি মূল স্ক্রীন মেনু থেকে এখনও যে কোনও সময় এটি বাতিল করতে পারেন।</string>

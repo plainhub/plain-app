@@ -498,6 +498,7 @@
     <string name="use_device_language">Использовать язык устройства</string>
     <string name="not_supported_error">Не поддерживается на этом устройстве.</string>
     <string name="amoled_dark_theme">AMOLED темная тема</string>
+    <string name="usb_storage">USB-накопитель</string>
     <string name="no_browser_error">У вас нет браузера для открытия веб-страницы.</string>
     <string name="text_file_size_limit">Можно открывать только файлы размером не более 10 МБ.</string>
     <string name="keep_screen_on_confirm">Вы выбрали передачу нескольких элементов. Чтобы обеспечить плавное воспроизведение, мы будем удерживать экран вашего телефона включенным во время передачи. Вы можете отменить это в любое время из меню главного экрана.</string>

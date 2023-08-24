@@ -498,6 +498,7 @@
     <string name="use_device_language">Gebruik de taal van het apparaat</string>
     <string name="not_supported_error">Niet ondersteund op dit apparaat.</string>
     <string name="amoled_dark_theme">AMOLED donker thema</string>
+    <string name="usb_storage">USB-opslag</string>
     <string name="no_browser_error">Je hebt geen browser om de webpagina te openen.</string>
     <string name="text_file_size_limit">Alleen bestanden met een grootte van 10 MB of minder zijn toegestaan om te openen.</string>
     <string name="keep_screen_on_confirm">Je hebt ervoor gekozen om meerdere items te casten. Om een soepele weergave te garanderen, houden we het scherm van je telefoon aan tijdens het casten. Je kunt dit op elk moment annuleren via het hoofdmenu.</string>

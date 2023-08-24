@@ -499,6 +499,7 @@
     <string name="use_device_language">Use device language</string>
     <string name="not_supported_error">Not supported on this device.</string>
     <string name="amoled_dark_theme">AMOLED dark theme</string>
+    <string name="usb_storage">USB storage</string>
     <string name="no_browser_error">You don\'t have any browser to open web page.</string>
     <string name="text_file_size_limit">Only files with a size of 10MB or less are permitted to be opened.</string>
     <string name="keep_screen_on_confirm">You have chosen to cast multiple items. To ensure smooth playback, we will keep your phone screen on during the casting process. You can cancel this at any time from the main screen menu.</string>
