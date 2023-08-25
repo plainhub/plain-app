@@ -12,6 +12,8 @@ import coil.decode.DataSource
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
+import coil.request.videoFrameMillis
+import coil.request.videoFrameOption
 import com.commit451.coiltransformations.CropTransformation
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.logcat.LogCat
@@ -71,6 +73,7 @@ suspend fun File.getBitmapAsync(context: Context, width: Int, height: Int): Bitm
             val request = ImageRequest.Builder(context)
                 .data(this)
                 .size(width, height)
+                .videoFrameMillis(3000)
                 .bitmapConfig(Bitmap.Config.ARGB_8888)
                 .transformations(CropTransformation())
                 .build()

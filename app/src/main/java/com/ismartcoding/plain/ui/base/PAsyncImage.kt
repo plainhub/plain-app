@@ -13,12 +13,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import coil.request.videoFrameMillis
 import coil.size.Precision
 import coil.size.Scale
 import coil.size.Size
 import com.ismartcoding.plain.R
-
-val SIZE_1000 = Size(1000, 1000)
 
 @Composable
 fun PAsyncImage(
@@ -34,14 +33,16 @@ fun PAsyncImage(
 ) {
     Image(
         painter = rememberAsyncImagePainter(
-            model = ImageRequest.Builder(LocalContext.current).data(data).apply {
-                if (placeholder != null) placeholder(placeholder)
-                if (error != null) error(error)
-                crossfade(true)
-                scale(scale)
-                precision(precision)
-                size(size)
-            }.build()
+            model = ImageRequest.Builder(LocalContext.current).data(data)
+                .videoFrameMillis(3000)
+                .apply {
+                    if (placeholder != null) placeholder(placeholder)
+                    if (error != null) error(error)
+                    crossfade(true)
+                    scale(scale)
+                    precision(precision)
+                    size(size)
+                }.build()
         ),
         contentDescription = contentDescription,
         contentScale = contentScale,

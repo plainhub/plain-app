@@ -1,21 +1,19 @@
 package com.ismartcoding.lib.extensions
 
 import android.widget.ImageView
-import androidx.lifecycle.coroutineScope
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import coil.load
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import kotlinx.coroutines.launch
-import java.io.File
+import coil.request.ImageRequest
+import coil.request.videoFrameMillis
+import coil.size.Precision
 
 fun ImageView.glide(url: String) {
-    if (url.isPartialSupportVideo()) {
-        val view = this
-        view.findViewTreeLifecycleOwner()?.lifecycle?.coroutineScope?.launch {
-            val t = withIO { File(url).getBitmapAsync(view.context, 400, 400) }
-            load(t)
-        }
-    } else {
-        load(url)
+    val builder: ImageRequest.Builder.() -> Unit = {
+        videoFrameMillis(3000)
+        placeholder(android.R.color.transparent)
+        error(android.R.color.transparent)
+        crossfade(true)
+        precision(Precision.AUTOMATIC)
+        size(400, 400)
     }
+    load(url, builder = builder)
 }
