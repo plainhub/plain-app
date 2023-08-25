@@ -13,6 +13,7 @@ import coil.decode.SvgDecoder
 import coil.decode.VideoFrameDecoder
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
+import coil.request.CachePolicy
 import coil.util.DebugLogger
 import com.ismartcoding.lib.brv.utils.BRV
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
@@ -65,6 +66,9 @@ class MainApp : Application(), ImageLoaderFactory {
                     .maxSizeBytes(512L * 1024 * 1024) // 512MB
                     .build()
             }
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .networkCachePolicy(CachePolicy.ENABLED)
             .okHttpClient {
                 // Don't limit concurrent network requests by host.
                 val dispatcher = Dispatcher().apply { maxRequestsPerHost = maxRequests }

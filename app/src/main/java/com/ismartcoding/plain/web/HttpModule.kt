@@ -275,7 +275,7 @@ fun Application.module() {
                         }
 
                         val stream = ByteArrayOutputStream()
-                        bitmap?.compress(Bitmap.CompressFormat.JPEG, 80, stream)
+                        bitmap?.compress(Bitmap.CompressFormat.PNG, 80, stream)
                         call.respondBytes(stream.toByteArray())
                         return@get
                     }
