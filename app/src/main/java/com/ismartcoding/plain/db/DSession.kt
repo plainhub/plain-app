@@ -29,6 +29,14 @@ data class DSession(
     var token: String = ""
 }
 
+
+data class SessionClientTsUpdate(
+    @ColumnInfo(name = "client_id")
+    var clientId: String,
+    @ColumnInfo(name = "updated_at")
+    val updatedAt: Instant = Clock.System.now(),
+)
+
 @Dao
 interface SessionDao {
     @Query("SELECT * FROM sessions ORDER BY updated_at DESC")
@@ -43,8 +51,8 @@ interface SessionDao {
     @Update
     fun update(vararg item: DSession)
 
-    @Query("UPDATE sessions SET updated_at=:updatedAt WHERE client_id=:clientId")
-    fun updateTs(clientId: String, updatedAt: Instant)
+    @Update(entity = DSession::class)
+    fun updateTs(items: List<SessionClientTsUpdate>)
 
     @Query("DELETE FROM sessions WHERE client_id=:clientId")
     fun delete(clientId: String)

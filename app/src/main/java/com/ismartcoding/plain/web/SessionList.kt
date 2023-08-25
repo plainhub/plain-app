@@ -3,7 +3,6 @@ package com.ismartcoding.plain.web
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DSession
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 
 object SessionList {
     fun getItemsAsync(): List<DSession> {
@@ -28,10 +27,6 @@ object SessionList {
         } else {
             AppDatabase.instance.sessionDao().update(item)
         }
-    }
-
-    fun updateTsAsync(clientId: String, updatedAt: Instant) {
-        AppDatabase.instance.sessionDao().updateTs(clientId, updatedAt)
     }
 
     fun deleteAsync(clientId: String) {

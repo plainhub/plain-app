@@ -12,6 +12,8 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.preference.HttpPortPreference
 import com.ismartcoding.plain.data.preference.HttpsPortPreference
 import com.ismartcoding.plain.data.preference.PasswordPreference
+import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.db.SessionClientTsUpdate
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.web.websocket.WebSocketSession
 import io.ktor.server.application.Application
@@ -106,18 +108,19 @@ object HttpServerManager {
     }
 
     fun clientTsInterval() {
+        val duration = 5000L
         Timer().scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
                 val now = System.currentTimeMillis()
-                clientRequestTs.forEach { (clientId, ts) ->
-                    if (ts + 5000 > now) {
-                        coIO {
-                            SessionList.updateTsAsync(clientId, Instant.fromEpochMilliseconds(ts))
-                        }
+                val updates = clientRequestTs.filter { it.value + duration > now }
+                    .map { SessionClientTsUpdate(it.key, Instant.fromEpochMilliseconds(it.value)) }
+                if (updates.isNotEmpty()) {
+                    coIO {
+                        AppDatabase.instance.sessionDao().updateTs(updates)
                     }
                 }
             }
-        }, 0, 5000)
+        }, 0, duration)
     }
 
     suspend fun respondTokenAsync(event: ConfirmToAcceptLoginEvent, clientIp: String) {
