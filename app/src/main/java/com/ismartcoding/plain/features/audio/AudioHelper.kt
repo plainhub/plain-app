@@ -8,11 +8,10 @@ import androidx.annotation.RequiresApi
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
-import com.ismartcoding.lib.helpers.SearchHelper
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.plain.data.DMediaBucket
-import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.BaseContentHelper
+import com.ismartcoding.plain.features.file.FileSortBy
 
 object AudioHelper : BaseContentHelper() {
     override val uriExternal: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
@@ -29,28 +28,33 @@ object AudioHelper : BaseContentHelper() {
     }
 
     override fun getWhere(query: String): ContentWhere {
+        return getWhere(query, MediaStore.Audio.Media._ID)
+    }
+
+    override fun getBaseWhere(groups: List<FilterField>): ContentWhere {
         val where = ContentWhere()
         where.add("${MediaStore.Audio.Media.DURATION}>0")
-        if (query.isNotEmpty()) {
-            val queryGroups = SearchHelper.parse(query)
-            queryGroups.forEach {
-                if (it.name == "text") {
+        groups.forEach {
+            when (it.name) {
+                "text" -> {
                     where.addLikes(arrayListOf(MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST), arrayListOf(it.value, it.value))
-                } else if (it.name == "name") {
+                }
+                "name" -> {
                     where.addEqual(MediaStore.Audio.Media.TITLE, it.value)
-                } else if (it.name == "bucket_id") {
+                }
+                "bucket_id" -> {
                     where.add("${MediaStore.Audio.Media.BUCKET_ID} = ?", it.value)
-                } else if (it.name == "artist") {
+                }
+                "artist" -> {
                     where.addEqual(MediaStore.Audio.Media.ARTIST, it.value)
-                } else if (it.name == "ids") {
-                    val ids = it.value.split(",")
-                    if (ids.isNotEmpty()) {
-                        where.addIn(MediaStore.Audio.Media._ID, ids)
-                    }
                 }
             }
         }
         return where
+    }
+
+    override fun getWheres(query: String): List<ContentWhere> {
+        return getWheres(query, MediaStore.Audio.Media._ID)
     }
 
     fun search(context: Context, query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DAudio> {

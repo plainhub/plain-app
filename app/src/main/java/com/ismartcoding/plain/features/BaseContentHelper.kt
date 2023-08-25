@@ -12,10 +12,13 @@ import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.paging
 import com.ismartcoding.lib.extensions.sort
 import com.ismartcoding.lib.extensions.where
+import com.ismartcoding.lib.helpers.FilterField
+import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.features.image.ImageHelper
 import java.io.File
 
 abstract class BaseContentHelper {
@@ -26,10 +29,66 @@ abstract class BaseContentHelper {
     }
 
     abstract fun getWhere(query: String): ContentWhere
+
+    open fun getWheres(query: String): List<ContentWhere> {
+        return listOf(getWhere(query))
+    }
+
     abstract fun getProjection(): Array<String>
 
     open fun count(context: Context, query: String): Int {
-        val where = getWhere(query)
+        return getWheres(query).sumOf { count(context, it) }
+    }
+
+    protected open fun getBaseWhere(groups: List<FilterField>): ContentWhere {
+        return ContentWhere()
+    }
+
+    protected open fun getWhere(query: String, field: String): ContentWhere {
+        if (query.isNotEmpty()) {
+            val queryGroups = SearchHelper.parse(query)
+            val where = getBaseWhere(queryGroups)
+            val idsGroup = queryGroups.firstOrNull { it.name == "ids" }
+            if (idsGroup != null) {
+                val ids = idsGroup.value.split(",")
+                if (ids.isNotEmpty()) {
+                    where.addIn(field, ids)
+                }
+            }
+            return where
+        }
+
+        return ContentWhere()
+    }
+
+    protected open fun getWheres(query: String, field: String): List<ContentWhere> {
+        val wheres = mutableListOf<ContentWhere>()
+        if (query.isNotEmpty()) {
+            val queryGroups = SearchHelper.parse(query)
+            val where = getBaseWhere(queryGroups)
+            val idsGroup = queryGroups.firstOrNull { it.name == "ids" }
+            if (idsGroup != null) {
+                val ids = idsGroup.value.split(",")
+                if (ids.isNotEmpty()) {
+                    ids.chunked(2000).forEach {
+                        val w = where.copy()
+                        w.addIn(field, it)
+                        wheres.add(w)
+                    }
+                } else {
+                    wheres.add(where)
+                }
+            } else {
+                wheres.add(where)
+            }
+        } else {
+            wheres.add(ContentWhere())
+        }
+
+        return wheres
+    }
+
+    private fun count(context: Context, where: ContentWhere): Int {
         var result = 0
         if (isQPlus()) {
             context.contentResolver.query(uriExternal, null, Bundle().apply {
@@ -107,7 +166,7 @@ abstract class BaseContentHelper {
     }
 
     open fun deleteByIds(context: Context, ids: Set<String>) {
-        ids.chunked(30).forEach { chunk ->
+        ids.chunked(500).forEach { chunk ->
             val selection = "${BaseColumns._ID} IN (${StringHelper.getQuestionMarks(chunk.size)})"
             val selectionArgs = chunk.map { it }.toTypedArray()
             context.contentResolver.delete(uriExternal, selection, selectionArgs)

@@ -6,7 +6,7 @@ import android.provider.MediaStore
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
-import com.ismartcoding.lib.helpers.SearchHelper
+import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.features.BaseContentHelper
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -24,24 +24,23 @@ object ImageHelper : BaseContentHelper() {
     }
 
     override fun getWhere(query: String): ContentWhere {
+        return getWhere(query, MediaStore.Images.Media._ID)
+    }
+
+    override fun getBaseWhere(groups: List<FilterField>): ContentWhere {
         val where = ContentWhere()
-        if (query.isNotEmpty()) {
-            val queryGroups = SearchHelper.parse(query)
-            queryGroups.forEach {
-                if (it.name == "text") {
-                    where.add("${MediaStore.Images.Media.TITLE} LIKE ?", "%${it.value}%")
-                } else if (it.name == "bucket_id") {
-                    where.add("${MediaStore.Images.Media.BUCKET_ID} = ?", it.value)
-                } else if (it.name == "ids") {
-                    val ids = it.value.split(",")
-                    if (ids.isNotEmpty()) {
-                        where.addIn(MediaStore.Images.Media._ID, ids)
-                    }
-                }
+        groups.forEach {
+            if (it.name == "text") {
+                where.add("${MediaStore.Images.Media.TITLE} LIKE ?", "%${it.value}%")
+            } else if (it.name == "bucket_id") {
+                where.add("${MediaStore.Images.Media.BUCKET_ID} = ?", it.value)
             }
         }
-
         return where
+    }
+
+    override fun getWheres(query: String): List<ContentWhere> {
+        return getWheres(query, MediaStore.Images.Media._ID)
     }
 
     fun search(context: Context, query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DImage> {
