@@ -41,7 +41,19 @@ Discord: https://discord.gg/RQWcS6DEEe
 - ⚠️ The project is under **very active** development.
 - ⚠️ Expect bugs and breaking changes.
 - ⚠️ It is not perfect, I am always looking for ways to improve. If you find that the app is missing a certain feature, please don't hesitate to submit a feature request.
-- ⚠️ I have anxiety disorder and depression, so I kindly request everyone to ask questions and engage in discussions in a friendly manner.
+- ⚠️ I kindly request everyone to ask questions and engage in discussions in a friendly manner.
+
+## Donations :heart:
+
+**This project needs you!** If you would like to support this project's further development, the creator of this project or the continuous maintenance of this project, **feel free to donate**.
+
+Your donation is highly appreciated. Thank you!
+
+- [Buy me a cup of Ko-Fi!](https://ko-fi.com/ismartcoding)
+
+- Use WeChat to scan the code
+
+<img src="assets/donate-wechat.jpeg" width="200"/>
 
 ## Screenshots
 
@@ -90,9 +102,5 @@ storeFile=release.jks
 
 [![Star History Chart](https://api.star-history.com/svg?repos=ismartcoding/plain-app&type=Date)](https://star-history.com/#ismartcoding/plain-app&Date)
 
-## Donation
 
-Loved the project? [Consider buying me a cup of Ko-Fi!](https://ko-fi.com/ismartcoding)
-
-<img src="assets/donate-wechat.jpeg" width="200"/>
 
