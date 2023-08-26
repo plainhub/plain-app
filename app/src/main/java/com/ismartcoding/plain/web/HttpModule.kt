@@ -357,8 +357,8 @@ fun Application.module() {
                                 call.respond(HttpStatusCode.BadRequest)
                                 return@forEachPart
                             }
+                            File(dir).mkdirs()
                             val file = File("${dir}/${fileName}")
-                            file.mkdirs()
                             var path = file.toPath()
                             if (!replace && file.exists()) {
                                 val newFile = file.newFile()
