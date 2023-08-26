@@ -11,7 +11,7 @@ import com.ismartcoding.plain.data.preference.ImageSortByPreference
 import com.ismartcoding.plain.data.preference.VideoSortByPreference
 import com.ismartcoding.plain.databinding.ViewPageListBinding
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.features.file.MediaType
+import com.ismartcoding.plain.data.enums.MediaType
 import com.ismartcoding.plain.ui.extensions.highlightTitle
 import com.ismartcoding.plain.ui.extensions.unhighlightTitle
 import com.ismartcoding.plain.ui.models.FilteredItemsViewModel

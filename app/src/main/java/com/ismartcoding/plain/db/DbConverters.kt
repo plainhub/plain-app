@@ -8,16 +8,16 @@ import org.json.JSONArray
 
 class StringListConverter {
     @TypeConverter
-    fun toJSON(list: List<String>): String {
+    fun toJSON(list: ArrayList<String>): String {
         return list.toJSON().toString()
     }
 
     @TypeConverter
-    fun fromJSON(value: String): List<String> {
+    fun fromJSON(value: String): ArrayList<String> {
         if (value.isEmpty()) {
             return arrayListOf()
         }
-        return JSONArray(value).toStringList()
+        return ArrayList(JSONArray(value).toStringList())
     }
 }
 

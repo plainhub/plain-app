@@ -71,7 +71,7 @@ class CreateVocabularyDialog : BaseBottomSheetDialog<DialogCreateVocabularyBindi
             VocabularyList.addOrUpdateAsync("") {
                 boxId = TempData.selectedBoxId
                 name = binding.name.text
-                this.words = words.distinct().toMutableList()
+                this.words = ArrayList(words.distinct())
             }
         }
         sendEvent(VocabularyCreatedEvent())

@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.features.file
+package com.ismartcoding.plain.data.enums
 
 
 enum class MediaType {

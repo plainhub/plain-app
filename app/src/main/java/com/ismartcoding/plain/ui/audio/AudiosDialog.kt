@@ -22,7 +22,7 @@ import com.ismartcoding.plain.features.*
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioHelper
 import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.features.file.MediaType
+import com.ismartcoding.plain.data.enums.MediaType
 import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.CastDialog

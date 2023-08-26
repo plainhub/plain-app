@@ -20,7 +20,7 @@ data class DBox(
     var bluetoothMac: String = ""
 
     @ColumnInfo(name = "ips")
-    var ips: MutableList<String> = arrayListOf()
+    var ips: ArrayList<String> = arrayListOf()
 
     fun getBoxIP(): String {
         val deviceIP = NetworkHelper.getDeviceIP4()

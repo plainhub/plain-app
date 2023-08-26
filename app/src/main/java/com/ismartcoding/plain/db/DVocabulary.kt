@@ -3,6 +3,7 @@ package com.ismartcoding.plain.db
 import androidx.room.*
 import com.ismartcoding.lib.helpers.StringHelper
 import kotlinx.datetime.*
+import java.util.ArrayList
 
 @Entity(tableName = "vocabularies")
 data class DVocabulary(
@@ -12,7 +13,7 @@ data class DVocabulary(
     var boxId: String = ""
 
     @ColumnInfo(name = "words")
-    var words: MutableList<String> = arrayListOf()
+    var words: ArrayList<String> = arrayListOf()
 
     @ColumnInfo(name = "name")
     var name: String = ""

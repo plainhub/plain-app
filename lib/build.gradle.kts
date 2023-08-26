@@ -1,5 +1,6 @@
 plugins {
     id("com.android.library")
+    id("com.google.devtools.ksp")
     kotlin("android")
     kotlin("kapt")
     kotlin("plugin.serialization") version "1.8.21"
@@ -56,10 +57,10 @@ dependencies {
 
     implementation("com.github.barteksc:pdfium-android:1.9.0")
 
-    implementation("com.google.code.gson:gson:2.9.1")
+    implementation("com.google.code.gson:gson:2.10")
 
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
     api("com.google.android.material:material:1.11.0-alpha01")
@@ -72,7 +73,7 @@ dependencies {
     api("androidx.transition:transition:1.4.1")
 //    api("com.squareup.picasso:picasso:2.71828")
 
-    api("com.google.android.exoplayer:exoplayer:2.19.0")
+    api("com.google.android.exoplayer:exoplayer:2.19.1")
     // https://github.com/davemorrissey/subsampling-scale-image-view
     api("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
 

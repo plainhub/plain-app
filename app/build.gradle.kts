@@ -8,9 +8,10 @@ plugins {
     id("com.google.firebase.crashlytics")
     id("com.apollographql.apollo3") version "3.2.1"
     id("kotlin-parcelize")
+    id("com.google.devtools.ksp")
     kotlin("android")
     kotlin("kapt")
-    kotlin("plugin.serialization") version "1.8.21"
+    kotlin("plugin.serialization") version "1.9.0"
 }
 
 val keystoreProperties = Properties()
@@ -89,7 +90,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.7"
+        kotlinCompilerExtensionVersion = "1.5.2"
     }
 
     packaging {
@@ -116,34 +117,33 @@ android {
 }
 
 dependencies {
-    val room = "2.5.1"
+    val room = "2.6.0-beta01"
     val apollo = "3.2.1"
     val kgraphql = "0.18.1"
     val ktor = "2.1.0" // don't upgrade, TLS handshake failed
-    val compose = "1.6.0-alpha03"
 
-    implementation(platform("androidx.compose:compose-bom:2023.06.01"))
+    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
 
     implementation("com.caverock:androidsvg-aar:1.4")
 
 //    implementation("androidx.activity:activity-compose:1.7.2")
-    implementation("androidx.compose.runtime:runtime:$compose")
-    implementation("androidx.compose.ui:ui:$compose")
-    implementation("androidx.compose.foundation:foundation:$compose")
-    implementation("androidx.compose.foundation:foundation-layout:$compose")
-    implementation("androidx.compose.material3:material3:1.2.0-alpha05")
-    implementation("androidx.compose.material:material-icons-extended:$compose")
+    implementation("androidx.compose.runtime:runtime")
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.foundation:foundation")
+    implementation("androidx.compose.foundation:foundation-layout")
+    implementation("androidx.compose.material3:material3:1.2.0-alpha06")
+    implementation("androidx.compose.material:material-icons-extended")
 
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha11")
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha12")
 
     // https://github.com/google/accompanist/releases
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.6-rc")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.33.1-alpha")
 
     // https://developer.android.com/jetpack/androidx/releases/navigation
-    implementation("androidx.navigation:navigation-compose:2.6.0")
+    implementation("androidx.navigation:navigation-compose:2.7.1")
 
-    releaseImplementation(platform("com.google.firebase:firebase-bom:31.2.1"))
-    releaseImplementation("com.google.firebase:firebase-crashlytics-ktx:18.4.0")
+    releaseImplementation(platform("com.google.firebase:firebase-bom:32.2.3"))
+    releaseImplementation("com.google.firebase:firebase-crashlytics-ktx:18.4.1")
 
     implementation("com.apollographql.apollo3:apollo-runtime:$apollo")
     implementation("com.apollographql.apollo3:apollo-normalized-cache:$apollo")
@@ -152,16 +152,16 @@ dependencies {
 
     implementation("androidx.viewpager2:viewpager2:1.0.0")
     implementation("androidx.paging:paging-runtime-ktx:3.2.0")
-    implementation("androidx.preference:preference-ktx:1.2.0")
+    implementation("androidx.preference:preference-ktx:1.2.1")
 
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("com.github.bmoliveira:snake-yaml:v1.18-android")
 
     // CameraX
-    implementation("androidx.camera:camera-core:1.3.0-beta02")
-    implementation("androidx.camera:camera-camera2:1.3.0-beta02")
-    implementation("androidx.camera:camera-lifecycle:1.3.0-beta02")
-    implementation("androidx.camera:camera-view:1.3.0-beta02")
+    implementation("androidx.camera:camera-core:1.3.0-rc01")
+    implementation("androidx.camera:camera-camera2:1.3.0-rc01")
+    implementation("androidx.camera:camera-lifecycle:1.3.0-rc01")
+    implementation("androidx.camera:camera-view:1.3.0-rc01")
 
     implementation("io.ktor:ktor-server-core:$ktor")
     implementation("io.ktor:ktor-server-netty:$ktor")
@@ -182,7 +182,7 @@ dependencies {
 
     // https://developer.android.com/jetpack/androidx/releases/room
     implementation("androidx.room:room-common:$room")
-    kapt("androidx.room:room-compiler:$room")
+    ksp("androidx.room:room-compiler:$room")
     implementation("androidx.room:room-ktx:$room")
     implementation("com.github.skydoves:balloon:1.5.2")
 

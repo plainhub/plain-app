@@ -28,6 +28,7 @@ import com.ismartcoding.plain.api.HttpApiTimeout
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
+import com.ismartcoding.plain.data.enums.BucketType
 import com.ismartcoding.plain.data.enums.TagType
 import com.ismartcoding.plain.data.preference.ApiPermissionsPreference
 import com.ismartcoding.plain.data.preference.AudioPlayModePreference
@@ -67,7 +68,7 @@ import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.features.feed.fetchContentAsync
 import com.ismartcoding.plain.features.file.FileSystemHelper
-import com.ismartcoding.plain.features.file.MediaType
+import com.ismartcoding.plain.data.enums.MediaType
 import com.ismartcoding.plain.features.image.ImageHelper
 import com.ismartcoding.plain.features.note.NoteHelper
 import com.ismartcoding.plain.features.pkg.PackageHelper
@@ -278,18 +279,18 @@ class SXGraphQL(val schema: Schema) {
                     }
                 }
                 query("mediaBuckets") {
-                    resolver { type: MediaType ->
+                    resolver { type: BucketType ->
                         val context = MainApp.instance
                         if (Permission.WRITE_EXTERNAL_STORAGE.can(context)) {
-                            if (type == MediaType.IMAGE) {
+                            if (type == BucketType.IMAGE) {
                                 ImageHelper.getBuckets(context).map { it.toModel() }
-                            } else if (type == MediaType.AUDIO) {
+                            } else if (type == BucketType.AUDIO) {
                                 if (isQPlus()) {
                                     AudioHelper.getBuckets(context).map { it.toModel() }
                                 } else {
                                     emptyList()
                                 }
-                            } else if (type == MediaType.VIDEO) {
+                            } else if (type == BucketType.VIDEO) {
                                 VideoHelper.getBuckets(context).map { it.toModel() }
                             } else {
                                 emptyList()
@@ -1001,6 +1002,7 @@ class SXGraphQL(val schema: Schema) {
                     }
                 }
                 enum<MediaPlayMode>()
+                enum<BucketType>()
                 enum<TagType>()
                 enum<Permission>()
                 stringScalar<Instant> {

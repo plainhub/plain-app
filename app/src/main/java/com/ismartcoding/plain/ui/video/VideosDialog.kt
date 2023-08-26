@@ -26,7 +26,7 @@ import com.ismartcoding.plain.databinding.ItemVideoGridBinding
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionResultEvent
-import com.ismartcoding.plain.features.file.MediaType
+import com.ismartcoding.plain.data.enums.MediaType
 import com.ismartcoding.plain.features.video.VideoHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.CastDialog
