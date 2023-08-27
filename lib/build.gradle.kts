@@ -49,7 +49,7 @@ dependencies {
     api("androidx.appcompat:appcompat:1.6.1")
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-    val ktor = "2.3.1"
+    val ktor = "2.3.3"
     val markwon = "4.6.2"
     val coil = "2.4.0"
 

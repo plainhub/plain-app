@@ -238,8 +238,11 @@ object FileSystemHelper {
 
     fun getRecents(context: Context): List<DFile> {
         val items = arrayListOf<DFile>()
-
-        val uri = MediaStore.Files.getContentUri("external")
+        val limit = 100
+        val uri = MediaStore.Files.getContentUri("external").buildUpon()
+            .appendQueryParameter("limit", limit.toString())
+            .appendQueryParameter("offset", "0")
+            .build()
         val projection = arrayOf(
             MediaStore.Files.FileColumns.DATA,
             MediaStore.Files.FileColumns.DISPLAY_NAME,
@@ -248,7 +251,7 @@ object FileSystemHelper {
         )
 
         val queryArgs = bundleOf(
-            ContentResolver.QUERY_ARG_LIMIT to 100,
+            ContentResolver.QUERY_ARG_LIMIT to limit,
             ContentResolver.QUERY_ARG_SORT_COLUMNS to arrayOf(MediaStore.Files.FileColumns.DATE_MODIFIED),
             ContentResolver.QUERY_ARG_SORT_DIRECTION to ContentResolver.QUERY_SORT_DIRECTION_DESCENDING
         )
@@ -268,7 +271,7 @@ object FileSystemHelper {
             }
         }
 
-        return items
+        return items.take(50)
     }
 
     private fun parseFilePermission(f: File): String {

@@ -460,8 +460,9 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("recentFiles") {
                     resolver { ->
-                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(MainApp.instance)
-                        FileSystemHelper.getRecents(MainApp.instance).map { it.toModel() }
+                        val context = MainApp.instance
+                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
+                        FileSystemHelper.getRecents(context).map { it.toModel() }
                     }
                 }
                 query("files") {
