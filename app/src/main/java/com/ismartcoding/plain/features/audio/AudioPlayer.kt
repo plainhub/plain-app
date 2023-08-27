@@ -171,7 +171,9 @@ class AudioPlayer : IMediaPlayer {
     private fun setListen() {
         mediaPlayer?.setOnPreparedListener {
             mediaPlayer?.seekTo(playerProgress)
-            mediaPlayer?.start()
+            coIO {
+                mediaPlayer?.start()
+            }
             setChangedNotify(AudioAction.PLAY)
         }
 
