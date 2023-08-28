@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.extensions
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.view.GestureDetector
@@ -117,7 +118,7 @@ fun TextView.markdown(content: String) {
                         ImageProps.DESTINATION.require(props)
                     ) { _, link ->
                         PreviewDialog().show(
-                            items = arrayListOf(PreviewItem(link, link)),
+                            items = arrayListOf(PreviewItem(link, Uri.parse(link))),
                             initKey = link,
                         )
                     }

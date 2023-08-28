@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.preview.viewholders
 
 import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -50,9 +51,10 @@ class SubsamplingViewHolder(
                 initTag(item, holder)
                 orientation = SubsamplingScaleImageView.ORIENTATION_USE_EXIF
                 coMain {
-                    if (item.uri.startsWith("http://", true) || item.uri.startsWith("https://", true)) {
+                    val path = item.uri.toString()
+                    if (path.startsWith("http://", true) || path.startsWith("https://", true)) {
                         val request = ImageRequest.Builder(context)
-                            .data(item.uri)
+                            .data(path)
                             .target(
                                 onStart = { _ ->
                                     binding.loading.isVisible = true
@@ -70,13 +72,13 @@ class SubsamplingViewHolder(
                             )
                             .build()
                         context.imageLoader.enqueue(request)
-                    } else if (item.uri.startsWith("app://", true)) {
-                        setImage(ImageSource.uri(item.uri.getFinalPath(context)))
+                    } else if (path.startsWith("app://", true)) {
+                        setImage(ImageSource.uri(path.getFinalPath(context)))
                     } else {
                         binding.loading.isVisible = true
                         delay(100)
                         binding.loading.isVisible = false
-                        setImage(ImageSource.uri(item.uri))
+                        setImage(ImageSource.uri(item.uri.toString()))
                     }
                 }
             }

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.video
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -84,7 +85,7 @@ class VideoPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
                 val m = getModel<SortableVideoModel>()
                 val items = getModelList<SortableVideoModel>()
                 PreviewDialog().show(
-                    items = items.map { s -> PreviewItem(s.data.id, s.data.path) },
+                    items = items.map { s -> PreviewItem(s.data.id, Uri.parse(s.data.path)) },
                     initKey = m.data.id,
                 )
             }

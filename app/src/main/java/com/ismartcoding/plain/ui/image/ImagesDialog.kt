@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.image
 
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
@@ -137,7 +138,7 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
                         CastDialog(arrayListOf(), m.data.path).show()
                     } else {
                         PreviewDialog().show(
-                            items = getModelList<ImageModel>().map { s -> PreviewItem(s.data.id, s.data.path) },
+                            items = getModelList<ImageModel>().map { s -> PreviewItem(s.data.id, Uri.parse(s.data.path)) },
                             initKey = m.data.id,
                         )
                     }

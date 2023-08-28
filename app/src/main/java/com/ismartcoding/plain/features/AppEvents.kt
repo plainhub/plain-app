@@ -141,7 +141,8 @@ object AppEvents {
         }
 
         receiveEventHandler<StartHttpServerEvent> {
-            ContextCompat.startForegroundService(MainApp.instance, Intent(MainApp.instance, HttpServerService::class.java))
+            val context = MainApp.instance
+            ContextCompat.startForegroundService(context, Intent(context, HttpServerService::class.java))
         }
 
         receiveEventHandler<AIChatCreatedEvent> { event ->

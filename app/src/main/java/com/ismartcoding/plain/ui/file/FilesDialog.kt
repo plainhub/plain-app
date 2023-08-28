@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.file
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
@@ -67,6 +68,7 @@ import com.ismartcoding.plain.ui.preview.TransitionHelper
 import com.ismartcoding.plain.ui.views.BreadcrumbItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.File
 import kotlin.io.path.Path
 import kotlin.io.path.moveTo
 
@@ -133,7 +135,7 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
                 } else if (m.data.path.isVideoFast() || m.data.path.isImageFast()) {
                     val items = getModelList<FileModel>()
                     PreviewDialog().show(
-                        items = items.filter { !it.data.isDir && (it.data.path.isVideoFast() || it.data.path.isImageFast()) }.map { s -> PreviewItem(s.data.path, s.data.path) },
+                        items = items.filter { !it.data.isDir && (it.data.path.isVideoFast() || it.data.path.isImageFast()) }.map { s -> PreviewItem(s.data.path, Uri.parse(s.data.path)) },
                         initKey = m.data.path,
                     )
                 } else if (m.data.path.isAudioFast()) {
@@ -146,12 +148,12 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
                     }
                 } else if (m.data.path.isTextFile()) {
                     if (m.data.size <= Constants.MAX_READABLE_TEXT_FILE_SIZE) {
-                        TextEditorDialog(m.data.path).show()
+                        TextEditorDialog(Uri.fromFile(File(m.data.path))).show()
                     } else {
                         DialogHelper.showMessage(R.string.text_file_size_limit)
                     }
                 } else if (m.data.path.isPdfFile()) {
-                    PdfViewerDialog(m.data.path).show()
+                    PdfViewerDialog(Uri.fromFile(File(m.data.path))).show()
                 } else {
                     MainActivity.instance.get()?.openPathIntent(m.data.path)
                 }

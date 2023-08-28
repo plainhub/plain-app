@@ -1,14 +1,17 @@
 package com.ismartcoding.plain.ui.preview
 
+import android.content.Context
+import android.net.Uri
+import com.ismartcoding.lib.extensions.getFileName
 import com.ismartcoding.lib.extensions.isVideoFast
 
 data class PreviewItem(
     val id: String,
-    val uri: String,
+    val uri: Uri,
 ) {
-    fun itemType(): Int {
+    fun itemType(context: Context): Int {
         return when {
-            uri.isVideoFast() -> ItemType.VIDEO
+            uri.getFileName(context).isVideoFast() -> ItemType.VIDEO
             else -> ItemType.IMAGE
         }
     }

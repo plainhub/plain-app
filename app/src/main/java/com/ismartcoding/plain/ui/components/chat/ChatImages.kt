@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.components.chat
 
 import android.content.Context
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -49,7 +50,7 @@ fun ChatImages(context: Context, m: VChat, imageWidthDp: Dp, imageWidthPx: Int) 
                 Box(modifier = Modifier.clickable {
                     sendEvent(ChatItemClickEvent())
                     PreviewDialog().show(
-                        items = imageItems.mapIndexed { i, s -> PreviewItem(m.id + "|" + i, s.uri.getFinalPath(context)) },
+                        items = imageItems.mapIndexed { i, s -> PreviewItem(m.id + "|" + i, Uri.parse(s.uri.getFinalPath(context))) },
                         initKey = m.id + "|" + index,
                     )
                 }) {

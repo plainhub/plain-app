@@ -709,7 +709,7 @@ fun String.getMimeType(): String {
 
 fun String.indexOf(anyOfTheseChars: Array<Char>): Int {
     for (element in anyOfTheseChars) {
-        for (j in 0 until this.length) {
+        for (j in indices) {
             if (this[j] == element) {
                 return j
             }

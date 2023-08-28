@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.video
 
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
@@ -138,7 +139,7 @@ class VideosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
                         CastDialog(arrayListOf(), m.data.path).show()
                     } else {
                         PreviewDialog().show(
-                            items = getModelList<VideoModel>().map { s -> PreviewItem(s.data.id, s.data.path) },
+                            items = getModelList<VideoModel>().map { s -> PreviewItem(s.data.id, Uri.parse(s.data.path)) },
                             initKey = getModel<VideoModel>().data.id,
                         )
                     }

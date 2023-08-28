@@ -8,6 +8,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.media.projection.MediaProjectionManager
 import android.net.ConnectivityManager
+import android.net.nsd.NsdManager
 import android.net.wifi.WifiManager
 import android.os.PowerManager
 import android.os.storage.StorageManager
@@ -31,6 +32,10 @@ val inputMethodManager: InputMethodManager by lazy {
 
 val notificationManager: NotificationManagerCompat by lazy {
     NotificationManagerCompat.from(MainApp.instance)
+}
+
+val nsdManager: NsdManager by lazy {
+    MainApp.instance.getSystemServiceCompat(NsdManager::class.java)
 }
 
 val powerManager: PowerManager by lazy {

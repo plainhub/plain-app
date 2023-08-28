@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.getFilenameFromPath
+import com.ismartcoding.lib.extensions.getFileName
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.media.VideoModel
 import com.ismartcoding.lib.media.VideoPlayer
@@ -31,10 +31,10 @@ class VideoViewHolder(
         _item = item
         binding.videoView.initTag(item, this)
         binding.imageView.visibility = View.GONE
-        binding.imageView.load(item.uri)
-        binding.videoView.binding.title.text = _item.uri.getFilenameFromPath()
+        binding.imageView.load(item.uri.toString())
+        binding.videoView.binding.title.text = _item.uri.getFileName(MainApp.instance)
         binding.videoView.binding.ivCast.setSafeClick {
-            sendEvent(ViewerShowCastListEvent(item.uri))
+            sendEvent(ViewerShowCastListEvent(item.uri.toString()))
         }
     }
 
@@ -49,7 +49,7 @@ class VideoViewHolder(
     fun resume() {
         // surrounded with coMain to fix the bug that it only shows loading in some case.
         coMain {
-            player.setMediaSource(MainApp.instance, VideoModel(Uri.fromFile(File(_item.uri))))
+            player.setMediaSource(MainApp.instance, VideoModel(_item.uri))
             binding.videoView.bindMediaPlayer(player)
             binding.videoView.play()
         }

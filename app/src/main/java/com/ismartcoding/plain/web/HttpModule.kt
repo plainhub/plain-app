@@ -251,9 +251,18 @@ fun Application.module() {
                 val path = FileHelper.getFilePath(id).getFinalPath(context)
                 if (path.startsWith("content://")) {
                     val bytes = context.contentResolver.openInputStream(Uri.parse(path))?.buffered()?.use { it.readBytes() }
-                    call.respondBytes(bytes!!)
+                    if (bytes != null) {
+                        call.respondBytes(bytes)
+                    } else {
+                        call.respond(HttpStatusCode.NotFound)
+                    }
                 } else {
                     val file = File(path)
+                    if (!file.exists()) {
+                        call.respond(HttpStatusCode.NotFound)
+                        return@get
+                    }
+
                     val fileName = URLEncoder.encode(q["name"] ?: file.name, "UTF-8")
                     if (q["dl"] == "1") {
                         call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")

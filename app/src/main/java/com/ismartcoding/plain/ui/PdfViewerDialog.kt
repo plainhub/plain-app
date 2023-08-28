@@ -1,9 +1,10 @@
 package com.ismartcoding.plain.ui
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
-import com.ismartcoding.lib.extensions.getFilenameFromPath
+import com.ismartcoding.lib.extensions.getFileName
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.pdfviewer.listener.OnPageErrorListener
 import com.ismartcoding.lib.pdfviewer.scroll.DefaultScrollHandle
@@ -11,24 +12,21 @@ import com.ismartcoding.lib.pdfviewer.util.FitPolicy
 import com.ismartcoding.plain.databinding.DialogPdfViewerBinding
 import com.ismartcoding.plain.ui.extensions.onBack
 import kotlinx.coroutines.launch
-import java.io.File
 
-class PdfViewerDialog(val path: String) : BaseDialog<DialogPdfViewerBinding>(),
+class PdfViewerDialog(val uri: Uri) : BaseDialog<DialogPdfViewerBinding>(),
     OnPageErrorListener {
-    var pdfFileName: String = ""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        pdfFileName = path.getFilenameFromPath()
         binding.topAppBar.run {
-            title = pdfFileName
+            title = uri.getFileName(requireContext())
             onBack {
                 dismiss()
             }
         }
 
         lifecycleScope.launch {
-            binding.pdfView.fromFile(File(path))
+            binding.pdfView.fromUri(uri)
                 .defaultPage(0)
                 .enableAnnotationRendering(true)
                 .scrollHandle(DefaultScrollHandle(requireContext()))

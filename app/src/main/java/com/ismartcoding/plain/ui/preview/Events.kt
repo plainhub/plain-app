@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.preview
 
+import android.net.Uri
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 
