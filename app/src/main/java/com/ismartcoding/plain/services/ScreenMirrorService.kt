@@ -161,6 +161,11 @@ class ScreenMirrorService : LifecycleService() {
             mScreenWidth
         }
         mImageReader = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 2)
+        mMediaProjection?.registerCallback(object : MediaProjection.Callback() {
+            override fun onStop() {
+                stop()
+            }
+        }, null)
         mVirtualDisplay = mMediaProjection?.createVirtualDisplay(
             "ScreenMirroringService", width, height, mScreenDensity,
             DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY or DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC,
