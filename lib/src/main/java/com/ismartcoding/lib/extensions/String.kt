@@ -1,9 +1,11 @@
 package com.ismartcoding.lib.extensions
 
 import android.content.Context
+import android.net.Uri
 import android.provider.MediaStore
 import android.telephony.PhoneNumberUtils
 import com.ismartcoding.lib.Constants
+import java.io.File
 import java.text.Normalizer
 import java.text.SimpleDateFormat
 import java.util.*
@@ -20,6 +22,14 @@ fun String.getFinalPath(context: Context): String {
     }
 
     return this
+}
+
+fun String.pathToUri(): Uri {
+    if (startsWith("/")) {
+        return Uri.fromFile(File(this))
+    }
+    
+    return Uri.parse(this)
 }
 
 fun String.toAppUrl(context: Context): String {

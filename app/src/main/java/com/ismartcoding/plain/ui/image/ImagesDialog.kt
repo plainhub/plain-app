@@ -10,6 +10,7 @@ import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.extensions.dp2px
+import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.lib.helpers.BitmapHelper
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
@@ -138,7 +139,7 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
                         CastDialog(arrayListOf(), m.data.path).show()
                     } else {
                         PreviewDialog().show(
-                            items = getModelList<ImageModel>().map { s -> PreviewItem(s.data.id, Uri.parse(s.data.path)) },
+                            items = getModelList<ImageModel>().map { s -> PreviewItem(s.data.id, s.data.path.pathToUri()) },
                             initKey = m.data.id,
                         )
                     }

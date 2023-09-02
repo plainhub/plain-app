@@ -2,22 +2,14 @@ package com.ismartcoding.lib.extensions
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.media.MediaMetadataRetriever
 import android.media.ThumbnailUtils
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Size
-import coil.decode.DataSource
-import coil.imageLoader
-import coil.request.ImageRequest
-import coil.request.SuccessResult
-import coil.request.videoFrameMillis
-import coil.request.videoFrameOption
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.Downsampler
 import com.bumptech.glide.request.RequestOptions
-import com.commit451.coiltransformations.CropTransformation
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.logcat.LogCat
 import java.io.ByteArrayOutputStream

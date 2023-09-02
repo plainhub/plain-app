@@ -1,32 +1,22 @@
 package com.ismartcoding.plain.ui.preview.viewholders
 
-import android.graphics.drawable.BitmapDrawable
-import android.net.Uri
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import coil.Coil.imageLoader
-import coil.Coil.setImageLoader
-import coil.ImageLoader
-import coil.decode.GifDecoder
-import coil.decode.ImageDecoderDecoder
-import coil.decode.SvgDecoder
-import coil.decode.VideoFrameDecoder
-import coil.imageLoader
-import coil.load
-import coil.request.ImageRequest
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
-import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.databinding.ItemImageviewerSubsamplingBinding
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import com.ismartcoding.plain.ui.preview.utils.initTag
 import kotlinx.coroutines.delay
-import java.io.File
 
 class SubsamplingViewHolder(
     parent: ViewGroup,
@@ -53,25 +43,23 @@ class SubsamplingViewHolder(
                 coMain {
                     val path = item.uri.toString()
                     if (path.startsWith("http://", true) || path.startsWith("https://", true)) {
-                        val request = ImageRequest.Builder(context)
-                            .data(path)
-                            .target(
-                                onStart = { _ ->
-                                    binding.loading.isVisible = true
-                                },
-                                onSuccess = { result ->
+                        binding.loading.isVisible = true
+                        Glide.with(context)
+                            .asBitmap()
+                            .load(path)
+                            .into(object : CustomTarget<Bitmap>() {
+                                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
                                     binding.loading.isVisible = false
-                                    val bitmap = (result as? BitmapDrawable)?.bitmap
-                                    if (bitmap != null) {
-                                        setImage(ImageSource.bitmap(bitmap))
-                                    }
-                                },
-                                onError = { _ ->
+                                    setImage(ImageSource.bitmap(resource))
+                                }
+
+                                override fun onLoadFailed(errorDrawable: Drawable?) {
                                     binding.loading.isVisible = false
                                 }
-                            )
-                            .build()
-                        context.imageLoader.enqueue(request)
+
+                                override fun onLoadCleared(placeholder: Drawable?) {
+                                }
+                            })
                     } else if (path.startsWith("app://", true)) {
                         setImage(ImageSource.uri(path.getFinalPath(context)))
                     } else {

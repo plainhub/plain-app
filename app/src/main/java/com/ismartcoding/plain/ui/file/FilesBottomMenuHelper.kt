@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.newPath
+import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.ShareHelper
@@ -39,7 +40,7 @@ object FilesBottomMenuHelper {
         when (menuItem.itemId) {
             R.id.share -> {
                 rv.ensureSelect { items ->
-                    ShareHelper.share(context, ArrayList(items.map { Uri.parse(it.data.id) }))
+                    ShareHelper.share(context, ArrayList(items.map { it.data.id.pathToUri() }))
                 }
             }
             R.id.cut -> {

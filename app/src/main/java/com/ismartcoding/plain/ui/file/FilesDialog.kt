@@ -21,6 +21,7 @@ import com.ismartcoding.lib.extensions.isPdfFile
 import com.ismartcoding.lib.extensions.isTextFile
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.extensions.newPath
+import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.lib.extensions.px
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
@@ -135,7 +136,7 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
                 } else if (m.data.path.isVideoFast() || m.data.path.isImageFast()) {
                     val items = getModelList<FileModel>()
                     PreviewDialog().show(
-                        items = items.filter { !it.data.isDir && (it.data.path.isVideoFast() || it.data.path.isImageFast()) }.map { s -> PreviewItem(s.data.path, Uri.parse(s.data.path)) },
+                        items = items.filter { !it.data.isDir && (it.data.path.isVideoFast() || it.data.path.isImageFast()) }.map { s -> PreviewItem(s.data.path, s.data.path.pathToUri()) },
                         initKey = m.data.path,
                     )
                 } else if (m.data.path.isAudioFast()) {

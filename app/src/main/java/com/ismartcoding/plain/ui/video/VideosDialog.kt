@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -11,6 +12,7 @@ import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.extensions.dp2px
+import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.lib.helpers.BitmapHelper
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
@@ -139,7 +141,7 @@ class VideosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
                         CastDialog(arrayListOf(), m.data.path).show()
                     } else {
                         PreviewDialog().show(
-                            items = getModelList<VideoModel>().map { s -> PreviewItem(s.data.id, Uri.parse(s.data.path)) },
+                            items = getModelList<VideoModel>().map { s -> PreviewItem(s.data.id, s.data.path.pathToUri()) },
                             initKey = getModel<VideoModel>().data.id,
                         )
                     }

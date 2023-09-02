@@ -4,11 +4,10 @@ import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
-import com.ismartcoding.lib.logcat.LogCat
 
 fun Uri.getFileName(context: Context): String {
     if (scheme == ContentResolver.SCHEME_FILE) {
-        return lastPathSegment ?: ""
+        return this.toString().getFilenameFromPath()
     }
 
     var fileName = ""
@@ -24,7 +23,7 @@ fun Uri.getFileName(context: Context): String {
 
     if (fileName.isEmpty()) {
         // Fallback: Extract file name from the URI
-        fileName = lastPathSegment ?: ""
+        fileName = this.toString().getFilenameFromPath()
     }
 
     return fileName

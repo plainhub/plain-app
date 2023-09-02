@@ -7,6 +7,7 @@ import android.media.MediaPlayer
 import android.net.Uri
 import androidx.media.AudioManagerCompat
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.media.AudioFocusHelper
@@ -61,7 +62,7 @@ class AudioPlayer : IMediaPlayer {
                 .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                 .build()
         )
-        mediaPlayer?.setDataSource(MainApp.instance, Uri.parse(path))
+        mediaPlayer?.setDataSource(MainApp.instance, path.pathToUri())
         mediaPlayer?.prepareAsync()
         requestFocus()
     }

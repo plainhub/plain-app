@@ -5,6 +5,7 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Parcelable
 import com.ismartcoding.lib.extensions.getFilenameWithoutExtensionFromPath
+import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import kotlinx.parcelize.Parcelize
@@ -25,7 +26,7 @@ data class DPlaylistAudio(
             var duration = 0L
             var artist = getString(R.string.unknown)
             try {
-                retriever.setDataSource(context, Uri.parse(path))
+                retriever.setDataSource(context, path.pathToUri())
                 val keyTitle = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: ""
                 if (keyTitle.isNotEmpty()) {
                     title = keyTitle

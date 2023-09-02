@@ -28,6 +28,7 @@ import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isPdfFile
 import com.ismartcoding.lib.extensions.isTextFile
 import com.ismartcoding.lib.extensions.isVideoFast
+import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
@@ -68,7 +69,7 @@ fun ChatFiles(context: Context, m: VChat) {
                         val items = fileItems
                             .filter { it.uri.isVideoFast() || it.uri.isImageFast() }
                         PreviewDialog().show(
-                            items = items.mapIndexed { i, s -> PreviewItem(m.id + "|" + i, Uri.parse(s.uri.getFinalPath(context))) },
+                            items = items.mapIndexed { i, s -> PreviewItem(m.id + "|" + i, s.uri.getFinalPath(context).pathToUri()) },
                             initKey = m.id + "|" + items.indexOf(item),
                         )
                     } else if (path.isAudioFast()) {
