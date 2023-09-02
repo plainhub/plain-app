@@ -61,15 +61,14 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: MainViewModel by viewModels()
     private val screenCapture = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-            if (ScreenMirrorService.instance == null) {
+            val base = ScreenMirrorService.instance?.getLatestImageBase64()
+            if (ScreenMirrorService.instance == null || base.isNullOrEmpty()) {
                 val service = Intent(this, ScreenMirrorService::class.java)
                 service.putExtra("code", result.resultCode)
                 service.putExtra("data", result.data)
                 startService(service)
             } else {
-                ScreenMirrorService.instance?.getLatestImageBase64()?.let {
-                    sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, it, false))
-                }
+                sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, base, false))
             }
         }
     }

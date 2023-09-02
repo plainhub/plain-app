@@ -36,7 +36,7 @@ class ScreenMirrorService : LifecycleService() {
     private var mScreenDensity = 0
     private var mResultCode = 0
     private var mResultData: Intent? = null
-    var mBitmap: Bitmap? = null
+    private var mBitmap: Bitmap? = null
     private lateinit var orientationEventListener: OrientationEventListener
     private var isPortrait = true
 
