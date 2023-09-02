@@ -15,8 +15,10 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.helpers.ZipHelper
+import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.upnp.UPnPController
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DownloadFileItem
@@ -102,8 +104,12 @@ fun Application.module() {
     }
 
     install(CORS) {
-        allowHost("localhost:3000")
-        allowHost("127.0.0.1:3000")
+        if (BuildConfig.DEBUG) {
+            allowHost("*")
+        } else {
+            allowHost("localhost:3000")
+            allowHost("127.0.0.1:3000")
+        }
         allowHeadersPrefixed("c-")
         allowHeader("x-box-api")
     }

@@ -2,12 +2,16 @@ package com.ismartcoding.lib.extensions
 
 import android.content.ContentResolver
 import android.provider.Settings
-import android.util.Log
 import androidx.annotation.CheckResult
 import com.ismartcoding.lib.logcat.LogCat
 
 fun ContentResolver.getSystemScreenTimeout(): Int {
-    return Settings.System.getInt(this, Settings.System.SCREEN_OFF_TIMEOUT)
+    return try {
+        Settings.System.getInt(this, Settings.System.SCREEN_OFF_TIMEOUT)
+    } catch (e: Settings.SettingNotFoundException) {
+        LogCat.e("Error getting screen timeout", e)
+        5000 * 60 // default 5 minutes
+    }
 }
 
 @CheckResult
