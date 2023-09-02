@@ -10,6 +10,7 @@ import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.newFile
 import com.ismartcoding.lib.extensions.parse
 import com.ismartcoding.lib.extensions.scanFileByConnection
+import com.ismartcoding.lib.extensions.toThumbBytesAsync
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
@@ -278,24 +279,10 @@ fun Application.module() {
 
                     val w = q["w"]?.toIntOrNull()
                     val h = q["h"]?.toIntOrNull()
-                    val centerCrop = q["cc"]?.toBooleanStrictOrNull()
+                    val centerCrop = q["cc"]?.toBooleanStrictOrNull() ?: true
                     // get video/image thumbnail
                     if (w != null && h != null) {
-                        val bitmap = file.getBitmapAsync(context, w, h)
-                        if (bitmap != null && file.name.endsWith(".gif", true)) {
-                            call.respondOutputStream(ContentType.Image.GIF) {
-                                bitmap.compress(Bitmap.CompressFormat.PNG, 100, this)
-                            }
-                            return@get
-                        }
-
-                        val stream = ByteArrayOutputStream()
-                        if (file.name.endsWith(".png", true)) {
-                            bitmap?.compress(Bitmap.CompressFormat.PNG, 70, stream)
-                        } else {
-                            bitmap?.compress(Bitmap.CompressFormat.JPEG, 80, stream)
-                        }
-                        call.respondBytes(stream.toByteArray())
+                        call.respondBytes(file.toThumbBytesAsync(MainApp.instance, w, h, centerCrop))
                         return@get
                     }
 

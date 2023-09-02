@@ -14,9 +14,13 @@ import coil.request.ImageRequest
 import coil.request.SuccessResult
 import coil.request.videoFrameMillis
 import coil.request.videoFrameOption
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.Downsampler
+import com.bumptech.glide.request.RequestOptions
 import com.commit451.coiltransformations.CropTransformation
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.logcat.LogCat
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 fun File.getDirectChildrenCount(countHiddenItems: Boolean): Int {
@@ -55,7 +59,7 @@ fun File.newFile(): File {
     return File(newPath())
 }
 
-suspend fun File.getBitmapAsync(context: Context, width: Int, height: Int): Bitmap? {
+suspend fun File.getBitmapAsync(context: Context, width: Int, height: Int, centerCrop: Boolean = true): Bitmap? {
     var bitmap: Bitmap? = null
     if (this.path.isPartialSupportVideo()) {
         try {
@@ -69,27 +73,34 @@ suspend fun File.getBitmapAsync(context: Context, width: Int, height: Int): Bitm
         }
     } else {
         try {
-            val imageLoader = context.imageLoader
-            val request = ImageRequest.Builder(context)
-                .data(this)
-                .size(width, height)
-                .videoFrameMillis(3000)
-                .bitmapConfig(Bitmap.Config.ARGB_8888)
-                .transformations(CropTransformation())
-                .build()
-            val result = (imageLoader.execute(request) as? SuccessResult)
-            bitmap = when (result?.dataSource) {
-                DataSource.MEMORY_CACHE, DataSource.DISK -> {
-                    (result.drawable as? BitmapDrawable)?.bitmap
-                }
-                else -> null
+            var options = RequestOptions().set(Downsampler.ALLOW_HARDWARE_CONFIG, true).override(width, height)
+            if (centerCrop) {
+                options = options.centerCrop()
             }
+            bitmap = Glide.with(context).asBitmap().load(this)
+                .apply(options)
+                .submit().get()
+            // https://stackoverflow.com/questions/58314397/java-lang-illegalstateexception-software-rendering-doesnt-support-hardware-bit
+//            bitmap = d.copy(Bitmap.Config.ARGB_8888, false)
         } catch (ex: Exception) {
             LogCat.e(ex.toString())
         }
     }
     return bitmap
 }
+
+suspend fun File.toThumbBytesAsync(context: Context, width: Int, height: Int, centerCrop: Boolean): ByteArray {
+    val stream = ByteArrayOutputStream()
+    getBitmapAsync(context, width, height, centerCrop)?.let{
+        if (this@toThumbBytesAsync.name.endsWith(".png", true)) {
+            it.compress(Bitmap.CompressFormat.PNG, 70, stream)
+        } else {
+            it.compress(Bitmap.CompressFormat.JPEG, 80, stream)
+        }
+    }
+    return stream.toByteArray()
+}
+
 
 fun File.getDuration(context: Context): Long {
     if (!this.name.isVideoFast() && !this.name.isAudioFast()) {

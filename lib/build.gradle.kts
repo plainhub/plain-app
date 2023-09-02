@@ -74,6 +74,10 @@ dependencies {
 //    api("com.squareup.picasso:picasso:2.71828")
 
     api("com.google.android.exoplayer:exoplayer:2.19.1")
+    // https://developer.android.com/topic/performance/graphics/load-bitmap
+    api("com.github.bumptech.glide:glide:4.16.0")
+    ksp("com.github.bumptech.glide:ksp:4.16.0")
+    api("com.google.android.exoplayer:exoplayer:2.19.1")
     // https://github.com/davemorrissey/subsampling-scale-image-view
     api("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
 
