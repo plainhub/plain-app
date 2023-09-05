@@ -7,7 +7,7 @@ import android.provider.OpenableColumns
 
 fun Uri.getFileName(context: Context): String {
     if (scheme == ContentResolver.SCHEME_FILE) {
-        return this.toString().getFilenameFromPath()
+        return this.lastPathSegment ?: ""
     }
 
     var fileName = ""
@@ -23,7 +23,7 @@ fun Uri.getFileName(context: Context): String {
 
     if (fileName.isEmpty()) {
         // Fallback: Extract file name from the URI
-        fileName = this.toString().getFilenameFromPath()
+        fileName = this.lastPathSegment ?: ""
     }
 
     return fileName
