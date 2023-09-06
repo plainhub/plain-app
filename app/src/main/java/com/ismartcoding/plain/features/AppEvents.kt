@@ -131,7 +131,9 @@ object AppEvents {
         }
 
         receiveEventHandler<WebSocketEvent> { event ->
-            WebSocketHelper.sendEventAsync(event)
+            coIO {
+                WebSocketHelper.sendEventAsync(event)
+            }
         }
 
         receiveEventHandler<PermissionResultEvent> { event ->

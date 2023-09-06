@@ -8,6 +8,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.util.Size
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.Downsampler
 import com.bumptech.glide.request.RequestOptions
 import com.ismartcoding.lib.isQPlus
@@ -65,7 +66,10 @@ suspend fun File.getBitmapAsync(context: Context, width: Int, height: Int, cente
         }
     } else {
         try {
-            var options = RequestOptions().set(Downsampler.ALLOW_HARDWARE_CONFIG, true).override(width, height)
+            var options = RequestOptions()
+                .set(Downsampler.ALLOW_HARDWARE_CONFIG, true)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .override(width, height)
             if (centerCrop) {
                 options = options.centerCrop()
             }
