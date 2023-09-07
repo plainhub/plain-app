@@ -481,8 +481,11 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("tags") {
                     resolver { type: TagType ->
-                        val items = TagHelper.getAll(type)
-                        items.map { it.toModel() }
+                        val tagCountMap = TagHelper.count(type).associate { it.id to it.count }
+                        TagHelper.getAll(type).map {
+                            it.count = tagCountMap[it.id] ?: 0
+                            it.toModel()
+                        }
                     }
                 }
                 query("feeds") {

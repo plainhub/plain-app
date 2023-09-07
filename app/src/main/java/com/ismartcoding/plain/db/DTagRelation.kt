@@ -48,7 +48,7 @@ interface TagRelationDao {
     @Update
     fun update(vararg item: DTagRelation)
 
-    @Query("SELECT tags.id AS id, count(tag_relations.tag_id) AS count FROM tags JOIN tag_relations ON tags.id = tag_relations.tag_id AND tags.type=:type GROUP BY tags.id")
+    @Query("SELECT tags.id AS id, count(tag_relations.tag_id) AS count FROM tags JOIN tag_relations ON tags.id = tag_relations.tag_id WHERE tags.type=:type GROUP BY tags.id")
     fun getAll(type: Int): List<DTagCount>
 }
 

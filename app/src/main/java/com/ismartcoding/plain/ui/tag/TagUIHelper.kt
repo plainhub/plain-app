@@ -19,9 +19,9 @@ import kotlinx.coroutines.launch
 
 object TagUIHelper {
     suspend fun createMenuGroupAsync(viewModel: FilteredItemsViewModel): DrawerMenuGroup {
-        val tagCounts = TagHelper.count(viewModel.tagType)
+        val tagCountMap = TagHelper.count(viewModel.tagType).associate { it.id to it.count }
         val tags = TagHelper.getAll(viewModel.tagType).map { tag ->
-            val count = tagCounts.find { it.id == tag.id }?.count ?: 0
+            val count = tagCountMap[tag.id] ?: 0
             MenuItemModel(tag).apply {
                 isChecked = (viewModel.data as? DTag)?.id == tag.id
                 title = tag.name
