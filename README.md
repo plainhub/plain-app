@@ -70,9 +70,23 @@ Your donation is highly appreciated. Thank you!
 
 PlainApp requires Android 9.0 or higher.
 
+## Roadmap
+
+- ❌ Not Started
+- 🟡 In Progress
+- ✅ Completed
+
+| Feature                   | WEB  | APP  |
+|---------------------------|:----:|:----:|
+| Material You Theme        | 🟡   | 🟡   |
+| Share Files via Web Link  | ❌   | ❌   |
+| Messaging between Phones with PlainApp (Bluetooth, Wi-Fi) | ❌ | ❌ |
+| Translation Dictionary    | ❌   | ❌   |
+| Books                     | ❌   | ❌   |
+
 ## Support
 
-If you encounter any issues, feel free to open an issue on GitHub. We're always happy to help.
+If you encounter any issues, feel free to open an issue on GitHub. I am always happy to help. Please do not give a one-star rating arbitrarily.
 
 ## Download GraphQL schema from PlainBox
 
