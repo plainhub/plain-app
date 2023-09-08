@@ -18,7 +18,7 @@ object ShareHelper {
         )
     }
 
-    fun share(context: Context, content: String) {
+    fun shareText(context: Context, content: String) {
         context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
             putExtra(
                 Intent.EXTRA_TEXT,
@@ -26,6 +26,10 @@ object ShareHelper {
             )
             type = "text/plain"
         }, null))
+    }
+
+    fun sharePaths(context: Context, paths: List<String>) {
+        share(context, ArrayList(paths.map { Uri.parse(it) }))
     }
 
     fun share(context: Context, uris: ArrayList<Uri>) {

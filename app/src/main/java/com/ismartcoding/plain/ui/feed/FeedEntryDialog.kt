@@ -46,7 +46,7 @@ class FeedEntryDialog(private val feedEntry: DFeedEntry, val feed: DFeed?) : Bas
                         SelectTagsDialog(TagType.FEED_ENTRY, arrayListOf(TagRelationStub.create(feedEntry))).show()
                     }
                     R.id.share -> {
-                        ShareHelper.share(requireContext(), feedEntry.title.let { it + "\n" } + feedEntry.url)
+                        ShareHelper.shareText(requireContext(), feedEntry.title.let { it + "\n" } + feedEntry.url)
                     }
                 }
             }

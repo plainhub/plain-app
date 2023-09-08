@@ -63,7 +63,7 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-    api("com.google.android.material:material:1.11.0-alpha01")
+    api("com.google.android.material:material:1.11.0-alpha02")
     api("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     api("androidx.lifecycle:lifecycle-extensions:2.2.0")
 

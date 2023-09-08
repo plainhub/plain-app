@@ -40,7 +40,7 @@ object FilesBottomMenuHelper {
         when (menuItem.itemId) {
             R.id.share -> {
                 rv.ensureSelect { items ->
-                    ShareHelper.share(context, ArrayList(items.map { it.data.id.pathToUri() }))
+                    ShareHelper.sharePaths(context, items.map { it.data.id })
                 }
             }
             R.id.cut -> {
