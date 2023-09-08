@@ -855,7 +855,9 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("trashNotes") {
                     resolver { ids: List<ID> ->
-                        NoteHelper.trashAsync(ids.map { it.value }.toSet())
+                        val newIds = ids.map { it.value }.toSet()
+                        TagHelper.deleteTagRelationByKeys(newIds, TagType.NOTE)
+                        NoteHelper.trashAsync(newIds)
                         true
                     }
                 }
