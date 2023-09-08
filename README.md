@@ -76,13 +76,16 @@ PlainApp requires Android 9.0 or higher.
 - 🟡 In Progress
 - ✅ Completed
 
-| Feature                   | WEB  | APP  |
-|---------------------------|:----:|:----:|
-| Material You Theme        | 🟡   | 🟡   |
-| Share Files via Web Link  | ❌   | ❌   |
-| Messaging between Phones with PlainApp (Bluetooth, Wi-Fi) | ❌ | ❌ |
-| Translation Dictionary    | ❌   | ❌   |
-| Books                     | ❌   | ❌   |
+| Feature                                                   | WEB | APP |
+|-----------------------------------------------------------|:---:|:---:|
+| Material You Theme                                        | 🟡  | 🟡  |
+| Share Files via Web Link                                  |  ❌  |  ❌  |
+| Messaging between Phones with PlainApp (Bluetooth, Wi-Fi) |  ❌  |  ❌  |
+| Translation Dictionary                                    |  ❌  |  ❌  |
+| Books                                                     |  ❌  |  ❌  |
+| TODO                                                      |  ❌  |  ❌  |
+
+The ultimate goal is to turn smartphones into personal data and knowledge managers, allowing individuals to more easily exchange knowledge and data with each other through PlainApp.
 
 ## Support
 
