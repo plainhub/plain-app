@@ -11,6 +11,7 @@ data class DImage(
     val title: String,
     val path: String,
     val size: Long,
+    val bucketId: String,
 ) : IData, Parcelable, Serializable {
     companion object {
         private const  val serialVersionUID = -76L

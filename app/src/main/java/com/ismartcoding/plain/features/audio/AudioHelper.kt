@@ -23,7 +23,8 @@ object AudioHelper : BaseContentHelper() {
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.SIZE,
             MediaStore.Audio.Media.DURATION,
-            MediaStore.Audio.Media.DATA
+            MediaStore.Audio.Media.DATA,
+            MediaStore.Audio.Media.BUCKET_ID
         )
     }
 
@@ -68,7 +69,8 @@ object AudioHelper : BaseContentHelper() {
                 val size = cursor.getLongValue(MediaStore.Audio.Media.SIZE)
                 val duration = cursor.getLongValue(MediaStore.Audio.Media.DURATION) / 1000
                 val path = cursor.getStringValue(MediaStore.Audio.Media.DATA)
-                result.add(DAudio(id, title, artist, path, duration, size))
+                val bucketId = cursor.getStringValue(MediaStore.Audio.Media.BUCKET_ID)
+                result.add(DAudio(id, title, artist, path, duration, size, bucketId))
             } while (cursor.moveToNext())
         }
         return result

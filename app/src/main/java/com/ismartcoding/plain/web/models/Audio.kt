@@ -11,6 +11,7 @@ data class Audio(
     val path: String,
     val duration: Long,
     val size: Long,
+    val bucketId: String
 )
 
 data class PlaylistAudio(
@@ -21,7 +22,7 @@ data class PlaylistAudio(
 )
 
 fun DAudio.toModel(): Audio {
-    return Audio(ID(id), title, artist, path, duration, size)
+    return Audio(ID(id), title, artist, path, duration, size, bucketId)
 }
 
 fun DPlaylistAudio.toModel(): PlaylistAudio {

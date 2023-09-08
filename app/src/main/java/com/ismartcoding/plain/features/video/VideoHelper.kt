@@ -21,6 +21,7 @@ object VideoHelper : BaseContentHelper() {
             MediaStore.Video.Media.DATA,
             MediaStore.Video.Media.SIZE,
             MediaStore.Video.Media.DURATION,
+            MediaStore.Video.Media.BUCKET_ID,
         )
     }
 
@@ -55,7 +56,8 @@ object VideoHelper : BaseContentHelper() {
                 val size = cursor.getLongValue(MediaStore.Video.Media.SIZE)
                 val duration = cursor.getLongValue(MediaStore.Video.Media.DURATION) / 1000
                 val path = cursor.getStringValue(MediaStore.Video.Media.DATA)
-                result.add(DVideo(id, title, path, duration, size))
+                val bucketId = cursor.getStringValue(MediaStore.Video.Media.BUCKET_ID)
+                result.add(DVideo(id, title, path, duration, size, bucketId))
             }
         }
         return result

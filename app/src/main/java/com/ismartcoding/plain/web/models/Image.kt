@@ -11,8 +11,9 @@ data class Image(
     var title: String,
     var path: String,
     val size: Long,
+    val bucketId: String
 )
 
 fun DImage.toModel(): Image {
-    return Image(ID(id), title, path, size)
+    return Image(ID(id), title, path, size, bucketId)
 }

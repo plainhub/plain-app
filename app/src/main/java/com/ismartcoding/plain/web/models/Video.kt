@@ -13,8 +13,9 @@ data class Video(
     var path: String,
     val duration: Long,
     val size: Long,
+    val bucketId: String
 )
 
 fun DVideo.toModel(): Video {
-    return Video(ID(id), title, path, duration, size)
+    return Video(ID(id), title, path, duration, size, bucketId)
 }

@@ -20,6 +20,7 @@ object ImageHelper : BaseContentHelper() {
             MediaStore.Images.Media.TITLE,
             MediaStore.Images.Media.DATA,
             MediaStore.Images.Media.SIZE,
+            MediaStore.Images.Media.BUCKET_ID,
         )
     }
 
@@ -52,7 +53,8 @@ object ImageHelper : BaseContentHelper() {
                 val title = cursor.getStringValue(MediaStore.Images.Media.TITLE)
                 val size = cursor.getLongValue(MediaStore.Images.Media.SIZE)
                 val path = cursor.getStringValue(MediaStore.Images.Media.DATA)
-                result.add(DImage(id, title, path, size))
+                val bucketId = cursor.getStringValue(MediaStore.Images.Media.BUCKET_ID)
+                result.add(DImage(id, title, path, size, bucketId))
             } while (cursor.moveToNext())
         }
         return result
