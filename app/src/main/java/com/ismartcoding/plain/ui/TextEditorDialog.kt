@@ -40,6 +40,8 @@ class TextEditorDialog(val uri: Uri) : BaseDialog<DialogTextEditorBinding>() {
                 onBackPressed()
             }
 
+            menu.findItem(R.id.save).isVisible = uri.scheme == ContentResolver.SCHEME_FILE
+
             onMenuItemClick {
                 when (itemId) {
                     R.id.save -> {

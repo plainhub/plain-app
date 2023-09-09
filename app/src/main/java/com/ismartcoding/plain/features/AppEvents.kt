@@ -48,13 +48,10 @@ import kotlin.time.Duration.Companion.seconds
 
 class BoxConnectivityStateChangedEvent
 
-class HttpServerEnabledEvent(val enabled: Boolean)
-
 class StartHttpServerEvent
 class StartScreenMirrorEvent
 class RestartAppEvent
 
-class SendMessageEvent(val content: DMessageContent)
 class UpdateMessageEvent(val id: String, val content: String)
 
 class DeleteChatItemViewEvent(val id: String)
@@ -143,8 +140,10 @@ object AppEvents {
         }
 
         receiveEventHandler<StartHttpServerEvent> {
-            val context = MainApp.instance
-            ContextCompat.startForegroundService(context, Intent(context, HttpServerService::class.java))
+            coIO {
+                val context = MainApp.instance
+                ContextCompat.startForegroundService(context, Intent(context, HttpServerService::class.java))
+            }
         }
 
         receiveEventHandler<AIChatCreatedEvent> { event ->

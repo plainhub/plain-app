@@ -14,7 +14,6 @@ import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.data.preference.WebPreference
-import com.ismartcoding.plain.features.HttpServerEnabledEvent
 import com.ismartcoding.plain.features.StartHttpServerEvent
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import io.ktor.client.request.get
@@ -26,7 +25,6 @@ class WebConsoleViewModel : ViewModel() {
     fun enableWebConsole(context: Context, enable: Boolean) {
         viewModelScope.launch {
             withIO { WebPreference.putAsync(context, enable) }
-            sendEvent(HttpServerEnabledEvent(enable))
             if (enable) {
                 requestIgnoreBatteryOptimization(context)
                 sendEvent(StartHttpServerEvent())
