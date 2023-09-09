@@ -31,6 +31,7 @@ import com.ismartcoding.plain.data.preference.dataStore
 import com.ismartcoding.plain.features.AppEvents
 import com.ismartcoding.plain.features.bluetooth.BluetoothEvents
 import com.ismartcoding.plain.features.box.BoxEvents
+import com.ismartcoding.plain.features.pkg.PackageHelper
 import com.ismartcoding.plain.ui.helpers.PageHelper
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
@@ -116,6 +117,7 @@ class MainApp : Application(), ImageLoaderFactory {
             if (FeedAutoRefreshPreference.get(preferences)) {
                 FeedFetchWorker.startRepeatWorkerAsync(instance)
             }
+            PackageHelper.cacheAppLabels()
             HttpServerManager.clientTsInterval()
         }
     }
