@@ -53,14 +53,14 @@ object FileSystemHelper {
     }
 
     fun getSDCardStorageStats(context: Context): DStorageStatsItem {
-        return getStorageStats(context, getSDCardPath(context))
+        return getStorageStats(getSDCardPath(context))
     }
 
-    fun getUSBStorageStats(context: Context): List<DStorageStatsItem> {
-        return getUsbDiskPaths().map { getStorageStats(context, it) }
+    fun getUSBStorageStats(): List<DStorageStatsItem> {
+        return getUsbDiskPaths().map { getStorageStats(it) }
     }
 
-    private fun getStorageStats(context: Context, path: String): DStorageStatsItem {
+    private fun getStorageStats(path: String): DStorageStatsItem {
         if (path.isNotEmpty()) {
             val stat = StatFs(path)
             val availableBytes = stat.blockSizeLong * stat.availableBlocksLong
@@ -71,7 +71,7 @@ object FileSystemHelper {
         return DStorageStatsItem(0, 0)
     }
 
-    fun getInternalStoragePath(context: Context): String {
+    fun getInternalStoragePath(): String {
         return (if (isRPlus()) {
             storageManager.primaryStorageVolume.directory?.path
         } else null) ?: Environment.getExternalStorageDirectory()?.absolutePath?.trimEnd('/') ?: ""
@@ -82,7 +82,7 @@ object FileSystemHelper {
     }
 
     fun getSDCardPath(context: Context): String {
-        val internalPath = getInternalStoragePath(context)
+        val internalPath = getInternalStoragePath()
         val directories = getStorageDirectories(context).filter {
             it != internalPath && !it.equals(
                 "/storage/emulated/0",
@@ -136,12 +136,18 @@ object FileSystemHelper {
 
     private fun getStorageDirectories(context: Context): Array<String> {
         val paths = HashSet<String>()
-        val rawExternalStorage = System.getenv("EXTERNAL_STORAGE")
         val rawSecondaryStoragesStr = System.getenv("SECONDARY_STORAGE")
         val rawEmulatedStorageTarget = System.getenv("EMULATED_STORAGE_TARGET")
-        if (TextUtils.isEmpty(rawEmulatedStorageTarget)) {
+        if (rawEmulatedStorageTarget.isNullOrEmpty()) {
             context.getExternalFilesDirs(null).filterNotNull().map { it.absolutePath }
-                .mapTo(paths) { it.substring(0, it.indexOf("Android/data")) }
+                .mapTo(paths) {
+                    val index = it.indexOf("/Android/data")
+                    if (index < 0) {
+                        it
+                    } else {
+                        it.substring(0, index)
+                    }
+                }
         } else {
             val path = Environment.getExternalStorageDirectory().absolutePath
             val folders = Pattern.compile("/").split(path)
@@ -155,13 +161,13 @@ object FileSystemHelper {
 
             val rawUserId = if (isDigit) lastFolder else ""
             if (TextUtils.isEmpty(rawUserId)) {
-                paths.add(rawEmulatedStorageTarget!!)
+                paths.add(rawEmulatedStorageTarget)
             } else {
                 paths.add(rawEmulatedStorageTarget + File.separator + rawUserId)
             }
         }
 
-        if (!TextUtils.isEmpty(rawSecondaryStoragesStr)) {
+        if (!rawSecondaryStoragesStr.isNullOrEmpty()) {
             val rawSecondaryStorages = rawSecondaryStoragesStr!!.split(File.pathSeparator.toRegex()).dropLastWhile(String::isEmpty).toTypedArray()
             Collections.addAll(paths, *rawSecondaryStorages)
         }

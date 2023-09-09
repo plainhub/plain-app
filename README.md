@@ -83,7 +83,7 @@ PlainApp requires Android 9.0 or higher.
 | Messaging between Phones with PlainApp (Bluetooth, Wi-Fi) |  ❌  |  ❌  |
 | Translation Dictionary                                    |  ❌  |  ❌  |
 | Books                                                     |  ❌  |  ❌  |
-| TODO                                                      |  ❌  |  ❌  |
+| To do list                                                |  ❌  |  ❌  |
 
 The ultimate goal is to turn smartphones into personal data and knowledge managers, allowing individuals to more easily exchange knowledge and data with each other through PlainApp.
 

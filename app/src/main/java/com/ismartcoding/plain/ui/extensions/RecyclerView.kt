@@ -199,7 +199,7 @@ suspend fun RecyclerView.updateDrawerMenuAsync(
         iconId = R.drawable.ic_history
     })
     val context = MainApp.instance
-    groups.add(MenuItemModel(FileSystemHelper.getInternalStoragePath(context)).apply {
+    groups.add(MenuItemModel(FileSystemHelper.getInternalStoragePath()).apply {
         isChecked = viewModel.type == FilesType.INTERNAL_STORAGE
         title = FileSystemHelper.getInternalStorageName(context)
         iconId = R.drawable.ic_storage

@@ -68,7 +68,6 @@ import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.features.feed.fetchContentAsync
 import com.ismartcoding.plain.features.file.FileSystemHelper
-import com.ismartcoding.plain.data.enums.MediaType
 import com.ismartcoding.plain.features.image.ImageHelper
 import com.ismartcoding.plain.features.note.NoteHelper
 import com.ismartcoding.plain.features.pkg.PackageHelper
@@ -449,7 +448,7 @@ class SXGraphQL(val schema: Schema) {
                         StorageStats(
                             FileSystemHelper.getInternalStorageStats().toModel(),
                             FileSystemHelper.getSDCardStorageStats(context).toModel(),
-                            FileSystemHelper.getUSBStorageStats(context).map { it.toModel() }
+                            FileSystemHelper.getUSBStorageStats().map { it.toModel() }
                         )
                     }
                 }
@@ -576,7 +575,7 @@ class SXGraphQL(val schema: Schema) {
                             context.allowSensitivePermissions(),
                             sdcardPath = FileSystemHelper.getSDCardPath(context),
                             usbDiskPaths = FileSystemHelper.getUsbDiskPaths(),
-                            internalStoragePath = FileSystemHelper.getInternalStoragePath(context),
+                            internalStoragePath = FileSystemHelper.getInternalStoragePath(),
                             downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
                         )
                     }
