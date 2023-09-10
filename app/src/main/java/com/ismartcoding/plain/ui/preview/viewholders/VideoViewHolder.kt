@@ -34,7 +34,7 @@ class VideoViewHolder(
             .into(binding.imageView)
         binding.videoView.binding.title.text = _item.uri.getFileName(MainApp.instance)
         binding.videoView.binding.ivCast.setSafeClick {
-            sendEvent(ViewerShowCastListEvent(item.uri.toString()))
+            sendEvent(ViewerShowCastListEvent(item.uri.path?: ""))
         }
     }
 
