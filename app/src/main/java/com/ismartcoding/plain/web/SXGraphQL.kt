@@ -13,6 +13,10 @@ import com.apurebase.kgraphql.schema.execution.Execution
 import com.apurebase.kgraphql.schema.execution.Executor
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.allowSensitivePermissions
+import com.ismartcoding.lib.extensions.getFinalPath
+import com.ismartcoding.lib.extensions.isAudioFast
+import com.ismartcoding.lib.extensions.isImageFast
+import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.extensions.newPath
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.extensions.toAppUrl
@@ -81,6 +85,7 @@ import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.MainActivity
+import com.ismartcoding.plain.web.loaders.FileInfoLoader
 import com.ismartcoding.plain.web.loaders.TagsLoader
 import com.ismartcoding.plain.web.models.AIChat
 import com.ismartcoding.plain.web.models.AIChatConfig
@@ -92,6 +97,7 @@ import com.ismartcoding.plain.web.models.Contact
 import com.ismartcoding.plain.web.models.ContactGroup
 import com.ismartcoding.plain.web.models.ContactInput
 import com.ismartcoding.plain.web.models.FeedEntry
+import com.ismartcoding.plain.web.models.FileInfo
 import com.ismartcoding.plain.web.models.Files
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.Image
@@ -130,19 +136,10 @@ import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import java.io.File
 import java.io.StringReader
 import java.io.StringWriter
-import kotlin.collections.List
-import kotlin.collections.any
-import kotlin.collections.arrayListOf
-import kotlin.collections.filter
-import kotlin.collections.forEach
-import kotlin.collections.isNotEmpty
-import kotlin.collections.map
 import kotlin.collections.set
-import kotlin.collections.setOf
-import kotlin.collections.toSet
-import kotlin.collections.toTypedArray
 import kotlin.io.path.Path
 import kotlin.io.path.moveTo
 
@@ -215,9 +212,9 @@ class SXGraphQL(val schema: Schema) {
                     }
                 }
                 type<ChatItem> {
-                    property(ChatItem::_content) {
-                        ignore = true
-                    }
+//                    property(ChatItem::_content) {
+//                        ignore = true
+//                    }
                     property("data") {
                         resolver { c: ChatItem ->
                             c.getContentData()
@@ -470,6 +467,25 @@ class SXGraphQL(val schema: Schema) {
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
                         val files = FileSystemHelper.getFilesList(dir, showHidden, FileSortByPreference.getValueAsync(context)).map { it.toModel() }
                         Files(dir, files)
+                    }
+                }
+                query("fileInfo") {
+                    resolver { id: ID, path: String ->
+                        val context = MainApp.instance
+                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
+                        val finalPath = path.getFinalPath(context)
+                        val file = File(finalPath)
+                        val updatedAt = Instant.fromEpochMilliseconds(file.lastModified())
+                        val size = file.length()
+                        val fileInfo = FileInfo(updatedAt, size)
+                        if (finalPath.isImageFast()) {
+                            fileInfo.data = FileInfoLoader.loadImage(id.value, finalPath)
+                        } else if (finalPath.isVideoFast()) {
+                            fileInfo.data = FileInfoLoader.loadVideo(context, id.value, finalPath)
+                        } else if (finalPath.isAudioFast()) {
+                            fileInfo.data = FileInfoLoader.loadAudio(context, id.value, finalPath)
+                        }
+                        fileInfo
                     }
                 }
                 query("boxes") {

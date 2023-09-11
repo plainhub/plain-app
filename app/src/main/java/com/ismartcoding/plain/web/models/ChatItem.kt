@@ -15,7 +15,7 @@ data class ChatItem(
     val content: String,
     val createdAt: Instant,
     val updatedAt: Instant,
-    @Transient val _content: DMessageContent? = null,
+    @Transient private val _content: DMessageContent? = null,
     @Contextual var data: ChatItemContent? = null,
 ) {
     fun getContentData(): ChatItemContent? {

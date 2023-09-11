@@ -26,4 +26,21 @@ object TagsLoader {
             })
         }
     }
+
+    fun load(id: String, tagType: TagType): List<Tag> {
+        val tagRelations = TagHelper.getTagRelationsByKey(id, tagType)
+        val tags = TagHelper.getAll(tagType).associateBy { it.id }
+        val tagIds = tagRelations.map { it.tagId }
+        return if (tagIds.isEmpty()) {
+            listOf()
+        } else {
+            val list = mutableListOf<Tag>()
+            tagIds.forEach { tagId ->
+                tags[tagId]?.toModel()?.let {
+                    list.add(it)
+                }
+            }
+            list
+        }
+    }
 }
