@@ -62,6 +62,7 @@ import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.RequestPermissionEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.ui.base.*
 import com.ismartcoding.plain.ui.extensions.navigate
@@ -69,7 +70,6 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.models.WebConsoleViewModel
 import com.ismartcoding.plain.ui.page.RouteName
-import com.ismartcoding.plain.ui.theme.palette.onDark
 import com.ismartcoding.plain.ui.theme.backColor
 import com.ismartcoding.plain.ui.theme.cardBackColor
 import com.ismartcoding.plain.web.HttpServerManager
@@ -301,7 +301,7 @@ fun WebConsolePage(
                         }
                     }
                     DialogHelper.showConfirmDialog(context, context.getString(R.string.restart_app_title), context.getString(R.string.restart_app_message)) {
-                        triggerRebirth(context)
+                        AppHelper.relaunch(context)
                     }
                 }
             }) {
@@ -399,12 +399,4 @@ fun BrowserPreview(context: Context, isHttps: Boolean, httpPort: Int, httpsPort:
         )
         Spacer(modifier = Modifier.height(24.dp))
     }
-}
-
-private fun triggerRebirth(context: Context) {
-    val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-    val componentName = intent!!.component
-    val mainIntent = Intent.makeRestartActivityTask(componentName)
-    context.startActivity(mainIntent)
-    Runtime.getRuntime().exit(0)
 }

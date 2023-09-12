@@ -20,6 +20,7 @@ import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.extensions.newPath
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.extensions.toAppUrl
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.PhoneHelper
@@ -79,6 +80,7 @@ import com.ismartcoding.plain.features.sms.SmsHelper
 import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.features.tag.TagRelationStub
 import com.ismartcoding.plain.features.video.VideoHelper
+import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.ExchangeHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.TempHelper
@@ -656,6 +658,14 @@ class SXGraphQL(val schema: Schema) {
                     resolver { ids: List<ID> ->
                         val newIds = ids.map { it.value }.toSet()
                         AIChatHelper.deleteByParentIdsAsync(newIds)
+                        true
+                    }
+                }
+                mutation("relaunchApp") {
+                    resolver { ->
+                        coIO {
+                            AppHelper.relaunch(MainApp.instance)
+                        }
                         true
                     }
                 }
