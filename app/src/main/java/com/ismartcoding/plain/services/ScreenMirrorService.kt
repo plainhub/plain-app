@@ -160,7 +160,6 @@ class ScreenMirrorService : LifecycleService() {
         mImageReader = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 2)
         mMediaProjection?.registerCallback(object : MediaProjection.Callback() {
             override fun onStop() {
-                stop()
             }
         }, null)
         mVirtualDisplay = mMediaProjection?.createVirtualDisplay(
