@@ -6,8 +6,10 @@ import android.content.Intent
 import android.net.Uri
 import android.os.PowerManager
 import android.provider.Settings
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.BuildConfig
@@ -15,6 +17,8 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.data.preference.WebPreference
 import com.ismartcoding.plain.features.StartHttpServerEvent
+import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
@@ -36,27 +40,36 @@ class WebConsoleViewModel : ViewModel() {
         viewModelScope.launch {
             val client = HttpClientManager.httpClient()
             DialogHelper.showLoading()
-            val errorMessage =
-                "Http server is not started. Kill all apps on your phone and start the PlainApp again. Make sure that there are no other apps occupying the HTTP or HTTPS ports. If the problem persists, please provide more details about the issue by contacting ismartcoding@gmail.com."
+            val errorMessage = context.getString(R.string.http_server_error)
             try {
                 val r = withIO { client.get("http://127.0.0.1:${httpPort}/health_check") }
                 DialogHelper.hideLoading()
                 if (r.status == HttpStatusCode.OK) {
-                    DialogHelper.showConfirmDialog(context, context.getString(R.string.confirm), "Http server is running well.")
+                    DialogHelper.showConfirmDialog(context, context.getString(R.string.confirm), context.getString(R.string.http_server_ok))
                 } else {
-                    DialogHelper.showConfirmDialog(
-                        context,
-                        context.getString(R.string.error),
-                        errorMessage
-                    )
+                    MaterialAlertDialogBuilder(context)
+                        .setTitle(context.getString(R.string.error))
+                        .setMessage(errorMessage)
+                        .setPositiveButton(R.string.ok) { _, _ ->
+                        }
+                        .setNegativeButton(R.string.relaunch_app) { _, _ ->
+                            AppHelper.relaunch(context)
+                        }
+                        .create()
+                        .show()
                 }
             } catch (ex: Exception) {
                 DialogHelper.hideLoading()
-                DialogHelper.showConfirmDialog(
-                    context,
-                    context.getString(R.string.error),
-                    errorMessage
-                )
+                MaterialAlertDialogBuilder(context)
+                    .setTitle(context.getString(R.string.error))
+                    .setMessage(errorMessage)
+                    .setPositiveButton(R.string.ok) { _, _ ->
+                    }
+                    .setNegativeButton(R.string.relaunch_app) { _, _ ->
+                        AppHelper.relaunch(context)
+                    }
+                    .create()
+                    .show()
             }
         }
     }

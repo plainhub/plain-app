@@ -1,5 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Простое Приложение</string>
+    <string name="http_server_ok">HTTP-сервер запущен</string>
+    <string name="http_server_error">HTTP-сервер не запущен. Перезапустите PlainApp и попробуйте снова. Убедитесь, что нет других приложений, занимающих порты HTTP или HTTPS. Если проблема сохраняется, предоставьте более подробную информацию о проблеме, связавшись с ismartcoding@gmail.com.</string>
+    <string name="relaunch_app">Перезапустите приложение</string>
     <string name="load_no_more">Конец</string>
     <string name="list_empty">Список пуст</string>
     <string name="select_box_title">Выберите ящик</string>

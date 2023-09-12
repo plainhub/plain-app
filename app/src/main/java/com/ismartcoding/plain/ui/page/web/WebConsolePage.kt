@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -155,7 +156,7 @@ fun WebConsolePage(
                         ""
                     }
                     if (errorMessage.isNotEmpty()) {
-                        Box(
+                        Column(
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
                                 .fillMaxWidth()
@@ -164,10 +165,18 @@ fun WebConsolePage(
                                 )
                         ) {
                             Text(
-                                modifier = Modifier.padding(16.dp),
+                                modifier = Modifier.padding(16.dp).fillMaxWidth(),
                                 text = errorMessage,
                                 color = MaterialTheme.colorScheme.error,
                             )
+                            Row(modifier = Modifier.padding(16.dp, 0.dp, 16.dp, 16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                                MiniOutlineButton(
+                                    text = stringResource(R.string.relaunch_app),
+                                    onClick = {
+                                        AppHelper.relaunch(context)
+                                    },
+                                )
+                            }
                         }
                     }
                     DisplayText(

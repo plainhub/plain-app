@@ -1,5 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
+    <string name="http_server_ok">Servidor HTTP iniciado</string>
+    <string name="http_server_error">O servidor HTTP não está iniciado. Reinicie o PlainApp e tente novamente. Certifique-se de que não existem outras aplicações a ocupar as portas HTTP ou HTTPS. Se o problema persistir, forneça mais detalhes sobre o problema ao contactar ismartcoding@gmail.com.</string>
+    <string name="relaunch_app">Reiniciar aplicativo</string>
     <string name="load_no_more">Fim</string>
     <string name="list_empty">Lista vazia</string>
     <string name="select_box_title">Selecione uma caixa</string>

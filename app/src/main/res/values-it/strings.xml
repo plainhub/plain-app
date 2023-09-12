@@ -1,5 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
+    <string name="http_server_ok">Server HTTP avviato</string>
+    <string name="http_server_error">Il server HTTP non è stato avviato. Riavvia PlainApp e riprova. Assicurati che non ci siano altre applicazioni che occupano le porte HTTP o HTTPS. Se il problema persiste, fornisci ulteriori dettagli sul problema contattando ismartcoding@gmail.com.</string>
+    <string name="relaunch_app">Rilancia l\'app</string>
     <string name="load_no_more">Fine</string>
     <string name="list_empty">La lista è vuota</string>
     <string name="select_box_title">Seleziona una box</string>

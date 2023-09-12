@@ -1,5 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
+    <string name="http_server_ok">HTTPサーバーが起動しました</string>
+    <string name="http_server_error">HTTPサーバーが起動していません。PlainAppを再起動して、もう一度試してみてください。HTTPまたはHTTPSポートを占有している他のアプリケーションがないことを確認してください。問題が解決しない場合は、ismartcoding@gmail.com に連絡して問題の詳細を提供してください。</string>
+    <string name="relaunch_app">アプリを再起動</string>
     <string name="load_no_more">終わり</string>
     <string name="list_empty">リストは空です</string>
     <string name="select_box_title">ボックスを選択</string>

@@ -1,5 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">প্লেনঅ্যাপ</string>
+    <string name="http_server_ok">সার্ভার চালু হয়েছে</string>
+    <string name="http_server_error">HTTP সার্ভার চালানো হয়নি। PlainApp পুনরায় চালিয়ে দেখুন এবং আবার চেষ্টা করুন। HTTP বা HTTPS পোর্ট দখল করা অন্য কোন অ্যাপস নেই সেটা নিশ্চিত করুন। সমস্যা অবিরত থাকলে, দয়া করে আইসমার্টকোডিং@gmail.com এ যোগাযোগ করে সমস্যার বিশদ বিবরণ সরবরাহ করুন।</string>
+    <string name="relaunch_app">পুনরায় চালু করুন</string>
     <string name="load_no_more">শেষ</string>
     <string name="list_empty">তালিকা খালি</string>
     <string name="select_box_title">একটি বাক্স নির্বাচন করুন</string>

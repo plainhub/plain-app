@@ -1,5 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">EinfacheApp</string>
+    <string name="http_server_ok">HTTP-Server läuft</string>
+    <string name="http_server_error">Der HTTP-Server ist nicht gestartet. Starten Sie die PlainApp erneut und versuchen Sie es erneut. Stellen Sie sicher, dass keine anderen Apps die HTTP- oder HTTPS-Ports belegen. Wenn das Problem weiterhin besteht, geben Sie bitte weitere Details zum Problem an, indem Sie ismartcoding@gmail.com kontaktieren.</string>
+    <string name="relaunch_app">App neu starten</string>
     <string name="load_no_more">Ende</string>
     <string name="list_empty">Liste ist leer</string>
     <string name="select_box_title">Wähle eine Box</string>
