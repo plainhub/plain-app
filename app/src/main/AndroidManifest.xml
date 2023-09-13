@@ -150,8 +150,8 @@
             android:name=".receivers.ServiceStopBroadcastReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.ismartcoding.plain.action.stop_http_server" />
-                <action android:name="com.ismartcoding.plain.action.stop_screen_mirror" />
+                <action android:name="${applicationId}.action.stop_http_server" />
+                <action android:name="${applicationId}.action.stop_screen_mirror" />
             </intent-filter>
         </receiver>
 

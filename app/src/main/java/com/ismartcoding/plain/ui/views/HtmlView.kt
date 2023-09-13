@@ -11,6 +11,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.content.FileProvider
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import java.io.File
@@ -65,7 +66,7 @@ class HtmlView(context: Context, attrs: AttributeSet? = null) : WebView(context,
                 try {
                     if (url.startsWith("file://")) {
                         val file = File(url.replace("file://", ""))
-                        val contentUri = FileProvider.getUriForFile(context, "com.ismartcoding.plain.fileprovider", file)
+                        val contentUri = FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.fileprovider", file)
                         val intent = Intent(Intent.ACTION_VIEW)
                         intent.setDataAndType(contentUri, "image/jpeg")
                         context.startActivity(intent)

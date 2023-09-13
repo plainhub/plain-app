@@ -114,6 +114,9 @@ android {
             jvmTarget = JavaVersion.VERSION_17.toString()
         }
     }
+    applicationVariants.forEach { variant ->
+        variant.buildConfigField( "String", "applicationId", "\"${variant.applicationId}\"")
+    }
 }
 
 dependencies {

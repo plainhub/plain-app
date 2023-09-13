@@ -6,6 +6,7 @@ import androidx.lifecycle.coroutineScope
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.isUPlus
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.helpers.NotificationHelper
@@ -21,7 +22,7 @@ class HttpServerService : LifecycleService() {
         NotificationHelper.ensureDefaultChannel()
         val notification = NotificationHelper.createServiceNotification(
             this,
-            "com.ismartcoding.plain.action.stop_http_server",
+            "${BuildConfig.APPLICATION_ID}.action.stop_http_server",
             getString(R.string.api_service_is_running)
         )
         if (isUPlus()) {
