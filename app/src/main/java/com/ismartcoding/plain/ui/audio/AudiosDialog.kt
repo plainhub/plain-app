@@ -15,7 +15,7 @@ import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.enums.ActionSourceType
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.data.preference.AudioPlayingPreference
 import com.ismartcoding.plain.data.preference.AudioSortByPreference
 import com.ismartcoding.plain.features.*
@@ -38,8 +38,8 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     override val titleId: Int
         get() = R.string.audios_title
 
-    override val tagType: TagType
-        get() = TagType.AUDIO
+    override val dataType: DataType
+        get() = DataType.AUDIO
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel.data = bucket

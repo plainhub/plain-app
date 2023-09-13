@@ -27,6 +27,7 @@ object PackageHelper {
         val apps = mutableListOf<DPackage>()
         var type = ""
         var text = ""
+        var ids = setOf<String>()
         if (query.isNotEmpty()) {
             val queryGroups = SearchHelper.parse(query)
             var t = queryGroups.find { it.name == "type" }
@@ -37,6 +38,10 @@ object PackageHelper {
             if (t != null) {
                 text = t.value
             }
+            t = queryGroups.find { it.name == "ids" }
+            if (t != null) {
+                ids = t.value.split(",").toSet()
+            }
         }
 
         packages.forEach { app ->
@@ -45,6 +50,10 @@ object PackageHelper {
             val isSystemApp = packageInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
             val appType = if (isSystemApp) "system" else "user"
             if (type.isNotEmpty() && appType != type) {
+                return@forEach
+            }
+
+            if (ids.isNotEmpty() && !ids.contains(packageInfo.packageName)) {
                 return@forEach
             }
 

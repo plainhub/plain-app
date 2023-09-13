@@ -7,7 +7,7 @@ import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.databinding.DialogListDrawerBinding
 import com.ismartcoding.plain.ui.models.FilteredItemsViewModel
 
@@ -24,7 +24,7 @@ fun DialogListDrawerBinding.initToggleMode(viewLifecycleOwner: LifecycleOwner, v
             drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         } else {
             topAppBar.setScrollBehavior(true)
-            if (viewModel.tagType != TagType.AUDIO) {
+            if (viewModel.dataType != DataType.AUDIO) {
                 list.rv.setPadding(0, 0, 0, context.dp2px(32))
             }
             bottomAction.performHide()
@@ -38,7 +38,7 @@ fun DialogListDrawerBinding.initToggleMode(viewLifecycleOwner: LifecycleOwner, v
             findItem(R.id.sort)?.isVisible = !toggleMode
             findItem(R.id.more)?.isVisible = !toggleMode
         }
-        player.isVisible = !toggleMode && viewModel.tagType == TagType.AUDIO
+        player.isVisible = !toggleMode && viewModel.dataType == DataType.AUDIO
         topAppBar.toolbar.toggleNavigationIcon(toggleMode)
         topAppBar.toolbar.updateTitle(viewModel, list.rv, title, viewModel.total)
     }

@@ -1,10 +1,8 @@
 package com.ismartcoding.plain.ui.video
 
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -22,7 +20,7 @@ import com.ismartcoding.lib.rv.GridSpacingItemDecoration
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.enums.ActionSourceType
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.data.preference.VideoSortByPreference
 import com.ismartcoding.plain.databinding.ItemMediaBucketGridBinding
 import com.ismartcoding.plain.databinding.ItemVideoGridBinding
@@ -50,8 +48,8 @@ class VideosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     override val titleId: Int
         get() = R.string.videos_title
 
-    override val tagType: TagType
-        get() = TagType.VIDEO
+    override val dataType: DataType
+        get() = DataType.VIDEO
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel.data = bucket

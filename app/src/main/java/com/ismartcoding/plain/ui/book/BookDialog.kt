@@ -2,10 +2,8 @@ package com.ismartcoding.plain.ui.book
 
 import android.os.Bundle
 import android.view.View
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.updateLayoutParams
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.databinding.DialogFeedEntryBinding
 import com.ismartcoding.plain.db.DBook
 import com.ismartcoding.plain.features.tag.TagRelationStub
@@ -29,7 +27,7 @@ class BookDialog(private val book: DBook) : BaseDialog<DialogFeedEntryBinding>()
             onMenuItemClick {
                 when (itemId) {
                     R.id.add_to_tags -> {
-                        SelectTagsDialog(TagType.BOOK, arrayListOf(TagRelationStub.create(book))).show()
+                        SelectTagsDialog(DataType.BOOK, arrayListOf(TagRelationStub.create(book))).show()
                     }
                 }
             }

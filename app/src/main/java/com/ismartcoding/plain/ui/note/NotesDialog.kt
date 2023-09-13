@@ -14,7 +14,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.data.preference.NoteEditModePreference
 import com.ismartcoding.plain.databinding.ItemRowBinding
 import com.ismartcoding.plain.db.DNote
@@ -37,8 +37,8 @@ class NotesDialog : BaseListDrawerDialog() {
     override val titleId: Int
         get() = if (viewModel.trash.value == true) R.string.trash_title else R.string.notes_title
 
-    override val tagType: TagType
-        get() = TagType.NOTE
+    override val dataType: DataType
+        get() = DataType.NOTE
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -63,7 +63,7 @@ class NotesDialog : BaseListDrawerDialog() {
                             withIO {
                                 TagHelper.deleteTagRelationByKeys(
                                     ids,
-                                    TagType.NOTE
+                                    DataType.NOTE
                                 )
                                 NoteHelper.trashAsync(ids)
                             }

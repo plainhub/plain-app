@@ -6,7 +6,6 @@ import com.ismartcoding.lib.brv.utils.linear
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.onItemClick
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.contentResolver
@@ -15,9 +14,8 @@ import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.data.enums.PickFileTag
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.features.book.BookHelper
-import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.extensions.checkable
@@ -32,8 +30,8 @@ class BooksDialog : BaseListDrawerDialog() {
     override val titleId: Int
         get() = R.string.books_title
 
-    override val tagType: TagType
-        get() = TagType.BOOK
+    override val dataType: DataType
+        get() = DataType.BOOK
 
     override fun initTopAppBar() {
         initTopAppBar(R.menu.books) {
@@ -44,7 +42,7 @@ class BooksDialog : BaseListDrawerDialog() {
                         lifecycleScope.launch {
                             val ids = items.map { it.data.id }.toSet()
                             withIO {
-                                TagHelper.deleteTagRelationByKeys(ids, TagType.BOOK)
+                                TagHelper.deleteTagRelationByKeys(ids, DataType.BOOK)
                                 BookHelper.bookDao.delete(ids)
                             }
                             rv.bindingAdapter.checkedAll(false)

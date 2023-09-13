@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.IData
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.features.tag.TagHelper
@@ -12,7 +12,7 @@ import com.ismartcoding.plain.features.tag.TagHelper
 open class FilteredItemsViewModel : BaseItemsModel() {
     var data: IData? = null
     val trash = MutableLiveData(false)
-    var tagType: TagType = TagType.DEFAULT
+    var dataType: DataType = DataType.DEFAULT
     var castMode = false
 
     suspend fun getQuery(): String {

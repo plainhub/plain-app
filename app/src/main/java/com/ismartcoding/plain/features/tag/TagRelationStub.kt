@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features.tag
 
 import com.ismartcoding.plain.data.IData
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.features.audio.DAudio
 import com.ismartcoding.plain.features.image.DImage
@@ -12,9 +12,9 @@ data class TagRelationStub(
     var title: String = "",
     var size: Long = 0,
 ) {
-    fun toTagRelation(tagId: String, tagType: TagType): DTagRelation {
+    fun toTagRelation(tagId: String, type: DataType): DTagRelation {
         val stub = this
-        return DTagRelation(tagId, stub.key, tagType.value).apply {
+        return DTagRelation(tagId, stub.key, type.value).apply {
             title = stub.title
             size = stub.size
         }

@@ -47,8 +47,8 @@ class FeedEntriesDialog : BaseListDrawerDialog() {
     override val titleId: Int
         get() = R.string.feeds_title
 
-    override val tagType: TagType
-        get() = TagType.FEED_ENTRY
+    override val dataType: DataType
+        get() = DataType.FEED_ENTRY
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -63,7 +63,7 @@ class FeedEntriesDialog : BaseListDrawerDialog() {
                                 val ids = items.map { it.data.id }.toSet()
                                 DialogHelper.showLoading()
                                 withIO {
-                                    TagHelper.deleteTagRelationByKeys(ids, TagType.FEED_ENTRY)
+                                    TagHelper.deleteTagRelationByKeys(ids, DataType.FEED_ENTRY)
                                     FeedEntryHelper.feedEntryDao.delete(ids)
                                 }
                                 DialogHelper.hideLoading()

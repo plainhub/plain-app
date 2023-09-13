@@ -1,16 +1,15 @@
 package com.ismartcoding.plain.web.loaders
 
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.web.models.Tag
 import com.ismartcoding.plain.web.models.toModel
-import nidomiro.kdataloader.BatchLoader
 import nidomiro.kdataloader.ExecutionResult
 
 object TagsLoader {
-    fun load(ids: List<String>, tagType: TagType): List<ExecutionResult<List<Tag>>> {
-        val tagRelations = TagHelper.getTagRelationsByKeys(ids.toSet(), tagType).groupBy { it.key }
-        val tags = TagHelper.getAll(tagType).associateBy { it.id }
+    fun load(ids: List<String>, type: DataType): List<ExecutionResult<List<Tag>>> {
+        val tagRelations = TagHelper.getTagRelationsByKeys(ids.toSet(), type).groupBy { it.key }
+        val tags = TagHelper.getAll(type).associateBy { it.id }
         return ids.map { id ->
             val tagIds = tagRelations[id]?.map { it.tagId } ?: setOf()
             ExecutionResult.Success(if (tagIds.isEmpty()) {
@@ -27,9 +26,9 @@ object TagsLoader {
         }
     }
 
-    fun load(id: String, tagType: TagType): List<Tag> {
-        val tagRelations = TagHelper.getTagRelationsByKey(id, tagType)
-        val tags = TagHelper.getAll(tagType).associateBy { it.id }
+    fun load(id: String, type: DataType): List<Tag> {
+        val tagRelations = TagHelper.getTagRelationsByKey(id, type)
+        val tags = TagHelper.getAll(type).associateBy { it.id }
         val tagIds = tagRelations.map { it.tagId }
         return if (tagIds.isEmpty()) {
             listOf()

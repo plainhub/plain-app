@@ -12,7 +12,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
@@ -33,8 +33,8 @@ class CallsDialog : BaseListDrawerDialog() {
     override val titleId: Int
         get() = R.string.calls_title
 
-    override val tagType: TagType
-        get() = TagType.CALL
+    override val dataType: DataType
+        get() = DataType.CALL
 
     private var phoneNumberToCall = ""
 
@@ -65,7 +65,7 @@ class CallsDialog : BaseListDrawerDialog() {
                                 val ids = items.map { it.data.id }.toSet()
                                 DialogHelper.showLoading()
                                 withIO {
-                                    TagHelper.deleteTagRelationByKeys(ids, TagType.CALL)
+                                    TagHelper.deleteTagRelationByKeys(ids, DataType.CALL)
                                     CallHelper.deleteByIds(requireContext(), ids)
                                 }
                                 DialogHelper.hideLoading()

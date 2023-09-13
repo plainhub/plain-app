@@ -10,7 +10,7 @@ import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.ActionSourceType
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
@@ -30,8 +30,8 @@ class SmsDialog : BaseListDrawerDialog() {
     override val titleId: Int
         get() = R.string.messages_title
 
-    override val tagType: TagType
-        get() = TagType.SMS
+    override val dataType: DataType
+        get() = DataType.SMS
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

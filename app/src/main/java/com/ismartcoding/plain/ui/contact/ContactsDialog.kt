@@ -13,7 +13,7 @@ import com.ismartcoding.lib.pinyin.Pinyin
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionResultEvent
@@ -35,8 +35,8 @@ class ContactsDialog : BaseListDrawerDialog() {
     override val titleId: Int
         get() = R.string.contacts_title
 
-    override val tagType: TagType
-        get() = TagType.CONTACT
+    override val dataType: DataType
+        get() = DataType.CONTACT
 
     private var phoneNumberToCall = ""
 
@@ -70,7 +70,7 @@ class ContactsDialog : BaseListDrawerDialog() {
                                 val ids = items.map { it.data.id }.toSet()
                                 DialogHelper.showLoading()
                                 withIO {
-                                    TagHelper.deleteTagRelationByKeys(ids, TagType.CONTACT)
+                                    TagHelper.deleteTagRelationByKeys(ids, DataType.CONTACT)
                                     ContactHelper.deleteByIds(requireContext(), ids)
                                 }
                                 DialogHelper.hideLoading()

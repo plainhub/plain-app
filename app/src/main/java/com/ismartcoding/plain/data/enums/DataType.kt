@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.data.enums
 
-enum class TagType(val value: Int) {
+enum class DataType(val value: Int) {
     DEFAULT(0),
     AUDIO(1),
     VIDEO(2),
@@ -11,7 +11,8 @@ enum class TagType(val value: Int) {
     FEED_ENTRY(7),
     CALL(8),
     BOOK(9),
-    AI_CHAT(10);
+    AI_CHAT(10),
+    PACKAGE(21); // starts from 21, not used for tag
 
     companion object {
         fun fromInt(value: Int) = values().first { it.value == value }

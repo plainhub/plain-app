@@ -6,7 +6,7 @@ import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.ShareHelper
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.databinding.DialogFeedEntryBinding
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DFeedEntry
@@ -43,7 +43,7 @@ class FeedEntryDialog(private val feedEntry: DFeedEntry, val feed: DFeed?) : Bas
                         WebHelper.open(requireContext(), feedEntry.url)
                     }
                     R.id.add_to_tags -> {
-                        SelectTagsDialog(TagType.FEED_ENTRY, arrayListOf(TagRelationStub.create(feedEntry))).show()
+                        SelectTagsDialog(DataType.FEED_ENTRY, arrayListOf(TagRelationStub.create(feedEntry))).show()
                     }
                     R.id.share -> {
                         ShareHelper.shareText(requireContext(), feedEntry.title.let { it + "\n" } + feedEntry.url)

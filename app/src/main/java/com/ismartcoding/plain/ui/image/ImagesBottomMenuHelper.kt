@@ -50,7 +50,7 @@ object ImagesBottomMenuHelper {
                             val ids = items.map { it.data.id }.toSet()
                             DialogHelper.showLoading()
                             withIO {
-                                TagHelper.deleteTagRelationByKeys(ids, viewModel.tagType)
+                                TagHelper.deleteTagRelationByKeys(ids, viewModel.dataType)
                                 ImageHelper.deleteRecordsAndFilesByIds(context, ids)
                             }
                             DialogHelper.hideLoading()

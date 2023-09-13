@@ -12,6 +12,6 @@ object TempData {
     var keyStorePassword = ""
     var httpPort: Int = 8080
     var httpsPort: Int = 8443
-    val fileIdToken = CryptoHelper.generateAESKey() // use to generate file path to id or decrypt file id to path
+    val urlToken = CryptoHelper.generateAESKey() // use to encrypt or decrypt params in url
     var chatItemsMigrated = false
 }

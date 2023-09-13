@@ -45,12 +45,7 @@ object FileHelper {
         if (path.startsWith("https://", true) || path.startsWith("http://", true)) {
             return path
         }
-        return Base64.encodeToString(CryptoHelper.aesEncrypt(TempData.fileIdToken, path), Base64.NO_WRAP)
-    }
-
-    fun getFilePath(id: String): String {
-        val bytes = Base64.decode(id, Base64.NO_WRAP)
-        return CryptoHelper.aesDecrypt(TempData.fileIdToken, bytes)?.decodeToString() ?: ""
+        return Base64.encodeToString(CryptoHelper.aesEncrypt(TempData.urlToken, path), Base64.NO_WRAP)
     }
 
     fun rename(filePath: String, newName: String): File? {

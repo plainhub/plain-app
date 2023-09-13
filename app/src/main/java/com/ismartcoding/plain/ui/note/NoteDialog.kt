@@ -15,7 +15,7 @@ import com.ismartcoding.lib.softinput.setWindowSoftInput
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.data.preference.NoteEditModePreference
 import com.ismartcoding.plain.databinding.DialogNoteBinding
 import com.ismartcoding.plain.db.DNote
@@ -79,7 +79,7 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
                         }
                         if (isNew && tag != null) {
                             // create note from tag items page.
-                            TagHelper.addTagRelations(arrayListOf(TagRelationStub(id).toTagRelation(tag!!.id, TagType.NOTE)))
+                            TagHelper.addTagRelations(arrayListOf(TagRelationStub(id).toTagRelation(tag!!.id, DataType.NOTE)))
                             sendEvent(ActionEvent(ActionSourceType.TAG_RELATION, ActionType.DELETED, setOf(id)))
                         }
                     }

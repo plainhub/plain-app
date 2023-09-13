@@ -10,7 +10,7 @@ import com.ismartcoding.lib.helpers.ShareHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.data.preference.VideoPlaylistPreference
 import com.ismartcoding.plain.databinding.DialogListDrawerBinding
 import com.ismartcoding.plain.features.ActionEvent
@@ -65,7 +65,7 @@ object VideosBottomMenuHelper {
                             withIO {
                                 TagHelper.deleteTagRelationByKeys(
                                     ids,
-                                    TagType.VIDEO
+                                    DataType.VIDEO
                                 )
                                 VideoHelper.deleteRecordsAndFilesByIds(
                                     context,

@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.helpers
 
+import android.util.Base64
 import com.ismartcoding.lib.extensions.getFilenameExtension
+import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.TempData
 
@@ -21,5 +23,10 @@ object UrlHelper {
 
     fun getMediaPath(id: String): String {
         return mediaPathMap[id] ?: ""
+    }
+
+    fun decrypt(id: String): String {
+        val bytes = Base64.decode(id, Base64.NO_WRAP)
+        return CryptoHelper.aesDecrypt(TempData.urlToken, bytes)?.decodeToString() ?: ""
     }
 }

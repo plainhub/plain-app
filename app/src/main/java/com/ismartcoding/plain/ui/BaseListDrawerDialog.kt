@@ -4,20 +4,16 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.annotation.MenuRes
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.view.updateLayoutParams
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.databinding.DialogListDrawerBinding
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -31,7 +27,7 @@ abstract class BaseListDrawerDialog : BaseDialog<DialogListDrawerBinding>() {
     protected val viewModel: FilteredItemsViewModel by viewModels()
 
     protected abstract val titleId: Int
-    protected abstract val tagType: TagType
+    protected abstract val dataType: DataType
 
     protected abstract fun initEvents()
     protected abstract fun initTopAppBar()
@@ -45,7 +41,7 @@ abstract class BaseListDrawerDialog : BaseDialog<DialogListDrawerBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.tagType = tagType
+        viewModel.dataType = dataType
 
         binding.list.page.pageName = this.javaClass.simpleName
         binding.initToggleMode(viewLifecycleOwner, viewModel, titleId)
@@ -172,7 +168,7 @@ abstract class BaseListDrawerDialog : BaseDialog<DialogListDrawerBinding>() {
         if (count > 0) {
             binding.bottomAction.performShow()
             binding.bottomAction.menu.run {
-                findItem(R.id.cast)?.isVisible = if (viewModel.tagType == TagType.IMAGE) count == 1 else true
+                findItem(R.id.cast)?.isVisible = if (viewModel.dataType == DataType.IMAGE) count == 1 else true
                 findItem(R.id.call)?.isVisible = count == 1 // for contactsDialog
             }
         } else {

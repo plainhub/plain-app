@@ -22,11 +22,17 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DownloadFileItem
 import com.ismartcoding.plain.data.DownloadFileItemWrap
 import com.ismartcoding.plain.data.enums.PasswordType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.data.preference.AuthTwoFactorPreference
 import com.ismartcoding.plain.data.preference.PasswordPreference
 import com.ismartcoding.plain.data.preference.PasswordTypePreference
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.features.audio.AudioHelper
+import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.features.image.ImageHelper
 import com.ismartcoding.plain.features.media.CastPlayer
+import com.ismartcoding.plain.features.pkg.PackageHelper
+import com.ismartcoding.plain.features.video.VideoHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.helpers.UrlHelper
@@ -184,7 +190,7 @@ fun Application.module() {
                 return@get
             }
 
-            val path = FileHelper.getFilePath(id)
+            val path = UrlHelper.decrypt(id)
             val folder = File(path)
             if (!folder.exists() || !folder.isDirectory) {
                 call.respond(HttpStatusCode.NotFound)
@@ -202,43 +208,68 @@ fun Application.module() {
         }
 
         get("/zip/files") {
-            val q = call.request.queryParameters
-            val id = q["id"] ?: ""
+            val query = call.request.queryParameters
+            val id = query["id"] ?: ""
             if (id.isEmpty()) {
                 call.respond(HttpStatusCode.BadRequest)
                 return@get
             }
 
-            val value = TempHelper.getValue(id)
-            TempHelper.clearValue(id)
-            if (value.isEmpty()) {
-                call.respond(HttpStatusCode.NotFound)
-                return@get
-            }
+            try {
+                val json = JSONObject(UrlHelper.decrypt(id))
+                var paths: List<DownloadFileItem> = arrayListOf()
+                val type = json.optString("type")
+                if (type.isEmpty()) {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@get
+                }
 
-            val paths = JSONArray(value).parse { DownloadFileItem(it.optString("path"), it.optString("name")) }
-            val items = paths.map { DownloadFileItemWrap(File(it.path), it.name) }.filter { it.file.exists() }
-            val dirs = items.filter { it.file.isDirectory }
-            val fileName = URLEncoder.encode(q["name"] ?: "download.zip", "UTF-8")
-            call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
-            call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
-            call.respondOutputStream(ContentType.Application.Zip) {
-                ZipOutputStream(this).use { zip ->
-                    items.forEach { item ->
-                        if (dirs.any { item.file.absolutePath != it.file.absolutePath && item.file.absolutePath.startsWith(it.file.absolutePath) }) {
-                        } else {
-                            val filePath = item.name.ifEmpty { item.file.name }
-                            if (item.file.isDirectory) {
-                                zip.putNextEntry(ZipEntry("$filePath/"))
-                                ZipHelper.zipFolderToStreamAsync(item.file, zip, filePath)
+                val q = json.optString("query")
+                val context = MainApp.instance
+                when (type) {
+                    DataType.PACKAGE.name -> {
+                        paths = PackageHelper.search(q, Int.MAX_VALUE, 0).map { DownloadFileItem(it.path, "${it.name.replace(" ", "")}-${it.id}.apk") }
+                    }
+
+                    DataType.VIDEO.name -> {
+                        paths = VideoHelper.search(context, q, Int.MAX_VALUE, 0, FileSortBy.DATE_DESC).map { DownloadFileItem(it.path, "") }
+                    }
+
+                    DataType.AUDIO.name -> {
+                        paths = AudioHelper.search(context, q, Int.MAX_VALUE, 0, FileSortBy.DATE_DESC).map { DownloadFileItem(it.path, "") }
+                    }
+
+                    DataType.IMAGE.name -> {
+                        paths = ImageHelper.search(context, q, Int.MAX_VALUE, 0, FileSortBy.DATE_DESC).map { DownloadFileItem(it.path, "") }
+                    }
+                }
+
+                val items = paths.map { DownloadFileItemWrap(File(it.path), it.name) }.filter { it.file.exists() }
+                val dirs = items.filter { it.file.isDirectory }
+                val fileName = URLEncoder.encode(json.optString("name") ?: "download.zip", "UTF-8")
+                call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
+                call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
+                call.respondOutputStream(ContentType.Application.Zip) {
+                    ZipOutputStream(this).use { zip ->
+                        items.forEach { item ->
+                            if (dirs.any { item.file.absolutePath != it.file.absolutePath && item.file.absolutePath.startsWith(it.file.absolutePath) }) {
                             } else {
-                                zip.putNextEntry(ZipEntry(filePath))
-                                item.file.inputStream().copyTo(zip)
+                                val filePath = item.name.ifEmpty { item.file.name }
+                                if (item.file.isDirectory) {
+                                    zip.putNextEntry(ZipEntry("$filePath/"))
+                                    ZipHelper.zipFolderToStreamAsync(item.file, zip, filePath)
+                                } else {
+                                    zip.putNextEntry(ZipEntry(filePath))
+                                    item.file.inputStream().copyTo(zip)
+                                }
+                                zip.closeEntry()
                             }
-                            zip.closeEntry()
                         }
                     }
                 }
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
             }
         }
 
@@ -251,7 +282,7 @@ fun Application.module() {
             }
             try {
                 val context = MainApp.instance
-                val path = FileHelper.getFilePath(id).getFinalPath(context)
+                val path = UrlHelper.decrypt(id).getFinalPath(context)
                 if (path.startsWith("content://")) {
                     val bytes = context.contentResolver.openInputStream(Uri.parse(path))?.buffered()?.use { it.readBytes() }
                     if (bytes != null) {

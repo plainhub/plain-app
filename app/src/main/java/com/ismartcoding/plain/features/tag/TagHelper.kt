@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.features.tag
 
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.db.*
 import kotlinx.datetime.Clock
 
@@ -13,11 +13,11 @@ object TagHelper {
         AppDatabase.instance.tagRelationDao()
     }
 
-    fun count(type: TagType): List<DTagCount> {
+    fun count(type: DataType): List<DTagCount> {
         return tagRelationDao.getAll(type.value)
     }
 
-    fun getAll(type: TagType): List<DTag> {
+    fun getAll(type: DataType): List<DTag> {
         return tagDao.getAll(type.value)
     }
 
@@ -50,12 +50,12 @@ object TagHelper {
         return tagDao.delete(id)
     }
 
-    fun getTagRelationsByKeys(keys: Set<String>, tagType: TagType): List<DTagRelation> {
-        return tagRelationDao.getAllByKeys(keys, tagType.value)
+    fun getTagRelationsByKeys(keys: Set<String>, type: DataType): List<DTagRelation> {
+        return tagRelationDao.getAllByKeys(keys, type.value)
     }
 
-    fun getTagRelationsByKey(key: String, tagType: TagType): List<DTagRelation> {
-        return tagRelationDao.getAllByKey(key, tagType.value)
+    fun getTagRelationsByKey(key: String, type: DataType): List<DTagRelation> {
+        return tagRelationDao.getAllByKey(key, type.value)
     }
 
     fun getKeysByTagId(tagId: String): List<String> {
@@ -75,9 +75,9 @@ object TagHelper {
         tagRelationDao.deleteByTagId(tagId)
     }
 
-    fun deleteTagRelationByKeys(keys: Set<String>, tagType: TagType) {
+    fun deleteTagRelationByKeys(keys: Set<String>, type: DataType) {
         keys.chunked(50).forEach { chunk ->
-            tagRelationDao.deleteByKeys(chunk.toSet(), tagType.value)
+            tagRelationDao.deleteByKeys(chunk.toSet(), type.value)
         }
     }
 

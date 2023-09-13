@@ -10,7 +10,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.databinding.DialogSelectTagsBinding
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.features.tag.TagHelper
@@ -24,7 +24,7 @@ import com.ismartcoding.plain.ui.models.ListItemModel
 import kotlinx.coroutines.launch
 
 class SelectTagsDialog(
-    val tagType: TagType,
+    val type: DataType,
     val items: List<TagRelationStub>,
     val removeFromTags: Boolean = false,
 ) : BaseBottomSheetDialog<DialogSelectTagsBinding>() {
@@ -46,7 +46,7 @@ class SelectTagsDialog(
                                 withIO {
                                     TagHelper.addOrUpdate("") {
                                         name = value
-                                        type = tagType.value
+                                        type = this@SelectTagsDialog.type.value
                                     }
                                 }
                                 dismiss()
@@ -70,7 +70,7 @@ class SelectTagsDialog(
                         } else {
                             withIO {
                                 TagHelper.addTagRelations(items.map {
-                                    it.toTagRelation(m.tag.id, tagType)
+                                    it.toTagRelation(m.tag.id, type)
                                 })
                             }
                             m.showSelected(true)
@@ -98,7 +98,7 @@ class SelectTagsDialog(
                         if (newItems.isNotEmpty()) {
                             withIO {
                                 TagHelper.addTagRelations(newItems.map {
-                                    it.toTagRelation(m.tag.id, tagType)
+                                    it.toTagRelation(m.tag.id, type)
                                 })
                             }
                         }
@@ -118,10 +118,10 @@ class SelectTagsDialog(
 
     private fun search() {
         lifecycleScope.launch {
-            val tags = withIO { TagHelper.getAll(tagType) }
+            val tags = withIO { TagHelper.getAll(type) }
             val tagIds = tags.map { it.id }
             val tagRelations = if (items.size == 1) {
-                withIO { TagHelper.getTagRelationsByKey(items.first().key, tagType) }.filter { tagIds.contains(it.tagId) }
+                withIO { TagHelper.getTagRelationsByKey(items.first().key, type) }.filter { tagIds.contains(it.tagId) }
             } else arrayListOf()
             binding.list.page.addData(tags
                 .map { tag ->

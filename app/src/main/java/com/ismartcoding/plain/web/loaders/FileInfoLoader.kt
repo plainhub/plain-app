@@ -5,18 +5,17 @@ import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.exifinterface.media.ExifInterface
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.web.models.AudioFileInfo
 import com.ismartcoding.plain.web.models.ImageFileInfo
 import com.ismartcoding.plain.web.models.Location
 import com.ismartcoding.plain.web.models.VideoFileInfo
-import kotlinx.datetime.Instant
 import java.io.File
 
 object FileInfoLoader {
     fun loadImage(id: String, path: String): ImageFileInfo {
         val file = File(path)
-        val tags = if (id.isNotEmpty()) TagsLoader.load(id, TagType.IMAGE) else listOf()
+        val tags = if (id.isNotEmpty()) TagsLoader.load(id, DataType.IMAGE) else listOf()
         val exifInterface = ExifInterface(path)
         val latLong = exifInterface.latLong
         var location: Location? = null
@@ -31,7 +30,7 @@ object FileInfoLoader {
 
     fun loadVideo(context: Context, id: String, path: String): VideoFileInfo {
         val file = File(path)
-        val tags = if (id.isNotEmpty()) TagsLoader.load(id, TagType.VIDEO) else listOf()
+        val tags = if (id.isNotEmpty()) TagsLoader.load(id, DataType.VIDEO) else listOf()
         val retriever = MediaMetadataRetriever()
         retriever.setDataSource(context, Uri.fromFile(file))
         val width = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull() ?: 0
@@ -44,7 +43,7 @@ object FileInfoLoader {
 
     fun loadAudio(context: Context, id: String, path: String): AudioFileInfo {
         val file = File(path)
-        val tags = if (id.isNotEmpty()) TagsLoader.load(id, TagType.AUDIO) else listOf()
+        val tags = if (id.isNotEmpty()) TagsLoader.load(id, DataType.AUDIO) else listOf()
         val retriever = MediaMetadataRetriever()
         retriever.setDataSource(context, Uri.fromFile(file))
         val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong()?.div(1000) ?: 0L

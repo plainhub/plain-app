@@ -19,14 +19,14 @@ object BottomMenuHelper {
         when (menuItem.itemId) {
             R.id.add_to_tags -> {
                 rv.ensureSelect { items ->
-                    SelectTagsDialog(viewModel.tagType, items.map {
+                    SelectTagsDialog(viewModel.dataType, items.map {
                         TagRelationStub.create(it.data)
                     }).show()
                 }
             }
             R.id.remove_from_tag -> {
                 rv.ensureSelect { items ->
-                    SelectTagsDialog(viewModel.tagType, items.map {
+                    SelectTagsDialog(viewModel.dataType, items.map {
                         TagRelationStub.create(it.data)
                     }, removeFromTags = true).show()
                 }

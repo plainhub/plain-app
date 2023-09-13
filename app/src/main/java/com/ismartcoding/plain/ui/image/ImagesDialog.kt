@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.image
 
 import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
@@ -20,7 +19,7 @@ import com.ismartcoding.lib.rv.GridSpacingItemDecoration
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.enums.ActionSourceType
-import com.ismartcoding.plain.data.enums.TagType
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.data.preference.ImageSortByPreference
 import com.ismartcoding.plain.databinding.ItemImageGridBinding
 import com.ismartcoding.plain.databinding.ItemMediaBucketGridBinding
@@ -47,8 +46,8 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
     override val titleId: Int
         get() = R.string.images_title
 
-    override val tagType: TagType
-        get() = TagType.IMAGE
+    override val dataType: DataType
+        get() = DataType.IMAGE
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel.data = bucket
