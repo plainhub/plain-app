@@ -181,7 +181,7 @@ class ScreenMirrorService : LifecycleService() {
 
                     mBitmap = Bitmap.createBitmap(newWidth, height, Bitmap.Config.ARGB_8888)
                     mBitmap?.copyPixelsFromBuffer(buffer)
-                    if (mBitmap != null) {
+                    if (mBitmap != null && instance != null) {
                         sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, bitmapToBase64Image(mBitmap!!, newWidth, height), false))
                     }
                     image.close()

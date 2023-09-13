@@ -1,10 +1,8 @@
 package com.ismartcoding.plain.web
 
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.getBitmapAsync
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.newFile
@@ -16,7 +14,6 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.helpers.ZipHelper
-import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.upnp.UPnPController
 import com.ismartcoding.plain.BuildConfig
@@ -84,7 +81,6 @@ import io.ktor.websocket.send
 import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.net.URLEncoder
 import java.nio.file.Files
