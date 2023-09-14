@@ -187,7 +187,7 @@ dependencies {
     implementation("androidx.room:room-common:$room")
     ksp("androidx.room:room-compiler:$room")
     implementation("androidx.room:room-ktx:$room")
-    implementation("com.github.skydoves:balloon:1.5.2")
+   // implementation("com.github.skydoves:balloon:1.5.2")
 
     implementation("com.aallam.openai:openai-client:3.2.0")
 

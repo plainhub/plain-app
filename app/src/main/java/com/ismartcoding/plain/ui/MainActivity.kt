@@ -7,6 +7,7 @@ import android.content.res.Configuration
 import android.database.CursorWindow
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.PickVisualMediaRequest
@@ -248,6 +249,9 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }.create()
+            if (Permission.SYSTEM_ALERT_WINDOW.can(this@MainActivity)) {
+                requestToConnectDialog?.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+            }
             requestToConnectDialog?.show()
         }
     }
