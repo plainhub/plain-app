@@ -7,7 +7,6 @@ import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.db.AIChatDao
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DAIChat
-import com.ismartcoding.plain.web.models.AIChat
 
 object AIChatHelper {
     private val chatDao: AIChatDao by lazy {
@@ -32,7 +31,7 @@ object AIChatHelper {
         val where = ContentWhere()
         val sort = ContentSort("updated_at", "DESC")
         if (query.isNotEmpty()) {
-            parseQuery(where, sort, query)
+            parseQuery(where, query, sort)
             sql += " WHERE ${where.toSelection()}"
         }
 
@@ -44,7 +43,7 @@ object AIChatHelper {
         val where = ContentWhere()
         val sort = ContentSort("updated_at", "DESC")
         if (query.isNotEmpty()) {
-            parseQuery(where, sort, query)
+            parseQuery(where, query, sort)
             sql += " WHERE ${where.toSelection()}"
         }
 
@@ -61,11 +60,18 @@ object AIChatHelper {
         chatDao.delete(ids)
     }
 
-    suspend fun deleteByParentIdsAsync(parentIds: Set<String>) {
-        chatDao.deleteByParentIds(parentIds)
+    suspend fun deleteAsync(query: String) {
+        var sql = "DELETE FROM aichats"
+        val where = ContentWhere()
+        if (query.isNotEmpty()) {
+            parseQuery(where, query)
+            sql += " WHERE ${where.toSelection()}"
+        }
+
+        chatDao.delete(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
     }
 
-    private fun parseQuery(where: ContentWhere, sort: ContentSort, query: String) {
+    private fun parseQuery(where: ContentWhere, query: String, sort: ContentSort? = null) {
         val queryGroups = SearchHelper.parse(query)
         queryGroups.forEach {
             if (it.name == "text") {
@@ -77,10 +83,15 @@ object AIChatHelper {
                 if (ids.isNotEmpty()) {
                     where.addIn("id", ids)
                 }
+            } else if (it.name == "parent_ids") {
+                val ids = it.value.split(",")
+                if (ids.isNotEmpty()) {
+                    where.addIn("parent_id", ids)
+                }
             } else if (it.name == "sort") {
                 val split = it.value.split("-")
-                sort.name = split[0]
-                sort.direction = split[1]
+                sort?.name = split[0]
+                sort?.direction = split[1]
             }
         }
     }

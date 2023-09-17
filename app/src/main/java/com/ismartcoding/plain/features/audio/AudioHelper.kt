@@ -15,6 +15,7 @@ import com.ismartcoding.plain.features.file.FileSortBy
 
 object AudioHelper : BaseContentHelper() {
     override val uriExternal: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+    override val idKey: String = MediaStore.Audio.Media._ID
 
     override fun getProjection(): Array<String> {
         return arrayOf(

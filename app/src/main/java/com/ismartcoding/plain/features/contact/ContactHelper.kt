@@ -19,6 +19,7 @@ import java.util.*
 
 object ContactHelper : BaseContentHelper() {
     override val uriExternal: Uri = ContactsContract.Data.CONTENT_URI
+    override val idKey: String = ContactsContract.Data.RAW_CONTACT_ID
 
     override fun getProjection(): Array<String> {
         return arrayOf(
@@ -197,7 +198,7 @@ object ContactHelper : BaseContentHelper() {
             operations.add(ContentHelper.newInsert(id, type, contact.notes))
         }
 
-        ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE.let { type ->
+        ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE.let {
             contact.organization?.let {
                 operations.add(ContentHelper.newOrgInsert(id, it))
             }

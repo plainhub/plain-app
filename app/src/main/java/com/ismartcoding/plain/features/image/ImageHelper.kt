@@ -13,6 +13,7 @@ import com.ismartcoding.plain.features.file.FileSortBy
 
 object ImageHelper : BaseContentHelper() {
     override val uriExternal: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+    override val idKey: String = MediaStore.Images.Media._ID
 
     override fun getProjection(): Array<String> {
         return arrayOf(

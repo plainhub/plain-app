@@ -20,6 +20,8 @@ import kotlin.random.Random
 
 object CallHelper : BaseContentHelper() {
     override val uriExternal: Uri = CallLog.Calls.CONTENT_URI
+    override val idKey: String = CallLog.Calls._ID
+
     private val demoItems = mutableListOf<DCall>()
 
     override fun getProjection(): Array<String> {
@@ -115,7 +117,7 @@ object CallHelper : BaseContentHelper() {
     }
 
     private fun demoSearch(): List<DCall> {
-        IntRange(1, 385).forEachIndexed { index, i ->
+        IntRange(1, 385).forEachIndexed { index, _ ->
             demoItems.add(
                 DCall(
                     (index + 658).toString(), Random.nextLong(1234567890, 9234567890).toString(),

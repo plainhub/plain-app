@@ -5,6 +5,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.BaseColumns
+import android.provider.ContactsContract
 import android.provider.MediaStore
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.data.SortBy
@@ -23,6 +24,7 @@ import java.io.File
 
 abstract class BaseContentHelper {
     abstract val uriExternal: Uri
+    abstract val idKey: String
 
     fun getItemUri(id: String): Uri {
         return Uri.withAppendedPath(uriExternal, id)
@@ -139,6 +141,18 @@ abstract class BaseContentHelper {
         }
     }
 
+    fun getIds(context: Context, query: String): Set<String> {
+        val cursor = getSearchCursor(context, query)
+        val ids = mutableSetOf<String>()
+        if (cursor?.moveToFirst() == true) {
+            do {
+                ids.add(cursor.getStringValue(idKey))
+            } while (cursor.moveToNext())
+        }
+
+        return ids
+    }
+
     private fun getSearchCursorWithBundle(context: Context, query: String, limit: Int, offset: Int, sortBy: SortBy): Cursor? {
         return try {
             val where = getWhere(query)
@@ -162,6 +176,14 @@ abstract class BaseContentHelper {
         return context.contentResolver.query(
             uriExternal, getProjection(),
             where.toSelection(), where.args.toTypedArray(), if (sortBy != null) "${sortBy.field} ${sortBy.direction} LIMIT $offset, $limit" else "LIMIT $offset, $limit"
+        )
+    }
+
+    protected fun getSearchCursor(context: Context, query: String): Cursor? {
+        val where = getWhere(query)
+        return context.contentResolver.query(
+            uriExternal, getProjection(),
+            where.toSelection(), where.args.toTypedArray(), null
         )
     }
 

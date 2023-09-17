@@ -21,6 +21,7 @@ import kotlin.random.Random
 
 object SmsHelper : BaseContentHelper() {
     override val uriExternal: Uri = Telephony.Sms.CONTENT_URI
+    override val idKey: String = Telephony.Sms._ID
     private val demoItems = mutableListOf<DMessage>()
 
     override fun getProjection(): Array<String> {

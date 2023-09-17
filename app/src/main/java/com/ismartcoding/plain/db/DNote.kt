@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.ismartcoding.lib.helpers.StringHelper
+import com.ismartcoding.plain.data.IDData
 import com.ismartcoding.plain.data.IData
 import kotlinx.datetime.*
 import kotlinx.parcelize.Parcelize
@@ -27,7 +28,13 @@ interface NoteDao {
     fun getAll(): List<DNote>
 
     @RawQuery
+    fun getIds(query: SupportSQLiteQuery): List<IDData>
+
+    @RawQuery
     fun search(query: SupportSQLiteQuery): List<DNote>
+
+    @RawQuery
+    fun delete(query: SupportSQLiteQuery): Int
 
     @RawQuery
     fun count(query: SupportSQLiteQuery): Int

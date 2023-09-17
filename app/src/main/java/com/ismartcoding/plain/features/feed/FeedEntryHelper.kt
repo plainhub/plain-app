@@ -6,6 +6,7 @@ import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.FeedEntryDao
+import com.ismartcoding.plain.features.note.NoteHelper
 import kotlinx.datetime.Clock
 
 object FeedEntryHelper {
@@ -22,6 +23,17 @@ object FeedEntryHelper {
         }
 
         return feedEntryDao.count(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
+    }
+
+    fun getIdsAsync(query: String): Set<String> {
+        var sql = "SELECT id FROM feed_entries"
+        val where = ContentWhere()
+        if (query.isNotEmpty()) {
+            parseQuery(where, query)
+            sql += " WHERE ${where.toSelection()}"
+        }
+
+        return feedEntryDao.getIds(SimpleSQLiteQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
     }
 
     fun search(query: String, limit: Int, offset: Int): List<DFeedEntry> {
@@ -44,6 +56,10 @@ object FeedEntryHelper {
         feedEntryDao.update(item)
 
         return item.id
+    }
+
+    fun deleteAsync(ids: Set<String>) {
+        feedEntryDao.delete(ids)
     }
 
     private fun parseQuery(where: ContentWhere, query: String) {

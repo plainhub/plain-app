@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.db
 
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.datetime.*
 
 @Entity(tableName = "tag_relations", primaryKeys = ["tag_id", "key", "type"])
@@ -41,6 +42,9 @@ interface TagRelationDao {
 
     @Query("DELETE FROM tag_relations WHERE `key` in (:keys) AND tag_id in (:tagIds)")
     fun deleteByKeysTagIds(keys: Set<String>, tagIds: Set<String>)
+
+    @RawQuery
+    fun delete(query: SupportSQLiteQuery): Int
 
     @Insert
     fun insert(vararg item: DTagRelation)

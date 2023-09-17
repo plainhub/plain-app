@@ -653,13 +653,6 @@ class SXGraphQL(val schema: Schema) {
                         items.map { it.toModel() }
                     }
                 }
-                mutation("deleteAIChatsByParentIds") {
-                    resolver { ids: List<ID> ->
-                        val newIds = ids.map { it.value }.toSet()
-                        AIChatHelper.deleteByParentIdsAsync(newIds)
-                        true
-                    }
-                }
                 mutation("relaunchApp") {
                     resolver { ->
                         coIO {
@@ -669,18 +662,18 @@ class SXGraphQL(val schema: Schema) {
                     }
                 }
                 mutation("deleteAIChats") {
-                    resolver { ids: List<ID> ->
-                        val newIds = ids.map { it.value }.toSet()
-                        AIChatHelper.deleteAsync(newIds)
+                    resolver { query: String ->
+                        AIChatHelper.deleteAsync(query)
                         true
                     }
                 }
                 mutation("deleteContacts") {
-                    resolver { ids: List<ID> ->
-                        Permission.WRITE_CONTACTS.checkAsync(MainApp.instance)
-                        val newIds = ids.map { it.value }.toSet()
+                    resolver { query: String ->
+                        val context = MainApp.instance
+                        Permission.WRITE_CONTACTS.checkAsync(context)
+                        val newIds = ContactHelper.getIds(context, query)
                         TagHelper.deleteTagRelationByKeys(newIds, DataType.CONTACT)
-                        ContactHelper.deleteByIds(MainApp.instance, newIds)
+                        ContactHelper.deleteByIds(context, newIds)
                         true
                     }
                 }
@@ -786,21 +779,23 @@ class SXGraphQL(val schema: Schema) {
                 }
 
                 mutation("deleteCalls") {
-                    resolver { ids: List<ID> ->
-                        Permission.WRITE_CALL_LOG.checkAsync(MainApp.instance)
-                        val newIds = ids.map { it.value }.toSet()
+                    resolver { query: String ->
+                        val context = MainApp.instance
+                        Permission.WRITE_CALL_LOG.checkAsync(context)
+                        val newIds = CallHelper.getIds(context, query)
                         TagHelper.deleteTagRelationByKeys(newIds, DataType.CALL)
-                        CallHelper.deleteByIds(MainApp.instance, newIds)
+                        CallHelper.deleteByIds(context, newIds)
                         true
                     }
                 }
                 mutation("deleteFiles") {
                     resolver { paths: List<String> ->
-                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(MainApp.instance)
+                        val context = MainApp.instance
+                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
                         paths.forEach {
                             java.io.File(it).deleteRecursively()
                         }
-                        MainApp.instance.scanFileByConnection(paths.toTypedArray())
+                        context.scanFileByConnection(paths.toTypedArray())
                         true
                     }
                 }
@@ -878,32 +873,33 @@ class SXGraphQL(val schema: Schema) {
                     }
                 }
                 mutation("trashNotes") {
-                    resolver { ids: List<ID> ->
-                        val newIds = ids.map { it.value }.toSet()
-                        TagHelper.deleteTagRelationByKeys(newIds, DataType.NOTE)
-                        NoteHelper.trashAsync(newIds)
+                    resolver { query: String ->
+                        val ids = NoteHelper.getIdsAsync(query)
+                        TagHelper.deleteTagRelationByKeys(ids, DataType.NOTE)
+                        NoteHelper.trashAsync(ids)
                         true
                     }
                 }
                 mutation("untrashNotes") {
-                    resolver { ids: List<ID> ->
-                        NoteHelper.untrashAsync(ids.map { it.value }.toSet())
+                    resolver { query: String ->
+                        val ids = NoteHelper.getIdsAsync(query)
+                        NoteHelper.untrashAsync(ids)
                         true
                     }
                 }
                 mutation("deleteNotes") {
-                    resolver { ids: List<ID> ->
-                        val newIds = ids.map { it.value }.toSet()
-                        TagHelper.deleteTagRelationByKeys(newIds, DataType.NOTE)
-                        NoteHelper.deleteAsync(newIds)
+                    resolver { query: String ->
+                        val ids = NoteHelper.getIdsAsync(query)
+                        TagHelper.deleteTagRelationByKeys(ids, DataType.NOTE)
+                        NoteHelper.deleteAsync(ids)
                         true
                     }
                 }
                 mutation("deleteFeedEntries") {
-                    resolver { ids: List<ID> ->
-                        val newIds = ids.map { it.value }.toSet()
-                        TagHelper.deleteTagRelationByKeys(newIds, DataType.FEED_ENTRY)
-                        FeedEntryHelper.feedEntryDao.delete(newIds)
+                    resolver { query: String ->
+                        val ids = FeedEntryHelper.getIdsAsync(query)
+                        TagHelper.deleteTagRelationByKeys(ids, DataType.FEED_ENTRY)
+                        FeedEntryHelper.deleteAsync(ids)
                         true
                     }
                 }
@@ -973,28 +969,31 @@ class SXGraphQL(val schema: Schema) {
                     }
                 }
                 mutation("deleteMediaItems") {
-                    resolver { type: DataType, ids: List<ID> ->
-                        val newIds = ids.map { it.value }.toSet()
-                        TagHelper.deleteTagRelationByKeys(newIds, type)
+                    resolver { type: DataType, query: String ->
+                        var newIds = setOf<String>()
                         val context = MainApp.instance
                         when (type) {
                             DataType.AUDIO -> {
+                                 newIds = AudioHelper.getIds(context, query)
                                 val paths = AudioHelper.deleteRecordsAndFilesByIds(context, newIds)
                                 AudioPlaylistPreference.deleteAsync(context, paths)
                             }
 
                             DataType.VIDEO -> {
+                                newIds = VideoHelper.getIds(context, query)
                                 val paths = VideoHelper.deleteRecordsAndFilesByIds(context, newIds)
                                 VideoPlaylistPreference.deleteAsync(context, paths)
                             }
 
                             DataType.IMAGE -> {
+                                newIds = ImageHelper.getIds(context, query)
                                 ImageHelper.deleteRecordsAndFilesByIds(context, newIds)
                             }
 
                             else -> {
                             }
                         }
+                        TagHelper.deleteTagRelationByKeys(newIds, type)
                         true
                     }
                 }

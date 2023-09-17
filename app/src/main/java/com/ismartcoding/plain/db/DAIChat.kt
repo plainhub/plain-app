@@ -29,6 +29,9 @@ interface AIChatDao {
     fun search(query: SupportSQLiteQuery): List<DAIChat>
 
     @RawQuery
+    fun delete(query: SupportSQLiteQuery): Int
+
+    @RawQuery
     fun count(query: SupportSQLiteQuery): Int
 
     @Query("SELECT * FROM aichats WHERE parent_id=:parentId")

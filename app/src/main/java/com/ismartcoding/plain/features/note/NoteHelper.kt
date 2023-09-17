@@ -24,6 +24,17 @@ object NoteHelper {
         return noteDao.count(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
     }
 
+    fun getIdsAsync(query: String): Set<String> {
+        var sql = "SELECT id FROM notes"
+        val where = ContentWhere()
+        if (query.isNotEmpty()) {
+            parseQuery(where, query)
+            sql += " WHERE ${where.toSelection()}"
+        }
+
+        return noteDao.getIds(SimpleSQLiteQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
+    }
+
     fun search(query: String, limit: Int, offset: Int): List<DNote> {
         var sql = "SELECT * FROM notes"
         val where = ContentWhere()
@@ -35,6 +46,18 @@ object NoteHelper {
         sql += " ORDER BY updated_at DESC LIMIT $limit OFFSET $offset"
 
         return noteDao.search(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
+    }
+
+
+    fun deleteAsync(query: String) {
+        var sql = "DELETE FROM notes"
+        val where = ContentWhere()
+        if (query.isNotEmpty()) {
+            parseQuery(where, query)
+            sql += " WHERE ${where.toSelection()}"
+        }
+
+        noteDao.delete(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
     }
 
     fun getById(id: String): DNote? {

@@ -10,6 +10,7 @@ import com.ismartcoding.plain.features.BaseContentHelper
 
 object FileHelper : BaseContentHelper() {
     override val uriExternal: Uri = MediaStore.Files.getContentUri("external")
+    override val idKey: String = MediaStore.Files.FileColumns._ID
 
     override fun getProjection(): Array<String> {
         return arrayOf(

@@ -3,6 +3,7 @@ package com.ismartcoding.plain.db
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.ismartcoding.lib.helpers.StringHelper
+import com.ismartcoding.plain.data.IDData
 import com.ismartcoding.plain.data.IData
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -38,6 +39,9 @@ data class DFeedEntry(
 interface FeedEntryDao {
     @Query("SELECT * FROM feed_entries")
     fun getAll(): List<DFeedEntry>
+
+    @RawQuery
+    fun getIds(query: SupportSQLiteQuery): List<IDData>
 
     @RawQuery
     fun search(query: SupportSQLiteQuery): List<DFeedEntry>
