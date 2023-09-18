@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.net.Uri
 import com.ismartcoding.lib.helpers.SearchHelper
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.packageManager
 import kotlinx.datetime.Instant
 import java.io.File
@@ -79,10 +80,14 @@ object PackageHelper {
     }
 
     fun cacheAppLabels() {
-        val packages = packageManager.getInstalledPackages(0)
-        packages.forEach { app ->
-            val packageInfo = packageManager.getApplicationInfo(app.packageName, 0)
-            appLabelCache[packageInfo.packageName] = packageManager.getApplicationLabel(packageInfo).toString()
+        try {
+            val packages = packageManager.getInstalledPackages(0)
+            packages.forEach { app ->
+                val packageInfo = packageManager.getApplicationInfo(app.packageName, 0)
+                appLabelCache[packageInfo.packageName] = packageManager.getApplicationLabel(packageInfo).toString()
+            }
+        } catch (ex: Exception) {
+            LogCat.d(ex.toString())
         }
     }
 
