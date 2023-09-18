@@ -904,9 +904,11 @@ class SXGraphQL(val schema: Schema) {
                     }
                 }
                 mutation("addPlaylistAudios") {
-                    resolver { paths: List<String> ->
+                    resolver { query: String ->
                         val context = MainApp.instance
-                        AudioPlaylistPreference.addAsync(context, paths.map { DPlaylistAudio.fromPath(context, it) })
+                        // 1000 items at most
+                        val items = AudioHelper.search(context, query, 1000, 0, AudioSortByPreference.getValueAsync(context))
+                        AudioPlaylistPreference.addAsync(context, items.map { DPlaylistAudio(it.title, it.path, it.artist, it.duration) })
                         true
                     }
                 }
