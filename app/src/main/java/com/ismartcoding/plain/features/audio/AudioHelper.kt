@@ -12,6 +12,7 @@ import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.features.BaseContentHelper
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.features.tag.TagRelationStub
 
 object AudioHelper : BaseContentHelper() {
     override val uriExternal: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
@@ -72,6 +73,20 @@ object AudioHelper : BaseContentHelper() {
                 val path = cursor.getStringValue(MediaStore.Audio.Media.DATA)
                 val bucketId = cursor.getStringValue(MediaStore.Audio.Media.BUCKET_ID)
                 result.add(DAudio(id, title, artist, path, duration, size, bucketId))
+            } while (cursor.moveToNext())
+        }
+        return result
+    }
+
+    fun getTagRelationStubs(context: Context, query: String): List<TagRelationStub> {
+        val cursor = getSearchCursor(context, query)
+        val result = mutableListOf<TagRelationStub>()
+        if (cursor?.moveToFirst() == true) {
+            do {
+                val id = cursor.getStringValue(MediaStore.Audio.Media._ID)
+                val title = cursor.getStringValue(MediaStore.Audio.Media.TITLE)
+                val size = cursor.getLongValue(MediaStore.Audio.Media.SIZE)
+                result.add(TagRelationStub(id, title,size))
             } while (cursor.moveToNext())
         }
         return result

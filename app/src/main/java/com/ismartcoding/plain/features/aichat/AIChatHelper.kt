@@ -7,6 +7,7 @@ import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.db.AIChatDao
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DAIChat
+import com.ismartcoding.plain.features.note.NoteHelper
 
 object AIChatHelper {
     private val chatDao: AIChatDao by lazy {
@@ -36,6 +37,17 @@ object AIChatHelper {
         }
 
         return chatDao.count(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
+    }
+
+    fun getIdsAsync(query: String): Set<String> {
+        var sql = "SELECT id FROM aichats"
+        val where = ContentWhere()
+        if (query.isNotEmpty()) {
+            parseQuery(where, query)
+            sql += " WHERE ${where.toSelection()}"
+        }
+
+        return chatDao.getIds(SimpleSQLiteQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
     }
 
     fun search(query: String, limit: Int, offset: Int): List<DAIChat> {

@@ -936,7 +936,49 @@ class SXGraphQL(val schema: Schema) {
                     }
                 }
                 mutation("addToTags") {
-                    resolver { type: DataType, tagIds: List<ID>, items: List<TagRelationStub> ->
+                    resolver { type: DataType, tagIds: List<ID>, query: String ->
+                        var items = listOf<TagRelationStub>()
+                        val context = MainApp.instance
+                        when (type) {
+                            DataType.AUDIO -> {
+                                items = AudioHelper.getTagRelationStubs(context, query)
+                            }
+
+                            DataType.VIDEO -> {
+                                items = VideoHelper.getTagRelationStubs(context, query)
+                            }
+
+                            DataType.IMAGE -> {
+                                items = ImageHelper.getTagRelationStubs(context, query)
+                            }
+
+                            DataType.SMS -> {
+                                items = SmsHelper.getIds(context, query).map { TagRelationStub(it) }
+                            }
+
+                            DataType.CONTACT -> {
+                                items = ContactHelper.getIds(context, query).map { TagRelationStub(it) }
+                            }
+
+                            DataType.NOTE -> {
+                                items = NoteHelper.getIdsAsync(query).map { TagRelationStub(it) }
+                            }
+
+                            DataType.FEED_ENTRY -> {
+                                items = FeedEntryHelper.getIdsAsync(query).map { TagRelationStub(it) }
+                            }
+
+                            DataType.CALL -> {
+                                items = CallHelper.getIds(context, query).map { TagRelationStub(it) }
+                            }
+
+                            DataType.AI_CHAT -> {
+                                items = AIChatHelper.getIdsAsync(query).map { TagRelationStub(it) }
+                            }
+
+                            else -> {}
+                        }
+
                         tagIds.forEach { tagId ->
                             val existingKeys = withIO { TagHelper.getKeysByTagId(tagId.value) }
                             val newItems = items.filter { !existingKeys.contains(it.key) }
@@ -963,37 +1005,79 @@ class SXGraphQL(val schema: Schema) {
                     }
                 }
                 mutation("removeFromTags") {
-                    resolver { tagIds: List<ID>, keys: List<ID> ->
-                        TagHelper.deleteTagRelationByKeysTagIds(keys.map { it.value }.toSet(), tagIds.map { it.value }.toSet())
+                    resolver { type: DataType, tagIds: List<ID>, query: String->
+                        val context = MainApp.instance
+                        var ids = setOf<String>()
+                        when (type) {
+                            DataType.AUDIO -> {
+                                ids = AudioHelper.getIds(context, query)
+                            }
+
+                            DataType.VIDEO -> {
+                                ids = VideoHelper.getIds(context, query)
+                            }
+
+                            DataType.IMAGE -> {
+                                ids = ImageHelper.getIds(context, query)
+                            }
+
+                            DataType.SMS -> {
+                                ids = SmsHelper.getIds(context, query)
+                            }
+
+                            DataType.CONTACT -> {
+                                ids = ContactHelper.getIds(context, query)
+                            }
+
+                            DataType.NOTE -> {
+                                ids = NoteHelper.getIdsAsync(query)
+                            }
+
+                            DataType.FEED_ENTRY -> {
+                                ids = FeedEntryHelper.getIdsAsync(query)
+                            }
+
+                            DataType.CALL -> {
+                                ids = CallHelper.getIds(context, query)
+                            }
+
+                            DataType.AI_CHAT -> {
+                                ids = AIChatHelper.getIdsAsync(query)
+                            }
+
+                            else -> {}
+                        }
+
+                        TagHelper.deleteTagRelationByKeysTagIds(ids, tagIds.map { it.value }.toSet())
                         true
                     }
                 }
                 mutation("deleteMediaItems") {
                     resolver { type: DataType, query: String ->
-                        var newIds = setOf<String>()
+                        var ids = setOf<String>()
                         val context = MainApp.instance
                         when (type) {
                             DataType.AUDIO -> {
-                                 newIds = AudioHelper.getIds(context, query)
-                                val paths = AudioHelper.deleteRecordsAndFilesByIds(context, newIds)
+                                ids = AudioHelper.getIds(context, query)
+                                val paths = AudioHelper.deleteRecordsAndFilesByIds(context, ids)
                                 AudioPlaylistPreference.deleteAsync(context, paths)
                             }
 
                             DataType.VIDEO -> {
-                                newIds = VideoHelper.getIds(context, query)
-                                val paths = VideoHelper.deleteRecordsAndFilesByIds(context, newIds)
+                                ids = VideoHelper.getIds(context, query)
+                                val paths = VideoHelper.deleteRecordsAndFilesByIds(context, ids)
                                 VideoPlaylistPreference.deleteAsync(context, paths)
                             }
 
                             DataType.IMAGE -> {
-                                newIds = ImageHelper.getIds(context, query)
-                                ImageHelper.deleteRecordsAndFilesByIds(context, newIds)
+                                ids = ImageHelper.getIds(context, query)
+                                ImageHelper.deleteRecordsAndFilesByIds(context, ids)
                             }
 
                             else -> {
                             }
                         }
-                        TagHelper.deleteTagRelationByKeys(newIds, type)
+                        TagHelper.deleteTagRelationByKeys(ids, type)
                         true
                     }
                 }
