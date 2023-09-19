@@ -450,7 +450,7 @@
     <string name="web_console_desc">Ihr PC und Ihr Mobilgerät müssen sich im gleichen Subnetz befinden. Um die Leistung Ihres Telefons zu maximieren, schließen Sie bitte den USB-Adapter an eine Stromquelle an.</string>
     <string name="fetch_content_automatically">Inhalt automatisch abrufen</string>
     <string name="app_restored">APP-Daten wurden wiederhergestellt. Sie müssen die App zwangsweise beenden und die App erneut als neu starten.</string>
-    <string name="welcome_text">Willkommen bei dieser App! Senden Sie Texte, Bilder und Videos einfach, um sie auf Ihrem PC anzuzeigen.</string>
+    <string name="welcome_text">Willkommen! Sie können ganz einfach Text, Bilder und Videos auf dieser Seite senden und sie auf Ihrem Computer anzeigen.\nWenn Sie auf Probleme stoßen, senden Sie bitte eine E-Mail an ismartcoding@gmail.com, um Unterstützung zu erhalten, oder nehmen Sie an unserer Discord-Diskussion teil unter: https://discord.gg/RQWcS6DEEe.</string>
     <string name="demo_mode">Demo-Modus</string>
     <string name="donation">Spende</string>
     <string name="logs">Protokolle</string>

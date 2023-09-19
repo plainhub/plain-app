@@ -450,7 +450,7 @@
     <string name="web_console_desc">PCとモバイルデバイスは同じサブネット内にある必要があります。スマートフォンのパフォーマンスを最大限に活用するには、USBアダプターを電源に接続してください。</string>
     <string name="fetch_content_automatically">コンテンツを自動的に取得</string>
     <string name="app_restored">アプリのデータが復元されました。新しい状態でアプリを再起動する必要があります。</string>
-    <string name="welcome_text">このアプリへようこそ！テキスト、画像、動画を簡単に送信してPCで表示できます。</string>
+    <string name="welcome_text">ようこそ！このページにテキスト、画像、動画を簡単に送信し、コンピュータで表示することができます。\n問題が発生した場合は、お手伝いが必要な場合はismartcoding@gmail.comにメールを送信するか、次のDiscordのディスカッションに参加してください：https://discord.gg/RQWcS6DEEe。</string>
     <string name="demo_mode">デモモード</string>
     <string name="donation">寄付</string>
     <string name="logs">ログ</string>

@@ -1,5 +1,7 @@
 package com.ismartcoding.plain
 
+import java.util.regex.Pattern
+
 object Constants {
     const val SSL_NAME = "Plain"
     const val DATABASE_NAME = "plain.db"
@@ -10,4 +12,5 @@ object Constants {
     const val MAX_READABLE_TEXT_FILE_SIZE = 10 * 1024 * 1024 // 10 MB
     const val SUPPORT_EMAIL = "ismartcoding@gmail.com"
     const val AUTHORITY = "${BuildConfig.APPLICATION_ID}.provider"
+    val EMAIL_PATTERN: Pattern = Pattern.compile("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}")
 }

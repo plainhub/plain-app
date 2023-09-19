@@ -451,7 +451,7 @@
     <string name="web_console_desc">Your PC and mobile device must be in the same subnet. To maximize your phone\'s performance, please connect the USB adapter to a power outlet.</string>
     <string name="fetch_content_automatically">Automatic fetch content</string>
     <string name="app_restored">APP data is restored, you need to force quit this app and start the app again as new.</string>
-    <string name="welcome_text">Welcome to this app! Easily send text, images, and videos to view them on your PC.</string>
+    <string name="welcome_text">Welcome! You can easily send text, images, and videos to this page and view them on your computer.\nIf you encounter any issues, please feel free to send an email to ismartcoding@gmail.com for assistance or join our Discord discussion at: https://discord.gg/RQWcS6DEEe.</string>
     <string name="demo_mode">Demo mode</string>
     <string name="donation">Donation</string>
     <string name="logs">Logs</string>

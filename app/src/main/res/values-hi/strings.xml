@@ -450,7 +450,7 @@
     <string name="web_console_desc">आपके पीसी और मोबाइल डिवाइस को एक ही सबनेट में होना चाहिए। अपने फोन के प्रदर्शन को अधिकतम करने के लिए, कृपया यूएसबी एडेप्टर को बिजली सेट पर लगाएं।</string>
     <string name="fetch_content_automatically">स्वचालित रूप से सामग्री प्राप्त करें</string>
     <string name="app_restored">ऐप डेटा पुनः प्राप्त हो गया है, आपको ऐप को मजबूरी से बंद करना होगा और उसे फिर से नए रूप में शुरू करना होगा।</string>
-    <string name="welcome_text">इस ऐप में आपका स्वागत है! आसानी से पाठ, तस्वीरें और वीडियो भेजें और उन्हें अपने पीसी पर देखें।</string>
+    <string name="welcome_text">स्वागत है! आप इस पृष्ठ पर टेक्स्ट, चित्र, और वीडियो आसानी से भेज सकते हैं, और उन्हें अपने कंप्यूटर पर देख सकते हैं।\nअगर आपको कोई समस्या आती है, तो कृपया सहायता के लिए ismartcoding@gmail.com पर एक ईमेल भेजें या हमारे Discord चर्चा में शामिल हों: https://discord.gg/RQWcS6DEEe।</string>
     <string name="demo_mode">डेमो मोड</string>
     <string name="donation">दान</string>
     <string name="logs">लॉग</string>

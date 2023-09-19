@@ -450,7 +450,7 @@
     <string name="web_console_desc">Seu PC e dispositivo móvel devem estar na mesma sub-rede. Para maximizar o desempenho do seu telefone, por favor, conecte o adaptador USB a uma tomada de energia.</string>
     <string name="fetch_content_automatically">Busca automática de conteúdo</string>
     <string name="app_restored">Dados do APP foram restaurados, você precisa sair forçadamente deste app e iniciá-lo novamente como novo.</string>
-    <string name="welcome_text">Bem-vindo a este aplicativo! Envie facilmente texto, imagens e vídeos para visualizá-los em seu PC.</string>
+    <string name="welcome_text">Bem-vindo! Você pode facilmente enviar texto, imagens e vídeos para esta página e visualizá-los no seu computador.\nSe encontrar algum problema, não hesite em enviar um e-mail para ismartcoding@gmail.com para assistência ou junte-se à nossa discussão no Discord em: https://discord.gg/RQWcS6DEEe.</string>
     <string name="demo_mode">Modo de demonstração</string>
     <string name="donation">Doação</string>
     <string name="logs">Logs</string>

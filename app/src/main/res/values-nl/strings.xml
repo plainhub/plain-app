@@ -450,7 +450,7 @@
     <string name="web_console_desc">Uw pc en mobiele apparaat moeten zich in hetzelfde subnet bevinden. Om de prestaties van uw telefoon te maximaliseren, sluit u de USB-adapter aan op een stopcontact.</string>
     <string name="fetch_content_automatically">Inhoud automatisch ophalen</string>
     <string name="app_restored">APP-gegevens zijn hersteld, u moet de app geforceerd afsluiten en de app opnieuw starten als nieuw.</string>
-    <string name="welcome_text">Welkom bij deze app! Verstuur eenvoudig tekst, afbeeldingen en video\'s om ze op uw pc te bekijken.</string>
+    <string name="welcome_text">Welkom! U kunt eenvoudig tekst, afbeeldingen en video\'s naar deze pagina sturen en ze op uw computer bekijken.\nAls u problemen ondervindt, aarzel dan niet om een e-mail te sturen naar ismartcoding@gmail.com voor hulp of neem deel aan onze Discord-discussie op: https://discord.gg/RQWcS6DEEe.</string>
     <string name="demo_mode">Demonstratiemodus</string>
     <string name="donation">Donatie</string>
     <string name="logs">Logs</string>
