@@ -1,5 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
+    <string name="security">Sécurité</string>
+    <string name="url_token">Jeton d\'URL</string>
+    <string name="url_token_tips">Le jeton d\'URL chiffre les données dans les URL. S\'il est réinitialisé, les URL chiffrées avec l\'ancien jeton deviennent inaccessibles.</string>
     <string name="http_server_ok">Servidor HTTP iniciado</string>
     <string name="http_server_error">Le serveur HTTP n\'est pas démarré. Relancez PlainApp et réessayez. Assurez-vous qu\'aucune autre application n\'occupe les ports HTTP ou HTTPS. Si le problème persiste, veuillez fournir plus de détails sur le problème en contactant ismartcoding@gmail.com.</string>
     <string name="relaunch_app">Relancer l\'application</string>

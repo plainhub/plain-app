@@ -12,6 +12,6 @@ object TempData {
     var keyStorePassword = ""
     var httpPort: Int = 8080
     var httpsPort: Int = 8443
-    val urlToken = CryptoHelper.generateAESKey() // use to encrypt or decrypt params in url
+    var urlToken = "" // use to encrypt or decrypt params in url
     var chatItemsMigrated = false
 }

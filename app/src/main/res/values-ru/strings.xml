@@ -1,5 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Простое Приложение</string>
+    <string name="security">Безопасность</string>
+    <string name="url_token">Токен URL</string>
+    <string name="url_token_tips">Токен URL шифрует данные в URL-адресах. Если он сброшен, старые URL-адреса, зашифрованные с использованием старого токена, становятся недоступными.</string>
     <string name="http_server_ok">HTTP-сервер запущен</string>
     <string name="http_server_error">HTTP-сервер не запущен. Перезапустите PlainApp и попробуйте снова. Убедитесь, что нет других приложений, занимающих порты HTTP или HTTPS. Если проблема сохраняется, предоставьте более подробную информацию о проблеме, связавшись с ismartcoding@gmail.com.</string>
     <string name="relaunch_app">Перезапустите приложение</string>

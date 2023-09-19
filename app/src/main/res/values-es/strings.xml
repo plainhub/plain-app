@@ -1,5 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
+    <string name="security">Seguridad</string>
+    <string name="url_token">Token de URL</string>
+    <string name="url_token_tips">El token de URL cifra datos en las URL. Si se restablece, las URL antiguas cifradas con el token anterior quedan inaccesibles.</string>
     <string name="http_server_ok">Servidor HTTP iniciado</string>
     <string name="http_server_error">El servidor HTTP no está iniciado. Vuelve a abrir PlainApp e inténtalo de nuevo. Asegúrate de que no haya otras aplicaciones ocupando los puertos HTTP o HTTPS. Si el problema persiste, proporciona más detalles sobre el problema contactando a ismartcoding@gmail.com.</string>
     <string name="relaunch_app">Vuelve a abrir PlainApp</string>

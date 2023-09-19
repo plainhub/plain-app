@@ -1,5 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">प्लेन ऐप</string>
+    <string name="security">सुरक्षा</string>
+    <string name="url_token">यूआरएल टोकन</string>
+    <string name="url_token_tips">URL टोकन URL में डेटा को एन्क्रिप्ट करता है। अगर इसे रीसेट किया जाता है, तो पुराने टोकन से एन्क्रिप्ट किए गए URL पहुँच नहीं पाएंगे।</string>
     <string name="http_server_ok">एचटीटीपी सर्वर शुरू हो गया है</string>
     <string name="http_server_error">HTTP सर्वर शुरू नहीं हुआ है। PlainApp को फिर से चालने का प्रयास करें और पुन: प्रयास करें। सुनिश्चित करें कि HTTP या HTTPS पोर्ट पर कोई अन्य एप्लिकेशन नहीं है। यदि समस्या बरकरार रहती है, तो कृपया ismartcoding@gmail.com पर समस्या के बारे में अधिक विवरण प्रदान करें।</string>
     <string name="relaunch_app">ऐप फिर से चालू करें</string>

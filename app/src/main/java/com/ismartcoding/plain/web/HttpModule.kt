@@ -396,29 +396,38 @@ fun Application.module() {
                                         }
                                     }
 
-                                    if (info.total > 1) {
-                                        destFile = File("${info.dir}/${fileName}.part${String.format("%03d", info.index)}")
-                                        if (destFile.exists() && destFile.length() == info.size) {
-                                            // skip if the part file is already uploaded
+                                    // use append file way
+                                    val noSplitFiles = false
+                                    if (noSplitFiles) {
+                                        FileOutputStream(destFile, true).use { part.streamProvider().use { input -> input.copyTo(it) } }
+                                        if (info.total - 1 == info.index) {
+                                            MainApp.instance.scanFileByConnection(destFile, null)
+                                        }
+                                    } else {
+                                        if (info.total > 1) {
+                                            destFile = File("${info.dir}/${fileName}.part${String.format("%03d", info.index)}")
+                                            if (destFile.exists() && destFile.length() == info.size) {
+                                                // skip if the part file is already uploaded
+                                            } else {
+                                                destFile.outputStream().use { part.streamProvider().use { input -> input.copyTo(it) } }
+                                            }
                                         } else {
                                             destFile.outputStream().use { part.streamProvider().use { input -> input.copyTo(it) } }
                                         }
-                                    } else {
-                                        destFile.outputStream().use { part.streamProvider().use { input -> input.copyTo(it) } }
-                                    }
 
-                                    if (info.total - 1 == info.index) {
-                                        if (info.total > 1) {
-                                            // merge part files into original file
-                                            destFile = File("${info.dir}/${fileName}")
-                                            val partFiles = File(info.dir).listFiles()?.filter { it.name.startsWith("$fileName.part") }?.sortedBy { it.name } ?: arrayListOf()
-                                            val fos = FileOutputStream(destFile, true)
-                                            partFiles.forEach {
-                                                it.inputStream().use { input -> input.copyTo(fos) }
-                                                it.delete()
+                                        if (info.total - 1 == info.index) {
+                                            if (info.total > 1) {
+                                                // merge part files into original file
+                                                destFile = File("${info.dir}/${fileName}")
+                                                val partFiles = File(info.dir).listFiles()?.filter { it.name.startsWith("$fileName.part") }?.sortedBy { it.name } ?: arrayListOf()
+                                                val fos = FileOutputStream(destFile, true)
+                                                partFiles.forEach {
+                                                    it.inputStream().use { input -> input.copyTo(fos) }
+                                                    it.delete()
+                                                }
                                             }
+                                            MainApp.instance.scanFileByConnection(destFile, null)
                                         }
-                                        MainApp.instance.scanFileByConnection(destFile, null)
                                     }
                                 }
 

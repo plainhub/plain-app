@@ -67,7 +67,7 @@ fun WebDevPage(
                         }
                         if (enable) {
                             Spacer(modifier = Modifier.height(16.dp))
-                            Subtitle(text = stringResource(id = R.string.token))
+                            Subtitle(text = stringResource(id = R.string.token), Modifier.padding(horizontal = 32.dp))
                             ClipboardCard(label = stringResource(id = R.string.token), devToken)
                             Spacer(modifier = Modifier.height(24.dp))
                             BlockOutlineButton(
@@ -79,7 +79,7 @@ fun WebDevPage(
                                 })
                             Spacer(modifier = Modifier.height(16.dp))
                             Tips(text = stringResource(id = R.string.auth_dev_token_tips))
-                            Subtitle(text = "CURL")
+                            Subtitle(text = "CURL", Modifier.padding(horizontal = 32.dp))
                             ClipboardCard(
                                 label = "CURL",
                                 text = """curl --request POST --url http://${ip4}:${httpPort}/graphql --header 'Authorization: Bearer ${devToken}' --header 'Content-Type: application/json' --data '{"query":"{ chatItems { content } }"}'"""

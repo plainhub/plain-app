@@ -26,6 +26,7 @@ import com.ismartcoding.plain.data.preference.HttpPortPreference
 import com.ismartcoding.plain.data.preference.HttpsPortPreference
 import com.ismartcoding.plain.data.preference.KeyStorePasswordPreference
 import com.ismartcoding.plain.data.preference.PasswordTypePreference
+import com.ismartcoding.plain.data.preference.UrlTokenPreference
 import com.ismartcoding.plain.data.preference.WebPreference
 import com.ismartcoding.plain.data.preference.dataStore
 import com.ismartcoding.plain.features.AppEvents
@@ -107,6 +108,7 @@ class MainApp : Application(), ImageLoaderFactory {
             TempData.httpsPort = HttpsPortPreference.get(preferences)
             ClientIdPreference.ensureValueAsync(instance, preferences)
             KeyStorePasswordPreference.ensureValueAsync(instance, preferences)
+            UrlTokenPreference.ensureValueAsync(instance, preferences)
 
             DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(preferences)))
 

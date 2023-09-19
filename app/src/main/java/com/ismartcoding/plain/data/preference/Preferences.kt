@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.TempData
@@ -54,6 +55,24 @@ object AuthTwoFactorPreference : BasePreference<Boolean>() {
 object AuthDevTokenPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("auth_dev_token")
+}
+
+object UrlTokenPreference : BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("url_token")
+
+    suspend fun ensureValueAsync(context: Context, preferences: Preferences) {
+        TempData.urlToken = get(preferences)
+        if (TempData.urlToken.isEmpty()) {
+            TempData.urlToken = CryptoHelper.generateAESKey()
+            putAsync(context, TempData.urlToken)
+        }
+    }
+
+    suspend fun resetAsync(context: Context) {
+        TempData.urlToken = CryptoHelper.generateAESKey()
+        putAsync(context, TempData.urlToken)
+    }
 }
 
 object ApiPermissionsPreference : BasePreference<Set<String>>() {

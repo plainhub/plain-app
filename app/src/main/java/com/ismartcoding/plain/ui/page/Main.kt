@@ -50,6 +50,7 @@ import com.ismartcoding.plain.ui.page.web.PasswordPage
 import com.ismartcoding.plain.ui.page.web.SessionsPage
 import com.ismartcoding.plain.ui.page.web.WebConsolePage
 import com.ismartcoding.plain.ui.page.web.WebDevPage
+import com.ismartcoding.plain.ui.page.web.WebSecurityPage
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import com.ismartcoding.plain.ui.theme.AppTheme
@@ -143,6 +144,7 @@ fun Main(
                 RouteName.PASSWORD to { PasswordPage(navController) },
                 RouteName.SESSIONS to { SessionsPage(navController) },
                 RouteName.WEB_DEV to { WebDevPage(navController) },
+                RouteName.WEB_SECURITY to { WebSecurityPage(navController) },
                 RouteName.EXCHANGE_RATE to { ExchangeRatePage(navController) },
                 RouteName.SOUND_METER to { SoundMeterPage(navController) },
                 RouteName.CHAT to { ChatPage(navController, sharedViewModel) },

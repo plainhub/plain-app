@@ -126,11 +126,9 @@ fun WebConsolePage(
             PDropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }, content = {
                 DropdownMenuItem(onClick = {
                     isMenuOpen = false
-                    sharedViewModel.textTitle.value = context.getString(R.string.https_certificate_signature)
-                    sharedViewModel.textContent.value = HttpServerManager.getSSLSignature(context).joinToString(" ") { "%02x".format(it).uppercase() }
-                    navController.navigate(RouteName.TEXT)
+                    navController.navigate(RouteName.WEB_SECURITY)
                 }, text = {
-                    Text(text = stringResource(R.string.https_certificate_signature))
+                    Text(text = stringResource(R.string.security))
                 })
                 DropdownMenuItem(onClick = {
                     isMenuOpen = false

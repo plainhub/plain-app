@@ -1,5 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">简朴</string>
+    <string name="security">安全</string>
+    <string name="url_token">URL令牌</string>
+    <string name="url_token_tips">URL令牌用于加密URL中的数据。如果重置，使用旧令牌加密的URL将不再可访问。</string>
     <string name="http_server_ok">HTTP服务运行中</string>
     <string name="http_server_error">HTTP服务器未启动。重新启动PlainApp并重试。确保没有其他应用程序占用HTTP或HTTPS端口。如果问题仍然存在，请通过ismartcoding@gmail.com提供有关问题的更多详细信息。</string>
     <string name="relaunch_app">重启应用</string>

@@ -1,5 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
+    <string name="security">Security</string>
+    <string name="url_token">URL token</string>
+    <string name="url_token_tips">The URL token encrypts data in URLs. If it\'s reset, old token-encrypted URLs become inaccessible.</string>
     <string name="http_server_ok">Http server is running well.</string>
     <string name="http_server_error">Http server is not started. Relaunch the PlainApp and try again. Make sure that there are no other apps occupying the HTTP or HTTPS ports. If the problem persists, please provide more details about the issue by contacting ismartcoding@gmail.com.</string>
     <string name="relaunch_app">Relaunch APP</string>
