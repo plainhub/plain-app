@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -54,7 +55,8 @@ fun ChatInput(
                     shape = RoundedCornerShape(8.dp),
                 )
                 .onFocusChanged { focusState -> hasFocus = focusState.hasFocus }
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .heightIn(max = 200.dp),
             keyboardOptions = keyboardOptions,
             shape = RoundedCornerShape(8.dp),
             placeholder = {

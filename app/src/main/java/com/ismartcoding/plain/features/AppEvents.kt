@@ -52,8 +52,6 @@ class StartHttpServerEvent
 class StartScreenMirrorEvent
 class RestartAppEvent
 
-class UpdateMessageEvent(val id: String, val content: String)
-
 class DeleteChatItemViewEvent(val id: String)
 
 class DeviceNameUpdatedEvent(val id: String, val name: String?)

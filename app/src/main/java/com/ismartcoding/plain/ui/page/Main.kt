@@ -15,6 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.parcelable
@@ -156,6 +157,15 @@ fun Main(
                 composable(routeName.name) {
                     content()
                 }
+            }
+
+            composable(
+                "${RouteName.CHAT_EDIT_TEXT.name}?id={id}",
+                arguments = listOf(navArgument("id") { })
+            ) { backStackEntry ->
+                val arguments = requireNotNull(backStackEntry.arguments)
+                val id = arguments.getString("id", "")
+                ChatEditTextPage(navController, sharedViewModel, id)
             }
         }
     }

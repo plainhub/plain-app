@@ -8,6 +8,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import com.ismartcoding.plain.ui.helpers.WebHelper
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 fun String.linkify(
@@ -20,41 +21,61 @@ fun String.linkify(
     val patterns = listOf(emailPattern, phonePattern, urlPattern)
     val tags = listOf("EMAIL", "PHONE", "URL")
 
-    var r = this@linkify
-    for (i in patterns.indices) {
-        val pattern = patterns[i]
-        val tag = tags[i]
-
-        val matcher = pattern.matcher(r)
-
-        while (matcher.find()) {
-            val start = matcher.start()
-            val end = matcher.end()
-            val matchedText = r.substring(start, end)
-
-            if (start > 0) {
-                // Append non-link text before the match
-                append(r.subSequence(0, start))
+    val parse = fun(input: String): Pair<Matcher, String>? {
+        var matcher: Matcher? = null
+        var tag = ""
+        for (i in patterns.indices) {
+            val pattern = patterns[i]
+            val m = pattern.matcher(input)
+            if (m.find()) {
+                if (matcher == null) {
+                    matcher = m
+                    tag = tags[i]
+                } else if (matcher.start() > m.start()) {
+                    matcher = m
+                    tag = tags[i]
+                }
             }
-
-            withStyle(linkStyle) {
-                // Append the linked text
-                addStringAnnotation(
-                    tag = tag,
-                    annotation = matchedText,
-                    start = length,
-                    end = length + matchedText.length
-                )
-                append(matchedText)
-            }
-
-            // Remove the processed part of the text
-            r = r.substring(end)
         }
+
+        if (matcher != null) {
+            return Pair(matcher, tag)
+        }
+
+        return null
+    }
+
+    var raw = this@linkify
+    var m = parse(raw)
+    while (m != null) {
+        val matcher = m.first
+        val start = matcher.start()
+        val end = matcher.end()
+        val matchedText = raw.substring(start, end)
+
+        if (start > 0) {
+            // Append non-link text before the match
+            append(raw.subSequence(0, start))
+        }
+
+        withStyle(linkStyle) {
+            // Append the linked text
+            addStringAnnotation(
+                tag = m!!.second,
+                annotation = matchedText,
+                start = length,
+                end = length + matchedText.length
+            )
+            append(matchedText)
+        }
+
+        // Remove the processed part of the text
+        raw = raw.substring(end)
+        m = parse(raw)
     }
 
     // Append any remaining non-link text
-    append(r)
+    append(raw)
 }
 
 fun AnnotatedString.urlAt(context: Context, position: Int) {
@@ -65,11 +86,13 @@ fun AnnotatedString.urlAt(context: Context, position: Int) {
                 WebHelper.open(context, it.item)
                 return
             }
+
             "EMAIL" -> {
                 val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:${it.item}"))
                 context.startActivity(emailIntent)
                 return
             }
+
             "PHONE" -> {
                 val phoneIntent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${it.item}"))
                 context.startActivity(phoneIntent)

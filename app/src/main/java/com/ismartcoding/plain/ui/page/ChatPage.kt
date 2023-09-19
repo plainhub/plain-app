@@ -6,14 +6,11 @@ import android.os.Environment
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,14 +19,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -67,8 +58,6 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.enums.PickFileTag
 import com.ismartcoding.plain.data.enums.PickFileType
-import com.ismartcoding.plain.db.AppDatabase
-import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
@@ -77,16 +66,11 @@ import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.features.DeleteChatItemViewEvent
 import com.ismartcoding.plain.features.PickFileResultEvent
-import com.ismartcoding.plain.features.UpdateMessageEvent
 import com.ismartcoding.plain.features.chat.ChatHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FileHelper
-import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.base.PDropdownMenu
-import com.ismartcoding.plain.ui.base.PIconButton
-import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
@@ -96,7 +80,6 @@ import com.ismartcoding.plain.ui.components.chat.ChatImages
 import com.ismartcoding.plain.ui.components.chat.ChatInput
 import com.ismartcoding.plain.ui.components.chat.ChatName
 import com.ismartcoding.plain.ui.components.chat.ChatText
-import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.SharedViewModel
@@ -136,7 +119,6 @@ fun ChatPage(
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
     var selectedItem by remember { mutableStateOf<VChat?>(null) }
     val showContextMenu = remember { mutableStateOf(false) }
-    var showEditTextSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.fetch(context)
@@ -148,23 +130,6 @@ fun ChatPage(
             viewModel.addAll(event.items)
             scope.launch {
                 scrollState.scrollToItem(0)
-            }
-        })
-
-        events.add(receiveEventHandler<UpdateMessageEvent> { event ->
-            scope.launch {
-                val update = ChatItemDataUpdate(event.id, DMessageContent(DMessageType.TEXT.value, DMessageText(event.content)))
-                withIO {
-                    AppDatabase.instance.chatDao().updateData(update)
-                }
-                val c = withIO { AppDatabase.instance.chatDao().getById(event.id) }
-                if (c != null) {
-                    viewModel.update(c)
-                    sendEvent(WebSocketEvent(EventType.MESSAGE_UPDATED, JsonHelper.jsonEncode(listOf(c.toModel().apply {
-                        data = this.getContentData()
-                    }))))
-                }
-                focusManager.clearFocus()
             }
         })
 
@@ -246,12 +211,6 @@ fun ChatPage(
         }
     }
 
-    if (showEditTextSheet) {
-        EditTextBottomSheet(selectedItem?.id ?: "", (selectedItem?.value as? DMessageText)?.text ?: "") {
-            showEditTextSheet = false
-        }
-    }
-
     PScaffold(
         navController,
         topBarTitle = stringResource(id = R.string.my_phone),
@@ -283,13 +242,6 @@ fun ChatPage(
                                                 onClick = {
                                                     focusManager.clearFocus()
                                                 },
-                                                onDoubleClick = {
-                                                    if (m.value is DMessageText) {
-                                                        val content = (m.value as DMessageText).text
-                                                        sharedViewModel.chatContent.value = content
-                                                        navController.navigate(RouteName.CHAT_TEXT)
-                                                    }
-                                                },
                                                 onLongClick = {
                                                     selectedItem = m
                                                     showContextMenu.value = true
@@ -306,7 +258,7 @@ fun ChatPage(
                                             }
 
                                             DMessageType.TEXT.value -> {
-                                                ChatText(context, m)
+                                                ChatText(context, navController, sharedViewModel, m)
                                             }
                                         }
                                     }
@@ -331,7 +283,8 @@ fun ChatPage(
                                                 DropdownMenuItem(text = { Text(stringResource(id = R.string.edit_text)) },
                                                     onClick = {
                                                         showContextMenu.value = false
-                                                        showEditTextSheet = true
+                                                        sharedViewModel.chatContent.value = (m.value as DMessageText).text
+                                                        navController.navigate("${RouteName.CHAT_EDIT_TEXT.name}?id=${m.id}")
                                                     })
                                             }
                                             DropdownMenuItem(
@@ -376,47 +329,4 @@ fun ChatPage(
             }
         }
     )
-}
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
-@Composable
-fun EditTextBottomSheet(id: String, value: String, onDismiss: () -> Unit) {
-    var inputValue by remember { mutableStateOf(value) }
-    PModalBottomSheet(
-        topBarTitle = stringResource(id = R.string.edit_text),
-        onDismissRequest = { onDismiss() },
-    ) {
-        OutlinedTextField(
-            value = inputValue,
-            onValueChange = { inputValue = it },
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(8.dp),
-                )
-                .fillMaxWidth(),
-            keyboardOptions = KeyboardOptions.Default,
-            shape = RoundedCornerShape(8.dp),
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp, end = 16.dp, bottom = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Spacer(modifier = Modifier.weight(1f))
-            PIconButton(
-                imageVector = Icons.Outlined.Send,
-                contentDescription = stringResource(R.string.send_message),
-                tint = MaterialTheme.colorScheme.primary
-            ) {
-                if (inputValue.isNotEmpty()) {
-                    onDismiss()
-                    sendEvent(UpdateMessageEvent(id, inputValue))
-                }
-            }
-        }
-    }
 }
