@@ -71,6 +71,7 @@ import com.ismartcoding.plain.features.contact.SourceHelper
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.features.feed.fetchContentAsync
+import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.image.ImageHelper
 import com.ismartcoding.plain.features.note.NoteHelper
@@ -463,10 +464,10 @@ class SXGraphQL(val schema: Schema) {
                     }
                 }
                 query("files") {
-                    resolver { dir: String, showHidden: Boolean ->
+                    resolver { dir: String, showHidden: Boolean, sortBy: FileSortBy ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-                        val files = FileSystemHelper.getFilesList(dir, showHidden, FileSortByPreference.getValueAsync(context)).map { it.toModel() }
+                        val files = FileSystemHelper.getFilesList(dir, showHidden, sortBy).map { it.toModel() }
                         Files(dir, files)
                     }
                 }
@@ -1119,6 +1120,7 @@ class SXGraphQL(val schema: Schema) {
                 enum<MediaPlayMode>()
                 enum<DataType>()
                 enum<Permission>()
+                enum<FileSortBy>()
                 stringScalar<Instant> {
                     deserialize = { value: String -> value.toInstant() }
                     serialize = Instant::toString

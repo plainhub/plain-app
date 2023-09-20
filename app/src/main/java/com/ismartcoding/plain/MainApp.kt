@@ -99,7 +99,7 @@ class MainApp : Application(), ImageLoaderFactory {
 
         BluetoothEvents.register()
         AppEvents.register()
-        BoxEvents.register()
+        //BoxEvents.register()
 
         coIO {
             val preferences = dataStore.data.first()

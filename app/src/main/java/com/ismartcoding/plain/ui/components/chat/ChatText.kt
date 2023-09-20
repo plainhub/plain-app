@@ -16,7 +16,6 @@ import com.ismartcoding.plain.ui.base.ClickableText
 import com.ismartcoding.plain.ui.base.linkify
 import com.ismartcoding.plain.ui.base.urlAt
 import com.ismartcoding.plain.ui.extensions.navigate
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.page.RouteName
