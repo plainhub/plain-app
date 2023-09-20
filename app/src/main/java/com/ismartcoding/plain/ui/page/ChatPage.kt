@@ -258,7 +258,7 @@ fun ChatPage(
                                             }
 
                                             DMessageType.TEXT.value -> {
-                                                ChatText(context, navController, sharedViewModel, m)
+                                                ChatText(context, navController, sharedViewModel, focusManager, m)
                                             }
                                         }
                                     }
