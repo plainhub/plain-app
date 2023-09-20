@@ -461,6 +461,7 @@
     <string name="password_type_none">Sem senha</string>
     <string name="restart_app_title">Reiniciar aplicativo</string>
     <string name="http_server_failed">Falha ao iniciar servidor HTTP. Você precisa sair do aplicativo forçadamente e, em seguida, abri-lo novamente.</string>
+    <string name="http_server_stopped">Servidor HTTP parado.</string>
     <string name="restart_app_message">Você precisa sair do aplicativo forçadamente e, em seguida, abri-lo novamente.</string>
     <string name="keep_screen_on">Manter a tela ligada</string>
     <string name="cast_mode">Modo de transmissão</string>

@@ -33,7 +33,7 @@ object VideoHelper : BaseContentHelper() {
 
     override fun getBaseWhere(groups: List<FilterField>): ContentWhere {
         val where = ContentWhere()
-        where.add("${MediaStore.Video.Media.DURATION}>0")
+        //where.add("${MediaStore.Video.Media.DURATION}>0")
         groups.forEach {
             if (it.name == "text") {
                 where.add("${MediaStore.Video.Media.TITLE} LIKE ?", "%${it.value}%")

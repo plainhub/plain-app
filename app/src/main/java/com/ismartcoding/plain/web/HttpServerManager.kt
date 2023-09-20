@@ -9,8 +9,6 @@ import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.data.preference.HttpPortPreference
-import com.ismartcoding.plain.data.preference.HttpsPortPreference
 import com.ismartcoding.plain.data.preference.PasswordPreference
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.SessionClientTsUpdate
@@ -42,6 +40,8 @@ object HttpServerManager {
     val wsSessions = Collections.synchronizedSet<WebSocketSession>(LinkedHashSet())
     val clientRequestTs = mutableMapOf<String, Long>()
     var httpServerError: String = ""
+    var httpServer: NettyApplicationEngine? = null
+    var stoppedByUser = false
 
     suspend fun resetPasswordAsync(): String {
         val password = CryptoHelper.randomPassword(6)

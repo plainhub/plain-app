@@ -32,14 +32,15 @@ class HttpServerService : LifecycleService() {
         }
         lifecycle.coroutineScope.launch(Dispatchers.IO) {
             try {
-                if (MainApp.instance.httpServer == null) {
-                    MainApp.instance.httpServer = HttpServerManager.createHttpServer(MainApp.instance)
-                    MainApp.instance.httpServer?.start(wait = true)
+                if (HttpServerManager.httpServer == null) {
+                    HttpServerManager.httpServer = HttpServerManager.createHttpServer(MainApp.instance)
+                    HttpServerManager.httpServer?.start(wait = true)
+                    HttpServerManager.stoppedByUser = false
                     HttpServerManager.httpServerError = ""
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                MainApp.instance.httpServer = null
+                HttpServerManager.httpServer = null
                 HttpServerManager.httpServerError = ex.toString()
                 LogCat.e(ex.toString())
             }
@@ -51,12 +52,12 @@ class HttpServerService : LifecycleService() {
         stopSelf()
         coIO {
             try {
-                MainApp.instance.httpServer?.let { h ->
+                HttpServerManager.httpServer?.let { h ->
                     val environment = h.environment
                     environment.monitor.raise(ApplicationStopPreparing, environment)
                     environment.stop()
                 }
-                MainApp.instance.httpServer = null
+                HttpServerManager.httpServer = null
             } catch (ex: Exception) {
                 ex.printStackTrace()
             }

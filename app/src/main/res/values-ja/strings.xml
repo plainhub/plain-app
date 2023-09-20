@@ -461,6 +461,7 @@
     <string name="password_type_none">パスワードなし</string>
     <string name="restart_app_title">アプリを再起動</string>
     <string name="http_server_failed">HTTPサーバーの起動に失敗しました。アプリを強制終了してから再度開いてください。</string>
+    <string name="http_server_stopped">HTTPサーバーが停止しました。</string>
     <string name="restart_app_message">アプリを強制終了してから再度開いてください。</string>
     <string name="keep_screen_on">画面を常にオンにする</string>
     <string name="cast_mode">キャストモード</string>

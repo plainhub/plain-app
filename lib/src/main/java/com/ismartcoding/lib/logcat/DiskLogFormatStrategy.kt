@@ -2,16 +2,14 @@ package com.ismartcoding.lib.logcat
 
 import android.content.Context
 import android.os.HandlerThread
-import java.text.SimpleDateFormat
-import java.util.*
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class DiskLogFormatStrategy(private val logStrategy: LogStrategy) : FormatStrategy {
-    private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.ENGLISH)
-
+    private val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
     override fun log(priority: Int, tag: String?, message: String) {
         val builder = StringBuilder()
-
-        builder.append(dateFormat.format(Date()))
+        builder.append(dateFormat.format(LocalDateTime.now()))
 
         builder.append(SEPARATOR)
         builder.append(logLevel(priority))

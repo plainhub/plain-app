@@ -48,6 +48,7 @@ import com.ismartcoding.plain.ui.components.home.HomeItemTools
 import com.ismartcoding.plain.ui.components.home.HomeItemWork
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.models.MainViewModel
+import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -76,7 +77,7 @@ fun HomePage(
                 imageVector = Icons.Outlined.Computer,
                 contentDescription = stringResource(R.string.web_console),
                 tint = MaterialTheme.colorScheme.onSurface,
-                showBadge = webConsole
+                showBadge = webConsole && HttpServerManager.httpServer != null && HttpServerManager.httpServerError.isEmpty()
             ) {
                 navController.navigate(RouteName.WEB_CONSOLE)
             }

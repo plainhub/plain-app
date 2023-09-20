@@ -461,6 +461,7 @@
     <string name="password_type_none">Nessuna password</string>
     <string name="restart_app_title">Riavvia app</string>
     <string name="http_server_failed">Avvio del server HTTP fallito, devi forzare la chiusura dell\'app e poi aprirla nuovamente.</string>
+    <string name="http_server_stopped">Server HTTP arrestato</string>
     <string name="restart_app_message">Devi forzare la chiusura dell\'app e poi aprirla nuovamente.</string>
     <string name="keep_screen_on">Mantieni schermo attivo</string>
     <string name="cast_mode">Modalità Cast</string>

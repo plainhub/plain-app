@@ -461,6 +461,7 @@
     <string name="password_type_none">कोई पासवर्ड नहीं</string>
     <string name="restart_app_title">ऐप पुनः शुरू करें</string>
     <string name="http_server_failed">HTTP सर्वर शुरू करने में विफल, आपको ऐप को मजबूरी से बंद करना होगा और फिर से खोलना होगा।</string>
+    <string name="http_server_stopped">HTTP सर्वर बंद कर दिया गया है।</string>
     <string name="restart_app_message">आपको ऐप को मजबूरी से बंद करना होगा और फिर से खोलना होगा।</string>
     <string name="keep_screen_on">स्क्रीन चालित रखें</string>
     <string name="cast_mode">कास्ट मोड</string>

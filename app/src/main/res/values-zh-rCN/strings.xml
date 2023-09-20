@@ -462,6 +462,7 @@
     <string name="password_type_none">无密码</string>
     <string name="restart_app_title">重启应用</string>
     <string name="http_server_failed">HTTP服务器启动失败，请强制退出应用并重新打开。</string>
+    <string name="http_server_stopped">HTTP服务器未启动。</string>
     <string name="restart_app_message">您需要退出当前应用并重新打开应用才能生效。</string>
     <string name="keep_screen_on">保持屏幕常亮</string>
     <string name="cast_mode">投屏模式</string>

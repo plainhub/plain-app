@@ -43,7 +43,6 @@ import okhttp3.OkHttpClient
 
 
 class MainApp : Application(), ImageLoaderFactory {
-    var httpServer: NettyApplicationEngine? = null
 
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this)

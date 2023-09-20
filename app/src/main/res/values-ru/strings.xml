@@ -461,6 +461,7 @@
     <string name="password_type_none">Без пароля</string>
     <string name="restart_app_title">Перезапустить приложение</string>
     <string name="http_server_failed">Запуск HTTP-сервера не удался. Вам нужно выйти из приложения и затем снова открыть его.</string>
+    <string name="http_server_stopped">HTTP-сервер остановлен.</string>
     <string name="restart_app_message">Вам нужно выйти из приложения и затем снова открыть его.</string>
     <string name="keep_screen_on">Не выключать экран</string>
     <string name="cast_mode">Режим передачи</string>

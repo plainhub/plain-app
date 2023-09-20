@@ -461,6 +461,7 @@
     <string name="password_type_none">Aucun mot de passe</string>
     <string name="restart_app_title">Redémarrer l\'application</string>
     <string name="http_server_failed">Démarrage du serveur HTTP échoué, vous devez quitter l\'application de force et la rouvrir.</string>
+    <string name="http_server_stopped">Le serveur HTTP est arrêté.</string>
     <string name="restart_app_message">Vous devez quitter l\'application de force et la rouvrir.</string>
     <string name="keep_screen_on">Garder l\'écran allumé</string>
     <string name="cast_mode">Mode de diffusion</string>

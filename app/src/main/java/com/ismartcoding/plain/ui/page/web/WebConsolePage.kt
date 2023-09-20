@@ -148,7 +148,9 @@ fun WebConsolePage(
                 item {
                     val errorMessage = if (HttpServerManager.httpServerError.isNotEmpty()) {
                         HttpServerManager.httpServerError
-                    } else if (webConsole && MainApp.instance.httpServer == null) {
+                    } else if (webConsole && HttpServerManager.stoppedByUser) {
+                        stringResource(id = R.string.http_server_stopped)
+                    } else if (webConsole && HttpServerManager.httpServer == null) {
                         stringResource(id = R.string.http_server_failed)
                     } else {
                         ""

@@ -461,6 +461,7 @@
     <string name="password_type_none">কোনও পাসওয়ার্ড নেই</string>
     <string name="restart_app_title">অ্যাপ পুনরায় চালু করুন</string>
     <string name="http_server_failed">এইচটিটিপি সার্ভার চালানো ব্যর্থ হয়েছে, আপনাকে অ্যাপটি বন্ধ করতে এবং তারপর আবার খোলতে হবে।</string>
+    <string name="http_server_stopped">এইচটিটিপি সার্ভার বন্ধ হয়েছে.</string>
     <string name="restart_app_message">আপনাকে অ্যাপটি বন্ধ করতে এবং তারপর আবার খোলতে হবে।</string>
     <string name="keep_screen_on">পর্দায় রাখুন</string>
     <string name="cast_mode">কাস্ট মোড</string>

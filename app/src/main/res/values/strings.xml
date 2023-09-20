@@ -462,6 +462,7 @@
     <string name="password_type_none">No password</string>
     <string name="restart_app_title">Restart app</string>
     <string name="http_server_failed">Http server started failed, You need to force quit the app and then open it again.</string>
+    <string name="http_server_stopped">Http server is stopped.</string>
     <string name="restart_app_message">You need to force quit the app and then open it again.</string>
     <string name="keep_screen_on">Keep screen on</string>
     <string name="cast_mode">Cast mode</string>
