@@ -9,6 +9,9 @@ data class DPackage(
     val version: String,
     val path: String,
     val size: Long,
+    val certs: List<DCertificate>,
     val installedAt: Instant,
     val updatedAt: Instant
 )
+
+data class DCertificate(val issuer: String, val subject: String, val serialNumber: String, val validFrom: Instant, val validTo: Instant)

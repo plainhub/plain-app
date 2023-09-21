@@ -3,12 +3,16 @@ package com.ismartcoding.plain.features.pkg
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import android.net.Uri
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.packageManager
 import kotlinx.datetime.Instant
 import java.io.File
+import android.content.pm.PackageManager
+import android.content.pm.Signature
+import javax.security.cert.X509Certificate
 
 object PackageHelper {
     private val appLabelCache: MutableMap<String, String> = HashMap()
@@ -24,7 +28,8 @@ object PackageHelper {
     }
 
     fun search(query: String, limit: Int, offset: Int): List<DPackage> {
-        val packages = if (query.isEmpty()) packageManager.getInstalledPackages(0).drop(offset).take(limit) else packageManager.getInstalledPackages(0)
+        val flags = PackageManager.GET_SIGNING_CERTIFICATES
+        val packages = if (query.isEmpty()) packageManager.getInstalledPackages(flags).drop(offset).take(limit) else packageManager.getInstalledPackages(flags)
         val apps = mutableListOf<DPackage>()
         var type = ""
         var text = ""
@@ -45,29 +50,46 @@ object PackageHelper {
             }
         }
 
-        packages.forEach { app ->
-            val packageInfo = packageManager.getApplicationInfo(app.packageName, 0)
-            val file = File(packageInfo.publicSourceDir)
-            val isSystemApp = packageInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
+        val applications = packageManager.getInstalledApplications(0).associateBy { it.packageName }
+        packages.forEach { pkg ->
+            val appInfo = applications[pkg.packageName] ?: return@forEach
+            val signatures = signatures(pkg)
+            val certs = mutableListOf<DCertificate>()
+            for (signature in signatures) {
+                val cert = X509Certificate.getInstance(signature.toByteArray())
+                certs.add(
+                    DCertificate(
+                        cert.issuerDN.name,
+                        cert.subjectDN.name,
+                        cert.serialNumber.toString(),
+                        Instant.fromEpochMilliseconds(cert.notBefore.time),
+                        Instant.fromEpochMilliseconds(cert.notAfter.time)
+                    )
+                )
+            }
+
+            val file = File(appInfo.publicSourceDir)
+            val isSystemApp = appInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
             val appType = if (isSystemApp) "system" else "user"
             if (type.isNotEmpty() && appType != type) {
                 return@forEach
             }
 
-            if (ids.isNotEmpty() && !ids.contains(packageInfo.packageName)) {
+            if (ids.isNotEmpty() && !ids.contains(appInfo.packageName)) {
                 return@forEach
             }
 
             apps.add(
                 DPackage(
-                    packageInfo.packageName,
-                    getLabel(packageInfo),
+                    appInfo.packageName,
+                    getLabel(appInfo),
                     appType,
-                    app.versionName ?: "",
-                    packageInfo.sourceDir,
+                    pkg.versionName ?: "",
+                    appInfo.sourceDir,
                     file.length(),
-                    Instant.fromEpochMilliseconds(app.firstInstallTime),
-                    Instant.fromEpochMilliseconds(app.lastUpdateTime),
+                    certs,
+                    Instant.fromEpochMilliseconds(pkg.firstInstallTime),
+                    Instant.fromEpochMilliseconds(pkg.lastUpdateTime),
                 )
             )
         }
@@ -75,7 +97,15 @@ object PackageHelper {
         return if (query.isEmpty()) {
             apps
         } else {
-            apps.filter { text.isEmpty() || it.name.contains(text, true) || it.id.contains(text, true) }.drop(offset).take(limit)
+            apps.filter {
+                text.isEmpty()
+                        || it.name.contains(text, true)
+                        || it.id.contains(text, true)
+                        || it.certs.any { c ->
+                    c.issuer.contains(text, true)
+                            || c.subject.contains(text, true)
+                }
+            }.drop(offset).take(limit)
         }
     }
 
@@ -119,6 +149,18 @@ object PackageHelper {
         }
 
         return appLabelCache[key] ?: ""
+    }
+
+    private fun signatures(packageInfo: PackageInfo): MutableSet<Signature> {
+        val signatures: MutableSet<Signature> = mutableSetOf()
+        val signingInfo = packageInfo.signingInfo
+        if (signingInfo != null) {
+            signingInfo.signingCertificateHistory?.let { signatures.addAll(it) }
+            signingInfo.apkContentsSigners?.let { signatures.addAll(it) }
+        }
+        @Suppress("DEPRECATION")
+        packageInfo.signatures?.let { signatures.addAll(it) }
+        return signatures
     }
 
     fun uninstall(context: Context, packageName: String) {
