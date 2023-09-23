@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.config.KotlinCompilerVersion
-import java.util.Properties
 import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     id("com.android.application")
@@ -29,11 +29,12 @@ android {
         targetSdk = 34
 
         val abiFilterList = if (hasProperty("abiFilters")) property("abiFilters").toString().split(';') else listOf()
-        val singleAbiNum = when (abiFilterList.takeIf { it.size == 1 }?.first()) {
-            "armeabi-v7a" -> 2
-            "arm64-v8a" -> 1
-            else -> 0
-        }
+        val singleAbiNum =
+            when (abiFilterList.takeIf { it.size == 1 }?.first()) {
+                "armeabi-v7a" -> 2
+                "arm64-v8a" -> 1
+                else -> 0
+            }
 
         val vCode = 146
         versionCode = vCode - singleAbiNum
@@ -115,7 +116,7 @@ android {
         }
     }
     applicationVariants.forEach { variant ->
-        variant.buildConfigField( "String", "applicationId", "\"${variant.applicationId}\"")
+        variant.buildConfigField("String", "applicationId", "\"${variant.applicationId}\"")
     }
 }
 
@@ -125,25 +126,22 @@ dependencies {
     val kgraphql = "0.18.1"
     val ktor = "2.1.0" // don't upgrade, TLS handshake failed
 
-    implementation(platform("androidx.compose:compose-bom:2023.09.00"))
+    implementation(platform("androidx.compose:compose-bom:2023.09.01"))
 
     implementation("com.caverock:androidsvg-aar:1.4")
-
-//    implementation("androidx.activity:activity-compose:1.7.2")
+    // https://github.com/google/accompanist/releases
+    implementation("androidx.activity:activity-compose:1.8.0-rc01")
     implementation("androidx.compose.runtime:runtime")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.foundation:foundation-layout")
-    implementation("androidx.compose.material3:material3:1.2.0-alpha07")
+    implementation("androidx.compose.material3:material3:1.2.0-alpha08")
     implementation("androidx.compose.material:material-icons-extended")
 
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha12")
 
-    // https://github.com/google/accompanist/releases
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.33.1-alpha")
-
     // https://developer.android.com/jetpack/androidx/releases/navigation
-    implementation("androidx.navigation:navigation-compose:2.7.1")
+    implementation("androidx.navigation:navigation-compose:2.7.3")
 
     releaseImplementation(platform("com.google.firebase:firebase-bom:32.2.3"))
     releaseImplementation("com.google.firebase:firebase-crashlytics-ktx:18.4.1")
@@ -187,7 +185,7 @@ dependencies {
     implementation("androidx.room:room-common:$room")
     ksp("androidx.room:room-compiler:$room")
     implementation("androidx.room:room-ktx:$room")
-   // implementation("com.github.skydoves:balloon:1.5.2")
+    // implementation("com.github.skydoves:balloon:1.5.2")
 
     implementation("com.aallam.openai:openai-client:3.2.0")
 
@@ -196,7 +194,6 @@ dependencies {
     implementation("com.rometools:rome:2.1.0")
 
     implementation("androidx.work:work-runtime-ktx:2.8.1")
-
 
     // https://developer.android.com/jetpack/androidx/releases/datastore
     implementation("androidx.datastore:datastore-preferences:1.0.0")

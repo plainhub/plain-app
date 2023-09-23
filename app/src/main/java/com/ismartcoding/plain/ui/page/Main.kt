@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -10,13 +11,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.extensions.parcelableArrayList
@@ -70,6 +73,9 @@ fun Main(
     val useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current)
     val sharedViewModel: SharedViewModel = viewModel()
     val scope = rememberCoroutineScope()
+    val view = LocalView.current
+    val window = (view.context as Activity).window
+    val insetsController = WindowCompat.getInsetsController(window, view)
 
     LaunchedEffect(Unit) {
         val intent = MainActivity.instance.get()?.intent
@@ -120,12 +126,10 @@ fun Main(
     }
 
     AppTheme(useDarkTheme = useDarkTheme) {
-        val systemUiController = rememberSystemUiController()
-        systemUiController.run {
-            setStatusBarColor(Color.Transparent, !useDarkTheme)
-            setSystemBarsColor(Color.Transparent, !useDarkTheme)
-            setNavigationBarColor(MaterialTheme.colorScheme.backColor(), !useDarkTheme)
-        }
+        window.statusBarColor = Color.Transparent.toArgb()
+        window.navigationBarColor = MaterialTheme.colorScheme.backColor().toArgb()
+        insetsController.isAppearanceLightStatusBars = !useDarkTheme
+        insetsController.isAppearanceLightNavigationBars = !useDarkTheme
 
         NavHost(
             modifier = Modifier.background(MaterialTheme.colorScheme.surface),
@@ -153,6 +157,7 @@ fun Main(
                 RouteName.TEXT to { TextPage(navController, sharedViewModel) },
                 RouteName.SCAN to { ScanPage(navController) },
                 RouteName.SCAN_HISTORY to { ScanHistoryPage(navController) },
+                RouteName.MEDIA_PREVIEW to { MediaPreviewPage(navController) },
             ).forEach { (routeName, content) ->
                 composable(routeName.name) {
                     content()

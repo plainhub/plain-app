@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.scan
 
+import android.app.Activity
 import android.content.ClipData
 import android.content.Context
 import android.graphics.ImageFormat
@@ -20,9 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Computer
 import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.CopyAll
 import androidx.compose.material.icons.rounded.Cancel
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Image
@@ -48,8 +47,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavHostController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.BinaryBitmap
 import com.google.zxing.DecodeHintType
@@ -75,7 +75,6 @@ import com.ismartcoding.plain.features.PickFileEvent
 import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.features.RequestPermissionEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.ui.base.ClipboardCard
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -91,16 +90,16 @@ import java.nio.ByteBuffer
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScanPage(
-    navController: NavHostController,
-) {
+fun ScanPage(navController: NavHostController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
+    val view = LocalView.current
+    val window = (view.context as Activity).window
+    val insetsController = WindowCompat.getInsetsController(window, view)
 
     var cameraProvider: ProcessCameraProvider? = null
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
-    val systemUiController = rememberSystemUiController()
     var cameraDetecting by remember { mutableStateOf(true) }
     var hasCamPermission by remember {
         mutableStateOf(Permission.CAMERA.can(context))
@@ -109,14 +108,16 @@ fun ScanPage(
     var scanResult by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        systemUiController.isSystemBarsVisible = false
+        // https://developer.android.com/develop/ui/views/layout/edge-to-edge
+        insetsController.hide(WindowInsetsCompat.Type.systemBars())
         events.add(
             receiveEventHandler<PermissionResultEvent> {
                 hasCamPermission = Permission.CAMERA.can(context)
                 if (!hasCamPermission) {
                     DialogHelper.showMessage(LocaleHelper.getString(R.string.scan_needs_camera_warning))
                 }
-            })
+            },
+        )
         events.add(
             receiveEventHandler<PickFileResultEvent> { event ->
                 if (event.tag != PickFileTag.SCAN) {
@@ -146,7 +147,8 @@ fun ScanPage(
                         ex.printStackTrace()
                     }
                 }
-            })
+            },
+        )
     }
     if (!hasCamPermission) {
         sendEvent(RequestPermissionEvent(Permission.CAMERA))
@@ -154,7 +156,7 @@ fun ScanPage(
 
     DisposableEffect(Unit) {
         onDispose {
-            systemUiController.isSystemBarsVisible = true
+            insetsController.show(WindowInsetsCompat.Type.systemBars())
             events.forEach { it.cancel() }
             cameraProvider?.unbindAll()
         }
@@ -173,62 +175,68 @@ fun ScanPage(
         navigationIcon = null,
         content = {
             Box(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 if (hasCamPermission) {
                     AndroidView(
                         factory = { context ->
                             val previewView = PreviewView(context)
                             val preview = Preview.Builder().build()
-                            val selector = CameraSelector.Builder()
-                                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                                .build()
+                            val selector =
+                                CameraSelector.Builder()
+                                    .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                                    .build()
                             preview.setSurfaceProvider(previewView.surfaceProvider)
-                            val imageAnalysis = ImageAnalysis.Builder()
-                                .setTargetResolution(
-                                    Size(
-                                        previewView.width,
-                                        previewView.height
+                            val imageAnalysis =
+                                ImageAnalysis.Builder()
+                                    .setTargetResolution(
+                                        Size(
+                                            previewView.width,
+                                            previewView.height,
+                                        ),
                                     )
-                                )
-                                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                                .build()
+                                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                                    .build()
                             imageAnalysis.setAnalyzer(
                                 ContextCompat.getMainExecutor(context),
                                 object : ImageAnalysis.Analyzer {
-                                    private val supportedImageFormats = listOf(
-                                        ImageFormat.YUV_420_888,
-                                        ImageFormat.YUV_422_888,
-                                        ImageFormat.YUV_444_888
-                                    )
+                                    private val supportedImageFormats =
+                                        listOf(
+                                            ImageFormat.YUV_420_888,
+                                            ImageFormat.YUV_422_888,
+                                            ImageFormat.YUV_444_888,
+                                        )
 
                                     override fun analyze(image: ImageProxy) {
                                         if (cameraDetecting) {
                                             if (image.format in supportedImageFormats) {
                                                 val bytes = image.planes.first().buffer.toByteArray()
 
-                                                val source = PlanarYUVLuminanceSource(
-                                                    bytes,
-                                                    image.width,
-                                                    image.height,
-                                                    0,
-                                                    0,
-                                                    image.width,
-                                                    image.height,
-                                                    false
-                                                )
+                                                val source =
+                                                    PlanarYUVLuminanceSource(
+                                                        bytes,
+                                                        image.width,
+                                                        image.height,
+                                                        0,
+                                                        0,
+                                                        image.width,
+                                                        image.height,
+                                                        false,
+                                                    )
                                                 val binaryBmp = BinaryBitmap(HybridBinarizer(source))
                                                 try {
                                                     cameraDetecting = false
-                                                    val result = MultiFormatReader().apply {
-                                                        setHints(
-                                                            mapOf(
-                                                                DecodeHintType.POSSIBLE_FORMATS to arrayListOf(
-                                                                    BarcodeFormat.QR_CODE
-                                                                )
+                                                    val result =
+                                                        MultiFormatReader().apply {
+                                                            setHints(
+                                                                mapOf(
+                                                                    DecodeHintType.POSSIBLE_FORMATS to
+                                                                            arrayListOf(
+                                                                                BarcodeFormat.QR_CODE,
+                                                                            ),
+                                                                ),
                                                             )
-                                                        )
-                                                    }.decode(binaryBmp)
+                                                        }.decode(binaryBmp)
                                                     scanResult = result.text
                                                     addScanResult(context, scope, scanResult)
                                                     showScanResultSheet = true
@@ -250,8 +258,7 @@ fun ScanPage(
                                             get(it)
                                         }
                                     }
-
-                                }
+                                },
                             )
                             try {
                                 val cameraProviderFeature = ProcessCameraProvider.getInstance(context)
@@ -260,7 +267,7 @@ fun ScanPage(
                                     lifecycleOwner,
                                     selector,
                                     preview,
-                                    imageAnalysis
+                                    imageAnalysis,
                                 )
                             } catch (e: Exception) {
                                 LogCat.e(e)
@@ -268,7 +275,7 @@ fun ScanPage(
                             }
                             previewView
                         },
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
                     )
                 }
                 TopAppBar(
@@ -278,27 +285,29 @@ fun ScanPage(
                         PIconButton(
                             imageVector = Icons.Rounded.Cancel,
                             contentDescription = stringResource(R.string.back),
-                            tint = Color.White
+                            tint = Color.White,
                         ) {
                             navController.popBackStack()
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(
+                    colors =
+                    TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
-                    )
+                    ),
                 )
                 Row(
-                    modifier = Modifier
+                    modifier =
+                    Modifier
                         .fillMaxWidth()
                         .padding(start = 24.dp, end = 24.dp, bottom = 64.dp)
-                        .align(Alignment.BottomCenter)
+                        .align(Alignment.BottomCenter),
                 ) {
                     PIconButton(
                         modifier = Modifier.size(40.dp),
                         containerModifier = Modifier.size(64.dp),
                         imageVector = Icons.Rounded.History,
                         contentDescription = stringResource(R.string.scan_history),
-                        tint = Color.White
+                        tint = Color.White,
                     ) {
                         navController.navigate(RouteName.SCAN_HISTORY)
                     }
@@ -308,17 +317,21 @@ fun ScanPage(
                         containerModifier = Modifier.size(size = 64.dp),
                         imageVector = Icons.Rounded.Image,
                         contentDescription = stringResource(R.string.images),
-                        tint = Color.White
+                        tint = Color.White,
                     ) {
                         sendEvent(PickFileEvent(PickFileTag.SCAN, PickFileType.IMAGE, multiple = false))
                     }
                 }
             }
-        }
+        },
     )
 }
 
-private fun addScanResult(context: Context, scope: CoroutineScope, value: String) {
+private fun addScanResult(
+    context: Context,
+    scope: CoroutineScope,
+    value: String,
+) {
     scope.launch {
         val results = withIO { ScanHistoryPreference.getValueAsync(context).toMutableList() }
         results.removeIf { it == value }
@@ -327,12 +340,16 @@ private fun addScanResult(context: Context, scope: CoroutineScope, value: String
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun ScanResultBottomSheet(context: Context, value: String, onDismiss: () -> Unit) {
+fun ScanResultBottomSheet(
+    context: Context,
+    value: String,
+    onDismiss: () -> Unit,
+) {
     PModalBottomSheet(
-        modifier = Modifier
+        modifier =
+        Modifier
             .padding(top = 16.dp)
             .defaultMinSize(minHeight = 240.dp),
         topBarTitle = stringResource(id = R.string.scan_result),

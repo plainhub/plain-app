@@ -22,4 +22,5 @@ enum class RouteName {
     CHAT_EDIT_TEXT,
     SCAN,
     SCAN_HISTORY,
+    MEDIA_PREVIEW,
 }
