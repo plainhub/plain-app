@@ -6,6 +6,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.newFile
+import com.ismartcoding.lib.extensions.parse
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.extensions.toThumbBytesAsync
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
@@ -33,6 +34,7 @@ import com.ismartcoding.plain.features.image.ImageHelper
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.features.pkg.PackageHelper
 import com.ismartcoding.plain.features.video.VideoHelper
+import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.web.websocket.WebSocketSession
 import io.ktor.http.CacheControl
@@ -83,6 +85,7 @@ import io.ktor.websocket.close
 import io.ktor.websocket.readBytes
 import io.ktor.websocket.send
 import kotlinx.serialization.json.Json
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
@@ -238,11 +241,23 @@ fun Application.module() {
                     DataType.IMAGE.name -> {
                         paths = ImageHelper.search(context, q, Int.MAX_VALUE, 0, FileSortBy.DATE_DESC).map { DownloadFileItem(it.path, "") }
                     }
+
+                    DataType.FILE.name -> {
+                        val tmpId = json.optString("id")
+                        val value = TempHelper.getValue(tmpId)
+                        TempHelper.clearValue(tmpId)
+                        if (value.isEmpty()) {
+                            call.respond(HttpStatusCode.NotFound)
+                            return@get
+                        }
+
+                        paths = JSONArray(value).parse { DownloadFileItem(it.optString("path"), it.optString("name")) }
+                    }
                 }
 
                 val items = paths.map { DownloadFileItemWrap(File(it.path), it.name) }.filter { it.file.exists() }
                 val dirs = items.filter { it.file.isDirectory }
-                val fileName = URLEncoder.encode(json.optString("name") ?: "download.zip", "UTF-8")
+                val fileName = URLEncoder.encode(json.optString("name").ifEmpty { "download.zip" }, "UTF-8")
                 call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
                 call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
                 call.respondOutputStream(ContentType.Application.Zip) {
