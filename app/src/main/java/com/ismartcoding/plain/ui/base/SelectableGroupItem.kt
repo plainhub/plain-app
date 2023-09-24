@@ -36,12 +36,9 @@ fun SelectableGroupItem(
     icon: ImageVector? = null,
     onClick: () -> Unit,
 ) {
-    val view = LocalView.current
-
     Surface(
         modifier = modifier
             .clickable {
-                view.playSoundEffect(SoundEffectConstants.CLICK)
                 onClick()
             }
             .alpha(if (enable) 1f else 0.5f),

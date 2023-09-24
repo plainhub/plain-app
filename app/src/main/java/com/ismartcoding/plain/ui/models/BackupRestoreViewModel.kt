@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.helpers.CoroutinesHelper
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.contentResolver
@@ -16,6 +16,7 @@ import com.ismartcoding.plain.features.RestartAppEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.zeroturnaround.zip.ZipUtil
 import org.zeroturnaround.zip.commons.IOUtils
@@ -28,7 +29,7 @@ class BackupRestoreViewModel : ViewModel() {
     data class ExportItem(val dir: String, val file: File)
 
     fun backup(context: Context, uri: Uri) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             contentResolver.openOutputStream(uri)?.use { stream ->
                 val out = ZipOutputStream(stream)
                 try {
@@ -46,7 +47,9 @@ class BackupRestoreViewModel : ViewModel() {
                         if (cursor.moveToFirst()) {
                             val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME)
                             DialogHelper.hideLoading()
-                            DialogHelper.showConfirmDialog(context, "", LocaleHelper.getStringF(R.string.exported_to, "name", fileName))
+                            coMain {
+                                DialogHelper.showConfirmDialog(context, "", LocaleHelper.getStringF(R.string.exported_to, "name", fileName))
+                            }
                         }
                     }
                 } finally {
@@ -57,7 +60,7 @@ class BackupRestoreViewModel : ViewModel() {
     }
 
     fun restore(context: Context, uri: Uri) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             DialogHelper.showLoading()
             contentResolver.query(uri, null, null, null, null)?.use { cursor ->
                 if (cursor.moveToFirst()) {
@@ -68,33 +71,33 @@ class BackupRestoreViewModel : ViewModel() {
                         return@launch
                     }
                     contentResolver.openInputStream(uri)?.use { stream ->
-                        withIO {
-                            val destFile = File(context.cacheDir, "restore")
-                            ZipUtil.unpack(stream, destFile)
+                        val destFile = File(context.cacheDir, "restore")
+                        ZipUtil.unpack(stream, destFile)
 
-                            // restore database
-                            File(destFile.path + "/databases").let {
-                                if (it.exists()) {
-                                    it.copyRecursively(File(context.dataDir.path + "/databases"), true)
-                                }
+                        // restore database
+                        File(destFile.path + "/databases").let {
+                            if (it.exists()) {
+                                it.copyRecursively(File(context.dataDir.path + "/databases"), true)
                             }
-
-                            // restore local storage
-                            File(destFile.path + "/files").let {
-                                if (it.exists()) {
-                                    it.copyRecursively(context.filesDir, true)
-                                }
-                            }
-
-                            // restore external files
-                            File(destFile.path + "/external/files").let {
-                                if (it.exists()) {
-                                    it.copyRecursively(context.getExternalFilesDir(null)!!, true)
-                                }
-                            }
-                            destFile.delete()
                         }
-                        DialogHelper.hideLoading()
+
+                        // restore local storage
+                        File(destFile.path + "/files").let {
+                            if (it.exists()) {
+                                it.copyRecursively(context.filesDir, true)
+                            }
+                        }
+
+                        // restore external files
+                        File(destFile.path + "/external/files").let {
+                            if (it.exists()) {
+                                it.copyRecursively(context.getExternalFilesDir(null)!!, true)
+                            }
+                        }
+                        destFile.delete()
+                    }
+                    DialogHelper.hideLoading()
+                    coMain {
                         DialogHelper.showConfirmDialog(context, "", getString(R.string.app_restored)) {
                             sendEvent(RestartAppEvent())
                         }

@@ -25,8 +25,8 @@ fun PIconButton(
     contentDescription: String?,
     tint: Color = LocalContentColor.current,
     showBadge: Boolean = false,
-    isHaptic: Boolean? = true,
-    isSound: Boolean? = true,
+    isHaptic: Boolean? = false,
+    isSound: Boolean? = false,
     onClick: () -> Unit = {},
 ) {
     val view = LocalView.current
