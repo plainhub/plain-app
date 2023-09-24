@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.ui.svg
 
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.ui.theme.palette.TonalPalettes
 
 object SVGString
@@ -10,7 +10,6 @@ object SVGString
 fun String.parseDynamicColor(tonalPalettes: TonalPalettes, isDarkTheme: Boolean): String =
     replace("fill=\"(.+?)\"".toRegex()) {
         val value = it.groupValues[1]
-        Log.i("RLog", "parseDynamicColor: $value")
         if (value.startsWith("#")) return@replace it.value
         try {
             val (scheme, tone) = value.split("(?<=\\d)(?=\\D)|(?=\\d)(?<=\\D)".toRegex())
@@ -26,7 +25,7 @@ fun String.parseDynamicColor(tonalPalettes: TonalPalettes, isDarkTheme: Boolean)
             "fill=\"${String.format("#%06X", 0xFFFFFF and argb)}\""
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.e("RLog", "parseDynamicColor: ${e.message}")
+            LogCat.e("parseDynamicColor: $value, ${e.message}")
             it.value
         }
     }

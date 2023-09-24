@@ -103,16 +103,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun fixSystemBarsAnimation() {
-        val decorView = window.decorView
-        val flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-
-        decorView.systemUiVisibility = flags
-
-        val windowInsetsController = WindowInsetsControllerCompat(window, decorView)
-        windowInsetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        val windowInsetsController =
+            WindowCompat.getInsetsController(window, window.decorView)
+        windowInsetsController.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
 
     @SuppressLint("ClickableViewAccessibility", "DiscouragedPrivateApi")

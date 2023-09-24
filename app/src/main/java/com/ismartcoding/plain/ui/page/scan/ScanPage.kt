@@ -107,9 +107,10 @@ fun ScanPage(navController: NavHostController) {
     var showScanResultSheet by remember { mutableStateOf(false) }
     var scanResult by remember { mutableStateOf("") }
 
+    // https://developer.android.com/develop/ui/views/layout/edge-to-edge
+    insetsController.hide(WindowInsetsCompat.Type.systemBars())
+
     LaunchedEffect(Unit) {
-        // https://developer.android.com/develop/ui/views/layout/edge-to-edge
-        insetsController.hide(WindowInsetsCompat.Type.systemBars())
         events.add(
             receiveEventHandler<PermissionResultEvent> {
                 hasCamPermission = Permission.CAMERA.can(context)

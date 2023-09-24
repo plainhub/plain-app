@@ -3,7 +3,12 @@ package com.ismartcoding.plain.ui.page
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -16,6 +21,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -62,6 +70,7 @@ import com.ismartcoding.plain.ui.theme.backColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -155,16 +164,16 @@ fun Main(
                 RouteName.CHAT to { ChatPage(navController, sharedViewModel) },
                 RouteName.CHAT_TEXT to { ChatTextPage(navController, sharedViewModel) },
                 RouteName.TEXT to { TextPage(navController, sharedViewModel) },
-                RouteName.SCAN to { ScanPage(navController) },
                 RouteName.SCAN_HISTORY to { ScanHistoryPage(navController) },
+                RouteName.SCAN to { ScanPage(navController) },
                 RouteName.MEDIA_PREVIEW to { MediaPreviewPage(navController) },
             ).forEach { (routeName, content) ->
-                composable(routeName.name) {
+                slideHorizontallyComposable(routeName.name) {
                     content()
                 }
             }
 
-            composable(
+            slideHorizontallyComposable(
                 "${RouteName.CHAT_EDIT_TEXT.name}?id={id}",
                 arguments = listOf(navArgument("id") { })
             ) { backStackEntry ->
@@ -173,6 +182,43 @@ fun Main(
                 ChatEditTextPage(navController, sharedViewModel, id)
             }
         }
+    }
+}
+
+fun NavGraphBuilder.slideHorizontallyComposable(
+    route: String,
+    arguments: List<NamedNavArgument> = emptyList(),
+    content: @Composable (AnimatedVisibilityScope.(NavBackStackEntry) -> Unit),
+) {
+    composable(
+        route,
+        arguments,
+        enterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                animationSpec = tween(400)
+            )
+        },
+        exitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+                animationSpec = tween(400)
+            )
+        },
+        popEnterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                animationSpec = tween(400)
+            )
+        },
+        popExitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+                animationSpec = tween(400)
+            )
+        },
+    ) {
+        content(it)
     }
 }
 
