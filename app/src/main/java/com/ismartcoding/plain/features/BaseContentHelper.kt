@@ -200,36 +200,38 @@ abstract class BaseContentHelper {
     }
 
     fun deleteRecordsAndFilesByIds(context: Context, ids: Set<String>): Set<String> {
-        val projection = arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.DATA)
-        val where = ContentWhere()
-        where.addIn(MediaStore.MediaColumns._ID, ids.toList())
-        var deletedCount = 0
-        val cursor = context.contentResolver.query(
-            uriExternal, projection, where.toSelection(),
-            where.args.toTypedArray(), null
-        )
         val paths = mutableSetOf<String>()
-        if (cursor != null) {
-            cursor.moveToFirst()
-            while (!cursor.isAfterLast) {
-                val id = cursor.getStringValue(MediaStore.MediaColumns._ID)
-                val path = cursor.getStringValue(MediaStore.MediaColumns.DATA)
-                paths.add(path)
-                try { // File.delete can throw a security exception
-                    val f = File(path)
-                    if (f.deleteRecursively()) {
-                        context.contentResolver.delete(
-                            getItemUri(id), null, null
-                        )
-                        deletedCount++
+        ids.chunked(500).forEach { chunk ->
+            val projection = arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.DATA)
+            val where = ContentWhere()
+            where.addIn(MediaStore.MediaColumns._ID, chunk)
+            var deletedCount = 0
+            val cursor = context.contentResolver.query(
+                uriExternal, projection, where.toSelection(),
+                where.args.toTypedArray(), null
+            )
+            if (cursor != null) {
+                cursor.moveToFirst()
+                while (!cursor.isAfterLast) {
+                    val id = cursor.getStringValue(MediaStore.MediaColumns._ID)
+                    val path = cursor.getStringValue(MediaStore.MediaColumns.DATA)
+                    paths.add(path)
+                    try { // File.delete can throw a security exception
+                        val f = File(path)
+                        if (f.deleteRecursively()) {
+                            context.contentResolver.delete(
+                                getItemUri(id), null, null
+                            )
+                            deletedCount++
+                        }
+                        cursor.moveToNext()
+                    } catch (ex: Exception) {
+                        cursor.moveToNext()
+                        LogCat.e(ex.toString())
                     }
-                    cursor.moveToNext()
-                } catch (ex: Exception) {
-                    cursor.moveToNext()
-                    LogCat.e(ex.toString())
                 }
+                cursor.close()
             }
-            cursor.close()
         }
 
         return paths
