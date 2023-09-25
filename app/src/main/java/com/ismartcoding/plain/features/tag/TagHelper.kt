@@ -1,10 +1,12 @@
 package com.ismartcoding.plain.features.tag
 
-import androidx.sqlite.db.SimpleSQLiteQuery
-import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.plain.data.enums.DataType
-import com.ismartcoding.plain.db.*
-import com.ismartcoding.plain.features.note.NoteHelper
+import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.db.DTag
+import com.ismartcoding.plain.db.DTagCount
+import com.ismartcoding.plain.db.DTagRelation
+import com.ismartcoding.plain.db.TagDao
+import com.ismartcoding.plain.db.TagRelationDao
 import kotlinx.datetime.Clock
 
 object TagHelper {
