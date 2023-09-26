@@ -121,7 +121,7 @@ android {
 }
 
 dependencies {
-    val room = "2.6.0-beta01"
+    val room = "2.6.0-rc01"
     val apollo = "3.2.1"
     val kgraphql = "0.18.1"
     val ktor = "2.1.0" // don't upgrade, TLS handshake failed
@@ -144,7 +144,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.3")
 
     releaseImplementation(platform("com.google.firebase:firebase-bom:32.2.3"))
-    releaseImplementation("com.google.firebase:firebase-crashlytics-ktx:18.4.1")
+    releaseImplementation("com.google.firebase:firebase-crashlytics-ktx:18.4.3")
 
     implementation("com.apollographql.apollo3:apollo-runtime:$apollo")
     implementation("com.apollographql.apollo3:apollo-normalized-cache:$apollo")
@@ -152,17 +152,17 @@ dependencies {
     implementation("com.apollographql.apollo3:apollo-adapters:$apollo")
 
     implementation("androidx.viewpager2:viewpager2:1.0.0")
-    implementation("androidx.paging:paging-runtime-ktx:3.2.0")
+    implementation("androidx.paging:paging-runtime-ktx:3.2.1")
     implementation("androidx.preference:preference-ktx:1.2.1")
 
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("com.github.bmoliveira:snake-yaml:v1.18-android")
 
     // CameraX
-    implementation("androidx.camera:camera-core:1.3.0-rc01")
-    implementation("androidx.camera:camera-camera2:1.3.0-rc01")
-    implementation("androidx.camera:camera-lifecycle:1.3.0-rc01")
-    implementation("androidx.camera:camera-view:1.3.0-rc01")
+    implementation("androidx.camera:camera-core:1.4.0-alpha01")
+    implementation("androidx.camera:camera-camera2:1.4.0-alpha01")
+    implementation("androidx.camera:camera-lifecycle:1.4.0-alpha01")
+    implementation("androidx.camera:camera-view:1.4.0-alpha01")
 
     implementation("io.ktor:ktor-server-core:$ktor")
     implementation("io.ktor:ktor-server-netty:$ktor")

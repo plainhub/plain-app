@@ -45,11 +45,11 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.10.1")
+    implementation("androidx.core:core-ktx:1.12.0")
     api("androidx.appcompat:appcompat:1.6.1")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
-    val ktor = "2.3.3"
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+    val ktor = "2.3.4"
     val markwon = "4.6.2"
     val coil = "2.4.0"
 
@@ -57,19 +57,19 @@ dependencies {
 
     implementation("com.github.barteksc:pdfium-android:1.9.0")
 
-    implementation("com.google.code.gson:gson:2.10")
+    implementation("com.google.code.gson:gson:2.10.1")
 
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-    api("com.google.android.material:material:1.11.0-alpha02")
-    api("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    api("com.google.android.material:material:1.11.0-alpha03")
+    api("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     api("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
     api("androidx.fragment:fragment-ktx:1.6.1")
     api("androidx.appcompat:appcompat:1.6.1")
-    api("androidx.core:core-ktx:1.10.1")
+    api("androidx.core:core-ktx:1.12.0")
     api("androidx.transition:transition:1.4.1")
 //    api("com.squareup.picasso:picasso:2.71828")
 
