@@ -139,8 +139,12 @@ object AppEvents {
 
         receiveEventHandler<StartHttpServerEvent> {
             coIO {
-                val context = MainApp.instance
-                ContextCompat.startForegroundService(context, Intent(context, HttpServerService::class.java))
+                try {
+                    val context = MainApp.instance
+                    ContextCompat.startForegroundService(context, Intent(context, HttpServerService::class.java))
+                } catch (ex: Exception) {
+                    LogCat.e(ex.toString())
+                }
             }
         }
 
