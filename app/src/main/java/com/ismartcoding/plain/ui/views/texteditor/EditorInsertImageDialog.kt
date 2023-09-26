@@ -32,7 +32,8 @@ class EditorInsertImageDialog : BaseBottomSheetDialog<DialogEditorInsertImageBin
             context.contentResolver.query(uri, null, null, null, null)
                 ?.use { cursor ->
                     cursor.moveToFirst()
-                    val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME)
+                    val cache = mutableMapOf<String, Int>()
+                    val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
                     cursor.close()
                     try {
                         val dir = Environment.DIRECTORY_PICTURES

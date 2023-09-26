@@ -42,6 +42,9 @@ enum class Permission {
     CAMERA,
     SYSTEM_ALERT_WINDOW,
     RECORD_AUDIO,
+    READ_MEDIA_IMAGES,
+    READ_MEDIA_VIDEOS,
+    READ_MEDIA_AUDIO,
     NONE;
 
     fun getText(): String {
@@ -236,6 +239,9 @@ object Permissions {
             Permission.SEND_SMS,
             Permission.POST_NOTIFICATIONS,
             Permission.RECORD_AUDIO,
+            Permission.READ_MEDIA_IMAGES,
+            Permission.READ_MEDIA_VIDEOS,
+            Permission.READ_MEDIA_AUDIO,
         ).forEach { permission ->
             map[permission] = activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
                 canContinue = true

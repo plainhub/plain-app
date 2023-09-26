@@ -64,14 +64,15 @@ object AudioHelper : BaseContentHelper() {
         val cursor = getSearchCursor(context, query, limit, offset, sortBy.toSortBy())
         val result = mutableListOf<DAudio>()
         if (cursor?.moveToFirst() == true) {
+            val cache = mutableMapOf<String, Int>()
             do {
-                val id = cursor.getStringValue(MediaStore.Audio.Media._ID)
-                val title = cursor.getStringValue(MediaStore.Audio.Media.TITLE)
-                val artist = cursor.getStringValue(MediaStore.Audio.Media.ARTIST).replace(MediaStore.UNKNOWN_STRING, "")
-                val size = cursor.getLongValue(MediaStore.Audio.Media.SIZE)
-                val duration = cursor.getLongValue(MediaStore.Audio.Media.DURATION) / 1000
-                val path = cursor.getStringValue(MediaStore.Audio.Media.DATA)
-                val bucketId = cursor.getStringValue(MediaStore.Audio.Media.BUCKET_ID)
+                val id = cursor.getStringValue(MediaStore.Audio.Media._ID, cache)
+                val title = cursor.getStringValue(MediaStore.Audio.Media.TITLE, cache)
+                val artist = cursor.getStringValue(MediaStore.Audio.Media.ARTIST, cache).replace(MediaStore.UNKNOWN_STRING, "")
+                val size = cursor.getLongValue(MediaStore.Audio.Media.SIZE, cache)
+                val duration = cursor.getLongValue(MediaStore.Audio.Media.DURATION, cache) / 1000
+                val path = cursor.getStringValue(MediaStore.Audio.Media.DATA, cache)
+                val bucketId = cursor.getStringValue(MediaStore.Audio.Media.BUCKET_ID, cache)
                 result.add(DAudio(id, title, artist, path, duration, size, bucketId))
             } while (cursor.moveToNext())
         }
@@ -82,10 +83,11 @@ object AudioHelper : BaseContentHelper() {
         val cursor = getSearchCursor(context, query)
         val result = mutableListOf<TagRelationStub>()
         if (cursor?.moveToFirst() == true) {
+            val cache = mutableMapOf<String, Int>()
             do {
-                val id = cursor.getStringValue(MediaStore.Audio.Media._ID)
-                val title = cursor.getStringValue(MediaStore.Audio.Media.TITLE)
-                val size = cursor.getLongValue(MediaStore.Audio.Media.SIZE)
+                val id = cursor.getStringValue(MediaStore.Audio.Media._ID, cache)
+                val title = cursor.getStringValue(MediaStore.Audio.Media.TITLE, cache)
+                val size = cursor.getLongValue(MediaStore.Audio.Media.SIZE, cache)
                 result.add(TagRelationStub(id, title,size))
             } while (cursor.moveToNext())
         }
@@ -111,10 +113,11 @@ object AudioHelper : BaseContentHelper() {
         )
 
         cursor?.use { c ->
+            val cache = mutableMapOf<String, Int>()
             while (c.moveToNext()) {
-                val bucketId = c.getStringValue(MediaStore.Audio.Media.BUCKET_ID)
-                val bucketName = c.getStringValue(MediaStore.Audio.Media.BUCKET_DISPLAY_NAME)
-                val path = c.getStringValue(MediaStore.Audio.Media.DATA)
+                val bucketId = c.getStringValue(MediaStore.Audio.Media.BUCKET_ID, cache)
+                val bucketName = c.getStringValue(MediaStore.Audio.Media.BUCKET_DISPLAY_NAME, cache)
+                val path = c.getStringValue(MediaStore.Audio.Media.DATA, cache)
                 val bucket = bucketMap[bucketName]
                 if (bucket != null) {
                     if (bucket.topItems.size < 4) {

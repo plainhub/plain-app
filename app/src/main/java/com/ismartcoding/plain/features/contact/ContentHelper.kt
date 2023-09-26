@@ -43,65 +43,65 @@ object ContentHelper {
             ContactsContract.Data.DATA6,
         )
 
-        context.queryCursor(uri, projection) { cursor ->
-            val id = cursor.getStringValue(ContactsContract.Data.RAW_CONTACT_ID)
+        context.queryCursor(uri, projection) { cursor, cache ->
+            val id = cursor.getStringValue(ContactsContract.Data.RAW_CONTACT_ID, cache)
             if (map[id] == null) {
                 map[id] = Content()
             }
 
-            when (cursor.getStringValue(ContactsContract.Data.MIMETYPE)) {
+            when (cursor.getStringValue(ContactsContract.Data.MIMETYPE, cache)) {
                 ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE -> {
-                    val startDate = cursor.getStringValue(ContactsContract.CommonDataKinds.Event.START_DATE)
-                    val type = cursor.getIntValue(ContactsContract.CommonDataKinds.Event.TYPE)
-                    val label = cursor.getStringValue(ContactsContract.CommonDataKinds.Event.LABEL)
+                    val startDate = cursor.getStringValue(ContactsContract.CommonDataKinds.Event.START_DATE, cache)
+                    val type = cursor.getIntValue(ContactsContract.CommonDataKinds.Event.TYPE, cache)
+                    val label = cursor.getStringValue(ContactsContract.CommonDataKinds.Event.LABEL, cache)
                     map[id]?.events?.add(ContentItem(startDate, type, label))
                 }
                 ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE -> {
-                    val address = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS)
-                    val type = cursor.getIntValue(ContactsContract.CommonDataKinds.StructuredPostal.TYPE)
-                    val label = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredPostal.LABEL)
+                    val address = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS, cache)
+                    val type = cursor.getIntValue(ContactsContract.CommonDataKinds.StructuredPostal.TYPE, cache)
+                    val label = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredPostal.LABEL, cache)
                     map[id]?.addresses?.add(ContentItem(address, type, label))
                 }
                 ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE -> {
-                    val email = cursor.getStringValue(ContactsContract.CommonDataKinds.Email.DATA)
-                    val type = cursor.getIntValue(ContactsContract.CommonDataKinds.Email.TYPE)
-                    val label = cursor.getStringValue(ContactsContract.CommonDataKinds.Email.LABEL)
+                    val email = cursor.getStringValue(ContactsContract.CommonDataKinds.Email.DATA, cache)
+                    val type = cursor.getIntValue(ContactsContract.CommonDataKinds.Email.TYPE, cache)
+                    val label = cursor.getStringValue(ContactsContract.CommonDataKinds.Email.LABEL, cache)
                     map[id]?.emails?.add(ContentItem(email, type, label))
                 }
                 ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE -> {
-                    val number = cursor.getStringValue(ContactsContract.CommonDataKinds.Phone.NUMBER)
-                    val normalizedNumber = cursor.getStringValue(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER)
-                    val type = cursor.getIntValue(ContactsContract.CommonDataKinds.Phone.TYPE)
-                    val label = cursor.getStringValue(ContactsContract.CommonDataKinds.Phone.LABEL)
+                    val number = cursor.getStringValue(ContactsContract.CommonDataKinds.Phone.NUMBER, cache)
+                    val normalizedNumber = cursor.getStringValue(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER, cache)
+                    val type = cursor.getIntValue(ContactsContract.CommonDataKinds.Phone.TYPE, cache)
+                    val label = cursor.getStringValue(ContactsContract.CommonDataKinds.Phone.LABEL, cache)
                     map[id]?.phoneNumbers?.add(PhoneNumber(number, type, label, normalizedNumber))
                 }
                 ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE -> {
-                    val url = cursor.getStringValue(ContactsContract.CommonDataKinds.Website.URL)
-                    val type = cursor.getIntValue(ContactsContract.CommonDataKinds.Website.TYPE)
-                    val label = cursor.getStringValue(ContactsContract.CommonDataKinds.Website.LABEL)
+                    val url = cursor.getStringValue(ContactsContract.CommonDataKinds.Website.URL, cache)
+                    val type = cursor.getIntValue(ContactsContract.CommonDataKinds.Website.TYPE, cache)
+                    val label = cursor.getStringValue(ContactsContract.CommonDataKinds.Website.LABEL, cache)
                     map[id]?.websites?.add(ContentItem(url, type, label))
                 }
                 ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE -> {
-                    val name = cursor.getStringValue(ContactsContract.CommonDataKinds.Nickname.NAME)
+                    val name = cursor.getStringValue(ContactsContract.CommonDataKinds.Nickname.NAME, cache)
                     map[id]?.nicknames?.add(name)
                 }
                 ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE -> {
-                    val value = cursor.getStringValue(ContactsContract.CommonDataKinds.Im.DATA)
-                    val type = cursor.getIntValue(ContactsContract.CommonDataKinds.Im.PROTOCOL)
-                    val label = cursor.getStringValue(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL)
+                    val value = cursor.getStringValue(ContactsContract.CommonDataKinds.Im.DATA, cache)
+                    val type = cursor.getIntValue(ContactsContract.CommonDataKinds.Im.PROTOCOL, cache)
+                    val label = cursor.getStringValue(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL, cache)
                     map[id]?.ims?.add(ContentItem(value, type, label))
                 }
                 ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE -> {
-                    val note = cursor.getStringValue(ContactsContract.CommonDataKinds.Note.NOTE)
+                    val note = cursor.getStringValue(ContactsContract.CommonDataKinds.Note.NOTE, cache)
                     map[id]?.notes?.add(note)
                 }
                 ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE -> {
-                    val company = cursor.getStringValue(ContactsContract.CommonDataKinds.Organization.COMPANY)
-                    val title = cursor.getStringValue(ContactsContract.CommonDataKinds.Organization.TITLE)
+                    val company = cursor.getStringValue(ContactsContract.CommonDataKinds.Organization.COMPANY, cache)
+                    val title = cursor.getStringValue(ContactsContract.CommonDataKinds.Organization.TITLE, cache)
                     map[id]?.organizations?.add(Organization(company, title))
                 }
                 ContactsContract.CommonDataKinds.GroupMembership.CONTENT_ITEM_TYPE -> {
-                    val groupId = cursor.getIntValue(ContactsContract.CommonDataKinds.GroupMembership.GROUP_ROW_ID)
+                    val groupId = cursor.getIntValue(ContactsContract.CommonDataKinds.GroupMembership.GROUP_ROW_ID, cache)
                     map[id]?.groupIds?.add(groupId)
                 }
             }

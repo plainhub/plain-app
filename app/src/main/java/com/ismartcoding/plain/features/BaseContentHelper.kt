@@ -145,8 +145,9 @@ abstract class BaseContentHelper {
         val cursor = getSearchCursor(context, query)
         val ids = mutableSetOf<String>()
         if (cursor?.moveToFirst() == true) {
+            val cache = mutableMapOf<String, Int>()
             do {
-                ids.add(cursor.getStringValue(idKey))
+                ids.add(cursor.getStringValue(idKey, cache))
             } while (cursor.moveToNext())
         }
 
@@ -212,9 +213,10 @@ abstract class BaseContentHelper {
             )
             if (cursor != null) {
                 cursor.moveToFirst()
+                val cache = mutableMapOf<String, Int>()
                 while (!cursor.isAfterLast) {
-                    val id = cursor.getStringValue(MediaStore.MediaColumns._ID)
-                    val path = cursor.getStringValue(MediaStore.MediaColumns.DATA)
+                    val id = cursor.getStringValue(MediaStore.MediaColumns._ID, cache)
+                    val path = cursor.getStringValue(MediaStore.MediaColumns.DATA, cache)
                     paths.add(path)
                     try { // File.delete can throw a security exception
                         val f = File(path)

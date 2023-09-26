@@ -72,12 +72,13 @@ fun Context.queryCursor(
     selection: String? = null,
     selectionArgs: Array<String>? = null,
     sortOrder: String? = null,
-    callback: (cursor: Cursor) -> Unit
+    callback: (cursor: Cursor, indexCache: MutableMap<String, Int>) -> Unit
 ) {
     contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)?.use { cursor ->
         if (cursor.moveToFirst()) {
+            val cache = mutableMapOf<String, Int>()
             do {
-                callback(cursor)
+                callback(cursor, cache)
             } while (cursor.moveToNext())
         }
     }
@@ -206,7 +207,8 @@ fun Context.getMediaContent(path: String, baseUri: Uri): Uri? {
         val cursor = contentResolver.query(baseUri, projection, selection, selectionArgs, null)
         cursor?.use {
             if (cursor.moveToFirst()) {
-                val id = cursor.getStringValue(MediaStore.Images.Media._ID)
+                val cache = mutableMapOf<String, Int>()
+                val id = cursor.getStringValue(MediaStore.Images.Media._ID, cache)
                 return Uri.withAppendedPath(baseUri, id)
             }
         }

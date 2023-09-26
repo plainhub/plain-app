@@ -24,9 +24,9 @@ object SourceHelper {
                 ContactsContract.RawContacts.ACCOUNT_NAME,
                 ContactsContract.RawContacts.ACCOUNT_TYPE
             )
-        ) { cursor ->
-            val name = cursor.getStringValue(ContactsContract.RawContacts.ACCOUNT_NAME)
-            val type = cursor.getStringValue(ContactsContract.RawContacts.ACCOUNT_TYPE)
+        ) { cursor, cache ->
+            val name = cursor.getStringValue(ContactsContract.RawContacts.ACCOUNT_NAME, cache)
+            val type = cursor.getStringValue(ContactsContract.RawContacts.ACCOUNT_TYPE, cache)
             if (!sources.any { it.name == name && it.type == type }) {
                 sources.add(DContactSource(name, type))
             }

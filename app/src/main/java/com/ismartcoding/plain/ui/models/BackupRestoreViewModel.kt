@@ -45,7 +45,8 @@ class BackupRestoreViewModel : ViewModel() {
                     }
                     contentResolver.query(uri, null, null, null, null)?.use { cursor ->
                         if (cursor.moveToFirst()) {
-                            val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME)
+                            val cache = mutableMapOf<String, Int>()
+                            val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
                             DialogHelper.hideLoading()
                             coMain {
                                 DialogHelper.showConfirmDialog(context, "", LocaleHelper.getStringF(R.string.exported_to, "name", fileName))
@@ -64,7 +65,8 @@ class BackupRestoreViewModel : ViewModel() {
             DialogHelper.showLoading()
             contentResolver.query(uri, null, null, null, null)?.use { cursor ->
                 if (cursor.moveToFirst()) {
-                    val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME)
+                    val cache = mutableMapOf<String, Int>()
+                    val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
                     if (!fileName.endsWith(".zip")) {
                         DialogHelper.showMessage(R.string.invalid_file)
                         DialogHelper.hideLoading()

@@ -88,7 +88,8 @@ class FeedEntriesDialog : BaseListDrawerDialog() {
                 }
                 contentResolver.query(event.uri, null, null, null, null)?.use { cursor ->
                     if (cursor.moveToFirst()) {
-                        val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME)
+                        val cache = mutableMapOf<String, Int>()
+                        val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
                         DialogHelper.showConfirmDialog(requireContext(), "", LocaleHelper.getStringF(R.string.exported_to, "name", fileName))
                     }
                 }

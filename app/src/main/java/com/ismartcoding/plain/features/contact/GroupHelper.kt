@@ -22,11 +22,11 @@ object GroupHelper {
 
         val selection = "${ContactsContract.Groups.AUTO_ADD} = ? AND ${ContactsContract.Groups.FAVORITES} = ?"
         val selectionArgs = arrayOf("0", "0")
-        context.queryCursor(uri, projection, selection, selectionArgs) { cursor ->
-            val id = cursor.getLongValue(ContactsContract.Groups._ID)
-            val title = cursor.getStringValue(ContactsContract.Groups.TITLE)
+        context.queryCursor(uri, projection, selection, selectionArgs) { cursor, cache ->
+            val id = cursor.getLongValue(ContactsContract.Groups._ID, cache)
+            val title = cursor.getStringValue(ContactsContract.Groups.TITLE, cache)
 
-            val systemId = cursor.getStringValue(ContactsContract.Groups.SYSTEM_ID)
+            val systemId = cursor.getStringValue(ContactsContract.Groups.SYSTEM_ID, cache)
             if (groups.map { it.name }.contains(title) && systemId.isNotEmpty()) {
                 return@queryCursor
             }

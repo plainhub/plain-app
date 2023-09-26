@@ -11,6 +11,7 @@ import androidx.core.os.bundleOf
 import com.ismartcoding.lib.extensions.getDirectChildrenCount
 import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
+import com.ismartcoding.lib.extensions.getTimeValue
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
@@ -263,15 +264,16 @@ object FileSystemHelper {
         )
         context.contentResolver?.query(uri, projection, queryArgs, null)?.use { cursor ->
             if (cursor.moveToFirst()) {
+                val cache = mutableMapOf<String, Int>()
                 do {
-                    val path = cursor.getStringValue(MediaStore.Files.FileColumns.DATA)
+                    val path = cursor.getStringValue(MediaStore.Files.FileColumns.DATA, cache)
                     if (File(path).isDirectory) {
                         continue
                     }
 
-                    val name = cursor.getStringValue(MediaStore.Files.FileColumns.DISPLAY_NAME)
-                    val size = cursor.getLongValue(MediaStore.Files.FileColumns.SIZE)
-                    val updatedAt = Instant.fromEpochMilliseconds(cursor.getLongValue(MediaStore.Files.FileColumns.DATE_MODIFIED) * 1000L)
+                    val name = cursor.getStringValue(MediaStore.Files.FileColumns.DISPLAY_NAME, cache)
+                    val size = cursor.getLongValue(MediaStore.Files.FileColumns.SIZE, cache)
+                    val updatedAt = Instant.fromEpochMilliseconds(cursor.getLongValue(MediaStore.Files.FileColumns.DATE_MODIFIED, cache) * 1000L)
                     items.add(DFile(name, path, "", updatedAt, size, false, 0))
                 } while (cursor.moveToNext())
             }

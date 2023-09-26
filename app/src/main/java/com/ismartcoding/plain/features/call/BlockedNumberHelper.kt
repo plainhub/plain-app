@@ -18,10 +18,10 @@ object BlockedNumberHelper {
             BlockedNumberContract.BlockedNumbers.COLUMN_E164_NUMBER
         )
 
-        MainApp.instance.queryCursor(uri, projection) { cursor ->
-            val id = cursor.getStringValue(BlockedNumberContract.BlockedNumbers.COLUMN_ID)
-            val number = cursor.getStringValue(BlockedNumberContract.BlockedNumbers.COLUMN_ORIGINAL_NUMBER)
-            val normalizedNumber = cursor.getStringValue(BlockedNumberContract.BlockedNumbers.COLUMN_E164_NUMBER)
+        MainApp.instance.queryCursor(uri, projection) { cursor, cache ->
+            val id = cursor.getStringValue(BlockedNumberContract.BlockedNumbers.COLUMN_ID, cache)
+            val number = cursor.getStringValue(BlockedNumberContract.BlockedNumbers.COLUMN_ORIGINAL_NUMBER, cache)
+            val normalizedNumber = cursor.getStringValue(BlockedNumberContract.BlockedNumbers.COLUMN_E164_NUMBER, cache)
             val comparableNumber = normalizedNumber.trimToComparableNumber()
             blockedNumbers.add(BlockedNumber(id, number, normalizedNumber, comparableNumber))
         }

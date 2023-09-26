@@ -52,13 +52,14 @@ object VideoHelper : BaseContentHelper() {
         val cursor = getSearchCursor(context, query, limit, offset, sortBy.toSortBy())
         val result = mutableListOf<DVideo>()
         cursor?.use { c ->
+            val cache = mutableMapOf<String, Int>()
             while (c.moveToNext()) {
-                val id = cursor.getStringValue(MediaStore.Video.Media._ID)
-                val title = cursor.getStringValue(MediaStore.Video.Media.TITLE)
-                val size = cursor.getLongValue(MediaStore.Video.Media.SIZE)
-                val duration = cursor.getLongValue(MediaStore.Video.Media.DURATION) / 1000
-                val path = cursor.getStringValue(MediaStore.Video.Media.DATA)
-                val bucketId = cursor.getStringValue(MediaStore.Video.Media.BUCKET_ID)
+                val id = cursor.getStringValue(MediaStore.Video.Media._ID, cache)
+                val title = cursor.getStringValue(MediaStore.Video.Media.TITLE, cache)
+                val size = cursor.getLongValue(MediaStore.Video.Media.SIZE, cache)
+                val duration = cursor.getLongValue(MediaStore.Video.Media.DURATION, cache) / 1000
+                val path = cursor.getStringValue(MediaStore.Video.Media.DATA, cache)
+                val bucketId = cursor.getStringValue(MediaStore.Video.Media.BUCKET_ID, cache)
                 result.add(DVideo(id, title, path, duration, size, bucketId))
             }
         }
@@ -69,10 +70,11 @@ object VideoHelper : BaseContentHelper() {
         val cursor = getSearchCursor(context, query)
         val result = mutableListOf<TagRelationStub>()
         if (cursor?.moveToFirst() == true) {
+            val cache = mutableMapOf<String, Int>()
             do {
-                val id = cursor.getStringValue(MediaStore.Video.Media._ID)
-                val title = cursor.getStringValue(MediaStore.Video.Media.TITLE)
-                val size = cursor.getLongValue(MediaStore.Video.Media.SIZE)
+                val id = cursor.getStringValue(MediaStore.Video.Media._ID, cache)
+                val title = cursor.getStringValue(MediaStore.Video.Media.TITLE, cache)
+                val size = cursor.getLongValue(MediaStore.Video.Media.SIZE, cache)
                 result.add(TagRelationStub(id, title,size))
             } while (cursor.moveToNext())
         }
@@ -98,10 +100,11 @@ object VideoHelper : BaseContentHelper() {
         )
 
         cursor?.use { c ->
+            val cache = mutableMapOf<String, Int>()
             while (c.moveToNext()) {
-                val bucketId = c.getStringValue(MediaStore.Video.Media.BUCKET_ID)
-                val bucketName = c.getStringValue(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)
-                val path = c.getStringValue(MediaStore.Video.Media.DATA)
+                val bucketId = c.getStringValue(MediaStore.Video.Media.BUCKET_ID, cache)
+                val bucketName = c.getStringValue(MediaStore.Video.Media.BUCKET_DISPLAY_NAME, cache)
+                val path = c.getStringValue(MediaStore.Video.Media.DATA, cache)
                 val bucket = bucketMap[bucketId]
                 if (bucket != null) {
                     if (bucket.topItems.size < 4) {

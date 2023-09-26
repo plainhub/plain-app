@@ -16,7 +16,8 @@ fun Uri.getFileName(context: Context): String {
             OpenableColumns.DISPLAY_NAME
         ), null, null, null)?.use { cursor ->
             if (cursor.moveToFirst()) {
-                fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME)
+                val cache = mutableMapOf<String, Int>()
+                fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
             }
         }
     }

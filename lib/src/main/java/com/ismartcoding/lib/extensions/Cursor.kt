@@ -1,25 +1,25 @@
 package com.ismartcoding.lib.extensions
 
-import android.annotation.SuppressLint
 import android.database.Cursor
 import androidx.core.database.getIntOrNull
 import androidx.core.database.getLongOrNull
 import kotlinx.datetime.Instant
 
-@SuppressLint("Range")
-fun Cursor.getStringValue(key: String): String = getString(getColumnIndex(key)) ?: ""
+// https://developer.android.com/training/data-storage/room/accessing-data#kotlin
 
-@SuppressLint("Range")
-fun Cursor.getStringValueOrNull(key: String): String? = getString(getColumnIndex(key))
+// Cache the column indices so that you don't need to call getColumnIndex() each time you process a row from the query result.
+fun Cursor.getColumnIndex(key: String, cache: MutableMap<String, Int>): Int {
+    return cache.getOrElse(key) {
+        val index = getColumnIndex(key)
+        cache[key] = index
+        index
+    }
+}
 
-@SuppressLint("Range")
-fun Cursor.getIntValue(key: String): Int = getIntOrNull(getColumnIndex(key)) ?: 0
+fun Cursor.getStringValue(key: String, cache: MutableMap<String, Int>): String = getString(getColumnIndex(key, cache)) ?: ""
 
-fun Cursor.getIntValueOrNull(key: String): Int? = getIntOrNull(getColumnIndex(key))
+fun Cursor.getIntValue(key: String, cache: MutableMap<String, Int>): Int = getIntOrNull(getColumnIndex(key, cache)) ?: 0
 
-@SuppressLint("Range")
-fun Cursor.getLongValue(key: String): Long = getLongOrNull(getColumnIndex(key)) ?: 0L
+fun Cursor.getLongValue(key: String, cache: MutableMap<String, Int>): Long = getLongOrNull(getColumnIndex(key, cache)) ?: 0L
 
-fun Cursor.getLongValueOrNull(key: String): Long? = getLongOrNull(getColumnIndex(key))
-
-fun Cursor.getTimeValue(key: String): Instant = Instant.fromEpochMilliseconds(getLongValue(key))
+fun Cursor.getTimeValue(key: String, cache: MutableMap<String, Int>): Instant = Instant.fromEpochMilliseconds(getLongValue(key, cache))

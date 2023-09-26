@@ -139,12 +139,13 @@ fun ChatPage(
             }
             val items = mutableListOf<DMessageFile>()
             withIO {
+                val cache = mutableMapOf<String, Int>()
                 event.uris.forEach { uri ->
                     context.contentResolver.query(uri, null, null, null, null)
                         ?.use { cursor ->
                             try {
                                 cursor.moveToFirst()
-                                var fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME)
+                                var fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
                                 if (event.type == PickFileType.IMAGE_VIDEO) {
                                     val mimeType = context.contentResolver.getType(uri)
                                     val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
@@ -152,7 +153,7 @@ fun ChatPage(
                                         fileName = fileName.getFilenameWithoutExtension() + "." + extension
                                     }
                                 }
-                                val size = cursor.getLongValue(OpenableColumns.SIZE)
+                                val size = cursor.getLongValue(OpenableColumns.SIZE, cache)
                                 cursor.close()
                                 val dir = when {
                                     fileName.isVideoFast() -> {

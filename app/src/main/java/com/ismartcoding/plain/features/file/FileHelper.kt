@@ -45,13 +45,14 @@ object FileHelper : BaseContentHelper() {
         val cursor = getSearchCursor(context, query, limit, offset, sortBy.toSortBy())
         val result = mutableListOf<DFile>()
         if (cursor?.moveToFirst() == true) {
+            val cache = mutableMapOf<String, Int>()
             do {
-                val id = cursor.getStringValue(MediaStore.Files.FileColumns._ID)
-                val title = cursor.getStringValue(MediaStore.Files.FileColumns.TITLE)
-                val size = cursor.getLongValue(MediaStore.Files.FileColumns.SIZE)
-                val path = cursor.getStringValue(MediaStore.Files.FileColumns.DATA)
-                val updatedAt = cursor.getTimeValue(MediaStore.Files.FileColumns.DATE_MODIFIED)
-                val mediaType = cursor.getIntValue(MediaStore.Files.FileColumns.MEDIA_TYPE)
+                val id = cursor.getStringValue(MediaStore.Files.FileColumns._ID, cache)
+                val title = cursor.getStringValue(MediaStore.Files.FileColumns.TITLE, cache)
+                val size = cursor.getLongValue(MediaStore.Files.FileColumns.SIZE, cache)
+                val path = cursor.getStringValue(MediaStore.Files.FileColumns.DATA, cache)
+                val updatedAt = cursor.getTimeValue(MediaStore.Files.FileColumns.DATE_MODIFIED, cache)
+                val mediaType = cursor.getIntValue(MediaStore.Files.FileColumns.MEDIA_TYPE, cache)
                 result.add(DFile(title, path, "", updatedAt, size,
                     mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_NONE, 0))
             } while (cursor.moveToNext())
