@@ -9,8 +9,8 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.preference.FeedAutoRefreshIntervalPreference
 import com.ismartcoding.plain.data.preference.FeedAutoRefreshOnlyWifiPreference
-import com.ismartcoding.plain.features.FeedStatusEvent
 import com.ismartcoding.plain.db.DFeed
+import com.ismartcoding.plain.features.FeedStatusEvent
 import com.ismartcoding.plain.features.feed.*
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
@@ -27,7 +27,7 @@ import kotlin.collections.set
 
 class FeedFetchWorker(
     val context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
         supervisorScope {
@@ -105,7 +105,10 @@ class FeedFetchWorker(
         val statusMap = mutableMapOf<String, FeedWorkerStatus>()
         val errorMap = mutableMapOf<String, String>()
 
-        private fun setStatusMap(feedId: String, status: FeedWorkerStatus) {
+        private fun setStatusMap(
+            feedId: String,
+            status: FeedWorkerStatus,
+        ) {
             statusMap[feedId] = status
             sendEvent(FeedStatusEvent(feedId, status))
         }
@@ -113,8 +116,9 @@ class FeedFetchWorker(
         fun oneTimeRequest(feedId: String) {
             val data = Data.Builder()
             data.putString("feed_id", feedId)
-            val request = OneTimeWorkRequestBuilder<FeedFetchWorker>()
-                .setInputData(data.build()).addTag(ONE_TIME_WORK_NAME)
+            val request =
+                OneTimeWorkRequestBuilder<FeedFetchWorker>()
+                    .setInputData(data.build()).addTag(ONE_TIME_WORK_NAME)
             WorkManager.getInstance(MainApp.instance).enqueue(request.build())
         }
 
@@ -127,16 +131,18 @@ class FeedFetchWorker(
         suspend fun startRepeatWorkerAsync(context: Context) {
             val data = Data.Builder()
             data.putBoolean("auto_refresh", true)
-            val request = PeriodicWorkRequestBuilder<FeedFetchWorker>(
-                FeedAutoRefreshIntervalPreference.getAsync(context).toLong(), TimeUnit.SECONDS
-            ).setInputData(data.build()).setConstraints(
-                Constraints.Builder().build()
-            ).addTag(REPEAT_WORK_NAME)
+            val request =
+                PeriodicWorkRequestBuilder<FeedFetchWorker>(
+                    FeedAutoRefreshIntervalPreference.getAsync(context).toLong(),
+                    TimeUnit.SECONDS,
+                ).setInputData(data.build()).setConstraints(
+                    Constraints.Builder().build(),
+                ).addTag(REPEAT_WORK_NAME)
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 REPEAT_WORK_NAME,
                 ExistingPeriodicWorkPolicy.REPLACE,
-                request.build()
+                request.build(),
             )
         }
     }

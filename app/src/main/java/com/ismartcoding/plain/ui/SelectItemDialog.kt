@@ -38,7 +38,11 @@ import kotlinx.coroutines.launch
 
 class SelectItemDialog(val search: suspend (String) -> List<Any>, val onSelect: (ApplyToType, String) -> Unit) : BaseBottomSheetDialog<DialogSelectItemBinding>() {
     private var searchQ: String = ""
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.topAppBar.run {
@@ -134,8 +138,10 @@ class SelectItemDialog(val search: suspend (String) -> List<Any>, val onSelect: 
         }
     }
 
-
-    private fun sort(menu: Menu, sortBy: DeviceSortBy) {
+    private fun sort(
+        menu: Menu,
+        sortBy: DeviceSortBy,
+    ) {
         lifecycleScope.launch {
             val context = requireContext()
             DeviceSortHelper.getSelectedSortItemAsync(context, menu).unhighlightTitle()

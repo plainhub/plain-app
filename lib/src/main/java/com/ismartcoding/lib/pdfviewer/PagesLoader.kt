@@ -5,10 +5,10 @@ import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.pdfviewer.util.Constants
 import com.ismartcoding.lib.pdfviewer.util.Constants.CACHE_SIZE
 import com.ismartcoding.lib.pdfviewer.util.Constants.PRELOAD_OFFSET
+import com.ismartcoding.lib.pdfviewer.util.MathUtils.ceil
 import com.ismartcoding.lib.pdfviewer.util.MathUtils.floor
 import com.ismartcoding.lib.pdfviewer.util.MathUtils.max
 import com.ismartcoding.lib.pdfviewer.util.MathUtils.min
-import com.ismartcoding.lib.pdfviewer.util.MathUtils.ceil
 import java.util.*
 
 internal class PagesLoader(private val pdfView: PDFView) {
@@ -25,11 +25,12 @@ internal class PagesLoader(private val pdfView: PDFView) {
     private inner class Holder {
         var row = 0
         var col = 0
+
         override fun toString(): String {
             return "Holder{" +
-                    "row=" + row +
-                    ", col=" + col +
-                    '}'
+                "row=" + row +
+                ", col=" + col +
+                '}'
         }
     }
 
@@ -41,26 +42,30 @@ internal class PagesLoader(private val pdfView: PDFView) {
 
         override fun toString(): String {
             return "RenderRange{" +
-                    "page=" + page +
-                    ", gridSize=" + gridSize +
-                    ", leftTop=" + leftTop +
-                    ", rightBottom=" + rightBottom +
-                    '}'
+                "page=" + page +
+                ", gridSize=" + gridSize +
+                ", leftTop=" + leftTop +
+                ", rightBottom=" + rightBottom +
+                '}'
         }
     }
 
     private inner class GridSize {
         var rows = 0
         var cols = 0
+
         override fun toString(): String {
             return "GridSize{" +
-                    "rows=" + rows +
-                    ", cols=" + cols +
-                    '}'
+                "rows=" + rows +
+                ", cols=" + cols +
+                '}'
         }
     }
 
-    private fun getPageColsRows(grid: GridSize, pageIndex: Int) {
+    private fun getPageColsRows(
+        grid: GridSize,
+        pageIndex: Int,
+    ) {
         val size = pdfView.pdfFile!!.getPageSize(pageIndex)
         val ratioX = 1f / size.width
         val ratioY = 1f / size.height
@@ -80,7 +85,12 @@ internal class PagesLoader(private val pdfView: PDFView) {
     /**
      * calculate the render range of each page
      */
-    private fun getRenderRangeList(firstXOffset: Float, firstYOffset: Float, lastXOffset: Float, lastYOffset: Float): MutableList<RenderRange> {
+    private fun getRenderRangeList(
+        firstXOffset: Float,
+        firstYOffset: Float,
+        lastXOffset: Float,
+        lastYOffset: Float,
+    ): MutableList<RenderRange> {
         val fixedFirstXOffset: Float = -max(firstXOffset, 0F)
         val fixedFirstYOffset: Float = -max(firstYOffset, 0F)
         val fixedLastXOffset: Float = -max(lastXOffset, 0F)
@@ -146,7 +156,6 @@ internal class PagesLoader(private val pdfView: PDFView) {
             val rowHeight = scaledPageSize.height / range.gridSize.rows
             val colWidth = scaledPageSize.width / range.gridSize.cols
 
-
             // get the page offset int the whole file
             // ---------------------------------------
             // |            |           |            |
@@ -194,8 +203,12 @@ internal class PagesLoader(private val pdfView: PDFView) {
     }
 
     private fun loadPage(
-        page: Int, firstRow: Int, lastRow: Int, firstCol: Int, lastCol: Int,
-        nbOfPartsLoadable: Int
+        page: Int,
+        firstRow: Int,
+        lastRow: Int,
+        firstCol: Int,
+        lastCol: Int,
+        nbOfPartsLoadable: Int,
     ): Int {
         var loaded = 0
         for (row in firstRow..lastRow) {
@@ -211,7 +224,13 @@ internal class PagesLoader(private val pdfView: PDFView) {
         return loaded
     }
 
-    private fun loadCell(page: Int, row: Int, col: Int, pageRelativePartWidth: Float, pageRelativePartHeight: Float): Boolean {
+    private fun loadCell(
+        page: Int,
+        row: Int,
+        col: Int,
+        pageRelativePartWidth: Float,
+        pageRelativePartHeight: Float,
+    ): Boolean {
         val relX = pageRelativePartWidth * col
         val relY = pageRelativePartHeight * row
         var relWidth = pageRelativePartWidth
@@ -230,9 +249,14 @@ internal class PagesLoader(private val pdfView: PDFView) {
         if (renderWidth > 0 && renderHeight > 0) {
             if (!pdfView.cacheManager.upPartIfContained(page, pageRelativeBounds, cacheOrder)) {
                 pdfView.renderingHandler!!.addRenderingTask(
-                    page, renderWidth, renderHeight,
-                    pageRelativeBounds, false, cacheOrder, pdfView.isBestQuality,
-                    pdfView.isAnnotationRendering
+                    page,
+                    renderWidth,
+                    renderHeight,
+                    pageRelativeBounds,
+                    false,
+                    cacheOrder,
+                    pdfView.isBestQuality,
+                    pdfView.isAnnotationRendering,
                 )
             }
             cacheOrder++
@@ -248,8 +272,13 @@ internal class PagesLoader(private val pdfView: PDFView) {
         if (!pdfView.cacheManager.containsThumbnail(page, thumbnailRect)) {
             pdfView.renderingHandler!!.addRenderingTask(
                 page,
-                thumbnailWidth, thumbnailHeight, thumbnailRect,
-                true, 0, pdfView.isBestQuality, pdfView.isAnnotationRendering
+                thumbnailWidth,
+                thumbnailHeight,
+                thumbnailRect,
+                true,
+                0,
+                pdfView.isBestQuality,
+                pdfView.isAnnotationRendering,
             )
         }
     }

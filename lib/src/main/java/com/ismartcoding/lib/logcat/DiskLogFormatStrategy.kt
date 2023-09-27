@@ -7,7 +7,12 @@ import java.time.format.DateTimeFormatter
 
 class DiskLogFormatStrategy(private val logStrategy: LogStrategy) : FormatStrategy {
     private val dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")
-    override fun log(priority: Int, tag: String?, message: String) {
+
+    override fun log(
+        priority: Int,
+        tag: String?,
+        message: String,
+    ) {
         val builder = StringBuilder()
         builder.append(dateFormat.format(LocalDateTime.now()))
 

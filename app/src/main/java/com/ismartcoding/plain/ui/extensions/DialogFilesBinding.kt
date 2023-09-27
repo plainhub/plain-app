@@ -10,7 +10,10 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.DialogFilesBinding
 import com.ismartcoding.plain.ui.file.FilesViewModel
 
-fun DialogFilesBinding.initToggleMode(viewLifecycleOwner: LifecycleOwner, viewModel: FilesViewModel) {
+fun DialogFilesBinding.initToggleMode(
+    viewLifecycleOwner: LifecycleOwner,
+    viewModel: FilesViewModel,
+) {
     viewModel.toggleMode.observe(viewLifecycleOwner) { toggleMode ->
         list.rv.bindingAdapter.toggle(toggleMode)
         if (toggleMode) {

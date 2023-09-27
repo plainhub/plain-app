@@ -17,7 +17,10 @@ import com.ismartcoding.plain.ui.models.ShowMessageEvent
 object DialogHelper {
     private var loadingDialog: LoadingDialog? = null
 
-    fun showMessage(message: String, duration: Int = Toast.LENGTH_SHORT) {
+    fun showMessage(
+        message: String,
+        duration: Int = Toast.LENGTH_SHORT,
+    ) {
         sendEvent(ShowMessageEvent(message, duration))
     }
 
@@ -61,7 +64,12 @@ object DialogHelper {
         }
     }
 
-    fun showConfirmDialog(context: Context, title: String, message: String, callback: (() -> Unit)? = null) {
+    fun showConfirmDialog(
+        context: Context,
+        title: String,
+        message: String,
+        callback: (() -> Unit)? = null,
+    ) {
         MaterialAlertDialogBuilder(context)
             .setTitle(title)
             .setMessage(message)
@@ -70,18 +78,29 @@ object DialogHelper {
             }
             .create()
             .show()
-
     }
 
-    fun showErrorDialog(context: Context, message: String, callback: (() -> Unit)? = null) {
+    fun showErrorDialog(
+        context: Context,
+        message: String,
+        callback: (() -> Unit)? = null,
+    ) {
         showConfirmDialog(context, getString(R.string.error), message, callback)
     }
 
-    fun confirmToAction(context: Context, messageId: Int, callback: () -> Unit) {
+    fun confirmToAction(
+        context: Context,
+        messageId: Int,
+        callback: () -> Unit,
+    ) {
         confirmToAction(context, getString(messageId), callback)
     }
 
-    fun confirmToAction(context: Context, message: String, callback: () -> Unit) {
+    fun confirmToAction(
+        context: Context,
+        message: String,
+        callback: () -> Unit,
+    ) {
         MaterialAlertDialogBuilder(context)
             .setMessage(message)
             .setPositiveButton(R.string.ok) { _, _ ->
@@ -93,7 +112,10 @@ object DialogHelper {
             .show()
     }
 
-    fun confirmToLeave(context: Context, callback: () -> Unit) {
+    fun confirmToLeave(
+        context: Context,
+        callback: () -> Unit,
+    ) {
         MaterialAlertDialogBuilder(context)
             .setTitle(R.string.leave_page_title)
             .setMessage(R.string.leave_page_message)
@@ -106,7 +128,10 @@ object DialogHelper {
             .show()
     }
 
-    fun confirmToDelete(context: Context, callback: () -> Unit) {
+    fun confirmToDelete(
+        context: Context,
+        callback: () -> Unit,
+    ) {
         confirmToAction(context, R.string.confirm_to_delete, callback)
     }
 }

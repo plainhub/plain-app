@@ -19,7 +19,6 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.formatName
 import com.ismartcoding.plain.ui.base.BlockOutlineButton
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
@@ -33,22 +32,24 @@ fun BackupRestorePage(
     viewModel: BackupRestoreViewModel = viewModel(),
 ) {
     val context = LocalContext.current
-    val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val data = result.data
-            if (data?.data != null) {
-                viewModel.backup(context, data.data!!)
+    val exportLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = result.data
+                if (data?.data != null) {
+                    viewModel.backup(context, data.data!!)
+                }
             }
         }
-    }
 
-     val restoreLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-            FilePickHelper.getUris(result.data!!).firstOrNull()?.let {
-                viewModel.restore(context, it)
+    val restoreLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+                FilePickHelper.getUris(result.data!!).firstOrNull()?.let {
+                    viewModel.restore(context, it)
+                }
             }
         }
-    }
 
     PScaffold(
         navController,
@@ -62,11 +63,13 @@ fun BackupRestorePage(
                     BlockOutlineButton(
                         text = stringResource(R.string.backup),
                         onClick = {
-                            exportLauncher.launch(Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                                type = "text/*"
-                                addCategory(Intent.CATEGORY_OPENABLE)
-                                putExtra(Intent.EXTRA_TITLE, "backup_" + Date().formatName() + ".zip")
-                            })
+                            exportLauncher.launch(
+                                Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                                    type = "text/*"
+                                    addCategory(Intent.CATEGORY_OPENABLE)
+                                    putExtra(Intent.EXTRA_TITLE, "backup_" + Date().formatName() + ".zip")
+                                },
+                            )
                         },
                     )
                     Spacer(modifier = Modifier.height(40.dp))
@@ -79,6 +82,6 @@ fun BackupRestorePage(
                     BottomSpace()
                 }
             }
-        }
+        },
     )
 }

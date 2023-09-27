@@ -4,12 +4,10 @@ import android.view.View
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 
-
 /**
  * 全局的缺省页布局[StateLayout]配置
  */
 object StateConfig {
-
     internal var retryIds: IntArray? = null
     internal var onEmpty: (View.(Any?) -> Unit)? = null
     internal var onError: (View.(Any?) -> Unit)? = null
@@ -81,7 +79,9 @@ object StateConfig {
      * @see isNetworkingRetry 点击重试是否检查网络
      */
     @JvmStatic
-    fun setRetryIds(@IdRes vararg ids: Int) {
+    fun setRetryIds(
+        @IdRes vararg ids: Int,
+    ) {
         retryIds = ids
     }
 }

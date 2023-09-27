@@ -6,7 +6,10 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 
 class Readability4JPreprocessor(regEx: RegExUtil = RegExUtil()) : Preprocessor(regEx) {
-    protected override fun shouldKeepImageInNoscriptElement(document: Document, noscript: Element): Boolean {
+    protected override fun shouldKeepImageInNoscriptElement(
+        document: Document,
+        noscript: Element,
+    ): Boolean {
         val images = noscript.select("img")
         if (images.size > 0) {
             val imagesToKeep = ArrayList(images)

@@ -10,13 +10,17 @@ import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.DialogSelectItemBinding
 import com.ismartcoding.plain.databinding.ViewListItemBinding
 import com.ismartcoding.plain.features.DExchangeRate
-import com.ismartcoding.plain.ui.helpers.ResourceHelper
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.*
+import com.ismartcoding.plain.ui.helpers.ResourceHelper
 
 class SelectCurrencyDialog(val onSelect: (DExchangeRate) -> Unit) : BaseBottomSheetDialog<DialogSelectItemBinding>() {
     private var searchQ: String = ""
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.topAppBar.run {
             initMenu(R.menu.select_item)
@@ -28,7 +32,6 @@ class SelectCurrencyDialog(val onSelect: (DExchangeRate) -> Unit) : BaseBottomSh
                 }
             }
         }
-
 
         binding.list.page.setEnableRefresh(false).setEnableAutoLoadMore(false)
         binding.list.rv.linear().setup {
@@ -48,7 +51,9 @@ class SelectCurrencyDialog(val onSelect: (DExchangeRate) -> Unit) : BaseBottomSh
     }
 
     private fun search() {
-        UIDataCache.current().latestExchangeRates?.rates?.filter { searchQ.isEmpty() || it.currency.contains(searchQ, true) }?.sortedBy { it.currency }?.let {
+        UIDataCache.current().latestExchangeRates?.rates?.filter {
+            searchQ.isEmpty() || it.currency.contains(searchQ, true)
+        }?.sortedBy { it.currency }?.let {
             binding.list.rv.models = it
         }
     }

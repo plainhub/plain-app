@@ -17,16 +17,17 @@ interface ItemDepth {
          */
         fun <T> refreshItemDepth(
             models: List<T>,
-            initDepth: Int = 0
-        ): List<T> = models.onEach { item ->
-            if (item is ItemDepth) {
-                item.itemDepth = initDepth
-            }
-            if (item is ItemExpand) {
-                item.itemSublist.run {
-                    refreshItemDepth(this, initDepth + 1)
+            initDepth: Int = 0,
+        ): List<T> =
+            models.onEach { item ->
+                if (item is ItemDepth) {
+                    item.itemDepth = initDepth
+                }
+                if (item is ItemExpand) {
+                    item.itemSublist.run {
+                        refreshItemDepth(this, initDepth + 1)
+                    }
                 }
             }
-        }
     }
 }

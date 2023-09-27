@@ -12,13 +12,19 @@ object MathUtils {
      * @param and     The biggest value the number can take.
      * @return The limited number.
      */
-    fun limit(number: Int, between: Int, and: Int): Int {
+    fun limit(
+        number: Int,
+        between: Int,
+        and: Int,
+    ): Int {
         if (number <= between) {
             return between
         }
         return if (number >= and) {
             and
-        } else number
+        } else {
+            number
+        }
     }
 
     /**
@@ -28,43 +34,69 @@ object MathUtils {
      * @param and     The biggest value the number can take.
      * @return The limited number.
      */
-    fun limit(number: Float, between: Float, and: Float): Float {
+    fun limit(
+        number: Float,
+        between: Float,
+        and: Float,
+    ): Float {
         if (number <= between) {
             return between
         }
         return if (number >= and) {
             and
-        } else number
+        } else {
+            number
+        }
     }
 
-
-    fun max(number: Float, max: Float): Float {
+    fun max(
+        number: Float,
+        max: Float,
+    ): Float {
         return if (number > max) {
             max
-        } else number
+        } else {
+            number
+        }
     }
 
-    fun min(number: Float, min: Float): Float {
+    fun min(
+        number: Float,
+        min: Float,
+    ): Float {
         return if (number < min) {
             min
-        } else number
+        } else {
+            number
+        }
     }
 
-    fun max(number: Int, max: Int): Int {
+    fun max(
+        number: Int,
+        max: Int,
+    ): Int {
         return if (number > max) {
             max
-        } else number
+        } else {
+            number
+        }
     }
 
-    fun min(number: Int, min: Int): Int {
+    fun min(
+        number: Int,
+        min: Int,
+    ): Int {
         return if (number < min) {
             min
-        } else number
+        } else {
+            number
+        }
     }
 
     /**
      * Methods from libGDX - https://github.com/libgdx/libgdx
      */
+
     /** Returns the largest integer less than or equal to the specified float. This method will only properly floor floats from
      * -(2^14) to (Float.MAX_VALUE - 2^14).  */
     fun floor(value: Float): Int {

@@ -46,13 +46,14 @@ fun RadioDialog(
             LazyColumn {
                 items(options) { option ->
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(CircleShape)
-                            .clickable {
-                                option.onClick()
-                                onDismissRequest()
-                            },
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clip(CircleShape)
+                                .clickable {
+                                    option.onClick()
+                                    onDismissRequest()
+                                },
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         RadioButton(selected = option.selected, onClick = {
@@ -62,9 +63,10 @@ fun RadioDialog(
                         Text(
                             modifier = Modifier.padding(start = 6.dp),
                             text = option.text,
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                baselineShift = BaselineShift.None
-                            ).merge(other = option.style),
+                            style =
+                                MaterialTheme.typography.bodyLarge.copy(
+                                    baselineShift = BaselineShift.None,
+                                ).merge(other = option.style),
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                     }

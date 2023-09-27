@@ -11,25 +11,26 @@ import com.ismartcoding.plain.R
 class AccessoryView(context: Context, attrs: AttributeSet?) : RecyclerView(context, attrs) {
     private data class AccessoryItem(val text: String, val before: String, val after: String = "")
 
-    private val items = listOf(
-        AccessoryItem("*", "*"),
-        AccessoryItem("_", "_"),
-        AccessoryItem("`", "`"),
-        AccessoryItem("#", "#"),
-        AccessoryItem("-", "-"),
-        AccessoryItem(">", ">"),
-        AccessoryItem("<", "<"),
-        AccessoryItem("/", "/"),
-        AccessoryItem("\\", "\\"),
-        AccessoryItem("|", "|"),
-        AccessoryItem("!", "!"),
-        AccessoryItem("[]", "[", "]"),
-        AccessoryItem("()", "(", ")"),
-        AccessoryItem("{}", "{", "}"),
-        AccessoryItem("<>", "<", ">"),
-        AccessoryItem("$", "$"),
-        AccessoryItem("\"", "\""),
-    )
+    private val items =
+        listOf(
+            AccessoryItem("*", "*"),
+            AccessoryItem("_", "_"),
+            AccessoryItem("`", "`"),
+            AccessoryItem("#", "#"),
+            AccessoryItem("-", "-"),
+            AccessoryItem(">", ">"),
+            AccessoryItem("<", "<"),
+            AccessoryItem("/", "/"),
+            AccessoryItem("\\", "\\"),
+            AccessoryItem("|", "|"),
+            AccessoryItem("!", "!"),
+            AccessoryItem("[]", "[", "]"),
+            AccessoryItem("()", "(", ")"),
+            AccessoryItem("{}", "{", "}"),
+            AccessoryItem("<>", "<", ">"),
+            AccessoryItem("$", "$"),
+            AccessoryItem("\"", "\""),
+        )
     private val outValue = TypedValue()
 
     lateinit var getEditor: (() -> Editor)
@@ -50,7 +51,6 @@ class AccessoryView(context: Context, attrs: AttributeSet?) : RecyclerView(conte
                 val editor = getEditor()
                 editor.insert(m.before, m.after)
             }
-
         }.models = items
     }
 }

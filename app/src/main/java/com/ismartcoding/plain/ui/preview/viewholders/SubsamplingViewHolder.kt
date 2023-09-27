@@ -21,7 +21,7 @@ import kotlinx.coroutines.delay
 class SubsamplingViewHolder(
     parent: ViewGroup,
     val binding: ItemImageviewerSubsamplingBinding =
-        ItemImageviewerSubsamplingBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        ItemImageviewerSubsamplingBinding.inflate(LayoutInflater.from(parent.context), parent, false),
 ) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.subsamplingView.setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_CENTER_INSIDE)
@@ -35,20 +35,24 @@ class SubsamplingViewHolder(
 //            binding.imageView.initTag(item, holder)
 //            binding.imageView.load(item.uri)
 //        } else{
-            binding.imageView.isVisible = false
-            binding.subsamplingView.isVisible = true
-            binding.subsamplingView.run {
-                initTag(item, holder)
-                orientation = SubsamplingScaleImageView.ORIENTATION_USE_EXIF
-                coMain {
-                    val path = item.uri.toString()
-                    if (path.startsWith("http://", true) || path.startsWith("https://", true)) {
-                        binding.loading.isVisible = true
-                        Glide.with(context)
-                            .asBitmap()
-                            .load(path)
-                            .into(object : CustomTarget<Bitmap>() {
-                                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+        binding.imageView.isVisible = false
+        binding.subsamplingView.isVisible = true
+        binding.subsamplingView.run {
+            initTag(item, holder)
+            orientation = SubsamplingScaleImageView.ORIENTATION_USE_EXIF
+            coMain {
+                val path = item.uri.toString()
+                if (path.startsWith("http://", true) || path.startsWith("https://", true)) {
+                    binding.loading.isVisible = true
+                    Glide.with(context)
+                        .asBitmap()
+                        .load(path)
+                        .into(
+                            object : CustomTarget<Bitmap>() {
+                                override fun onResourceReady(
+                                    resource: Bitmap,
+                                    transition: Transition<in Bitmap>?,
+                                ) {
                                     binding.loading.isVisible = false
                                     setImage(ImageSource.bitmap(resource))
                                 }
@@ -59,19 +63,18 @@ class SubsamplingViewHolder(
 
                                 override fun onLoadCleared(placeholder: Drawable?) {
                                 }
-                            })
-                    } else if (path.startsWith("app://", true)) {
-                        setImage(ImageSource.uri(path.getFinalPath(context)))
-                    } else {
-                        binding.loading.isVisible = true
-                        delay(100)
-                        binding.loading.isVisible = false
-                        setImage(ImageSource.uri(item.uri.toString()))
-                    }
+                            },
+                        )
+                } else if (path.startsWith("app://", true)) {
+                    setImage(ImageSource.uri(path.getFinalPath(context)))
+                } else {
+                    binding.loading.isVisible = true
+                    delay(100)
+                    binding.loading.isVisible = false
+                    setImage(ImageSource.uri(item.uri.toString()))
                 }
             }
-        //}
+        }
+        // }
     }
 }
-
-

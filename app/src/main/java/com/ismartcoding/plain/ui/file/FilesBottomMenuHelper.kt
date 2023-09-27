@@ -1,13 +1,11 @@
 package com.ismartcoding.plain.ui.file
 
 import android.content.Context
-import android.net.Uri
 import android.view.MenuItem
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.newPath
-import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.ShareHelper
@@ -31,7 +29,7 @@ object FilesBottomMenuHelper {
     fun onMenuItemClick(
         context: Context,
         dialog: FilesDialog,
-        menuItem: MenuItem
+        menuItem: MenuItem,
     ) {
         val binding = dialog.binding
         val list = binding.list

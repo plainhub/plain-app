@@ -5,8 +5,10 @@ import com.ismartcoding.lib.brv.BindingAdapter
 import com.ismartcoding.lib.brv.item.ItemCheckable
 import com.ismartcoding.plain.R
 
-
-fun BindingAdapter.checkable(onItemClick: BindingAdapter.BindingViewHolder.() -> Unit, onChecked: () -> Unit) {
+fun BindingAdapter.checkable(
+    onItemClick: BindingAdapter.BindingViewHolder.() -> Unit,
+    onChecked: () -> Unit,
+) {
     R.id.container.onClick {
         if (!toggleMode) {
             onItemClick()

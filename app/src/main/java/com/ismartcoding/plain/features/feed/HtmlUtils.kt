@@ -5,15 +5,15 @@ import org.jsoup.safety.Safelist
 import java.util.regex.Pattern
 
 object HtmlUtils {
-
-    private val JSOUP_WHITELIST = Safelist.relaxed().addTags("iframe", "video", "audio", "source", "track")
-        .addAttributes("iframe", "src", "frameborder")
-        .addAttributes("video", "src", "controls", "poster")
-        .addAttributes("audio", "src", "controls")
-        .addAttributes("source", "src", "type")
-        .addAttributes("track", "src", "kind", "srclang", "label")
-        .addAttributes("p", "style")
-        .removeAttributes("img", "height", "width")
+    private val JSOUP_WHITELIST =
+        Safelist.relaxed().addTags("iframe", "video", "audio", "source", "track")
+            .addAttributes("iframe", "src", "frameborder")
+            .addAttributes("video", "src", "controls", "poster")
+            .addAttributes("audio", "src", "controls")
+            .addAttributes("source", "src", "type")
+            .addAttributes("track", "src", "kind", "srclang", "label")
+            .addAttributes("p", "style")
+            .removeAttributes("img", "height", "width")
 
     private const val URL_SPACE = "%20"
 
@@ -22,7 +22,10 @@ object HtmlUtils {
     private val SRCSET_PATTERN = Pattern.compile("\\s+srcset=\\s*['\"]([^'\"\\s]+)[^'\"]*['\"]", Pattern.CASE_INSENSITIVE)
     private val LAZY_LOADING_PATTERN = Pattern.compile("\\s+src=[^>]+\\s+original[-]*src=(\"|')", Pattern.CASE_INSENSITIVE)
     private val PIXEL_IMAGE_PATTERN =
-        Pattern.compile("<img\\s+(height=['\"]1['\"]\\s+width=['\"]1['\"]|width=['\"]1['\"]\\s+height=['\"]1['\"])\\s+[^>]*src=\\s*['\"]([^'\"]+)['\"][^>]*>", Pattern.CASE_INSENSITIVE)
+        Pattern.compile(
+            "<img\\s+(height=['\"]1['\"]\\s+width=['\"]1['\"]|width=['\"]1['\"]\\s+height=['\"]1['\"])\\s+[^>]*src=\\s*['\"]([^'\"]+)['\"][^>]*>",
+            Pattern.CASE_INSENSITIVE,
+        )
     private val NON_HTTP_IMAGE_PATTERN = Pattern.compile("\\s+(href|src)=(\"|')//", Pattern.CASE_INSENSITIVE)
     private val BAD_IMAGE_PATTERN = Pattern.compile("<img\\s+[^>]*src=\\s*['\"]([^'\"]+)\\.img['\"][^>]*>", Pattern.CASE_INSENSITIVE)
     private val EMPTY_IMAGE_PATTERN = Pattern.compile("<img((?!src=).)*?>", Pattern.CASE_INSENSITIVE)
@@ -31,7 +34,10 @@ object HtmlUtils {
     private val MULTIPLE_BR_PATTERN = Pattern.compile("(\\s*<br\\s*[/]*>\\s*){3,}", Pattern.CASE_INSENSITIVE)
     private val EMPTY_LINK_PATTERN = Pattern.compile("<a\\s+[^>]*></a>", Pattern.CASE_INSENSITIVE)
 
-    fun improveHtmlContent(content: String, baseUri: String): String {
+    fun improveHtmlContent(
+        content: String,
+        baseUri: String,
+    ): String {
         var c = content
 
         // remove some ads

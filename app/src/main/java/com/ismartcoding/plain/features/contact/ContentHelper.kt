@@ -12,7 +12,9 @@ import com.ismartcoding.plain.web.models.OrganizationInput
 import java.util.ArrayList
 
 data class ContentItem(var value: String, var type: Int, var label: String)
+
 data class Organization(var company: String, var title: String)
+
 data class PhoneNumber(var value: String, var type: Int, var label: String, var normalizedNumber: String)
 
 data class Content(
@@ -25,23 +27,24 @@ data class Content(
     val ims: MutableList<ContentItem> = ArrayList(),
     val organizations: MutableList<Organization> = ArrayList(),
     val notes: MutableList<String> = ArrayList(),
-    val groupIds: MutableList<Int> = ArrayList()
+    val groupIds: MutableList<Int> = ArrayList(),
 )
 
 object ContentHelper {
     fun getMap(context: Context): Map<String, Content> {
         val map = mutableMapOf<String, Content>()
         val uri = ContactsContract.Data.CONTENT_URI
-        val projection = arrayOf(
-            ContactsContract.Data.RAW_CONTACT_ID,
-            ContactsContract.Data.MIMETYPE,
-            ContactsContract.Data.DATA1,
-            ContactsContract.Data.DATA2,
-            ContactsContract.Data.DATA3,
-            ContactsContract.Data.DATA4,
-            ContactsContract.Data.DATA5,
-            ContactsContract.Data.DATA6,
-        )
+        val projection =
+            arrayOf(
+                ContactsContract.Data.RAW_CONTACT_ID,
+                ContactsContract.Data.MIMETYPE,
+                ContactsContract.Data.DATA1,
+                ContactsContract.Data.DATA2,
+                ContactsContract.Data.DATA3,
+                ContactsContract.Data.DATA4,
+                ContactsContract.Data.DATA5,
+                ContactsContract.Data.DATA6,
+            )
 
         context.queryCursor(uri, projection) { cursor, cache ->
             val id = cursor.getStringValue(ContactsContract.Data.RAW_CONTACT_ID, cache)
@@ -110,13 +113,23 @@ object ContentHelper {
         return map
     }
 
-    fun newDelete(contactId: String, mimeType: String): ContentProviderOperation {
+    fun newDelete(
+        contactId: String,
+        mimeType: String,
+    ): ContentProviderOperation {
         val o = ContentProviderOperation.newDelete(ContactsContract.Data.CONTENT_URI)
-        o.withSelection("${ContactsContract.Data.RAW_CONTACT_ID} = ? AND ${ContactsContract.Data.MIMETYPE} = ? ", arrayOf(contactId, mimeType))
+        o.withSelection(
+            "${ContactsContract.Data.RAW_CONTACT_ID} = ? AND ${ContactsContract.Data.MIMETYPE} = ? ",
+            arrayOf(contactId, mimeType),
+        )
         return o.build()
     }
 
-    fun newInsert(contactId: String, mimeType: String, item: ContentItemInput): ContentProviderOperation {
+    fun newInsert(
+        contactId: String,
+        mimeType: String,
+        item: ContentItemInput,
+    ): ContentProviderOperation {
         val o = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
         o.apply {
             withValueId(this, contactId)
@@ -158,7 +171,11 @@ object ContentHelper {
         return o.build()
     }
 
-    fun newInsert(contactId: String, mimeType: String, value: String): ContentProviderOperation {
+    fun newInsert(
+        contactId: String,
+        mimeType: String,
+        value: String,
+    ): ContentProviderOperation {
         val o = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
         o.apply {
             withValueId(this, contactId)
@@ -178,7 +195,10 @@ object ContentHelper {
         return o.build()
     }
 
-    fun newOrgInsert(contactId: String, organization: OrganizationInput): ContentProviderOperation {
+    fun newOrgInsert(
+        contactId: String,
+        organization: OrganizationInput,
+    ): ContentProviderOperation {
         val o = ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
         o.apply {
             withValueId(this, contactId)
@@ -190,7 +210,10 @@ object ContentHelper {
         return o.build()
     }
 
-    private fun withValueId(builder: ContentProviderOperation.Builder, contactId: String) {
+    private fun withValueId(
+        builder: ContentProviderOperation.Builder,
+        contactId: String,
+    ) {
         if (contactId == "0") {
             builder.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
         } else {

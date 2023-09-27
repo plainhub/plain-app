@@ -13,6 +13,4 @@ class GetTransportInfoResponse {
     val speed: Int = 0
 }
 
-
-class SetAVTransportURIResponse {
-}
+class SetAVTransportURIResponse

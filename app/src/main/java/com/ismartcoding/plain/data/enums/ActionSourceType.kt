@@ -17,5 +17,5 @@ enum class ActionSourceType {
     TAG,
     TAG_RELATION,
     RULE,
-    BOOK;
+    BOOK,
 }

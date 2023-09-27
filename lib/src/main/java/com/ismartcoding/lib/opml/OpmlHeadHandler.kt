@@ -64,67 +64,72 @@ internal class OpmlHeadHandler : OpmlSectionHandler<Head> {
 
             "vertScrollState" -> {
                 val trimmed = text.trim { it <= ' ' }
-                vertScrollState = if (trimmed.isNotEmpty()) {
-                    try {
-                        trimmed.trim { it <= ' ' }.toInt()
-                    } catch (e: NumberFormatException) {
-                        throw OpmlParseException("vertScrollState must be a number")
+                vertScrollState =
+                    if (trimmed.isNotEmpty()) {
+                        try {
+                            trimmed.trim { it <= ' ' }.toInt()
+                        } catch (e: NumberFormatException) {
+                            throw OpmlParseException("vertScrollState must be a number")
+                        }
+                    } else {
+                        null
                     }
-                } else {
-                    null
-                }
             }
 
             "windowBottom" -> {
                 val trimmed = text.trim { it <= ' ' }
-                windowBottom = if (trimmed.isNotEmpty()) {
-                    try {
-                        text.trim { it <= ' ' }.toInt()
-                    } catch (e: NumberFormatException) {
-                        throw OpmlParseException("windowBottom must be a number")
+                windowBottom =
+                    if (trimmed.isNotEmpty()) {
+                        try {
+                            text.trim { it <= ' ' }.toInt()
+                        } catch (e: NumberFormatException) {
+                            throw OpmlParseException("windowBottom must be a number")
+                        }
+                    } else {
+                        null
                     }
-                } else {
-                    null
-                }
             }
 
             "windowLeft" -> {
                 val trimmed = text.trim { it <= ' ' }
-                windowLeft = if (trimmed.isNotEmpty()) {
-                    try {
-                        text.trim { it <= ' ' }.toInt()
-                    } catch (e: NumberFormatException) {
-                        throw OpmlParseException("windowLeft must be a number")
+                windowLeft =
+                    if (trimmed.isNotEmpty()) {
+                        try {
+                            text.trim { it <= ' ' }.toInt()
+                        } catch (e: NumberFormatException) {
+                            throw OpmlParseException("windowLeft must be a number")
+                        }
+                    } else {
+                        null
                     }
-                } else {
-                    null
-                }
             }
 
             "windowRight" -> {
                 val trimmed = text.trim { it <= ' ' }
-                windowRight = if (trimmed.isNotEmpty()) {
-                    try {
-                        text.trim { it <= ' ' }.toInt()
-                    } catch (e: NumberFormatException) {
-                        throw OpmlParseException("windowRight must be a number")
+                windowRight =
+                    if (trimmed.isNotEmpty()) {
+                        try {
+                            text.trim { it <= ' ' }.toInt()
+                        } catch (e: NumberFormatException) {
+                            throw OpmlParseException("windowRight must be a number")
+                        }
+                    } else {
+                        null
                     }
-                } else {
-                    null
-                }
             }
 
             "windowTop" -> {
                 val trimmed = text.trim { it <= ' ' }
-                windowTop = if (trimmed.isNotEmpty()) {
-                    try {
-                        text.trim { it <= ' ' }.toInt()
-                    } catch (e: NumberFormatException) {
-                        throw OpmlParseException("windowTop must be a number")
+                windowTop =
+                    if (trimmed.isNotEmpty()) {
+                        try {
+                            text.trim { it <= ' ' }.toInt()
+                        } catch (e: NumberFormatException) {
+                            throw OpmlParseException("windowTop must be a number")
+                        }
+                    } else {
+                        null
                     }
-                } else {
-                    null
-                }
             }
         }
     }
@@ -138,7 +143,7 @@ internal class OpmlHeadHandler : OpmlSectionHandler<Head> {
     override fun get(): Head {
         return Head(
             title, dateCreated, dateModified, ownerName, ownerEmail, ownerId, docs, expansionState,
-            vertScrollState, windowTop, windowLeft, windowBottom, windowRight
+            vertScrollState, windowTop, windowLeft, windowBottom, windowRight,
         )
     }
 }

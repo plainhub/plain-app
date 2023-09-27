@@ -9,12 +9,12 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.contentResolver
-import com.ismartcoding.plain.features.ActionEvent
-import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
-import com.ismartcoding.plain.data.enums.PickFileTag
 import com.ismartcoding.plain.data.enums.DataType
+import com.ismartcoding.plain.data.enums.PickFileTag
+import com.ismartcoding.plain.features.ActionEvent
+import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.features.book.BookHelper
 import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
@@ -106,19 +106,21 @@ class BooksDialog : BaseListDrawerDialog() {
             val bindingAdapter = binding.list.rv.bindingAdapter
             val toggleMode = bindingAdapter.toggleMode
             val checkedItems = bindingAdapter.getCheckedModels<BookModel>()
-            binding.list.page.addData(items.map { a ->
-                BookModel(a).apply {
-                    image = a.image
-                    title = a.name
-                    subtitle = a.description
-                    this.toggleMode = toggleMode
-                    isChecked = checkedItems.any { it.data.id == data.id }
-                }
-            }, hasMore = {
-                items.size == viewModel.limit
-            })
+            binding.list.page.addData(
+                items.map { a ->
+                    BookModel(a).apply {
+                        image = a.image
+                        title = a.name
+                        subtitle = a.description
+                        this.toggleMode = toggleMode
+                        isChecked = checkedItems.any { it.data.id == data.id }
+                    }
+                },
+                hasMore = {
+                    items.size == viewModel.limit
+                },
+            )
             updateTitle()
         }
     }
 }
-

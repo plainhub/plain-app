@@ -14,7 +14,7 @@ fun NavigationBackIcon(navController: NavHostController) {
     PIconButton(
         imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
         contentDescription = stringResource(R.string.back),
-        tint = MaterialTheme.colorScheme.onSurface
+        tint = MaterialTheme.colorScheme.onSurface,
     ) {
         navController.popBackStack()
     }

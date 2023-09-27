@@ -8,7 +8,11 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 object FragmentHelper {
-    fun <VB : ViewBinding> createBinding(dialog: Fragment, inflater: LayoutInflater, container: ViewGroup?): VB {
+    fun <VB : ViewBinding> createBinding(
+        dialog: Fragment,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+    ): VB {
         var parametrizedType: ParameterizedType? = null
         var genericSuperClass: Type? = dialog.javaClass.genericSuperclass
         while (parametrizedType == null) {
@@ -25,7 +29,7 @@ object FragmentHelper {
             "inflate",
             LayoutInflater::class.java,
             ViewGroup::class.java,
-            Boolean::class.java
+            Boolean::class.java,
         ).invoke(null, inflater, container, false) as VB
     }
 }

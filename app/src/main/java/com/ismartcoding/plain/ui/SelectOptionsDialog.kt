@@ -19,10 +19,12 @@ class SelectOptionsDialog<T : ISelectOption>(
     private val options: List<T>,
     val selectCallback: (T) -> Unit,
 ) : BaseBottomSheetDialog<DialogSelectOptionsBinding>() {
-
     data class ItemModel(val data: ISelectOption) : ListItemModel()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.topAppBar.title = title
         initList()
@@ -43,13 +45,13 @@ class SelectOptionsDialog<T : ISelectOption>(
     private fun updateList() {
         lifecycleScope.launch {
             val context = requireContext()
-            binding.rv.models = options.map { opt ->
-                ItemModel(opt).apply {
-                    keyText = opt.getText()
-                    showSelected(withIO { opt.isSelected(context) })
+            binding.rv.models =
+                options.map { opt ->
+                    ItemModel(opt).apply {
+                        keyText = opt.getText()
+                        showSelected(withIO { opt.isSelected(context) })
+                    }
                 }
-            }
         }
-
     }
 }

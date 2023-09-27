@@ -16,15 +16,21 @@ import java.io.FileOutputStream
 import java.io.FileWriter
 import java.io.IOException
 
-
 object FileHelper {
-    fun fileFromAsset(context: Context, name: String): File {
+    fun fileFromAsset(
+        context: Context,
+        name: String,
+    ): File {
         return File("${context.cacheDir}/$name").apply {
             writeBytes(context.assets.open(name).readBytes())
         }
     }
 
-    fun writeFile(context: Context, filename: String, content: String) {
+    fun writeFile(
+        context: Context,
+        filename: String,
+        content: String,
+    ) {
         FileWriter(File(context.filesDir, filename)).use {
             it.write(content)
         }
@@ -48,11 +54,17 @@ object FileHelper {
         return Base64.encodeToString(CryptoHelper.aesEncrypt(TempData.urlToken, path), Base64.NO_WRAP)
     }
 
-    fun rename(filePath: String, newName: String): File? {
+    fun rename(
+        filePath: String,
+        newName: String,
+    ): File? {
         return rename(File(filePath), newName)
     }
 
-    fun rename(file: File, newName: String): File? {
+    fun rename(
+        file: File,
+        newName: String,
+    ): File? {
         if (!file.exists()) return null
         if (newName.isBlank()) return null
         if (newName == file.name) return file
@@ -64,7 +76,11 @@ object FileHelper {
         return null
     }
 
-    fun copyFile(context: Context, pathFrom: Uri, pathTo: String) {
+    fun copyFile(
+        context: Context,
+        pathFrom: Uri,
+        pathTo: String,
+    ) {
         context.contentResolver.openInputStream(pathFrom).use { input ->
             var bis: BufferedInputStream? = null
             var bos: BufferedOutputStream? = null

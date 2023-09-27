@@ -1,14 +1,14 @@
 package com.ismartcoding.plain.db
 
 import androidx.room.*
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.helpers.NetworkHelper
+import com.ismartcoding.lib.logcat.LogCat
 import kotlinx.datetime.*
 import java.util.*
 
 @Entity(tableName = "boxes")
 data class DBox(
-    @PrimaryKey var id: String
+    @PrimaryKey var id: String,
 ) : DEntityBase() {
     @ColumnInfo(name = "name")
     var name: String = ""

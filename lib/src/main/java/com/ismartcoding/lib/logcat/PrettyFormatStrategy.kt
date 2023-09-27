@@ -37,12 +37,17 @@ class PrettyFormatStrategy private constructor(builder: Builder) : FormatStrateg
     private val showThreadInfo: Boolean
     private val logStrategy: LogStrategy
     private val tag: String?
-    override fun log(priority: Int, tag: String?, message: String) {
+
+    override fun log(
+        priority: Int,
+        tag: String?,
+        message: String,
+    ) {
         val newTag = formatTag(tag)
         logTopBorder(priority, newTag)
         logHeaderContent(priority, newTag, methodCount)
 
-        //get bytes of message with system's default charset (which is UTF-8 for Android)
+        // get bytes of message with system's default charset (which is UTF-8 for Android)
         val bytes = message.toByteArray()
         val length = bytes.size
         if (length <= CHUNK_SIZE) {
@@ -59,18 +64,25 @@ class PrettyFormatStrategy private constructor(builder: Builder) : FormatStrateg
         var i = 0
         while (i < length) {
             val count = Math.min(length - i, CHUNK_SIZE)
-            //create a new String with system's default charset (which is UTF-8 for Android)
+            // create a new String with system's default charset (which is UTF-8 for Android)
             logContent(priority, newTag, String(bytes, i, count))
             i += CHUNK_SIZE
         }
         logBottomBorder(priority, newTag)
     }
 
-    private fun logTopBorder(logType: Int, tag: String?) {
+    private fun logTopBorder(
+        logType: Int,
+        tag: String?,
+    ) {
         logChunk(logType, tag, TOP_BORDER)
     }
 
-    private fun logHeaderContent(logType: Int, tag: String?, methodCount: Int) {
+    private fun logHeaderContent(
+        logType: Int,
+        tag: String?,
+        methodCount: Int,
+    ) {
         var newMethodCount = methodCount
         val trace = Thread.currentThread().stackTrace
         if (showThreadInfo) {
@@ -80,7 +92,7 @@ class PrettyFormatStrategy private constructor(builder: Builder) : FormatStrateg
         var level = ""
         val stackOffset = getStackOffset(trace) + methodOffset
 
-        //corresponding method count with the current stack may exceeds the stack trace. Trims the count
+        // corresponding method count with the current stack may exceeds the stack trace. Trims the count
         if (newMethodCount + stackOffset > trace.size) {
             newMethodCount = trace.size - stackOffset - 1
         }
@@ -107,22 +119,36 @@ class PrettyFormatStrategy private constructor(builder: Builder) : FormatStrateg
         }
     }
 
-    private fun logBottomBorder(logType: Int, tag: String?) {
+    private fun logBottomBorder(
+        logType: Int,
+        tag: String?,
+    ) {
         logChunk(logType, tag, BOTTOM_BORDER)
     }
 
-    private fun logDivider(logType: Int, tag: String?) {
+    private fun logDivider(
+        logType: Int,
+        tag: String?,
+    ) {
         logChunk(logType, tag, MIDDLE_BORDER)
     }
 
-    private fun logContent(logType: Int, tag: String?, chunk: String) {
+    private fun logContent(
+        logType: Int,
+        tag: String?,
+        chunk: String,
+    ) {
         val lines = chunk.split(System.getProperty("line.separator") ?: "").toTypedArray()
         for (line in lines) {
             logChunk(logType, tag, "$HORIZONTAL_LINE $line")
         }
     }
 
-    private fun logChunk(priority: Int, tag: String?, chunk: String) {
+    private fun logChunk(
+        priority: Int,
+        tag: String?,
+        chunk: String,
+    ) {
         logStrategy.log(priority, tag, chunk)
     }
 
@@ -153,7 +179,9 @@ class PrettyFormatStrategy private constructor(builder: Builder) : FormatStrateg
     private fun formatTag(tag: String?): String? {
         return if (!Utils.isEmpty(tag) && !Utils.equals(this.tag, tag)) {
             this.tag + "-" + tag
-        } else this.tag
+        } else {
+            this.tag
+        }
     }
 
     class Builder {
@@ -162,6 +190,7 @@ class PrettyFormatStrategy private constructor(builder: Builder) : FormatStrateg
         var showThreadInfo = true
         var logStrategy: LogStrategy? = null
         var tag: String? = "PRETTY_LOGGER"
+
         fun methodCount(`val`: Int): Builder {
             methodCount = `val`
             return this
@@ -220,6 +249,7 @@ class PrettyFormatStrategy private constructor(builder: Builder) : FormatStrateg
         private const val TOP_BORDER = TOP_LEFT_CORNER.toString() + DOUBLE_DIVIDER + DOUBLE_DIVIDER
         private const val BOTTOM_BORDER = BOTTOM_LEFT_CORNER.toString() + DOUBLE_DIVIDER + DOUBLE_DIVIDER
         private const val MIDDLE_BORDER = MIDDLE_CORNER.toString() + SINGLE_DIVIDER + SINGLE_DIVIDER
+
         fun newBuilder(): Builder {
             return Builder()
         }

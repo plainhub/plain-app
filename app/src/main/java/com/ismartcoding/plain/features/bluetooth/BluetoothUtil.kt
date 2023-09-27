@@ -14,11 +14,11 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.ParcelUuid
 import androidx.annotation.RequiresApi
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.lib.extensions.hasPermission
 import com.ismartcoding.lib.isSPlus
+import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.MainApp
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -69,12 +69,13 @@ object BluetoothUtil {
 
     private fun shouldEnableGPS(): Boolean {
         val locationManager = MainApp.instance.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val hasGPS = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            locationManager.getProviderProperties(LocationManager.GPS_PROVIDER) != null
-        } else {
-            @Suppress("DEPRECATION")
-            locationManager.getProvider(LocationManager.GPS_PROVIDER) != null
-        }
+        val hasGPS =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                locationManager.getProviderProperties(LocationManager.GPS_PROVIDER) != null
+            } else {
+                @Suppress("DEPRECATION")
+                locationManager.getProvider(LocationManager.GPS_PROVIDER) != null
+            }
 
         return hasGPS && !locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
@@ -150,11 +151,15 @@ object BluetoothUtil {
         return callbackFlow {
             LogCat.d("Scan bluetooth devices")
 
-            scanCallback = object : ScanCallback() {
-                override fun onScanResult(callbackType: Int, result: ScanResult) {
-                    trySend(addBTDevice(result.device, result.rssi))
+            scanCallback =
+                object : ScanCallback() {
+                    override fun onScanResult(
+                        callbackType: Int,
+                        result: ScanResult,
+                    ) {
+                        trySend(addBTDevice(result.device, result.rssi))
+                    }
                 }
-            }
             val filters = arrayListOf(ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString(BTDevice.SERVICE_UUID.toString())).build())
             getBluetoothAdapter().bluetoothLeScanner.startScan(filters, ScanSettings.Builder().build(), scanCallback)
             isScanning = true
@@ -192,7 +197,10 @@ object BluetoothUtil {
         }
     }
 
-    fun requestMtu(device: BTDevice, mtu: Int) {
+    fun requestMtu(
+        device: BTDevice,
+        mtu: Int,
+    ) {
         if (device.isConnected()) {
             enqueueOperation(BTOperationMtuRequest(device, mtu.coerceIn(GATT_MIN_MTU_SIZE, GATT_MAX_MTU_SIZE)))
         } else {
@@ -232,10 +240,11 @@ object BluetoothUtil {
             return
         }
 
-        val operation = operationQueue.poll() ?: run {
-            LogCat.d("Operation queue empty, returning")
-            return
-        }
+        val operation =
+            operationQueue.poll() ?: run {
+                LogCat.d("Operation queue empty, returning")
+                return
+            }
         pendingOperation = operation
 
         // Handle Connect separately from other operations that require device to be connected
@@ -254,7 +263,10 @@ object BluetoothUtil {
     }
 
     @SuppressLint("MissingPermission")
-    private fun addBTDevice(device: BluetoothDevice, rssi: Int): BTDevice {
+    private fun addBTDevice(
+        device: BluetoothDevice,
+        rssi: Int,
+    ): BTDevice {
         var d = allDevices.find { it.device.address == device.address }
         LogCat.v("Found device: ${device.name}, ${device.address}, $rssi")
         if (d == null) {

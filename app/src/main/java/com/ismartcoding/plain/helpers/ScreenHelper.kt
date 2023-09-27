@@ -11,7 +11,10 @@ import com.ismartcoding.plain.features.Permission
 
 object ScreenHelper {
     @SuppressLint("CheckResult")
-    suspend fun keepScreenOnAsync(context: Context, enable: Boolean): Boolean {
+    suspend fun keepScreenOnAsync(
+        context: Context,
+        enable: Boolean,
+    ): Boolean {
         val contentResolver = context.contentResolver
         if (Permission.WRITE_SETTINGS.can(context)) {
             saveOn(context, enable)
@@ -29,13 +32,19 @@ object ScreenHelper {
         return false
     }
 
-    fun saveTimeout(context: Context, value: Int) {
+    fun saveTimeout(
+        context: Context,
+        value: Int,
+    ) {
         coIO {
             SystemScreenTimeoutPreference.putAsync(context, value)
         }
     }
 
-    fun saveOn(context: Context, value: Boolean) {
+    fun saveOn(
+        context: Context,
+        value: Boolean,
+    ) {
         coIO {
             KeepScreenOnPreference.putAsync(context, value)
         }

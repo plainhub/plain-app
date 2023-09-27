@@ -27,11 +27,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
-    data class AudioModel(val audio: DPlaylistAudio, override var itemOrientationDrag: Int = ItemOrientation.ALL) : BaseAudioModel(), ItemDrag
+    data class AudioModel(
+        val audio: DPlaylistAudio,
+        override var itemOrientationDrag: Int = ItemOrientation.ALL,
+    ) : BaseAudioModel(), ItemDrag
 
     private var searchQ: String = ""
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         initEvents()
@@ -72,16 +78,19 @@ class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
                 }
             }
 
-            itemTouchHelper = ItemTouchHelper(object : DefaultItemTouchCallback() {
-                override fun onDrag(
-                    source: BindingAdapter.BindingViewHolder,
-                    target: BindingAdapter.BindingViewHolder
-                ) {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        AudioPlaylistPreference.putAsync(requireContext(), getModelList<AudioModel>().map { it.audio })
-                    }
-                }
-            })
+            itemTouchHelper =
+                ItemTouchHelper(
+                    object : DefaultItemTouchCallback() {
+                        override fun onDrag(
+                            source: BindingAdapter.BindingViewHolder,
+                            target: BindingAdapter.BindingViewHolder,
+                        ) {
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                AudioPlaylistPreference.putAsync(requireContext(), getModelList<AudioModel>().map { it.audio })
+                            }
+                        }
+                    },
+                )
         }
 
         binding.list.page.run {
@@ -128,15 +137,16 @@ class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
     private fun search() {
         lifecycleScope.launch {
             val context = requireContext()
-            val audios = withIO {
-                AudioPlaylistPreference.getValueAsync(context)
-                    .filter {
-                        searchQ.isEmpty()
-                                || it.title.contains(searchQ, true)
-                                || it.artist.contains(searchQ, true)
-                    }
-            }
-            val currentPath = withIO {  AudioPlayingPreference.getValueAsync(context)?.path  }
+            val audios =
+                withIO {
+                    AudioPlaylistPreference.getValueAsync(context)
+                        .filter {
+                            searchQ.isEmpty() ||
+                                it.title.contains(searchQ, true) ||
+                                it.artist.contains(searchQ, true)
+                        }
+                }
+            val currentPath = withIO { AudioPlayingPreference.getValueAsync(context)?.path }
             val isAudioPlaying = AudioPlayer.instance.isPlaying()
             binding.list.page.addData(
                 audios
@@ -158,13 +168,12 @@ class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
                                     }
                                     updateTitle()
                                 }
-
                             }
                         }
-                    })
+                    },
+            )
             updateTitle()
         }
-
     }
 
     private fun updateTitle() {

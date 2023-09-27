@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.web.models
 
 data class ContentItemInput(var value: String, var type: Int, var label: String)
+
 data class OrganizationInput(var company: String, var title: String)
 
 data class ContactInput(
@@ -22,4 +23,3 @@ data class ContactInput(
     var websites: List<ContentItemInput>,
     var ims: List<ContentItemInput>,
 )
-

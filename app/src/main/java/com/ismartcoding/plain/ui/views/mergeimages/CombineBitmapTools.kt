@@ -8,7 +8,8 @@ import android.media.ThumbnailUtils
 object CombineBitmapTools {
     fun combineBitmap(
         combineWidth: Int,
-        combineHeight: Int, bitmaps: List<Bitmap>
+        combineHeight: Int,
+        bitmaps: List<Bitmap>,
     ): Bitmap {
         val len = bitmaps.size
         val combineBitmapEntities = CombineNineRect.generateCombineBitmapEntity(combineWidth, combineHeight, len)
@@ -18,40 +19,49 @@ object CombineBitmapTools {
                 ThumbnailUtils.extractThumbnail(
                     bitmaps[i],
                     combineBitmapEntities[i].width.toInt(),
-                    combineBitmapEntities[i].height.toInt()
-                )
+                    combineBitmapEntities[i].height.toInt(),
+                ),
             )
         }
 
         return getCombineBitmaps(
             combineBitmapEntities,
-            thumbnailBitmaps, combineWidth, combineHeight
+            thumbnailBitmaps,
+            combineWidth,
+            combineHeight,
         )
     }
 
     private fun getCombineBitmaps(
-        mEntityList: List<CombineBitmapEntity>, bitmaps: List<Bitmap>,
-        width: Int, height: Int
+        mEntityList: List<CombineBitmapEntity>,
+        bitmaps: List<Bitmap>,
+        width: Int,
+        height: Int,
     ): Bitmap {
         var newBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         for (i in mEntityList.indices) {
-            newBitmap = mixtureBitmap(
-                newBitmap, bitmaps[i], PointF(
-                    mEntityList[i].x, mEntityList[i].y
+            newBitmap =
+                mixtureBitmap(
+                    newBitmap, bitmaps[i],
+                    PointF(
+                        mEntityList[i].x, mEntityList[i].y,
+                    ),
                 )
-            )
         }
         return newBitmap
     }
 
     private fun mixtureBitmap(
-        first: Bitmap, second: Bitmap,
-        fromPoint: PointF
+        first: Bitmap,
+        second: Bitmap,
+        fromPoint: PointF,
     ): Bitmap {
-        val newBitmap = Bitmap.createBitmap(
-            first.width,
-            first.height, Bitmap.Config.ARGB_8888
-        )
+        val newBitmap =
+            Bitmap.createBitmap(
+                first.width,
+                first.height,
+                Bitmap.Config.ARGB_8888,
+            )
         val cv = Canvas(newBitmap)
         cv.drawBitmap(first, 0f, 0f, null)
         cv.drawBitmap(second, fromPoint.x, fromPoint.y, null)
@@ -69,10 +79,13 @@ class CombineBitmapEntity {
     var width = 0f
     var height = 0f
     var index = -1
+
     override fun toString(): String {
-        return ("MyBitmap [x=" + x + ", y=" + y + ", width=" + width
-                + ", height=" + height + ", device=" + devide + ", index="
-                + index + "]")
+        return (
+            "MyBitmap [x=" + x + ", y=" + y + ", width=" + width +
+                ", height=" + height + ", device=" + devide + ", index=" +
+                index + "]"
+        )
     }
 
     companion object {

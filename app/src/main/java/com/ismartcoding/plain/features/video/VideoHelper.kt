@@ -33,7 +33,7 @@ object VideoHelper : BaseContentHelper() {
 
     override fun getBaseWhere(groups: List<FilterField>): ContentWhere {
         val where = ContentWhere()
-        //where.add("${MediaStore.Video.Media.DURATION}>0")
+        // where.add("${MediaStore.Video.Media.DURATION}>0")
         groups.forEach {
             if (it.name == "text") {
                 where.add("${MediaStore.Video.Media.TITLE} LIKE ?", "%${it.value}%")
@@ -48,7 +48,13 @@ object VideoHelper : BaseContentHelper() {
         return getWheres(query, MediaStore.Video.Media._ID)
     }
 
-    fun search(context: Context, query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DVideo> {
+    fun search(
+        context: Context,
+        query: String,
+        limit: Int,
+        offset: Int,
+        sortBy: FileSortBy,
+    ): List<DVideo> {
         val cursor = getSearchCursor(context, query, limit, offset, sortBy.toSortBy())
         val result = mutableListOf<DVideo>()
         cursor?.use { c ->
@@ -66,7 +72,10 @@ object VideoHelper : BaseContentHelper() {
         return result
     }
 
-    fun getTagRelationStubs(context: Context, query: String): List<TagRelationStub> {
+    fun getTagRelationStubs(
+        context: Context,
+        query: String,
+    ): List<TagRelationStub> {
         val cursor = getSearchCursor(context, query)
         val result = mutableListOf<TagRelationStub>()
         if (cursor?.moveToFirst() == true) {
@@ -75,7 +84,7 @@ object VideoHelper : BaseContentHelper() {
                 val id = cursor.getStringValue(MediaStore.Video.Media._ID, cache)
                 val title = cursor.getStringValue(MediaStore.Video.Media.TITLE, cache)
                 val size = cursor.getLongValue(MediaStore.Video.Media.SIZE, cache)
-                result.add(TagRelationStub(id, title,size))
+                result.add(TagRelationStub(id, title, size))
             } while (cursor.moveToNext())
         }
         return result
@@ -85,19 +94,21 @@ object VideoHelper : BaseContentHelper() {
         val bucketMap = mutableMapOf<String, DMediaBucket>()
 
         // Columns to retrieve from the MediaStore query
-        val projection = arrayOf(
-            MediaStore.Video.Media.BUCKET_ID,
-            MediaStore.Video.Media.BUCKET_DISPLAY_NAME,
-            MediaStore.Video.Media.DATA
-        )
+        val projection =
+            arrayOf(
+                MediaStore.Video.Media.BUCKET_ID,
+                MediaStore.Video.Media.BUCKET_DISPLAY_NAME,
+                MediaStore.Video.Media.DATA,
+            )
 
-        val cursor = context.contentResolver.query(
-            uriExternal,
-            projection,
-            "${MediaStore.Video.Media.BUCKET_DISPLAY_NAME} != ''",
-            null,
-            null
-        )
+        val cursor =
+            context.contentResolver.query(
+                uriExternal,
+                projection,
+                "${MediaStore.Video.Media.BUCKET_DISPLAY_NAME} != ''",
+                null,
+                null,
+            )
 
         cursor?.use { c ->
             val cache = mutableMapOf<String, Int>()

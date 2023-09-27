@@ -4,12 +4,19 @@ import java.util.HashMap
 
 class PinyinRules {
     private val mOverrides: MutableMap<String, Array<String>> = HashMap()
-    fun add(c: Char, pinyin: String): PinyinRules {
+
+    fun add(
+        c: Char,
+        pinyin: String,
+    ): PinyinRules {
         mOverrides[c.toString()] = arrayOf(pinyin)
         return this
     }
 
-    fun add(str: String, pinyin: String): PinyinRules {
+    fun add(
+        str: String,
+        pinyin: String,
+    ): PinyinRules {
         mOverrides[str] = arrayOf(pinyin)
         return this
     }

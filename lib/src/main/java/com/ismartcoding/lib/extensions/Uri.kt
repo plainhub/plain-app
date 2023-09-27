@@ -12,9 +12,15 @@ fun Uri.getFileName(context: Context): String {
 
     var fileName = ""
     if (scheme == ContentResolver.SCHEME_CONTENT) {
-        context.contentResolver.query(this, arrayOf(
-            OpenableColumns.DISPLAY_NAME
-        ), null, null, null)?.use { cursor ->
+        context.contentResolver.query(
+            this,
+            arrayOf(
+                OpenableColumns.DISPLAY_NAME,
+            ),
+            null,
+            null,
+            null,
+        )?.use { cursor ->
             if (cursor.moveToFirst()) {
                 val cache = mutableMapOf<String, Int>()
                 fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)

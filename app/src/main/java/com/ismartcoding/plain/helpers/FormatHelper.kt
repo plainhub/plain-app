@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.helpers
 
-import android.content.Context
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper
 

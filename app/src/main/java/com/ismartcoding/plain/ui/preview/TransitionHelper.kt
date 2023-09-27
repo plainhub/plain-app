@@ -5,7 +5,11 @@ import java.lang.ref.WeakReference
 
 object TransitionHelper {
     private val transition = HashMap<String, WeakReference<ImageView>>()
-    fun put(key: String, imageView: ImageView) {
+
+    fun put(
+        key: String,
+        imageView: ImageView,
+    ) {
         transition[key] = WeakReference(imageView)
     }
 

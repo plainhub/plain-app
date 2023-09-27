@@ -17,7 +17,6 @@ import com.ismartcoding.plain.ui.extensions.onBack
 import com.ismartcoding.plain.ui.extensions.onMenuItemClick
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.launch
-import java.io.File
 
 class TextEditorDialog(val uri: Uri) : BaseDialog<DialogTextEditorBinding>() {
     override fun onBackPressed() {
@@ -30,7 +29,10 @@ class TextEditorDialog(val uri: Uri) : BaseDialog<DialogTextEditorBinding>() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.topAppBar.toolbar.run {
             title = uri.getFileName(requireContext())
@@ -60,22 +62,23 @@ class TextEditorDialog(val uri: Uri) : BaseDialog<DialogTextEditorBinding>() {
 
         lifecycleScope.launch {
             var text = ""
-            text = if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
-                val context = requireContext()
-                withIO {
-                    context.contentResolver.openInputStream(uri)?.bufferedReader()
-                        ?.use { it.readText() } ?: ""
+            text =
+                if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
+                    val context = requireContext()
+                    withIO {
+                        context.contentResolver.openInputStream(uri)?.bufferedReader()
+                            ?.use { it.readText() } ?: ""
+                    }
+                } else {
+                    withIO {
+                        uri.toFile().readText()
+                    }
                 }
-            } else {
-                withIO {
-                    uri.toFile().readText()
-                }
-            }
             val fileExtension = binding.topAppBar.toolbar.title.toString().getFilenameExtension()
             binding.editor.initViewAsync(
                 lifecycle,
                 text,
-                fileExtension
+                fileExtension,
             )
         }
     }

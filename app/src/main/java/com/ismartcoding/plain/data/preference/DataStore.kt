@@ -11,7 +11,10 @@ import java.io.IOException
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-suspend fun <T> DataStore<Preferences>.put(key: Preferences.Key<T>, value: T) {
+suspend fun <T> DataStore<Preferences>.put(
+    key: Preferences.Key<T>,
+    value: T,
+) {
     this.edit {
         it[key] = value
     }
@@ -29,4 +32,3 @@ suspend fun <T> DataStore<Preferences>.getAsync(key: Preferences.Key<T>): T? {
         }
     }.first()[key] as T
 }
-

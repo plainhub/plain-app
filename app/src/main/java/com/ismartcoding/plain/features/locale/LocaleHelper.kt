@@ -24,17 +24,25 @@ object LocaleHelper {
         return try {
             if (identifier == 0) {
                 ""
-            } else MainApp.instance.getString(identifier)
+            } else {
+                MainApp.instance.getString(identifier)
+            }
         } catch (e: Exception) {
             identifierName
         }
     }
 
-    fun getQuantityString(@PluralsRes id: Int, quantity: Int): String {
+    fun getQuantityString(
+        @PluralsRes id: Int,
+        quantity: Int,
+    ): String {
         return MainApp.instance.resources.getQuantityString(id, quantity, quantity)
     }
 
-    fun getStringF(resourceKey: Int, vararg formatArguments: Any): String {
+    fun getStringF(
+        resourceKey: Int,
+        vararg formatArguments: Any,
+    ): String {
         var text = ""
         return try {
             if (formatArguments.size % 2 != 0) {

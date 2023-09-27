@@ -8,11 +8,18 @@ class Weak<T : Any>(initializer: () -> T?) {
 
     constructor() : this({ null })
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T? {
+    operator fun getValue(
+        thisRef: Any?,
+        property: KProperty<*>,
+    ): T? {
         return weakReference.get()
     }
 
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T?) {
+    operator fun setValue(
+        thisRef: Any?,
+        property: KProperty<*>,
+        value: T?,
+    ) {
         weakReference = WeakReference(value)
     }
 }

@@ -16,14 +16,16 @@ class EditValueDialog(
     val hint: String = LocaleHelper.getString(R.string.value),
     val value: String = "",
     private val inputType: Int = -1,
-    val callback: (EditValueDialog.() -> Unit)? = null
+    val callback: (EditValueDialog.() -> Unit)? = null,
 ) : BaseBottomSheetDialog<DialogEditValueBinding>() {
-
     override fun getSubmitButton(): LoadingButtonView {
         return binding.button
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.topAppBar.title = title
         binding.value.let {

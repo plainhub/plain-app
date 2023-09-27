@@ -11,7 +11,12 @@ import java.util.*
  */
 internal object Engine {
     val EMIT_COMPARATOR = EmitComparator()
-    fun toPinyin(inputStr: String, config: Pinyin.Config, separator: String): String {
+
+    fun toPinyin(
+        inputStr: String,
+        config: Pinyin.Config,
+        separator: String,
+    ): String {
         val pinyinDicts = Collections.unmodifiableList(config.pinyinDicts)
         val trie = dictsToTrie(config.pinyinDicts)
         val selector = config.selector
@@ -19,8 +24,11 @@ internal object Engine {
     }
 
     fun toPinyin(
-        inputStr: String, trie: Trie?, pinyinDictList: List<PinyinDict>?,
-        separator: String, selector: SegmentationSelector?
+        inputStr: String,
+        trie: Trie?,
+        pinyinDictList: List<PinyinDict>?,
+        separator: String,
+        selector: SegmentationSelector?,
     ): String {
         if (inputStr.isEmpty()) {
             return inputStr
@@ -66,7 +74,10 @@ internal object Engine {
         return resultPinyinStrBuf.toString()
     }
 
-    private fun pinyinFromDict(wordInDict: String, pinyinDictSet: List<PinyinDict>?): Array<String> {
+    private fun pinyinFromDict(
+        wordInDict: String,
+        pinyinDictSet: List<PinyinDict>?,
+    ): Array<String> {
         if (pinyinDictSet != null) {
             for (dict in pinyinDictSet) {
                 if (dict.words().contains(wordInDict)) {
@@ -78,13 +89,28 @@ internal object Engine {
     }
 
     internal class EmitComparator : Comparator<Emit> {
-        override fun compare(o1: Emit, o2: Emit): Int {
+        override fun compare(
+            o1: Emit,
+            o2: Emit,
+        ): Int {
             return if (o1.start == o2.start) {
                 // 起点相同时，更长的排前面
-                if (o1.size() < o2.size()) 1 else if (o1.size() == o2.size()) 0 else -1
+                if (o1.size() < o2.size()) {
+                    1
+                } else if (o1.size() == o2.size()) {
+                    0
+                } else {
+                    -1
+                }
             } else {
                 // 起点小的放前面
-                if (o1.start < o2.start) -1 else if (o1.start == o2.start) 0 else 1
+                if (o1.start < o2.start) {
+                    -1
+                } else if (o1.start == o2.start) {
+                    0
+                } else {
+                    1
+                }
             }
         }
     }

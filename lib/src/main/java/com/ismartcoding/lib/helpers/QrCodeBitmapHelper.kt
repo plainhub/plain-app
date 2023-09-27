@@ -10,13 +10,17 @@ import androidx.exifinterface.media.ExifInterface
 import com.ismartcoding.lib.logcat.LogCat
 import java.io.IOException
 
-
 object QrCodeBitmapHelper {
     private const val MAX_BITMAP_SIZE = 1024 // Maximum allowed bitmap size (in pixels)
-    fun getBitmapFromContentUri(context: Context, imageUri: Uri): Bitmap {
-        val options = BitmapFactory.Options().apply {
-            inJustDecodeBounds = true
-        }
+
+    fun getBitmapFromContentUri(
+        context: Context,
+        imageUri: Uri,
+    ): Bitmap {
+        val options =
+            BitmapFactory.Options().apply {
+                inJustDecodeBounds = true
+            }
 
         // Load the bitmap size information without actually loading the bitmap into memory
         BitmapFactory.decodeFileDescriptor(context.contentResolver.openFileDescriptor(imageUri, "r")?.fileDescriptor, null, options)
@@ -28,7 +32,12 @@ object QrCodeBitmapHelper {
         options.inJustDecodeBounds = false
 
         // Load the bitmap with the calculated sample size
-        val bitmap = BitmapFactory.decodeFileDescriptor(context.contentResolver.openFileDescriptor(imageUri, "r")?.fileDescriptor, null, options)
+        val bitmap =
+            BitmapFactory.decodeFileDescriptor(
+                context.contentResolver.openFileDescriptor(imageUri, "r")?.fileDescriptor,
+                null,
+                options,
+            )
 
         val orientation = getExifOrientationTag(context.contentResolver, imageUri)
         var rotationDegrees = 0
@@ -54,12 +63,15 @@ object QrCodeBitmapHelper {
         return rotateBitmap(bitmap, rotationDegrees, flipX, flipY)
     }
 
-    private fun getExifOrientationTag(resolver: ContentResolver, imageUri: Uri): Int {
+    private fun getExifOrientationTag(
+        resolver: ContentResolver,
+        imageUri: Uri,
+    ): Int {
         // We only support parsing EXIF orientation tag from local file on the device.
         // See also:
         // https://android-developers.googleblog.com/2016/12/introducing-the-exifinterface-support-library.html
-        if (ContentResolver.SCHEME_CONTENT != imageUri.scheme
-            && ContentResolver.SCHEME_FILE != imageUri.scheme
+        if (ContentResolver.SCHEME_CONTENT != imageUri.scheme &&
+            ContentResolver.SCHEME_FILE != imageUri.scheme
         ) {
             return 0
         }
@@ -79,7 +91,10 @@ object QrCodeBitmapHelper {
     }
 
     private fun rotateBitmap(
-        bitmap: Bitmap, rotationDegrees: Int, flipX: Boolean, flipY: Boolean
+        bitmap: Bitmap,
+        rotationDegrees: Int,
+        flipX: Boolean,
+        flipY: Boolean,
     ): Bitmap {
         val matrix = Matrix()
 

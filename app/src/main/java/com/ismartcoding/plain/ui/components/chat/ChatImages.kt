@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.components.chat
 
 import android.content.Context
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,14 +32,19 @@ import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 
-
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ChatImages(context: Context, m: VChat, imageWidthDp: Dp, imageWidthPx: Int) {
+fun ChatImages(
+    context: Context,
+    m: VChat,
+    imageWidthDp: Dp,
+    imageWidthPx: Int,
+) {
     FlowRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
         maxItemsInEachRow = 3,
         horizontalArrangement = Arrangement.spacedBy(1.dp, Alignment.Start),
         verticalArrangement = Arrangement.spacedBy(1.dp, Alignment.Top),
@@ -48,35 +52,52 @@ fun ChatImages(context: Context, m: VChat, imageWidthDp: Dp, imageWidthPx: Int) 
             val imageItems = (m.value as DMessageImages).items
             imageItems.forEachIndexed { index, item ->
                 val path = item.uri.getFinalPath(context)
-                Box(modifier = Modifier.clickable {
-                    sendEvent(ChatItemClickEvent())
-                    PreviewDialog().show(
-                        items = imageItems.mapIndexed { i, s -> PreviewItem(m.id + "|" + i, s.uri.getFinalPath(context).pathToUri()) },
-                        initKey = m.id + "|" + index,
-                    )
-                }) {
+                Box(
+                    modifier =
+                        Modifier.clickable {
+                            sendEvent(ChatItemClickEvent())
+                            PreviewDialog().show(
+                                items =
+                                    imageItems.mapIndexed {
+                                            i,
+                                            s,
+                                        ->
+                                        PreviewItem(m.id + "|" + i, s.uri.getFinalPath(context).pathToUri())
+                                    },
+                                initKey = m.id + "|" + index,
+                            )
+                        },
+                ) {
                     PAsyncImage(
                         modifier = Modifier.size(imageWidthDp),
                         data = path,
                         size = Size(imageWidthPx, imageWidthPx),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
                     )
                     Box(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .background(Color.Black.copy(alpha = 0.4f))
+                        modifier =
+                            Modifier
+                                .align(Alignment.BottomEnd)
+                                .background(Color.Black.copy(alpha = 0.4f)),
                     ) {
                         Text(
-                            modifier = Modifier
-                                .padding(horizontal = 4.dp, vertical = 2.dp),
-                            text = if (item.duration > 0) FormatHelper.formatDuration(item.duration) else FormatHelper.formatBytes(item.size),
+                            modifier =
+                                Modifier
+                                    .padding(horizontal = 4.dp, vertical = 2.dp),
+                            text =
+                                if (item.duration > 0) {
+                                    FormatHelper.formatDuration(
+                                        item.duration,
+                                    )
+                                } else {
+                                    FormatHelper.formatBytes(item.size)
+                                },
                             color = Color.White,
                             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
                         )
-
                     }
                 }
             }
-        }
+        },
     )
 }

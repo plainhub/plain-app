@@ -13,16 +13,15 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun HomeItemFlow(
-    content: @Composable FlowRowScope.() -> Unit
-) {
+fun HomeItemFlow(content: @Composable FlowRowScope.() -> Unit) {
     FlowRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
         maxItemsInEachRow = 4,
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
-        content = content
+        content = content,
     )
 }

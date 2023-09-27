@@ -19,7 +19,10 @@ import com.ismartcoding.plain.workers.FeedFetchWorker
 import kotlinx.coroutines.launch
 
 class FeedSettingsDialog : BaseBottomSheetDialog<DialogFeedSettingsBinding>() {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
             val context = requireContext()
@@ -42,9 +45,10 @@ class FeedSettingsDialog : BaseBottomSheetDialog<DialogFeedSettingsBinding>() {
                     SelectOptionsDialog(LocaleHelper.getString(R.string.auto_refresh_interval), options) {
                         lifecycleScope.launch {
                             FeedAutoRefreshIntervalPreference.putAsync(context, it.value)
-                            binding.autoRefreshInterval.setValueText(FormatHelper.formatSeconds(withIO { FeedAutoRefreshIntervalPreference.getAsync(context) }))
+                            binding.autoRefreshInterval.setValueText(
+                                FormatHelper.formatSeconds(withIO { FeedAutoRefreshIntervalPreference.getAsync(context) }),
+                            )
                         }
-
                     }.show()
                 }
 

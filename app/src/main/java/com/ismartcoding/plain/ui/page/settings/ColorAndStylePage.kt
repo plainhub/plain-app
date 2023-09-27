@@ -50,9 +50,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
-fun ColorAndStylePage(
-    navController: NavHostController,
-) {
+fun ColorAndStylePage(navController: NavHostController) {
     val context = LocalContext.current
     val darkTheme = LocalDarkTheme.current
     val themeIndex = LocalThemeIndex.current
@@ -72,18 +70,19 @@ fun ColorAndStylePage(
                 }
                 item {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .aspectRatio(1.38f)
-                            .clip(RoundedCornerShape(24.dp))
-                            .background(
-                                MaterialTheme.colorScheme.inverseOnSurface
-                                        onLight MaterialTheme.colorScheme.surface.copy(0.7f)
-                            )
-                            .clickable { },
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .aspectRatio(1.38f)
+                                .clip(RoundedCornerShape(24.dp))
+                                .background(
+                                    MaterialTheme.colorScheme.inverseOnSurface
+                                        onLight MaterialTheme.colorScheme.surface.copy(0.7f),
+                                )
+                                .clickable { },
                         horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         DynamicSVGImage(
                             modifier = Modifier.padding(60.dp),
@@ -97,37 +96,39 @@ fun ColorAndStylePage(
                     BlockRadioButton(
                         selected = radioButtonSelected,
                         onSelected = { radioButtonSelected = it },
-                        itemRadioGroups = listOf(
-                            BlockRadioGroupButtonItem(
-                                text = stringResource(R.string.wallpaper_colors),
-                                onClick = {},
-                            ) {
-                                Palettes(
-                                    context = context,
-                                    palettes = wallpaperTonalPalettes.run {
-                                        if (this.size > 5) {
-                                            this.subList(5, wallpaperTonalPalettes.size)
-                                        } else {
-                                            emptyList()
-                                        }
-                                    },
-                                    themeIndex = themeIndex,
-                                    themeIndexPrefix = 5,
-                                    customPrimaryColor = customPrimaryColor,
-                                )
-                            },
-                            BlockRadioGroupButtonItem(
-                                text = stringResource(R.string.basic_colors),
-                                onClick = {},
-                            ) {
-                                Palettes(
-                                    context = context,
-                                    themeIndex = themeIndex,
-                                    palettes = wallpaperTonalPalettes.subList(0, 5),
-                                    customPrimaryColor = customPrimaryColor,
-                                )
-                            },
-                        ),
+                        itemRadioGroups =
+                            listOf(
+                                BlockRadioGroupButtonItem(
+                                    text = stringResource(R.string.wallpaper_colors),
+                                    onClick = {},
+                                ) {
+                                    Palettes(
+                                        context = context,
+                                        palettes =
+                                            wallpaperTonalPalettes.run {
+                                                if (this.size > 5) {
+                                                    this.subList(5, wallpaperTonalPalettes.size)
+                                                } else {
+                                                    emptyList()
+                                                }
+                                            },
+                                        themeIndex = themeIndex,
+                                        themeIndexPrefix = 5,
+                                        customPrimaryColor = customPrimaryColor,
+                                    )
+                                },
+                                BlockRadioGroupButtonItem(
+                                    text = stringResource(R.string.basic_colors),
+                                    onClick = {},
+                                ) {
+                                    Palettes(
+                                        context = context,
+                                        themeIndex = themeIndex,
+                                        palettes = wallpaperTonalPalettes.subList(0, 5),
+                                        customPrimaryColor = customPrimaryColor,
+                                    )
+                                },
+                            ),
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                 }
@@ -144,7 +145,7 @@ fun ColorAndStylePage(
                         },
                     ) {
                         PSwitch(
-                            activated = DarkTheme.isDarkTheme(darkTheme)
+                            activated = DarkTheme.isDarkTheme(darkTheme),
                         ) {
                             scope.launch {
                                 withIO {
@@ -156,7 +157,7 @@ fun ColorAndStylePage(
                     BottomSpace()
                 }
             }
-        }
+        },
     )
 }
 
@@ -175,16 +176,17 @@ fun Palettes(
 
     if (palettes.isEmpty()) {
         Row(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .fillMaxWidth()
-                .height(80.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(
-                    MaterialTheme.colorScheme.inverseOnSurface
+            modifier =
+                Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+                    .height(80.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(
+                        MaterialTheme.colorScheme.inverseOnSurface
                             onLight MaterialTheme.colorScheme.surface.copy(0.7f),
-                )
-                .clickable {},
+                    )
+                    .clickable {},
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -196,10 +198,11 @@ fun Palettes(
         }
     } else {
         Row(
-            modifier = Modifier
-                .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            modifier =
+                Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             palettes.forEachIndexed { index, palette ->
                 val isCustom = index == palettes.lastIndex && themeIndexPrefix == 0
@@ -217,7 +220,7 @@ fun Palettes(
                             }
                         }
                     },
-                    palette = if (isCustom) tonalPalettes else palette
+                    palette = if (isCustom) tonalPalettes else palette,
                 )
             }
         }
@@ -242,7 +245,7 @@ fun Palettes(
                     addDialogVisible = false
                 }
             }
-        }
+        },
     )
 }
 
@@ -257,51 +260,57 @@ fun SelectableMiniPalette(
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
-        color = if (isCustom) {
-            MaterialTheme.colorScheme.primaryContainer
-                .copy(0.5f) onDark MaterialTheme.colorScheme.onPrimaryContainer.copy(0.3f)
-        } else {
-            MaterialTheme.colorScheme
-                .inverseOnSurface onLight MaterialTheme.colorScheme.surface.copy(0.7f)
-        },
+        color =
+            if (isCustom) {
+                MaterialTheme.colorScheme.primaryContainer
+                    .copy(0.5f) onDark MaterialTheme.colorScheme.onPrimaryContainer.copy(0.3f)
+            } else {
+                MaterialTheme.colorScheme
+                    .inverseOnSurface onLight MaterialTheme.colorScheme.surface.copy(0.7f)
+            },
     ) {
         Surface(
-            modifier = Modifier
-                .clickable { onClick() }
-                .padding(16.dp)
-                .size(48.dp),
+            modifier =
+                Modifier
+                    .clickable { onClick() }
+                    .padding(16.dp)
+                    .size(48.dp),
             shape = CircleShape,
             color = palette primary 90,
         ) {
             Box {
                 Surface(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .offset((-24).dp, 24.dp),
+                    modifier =
+                        Modifier
+                            .size(48.dp)
+                            .offset((-24).dp, 24.dp),
                     color = palette tertiary 90,
                 ) {}
                 Surface(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .offset(24.dp, 24.dp),
+                    modifier =
+                        Modifier
+                            .size(48.dp)
+                            .offset(24.dp, 24.dp),
                     color = palette secondary 60,
                 ) {}
                 AnimatedVisibility(
                     visible = selected,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary),
+                    modifier =
+                        Modifier
+                            .align(Alignment.Center)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary),
                     enter = fadeIn() + expandIn(expandFrom = Alignment.Center),
-                    exit = shrinkOut(shrinkTowards = Alignment.Center) + fadeOut()
+                    exit = shrinkOut(shrinkTowards = Alignment.Center) + fadeOut(),
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Check,
                         contentDescription = stringResource(R.string.checked),
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .size(16.dp),
-                        tint = MaterialTheme.colorScheme.surface
+                        modifier =
+                            Modifier
+                                .padding(8.dp)
+                                .size(16.dp),
+                        tint = MaterialTheme.colorScheme.surface,
                     )
                 }
             }

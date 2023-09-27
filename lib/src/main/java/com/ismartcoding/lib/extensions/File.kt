@@ -52,30 +52,38 @@ fun File.newFile(): File {
     return File(newPath())
 }
 
-suspend fun File.getBitmapAsync(context: Context, width: Int, height: Int, centerCrop: Boolean = true): Bitmap? {
+suspend fun File.getBitmapAsync(
+    context: Context,
+    width: Int,
+    height: Int,
+    centerCrop: Boolean = true,
+): Bitmap? {
     var bitmap: Bitmap? = null
     if (this.path.isPartialSupportVideo()) {
         try {
-            bitmap = if (isQPlus()) {
-                ThumbnailUtils.createVideoThumbnail(this, Size(width, height), null)
-            } else {
-                ThumbnailUtils.createVideoThumbnail(this.absolutePath, MediaStore.Video.Thumbnails.MICRO_KIND)
-            }
+            bitmap =
+                if (isQPlus()) {
+                    ThumbnailUtils.createVideoThumbnail(this, Size(width, height), null)
+                } else {
+                    ThumbnailUtils.createVideoThumbnail(this.absolutePath, MediaStore.Video.Thumbnails.MICRO_KIND)
+                }
         } catch (ex: Exception) {
             LogCat.e(ex.toString())
         }
     } else {
         try {
-            var options = RequestOptions()
-                .set(Downsampler.ALLOW_HARDWARE_CONFIG, true)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .override(width, height)
+            var options =
+                RequestOptions()
+                    .set(Downsampler.ALLOW_HARDWARE_CONFIG, true)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .override(width, height)
             if (centerCrop) {
                 options = options.centerCrop()
             }
-            bitmap = Glide.with(context).asBitmap().load(this)
-                .apply(options)
-                .submit().get()
+            bitmap =
+                Glide.with(context).asBitmap().load(this)
+                    .apply(options)
+                    .submit().get()
             // https://stackoverflow.com/questions/58314397/java-lang-illegalstateexception-software-rendering-doesnt-support-hardware-bit
 //            bitmap = d.copy(Bitmap.Config.ARGB_8888, false)
         } catch (ex: Exception) {
@@ -85,9 +93,14 @@ suspend fun File.getBitmapAsync(context: Context, width: Int, height: Int, cente
     return bitmap
 }
 
-suspend fun File.toThumbBytesAsync(context: Context, width: Int, height: Int, centerCrop: Boolean): ByteArray {
+suspend fun File.toThumbBytesAsync(
+    context: Context,
+    width: Int,
+    height: Int,
+    centerCrop: Boolean,
+): ByteArray {
     val stream = ByteArrayOutputStream()
-    getBitmapAsync(context, width, height, centerCrop)?.let{
+    getBitmapAsync(context, width, height, centerCrop)?.let {
         if (this@toThumbBytesAsync.name.endsWith(".png", true)) {
             it.compress(Bitmap.CompressFormat.PNG, 70, stream)
         } else {
@@ -96,7 +109,6 @@ suspend fun File.toThumbBytesAsync(context: Context, width: Int, height: Int, ce
     }
     return stream.toByteArray()
 }
-
 
 fun File.getDuration(context: Context): Long {
     if (!this.name.isVideoFast() && !this.name.isAudioFast()) {

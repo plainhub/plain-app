@@ -30,7 +30,7 @@ object AudiosBottomMenuHelper {
         viewModel: FilteredItemsViewModel,
         lifecycleScope: LifecycleCoroutineScope,
         binding: DialogListDrawerBinding,
-        menuItem: MenuItem
+        menuItem: MenuItem,
     ) {
         val list = binding.list
         val rv = list.rv
@@ -64,11 +64,11 @@ object AudiosBottomMenuHelper {
                             withIO {
                                 TagHelper.deleteTagRelationByKeys(
                                     ids,
-                                    DataType.AUDIO
+                                    DataType.AUDIO,
                                 )
                                 AudioHelper.deleteRecordsAndFilesByIds(
                                     context,
-                                    ids
+                                    ids,
                                 )
                                 AudioPlaylistPreference.deleteAsync(context, items.map { (it.data as DAudio).path }.toSet())
                             }

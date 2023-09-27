@@ -7,7 +7,7 @@ import java.util.ArrayList
 
 @Entity(tableName = "vocabularies")
 data class DVocabulary(
-    @PrimaryKey var id: String = StringHelper.shortUUID()
+    @PrimaryKey var id: String = StringHelper.shortUUID(),
 ) : DEntityBase() {
     @ColumnInfo(name = "box_id")
     var boxId: String = ""
@@ -36,4 +36,3 @@ interface VocabularyDao {
     @Delete
     fun delete(item: DVocabulary)
 }
-

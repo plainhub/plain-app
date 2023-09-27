@@ -10,7 +10,6 @@ import io.ktor.http.HttpStatusCode
 import org.json.JSONObject
 
 object ExchangeHelper {
-
     suspend fun getRates(): DExchangeRates? {
         val client = HttpClientManager.httpClient()
         try {
@@ -30,5 +29,4 @@ object ExchangeHelper {
 
         return null
     }
-
 }

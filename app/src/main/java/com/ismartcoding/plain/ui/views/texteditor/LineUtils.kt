@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.views.texteditor
 
 import android.text.Layout
-import android.text.TextUtils
 import android.widget.ScrollView
 
 class LineUtils {
@@ -10,8 +9,12 @@ class LineUtils {
     lateinit var realLines: IntArray
         private set
 
-    fun updateHasNewLineArray(startingLine: Int, lineCount: Int, layout: Layout, text: String) {
-
+    fun updateHasNewLineArray(
+        startingLine: Int,
+        lineCount: Int,
+        layout: Layout,
+        text: String,
+    ) {
         val hasNewLineArray = BooleanArray(lineCount)
         goodLines = BooleanArray(lineCount)
         realLines = IntArray(lineCount)
@@ -27,7 +30,7 @@ class LineUtils {
         // for every line on the edittext
         while (i < lineCount) {
             // check if this line contains "\n" or it is the last line
-            //hasNewLineArray[i] = text.substring(layout.getLineStart(i), layout.getLineEnd(i)).endsWith("\n");
+            // hasNewLineArray[i] = text.substring(layout.getLineStart(i), layout.getLineEnd(i)).endsWith("\n");
             hasNewLineArray[i] = text[layout.getLineEnd(i) - 1] == '\n' || i == lineCount - 1
             // if true
             if (hasNewLineArray[i]) {
@@ -36,7 +39,6 @@ class LineUtils {
                     j--
                 }
                 goodLines[j + 1] = true
-
             }
             i++
         }
@@ -76,19 +78,31 @@ class LineUtils {
     }
 
     companion object {
-
-        fun getYAtLine(scrollView: ScrollView, lineCount: Int, line: Int): Int {
+        fun getYAtLine(
+            scrollView: ScrollView,
+            lineCount: Int,
+            line: Int,
+        ): Int {
             return scrollView.getChildAt(0).height / lineCount * line
         }
 
         @Throws(ArithmeticException::class)
-        fun getFirstVisibleLine(scrollView: ScrollView, childHeight: Int, lineCount: Int): Int {
+        fun getFirstVisibleLine(
+            scrollView: ScrollView,
+            childHeight: Int,
+            lineCount: Int,
+        ): Int {
             var line = scrollView.scrollY * lineCount / childHeight
             if (line < 0) line = 0
             return line
         }
 
-        fun getLastVisibleLine(scrollView: ScrollView, childHeight: Int, lineCount: Int, deviceHeight: Int): Int {
+        fun getLastVisibleLine(
+            scrollView: ScrollView,
+            childHeight: Int,
+            lineCount: Int,
+            deviceHeight: Int,
+        ): Int {
             var line = (scrollView.scrollY + deviceHeight) * lineCount / childHeight
             if (line > lineCount) line = lineCount
             return line
@@ -102,7 +116,11 @@ class LineUtils {
          * @param layout
          * @return
          */
-        fun getLineFromIndex(index: Int, lineCount: Int, layout: Layout): Int {
+        fun getLineFromIndex(
+            index: Int,
+            lineCount: Int,
+            layout: Layout,
+        ): Int {
             var line = 0
             var currentIndex = 0
 
@@ -117,5 +135,4 @@ class LineUtils {
             return line
         }
     }
-
 }

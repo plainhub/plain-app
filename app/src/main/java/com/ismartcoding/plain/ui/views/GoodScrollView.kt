@@ -12,7 +12,12 @@ class GoodScrollView(context: Context?, attrs: AttributeSet?) : ScrollView(conte
     var lastY = 0
     var listenerEnabled = true
 
-    override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
+    override fun onScrollChanged(
+        l: Int,
+        t: Int,
+        oldl: Int,
+        oldt: Int,
+    ) {
         super.onScrollChanged(l, t, oldl, oldt)
         if (onScrollChanged == null || !listenerEnabled) return
         if (abs(lastY - t) > 100) {

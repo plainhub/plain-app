@@ -4,23 +4,23 @@ import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.CreateConfigMutation
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.UpdateConfigMutation
 import com.ismartcoding.plain.api.BoxApi
 import com.ismartcoding.plain.data.*
-import com.ismartcoding.plain.databinding.DialogRuleBinding
-import com.ismartcoding.plain.ui.BaseBottomSheetDialog
-import com.ismartcoding.plain.ui.SelectItemDialog
-import com.ismartcoding.plain.ui.extensions.setSafeClick
-import com.ismartcoding.plain.extensions.toRule
-import com.ismartcoding.plain.features.rule.*
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.data.preference.DeviceSortByPreference
+import com.ismartcoding.plain.databinding.DialogRuleBinding
 import com.ismartcoding.plain.extensions.sorted
+import com.ismartcoding.plain.extensions.toRule
 import com.ismartcoding.plain.features.ActionEvent
+import com.ismartcoding.plain.features.rule.*
+import com.ismartcoding.plain.ui.BaseBottomSheetDialog
+import com.ismartcoding.plain.ui.SelectItemDialog
+import com.ismartcoding.plain.ui.extensions.setSafeClick
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.views.ChipItem
 import com.ismartcoding.plain.ui.views.LoadingButtonView
@@ -28,11 +28,15 @@ import kotlinx.coroutines.launch
 
 class RuleDialog(private var mItem: Rule?) : BaseBottomSheetDialog<DialogRuleBinding>() {
     private lateinit var ruleEdit: RuleEdit
+
     override fun getSubmitButton(): LoadingButtonView {
         return binding.button
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         updateUI()
         addFormItem(binding.target)
@@ -81,9 +85,10 @@ class RuleDialog(private var mItem: Rule?) : BaseBottomSheetDialog<DialogRuleBin
 
     private suspend fun doCreateRuleAsync() {
         blockFormUI()
-        val r = withIO {
-            BoxApi.mixMutateAsync(CreateConfigMutation(ruleEdit.toRuleInput()))
-        }
+        val r =
+            withIO {
+                BoxApi.mixMutateAsync(CreateConfigMutation(ruleEdit.toRuleInput()))
+            }
         unblockFormUI()
         if (!r.isSuccess()) {
             DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())
@@ -100,9 +105,10 @@ class RuleDialog(private var mItem: Rule?) : BaseBottomSheetDialog<DialogRuleBin
 
     private suspend fun doUpdateRuleAsync() {
         blockFormUI()
-        val r = withIO {
-            BoxApi.mixMutateAsync(UpdateConfigMutation(mItem!!.id, ruleEdit.toRuleInput()))
-        }
+        val r =
+            withIO {
+                BoxApi.mixMutateAsync(UpdateConfigMutation(mItem!!.id, ruleEdit.toRuleInput()))
+            }
         unblockFormUI()
         if (!r.isSuccess()) {
             DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())

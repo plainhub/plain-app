@@ -12,23 +12,30 @@ object BottomMenuHelper {
     fun onMenuItemClick(
         viewModel: FilteredItemsViewModel,
         binding: DialogListDrawerBinding,
-        menuItem: MenuItem
+        menuItem: MenuItem,
     ) {
         val list = binding.list
         val rv = list.rv
         when (menuItem.itemId) {
             R.id.add_to_tags -> {
                 rv.ensureSelect { items ->
-                    SelectTagsDialog(viewModel.dataType, items.map {
-                        TagRelationStub.create(it.data)
-                    }).show()
+                    SelectTagsDialog(
+                        viewModel.dataType,
+                        items.map {
+                            TagRelationStub.create(it.data)
+                        },
+                    ).show()
                 }
             }
             R.id.remove_from_tag -> {
                 rv.ensureSelect { items ->
-                    SelectTagsDialog(viewModel.dataType, items.map {
-                        TagRelationStub.create(it.data)
-                    }, removeFromTags = true).show()
+                    SelectTagsDialog(
+                        viewModel.dataType,
+                        items.map {
+                            TagRelationStub.create(it.data)
+                        },
+                        removeFromTags = true,
+                    ).show()
                 }
             }
         }

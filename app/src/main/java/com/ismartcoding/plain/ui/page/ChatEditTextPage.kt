@@ -67,9 +67,18 @@ fun ChatEditTextPage(
                         }
                         val c = withIO { AppDatabase.instance.chatDao().getById(id) }
                         if (c != null) {
-                            sendEvent(WebSocketEvent(EventType.MESSAGE_UPDATED, JsonHelper.jsonEncode(listOf(c.toModel().apply {
-                                data = this.getContentData()
-                            }))))
+                            sendEvent(
+                                WebSocketEvent(
+                                    EventType.MESSAGE_UPDATED,
+                                    JsonHelper.jsonEncode(
+                                        listOf(
+                                            c.toModel().apply {
+                                                data = this.getContentData()
+                                            },
+                                        ),
+                                    ),
+                                ),
+                            )
                         }
                         focusManager.clearFocus()
                         navController.popBackStack()
@@ -81,19 +90,19 @@ fun ChatEditTextPage(
             OutlinedTextField(
                 value = inputValue,
                 onValueChange = { inputValue = it },
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .imePadding()
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(8.dp),
-                    )
-                    .fillMaxWidth(),
+                modifier =
+                    Modifier
+                        .padding(horizontal = 16.dp)
+                        .imePadding()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(8.dp),
+                        )
+                        .fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default,
                 shape = RoundedCornerShape(8.dp),
             )
-        }
+        },
     )
 }
-

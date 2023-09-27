@@ -17,9 +17,10 @@ fun Tips(
 ) {
     SelectionContainer {
         Text(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
+            modifier =
+                modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
             text = text,
             style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Light),
             color = MaterialTheme.colorScheme.onSurfaceVariant,

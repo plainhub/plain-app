@@ -28,7 +28,10 @@ class SwipeMenuLayout(context: Context, attrs: AttributeSet? = null) : ViewGroup
     var isSwipeEnable = false
     var isLeftSwipe = true
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    override fun onMeasure(
+        widthMeasureSpec: Int,
+        heightMeasureSpec: Int,
+    ) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         isClickable = true
         mRightMenuWidths = 0
@@ -57,7 +60,7 @@ class SwipeMenuLayout(context: Context, attrs: AttributeSet? = null) : ViewGroup
         }
         setMeasuredDimension(
             paddingLeft + paddingRight + contentWidth,
-            mHeight + paddingTop + paddingBottom
+            mHeight + paddingTop + paddingBottom,
         )
         mLimit = mRightMenuWidths * 4 / 10
         if (isNeedMeasureChildHeight) {
@@ -69,11 +72,15 @@ class SwipeMenuLayout(context: Context, attrs: AttributeSet? = null) : ViewGroup
         return MarginLayoutParams(context, attrs)
     }
 
-    private fun forceUniformHeight(count: Int, widthMeasureSpec: Int) {
-        val uniformMeasureSpec = MeasureSpec.makeMeasureSpec(
-            measuredHeight,
-            MeasureSpec.EXACTLY
-        )
+    private fun forceUniformHeight(
+        count: Int,
+        widthMeasureSpec: Int,
+    ) {
+        val uniformMeasureSpec =
+            MeasureSpec.makeMeasureSpec(
+                measuredHeight,
+                MeasureSpec.EXACTLY,
+            )
         for (i in 0 until count) {
             val child = getChildAt(i)
             if (child.visibility != GONE) {
@@ -88,7 +95,13 @@ class SwipeMenuLayout(context: Context, attrs: AttributeSet? = null) : ViewGroup
         }
     }
 
-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+    override fun onLayout(
+        changed: Boolean,
+        l: Int,
+        t: Int,
+        r: Int,
+        b: Int,
+    ) {
         val childCount = childCount
         var left = 0 + paddingLeft
         var right = 0 + paddingLeft
@@ -199,9 +212,10 @@ class SwipeMenuLayout(context: Context, attrs: AttributeSet? = null) : ViewGroup
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
         if (isSwipeEnable) {
             when (ev.action) {
-                MotionEvent.ACTION_MOVE -> if (Math.abs(ev.rawX - mFirstP.x) > mScaleTouchSlop) {
-                    return true
-                }
+                MotionEvent.ACTION_MOVE ->
+                    if (Math.abs(ev.rawX - mFirstP.x) > mScaleTouchSlop) {
+                        return true
+                    }
                 MotionEvent.ACTION_UP -> {
                     if (isLeftSwipe) {
                         if (scrollX > mScaleTouchSlop) {
@@ -209,7 +223,7 @@ class SwipeMenuLayout(context: Context, attrs: AttributeSet? = null) : ViewGroup
                                 if (isUnMoved) {
                                     smoothClose()
                                 }
-                                return true //true表示拦截
+                                return true // true表示拦截
                             }
                         }
                     } else {
@@ -234,6 +248,7 @@ class SwipeMenuLayout(context: Context, attrs: AttributeSet? = null) : ViewGroup
     private var mExpandAnim: ValueAnimator? = null
     private var mCloseAnim: ValueAnimator? = null
     var isExpand = false
+
     fun smoothExpand() {
         viewCache = this@SwipeMenuLayout
         mContentView?.isLongClickable = false
@@ -241,11 +256,13 @@ class SwipeMenuLayout(context: Context, attrs: AttributeSet? = null) : ViewGroup
         mExpandAnim = ValueAnimator.ofInt(scrollX, if (isLeftSwipe) mRightMenuWidths else -mRightMenuWidths)
         mExpandAnim?.addUpdateListener { animation: ValueAnimator -> scrollTo((animation.animatedValue as Int), 0) }
         mExpandAnim?.setInterpolator(OvershootInterpolator())
-        mExpandAnim?.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                isExpand = true
-            }
-        })
+        mExpandAnim?.addListener(
+            object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    isExpand = true
+                }
+            },
+        )
         mExpandAnim?.setDuration(300)?.start()
     }
 
@@ -265,11 +282,13 @@ class SwipeMenuLayout(context: Context, attrs: AttributeSet? = null) : ViewGroup
         mCloseAnim = ValueAnimator.ofInt(scrollX, 0)
         mCloseAnim?.addUpdateListener { animation -> scrollTo((animation.animatedValue as Int), 0) }
         mCloseAnim?.interpolator = AccelerateInterpolator()
-        mCloseAnim?.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                isExpand = false
-            }
-        })
+        mCloseAnim?.addListener(
+            object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    isExpand = false
+                }
+            },
+        )
         mCloseAnim?.setDuration(300)?.start()
     }
 
@@ -297,7 +316,9 @@ class SwipeMenuLayout(context: Context, attrs: AttributeSet? = null) : ViewGroup
     override fun performLongClick(): Boolean {
         return if (Math.abs(scrollX) > mScaleTouchSlop) {
             false
-        } else super.performLongClick()
+        } else {
+            super.performLongClick()
+        }
     }
 
     fun quickClose() {

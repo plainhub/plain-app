@@ -7,7 +7,7 @@ import java.net.URL
 
 class UPnPDevice(
     val hostAddress: String,
-    val header: String
+    val header: String,
 ) {
     val location = parseHeader(header, "LOCATION: ")
     val server = parseHeader(header, "SERVER: ")
@@ -44,7 +44,10 @@ class UPnPDevice(
         return str
     }
 
-    private fun parseHeader(mSearchAnswer: String, whatSearch: String): String {
+    private fun parseHeader(
+        mSearchAnswer: String,
+        whatSearch: String,
+    ): String {
         var result = ""
         var searchLinePos = mSearchAnswer.indexOf(whatSearch)
         if (searchLinePos != -1) {
@@ -72,7 +75,7 @@ class UPnPDevice(
 
     data class DescriptionModel(
         val device: Device,
-        val URLBase: String
+        val URLBase: String,
     )
 
     @Serializable

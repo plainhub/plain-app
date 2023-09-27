@@ -9,12 +9,10 @@ data class ZcamLch(
     val C: Double,
     val h: Double,
 ) {
-
     @Composable
     fun toZcam(): Zcam = zcamLch(L = L, C = C, h = h)
 
     companion object {
-
         @Composable
         fun Color.toZcamLch(): ZcamLch = toRgb().toZcam().toZcamLch()
 

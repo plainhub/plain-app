@@ -7,8 +7,6 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -71,12 +69,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun Main(
-    viewModel: MainViewModel,
-) {
+fun Main(viewModel: MainViewModel) {
     val context = LocalContext.current
     val navController = rememberNavController()
     val useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current)
@@ -93,8 +88,8 @@ fun Main(
             if (uri != null) {
                 val mimeType = context.contentResolver.getType(uri)
                 if (mimeType != null) {
-                    if (mimeType.startsWith("audio/")
-                        || setOf("application/ogg", "application/x-ogg", "application/itunes").contains(mimeType)
+                    if (mimeType.startsWith("audio/") ||
+                        setOf("application/ogg", "application/x-ogg", "application/itunes").contains(mimeType)
                     ) {
                         AudioPlayerDialog().show()
                         Permissions.checkNotification(context, R.string.audio_notification_prompt) {
@@ -175,7 +170,7 @@ fun Main(
 
             slideHorizontallyComposable(
                 "${RouteName.CHAT_EDIT_TEXT.name}?id={id}",
-                arguments = listOf(navArgument("id") { })
+                arguments = listOf(navArgument("id") { }),
             ) { backStackEntry ->
                 val arguments = requireNotNull(backStackEntry.arguments)
                 val id = arguments.getString("id", "")
@@ -196,29 +191,28 @@ fun NavGraphBuilder.slideHorizontallyComposable(
         enterTransition = {
             slideIntoContainer(
                 towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-                animationSpec = tween(400)
+                animationSpec = tween(400),
             )
         },
         exitTransition = {
             slideOutOfContainer(
                 towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-                animationSpec = tween(400)
+                animationSpec = tween(400),
             )
         },
         popEnterTransition = {
             slideIntoContainer(
                 towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
-                animationSpec = tween(400)
+                animationSpec = tween(400),
             )
         },
         popExitTransition = {
             slideOutOfContainer(
                 towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
-                animationSpec = tween(400)
+                animationSpec = tween(400),
             )
         },
     ) {
         content(it)
     }
 }
-

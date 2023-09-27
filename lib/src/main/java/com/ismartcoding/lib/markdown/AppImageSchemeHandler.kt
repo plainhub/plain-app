@@ -10,8 +10,11 @@ import java.io.FileInputStream
 import java.util.*
 
 class AppImageSchemeHandler(val context: Context) : SchemeHandler() {
-    override fun handle(raw: String, uri: Uri): ImageItem {
-        return ImageItem.withDecodingNeeded(raw.getMimeType(), FileInputStream(raw.getFinalPath(context)));
+    override fun handle(
+        raw: String,
+        uri: Uri,
+    ): ImageItem {
+        return ImageItem.withDecodingNeeded(raw.getMimeType(), FileInputStream(raw.getFinalPath(context)))
     }
 
     override fun supportedSchemes(): MutableCollection<String> {

@@ -11,5 +11,4 @@ internal object NodeUtils {
     fun isNodeType3(element: Node): Boolean {
         return element.nodeName() == "text" || element.nodeName() == "#text"
     }
-
 }

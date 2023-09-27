@@ -20,27 +20,31 @@ fun AppTheme(
 ) {
     val themeIndex = LocalThemeIndex.current
 
-    val tonalPalettes = wallpaperPalettes[
-        if (themeIndex >= wallpaperPalettes.size) {
-            when {
-                wallpaperPalettes.size == 5 -> 0
-                wallpaperPalettes.size > 5 -> 5
-                else -> 0
-            }
-        } else {
-            themeIndex
-        }
-    ]
+    val tonalPalettes =
+        wallpaperPalettes[
+            if (themeIndex >= wallpaperPalettes.size) {
+                when {
+                    wallpaperPalettes.size == 5 -> 0
+                    wallpaperPalettes.size > 5 -> 5
+                    else -> 0
+                }
+            } else {
+                themeIndex
+            },
+        ]
 
     ProvideZcamViewingConditions {
         CompositionLocalProvider(
             LocalTonalPalettes provides tonalPalettes.apply { Preparing() },
-            LocalTextStyle provides LocalTextStyle.current.applyTextDirection()
+            LocalTextStyle provides LocalTextStyle.current.applyTextDirection(),
         ) {
             MaterialTheme(
                 colorScheme =
-                if (useDarkTheme) dynamicDarkColorScheme()
-                else dynamicLightColorScheme(),
+                    if (useDarkTheme) {
+                        dynamicDarkColorScheme()
+                    } else {
+                        dynamicLightColorScheme()
+                    },
                 typography = SystemTypography.applyTextDirection(),
                 shapes = Shapes,
                 content = content,

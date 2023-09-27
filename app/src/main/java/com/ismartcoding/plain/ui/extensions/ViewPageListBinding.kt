@@ -8,7 +8,10 @@ import com.ismartcoding.plain.databinding.ViewPageListBinding
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 
-fun ViewPageListBinding.checkPermission(context: Context, permission: Permission) {
+fun ViewPageListBinding.checkPermission(
+    context: Context,
+    permission: Permission,
+) {
     if (permission.can(context)) {
         page.visibility = View.VISIBLE
         empty.root.isVisible = false

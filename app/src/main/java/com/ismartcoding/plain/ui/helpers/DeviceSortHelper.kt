@@ -9,7 +9,10 @@ import com.ismartcoding.plain.data.preference.DeviceSortByPreference
 import com.ismartcoding.plain.features.device.DeviceSortBy
 
 object DeviceSortHelper {
-    suspend fun getSelectedSortItemAsync(context: Context, menu: Menu): MenuItem {
+    suspend fun getSelectedSortItemAsync(
+        context: Context,
+        menu: Menu,
+    ): MenuItem {
         return when (withIO { DeviceSortByPreference.getValueAsync(context) }) {
             DeviceSortBy.NAME_ASC -> {
                 menu.findItem(R.id.sort_name_asc)

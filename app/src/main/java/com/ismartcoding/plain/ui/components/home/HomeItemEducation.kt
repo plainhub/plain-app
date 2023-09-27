@@ -23,14 +23,15 @@ fun HomeItemEducation(
 ) {
     Column {
         Subtitle(
-            text = stringResource(R.string.home_item_title_education)
+            text = stringResource(R.string.home_item_title_education),
         )
         HomeItemFlow {
             GridItem(
                 icon = Icons.Outlined.Language,
                 stringResource(id = R.string.memorize_words),
-                modifier = Modifier
-                    .width(itemWidth)
+                modifier =
+                    Modifier
+                        .width(itemWidth),
             ) {
                 VocabulariesDialog().show()
             }

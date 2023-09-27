@@ -8,15 +8,16 @@ import androidx.compose.ui.Modifier
 fun PullToRefresh(
     refreshLayoutState: RefreshLayoutState,
     modifier: Modifier = Modifier,
-    refreshContent: @Composable RefreshLayoutState.() -> Unit = remember {
-        { PullToRefreshContent() }
-    },
+    refreshContent: @Composable RefreshLayoutState.() -> Unit =
+        remember {
+            { PullToRefreshContent() }
+        },
     content: @Composable () -> Unit,
 ) {
     RefreshLayout(
         refreshContent = refreshContent,
         refreshLayoutState = refreshLayoutState,
         modifier = modifier,
-        content = content
+        content = content,
     )
 }

@@ -29,39 +29,37 @@ fun HomeItemStorage(
 ) {
     Column {
         Subtitle(
-            text = stringResource(R.string.home_item_title_storage)
+            text = stringResource(R.string.home_item_title_storage),
         )
         HomeItemFlow {
             GridItem(
                 icon = Icons.Outlined.Image,
                 stringResource(id = R.string.images),
-                modifier = Modifier.width(itemWidth)
+                modifier = Modifier.width(itemWidth),
             ) {
                 ImagesDialog().show()
             }
             GridItem(
                 icon = Icons.Outlined.AudioFile,
                 stringResource(id = R.string.audios),
-                modifier = Modifier.width(itemWidth)
+                modifier = Modifier.width(itemWidth),
             ) {
                 AudiosDialog().show()
             }
             GridItem(
                 icon = Icons.Outlined.VideoFile,
                 stringResource(id = R.string.videos),
-                modifier = Modifier.width(itemWidth)
+                modifier = Modifier.width(itemWidth),
             ) {
                 VideosDialog().show()
             }
             GridItem(
                 icon = Icons.Outlined.FilePresent,
                 stringResource(id = R.string.files),
-                modifier = Modifier.width(itemWidth)
+                modifier = Modifier.width(itemWidth),
             ) {
                 FilesDialog().show()
             }
         }
     }
 }
-
-

@@ -17,36 +17,50 @@ object TransitionEndHelper {
     val transitionAnimating get() = animating
     private var animating = false
 
-    fun end(fragment: DialogFragment, startView: View?, holder: RecyclerView.ViewHolder) {
+    fun end(
+        fragment: DialogFragment,
+        startView: View?,
+        holder: RecyclerView.ViewHolder,
+    ) {
         beforeTransition(holder)
         val doTransition = {
-            TransitionManager.beginDelayedTransition(holder.itemView as ViewGroup, transitionSet().also {
-                it.addListener(object : TransitionListenerAdapter() {
-                    override fun onTransitionStart(transition: Transition) {
-                        animating = true
-                    }
+            TransitionManager.beginDelayedTransition(
+                holder.itemView as ViewGroup,
+                transitionSet().also {
+                    it.addListener(
+                        object : TransitionListenerAdapter() {
+                            override fun onTransitionStart(transition: Transition) {
+                                animating = true
+                            }
 
-                    override fun onTransitionEnd(transition: Transition) {
-                        if (!animating) return
-                        animating = false
-                        fragment.dismissAllowingStateLoss()
-                    }
-                })
-            })
+                            override fun onTransitionEnd(transition: Transition) {
+                                if (!animating) return
+                                animating = false
+                                fragment.dismissAllowingStateLoss()
+                            }
+                        },
+                    )
+                },
+            )
             transition(startView, holder)
         }
         holder.itemView.post(doTransition)
 
-        fragment.lifecycle.addObserver(object : LifecycleEventObserver {
-            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-                if (event == Lifecycle.Event.ON_DESTROY) {
-                    fragment.lifecycle.removeObserver(this)
-                    animating = false
-                    holder.itemView.removeCallbacks(doTransition)
-                    TransitionManager.endTransitions(holder.itemView as ViewGroup)
+        fragment.lifecycle.addObserver(
+            object : LifecycleEventObserver {
+                override fun onStateChanged(
+                    source: LifecycleOwner,
+                    event: Lifecycle.Event,
+                ) {
+                    if (event == Lifecycle.Event.ON_DESTROY) {
+                        fragment.lifecycle.removeObserver(this)
+                        animating = false
+                        holder.itemView.removeCallbacks(doTransition)
+                        TransitionManager.endTransitions(holder.itemView as ViewGroup)
+                    }
                 }
-            }
-        })
+            },
+        )
     }
 
     private fun beforeTransition(holder: RecyclerView.ViewHolder) {
@@ -62,7 +76,10 @@ object TransitionEndHelper {
         }
     }
 
-    private fun transition(startView: View?, holder: RecyclerView.ViewHolder) {
+    private fun transition(
+        startView: View?,
+        holder: RecyclerView.ViewHolder,
+    ) {
         when (holder) {
             is SubsamplingViewHolder -> {
                 holder.binding.subsamplingView.translationX = 0f
@@ -70,16 +87,17 @@ object TransitionEndHelper {
                 holder.binding.subsamplingView.scaleX = 2f
                 holder.binding.subsamplingView.scaleY = 2f
                 fade(holder) // https://github.com/davemorrissey/subsampling-scale-image-view/issues/313
-                holder.binding.subsamplingView.layoutParams = holder.binding.subsamplingView.layoutParams.apply {
-                    width = startView?.width ?: width
-                    height = startView?.height ?: height
-                    val location = IntArray(2)
-                    getLocationOnScreen(startView, location)
-                    if (this is ViewGroup.MarginLayoutParams) {
-                        marginStart = location[0]
-                        topMargin = location[1] - Config.TRANSITION_OFFSET_Y
+                holder.binding.subsamplingView.layoutParams =
+                    holder.binding.subsamplingView.layoutParams.apply {
+                        width = startView?.width ?: width
+                        height = startView?.height ?: height
+                        val location = IntArray(2)
+                        getLocationOnScreen(startView, location)
+                        if (this is ViewGroup.MarginLayoutParams) {
+                            marginStart = location[0]
+                            topMargin = location[1] - Config.TRANSITION_OFFSET_Y
+                        }
                     }
-                }
             }
             is VideoViewHolder -> {
                 holder.binding.imageView.translationX = 0f
@@ -88,16 +106,17 @@ object TransitionEndHelper {
                 holder.binding.imageView.scaleY = if (startView != null) 1f else 2f
                 fade(holder, startView)
                 holder.binding.videoView.pause()
-                holder.binding.imageView.layoutParams = holder.binding.imageView.layoutParams.apply {
-                    width = startView?.width ?: width
-                    height = startView?.height ?: height
-                    val location = IntArray(2)
-                    getLocationOnScreen(startView, location)
-                    if (this is ViewGroup.MarginLayoutParams) {
-                        marginStart = location[0]
-                        topMargin = location[1] - Config.TRANSITION_OFFSET_Y
+                holder.binding.imageView.layoutParams =
+                    holder.binding.imageView.layoutParams.apply {
+                        width = startView?.width ?: width
+                        height = startView?.height ?: height
+                        val location = IntArray(2)
+                        getLocationOnScreen(startView, location)
+                        if (this is ViewGroup.MarginLayoutParams) {
+                            marginStart = location[0]
+                            topMargin = location[1] - Config.TRANSITION_OFFSET_Y
+                        }
                     }
-                }
             }
         }
     }
@@ -113,27 +132,33 @@ object TransitionEndHelper {
         }
     }
 
-    private fun fade(holder: RecyclerView.ViewHolder, startView: View? = null) {
+    private fun fade(
+        holder: RecyclerView.ViewHolder,
+        startView: View? = null,
+    ) {
         when (holder) {
             is SubsamplingViewHolder -> {
                 holder.binding.subsamplingView.animate().setDuration(Config.DURATION_TRANSITION)
-                        .alpha(0f).start()
+                    .alpha(0f).start()
             }
             is VideoViewHolder -> {
                 if (startView != null) {
                     holder.binding.imageView.animate()
-                            .setDuration(0)
-                            .setStartDelay(max(Config.DURATION_TRANSITION - 20, 0))
-                            .alpha(0f).start()
+                        .setDuration(0)
+                        .setStartDelay(max(Config.DURATION_TRANSITION - 20, 0))
+                        .alpha(0f).start()
                 } else {
                     holder.binding.imageView.animate().setDuration(Config.DURATION_TRANSITION)
-                            .alpha(0f).start()
+                        .alpha(0f).start()
                 }
             }
         }
     }
 
-    private fun getLocationOnScreen(startView: View?, location: IntArray) {
+    private fun getLocationOnScreen(
+        startView: View?,
+        location: IntArray,
+    ) {
         startView?.getLocationOnScreen(location)
 
         if (location[0] == 0) {

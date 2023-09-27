@@ -23,10 +23,11 @@ fun OutlineButton(
         onClick = onClick,
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            contentColor = MaterialTheme.colorScheme.primary,
-        ),
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.primary,
+            ),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
     ) {
         Text(text = text)
@@ -40,14 +41,16 @@ fun MiniOutlineButton(
 ) {
     Button(
         onClick,
-        modifier = Modifier
-            .height(32.dp),
+        modifier =
+            Modifier
+                .height(32.dp),
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
         shape = RoundedCornerShape(8.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            contentColor = MaterialTheme.colorScheme.primary,
-        ),
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.primary,
+            ),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
     ) {
         Text(text, style = MaterialTheme.typography.labelSmall)

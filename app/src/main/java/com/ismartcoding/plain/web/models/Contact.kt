@@ -35,6 +35,6 @@ fun DContact.toModel(): Contact {
         ID(id.toString()), prefix, givenName, middleName, familyName, suffix,
         nickname, FileHelper.getFileId(photoUri), phoneNumbers, emails, addresses, events, source,
         starred == 1, ID(contactId.toString()), FileHelper.getFileId(thumbnailUri),
-        notes, groups.map { it.toModel() }, organization, websites, ims, ringtone, updatedAt
+        notes, groups.map { it.toModel() }, organization, websites, ims, ringtone, updatedAt,
     )
 }

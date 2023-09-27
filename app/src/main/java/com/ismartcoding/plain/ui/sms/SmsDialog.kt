@@ -33,7 +33,10 @@ class SmsDialog : BaseListDrawerDialog() {
     override val dataType: DataType
         get() = DataType.SMS
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         checkPermission()
         initBottomBar(R.menu.action_sms) {
@@ -92,17 +95,20 @@ class SmsDialog : BaseListDrawerDialog() {
             val bindingAdapter = binding.list.rv.bindingAdapter
             val toggleMode = bindingAdapter.toggleMode
             val checkedItems = bindingAdapter.getCheckedModels<DataModel>()
-            binding.list.page.addData(items.map { a ->
-                DataModel(a).apply {
-                    keyText = a.address
-                    valueText = a.date.formatDateTime()
-                    subtitle = a.body
-                    this.toggleMode = toggleMode
-                    isChecked = checkedItems.any { it.data.id == data.id }
-                }
-            }, hasMore = {
-                items.size == viewModel.limit
-            })
+            binding.list.page.addData(
+                items.map { a ->
+                    DataModel(a).apply {
+                        keyText = a.address
+                        valueText = a.date.formatDateTime()
+                        subtitle = a.body
+                        this.toggleMode = toggleMode
+                        isChecked = checkedItems.any { it.data.id == data.id }
+                    }
+                },
+                hasMore = {
+                    items.size == viewModel.limit
+                },
+            )
             updateTitle()
         }
     }
@@ -111,4 +117,3 @@ class SmsDialog : BaseListDrawerDialog() {
         updateDrawerMenu(DrawerMenuGroupType.ALL, DrawerMenuGroupType.SMS_TYPES, DrawerMenuGroupType.TAGS)
     }
 }
-

@@ -16,9 +16,11 @@ fun View.alphaEnable(enable: Boolean) {
 }
 
 fun View.setSafeClick(onSafeClick: (View) -> Unit) {
-    setOnClickListener(SafeClickListener {
-        onSafeClick(it)
-    })
+    setOnClickListener(
+        SafeClickListener {
+            onSafeClick(it)
+        },
+    )
 }
 
 fun View.actionBarItemBackground() {

@@ -17,14 +17,21 @@ class FakeDragHelper(val context: Context) {
     private var lastY = 0f
     private val scaledTouchSlop by lazy { ViewConfiguration.get(context).scaledTouchSlop * Config.SWIPE_TOUCH_SLOP }
 
-    fun drag(view: View, rawX: Float, rawY: Float) {
+    fun drag(
+        view: View,
+        rawX: Float,
+        rawY: Float,
+    ) {
         if (lastX == 0f) lastX = rawX
         if (lastY == 0f) lastY = rawY
         val offsetX = rawX - lastX
         val offsetY = rawY - lastY
         if (fakeDragOffset == 0f) {
-            if (offsetY > scaledTouchSlop) fakeDragOffset = scaledTouchSlop
-            else if (offsetY < -scaledTouchSlop) fakeDragOffset = -scaledTouchSlop
+            if (offsetY > scaledTouchSlop) {
+                fakeDragOffset = scaledTouchSlop
+            } else if (offsetY < -scaledTouchSlop) {
+                fakeDragOffset = -scaledTouchSlop
+            }
         }
         if (fakeDragOffset != 0f) {
             val fixedOffsetY = offsetY - fakeDragOffset
@@ -39,7 +46,10 @@ class FakeDragHelper(val context: Context) {
         }
     }
 
-    fun up(view: View, setSingleTouch: (Boolean) -> Unit) {
+    fun up(
+        view: View,
+        setSingleTouch: (Boolean) -> Unit,
+    ) {
         view.parent?.requestDisallowInterceptTouchEvent(false)
         setSingleTouch(true)
         fakeDragOffset = 0f

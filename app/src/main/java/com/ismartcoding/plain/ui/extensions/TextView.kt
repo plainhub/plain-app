@@ -9,7 +9,6 @@ import android.view.MotionEvent
 import android.widget.TextView
 import androidx.core.view.GestureDetectorCompat
 import com.ismartcoding.lib.extensions.dp2px
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.markdown.AppImageSchemeHandler
 import com.ismartcoding.lib.markdown.FontTagHandler
 import com.ismartcoding.lib.markdown.NetworkSchemeHandler
@@ -35,20 +34,22 @@ import org.commonmark.node.SoftLineBreak
 @SuppressLint("ClickableViewAccessibility")
 fun TextView.setSelectableTextClickable(click: () -> Unit) {
     val detector = GestureDetectorCompat(context, GestureDetector.SimpleOnGestureListener())
-    detector.setOnDoubleTapListener(object : GestureDetector.OnDoubleTapListener {
-        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-            click()
-            return false
-        }
+    detector.setOnDoubleTapListener(
+        object : GestureDetector.OnDoubleTapListener {
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                click()
+                return false
+            }
 
-        override fun onDoubleTap(e: MotionEvent): Boolean {
-            return false
-        }
+            override fun onDoubleTap(e: MotionEvent): Boolean {
+                return false
+            }
 
-        override fun onDoubleTapEvent(e: MotionEvent): Boolean {
-            return false
-        }
-    })
+            override fun onDoubleTapEvent(e: MotionEvent): Boolean {
+                return false
+            }
+        },
+    )
 
     setOnTouchListener { _, event ->
         detector.onTouchEvent(event)
@@ -59,22 +60,24 @@ fun TextView.setSelectableTextClickable(click: () -> Unit) {
 @SuppressLint("ClickableViewAccessibility")
 fun TextView.setDoubleCLick(click: () -> Unit) {
     val detector = GestureDetectorCompat(context, GestureDetector.SimpleOnGestureListener())
-    detector.setOnDoubleTapListener(object : GestureDetector.OnDoubleTapListener {
-        override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-            return false
-        }
+    detector.setOnDoubleTapListener(
+        object : GestureDetector.OnDoubleTapListener {
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                return false
+            }
 
-        override fun onDoubleTap(e: MotionEvent): Boolean {
-            setTextIsSelectable(false) // deselect text
-            click()
-            setTextIsSelectable(true)
-            return false
-        }
+            override fun onDoubleTap(e: MotionEvent): Boolean {
+                setTextIsSelectable(false) // deselect text
+                click()
+                setTextIsSelectable(true)
+                return false
+            }
 
-        override fun onDoubleTapEvent(e: MotionEvent): Boolean {
-            return false
-        }
-    })
+            override fun onDoubleTapEvent(e: MotionEvent): Boolean {
+                return false
+            }
+        },
+    )
 
     setOnTouchListener { _, event ->
         detector.onTouchEvent(event)
@@ -86,16 +89,20 @@ fun TextView.markdown(content: String) {
     this.movementMethod = LinkMovementMethod.getInstance()
     Markwon.builder(context)
         .usePlugin(CoilImagesPlugin.create(context))
-        .usePlugin(object : AbstractMarkwonPlugin() {
-            override fun configureTheme(builder: MarkwonTheme.Builder) {
-                builder
-                    .bulletWidth(context.dp2px(5))
-            }
-        })
-        .usePlugin(ImagesPlugin.create { plugin ->
-            plugin.addSchemeHandler(AppImageSchemeHandler(context))
-            plugin.addSchemeHandler(NetworkSchemeHandler())
-        })
+        .usePlugin(
+            object : AbstractMarkwonPlugin() {
+                override fun configureTheme(builder: MarkwonTheme.Builder) {
+                    builder
+                        .bulletWidth(context.dp2px(5))
+                }
+            },
+        )
+        .usePlugin(
+            ImagesPlugin.create { plugin ->
+                plugin.addSchemeHandler(AppImageSchemeHandler(context))
+                plugin.addSchemeHandler(NetworkSchemeHandler())
+            },
+        )
         .usePlugin(HtmlPlugin.create { plugin -> plugin.addHandler(FontTagHandler()) })
         .usePlugin(LinkifyPlugin.create(Linkify.EMAIL_ADDRESSES or Linkify.PHONE_NUMBERS))
         .usePlugin(StrikethroughPlugin.create())
@@ -103,33 +110,38 @@ fun TextView.markdown(content: String) {
         .usePlugin(TaskListPlugin.create(context))
         .usePlugin(MarkwonInlineParserPlugin.create())
         .usePlugin(JLatexMathPlugin.create(this.textSize) { builder -> builder.inlinesEnabled(true) })
-        .usePlugin(object : AbstractMarkwonPlugin() {
-            override fun configureConfiguration(builder: MarkwonConfiguration.Builder) {
-                builder.linkResolver { _, link ->
-                    WebHelper.open(context, link)
-                }
-            }
-        })
-        .usePlugin(object : AbstractMarkwonPlugin() {
-            override fun configureSpansFactory(builder: MarkwonSpansFactory.Builder) {
-                builder.appendFactory(Image::class.java) { configuration, props ->
-                    LinkSpan(
-                        configuration.theme(),
-                        ImageProps.DESTINATION.require(props)
-                    ) { _, link ->
-                        PreviewDialog().show(
-                            items = arrayListOf(PreviewItem(link, Uri.parse(link))),
-                            initKey = link,
-                        )
+        .usePlugin(
+            object : AbstractMarkwonPlugin() {
+                override fun configureConfiguration(builder: MarkwonConfiguration.Builder) {
+                    builder.linkResolver { _, link ->
+                        WebHelper.open(context, link)
                     }
                 }
-            }
-        })
-        .usePlugin(object : AbstractMarkwonPlugin() {
-            override fun configureVisitor(builder: MarkwonVisitor.Builder) {
-                builder.on(SoftLineBreak::class.java) { visitor, _ -> visitor.forceNewLine() }
-            }
-        })
+            },
+        )
+        .usePlugin(
+            object : AbstractMarkwonPlugin() {
+                override fun configureSpansFactory(builder: MarkwonSpansFactory.Builder) {
+                    builder.appendFactory(Image::class.java) { configuration, props ->
+                        LinkSpan(
+                            configuration.theme(),
+                            ImageProps.DESTINATION.require(props),
+                        ) { _, link ->
+                            PreviewDialog().show(
+                                items = arrayListOf(PreviewItem(link, Uri.parse(link))),
+                                initKey = link,
+                            )
+                        }
+                    }
+                }
+            },
+        )
+        .usePlugin(
+            object : AbstractMarkwonPlugin() {
+                override fun configureVisitor(builder: MarkwonVisitor.Builder) {
+                    builder.on(SoftLineBreak::class.java) { visitor, _ -> visitor.forceNewLine() }
+                }
+            },
+        )
         .build().setMarkdown(this, content)
 }
-

@@ -3,10 +3,15 @@ package com.ismartcoding.plain.ui.views.texteditor
 import java.util.*
 
 class SearchResult(
-    var foundIndex: LinkedList<Int>, var textLength: Int, var isReplace: Boolean,
-    var whatToSearch: String, var textToReplace: String, var isRegex: Boolean
+    var foundIndex: LinkedList<Int>,
+    var textLength: Int,
+    var isReplace: Boolean,
+    var whatToSearch: String,
+    var textToReplace: String,
+    var isRegex: Boolean,
 ) {
     var index = 0
+
     fun doneReplace() {
         foundIndex.removeAt(index)
         var i: Int = index

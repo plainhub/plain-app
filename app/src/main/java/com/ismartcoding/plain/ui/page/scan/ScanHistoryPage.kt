@@ -43,10 +43,11 @@ fun ScanHistoryPage(
     val context = LocalContext.current
     val itemsState by viewModel.itemsFlow.collectAsState()
 
-    val refreshState = rememberRefreshLayoutState {
-        viewModel.fetch(context)
-        setRefreshState(RefreshContentState.Stop)
-    }
+    val refreshState =
+        rememberRefreshLayoutState {
+            viewModel.fetch(context)
+            setRefreshState(RefreshContentState.Stop)
+        }
 
     LaunchedEffect(Unit) {
         viewModel.fetch(context)
@@ -61,7 +62,7 @@ fun ScanHistoryPage(
                     LazyColumn(
                         Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight()
+                            .fillMaxHeight(),
                     ) {
                         items(itemsState) { m ->
                             Row(
@@ -91,7 +92,6 @@ fun ScanHistoryPage(
                     NoDataColumn()
                 }
             }
-        }
+        },
     )
 }
-

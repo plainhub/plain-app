@@ -1,6 +1,5 @@
 package com.ismartcoding.lib.html2md
 
-import com.ismartcoding.lib.logcat.LogCat
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.Node
 
@@ -13,11 +12,12 @@ internal object Table {
 
     fun tableRow(): Rule {
         return Rule(setOf("tr")) { content: String, node: Node ->
-            val alignMap = mapOf(
-                "left" to ":--",
-                "right" to "--:",
-                "center" to ":-:"
-            )
+            val alignMap =
+                mapOf(
+                    "left" to ":--",
+                    "right" to "--:",
+                    "center" to ":-:",
+                )
 
             var borderCells = ""
             if (isHeadingRow(node)) {
@@ -30,9 +30,13 @@ internal object Table {
                     borderCells += cell(border, n) + spannedCells(n, border)
                 }
             }
-            "\n" + content + (if (borderCells.isNotEmpty()) {
-                "\n" + borderCells
-            } else "")
+            "\n" + content + (
+                if (borderCells.isNotEmpty()) {
+                    "\n" + borderCells
+                } else {
+                    ""
+                }
+            )
         }
     }
 
@@ -70,7 +74,10 @@ internal object Table {
         return (tableNode?.nodeName().equals("table", true) && (tableNode as Element).select("tr").firstOrNull() == tr)
     }
 
-    private fun cell(content: String, node: Node): String {
+    private fun cell(
+        content: String,
+        node: Node,
+    ): String {
         val parent = node.parentNode() as Element
         val index = parent.childNodes().indexOf(node)
         var prefix = " "
@@ -83,7 +90,10 @@ internal object Table {
         return "$prefix$c |"
     }
 
-    private fun spannedCells(node: Node, content: String): String {
+    private fun spannedCells(
+        node: Node,
+        content: String,
+    ): String {
         val colSpan = node.attr("colspan").toIntOrNull() ?: 1
         if (colSpan <= 1) {
             return ""

@@ -11,13 +11,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.preference.AmoledDarkThemePreference
 import com.ismartcoding.plain.data.enums.DarkTheme
+import com.ismartcoding.plain.data.preference.AmoledDarkThemePreference
 import com.ismartcoding.plain.data.preference.DarkThemePreference
 import com.ismartcoding.plain.data.preference.LocalAmoledDarkTheme
 import com.ismartcoding.plain.data.preference.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
@@ -28,9 +27,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DarkThemePage(
-    navController: NavHostController,
-) {
+fun DarkThemePage(navController: NavHostController) {
     val context = LocalContext.current
     val darkTheme = LocalDarkTheme.current
     val amoledDarkTheme = LocalAmoledDarkTheme.current
@@ -85,6 +82,6 @@ fun DarkThemePage(
                     BottomSpace()
                 }
             }
-        }
+        },
     )
 }

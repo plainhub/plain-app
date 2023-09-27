@@ -10,7 +10,10 @@ interface LogAdapter {
      * @return is used to determine if log should printed.
      * If it is true, it will be printed, otherwise it'll be ignored.
      */
-    fun isLoggable(priority: Int, tag: String?): Boolean
+    fun isLoggable(
+        priority: Int,
+        tag: String?,
+    ): Boolean
 
     /**
      * Each log will use this pipeline
@@ -19,5 +22,9 @@ interface LogAdapter {
      * @param tag is the given tag for the log message.
      * @param message is the given message for the log message.
      */
-    fun log(priority: Int, tag: String?, message: String)
+    fun log(
+        priority: Int,
+        tag: String?,
+        message: String,
+    )
 }

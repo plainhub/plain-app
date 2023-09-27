@@ -25,20 +25,20 @@ fun HomeItemTools(
 ) {
     Column {
         Subtitle(
-            text = stringResource(R.string.home_item_title_tools)
+            text = stringResource(R.string.home_item_title_tools),
         )
         HomeItemFlow {
             GridItem(
                 icon = Icons.Outlined.CurrencyExchange,
                 stringResource(id = R.string.exchange_rate),
-                modifier = Modifier.width(itemWidth)
+                modifier = Modifier.width(itemWidth),
             ) {
                 navController.navigate(RouteName.EXCHANGE_RATE)
             }
             GridItem(
                 icon = Icons.Outlined.GraphicEq,
                 stringResource(id = R.string.sound_meter),
-                modifier = Modifier.width(itemWidth)
+                modifier = Modifier.width(itemWidth),
             ) {
                 navController.navigate(RouteName.SOUND_METER)
             }

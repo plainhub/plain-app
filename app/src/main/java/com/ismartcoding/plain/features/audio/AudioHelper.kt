@@ -26,7 +26,7 @@ object AudioHelper : BaseContentHelper() {
             MediaStore.Audio.Media.SIZE,
             MediaStore.Audio.Media.DURATION,
             MediaStore.Audio.Media.DATA,
-            MediaStore.Audio.Media.BUCKET_ID
+            MediaStore.Audio.Media.BUCKET_ID,
         )
     }
 
@@ -40,7 +40,10 @@ object AudioHelper : BaseContentHelper() {
         groups.forEach {
             when (it.name) {
                 "text" -> {
-                    where.addLikes(arrayListOf(MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST), arrayListOf(it.value, it.value))
+                    where.addLikes(
+                        arrayListOf(MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.ARTIST),
+                        arrayListOf(it.value, it.value),
+                    )
                 }
                 "name" -> {
                     where.addEqual(MediaStore.Audio.Media.TITLE, it.value)
@@ -60,7 +63,13 @@ object AudioHelper : BaseContentHelper() {
         return getWheres(query, MediaStore.Audio.Media._ID)
     }
 
-    fun search(context: Context, query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DAudio> {
+    fun search(
+        context: Context,
+        query: String,
+        limit: Int,
+        offset: Int,
+        sortBy: FileSortBy,
+    ): List<DAudio> {
         val cursor = getSearchCursor(context, query, limit, offset, sortBy.toSortBy())
         val result = mutableListOf<DAudio>()
         if (cursor?.moveToFirst() == true) {
@@ -79,7 +88,10 @@ object AudioHelper : BaseContentHelper() {
         return result
     }
 
-    fun getTagRelationStubs(context: Context, query: String): List<TagRelationStub> {
+    fun getTagRelationStubs(
+        context: Context,
+        query: String,
+    ): List<TagRelationStub> {
         val cursor = getSearchCursor(context, query)
         val result = mutableListOf<TagRelationStub>()
         if (cursor?.moveToFirst() == true) {
@@ -88,7 +100,7 @@ object AudioHelper : BaseContentHelper() {
                 val id = cursor.getStringValue(MediaStore.Audio.Media._ID, cache)
                 val title = cursor.getStringValue(MediaStore.Audio.Media.TITLE, cache)
                 val size = cursor.getLongValue(MediaStore.Audio.Media.SIZE, cache)
-                result.add(TagRelationStub(id, title,size))
+                result.add(TagRelationStub(id, title, size))
             } while (cursor.moveToNext())
         }
         return result
@@ -98,19 +110,21 @@ object AudioHelper : BaseContentHelper() {
     fun getBuckets(context: Context): List<DMediaBucket> {
         val bucketMap = mutableMapOf<String, DMediaBucket>()
 
-        val projection = arrayOf(
-            MediaStore.Audio.Media.BUCKET_ID,
-            MediaStore.Audio.Media.BUCKET_DISPLAY_NAME,
-            MediaStore.Audio.Media.DATA
-        )
+        val projection =
+            arrayOf(
+                MediaStore.Audio.Media.BUCKET_ID,
+                MediaStore.Audio.Media.BUCKET_DISPLAY_NAME,
+                MediaStore.Audio.Media.DATA,
+            )
 
-        val cursor = context.contentResolver.query(
-            uriExternal,
-            projection,
-            "${MediaStore.Audio.Media.BUCKET_DISPLAY_NAME} != ''",
-            null,
-            null
-        )
+        val cursor =
+            context.contentResolver.query(
+                uriExternal,
+                projection,
+                "${MediaStore.Audio.Media.BUCKET_DISPLAY_NAME} != ''",
+                null,
+                null,
+            )
 
         cursor?.use { c ->
             val cache = mutableMapOf<String, Int>()

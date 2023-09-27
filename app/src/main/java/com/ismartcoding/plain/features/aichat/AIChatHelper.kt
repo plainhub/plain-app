@@ -7,7 +7,6 @@ import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.db.AIChatDao
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DAIChat
-import com.ismartcoding.plain.features.note.NoteHelper
 
 object AIChatHelper {
     private val chatDao: AIChatDao by lazy {
@@ -18,7 +17,11 @@ object AIChatHelper {
         return chatDao.getChats(id)
     }
 
-    suspend fun createChatItemsAsync(parentId: String, isMe: Boolean, message: String): List<DAIChat> {
+    suspend fun createChatItemsAsync(
+        parentId: String,
+        isMe: Boolean,
+        message: String,
+    ): List<DAIChat> {
         val item = DAIChat()
         item.isMe = isMe
         item.content = message
@@ -50,7 +53,11 @@ object AIChatHelper {
         return chatDao.getIds(SimpleSQLiteQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
     }
 
-    fun search(query: String, limit: Int, offset: Int): List<DAIChat> {
+    fun search(
+        query: String,
+        limit: Int,
+        offset: Int,
+    ): List<DAIChat> {
         var sql = "SELECT * FROM aichats"
         val where = ContentWhere()
         val sort = ContentSort("updated_at", "DESC")
@@ -83,7 +90,11 @@ object AIChatHelper {
         chatDao.delete(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
     }
 
-    private fun parseQuery(where: ContentWhere, query: String, sort: ContentSort? = null) {
+    private fun parseQuery(
+        where: ContentWhere,
+        query: String,
+        sort: ContentSort? = null,
+    ) {
         val queryGroups = SearchHelper.parse(query)
         queryGroups.forEach {
             if (it.name == "text") {

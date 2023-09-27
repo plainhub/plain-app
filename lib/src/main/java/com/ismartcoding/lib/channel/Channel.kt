@@ -16,13 +16,14 @@ object Channel {
     internal val internalScope = ChannelScope()
 }
 
-fun sendEvent(event: Any) = internalScope.launch {
-    sharedFlow.emit(ChannelEvent(event))
-}
+fun sendEvent(event: Any) =
+    internalScope.launch {
+        sharedFlow.emit(ChannelEvent(event))
+    }
 
 inline fun <reified T> LifecycleOwner.receiveEvent(
     lifeEvent: Lifecycle.Event = Lifecycle.Event.ON_DESTROY,
-    noinline block: suspend CoroutineScope.(event: T) -> Unit
+    noinline block: suspend CoroutineScope.(event: T) -> Unit,
 ): Job {
     return ChannelScope(this, lifeEvent).launch {
         sharedFlow.collect {
@@ -40,7 +41,7 @@ inline fun <reified T> LifecycleOwner.receiveEvent(): Flow<T> {
 
 inline fun <reified T> LifecycleOwner.receiveEventLive(
     lifeEvent: Lifecycle.Event = Lifecycle.Event.ON_START,
-    noinline block: suspend CoroutineScope.(event: T) -> Unit
+    noinline block: suspend CoroutineScope.(event: T) -> Unit,
 ): Job {
     return lifecycleScope.launch {
         sharedFlow.flowWithLifecycle(lifecycle, lifeEvent.targetState).collect {
@@ -51,9 +52,7 @@ inline fun <reified T> LifecycleOwner.receiveEventLive(
     }
 }
 
-inline fun <reified T> receiveEventHandler(
-    noinline block: suspend CoroutineScope.(event: T) -> Unit
-): Job {
+inline fun <reified T> receiveEventHandler(noinline block: suspend CoroutineScope.(event: T) -> Unit): Job {
     return ChannelScope().launch {
         sharedFlow.collect {
             if (it.event is T) {

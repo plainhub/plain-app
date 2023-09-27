@@ -10,17 +10,24 @@ enum class ApplyToType(val value: String) {
     ALL("all"),
     DEVICE("mac"),
     TAG("tag"),
-    INTERFACE("iface");
+    INTERFACE("iface"),
+    ;
 
     companion object {
-        fun parse(value: String, default: ApplyToType = ALL): ApplyToType {
+        fun parse(
+            value: String,
+            default: ApplyToType = ALL,
+        ): ApplyToType {
             return values().find { it.value == value } ?: default
         }
     }
 }
 
 data class ApplyTo(var type: ApplyToType = ApplyToType.ALL, var value: String = "") {
-    fun getText(devices: List<DeviceFragment>, networks: List<NetworkFragment>): String {
+    fun getText(
+        devices: List<DeviceFragment>,
+        networks: List<NetworkFragment>,
+    ): String {
         return when (type) {
             ApplyToType.ALL -> {
                 getString(R.string.all_devices)
@@ -29,7 +36,7 @@ data class ApplyTo(var type: ApplyToType = ApplyToType.ALL, var value: String = 
                 devices.find { it.mac == value }?.getName() ?: value
             }
             ApplyToType.INTERFACE -> {
-               networks.find { it.ifName == value }?.name ?: value
+                networks.find { it.ifName == value }?.name ?: value
             }
             else -> ""
         }
@@ -40,7 +47,7 @@ data class ApplyTo(var type: ApplyToType = ApplyToType.ALL, var value: String = 
             return type.value
         }
 
-        return "${type.value}:${value}"
+        return "${type.value}:$value"
     }
 
     companion object {

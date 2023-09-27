@@ -53,7 +53,6 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isTV
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.NetworkHelper
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.enums.PasswordType
@@ -104,7 +103,8 @@ fun WebConsolePage(
             events.add(
                 receiveEventHandler<PermissionResultEvent> {
                     permissionList = Permissions.getWebList(context)
-                })
+                },
+            )
         }
 
         DisposableEffect(Unit) {
@@ -146,30 +146,36 @@ fun WebConsolePage(
         }, content = {
             LazyColumn {
                 item {
-                    val errorMessage = if (HttpServerManager.httpServerError.isNotEmpty()) {
-                        HttpServerManager.httpServerError
-                    } else if (webConsole && HttpServerManager.stoppedByUser) {
-                        stringResource(id = R.string.http_server_stopped)
-                    } else if (webConsole && HttpServerManager.httpServer == null) {
-                        stringResource(id = R.string.http_server_failed)
-                    } else {
-                        ""
-                    }
+                    val errorMessage =
+                        if (HttpServerManager.httpServerError.isNotEmpty()) {
+                            HttpServerManager.httpServerError
+                        } else if (webConsole && HttpServerManager.stoppedByUser) {
+                            stringResource(id = R.string.http_server_stopped)
+                        } else if (webConsole && HttpServerManager.httpServer == null) {
+                            stringResource(id = R.string.http_server_failed)
+                        } else {
+                            ""
+                        }
                     if (errorMessage.isNotEmpty()) {
                         Column(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .fillMaxWidth()
-                                .background(
-                                    color = MaterialTheme.colorScheme.cardBackColor(), shape = RoundedCornerShape(16.dp)
-                                )
+                            modifier =
+                                Modifier
+                                    .padding(horizontal = 16.dp)
+                                    .fillMaxWidth()
+                                    .background(
+                                        color = MaterialTheme.colorScheme.cardBackColor(),
+                                        shape = RoundedCornerShape(16.dp),
+                                    ),
                         ) {
                             Text(
                                 modifier = Modifier.padding(16.dp).fillMaxWidth(),
                                 text = errorMessage,
                                 color = MaterialTheme.colorScheme.error,
                             )
-                            Row(modifier = Modifier.padding(16.dp, 0.dp, 16.dp, 16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                            Row(
+                                modifier = Modifier.padding(16.dp, 0.dp, 16.dp, 16.dp).fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End,
+                            ) {
                                 MiniOutlineButton(
                                     text = stringResource(R.string.relaunch_app),
                                     onClick = {
@@ -180,7 +186,8 @@ fun WebConsolePage(
                         }
                     }
                     DisplayText(
-                        text = stringResource(R.string.web_console), desc = stringResource(id = R.string.web_console_desc)
+                        text = stringResource(R.string.web_console),
+                        desc = stringResource(id = R.string.web_console_desc),
                     )
                 }
                 item {
@@ -188,7 +195,7 @@ fun WebConsolePage(
                         title = stringResource(R.string.enable),
                     ) {
                         PSwitch(
-                            activated = webConsole
+                            activated = webConsole,
                         ) {
                             viewModel.enableWebConsole(context, !webConsole)
                         }
@@ -199,16 +206,17 @@ fun WebConsolePage(
                     BlockRadioButton(
                         selected = if (isHttps) 0 else 1,
                         onSelected = { isHttps = it == 0 },
-                        itemRadioGroups = listOf(
-                            BlockRadioGroupButtonItem(
-                                text = stringResource(R.string.recommended_https),
-                                onClick = {},
-                            ) {},
-                            BlockRadioGroupButtonItem(
-                                text = "HTTP",
-                                onClick = {},
-                            ) {},
-                        ),
+                        itemRadioGroups =
+                            listOf(
+                                BlockRadioGroupButtonItem(
+                                    text = stringResource(R.string.recommended_https),
+                                    onClick = {},
+                                ) {},
+                                BlockRadioGroupButtonItem(
+                                    text = "HTTP",
+                                    onClick = {},
+                                ) {},
+                            ),
                     )
                     BrowserPreview(context, isHttps, httpPort, httpsPort, onEditPort = {
                         portDialogVisible = true
@@ -241,7 +249,10 @@ fun WebConsolePage(
                             title = permission.getText(),
                             showMore = true,
                             onClick = {
-                                val intent = Intent(if (context.isTV()) Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS else Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                val intent =
+                                    Intent(
+                                        if (context.isTV()) Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS else Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                    )
                                 intent.addCategory(Intent.CATEGORY_DEFAULT)
                                 intent.data = Uri.fromParts("package", context.packageName, null)
                                 if (intent.resolveActivity(packageManager) != null) {
@@ -249,11 +260,15 @@ fun WebConsolePage(
                                 } else {
                                     DialogHelper.showMessage(R.string.not_supported_error)
                                 }
-                            })
+                            },
+                        )
                     } else {
                         PListItem(
                             title = permission.getText(),
-                            desc = stringResource(if (m.granted) R.string.system_permission_granted else R.string.system_permission_not_granted),
+                            desc =
+                                stringResource(
+                                    if (m.granted) R.string.system_permission_granted else R.string.system_permission_not_granted,
+                                ),
                             showMore = permission == Permission.SYSTEM_ALERT_WINDOW,
                             onClick = {
                                 scope.launch {
@@ -270,7 +285,8 @@ fun WebConsolePage(
                                         }
                                     }
                                 }
-                            }) {
+                            },
+                        ) {
                             if (permission != Permission.SYSTEM_ALERT_WINDOW) {
                                 PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
                                     scope.launch {
@@ -295,25 +311,32 @@ fun WebConsolePage(
             }
         })
 
-        RadioDialog(visible = portDialogVisible,
+        RadioDialog(
+            visible = portDialogVisible,
             title = stringResource(if (isHttps) R.string.https_port else R.string.http_port),
-            options = (if (isHttps) listOf(8043, 8143, 8243, 8343, 8443, 8543, 8643, 8743, 8843, 8943) else listOf(8080, 8180, 8280, 8380, 8480, 8580, 8680, 8780, 8880, 8980)).map {
-                RadioDialogOption(
-                    text = it.toString(),
-                    selected = if (isHttps) it == httpsPort else it == httpPort,
-                ) {
-                    scope.launch(Dispatchers.IO) {
-                        if (isHttps) {
-                            HttpsPortPreference.putAsync(context, it)
-                        } else {
-                            HttpPortPreference.putAsync(context, it)
+            options =
+                (if (isHttps) listOf(8043, 8143, 8243, 8343, 8443, 8543, 8643, 8743, 8843, 8943) else listOf(8080, 8180, 8280, 8380, 8480, 8580, 8680, 8780, 8880, 8980)).map {
+                    RadioDialogOption(
+                        text = it.toString(),
+                        selected = if (isHttps) it == httpsPort else it == httpPort,
+                    ) {
+                        scope.launch(Dispatchers.IO) {
+                            if (isHttps) {
+                                HttpsPortPreference.putAsync(context, it)
+                            } else {
+                                HttpPortPreference.putAsync(context, it)
+                            }
+                        }
+                        DialogHelper.showConfirmDialog(
+                            context,
+                            context.getString(R.string.restart_app_title),
+                            context.getString(R.string.restart_app_message),
+                        ) {
+                            AppHelper.relaunch(context)
                         }
                     }
-                    DialogHelper.showConfirmDialog(context, context.getString(R.string.restart_app_title), context.getString(R.string.restart_app_message)) {
-                        AppHelper.relaunch(context)
-                    }
-                }
-            }) {
+                },
+        ) {
             portDialogVisible = false
         }
     }
@@ -321,71 +344,89 @@ fun WebConsolePage(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BrowserPreview(context: Context, isHttps: Boolean, httpPort: Int, httpsPort: Int, onEditPort: () -> Unit) {
+fun BrowserPreview(
+    context: Context,
+    isHttps: Boolean,
+    httpPort: Int,
+    httpsPort: Int,
+    onEditPort: () -> Unit,
+) {
     val ip4 = remember { NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" } }
     val ip4s = remember { NetworkHelper.getDeviceIP4s().filter { it != ip4 } }
     val showContextMenu = remember { mutableStateOf(false) }
-    val defaultUrl = "${if (isHttps) "https" else "http"}://${ip4}:${if (isHttps) httpsPort else httpPort}"
+    val defaultUrl = "${if (isHttps) "https" else "http"}://$ip4:${if (isHttps) httpsPort else httpPort}"
     Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .background(
-                color = MaterialTheme.colorScheme.cardBackColor(), shape = RoundedCornerShape(16.dp)
-            )
+        modifier =
+            Modifier
+                .padding(horizontal = 16.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.cardBackColor(),
+                    shape = RoundedCornerShape(16.dp),
+                ),
     ) {
         Row(
             Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
                 .background(
-                    color = MaterialTheme.colorScheme.backColor(), shape = RoundedCornerShape(8.dp)
-                ), verticalAlignment = Alignment.CenterVertically
+                    color = MaterialTheme.colorScheme.backColor(),
+                    shape = RoundedCornerShape(8.dp),
+                ),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             SelectionContainer {
                 ClickableText(
                     text = AnnotatedString(defaultUrl),
                     modifier = Modifier.padding(start = 16.dp),
-                    style = TextStyle(
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 16.sp
-                    ),
+                    style =
+                        TextStyle(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 16.sp,
+                        ),
                     onClick = {
                         val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), defaultUrl)
                         clipboardManager.setPrimaryClip(clip)
                         DialogHelper.showConfirmDialog(context, "", context.getString(R.string.copied_to_clipboard_format, defaultUrl))
-                    }
+                    },
                 )
             }
-            PIconButton(imageVector = Icons.Rounded.Edit,
-                modifier = Modifier
-                    .height(16.dp)
-                    .width(16.dp),
+            PIconButton(
+                imageVector = Icons.Rounded.Edit,
+                modifier =
+                    Modifier
+                        .height(16.dp)
+                        .width(16.dp),
                 contentDescription = stringResource(id = R.string.edit),
                 tint = MaterialTheme.colorScheme.onSurface,
                 onClick = {
                     onEditPort()
-                })
+                },
+            )
             if (ip4s.isNotEmpty()) {
                 Spacer(modifier = Modifier.weight(1f))
                 Box(
-                    modifier = Modifier
-                        .wrapContentSize(Alignment.TopEnd)
+                    modifier =
+                        Modifier
+                            .wrapContentSize(Alignment.TopEnd),
                 ) {
-                    PIconButton(imageVector = Icons.Rounded.MoreVert,
-                        modifier = Modifier
-                            .height(16.dp)
-                            .width(16.dp),
+                    PIconButton(
+                        imageVector = Icons.Rounded.MoreVert,
+                        modifier =
+                            Modifier
+                                .height(16.dp)
+                                .width(16.dp),
                         contentDescription = stringResource(id = R.string.more),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         onClick = {
                             showContextMenu.value = true
-                        })
+                        },
+                    )
                     PDropdownMenu(
                         expanded = showContextMenu.value,
-                        onDismissRequest = { showContextMenu.value = false }
+                        onDismissRequest = { showContextMenu.value = false },
                     ) {
                         ip4s.forEach { ip ->
-                            val url = "${if (isHttps) "https" else "http"}://${ip}:${if (isHttps) httpsPort else httpPort}"
+                            val url = "${if (isHttps) "https" else "http"}://$ip:${if (isHttps) httpsPort else httpPort}"
                             DropdownMenuItem(text = { Text(url) }, onClick = {
                                 showContextMenu.value = false
                                 val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), url)
@@ -398,9 +439,10 @@ fun BrowserPreview(context: Context, isHttps: Boolean, httpPort: Int, httpsPort:
             }
         }
         Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             text = stringResource(id = R.string.enter_this_address_tips),
             style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Light),
             color = MaterialTheme.colorScheme.onSurfaceVariant,

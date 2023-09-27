@@ -14,12 +14,12 @@ fun PDropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
         modifier = modifier.background(MaterialTheme.colorScheme.inverseOnSurface),
-        content = content
+        content = content,
     )
 }

@@ -6,7 +6,10 @@ import android.net.Uri
 import com.ismartcoding.plain.R
 
 object WebHelper {
-    fun open(context: Context, url: String) {
+    fun open(
+        context: Context,
+        url: String,
+    ) {
         try {
             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         } catch (ex: java.lang.Exception) {

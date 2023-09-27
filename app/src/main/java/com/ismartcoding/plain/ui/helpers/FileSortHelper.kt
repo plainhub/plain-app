@@ -5,13 +5,13 @@ import android.view.Menu
 import android.view.MenuItem
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.enums.MediaType
 import com.ismartcoding.plain.data.preference.AudioSortByPreference
 import com.ismartcoding.plain.data.preference.FileSortByPreference
 import com.ismartcoding.plain.data.preference.ImageSortByPreference
 import com.ismartcoding.plain.data.preference.VideoSortByPreference
 import com.ismartcoding.plain.databinding.ViewPageListBinding
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.data.enums.MediaType
 import com.ismartcoding.plain.ui.extensions.highlightTitle
 import com.ismartcoding.plain.ui.extensions.unhighlightTitle
 import com.ismartcoding.plain.ui.models.FilteredItemsViewModel
@@ -19,7 +19,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 object FileSortHelper {
-    fun getSelectedSortItem(menu: Menu, sortBy: FileSortBy): MenuItem {
+    fun getSelectedSortItem(
+        menu: Menu,
+        sortBy: FileSortBy,
+    ): MenuItem {
         return when (sortBy) {
             FileSortBy.DATE_ASC -> {
                 menu.findItem(R.id.sort_oldest_first)
@@ -47,7 +50,10 @@ object FileSortHelper {
         }
     }
 
-    private suspend fun getSortByAsync(context: Context, mediaType: MediaType): FileSortBy {
+    private suspend fun getSortByAsync(
+        context: Context,
+        mediaType: MediaType,
+    ): FileSortBy {
         return when (mediaType) {
             MediaType.VIDEO -> {
                 VideoSortByPreference.getValueAsync(context)
@@ -67,7 +73,11 @@ object FileSortHelper {
         }
     }
 
-    private suspend fun setSortByAsync(context: Context, mediaType: MediaType, sortBy: FileSortBy) {
+    private suspend fun setSortByAsync(
+        context: Context,
+        mediaType: MediaType,
+        sortBy: FileSortBy,
+    ) {
         when (mediaType) {
             MediaType.VIDEO -> {
                 VideoSortByPreference.putAsync(context, sortBy)
@@ -94,7 +104,7 @@ object FileSortHelper {
         mediaType: MediaType,
         viewModel: FilteredItemsViewModel,
         list: ViewPageListBinding,
-        sortBy: FileSortBy
+        sortBy: FileSortBy,
     ) {
         scope.launch {
             getSelectedSortItem(menu, withIO { getSortByAsync(context, mediaType) }).unhighlightTitle()

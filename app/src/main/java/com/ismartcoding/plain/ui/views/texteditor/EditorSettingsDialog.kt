@@ -16,7 +16,10 @@ import com.ismartcoding.plain.ui.extensions.setSwitch
 import kotlinx.coroutines.launch
 
 class EditorSettingsDialog : BaseBottomSheetDialog<DialogEditorSettingsBinding>() {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
             val context = requireContext()

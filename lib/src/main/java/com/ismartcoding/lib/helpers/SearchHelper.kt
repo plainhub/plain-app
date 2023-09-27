@@ -5,29 +5,30 @@ internal data class QueryGroup(
     var field: String = "",
     var query: String = "",
     var op: String = "",
-    var value: String = ""
+    var value: String = "",
 )
 
 data class FilterField(
     var name: String = "",
     var op: String = "",
-    var value: String = ""
+    var value: String = "",
 )
 
 object SearchHelper {
     private val GROUP_DELIMITER = "(?:[^\\s\"]+|\"[^\"]*\")+".toRegex()
     var FILTER_DELIMITER = ":"
     const val NOT_TYPE = "NOT"
-    private val INVERT = mapOf(
-        "=" to "!=",
-        ">=" to "<",
-        ">" to "<=",
-        "!=" to "=",
-        "<=" to ">",
-        "<" to ">=",
-        "in" to "nin",
-        "nin" to "in"
-    )
+    private val INVERT =
+        mapOf(
+            "=" to "!=",
+            ">=" to "<",
+            ">" to "<=",
+            "!=" to "=",
+            "<=" to ">",
+            "<" to ">=",
+            "in" to "nin",
+            "nin" to "in",
+        )
     val NUMBER_OPS = setOf(">", ">=", "<", "<=")
     private var GROUP_TYPES = INVERT.keys.filter { !setOf("in", "nin").contains(it) }
 
@@ -73,9 +74,10 @@ object SearchHelper {
 
     // q = "Hello World" username:plain ids:1,2,3 stars:>10 stars:<100 NOT language:javascript
     fun parse(q: String): List<FilterField> {
-        val groups = splitInGroup(q).map {
-            parseGroup(it)
-        }
+        val groups =
+            splitInGroup(q).map {
+                parseGroup(it)
+            }
         var invert = false
         groups.forEach {
             if (it.op == NOT_TYPE) {

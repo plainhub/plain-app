@@ -10,6 +10,7 @@ internal class Stack<T> {
 
     /** Stack size.  */
     private var size = 0
+
     fun peek(): T? {
         return array[size - 1] as T?
     }
@@ -27,7 +28,10 @@ internal class Stack<T> {
     }
 
     @JvmOverloads
-    fun cleanup(count: Int, oldStackSize: Int = size): Int {
+    fun cleanup(
+        count: Int,
+        oldStackSize: Int = size,
+    ): Int {
         val curStackSize = size
         if (oldStackSize < curStackSize) {
             for (i in oldStackSize until curStackSize) {
@@ -63,7 +67,10 @@ internal class Stack<T> {
         array[size++] = value
     }
 
-    fun pushAt(position: Int, scope: T) {
+    fun pushAt(
+        position: Int,
+        scope: T,
+    ) {
         var pos = position
         if (pos < 0) {
             pos = 0

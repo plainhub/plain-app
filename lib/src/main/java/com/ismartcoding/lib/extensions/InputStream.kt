@@ -12,7 +12,7 @@ suspend fun InputStream.copyToSuspend(
     out: OutputStream,
     bufferSize: Int = DEFAULT_BUFFER_SIZE,
     yieldSize: Int = 4 * 1024 * 1024,
-    dispatcher: CoroutineDispatcher = Dispatchers.IO
+    dispatcher: CoroutineDispatcher = Dispatchers.IO,
 ): Long {
     return withContext(dispatcher) {
         val buffer = ByteArray(bufferSize)

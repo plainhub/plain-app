@@ -20,11 +20,12 @@ class HttpServerService : LifecycleService() {
         super.onCreate()
         instance = this
         NotificationHelper.ensureDefaultChannel()
-        val notification = NotificationHelper.createServiceNotification(
-            this,
-            "${BuildConfig.APPLICATION_ID}.action.stop_http_server",
-            getString(R.string.api_service_is_running)
-        )
+        val notification =
+            NotificationHelper.createServiceNotification(
+                this,
+                "${BuildConfig.APPLICATION_ID}.action.stop_http_server",
+                getString(R.string.api_service_is_running),
+            )
         if (isUPlus()) {
             startForeground(1, notification, FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
         } else {

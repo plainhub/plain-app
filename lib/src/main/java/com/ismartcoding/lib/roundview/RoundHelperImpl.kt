@@ -33,7 +33,12 @@ class RoundHelperImpl : RoundHelper {
     private var mRadiusBottomLeft = 0f
     private var mRadiusBottomRight = 0f
     private var isNewLayer = false
-    override fun init(context: Context, attrs: AttributeSet?, view: View) {
+
+    override fun init(
+        context: Context,
+        attrs: AttributeSet?,
+        view: View,
+    ) {
         if (view is ViewGroup && view.getBackground() == null) {
             view.setBackgroundColor(Color.parseColor("#00000000"))
         }
@@ -69,7 +74,10 @@ class RoundHelperImpl : RoundHelper {
         array.recycle()
     }
 
-    override fun onSizeChanged(width: Int, height: Int) {
+    override fun onSizeChanged(
+        width: Int,
+        height: Int,
+    ) {
         mWidth = width
         mHeight = height
         if (isCircle) {
@@ -92,10 +100,17 @@ class RoundHelperImpl : RoundHelper {
     }
 
     override fun preDraw(canvas: Canvas) {
-        canvas.saveLayer(if (isNewLayer && Build.VERSION.SDK_INT > Build.VERSION_CODES.P) mOriginRectF else mRectF, null, Canvas.ALL_SAVE_FLAG)
+        canvas.saveLayer(
+            if (isNewLayer && Build.VERSION.SDK_INT > Build.VERSION_CODES.P) mOriginRectF else mRectF,
+            null,
+            Canvas.ALL_SAVE_FLAG,
+        )
     }
 
-    override fun drawPath(canvas: Canvas, drawableState: IntArray?) {
+    override fun drawPath(
+        canvas: Canvas,
+        drawableState: IntArray?,
+    ) {
         mPaint!!.reset()
         mPath!!.reset()
         mPaint!!.isAntiAlias = true
@@ -142,7 +157,12 @@ class RoundHelperImpl : RoundHelper {
         }
     }
 
-    override fun setRadius(radiusTopLeftDp: Float, radiusTopRightDp: Float, radiusBottomLeftDp: Float, radiusBottomRightDp: Float) {
+    override fun setRadius(
+        radiusTopLeftDp: Float,
+        radiusTopRightDp: Float,
+        radiusBottomLeftDp: Float,
+        radiusBottomRightDp: Float,
+    ) {
         if (mContext == null) {
             return
         }
@@ -245,7 +265,7 @@ class RoundHelperImpl : RoundHelper {
         if (mContext == null) {
             return
         }
-        mRadiusBottomRight =mContext!!.dp2px(radiusDp.toInt()).toFloat()
+        mRadiusBottomRight = mContext!!.dp2px(radiusDp.toInt()).toFloat()
         if (mView != null) {
             onSizeChanged(mWidth, mHeight)
             mView!!.invalidate()
@@ -271,7 +291,10 @@ class RoundHelperImpl : RoundHelper {
         }
     }
 
-    override fun setStrokeWidthColor(widthDp: Float, color: Int) {
+    override fun setStrokeWidthColor(
+        widthDp: Float,
+        color: Int,
+    ) {
         if (mContext == null) {
             return
         }

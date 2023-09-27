@@ -50,8 +50,10 @@ class FeedEntriesDialog : BaseListDrawerDialog() {
     override val dataType: DataType
         get() = DataType.FEED_ENTRY
 
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initBottomBar(R.menu.action_feed_entries) {
             when (itemId) {
@@ -90,7 +92,11 @@ class FeedEntriesDialog : BaseListDrawerDialog() {
                     if (cursor.moveToFirst()) {
                         val cache = mutableMapOf<String, Int>()
                         val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
-                        DialogHelper.showConfirmDialog(requireContext(), "", LocaleHelper.getStringF(R.string.exported_to, "name", fileName))
+                        DialogHelper.showConfirmDialog(
+                            requireContext(),
+                            "",
+                            LocaleHelper.getStringF(R.string.exported_to, "name", fileName),
+                        )
                     }
                 }
             }
@@ -116,8 +122,8 @@ class FeedEntriesDialog : BaseListDrawerDialog() {
 
         receiveEvent<ActionEvent> { event ->
             if (setOf(ActionSourceType.FEED_ENTRY, ActionSourceType.FEED).contains(event.source)) {
-                if (event.source == ActionSourceType.FEED && event.action == ActionType.UPDATED
-                    && (viewModel.data as? DFeed)?.id == event.ids.first()
+                if (event.source == ActionSourceType.FEED && event.action == ActionType.UPDATED &&
+                    (viewModel.data as? DFeed)?.id == event.ids.first()
                 ) {
                     viewModel.data = event.extra as IData
                 }
@@ -205,13 +211,19 @@ class FeedEntriesDialog : BaseListDrawerDialog() {
         }
 
         binding.list.page.run {
-            setRefreshHeader(ClassicsHeader(context, this).apply {
-                pullText = { if (viewModel.data is DFeed) LocaleHelper.getString(R.string.pull_down_to_sync_current_feed) else LocaleHelper.getString(R.string.pull_down_to_sync_all_feeds) }
-                refreshingText = { LocaleHelper.getString(R.string.syncing) }
-                releaseText = { if (viewModel.data is DFeed) LocaleHelper.getString(R.string.release_to_sync_current_feed) else LocaleHelper.getString(R.string.release_to_sync_all_feeds) }
-                finishText = { LocaleHelper.getString(R.string.synced) }
-                failedText = { LocaleHelper.getString(R.string.sync_failed) }
-            })
+            setRefreshHeader(
+                ClassicsHeader(context, this).apply {
+                    pullText = {
+                        if (viewModel.data is DFeed) LocaleHelper.getString(R.string.pull_down_to_sync_current_feed) else LocaleHelper.getString(R.string.pull_down_to_sync_all_feeds)
+                    }
+                    refreshingText = { LocaleHelper.getString(R.string.syncing) }
+                    releaseText = {
+                        if (viewModel.data is DFeed) LocaleHelper.getString(R.string.release_to_sync_current_feed) else LocaleHelper.getString(R.string.release_to_sync_all_feeds)
+                    }
+                    finishText = { LocaleHelper.getString(R.string.synced) }
+                    failedText = { LocaleHelper.getString(R.string.sync_failed) }
+                },
+            )
 
             setOnRefreshListener {
                 viewModel.offset = 0
@@ -227,7 +239,6 @@ class FeedEntriesDialog : BaseListDrawerDialog() {
                 viewModel.offset += viewModel.limit
                 updateDBList()
             }
-
         }
 
         refreshList()
@@ -248,25 +259,31 @@ class FeedEntriesDialog : BaseListDrawerDialog() {
             val query = viewModel.getQuery()
             val items = withIO { FeedEntryHelper.search(query, viewModel.limit, viewModel.offset) }
             viewModel.total = withIO { FeedEntryHelper.count(query) }
-            val feeds = if (viewModel.data is DFeed) {
-                val feed = viewModel.data as DFeed
-                mapOf(feed.id to feed)
-            } else withIO { FeedHelper.getAll().associateBy { it.id } }
+            val feeds =
+                if (viewModel.data is DFeed) {
+                    val feed = viewModel.data as DFeed
+                    mapOf(feed.id to feed)
+                } else {
+                    withIO { FeedHelper.getAll().associateBy { it.id } }
+                }
 
             val bindingAdapter = binding.list.rv.bindingAdapter
             val toggleMode = bindingAdapter.toggleMode
             val checkedItems = bindingAdapter.getCheckedModels<FeedEntryModel>()
-            binding.list.page.addData(items.map { a ->
-                FeedEntryModel(a, feeds[a.feedId]).apply {
-                    image = a.image
-                    title = a.title
-                    subtitle = a.publishedAt.formatDateTime()
-                    this.toggleMode = toggleMode
-                    isChecked = checkedItems.any { it.data.id == data.id }
-                }
-            }, hasMore = {
-                items.size == viewModel.limit
-            })
+            binding.list.page.addData(
+                items.map { a ->
+                    FeedEntryModel(a, feeds[a.feedId]).apply {
+                        image = a.image
+                        title = a.title
+                        subtitle = a.publishedAt.formatDateTime()
+                        this.toggleMode = toggleMode
+                        isChecked = checkedItems.any { it.data.id == data.id }
+                    }
+                },
+                hasMore = {
+                    items.size == viewModel.limit
+                },
+            )
             updateTitle()
         }
     }
@@ -291,4 +308,3 @@ class FeedEntriesDialog : BaseListDrawerDialog() {
         }
     }
 }
-

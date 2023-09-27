@@ -27,7 +27,10 @@ import com.ismartcoding.plain.ui.views.ClassicsHeader
 import kotlinx.coroutines.launch
 
 class FeedEntryDialog(private val feedEntry: DFeedEntry, val feed: DFeed?) : BaseDialog<DialogFeedEntryBinding>() {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.topAppBar.toolbar.run {
@@ -52,13 +55,15 @@ class FeedEntryDialog(private val feedEntry: DFeedEntry, val feed: DFeed?) : Bas
             }
         }
         binding.page.run {
-            setRefreshHeader(ClassicsHeader(context, this).apply {
-                pullText = { getString(R.string.pull_down_to_fecth_content) }
-                refreshingText = { getString(R.string.fetching_content) }
-                releaseText = { getString(R.string.release_to_fetch) }
-                finishText = { getString(R.string.fetched) }
-                failedText = { getString(R.string.fetch_failed) }
-            })
+            setRefreshHeader(
+                ClassicsHeader(context, this).apply {
+                    pullText = { getString(R.string.pull_down_to_fecth_content) }
+                    refreshingText = { getString(R.string.fetching_content) }
+                    releaseText = { getString(R.string.release_to_fetch) }
+                    finishText = { getString(R.string.fetched) }
+                    failedText = { getString(R.string.fetch_failed) }
+                },
+            )
             onRefresh {
                 lifecycleScope.launch {
                     val r = withIO { feedEntry.fetchContentAsync() }
@@ -78,7 +83,10 @@ class FeedEntryDialog(private val feedEntry: DFeedEntry, val feed: DFeed?) : Bas
 
     private fun updateContent() {
         binding.title.text = feedEntry.title
-        binding.subtitle.text = arrayOf(feed?.name ?: "", feedEntry.author, feedEntry.publishedAt.formatDateTime()).filter { it.isNotEmpty() }.joinToString(" | ")
+        binding.subtitle.text =
+            arrayOf(feed?.name ?: "", feedEntry.author, feedEntry.publishedAt.formatDateTime()).filter {
+                it.isNotEmpty()
+            }.joinToString(" | ")
         val content = feedEntry.content.ifEmpty { feedEntry.description }
         binding.title.setDoubleCLick {
             PlainTextDialog("HTML", content).show()

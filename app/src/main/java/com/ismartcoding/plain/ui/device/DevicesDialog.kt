@@ -44,7 +44,11 @@ import kotlinx.coroutines.launch
 
 class DevicesDialog : BaseDialog<DialogDevicesBinding>() {
     private var searchQ: String = ""
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.list.rv.linear().setup {
@@ -141,8 +145,10 @@ class DevicesDialog : BaseDialog<DialogDevicesBinding>() {
         }
     }
 
-
-    private fun sort(menu: Menu, sortBy: DeviceSortBy) {
+    private fun sort(
+        menu: Menu,
+        sortBy: DeviceSortBy,
+    ) {
         lifecycleScope.launch {
             DeviceSortHelper.getSelectedSortItemAsync(requireContext(), menu).unhighlightTitle()
             withIO { DeviceSortByPreference.putAsync(requireContext(), sortBy) }
@@ -159,11 +165,12 @@ class DevicesDialog : BaseDialog<DialogDevicesBinding>() {
             binding.topAppBar.toolbar.run {
                 title = LocaleHelper.getString(R.string.devices)
                 val total = devices.size
-                subtitle = if (total > 0) {
-                    LocaleHelper.getStringF(R.string.devices_subtitle, "total", total, "online", devices.count { it.isOnline })
-                } else {
-                    ""
-                }
+                subtitle =
+                    if (total > 0) {
+                        LocaleHelper.getStringF(R.string.devices_subtitle, "total", total, "online", devices.count { it.isOnline })
+                    } else {
+                        ""
+                    }
             }
         }
     }

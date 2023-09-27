@@ -13,7 +13,6 @@ fun BlockRadioButton(
     onSelected: (Int) -> Unit,
     itemRadioGroups: List<BlockRadioGroupButtonItem> = listOf(),
 ) {
-
     Column {
         Row(
             modifier = modifier.padding(horizontal = 16.dp),
@@ -22,9 +21,10 @@ fun BlockRadioButton(
         ) {
             itemRadioGroups.forEachIndexed { index, item ->
                 BlockButton(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = if (item == itemRadioGroups.last()) 0.dp else 8.dp),
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .padding(end = if (item == itemRadioGroups.last()) 0.dp else 8.dp),
                     text = item.text,
                     selected = selected == index,
                 ) {

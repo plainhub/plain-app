@@ -30,8 +30,8 @@ class BreadcrumbLayout : HorizontalScrollView {
             arrayOf(intArrayOf(android.R.attr.state_activated), intArrayOf()),
             intArrayOf(
                 ContextCompat.getColor(context, R.color.primary),
-                ContextCompat.getColor(context, R.color.secondary)
-            )
+                ContextCompat.getColor(context, R.color.secondary),
+            ),
         )
     var navigateTo: ((BreadcrumbItem) -> Unit)? = null
     private val mPaths = mutableListOf<BreadcrumbItem>()
@@ -44,18 +44,25 @@ class BreadcrumbLayout : HorizontalScrollView {
     constructor(context: Context) : super(context)
 
     constructor(context: Context, attrs: AttributeSet?) : super(
-        context, attrs
-    )
-
-    constructor(context: Context, attrs: AttributeSet?, @AttrRes defStyleAttr: Int) : super(
-        context, attrs, defStyleAttr
+        context,
+        attrs,
     )
 
     constructor(
         context: Context,
         attrs: AttributeSet?,
         @AttrRes defStyleAttr: Int,
-        @StyleRes defStyleRes: Int
+    ) : super(
+        context,
+        attrs,
+        defStyleAttr,
+    )
+
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        @AttrRes defStyleAttr: Int,
+        @StyleRes defStyleRes: Int,
     ) : super(context, attrs, defStyleAttr, defStyleRes)
 
     init {
@@ -73,7 +80,10 @@ class BreadcrumbLayout : HorizontalScrollView {
         super.jumpDrawablesToCurrentState()
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    override fun onMeasure(
+        widthMeasureSpec: Int,
+        heightMeasureSpec: Int,
+    ) {
         val heightMode = MeasureSpec.getMode(heightMeasureSpec)
         var newHeightMeasureSpec = heightMeasureSpec
         if (heightMode == MeasureSpec.UNSPECIFIED || heightMode == MeasureSpec.AT_MOST) {
@@ -91,7 +101,13 @@ class BreadcrumbLayout : HorizontalScrollView {
         super.requestLayout()
     }
 
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+    override fun onLayout(
+        changed: Boolean,
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int,
+    ) {
         super.onLayout(changed, left, top, right, bottom)
 
         mIsLayoutDirty = false
@@ -101,7 +117,10 @@ class BreadcrumbLayout : HorizontalScrollView {
         }
     }
 
-    fun setData(paths: List<BreadcrumbItem>, selectedIndex: Int) {
+    fun setData(
+        paths: List<BreadcrumbItem>,
+        selectedIndex: Int,
+    ) {
         mPaths.clear()
         mPaths.addAll(paths)
         mSelectedIndex = selectedIndex
@@ -115,11 +134,12 @@ class BreadcrumbLayout : HorizontalScrollView {
             return
         }
         val selectedItemView = mItemsLayout.getChildAt(mSelectedIndex)
-        val scrollX = if (layoutDirection == View.LAYOUT_DIRECTION_LTR) {
-            selectedItemView.left - mItemsLayout.paddingStart
-        } else {
-            selectedItemView.right - width + mItemsLayout.paddingStart
-        }
+        val scrollX =
+            if (layoutDirection == View.LAYOUT_DIRECTION_LTR) {
+                selectedItemView.left - mItemsLayout.paddingStart
+            } else {
+                selectedItemView.right - width + mItemsLayout.paddingStart
+            }
         if (!mIsFirstScroll && isShown) {
             smoothScrollTo(scrollX, 0)
         } else {
@@ -133,8 +153,9 @@ class BreadcrumbLayout : HorizontalScrollView {
         mPaths.forEachIndexed { index, data ->
             val binding = ItemBreadcrumbBinding.inflate(LayoutInflater.from(context), mItemsLayout, false)
             binding.root.setOnLongClickListener {
-                val menu = PopupMenu(context, binding.root)
-                    .apply { inflate(R.menu.files_breadcrumb) }
+                val menu =
+                    PopupMenu(context, binding.root)
+                        .apply { inflate(R.menu.files_breadcrumb) }
                 menu.setOnMenuItemClickListener {
                     when (it.itemId) {
                         R.id.copy_path -> {

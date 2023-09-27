@@ -10,16 +10,18 @@ fun VerticalRefreshableLayout(
     topRefreshLayoutState: RefreshLayoutState,
     bottomRefreshLayoutState: RefreshLayoutState,
     modifier: Modifier = Modifier,
-    topRefreshContent: @Composable RefreshLayoutState.() -> Unit = remember {
-        { PullToRefreshContent() }
-    },
+    topRefreshContent: @Composable RefreshLayoutState.() -> Unit =
+        remember {
+            { PullToRefreshContent() }
+        },
     bottomIsLoadFinish: Boolean = false,
-    bottomRefreshContent: @Composable RefreshLayoutState.() -> Unit = remember(bottomIsLoadFinish) {
-        { LoadMoreRefreshContent(bottomIsLoadFinish) }
-    },
+    bottomRefreshContent: @Composable RefreshLayoutState.() -> Unit =
+        remember(bottomIsLoadFinish) {
+            { LoadMoreRefreshContent(bottomIsLoadFinish) }
+        },
     topUserEnable: Boolean = true,
     bottomUserEnable: Boolean = true,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     RefreshLayout(
         modifier = modifier,
@@ -33,8 +35,7 @@ fun VerticalRefreshableLayout(
             refreshLayoutState = bottomRefreshLayoutState,
             composePosition = ComposePosition.Bottom,
             userEnable = bottomUserEnable,
-            content = content
+            content = content,
         )
     }
 }
-

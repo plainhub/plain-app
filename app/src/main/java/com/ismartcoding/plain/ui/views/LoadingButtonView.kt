@@ -13,7 +13,7 @@ import com.ismartcoding.plain.ui.extensions.alphaEnable
 
 enum class ButtonType {
     NORMAL,
-    DANGER
+    DANGER,
 }
 
 class LoadingButtonView(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {

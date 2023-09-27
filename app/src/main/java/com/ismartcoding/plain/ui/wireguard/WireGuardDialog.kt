@@ -17,7 +17,10 @@ import com.ismartcoding.plain.ui.extensions.onMenuItemClick
 import com.ismartcoding.plain.ui.views.ListItemView
 
 class WireGuardDialog(var wireGuard: WireGuard) : BaseBottomSheetDialog<DialogWireguardBinding>() {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.topAppBar.run {
             title = wireGuard.interfaze.name
@@ -63,7 +66,15 @@ class WireGuardDialog(var wireGuard: WireGuard) : BaseBottomSheetDialog<DialogWi
             if (peer.latestHandshake != null) {
                 view.addTextRow("${getString(R.string.endpoint)}: " + peer.endpointing)
                 view.addTextRow("${getString(R.string.latest_handshake)}: " + peer.latestHandshake?.formatDateTime())
-                view.addTextRow(LocaleHelper.getStringF(R.string.transfer_text, "rx_bytes", FormatHelper.formatBytes(peer.rxBytes), "tx_bytes", FormatHelper.formatBytes(peer.txBytes)))
+                view.addTextRow(
+                    LocaleHelper.getStringF(
+                        R.string.transfer_text,
+                        "rx_bytes",
+                        FormatHelper.formatBytes(peer.rxBytes),
+                        "tx_bytes",
+                        FormatHelper.formatBytes(peer.txBytes),
+                    ),
+                )
             }
             binding.peers.addView(view)
         }

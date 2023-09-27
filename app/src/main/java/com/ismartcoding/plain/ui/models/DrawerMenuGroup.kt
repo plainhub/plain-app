@@ -17,5 +17,5 @@ enum class DrawerMenuGroupType {
     CALL_TYPES,
     SMS_TYPES,
     FOLDERS,
-    TAGS;
+    TAGS,
 }

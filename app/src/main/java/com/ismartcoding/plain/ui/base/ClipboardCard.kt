@@ -27,27 +27,30 @@ fun ClipboardCard(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(
-                color = MaterialTheme.colorScheme.cardBackColor(), shape = RoundedCornerShape(16.dp)
-            )
+        modifier =
+            modifier
+                .padding(horizontal = 16.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(
+                    color = MaterialTheme.colorScheme.cardBackColor(),
+                    shape = RoundedCornerShape(16.dp),
+                ),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    val clip = ClipData.newPlainText(label, text)
-                    clipboardManager.setPrimaryClip(clip)
-                    DialogHelper.showMessage(R.string.copied)
-                }
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        val clip = ClipData.newPlainText(label, text)
+                        clipboardManager.setPrimaryClip(clip)
+                        DialogHelper.showMessage(R.string.copied)
+                    }
+                    .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = text,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
     }

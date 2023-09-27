@@ -20,9 +20,7 @@ import com.ismartcoding.plain.ui.page.RouteName
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsPage(
-    navController: NavHostController,
-) {
+fun SettingsPage(navController: NavHostController) {
     PScaffold(
         navController,
         topBarTitle = stringResource(R.string.settings),
@@ -70,6 +68,6 @@ fun SettingsPage(
                     )
                 }
             }
-        }
+        },
     )
 }

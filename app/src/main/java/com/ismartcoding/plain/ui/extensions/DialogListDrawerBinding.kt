@@ -11,7 +11,11 @@ import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.databinding.DialogListDrawerBinding
 import com.ismartcoding.plain.ui.models.FilteredItemsViewModel
 
-fun DialogListDrawerBinding.initToggleMode(viewLifecycleOwner: LifecycleOwner, viewModel: FilteredItemsViewModel, title: Int) {
+fun DialogListDrawerBinding.initToggleMode(
+    viewLifecycleOwner: LifecycleOwner,
+    viewModel: FilteredItemsViewModel,
+    title: Int,
+) {
     viewModel.toggleMode.observe(viewLifecycleOwner) { toggleMode ->
         list.rv.bindingAdapter.toggle(toggleMode)
         val context = list.page.context
@@ -28,7 +32,9 @@ fun DialogListDrawerBinding.initToggleMode(viewLifecycleOwner: LifecycleOwner, v
                 list.rv.setPadding(0, 0, 0, context.dp2px(32))
             }
             bottomAction.performHide()
-            drawer.setDrawerLockMode(if (viewModel.data is DMediaBucket) DrawerLayout.LOCK_MODE_LOCKED_CLOSED else DrawerLayout.LOCK_MODE_UNLOCKED)
+            drawer.setDrawerLockMode(
+                if (viewModel.data is DMediaBucket) DrawerLayout.LOCK_MODE_LOCKED_CLOSED else DrawerLayout.LOCK_MODE_UNLOCKED,
+            )
         }
         topAppBar.toolbar.menu.run {
             findItem(R.id.select_all)?.isVisible = toggleMode

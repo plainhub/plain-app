@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ui.base
 
 import android.view.HapticFeedbackConstants
 import android.view.SoundEffectConstants
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -11,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
@@ -43,14 +41,15 @@ fun PIconButton(
             BadgedBox(
                 badge = {
                     Badge(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .offset(x = (-3).dp, y = 9.dp)
-                            .clip(CircleShape),
+                        modifier =
+                            Modifier
+                                .size(8.dp)
+                                .offset(x = (-3).dp, y = 9.dp)
+                                .clip(CircleShape),
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary,
                     )
-                }
+                },
             ) {
                 Icon(
                     modifier = modifier,

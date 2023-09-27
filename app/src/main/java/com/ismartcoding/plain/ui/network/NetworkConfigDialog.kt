@@ -17,11 +17,11 @@ import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.DialogNetworkConfigBinding
 import com.ismartcoding.plain.features.box.FetchNetworkConfigEvent
 import com.ismartcoding.plain.features.box.NetworkConfigResultEvent
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.ui.extensions.initMenu
 import com.ismartcoding.plain.ui.extensions.onBack
 import com.ismartcoding.plain.ui.extensions.onMenuItemClick
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.launch
 
 class NetworkConfigDialog : BaseDialog<DialogNetworkConfigBinding>() {
@@ -35,7 +35,10 @@ class NetworkConfigDialog : BaseDialog<DialogNetworkConfigBinding>() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.topAppBar.toolbar.run {
             setTitle(R.string.network_config)
@@ -57,9 +60,13 @@ class NetworkConfigDialog : BaseDialog<DialogNetworkConfigBinding>() {
 
                         lifecycleScope.launch {
                             DialogHelper.showLoading()
-                            val r = withIO {
-                                BoxApi.mixMutateAsync(ApplyNetplanAndNetmixMutation(netplan, netmix), timeout = HttpApiTimeout.MEDIUM_SECONDS)
-                            }
+                            val r =
+                                withIO {
+                                    BoxApi.mixMutateAsync(
+                                        ApplyNetplanAndNetmixMutation(netplan, netmix),
+                                        timeout = HttpApiTimeout.MEDIUM_SECONDS,
+                                    )
+                                }
                             DialogHelper.hideLoading()
                             if (!r.isSuccess()) {
                                 DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())
@@ -76,27 +83,29 @@ class NetworkConfigDialog : BaseDialog<DialogNetworkConfigBinding>() {
             }
         }
 
-        binding.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                if (tab.position == 0) {
-                    binding.netplan.visibility = View.VISIBLE
-                } else {
-                    binding.netmix.visibility = View.VISIBLE
+        binding.tabs.addOnTabSelectedListener(
+            object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab) {
+                    if (tab.position == 0) {
+                        binding.netplan.visibility = View.VISIBLE
+                    } else {
+                        binding.netmix.visibility = View.VISIBLE
+                    }
+                    binding.page.setEnableRefresh(true)
                 }
-                binding.page.setEnableRefresh(true)
-            }
 
-            override fun onTabUnselected(tab: TabLayout.Tab) {
-                if (tab.position == 0) {
-                    binding.netplan.visibility = View.GONE
-                } else {
-                    binding.netmix.visibility = View.GONE
+                override fun onTabUnselected(tab: TabLayout.Tab) {
+                    if (tab.position == 0) {
+                        binding.netplan.visibility = View.GONE
+                    } else {
+                        binding.netmix.visibility = View.GONE
+                    }
                 }
-            }
 
-            override fun onTabReselected(tab: TabLayout.Tab) {
-            }
-        })
+                override fun onTabReselected(tab: TabLayout.Tab) {
+                }
+            },
+        )
 
         binding.page.onRefresh {
             fetch()

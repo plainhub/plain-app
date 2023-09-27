@@ -65,7 +65,10 @@ interface FeedEntryDao {
     fun deleteByFeedIds(ids: Set<String>)
 
     @Query("SELECT * from feed_entries WHERE url=:url AND feed_id=:feedId")
-    fun getByUrl(url: String, feedId: String): DFeedEntry?
+    fun getByUrl(
+        url: String,
+        feedId: String,
+    ): DFeedEntry?
 
     @Query("SELECT id from feed_entries WHERE feed_id in (:ids)")
     fun getIds(ids: Set<String>): List<String>
@@ -80,10 +83,13 @@ interface FeedEntryDao {
                     url = it.url,
                     feedId = it.feedId,
                 ) == null
-            ) it else null
+            ) {
+                it
+            } else {
+                null
+            }
         }.also {
             insertList(it)
         }
     }
 }
-

@@ -48,13 +48,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
-
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SoundMeterPage(
-    navController: NavHostController,
-) {
+fun SoundMeterPage(navController: NavHostController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var decibelValuesDialogVisible by remember { mutableStateOf(false) }
@@ -82,7 +79,8 @@ fun SoundMeterPage(
         events.add(
             receiveEventHandler<PermissionResultEvent> {
                 isRunning = Permission.RECORD_AUDIO.can(context)
-            })
+            },
+        )
     }
 
     DisposableEffect(Unit) {
@@ -101,19 +99,21 @@ fun SoundMeterPage(
             return@LaunchedEffect
         }
 
-        val bufferSize = AudioRecord.getMinBufferSize(
-            44100,
-            AudioFormat.CHANNEL_IN_MONO,
-            AudioFormat.ENCODING_PCM_16BIT
-        )
+        val bufferSize =
+            AudioRecord.getMinBufferSize(
+                44100,
+                AudioFormat.CHANNEL_IN_MONO,
+                AudioFormat.ENCODING_PCM_16BIT,
+            )
         val buffer = ShortArray(bufferSize)
-        audioRecord = AudioRecord(
-            MediaRecorder.AudioSource.MIC,
-            44100,
-            AudioFormat.CHANNEL_IN_MONO,
-            AudioFormat.ENCODING_PCM_16BIT,
-            bufferSize
-        )
+        audioRecord =
+            AudioRecord(
+                MediaRecorder.AudioSource.MIC,
+                44100,
+                AudioFormat.CHANNEL_IN_MONO,
+                AudioFormat.ENCODING_PCM_16BIT,
+                bufferSize,
+            )
         if (audioRecord?.state == AudioRecord.STATE_INITIALIZED) {
             audioRecord?.startRecording()
         }
@@ -168,10 +168,11 @@ fun SoundMeterPage(
             LazyColumn {
                 item {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 56.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 56.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Row(verticalAlignment = Alignment.Bottom) {
                             Text(
@@ -191,28 +192,29 @@ fun SoundMeterPage(
                 }
                 item {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 40.dp, vertical = 24.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 40.dp, vertical = 24.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Column(
                             modifier = Modifier.weight(1f),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(text = stringResource(id = R.string.min))
                             Text(text = FormatHelper.formatFloat(min, digits = 1))
                         }
                         Column(
                             modifier = Modifier.weight(1f),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(text = stringResource(id = R.string.avg))
                             Text(text = FormatHelper.formatFloat(avg, digits = 1))
                         }
                         Column(
                             modifier = Modifier.weight(1f),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(text = stringResource(id = R.string.max))
                             Text(text = FormatHelper.formatFloat(max, digits = 1))
@@ -221,11 +223,12 @@ fun SoundMeterPage(
                     Text(
                         text = decibelValueString,
                         color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(96.dp)
-                            .padding(16.dp),
-                        textAlign = TextAlign.Center
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(96.dp)
+                                .padding(16.dp),
+                        textAlign = TextAlign.Center,
                     )
                     BlockOutlineButton(text = stringResource(id = if (isRunning) R.string.stop else R.string.start)) {
                         if (isRunning) {
@@ -252,7 +255,7 @@ fun SoundMeterPage(
                     BottomSpace()
                 }
             }
-        }
+        },
     )
 
     if (decibelValuesDialogVisible) {
@@ -267,7 +270,7 @@ fun SoundMeterPage(
                             Text(
                                 text = it,
                                 color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 8.dp)
+                                modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 8.dp),
                             )
                         }
                     }
@@ -276,7 +279,4 @@ fun SoundMeterPage(
             }
         }
     }
-
 }
-
-

@@ -10,7 +10,7 @@ import kotlinx.parcelize.Parcelize
 @Entity(tableName = "tags")
 @Parcelize
 data class DTag(
-    @PrimaryKey override var id: String = StringHelper.shortUUID()
+    @PrimaryKey override var id: String = StringHelper.shortUUID(),
 ) : IData, Parcelable, DEntityBase() {
     var name: String = ""
     var type: Int = 0
@@ -34,4 +34,3 @@ interface TagDao {
     @Query("DELETE FROM tags WHERE id=:id")
     fun delete(id: String)
 }
-

@@ -4,8 +4,6 @@ import android.view.View
 import android.widget.*
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
-import androidx.core.view.updateLayoutParams
-import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
 import com.google.android.material.button.MaterialButton
 import com.ismartcoding.lib.extensions.delayOnLifecycle
 import com.ismartcoding.lib.extensions.px
@@ -32,7 +30,9 @@ fun ViewListItemBinding.initTheme(): ViewListItemBinding {
         .setValueTextColor(color)
 }
 
-fun ViewListItemBinding.setKeyTextColor(@ColorInt color: Int): ViewListItemBinding {
+fun ViewListItemBinding.setKeyTextColor(
+    @ColorInt color: Int,
+): ViewListItemBinding {
     this.textKey.setTextColor(color)
     return this
 }
@@ -49,7 +49,9 @@ fun ViewListItemBinding.performClickRow() {
     }
 }
 
-fun ViewListItemBinding.setValueTextColor(@ColorInt color: Int): ViewListItemBinding {
+fun ViewListItemBinding.setValueTextColor(
+    @ColorInt color: Int,
+): ViewListItemBinding {
     this.textValue.setTextColor(color)
     return this
 }
@@ -63,7 +65,9 @@ fun ViewListItemBinding.setValueText(text: String): ViewListItemBinding {
     return this
 }
 
-fun ViewListItemBinding.setStartIcon(@DrawableRes iconId: Int): ViewListItemBinding {
+fun ViewListItemBinding.setStartIcon(
+    @DrawableRes iconId: Int,
+): ViewListItemBinding {
     startIcon.visibility = View.VISIBLE
     startIcon.setImageResource(iconId)
     return this
@@ -81,10 +85,11 @@ fun ViewListItemBinding.addTextRow(text: String): ViewListItemBinding {
     textView.setSelectableTextClickable {
         performClickRow()
     }
-    val layoutParams = LinearLayout.LayoutParams(
-        LinearLayout.LayoutParams.MATCH_PARENT,
-        LinearLayout.LayoutParams.WRAP_CONTENT
-    )
+    val layoutParams =
+        LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+        )
     layoutParams.topMargin = context.px(R.dimen.size_mini)
     textView.layoutParams = layoutParams
     textView.setTextIsSelectable(true)
@@ -102,8 +107,10 @@ fun ViewListItemBinding.setButton(block: MaterialButton.() -> Unit) {
     block(button)
 }
 
-
-fun ViewListItemBinding.setLeftSwipeButton(buttonText: String, buttonCallback: () -> Unit): ViewListItemBinding {
+fun ViewListItemBinding.setLeftSwipeButton(
+    buttonText: String,
+    buttonCallback: () -> Unit,
+): ViewListItemBinding {
     leftSwipeButton.let {
         it.visibility = View.VISIBLE
         it.text = buttonText
@@ -114,7 +121,10 @@ fun ViewListItemBinding.setLeftSwipeButton(buttonText: String, buttonCallback: (
     return this
 }
 
-fun ViewListItemBinding.setRightSwipeButton(buttonText: String, buttonCallback: () -> Unit): ViewListItemBinding {
+fun ViewListItemBinding.setRightSwipeButton(
+    buttonText: String,
+    buttonCallback: () -> Unit,
+): ViewListItemBinding {
     rightSwipeButton.let {
         it.visibility = View.VISIBLE
         it.text = buttonText
@@ -132,7 +142,10 @@ fun ViewListItemBinding.setClick(callback: (() -> Unit)?): ViewListItemBinding {
     return this
 }
 
-fun ViewListItemBinding.setSwitch(enable: Boolean, onChanged: ((CompoundButton, Boolean) -> Unit)? = null): ViewListItemBinding {
+fun ViewListItemBinding.setSwitch(
+    enable: Boolean,
+    onChanged: ((CompoundButton, Boolean) -> Unit)? = null,
+): ViewListItemBinding {
     endSwitch.visibility = View.VISIBLE
     endSwitch.setOnCheckedChangeListener(null)
     endSwitch.isChecked = enable
@@ -161,7 +174,10 @@ fun ViewListItemBinding.showSelected() {
     setEndIcon(R.drawable.ic_done)
 }
 
-fun ViewListItemBinding.setEndIcon(@DrawableRes iconId: Int, clickCallback: (() -> Unit)? = null): ViewListItemBinding {
+fun ViewListItemBinding.setEndIcon(
+    @DrawableRes iconId: Int,
+    clickCallback: (() -> Unit)? = null,
+): ViewListItemBinding {
     endIcon.visibility = View.VISIBLE
     endIcon.setImageResource(iconId)
     if (clickCallback != null) {
@@ -180,7 +196,11 @@ fun ViewListItemBinding.showMore(): ViewListItemBinding {
     return this
 }
 
-fun ViewListItemBinding.setChips(items: List<ChipItem>, value: String, onChanged: ((String) -> Unit)? = null) {
+fun ViewListItemBinding.setChips(
+    items: List<ChipItem>,
+    value: String,
+    onChanged: ((String) -> Unit)? = null,
+) {
     chipGroup.run {
         visibility = View.VISIBLE
         initView(items, value, false) {
@@ -189,25 +209,37 @@ fun ViewListItemBinding.setChips(items: List<ChipItem>, value: String, onChanged
     }
 }
 
-fun ViewListItemBinding.setSpinners(items: List<String>, value: String, onChanged: ((String) -> Unit)? = null) {
+fun ViewListItemBinding.setSpinners(
+    items: List<String>,
+    value: String,
+    onChanged: ((String) -> Unit)? = null,
+) {
     spinner.run {
         visibility = View.VISIBLE
-        val adapter = ArrayAdapter<String>(
-            this.context,
-            R.layout.simple_spinner_item, items
-        )
+        val adapter =
+            ArrayAdapter<String>(
+                this.context,
+                R.layout.simple_spinner_item,
+                items,
+            )
         spinner.adapter = adapter
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val newValue = items[position]
-                if (value != newValue) {
-                    onChanged?.invoke(newValue)
+        spinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>,
+                    view: View?,
+                    position: Int,
+                    id: Long,
+                ) {
+                    val newValue = items[position]
+                    if (value != newValue) {
+                        onChanged?.invoke(newValue)
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
                 }
             }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
-        }
         spinner.setSelection(items.indexOf(value))
     }
 }

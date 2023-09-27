@@ -32,7 +32,11 @@ import kotlinx.coroutines.launch
 class CastDialog(val items: List<IMedia>, private val singlePath: String = "") :
     BaseBottomSheetDialog<DialogScreencastBinding>() {
     private var viewModel: CastViewModel? = null
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[CastViewModel::class.java]
         sendEvent(StartHttpServerEvent())
@@ -109,7 +113,8 @@ class CastDialog(val items: List<IMedia>, private val singlePath: String = "") :
                 if (view != null && binding.list.rv.models == null) {
                     binding.list.page.addData(listOf())
                 }
-            }, 5000
+            },
+            5000,
         )
     }
 

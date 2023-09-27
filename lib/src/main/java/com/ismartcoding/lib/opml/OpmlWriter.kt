@@ -22,7 +22,10 @@ class OpmlWriter {
         return stringWriter.toString()
     }
 
-    private fun writeOpml(serializer: XmlSerializer, opml: Opml) {
+    private fun writeOpml(
+        serializer: XmlSerializer,
+        opml: Opml,
+    ) {
         serializer.startTag(null, "opml")
         serializer.attribute(null, "version", opml.version)
         serializer.text(System.lineSeparator())
@@ -32,7 +35,10 @@ class OpmlWriter {
         serializer.text(System.lineSeparator())
     }
 
-    private fun writeHead(serializer: XmlSerializer, head: Head) {
+    private fun writeHead(
+        serializer: XmlSerializer,
+        head: Head,
+    ) {
         serializer.text(SINGLE_INDENT)
         serializer.startTag(null, "head")
         serializer.text(System.lineSeparator())
@@ -132,7 +138,10 @@ class OpmlWriter {
         serializer.text(System.lineSeparator())
     }
 
-    private fun writeBody(serializer: XmlSerializer, body: Body) {
+    private fun writeBody(
+        serializer: XmlSerializer,
+        body: Body,
+    ) {
         serializer.text(SINGLE_INDENT)
         serializer.startTag(null, "body")
         serializer.text(System.lineSeparator())
@@ -144,7 +153,10 @@ class OpmlWriter {
         serializer.text(System.lineSeparator())
     }
 
-    private fun writeOutline(serializer: XmlSerializer, outline: Outline) {
+    private fun writeOutline(
+        serializer: XmlSerializer,
+        outline: Outline,
+    ) {
         serializer.text(DOUBLE_INDENT)
         serializer.startTag(null, "outline")
         for ((key, value) in outline.attributes.entries) {

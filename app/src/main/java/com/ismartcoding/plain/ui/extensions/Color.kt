@@ -23,5 +23,7 @@ fun Color.atElevation(
     return sourceColor.copy(alpha = elevation.alphaLN(constant = 4.5f)).compositeOver(this)
 }
 
-fun Dp.alphaLN(constant: Float = 1f, weight: Float = 0f): Float =
-    ((constant * ln(value + 1) + weight) + 2f) / 100f
+fun Dp.alphaLN(
+    constant: Float = 1f,
+    weight: Float = 0f,
+): Float = ((constant * ln(value + 1) + weight) + 2f) / 100f

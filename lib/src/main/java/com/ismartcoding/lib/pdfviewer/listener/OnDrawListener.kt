@@ -19,5 +19,10 @@ interface OnDrawListener {
      * @param pageHeight    The height of the current page.
      * @param displayedPage The current page index
      */
-    fun onLayerDrawn(canvas: Canvas, pageWidth: Float, pageHeight: Float, displayedPage: Int)
+    fun onLayerDrawn(
+        canvas: Canvas,
+        pageWidth: Float,
+        pageHeight: Float,
+        displayedPage: Int,
+    )
 }

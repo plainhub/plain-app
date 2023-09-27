@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.features.bluetooth
 
-
 interface IBTOperation {
     val device: BTDevice
+
     fun run()
 }
 
@@ -30,7 +30,7 @@ data class BTOperationDisconnect(override val device: BTDevice) : IBTOperation {
 data class BTOperationCharacteristicWrite(
     override val device: BTDevice,
     val api: BluetoothApi,
-    val value: String
+    val value: String,
 ) : IBTOperation {
     override fun run() {
         if (!device.writeCharacteristic(api, value)) {
@@ -45,7 +45,7 @@ data class BTOperationCharacteristicWrite(
 
 data class BTOperationCharacteristicRead(
     override val device: BTDevice,
-    val api: BluetoothApi
+    val api: BluetoothApi,
 ) : IBTOperation {
     override fun run() {
         if (!device.readCharacteristic(api)) {
@@ -61,7 +61,7 @@ data class BTOperationCharacteristicRead(
 data class BTOperationEnableNotifications(
     override val device: BTDevice,
     val api: BluetoothApi,
-    val enable: Boolean
+    val enable: Boolean,
 ) : IBTOperation {
     override fun run() {
         if (!device.enableNotification(api, enable)) {
@@ -76,7 +76,7 @@ data class BTOperationEnableNotifications(
 
 data class BTOperationMtuRequest(
     override val device: BTDevice,
-    val mtu: Int
+    val mtu: Int,
 ) : IBTOperation {
     override fun run() {
         device.bluetoothGatt?.requestMtu(mtu)

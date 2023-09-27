@@ -11,9 +11,9 @@ import android.util.DisplayMetrics
 import android.view.*
 import android.view.animation.LinearInterpolator
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.databinding.ViewVideoPlayerFloatBinding
-import com.ismartcoding.lib.media.VideoPlayer
 import com.ismartcoding.lib.media.IVideoPlayer
+import com.ismartcoding.lib.media.VideoPlayer
+import com.ismartcoding.plain.databinding.ViewVideoPlayerFloatBinding
 import kotlin.math.abs
 
 class PlayerFloatWindow(context: Context) :
@@ -22,7 +22,7 @@ class PlayerFloatWindow(context: Context) :
         ViewVideoPlayerFloatBinding.inflate(
             LayoutInflater.from(context),
             this,
-            true
+            true,
         )
 
     /** 窗体管理者：管理悬浮窗 */
@@ -52,11 +52,12 @@ class PlayerFloatWindow(context: Context) :
 
     override fun onBufferingUpdate(mp: IVideoPlayer) {
         super.onBufferingUpdate(mp)
-        binding.playerLoadingView.visibility = if (mp.isBuffering() && !mp.isPlaying()) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
+        binding.playerLoadingView.visibility =
+            if (mp.isBuffering() && !mp.isPlaying()) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
     }
 
     init {
@@ -67,14 +68,15 @@ class PlayerFloatWindow(context: Context) :
 
     private fun initWindowManager(context: Context) {
         mWindowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        mWindowLayoutParams = WindowManager.LayoutParams().apply {
-            type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-            flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-            format = PixelFormat.RGBA_8888
-            gravity = Gravity.TOP or Gravity.START
-            width = WindowManager.LayoutParams.WRAP_CONTENT
-            height = WindowManager.LayoutParams.WRAP_CONTENT
-        }
+        mWindowLayoutParams =
+            WindowManager.LayoutParams().apply {
+                type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                format = PixelFormat.RGBA_8888
+                gravity = Gravity.TOP or Gravity.START
+                width = WindowManager.LayoutParams.WRAP_CONTENT
+                height = WindowManager.LayoutParams.WRAP_CONTENT
+            }
     }
 
     private fun initView(context: Context) {
@@ -86,54 +88,60 @@ class PlayerFloatWindow(context: Context) :
     }
 
     private fun initTouch() {
-        setOnTouchListener(object : OnTouchListener {
-            var startRawX = 0f
-            var startRawY = 0f
-            var moveRawX = 0f
-            var moveRawY = 0f
-            var startX = 0f
-            var startY = 0f
-            var isMoving = false
-            override fun onTouch(v: View, event: MotionEvent): Boolean {
-                when (event.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        isMoving = false
-                        startX = event.x
-                        startY = event.y
-                        startRawX = event.rawX
-                        startRawY = event.rawY
-                        return false
-                    }
-                    MotionEvent.ACTION_MOVE -> {
-                        val dx = event.x - startX
-                        val dy = event.y - startY
-                        if (!isMoving && (abs(dx) > touchSlop || abs(dy) > touchSlop)) {
-                            isMoving = true
+        setOnTouchListener(
+            object : OnTouchListener {
+                var startRawX = 0f
+                var startRawY = 0f
+                var moveRawX = 0f
+                var moveRawY = 0f
+                var startX = 0f
+                var startY = 0f
+                var isMoving = false
+
+                override fun onTouch(
+                    v: View,
+                    event: MotionEvent,
+                ): Boolean {
+                    when (event.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            isMoving = false
+                            startX = event.x
+                            startY = event.y
+                            startRawX = event.rawX
+                            startRawY = event.rawY
+                            return false
                         }
-                        if (isMoving) {
-                            moveRawX = event.rawX
-                            moveRawY = event.rawY
-                            mWindowLayoutParams.let {
-                                it.x += (moveRawX - startRawX).toInt()
-                                it.y += (moveRawY - startRawY).toInt()
+                        MotionEvent.ACTION_MOVE -> {
+                            val dx = event.x - startX
+                            val dy = event.y - startY
+                            if (!isMoving && (abs(dx) > touchSlop || abs(dy) > touchSlop)) {
+                                isMoving = true
                             }
-                            updateViewLayout()
-                            startRawX = moveRawX
-                            startRawY = moveRawY
+                            if (isMoving) {
+                                moveRawX = event.rawX
+                                moveRawY = event.rawY
+                                mWindowLayoutParams.let {
+                                    it.x += (moveRawX - startRawX).toInt()
+                                    it.y += (moveRawY - startRawY).toInt()
+                                }
+                                updateViewLayout()
+                                startRawX = moveRawX
+                                startRawY = moveRawY
+                            }
+                            return true
                         }
-                        return true
-                    }
-                    MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
-                        // 解决onTouch和OnClick冲突
-                        if (!isMoving) {
-                            v.performClick()
+                        MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
+                            // 解决onTouch和OnClick冲突
+                            if (!isMoving) {
+                                v.performClick()
+                            }
+                            return true
                         }
-                        return true
                     }
+                    return true
                 }
-                return true
-            }
-        })
+            },
+        )
     }
 
     private fun initScreenSize() {
@@ -162,7 +170,8 @@ class PlayerFloatWindow(context: Context) :
             it.x = if (it.x < 0) 0 else it.x
             it.y = if (it.y > screenHeight - height) screenHeight - height else it.y
             it.y = if (it.y < 0) 0 else it.y
-            try { // 部分手机在某些情况下会出现 非法参数异常
+            try {
+                // 部分手机在某些情况下会出现 非法参数异常
                 mWindowManager.updateViewLayout(this, it) // 刷新显示
             } catch (e: IllegalArgumentException) {
                 LogCat.e(e.toString())
@@ -180,20 +189,22 @@ class PlayerFloatWindow(context: Context) :
         showAnimatorSet = getShowAnimator()
         hideAnimatorSet = getHideAnimator()
 
-        hideAnimatorSet?.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                if (this@PlayerFloatWindow.isAttachedToWindow
-                    || this@PlayerFloatWindow.parent != null
-                ) {
-                    try {
-                        mWindowManager.removeViewImmediate(this@PlayerFloatWindow)
-                    } catch (e: Exception) {
+        hideAnimatorSet?.addListener(
+            object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    if (this@PlayerFloatWindow.isAttachedToWindow ||
+                        this@PlayerFloatWindow.parent != null
+                    ) {
+                        try {
+                            mWindowManager.removeViewImmediate(this@PlayerFloatWindow)
+                        } catch (e: Exception) {
+                        }
                     }
+                    isHiding = false
+                    isShowing = false
                 }
-                isHiding = false
-                isShowing = false
-            }
-        })
+            },
+        )
     }
 
     private fun startShowAnim() {

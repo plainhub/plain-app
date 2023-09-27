@@ -27,14 +27,15 @@ fun ChatText(
     navController: NavHostController,
     sharedViewModel: SharedViewModel,
     focusManager: FocusManager,
-    m: VChat
+    m: VChat,
 ) {
-    val text = (m.value as DMessageText).text.linkify(
-        SpanStyle(
-            color = MaterialTheme.colorScheme.primary,
-            textDecoration = TextDecoration.Underline,
+    val text =
+        (m.value as DMessageText).text.linkify(
+            SpanStyle(
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = TextDecoration.Underline,
+            ),
         )
-    )
     SelectionContainer {
         ClickableText(
             text = text,

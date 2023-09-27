@@ -22,7 +22,11 @@ object BookHelper {
         return bookDao.count(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
     }
 
-    fun search(query: String, limit: Int, offset: Int): List<DBook> {
+    fun search(
+        query: String,
+        limit: Int,
+        offset: Int,
+    ): List<DBook> {
         var sql = "SELECT * FROM books"
         val where = ContentWhere()
         if (query.isNotEmpty()) {
@@ -35,7 +39,10 @@ object BookHelper {
         return bookDao.search(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
     }
 
-    fun updateAsync(id: String, updateItem: DBook.() -> Unit): String {
+    fun updateAsync(
+        id: String,
+        updateItem: DBook.() -> Unit,
+    ): String {
         val item = bookDao.getById(id) ?: return id
         item.updatedAt = Clock.System.now()
         updateItem(item)
@@ -44,7 +51,10 @@ object BookHelper {
         return item.id
     }
 
-    private fun parseQuery(where: ContentWhere, query: String) {
+    private fun parseQuery(
+        where: ContentWhere,
+        query: String,
+    ) {
         val queryGroups = SearchHelper.parse(query)
         queryGroups.forEach {
             if (it.name == "text") {

@@ -121,7 +121,7 @@ fun RecyclerView.initDrawerMenu() {
 
 suspend fun RecyclerView.updateDrawerMenuAsync(
     viewModel: FilteredItemsViewModel,
-    vararg types: DrawerMenuGroupType
+    vararg types: DrawerMenuGroupType,
 ) {
     val groups = mutableListOf<Any>()
     types.forEach { type ->
@@ -130,58 +130,72 @@ suspend fun RecyclerView.updateDrawerMenuAsync(
                 arrayOf(
                     DType(CallLog.Calls.INCOMING_TYPE.toString(), R.string.call_incoming, R.drawable.ic_call_received),
                     DType(CallLog.Calls.OUTGOING_TYPE.toString(), R.string.call_outgoing, R.drawable.ic_call_made),
-                    DType(CallLog.Calls.MISSED_TYPE.toString(), R.string.call_missed, R.drawable.ic_call_missed)
+                    DType(CallLog.Calls.MISSED_TYPE.toString(), R.string.call_missed, R.drawable.ic_call_missed),
                 ).forEach { t ->
-                    groups.add(MenuItemModel(t).apply {
-                        isChecked = (viewModel.data as? DType)?.id == t.id
-                        title = getString(t.titleId)
-                        iconId = t.iconId
-                    })
+                    groups.add(
+                        MenuItemModel(t).apply {
+                            isChecked = (viewModel.data as? DType)?.id == t.id
+                            title = getString(t.titleId)
+                            iconId = t.iconId
+                        },
+                    )
                 }
             }
             DrawerMenuGroupType.SMS_TYPES -> {
                 arrayOf(
                     DType(Telephony.Sms.MESSAGE_TYPE_INBOX.toString(), R.string.inbox, R.drawable.ic_inbox),
                     DType(Telephony.Sms.MESSAGE_TYPE_SENT.toString(), R.string.sent, R.drawable.ic_outbox),
-                    DType(Telephony.Sms.MESSAGE_TYPE_DRAFT.toString(), R.string.drafts, R.drawable.ic_drafts)
+                    DType(Telephony.Sms.MESSAGE_TYPE_DRAFT.toString(), R.string.drafts, R.drawable.ic_drafts),
                 ).forEach { t ->
-                    groups.add(MenuItemModel(t).apply {
-                        isChecked = (viewModel.data as? DType)?.id == t.id
-                        title = getString(t.titleId)
-                        iconId = t.iconId
-                    })
+                    groups.add(
+                        MenuItemModel(t).apply {
+                            isChecked = (viewModel.data as? DType)?.id == t.id
+                            title = getString(t.titleId)
+                            iconId = t.iconId
+                        },
+                    )
                 }
             }
             DrawerMenuGroupType.FEEDS -> {
-                groups.add(withIO {
-                    FeedsHelper.createMenuGroupAsync(viewModel)
-                })
+                groups.add(
+                    withIO {
+                        FeedsHelper.createMenuGroupAsync(viewModel)
+                    },
+                )
             }
             DrawerMenuGroupType.ALL -> {
-                groups.add(MenuItemModel().apply {
-                    isChecked = viewModel.data == null && viewModel.trash.value == false
-                    title = getString(R.string.all)
-                    iconId = R.drawable.ic_format_list_bulleted
-                })
+                groups.add(
+                    MenuItemModel().apply {
+                        isChecked = viewModel.data == null && viewModel.trash.value == false
+                        title = getString(R.string.all)
+                        iconId = R.drawable.ic_format_list_bulleted
+                    },
+                )
             }
             DrawerMenuGroupType.FOLDERS -> {
-                groups.add(MenuItemModel(DMediaFolders()).apply {
-                    isChecked = viewModel.data is DMediaFolders
-                    title = getString(R.string.folders)
-                    iconId = R.drawable.ic_folder
-                })
+                groups.add(
+                    MenuItemModel(DMediaFolders()).apply {
+                        isChecked = viewModel.data is DMediaFolders
+                        title = getString(R.string.folders)
+                        iconId = R.drawable.ic_folder
+                    },
+                )
             }
             DrawerMenuGroupType.TRASH -> {
-                groups.add(MenuItemModel().apply {
-                    isChecked = viewModel.trash.value == true
-                    title = getString(R.string.trash)
-                    iconId = R.drawable.ic_trash
-                })
+                groups.add(
+                    MenuItemModel().apply {
+                        isChecked = viewModel.trash.value == true
+                        title = getString(R.string.trash)
+                        iconId = R.drawable.ic_trash
+                    },
+                )
             }
             DrawerMenuGroupType.TAGS -> {
-                groups.add(withIO {
-                    TagUIHelper.createMenuGroupAsync(viewModel)
-                })
+                groups.add(
+                    withIO {
+                        TagUIHelper.createMenuGroupAsync(viewModel)
+                    },
+                )
             }
             else -> {}
         }
@@ -189,43 +203,51 @@ suspend fun RecyclerView.updateDrawerMenuAsync(
     models = groups
 }
 
-suspend fun RecyclerView.updateDrawerMenuAsync(
-    viewModel: FilesViewModel
-) {
+suspend fun RecyclerView.updateDrawerMenuAsync(viewModel: FilesViewModel) {
     val groups = mutableListOf<MenuItemModel>()
-    groups.add(MenuItemModel("").apply {
-        isChecked = viewModel.type == FilesType.RECENTS
-        title = getString(R.string.recents)
-        iconId = R.drawable.ic_history
-    })
+    groups.add(
+        MenuItemModel("").apply {
+            isChecked = viewModel.type == FilesType.RECENTS
+            title = getString(R.string.recents)
+            iconId = R.drawable.ic_history
+        },
+    )
     val context = MainApp.instance
-    groups.add(MenuItemModel(FileSystemHelper.getInternalStoragePath()).apply {
-        isChecked = viewModel.type == FilesType.INTERNAL_STORAGE
-        title = FileSystemHelper.getInternalStorageName(context)
-        iconId = R.drawable.ic_storage
-    })
+    groups.add(
+        MenuItemModel(FileSystemHelper.getInternalStoragePath()).apply {
+            isChecked = viewModel.type == FilesType.INTERNAL_STORAGE
+            title = FileSystemHelper.getInternalStorageName(context)
+            iconId = R.drawable.ic_storage
+        },
+    )
     val sdCardPath = FileSystemHelper.getSDCardPath(context)
     if (sdCardPath.isNotEmpty()) {
-        groups.add(MenuItemModel(sdCardPath).apply {
-            isChecked = viewModel.type == FilesType.SDCARD
-            title = getString(R.string.sdcard)
-            iconId = R.drawable.ic_sd_card
-        })
+        groups.add(
+            MenuItemModel(sdCardPath).apply {
+                isChecked = viewModel.type == FilesType.SDCARD
+                title = getString(R.string.sdcard)
+                iconId = R.drawable.ic_sd_card
+            },
+        )
     }
     val usbPaths = FileSystemHelper.getUsbDiskPaths()
     if (usbPaths.isNotEmpty()) {
         usbPaths.forEachIndexed { index, path ->
-            groups.add(MenuItemModel(path).apply {
-                isChecked = viewModel.root == path
-                title = getString(R.string.usb_storage) + " ${index + 1}"
-                iconId = R.drawable.ic_usb
-            })
+            groups.add(
+                MenuItemModel(path).apply {
+                    isChecked = viewModel.root == path
+                    title = getString(R.string.usb_storage) + " ${index + 1}"
+                    iconId = R.drawable.ic_usb
+                },
+            )
         }
     }
-    groups.add(MenuItemModel(context.getExternalFilesDir(null)!!.absolutePath).apply {
-        isChecked = viewModel.type == FilesType.APP
-        title = getString(R.string.app_name)
-        iconId = R.drawable.ic_app_icon
-    })
+    groups.add(
+        MenuItemModel(context.getExternalFilesDir(null)!!.absolutePath).apply {
+            isChecked = viewModel.type == FilesType.APP
+            title = getString(R.string.app_name)
+            iconId = R.drawable.ic_app_icon
+        },
+    )
     models = groups
 }

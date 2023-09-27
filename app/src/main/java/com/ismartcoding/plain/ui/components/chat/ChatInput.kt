@@ -48,44 +48,46 @@ fun ChatInput(
         OutlinedTextField(
             value = value,
             onValueChange = { onValueChange(it) },
-            modifier = modifier
-                .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(8.dp),
-                )
-                .onFocusChanged { focusState -> hasFocus = focusState.hasFocus }
-                .fillMaxWidth()
-                .heightIn(max = 200.dp),
+            modifier =
+                modifier
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(8.dp),
+                    )
+                    .onFocusChanged { focusState -> hasFocus = focusState.hasFocus }
+                    .fillMaxWidth()
+                    .heightIn(max = 200.dp),
             keyboardOptions = keyboardOptions,
             shape = RoundedCornerShape(8.dp),
             placeholder = {
                 Text(
                     hint,
                     color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             },
         )
         if (hasFocus) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .imePadding()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .imePadding()
+                        .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 PIconButton(
                     imageVector = Icons.Outlined.Image,
                     contentDescription = stringResource(R.string.images),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 ) {
                     sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.IMAGE_VIDEO, multiple = true))
                 }
                 PIconButton(
                     imageVector = Icons.Outlined.Folder,
                     contentDescription = stringResource(R.string.files),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 ) {
                     sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, multiple = true))
                 }
@@ -93,7 +95,7 @@ fun ChatInput(
                 PIconButton(
                     imageVector = Icons.Outlined.Send,
                     contentDescription = stringResource(R.string.send_message),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 ) {
                     onSend()
                 }

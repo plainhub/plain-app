@@ -1,3 +1,3 @@
 package com.ismartcoding.plain.api
 
-class BoxUnreachableException: Exception()
+class BoxUnreachableException : Exception()

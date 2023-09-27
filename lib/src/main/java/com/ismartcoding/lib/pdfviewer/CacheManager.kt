@@ -15,7 +15,6 @@ class CacheManager {
 
     fun cachePart(part: PagePart) {
         synchronized(passiveActiveLock) {
-
             // If cache too big, remove and recycle
             makeAFreeSpace()
 
@@ -48,7 +47,6 @@ class CacheManager {
 
     fun cacheThumbnail(part: PagePart) {
         synchronized(thumbnails) {
-
             // If cache too big, remove and recycle
             while (thumbnails.size >= THUMBNAILS_CACHE_SIZE) {
                 thumbnails.removeAt(0).renderedBitmap?.recycle()
@@ -59,7 +57,11 @@ class CacheManager {
         }
     }
 
-    fun upPartIfContained(page: Int, pageRelativeBounds: RectF, toOrder: Int): Boolean {
+    fun upPartIfContained(
+        page: Int,
+        pageRelativeBounds: RectF,
+        toOrder: Int,
+    ): Boolean {
         val fakePart = PagePart(page, null, pageRelativeBounds, false, 0)
         var found: PagePart?
         synchronized(passiveActiveLock) {
@@ -76,7 +78,10 @@ class CacheManager {
     /**
      * Return true if already contains the described PagePart
      */
-    fun containsThumbnail(page: Int, pageRelativeBounds: RectF): Boolean {
+    fun containsThumbnail(
+        page: Int,
+        pageRelativeBounds: RectF,
+    ): Boolean {
         val fakePart = PagePart(page, null, pageRelativeBounds, true, 0)
         synchronized(thumbnails) {
             for (part in thumbnails) {
@@ -91,7 +96,10 @@ class CacheManager {
     /**
      * Add part if it doesn't exist, recycle bitmap otherwise
      */
-    private fun addWithoutDuplicates(collection: MutableCollection<PagePart>, newPart: PagePart) {
+    private fun addWithoutDuplicates(
+        collection: MutableCollection<PagePart>,
+        newPart: PagePart,
+    ) {
         for (part in collection) {
             if (part == newPart) {
                 newPart.renderedBitmap?.recycle()
@@ -134,7 +142,10 @@ class CacheManager {
     }
 
     internal inner class PagePartComparator : Comparator<PagePart> {
-        override fun compare(part1: PagePart, part2: PagePart): Int {
+        override fun compare(
+            part1: PagePart,
+            part2: PagePart,
+        ): Int {
             if (part1.cacheOrder == part2.cacheOrder) {
                 return 0
             }
@@ -143,7 +154,10 @@ class CacheManager {
     }
 
     companion object {
-        private fun find(vector: PriorityQueue<PagePart>, fakePart: PagePart): PagePart? {
+        private fun find(
+            vector: PriorityQueue<PagePart>,
+            fakePart: PagePart,
+        ): PagePart? {
             for (part in vector) {
                 if (part.equals(fakePart)) {
                     return part

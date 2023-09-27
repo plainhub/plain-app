@@ -75,12 +75,10 @@ fun dynamicDarkColorScheme(): ColorScheme {
 }
 
 @Composable
-infix fun Color.onLight(lightColor: Color): Color =
-    if (!DarkTheme.isDarkTheme(LocalDarkTheme.current)) lightColor else this
+infix fun Color.onLight(lightColor: Color): Color = if (!DarkTheme.isDarkTheme(LocalDarkTheme.current)) lightColor else this
 
 @Composable
-infix fun Color.onDark(darkColor: Color): Color =
-    if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) darkColor else this
+infix fun Color.onDark(darkColor: Color): Color = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) darkColor else this
 
 @Stable
 @Composable

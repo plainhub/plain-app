@@ -31,19 +31,15 @@ import com.ismartcoding.plain.data.preference.WebPreference
 import com.ismartcoding.plain.data.preference.dataStore
 import com.ismartcoding.plain.features.AppEvents
 import com.ismartcoding.plain.features.bluetooth.BluetoothEvents
-import com.ismartcoding.plain.features.box.BoxEvents
 import com.ismartcoding.plain.features.pkg.PackageHelper
 import com.ismartcoding.plain.ui.helpers.PageHelper
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
-import io.ktor.server.netty.NettyApplicationEngine
 import kotlinx.coroutines.flow.first
 import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
 
-
 class MainApp : Application(), ImageLoaderFactory {
-
     override fun newImageLoader(): ImageLoader {
         return ImageLoader.Builder(this)
             .components {
@@ -98,7 +94,7 @@ class MainApp : Application(), ImageLoaderFactory {
 
         BluetoothEvents.register()
         AppEvents.register()
-        //BoxEvents.register()
+        // BoxEvents.register()
 
         coIO {
             val preferences = dataStore.data.first()

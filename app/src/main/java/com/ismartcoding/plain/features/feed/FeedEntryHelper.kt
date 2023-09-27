@@ -6,7 +6,6 @@ import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.FeedEntryDao
-import com.ismartcoding.plain.features.note.NoteHelper
 import kotlinx.datetime.Clock
 
 object FeedEntryHelper {
@@ -36,7 +35,11 @@ object FeedEntryHelper {
         return feedEntryDao.getIds(SimpleSQLiteQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
     }
 
-    fun search(query: String, limit: Int, offset: Int): List<DFeedEntry> {
+    fun search(
+        query: String,
+        limit: Int,
+        offset: Int,
+    ): List<DFeedEntry> {
         var sql = "SELECT * FROM feed_entries"
         val where = ContentWhere()
         if (query.isNotEmpty()) {
@@ -49,7 +52,10 @@ object FeedEntryHelper {
         return feedEntryDao.search(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
     }
 
-    fun updateAsync(id: String, updateItem: DFeedEntry.() -> Unit): String {
+    fun updateAsync(
+        id: String,
+        updateItem: DFeedEntry.() -> Unit,
+    ): String {
         val item = feedEntryDao.getById(id) ?: return id
         item.updatedAt = Clock.System.now()
         updateItem(item)
@@ -62,7 +68,10 @@ object FeedEntryHelper {
         feedEntryDao.delete(ids)
     }
 
-    private fun parseQuery(where: ContentWhere, query: String) {
+    private fun parseQuery(
+        where: ContentWhere,
+        query: String,
+    ) {
         val queryGroups = SearchHelper.parse(query)
         queryGroups.forEach {
             if (it.name == "text") {

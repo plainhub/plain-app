@@ -40,7 +40,10 @@ class ContactsDialog : BaseListDrawerDialog() {
 
     private var phoneNumberToCall = ""
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         checkPermission()
         initBottomBar(R.menu.action_contacts) {
@@ -119,22 +122,33 @@ class ContactsDialog : BaseListDrawerDialog() {
         viewModel.limit = 5000
         lifecycleScope.launch {
             val query = viewModel.getQuery()
-            val items = withIO { ContactHelper.search(requireContext(), query, viewModel.limit, viewModel.offset).sortedBy { Pinyin.toPinyin(it.fullName()) } }
+            val items =
+                withIO {
+                    ContactHelper.search(
+                        requireContext(),
+                        query,
+                        viewModel.limit,
+                        viewModel.offset,
+                    ).sortedBy { Pinyin.toPinyin(it.fullName()) }
+                }
             viewModel.total = withIO { ContactHelper.count(requireContext(), query) }
 
             val bindingAdapter = binding.list.rv.bindingAdapter
             val toggleMode = bindingAdapter.toggleMode
             val checkedItems = bindingAdapter.getCheckedModels<DataModel>()
-            binding.list.page.addData(items.map { a ->
-                DataModel(a).apply {
-                    keyText = a.fullName()
-                    subtitle = a.phoneNumbers.map { it.value }.distinct().joinToString(", ")
-                    this.toggleMode = toggleMode
-                    isChecked = checkedItems.any { it.data.id == data.id }
-                }
-            }, hasMore = {
-                items.size == viewModel.limit
-            })
+            binding.list.page.addData(
+                items.map { a ->
+                    DataModel(a).apply {
+                        keyText = a.fullName()
+                        subtitle = a.phoneNumbers.map { it.value }.distinct().joinToString(", ")
+                        this.toggleMode = toggleMode
+                        isChecked = checkedItems.any { it.data.id == data.id }
+                    }
+                },
+                hasMore = {
+                    items.size == viewModel.limit
+                },
+            )
             updateTitle()
         }
     }
@@ -163,4 +177,3 @@ class ContactsDialog : BaseListDrawerDialog() {
         initRefreshLoadMore()
     }
 }
-

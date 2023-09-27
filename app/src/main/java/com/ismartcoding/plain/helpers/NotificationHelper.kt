@@ -23,12 +23,18 @@ object NotificationHelper {
             launchIntent.flags =
                 Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
             PendingIntent.getActivity(
-                context, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE
+                context,
+                0,
+                launchIntent,
+                PendingIntent.FLAG_IMMUTABLE,
             )
         } else {
             val fallbackIntent = Intent(context, MainActivity::class.java)
             PendingIntent.getActivity(
-                context, 0, fallbackIntent, PendingIntent.FLAG_IMMUTABLE
+                context,
+                0,
+                fallbackIntent,
+                PendingIntent.FLAG_IMMUTABLE,
             )
         }
     }
@@ -36,19 +42,32 @@ object NotificationHelper {
     fun ensureDefaultChannel() {
         val notificationManager = MainApp.instance.notificationManager
         if (notificationManager.getNotificationChannel(Constants.NOTIFICATION_CHANNEL_ID) == null) {
-            notificationManager.createNotificationChannel(NotificationChannel(Constants.NOTIFICATION_CHANNEL_ID, getString(R.string.app_name), NotificationManager.IMPORTANCE_DEFAULT).apply {
-                setShowBadge(false)
-            })
+            notificationManager.createNotificationChannel(
+                NotificationChannel(
+                    Constants.NOTIFICATION_CHANNEL_ID,
+                    getString(R.string.app_name),
+                    NotificationManager.IMPORTANCE_DEFAULT,
+                ).apply {
+                    setShowBadge(false)
+                },
+            )
         }
     }
 
-    fun createServiceNotification(context: Context, action: String, title: String): Notification {
-        val stopPendingIntent = PendingIntent.getBroadcast(
-            context, 0,
-            Intent(context, ServiceStopBroadcastReceiver::class.java).apply {
-                this.action = action
-            }, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
+    fun createServiceNotification(
+        context: Context,
+        action: String,
+        title: String,
+    ): Notification {
+        val stopPendingIntent =
+            PendingIntent.getBroadcast(
+                context,
+                0,
+                Intent(context, ServiceStopBroadcastReceiver::class.java).apply {
+                    this.action = action
+                },
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            )
 
         return NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID).apply {
             setLargeIcon(BitmapFactory.decodeResource(context.resources, R.drawable.ic_notification))

@@ -9,7 +9,10 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class NetworkSchemeHandler() : SchemeHandler() {
-    override fun handle(raw: String, uri: Uri): ImageItem {
+    override fun handle(
+        raw: String,
+        uri: Uri,
+    ): ImageItem {
         val imageItem: ImageItem
         try {
             val url = URL(raw)
@@ -17,20 +20,21 @@ class NetworkSchemeHandler() : SchemeHandler() {
             connection.connect()
 
             val responseCode = connection.responseCode
-            imageItem = when (responseCode) {
-                in 200..299 -> {
-                    val contentType = contentType(connection.getHeaderField("Content-Type"))
-                    val inputStream = BufferedInputStream(connection.inputStream)
-                    ImageItem.withDecodingNeeded(contentType, inputStream)
+            imageItem =
+                when (responseCode) {
+                    in 200..299 -> {
+                        val contentType = contentType(connection.getHeaderField("Content-Type"))
+                        val inputStream = BufferedInputStream(connection.inputStream)
+                        ImageItem.withDecodingNeeded(contentType, inputStream)
+                    }
+                    HttpURLConnection.HTTP_MOVED_PERM, HttpURLConnection.HTTP_MOVED_TEMP, HttpURLConnection.HTTP_SEE_OTHER -> {
+                        val redirectUrl = connection.getHeaderField("Location")
+                        handle(redirectUrl, uri)
+                    }
+                    else -> {
+                        throw IOException("Bad response code: $responseCode, url: $raw")
+                    }
                 }
-                HttpURLConnection.HTTP_MOVED_PERM, HttpURLConnection.HTTP_MOVED_TEMP, HttpURLConnection.HTTP_SEE_OTHER -> {
-                    val redirectUrl = connection.getHeaderField("Location")
-                    handle(redirectUrl, uri)
-                }
-                else -> {
-                    throw IOException("Bad response code: $responseCode, url: $raw")
-                }
-            }
         } catch (e: IOException) {
             throw IllegalStateException("Exception obtaining network resource: $raw", e)
         }
@@ -48,7 +52,9 @@ class NetworkSchemeHandler() : SchemeHandler() {
         val index = contentType.indexOf(';')
         return if (index > -1) {
             contentType.substring(0, index)
-        } else contentType
+        } else {
+            contentType
+        }
     }
 
     companion object {

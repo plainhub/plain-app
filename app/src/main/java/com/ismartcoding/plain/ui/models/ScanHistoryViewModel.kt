@@ -21,7 +21,10 @@ class ScanHistoryViewModel : ViewModel() {
         }
     }
 
-    fun delete(context: Context, value: String) {
+    fun delete(
+        context: Context,
+        value: String,
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             val results = ScanHistoryPreference.getValueAsync(context).toMutableList()
             results.remove(value)

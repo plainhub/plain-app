@@ -11,11 +11,12 @@ class SequenceSearchAlgorithm(data: ByteArray) : LookupAlgorithm(data) {
             return null
         }
         val byteBuffer = srcByteBuffer.asReadOnlyBuffer().order(ByteOrder.LITTLE_ENDIAN)
-        val geoId = try {
-            phoneNumber.substring(0, 7).toInt()
-        } catch (e: NumberFormatException) {
-            throw IllegalArgumentException("phone number %s is invalid, is it numeric".format(phoneNumber))
-        }
+        val geoId =
+            try {
+                phoneNumber.substring(0, 7).toInt()
+            } catch (e: NumberFormatException) {
+                throw IllegalArgumentException("phone number %s is invalid, is it numeric".format(phoneNumber))
+            }
         for (i in indicesStartOffset until byteBuffer.limit() step 8 + 1) {
             byteBuffer.position(i)
             val phonePrefix = byteBuffer.int

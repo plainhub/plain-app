@@ -1,10 +1,10 @@
 package com.ismartcoding.plain.db
 
 import androidx.room.*
-import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
+import com.ismartcoding.plain.R
+import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import kotlinx.datetime.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -55,7 +55,7 @@ class DMessageFiles(val items: List<DMessageFile>)
 @Entity(tableName = "chats")
 data class DChat(
     @PrimaryKey var id: String = StringHelper.shortUUID(),
-): DEntityBase() {
+) : DEntityBase() {
     @ColumnInfo(name = "is_me")
     var isMe: Boolean = false
 
@@ -91,7 +91,6 @@ data class DChat(
             return message
         }
     }
-
 }
 
 data class ChatItemDataUpdate(
@@ -124,4 +123,3 @@ interface ChatDao {
     @Query("DELETE FROM chats WHERE id in (:ids)")
     fun deleteByIds(ids: List<String>)
 }
-

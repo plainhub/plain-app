@@ -3,7 +3,6 @@ package com.ismartcoding.plain.features.call
 import com.ismartcoding.lib.phonegeo.PhoneNumberLookup
 import com.ismartcoding.lib.phonegeo.algo.LookupAlgorithm
 import com.ismartcoding.plain.data.IData
-import com.ismartcoding.plain.ui.models.IDataModel
 import com.ismartcoding.plain.web.models.PhoneGeo
 import kotlinx.datetime.Instant
 

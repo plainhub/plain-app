@@ -21,8 +21,6 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.enums.*
 import com.ismartcoding.plain.data.preference.ChatGPTApiKeyPreference
 import com.ismartcoding.plain.db.DAIChat
-import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.features.aichat.AIChatHelper
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioPlayer
@@ -49,7 +47,9 @@ import kotlin.time.Duration.Companion.seconds
 class BoxConnectivityStateChangedEvent
 
 class StartHttpServerEvent
+
 class StartScreenMirrorEvent
+
 class RestartAppEvent
 
 class DeleteChatItemViewEvent(val id: String)
@@ -59,31 +59,43 @@ class DeviceNameUpdatedEvent(val id: String, val name: String?)
 class CurrentBoxChangedEvent
 
 class VocabularyCreatedEvent
+
 class VocabularyUpdatedEvent
+
 class VocabularyDeletedEvent(val id: String)
 
 class VocabularyWordsDeletedEvent(val id: String)
+
 class VocabularyWordsUpdatedEvent(val id: String)
 
 class ConfirmToAcceptLoginEvent(
-    val session: DefaultWebSocketServerSession, val clientId: String, val request: AuthRequest
+    val session: DefaultWebSocketServerSession,
+    val clientId: String,
+    val request: AuthRequest,
 )
 
 class PermissionResultEvent(val permission: Permission)
+
 class RequestPermissionEvent(val permission: Permission)
+
 class PickFileEvent(val tag: PickFileTag, val type: PickFileType, val multiple: Boolean)
+
 class PickFileResultEvent(val tag: PickFileTag, val type: PickFileType, val uris: Set<Uri>)
+
 class ExportFileEvent(val type: ExportFileType, val fileName: String)
+
 class ExportFileResultEvent(val type: ExportFileType, val uri: Uri)
 
 class ActionEvent(val source: ActionSourceType, val action: ActionType, val ids: Set<String>, val extra: Any? = null)
 
 class AudioActionEvent(val action: AudioAction)
+
 class ClearAudioPlaylistEvent
 
 class FeedStatusEvent(val feedId: String, val status: FeedWorkerStatus)
 
 data class PlayAudioEvent(val uri: Uri)
+
 data class PlayAudioResultEvent(val uri: Uri)
 
 class AIChatCreatedEvent(val item: DAIChat)
@@ -150,27 +162,31 @@ object AppEvents {
 
         receiveEventHandler<AIChatCreatedEvent> { event ->
             coIO {
-                val openAI = OpenAI(
-                    OpenAIConfig(
-                        token = ChatGPTApiKeyPreference.getAsync(MainApp.instance),
-                        timeout = Timeout(socket = 60.seconds),
+                val openAI =
+                    OpenAI(
+                        OpenAIConfig(
+                            token = ChatGPTApiKeyPreference.getAsync(MainApp.instance),
+                            timeout = Timeout(socket = 60.seconds),
+                        ),
                     )
-                )
 
                 val messages = mutableListOf<ChatMessage>()
                 val parentId = event.item.parentId.ifEmpty { event.item.id }
-                messages.addAll(AIChatHelper.getChats(parentId).map {
-                    ChatMessage(
-                        role = if (it.isMe) ChatRole.User else ChatRole.Assistant,
-                        content = it.content,
-                    )
-                })
+                messages.addAll(
+                    AIChatHelper.getChats(parentId).map {
+                        ChatMessage(
+                            role = if (it.isMe) ChatRole.User else ChatRole.Assistant,
+                            content = it.content,
+                        )
+                    },
+                )
 
                 try {
-                    val chatCompletionRequest = ChatCompletionRequest(
-                        model = ModelId("gpt-3.5-turbo"),
-                        messages = messages
-                    )
+                    val chatCompletionRequest =
+                        ChatCompletionRequest(
+                            model = ModelId("gpt-3.5-turbo"),
+                            messages = messages,
+                        )
                     openAI.chatCompletions(chatCompletionRequest).collect { completion ->
                         val data = JSONObject()
                         data.put("parentId", parentId)

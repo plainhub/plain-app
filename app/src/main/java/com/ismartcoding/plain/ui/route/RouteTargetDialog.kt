@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.route
 import android.os.Bundle
 import android.view.View
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.ui.views.ChipItem
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.DialogRouteTargetBinding
 import com.ismartcoding.plain.features.TargetType
@@ -11,13 +10,17 @@ import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.SelectNetworkDialog
 import com.ismartcoding.plain.ui.extensions.initView
 import com.ismartcoding.plain.ui.extensions.setSafeClick
+import com.ismartcoding.plain.ui.views.ChipItem
 
 class RouteTargetDialog(
     var type: TargetType,
     var value: String = "",
-    val onDone: (TargetType, String) -> Unit
+    val onDone: (TargetType, String) -> Unit,
 ) : BaseBottomSheetDialog<DialogRouteTargetBinding>() {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         updateUI()
     }
@@ -81,7 +84,9 @@ class RouteTargetDialog(
             if (type == TargetType.INTERFACE) {
                 isRequired = false
                 showMore()
-                setValueText(com.ismartcoding.plain.features.Target(TargetType.INTERFACE, value).getText(UIDataCache.current().getNetworks()))
+                setValueText(
+                    com.ismartcoding.plain.features.Target(TargetType.INTERFACE, value).getText(UIDataCache.current().getNetworks()),
+                )
                 setValueTextColor(R.color.primary)
             } else {
                 isRequired = true

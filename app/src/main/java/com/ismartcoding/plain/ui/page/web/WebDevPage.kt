@@ -30,9 +30,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WebDevPage(
-    navController: NavHostController,
-) {
+fun WebDevPage(navController: NavHostController) {
     WebSettingsProvider {
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
@@ -58,7 +56,7 @@ fun WebDevPage(
                             title = stringResource(R.string.enable_testing_token),
                         ) {
                             PSwitch(
-                                activated = enable
+                                activated = enable,
                             ) {
                                 scope.launch(Dispatchers.IO) {
                                     AuthDevTokenPreference.putAsync(context, if (it) CryptoHelper.randomPassword(128) else "")
@@ -76,19 +74,20 @@ fun WebDevPage(
                                     scope.launch(Dispatchers.IO) {
                                         AuthDevTokenPreference.putAsync(context, CryptoHelper.randomPassword(128))
                                     }
-                                })
+                                },
+                            )
                             Spacer(modifier = Modifier.height(16.dp))
                             Tips(text = stringResource(id = R.string.auth_dev_token_tips))
                             Subtitle(text = "CURL", Modifier.padding(horizontal = 32.dp))
                             ClipboardCard(
                                 label = "CURL",
-                                text = """curl --request POST --url http://${ip4}:${httpPort}/graphql --header 'Authorization: Bearer ${devToken}' --header 'Content-Type: application/json' --data '{"query":"{ chatItems { content } }"}'"""
+                                text = """curl --request POST --url http://$ip4:$httpPort/graphql --header 'Authorization: Bearer $devToken' --header 'Content-Type: application/json' --data '{"query":"{ chatItems { content } }"}'""",
                             )
                         }
                         BottomSpace()
                     }
                 }
-            }
+            },
         )
     }
 }

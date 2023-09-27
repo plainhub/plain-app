@@ -50,4 +50,3 @@ class ChatItemContentConverter {
         return data.toJSONString()
     }
 }
-

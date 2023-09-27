@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.web.models
 
-import com.ismartcoding.lib.phonegeo.PhoneNumberLookup
-import com.ismartcoding.lib.phonegeo.algo.LookupAlgorithm
 import com.ismartcoding.plain.features.call.DCall
 import com.ismartcoding.plain.helpers.FileHelper
 import kotlinx.datetime.Instant
@@ -15,7 +13,7 @@ data class Call(
     var duration: Int,
     var type: Int,
     val accountId: ID,
-    val geo: PhoneGeo?
+    val geo: PhoneGeo?,
 )
 
 fun DCall.toModel(): Call {

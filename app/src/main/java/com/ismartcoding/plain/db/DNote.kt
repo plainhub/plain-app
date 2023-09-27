@@ -12,7 +12,7 @@ import kotlinx.parcelize.Parcelize
 @Entity(tableName = "notes")
 @Parcelize
 data class DNote(
-    @PrimaryKey override var id: String = StringHelper.shortUUID()
+    @PrimaryKey override var id: String = StringHelper.shortUUID(),
 ) : IData, Parcelable, DEntityBase() {
     var title: String = ""
 
@@ -43,7 +43,10 @@ interface NoteDao {
     fun getById(id: String): DNote?
 
     @Query("UPDATE notes SET deleted_at=:time WHERE id in (:ids)")
-    fun trash(ids: Set<String>, time: Instant?)
+    fun trash(
+        ids: Set<String>,
+        time: Instant?,
+    )
 
     @Insert
     fun insert(vararg item: DNote)

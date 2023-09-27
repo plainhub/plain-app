@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.views.texteditor
 import com.ismartcoding.plain.R
 
 interface HighlightColorProvider {
-
     val keywordColor: Int
 
     val attrColor: Int

@@ -2,26 +2,28 @@ package com.ismartcoding.plain.ui.endict
 
 import android.os.Bundle
 import android.view.View
+import com.ismartcoding.lib.brv.utils.linear
+import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.DialogSelectItemBinding
 import com.ismartcoding.plain.databinding.ViewListItemBinding
-import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.features.box.FetchVocabulariesEvent
 import com.ismartcoding.plain.features.box.VocabulariesResultEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.lib.brv.utils.linear
-import com.ismartcoding.lib.brv.utils.models
-import com.ismartcoding.lib.brv.utils.setup
-import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.setClick
 import com.ismartcoding.plain.ui.extensions.setKeyText
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 
 class SelectTemplateDialog(val onSelect: (String) -> Unit) : BaseBottomSheetDialog<DialogSelectItemBinding>() {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.list.rv.isNestedScrollingEnabled = false
         binding.list.rv.linear().setup {
@@ -29,7 +31,7 @@ class SelectTemplateDialog(val onSelect: (String) -> Unit) : BaseBottomSheetDial
             onBind {
                 val binding = getBinding<ViewListItemBinding>()
                 val m = getModel<String>()
-                binding.setKeyText(LocaleHelper.getString("vocabulary_${m}"))
+                binding.setKeyText(LocaleHelper.getString("vocabulary_$m"))
                 binding.setClick {
                     onSelect(m)
                     dismiss()
@@ -64,13 +66,15 @@ class SelectTemplateDialog(val onSelect: (String) -> Unit) : BaseBottomSheetDial
         val sortedIds = listOf("none", "xiaoxue", "chuzhong", "gaozhong", "cet4", "cet6", "kaoyan")
         items.add("none")
         items.addAll(UIDataCache.current().vocabularies?.map { it.id } ?: arrayListOf())
-        binding.list.page.replaceData(items.sortedBy {
-            var index = sortedIds.indexOf(it)
-            if (index == -1) {
-                index = 999
-            }
-            index
-        })
+        binding.list.page.replaceData(
+            items.sortedBy {
+                var index = sortedIds.indexOf(it)
+                if (index == -1) {
+                    index = 999
+                }
+                index
+            },
+        )
     }
 
     private fun fetch() {

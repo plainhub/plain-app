@@ -40,7 +40,10 @@ class NotesDialog : BaseListDrawerDialog() {
     override val dataType: DataType
         get() = DataType.NOTE
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         val rv = binding.list.rv
         viewModel.trash.observe(viewLifecycleOwner) { trash ->
@@ -63,7 +66,7 @@ class NotesDialog : BaseListDrawerDialog() {
                             withIO {
                                 TagHelper.deleteTagRelationByKeys(
                                     ids,
-                                    DataType.NOTE
+                                    DataType.NOTE,
                                 )
                                 NoteHelper.trashAsync(ids)
                             }
@@ -160,16 +163,19 @@ class NotesDialog : BaseListDrawerDialog() {
             val bindingAdapter = binding.list.rv.bindingAdapter
             val toggleMode = bindingAdapter.toggleMode
             val checkedItems = bindingAdapter.getCheckedModels<DataModel>()
-            binding.list.page.addData(items.map { a ->
-                DataModel(a).apply {
-                    keyText = a.updatedAt.formatDateTime()
-                    subtitle = a.title
-                    this.toggleMode = toggleMode
-                    isChecked = checkedItems.any { it.data.id == data.id }
-                }
-            }, hasMore = {
-                items.size == viewModel.limit
-            })
+            binding.list.page.addData(
+                items.map { a ->
+                    DataModel(a).apply {
+                        keyText = a.updatedAt.formatDateTime()
+                        subtitle = a.title
+                        this.toggleMode = toggleMode
+                        isChecked = checkedItems.any { it.data.id == data.id }
+                    }
+                },
+                hasMore = {
+                    items.size == viewModel.limit
+                },
+            )
             updateTitle()
         }
     }

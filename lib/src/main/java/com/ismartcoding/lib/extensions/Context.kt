@@ -11,7 +11,6 @@ import android.media.MediaScannerConnection
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
-import android.os.Build
 import android.provider.MediaStore
 import android.telecom.TelecomManager
 import android.util.DisplayMetrics
@@ -25,10 +24,13 @@ import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.isTPlus
 import java.io.File
 
+fun Context.px(
+    @DimenRes dimen: Int,
+): Int = resources.getDimension(dimen).toInt()
 
-fun Context.px(@DimenRes dimen: Int): Int = resources.getDimension(dimen).toInt()
-
-fun Context.dp(@DimenRes dimen: Int): Float = resources.getDimensionPixelSize(dimen) / resources.displayMetrics.density
+fun Context.dp(
+    @DimenRes dimen: Int,
+): Float = resources.getDimensionPixelSize(dimen) / resources.displayMetrics.density
 
 fun Context.getTextWidth(text: String): Float = TextView(this).paint.measureText(text)
 
@@ -72,7 +74,7 @@ fun Context.queryCursor(
     selection: String? = null,
     selectionArgs: Array<String>? = null,
     sortOrder: String? = null,
-    callback: (cursor: Cursor, indexCache: MutableMap<String, Int>) -> Unit
+    callback: (cursor: Cursor, indexCache: MutableMap<String, Int>) -> Unit,
 ) {
     contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)?.use { cursor ->
         if (cursor.moveToFirst()) {
@@ -85,14 +87,17 @@ fun Context.queryCursor(
 }
 
 fun Context.count(
-    uri: Uri, selection: String? = null, selectionArgs: Array<String>? = null
+    uri: Uri,
+    selection: String? = null,
+    selectionArgs: Array<String>? = null,
 ): Int {
     var result = 0
     contentResolver.query(
-        uri, arrayOf("count(*) AS count"),
+        uri,
+        arrayOf("count(*) AS count"),
         selection,
         selectionArgs,
-        null
+        null,
     )?.run {
         moveToFirst()
         if (count > 0) {
@@ -104,14 +109,17 @@ fun Context.count(
 }
 
 fun Context.count2(
-    uri: Uri, selection: String? = null, selectionArgs: Array<String>? = null
+    uri: Uri,
+    selection: String? = null,
+    selectionArgs: Array<String>? = null,
 ): Int {
     var result = 0
     contentResolver.query(
-        uri, null,
+        uri,
+        null,
         selection,
         selectionArgs,
-        null
+        null,
     )?.run {
         moveToFirst()
         result = count
@@ -121,14 +129,18 @@ fun Context.count2(
 }
 
 fun Context.contentCount(
-    uri: Uri, projection: Array<String> = arrayOf("_id"), selection: String? = null, selectionArgs: Array<String>? = null
+    uri: Uri,
+    projection: Array<String> = arrayOf("_id"),
+    selection: String? = null,
+    selectionArgs: Array<String>? = null,
 ): Int {
     var result = 0
     contentResolver.query(
-        uri, projection,
+        uri,
+        projection,
         selection,
         selectionArgs,
-        null
+        null,
     )?.run {
         result = count
     }
@@ -142,7 +154,7 @@ val Context.shortcutManager: ShortcutManager get() = getSystemService(ShortcutMa
 
 fun Context.scanFileByConnection(
     file: File,
-    callback: MediaScannerConnection.OnScanCompletedListener? = null
+    callback: MediaScannerConnection.OnScanCompletedListener? = null,
 ) {
     val path = file.absolutePath
     val mimeType = file.name.getMimeType()
@@ -151,7 +163,7 @@ fun Context.scanFileByConnection(
 
 fun Context.scanFileByConnection(
     path: String,
-    callback: MediaScannerConnection.OnScanCompletedListener? = null
+    callback: MediaScannerConnection.OnScanCompletedListener? = null,
 ) {
     val mimeType = path.getMimeType()
     scanFileByConnection(arrayOf(path), arrayOf(mimeType), callback)
@@ -160,17 +172,21 @@ fun Context.scanFileByConnection(
 fun Context.scanFileByConnection(
     paths: Array<String>,
     mimeTypes: Array<String>? = null,
-    callback: MediaScannerConnection.OnScanCompletedListener? = null
+    callback: MediaScannerConnection.OnScanCompletedListener? = null,
 ) {
     MediaScannerConnection.scanFile(this, paths, mimeTypes, callback)
 }
 
-fun <T> Context.getSystemServiceCompat(serviceClass: Class<T>): T =
-    ContextCompat.getSystemService(this, serviceClass)!!
+fun <T> Context.getSystemServiceCompat(serviceClass: Class<T>): T = ContextCompat.getSystemService(this, serviceClass)!!
 
-fun Context.getCompatDrawable(@DrawableRes drawableId: Int) = ContextCompat.getDrawable(this, drawableId)
+fun Context.getCompatDrawable(
+    @DrawableRes drawableId: Int,
+) = ContextCompat.getDrawable(this, drawableId)
 
-fun Context.getUriMimeType(path: String, newUri: Uri): String {
+fun Context.getUriMimeType(
+    path: String,
+    newUri: Uri,
+): String {
     var mimeType = path.getMimeType()
     if (mimeType.isEmpty()) {
         mimeType = getMimeTypeFromUri(newUri)
@@ -190,16 +206,20 @@ fun Context.getMimeTypeFromUri(uri: Uri): String {
 }
 
 fun Context.getMediaContentUri(path: String): Uri? {
-    val uri = when {
-        path.isImageFast() -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        path.isVideoFast() -> MediaStore.Video.Media.EXTERNAL_CONTENT_URI
-        else -> MediaStore.Files.getContentUri("external")
-    }
+    val uri =
+        when {
+            path.isImageFast() -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            path.isVideoFast() -> MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            else -> MediaStore.Files.getContentUri("external")
+        }
 
     return getMediaContent(path, uri)
 }
 
-fun Context.getMediaContent(path: String, baseUri: Uri): Uri? {
+fun Context.getMediaContent(
+    path: String,
+    baseUri: Uri,
+): Uri? {
     val projection = arrayOf(MediaStore.Images.Media._ID)
     val selection = MediaStore.Images.Media.DATA + "= ?"
     val selectionArgs = arrayOf(path)
@@ -232,9 +252,9 @@ fun Context.isGestureNavigationBar(): Boolean {
 }
 
 val Context.actionBarSize
-    get() = theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
-        .let { attrs -> attrs.getDimension(0, 0F).toInt().also { attrs.recycle() } }
-
+    get() =
+        theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
+            .let { attrs -> attrs.getDimension(0, 0F).toInt().also { attrs.recycle() } }
 
 fun Context.hasPermissions(vararg permissions: String): Boolean {
     return permissions
@@ -243,12 +263,13 @@ fun Context.hasPermissions(vararg permissions: String): Boolean {
 }
 
 fun Context.hasPermissionInManifest(vararg permissions: String): Boolean {
-    val packageInfo = if (isTPlus()) {
-        packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong()))
-    } else {
-        @Suppress("DEPRECATION")
-        packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
-    }
+    val packageInfo =
+        if (isTPlus()) {
+            packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong()))
+        } else {
+            @Suppress("DEPRECATION")
+            packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
+        }
     return packageInfo.requestedPermissions?.any { permissions.contains(it) } ?: false
 }
 

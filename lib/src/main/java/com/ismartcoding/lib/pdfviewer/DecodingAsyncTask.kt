@@ -12,7 +12,7 @@ internal class DecodingAsyncTask(
     val password: String?,
     val userPages: IntArray?,
     val pdfViewReference: WeakReference<PDFView>,
-    val pdfiumCore: PdfiumCore
+    val pdfiumCore: PdfiumCore,
 ) : AsyncTask<Void?, Void?, Throwable?>() {
     private var cancelled: Boolean = false
     private var pdfFile: PdfFile? = null
@@ -22,11 +22,12 @@ internal class DecodingAsyncTask(
             val pdfView = pdfViewReference.get()
             if (pdfView != null) {
                 val pdfDocument = docSource.createDocument(pdfView.context, pdfiumCore, password)
-                pdfFile = PdfFile(
-                    pdfiumCore, pdfDocument, pdfView.pageFitPolicy, getViewSize(pdfView),
-                    userPages, pdfView.isSwipeVertical, pdfView.spacingPx, pdfView.isAutoSpacingEnabled,
-                    pdfView.isFitEachPage
-                )
+                pdfFile =
+                    PdfFile(
+                        pdfiumCore, pdfDocument, pdfView.pageFitPolicy, getViewSize(pdfView),
+                        userPages, pdfView.isSwipeVertical, pdfView.spacingPx, pdfView.isAutoSpacingEnabled,
+                        pdfView.isFitEachPage,
+                    )
                 null
             } else {
                 NullPointerException("pdfView == null")

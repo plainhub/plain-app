@@ -8,9 +8,15 @@ import android.text.style.StyleSpan
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 
-fun SpannableString.setColor(context: Context, @ColorRes color: Int) {
+fun SpannableString.setColor(
+    context: Context,
+    @ColorRes color: Int,
+) {
     setSpan(
-        ForegroundColorSpan(ContextCompat.getColor(context, color)), 0, length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+        ForegroundColorSpan(ContextCompat.getColor(context, color)),
+        0,
+        length,
+        SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE,
     )
 }
 

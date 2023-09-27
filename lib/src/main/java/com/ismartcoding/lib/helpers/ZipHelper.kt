@@ -11,7 +11,10 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 object ZipHelper {
-    fun zip(sourcePaths: List<String>, targetPath: String): Boolean {
+    fun zip(
+        sourcePaths: List<String>,
+        targetPath: String,
+    ): Boolean {
         val queue = LinkedList<String>()
         val fos = FileOutputStream(File(targetPath))
         val zout = ZipOutputStream(fos)
@@ -62,7 +65,11 @@ object ZipHelper {
         return true
     }
 
-    suspend fun zipFolderToStreamAsync(folder: File, zip: ZipOutputStream, path: String = "") {
+    suspend fun zipFolderToStreamAsync(
+        folder: File,
+        zip: ZipOutputStream,
+        path: String = "",
+    ) {
         folder.listFiles()?.forEach { file ->
             val filePath = if (path.isNotEmpty()) "$path/${file.name}" else file.name
             if (file.isDirectory) {

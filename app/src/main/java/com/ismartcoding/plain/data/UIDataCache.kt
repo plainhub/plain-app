@@ -49,9 +49,10 @@ class UIDataCache {
         configs = data.configs.map { it.configFragment }.toMutableList()
         rules = configs?.filter { it.group == ConfigType.RULE.value }?.map { it.toRule() }?.toMutableList()
         routes = configs?.filter { it.group == ConfigType.ROUTE.value }?.map { it.toRoute() }?.toMutableList()
-        val json = Json {
-            ignoreUnknownKeys = true
-        }
+        val json =
+            Json {
+                ignoreUnknownKeys = true
+            }
         configs?.find { it.group == ConfigType.SYSTEM.value }?.let {
             systemConfig = json.decodeFromString(it.value)
         }
@@ -64,39 +65,65 @@ class UIDataCache {
     }
 
     fun getDevices(q: String = ""): List<DeviceFragment> {
-        return (if (q.isNotEmpty()) devices?.filter { d ->
-            d.name?.contains(q, true) == true || d.ip4.contains(q)
-        } else devices) ?: arrayListOf()
+        return (
+            if (q.isNotEmpty()) {
+                devices?.filter { d ->
+                    d.name?.contains(q, true) == true || d.ip4.contains(q)
+                }
+            } else {
+                devices
+            }
+        ) ?: arrayListOf()
     }
 
     fun getRules(q: String = ""): List<Rule> {
-        return (if (q.isNotEmpty()) rules?.filter { d ->
-            d.target.contains(q, true) || d.applyTo.contains(q, true)
-        } else rules) ?: arrayListOf()
+        return (
+            if (q.isNotEmpty()) {
+                rules?.filter { d ->
+                    d.target.contains(q, true) || d.applyTo.contains(q, true)
+                }
+            } else {
+                rules
+            }
+        ) ?: arrayListOf()
     }
 
     fun getRoutes(q: String = ""): List<Route> {
-        return (if (q.isNotEmpty()) routes?.filter { d ->
-            d.getMessage().contains(q, true) || d.getTitle().contains(q, true)
-        } else routes) ?: arrayListOf()
+        return (
+            if (q.isNotEmpty()) {
+                routes?.filter { d ->
+                    d.getMessage().contains(q, true) || d.getTitle().contains(q, true)
+                }
+            } else {
+                routes
+            }
+        ) ?: arrayListOf()
     }
 
     fun getInterfaces(q: String = ""): List<InterfaceFragment> {
         if (interfaces == null) {
             return arrayListOf()
         }
-        return if (q.isNotEmpty()) interfaces!!.filter {
-            it.name.contains(q, true)
-        } else interfaces!!
+        return if (q.isNotEmpty()) {
+            interfaces!!.filter {
+                it.name.contains(q, true)
+            }
+        } else {
+            interfaces!!
+        }
     }
 
     fun getNetworks(q: String = ""): List<NetworkFragment> {
         if (networks == null) {
             return arrayListOf()
         }
-        return if (q.isNotEmpty()) networks!!.filter {
-            it.name.contains(q, true)
-        } else networks!!
+        return if (q.isNotEmpty()) {
+            networks!!.filter {
+                it.name.contains(q, true)
+            }
+        } else {
+            networks!!
+        }
     }
 
     fun getSelectableNetworks(q: String = ""): List<NetworkFragment> {

@@ -3,27 +3,36 @@ package com.ismartcoding.plain.features.contact
 import android.content.Context
 import android.net.Uri
 import android.provider.ContactsContract
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.queryCursor
+import com.ismartcoding.plain.MainApp
 
 object SourceHelper {
     fun getAll(): List<DContactSource> {
         val context = MainApp.instance
         val sources = mutableListOf<DContactSource>()
-        setOf(ContactsContract.Groups.CONTENT_URI, ContactsContract.Settings.CONTENT_URI, ContactsContract.RawContacts.CONTENT_URI).forEach {
+        setOf(
+            ContactsContract.Groups.CONTENT_URI,
+            ContactsContract.Settings.CONTENT_URI,
+            ContactsContract.RawContacts.CONTENT_URI,
+        ).forEach {
             fillSourcesFromUri(context, it, sources)
         }
 
         return sources
     }
 
-    private fun fillSourcesFromUri(context: Context, uri: Uri, sources: MutableList<DContactSource>) {
+    private fun fillSourcesFromUri(
+        context: Context,
+        uri: Uri,
+        sources: MutableList<DContactSource>,
+    ) {
         context.queryCursor(
-            uri, arrayOf(
+            uri,
+            arrayOf(
                 ContactsContract.RawContacts.ACCOUNT_NAME,
-                ContactsContract.RawContacts.ACCOUNT_TYPE
-            )
+                ContactsContract.RawContacts.ACCOUNT_TYPE,
+            ),
         ) { cursor, cache ->
             val name = cursor.getStringValue(ContactsContract.RawContacts.ACCOUNT_NAME, cache)
             val type = cursor.getStringValue(ContactsContract.RawContacts.ACCOUNT_TYPE, cache)

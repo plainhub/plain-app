@@ -3,17 +3,17 @@ package com.ismartcoding.plain.features.wireguard
 import android.content.Context
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.ApplyWireGuardMutation
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.BoxApi
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.ViewListItemBinding
-import com.ismartcoding.plain.ui.wireguard.WireGuardDialog
 import com.ismartcoding.plain.features.box.ApplyWireGuardResultEvent
 import com.ismartcoding.plain.fragment.WireGuardFragment
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.extensions.*
+import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.wireguard.WireGuardDialog
 import kotlinx.coroutines.launch
 
 fun WireGuardFragment.toWireGuard(): WireGuard {
@@ -35,7 +35,11 @@ fun WireGuardFragment.toWireGuard(): WireGuard {
     return wg
 }
 
-fun ViewListItemBinding.bindWireGuard(context: Context, lifecycleScope: LifecycleCoroutineScope, item: WireGuard) {
+fun ViewListItemBinding.bindWireGuard(
+    context: Context,
+    lifecycleScope: LifecycleCoroutineScope,
+    item: WireGuard,
+) {
     clearTextRows()
     setKeyText(if (item.interfaze.name.isEmpty()) item.id else item.interfaze.name)
     addTextRow(item.interfaze.addresses.joinToString(", "))
@@ -45,9 +49,10 @@ fun ViewListItemBinding.bindWireGuard(context: Context, lifecycleScope: Lifecycl
     setSwitch(item.isEnabled, onChanged = { _, isEnabled ->
         lifecycleScope.launch {
             DialogHelper.showLoading()
-            val r = withIO {
-                BoxApi.mixMutateAsync(ApplyWireGuardMutation(item.id, item.raw, isEnabled))
-            }
+            val r =
+                withIO {
+                    BoxApi.mixMutateAsync(ApplyWireGuardMutation(item.id, item.raw, isEnabled))
+                }
             DialogHelper.hideLoading()
             if (!r.isSuccess()) {
                 DialogHelper.showErrorDialog(context, r.getErrorMessage())

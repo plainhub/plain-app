@@ -26,11 +26,15 @@ import net.dankito.readability4j.processor.MetadataParser
 import java.io.File
 import java.util.*
 
-fun SyndEntry.toDFeedEntry(feedId: String, feedUrl: String): DFeedEntry {
+fun SyndEntry.toDFeedEntry(
+    feedId: String,
+    feedUrl: String,
+): DFeedEntry {
     val item = DFeedEntry()
-    item.rawId = CryptoHelper.sha1(
-        (feedId + "_" + (link ?: uri ?: title ?: UUID.randomUUID().toString())).toByteArray()
-    )
+    item.rawId =
+        CryptoHelper.sha1(
+            (feedId + "_" + (link ?: uri ?: title ?: UUID.randomUUID().toString())).toByteArray(),
+        )
     item.feedId = feedId
     if (title != null) {
         item.title = HtmlCompat.fromHtml(title, HtmlCompat.FROM_HTML_MODE_LEGACY).toString().replace("\n", " ").trim()
@@ -72,26 +76,31 @@ fun SyndEntry.toDFeedEntry(feedId: String, feedUrl: String): DFeedEntry {
 suspend fun DFeedEntry.fetchContentAsync(): ApiResult {
     try {
         val httpClient = HttpClientManager.browserClient()
-        val response = httpClient.get(url) {
-            headers {
-                set("accept", "*/*")
+        val response =
+            httpClient.get(url) {
+                headers {
+                    set("accept", "*/*")
+                }
             }
-        }
 
         if (response.isOk()) {
             val input = response.body<String>()
             val options = ReadabilityOptions()
             val regExUtil = RegExUtilExtended()
             Readability4JExtended(
-                url, input, options = options, regExUtil = regExUtil,
-                preprocessor = Readability4JPreprocessor(regExUtil), metadataParser = MetadataParser(regExUtil),
-                articleGrabber = ArticleGrabberExtended(options, regExUtil)
+                url,
+                input,
+                options = options,
+                regExUtil = regExUtil,
+                preprocessor = Readability4JPreprocessor(regExUtil),
+                metadataParser = MetadataParser(regExUtil),
+                articleGrabber = ArticleGrabberExtended(options, regExUtil),
             ).parse().articleContent?.let { articleContent ->
                 articleContent.selectFirst("h1")?.remove()
                 val c = articleContent.toString()
                 val mobilizedHtml = HtmlUtils.improveHtmlContent(c, HtmlUtils.getBaseUrl(url))
-                if (description.isEmpty()
-                    || HtmlCompat.fromHtml(mobilizedHtml, HtmlCompat.FROM_HTML_MODE_LEGACY).length > description.length
+                if (description.isEmpty() ||
+                    HtmlCompat.fromHtml(mobilizedHtml, HtmlCompat.FROM_HTML_MODE_LEGACY).length > description.length
                 ) { // If the retrieved text is smaller than the original one, then we certainly failed...
                     val imagesList = HtmlUtils.getImageURLs(mobilizedHtml)
                     if (imagesList.isNotEmpty()) {
@@ -125,7 +134,6 @@ suspend fun DFeedEntry.fetchContentAsync(): ApiResult {
                 }
             }
         }
-
 
         return ApiResult(response)
     } catch (ex: Throwable) {

@@ -1,8 +1,6 @@
 package com.ismartcoding.plain.web.models
 
-import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DFeedEntry
-import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.helpers.FileHelper
 import kotlinx.datetime.Instant
 
@@ -22,5 +20,10 @@ data class FeedEntry(
 )
 
 fun DFeedEntry.toModel(): FeedEntry {
-    return FeedEntry(ID(id), title, url, FileHelper.getFileId(image), description, author, content, feedId, rawId, publishedAt, createdAt, updatedAt)
+    return FeedEntry(
+        ID(
+            id,
+        ),
+        title, url, FileHelper.getFileId(image), description, author, content, feedId, rawId, publishedAt, createdAt, updatedAt,
+    )
 }

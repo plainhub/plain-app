@@ -5,20 +5,21 @@ import android.net.Uri
 import android.view.Surface
 
 interface IVideoPlayer : IMediaPlayer {
-
     /**
      * 设置数据源
      *
      * @param context
      * @param videoModel
      */
-    fun setMediaSource(context: Context, videoModel: VideoModel)
+    fun setMediaSource(
+        context: Context,
+        videoModel: VideoModel,
+    )
 
     /**
      * 异步加载
      */
     fun prepareAsync()
-
 
     /**
      * 释放内核
@@ -89,13 +90,31 @@ interface IVideoPlayer : IMediaPlayer {
     // -------- 播放器回调 --------
     interface PlayerCallback {
         fun onPreparing(mp: IVideoPlayer)
-        fun onPrepared(mp: IVideoPlayer)
-        fun onCompletion(mp: IVideoPlayer)
-        fun onBufferingUpdate(mp: IVideoPlayer)
-        fun onSeekComplete(mp: IVideoPlayer)
-        fun onVideoSizeChanged(mp: IVideoPlayer, width: Int, height: Int)
-        fun onError(mp: IVideoPlayer, what: Int, extra: Int): Boolean
-        fun onInfo(mp: IVideoPlayer, what: Int, extra: Int): Boolean
-    }
 
+        fun onPrepared(mp: IVideoPlayer)
+
+        fun onCompletion(mp: IVideoPlayer)
+
+        fun onBufferingUpdate(mp: IVideoPlayer)
+
+        fun onSeekComplete(mp: IVideoPlayer)
+
+        fun onVideoSizeChanged(
+            mp: IVideoPlayer,
+            width: Int,
+            height: Int,
+        )
+
+        fun onError(
+            mp: IVideoPlayer,
+            what: Int,
+            extra: Int,
+        ): Boolean
+
+        fun onInfo(
+            mp: IVideoPlayer,
+            what: Int,
+            extra: Int,
+        ): Boolean
+    }
 }

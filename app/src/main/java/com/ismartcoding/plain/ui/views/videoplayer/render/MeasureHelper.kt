@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.views.videoplayer.render
 import android.view.View
 
 class MeasureHelper {
-
     private var videoWidth = 0
     private var videoHeight = 0
 
@@ -12,7 +11,10 @@ class MeasureHelper {
 
     private var videoRotationDegree = 0
 
-    fun setVideoSize(videoWidth: Int, videoHeight: Int) {
+    fun setVideoSize(
+        videoWidth: Int,
+        videoHeight: Int,
+    ) {
         this.videoWidth = videoWidth
         this.videoHeight = videoHeight
     }
@@ -21,7 +23,11 @@ class MeasureHelper {
         this.videoRotationDegree = videoRotationDegree
     }
 
-    fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int, aspectRatio: Int) {
+    fun onMeasure(
+        widthMeasureSpec: Int,
+        heightMeasureSpec: Int,
+        aspectRatio: Int,
+    ) {
         val wms: Int
         val hms: Int
         if (videoRotationDegree == 90 || videoRotationDegree == 270) {
@@ -65,14 +71,13 @@ class MeasureHelper {
                         height = (width / displayAspectRatio).toInt()
                     }
                 }
-
             } else if (widthSpecMode == View.MeasureSpec.EXACTLY && heightSpecMode == View.MeasureSpec.EXACTLY) { // the size is fixed
                 width = widthSpecSize
                 height = heightSpecSize
                 // for compatibility, we adjust size based on aspect ratio
-                if (videoWidth * height < width * videoHeight) { //Log.i("@@@", "image too wide, correcting");
+                if (videoWidth * height < width * videoHeight) { // Log.i("@@@", "image too wide, correcting");
                     width = height * videoWidth / videoHeight
-                } else if (videoWidth * height > width * videoHeight) { //Log.i("@@@", "image too tall, correcting");
+                } else if (videoWidth * height > width * videoHeight) { // Log.i("@@@", "image too tall, correcting");
                     height = width * videoHeight / videoWidth
                 }
             } else if (widthSpecMode == View.MeasureSpec.EXACTLY) { // only the width is fixed, adjust the height to match aspect ratio if possible
@@ -112,5 +117,4 @@ class MeasureHelper {
     fun getMeasureHeight(): Int {
         return measureHeight
     }
-
 }

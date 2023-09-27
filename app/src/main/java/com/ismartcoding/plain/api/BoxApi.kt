@@ -12,12 +12,12 @@ import com.apollographql.apollo3.cache.normalized.normalizedCache
 import com.apollographql.apollo3.cache.normalized.sql.SqlNormalizedCacheFactory
 import com.apollographql.apollo3.exception.ApolloException
 import com.apollographql.apollo3.network.okHttpClient
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.features.BoxConnectivityStateChangedEvent
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.db.DBox
+import com.ismartcoding.plain.features.BoxConnectivityStateChangedEvent
 import com.ismartcoding.plain.features.bluetooth.BluetoothUtil
 import com.ismartcoding.plain.features.bluetooth.SmartBTDevice
 import kotlinx.coroutines.sync.Mutex
@@ -27,7 +27,11 @@ object BoxApi {
     private var clients = mutableMapOf<String, ApolloClient>()
     private val mutex = Mutex()
 
-    suspend fun <D : Mutation.Data> mixMutateAsync(mutation: Mutation<D>, box: DBox? = UIDataCache.current().box, timeout: Int = HttpApiTimeout.DEFAULT_SECONDS): GraphqlApiResult<D> {
+    suspend fun <D : Mutation.Data> mixMutateAsync(
+        mutation: Mutation<D>,
+        box: DBox? = UIDataCache.current().box,
+        timeout: Int = HttpApiTimeout.DEFAULT_SECONDS,
+    ): GraphqlApiResult<D> {
         if (box == null) {
             return GraphqlApiResult(null, BoxUnreachableException())
         }
@@ -46,7 +50,11 @@ object BoxApi {
         return r
     }
 
-    suspend fun <D : Query.Data> mixQueryAsync(query: Query<D>, box: DBox? = UIDataCache.current().box, timeout: Int = HttpApiTimeout.DEFAULT_SECONDS): GraphqlApiResult<D> {
+    suspend fun <D : Query.Data> mixQueryAsync(
+        query: Query<D>,
+        box: DBox? = UIDataCache.current().box,
+        timeout: Int = HttpApiTimeout.DEFAULT_SECONDS,
+    ): GraphqlApiResult<D> {
         if (box == null) {
             return GraphqlApiResult(null, BoxUnreachableException())
         }
@@ -74,19 +82,24 @@ object BoxApi {
         return r
     }
 
-    private suspend fun <D : Query.Data> queryAsync(query: Query<D>, box: DBox, timeout: Int): GraphqlApiResult<D> {
+    private suspend fun <D : Query.Data> queryAsync(
+        query: Query<D>,
+        box: DBox,
+        timeout: Int,
+    ): GraphqlApiResult<D> {
         val boxIP = box.getBoxIP()
         if (boxIP.isEmpty()) {
             UIDataCache.current().boxNetworkReachable = false
             return GraphqlApiResult(null, BoxUnreachableException())
         }
 
-        val response = try {
-            getOrCreateClient(box.id, boxIP, box.token, timeout).query(query).fetchPolicy(FetchPolicy.NetworkFirst).execute()
-        } catch (e: ApolloException) {
-            e.printStackTrace()
-            return GraphqlApiResult(null, e)
-        }
+        val response =
+            try {
+                getOrCreateClient(box.id, boxIP, box.token, timeout).query(query).fetchPolicy(FetchPolicy.NetworkFirst).execute()
+            } catch (e: ApolloException) {
+                e.printStackTrace()
+                return GraphqlApiResult(null, e)
+            }
 
         if (response.isFromCache) {
             if (UIDataCache.current().boxNetworkReachable != false) {
@@ -112,7 +125,10 @@ object BoxApi {
         }
     }
 
-    private suspend fun <D : Operation.Data> callBluetoothApiAsync(operation: Operation<D>, box: DBox): ApolloResponse<D>? {
+    private suspend fun <D : Operation.Data> callBluetoothApiAsync(
+        operation: Operation<D>,
+        box: DBox,
+    ): ApolloResponse<D>? {
         if (!BluetoothUtil.ensurePermissionAsync()) {
             return null
         }
@@ -140,34 +156,45 @@ object BoxApi {
         return "https://$boxIP:8443/public"
     }
 
-    private suspend fun <D : Mutation.Data> mutateAsync(mutation: Mutation<D>, box: DBox, timeout: Int): GraphqlApiResult<D> {
+    private suspend fun <D : Mutation.Data> mutateAsync(
+        mutation: Mutation<D>,
+        box: DBox,
+        timeout: Int,
+    ): GraphqlApiResult<D> {
         val boxIP = box.getBoxIP()
         if (boxIP.isEmpty()) {
             return GraphqlApiResult(null, BoxUnreachableException())
         }
-        val response = try {
-            getOrCreateClient(box.id, boxIP, box.token, timeout).mutation(mutation).execute()
-        } catch (e: ApolloException) {
-            e.printStackTrace()
-            return GraphqlApiResult(null, e)
-        }
+        val response =
+            try {
+                getOrCreateClient(box.id, boxIP, box.token, timeout).mutation(mutation).execute()
+            } catch (e: ApolloException) {
+                e.printStackTrace()
+                return GraphqlApiResult(null, e)
+            }
 
         return GraphqlApiResult(response, null)
     }
 
-    private fun getOrCreateClient(boxId: String, ip: String, token: String, timeout: Int): ApolloClient {
+    private fun getOrCreateClient(
+        boxId: String,
+        ip: String,
+        token: String,
+        timeout: Int,
+    ): ApolloClient {
         val key = "$boxId:$ip:$timeout"
         var apolloClient = clients[key]
         if (apolloClient != null) {
             return apolloClient
         }
 
-        apolloClient = ApolloClient.Builder()
-            .serverUrl("https://$ip:8443/graphql")
-            .okHttpClient(HttpClientManager.createCryptoHttpClient(token, timeout))
-            .normalizedCache(SqlNormalizedCacheFactory(MainApp.instance, "apollo_${boxId}.db"))
-            .addCustomScalarAdapter(com.ismartcoding.plain.type.Time.type, com.apollographql.apollo3.adapter.DateAdapter)
-            .build()
+        apolloClient =
+            ApolloClient.Builder()
+                .serverUrl("https://$ip:8443/graphql")
+                .okHttpClient(HttpClientManager.createCryptoHttpClient(token, timeout))
+                .normalizedCache(SqlNormalizedCacheFactory(MainApp.instance, "apollo_$boxId.db"))
+                .addCustomScalarAdapter(com.ismartcoding.plain.type.Time.type, com.apollographql.apollo3.adapter.DateAdapter)
+                .build()
         clients[key] = apolloClient
         return apolloClient
     }

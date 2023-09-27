@@ -21,9 +21,7 @@ import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.R
 
 @Composable
-fun RefreshLayoutState.LoadMoreRefreshContent(
-    isLoadFinish: Boolean = false
-) {
+fun RefreshLayoutState.LoadMoreRefreshContent(isLoadFinish: Boolean = false) {
     val rotate =
         if (isLoadFinish || getRefreshContentOffset() == 0f) {
             0f
@@ -32,24 +30,28 @@ fun RefreshLayoutState.LoadMoreRefreshContent(
             infiniteTransition.animateFloat(
                 initialValue = 0f,
                 targetValue = 360f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(durationMillis = 1000, easing = LinearEasing),
-                    repeatMode = RepeatMode.Restart
-                )
+                animationSpec =
+                    infiniteRepeatable(
+                        animation = tween(durationMillis = 1000, easing = LinearEasing),
+                        repeatMode = RepeatMode.Restart,
+                    ),
             ).value
         }
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(30.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(30.dp),
         horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = if (isLoadFinish)
-                stringResource(id = R.string.load_no_more)
-            else
-                stringResource(id = R.string.loading),
+            text =
+                if (isLoadFinish) {
+                    stringResource(id = R.string.load_no_more)
+                } else {
+                    stringResource(id = R.string.loading)
+                },
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.secondary,
         )

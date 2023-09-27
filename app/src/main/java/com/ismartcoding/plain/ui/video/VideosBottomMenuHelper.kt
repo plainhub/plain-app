@@ -30,7 +30,7 @@ object VideosBottomMenuHelper {
         viewModel: FilteredItemsViewModel,
         lifecycleScope: LifecycleCoroutineScope,
         binding: DialogListDrawerBinding,
-        menuItem: MenuItem
+        menuItem: MenuItem,
     ) {
         val list = binding.list
         val rv = list.rv
@@ -65,11 +65,11 @@ object VideosBottomMenuHelper {
                             withIO {
                                 TagHelper.deleteTagRelationByKeys(
                                     ids,
-                                    DataType.VIDEO
+                                    DataType.VIDEO,
                                 )
                                 VideoHelper.deleteRecordsAndFilesByIds(
                                     context,
-                                    ids
+                                    ids,
                                 )
                                 VideoPlaylistPreference.deleteAsync(context, ids.map { VideoHelper.getItemUri(it).toString() }.toSet())
                             }

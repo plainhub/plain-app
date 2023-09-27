@@ -8,13 +8,14 @@ import com.ismartcoding.plain.data.IData
 import kotlinx.datetime.*
 
 @Entity(
-    tableName = "aichats"
+    tableName = "aichats",
 )
 data class DAIChat(
     @PrimaryKey override var id: String = StringHelper.shortUUID(),
 ) : IData, DEntityBase() {
     @ColumnInfo(name = "parent_id")
     var parentId: String = ""
+
     @ColumnInfo(name = "is_me")
     var isMe: Boolean = false
     var content: String = ""
@@ -59,4 +60,3 @@ interface AIChatDao {
     @Query("DELETE FROM aichats WHERE parent_id in (:ids)")
     fun deleteByParentIds(ids: Set<String>)
 }
-

@@ -16,13 +16,13 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.DataType
+import com.ismartcoding.plain.data.enums.MediaType
 import com.ismartcoding.plain.data.preference.AudioPlayingPreference
 import com.ismartcoding.plain.data.preference.AudioSortByPreference
 import com.ismartcoding.plain.features.*
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioHelper
 import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.data.enums.MediaType
 import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.CastDialog
@@ -41,7 +41,10 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     override val dataType: DataType
         get() = DataType.AUDIO
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         viewModel.data = bucket
         super.onViewCreated(view, savedInstanceState)
         binding.list.rv.setPadding(0, 0, 0, requireContext().dp2px(72))
@@ -101,7 +104,6 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
                 }
             }
         }
-
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -120,12 +122,19 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
         lifecycleScope.launch {
             val context = requireContext()
             initTopAppBar(R.menu.media_items_top) {
-                FileSortHelper.bindSortMenuItemClick(context, lifecycleScope, binding.topAppBar.toolbar.menu, this, MediaType.AUDIO, viewModel, binding.list)
+                FileSortHelper.bindSortMenuItemClick(
+                    context,
+                    lifecycleScope,
+                    binding.topAppBar.toolbar.menu,
+                    this,
+                    MediaType.AUDIO,
+                    viewModel,
+                    binding.list,
+                )
             }
             val sortBy = withIO { AudioSortByPreference.getValueAsync(context) }
             FileSortHelper.getSelectedSortItem(binding.topAppBar.toolbar.menu, sortBy).highlightTitle(context)
         }
-
     }
 
     override fun initList() {
@@ -181,19 +190,22 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
         val bindingAdapter = binding.list.rv.bindingAdapter
         val toggleMode = bindingAdapter.toggleMode
         val checkedItems = bindingAdapter.getCheckedModels<AudioModel>()
-        val currentPath = withIO {  AudioPlayingPreference.getValueAsync(context)?.path  }
+        val currentPath = withIO { AudioPlayingPreference.getValueAsync(context)?.path }
         val isAudioPlaying = AudioPlayer.instance.isPlaying()
-        binding.list.page.addData(items.map { a ->
-            AudioModel(a).apply {
-                title = a.title
-                subtitle = a.artist + " " + FormatHelper.formatDuration(a.duration)
-                this.toggleMode = toggleMode
-                isChecked = checkedItems.any { it.data.id == data.id }
-                isPlaying = isAudioPlaying && currentPath == a.path
-            }
-        }, hasMore = {
-            items.size == viewModel.limit
-        })
+        binding.list.page.addData(
+            items.map { a ->
+                AudioModel(a).apply {
+                    title = a.title
+                    subtitle = a.artist + " " + FormatHelper.formatDuration(a.duration)
+                    this.toggleMode = toggleMode
+                    isChecked = checkedItems.any { it.data.id == data.id }
+                    isPlaying = isAudioPlaying && currentPath == a.path
+                }
+            },
+            hasMore = {
+                items.size == viewModel.limit
+            },
+        )
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -203,4 +215,3 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
         binding.list.page.addData(items, hasMore = { false })
     }
 }
-

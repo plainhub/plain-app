@@ -23,20 +23,22 @@ fun RefreshLayoutState.PullToRefreshContent() {
         Modifier
             .fillMaxWidth()
             .height(35.dp),
-        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
     ) {
         Text(
-            text = when (refreshContentState) {
-                RefreshContentState.Stop -> stringResource(id = R.string.srl_header_finish)
-                RefreshContentState.Refreshing -> stringResource(id = R.string.srl_header_refreshing)
-                RefreshContentState.Dragging -> {
-                    if (abs(getRefreshContentOffset()) < getRefreshContentThreshold()) {
-                        stringResource(id = R.string.srl_header_pulling)
-                    } else {
-                        stringResource(id = R.string.srl_header_release)
+            text =
+                when (refreshContentState) {
+                    RefreshContentState.Stop -> stringResource(id = R.string.srl_header_finish)
+                    RefreshContentState.Refreshing -> stringResource(id = R.string.srl_header_refreshing)
+                    RefreshContentState.Dragging -> {
+                        if (abs(getRefreshContentOffset()) < getRefreshContentThreshold()) {
+                            stringResource(id = R.string.srl_header_pulling)
+                        } else {
+                            stringResource(id = R.string.srl_header_release)
+                        }
                     }
-                }
-            },
+                },
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.secondary,
         )

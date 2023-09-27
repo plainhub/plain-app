@@ -32,18 +32,20 @@ fun PAsyncImage(
     @DrawableRes error: Int? = R.drawable.ic_broken_image,
 ) {
     Image(
-        painter = rememberAsyncImagePainter(
-            model = ImageRequest.Builder(LocalContext.current).data(data)
-                .videoFrameMillis(3000)
-                .apply {
-                    if (placeholder != null) placeholder(placeholder)
-                    if (error != null) error(error)
-                    crossfade(true)
-                    scale(scale)
-                    precision(precision)
-                    size(size)
-                }.build()
-        ),
+        painter =
+            rememberAsyncImagePainter(
+                model =
+                    ImageRequest.Builder(LocalContext.current).data(data)
+                        .videoFrameMillis(3000)
+                        .apply {
+                            if (placeholder != null) placeholder(placeholder)
+                            if (error != null) error(error)
+                            crossfade(true)
+                            scale(scale)
+                            precision(precision)
+                            size(size)
+                        }.build(),
+            ),
         contentDescription = contentDescription,
         contentScale = contentScale,
         modifier = modifier,
@@ -76,7 +78,6 @@ private class ForwardingPainter(
     private var colorFilter: ColorFilter?,
     private val onDraw: DrawScope.(ForwardingDrawInfo) -> Unit,
 ) : Painter() {
-
     private var info = newInfo()
 
     override val intrinsicSize get() = painter.intrinsicSize
@@ -107,7 +108,7 @@ private val DefaultOnDraw: DrawScope.(ForwardingDrawInfo) -> Unit = { info ->
         draw(
             androidx.compose.ui.geometry.Size(size.width, size.height),
             info.alpha,
-            info.colorFilter
+            info.colorFilter,
         )
     }
 }

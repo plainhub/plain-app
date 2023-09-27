@@ -29,7 +29,10 @@ class LogsViewModel : ViewModel() {
         }
     }
 
-    private fun share(context: Context, file: File) {
+    private fun share(
+        context: Context,
+        file: File,
+    ) {
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = "*/*"
         intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.share_logs))
@@ -38,5 +41,4 @@ class LogsViewModel : ViewModel() {
         intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, Constants.AUTHORITY, file))
         context.startActivity(Intent.createChooser(intent, getString(R.string.share_logs)))
     }
-
 }

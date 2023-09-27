@@ -1,14 +1,9 @@
 package com.ismartcoding.lib.html2md
 
-import com.ismartcoding.lib.html2md.ProcessNode.Companion.isBlank
-import com.ismartcoding.lib.html2md.ProcessNode.Companion.isBlock
 import com.ismartcoding.lib.html2md.NodeUtils.isNodeType1
 import com.ismartcoding.lib.html2md.NodeUtils.isNodeType3
-import org.jsoup.nodes.Element
-import org.jsoup.nodes.Node
 import org.jsoup.nodes.TextNode
 import java.util.*
-import java.util.function.BiFunction
 import java.util.regex.Pattern
 
 class MDConverter {
@@ -28,21 +23,22 @@ class MDConverter {
 
     private class Escape(var pattern: String, var replace: String)
 
-    private val escapes = listOf(
-        Escape("\\\\", "\\\\\\\\"),
-        Escape("\\*", "\\\\*"),
-        Escape("^-", "\\\\-"),
-        Escape("^\\+ ", "\\\\+ "),
-        Escape("^(=+)", "\\\\$1"),
-        Escape("^(#{1,6}) ", "\\\\$1 "),
-        Escape("`", "\\\\`"),
-        Escape("^~~~", "\\\\~~~"),
-        Escape("\\[", "\\\\["),
-        Escape("\\]", "\\\\]"),
-        Escape("^>", "\\\\>"),
-        Escape("_", "\\\\_"),
-        Escape("^(\\d+)\\. ", "$1\\\\. ")
-    )
+    private val escapes =
+        listOf(
+            Escape("\\\\", "\\\\\\\\"),
+            Escape("\\*", "\\\\*"),
+            Escape("^-", "\\\\-"),
+            Escape("^\\+ ", "\\\\+ "),
+            Escape("^(=+)", "\\\\$1"),
+            Escape("^(#{1,6}) ", "\\\\$1 "),
+            Escape("`", "\\\\`"),
+            Escape("^~~~", "\\\\~~~"),
+            Escape("\\[", "\\\\["),
+            Escape("\\]", "\\\\]"),
+            Escape("^>", "\\\\>"),
+            Escape("_", "\\\\_"),
+            Escape("^(\\d+)\\. ", "$1\\\\. "),
+        )
 
     private fun postProcess(output: String): String {
         var o = output
@@ -77,20 +73,27 @@ class MDConverter {
         if (flankingWhiteSpaces.leading.isNotEmpty() || flankingWhiteSpaces.trailing.isNotEmpty()) {
             content = content.trim { it <= ' ' }
         }
-        return (flankingWhiteSpaces.leading + rule!!.replacement.apply(content, node.element)
-                + flankingWhiteSpaces.trailing)
+        return (
+            flankingWhiteSpaces.leading + rule!!.replacement.apply(content, node.element) +
+                flankingWhiteSpaces.trailing
+        )
     }
 
-    private fun join(string1: String, string2: String): String {
+    private fun join(
+        string1: String,
+        string2: String,
+    ): String {
         val trailingMatcher = trailingNewLinePattern.matcher(string1)
         trailingMatcher.find()
         val leadingMatcher = leadingNewLinePattern.matcher(string2)
         leadingMatcher.find()
         val nNewLines = Integer.min(2, Integer.max(leadingMatcher.group().length, trailingMatcher.group().length))
         val newLineJoin = java.lang.String.join("", Collections.nCopies(nNewLines, "\n"))
-        return (trailingMatcher.replaceAll("")
-                + newLineJoin
-                + leadingMatcher.replaceAll(""))
+        return (
+            trailingMatcher.replaceAll("") +
+                newLineJoin +
+                leadingMatcher.replaceAll("")
+        )
     }
 
     private fun escape(string: String): String {
@@ -100,7 +103,6 @@ class MDConverter {
         }
         return s
     }
-
 
     companion object {
         private val leadingNewLinePattern = Pattern.compile("^(\n*)")

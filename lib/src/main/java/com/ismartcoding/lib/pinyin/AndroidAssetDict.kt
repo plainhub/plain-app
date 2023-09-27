@@ -19,8 +19,10 @@ abstract class AndroidAssetDict(context: Context) : PinyinMapDict() {
      * @return
      */
     protected abstract fun assetFileName(): String?
+
     val mContext: Context
     val mDict: MutableMap<String, Array<String>> = hashMapOf()
+
     override fun mapping(): Map<String, Array<String>> {
         return mDict
     }

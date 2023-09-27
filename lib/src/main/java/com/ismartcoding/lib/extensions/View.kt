@@ -14,41 +14,55 @@ import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import kotlinx.coroutines.*
 
-
 val View.compatPaddingStart get() = ViewCompat.getPaddingStart(this)
 
 @BindingAdapter("glide")
-fun glide(view: ImageView, url: String?) {
+fun glide(
+    view: ImageView,
+    url: String?,
+) {
     if (!url.isNullOrEmpty()) {
         view.glide(url)
     }
 }
 
-fun View.slideUp(show: Boolean, duration: Long = 200) {
+fun View.slideUp(
+    show: Boolean,
+    duration: Long = 200,
+) {
     val animate = TranslateAnimation(0f, 0f, this.height.toFloat(), 0f)
     animate.duration = duration
-    animate.setAnimationListener(object : Animation.AnimationListener {
-        override fun onAnimationStart(animation: Animation) {}
-        override fun onAnimationEnd(animation: Animation) {
-            isVisible = show
-        }
+    animate.setAnimationListener(
+        object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {}
 
-        override fun onAnimationRepeat(animation: Animation) {}
-    })
+            override fun onAnimationEnd(animation: Animation) {
+                isVisible = show
+            }
+
+            override fun onAnimationRepeat(animation: Animation) {}
+        },
+    )
     startAnimation(animate)
 }
 
-fun View.slideDown(show: Boolean, duration: Long = 200) {
+fun View.slideDown(
+    show: Boolean,
+    duration: Long = 200,
+) {
     val animate = TranslateAnimation(0f, 0f, 0f, this.height.toFloat())
     animate.duration = duration
-    animate.setAnimationListener(object : Animation.AnimationListener {
-        override fun onAnimationStart(animation: Animation) {}
-        override fun onAnimationEnd(animation: Animation) {
-            isVisible = show
-        }
+    animate.setAnimationListener(
+        object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {}
 
-        override fun onAnimationRepeat(animation: Animation) {}
-    })
+            override fun onAnimationEnd(animation: Animation) {
+                isVisible = show
+            }
+
+            override fun onAnimationRepeat(animation: Animation) {}
+        },
+    )
     startAnimation(animate)
 }
 
@@ -59,15 +73,18 @@ fun View.toggle() {
 fun View.delayOnLifecycle(
     durationInMillis: Long,
     dispatcher: CoroutineDispatcher = Dispatchers.Main,
-    block: () -> Unit
-): Job? = findViewTreeLifecycleOwner()?.let { lifecycleOwner ->
-    lifecycleOwner.lifecycle.coroutineScope.launch(dispatcher) {
-        delay(durationInMillis)
-        block()
+    block: () -> Unit,
+): Job? =
+    findViewTreeLifecycleOwner()?.let { lifecycleOwner ->
+        lifecycleOwner.lifecycle.coroutineScope.launch(dispatcher) {
+            delay(durationInMillis)
+            block()
+        }
     }
-}
 
-fun View.setBackgroundAttr(@AttrRes attr: Int) {
+fun View.setBackgroundAttr(
+    @AttrRes attr: Int,
+) {
     val outValue = TypedValue()
     context.theme.resolveAttribute(attr, outValue, true)
     background = ContextCompat.getDrawable(context, outValue.resourceId)

@@ -7,7 +7,7 @@ enum class AudioAction {
     STOP,
     SEEK,
     NOT_FOUND,
-    NOTIFICATION
+    NOTIFICATION,
 }
 
 enum class AudioServiceAction {
@@ -17,5 +17,5 @@ enum class AudioServiceAction {
     SKIP_PREVIOUS,
     SEEK,
     QUIT,
-    PENDING_QUIT
+    PENDING_QUIT,
 }

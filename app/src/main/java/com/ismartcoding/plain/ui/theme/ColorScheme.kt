@@ -7,7 +7,6 @@ import androidx.compose.ui.graphics.Color
 import com.ismartcoding.plain.ui.theme.palette.onDark
 import com.ismartcoding.plain.ui.theme.palette.onLight
 
-
 @Composable
 fun ColorScheme.backColor(): Color {
     return MaterialTheme.colorScheme.surface onLight MaterialTheme.colorScheme.inverseOnSurface

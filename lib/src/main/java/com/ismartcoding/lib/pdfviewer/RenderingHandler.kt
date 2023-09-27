@@ -2,7 +2,6 @@ package com.ismartcoding.lib.pdfviewer
 
 import android.graphics.*
 import android.os.*
-import android.util.Log
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.pdfviewer.RenderingHandler.RenderingTask
 import com.ismartcoding.lib.pdfviewer.exception.PageRenderingException
@@ -20,7 +19,16 @@ class RenderingHandler(looper: Looper, private val pdfView: PDFView) : Handler(l
     private val renderMatrix = Matrix()
     private var running = false
 
-    fun addRenderingTask(page: Int, width: Float, height: Float, bounds: RectF, thumbnail: Boolean, cacheOrder: Int, bestQuality: Boolean, annotationRendering: Boolean) {
+    fun addRenderingTask(
+        page: Int,
+        width: Float,
+        height: Float,
+        bounds: RectF,
+        thumbnail: Boolean,
+        cacheOrder: Int,
+        bestQuality: Boolean,
+        annotationRendering: Boolean,
+    ) {
         val task = RenderingTask(width, height, bounds, page, thumbnail, cacheOrder, bestQuality, annotationRendering)
         val msg = obtainMessage(MSG_RENDER_TASK, task)
         sendMessage(msg)
@@ -61,13 +69,19 @@ class RenderingHandler(looper: Looper, private val pdfView: PDFView) : Handler(l
         calculateBounds(w, h, renderingTask.bounds)
         pdfFile.renderPageBitmap(render, renderingTask.page, roundedRenderBounds, renderingTask.annotationRendering)
         return PagePart(
-            renderingTask.page, render,
-            renderingTask.bounds, renderingTask.thumbnail,
-            renderingTask.cacheOrder
+            renderingTask.page,
+            render,
+            renderingTask.bounds,
+            renderingTask.thumbnail,
+            renderingTask.cacheOrder,
         )
     }
 
-    private fun calculateBounds(width: Int, height: Int, pageSliceBounds: RectF) {
+    private fun calculateBounds(
+        width: Int,
+        height: Int,
+        pageSliceBounds: RectF,
+    ) {
         renderMatrix.reset()
         renderMatrix.postTranslate(-pageSliceBounds.left * width, -pageSliceBounds.top * height)
         renderMatrix.postScale(1 / pageSliceBounds.width(), 1 / pageSliceBounds.height())
@@ -92,7 +106,7 @@ class RenderingHandler(looper: Looper, private val pdfView: PDFView) : Handler(l
         var thumbnail: Boolean,
         var cacheOrder: Int,
         var bestQuality: Boolean,
-        var annotationRendering: Boolean
+        var annotationRendering: Boolean,
     )
 
     companion object {

@@ -3,24 +3,27 @@ package com.ismartcoding.plain.ui.box
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
-import com.ismartcoding.plain.InitQuery
-import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.*
-import com.ismartcoding.plain.databinding.DialogConnectBoxBinding
-import com.ismartcoding.plain.ui.BaseBottomSheetDialog
-import com.ismartcoding.plain.ui.extensions.setSafeClick
-import com.ismartcoding.plain.features.bluetooth.*
-import com.ismartcoding.plain.features.box.BoxHelper
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.softinput.setWindowSoftInput
+import com.ismartcoding.plain.InitQuery
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.data.*
+import com.ismartcoding.plain.databinding.DialogConnectBoxBinding
+import com.ismartcoding.plain.features.bluetooth.*
+import com.ismartcoding.plain.features.box.BoxHelper
+import com.ismartcoding.plain.ui.BaseBottomSheetDialog
+import com.ismartcoding.plain.ui.extensions.setSafeClick
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
 class ConnectBoxDialog(private val device: BTDevice, val updateCallback: () -> Unit) : BaseBottomSheetDialog<DialogConnectBoxBinding>() {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.topAppBar.title = device.device.name
         binding.connect.run {
@@ -68,19 +71,33 @@ class ConnectBoxDialog(private val device: BTDevice, val updateCallback: () -> U
         setWindowSoftInput(binding.connect)
     }
 
-
-    private suspend fun requestTokenAsync(smartDevice: SmartBTDevice, password: String): BluetoothResult {
+    private suspend fun requestTokenAsync(
+        smartDevice: SmartBTDevice,
+        password: String,
+    ): BluetoothResult {
         val data = BleRequestData.create(requireContext())
         data.body = BleAuthData(CryptoHelper.sha512(password.toByteArray())).toJSON().toString()
         return smartDevice.requestAsync(BTDevice.authService, data)
     }
 
-    private suspend fun bindBoxDataAsync(smartDevice: SmartBTDevice, json: JSONObject) {
+    private suspend fun bindBoxDataAsync(
+        smartDevice: SmartBTDevice,
+        json: JSONObject,
+    ) {
         val boxId = json.optString("box_id")
         val token = json.optString("token")
         val r2 = withIO { smartDevice.graphqlAsync(requireContext(), InitQuery(), token) }
         if (r2 != null) {
-            val ips = if (r2.data?.interfaces != null) BoxHelper.getIPs(r2.data?.interfaces?.map { it.interfaceFragment } ?: arrayListOf()) else arrayListOf()
+            val ips =
+                if (r2.data?.interfaces != null) {
+                    BoxHelper.getIPs(
+                        r2.data?.interfaces?.map {
+                            it.interfaceFragment
+                        } ?: arrayListOf(),
+                    )
+                } else {
+                    arrayListOf()
+                }
             withIO {
                 BoxHelper.addOrUpdateAsync(boxId) { item ->
                     item.token = token
@@ -102,7 +119,10 @@ class ConnectBoxDialog(private val device: BTDevice, val updateCallback: () -> U
         }
     }
 
-    private suspend fun finishRequestAsync(smartDevice: SmartBTDevice, error: String) {
+    private suspend fun finishRequestAsync(
+        smartDevice: SmartBTDevice,
+        error: String,
+    ) {
         withIO { smartDevice.disconnect() }
         binding.connect.hideLoading()
         DialogHelper.showMessage(error)

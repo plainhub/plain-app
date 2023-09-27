@@ -4,14 +4,12 @@ import androidx.databinding.Bindable
 import androidx.databinding.Observable
 import androidx.databinding.PropertyChangeRegistry
 
-
 /**
  * A convenience class that implements [android.databinding.Observable] interface and provides
  * [.notifyPropertyChanged] and [.notifyChange] methods.
  */
 
 interface ObservableIml : Observable {
-
     val registry: PropertyChangeRegistry
 
     override fun addOnPropertyChangedCallback(callback: Observable.OnPropertyChangedCallback) {

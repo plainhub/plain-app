@@ -11,8 +11,8 @@ class FullDraggableHelper(private val context: Context, private val callback: Ca
     private var lastMotionX = 0f
     private val touchSlop: Int = ViewConfiguration.get(context).scaledTouchSlop
     private val swipeSlop: Int = context.dp2px(8)
-    private val distanceThreshold: Int= context.dp2px(80)
-    private val xVelocityThreshold: Int= context.dp2px(150)
+    private val distanceThreshold: Int = context.dp2px(80)
+    private val xVelocityThreshold: Int = context.dp2px(150)
     private var gravity = Gravity.NO_GRAVITY
     private var isDraggingDrawer = false
     private var shouldOpenDrawer = false
@@ -109,7 +109,13 @@ class FullDraggableHelper(private val context: Context, private val callback: Ca
         return true
     }
 
-    private fun canNestedViewScroll(view: View, checkSelf: Boolean, dx: Int, x: Int, y: Int): Boolean {
+    private fun canNestedViewScroll(
+        view: View,
+        checkSelf: Boolean,
+        dx: Int,
+        x: Int,
+        y: Int,
+    ): Boolean {
         if (view is ViewGroup) {
             val group = view
             val scrollX = view.getScrollX()
@@ -118,12 +124,13 @@ class FullDraggableHelper(private val context: Context, private val callback: Ca
             for (i in count - 1 downTo 0) {
                 val child = group.getChildAt(i)
                 if (child.visibility != View.VISIBLE) continue
-                if (x + scrollX >= child.left && x + scrollX < child.right && y + scrollY >= child.top && y + scrollY < child.bottom && canNestedViewScroll(
+                if (x + scrollX >= child.left && x + scrollX < child.right && y + scrollY >= child.top && y + scrollY < child.bottom &&
+                    canNestedViewScroll(
                         child,
                         true,
                         dx,
                         x + scrollX - child.left,
-                        y + scrollY - child.top
+                        y + scrollY - child.top,
                     )
                 ) {
                     return true
@@ -139,17 +146,28 @@ class FullDraggableHelper(private val context: Context, private val callback: Ca
 
     @SuppressLint("RtlHardcoded")
     private fun isDrawerEnabled(direction: Float): Boolean {
-        return (direction > 0 && callback.hasEnabledDrawer(Gravity.LEFT)
-                || direction < 0 && callback.hasEnabledDrawer(Gravity.RIGHT))
+        return (
+            direction > 0 && callback.hasEnabledDrawer(Gravity.LEFT) ||
+                direction < 0 && callback.hasEnabledDrawer(Gravity.RIGHT)
+        )
     }
 
     interface Callback {
         val drawerMainContainer: View
+
         fun isDrawerOpen(gravity: Int): Boolean
+
         fun hasEnabledDrawer(gravity: Int): Boolean
-        fun offsetDrawer(gravity: Int, offset: Float)
+
+        fun offsetDrawer(
+            gravity: Int,
+            offset: Float,
+        )
+
         fun smoothOpenDrawer(gravity: Int)
+
         fun smoothCloseDrawer(gravity: Int)
+
         fun onDrawerDragging()
     }
 }

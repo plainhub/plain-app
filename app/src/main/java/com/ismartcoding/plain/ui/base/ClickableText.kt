@@ -23,29 +23,30 @@ fun ClickableText(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onClick: (Int) -> Unit,
     onDoubleClick: () -> Unit,
-    doubleClickTimeoutMillis: Long = 300
+    doubleClickTimeoutMillis: Long = 300,
 ) {
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
     val lastClickTime = remember { mutableStateOf(0L) }
 
-    val pressIndicator = Modifier.pointerInput(onClick) {
-        detectTapGestures { pos ->
-            val currentTime = System.currentTimeMillis()
-            val layout = layoutResult.value
-            if (layout != null) {
-                val offset = layout.getOffsetForPosition(pos)
-                val timeSinceLastClick = currentTime - lastClickTime.value
-                if (timeSinceLastClick <= doubleClickTimeoutMillis) {
-                    // Double-click detected
-                    onDoubleClick()
-                } else {
-                    // Single click
-                    onClick(offset)
+    val pressIndicator =
+        Modifier.pointerInput(onClick) {
+            detectTapGestures { pos ->
+                val currentTime = System.currentTimeMillis()
+                val layout = layoutResult.value
+                if (layout != null) {
+                    val offset = layout.getOffsetForPosition(pos)
+                    val timeSinceLastClick = currentTime - lastClickTime.value
+                    if (timeSinceLastClick <= doubleClickTimeoutMillis) {
+                        // Double-click detected
+                        onDoubleClick()
+                    } else {
+                        // Single click
+                        onClick(offset)
+                    }
+                    lastClickTime.value = currentTime
                 }
-                lastClickTime.value = currentTime
             }
         }
-    }
 
     BasicText(
         text = text,
@@ -57,6 +58,6 @@ fun ClickableText(
         onTextLayout = {
             layoutResult.value = it
             onTextLayout(it)
-        }
+        },
     )
 }

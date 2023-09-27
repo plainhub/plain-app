@@ -20,10 +20,12 @@ import com.ismartcoding.plain.ui.extensions.onBack
 import com.ismartcoding.plain.ui.extensions.onMenuItemClick
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 
-
 class WebDialog(val url: String) : BaseDialog<DialogWebBinding>() {
     @SuppressLint("SetJavaScriptEnabled")
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         val context = requireContext()
@@ -67,11 +69,13 @@ class WebDialog(val url: String) : BaseDialog<DialogWebBinding>() {
             settings.cacheMode = LOAD_DEFAULT
             loadUrl(this@WebDialog.url)
         }
-
     }
 
     internal inner class CustomWebChromeClient : WebChromeClient() {
-        override fun onProgressChanged(view: WebView, progress: Int) {
+        override fun onProgressChanged(
+            view: WebView,
+            progress: Int,
+        ) {
             if (this@WebDialog.isActive) {
                 if (progress < 100) {
                     binding.topAppBar.progressBar.isVisible = true
@@ -85,12 +89,16 @@ class WebDialog(val url: String) : BaseDialog<DialogWebBinding>() {
 
     internal inner class CustomWebViewClient : WebViewClient() {
         override fun onReceivedSslError(
-            view: WebView, handler: SslErrorHandler,
-            error: SslError
+            view: WebView,
+            handler: SslErrorHandler,
+            error: SslError,
         ) {
         }
 
-        override fun onPageFinished(view: WebView, url: String?) {
+        override fun onPageFinished(
+            view: WebView,
+            url: String?,
+        ) {
             if (this@WebDialog.isActive) {
                 binding.topAppBar.toolbar.title = view.title
             }

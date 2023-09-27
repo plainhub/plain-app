@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.features.bluetooth
 
 import android.content.Context
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.lib.helpers.PhoneHelper
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import org.json.JSONObject
 
@@ -59,7 +59,11 @@ data class BleSegmentData(val data: String, val state: Int) {
         private const val stateStartBit = 1
         const val stateEndBit = 2
 
-        fun build(data: String, start: Boolean, end: Boolean): BleSegmentData {
+        fun build(
+            data: String,
+            start: Boolean,
+            end: Boolean,
+        ): BleSegmentData {
             var state = 0
             if (start && end) {
                 state = stateStartBit or stateEndBit

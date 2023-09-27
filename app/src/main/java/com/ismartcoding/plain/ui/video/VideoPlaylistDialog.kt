@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.video
 
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.TextView
@@ -34,11 +33,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class VideoPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
-    data class SortableVideoModel(override val data: DVideo, override var itemOrientationDrag: Int = ItemOrientation.ALL) : VideoModel(data), ItemDrag
+    data class SortableVideoModel(
+        override val data: DVideo,
+        override var itemOrientationDrag: Int = ItemOrientation.ALL,
+    ) : VideoModel(data), ItemDrag
 
     private var searchQ: String = ""
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.topAppBar.run {
@@ -91,16 +96,19 @@ class VideoPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
                 )
             }
 
-            itemTouchHelper = ItemTouchHelper(object : DefaultItemTouchCallback() {
-                override fun onDrag(
-                    source: BindingAdapter.BindingViewHolder,
-                    target: BindingAdapter.BindingViewHolder
-                ) {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        VideoPlaylistPreference.putAsync(requireContext(), getModelList<SortableVideoModel>().map { it.data })
-                    }
-                }
-            })
+            itemTouchHelper =
+                ItemTouchHelper(
+                    object : DefaultItemTouchCallback() {
+                        override fun onDrag(
+                            source: BindingAdapter.BindingViewHolder,
+                            target: BindingAdapter.BindingViewHolder,
+                        ) {
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                VideoPlaylistPreference.putAsync(requireContext(), getModelList<SortableVideoModel>().map { it.data })
+                            }
+                        }
+                    },
+                )
         }
 
         binding.list.page.run {
@@ -155,7 +163,8 @@ class VideoPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
                                 }
                             }
                         }
-                })
+                },
+            )
             updateTitle()
         }
     }

@@ -31,7 +31,6 @@ internal class Rule {
         this.replacement = replacement
     }
 
-
     constructor(filter: Predicate<Node>, replacement: BiFunction<String, Node, String>, append: Supplier<String>) {
         this.filter = filter
         this.replacement = replacement

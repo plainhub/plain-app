@@ -10,7 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.preview.PreviewItem
 
-internal fun ViewGroup.findViewWithKeyTag(key: Int, tag: Any): View? {
+internal fun ViewGroup.findViewWithKeyTag(
+    key: Int,
+    tag: Any,
+): View? {
     forEach {
         if (it.getTag(key) == tag) return it
         if (it is ViewGroup) {
@@ -32,7 +35,10 @@ private fun getActivity(context: Context?): Activity? {
     return null
 }
 
-internal fun View.initTag(item: PreviewItem, holder: RecyclerView.ViewHolder) {
+internal fun View.initTag(
+    item: PreviewItem,
+    holder: RecyclerView.ViewHolder,
+) {
     setTag(R.id.viewer_adapter_item_key, item.id)
     setTag(R.id.viewer_adapter_item_data, item)
     setTag(R.id.viewer_adapter_item_holder, holder)

@@ -9,30 +9,47 @@ import com.ismartcoding.lib.extensions.getMimeTypeFromUri
 import kotlin.collections.ArrayList
 
 object ShareHelper {
-    fun share(context: Context, uri: Uri) {
+    fun share(
+        context: Context,
+        uri: Uri,
+    ) {
         context.startActivity(
             Intent.createChooser(
                 createFileIntent(context, uri),
-                null
-            )
+                null,
+            ),
         )
     }
 
-    fun shareText(context: Context, content: String) {
-        context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
-            putExtra(
-                Intent.EXTRA_TEXT,
-                content,
-            )
-            type = "text/plain"
-        }, null))
+    fun shareText(
+        context: Context,
+        content: String,
+    ) {
+        context.startActivity(
+            Intent.createChooser(
+                Intent(Intent.ACTION_SEND).apply {
+                    putExtra(
+                        Intent.EXTRA_TEXT,
+                        content,
+                    )
+                    type = "text/plain"
+                },
+                null,
+            ),
+        )
     }
 
-    fun sharePaths(context: Context, paths: List<String>) {
+    fun sharePaths(
+        context: Context,
+        paths: List<String>,
+    ) {
         share(context, ArrayList(paths.map { Uri.parse(it) }))
     }
 
-    fun share(context: Context, uris: ArrayList<Uri>) {
+    fun share(
+        context: Context,
+        uris: ArrayList<Uri>,
+    ) {
         if (uris.size == 1) {
             share(context, uris[0])
         } else {
@@ -40,16 +57,22 @@ object ShareHelper {
         }
     }
 
-    private fun shareFiles(context: Context, uris: ArrayList<Uri>) {
+    private fun shareFiles(
+        context: Context,
+        uris: ArrayList<Uri>,
+    ) {
         context.startActivity(
             Intent.createChooser(
                 createFilesIntent(context, uris),
-                null
-            )
+                null,
+            ),
         )
     }
 
-    private fun createFileIntent(context: Context, uri: Uri): Intent {
+    private fun createFileIntent(
+        context: Context,
+        uri: Uri,
+    ): Intent {
         return Intent().apply {
             action = Intent.ACTION_SEND
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -62,7 +85,7 @@ object ShareHelper {
             }
             putExtra(
                 Intent.EXTRA_STREAM,
-                newUri
+                newUri,
             )
             var mimeType = path.getMimeType()
             if (mimeType.isEmpty()) {
@@ -72,7 +95,10 @@ object ShareHelper {
         }
     }
 
-    private fun createFilesIntent(context: Context, uris: ArrayList<Uri>): Intent {
+    private fun createFilesIntent(
+        context: Context,
+        uris: ArrayList<Uri>,
+    ): Intent {
         return Intent().apply {
             action = Intent.ACTION_SEND_MULTIPLE
             val newUris = mutableListOf<Uri>()

@@ -36,7 +36,11 @@ class Delims {
         return this
     }
 
-    fun addTag(prefix: Char, name: String, into: StringBuilder) {
+    fun addTag(
+        prefix: Char,
+        name: String,
+        into: StringBuilder,
+    ) {
         into.append(start1)
         into.append(start2)
         if (prefix != ' ') into.append(prefix)
@@ -57,7 +61,7 @@ class Delims {
     companion object {
         private fun errmsg(dtext: String): String {
             return "Invalid delimiter configuration '" + dtext + "'. Must be of the " +
-                    "form {{=1 2=}} or {{=12 34=}} where 1, 2, 3 and 4 are delimiter chars."
+                "form {{=1 2=}} or {{=12 34=}} where 1, 2, 3 and 4 are delimiter chars."
         }
     }
 }

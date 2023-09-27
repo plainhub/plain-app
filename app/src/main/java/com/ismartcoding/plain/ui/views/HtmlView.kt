@@ -17,16 +17,15 @@ import com.ismartcoding.plain.ui.helpers.WebHelper
 import java.io.File
 import java.io.IOException
 
-
 class HtmlView(context: Context, attrs: AttributeSet? = null) : WebView(context, attrs) {
-
     private val TEXT_HTML = "text/html"
     private val HTML_IMG_REGEX = "(?i)<[/]?[ ]?img(.|\n)*?>"
     private val BACKGROUND_COLOR = colorString(R.color.canvas)
     private val QUOTE_BACKGROUND_COLOR = colorString(R.color.secondary)
     private val QUOTE_LEFT_COLOR = colorString(R.color.secondary)
     private val TEXT_COLOR = colorString(R.color.primary)
-    private val CSS = "<head><style type='text/css'> " +
+    private val CSS =
+        "<head><style type='text/css'> " +
             "body {max-width: 100%; margin: 0.3cm; font-family: sans-serif-light; color: " + TEXT_COLOR + "; background-color:" + BACKGROUND_COLOR + "; line-height: 150%} " +
             "* {max-width: 100%; word-break: break-word}" +
             "h1, h2 {font-weight: normal; line-height: 130%} " +
@@ -59,29 +58,32 @@ class HtmlView(context: Context, attrs: AttributeSet? = null) : WebView(context,
         // For color
         setBackgroundColor(Color.parseColor(BACKGROUND_COLOR))
 
-        webViewClient = object : WebViewClient() {
-
-            @Suppress("OverridingDeprecatedMember")
-            override fun shouldOverrideUrlLoading(view: WebView, url: String): Boolean {
-                try {
-                    if (url.startsWith("file://")) {
-                        val file = File(url.replace("file://", ""))
-                        val contentUri = FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.fileprovider", file)
-                        val intent = Intent(Intent.ACTION_VIEW)
-                        intent.setDataAndType(contentUri, "image/jpeg")
-                        context.startActivity(intent)
-                    } else {
-                        WebHelper.open(context, url)
-                    }
-                } catch (e: ActivityNotFoundException) {
+        webViewClient =
+            object : WebViewClient() {
+                @Suppress("OverridingDeprecatedMember")
+                override fun shouldOverrideUrlLoading(
+                    view: WebView,
+                    url: String,
+                ): Boolean {
+                    try {
+                        if (url.startsWith("file://")) {
+                            val file = File(url.replace("file://", ""))
+                            val contentUri = FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.fileprovider", file)
+                            val intent = Intent(Intent.ACTION_VIEW)
+                            intent.setDataAndType(contentUri, "image/jpeg")
+                            context.startActivity(intent)
+                        } else {
+                            WebHelper.open(context, url)
+                        }
+                    } catch (e: ActivityNotFoundException) {
 //                    Toast.makeText(context, R.string.cant_open_link, Toast.LENGTH_SHORT).show()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
 
-                return true
+                    return true
+                }
             }
-        }
     }
 
     fun setEntry(content: String) {
@@ -91,11 +93,12 @@ class HtmlView(context: Context, attrs: AttributeSet? = null) : WebView(context,
             settings.blockNetworkImage = false
         }
 
-        val html = StringBuilder(CSS)
-            .append(BODY_START)
-            .append(content)
-            .append(BODY_END)
-            .toString()
+        val html =
+            StringBuilder(CSS)
+                .append(BODY_START)
+                .append(content)
+                .append(BODY_END)
+                .toString()
 
         // do not put 'null' to the base url...
         loadDataWithBaseURL("", html, TEXT_HTML, "UTF-8", null)

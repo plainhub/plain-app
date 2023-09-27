@@ -5,7 +5,8 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 enum class PasswordType(val value: Int) {
     RANDOM(0),
     FIXED(1),
-    NONE(2);
+    NONE(2),
+    ;
 
     fun getText(): String {
         return LocaleHelper.getString("password_type_" + this.name.lowercase())

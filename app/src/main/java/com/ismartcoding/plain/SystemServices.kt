@@ -3,8 +3,6 @@ package com.ismartcoding.plain
 import android.app.usage.StorageStatsManager
 import android.content.ClipboardManager
 import android.content.ContentResolver
-import android.content.Context
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.media.projection.MediaProjectionManager
 import android.net.ConnectivityManager
@@ -14,8 +12,6 @@ import android.os.PowerManager
 import android.os.storage.StorageManager
 import android.view.inputmethod.InputMethodManager
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
-import java.util.concurrent.Executor
 import com.ismartcoding.lib.extensions.getSystemServiceCompat
 
 val contentResolver: ContentResolver by lazy { MainApp.instance.contentResolver }

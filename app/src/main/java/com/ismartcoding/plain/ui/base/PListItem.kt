@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -48,19 +47,21 @@ fun PListItem(
 ) {
     val tonalPalettes = LocalTonalPalettes.current
     Surface(
-        modifier = modifier
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick,
-            )
-            .alpha(if (enable) 1f else 0.5f),
-        color = Color.Unspecified
+        modifier =
+            modifier
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = onLongClick,
+                )
+                .alpha(if (enable) 1f else 0.5f),
+        color = Color.Unspecified,
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp, 8.dp, 8.dp, 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp, 8.dp, 8.dp, 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             if (icon != null) {
                 Icon(
@@ -72,9 +73,10 @@ fun PListItem(
             } else {
                 iconPainter?.let {
                     Image(
-                        modifier = Modifier
-                            .padding(end = 24.dp)
-                            .size(24.dp),
+                        modifier =
+                            Modifier
+                                .padding(end = 24.dp)
+                                .size(24.dp),
                         painter = it,
                         contentDescription = title,
                     )
@@ -83,7 +85,7 @@ fun PListItem(
             Column(modifier = Modifier.weight(1f).padding(vertical = 8.dp)) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp)
+                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
                 )
                 desc?.let {
                     SelectionContainer {
@@ -97,9 +99,10 @@ fun PListItem(
             }
             if (separatedActions) {
                 HorizontalDivider(
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                        .size(1.dp, 32.dp),
+                    modifier =
+                        Modifier
+                            .padding(start = 16.dp)
+                            .size(1.dp, 32.dp),
                     color = tonalPalettes neutralVariant 80 onDark (tonalPalettes neutralVariant 30),
                 )
             }
@@ -128,8 +131,9 @@ fun PListItem(
             if (showMore) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_chevron_right),
-                    modifier = Modifier
-                        .size(24.dp),
+                    modifier =
+                        Modifier
+                            .size(24.dp),
                     contentDescription = title,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

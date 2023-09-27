@@ -7,7 +7,11 @@ import com.ismartcoding.plain.data.preference.DeviceSortByPreference
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 
 enum class DeviceSortBy : ISelectOption {
-    NAME_ASC, NAME_DESC, IP_ADDRESS, LAST_ACTIVE;
+    NAME_ASC,
+    NAME_DESC,
+    IP_ADDRESS,
+    LAST_ACTIVE,
+    ;
 
     override fun getText(): String {
         return when (this) {

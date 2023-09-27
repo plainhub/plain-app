@@ -6,22 +6,26 @@ import com.ismartcoding.plain.data.preference.LanguagePreference
 import java.util.*
 
 object Language {
-    val locales = listOf(
-        Locale("en", "US"),
-        Locale("zh", "CN"),
-        Locale("es", ""),
-        Locale("ja", ""),
-        Locale("nl", ""),
-        Locale("it", ""),
-        Locale("hi", ""),
-        Locale("fr", ""),
-        Locale("ru", ""),
-        Locale("bn", ""),
-        Locale("de", ""),
-        Locale("pt", ""),
-    )
+    val locales =
+        listOf(
+            Locale("en", "US"),
+            Locale("zh", "CN"),
+            Locale("es", ""),
+            Locale("ja", ""),
+            Locale("nl", ""),
+            Locale("it", ""),
+            Locale("hi", ""),
+            Locale("fr", ""),
+            Locale("ru", ""),
+            Locale("bn", ""),
+            Locale("de", ""),
+            Locale("pt", ""),
+        )
 
-    fun setLocale(context: Context, locale: Locale) {
+    fun setLocale(
+        context: Context,
+        locale: Locale,
+    ) {
         val resources = context.resources
         val metrics = resources.displayMetrics
         val configuration = resources.configuration
@@ -46,4 +50,3 @@ object Language {
         }
     }
 }
-

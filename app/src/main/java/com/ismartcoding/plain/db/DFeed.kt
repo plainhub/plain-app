@@ -46,4 +46,3 @@ interface FeedDao {
     @Query("DELETE FROM feeds WHERE id in (:ids)")
     fun delete(ids: Set<String>)
 }
-

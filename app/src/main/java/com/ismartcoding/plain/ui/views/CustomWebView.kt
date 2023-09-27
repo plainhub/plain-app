@@ -13,7 +13,12 @@ class CustomWebView(context: Context, attrs: AttributeSet?) : WebView(context, a
         this.refreshState = refreshState
     }
 
-    override fun onOverScrolled(scrollX: Int, scrollY: Int, clampedX: Boolean, clampedY: Boolean) {
+    override fun onOverScrolled(
+        scrollX: Int,
+        scrollY: Int,
+        clampedX: Boolean,
+        clampedY: Boolean,
+    ) {
         super.onOverScrolled(scrollX, scrollY, clampedX, clampedY)
         refreshState?.invoke(clampedY)
     }

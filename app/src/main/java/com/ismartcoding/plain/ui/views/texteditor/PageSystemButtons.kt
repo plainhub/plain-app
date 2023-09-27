@@ -3,17 +3,17 @@ package com.ismartcoding.plain.ui.views.texteditor
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
-import android.view.View
 import androidx.core.view.isVisible
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.ismartcoding.plain.R
 
 class PageSystemButtons(context: Context, val pageButtonsInterface: PageButtonsInterface, val prev: FloatingActionButton, val next: FloatingActionButton) {
     val handler = Handler(Looper.getMainLooper())
-    val runnable = Runnable {
-        next.isVisible = false
-        prev.isVisible = false
-    }
+    val runnable =
+        Runnable {
+            next.isVisible = false
+            prev.isVisible = false
+        }
 
     init {
         next.setBackgroundColor(context.getColor(R.color.canvas))
@@ -45,9 +45,13 @@ class PageSystemButtons(context: Context, val pageButtonsInterface: PageButtonsI
 
     interface PageButtonsInterface {
         fun nextPageClicked()
+
         fun prevPageClicked()
+
         fun pageSystemButtonLongClicked()
+
         fun canReadNextPage(): Boolean
+
         fun canReadPrevPage(): Boolean
     }
 

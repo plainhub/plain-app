@@ -25,19 +25,25 @@ object Mustache {
     fun compiler(): Compiler {
         return Compiler(
             standardsMode = false, strictSections = false, nullValue = null, missingIsNull = false, emptyStringIsFalse = false,
-            zeroIsFalse = false, DEFAULT_FORMATTER, FAILING_LOADER, DefaultCollector(), Delims()
+            zeroIsFalse = false, DEFAULT_FORMATTER, FAILING_LOADER, DefaultCollector(), Delims(),
         )
     }
 
     /**
      * Compiles the supplied template into a repeatedly executable intermediate form.
      */
-    internal fun compile(source: Reader, compiler: Compiler): Template {
+    internal fun compile(
+        source: Reader,
+        compiler: Compiler,
+    ): Template {
         val accum = Parser(compiler).parse(source)
         return Template(trim(accum.finish(), true), compiler)
     }
 
-    internal fun trim(segs: Array<Segment>, top: Boolean): Array<Segment> {
+    internal fun trim(
+        segs: Array<Segment>,
+        top: Boolean,
+    ): Array<Segment> {
         // now that we have all of our segments, we make a pass through them to trim whitespace
         // from section tags which stand alone on their lines
         var ii = 0
@@ -73,7 +79,10 @@ object Mustache {
         return segs
     }
 
-    internal fun restoreStartTag(text: StringBuilder, starts: Delims) {
+    internal fun restoreStartTag(
+        text: StringBuilder,
+        starts: Delims,
+    ) {
         text.insert(0, starts.start1)
         if (starts.start2 != NO_CHAR) {
             text.insert(1, starts.start2)
@@ -89,16 +98,18 @@ object Mustache {
      * Used when we have only a single character delimiter.
      */
     const val NO_CHAR = Character.MIN_VALUE
-    private val FAILING_LOADER = object : TemplateLoader {
-        override fun getTemplate(name: String): Reader? {
-            throw UnsupportedOperationException("Template loading not configured")
+    private val FAILING_LOADER =
+        object : TemplateLoader {
+            override fun getTemplate(name: String): Reader? {
+                throw UnsupportedOperationException("Template loading not configured")
+            }
         }
-    }
-    private val DEFAULT_FORMATTER = object : Formatter {
-        override fun format(value: Any): String {
-            return value.toString()
+    private val DEFAULT_FORMATTER =
+        object : Formatter {
+            override fun format(value: Any): String {
+                return value.toString()
+            }
         }
-    }
 
     /**
      * Handles converting objects to strings when rendering templates.
@@ -122,7 +133,10 @@ object Mustache {
          * @param out  the writer to which the lambda should write its output.
          */
         @Throws(IOException::class)
-        fun execute(frag: Template.Fragment?, out: Writer?)
+        fun execute(
+            frag: Template.Fragment?,
+            out: Writer?,
+        )
     }
 
     /**
@@ -137,7 +151,10 @@ object Mustache {
          * @param out  the writer to which the lambda should write its output.
          */
         @Throws(IOException::class)
-        fun executeInverse(frag: Template.Fragment?, out: Writer?)
+        fun executeInverse(
+            frag: Template.Fragment?,
+            out: Writer?,
+        )
     }
 
     /**
@@ -148,7 +165,10 @@ object Mustache {
          * Reads the so-named variable from the supplied context object.
          */
         @Throws(Exception::class)
-        operator fun get(ctx: Any, name: String): Any
+        operator fun get(
+            ctx: Any,
+            name: String,
+        ): Any
     }
 
     /**
@@ -266,75 +286,81 @@ object Mustache {
 
         private fun parseChar(c: Char) {
             when (state) {
-                TEXT -> if (c == delims.start1) {
-                    state = MATCHING_START
-                    tagStartColumn = column
-                    if (delims.start2 == NO_CHAR) {
-                        parseChar(NO_CHAR)
-                    }
-                } else {
-                    text.append(c)
-                }
-                MATCHING_START -> if (c == delims.start2) {
-                    accum.addTextSegment(text)
-                    state = TAG
-                } else {
-                    text.append(delims.start1)
-                    state = TEXT
-                    parseChar(c)
-                }
-                TAG -> if (c == delims.end1) {
-                    state = MATCHING_END
-                    if (delims.end2 == NO_CHAR) {
-                        parseChar(NO_CHAR)
-                    }
-                } else if (c == delims.start1 && text.length > 0 && text[0] != '!') {
-                    // if we've already matched some tag characters and we see a new start tag
-                    // character (e.g. "{{foo {" but not "{{{"), treat the already matched text as
-                    // plain text and start matching a new tag from this point, unless we're in
-                    // a comment tag.
-                    restoreStartTag(text, delims)
-                    accum.addTextSegment(text)
-                    tagStartColumn = column
-                    state = if (delims.start2 == NO_CHAR) {
-                        accum.addTextSegment(text)
-                        TAG
-                    } else {
-                        MATCHING_START
-                    }
-                } else {
-                    text.append(c)
-                }
-                MATCHING_END -> if (c == delims.end2) {
-                    if (text[0] == '=') {
-                        delims.updateDelims(text.substring(1, text.length - 1))
-                        text.setLength(0)
-                        accum.addFauxSegment() // for newline trimming
-                    } else {
-                        // if the delimiters are {{ and }}, and the tag starts with {{{ then
-                        // require that it end with }}} and disable escaping
-                        if (delims.isStaches && text[0] == delims.start1) {
-                            // we've only parsed }} at this point, so we have to slurp in another
-                            // character from the input stream and check it
-                            val end3 = nextChar()
-                            if (end3 != '}'.code) {
-                                val got = if (end3 == -1) "" else end3.toChar().toString()
-                                throw MustacheParseException(
-                                    "Invalid triple-mustache tag: {{$text}}$got", line
-                                )
-                            }
-                            // convert it into (equivalent) {{&text}} which addTagSegment handles
-                            text.replace(0, 1, "&")
+                TEXT ->
+                    if (c == delims.start1) {
+                        state = MATCHING_START
+                        tagStartColumn = column
+                        if (delims.start2 == NO_CHAR) {
+                            parseChar(NO_CHAR)
                         }
-                        // process the tag between the mustaches
-                        accum = accum.addTagSegment(text, line)
+                    } else {
+                        text.append(c)
                     }
-                    state = TEXT
-                } else {
-                    text.append(delims.end1)
-                    state = TAG
-                    parseChar(c)
-                }
+                MATCHING_START ->
+                    if (c == delims.start2) {
+                        accum.addTextSegment(text)
+                        state = TAG
+                    } else {
+                        text.append(delims.start1)
+                        state = TEXT
+                        parseChar(c)
+                    }
+                TAG ->
+                    if (c == delims.end1) {
+                        state = MATCHING_END
+                        if (delims.end2 == NO_CHAR) {
+                            parseChar(NO_CHAR)
+                        }
+                    } else if (c == delims.start1 && text.length > 0 && text[0] != '!') {
+                        // if we've already matched some tag characters and we see a new start tag
+                        // character (e.g. "{{foo {" but not "{{{"), treat the already matched text as
+                        // plain text and start matching a new tag from this point, unless we're in
+                        // a comment tag.
+                        restoreStartTag(text, delims)
+                        accum.addTextSegment(text)
+                        tagStartColumn = column
+                        state =
+                            if (delims.start2 == NO_CHAR) {
+                                accum.addTextSegment(text)
+                                TAG
+                            } else {
+                                MATCHING_START
+                            }
+                    } else {
+                        text.append(c)
+                    }
+                MATCHING_END ->
+                    if (c == delims.end2) {
+                        if (text[0] == '=') {
+                            delims.updateDelims(text.substring(1, text.length - 1))
+                            text.setLength(0)
+                            accum.addFauxSegment() // for newline trimming
+                        } else {
+                            // if the delimiters are {{ and }}, and the tag starts with {{{ then
+                            // require that it end with }}} and disable escaping
+                            if (delims.isStaches && text[0] == delims.start1) {
+                                // we've only parsed }} at this point, so we have to slurp in another
+                                // character from the input stream and check it
+                                val end3 = nextChar()
+                                if (end3 != '}'.code) {
+                                    val got = if (end3 == -1) "" else end3.toChar().toString()
+                                    throw MustacheParseException(
+                                        "Invalid triple-mustache tag: {{$text}}$got",
+                                        line,
+                                    )
+                                }
+                                // convert it into (equivalent) {{&text}} which addTagSegment handles
+                                text.replace(0, 1, "&")
+                            }
+                            // process the tag between the mustaches
+                            accum = accum.addTagSegment(text, line)
+                        }
+                        state = TEXT
+                    } else {
+                        text.append(delims.end1)
+                        state = TAG
+                        parseChar(c)
+                    }
             }
         }
 
@@ -355,7 +381,10 @@ object Mustache {
             }
         }
 
-        fun addTagSegment(accum: StringBuilder, tagLine: Int): Accumulator {
+        fun addTagSegment(
+            accum: StringBuilder,
+            tagLine: Int,
+        ): Accumulator {
             val outer = this
             val tag = accum.toString().trim { it <= ' ' }
             val tag1 = tag.substring(1).trim { it <= ' ' }
@@ -366,11 +395,15 @@ object Mustache {
                     object : Accumulator(_comp, false) {
                         override fun finish(): Array<Segment> {
                             throw MustacheParseException(
-                                "Section missing close tag '$tag1'", tagLine
+                                "Section missing close tag '$tag1'",
+                                tagLine,
                             )
                         }
 
-                        override fun addCloseSectionSegment(itag: String, line: Int): Accumulator {
+                        override fun addCloseSectionSegment(
+                            itag: String,
+                            line: Int,
+                        ): Accumulator {
                             requireSameName(tag1, itag, line)
                             outer._segs.add(SectionSegment(_comp, itag, super.finish(), tagLine))
                             return outer
@@ -386,11 +419,15 @@ object Mustache {
                     object : Accumulator(_comp, false) {
                         override fun finish(): Array<Segment> {
                             throw MustacheParseException(
-                                "Inverted section missing close tag '$tag1'", tagLine
+                                "Inverted section missing close tag '$tag1'",
+                                tagLine,
                             )
                         }
 
-                        override fun addCloseSectionSegment(itag: String, line: Int): Accumulator {
+                        override fun addCloseSectionSegment(
+                            itag: String,
+                            line: Int,
+                        ): Accumulator {
                             requireSameName(tag1, itag, line)
                             outer._segs.add(InvertedSegment(_comp, itag, super.finish(), tagLine))
                             return outer
@@ -427,28 +464,41 @@ object Mustache {
             return _segs.toTypedArray()
         }
 
-        protected open fun addCloseSectionSegment(tag: String, line: Int): Accumulator {
+        protected open fun addCloseSectionSegment(
+            tag: String,
+            line: Int,
+        ): Accumulator {
             throw MustacheParseException(
-                "Section close tag with no open tag '$tag'", line
+                "Section close tag with no open tag '$tag'",
+                line,
             )
         }
 
         protected val _segs: MutableList<Segment> = ArrayList()
 
         companion object {
-            protected fun requireNoNewlines(tag: String, line: Int) {
+            protected fun requireNoNewlines(
+                tag: String,
+                line: Int,
+            ) {
                 if (tag.indexOf('\n') != -1 || tag.indexOf('\r') != -1) {
                     throw MustacheParseException(
-                        "Invalid tag name: contains newline '$tag'", line
+                        "Invalid tag name: contains newline '$tag'",
+                        line,
                     )
                 }
             }
 
-            protected fun requireSameName(name1: String, name2: String, line: Int) {
+            protected fun requireSameName(
+                name1: String,
+                name2: String,
+                line: Int,
+            ) {
                 if (name1 != name2) {
                     throw MustacheParseException(
                         "Section close tag with mismatched open tag '" +
-                                name2 + "' != '" + name1 + "'", line
+                            name2 + "' != '" + name1 + "'",
+                        line,
                     )
                 }
             }
@@ -477,16 +527,29 @@ object Mustache {
         }
 
         fun trimTrailBlank(): StringSegment {
-            return if (_trailBlank == -1) this else StringSegment(
-                text.substring(0, _trailBlank), _leadBlank, -1
-            )
+            return if (_trailBlank == -1) {
+                this
+            } else {
+                StringSegment(
+                    text.substring(0, _trailBlank),
+                    _leadBlank,
+                    -1,
+                )
+            }
         }
 
-        override fun execute(tmpl: Template, ctx: Context, out: Writer) {
+        override fun execute(
+            tmpl: Template,
+            ctx: Context,
+            out: Writer,
+        ) {
             write(out, text)
         }
 
-        override fun decompile(delims: Delims, into: StringBuilder) {
+        override fun decompile(
+            delims: Delims,
+            into: StringBuilder,
+        ) {
             into.append(text)
         }
 
@@ -496,7 +559,7 @@ object Mustache {
 
         override fun toString(): String {
             return "Text(" + text.replace("\r", "\\r").replace("\n", "\\n") + ")" +
-                    _leadBlank + "/" + _trailBlank
+                _leadBlank + "/" + _trailBlank
         }
 
         protected val _leadBlank: Int
@@ -510,7 +573,11 @@ object Mustache {
         }
 
         companion object {
-            private fun blankPos(text: String, leading: Boolean, first: Boolean): Int {
+            private fun blankPos(
+                text: String,
+                leading: Boolean,
+                first: Boolean,
+            ): Int {
                 val len = text.length
                 var ii = if (leading) 0 else len - 1
                 val ll = if (leading) len else -1
@@ -532,13 +599,20 @@ object Mustache {
      * A segment that loads and executes a sub-template.
      */
     class IncludedTemplateSegment(protected val _comp: Compiler, protected val _name: String) : Segment() {
-        override fun execute(tmpl: Template, ctx: Context, out: Writer) {
+        override fun execute(
+            tmpl: Template,
+            ctx: Context,
+            out: Writer,
+        ) {
             // we must take care to preserve our context rather than creating a new one, which
             // would happen if we just called execute() with ctx.data
             template.executeSegs(ctx, out)
         }
 
-        override fun decompile(delims: Delims, into: StringBuilder) {
+        override fun decompile(
+            delims: Delims,
+            into: StringBuilder,
+        ) {
             delims.addTag('>', _name, into)
         }
 
@@ -571,16 +645,31 @@ object Mustache {
      * A segment that substitutes the contents of a variable.
      */
     class VariableSegment(name: String, line: Int, private val _formatter: Formatter) : NamedSegment(name, line) {
-        override fun execute(tmpl: Template, ctx: Context, out: Writer) {
+        override fun execute(
+            tmpl: Template,
+            ctx: Context,
+            out: Writer,
+        ) {
             val value = tmpl.getValueOrDefault(ctx, _name, _line)
             if (value == null) {
-                val msg = if (isThisName(_name)) "Resolved '.' to null (which is disallowed), on line $_line" else "No key, method or field with name '$_name' on line $_line"
+                val msg =
+                    if (isThisName(
+                            _name,
+                        )
+                    ) {
+                        "Resolved '.' to null (which is disallowed), on line $_line"
+                    } else {
+                        "No key, method or field with name '$_name' on line $_line"
+                    }
                 throw MustacheException.Context(msg, _name, _line)
             }
             write(out, _formatter.format(value))
         }
 
-        override fun decompile(delims: Delims, into: StringBuilder) {
+        override fun decompile(
+            delims: Delims,
+            into: StringBuilder,
+        ) {
             delims.addTag(' ', _name, into)
         }
 
@@ -615,7 +704,11 @@ object Mustache {
             _segs[idx] = (_segs[idx] as StringSegment).trimTrailBlank()
         }
 
-        protected fun executeSegs(tmpl: Template, ctx: Context, out: Writer) {
+        protected fun executeSegs(
+            tmpl: Template,
+            ctx: Context,
+            out: Writer,
+        ) {
             for (seg in _segs) {
                 seg.execute(tmpl, ctx, out)
             }
@@ -632,7 +725,11 @@ object Mustache {
      * A segment that represents an inverted section.
      */
     class InvertedSegment(protected val _comp: Compiler, name: String, segs: Array<Segment>, line: Int) : BlockSegment(name, segs, line) {
-        override fun execute(tmpl: Template, ctx: Context, out: Writer) {
+        override fun execute(
+            tmpl: Template,
+            ctx: Context,
+            out: Writer,
+        ) {
             val value = tmpl.getSectionValue(ctx, _name, _line) // won't return null
             val iter = _comp.collector.toIterator(value)
             if (iter != null) {
@@ -654,7 +751,10 @@ object Mustache {
             } // TODO: fail?
         }
 
-        override fun decompile(delims: Delims, into: StringBuilder) {
+        override fun decompile(
+            delims: Delims,
+            into: StringBuilder,
+        ) {
             delims.addTag('^', _name, into!!)
             for (seg in _segs) seg.decompile(delims, into)
             delims.addTag('/', _name, into)
@@ -677,7 +777,11 @@ object Mustache {
      * A segment that represents a section.
      */
     class SectionSegment(protected val _comp: Compiler, name: String, segs: Array<Segment>, line: Int) : BlockSegment(name, segs, line) {
-        override fun execute(tmpl: Template, ctx: Context, out: Writer) {
+        override fun execute(
+            tmpl: Template,
+            ctx: Context,
+            out: Writer,
+        ) {
             val value = tmpl.getSectionValue(ctx, _name, _line) // won't return null
             val iter = _comp.collector.toIterator(value)
             if (iter != null) {
@@ -705,7 +809,10 @@ object Mustache {
             }
         }
 
-        override fun decompile(delims: Delims, into: StringBuilder) {
+        override fun decompile(
+            delims: Delims,
+            into: StringBuilder,
+        ) {
             delims.addTag('#', _name, into)
             for (seg in _segs) seg.decompile(delims, into)
             delims.addTag('/', _name, into)
@@ -725,9 +832,19 @@ object Mustache {
     }
 
     class FauxSegment : Segment() {
-        override fun execute(tmpl: Template, ctx: Context, out: Writer) {} // nada
-        override fun decompile(delims: Delims, into: StringBuilder) {} // nada
+        override fun execute(
+            tmpl: Template,
+            ctx: Context,
+            out: Writer,
+        ) {} // nada
+
+        override fun decompile(
+            delims: Delims,
+            into: StringBuilder,
+        ) {} // nada
+
         override fun visit(visit: Visitor) {}
+
         override fun toString(): String {
             return "Faux"
         }

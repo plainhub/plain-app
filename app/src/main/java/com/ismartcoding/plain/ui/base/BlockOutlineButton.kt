@@ -18,20 +18,22 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun BlockOutlineButton(
     text: String,
-    modifier: Modifier = Modifier
-        .padding(horizontal = 16.dp)
-        .height(56.dp)
-        .fillMaxWidth(),
+    modifier: Modifier =
+        Modifier
+            .padding(horizontal = 16.dp)
+            .height(56.dp)
+            .fillMaxWidth(),
     onClick: () -> Unit,
 ) {
     Button(
         onClick = onClick,
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            contentColor = MaterialTheme.colorScheme.primary,
-        ),
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.primary,
+            ),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
     ) {
         Text(

@@ -8,12 +8,11 @@ import android.view.LayoutInflater
 import android.view.WindowManager
 import android.widget.PopupWindow
 import android.widget.SeekBar
-import com.ismartcoding.plain.R
 import com.ismartcoding.lib.helpers.FormatHelper
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.ViewVideoPlayerDmcBinding
 
 class DMCPopupWindow(context: Context) : PopupWindow(context) {
-
     private val viewBinding = ViewVideoPlayerDmcBinding.inflate(LayoutInflater.from(context))
 
     var controlCallback: ControlCallback? = null
@@ -25,12 +24,13 @@ class DMCPopupWindow(context: Context) : PopupWindow(context) {
 
     private val MSG_UPDATE_TIME = 66
     private val UPDATE_TIME_INTERVAL = 900L
-    private val mHandler = object : Handler(Looper.getMainLooper()) {
-        override fun handleMessage(msg: Message) {
-            controlCallback?.updateTime()
-            startUpdateTime()
+    private val mHandler =
+        object : Handler(Looper.getMainLooper()) {
+            override fun handleMessage(msg: Message) {
+                controlCallback?.updateTime()
+                startUpdateTime()
+            }
         }
-    }
 
     init {
         contentView = viewBinding.root
@@ -62,31 +62,38 @@ class DMCPopupWindow(context: Context) : PopupWindow(context) {
             }
         }
         viewBinding.seekbar.max = 1000
-        viewBinding.seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            var newPosition: Long = 0
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                if (!fromUser) { // 不是用户主动拉动进度条，则不需要seek
-                    return
-                }
-                if (isSuccess) {
-                    newPosition = duration * progress / seekBar.max
-                    viewBinding.tvCurrentTime.text = FormatHelper.formatDuration(newPosition)
-                }
-            }
+        viewBinding.seekbar.setOnSeekBarChangeListener(
+            object : SeekBar.OnSeekBarChangeListener {
+                var newPosition: Long = 0
 
-            override fun onStartTrackingTouch(seekBar: SeekBar) {
-                isDragging = true
-                stopUpdateTime()
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar) {
-                if (isSuccess) {
-                    controlCallback?.seekTo(newPosition)
+                override fun onProgressChanged(
+                    seekBar: SeekBar,
+                    progress: Int,
+                    fromUser: Boolean,
+                ) {
+                    if (!fromUser) { // 不是用户主动拉动进度条，则不需要seek
+                        return
+                    }
+                    if (isSuccess) {
+                        newPosition = duration * progress / seekBar.max
+                        viewBinding.tvCurrentTime.text = FormatHelper.formatDuration(newPosition)
+                    }
                 }
-                isDragging = false
-                startUpdateTime()
-            }
-        })
+
+                override fun onStartTrackingTouch(seekBar: SeekBar) {
+                    isDragging = true
+                    stopUpdateTime()
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar) {
+                    if (isSuccess) {
+                        controlCallback?.seekTo(newPosition)
+                    }
+                    isDragging = false
+                    startUpdateTime()
+                }
+            },
+        )
 
         viewBinding.btnAddVolume.setOnClickListener {
             controlCallback?.addVolume()
@@ -136,7 +143,10 @@ class DMCPopupWindow(context: Context) : PopupWindow(context) {
         }
     }
 
-    fun updateTime(currentPosition: Long, duration: Long) {
+    fun updateTime(
+        currentPosition: Long,
+        duration: Long,
+    ) {
         this.duration = duration
         if (!isDragging) {
             if (duration > 0) {
@@ -148,7 +158,6 @@ class DMCPopupWindow(context: Context) : PopupWindow(context) {
     }
 
     interface ControlCallback {
-
         fun close()
 
         fun play()
@@ -163,5 +172,4 @@ class DMCPopupWindow(context: Context) : PopupWindow(context) {
 
         fun lessVolume()
     }
-
 }

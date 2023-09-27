@@ -19,9 +19,9 @@ import com.ismartcoding.plain.data.preference.AudioSleepTimerFutureTimePreferenc
 import com.ismartcoding.plain.data.preference.AudioSleepTimerMinutesPreference
 import com.ismartcoding.plain.databinding.DialogSleepTimerBinding
 import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.features.audio.AudioServiceAction
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.setSafeClick
 import kotlinx.coroutines.launch
@@ -31,11 +31,13 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
     private var seekProgress: Int = 0
     private var timerUpdater: TimerUpdater? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         lifecycleScope.launch {
-
             val context = requireContext()
             binding.shouldFinishLastAudio.apply {
                 isChecked = withIO { AudioSleepTimerFinishLastPreference.getAsync(context) }
@@ -52,27 +54,33 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
                 progress = seekProgress
             }
 
-            binding.seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
-                    if (i < 1) {
-                        seekBar.progress = 1
-                        return
+            binding.seekBar.setOnSeekBarChangeListener(
+                object : SeekBar.OnSeekBarChangeListener {
+                    override fun onProgressChanged(
+                        seekBar: SeekBar,
+                        i: Int,
+                        b: Boolean,
+                    ) {
+                        if (i < 1) {
+                            seekBar.progress = 1
+                            return
+                        }
+                        seekProgress = i
+                        updateTimeDisplayTime()
                     }
-                    seekProgress = i
-                    updateTimeDisplayTime()
-                }
 
-                override fun onStartTrackingTouch(seekBar: SeekBar) {
-                }
+                    override fun onStartTrackingTouch(seekBar: SeekBar) {
+                    }
 
-                override fun onStopTrackingTouch(seekBar: SeekBar) {
-                    lifecycleScope.launch {
-                        withIO {
-                            AudioSleepTimerMinutesPreference.putAsync(context, seekProgress)
+                    override fun onStopTrackingTouch(seekBar: SeekBar) {
+                        lifecycleScope.launch {
+                            withIO {
+                                AudioSleepTimerMinutesPreference.putAsync(context, seekProgress)
+                            }
                         }
                     }
-                }
-            })
+                },
+            )
         }
     }
 
@@ -82,7 +90,13 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
             if (withIO { AudioSleepTimerFutureTimePreference.getAsync(context) } > SystemClock.elapsedRealtime()) {
                 binding.seekBar.isVisible = false
                 binding.shouldFinishLastAudio.isVisible = false
-                timerUpdater = TimerUpdater(WeakReference(this@SleepTimerDialog), withIO { AudioSleepTimerFutureTimePreference.getAsync(requireContext()) - SystemClock.elapsedRealtime() })
+                timerUpdater =
+                    TimerUpdater(
+                        WeakReference(this@SleepTimerDialog),
+                        withIO {
+                            AudioSleepTimerFutureTimePreference.getAsync(requireContext()) - SystemClock.elapsedRealtime()
+                        },
+                    )
                 timerUpdater?.start()
                 binding.start.text = getString(R.string.stop)
                 binding.start.setSafeClick {
@@ -107,12 +121,12 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
                         withIO {
                             AudioSleepTimerFutureTimePreference.putAsync(
                                 context,
-                                SystemClock.elapsedRealtime() + AudioSleepTimerMinutesPreference.getAsync(context) * 60 * 1000
+                                SystemClock.elapsedRealtime() + AudioSleepTimerMinutesPreference.getAsync(context) * 60 * 1000,
                             )
                             context.getSystemService<AlarmManager>()?.setExact(
                                 AlarmManager.ELAPSED_REALTIME_WAKEUP,
                                 AudioSleepTimerFutureTimePreference.getAsync(context),
-                                makeTimerPendingIntent(PendingIntent.FLAG_CANCEL_CURRENT)
+                                makeTimerPendingIntent(PendingIntent.FLAG_CANCEL_CURRENT),
                             )
                         }
                         updateUI()
@@ -138,7 +152,10 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
 
     private suspend fun makeTimerPendingIntent(flag: Int): PendingIntent {
         return PendingIntent.getService(
-            requireActivity(), 0, makeTimerIntent(), flag or PendingIntent.FLAG_IMMUTABLE
+            requireActivity(),
+            0,
+            makeTimerIntent(),
+            flag or PendingIntent.FLAG_IMMUTABLE,
         )
     }
 
@@ -147,12 +164,14 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
         val intent = Intent(requireActivity(), AudioPlayerService::class.java)
         return if (AudioSleepTimerFinishLastPreference.getAsync(context)) {
             intent.setAction(AudioServiceAction.PENDING_QUIT.name)
-        } else intent.setAction(AudioServiceAction.QUIT.name)
+        } else {
+            intent.setAction(AudioServiceAction.QUIT.name)
+        }
     }
 
     private inner class TimerUpdater(val dialog: WeakReference<SleepTimerDialog>, val millisInFuture: Long) : CountDownTimer(
         millisInFuture,
-        1000
+        1000,
     ) {
         override fun onTick(millisUntilFinished: Long) {
             dialog.get()?.let {
@@ -172,7 +191,6 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
                     }
                 }
             }
-
         }
     }
 }

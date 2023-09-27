@@ -17,7 +17,6 @@ import com.ismartcoding.plain.features.BaseContentHelper
 import kotlinx.datetime.Instant
 import kotlin.random.Random
 
-
 object CallHelper : BaseContentHelper() {
     override val uriExternal: Uri = CallLog.Calls.CONTENT_URI
     override val idKey: String = CallLog.Calls._ID
@@ -33,7 +32,7 @@ object CallHelper : BaseContentHelper() {
             CallLog.Calls.DATE,
             CallLog.Calls.DURATION,
             CallLog.Calls.TYPE,
-            CallLog.Calls.PHONE_ACCOUNT_ID
+            CallLog.Calls.PHONE_ACCOUNT_ID,
         )
     }
 
@@ -58,7 +57,10 @@ object CallHelper : BaseContentHelper() {
         return where
     }
 
-    override fun count(context: Context, query: String): Int {
+    override fun count(
+        context: Context,
+        query: String,
+    ): Int {
         if (TempData.demoMode) {
             if (demoItems.isEmpty()) {
                 demoSearch()
@@ -76,7 +78,12 @@ object CallHelper : BaseContentHelper() {
         return super.count(context, query)
     }
 
-    fun search(context: Context, query: String, limit: Int, offset: Int): List<DCall> {
+    fun search(
+        context: Context,
+        query: String,
+        limit: Int,
+        offset: Int,
+    ): List<DCall> {
         if (TempData.demoMode) {
             if (demoItems.isEmpty()) {
                 demoSearch()
@@ -111,7 +118,10 @@ object CallHelper : BaseContentHelper() {
         return items
     }
 
-    fun call(context: Context, number: String) {
+    fun call(
+        context: Context,
+        number: String,
+    ) {
         val callIntent = Intent(Intent.ACTION_CALL)
         callIntent.data = Uri.parse("tel:$number")
         context.startActivity(callIntent)
@@ -121,13 +131,15 @@ object CallHelper : BaseContentHelper() {
         IntRange(1, 385).forEachIndexed { index, _ ->
             demoItems.add(
                 DCall(
-                    (index + 658).toString(), Random.nextLong(1234567890, 9234567890).toString(),
-                    "", "",
+                    (index + 658).toString(),
+                    Random.nextLong(1234567890, 9234567890).toString(),
+                    "",
+                    "",
                     Instant.fromEpochMilliseconds(System.currentTimeMillis() - Random.nextInt(0, 100 * 3600) * 1000),
                     Random.nextInt(200),
                     if (Random.nextInt() % 2 == 0) CallLog.Calls.INCOMING_TYPE else CallLog.Calls.OUTGOING_TYPE,
-                    ""
-                )
+                    "",
+                ),
             )
         }
 

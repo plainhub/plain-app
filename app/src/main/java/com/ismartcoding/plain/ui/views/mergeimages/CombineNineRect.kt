@@ -4,19 +4,26 @@ import java.util.*
 
 object CombineNineRect {
     fun generateCombineBitmapEntity(
-        combineWidth: Int, combineHeight: Int, count: Int
+        combineWidth: Int,
+        combineHeight: Int,
+        count: Int,
     ): List<CombineBitmapEntity> {
         val mCRC = generateColumnRowCountByCount(count)
         var mBitmapEntity: CombineBitmapEntity? = null
-        val perBitmapWidth = ((combineWidth - 1 * 2 * mCRC.columns)
-                / mCRC.columns).toFloat()
+        val perBitmapWidth =
+            (
+                (combineWidth - 1 * 2 * mCRC.columns) /
+                    mCRC.columns
+            ).toFloat()
         val topDownDelta: Float = combineHeight - mCRC.rows * (perBitmapWidth + CombineBitmapEntity.devide * 2)
         val mList: MutableList<CombineBitmapEntity> = LinkedList<CombineBitmapEntity>()
         for (row in 0 until mCRC.rows) {
             for (column in 0 until mCRC.columns) {
                 mBitmapEntity = CombineBitmapEntity()
-                mBitmapEntity.y = 1 + topDownDelta / 2 + row * 2 + (row
-                        * perBitmapWidth)
+                mBitmapEntity.y = 1 + topDownDelta / 2 + row * 2 + (
+                    row
+                        * perBitmapWidth
+                )
                 mBitmapEntity.x = 1 + column * 2 + column * perBitmapWidth
                 mBitmapEntity.height = perBitmapWidth
                 mBitmapEntity.width = mBitmapEntity.height
@@ -75,8 +82,10 @@ object CombineNineRect {
 
     private class ColumnRowCount(var rows: Int, var columns: Int, var count: Int) {
         override fun toString(): String {
-            return ("ColumnRowCount [rows=" + rows + ", columns=" + columns
-                    + ", count=" + count + "]")
+            return (
+                "ColumnRowCount [rows=" + rows + ", columns=" + columns +
+                    ", count=" + count + "]"
+            )
         }
     }
 }

@@ -7,9 +7,9 @@ import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.View
 import android.widget.Checkable
-import com.ismartcoding.plain.R
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.extensions.parcelable
+import com.ismartcoding.plain.R
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
@@ -105,12 +105,21 @@ class SmoothCheckBox(context: Context, attrs: AttributeSet? = null) : View(conte
         return result
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    override fun onMeasure(
+        widthMeasureSpec: Int,
+        heightMeasureSpec: Int,
+    ) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         setMeasuredDimension(measureSize(widthMeasureSpec), measureSize(heightMeasureSpec))
     }
 
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+    override fun onLayout(
+        changed: Boolean,
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int,
+    ) {
         mWidth = measuredWidth
         mStrokeWidth = if (mStrokeWidth == 0) measuredWidth / 10 else mStrokeWidth
         mStrokeWidth = if (mStrokeWidth > measuredWidth / 5) measuredWidth / 5 else mStrokeWidth
@@ -123,14 +132,16 @@ class SmoothCheckBox(context: Context, attrs: AttributeSet? = null) : View(conte
         mTickPoints[1].y = (measuredHeight.toFloat() / 30 * 20).roundToInt()
         mTickPoints[2].x = (measuredWidth.toFloat() / 30 * 22).roundToInt()
         mTickPoints[2].y = (measuredHeight.toFloat() / 30 * 10).roundToInt()
-        mLeftLineDistance = sqrt(
-            (mTickPoints[1].x - mTickPoints[0].x).toDouble().pow(2.0) +
-                    (mTickPoints[1].y - mTickPoints[0].y).toDouble().pow(2.0)
-        ).toFloat()
-        mRightLineDistance = sqrt(
-            (mTickPoints[2].x - mTickPoints[1].x).toDouble().pow(2.0) +
-                    (mTickPoints[2].y - mTickPoints[1].y).toDouble().pow(2.0)
-        ).toFloat()
+        mLeftLineDistance =
+            sqrt(
+                (mTickPoints[1].x - mTickPoints[0].x).toDouble().pow(2.0) +
+                    (mTickPoints[1].y - mTickPoints[0].y).toDouble().pow(2.0),
+            ).toFloat()
+        mRightLineDistance =
+            sqrt(
+                (mTickPoints[2].x - mTickPoints[1].x).toDouble().pow(2.0) +
+                    (mTickPoints[2].y - mTickPoints[1].y).toDouble().pow(2.0),
+            ).toFloat()
         mTickPaint.strokeWidth = mStrokeWidth.toFloat()
     }
 

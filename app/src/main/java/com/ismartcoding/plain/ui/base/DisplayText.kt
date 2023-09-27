@@ -18,20 +18,22 @@ fun DisplayText(
     desc: String = "",
 ) {
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(
-                start = 16.dp,
-                top = 48.dp,
-                end = 16.dp,
-                bottom = 24.dp,
-            )
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(
+                    start = 16.dp,
+                    top = 48.dp,
+                    end = 16.dp,
+                    bottom = 24.dp,
+                ),
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.displaySmall.copy(
-                baselineShift = BaselineShift.Superscript
-            ),
+            style =
+                MaterialTheme.typography.displaySmall.copy(
+                    baselineShift = BaselineShift.Superscript,
+                ),
             color = MaterialTheme.colorScheme.onSurface,
         )
         if (desc.isNotEmpty()) {

@@ -5,12 +5,19 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import kotlinx.coroutines.withTimeoutOrNull
 
 class RequestEnableBluetoothEvent
+
 class RequestScanConnectBluetoothEvent
+
 class RequestBluetoothLocationPermissionEvent
+
 class RequestBluetoothLocationGPSPermissionEvent
+
 class BluetoothPermissionResultEvent
+
 class BluetoothFindOneEvent(val mac: String)
+
 class ScanBTDeviceTimeoutEvent
+
 class BTDeviceFoundEvent(val device: BTDevice)
 
 object BluetoothEvents {

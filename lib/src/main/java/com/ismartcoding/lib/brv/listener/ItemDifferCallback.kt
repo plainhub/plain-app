@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.RecyclerView
  * 数据对比默认使用`equals`函数对比, 你可以为数据手动实现equals函数来修改对比逻辑. 推荐定义数据为 data class, 因其会根据构造参数自动生成equals
  */
 interface ItemDifferCallback {
-
     companion object DEFAULT : ItemDifferCallback
 
     /**
@@ -16,7 +15,10 @@ interface ItemDifferCallback {
      * @param newItem 新数据
      * @return 新旧数据是否相等
      */
-    fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
+    fun areItemsTheSame(
+        oldItem: Any,
+        newItem: Any,
+    ): Boolean {
         return oldItem == newItem
     }
 
@@ -30,7 +32,10 @@ interface ItemDifferCallback {
      * @param newItem 新数据
      * @return 新旧数据的内容是否相等
      */
-    fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
+    fun areContentsTheSame(
+        oldItem: Any,
+        newItem: Any,
+    ): Boolean {
         return oldItem == newItem
     }
 
@@ -41,7 +46,10 @@ interface ItemDifferCallback {
      * @see [RecyclerView.Adapter.onBindViewHolder]
      * @see [RecyclerView.Adapter.notifyItemChanged]
      */
-    fun getChangePayload(oldItem: Any, newItem: Any): Any? {
+    fun getChangePayload(
+        oldItem: Any,
+        newItem: Any,
+    ): Any? {
         return null
     }
 }

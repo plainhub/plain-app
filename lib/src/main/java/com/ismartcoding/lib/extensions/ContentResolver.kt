@@ -24,4 +24,3 @@ fun ContentResolver.setSystemScreenTimeout(timeout: Int): Boolean {
         false
     }
 }
-

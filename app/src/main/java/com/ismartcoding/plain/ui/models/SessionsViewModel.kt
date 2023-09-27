@@ -16,7 +16,16 @@ import kotlinx.datetime.Instant
 data class VSession(val clientId: String, val clientIP: String, val osName: String, val osVersion: String, val browserName: String, val browserVersion: String, val createdAt: Instant, val updatedAt: Instant) {
     companion object {
         fun from(data: DSession): VSession {
-            return VSession(data.clientId, data.clientIP, data.osName, data.osVersion, data.browserName, data.browserVersion, data.createdAt, data.updatedAt)
+            return VSession(
+                data.clientId,
+                data.clientIP,
+                data.osName,
+                data.osVersion,
+                data.browserName,
+                data.browserVersion,
+                data.createdAt,
+                data.updatedAt,
+            )
         }
     }
 }

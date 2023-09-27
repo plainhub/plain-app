@@ -53,10 +53,11 @@ fun SessionsPage(
     val context = LocalContext.current
     val itemsState by viewModel.itemsFlow.collectAsState()
 
-    val refreshState = rememberRefreshLayoutState {
-        viewModel.fetch()
-        setRefreshState(RefreshContentState.Stop)
-    }
+    val refreshState =
+        rememberRefreshLayoutState {
+            viewModel.fetch()
+            setRefreshState(RefreshContentState.Stop)
+        }
 
     LaunchedEffect(Unit) {
         viewModel.fetch()
@@ -71,7 +72,7 @@ fun SessionsPage(
                     LazyColumn(
                         Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight()
+                            .fillMaxHeight(),
                     ) {
                         items(itemsState) { m ->
                             Row(
@@ -82,10 +83,11 @@ fun SessionsPage(
                             ) {
                                 Text(
                                     text = stringResource(R.string.last_visit_at) + " " + m.updatedAt.formatDateTime(),
-                                    modifier = Modifier
-                                        .weight(1f),
+                                    modifier =
+                                        Modifier
+                                            .weight(1f),
                                     color = MaterialTheme.colorScheme.primary,
-                                    style = MaterialTheme.typography.labelLarge
+                                    style = MaterialTheme.typography.labelLarge,
                                 )
                                 PIconButton(
                                     imageVector = Icons.Outlined.Delete,
@@ -98,24 +100,39 @@ fun SessionsPage(
                                 }
                             }
                             Column(
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp)
-                                    .fillMaxWidth()
-                                    .background(
-                                        color = MaterialTheme.colorScheme.cardBackColor(),
-                                        shape = RoundedCornerShape(16.dp)
-                                    )
+                                modifier =
+                                    Modifier
+                                        .padding(horizontal = 16.dp)
+                                        .fillMaxWidth()
+                                        .background(
+                                            color = MaterialTheme.colorScheme.cardBackColor(),
+                                            shape = RoundedCornerShape(16.dp),
+                                        ),
                             ) {
                                 Column(
-                                    modifier = Modifier
-                                        .padding(16.dp, 16.dp, 16.dp, 8.dp)
+                                    modifier =
+                                        Modifier
+                                            .padding(16.dp, 16.dp, 16.dp, 8.dp),
                                 ) {
                                     SubItem(R.string.client_id, m.clientId)
                                     SubItem(R.string.ip_address, m.clientIP)
                                     SubItem(R.string.created_at, m.createdAt.formatDateTime())
                                     SubItem(R.string.os, m.osName.capitalize() + " " + m.osVersion)
                                     SubItem(R.string.browser, m.browserName.capitalize() + " " + m.browserVersion)
-                                    SubItem(R.string.status, stringResource(id = if (HttpServerManager.wsSessions.any { it.clientId == m.clientId }) R.string.online else R.string.offline))
+                                    SubItem(
+                                        R.string.status,
+                                        stringResource(
+                                            id =
+                                                if (HttpServerManager.wsSessions.any {
+                                                        it.clientId == m.clientId
+                                                    }
+                                                ) {
+                                                    R.string.online
+                                                } else {
+                                                    R.string.offline
+                                                },
+                                        ),
+                                    )
                                 }
                             }
                             Spacer(modifier = Modifier.height(16.dp))
@@ -128,15 +145,18 @@ fun SessionsPage(
                     NoDataColumn()
                 }
             }
-        }
+        },
     )
 }
 
 @Composable
-fun SubItem(@StringRes titleId: Int, value: String) {
+fun SubItem(
+    @StringRes titleId: Int,
+    value: String,
+) {
     Text(
         text = stringResource(id = titleId),
-        style = MaterialTheme.typography.titleMedium
+        style = MaterialTheme.typography.titleMedium,
     )
     Spacer(modifier = Modifier.height(8.dp))
     SelectionContainer {
@@ -148,4 +168,3 @@ fun SubItem(@StringRes titleId: Int, value: String) {
     }
     Spacer(modifier = Modifier.height(16.dp))
 }
-

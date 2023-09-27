@@ -5,7 +5,10 @@ import java.io.*
 
 object FileUtils {
     @Throws(IOException::class)
-    fun fileFromAsset(context: Context, assetName: String): File {
+    fun fileFromAsset(
+        context: Context,
+        assetName: String,
+    ): File {
         val outFile = File(context.cacheDir, "$assetName-pdfview.pdf")
         if (assetName.contains("/")) {
             outFile.parentFile?.mkdirs()
@@ -15,7 +18,10 @@ object FileUtils {
     }
 
     @Throws(IOException::class)
-    fun copy(inputStream: InputStream, output: File) {
+    fun copy(
+        inputStream: InputStream,
+        output: File,
+    ) {
         var outputStream: OutputStream? = null
         try {
             outputStream = FileOutputStream(output)

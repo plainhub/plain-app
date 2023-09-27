@@ -11,7 +11,7 @@ import java.io.File
 
 fun Activity.openPathIntent(
     path: String,
-    extras: HashMap<String, Boolean> = HashMap()
+    extras: HashMap<String, Boolean> = HashMap(),
 ) {
     val file = File(path)
     val newUri = FileProvider.getUriForFile(this, Constants.AUTHORITY, file)

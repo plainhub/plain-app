@@ -8,7 +8,6 @@ data class CieLab(
     val a: Double,
     val b: Double,
 ) {
-
     fun toXyz(
         whitePoint: CieXyz,
         luminance: Double,
@@ -23,16 +22,17 @@ data class CieLab(
     }
 
     companion object {
+        private fun f(x: Double) =
+            when {
+                x > 216.0 / 24389.0 -> x.pow(1.0 / 3.0)
+                else -> x / (108.0 / 841.0) + 4.0 / 29.0
+            }
 
-        private fun f(x: Double) = when {
-            x > 216.0 / 24389.0 -> x.pow(1.0 / 3.0)
-            else -> x / (108.0 / 841.0) + 4.0 / 29.0
-        }
-
-        private fun fInv(x: Double): Double = when {
-            x > 6.0 / 29.0 -> x.pow(3.0)
-            else -> 108.0 / 841.0 * (x - 4.0 / 29.0)
-        }
+        private fun fInv(x: Double): Double =
+            when {
+                x > 6.0 / 29.0 -> x.pow(3.0)
+                else -> 108.0 / 841.0 * (x - 4.0 / 29.0)
+            }
 
         fun CieXyz.toCieLab(
             whitePoint: CieXyz,

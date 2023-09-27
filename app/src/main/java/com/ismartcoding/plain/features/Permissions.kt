@@ -45,7 +45,8 @@ enum class Permission {
     READ_MEDIA_IMAGES,
     READ_MEDIA_VIDEOS,
     READ_MEDIA_AUDIO,
-    NONE;
+    NONE,
+    ;
 
     fun getText(): String {
         if (this == NONE) {
@@ -158,7 +159,11 @@ enum class Permission {
         }
     }
 
-    fun request(context: Context, launcher: ActivityResultLauncher<String>?, intentLauncher: ActivityResultLauncher<Intent>?) {
+    fun request(
+        context: Context,
+        launcher: ActivityResultLauncher<String>?,
+        intentLauncher: ActivityResultLauncher<Intent>?,
+    ) {
         if (this == WRITE_EXTERNAL_STORAGE && isRPlus()) {
             try {
                 val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
@@ -171,7 +176,9 @@ enum class Permission {
                 if (intent.resolveActivity(packageManager) != null) {
                     intentLauncher?.launch(intent)
                 } else {
-                    DialogHelper.showMessage("ActivityNotFoundException: No Activity found to handle Intent act=android.settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION")
+                    DialogHelper.showMessage(
+                        "ActivityNotFoundException: No Activity found to handle Intent act=android.settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION",
+                    )
                 }
             }
         } else if (this == WRITE_SETTINGS) {
@@ -181,14 +188,18 @@ enum class Permission {
             if (intent.resolveActivity(packageManager) != null) {
                 intentLauncher?.launch(intent)
             } else {
-                DialogHelper.showMessage("ActivityNotFoundException: No Activity found to handle Intent act=android.settings.action.MANAGE_WRITE_SETTINGS")
+                DialogHelper.showMessage(
+                    "ActivityNotFoundException: No Activity found to handle Intent act=android.settings.action.MANAGE_WRITE_SETTINGS",
+                )
             }
         } else if (this == SYSTEM_ALERT_WINDOW) {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}"))
             if (intent.resolveActivity(packageManager) != null) {
                 intentLauncher?.launch(intent)
             } else {
-                DialogHelper.showMessage("ActivityNotFoundException: No Activity found to handle Intent act=android.settings.action.ACTION_MANAGE_OVERLAY_PERMISSION")
+                DialogHelper.showMessage(
+                    "ActivityNotFoundException: No Activity found to handle Intent act=android.settings.action.ACTION_MANAGE_OVERLAY_PERMISSION",
+                )
             }
         } else if (this == POST_NOTIFICATIONS) {
             val permission = this.toSysPermission()
@@ -243,25 +254,31 @@ object Permissions {
             Permission.READ_MEDIA_VIDEOS,
             Permission.READ_MEDIA_AUDIO,
         ).forEach { permission ->
-            map[permission] = activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
-                canContinue = true
-                sendEvent(PermissionResultEvent(permission))
-            }
+            map[permission] =
+                activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+                    canContinue = true
+                    sendEvent(PermissionResultEvent(permission))
+                }
         }
 
         setOf(
-            Permission.WRITE_SETTINGS, Permission.WRITE_EXTERNAL_STORAGE,
-            Permission.SYSTEM_ALERT_WINDOW, Permission.POST_NOTIFICATIONS
+            Permission.WRITE_SETTINGS,
+            Permission.WRITE_EXTERNAL_STORAGE,
+            Permission.SYSTEM_ALERT_WINDOW,
+            Permission.POST_NOTIFICATIONS,
         ).forEach { permission ->
-            intentLauncherMap[permission] = activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                canContinue = true
-                sendEvent(PermissionResultEvent(permission))
-            }
+            intentLauncherMap[permission] =
+                activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                    canContinue = true
+                    sendEvent(PermissionResultEvent(permission))
+                }
         }
 
-        events.add(receiveEventHandler<RequestPermissionEvent> { event ->
-            event.permission.request(MainApp.instance, map[event.permission], intentLauncherMap[event.permission])
-        })
+        events.add(
+            receiveEventHandler<RequestPermissionEvent> { event ->
+                event.permission.request(MainApp.instance, map[event.permission], intentLauncherMap[event.permission])
+            },
+        )
     }
 
     private var canContinue = false
@@ -293,7 +310,11 @@ object Permissions {
         return true
     }
 
-    fun checkNotification(context: Context, stringKey: Int, callback: () -> Unit) {
+    fun checkNotification(
+        context: Context,
+        stringKey: Int,
+        callback: () -> Unit,
+    ) {
         val permission = Permission.POST_NOTIFICATIONS
         if (permission.can(context)) {
             callback()
@@ -313,4 +334,3 @@ object Permissions {
         }
     }
 }
-

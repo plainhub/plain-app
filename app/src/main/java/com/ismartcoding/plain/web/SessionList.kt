@@ -9,7 +9,10 @@ object SessionList {
         return AppDatabase.instance.sessionDao().getAll()
     }
 
-    fun addOrUpdateAsync(clientId: String, updateItem: (DSession) -> Unit) {
+    fun addOrUpdateAsync(
+        clientId: String,
+        updateItem: (DSession) -> Unit,
+    ) {
         var item = AppDatabase.instance.sessionDao().getByClientId(clientId)
         var isInsert = false
         if (item == null) {

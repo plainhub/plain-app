@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.database.CursorWindow
 import android.os.Bundle
-import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -61,46 +60,51 @@ class MainActivity : AppCompatActivity() {
     private var exportFileType = ExportFileType.OPML
     private var requestToConnectDialog: AlertDialog? = null
     private val viewModel: MainViewModel by viewModels()
-    private val screenCapture = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-            val base = ScreenMirrorService.instance?.getLatestImageBase64()
-            if (ScreenMirrorService.instance == null || base.isNullOrEmpty()) {
-                val service = Intent(this, ScreenMirrorService::class.java)
-                service.putExtra("code", result.resultCode)
-                service.putExtra("data", result.data)
-                startService(service)
-            } else {
-                sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, base, false))
+    private val screenCapture =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+                val base = ScreenMirrorService.instance?.getLatestImageBase64()
+                if (ScreenMirrorService.instance == null || base.isNullOrEmpty()) {
+                    val service = Intent(this, ScreenMirrorService::class.java)
+                    service.putExtra("code", result.resultCode)
+                    service.putExtra("data", result.data)
+                    startService(service)
+                } else {
+                    sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, base, false))
+                }
             }
         }
-    }
 
-    private val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        if (uri != null) {
-            sendEvent(PickFileResultEvent(pickFileTag, pickFileType, setOf(uri)))
-        }
-    }
-
-    private val pickMultipleMedia = registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uris ->
-        if (uris.isNotEmpty()) {
-            sendEvent(PickFileResultEvent(pickFileTag, pickFileType, uris.toSet()))
-        }
-    }
-
-    private val pickFileActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-            sendEvent(PickFileResultEvent(pickFileTag, pickFileType, FilePickHelper.getUris(result.data!!)))
-        }
-    }
-
-    private val exportFileActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val data = result.data
-            if (data?.data != null) {
-                sendEvent(ExportFileResultEvent(exportFileType, data.data!!))
+    private val pickMedia =
+        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+            if (uri != null) {
+                sendEvent(PickFileResultEvent(pickFileTag, pickFileType, setOf(uri)))
             }
         }
-    }
+
+    private val pickMultipleMedia =
+        registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uris ->
+            if (uris.isNotEmpty()) {
+                sendEvent(PickFileResultEvent(pickFileTag, pickFileType, uris.toSet()))
+            }
+        }
+
+    private val pickFileActivityLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+                sendEvent(PickFileResultEvent(pickFileTag, pickFileType, FilePickHelper.getUris(result.data!!)))
+            }
+        }
+
+    private val exportFileActivityLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = result.data
+                if (data?.data != null) {
+                    sendEvent(ExportFileResultEvent(exportFileType, data.data!!))
+                }
+            }
+        }
 
     private fun fixSystemBarsAnimation() {
         val windowInsetsController =
@@ -126,7 +130,7 @@ class MainActivity : AppCompatActivity() {
         try {
             val field = CursorWindow::class.java.getDeclaredField("sCursorWindowSize")
             field.isAccessible = true
-            field.set(null, 100 * 1024 * 1024) //the 100MB is the new size
+            field.set(null, 100 * 1024 * 1024) // the 100MB is the new size
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -167,7 +171,9 @@ class MainActivity : AppCompatActivity() {
                     contentResolver.setSystemScreenTimeout(Int.MAX_VALUE)
                 } else {
                     val systemScreenTimeout = SystemScreenTimeoutPreference.getAsync(this@MainActivity)
-                    contentResolver.setSystemScreenTimeout(if (systemScreenTimeout > 0) systemScreenTimeout else 5000 * 60) // default 5 minutes
+                    contentResolver.setSystemScreenTimeout(
+                        if (systemScreenTimeout > 0) systemScreenTimeout else 5000 * 60,
+                    ) // default 5 minutes
                 }
             }
         }
@@ -211,11 +217,13 @@ class MainActivity : AppCompatActivity() {
 
         receiveEvent<ExportFileEvent> { event ->
             exportFileType = event.type
-            exportFileActivityLauncher.launch(Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                type = "text/*"
-                addCategory(Intent.CATEGORY_OPENABLE)
-                putExtra(Intent.EXTRA_TITLE, event.fileName)
-            })
+            exportFileActivityLauncher.launch(
+                Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    type = "text/*"
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    putExtra(Intent.EXTRA_TITLE, event.fileName)
+                },
+            )
         }
 
         receiveEvent<ConfirmToAcceptLoginEvent> { event ->
@@ -226,32 +234,32 @@ class MainActivity : AppCompatActivity() {
             }
 
             val r = event.request
-            requestToConnectDialog = MaterialAlertDialogBuilder(instance.get()!!).setTitle(getStringF(R.string.request_to_connect, "ip", clientIp)).setMessage(
-                getStringF(
-                    R.string.client_ua, "os_name", r.osName.capitalize(), "os_version", r.osVersion, "browser_name", r.browserName.capitalize(), "browser_version", r.browserVersion
-                )
-            ).setPositiveButton(getString(R.string.accept)) { _, _ ->
-                launch {
-                    withIO { HttpServerManager.respondTokenAsync(event, clientIp) }
-                }
-            }.setNegativeButton(getString(R.string.reject)) { _, _ ->
-                launch {
-                    withIO {
-                        event.session.close(
-                            CloseReason(
-                                CloseReason.Codes.TRY_AGAIN_LATER, "rejected"
-                            )
-                        )
+            requestToConnectDialog =
+                MaterialAlertDialogBuilder(instance.get()!!).setTitle(getStringF(R.string.request_to_connect, "ip", clientIp)).setMessage(
+                    getStringF(
+                        R.string.client_ua, "os_name", r.osName.capitalize(), "os_version", r.osVersion, "browser_name", r.browserName.capitalize(), "browser_version", r.browserVersion,
+                    ),
+                ).setPositiveButton(getString(R.string.accept)) { _, _ ->
+                    launch {
+                        withIO { HttpServerManager.respondTokenAsync(event, clientIp) }
                     }
-                }
-            }.create()
+                }.setNegativeButton(getString(R.string.reject)) { _, _ ->
+                    launch {
+                        withIO {
+                            event.session.close(
+                                CloseReason(
+                                    CloseReason.Codes.TRY_AGAIN_LATER, "rejected",
+                                ),
+                            )
+                        }
+                    }
+                }.create()
             if (Permission.SYSTEM_ALERT_WINDOW.can(this@MainActivity)) {
                 requestToConnectDialog?.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
             }
             requestToConnectDialog?.show()
         }
     }
-
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)

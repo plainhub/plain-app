@@ -4,15 +4,14 @@ import android.content.ContentProviderOperation
 import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
-import android.provider.BaseColumns
 import android.provider.ContactsContract
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.data.SortBy
 import com.ismartcoding.lib.data.enums.SortDirection
 import com.ismartcoding.lib.extensions.*
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.lib.helpers.StringHelper
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.features.BaseContentHelper
 import com.ismartcoding.plain.web.models.ContactInput
 import java.util.*
@@ -60,7 +59,10 @@ object ContactHelper : BaseContentHelper() {
         return where
     }
 
-    override fun deleteByIds(context: Context, ids: Set<String>) {
+    override fun deleteByIds(
+        context: Context,
+        ids: Set<String>,
+    ) {
         ids.chunked(30).forEach { chunk ->
             val selection = "${ContactsContract.Data.RAW_CONTACT_ID} IN (${StringHelper.getQuestionMarks(chunk.size)})"
             val selectionArgs = chunk.map { it }.toTypedArray()
@@ -68,11 +70,17 @@ object ContactHelper : BaseContentHelper() {
         }
     }
 
-    fun get(context: Context, id: String): DContact? {
+    fun get(
+        context: Context,
+        id: String,
+    ): DContact? {
         return search(context, "ids=$id", 1, 0).firstOrNull()
     }
 
-    fun update(id: String, contact: ContactInput) {
+    fun update(
+        id: String,
+        contact: ContactInput,
+    ) {
         val context = MainApp.instance
         val operations = ArrayList<ContentProviderOperation>()
         ContentProviderOperation.newUpdate(ContactsContract.Data.CONTENT_URI).apply {
@@ -220,9 +228,21 @@ object ContactHelper : BaseContentHelper() {
         return ContentUris.parseId(results[0].uri!!).toString()
     }
 
-    fun search(context: Context, query: String, limit: Int, offset: Int): List<DContact> {
+    fun search(
+        context: Context,
+        query: String,
+        limit: Int,
+        offset: Int,
+    ): List<DContact> {
         val contentMap = ContentHelper.getMap(context)
-        val cursor = getSearchCursorWithSortOrder(context, query, limit, offset, SortBy(ContactsContract.Data.DISPLAY_NAME_PRIMARY, SortDirection.ASC))
+        val cursor =
+            getSearchCursorWithSortOrder(
+                context,
+                query,
+                limit,
+                offset,
+                SortBy(ContactsContract.Data.DISPLAY_NAME_PRIMARY, SortDirection.ASC),
+            )
         val items = mutableListOf<DContact>()
         if (cursor?.moveToFirst() == true) {
             val cache = mutableMapOf<String, Int>()
@@ -251,26 +271,27 @@ object ContactHelper : BaseContentHelper() {
                 val addresses = contentMap[rawId]?.addresses ?: arrayListOf()
                 val ims = contentMap[rawId]?.ims ?: arrayListOf()
                 val phoneNumbers = contentMap[rawId]?.phoneNumbers ?: arrayListOf()
-                val contact = DContact(
-                    rawId, prefix, givenName, middleName,
-                    familyName, suffix,
-                    if (nicknames.isNotEmpty()) nicknames[0] else "",
-                    photoUri,
-                    phoneNumbers,
-                    emails,
-                    addresses,
-                    events,
-                    accountName,
-                    starred,
-                    contactId, thumbnailUri,
-                    if (notes.isNotEmpty()) notes[0] else "",
-                    groups,
-                    if (organizations.isNotEmpty()) organizations[0] else Organization("", ""),
-                    websites,
-                    ims,
-                    ringtone,
-                    updatedAt
-                )
+                val contact =
+                    DContact(
+                        rawId, prefix, givenName, middleName,
+                        familyName, suffix,
+                        if (nicknames.isNotEmpty()) nicknames[0] else "",
+                        photoUri,
+                        phoneNumbers,
+                        emails,
+                        addresses,
+                        events,
+                        accountName,
+                        starred,
+                        contactId, thumbnailUri,
+                        if (notes.isNotEmpty()) notes[0] else "",
+                        groups,
+                        if (organizations.isNotEmpty()) organizations[0] else Organization("", ""),
+                        websites,
+                        ims,
+                        ringtone,
+                        updatedAt,
+                    )
 
                 items.add(contact)
             } while (cursor.moveToNext())

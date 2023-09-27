@@ -34,7 +34,11 @@ abstract class BaseDialog<VB : ViewBinding> : DialogFragment() {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?,
+    ): View {
         _binding = FragmentHelper.createBinding(this, inflater, container)
         return binding.root
     }

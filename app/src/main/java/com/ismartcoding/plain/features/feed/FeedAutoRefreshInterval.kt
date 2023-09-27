@@ -13,5 +13,4 @@ class FeedAutoRefreshInterval(val value: Int) : ISelectOption {
     override fun getText(): String {
         return FormatHelper.formatSeconds(value)
     }
-
 }

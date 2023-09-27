@@ -30,7 +30,10 @@ object TagHelper {
         return tagDao.getById(id)
     }
 
-    fun addOrUpdate(id: String, updateItem: DTag.() -> Unit): String {
+    fun addOrUpdate(
+        id: String,
+        updateItem: DTag.() -> Unit,
+    ): String {
         var item = if (id.isNotEmpty()) tagDao.getById(id) else null
         var isInsert = false
         if (item == null) {
@@ -55,11 +58,17 @@ object TagHelper {
         return tagDao.delete(id)
     }
 
-    fun getTagRelationsByKeys(keys: Set<String>, type: DataType): List<DTagRelation> {
+    fun getTagRelationsByKeys(
+        keys: Set<String>,
+        type: DataType,
+    ): List<DTagRelation> {
         return tagRelationDao.getAllByKeys(keys, type.value)
     }
 
-    fun getTagRelationsByKey(key: String, type: DataType): List<DTagRelation> {
+    fun getTagRelationsByKey(
+        key: String,
+        type: DataType,
+    ): List<DTagRelation> {
         return tagRelationDao.getAllByKey(key, type.value)
     }
 
@@ -80,19 +89,28 @@ object TagHelper {
         tagRelationDao.deleteByTagId(tagId)
     }
 
-    fun deleteTagRelationByKeys(keys: Set<String>, type: DataType) {
+    fun deleteTagRelationByKeys(
+        keys: Set<String>,
+        type: DataType,
+    ) {
         keys.chunked(50).forEach { chunk ->
             tagRelationDao.deleteByKeys(chunk.toSet(), type.value)
         }
     }
 
-    fun deleteTagRelationByKeysTagId(keys: Set<String>, tagId: String) {
+    fun deleteTagRelationByKeysTagId(
+        keys: Set<String>,
+        tagId: String,
+    ) {
         keys.chunked(50).forEach { chunk ->
             tagRelationDao.deleteByKeysTagId(chunk.toSet(), tagId)
         }
     }
 
-    fun deleteTagRelationByKeysTagIds(keys: Set<String>, tagIds: Set<String>) {
+    fun deleteTagRelationByKeysTagIds(
+        keys: Set<String>,
+        tagIds: Set<String>,
+    ) {
         keys.chunked(50).forEach { chunk ->
             tagRelationDao.deleteByKeysTagIds(chunk.toSet(), tagIds)
         }

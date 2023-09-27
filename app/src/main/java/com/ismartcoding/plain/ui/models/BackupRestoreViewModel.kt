@@ -28,17 +28,21 @@ import java.util.zip.ZipOutputStream
 class BackupRestoreViewModel : ViewModel() {
     data class ExportItem(val dir: String, val file: File)
 
-    fun backup(context: Context, uri: Uri) {
+    fun backup(
+        context: Context,
+        uri: Uri,
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             contentResolver.openOutputStream(uri)?.use { stream ->
                 val out = ZipOutputStream(stream)
                 try {
                     DialogHelper.showLoading()
-                    val files = arrayListOf(
-                        ExportItem("/", File(context.dataDir.path + "/databases")),
-                        ExportItem("/", context.filesDir),
-                        ExportItem("/external/", context.getExternalFilesDir(null)!!)
-                    )
+                    val files =
+                        arrayListOf(
+                            ExportItem("/", File(context.dataDir.path + "/databases")),
+                            ExportItem("/", context.filesDir),
+                            ExportItem("/external/", context.getExternalFilesDir(null)!!),
+                        )
                     for (i in files.indices) {
                         val item = files[i]
                         appendFile(out, item.dir, item.file)
@@ -60,7 +64,10 @@ class BackupRestoreViewModel : ViewModel() {
         }
     }
 
-    fun restore(context: Context, uri: Uri) {
+    fun restore(
+        context: Context,
+        uri: Uri,
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             DialogHelper.showLoading()
             contentResolver.query(uri, null, null, null, null)?.use { cursor ->
@@ -109,7 +116,11 @@ class BackupRestoreViewModel : ViewModel() {
         }
     }
 
-    private suspend fun appendFile(out: ZipOutputStream, dir: String, file: File) {
+    private suspend fun appendFile(
+        out: ZipOutputStream,
+        dir: String,
+        file: File,
+    ) {
         if (file.isDirectory) {
             file.listFiles()?.forEach {
                 LogCat.e(it.path)
@@ -123,13 +134,13 @@ class BackupRestoreViewModel : ViewModel() {
         CoroutinesHelper.withIO {
             out.putNextEntry(entry)
         }
-        val input = CoroutinesHelper.withIO {
-            FileInputStream(file)
-        }
+        val input =
+            CoroutinesHelper.withIO {
+                FileInputStream(file)
+            }
         IOUtils.copy(input, out)
         CoroutinesHelper.withIO {
             out.closeEntry()
         }
     }
-
 }

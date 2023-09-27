@@ -7,19 +7,19 @@ import com.ismartcoding.lib.brv.utils.*
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.databinding.DialogSelectTagsBinding
 import com.ismartcoding.plain.db.DTag
+import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.features.tag.TagRelationStub
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.EditValueDialog
 import com.ismartcoding.plain.ui.extensions.initMenu
 import com.ismartcoding.plain.ui.extensions.onMenuItemClick
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ListItemModel
 import kotlinx.coroutines.launch
 
@@ -30,7 +30,10 @@ class SelectTagsDialog(
 ) : BaseBottomSheetDialog<DialogSelectTagsBinding>() {
     data class TagModel(val tag: DTag) : ListItemModel()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.topAppBar.run {
@@ -69,9 +72,11 @@ class SelectTagsDialog(
                             m.showSelected(false)
                         } else {
                             withIO {
-                                TagHelper.addTagRelations(items.map {
-                                    it.toTagRelation(m.tag.id, type)
-                                })
+                                TagHelper.addTagRelations(
+                                    items.map {
+                                        it.toTagRelation(m.tag.id, type)
+                                    },
+                                )
                             }
                             m.showSelected(true)
                         }
@@ -84,7 +89,7 @@ class SelectTagsDialog(
                         withIO {
                             TagHelper.deleteTagRelationByKeysTagId(
                                 ids,
-                                m.tag.id
+                                m.tag.id,
                             )
                         }
                         DialogHelper.hideLoading()
@@ -97,9 +102,11 @@ class SelectTagsDialog(
                         val newItems = items.filter { !existingKeys.contains(it.key) }
                         if (newItems.isNotEmpty()) {
                             withIO {
-                                TagHelper.addTagRelations(newItems.map {
-                                    it.toTagRelation(m.tag.id, type)
-                                })
+                                TagHelper.addTagRelations(
+                                    newItems.map {
+                                        it.toTagRelation(m.tag.id, type)
+                                    },
+                                )
                             }
                         }
                         DialogHelper.hideLoading()
@@ -120,18 +127,23 @@ class SelectTagsDialog(
         lifecycleScope.launch {
             val tags = withIO { TagHelper.getAll(type) }
             val tagIds = tags.map { it.id }
-            val tagRelations = if (items.size == 1) {
-                withIO { TagHelper.getTagRelationsByKey(items.first().key, type) }.filter { tagIds.contains(it.tagId) }
-            } else arrayListOf()
-            binding.list.page.addData(tags
-                .map { tag ->
-                    TagModel(tag).apply {
-                        keyText = tag.name
-                        if (items.size == 1) {
-                            showSelected(tagRelations.any { it.tagId == tag.id })
+            val tagRelations =
+                if (items.size == 1) {
+                    withIO { TagHelper.getTagRelationsByKey(items.first().key, type) }.filter { tagIds.contains(it.tagId) }
+                } else {
+                    arrayListOf()
+                }
+            binding.list.page.addData(
+                tags
+                    .map { tag ->
+                        TagModel(tag).apply {
+                            keyText = tag.name
+                            if (items.size == 1) {
+                                showSelected(tagRelations.any { it.tagId == tag.id })
+                            }
                         }
-                    }
-                })
+                    },
+            )
         }
     }
 }

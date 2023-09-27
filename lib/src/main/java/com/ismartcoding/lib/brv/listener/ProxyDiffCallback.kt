@@ -1,7 +1,6 @@
 package com.ismartcoding.lib.brv.listener
 
 import androidx.recyclerview.widget.DiffUtil
-import com.ismartcoding.lib.brv.listener.ItemDifferCallback
 
 /**
  * 将数据对比实现转交给[ItemDifferCallback]
@@ -9,8 +8,11 @@ import com.ismartcoding.lib.brv.listener.ItemDifferCallback
  * @param oldModels 旧的数据
  * @param callback 实际对比数据接口
  */
-internal class ProxyDiffCallback(private val newModels: List<Any?>?, private val oldModels: List<Any?>?, val callback: ItemDifferCallback) : DiffUtil.Callback() {
-
+internal class ProxyDiffCallback(
+    private val newModels: List<Any?>?,
+    private val oldModels: List<Any?>?,
+    val callback: ItemDifferCallback,
+) : DiffUtil.Callback() {
     override fun getOldListSize(): Int {
         return oldModels?.size ?: 0
     }
@@ -19,7 +21,10 @@ internal class ProxyDiffCallback(private val newModels: List<Any?>?, private val
         return newModels?.size ?: 0
     }
 
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+    override fun areItemsTheSame(
+        oldItemPosition: Int,
+        newItemPosition: Int,
+    ): Boolean {
         return if (oldModels == null || newModels == null) {
             false
         } else {
@@ -33,7 +38,10 @@ internal class ProxyDiffCallback(private val newModels: List<Any?>?, private val
         }
     }
 
-    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+    override fun areContentsTheSame(
+        oldItemPosition: Int,
+        newItemPosition: Int,
+    ): Boolean {
         return if (oldModels == null || newModels == null) {
             false
         } else {
@@ -47,7 +55,10 @@ internal class ProxyDiffCallback(private val newModels: List<Any?>?, private val
         }
     }
 
-    override fun getChangePayload(oldItemPosition: Int, newItemPosition: Int): Any? {
+    override fun getChangePayload(
+        oldItemPosition: Int,
+        newItemPosition: Int,
+    ): Any? {
         return if (oldModels == null || newModels == null) {
             null
         } else {
@@ -55,7 +66,9 @@ internal class ProxyDiffCallback(private val newModels: List<Any?>?, private val
             val newItem = newModels[newItemPosition]
             if (oldItem != null && newItem != null) {
                 callback.getChangePayload(oldItem, newItem)
-            } else null
+            } else {
+                null
+            }
         }
     }
 }

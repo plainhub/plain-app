@@ -45,7 +45,7 @@ class PreviewDialog : DialogFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = DialogPreviewBinding.inflate(inflater, container, false)
         return binding.root
@@ -56,7 +56,10 @@ class PreviewDialog : DialogFragment() {
         view?.requestFocus()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         initEvents()
 
@@ -103,7 +106,7 @@ class PreviewDialog : DialogFragment() {
             TransitionStartHelper.start(
                 this@PreviewDialog,
                 TransitionHelper.provide(initKey),
-                event.viewHolder
+                event.viewHolder,
             )
             binding.background.changeToBackgroundColor(Config.VIEWER_BACKGROUND_COLOR)
             playVideo(event.viewHolder)
@@ -113,7 +116,7 @@ class PreviewDialog : DialogFragment() {
             binding.background.updateBackgroundColor(
                 event.fraction,
                 Config.VIEWER_BACKGROUND_COLOR,
-                Color.TRANSPARENT
+                Color.TRANSPARENT,
             )
         }
 
@@ -129,7 +132,7 @@ class PreviewDialog : DialogFragment() {
             TransitionEndHelper.end(
                 this@PreviewDialog,
                 startView,
-                event.view.getTag(R.id.viewer_adapter_item_holder) as RecyclerView.ViewHolder
+                event.view.getTag(R.id.viewer_adapter_item_holder) as RecyclerView.ViewHolder,
             )
         }
     }
@@ -149,13 +152,13 @@ class PreviewDialog : DialogFragment() {
             override fun onPageScrolled(
                 position: Int,
                 positionOffset: Float,
-                positionOffsetPixels: Int
+                positionOffsetPixels: Int,
             ) {
             }
 
             override fun onPageSelected(position: Int) {
                 (binding.viewer.getChildAt(0) as RecyclerView).findViewHolderForAdapterPosition(
-                    position
+                    position,
                 )?.let {
                     playVideo(it)
                 }
@@ -197,13 +200,13 @@ class PreviewDialog : DialogFragment() {
 
     fun show(
         items: List<PreviewItem>,
-        initKey: String = ""
+        initKey: String = "",
     ) {
         list = items
         this.initKey = initKey
         super.show(
             MainActivity.instance.get()!!.supportFragmentManager,
-            this.javaClass.simpleName
+            this.javaClass.simpleName,
         )
     }
 }

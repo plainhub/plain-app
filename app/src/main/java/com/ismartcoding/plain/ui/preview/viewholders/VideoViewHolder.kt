@@ -20,7 +20,7 @@ import com.ismartcoding.plain.ui.preview.utils.initTag
 class VideoViewHolder(
     parent: ViewGroup,
     val binding: ItemImageviewerVideoBinding =
-        ItemImageviewerVideoBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        ItemImageviewerVideoBinding.inflate(LayoutInflater.from(parent.context), parent, false),
 ) : RecyclerView.ViewHolder(binding.root) {
     private lateinit var _item: PreviewItem
     private val player = VideoPlayer()
@@ -34,7 +34,7 @@ class VideoViewHolder(
             .into(binding.imageView)
         binding.videoView.binding.title.text = _item.uri.getFileName(MainApp.instance)
         binding.videoView.binding.ivCast.setSafeClick {
-            sendEvent(ViewerShowCastListEvent(item.uri.path?: ""))
+            sendEvent(ViewerShowCastListEvent(item.uri.path ?: ""))
         }
     }
 

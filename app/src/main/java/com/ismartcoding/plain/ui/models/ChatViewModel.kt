@@ -41,7 +41,13 @@ class ChatViewModel : ViewModel() {
                     if (it.content.value is DMessageImages) {
                         val c = it.content.value as DMessageImages
                         if (c.items.any { i -> !i.uri.startsWith("app://") }) {
-                            it.content.value = DMessageImages(c.items.map { i -> DMessageFile(i.uri.toAppUrl(context), i.size, i.duration) })
+                            it.content.value =
+                                DMessageImages(
+                                    c.items.map {
+                                            i ->
+                                        DMessageFile(i.uri.toAppUrl(context), i.size, i.duration)
+                                    },
+                                )
                             dao.update(it)
                         }
                     } else if (it.content.value is DMessageFiles) {

@@ -2,8 +2,8 @@ package com.ismartcoding.plain.features.call
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.lib.extensions.telecomManager
+import com.ismartcoding.plain.MainApp
 
 @SuppressLint("MissingPermission")
 object SimHelper {

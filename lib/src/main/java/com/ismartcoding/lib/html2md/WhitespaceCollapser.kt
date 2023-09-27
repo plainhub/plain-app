@@ -78,7 +78,10 @@ internal class WhitespaceCollapser {
     /**
      * Returns next node in the sequence given current and previous nodes
      */
-    private fun next(prev: Node?, current: Node): Node? {
+    private fun next(
+        prev: Node?,
+        current: Node,
+    ): Node? {
         if (prev != null && prev.parent() == current || isPre(current)) {
             // TODO beware parentNode might not be element
             return if (current.nextSibling() != null) current.nextSibling() else current.parentNode()
@@ -88,7 +91,9 @@ internal class WhitespaceCollapser {
         }
         return if (current.nextSibling() != null) {
             current.nextSibling()
-        } else current.parentNode()
+        } else {
+            current.parentNode()
+        }
     }
 
     private fun isPre(element: Node): Boolean {

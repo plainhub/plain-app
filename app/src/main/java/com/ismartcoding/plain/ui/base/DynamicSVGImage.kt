@@ -27,19 +27,20 @@ fun DynamicSVGImage(
         mutableStateOf(
             PictureDrawable(
                 SVG.getFromString(svgImageString.parseDynamicColor(tonalPalettes, useDarkTheme))
-                    .renderToPicture(size.width, size.height)
-            )
+                    .renderToPicture(size.width, size.height),
+            ),
         )
     }
 
     Row(
-        modifier = modifier
-            .aspectRatio(1.38f)
-            .onGloballyPositioned {
-                if (it.size != IntSize.Zero) {
-                    size = it.size
-                }
-            },
+        modifier =
+            modifier
+                .aspectRatio(1.38f)
+                .onGloballyPositioned {
+                    if (it.size != IntSize.Zero) {
+                        size = it.size
+                    }
+                },
     ) {
         Crossfade(targetState = pic) {
             PAsyncImage(

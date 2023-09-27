@@ -28,34 +28,38 @@ fun RefreshLayout(
 ) {
     val density = LocalDensity.current
     val coroutineScope = rememberCoroutineScope()
-    val orientationIsHorizontal = remember(
-        refreshLayoutState,
-        composePosition,
-        refreshContentThreshold,
-        coroutineScope,
-    ) {
-        refreshLayoutState.composePositionState.value = composePosition
-        refreshLayoutState.coroutineScope = coroutineScope
-        if (refreshContentThreshold != null)
-            refreshLayoutState.refreshContentThresholdState.value =
-                with(density) { refreshContentThreshold.toPx() }
-        composePosition.isHorizontal()
-    }
-    val nestedScrollState = rememberRefreshLayoutNestedScrollConnection(
-        composePosition,
-        refreshLayoutState,
-        dragEfficiency,
-        orientationIsHorizontal
-    )
+    val orientationIsHorizontal =
+        remember(
+            refreshLayoutState,
+            composePosition,
+            refreshContentThreshold,
+            coroutineScope,
+        ) {
+            refreshLayoutState.composePositionState.value = composePosition
+            refreshLayoutState.coroutineScope = coroutineScope
+            if (refreshContentThreshold != null) {
+                refreshLayoutState.refreshContentThresholdState.value =
+                    with(density) { refreshContentThreshold.toPx() }
+            }
+            composePosition.isHorizontal()
+        }
+    val nestedScrollState =
+        rememberRefreshLayoutNestedScrollConnection(
+            composePosition,
+            refreshLayoutState,
+            dragEfficiency,
+            orientationIsHorizontal,
+        )
 
     Layout(
         content = {
             if (isSupportCanNotScrollCompose) {
                 Box(
-                    if (orientationIsHorizontal)
+                    if (orientationIsHorizontal) {
                         Modifier.horizontalScroll(rememberScrollState())
-                    else
+                    } else {
                         Modifier.verticalScroll(rememberScrollState())
+                    },
                 ) {
                     content()
                 }
@@ -64,24 +68,27 @@ fun RefreshLayout(
             }
             refreshLayoutState.refreshContent()
         },
-        modifier = modifier
-            .let {
-                if (userEnable)
-                    it.nestedScroll(nestedScrollState)
-                else
-                    it
-            }
-            .clipScrollableContainer(composePosition.orientation)
+        modifier =
+            modifier
+                .let {
+                    if (userEnable) {
+                        it.nestedScroll(nestedScrollState)
+                    } else {
+                        it
+                    }
+                }
+                .clipScrollableContainer(composePosition.orientation),
     ) { measurableList, constraints ->
         val contentPlaceable =
             measurableList[0].measure(constraints.copy(minWidth = 0, minHeight = 0))
-        //宽或高不能超过content(根据方向来定)
-        val refreshContentPlaceable = measurableList[1].measure(
-            Constraints(
-                maxWidth = if (orientationIsHorizontal) Constraints.Infinity else contentPlaceable.width,
-                maxHeight = if (orientationIsHorizontal) contentPlaceable.height else Constraints.Infinity,
+        // 宽或高不能超过content(根据方向来定)
+        val refreshContentPlaceable =
+            measurableList[1].measure(
+                Constraints(
+                    maxWidth = if (orientationIsHorizontal) Constraints.Infinity else contentPlaceable.width,
+                    maxHeight = if (orientationIsHorizontal) contentPlaceable.height else Constraints.Infinity,
+                ),
             )
-        )
         if (refreshContentThreshold == null && refreshLayoutState.refreshContentThresholdState.value == 0f) {
             refreshLayoutState.refreshContentThresholdState.value =
                 if (orientationIsHorizontal) {
@@ -98,28 +105,28 @@ fun RefreshLayout(
                     contentPlaceable.placeRelative(if (contentIsMove) offset else 0, 0)
                     refreshContentPlaceable.placeRelative(
                         (-refreshContentPlaceable.width) + offset,
-                        0
+                        0,
                     )
                 }
                 ComposePosition.End -> {
                     contentPlaceable.placeRelative(if (contentIsMove) offset else 0, 0)
                     refreshContentPlaceable.placeRelative(
                         contentPlaceable.width + offset,
-                        0
+                        0,
                     )
                 }
                 ComposePosition.Top -> {
                     contentPlaceable.placeRelative(0, if (contentIsMove) offset else 0)
                     refreshContentPlaceable.placeRelative(
                         0,
-                        (-refreshContentPlaceable.height) + offset
+                        (-refreshContentPlaceable.height) + offset,
                     )
                 }
                 ComposePosition.Bottom -> {
                     contentPlaceable.placeRelative(0, if (contentIsMove) offset else 0)
                     refreshContentPlaceable.placeRelative(
                         0,
-                        contentPlaceable.height + offset
+                        contentPlaceable.height + offset,
                     )
                 }
             }

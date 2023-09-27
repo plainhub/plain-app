@@ -4,37 +4,41 @@ import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.CreateConfigMutation
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.UpdateConfigMutation
 import com.ismartcoding.plain.api.BoxApi
 import com.ismartcoding.plain.data.*
+import com.ismartcoding.plain.data.enums.ActionSourceType
+import com.ismartcoding.plain.data.enums.ActionType
+import com.ismartcoding.plain.data.preference.DeviceSortByPreference
 import com.ismartcoding.plain.databinding.DialogRouteBinding
+import com.ismartcoding.plain.extensions.sorted
+import com.ismartcoding.plain.extensions.toRoute
+import com.ismartcoding.plain.features.ActionEvent
+import com.ismartcoding.plain.features.route.Route
+import com.ismartcoding.plain.features.route.RouteEdit
+import com.ismartcoding.plain.features.route.toRouteEdit
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.SelectInterfaceDialog
 import com.ismartcoding.plain.ui.SelectItemDialog
 import com.ismartcoding.plain.ui.extensions.setSafeClick
-import com.ismartcoding.plain.extensions.toRoute
-import com.ismartcoding.plain.features.route.Route
-import com.ismartcoding.plain.features.route.RouteEdit
-import com.ismartcoding.plain.features.route.toRouteEdit
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.data.enums.ActionSourceType
-import com.ismartcoding.plain.data.enums.ActionType
-import com.ismartcoding.plain.data.preference.DeviceSortByPreference
-import com.ismartcoding.plain.extensions.sorted
-import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.views.LoadingButtonView
 import kotlinx.coroutines.launch
 
 class RouteDialog(private var mItem: Route?) : BaseBottomSheetDialog<DialogRouteBinding>() {
     private lateinit var routeEdit: RouteEdit
+
     override fun getSubmitButton(): LoadingButtonView {
         return binding.button
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         updateUI()
         addFormItem(binding.target)
@@ -75,9 +79,10 @@ class RouteDialog(private var mItem: Route?) : BaseBottomSheetDialog<DialogRoute
 
     private suspend fun doCreateRouteAsync() {
         blockFormUI()
-        val r = withIO {
-            BoxApi.mixMutateAsync(CreateConfigMutation(routeEdit.toRouteInput()))
-        }
+        val r =
+            withIO {
+                BoxApi.mixMutateAsync(CreateConfigMutation(routeEdit.toRouteInput()))
+            }
         unblockFormUI()
         if (!r.isSuccess()) {
             DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())
@@ -94,9 +99,10 @@ class RouteDialog(private var mItem: Route?) : BaseBottomSheetDialog<DialogRoute
 
     private suspend fun doUpdateRouteAsync() {
         blockFormUI()
-        val r = withIO {
-            BoxApi.mixMutateAsync(UpdateConfigMutation(mItem!!.id, routeEdit.toRouteInput()))
-        }
+        val r =
+            withIO {
+                BoxApi.mixMutateAsync(UpdateConfigMutation(mItem!!.id, routeEdit.toRouteInput()))
+            }
         unblockFormUI()
         if (!r.isSuccess()) {
             DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())

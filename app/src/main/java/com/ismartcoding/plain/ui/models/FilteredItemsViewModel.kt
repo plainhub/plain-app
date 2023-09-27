@@ -26,11 +26,11 @@ open class FilteredItemsViewModel : BaseItemsModel() {
                 }
                 is DFeed -> {
                     val feedId = (data as DFeed).id
-                    query += " feed_id:${feedId}"
+                    query += " feed_id:$feedId"
                 }
                 is DType -> {
                     val type = (data as DType).id
-                    query += " type:${type}"
+                    query += " type:$type"
                 }
                 is DMediaBucket -> {
                     query += " bucket_id:${(data as DMediaBucket).id}"
@@ -43,4 +43,5 @@ open class FilteredItemsViewModel : BaseItemsModel() {
 }
 
 data class DType(override var id: String, val titleId: Int, val iconId: Int) : IData
-data class DMediaFolders(override var id: String = ""): IData
+
+data class DMediaFolders(override var id: String = "") : IData

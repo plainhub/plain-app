@@ -11,7 +11,10 @@ interface ICollector {
     /** Creates a fetcher for a so-named variable in the supplied context object, which will
      * never be null. The fetcher will be cached and reused for future contexts for which
      * `octx.getClass().equals(nctx.getClass()`.  */
-    fun createFetcher(ctx: Any, name: String): VariableFetcher?
+    fun createFetcher(
+        ctx: Any,
+        name: String,
+    ): VariableFetcher?
 
     /** Creates a map to be used to cache [Mustache.VariableFetcher] instances. The GWT-compatible
      * collector returns a HashMap here, but the reflection based fetcher (which only works on

@@ -18,5 +18,5 @@ data class App(
     val sdcardPath: String,
     val usbDiskPaths: List<String>,
     val internalStoragePath: String,
-    val downloadsDir: String
+    val downloadsDir: String,
 )

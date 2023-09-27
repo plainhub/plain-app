@@ -8,22 +8,22 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.brv.utils.*
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.px
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.SearchEndictByWordsQuery
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.BoxApi
-import com.ismartcoding.plain.features.VocabularyWordsDeletedEvent
-import com.ismartcoding.plain.features.VocabularyWordsUpdatedEvent
 import com.ismartcoding.plain.databinding.DialogVocabularyBinding
 import com.ismartcoding.plain.databinding.ViewListItemBinding
 import com.ismartcoding.plain.db.DVocabulary
-import com.ismartcoding.lib.extensions.px
-import com.ismartcoding.plain.ui.BaseDialog
-import com.ismartcoding.plain.fragment.EndictItemFragment
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.features.VocabularyWordsDeletedEvent
+import com.ismartcoding.plain.features.VocabularyWordsUpdatedEvent
 import com.ismartcoding.plain.features.vocabulary.VocabularyList
+import com.ismartcoding.plain.fragment.EndictItemFragment
+import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.ui.extensions.*
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.launch
 
 class VocabularyDialog(val vocabulary: DVocabulary) : BaseDialog<DialogVocabularyBinding>() {
@@ -35,15 +35,22 @@ class VocabularyDialog(val vocabulary: DVocabulary) : BaseDialog<DialogVocabular
         SELECT,
         SORT_RANDOM,
         TOGGLE_WORD,
-        TOGGLE_TRANSLATION
+        TOGGLE_TRANSLATION,
     }
 
-    private fun addMenuItem(menu: Menu, type: PopupMenuItemType, titleRes: Int) {
+    private fun addMenuItem(
+        menu: Menu,
+        type: PopupMenuItemType,
+        titleRes: Int,
+    ) {
         menu.add(0, type.ordinal, type.ordinal, titleRes)
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.topAppBar.run {
             initMenu(R.menu.vocabulary)
@@ -59,8 +66,16 @@ class VocabularyDialog(val vocabulary: DVocabulary) : BaseDialog<DialogVocabular
                         val popupMenu = popup.menu
                         addMenuItem(popupMenu, PopupMenuItemType.SELECT, R.string.select)
                         addMenuItem(popupMenu, PopupMenuItemType.SORT_RANDOM, R.string.sort_by_random)
-                        addMenuItem(popupMenu, PopupMenuItemType.TOGGLE_WORD, if (TempData.endictShowWord) R.string.hide_word else R.string.show_word)
-                        addMenuItem(popupMenu, PopupMenuItemType.TOGGLE_TRANSLATION, if (TempData.endictShowTranslation) R.string.hide_translation else R.string.show_translation)
+                        addMenuItem(
+                            popupMenu,
+                            PopupMenuItemType.TOGGLE_WORD,
+                            if (TempData.endictShowWord) R.string.hide_word else R.string.show_word,
+                        )
+                        addMenuItem(
+                            popupMenu,
+                            PopupMenuItemType.TOGGLE_TRANSLATION,
+                            if (TempData.endictShowTranslation) R.string.hide_translation else R.string.show_translation,
+                        )
                         popup.setOnMenuItemClickListener {
                             when (it.itemId) {
                                 PopupMenuItemType.SELECT.ordinal -> {
@@ -83,12 +98,20 @@ class VocabularyDialog(val vocabulary: DVocabulary) : BaseDialog<DialogVocabular
                                 PopupMenuItemType.TOGGLE_WORD.ordinal -> {
                                     TempData.endictShowWord = !TempData.endictShowWord
                                     popupMenu.removeItem(PopupMenuItemType.TOGGLE_WORD.ordinal)
-                                    addMenuItem(popupMenu, PopupMenuItemType.TOGGLE_WORD, if (TempData.endictShowWord) R.string.hide_word else R.string.show_word)
+                                    addMenuItem(
+                                        popupMenu,
+                                        PopupMenuItemType.TOGGLE_WORD,
+                                        if (TempData.endictShowWord) R.string.hide_word else R.string.show_word,
+                                    )
                                     binding.list.rv.bindingAdapter.notifyDataSetChanged()
                                 }
                                 PopupMenuItemType.TOGGLE_TRANSLATION.ordinal -> {
                                     popupMenu.removeItem(PopupMenuItemType.TOGGLE_TRANSLATION.ordinal)
-                                    addMenuItem(popupMenu, PopupMenuItemType.TOGGLE_TRANSLATION, if (TempData.endictShowTranslation) R.string.hide_translation else R.string.show_translation)
+                                    addMenuItem(
+                                        popupMenu,
+                                        PopupMenuItemType.TOGGLE_TRANSLATION,
+                                        if (TempData.endictShowTranslation) R.string.hide_translation else R.string.show_translation,
+                                    )
                                     TempData.endictShowTranslation = !TempData.endictShowTranslation
                                     binding.list.rv.bindingAdapter.notifyDataSetChanged()
                                 }
@@ -115,17 +138,19 @@ class VocabularyDialog(val vocabulary: DVocabulary) : BaseDialog<DialogVocabular
                 bindingItem.clearTextRows()
                 bindingItem.addTextRow(m.translation.joinToString("\n"))
 
-                bindingItem.textKey.visibility = if (TempData.endictShowWord) {
-                    View.VISIBLE
-                } else {
-                    View.INVISIBLE
-                }
+                bindingItem.textKey.visibility =
+                    if (TempData.endictShowWord) {
+                        View.VISIBLE
+                    } else {
+                        View.INVISIBLE
+                    }
 
-                bindingItem.rows.visibility = if (TempData.endictShowTranslation) {
-                    View.VISIBLE
-                } else {
-                    View.INVISIBLE
-                }
+                bindingItem.rows.visibility =
+                    if (TempData.endictShowTranslation) {
+                        View.VISIBLE
+                    } else {
+                        View.INVISIBLE
+                    }
 
                 if (toggleMode) {
                     bindingItem.cb.isChecked = selectedWords.contains(m.word)
@@ -249,9 +274,10 @@ class VocabularyDialog(val vocabulary: DVocabulary) : BaseDialog<DialogVocabular
             val endIndex = offset + limit
             val total = vocabulary.words.size
             val words = vocabulary.words.toList().subList(offset, if (endIndex > total) total else endIndex)
-            val r = withIO {
-                BoxApi.mixQueryAsync(SearchEndictByWordsQuery(words))
-            }
+            val r =
+                withIO {
+                    BoxApi.mixQueryAsync(SearchEndictByWordsQuery(words))
+                }
 
             if (!r.isSuccess()) {
                 binding.list.page.run {
@@ -267,11 +293,15 @@ class VocabularyDialog(val vocabulary: DVocabulary) : BaseDialog<DialogVocabular
             }
 
             r.response?.data?.let { data ->
-                binding.list.page.addData(data.searchEndictByWords.map { it.endictItemFragment }.sortedBy { words.indexOf(it.word) }, isEmpty = { total == 0 }) {
+                binding.list.page.addData(
+                    data.searchEndictByWords.map {
+                        it.endictItemFragment
+                    }.sortedBy { words.indexOf(it.word) },
+                    isEmpty = { total == 0 },
+                ) {
                     endIndex < total
                 }
             }
         }
     }
 }
-

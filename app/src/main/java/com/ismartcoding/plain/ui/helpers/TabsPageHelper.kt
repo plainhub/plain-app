@@ -9,7 +9,11 @@ import com.ismartcoding.lib.fragment.FragmentPagerAdapter
 import com.ismartcoding.plain.R
 
 object TabsPageHelper {
-    fun initTabsPager(fragment: DialogFragment, titleIds: List<Int>, fragments: List<Fragment>) {
+    fun initTabsPager(
+        fragment: DialogFragment,
+        titleIds: List<Int>,
+        fragments: List<Fragment>,
+    ) {
         val pager = fragment.dialog?.findViewById<ViewPager2>(R.id.pager)
         pager?.apply {
             adapter = FragmentPagerAdapter(fragment, fragments)

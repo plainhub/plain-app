@@ -1,10 +1,10 @@
 package com.ismartcoding.plain.features.wireguard.config
 
+import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.features.wireguard.config.Attribute.Companion.parse
 import com.ismartcoding.plain.features.wireguard.config.Attribute.Companion.split
 import com.ismartcoding.plain.features.wireguard.crypto.Key
 import com.ismartcoding.plain.features.wireguard.crypto.KeyPair
-import com.ismartcoding.lib.helpers.NetworkHelper
 import java.util.*
 
 class Interface {

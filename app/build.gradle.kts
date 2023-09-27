@@ -60,8 +60,8 @@ android {
         debug {
             applicationIdSuffix = ".debug"
             resValue("string", "app_name", "PlainApp-Debug")
-            isShrinkResources = false
-            isMinifyEnabled = false
+            isShrinkResources = true
+            isMinifyEnabled = true
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"
             }
@@ -96,7 +96,7 @@ android {
 
     packaging {
         jniLibs {
-            //useLegacyPackaging = true
+            // useLegacyPackaging = true
             excludes += listOf("META-INF/*")
         }
         resources {

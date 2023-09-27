@@ -40,14 +40,20 @@ class Template(val _segs: Array<Segment>, val _compiler: Compiler) {
 
         /** Executes this fragment with the provided context; writes its result to `out`. The
          * provided context will be nested in the fragment's bound context.  */
-        abstract fun execute(context: Any?, out: Writer)
+        abstract fun execute(
+            context: Any?,
+            out: Writer,
+        )
 
         /** Executes `tmpl` using this fragment's bound context. This allows a lambda to
          * resolve its fragment to a dynamically loaded template and then run that template with
          * the same context as the lamda, allowing a lambda to act as a 'late bound' included
          * template, i.e. you can decide which template to include based on information in the
          * context.  */
-        abstract fun executeTemplate(tmpl: Template, out: Writer)
+        abstract fun executeTemplate(
+            tmpl: Template,
+            out: Writer,
+        )
 
         /** Executes this fragment and returns its result as a string.  */
         fun execute(): String {
@@ -142,7 +148,10 @@ class Template(val _segs: Array<Segment>, val _compiler: Compiler) {
      * @throws MustacheException if an error occurs while executing or writing the template.
      */
     @Throws(MustacheException::class)
-    fun execute(context: Map<String, Any>, out: Writer) {
+    fun execute(
+        context: Map<String, Any>,
+        out: Writer,
+    ) {
         executeSegs(Context(context, null, 0, false, false), out)
     }
 
@@ -154,7 +163,11 @@ class Template(val _segs: Array<Segment>, val _compiler: Compiler) {
      * @throws MustacheException if an error occurs while executing or writing the template.
      */
     @Throws(MustacheException::class)
-    fun execute(context: Map<String, Any>, parentContext: Any, out: Writer) {
+    fun execute(
+        context: Map<String, Any>,
+        parentContext: Any,
+        out: Writer,
+    ) {
         val pctx = Context(parentContext, null, 0, false, false)
         executeSegs(Context(context, pctx, 0, false, false), out)
     }
@@ -170,23 +183,35 @@ class Template(val _segs: Array<Segment>, val _compiler: Compiler) {
     }
 
     @Throws(MustacheException::class)
-    fun executeSegs(ctx: Context, out: Writer) {
+    fun executeSegs(
+        ctx: Context,
+        out: Writer,
+    ) {
         for (seg in _segs) {
             seg.execute(this, ctx, out)
         }
     }
 
-    fun createFragment(segs: Array<Segment>, currentCtx: Context): Fragment {
+    fun createFragment(
+        segs: Array<Segment>,
+        currentCtx: Context,
+    ): Fragment {
         return object : Fragment() {
             override fun execute(out: Writer) {
                 execute(currentCtx, out)
             }
 
-            override fun execute(context: Any?, out: Writer) {
+            override fun execute(
+                context: Any?,
+                out: Writer,
+            ) {
                 execute(currentCtx.nest(context!!), out)
             }
 
-            override fun executeTemplate(tmpl: Template, out: Writer) {
+            override fun executeTemplate(
+                tmpl: Template,
+                out: Writer,
+            ) {
                 tmpl.executeSegs(currentCtx, out)
             }
 
@@ -203,11 +228,17 @@ class Template(val _segs: Array<Segment>, val _compiler: Compiler) {
                 return into
             }
 
-            private fun context(ctx: Context, n: Int): Any {
+            private fun context(
+                ctx: Context,
+                n: Int,
+            ): Any {
                 return if (n == 0) ctx.data else context(ctx.parent!!, n - 1)
             }
 
-            private fun execute(ctx: Context, out: Writer) {
+            private fun execute(
+                ctx: Context,
+                out: Writer,
+            ) {
                 for (seg in segs) {
                     seg.execute(this@Template, ctx, out)
                 }
@@ -226,7 +257,12 @@ class Template(val _segs: Array<Segment>, val _compiler: Compiler) {
      *
      * @return the value associated with the supplied name or null if no value could be resolved.
      */
-    protected fun getValue(ctx: Context, name: String, line: Int, missingIsNull: Boolean): Any? {
+    protected fun getValue(
+        ctx: Context,
+        name: String,
+        line: Int,
+        missingIsNull: Boolean,
+    ): Any? {
         // handle our special variables
         if (name == FIRST_NAME) {
             return ctx.onFirst
@@ -264,7 +300,12 @@ class Template(val _segs: Array<Segment>, val _compiler: Compiler) {
      * Decomposes the compound key `name` into components and resolves the value they
      * reference.
      */
-    private fun getCompoundValue(ctx: Context, name: String, line: Int, missingIsNull: Boolean): Any? {
+    private fun getCompoundValue(
+        ctx: Context,
+        name: String,
+        line: Int,
+        missingIsNull: Boolean,
+    ): Any? {
         val comps = name.split("\\.").toTypedArray()
         // we want to allow the first component of a compound key to be located in a parent
         // context, but once we're selecting sub-components, they must only be resolved in the
@@ -272,10 +313,14 @@ class Template(val _segs: Array<Segment>, val _compiler: Compiler) {
         var data = getValue(ctx, comps[0], line, missingIsNull)
         for (ii in 1 until comps.size) {
             if (data === NO_FETCHER_FOUND) {
-                if (!missingIsNull) throw MustacheException.Context(
-                    "Missing context for compound variable '" + name + "' on line " + line +
-                            ". '" + comps[ii - 1] + "' was not found.", name, line
-                )
+                if (!missingIsNull) {
+                    throw MustacheException.Context(
+                        "Missing context for compound variable '" + name + "' on line " + line +
+                            ". '" + comps[ii - 1] + "' was not found.",
+                        name,
+                        line,
+                    )
+                }
                 return null
             } else if (data == null) {
                 return null
@@ -291,7 +336,11 @@ class Template(val _segs: Array<Segment>, val _compiler: Compiler) {
      * Returns the value of the specified variable, noting that it is intended to be used as the
      * contents for a section.
      */
-    fun getSectionValue(ctx: Context, name: String, line: Int): Any {
+    fun getSectionValue(
+        ctx: Context,
+        name: String,
+        line: Int,
+    ): Any {
         val value = getValue(ctx, name, line, !_compiler.strictSections)
         // TODO: configurable behavior on null values?
         return value ?: emptyList<Any>()
@@ -301,7 +350,11 @@ class Template(val _segs: Array<Segment>, val _compiler: Compiler) {
      * Returns the value for the specified variable, or the configured default value if the
      * variable resolves to null. See [.getValue].
      */
-    fun getValueOrDefault(ctx: Context, name: String, line: Int): Any? {
+    fun getValueOrDefault(
+        ctx: Context,
+        name: String,
+        line: Int,
+    ): Any? {
         val value = getValue(ctx, name, line, _compiler.missingIsNull)
         // getValue will raise MustacheException if a variable cannot be resolved and missingIsNull
         // is not configured; so we're safe to assume that any null that makes it up to this point
@@ -309,23 +362,28 @@ class Template(val _segs: Array<Segment>, val _compiler: Compiler) {
         return value ?: _compiler.computeNullValue(name)
     }
 
-    private fun getValueIn(data: Any, name: String, line: Int): Any {
+    private fun getValueIn(
+        data: Any,
+        name: String,
+        line: Int,
+    ): Any {
         // if we're getting `.` or `this` then just return the whole context; we do this before the
         // null check because it may be valid for the context to be null (if we're iterating over a
         // list which contains nulls, for example)
         if (isThisName(name)) return data
         val key = Key(data.javaClass, name)
         var fetcher = _fcache[key]
-        fetcher = if (fetcher != null) {
-            try {
-                return fetcher[data, name]
-            } catch (e: Exception) {
-                // zoiks! non-monomorphic call site, update the cache and try again
+        fetcher =
+            if (fetcher != null) {
+                try {
+                    return fetcher[data, name]
+                } catch (e: Exception) {
+                    // zoiks! non-monomorphic call site, update the cache and try again
+                    _compiler.collector.createFetcher(data, key.name)
+                }
+            } else {
                 _compiler.collector.createFetcher(data, key.name)
             }
-        } else {
-            _compiler.collector.createFetcher(data, key.name)
-        }
 
         // if we were unable to create a fetcher, use the NOT_FOUND_FETCHER which will return
         // NO_FETCHER_FOUND to let the caller know that they can try the parent context or do le
@@ -340,16 +398,26 @@ class Template(val _segs: Array<Segment>, val _compiler: Compiler) {
             value
         } catch (e: Exception) {
             throw MustacheException.Context(
-                "Failure fetching variable '$name' on line $line", name, line, e
+                "Failure fetching variable '$name' on line $line",
+                name,
+                line,
+                e,
             )
         }
     }
 
-    private fun checkForMissing(name: String, line: Int, missingIsNull: Boolean, value: Any?): Any? {
+    private fun checkForMissing(
+        name: String,
+        line: Int,
+        missingIsNull: Boolean,
+        value: Any?,
+    ): Any? {
         return if (value === NO_FETCHER_FOUND) {
             if (missingIsNull) return null
             throw MustacheException.Context(
-                "No method or field with name '$name' on line $line", name, line
+                "No method or field with name '$name' on line $line",
+                name,
+                line,
             )
         } else {
             value
@@ -374,10 +442,14 @@ class Template(val _segs: Array<Segment>, val _compiler: Compiler) {
         const val INDEX_NAME = "-index"
 
         /** A fetcher cached for lookups that failed to find a fetcher.  */
-        val NOT_FOUND_FETCHER = object : VariableFetcher {
-            override fun get(ctx: Any, name: String): Any {
-                return NO_FETCHER_FOUND
+        val NOT_FOUND_FETCHER =
+            object : VariableFetcher {
+                override fun get(
+                    ctx: Any,
+                    name: String,
+                ): Any {
+                    return NO_FETCHER_FOUND
+                }
             }
-        }
     }
 }

@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.db
 
 import androidx.room.*
-import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.*
 
 @Entity(tableName = "sessions")
@@ -28,7 +27,6 @@ data class DSession(
     @ColumnInfo(name = "token")
     var token: String = ""
 }
-
 
 data class SessionClientTsUpdate(
     @ColumnInfo(name = "client_id")

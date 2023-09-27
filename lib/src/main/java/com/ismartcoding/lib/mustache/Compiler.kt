@@ -1,12 +1,12 @@
 package com.ismartcoding.lib.mustache
 
 import com.ismartcoding.lib.mustache.Mustache.TemplateLoader
-import kotlin.Throws
 import java.io.IOException
 import java.io.Reader
 import java.io.StringReader
 import java.lang.Exception
 import java.lang.RuntimeException
+import kotlin.Throws
 
 /** Compiles templates into executable form. See [Mustache].  */
 class Compiler(
@@ -43,7 +43,7 @@ class Compiler(
     /** The collector used by templates compiled with this compiler.  */
     val collector: ICollector,
     /** The delimiters used by default in templates compiled with this compiler.  */
-    val delims: Delims
+    val delims: Delims,
 ) {
     /** Compiles the supplied template into a repeatedly executable intermediate form.  */
     fun compile(template: String): Template {
@@ -61,7 +61,7 @@ class Compiler(
     fun defaultValue(defaultValue: String?): Compiler {
         return Compiler(
             standardsMode, strictSections, defaultValue, true,
-            emptyStringIsFalse, zeroIsFalse, formatter, loader, collector, delims
+            emptyStringIsFalse, zeroIsFalse, formatter, loader, collector, delims,
         )
     }
 
@@ -79,7 +79,7 @@ class Compiler(
     fun nullValue(nullValue: String?): Compiler {
         return Compiler(
             standardsMode, strictSections, nullValue, false,
-            emptyStringIsFalse, zeroIsFalse, formatter, loader, collector, delims
+            emptyStringIsFalse, zeroIsFalse, formatter, loader, collector, delims,
         )
     }
 
@@ -89,7 +89,7 @@ class Compiler(
             standardsMode, strictSections, nullValue,
             missingIsNull, emptyStringIsFalse, zeroIsFalse,
             formatter, loader, collector,
-            delims
+            delims,
         )
     }
 
@@ -99,10 +99,9 @@ class Compiler(
             standardsMode, strictSections, nullValue,
             missingIsNull, emptyStringIsFalse, zeroIsFalse,
             formatter, loader, collector,
-            delims
+            delims,
         )
     }
-
 
     /** Returns the value to use in the template for the null-valued property `name`. See
      * [.nullValue] for more details.  */
@@ -115,7 +114,7 @@ class Compiler(
      * values are considered falsey.  */
     fun isFalsey(value: Any): Boolean {
         return emptyStringIsFalse && "" == formatter.format(value) ||
-                zeroIsFalse && value is Number && value.toLong() == 0L
+            zeroIsFalse && value is Number && value.toLong() == 0L
     }
 
     /** Loads and compiles the template `name` using this compiler's configured template
@@ -138,10 +137,12 @@ class Compiler(
                 throw MustacheException("Unable to load template: $name", e)
             }
         } finally {
-            if (tin != null) try {
-                tin.close()
-            } catch (ioe: IOException) {
-                throw RuntimeException(ioe)
+            if (tin != null) {
+                try {
+                    tin.close()
+                } catch (ioe: IOException) {
+                    throw RuntimeException(ioe)
+                }
             }
         }
     }

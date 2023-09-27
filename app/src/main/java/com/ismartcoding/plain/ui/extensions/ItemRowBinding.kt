@@ -1,11 +1,14 @@
 package com.ismartcoding.plain.ui.extensions
 
 import android.widget.CompoundButton
+import com.ismartcoding.lib.extensions.setSelectableItemBackground
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.ItemRowBinding
-import com.ismartcoding.lib.extensions.setSelectableItemBackground
 
-fun ItemRowBinding.setSwitch(enable: Boolean, onChanged: ((CompoundButton, Boolean) -> Unit)? = null): ItemRowBinding {
+fun ItemRowBinding.setSwitch(
+    enable: Boolean,
+    onChanged: ((CompoundButton, Boolean) -> Unit)? = null,
+): ItemRowBinding {
     endSwitch.setOnCheckedChangeListener(null)
     endSwitch.isChecked = enable
     val listener = CompoundButton.OnCheckedChangeListener { buttonView, isChecked -> onChanged?.invoke(buttonView, isChecked) }

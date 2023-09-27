@@ -6,7 +6,10 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.ismartcoding.plain.R
 
-fun BottomAppBar.initMenu(@MenuRes menuId: Int, overflow: Boolean = false) {
+fun BottomAppBar.initMenu(
+    @MenuRes menuId: Int,
+    overflow: Boolean = false,
+) {
     menu.clear()
     inflateMenu(menuId)
     if (overflow) {

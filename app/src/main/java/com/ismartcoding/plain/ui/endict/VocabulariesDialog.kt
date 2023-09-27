@@ -7,23 +7,25 @@ import com.ismartcoding.lib.brv.utils.linear
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.DialogVocabulariesBinding
 import com.ismartcoding.plain.databinding.ViewListItemBinding
 import com.ismartcoding.plain.db.DVocabulary
-import com.ismartcoding.plain.ui.BaseDialog
-import com.ismartcoding.plain.ui.EditValueDialog
+import com.ismartcoding.plain.features.*
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.vocabulary.VocabularyList
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.features.*
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.BaseDialog
+import com.ismartcoding.plain.ui.EditValueDialog
 import com.ismartcoding.plain.ui.extensions.*
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.launch
 
 class VocabulariesDialog : BaseDialog<DialogVocabulariesBinding>() {
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.topAppBar.onBack {
             dismiss()
@@ -101,10 +103,11 @@ class VocabulariesDialog : BaseDialog<DialogVocabulariesBinding>() {
 
     private fun updateList() {
         lifecycleScope.launch {
-            binding.list.page.addData(withIO {
-                VocabularyList.getItemsAsync()
-            })
+            binding.list.page.addData(
+                withIO {
+                    VocabularyList.getItemsAsync()
+                },
+            )
         }
     }
 }
-

@@ -29,7 +29,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ismartcoding.lib.R
 import com.ismartcoding.lib.brv.PageRefreshLayout
 import com.ismartcoding.lib.extensions.*
-import com.ismartcoding.lib.logcat.LogCat
 import kotlin.math.roundToInt
 
 private const val BUBBLE_ANIM_DURATION = 100L
@@ -38,10 +37,12 @@ private const val SCROLLBAR_HIDE_DELAY = 1000L
 private const val TRACK_SNAP_RANGE = 5
 
 class FastScroller : LinearLayout {
-
-    enum class Size(@DrawableRes val drawableId: Int, @DimenRes val textSizeId: Int) {
+    enum class Size(
+        @DrawableRes val drawableId: Int,
+        @DimenRes val textSizeId: Int,
+    ) {
         NORMAL(R.drawable.fastscroll_bubble, R.dimen.fastscroll_bubble_text_size),
-        SMALL(R.drawable.fastscroll_bubble_small, R.dimen.fastscroll_bubble_text_size_small)
+        SMALL(R.drawable.fastscroll_bubble_small, R.dimen.fastscroll_bubble_text_size_small),
     }
 
     private val Size.textSize get() = resources.getDimension(textSizeId)
@@ -79,53 +80,64 @@ class FastScroller : LinearLayout {
     private var fastScrollListener: FastScrollListener? = null
     private var sectionIndexer: SectionIndexer? = null
 
-    private val scrollbarHider = Runnable {
-        hideBubble()
-        hideScrollbar()
-    }
+    private val scrollbarHider =
+        Runnable {
+            hideBubble()
+            hideScrollbar()
+        }
 
-    private val alphaAnimatorListener = object : AnimatorListenerAdapter() {
-        /* adapter required for new alpha value to stick */
-    }
+    private val alphaAnimatorListener =
+        object : AnimatorListenerAdapter() {
+            // adapter required for new alpha value to stick
+        }
 
-    private val scrollListener: RecyclerView.OnScrollListener = object : RecyclerView.OnScrollListener() {
-        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            if (!handleView.isSelected && isEnabled) {
-                val y = recyclerView.scrollProportion
-                setViewPositions(y)
+    private val scrollListener: RecyclerView.OnScrollListener =
+        object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(
+                recyclerView: RecyclerView,
+                dx: Int,
+                dy: Int,
+            ) {
+                if (!handleView.isSelected && isEnabled) {
+                    val y = recyclerView.scrollProportion
+                    setViewPositions(y)
 
-                if (showBubbleAlways) {
-                    val targetPos = getRecyclerViewTargetPosition(y)
-                    sectionIndexer?.let { bubbleView.text = it.getSectionText(targetPos) }
+                    if (showBubbleAlways) {
+                        val targetPos = getRecyclerViewTargetPosition(y)
+                        sectionIndexer?.let { bubbleView.text = it.getSectionText(targetPos) }
+                    }
+                }
+
+                swipeRefreshLayout?.let {
+                    val firstVisibleItem = recyclerView.layoutManager.firstVisibleItemPosition
+                    val topPosition = if (recyclerView.childCount == 0) 0 else recyclerView.getChildAt(0).top
+                    it.isEnabled = firstVisibleItem == 0 && topPosition >= 0
                 }
             }
 
-            swipeRefreshLayout?.let {
-                val firstVisibleItem = recyclerView.layoutManager.firstVisibleItemPosition
-                val topPosition = if (recyclerView.childCount == 0) 0 else recyclerView.getChildAt(0).top
-                it.isEnabled = firstVisibleItem == 0 && topPosition >= 0
-            }
-        }
+            override fun onScrollStateChanged(
+                recyclerView: RecyclerView,
+                newState: Int,
+            ) {
+                super.onScrollStateChanged(recyclerView, newState)
 
-        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-            super.onScrollStateChanged(recyclerView, newState)
+                if (isEnabled) {
+                    when (newState) {
+                        RecyclerView.SCROLL_STATE_DRAGGING -> {
+                            handler.removeCallbacks(scrollbarHider)
+                            scrollbarAnimator?.cancel()
 
-            if (isEnabled) {
-                when (newState) {
-                    RecyclerView.SCROLL_STATE_DRAGGING -> {
-                        handler.removeCallbacks(scrollbarHider)
-                        scrollbarAnimator?.cancel()
-
-                        if (!scrollbar.isVisible) showScrollbar()
-                        if (showBubbleAlways && sectionIndexer != null) showBubble()
-                    }
-                    RecyclerView.SCROLL_STATE_IDLE -> if (hideScrollbar && !handleView.isSelected) {
-                        handler.postDelayed(scrollbarHider, SCROLLBAR_HIDE_DELAY)
+                            if (!scrollbar.isVisible) showScrollbar()
+                            if (showBubbleAlways && sectionIndexer != null) showBubble()
+                        }
+                        RecyclerView.SCROLL_STATE_IDLE ->
+                            if (hideScrollbar && !handleView.isSelected) {
+                                handler.postDelayed(scrollbarHider, SCROLLBAR_HIDE_DELAY)
+                            }
                     }
                 }
             }
         }
-    }
 
     private val RecyclerView.scrollProportion: Float
         get() {
@@ -145,11 +157,16 @@ class FastScroller : LinearLayout {
         context.layout(attrs)
         layoutParams = attrs?.let { generateLayoutParams(it) } ?: LayoutParams(
             LayoutParams.WRAP_CONTENT,
-            LayoutParams.MATCH_PARENT
+            LayoutParams.MATCH_PARENT,
         )
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldW: Int, oldH: Int) = super.onSizeChanged(w, h, oldW, oldH).also {
+    override fun onSizeChanged(
+        w: Int,
+        h: Int,
+        oldW: Int,
+        oldH: Int,
+    ) = super.onSizeChanged(w, h, oldW, oldH).also {
         viewHeight = h
     }
 
@@ -161,9 +178,10 @@ class FastScroller : LinearLayout {
      *
      * @param enabled True if this view is enabled, false otherwise
      */
-    override fun setEnabled(enabled: Boolean) = super.setEnabled(enabled).also {
-        isVisible = enabled
-    }
+    override fun setEnabled(enabled: Boolean) =
+        super.setEnabled(enabled).also {
+            isVisible = enabled
+        }
 
     /**
      * Set the [ViewGroup.LayoutParams] associated with this view. These supply
@@ -202,30 +220,39 @@ class FastScroller : LinearLayout {
                     applyTo(viewGroup)
                 }
 
-                layoutParams = (layoutParams as ConstraintLayout.LayoutParams).apply {
-                    height = 0
-                    setMargins(0, marginTop, 0, marginBottom)
-                }
+                layoutParams =
+                    (layoutParams as ConstraintLayout.LayoutParams).apply {
+                        height = 0
+                        setMargins(0, marginTop, 0, marginBottom)
+                    }
             }
-            is CoordinatorLayout -> layoutParams = (layoutParams as CoordinatorLayout.LayoutParams).apply {
-                height = LayoutParams.MATCH_PARENT
-                anchorGravity = GravityCompat.END
-                anchorId = recyclerViewId
-                setMargins(0, marginTop, 0, marginBottom)
-            }
-            is FrameLayout -> layoutParams = (layoutParams as FrameLayout.LayoutParams).apply {
-                height = LayoutParams.MATCH_PARENT
-                gravity = GravityCompat.END
-                setMargins(0, marginTop, 0, marginBottom)
-            }
-            is RelativeLayout -> layoutParams = (layoutParams as RelativeLayout.LayoutParams).apply {
-                height = 0
-                addRule(ALIGN_TOP, recyclerViewId)
-                addRule(ALIGN_BOTTOM, recyclerViewId)
-                addRule(ALIGN_END, recyclerViewId)
-                setMargins(0, marginTop, 0, marginBottom)
-            }
-            else -> throw IllegalArgumentException("Parent ViewGroup must be a ConstraintLayout, CoordinatorLayout, FrameLayout, or RelativeLayout")
+            is CoordinatorLayout ->
+                layoutParams =
+                    (layoutParams as CoordinatorLayout.LayoutParams).apply {
+                        height = LayoutParams.MATCH_PARENT
+                        anchorGravity = GravityCompat.END
+                        anchorId = recyclerViewId
+                        setMargins(0, marginTop, 0, marginBottom)
+                    }
+            is FrameLayout ->
+                layoutParams =
+                    (layoutParams as FrameLayout.LayoutParams).apply {
+                        height = LayoutParams.MATCH_PARENT
+                        gravity = GravityCompat.END
+                        setMargins(0, marginTop, 0, marginBottom)
+                    }
+            is RelativeLayout ->
+                layoutParams =
+                    (layoutParams as RelativeLayout.LayoutParams).apply {
+                        height = 0
+                        addRule(ALIGN_TOP, recyclerViewId)
+                        addRule(ALIGN_BOTTOM, recyclerViewId)
+                        addRule(ALIGN_END, recyclerViewId)
+                        setMargins(0, marginTop, 0, marginBottom)
+                    }
+            else -> throw IllegalArgumentException(
+                "Parent ViewGroup must be a ConstraintLayout, CoordinatorLayout, FrameLayout, or RelativeLayout",
+            )
         }
 
         updateViewHeights()
@@ -311,7 +338,9 @@ class FastScroller : LinearLayout {
      *
      * @param color The color for the scroll track
      */
-    fun setTrackColor(@ColorInt color: Int) {
+    fun setTrackColor(
+        @ColorInt color: Int,
+    ) {
         if (trackImage == null) {
             context.getCompatDrawable(R.drawable.fastscroll_track)?.let { trackImage = it.wrap().mutate() }
         }
@@ -327,7 +356,9 @@ class FastScroller : LinearLayout {
      *
      * @param color The color for the scroll handle
      */
-    fun setHandleColor(@ColorInt color: Int) {
+    fun setHandleColor(
+        @ColorInt color: Int,
+    ) {
         handleColor = color
 
         if (handleImage == null) {
@@ -347,7 +378,10 @@ class FastScroller : LinearLayout {
      * @param always  True to always show the bubble, false to only show on handle touch
      */
     @JvmOverloads
-    fun setBubbleVisible(visible: Boolean, always: Boolean = false) {
+    fun setBubbleVisible(
+        visible: Boolean,
+        always: Boolean = false,
+    ) {
         showBubble = visible
         showBubbleAlways = visible && always
     }
@@ -357,7 +391,9 @@ class FastScroller : LinearLayout {
      *
      * @param color The background color for the section bubble
      */
-    fun setBubbleColor(@ColorInt color: Int) {
+    fun setBubbleColor(
+        @ColorInt color: Int,
+    ) {
         bubbleColor = color
 
         if (bubbleImage == null) {
@@ -375,7 +411,9 @@ class FastScroller : LinearLayout {
      *
      * @param color The text color for the section bubble
      */
-    fun setBubbleTextColor(@ColorInt color: Int) = bubbleView.setTextColor(color)
+    fun setBubbleTextColor(
+        @ColorInt color: Int,
+    ) = bubbleView.setTextColor(color)
 
     /**
      * Set the scaled pixel text size of the section bubble.
@@ -386,23 +424,25 @@ class FastScroller : LinearLayout {
         bubbleView.textSize = size.toFloat()
     }
 
-    private fun getRecyclerViewTargetPosition(y: Float) = recyclerView?.let { recyclerView ->
-        val itemCount = recyclerView.adapter?.itemCount ?: 0
+    private fun getRecyclerViewTargetPosition(y: Float) =
+        recyclerView?.let { recyclerView ->
+            val itemCount = recyclerView.adapter?.itemCount ?: 0
 
-        val proportion = when {
-            handleView.y == 0f -> 0f
-            handleView.y + handleHeight >= viewHeight - TRACK_SNAP_RANGE -> 1f
-            else -> y / viewHeight.toFloat()
-        }
+            val proportion =
+                when {
+                    handleView.y == 0f -> 0f
+                    handleView.y + handleHeight >= viewHeight - TRACK_SNAP_RANGE -> 1f
+                    else -> y / viewHeight.toFloat()
+                }
 
-        var scrolledItemCount = (proportion * itemCount).roundToInt()
+            var scrolledItemCount = (proportion * itemCount).roundToInt()
 
-        if (recyclerView.layoutManager.isLayoutReversed) {
-            scrolledItemCount = itemCount - scrolledItemCount
-        }
+            if (recyclerView.layoutManager.isLayoutReversed) {
+                scrolledItemCount = itemCount - scrolledItemCount
+            }
 
-        if (itemCount > 0) scrolledItemCount.coerceIn(0, itemCount - 1) else 0
-    } ?: 0
+            if (itemCount > 0) scrolledItemCount.coerceIn(0, itemCount - 1) else 0
+        } ?: 0
 
     private fun setRecyclerViewPosition(y: Float) {
         recyclerView?.layoutManager?.let { layoutManager ->
@@ -432,7 +472,10 @@ class FastScroller : LinearLayout {
         handleImage?.setCompatTint(if (selected) bubbleColor else handleColor)
     }
 
-    private fun handleTouchEvent(view: View, event: MotionEvent): Boolean {
+    private fun handleTouchEvent(
+        view: View,
+        event: MotionEvent,
+    ): Boolean {
         val setYPositions: () -> Unit = {
             val y = event.y
             setViewPositions(y)
@@ -490,29 +533,33 @@ class FastScroller : LinearLayout {
     private fun showBubble() {
         if (!bubbleView.isVisible) {
             bubbleView.isVisible = true
-            bubbleAnimator = bubbleView.animate().alpha(1f)
-                .setDuration(BUBBLE_ANIM_DURATION)
-                .setListener(alphaAnimatorListener)
+            bubbleAnimator =
+                bubbleView.animate().alpha(1f)
+                    .setDuration(BUBBLE_ANIM_DURATION)
+                    .setListener(alphaAnimatorListener)
         }
     }
 
     private fun hideBubble() {
         if (bubbleView.isVisible) {
-            bubbleAnimator = bubbleView.animate().alpha(0f)
-                .setDuration(BUBBLE_ANIM_DURATION)
-                .setListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        super.onAnimationEnd(animation)
-                        bubbleView.isVisible = false
-                        bubbleAnimator = null
-                    }
+            bubbleAnimator =
+                bubbleView.animate().alpha(0f)
+                    .setDuration(BUBBLE_ANIM_DURATION)
+                    .setListener(
+                        object : AnimatorListenerAdapter() {
+                            override fun onAnimationEnd(animation: Animator) {
+                                super.onAnimationEnd(animation)
+                                bubbleView.isVisible = false
+                                bubbleAnimator = null
+                            }
 
-                    override fun onAnimationCancel(animation: Animator) {
-                        super.onAnimationCancel(animation)
-                        bubbleView.isVisible = false
-                        bubbleAnimator = null
-                    }
-                })
+                            override fun onAnimationCancel(animation: Animator) {
+                                super.onAnimationCancel(animation)
+                                bubbleView.isVisible = false
+                                bubbleAnimator = null
+                            }
+                        },
+                    )
         }
     }
 
@@ -521,43 +568,56 @@ class FastScroller : LinearLayout {
         if ((recyclerView?.computeVerticalScrollRange() ?: (0 - viewHeight)) > 0) {
             scrollbar.translationX = scrollbarPaddingEnd
             scrollbar.isVisible = true
-            scrollbarAnimator = scrollbar.animate().translationX(0f).alpha(1f)
-                .setDuration(SCROLLBAR_ANIM_DURATION)
-                .setListener(alphaAnimatorListener)
+            scrollbarAnimator =
+                scrollbar.animate().translationX(0f).alpha(1f)
+                    .setDuration(SCROLLBAR_ANIM_DURATION)
+                    .setListener(alphaAnimatorListener)
         }
     }
 
     private fun hideScrollbar() {
-        scrollbarAnimator = scrollbar.animate().translationX(scrollbarPaddingEnd).alpha(0f)
-            .setDuration(SCROLLBAR_ANIM_DURATION)
-            .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    super.onAnimationEnd(animation)
-                    scrollbar.isVisible = false
-                    scrollbarAnimator = null
-                }
+        scrollbarAnimator =
+            scrollbar.animate().translationX(scrollbarPaddingEnd).alpha(0f)
+                .setDuration(SCROLLBAR_ANIM_DURATION)
+                .setListener(
+                    object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            super.onAnimationEnd(animation)
+                            scrollbar.isVisible = false
+                            scrollbarAnimator = null
+                        }
 
-                override fun onAnimationCancel(animation: Animator) {
-                    super.onAnimationCancel(animation)
-                    scrollbar.isVisible = false
-                    scrollbarAnimator = null
-                }
-            })
+                        override fun onAnimationCancel(animation: Animator) {
+                            super.onAnimationCancel(animation)
+                            scrollbar.isVisible = false
+                            scrollbarAnimator = null
+                        }
+                    },
+                )
     }
 
-    private fun TypedArray.getSize(@StyleableRes index: Int, defValue: Int) = getInt(index, defValue).let { ordinal ->
+    private fun TypedArray.getSize(
+        @StyleableRes index: Int,
+        defValue: Int,
+    ) = getInt(index, defValue).let { ordinal ->
         Size.values().find { it.ordinal == ordinal } ?: Size.NORMAL
     }
 
-    private fun Context.layout(attrs: AttributeSet? = null, size: Size = Size.NORMAL) {
+    private fun Context.layout(
+        attrs: AttributeSet? = null,
+        size: Size = Size.NORMAL,
+    ) {
         inflate(this, R.layout.fast_scroller, this@FastScroller)
 
         clipChildren = false
         orientation = HORIZONTAL
 
         @ColorInt var bubbleColor = Color.GRAY
+
         @ColorInt var handleColor = Color.DKGRAY
+
         @ColorInt var trackColor = Color.LTGRAY
+
         @ColorInt var textColor = Color.WHITE
 
         var showTrack = false
@@ -595,7 +655,6 @@ class FastScroller : LinearLayout {
      * @see FastScroller.setFastScrollListener
      */
     interface FastScrollListener {
-
         /**
          * Called when fast scrolling begins.
          * @param fastScroller The [FastScroller] with this event
@@ -616,7 +675,6 @@ class FastScroller : LinearLayout {
      * @see FastScroller.setSectionIndexer
      */
     interface SectionIndexer {
-
         /**
          * Get the text to be displayed for the visible section at the current position.
          *

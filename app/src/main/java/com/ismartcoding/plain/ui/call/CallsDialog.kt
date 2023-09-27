@@ -38,7 +38,10 @@ class CallsDialog : BaseListDrawerDialog() {
 
     private var phoneNumberToCall = ""
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         checkPermission()
         initBottomBar(R.menu.action_calls) {
@@ -119,16 +122,19 @@ class CallsDialog : BaseListDrawerDialog() {
             val bindingAdapter = binding.list.rv.bindingAdapter
             val toggleMode = bindingAdapter.toggleMode
             val checkedItems = bindingAdapter.getCheckedModels<CallModel>()
-            binding.list.page.addData(items.map { a ->
-                CallModel(a).apply {
-                    keyText = a.name.ifEmpty { a.number }
-                    this.toggleMode = toggleMode
-                    subtitle = "${a.startedAt.formatDateTime()} ${getDurationText()} ${getGeoText()}"
-                    isChecked = checkedItems.any { it.data.id == data.id }
-                }
-            }, hasMore = {
-                items.size == viewModel.limit
-            })
+            binding.list.page.addData(
+                items.map { a ->
+                    CallModel(a).apply {
+                        keyText = a.name.ifEmpty { a.number }
+                        this.toggleMode = toggleMode
+                        subtitle = "${a.startedAt.formatDateTime()} ${getDurationText()} ${getGeoText()}"
+                        isChecked = checkedItems.any { it.data.id == data.id }
+                    }
+                },
+                hasMore = {
+                    items.size == viewModel.limit
+                },
+            )
             updateTitle()
         }
     }
@@ -148,7 +154,6 @@ class CallsDialog : BaseListDrawerDialog() {
             }
 
             checkable(onItemClick = {
-
             }, onChecked = {
                 updateBottomActions()
                 updateTitle()

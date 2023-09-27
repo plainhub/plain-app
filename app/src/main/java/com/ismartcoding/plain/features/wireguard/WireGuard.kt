@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.features.wireguard
 
+import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.features.wireguard.config.Interface
 import com.ismartcoding.plain.features.wireguard.config.Peer
 import com.ismartcoding.plain.features.wireguard.crypto.KeyPair
-import com.ismartcoding.lib.helpers.NetworkHelper
 import java.util.ArrayList
 
 class WireGuard {

@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.db.DFeed
-import com.ismartcoding.plain.db.DNote
 import kotlinx.datetime.Instant
 
 data class Feed(

@@ -28,7 +28,10 @@ class AddNewBoxDialog(val updateCallback: () -> Unit) : BaseDialog<DialogAddNewB
     data class ItemModel(val device: BTDevice) : ListItemModel()
 
     @SuppressLint("MissingPermission")
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.topAppBar.onBack {
             dismiss()
@@ -53,10 +56,14 @@ class AddNewBoxDialog(val updateCallback: () -> Unit) : BaseDialog<DialogAddNewB
 
             addedMacSet.add(device.mac)
 
-            binding.rv.addModels(arrayListOf(ItemModel(device).apply {
-                keyText = device.device.name
-                subtitle = device.mac
-            }))
+            binding.rv.addModels(
+                arrayListOf(
+                    ItemModel(device).apply {
+                        keyText = device.device.name
+                        subtitle = device.mac
+                    },
+                ),
+            )
             binding.discovering.visibility = View.GONE
             binding.empty.visibility = View.GONE
         }

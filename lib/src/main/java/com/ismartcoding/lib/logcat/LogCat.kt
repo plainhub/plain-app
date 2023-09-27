@@ -90,11 +90,19 @@ object LogCat {
     /**
      * General log function that accepts all configurations as parameter
      */
-    fun log(priority: Int, tag: String?, message: String?, throwable: Throwable?) {
+    fun log(
+        priority: Int,
+        tag: String?,
+        message: String?,
+        throwable: Throwable?,
+    ) {
         printer.log(priority, tag, message, throwable)
     }
 
-    fun d(message: String, vararg args: Any?) {
+    fun d(
+        message: String,
+        vararg args: Any?,
+    ) {
         printer.d(message, args)
     }
 
@@ -102,23 +110,39 @@ object LogCat {
         printer.d(`object`)
     }
 
-    fun e(message: String, vararg args: Any?) {
+    fun e(
+        message: String,
+        vararg args: Any?,
+    ) {
         printer.e(null, message, args)
     }
 
-    fun e(throwable: Throwable?, message: String = "", vararg args: Any?) {
+    fun e(
+        throwable: Throwable?,
+        message: String = "",
+        vararg args: Any?,
+    ) {
         printer.e(throwable, message, args)
     }
 
-    fun i(message: String, vararg args: Any?) {
+    fun i(
+        message: String,
+        vararg args: Any?,
+    ) {
         printer.i(message, args)
     }
 
-    fun v(message: String, vararg args: Any?) {
+    fun v(
+        message: String,
+        vararg args: Any?,
+    ) {
         printer.v(message, args)
     }
 
-    fun w(message: String, vararg args: Any?) {
+    fun w(
+        message: String,
+        vararg args: Any?,
+    ) {
         printer.w(message, args)
     }
 
@@ -126,7 +150,10 @@ object LogCat {
      * Tip: Use this for exceptional situations to log
      * ie: Unexpected errors etc
      */
-    fun wtf(message: String, vararg args: Any?) {
+    fun wtf(
+        message: String,
+        vararg args: Any?,
+    ) {
         printer.wtf(message, args)
     }
 

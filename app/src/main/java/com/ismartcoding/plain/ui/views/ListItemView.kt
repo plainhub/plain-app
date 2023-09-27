@@ -98,7 +98,10 @@ class ListItemView(context: Context, attrs: AttributeSet? = null) : LinearLayout
         }
     }
 
-    fun setEndIcon(@DrawableRes iconId: Int, clickCallback: (() -> Unit)? = null) {
+    fun setEndIcon(
+        @DrawableRes iconId: Int,
+        clickCallback: (() -> Unit)? = null,
+    ) {
         binding.endIcon.run {
             visibility = View.VISIBLE
             setImageResource(iconId)
@@ -110,12 +113,16 @@ class ListItemView(context: Context, attrs: AttributeSet? = null) : LinearLayout
         }
     }
 
-    fun setStartIcon(@DrawableRes iconId: Int) {
+    fun setStartIcon(
+        @DrawableRes iconId: Int,
+    ) {
         binding.startIcon.visibility = View.VISIBLE
         binding.startIcon.setImageResource(iconId)
     }
 
-    fun setStartIconColor(@ColorRes colorId: Int) {
+    fun setStartIconColor(
+        @ColorRes colorId: Int,
+    ) {
         binding.startIcon.setColorFilter(context.getColor(colorId))
     }
 
@@ -135,15 +142,25 @@ class ListItemView(context: Context, attrs: AttributeSet? = null) : LinearLayout
         binding.enableSwipeMenu(enable)
     }
 
-    fun setLeftSwipeButton(buttonText: String, buttonCallback: () -> Unit) {
+    fun setLeftSwipeButton(
+        buttonText: String,
+        buttonCallback: () -> Unit,
+    ) {
         binding.setLeftSwipeButton(buttonText, buttonCallback)
     }
 
-    fun setRightSwipeButton(buttonText: String, buttonCallback: () -> Unit) {
+    fun setRightSwipeButton(
+        buttonText: String,
+        buttonCallback: () -> Unit,
+    ) {
         binding.setRightSwipeButton(buttonText, buttonCallback)
     }
 
-    fun setChips(items: List<ChipItem>, value: String, onChanged: ((String) -> Unit)? = null) {
+    fun setChips(
+        items: List<ChipItem>,
+        value: String,
+        onChanged: ((String) -> Unit)? = null,
+    ) {
         selectValue = value
         binding.chipGroup.run {
             visibility = View.VISIBLE
@@ -154,7 +171,10 @@ class ListItemView(context: Context, attrs: AttributeSet? = null) : LinearLayout
         }
     }
 
-    fun setSwitch(enable: Boolean, onChanged: ((CompoundButton, Boolean) -> Unit)? = null) {
+    fun setSwitch(
+        enable: Boolean,
+        onChanged: ((CompoundButton, Boolean) -> Unit)? = null,
+    ) {
         binding.setSwitch(enable, onChanged)
     }
 
@@ -176,7 +196,12 @@ class ListItemView(context: Context, attrs: AttributeSet? = null) : LinearLayout
     }
 
     companion object {
-        fun createItem(context: Context, key: String, value: String, click: (() -> Unit)? = null): ListItemView {
+        fun createItem(
+            context: Context,
+            key: String,
+            value: String,
+            click: (() -> Unit)? = null,
+        ): ListItemView {
             val row = ListItemView(context)
             row.run {
                 setKeyText(key)
@@ -187,7 +212,11 @@ class ListItemView(context: Context, attrs: AttributeSet? = null) : LinearLayout
             return row
         }
 
-        fun createCommandItem(context: Context, keyTextId: Int, click: () -> Unit): ListItemView {
+        fun createCommandItem(
+            context: Context,
+            keyTextId: Int,
+            click: () -> Unit,
+        ): ListItemView {
             val row = ListItemView(context)
             row.setKeyText(getString(keyTextId))
             row.setClick(click)

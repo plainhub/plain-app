@@ -22,7 +22,6 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.base.BlockOutlineButton
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -50,7 +49,7 @@ fun LogsPage(
                 item {
                     PListItem(
                         title = stringResource(R.string.file_size),
-                        value = FormatHelper.formatBytes(fileSize)
+                        value = FormatHelper.formatBytes(fileSize),
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     BlockOutlineButton(
@@ -61,7 +60,7 @@ fun LogsPage(
                                 return@BlockOutlineButton
                             }
                             viewModel.export(context)
-                        }
+                        },
                     )
                     Spacer(modifier = Modifier.height(40.dp))
                     BlockOutlineButton(
@@ -74,12 +73,12 @@ fun LogsPage(
                                 }
                                 fileSize = 0
                             }
-                        }
+                        },
                     )
                     BottomSpace()
                 }
             }
-        }
+        },
     )
 }
 

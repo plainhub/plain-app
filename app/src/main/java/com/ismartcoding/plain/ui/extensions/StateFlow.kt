@@ -8,9 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlin.coroutines.CoroutineContext
 
 @Composable
-fun <T> StateFlow<T>.collectAsStateValue(
-    context: CoroutineContext = Dispatchers.Default,
-): T = collectAsState(context).value
+fun <T> StateFlow<T>.collectAsStateValue(context: CoroutineContext = Dispatchers.Default): T = collectAsState(context).value
 
 @Composable
 fun <T : R, R> Flow<T>.collectAsStateValue(

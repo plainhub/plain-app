@@ -12,26 +12,27 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.ismartcoding.plain.ui.theme.palette.onLight
 
 @Composable
 fun PDialog(
     onClose: () -> Unit,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     Dialog(
         onDismissRequest = onClose,
-        properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true
-        )
+        properties =
+            DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true,
+            ),
     ) {
         Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(32.dp))
-                .background(MaterialTheme.colorScheme.inverseOnSurface)
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .clip(RoundedCornerShape(32.dp))
+                    .background(MaterialTheme.colorScheme.inverseOnSurface)
+                    .fillMaxSize(),
+            contentAlignment = Alignment.Center,
         ) {
             content()
         }

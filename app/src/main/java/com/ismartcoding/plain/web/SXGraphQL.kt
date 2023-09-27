@@ -41,7 +41,6 @@ import com.ismartcoding.plain.data.preference.AudioPlaylistPreference
 import com.ismartcoding.plain.data.preference.AudioSortByPreference
 import com.ismartcoding.plain.data.preference.AuthDevTokenPreference
 import com.ismartcoding.plain.data.preference.ChatGPTApiKeyPreference
-import com.ismartcoding.plain.data.preference.FileSortByPreference
 import com.ismartcoding.plain.data.preference.ImageSortByPreference
 import com.ismartcoding.plain.data.preference.VideoPlaylistPreference
 import com.ismartcoding.plain.data.preference.VideoSortByPreference
@@ -198,13 +197,25 @@ class SXGraphQL(val schema: Schema) {
                                 if (it.content.value is DMessageImages) {
                                     val c = it.content.value as DMessageImages
                                     if (c.items.any { i -> !i.uri.startsWith("app://") }) {
-                                        it.content.value = DMessageImages(c.items.map { i -> DMessageFile(i.uri.toAppUrl(context), i.size, i.duration) })
+                                        it.content.value =
+                                            DMessageImages(
+                                                c.items.map {
+                                                        i ->
+                                                    DMessageFile(i.uri.toAppUrl(context), i.size, i.duration)
+                                                },
+                                            )
                                         dao.update(it)
                                     }
                                 } else if (it.content.value is DMessageFiles) {
                                     val c = it.content.value as DMessageFiles
                                     if (c.items.any { i -> !i.uri.startsWith("app://") }) {
-                                        it.content.value = DMessageFiles(c.items.map { i -> DMessageFile(i.uri.toAppUrl(context), i.size, i.duration) })
+                                        it.content.value =
+                                            DMessageFiles(
+                                                c.items.map {
+                                                        i ->
+                                                    DMessageFile(i.uri.toAppUrl(context), i.size, i.duration)
+                                                },
+                                            )
                                         dao.update(it)
                                     }
                                 }
@@ -256,7 +267,9 @@ class SXGraphQL(val schema: Schema) {
                     resolver { offset: Int, limit: Int, query: String ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-                        ImageHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, ImageSortByPreference.getValueAsync(context)).map { it.toModel() }
+                        ImageHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, ImageSortByPreference.getValueAsync(context)).map {
+                            it.toModel()
+                        }
                     }
                     type<Image> {
                         dataProperty("tags") {
@@ -305,7 +318,9 @@ class SXGraphQL(val schema: Schema) {
                     resolver { offset: Int, limit: Int, query: String ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-                        VideoHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, VideoSortByPreference.getValueAsync(context)).map { it.toModel() }
+                        VideoHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, VideoSortByPreference.getValueAsync(context)).map {
+                            it.toModel()
+                        }
                     }
                     type<Video> {
                         dataProperty("tags") {
@@ -332,7 +347,9 @@ class SXGraphQL(val schema: Schema) {
                     resolver { offset: Int, limit: Int, query: String ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-                        AudioHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, AudioSortByPreference.getValueAsync(context)).map { it.toModel() }
+                        AudioHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, AudioSortByPreference.getValueAsync(context)).map {
+                            it.toModel()
+                        }
                     }
                     type<Audio> {
                         dataProperty("tags") {
@@ -447,7 +464,7 @@ class SXGraphQL(val schema: Schema) {
                         StorageStats(
                             FileSystemHelper.getInternalStorageStats().toModel(),
                             FileSystemHelper.getSDCardStorageStats(context).toModel(),
-                            FileSystemHelper.getUSBStorageStats().map { it.toModel() }
+                            FileSystemHelper.getUSBStorageStats().map { it.toModel() },
                         )
                     }
                 }
@@ -594,7 +611,7 @@ class SXGraphQL(val schema: Schema) {
                             sdcardPath = FileSystemHelper.getSDCardPath(context),
                             usbDiskPaths = FileSystemHelper.getUsbDiskPaths(),
                             internalStoragePath = FileSystemHelper.getInternalStoragePath(),
-                            downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
+                            downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath,
                         )
                     }
                 }
@@ -626,9 +643,10 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("createChatItem") {
                     resolver { content: String ->
-                        val item = ChatHelper.sendAsync(
-                            DChat.parseContent(content)
-                        )
+                        val item =
+                            ChatHelper.sendAsync(
+                                DChat.parseContent(content),
+                            )
                         sendEvent(HttpServerEvents.MessageCreatedEvent(arrayListOf(item)))
                         arrayListOf(item).map { it.toModel() }
                     }
@@ -701,10 +719,11 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("createTag") {
                     resolver { type: DataType, name: String ->
-                        val id = TagHelper.addOrUpdate("") {
-                            this.name = name
-                            this.type = type.value
-                        }
+                        val id =
+                            TagHelper.addOrUpdate("") {
+                                this.name = name
+                                this.type = type.value
+                            }
                         TagHelper.get(id)?.toModel()
                     }
                 }
@@ -866,10 +885,11 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("saveNote") {
                     resolver { id: ID, input: NoteInput ->
-                        val newId = NoteHelper.addOrUpdateAsync(id.value) {
-                            title = input.title
-                            content = input.content
-                        }
+                        val newId =
+                            NoteHelper.addOrUpdateAsync(id.value) {
+                                title = input.title
+                                content = input.content
+                            }
                         NoteHelper.getById(newId)?.toModel()
                     }
                 }
@@ -916,10 +936,11 @@ class SXGraphQL(val schema: Schema) {
                 mutation("createFeed") {
                     resolver { url: String ->
                         val syndFeed = withIO { FeedHelper.fetchAsync(url) }
-                        val id = FeedHelper.addAsync {
-                            this.url = url
-                            this.name = syndFeed.title
-                        }
+                        val id =
+                            FeedHelper.addAsync {
+                                this.url = url
+                                this.name = syndFeed.title
+                            }
                         FeedFetchWorker.oneTimeRequest(id)
                         sendEvent(ActionEvent(ActionSourceType.FEED, ActionType.CREATED, setOf(id)))
                         FeedHelper.getById(id)
@@ -986,9 +1007,11 @@ class SXGraphQL(val schema: Schema) {
                             val existingKeys = withIO { TagHelper.getKeysByTagId(tagId.value) }
                             val newItems = items.filter { !existingKeys.contains(it.key) }
                             if (newItems.isNotEmpty()) {
-                                TagHelper.addTagRelations(newItems.map {
-                                    it.toTagRelation(tagId.value, type)
-                                })
+                                TagHelper.addTagRelations(
+                                    newItems.map {
+                                        it.toTagRelation(tagId.value, type)
+                                    },
+                                )
                             }
                         }
                         true
@@ -997,9 +1020,11 @@ class SXGraphQL(val schema: Schema) {
                 mutation("updateTagRelations") {
                     resolver { type: DataType, item: TagRelationStub, addTagIds: List<ID>, removeTagIds: List<ID> ->
                         addTagIds.forEach { tagId ->
-                            TagHelper.addTagRelations(arrayOf(item).map {
-                                it.toTagRelation(tagId.value, type)
-                            })
+                            TagHelper.addTagRelations(
+                                arrayOf(item).map {
+                                    it.toTagRelation(tagId.value, type)
+                                },
+                            )
                         }
                         if (removeTagIds.isNotEmpty()) {
                             TagHelper.deleteTagRelationByKeysTagIds(setOf(item.key), removeTagIds.map { it.value }.toSet())
@@ -1008,7 +1033,7 @@ class SXGraphQL(val schema: Schema) {
                     }
                 }
                 mutation("removeFromTags") {
-                    resolver { type: DataType, tagIds: List<ID>, query: String->
+                    resolver { type: DataType, tagIds: List<ID>, query: String ->
                         val context = MainApp.instance
                         var ids = setOf<String>()
                         when (type) {
@@ -1142,7 +1167,7 @@ class SXGraphQL(val schema: Schema) {
         private suspend fun executeGraphqlQL(
             schema: Schema,
             query: String,
-            useBoxApi: Boolean
+            useBoxApi: Boolean,
         ): String {
             if (useBoxApi) {
                 return BoxProxyApi.executeAsync(query, HttpApiTimeout.MEDIUM_SECONDS)
@@ -1153,13 +1178,14 @@ class SXGraphQL(val schema: Schema) {
 
         override fun install(
             pipeline: Application,
-            configure: Configuration.() -> Unit
+            configure: Configuration.() -> Unit,
         ): SXGraphQL {
             val config = Configuration().apply(configure)
-            val schema = KGraphQL.schema {
-                configuration = config
-                config.schemaBlock?.invoke(this)
-            }
+            val schema =
+                KGraphQL.schema {
+                    configuration = config
+                    config.schemaBlock?.invoke(this)
+                }
 
             val routing: Routing.() -> Unit = {
                 route("/graphql") {
@@ -1197,7 +1223,7 @@ class SXGraphQL(val schema: Schema) {
                             if (token.isEmpty() || authStr?.get(1) != token) {
                                 call.respondText(
                                     """{"errors":[{"message":"Unauthorized"}]}""",
-                                    contentType = ContentType.Application.Json
+                                    contentType = ContentType.Application.Json,
                                 )
                                 return@post
                             }
@@ -1232,30 +1258,41 @@ class SXGraphQL(val schema: Schema) {
                         } else {
                             context.respond(HttpStatusCode.OK, e.serialize())
                         }
-                    } else throw e
+                    } else {
+                        throw e
+                    }
                 }
             }
             return SXGraphQL(schema)
         }
 
-        private fun GraphQLError.serialize(): String = buildJsonObject {
-            put("errors", buildJsonArray {
-                addJsonObject {
-                    put("message", message)
-                    put("locations", buildJsonArray {
-                        locations?.forEach {
-                            addJsonObject {
-                                put("line", it.line)
-                                put("column", it.column)
-                            }
+        private fun GraphQLError.serialize(): String =
+            buildJsonObject {
+                put(
+                    "errors",
+                    buildJsonArray {
+                        addJsonObject {
+                            put("message", message)
+                            put(
+                                "locations",
+                                buildJsonArray {
+                                    locations?.forEach {
+                                        addJsonObject {
+                                            put("line", it.line)
+                                            put("column", it.column)
+                                        }
+                                    }
+                                },
+                            )
+                            put(
+                                "path",
+                                buildJsonArray {
+                                    // TODO: Build this path. https://spec.graphql.org/June2018/#example-90475
+                                },
+                            )
                         }
-                    })
-                    put("path", buildJsonArray {
-                        // TODO: Build this path. https://spec.graphql.org/June2018/#example-90475
-                    })
-                }
-            })
-        }.toString()
+                    },
+                )
+            }.toString()
     }
-
 }

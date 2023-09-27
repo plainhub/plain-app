@@ -21,8 +21,10 @@ import kotlinx.coroutines.launch
 object FilesTopMenuHelper {
     fun onMenuItemClick(
         lifecycleScope: LifecycleCoroutineScope,
-        context: Context, viewModel: FilesViewModel,
-        binding: DialogFilesBinding, menuItem: MenuItem
+        context: Context,
+        viewModel: FilesViewModel,
+        binding: DialogFilesBinding,
+        menuItem: MenuItem,
     ) {
         when (menuItem.itemId) {
             R.id.create_folder -> {
@@ -98,7 +100,7 @@ object FilesTopMenuHelper {
         context: Context,
         lifecycleScope: LifecycleCoroutineScope,
         binding: DialogFilesBinding,
-        sortBy: FileSortBy
+        sortBy: FileSortBy,
     ) {
         lifecycleScope.launch {
             val menu = binding.toolbar.menu

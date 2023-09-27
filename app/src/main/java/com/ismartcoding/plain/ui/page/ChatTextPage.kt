@@ -29,33 +29,36 @@ fun ChatTextPage(
     sharedViewModel: SharedViewModel,
 ) {
     val context = LocalContext.current
-    val text = sharedViewModel.chatContent.value.linkify(
-        SpanStyle(
-            color = MaterialTheme.colorScheme.primary,
-            textDecoration = TextDecoration.Underline,
+    val text =
+        sharedViewModel.chatContent.value.linkify(
+            SpanStyle(
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = TextDecoration.Underline,
+            ),
         )
-    )
     PScaffold(
         navController,
         content = {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState()),
             ) {
                 SelectionContainer {
                     ClickableText(
                         text = text,
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 24.sp, lineHeight = 36.sp
-                        ),
+                        style =
+                            MaterialTheme.typography.bodyLarge.copy(
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontSize = 24.sp,
+                                lineHeight = 36.sp,
+                            ),
                         onClick = { position -> text.urlAt(context, position) },
                     )
                 }
             }
-        }
+        },
     )
 }
-

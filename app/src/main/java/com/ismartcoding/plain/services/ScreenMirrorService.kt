@@ -63,26 +63,29 @@ class ScreenMirrorService : LifecycleService() {
             heightLandscape = metrics.widthPixels
         }
         mScreenDensity = metrics.densityDpi
-        orientationEventListener = object : OrientationEventListener(this) {
-            override fun onOrientationChanged(orientation: Int) {
-                val r = when (orientation) {
-                    in 45..134 -> Surface.ROTATION_270
-                    in 135..224 -> Surface.ROTATION_180
-                    in 225..314 -> Surface.ROTATION_90
-                    else -> Surface.ROTATION_0
-                }
-                val newIsPortrait = r == Surface.ROTATION_0 || r == Surface.ROTATION_180
-                if (isPortrait != newIsPortrait) {
-                    isPortrait = newIsPortrait
-                    resize()
+        orientationEventListener =
+            object : OrientationEventListener(this) {
+                override fun onOrientationChanged(orientation: Int) {
+                    val r =
+                        when (orientation) {
+                            in 45..134 -> Surface.ROTATION_270
+                            in 135..224 -> Surface.ROTATION_180
+                            in 225..314 -> Surface.ROTATION_90
+                            else -> Surface.ROTATION_0
+                        }
+                    val newIsPortrait = r == Surface.ROTATION_0 || r == Surface.ROTATION_180
+                    if (isPortrait != newIsPortrait) {
+                        isPortrait = newIsPortrait
+                        resize()
+                    }
                 }
             }
-        }
-        val notification = NotificationHelper.createServiceNotification(
-            this,
-            "${BuildConfig.APPLICATION_ID}.action.stop_screen_mirror",
-            getString(R.string.screen_mirror_service_is_running)
-        )
+        val notification =
+            NotificationHelper.createServiceNotification(
+                this,
+                "${BuildConfig.APPLICATION_ID}.action.stop_screen_mirror",
+                getString(R.string.screen_mirror_service_is_running),
+            )
         if (isQPlus()) {
             startForeground(3, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
         } else {
@@ -91,7 +94,11 @@ class ScreenMirrorService : LifecycleService() {
     }
 
     @SuppressLint("WrongConstant")
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         super.onStartCommand(intent, flags, startId)
         if (intent != null) {
             mResultCode = intent.getIntExtra("code", -1)
@@ -115,14 +122,19 @@ class ScreenMirrorService : LifecycleService() {
         orientationEventListener.disable()
     }
 
-    private fun bitmapToBase64Image(bitmap: Bitmap, width: Int, height: Int): String {
+    private fun bitmapToBase64Image(
+        bitmap: Bitmap,
+        width: Int,
+        height: Int,
+    ): String {
         val maxSize = 100 * 1024 // 100KB
         val maxWidth = 500
-        val needCompress = if (isPortrait) {
-            width > maxWidth
-        } else {
-            height > maxWidth
-        }
+        val needCompress =
+            if (isPortrait) {
+                width > maxWidth
+            } else {
+                height > maxWidth
+            }
 
         var newBitmap = bitmap
         if (needCompress) {
@@ -148,16 +160,18 @@ class ScreenMirrorService : LifecycleService() {
     }
 
     private fun resize() {
-        val width = if (isPortrait) {
-            widthPortrait
-        } else {
-            widthLandscape
-        }
-        val height = if (isPortrait) {
-            heightPortrait
-        } else {
-            heightLandscape
-        }
+        val width =
+            if (isPortrait) {
+                widthPortrait
+            } else {
+                widthLandscape
+            }
+        val height =
+            if (isPortrait) {
+                heightPortrait
+            } else {
+                heightLandscape
+            }
 
         mVirtualDisplay?.surface = if (isPortrait) mImageReaderPortrait!!.surface else mImageReaderLanscape!!.surface
         mVirtualDisplay?.resize(width, height, mScreenDensity)
@@ -165,28 +179,36 @@ class ScreenMirrorService : LifecycleService() {
 
     private fun doMirror() {
         mMediaProjection = mediaProjectionManager.getMediaProjection(mResultCode, mResultData!!)
-        val width = if (isPortrait) {
-            widthPortrait
-        } else {
-            widthLandscape
-        }
-        val height = if (isPortrait) {
-            heightPortrait
-        } else {
-            heightLandscape
-        }
+        val width =
+            if (isPortrait) {
+                widthPortrait
+            } else {
+                widthLandscape
+            }
+        val height =
+            if (isPortrait) {
+                heightPortrait
+            } else {
+                heightLandscape
+            }
         mImageReaderPortrait = ImageReader.newInstance(widthPortrait, heightPortrait, PixelFormat.RGBA_8888, 2)
         mImageReaderLanscape = ImageReader.newInstance(widthLandscape, heightLandscape, PixelFormat.RGBA_8888, 2)
-        mMediaProjection?.registerCallback(object : MediaProjection.Callback() {
-            override fun onStop() {
-            }
-        }, null)
-        mVirtualDisplay = mMediaProjection?.createVirtualDisplay(
-            "ScreenMirroringService", width, height, mScreenDensity,
-            DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY or DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC,
-           if (isPortrait) mImageReaderPortrait!!.surface else mImageReaderLanscape!!.surface, object : VirtualDisplay.Callback() {
-            }, null
+        mMediaProjection?.registerCallback(
+            object : MediaProjection.Callback() {
+                override fun onStop() {
+                }
+            },
+            null,
         )
+        mVirtualDisplay =
+            mMediaProjection?.createVirtualDisplay(
+                "ScreenMirroringService", width, height, mScreenDensity,
+                DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY or DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC,
+                if (isPortrait) mImageReaderPortrait!!.surface else mImageReaderLanscape!!.surface,
+                object : VirtualDisplay.Callback() {
+                },
+                null,
+            )
 
         mImageReaderPortrait?.setOnImageAvailableListener({
             try {
@@ -201,7 +223,9 @@ class ScreenMirrorService : LifecycleService() {
                     mBitmap = Bitmap.createBitmap(newWidth, heightPortrait, Bitmap.Config.ARGB_8888)
                     mBitmap?.copyPixelsFromBuffer(buffer)
                     if (mBitmap != null && instance != null && isPortrait) {
-                        sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, bitmapToBase64Image(mBitmap!!, newWidth, heightPortrait), false))
+                        sendEvent(
+                            WebSocketEvent(EventType.SCREEN_MIRRORING, bitmapToBase64Image(mBitmap!!, newWidth, heightPortrait), false),
+                        )
                     }
                     image.close()
                 }
@@ -223,7 +247,9 @@ class ScreenMirrorService : LifecycleService() {
                     mBitmap = Bitmap.createBitmap(newWidth, heightLandscape, Bitmap.Config.ARGB_8888)
                     mBitmap?.copyPixelsFromBuffer(buffer)
                     if (mBitmap != null && instance != null && !isPortrait) {
-                        sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, bitmapToBase64Image(mBitmap!!, newWidth, heightLandscape), false))
+                        sendEvent(
+                            WebSocketEvent(EventType.SCREEN_MIRRORING, bitmapToBase64Image(mBitmap!!, newWidth, heightLandscape), false),
+                        )
                     }
                     image.close()
                 }

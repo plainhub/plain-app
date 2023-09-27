@@ -21,20 +21,20 @@ import com.ismartcoding.plain.ui.note.NotesDialog
 fun HomeItemWork(itemWidth: Dp) {
     Column {
         Subtitle(
-            text = stringResource(R.string.home_item_title_work)
+            text = stringResource(R.string.home_item_title_work),
         )
         HomeItemFlow {
             GridItem(
                 icon = Icons.Outlined.Notes,
                 stringResource(id = R.string.notes),
-                modifier = Modifier.width(itemWidth)
+                modifier = Modifier.width(itemWidth),
             ) {
                 NotesDialog().show()
             }
             GridItem(
                 icon = Icons.Outlined.RssFeed,
                 stringResource(id = R.string.feeds),
-                modifier = Modifier.width(itemWidth)
+                modifier = Modifier.width(itemWidth),
             ) {
                 FeedEntriesDialog().show()
             }

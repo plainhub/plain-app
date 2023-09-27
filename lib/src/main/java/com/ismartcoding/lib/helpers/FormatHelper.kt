@@ -1,6 +1,5 @@
 package com.ismartcoding.lib.helpers
 
-import android.content.Context
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -8,7 +7,10 @@ import java.text.StringCharacterIterator
 import java.util.*
 
 object FormatHelper {
-    fun formatMoney(value: Double, currencyCode: String): String {
+    fun formatMoney(
+        value: Double,
+        currencyCode: String,
+    ): String {
         val format = NumberFormat.getCurrencyInstance(Locale.getDefault())
         if (format is DecimalFormat) {
             val dfs = DecimalFormat().decimalFormatSymbols
@@ -23,7 +25,11 @@ object FormatHelper {
         return format.format(value)
     }
 
-    fun formatDouble(value: Double, digits: Int = 2, isGroupingUsed: Boolean = true): String {
+    fun formatDouble(
+        value: Double,
+        digits: Int = 2,
+        isGroupingUsed: Boolean = true,
+    ): String {
         val format = DecimalFormat()
         format.minimumFractionDigits = digits
         format.maximumFractionDigits = digits
@@ -32,7 +38,11 @@ object FormatHelper {
         return format.format(value)
     }
 
-    fun formatFloat(value: Float, digits: Int = 2, isGroupingUsed: Boolean = true): String {
+    fun formatFloat(
+        value: Float,
+        digits: Int = 2,
+        isGroupingUsed: Boolean = true,
+    ): String {
         val format = DecimalFormat()
         format.minimumFractionDigits = digits
         format.maximumFractionDigits = digits
@@ -41,7 +51,10 @@ object FormatHelper {
         return format.format(value)
     }
 
-    fun formatDuration(totalSeconds: Long, alwaysShowHour: Boolean = false): String {
+    fun formatDuration(
+        totalSeconds: Long,
+        alwaysShowHour: Boolean = false,
+    ): String {
         val seconds = totalSeconds % 60
         val minutes = totalSeconds / 60 % 60
         val hours = totalSeconds / 3600

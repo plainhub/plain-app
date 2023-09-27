@@ -13,21 +13,29 @@ import java.io.StringReader
 import java.lang.reflect.Type
 
 class GsonXml internal constructor(val gson: Gson, val options: XmlReader.Options) {
-
     @Throws(JsonSyntaxException::class)
-    fun <T> fromXml(json: String, classOfT: Class<T>): T {
+    fun <T> fromXml(
+        json: String,
+        classOfT: Class<T>,
+    ): T {
         val `object` = fromXml<Any>(json, classOfT as Type)
         return Primitives.wrap(classOfT).cast(`object`)
     }
 
     @Throws(JsonSyntaxException::class)
-    fun <T> fromXml(json: String, typeOfT: Type): T {
+    fun <T> fromXml(
+        json: String,
+        typeOfT: Type,
+    ): T {
         val reader = StringReader(json)
         return fromXml<Any>(reader, typeOfT) as T
     }
 
     @Throws(JsonIOException::class, JsonSyntaxException::class)
-    fun <T> fromXml(json: Reader, typeOfT: Type): T {
+    fun <T> fromXml(
+        json: Reader,
+        typeOfT: Type,
+    ): T {
         val jsonReader = XmlReader(json, options) // change reader
         val `object` = fromXml<Any>(jsonReader, typeOfT)
         assertFullConsumption(`object`, jsonReader)
@@ -45,9 +53,12 @@ class GsonXml internal constructor(val gson: Gson, val options: XmlReader.Option
      * @param typeOfT type to deserialize
      * @throws JsonIOException if there was a problem writing to the Reader
      * @throws JsonSyntaxException if json is not a valid representation for an object of type
-    </T> */
+     </T> */
     @Throws(JsonIOException::class, JsonSyntaxException::class)
-    fun <T> fromXml(reader: XmlReader, typeOfT: Type): T {
+    fun <T> fromXml(
+        reader: XmlReader,
+        typeOfT: Type,
+    ): T {
         return gson.fromJson(reader, typeOfT)
     }
 
@@ -56,7 +67,10 @@ class GsonXml internal constructor(val gson: Gson, val options: XmlReader.Option
     }
 
     companion object {
-        private fun assertFullConsumption(obj: Any?, reader: JsonReader) {
+        private fun assertFullConsumption(
+            obj: Any?,
+            reader: JsonReader,
+        ) {
             try {
                 if (obj != null && reader.peek() != JsonToken.END_DOCUMENT) {
                     throw JsonIOException("JSON document was not fully consumed.")

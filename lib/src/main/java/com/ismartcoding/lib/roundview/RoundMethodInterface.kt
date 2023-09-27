@@ -8,7 +8,12 @@ fun RoundMethodInterface.setRadius(radiusDp: Float) {
     helper.setRadius(radiusDp)
 }
 
-fun RoundMethodInterface.setRadius(radiusTopLeftDp: Float, radiusTopRightDp: Float, radiusBottomLeftDp: Float, radiusBottomRightDp: Float) {
+fun RoundMethodInterface.setRadius(
+    radiusTopLeftDp: Float,
+    radiusTopRightDp: Float,
+    radiusBottomLeftDp: Float,
+    radiusBottomRightDp: Float,
+) {
     helper.setRadius(radiusTopLeftDp, radiusTopRightDp, radiusBottomLeftDp, radiusBottomRightDp)
 }
 
@@ -52,6 +57,9 @@ fun RoundMethodInterface.setStrokeColor(color: Int) {
     helper.setStrokeColor(color)
 }
 
-fun RoundMethodInterface.setStrokeWidthColor(widthDp: Float, color: Int) {
+fun RoundMethodInterface.setStrokeWidthColor(
+    widthDp: Float,
+    color: Int,
+) {
     helper.setStrokeWidthColor(widthDp, color)
 }

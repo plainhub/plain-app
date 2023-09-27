@@ -38,7 +38,7 @@ object AudioFocusHelper {
             }
             .setAudioAttributes(
                 AudioAttributesCompat.Builder()
-                    .setContentType(AudioAttributesCompat.CONTENT_TYPE_MUSIC).build()
+                    .setContentType(AudioAttributesCompat.CONTENT_TYPE_MUSIC).build(),
             ).build()
     }
 

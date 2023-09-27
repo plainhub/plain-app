@@ -12,7 +12,7 @@ class FontTagHandler() : SimpleTagHandler() {
     override fun getSpans(
         configuration: MarkwonConfiguration,
         renderProps: RenderProps,
-        tag: HtmlTag
+        tag: HtmlTag,
     ): Any? {
         return try {
             val color = tag.attributes()["color"]

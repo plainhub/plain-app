@@ -6,9 +6,9 @@ import com.ismartcoding.lib.logcat.LogCat.ERROR
 import com.ismartcoding.lib.logcat.LogCat.INFO
 import com.ismartcoding.lib.logcat.LogCat.VERBOSE
 import com.ismartcoding.lib.logcat.LogCat.WARN
-import org.json.JSONObject
 import org.json.JSONArray
 import org.json.JSONException
+import org.json.JSONObject
 import java.io.StringReader
 import java.io.StringWriter
 import java.util.ArrayList
@@ -25,6 +25,7 @@ internal class LoggerPrinter : Printer {
      */
     private val localTag = ThreadLocal<String>()
     private val logAdapters: MutableList<LogAdapter> = ArrayList()
+
     override fun t(tag: String?): Printer {
         if (tag != null) {
             localTag.set(tag)
@@ -32,7 +33,10 @@ internal class LoggerPrinter : Printer {
         return this
     }
 
-    override fun d(message: String, vararg args: Any?) {
+    override fun d(
+        message: String,
+        vararg args: Any?,
+    ) {
         log(DEBUG, null, message, args)
     }
 
@@ -40,27 +44,46 @@ internal class LoggerPrinter : Printer {
         log(DEBUG, null, Utils.toString(`object`))
     }
 
-    override fun e(message: String, vararg args: Any?) {
+    override fun e(
+        message: String,
+        vararg args: Any?,
+    ) {
         e(null, message, *args)
     }
 
-    override fun e(throwable: Throwable?, message: String, vararg args: Any?) {
+    override fun e(
+        throwable: Throwable?,
+        message: String,
+        vararg args: Any?,
+    ) {
         log(ERROR, throwable, message, args)
     }
 
-    override fun w(message: String, vararg args: Any?) {
+    override fun w(
+        message: String,
+        vararg args: Any?,
+    ) {
         log(WARN, null, message, args)
     }
 
-    override fun i(message: String, vararg args: Any?) {
+    override fun i(
+        message: String,
+        vararg args: Any?,
+    ) {
         log(INFO, null, message, args)
     }
 
-    override fun v(message: String, vararg args: Any?) {
+    override fun v(
+        message: String,
+        vararg args: Any?,
+    ) {
         log(VERBOSE, null, message, args)
     }
 
-    override fun wtf(message: String, vararg args: Any?) {
+    override fun wtf(
+        message: String,
+        vararg args: Any?,
+    ) {
         log(ASSERT, null, message, args)
     }
 
@@ -113,7 +136,7 @@ internal class LoggerPrinter : Printer {
         priority: Int,
         tag: String?,
         message: String?,
-        throwable: Throwable?
+        throwable: Throwable?,
     ) {
         var newMessage = message
         if (throwable != null && newMessage != null) {
@@ -148,7 +171,7 @@ internal class LoggerPrinter : Printer {
         priority: Int,
         throwable: Throwable?,
         msg: String,
-        vararg args: Any?
+        vararg args: Any?,
     ) {
         log(priority, tag, createMessage(msg, args), throwable)
     }
@@ -166,7 +189,10 @@ internal class LoggerPrinter : Printer {
             return null
         }
 
-    private fun createMessage(message: String, vararg args: Any?): String {
+    private fun createMessage(
+        message: String,
+        vararg args: Any?,
+    ): String {
         return if (args.size <= 1) message else String.format(message, *args)
     }
 

@@ -3,7 +3,10 @@ package com.ismartcoding.plain.helpers
 object TempHelper {
     private val dict = mutableMapOf<String, String>()
 
-    fun setValue(key: String, value: String) {
+    fun setValue(
+        key: String,
+        value: String,
+    ) {
         return dict.set(key, value)
     }
 

@@ -8,7 +8,10 @@ object EditTextPadding {
         return context.dp2px(8)
     }
 
-    fun getPaddingWithLineNumbers(context: Context, fontSize: Int): Int {
+    fun getPaddingWithLineNumbers(
+        context: Context,
+        fontSize: Int,
+    ): Int {
         return context.dp2px(fontSize * 2)
     }
 

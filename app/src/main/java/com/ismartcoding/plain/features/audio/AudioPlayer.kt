@@ -4,7 +4,6 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
-import android.net.Uri
 import androidx.media.AudioManagerCompat
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.pathToUri
@@ -31,7 +30,7 @@ class AudioPlayer : IMediaPlayer {
     private val audioManager by lazy { MainApp.instance.applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
     override var isPausedByTransientLossOfFocus = false
     private val audioFocusRequest = AudioFocusHelper.createRequest(this)
-    private var playerProgress: Int = 0    // player progress
+    private var playerProgress: Int = 0 // player progress
 
     var pendingQuit: Boolean = false
 
@@ -60,7 +59,7 @@ class AudioPlayer : IMediaPlayer {
             AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_MEDIA)
                 .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                .build()
+                .build(),
         )
         mediaPlayer?.setDataSource(MainApp.instance, path.pathToUri())
         mediaPlayer?.prepareAsync()
@@ -195,7 +194,7 @@ class AudioPlayer : IMediaPlayer {
     private fun requestFocus(): Boolean {
         return AudioManagerCompat.requestAudioFocus(
             audioManager,
-            audioFocusRequest
+            audioFocusRequest,
         ) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
     }
 

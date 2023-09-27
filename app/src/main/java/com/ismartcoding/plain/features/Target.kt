@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.features
 
+import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.fragment.NetworkFragment
-import com.ismartcoding.lib.helpers.NetworkHelper
 
 enum class TargetType(val value: String) {
     IP("ip"),
@@ -12,7 +12,8 @@ enum class TargetType(val value: String) {
     REMOTE_PORT("remote_port"),
     INTERNET("internet"),
     INTERFACE("iface"),
-    LIST("list");
+    LIST("list"),
+    ;
 
     fun getExamples(): String {
         return when {
@@ -86,7 +87,10 @@ enum class TargetType(val value: String) {
     }
 
     companion object {
-        fun parse(value: String, default: TargetType = DNS): TargetType {
+        fun parse(
+            value: String,
+            default: TargetType = DNS,
+        ): TargetType {
             return values().find { it.value == value } ?: default
         }
     }
@@ -98,7 +102,7 @@ data class Target(var type: TargetType = TargetType.DNS, var value: String = "")
             return type.value
         }
 
-        return "${type.value}:${value}"
+        return "${type.value}:$value"
     }
 
     fun isEmpty(): Boolean {

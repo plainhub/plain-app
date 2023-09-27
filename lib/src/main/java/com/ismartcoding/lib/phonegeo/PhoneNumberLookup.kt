@@ -40,13 +40,14 @@ class PhoneNumberLookup private constructor() {
             throw IllegalStateException("Something happens when loading phone.dat")
         }
         if (algorithmCache[algoType]?.get() == null) {
-            algorithmCache[algoType] = WeakReference(
-                when (algoType) {
-                    LookupAlgorithm.IMPL.BINARY_SEARCH -> BinarySearchAlgorithm(srcPhoneBytes!!)
-                    LookupAlgorithm.IMPL.BINARY_SEARCH_PROSPECT -> ProspectBinarySearchAlgorithm(srcPhoneBytes!!)
-                    else -> SequenceSearchAlgorithm(srcPhoneBytes!!)
-                }
-            )
+            algorithmCache[algoType] =
+                WeakReference(
+                    when (algoType) {
+                        LookupAlgorithm.IMPL.BINARY_SEARCH -> BinarySearchAlgorithm(srcPhoneBytes!!)
+                        LookupAlgorithm.IMPL.BINARY_SEARCH_PROSPECT -> ProspectBinarySearchAlgorithm(srcPhoneBytes!!)
+                        else -> SequenceSearchAlgorithm(srcPhoneBytes!!)
+                    },
+                )
         }
         return algorithmCache[algoType]?.get()?.lookup(phoneNumber)
     }
@@ -55,6 +56,7 @@ class PhoneNumberLookup private constructor() {
         private const val PHONE_GEO_DAT = "phone.dat"
 
         private var INSTANCE: PhoneNumberLookup? = null
+
         fun instance(): PhoneNumberLookup {
             if (INSTANCE == null) {
                 synchronized(PhoneNumberLookup::class) {

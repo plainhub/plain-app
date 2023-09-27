@@ -7,23 +7,26 @@ import com.ismartcoding.lib.brv.utils.linear
 import com.ismartcoding.lib.brv.utils.models
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.db.DBox
-import com.ismartcoding.plain.features.CurrentBoxChangedEvent
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.DialogSelectBoxBinding
 import com.ismartcoding.plain.databinding.ViewListItemBinding
-import com.ismartcoding.plain.ui.BaseBottomSheetDialog
+import com.ismartcoding.plain.db.DBox
 import com.ismartcoding.plain.extensions.*
+import com.ismartcoding.plain.features.CurrentBoxChangedEvent
 import com.ismartcoding.plain.features.box.BoxHelper
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.*
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.launch
 
 class SelectBoxDialog() : BaseBottomSheetDialog<DialogSelectBoxBinding>() {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
             binding.rv.linear().setup {
@@ -59,9 +62,10 @@ class SelectBoxDialog() : BaseBottomSheetDialog<DialogSelectBoxBinding>() {
                         lifecycleScope.launch {
                             val isChanged = TempData.selectedBoxId != m.id
                             TempData.selectedBoxId = m.id
-                            UIDataCache.current().box = withIO {
-                                BoxHelper.getSelectedBoxAsync()
-                            }
+                            UIDataCache.current().box =
+                                withIO {
+                                    BoxHelper.getSelectedBoxAsync()
+                                }
                             if (isChanged) {
                                 sendEvent(CurrentBoxChangedEvent())
                             }
@@ -83,9 +87,10 @@ class SelectBoxDialog() : BaseBottomSheetDialog<DialogSelectBoxBinding>() {
     }
 
     private suspend fun updateList() {
-        val items = withIO {
-            BoxHelper.getItemsAsync()
-        }
+        val items =
+            withIO {
+                BoxHelper.getItemsAsync()
+            }
         binding.rv.models = items
     }
 }

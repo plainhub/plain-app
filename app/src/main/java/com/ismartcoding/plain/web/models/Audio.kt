@@ -2,7 +2,6 @@ package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.features.audio.DAudio
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
-import com.ismartcoding.plain.helpers.FileHelper
 
 data class Audio(
     val id: ID,
@@ -11,7 +10,7 @@ data class Audio(
     val path: String,
     val duration: Long,
     val size: Long,
-    val bucketId: String
+    val bucketId: String,
 )
 
 data class PlaylistAudio(
@@ -28,4 +27,3 @@ fun DAudio.toModel(): Audio {
 fun DPlaylistAudio.toModel(): PlaylistAudio {
     return PlaylistAudio(title, artist, path, duration)
 }
-

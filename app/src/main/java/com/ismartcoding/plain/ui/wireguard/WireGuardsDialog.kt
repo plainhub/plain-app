@@ -30,7 +30,10 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.launch
 
 class WireGuardsDialog : BaseDialog<DialogWireguardsBinding>() {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.topAppBar.apply {
             toolbar.setTitle(R.string.wireguard)
@@ -105,4 +108,3 @@ class WireGuardsDialog : BaseDialog<DialogWireguardsBinding>() {
         sendEvent(FetchWireGuardsEvent(TempData.selectedBoxId))
     }
 }
-

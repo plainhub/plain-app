@@ -18,7 +18,11 @@ import java.security.spec.ECGenParameterSpec
 import java.util.*
 
 object JksHelper {
-    fun genJksFile(alias: String, password: String, commonName: String): KeyStore {
+    fun genJksFile(
+        alias: String,
+        password: String,
+        commonName: String,
+    ): KeyStore {
         val keyPairGenerator = KeyPairGenerator.getInstance("EC", "BC")
         keyPairGenerator.initialize(ECGenParameterSpec("P-256"))
 
@@ -34,23 +38,29 @@ object JksHelper {
         return keyStore
     }
 
-    private fun createTrustHolder(keyPair: KeyPair, sigAlg: String, commonName: String): X509CertificateHolder {
+    private fun createTrustHolder(
+        keyPair: KeyPair,
+        sigAlg: String,
+        commonName: String,
+    ): X509CertificateHolder {
         val x500NameBuilder = X500NameBuilder(BCStyle.INSTANCE)
-        val x500Name = x500NameBuilder
-            .addRDN(BCStyle.CN, commonName)
-            .addRDN(BCStyle.O, commonName)
-            .build()
-        val certificateBuilder = X509v3CertificateBuilder(
-            x500Name,
-            BigInteger.valueOf(System.currentTimeMillis()),
-            calculateDate(0),
-            calculateDate(24 * 365 * 20),
-            Locale.ENGLISH,
-            x500Name,
-            SubjectPublicKeyInfo.getInstance(
-                keyPair.public.encoded
+        val x500Name =
+            x500NameBuilder
+                .addRDN(BCStyle.CN, commonName)
+                .addRDN(BCStyle.O, commonName)
+                .build()
+        val certificateBuilder =
+            X509v3CertificateBuilder(
+                x500Name,
+                BigInteger.valueOf(System.currentTimeMillis()),
+                calculateDate(0),
+                calculateDate(24 * 365 * 20),
+                Locale.ENGLISH,
+                x500Name,
+                SubjectPublicKeyInfo.getInstance(
+                    keyPair.public.encoded,
+                ),
             )
-        )
         val contentSigner = JcaContentSignerBuilder(sigAlg).setProvider("BC").build(keyPair.private)
         return certificateBuilder.build(contentSigner)
     }

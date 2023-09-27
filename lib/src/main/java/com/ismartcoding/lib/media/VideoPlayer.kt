@@ -40,7 +40,10 @@ class VideoPlayer : IVideoPlayer {
     override var isPausedByTransientLossOfFocus = false
     private val audioFocusRequest = AudioFocusHelper.createRequest(this)
 
-    override fun setMediaSource(context: Context, videoModel: VideoModel) {
+    override fun setMediaSource(
+        context: Context,
+        videoModel: VideoModel,
+    ) {
         this.videoModel = videoModel
         if (mAudioManager == null) {
             mAudioManager =
@@ -48,9 +51,10 @@ class VideoPlayer : IVideoPlayer {
         }
         mMediaPlayer.let { player ->
             if (player == null) {
-                mMediaPlayer = createPlayer(context).also {
-                    setMediaSource(context, it, videoModel)
-                }
+                mMediaPlayer =
+                    createPlayer(context).also {
+                        setMediaSource(context, it, videoModel)
+                    }
             } else {
                 setMediaSource(context, player, videoModel)
             }
@@ -63,7 +67,11 @@ class VideoPlayer : IVideoPlayer {
         }
     }
 
-    private fun setMediaSource(context: Context, player: ExoPlayer, videoModel: VideoModel) {
+    private fun setMediaSource(
+        context: Context,
+        player: ExoPlayer,
+        videoModel: VideoModel,
+    ) {
         mSurface?.let {
             player.setVideoSurface(it)
         }
@@ -82,9 +90,9 @@ class VideoPlayer : IVideoPlayer {
         mediaItemBuilder.setMimeType(
             Util.getAdaptiveMimeTypeForContentType(
                 Util.inferContentType(
-                    videoModel.uri
-                )
-            )
+                    videoModel.uri,
+                ),
+            ),
         )
         val factory = ProgressiveMediaSource.Factory(DefaultDataSource.Factory(context))
         val source = factory.createMediaSource(mediaItemBuilder.build())
@@ -96,7 +104,7 @@ class VideoPlayer : IVideoPlayer {
         mAudioManager?.let {
             AudioManagerCompat.requestAudioFocus(
                 it,
-                audioFocusRequest
+                audioFocusRequest,
             )
         }
         mMediaPlayer?.let {
@@ -162,7 +170,10 @@ class VideoPlayer : IVideoPlayer {
         seekTo(pos, SeekParameters.PREVIOUS_SYNC)
     }
 
-    fun seekTo(pos: Long, mode: SeekParameters) {
+    fun seekTo(
+        pos: Long,
+        mode: SeekParameters,
+    ) {
         if (isInPlaybackState()) {
             mMediaPlayer?.setSeekParameters(mode)
             mMediaPlayer?.seekTo(pos)
@@ -220,73 +231,76 @@ class VideoPlayer : IVideoPlayer {
         mMediaPlayer?.volume = volume
     }
 
-    private val mPlayerEventListener = object : Player.Listener {
-        override fun onPlaybackStateChanged(playbackState: Int) {
-            when (playbackState) {
-                Player.STATE_READY -> {
-                    buffering = false
-                    notifyOnBufferingUpdate()
-                    if (!isInPlaybackState()) {
-                        currentState = STATE_PREPARED
-                        notifyOnPrepared()
-                        // 获取视频跳转位置, 这个跳转位置需要设置完视频地址后马上调用 seekTo() 方法
-                        val seekToPosition = videoModel?.seekPosition ?: 0
-                        if (seekToPosition != 0L && seekToPosition < (mMediaPlayer?.duration
-                                ?: 0)
-                        ) {
-                            seekTo(seekToPosition)
+    private val mPlayerEventListener =
+        object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                when (playbackState) {
+                    Player.STATE_READY -> {
+                        buffering = false
+                        notifyOnBufferingUpdate()
+                        if (!isInPlaybackState()) {
+                            currentState = STATE_PREPARED
+                            notifyOnPrepared()
+                            // 获取视频跳转位置, 这个跳转位置需要设置完视频地址后马上调用 seekTo() 方法
+                            val seekToPosition = videoModel?.seekPosition ?: 0
+                            if (seekToPosition != 0L && seekToPosition < (
+                                    mMediaPlayer?.duration
+                                        ?: 0
+                                )
+                            ) {
+                                seekTo(seekToPosition)
+                            }
+                        }
+                        if (targetState == STATE_PLAYING) {
+                            play()
                         }
                     }
-                    if (targetState == STATE_PLAYING) {
-                        play()
+
+                    Player.STATE_ENDED -> {
+                        buffering = false
+                        notifyOnBufferingUpdate()
+                        currentState = STATE_PLAYBACK_COMPLETED
+                        notifyOnCompletion()
+                    }
+                    Player.STATE_BUFFERING -> {
+                        buffering = true
+                        notifyOnBufferingUpdate()
+                    }
+                    Player.STATE_IDLE -> {
+                        currentState = STATE_IDLE
                     }
                 }
+            }
 
-                Player.STATE_ENDED -> {
-                    buffering = false
+            override fun onPlayerError(error: PlaybackException) {
+                LogCat.e(error.message ?: "")
+                currentState = STATE_ERROR
+                notifyOnError(error.errorCode, 0)
+            }
+
+            override fun onPositionDiscontinuity(
+                oldPosition: Player.PositionInfo,
+                newPosition: Player.PositionInfo,
+                reason: Int,
+            ) {
+                notifyOnSeekComplete()
+            }
+
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                if (isPlaying) {
+                    currentState = STATE_PLAYING
+                } else {
+                    if (currentState == STATE_PLAYING) {
+                        currentState = STATE_PAUSED
+                    }
                     notifyOnBufferingUpdate()
-                    currentState = STATE_PLAYBACK_COMPLETED
-                    notifyOnCompletion()
-                }
-                Player.STATE_BUFFERING -> {
-                    buffering = true
-                    notifyOnBufferingUpdate()
-                }
-                Player.STATE_IDLE -> {
-                    currentState = STATE_IDLE
                 }
             }
-        }
 
-        override fun onPlayerError(error: PlaybackException) {
-            LogCat.e(error.message ?: "")
-            currentState = STATE_ERROR
-            notifyOnError(error.errorCode, 0)
-        }
-
-        override fun onPositionDiscontinuity(
-            oldPosition: Player.PositionInfo,
-            newPosition: Player.PositionInfo,
-            reason: Int
-        ) {
-            notifyOnSeekComplete()
-        }
-
-        override fun onIsPlayingChanged(isPlaying: Boolean) {
-            if (isPlaying) {
-                currentState = STATE_PLAYING
-            } else {
-                if (currentState == STATE_PLAYING) {
-                    currentState = STATE_PAUSED
-                }
-                notifyOnBufferingUpdate()
+            override fun onVideoSizeChanged(videoSize: VideoSize) {
+                notifyOnVideoSizeChanged(videoSize.width, videoSize.height)
             }
         }
-
-        override fun onVideoSizeChanged(videoSize: VideoSize) {
-            notifyOnVideoSizeChanged(videoSize.width, videoSize.height)
-        }
-    }
 
     /** 所有有可能的播放状态 */
     companion object {
@@ -374,15 +388,24 @@ class VideoPlayer : IVideoPlayer {
         mPlayerCallback?.onSeekComplete(this)
     }
 
-    private fun notifyOnVideoSizeChanged(width: Int, height: Int) {
+    private fun notifyOnVideoSizeChanged(
+        width: Int,
+        height: Int,
+    ) {
         mPlayerCallback?.onVideoSizeChanged(this, width, height)
     }
 
-    private fun notifyOnError(what: Int, extra: Int): Boolean {
+    private fun notifyOnError(
+        what: Int,
+        extra: Int,
+    ): Boolean {
         return mPlayerCallback?.onError(this, what, extra) ?: false
     }
 
-    private fun notifyOnInfo(what: Int, extra: Int): Boolean {
+    private fun notifyOnInfo(
+        what: Int,
+        extra: Int,
+    ): Boolean {
         return mPlayerCallback?.onInfo(this, what, extra) ?: false
     }
 }

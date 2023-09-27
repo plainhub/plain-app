@@ -27,7 +27,10 @@ class ClassicsHeader(context: Context, private val refreshLayout: RefreshLayout)
     var finishText: () -> String = { getString(R.string.srl_header_finish) }
     var failedText: () -> String = { getString(R.string.srl_header_failed) }
 
-    override fun onFinish(refreshLayout: RefreshLayout, success: Boolean): Int {
+    override fun onFinish(
+        refreshLayout: RefreshLayout,
+        success: Boolean,
+    ): Int {
         // if the dialog was destroyed, here may crash when the api request finished.
         try {
             if (success) {
@@ -42,10 +45,14 @@ class ClassicsHeader(context: Context, private val refreshLayout: RefreshLayout)
             LogCat.e(ex.toString())
         }
 
-        return super.onFinish(refreshLayout, success) //延迟500毫秒之后再弹回
+        return super.onFinish(refreshLayout, success) // 延迟500毫秒之后再弹回
     }
 
-    override fun onStateChanged(refreshLayout: RefreshLayout, oldState: RefreshState, newState: RefreshState) {
+    override fun onStateChanged(
+        refreshLayout: RefreshLayout,
+        oldState: RefreshState,
+        newState: RefreshState,
+    ) {
         // if the dialog was destroyed, here may crash when the api request finished.
         try {
             when (newState) {
@@ -79,7 +86,7 @@ class ClassicsHeader(context: Context, private val refreshLayout: RefreshLayout)
     private fun setLastUpdateTime(time: Date): ClassicsHeader {
         mLastTime = time
         binding.update.text = LocaleHelper.getStringF(R.string.last_update, "time", time.formatDateTime())
-        //MMKV.defaultMMKV().encode(KEY_LAST_UPDATE_TIME, time.time)
+        // MMKV.defaultMMKV().encode(KEY_LAST_UPDATE_TIME, time.time)
         return this
     }
 
@@ -87,6 +94,6 @@ class ClassicsHeader(context: Context, private val refreshLayout: RefreshLayout)
         binding.update.isVisible = mEnableLastTime
         binding.title.text = pullText()
         KEY_LAST_UPDATE_TIME += (refreshLayout as PageRefreshLayout).pageName
-       // setLastUpdateTime(Date(MMKV.defaultMMKV().decodeLong(KEY_LAST_UPDATE_TIME, System.currentTimeMillis())))
+        // setLastUpdateTime(Date(MMKV.defaultMMKV().decodeLong(KEY_LAST_UPDATE_TIME, System.currentTimeMillis())))
     }
 }

@@ -31,7 +31,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
@@ -57,9 +56,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PasswordPage(
-    navController: NavHostController,
-) {
+fun PasswordPage(navController: NavHostController) {
     WebSettingsProvider {
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
@@ -85,13 +82,14 @@ fun PasswordPage(
                                     withIO { PasswordTypePreference.putAsync(context, PasswordType.parse(it)) }
                                 }
                             },
-                            itemRadioGroups = PasswordType.values().map {
-                                BlockRadioGroupButtonItem(
-                                    text = it.getText(),
-                                    onClick = {},
-                                ) {
-                                }
-                            },
+                            itemRadioGroups =
+                                PasswordType.values().map {
+                                    BlockRadioGroupButtonItem(
+                                        text = it.getText(),
+                                        onClick = {},
+                                    ) {
+                                    }
+                                },
                         )
                         if (passwordType == PasswordType.RANDOM.value) {
                             PListItem(
@@ -124,7 +122,7 @@ fun PasswordPage(
                             title = stringResource(R.string.require_confirmation),
                         ) {
                             PSwitch(
-                                activated = authTwoFactor
+                                activated = authTwoFactor,
                             ) {
                                 scope.launch(Dispatchers.IO) {
                                     AuthTwoFactorPreference.putAsync(context, it)
@@ -134,7 +132,7 @@ fun PasswordPage(
                         BottomSpace()
                     }
                 }
-            }
+            },
         )
     }
 }
@@ -150,14 +148,16 @@ fun PasswordTextField(
         val clipboardManager = LocalClipboardManager.current
         val focusRequester = remember { FocusRequester() }
         TextField(
-            modifier = Modifier
-                .focusRequester(focusRequester)
-                .fillMaxWidth(),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
-            ),
+            modifier =
+                Modifier
+                    .focusRequester(focusRequester)
+                    .fillMaxWidth(),
+            colors =
+                TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                ),
             maxLines = 1,
             value = value,
             onValueChange = {
@@ -168,7 +168,7 @@ fun PasswordTextField(
                 Text(
                     text = stringResource(id = R.string.password),
                     color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             },
             singleLine = true,
@@ -179,7 +179,7 @@ fun PasswordTextField(
                             text = stringResource(id = R.string.confirm),
                             onClick = {
                                 onConfirm(value)
-                            }
+                            },
                         )
                     }
                 } else {
@@ -189,14 +189,15 @@ fun PasswordTextField(
                         Icon(
                             imageVector = Icons.Rounded.ContentPaste,
                             contentDescription = stringResource(R.string.paste),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }
             },
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Done
-            )
+            keyboardOptions =
+                KeyboardOptions(
+                    imeAction = ImeAction.Done,
+                ),
         )
     }
 }

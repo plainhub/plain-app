@@ -11,7 +11,6 @@ import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
@@ -49,22 +48,26 @@ fun PTextField(
         }
     }
 
-
     TextField(
-        modifier = Modifier
-            .focusRequester(focusRequester)
-            .fillMaxWidth(),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent,
-        ),
+        modifier =
+            Modifier
+                .focusRequester(focusRequester)
+                .fillMaxWidth(),
+        colors =
+            TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+            ),
         maxLines = if (singleLine) 1 else Int.MAX_VALUE,
         enabled = !readOnly,
         value = value,
-        label = if (label.isEmpty()) null else {
-            { Text(label) }
-        },
+        label =
+            if (label.isEmpty()) {
+                null
+            } else {
+                { Text(label) }
+            },
         onValueChange = {
             if (!readOnly) onValueChange(it)
         },
@@ -73,7 +76,7 @@ fun PTextField(
             Text(
                 text = placeholder,
                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.8f),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
         },
         isError = errorMessage.isNotEmpty(),
@@ -88,10 +91,16 @@ fun PTextField(
                     }
                 }) {
                     Icon(
-                        imageVector = if (isPassword) {
-                            if (showPassword) Icons.Rounded.Visibility
-                            else Icons.Rounded.VisibilityOff
-                        } else Icons.Rounded.Close,
+                        imageVector =
+                            if (isPassword) {
+                                if (showPassword) {
+                                    Icons.Rounded.Visibility
+                                } else {
+                                    Icons.Rounded.VisibilityOff
+                                }
+                            } else {
+                                Icons.Rounded.Close
+                            },
                         contentDescription = if (isPassword) stringResource(R.string.password) else stringResource(R.string.clear),
                         tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                     )
@@ -103,7 +112,7 @@ fun PTextField(
                     Icon(
                         imageVector = Icons.Rounded.ContentPaste,
                         contentDescription = stringResource(R.string.paste),
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                 }
             }

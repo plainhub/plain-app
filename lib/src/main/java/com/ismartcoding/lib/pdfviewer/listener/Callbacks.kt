@@ -60,7 +60,10 @@ class Callbacks {
         onLoadComplete?.loadComplete(pagesCount)
     }
 
-    fun callOnPageError(page: Int, error: Throwable?): Boolean {
+    fun callOnPageError(
+        page: Int,
+        error: Throwable?,
+    ): Boolean {
         if (onPageError != null) {
             onPageError?.onPageError(page, error)
             return true
@@ -72,11 +75,17 @@ class Callbacks {
         onRender?.onInitiallyRendered(pagesCount)
     }
 
-    fun callOnPageChange(page: Int, pagesCount: Int) {
+    fun callOnPageChange(
+        page: Int,
+        pagesCount: Int,
+    ) {
         onPageChange?.onPageChanged(page, pagesCount)
     }
 
-    fun callOnPageScroll(currentPage: Int, offset: Float) {
+    fun callOnPageScroll(
+        currentPage: Int,
+        offset: Float,
+    ) {
         onPageScroll?.onPageScrolled(currentPage, offset)
     }
 

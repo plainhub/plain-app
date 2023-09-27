@@ -30,36 +30,36 @@ val LocalKeepScreenOn = compositionLocalOf { KeepScreenOnPreference.default }
 val LocalSystemScreenTimeout = compositionLocalOf { SystemScreenTimeoutPreference.default }
 
 @Composable
-fun SettingsProvider(
-    content: @Composable () -> Unit,
-) {
+fun SettingsProvider(content: @Composable () -> Unit) {
     val context = LocalContext.current
-    val defaultSettings = Settings(
-        themeIndex = ThemeIndexPreference.default,
-        customPrimaryColor = CustomPrimaryColorPreference.default,
-        darkTheme = DarkThemePreference.default,
-        amoledDarkTheme = AmoledDarkThemePreference.default,
-        locale = null,
-        web = WebPreference.default,
-        keepScreenOn = KeepScreenOnPreference.default,
-        systemScreenTimeout = SystemScreenTimeoutPreference.default,
-    )
-    val settings = remember {
-        context.dataStore.data.map {
-            Settings(
-                themeIndex = ThemeIndexPreference.get(it),
-                customPrimaryColor = CustomPrimaryColorPreference.get(it),
-                darkTheme = DarkThemePreference.get(it),
-                amoledDarkTheme = AmoledDarkThemePreference.get(it),
-                locale = LanguagePreference.getLocale(it),
-                web = WebPreference.get(it),
-                keepScreenOn = KeepScreenOnPreference.get(it),
-                systemScreenTimeout = SystemScreenTimeoutPreference.get(it),
-            )
-        }
-    }.collectAsStateValue(
-        initial = defaultSettings
-    )
+    val defaultSettings =
+        Settings(
+            themeIndex = ThemeIndexPreference.default,
+            customPrimaryColor = CustomPrimaryColorPreference.default,
+            darkTheme = DarkThemePreference.default,
+            amoledDarkTheme = AmoledDarkThemePreference.default,
+            locale = null,
+            web = WebPreference.default,
+            keepScreenOn = KeepScreenOnPreference.default,
+            systemScreenTimeout = SystemScreenTimeoutPreference.default,
+        )
+    val settings =
+        remember {
+            context.dataStore.data.map {
+                Settings(
+                    themeIndex = ThemeIndexPreference.get(it),
+                    customPrimaryColor = CustomPrimaryColorPreference.get(it),
+                    darkTheme = DarkThemePreference.get(it),
+                    amoledDarkTheme = AmoledDarkThemePreference.get(it),
+                    locale = LanguagePreference.getLocale(it),
+                    web = WebPreference.get(it),
+                    keepScreenOn = KeepScreenOnPreference.get(it),
+                    systemScreenTimeout = SystemScreenTimeoutPreference.get(it),
+                )
+            }
+        }.collectAsStateValue(
+            initial = defaultSettings,
+        )
 
     CompositionLocalProvider(
         LocalThemeIndex provides settings.themeIndex,

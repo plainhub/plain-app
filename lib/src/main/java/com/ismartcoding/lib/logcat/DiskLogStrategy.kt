@@ -8,7 +8,11 @@ import java.io.FileWriter
 import java.io.IOException
 
 class DiskLogStrategy(val handler: Handler) : LogStrategy {
-    override fun log(level: Int, tag: String?, message: String) {
+    override fun log(
+        level: Int,
+        tag: String?,
+        message: String,
+    ) {
         handler.sendMessage(handler.obtainMessage(level, message))
     }
 

@@ -46,7 +46,13 @@ object ImageHelper : BaseContentHelper() {
         return getWheres(query, MediaStore.Images.Media._ID)
     }
 
-    fun search(context: Context, query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DImage> {
+    fun search(
+        context: Context,
+        query: String,
+        limit: Int,
+        offset: Int,
+        sortBy: FileSortBy,
+    ): List<DImage> {
         val cursor = getSearchCursor(context, query, limit, offset, sortBy.toSortBy())
         val result = mutableListOf<DImage>()
         if (cursor?.moveToFirst() == true) {
@@ -63,7 +69,10 @@ object ImageHelper : BaseContentHelper() {
         return result
     }
 
-    fun getTagRelationStubs(context: Context, query: String): List<TagRelationStub> {
+    fun getTagRelationStubs(
+        context: Context,
+        query: String,
+    ): List<TagRelationStub> {
         val cursor = getSearchCursor(context, query)
         val result = mutableListOf<TagRelationStub>()
         if (cursor?.moveToFirst() == true) {
@@ -72,7 +81,7 @@ object ImageHelper : BaseContentHelper() {
                 val id = cursor.getStringValue(MediaStore.Images.Media._ID, cache)
                 val title = cursor.getStringValue(MediaStore.Images.Media.TITLE, cache)
                 val size = cursor.getLongValue(MediaStore.Images.Media.SIZE, cache)
-                result.add(TagRelationStub(id, title,size))
+                result.add(TagRelationStub(id, title, size))
             } while (cursor.moveToNext())
         }
         return result
@@ -82,20 +91,22 @@ object ImageHelper : BaseContentHelper() {
         val bucketMap = mutableMapOf<String, DMediaBucket>()
 
         // Columns to retrieve from the MediaStore query
-        val projection = arrayOf(
-            MediaStore.Images.Media.BUCKET_ID,
-            MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
-            MediaStore.Images.Media.DATA
-        )
+        val projection =
+            arrayOf(
+                MediaStore.Images.Media.BUCKET_ID,
+                MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
+                MediaStore.Images.Media.DATA,
+            )
 
         // Querying the MediaStore for images
-        val cursor = context.contentResolver.query(
-            uriExternal,
-            projection,
-            "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} != ''",
-            null,
-            null
-        )
+        val cursor =
+            context.contentResolver.query(
+                uriExternal,
+                projection,
+                "${MediaStore.Images.Media.BUCKET_DISPLAY_NAME} != ''",
+                null,
+                null,
+            )
 
         cursor?.use { c ->
             val cache = mutableMapOf<String, Int>()

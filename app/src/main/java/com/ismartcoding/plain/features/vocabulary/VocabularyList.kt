@@ -10,7 +10,10 @@ object VocabularyList {
         return AppDatabase.instance.vocabularyDao().getAll(TempData.selectedBoxId)
     }
 
-    fun addOrUpdateAsync(id: String, updateItem: DVocabulary.() -> Unit) {
+    fun addOrUpdateAsync(
+        id: String,
+        updateItem: DVocabulary.() -> Unit,
+    ) {
         var item = if (id.isNotEmpty()) AppDatabase.instance.vocabularyDao().getById(id) else null
         var isInsert = false
         if (item == null) {

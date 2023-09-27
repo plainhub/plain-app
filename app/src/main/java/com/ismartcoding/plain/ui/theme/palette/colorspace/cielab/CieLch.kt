@@ -13,7 +13,6 @@ data class CieLch(
     val C: Double,
     val h: Double,
 ) {
-
     fun toCieLab(): CieLab {
         val hRad = h.toRadians()
         return CieLab(
@@ -24,11 +23,11 @@ data class CieLch(
     }
 
     companion object {
-
-        fun CieLab.toCieLch(): CieLch = CieLch(
-            L = L,
-            C = sqrt(square(a) + square(b)),
-            h = atan2(b, a).toDegrees().mod(360.0),
-        )
+        fun CieLab.toCieLch(): CieLch =
+            CieLch(
+                L = L,
+                C = sqrt(square(a) + square(b)),
+                h = atan2(b, a).toDegrees().mod(360.0),
+            )
     }
 }

@@ -8,7 +8,12 @@ import com.ismartcoding.lib.extensions.isVideoFast
 import java.io.File
 
 object BitmapHelper {
-   suspend fun decodeBitmapFromFileAsync(context: Context, filePath: String, reqWidth: Int, reqHeight: Int): Bitmap? {
+    suspend fun decodeBitmapFromFileAsync(
+        context: Context,
+        filePath: String,
+        reqWidth: Int,
+        reqHeight: Int,
+    ): Bitmap? {
         if (filePath.isVideoFast()) {
             return File(filePath).getBitmapAsync(context, reqWidth, reqHeight)
         }
@@ -23,7 +28,11 @@ object BitmapHelper {
         return BitmapFactory.decodeFile(filePath, options)
     }
 
-    fun calculateInSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+    fun calculateInSampleSize(
+        options: BitmapFactory.Options,
+        reqWidth: Int,
+        reqHeight: Int,
+    ): Int {
         val imageHeight = options.outHeight
         val imageWidth = options.outWidth
         var inSampleSize = 1

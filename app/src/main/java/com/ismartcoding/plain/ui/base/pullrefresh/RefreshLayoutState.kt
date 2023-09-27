@@ -10,7 +10,7 @@ import kotlin.math.abs
 
 @Stable
 class RefreshLayoutState(
-    internal val onRefreshListener: RefreshLayoutState.() -> Unit
+    internal val onRefreshListener: RefreshLayoutState.() -> Unit,
 ) {
     internal val refreshContentState = mutableStateOf(RefreshContentState.Stop)
 
@@ -24,8 +24,7 @@ class RefreshLayoutState(
 
     fun getRefreshContentState(): State<RefreshContentState> = refreshContentState
 
-    fun createRefreshContentOffsetFlow(): Flow<Float> =
-        snapshotFlow { refreshContentOffsetState.value }
+    fun createRefreshContentOffsetFlow(): Flow<Float> = snapshotFlow { refreshContentOffsetState.value }
 
     fun getComposePositionState(): State<ComposePosition> = composePositionState
 
@@ -36,10 +35,12 @@ class RefreshLayoutState(
     fun setRefreshState(state: RefreshContentState) {
         when (state) {
             RefreshContentState.Stop -> {
-                if (refreshContentState.value == RefreshContentState.Stop)
+                if (refreshContentState.value == RefreshContentState.Stop) {
                     return
-                if (!this::coroutineScope.isInitialized)
+                }
+                if (!this::coroutineScope.isInitialized) {
                     throw IllegalStateException("[RefreshLayoutState]还未初始化完成,请在[LaunchedEffect]中或composable至少组合一次后使用此方法")
+                }
                 coroutineScope.launch {
                     refreshContentState.value = RefreshContentState.Stop
                     delay(300)
@@ -47,10 +48,12 @@ class RefreshLayoutState(
                 }
             }
             RefreshContentState.Refreshing -> {
-                if (refreshContentState.value == RefreshContentState.Refreshing)
+                if (refreshContentState.value == RefreshContentState.Refreshing) {
                     return
-                if (!this::coroutineScope.isInitialized)
+                }
+                if (!this::coroutineScope.isInitialized) {
                     throw IllegalStateException("[RefreshLayoutState]还未初始化完成,请在[LaunchedEffect]中或composable至少组合一次后使用此方法")
+                }
                 coroutineScope.launch {
                     refreshContentState.value = RefreshContentState.Refreshing
                     onRefreshListener()
@@ -76,10 +79,11 @@ class RefreshLayoutState(
 
     private suspend fun animateToThreshold() {
         val composePosition = composePositionState.value
-        if (composePosition == ComposePosition.Start || composePosition == ComposePosition.Top)
+        if (composePosition == ComposePosition.Start || composePosition == ComposePosition.Top) {
             refreshContentOffsetState.animateTo(refreshContentThresholdState.value)
-        else
+        } else {
             refreshContentOffsetState.animateTo(-refreshContentThresholdState.value)
+        }
     }
 
     internal fun offset(refreshContentOffset: Float) {
@@ -94,5 +98,4 @@ class RefreshLayoutState(
 }
 
 @Composable
-fun rememberRefreshLayoutState(onRefreshListener: RefreshLayoutState.() -> Unit) =
-    remember { RefreshLayoutState(onRefreshListener) }
+fun rememberRefreshLayoutState(onRefreshListener: RefreshLayoutState.() -> Unit) = remember { RefreshLayoutState(onRefreshListener) }

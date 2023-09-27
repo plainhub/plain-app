@@ -7,18 +7,21 @@ import android.view.View
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.*
-import com.ismartcoding.plain.features.PickFileEvent
-import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.data.enums.PickFileTag
 import com.ismartcoding.plain.data.enums.PickFileType
 import com.ismartcoding.plain.databinding.DialogEditorInsertImageBinding
+import com.ismartcoding.plain.features.PickFileEvent
+import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.setSafeClick
 import java.io.File
 
 class EditorInsertImageDialog : BaseBottomSheetDialog<DialogEditorInsertImageBinding>() {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.browse.setSafeClick {
             sendEvent(PickFileEvent(PickFileTag.EDITOR, PickFileType.IMAGE, multiple = false))
@@ -39,11 +42,12 @@ class EditorInsertImageDialog : BaseBottomSheetDialog<DialogEditorInsertImageBin
                         val dir = Environment.DIRECTORY_PICTURES
                         val dst = context.getExternalFilesDir(dir)!!.path + "/$fileName"
                         val dstFile = File(dst)
-                        val path = if (dstFile.exists()) {
-                            dstFile.newPath()
-                        } else {
-                            dst
-                        }
+                        val path =
+                            if (dstFile.exists()) {
+                                dstFile.newPath()
+                            } else {
+                                dst
+                            }
                         FileHelper.copyFile(context, uri, path)
                         binding.url.text = "app://$dir/${path.getFilenameFromPath()}"
                     } catch (ex: Exception) {

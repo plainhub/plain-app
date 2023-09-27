@@ -13,10 +13,13 @@ import com.ismartcoding.plain.databinding.DialogPdfViewerBinding
 import com.ismartcoding.plain.ui.extensions.onBack
 import kotlinx.coroutines.launch
 
-class PdfViewerDialog(val uri: Uri) : BaseDialog<DialogPdfViewerBinding>(),
+class PdfViewerDialog(val uri: Uri) :
+    BaseDialog<DialogPdfViewerBinding>(),
     OnPageErrorListener {
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.topAppBar.run {
             title = uri.getFileName(requireContext())
@@ -37,7 +40,10 @@ class PdfViewerDialog(val uri: Uri) : BaseDialog<DialogPdfViewerBinding>(),
         }
     }
 
-    override fun onPageError(page: Int, t: Throwable?) {
+    override fun onPageError(
+        page: Int,
+        t: Throwable?,
+    ) {
         LogCat.e(page.toString())
     }
 }

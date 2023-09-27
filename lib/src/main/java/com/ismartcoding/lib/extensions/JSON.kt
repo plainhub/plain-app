@@ -10,9 +10,13 @@ interface IJSONItem {
 fun <T : Any> List<T>.toJSON(): JSONArray {
     val jsonArr = JSONArray()
     this.forEach {
-        jsonArr.put(if (it is IJSONItem) {
-            it.toJSON()
-        } else it.toString())
+        jsonArr.put(
+            if (it is IJSONItem) {
+                it.toJSON()
+            } else {
+                it.toString()
+            },
+        )
     }
     return jsonArr
 }
@@ -24,7 +28,6 @@ fun JSONArray.toStringList(): List<String> {
     }
     return list
 }
-
 
 fun <T : IJSONItem> JSONArray.parse(toItem: (JSONObject) -> T): List<T> {
     val items = mutableListOf<T>()

@@ -232,9 +232,9 @@ fun ScanPage(navController: NavHostController) {
                                                             setHints(
                                                                 mapOf(
                                                                     DecodeHintType.POSSIBLE_FORMATS to
-                                                                            arrayListOf(
-                                                                                BarcodeFormat.QR_CODE,
-                                                                            ),
+                                                                        arrayListOf(
+                                                                            BarcodeFormat.QR_CODE,
+                                                                        ),
                                                                 ),
                                                             )
                                                         }.decode(binaryBmp)
@@ -292,16 +292,16 @@ fun ScanPage(navController: NavHostController) {
                         }
                     },
                     colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent,
-                    ),
+                        TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.Transparent,
+                        ),
                 )
                 Row(
                     modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(start = 24.dp, end = 24.dp, bottom = 64.dp)
-                        .align(Alignment.BottomCenter),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(start = 24.dp, end = 24.dp, bottom = 64.dp)
+                            .align(Alignment.BottomCenter),
                 ) {
                     PIconButton(
                         modifier = Modifier.size(40.dp),
@@ -350,9 +350,9 @@ fun ScanResultBottomSheet(
 ) {
     PModalBottomSheet(
         modifier =
-        Modifier
-            .padding(top = 16.dp)
-            .defaultMinSize(minHeight = 240.dp),
+            Modifier
+                .padding(top = 16.dp)
+                .defaultMinSize(minHeight = 240.dp),
         topBarTitle = stringResource(id = R.string.scan_result),
         actions = {
             PIconButton(

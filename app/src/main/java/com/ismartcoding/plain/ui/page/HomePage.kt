@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.Computer
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -66,7 +65,8 @@ fun HomePage(
     val configuration = LocalConfiguration.current
     val itemWidth = (configuration.screenWidthDp.dp - 40.dp) / 4
 
-    PScaffold(navController,
+    PScaffold(
+        navController,
         navigationIcon = {
             ActionButtonSettings {
                 navController.navigate(RouteName.SETTINGS)
@@ -77,7 +77,7 @@ fun HomePage(
                 imageVector = Icons.Outlined.Computer,
                 contentDescription = stringResource(R.string.web_console),
                 tint = MaterialTheme.colorScheme.onSurface,
-                showBadge = webConsole && HttpServerManager.httpServer != null && HttpServerManager.httpServerError.isEmpty()
+                showBadge = webConsole && HttpServerManager.httpServer != null && HttpServerManager.httpServerError.isEmpty(),
             ) {
                 navController.navigate(RouteName.WEB_CONSOLE)
             }
@@ -93,7 +93,8 @@ fun HomePage(
                 }, text = {
                     Row {
                         Text(
-                            text = stringResource(R.string.keep_screen_on), modifier = Modifier.padding(top = 14.dp)
+                            text = stringResource(R.string.keep_screen_on),
+                            modifier = Modifier.padding(top = 14.dp),
                         )
                         Checkbox(checked = keepScreenOn, onCheckedChange = {
                             isMenuOpen = false
@@ -113,15 +114,21 @@ fun HomePage(
             })
         },
         floatingActionButton = {
-            FloatingActionButton(modifier = Modifier
-                .padding(bottom = 32.dp), onClick = {
-                navController.navigate(RouteName.CHAT)
-            }) {
+            FloatingActionButton(
+                modifier =
+                    Modifier
+                        .padding(bottom = 32.dp),
+                onClick = {
+                    navController.navigate(RouteName.CHAT)
+                },
+            ) {
                 Icon(
-                    Icons.Outlined.Chat, stringResource(R.string.my_phone)
+                    Icons.Outlined.Chat,
+                    stringResource(R.string.my_phone),
                 )
             }
-        }) {
+        },
+    ) {
         LazyColumn {
             item {
                 HomeItemStorage(navController, itemWidth)

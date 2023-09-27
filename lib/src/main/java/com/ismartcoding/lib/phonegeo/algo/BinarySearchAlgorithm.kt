@@ -12,11 +12,12 @@ open class BinarySearchAlgorithm(data: ByteArray) : LookupAlgorithm(data) {
             return null
         }
         val byteBuffer = srcByteBuffer.asReadOnlyBuffer().order(ByteOrder.LITTLE_ENDIAN)
-        val geoId = try {
-            phoneNumber.substring(0, 7).toInt()
-        } catch (e: NumberFormatException) {
-            throw IllegalArgumentException("phone number %s is invalid, is it numeric".format(phoneNumber))
-        }
+        val geoId =
+            try {
+                phoneNumber.substring(0, 7).toInt()
+            } catch (e: NumberFormatException) {
+                throw IllegalArgumentException("phone number %s is invalid, is it numeric".format(phoneNumber))
+            }
         var left = indicesStartOffset
         var right = indicesEndOffset
         var mid = indicesStartOffset + (indicesEndOffset - indicesStartOffset) / 2
@@ -53,7 +54,11 @@ open class BinarySearchAlgorithm(data: ByteArray) : LookupAlgorithm(data) {
         }
     }
 
-    protected fun compare(position: Int, key: Int, byteBuffer: ByteBuffer): Int {
+    protected fun compare(
+        position: Int,
+        key: Int,
+        byteBuffer: ByteBuffer,
+    ): Int {
         byteBuffer.position(position)
         val phoneNumberPrefix = byteBuffer.int
         return phoneNumberPrefix.compareTo(key)
@@ -67,7 +72,10 @@ open class BinarySearchAlgorithm(data: ByteArray) : LookupAlgorithm(data) {
         return PhoneGeoInfo(geos[0], geos[1], geos[2], geos[3])
     }
 
-    protected fun detectInfoLength(infoStartIndex: Int, byteBuffer: ByteBuffer): Int {
+    protected fun detectInfoLength(
+        infoStartIndex: Int,
+        byteBuffer: ByteBuffer,
+    ): Int {
         byteBuffer.position(infoStartIndex)
         while (byteBuffer.get() != 0.toByte()) {
         }
@@ -76,9 +84,14 @@ open class BinarySearchAlgorithm(data: ByteArray) : LookupAlgorithm(data) {
         return infoEndIndex - infoStartIndex
     }
 
-    protected fun extract(phoneNumber: String, start: Int, byteBuffer: ByteBuffer): PhoneNumberInfo {
+    protected fun extract(
+        phoneNumber: String,
+        start: Int,
+        byteBuffer: ByteBuffer,
+    ): PhoneNumberInfo {
         byteBuffer.position(start)
-        @Suppress("UNUSED_VARIABLE") val prefix = byteBuffer.int // prefix is not used, but we need ByteBuffer.getInt() to move cursor
+        @Suppress("UNUSED_VARIABLE")
+        val prefix = byteBuffer.int // prefix is not used, but we need ByteBuffer.getInt() to move cursor
         val infoStartIndex = byteBuffer.int
         val ispCode = byteBuffer.get()
 

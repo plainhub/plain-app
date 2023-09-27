@@ -11,7 +11,6 @@ import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import kotlin.math.abs
 
-
 class CustomAppBarLayout(context: Context, attributeSet: AttributeSet? = null) : AppBarLayout(context, attributeSet) {
     lateinit var quickNav: QuickNav
     private var downRawY = 0f
@@ -82,7 +81,6 @@ class CustomAppBarLayout(context: Context, attributeSet: AttributeSet? = null) :
             else -> false
         }
     }
-
 
     private fun isReadyForPullDown(y: Float): Boolean {
         return y > 0

@@ -5,7 +5,13 @@ import com.ismartcoding.lib.data.SortBy
 import com.ismartcoding.lib.data.enums.SortDirection
 
 enum class FileSortBy {
-    DATE_ASC, DATE_DESC, SIZE_ASC, SIZE_DESC, NAME_ASC, NAME_DESC;
+    DATE_ASC,
+    DATE_DESC,
+    SIZE_ASC,
+    SIZE_DESC,
+    NAME_ASC,
+    NAME_DESC,
+    ;
 
     fun toSortBy(): SortBy {
         return when (this) {

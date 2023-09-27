@@ -31,20 +31,22 @@ fun BlockButton(
     onClick: () -> Unit = {},
 ) {
     Column(
-        modifier = modifier
-            .height(56.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (selected) selectedContainerColor else containerColor)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 5.dp),
+        modifier =
+            modifier
+                .height(56.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(if (selected) selectedContainerColor else containerColor)
+                .clickable(onClick = onClick)
+                .padding(horizontal = 5.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.labelLarge.copy(
-                textAlign = TextAlign.Center,
-            ),
+            style =
+                MaterialTheme.typography.labelLarge.copy(
+                    textAlign = TextAlign.Center,
+                ),
             color = if (selected) selectedContentColor else contentColor,
         )
     }

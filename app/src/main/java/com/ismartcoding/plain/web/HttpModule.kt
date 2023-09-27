@@ -99,7 +99,10 @@ fun Application.module() {
     install(CachingHeaders) {
         options { _, outgoingContent ->
             when (outgoingContent.contentType?.withoutParameters()) {
-                ContentType.Text.CSS, ContentType.Application.JavaScript -> CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 3600 * 24 * 30))
+                ContentType.Text.CSS, ContentType.Application.JavaScript ->
+                    CachingOptions(
+                        CacheControl.MaxAge(maxAgeSeconds = 3600 * 24 * 30),
+                    )
                 else -> null
             }
         }
@@ -123,10 +126,12 @@ fun Application.module() {
     install(PartialContent)
     install(AutoHeadResponse)
     install(ContentNegotiation) {
-        json(Json {
-            prettyPrint = true
-            isLenient = true
-        })
+        json(
+            Json {
+                prettyPrint = true
+                isLenient = true
+            },
+        )
     }
 
     routing {
@@ -166,7 +171,7 @@ fun Application.module() {
                         header("Connection", "keep-alive")
                         header(
                             "Server",
-                            "DLNADOC/1.50 UPnP/1.0 Plain/1.0 Android/" + Build.VERSION.RELEASE
+                            "DLNADOC/1.50 UPnP/1.0 Plain/1.0 Android/" + Build.VERSION.RELEASE,
                         )
 
                         EntityTagVersion(file.lastModified().hashCode().toString())
@@ -176,7 +181,7 @@ fun Application.module() {
                     call.respondFile(file)
                 }
             } catch (ex: Exception) {
-                //ex.printStackTrace()
+                // ex.printStackTrace()
                 call.respondText("File is expired or does not exist. $ex", status = HttpStatusCode.Forbidden)
             }
         }
@@ -401,7 +406,7 @@ fun Application.module() {
                                         return@forEachPart
                                     }
                                     File(info.dir).mkdirs()
-                                    var destFile = File("${info.dir}/${fileName}")
+                                    var destFile = File("${info.dir}/$fileName")
                                     if (info.index == 0 && destFile.exists()) {
                                         if (info.replace) {
                                             destFile.delete()
@@ -420,7 +425,7 @@ fun Application.module() {
                                         }
                                     } else {
                                         if (info.total > 1) {
-                                            destFile = File("${info.dir}/${fileName}.part${String.format("%03d", info.index)}")
+                                            destFile = File("${info.dir}/$fileName.part${String.format("%03d", info.index)}")
                                             if (destFile.exists() && destFile.length() == info.size) {
                                                 // skip if the part file is already uploaded
                                             } else {
@@ -433,7 +438,7 @@ fun Application.module() {
                                         if (info.total - 1 == info.index) {
                                             if (info.total > 1) {
                                                 // merge part files into original file
-                                                destFile = File("${info.dir}/${fileName}")
+                                                destFile = File("${info.dir}/$fileName")
                                                 val partFiles = File(info.dir).listFiles()?.filter { it.name.startsWith("$fileName.part") }?.sortedBy { it.name } ?: arrayListOf()
                                                 val fos = FileOutputStream(destFile, true)
                                                 partFiles.forEach {

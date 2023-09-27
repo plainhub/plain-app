@@ -3,9 +3,7 @@ package com.ismartcoding.plain.features.box
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.*
-import com.ismartcoding.plain.api.ApiResult
 import com.ismartcoding.plain.api.BoxApi
 import com.ismartcoding.plain.api.GraphqlApiResult
 import com.ismartcoding.plain.data.UIDataCache
@@ -33,28 +31,43 @@ data class FetchInitDataEvent(override val boxId: String) : IBoxEvent {
 }
 
 data class FetchNetworkConfigEvent(override val boxId: String) : IBoxEvent
+
 data class FetchNetworksEvent(override val boxId: String) : IBoxEvent
+
 data class FetchWireGuardsEvent(override val boxId: String) : IBoxEvent
+
 data class FetchVocabulariesEvent(override val boxId: String) : IBoxEvent
 
 data class NetworkConfigResultEvent(val boxId: String, val result: GraphqlApiResult<NetworkConfigQuery.Data>)
-data class ApplyHostapdResultEvent(val boxId: String, val result: GraphqlApiResult<ApplyHostapdMutation.Data>)
-data class ApplyWireGuardResultEvent(val boxId: String, val result: GraphqlApiResult<ApplyWireGuardMutation.Data>)
-data class WireGuardsResultEvent(val boxId: String, val result: GraphqlApiResult<WireGuardsQuery.Data>)
-data class NetworksResultEvent(val boxId: String, val result: GraphqlApiResult<NetworkQuery.Data>)
-data class CancelActiveJobEvent(val boxId: String, val eventClass: Class<Any>)
-data class InitDataResultEvent(val boxId: String, val result: GraphqlApiResult<InitQuery.Data>)
-data class VocabulariesResultEvent(val boxId: String, val result: GraphqlApiResult<VocabulariesQuery.Data>)
 
+data class ApplyHostapdResultEvent(val boxId: String, val result: GraphqlApiResult<ApplyHostapdMutation.Data>)
+
+data class ApplyWireGuardResultEvent(val boxId: String, val result: GraphqlApiResult<ApplyWireGuardMutation.Data>)
+
+data class WireGuardsResultEvent(val boxId: String, val result: GraphqlApiResult<WireGuardsQuery.Data>)
+
+data class NetworksResultEvent(val boxId: String, val result: GraphqlApiResult<NetworkQuery.Data>)
+
+data class CancelActiveJobEvent(val boxId: String, val eventClass: Class<Any>)
+
+data class InitDataResultEvent(val boxId: String, val result: GraphqlApiResult<InitQuery.Data>)
+
+data class VocabulariesResultEvent(val boxId: String, val result: GraphqlApiResult<VocabulariesQuery.Data>)
 
 object BoxEvents {
     private val eventJobs: MutableMap<String, Job> = mutableMapOf()
 
-    private fun getJobKey(boxId: String, eventClass: Class<Any>): String {
+    private fun getJobKey(
+        boxId: String,
+        eventClass: Class<Any>,
+    ): String {
         return "$boxId:${eventClass.simpleName}"
     }
 
-    private fun safeRun(event: IBoxEvent, runJob: () -> Job) {
+    private fun safeRun(
+        event: IBoxEvent,
+        runJob: () -> Job,
+    ) {
         if (eventJobs[getJobKey(event.boxId, event.javaClass)]?.isActive == true) {
             return
         }
@@ -66,14 +79,16 @@ object BoxEvents {
             safeRun(event) {
                 launch {
                     val r: GraphqlApiResult<InitQuery.Data>
-                    val t = measureTimeMillis {
-                        r = withIO {
-                            BoxApi.mixQueryAsync(InitQuery())
+                    val t =
+                        measureTimeMillis {
+                            r =
+                                withIO {
+                                    BoxApi.mixQueryAsync(InitQuery())
+                                }
+                            if (r.isSuccess()) {
+                                UIDataCache.get(TempData.selectedBoxId).initData(r.response?.data!!)
+                            }
                         }
-                        if (r.isSuccess()) {
-                            UIDataCache.get(TempData.selectedBoxId).initData(r.response?.data!!)
-                        }
-                    }
                     if (t < 500) {
                         delay(500 - t) // to make sure the loading text of top bar is not refreshed so fast.
                     }
@@ -148,6 +163,5 @@ object BoxEvents {
         receiveEventHandler<CancelActiveJobEvent> { event ->
             eventJobs[getJobKey(event.boxId, event.eventClass)]?.cancel()
         }
-
     }
 }

@@ -15,24 +15,30 @@ import com.ismartcoding.plain.extensions.formatDate
 import com.ismartcoding.plain.ui.models.VChat
 
 @Composable
-fun ChatDate(items: List<VChat>, m: VChat, index: Int) {
-    val dateVisible = remember {
-        if (index == items.size - 1) {
-            true
-        } else {
-            if (index + 1 < items.size) {
-                items[index + 1].createdAt.formatDate() != m.createdAt.formatDate()
+fun ChatDate(
+    items: List<VChat>,
+    m: VChat,
+    index: Int,
+) {
+    val dateVisible =
+        remember {
+            if (index == items.size - 1) {
+                true
             } else {
-                false
+                if (index + 1 < items.size) {
+                    items[index + 1].createdAt.formatDate() != m.createdAt.formatDate()
+                } else {
+                    false
+                }
             }
         }
-    }
     if (dateVisible) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(vertical = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = m.createdAt.formatDate(),

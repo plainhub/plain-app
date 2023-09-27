@@ -3,7 +3,7 @@ package com.ismartcoding.plain.ui.models
 import androidx.databinding.BaseObservable
 import com.ismartcoding.lib.brv.item.ItemCheckable
 
-abstract class BaseItemModel: ItemCheckable, BaseObservable() {
+abstract class BaseItemModel : ItemCheckable, BaseObservable() {
     override var toggleMode = false
     override var isChecked = false
 

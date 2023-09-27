@@ -3,7 +3,7 @@ package com.ismartcoding.plain.data.enums
 enum class PickFileType {
     IMAGE,
     IMAGE_VIDEO,
-    FILE
+    FILE,
 }
 
 enum class PickFileTag {

@@ -10,7 +10,10 @@ import android.view.MenuItem
 import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.plain.R
 
-fun MenuItem.setTitle(context: Context, title: String) {
+fun MenuItem.setTitle(
+    context: Context,
+    title: String,
+) {
     SpannableString(title).apply {
         setSpan(RelativeSizeSpan(0.85f), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         setColor(context, R.color.purple)
@@ -27,11 +30,13 @@ fun MenuItem.unhighlightTitle() {
 
 fun MenuItem.highlightTitle(context: Context) {
     if (intent == null) {
-        intent = Intent().apply {
-            putExtra("title", title)
+        intent =
+            Intent().apply {
+                putExtra("title", title)
+            }
+    }
+    title =
+        SpannableString(title).apply {
+            setTypeface(Typeface.BOLD)
         }
-    }
-    title = SpannableString(title).apply {
-        setTypeface(Typeface.BOLD)
-    }
 }

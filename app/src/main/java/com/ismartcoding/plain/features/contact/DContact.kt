@@ -35,13 +35,14 @@ data class DContact(
     var ims: List<ContentItem>,
     var ringtone: String,
     var updatedAt: Instant,
-): IData {
+) : IData {
     fun fullName(): String {
-        val name = if (givenName.containsChinese() || familyName.containsChinese()) {
-            "$familyName$middleName$givenName"
-        } else {
-            setOf(givenName, middleName, familyName).filter { it.isNotEmpty() }.joinToString(" ")
-        }
+        val name =
+            if (givenName.containsChinese() || familyName.containsChinese()) {
+                "$familyName$middleName$givenName"
+            } else {
+                setOf(givenName, middleName, familyName).filter { it.isNotEmpty() }.joinToString(" ")
+            }
 
         val suffixComma = if (suffix.isEmpty()) "" else ", $suffix"
         val fullName = "$prefix $name $suffixComma".trim()

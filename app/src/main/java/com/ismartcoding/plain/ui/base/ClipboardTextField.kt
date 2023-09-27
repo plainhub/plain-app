@@ -2,9 +2,6 @@ package com.ismartcoding.plain.ui.base
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActionScope
@@ -29,9 +26,10 @@ fun ClipboardTextField(
     placeholder: String = "",
     isPassword: Boolean = false,
     errorText: String = "",
-    keyboardOptions: KeyboardOptions = KeyboardOptions(
-        imeAction = ImeAction.Done
-    ),
+    keyboardOptions: KeyboardOptions =
+        KeyboardOptions(
+            imeAction = ImeAction.Done,
+        ),
     focusManager: FocusManager? = null,
     requestFocus: Boolean = false,
     onConfirm: (String) -> Unit = {},
@@ -47,28 +45,54 @@ fun ClipboardTextField(
             isPassword = isPassword,
             errorMessage = errorText,
             requestFocus = requestFocus,
-            keyboardActions = KeyboardActions(
-                onDone = if (imeAction == ImeAction.Done)
-                    action(focusManager, onConfirm, value) else null,
-                onGo = if (imeAction == ImeAction.Go)
-                    action(focusManager, onConfirm, value) else null,
-                onNext = if (imeAction == ImeAction.Next)
-                    action(focusManager, onConfirm, value) else null,
-                onPrevious = if (imeAction == ImeAction.Previous)
-                    action(focusManager, onConfirm, value) else null,
-                onSearch = if (imeAction == ImeAction.Search)
-                    action(focusManager, onConfirm, value) else null,
-                onSend = if (imeAction == ImeAction.Send)
-                    action(focusManager, onConfirm, value) else null,
-            ),
+            keyboardActions =
+                KeyboardActions(
+                    onDone =
+                        if (imeAction == ImeAction.Done) {
+                            action(focusManager, onConfirm, value)
+                        } else {
+                            null
+                        },
+                    onGo =
+                        if (imeAction == ImeAction.Go) {
+                            action(focusManager, onConfirm, value)
+                        } else {
+                            null
+                        },
+                    onNext =
+                        if (imeAction == ImeAction.Next) {
+                            action(focusManager, onConfirm, value)
+                        } else {
+                            null
+                        },
+                    onPrevious =
+                        if (imeAction == ImeAction.Previous) {
+                            action(focusManager, onConfirm, value)
+                        } else {
+                            null
+                        },
+                    onSearch =
+                        if (imeAction == ImeAction.Search) {
+                            action(focusManager, onConfirm, value)
+                        } else {
+                            null
+                        },
+                    onSend =
+                        if (imeAction == ImeAction.Send) {
+                            action(focusManager, onConfirm, value)
+                        } else {
+                            null
+                        },
+                ),
             keyboardOptions = keyboardOptions,
         )
         if (errorText.isNotEmpty()) {
             SelectionContainer {
                 Text(
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                        .horizontalScroll(rememberScrollState()),
+                    modifier =
+                        Modifier
+                            .padding(start = 16.dp)
+                            .horizontalScroll(rememberScrollState()),
                     text = errorText,
                     color = MaterialTheme.colorScheme.error,
                     maxLines = 1,
@@ -83,7 +107,8 @@ private fun action(
     focusManager: FocusManager?,
     onConfirm: (String) -> Unit,
     value: String,
-): KeyboardActionScope.() -> Unit = {
-    focusManager?.clearFocus()
-    onConfirm(value)
-}
+): KeyboardActionScope.() -> Unit =
+    {
+        focusManager?.clearFocus()
+        onConfirm(value)
+    }

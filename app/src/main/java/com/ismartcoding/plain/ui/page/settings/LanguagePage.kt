@@ -1,13 +1,10 @@
 package com.ismartcoding.plain.ui.page.settings
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RadioButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -17,7 +14,6 @@ import com.ismartcoding.plain.data.enums.Language
 import com.ismartcoding.plain.data.preference.LanguagePreference
 import com.ismartcoding.plain.data.preference.LocalLocale
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -27,9 +23,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LanguagePage(
-    navController: NavHostController,
-) {
+fun LanguagePage(navController: NavHostController) {
     val context = LocalContext.current
     val language = LocalLocale.current
     val scope = rememberCoroutineScope()
@@ -63,6 +57,6 @@ fun LanguagePage(
                     BottomSpace()
                 }
             }
-        }
+        },
     )
 }

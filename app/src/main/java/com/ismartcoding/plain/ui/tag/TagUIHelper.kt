@@ -5,10 +5,10 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.db.DTag
+import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.ui.EditValueDialog
@@ -20,15 +20,16 @@ import kotlinx.coroutines.launch
 object TagUIHelper {
     suspend fun createMenuGroupAsync(viewModel: FilteredItemsViewModel): DrawerMenuGroup {
         val tagCountMap = TagHelper.count(viewModel.dataType).associate { it.id to it.count }
-        val tags = TagHelper.getAll(viewModel.dataType).map { tag ->
-            val count = tagCountMap[tag.id] ?: 0
-            MenuItemModel(tag).apply {
-                isChecked = (viewModel.data as? DTag)?.id == tag.id
-                title = tag.name
-                iconId = R.drawable.ic_tag
-                this.count = count
+        val tags =
+            TagHelper.getAll(viewModel.dataType).map { tag ->
+                val count = tagCountMap[tag.id] ?: 0
+                MenuItemModel(tag).apply {
+                    isChecked = (viewModel.data as? DTag)?.id == tag.id
+                    title = tag.name
+                    iconId = R.drawable.ic_tag
+                    this.count = count
+                }
             }
-        }
 
         return DrawerMenuGroup(getString(R.string.tags)).apply {
             itemSublist = tags
@@ -37,12 +38,13 @@ object TagUIHelper {
                     val value = this.binding.value.text
                     lifecycleScope.launch {
                         blockFormUI()
-                        val id = withIO {
-                            TagHelper.addOrUpdate("") {
-                                name = value
-                                type = viewModel.dataType.value
+                        val id =
+                            withIO {
+                                TagHelper.addOrUpdate("") {
+                                    name = value
+                                    type = viewModel.dataType.value
+                                }
                             }
-                        }
                         sendEvent(ActionEvent(ActionSourceType.TAG, ActionType.CREATED, setOf(id)))
                         dismiss()
                     }
@@ -52,7 +54,8 @@ object TagUIHelper {
     }
 
     fun itemLongClick(
-        itemId: Int, tag: DTag
+        itemId: Int,
+        tag: DTag,
     ) {
         when (itemId) {
             R.id.edit -> {

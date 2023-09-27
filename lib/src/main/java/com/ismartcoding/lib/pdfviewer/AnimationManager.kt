@@ -20,45 +20,66 @@ internal class AnimationManager(private val pdfView: PDFView) {
     private var flinging = false
     private var pageFlinging = false
 
-    fun startXAnimation(xFrom: Float, xTo: Float) {
+    fun startXAnimation(
+        xFrom: Float,
+        xTo: Float,
+    ) {
         stopAll()
         val xAnimation = XAnimation()
-        animation = ValueAnimator.ofFloat(xFrom, xTo).apply {
-            interpolator = DecelerateInterpolator()
-            addListener(xAnimation)
-            addUpdateListener(xAnimation)
-            duration = 400
-            start()
-        }
+        animation =
+            ValueAnimator.ofFloat(xFrom, xTo).apply {
+                interpolator = DecelerateInterpolator()
+                addListener(xAnimation)
+                addUpdateListener(xAnimation)
+                duration = 400
+                start()
+            }
     }
 
-    fun startYAnimation(yFrom: Float, yTo: Float) {
+    fun startYAnimation(
+        yFrom: Float,
+        yTo: Float,
+    ) {
         stopAll()
         val yAnimation = YAnimation()
-        animation = ValueAnimator.ofFloat(yFrom, yTo).apply {
-            interpolator = DecelerateInterpolator()
-            addUpdateListener(yAnimation)
-            addListener(yAnimation)
-            duration = 400
-            start()
-        }
-
+        animation =
+            ValueAnimator.ofFloat(yFrom, yTo).apply {
+                interpolator = DecelerateInterpolator()
+                addUpdateListener(yAnimation)
+                addListener(yAnimation)
+                duration = 400
+                start()
+            }
     }
 
-    fun startZoomAnimation(centerX: Float, centerY: Float, zoomFrom: Float, zoomTo: Float) {
+    fun startZoomAnimation(
+        centerX: Float,
+        centerY: Float,
+        zoomFrom: Float,
+        zoomTo: Float,
+    ) {
         stopAll()
         val zoomAnim = ZoomAnimation(centerX, centerY)
-        animation = ValueAnimator.ofFloat(zoomFrom, zoomTo).apply {
-            interpolator = DecelerateInterpolator()
-            addUpdateListener(zoomAnim)
-            addListener(zoomAnim)
-            duration = 400
-            start()
-        }
-
+        animation =
+            ValueAnimator.ofFloat(zoomFrom, zoomTo).apply {
+                interpolator = DecelerateInterpolator()
+                addUpdateListener(zoomAnim)
+                addListener(zoomAnim)
+                duration = 400
+                start()
+            }
     }
 
-    fun startFlingAnimation(startX: Int, startY: Int, velocityX: Int, velocityY: Int, minX: Int, maxX: Int, minY: Int, maxY: Int) {
+    fun startFlingAnimation(
+        startX: Int,
+        startY: Int,
+        velocityX: Int,
+        velocityY: Int,
+        minX: Int,
+        maxX: Int,
+        minY: Int,
+        maxY: Int,
+    ) {
         stopAll()
         flinging = true
         scroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY)
@@ -158,6 +179,7 @@ internal class AnimationManager(private val pdfView: PDFView) {
         }
 
         override fun onAnimationRepeat(animation: Animator) {}
+
         override fun onAnimationStart(animation: Animator) {}
     }
 

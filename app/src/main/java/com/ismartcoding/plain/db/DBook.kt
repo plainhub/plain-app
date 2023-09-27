@@ -7,7 +7,7 @@ import com.ismartcoding.plain.data.IData
 import kotlinx.datetime.*
 
 @Entity(
-    tableName = "books"
+    tableName = "books",
 )
 data class DBook(
     @PrimaryKey override var id: String = StringHelper.shortUUID(),
@@ -41,4 +41,3 @@ interface BookDao {
     @Query("DELETE FROM books WHERE id in (:ids)")
     fun delete(ids: Set<String>)
 }
-

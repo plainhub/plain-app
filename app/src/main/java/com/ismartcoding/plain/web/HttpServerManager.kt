@@ -30,14 +30,13 @@ import java.security.KeyStore
 import java.security.cert.X509Certificate
 import java.util.Collections
 import java.util.Timer
-import java.util.TimerTask
 import kotlin.collections.set
 import kotlin.concurrent.timerTask
 
 object HttpServerManager {
     private const val SSL_KEY_ALIAS = Constants.SSL_NAME
     var tokenCache = mutableMapOf<String, ByteArray>() // cache the session token, format: <client_id>:<token>
-    val clientIpCache = mutableMapOf<String, String>()  // format: <client_id>:<client_ip>
+    val clientIpCache = mutableMapOf<String, String>() // format: <client_id>:<client_ip>
     val wsSessions = Collections.synchronizedSet<WebSocketSession>(LinkedHashSet())
     val clientRequestTs = mutableMapOf<String, Long>()
     var httpServerError: String = ""
@@ -85,20 +84,22 @@ object HttpServerManager {
         val password = TempData.keyStorePassword.toCharArray()
         val httpPort = TempData.httpPort
         val httpsPort = TempData.httpsPort
-        val environment = applicationEngineEnvironment {
-            log = LoggerFactory.getLogger("ktor.application")
-            connector {
-                port = httpPort
+        val environment =
+            applicationEngineEnvironment {
+                log = LoggerFactory.getLogger("ktor.application")
+                connector {
+                    port = httpPort
+                }
+                sslConnector(
+                    keyStore = getSSLKeyStore(context),
+                    keyAlias = SSL_KEY_ALIAS,
+                    keyStorePassword = { password },
+                    privateKeyPassword = { password },
+                ) {
+                    port = httpsPort
+                }
+                module(Application::module)
             }
-            sslConnector(
-                keyStore = getSSLKeyStore(context),
-                keyAlias = SSL_KEY_ALIAS,
-                keyStorePassword = { password },
-                privateKeyPassword = { password }) {
-                port = httpsPort
-            }
-            module(Application::module)
-        }
         return embeddedServer(Netty, environment)
     }
 
@@ -110,19 +111,27 @@ object HttpServerManager {
 
     fun clientTsInterval() {
         val duration = 5000L
-        Timer().scheduleAtFixedRate(timerTask {
-            val now = System.currentTimeMillis()
-            val updates = clientRequestTs.filter { it.value + duration > now }
-                .map { SessionClientTsUpdate(it.key, Instant.fromEpochMilliseconds(it.value)) }
-            if (updates.isNotEmpty()) {
-                coIO {
-                    AppDatabase.instance.sessionDao().updateTs(updates)
+        Timer().scheduleAtFixedRate(
+            timerTask {
+                val now = System.currentTimeMillis()
+                val updates =
+                    clientRequestTs.filter { it.value + duration > now }
+                        .map { SessionClientTsUpdate(it.key, Instant.fromEpochMilliseconds(it.value)) }
+                if (updates.isNotEmpty()) {
+                    coIO {
+                        AppDatabase.instance.sessionDao().updateTs(updates)
+                    }
                 }
-            }
-        }, duration, duration)
+            },
+            duration,
+            duration,
+        )
     }
 
-    suspend fun respondTokenAsync(event: ConfirmToAcceptLoginEvent, clientIp: String) {
+    suspend fun respondTokenAsync(
+        event: ConfirmToAcceptLoginEvent,
+        clientIp: String,
+    ) {
         val token = CryptoHelper.generateAESKey()
         SessionList.addOrUpdateAsync(event.clientId) {
             val r = event.request
@@ -136,12 +145,14 @@ object HttpServerManager {
         HttpServerManager.loadTokenCache()
         event.session.send(
             CryptoHelper.aesEncrypt(
-                HttpServerManager.passwordToToken(), JsonHelper.jsonEncode(
+                HttpServerManager.passwordToToken(),
+                JsonHelper.jsonEncode(
                     AuthResponse(
-                        AuthStatus.COMPLETED, token
-                    )
-                )
-            )
+                        AuthStatus.COMPLETED,
+                        token,
+                    ),
+                ),
+            ),
         )
     }
 }

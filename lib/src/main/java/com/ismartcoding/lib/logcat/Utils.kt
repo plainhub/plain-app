@@ -39,7 +39,10 @@ internal object Utils {
      * NOTE: Logic slightly change due to strict policy on CI -
      * "Inner assignments should be avoided"
      */
-    fun equals(a: CharSequence?, b: CharSequence?): Boolean {
+    fun equals(
+        a: CharSequence?,
+        b: CharSequence?,
+    ): Boolean {
         if (a === b) return true
         if (a != null && b != null) {
             val length = a.length
@@ -129,6 +132,8 @@ internal object Utils {
         }
         return if (`object` is Array<*>) {
             Arrays.deepToString(`object`)
-        } else "Couldn't find a correct type for the object"
+        } else {
+            "Couldn't find a correct type for the object"
+        }
     }
 }

@@ -5,24 +5,24 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.softinput.setWindowSoftInput
 import com.ismartcoding.plain.ApplyWireGuardMutation
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.BoxApi
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.DialogWireguardConfigBinding
-import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.features.box.ApplyWireGuardResultEvent
 import com.ismartcoding.plain.features.box.FetchWireGuardsEvent
 import com.ismartcoding.plain.features.box.WireGuardsResultEvent
 import com.ismartcoding.plain.features.wireguard.WireGuard
 import com.ismartcoding.plain.features.wireguard.toWireGuard
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.softinput.setWindowSoftInput
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.ui.extensions.initMenu
 import com.ismartcoding.plain.ui.extensions.onBack
 import com.ismartcoding.plain.ui.extensions.onMenuItemClick
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.launch
 
 class WireGuardConfigDialog(val wireGuard: WireGuard) : BaseDialog<DialogWireguardConfigBinding>() {
@@ -36,7 +36,10 @@ class WireGuardConfigDialog(val wireGuard: WireGuard) : BaseDialog<DialogWiregua
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.topAppBar.toolbar.run {
             title = "${wireGuard.id}.conf"
@@ -56,7 +59,9 @@ class WireGuardConfigDialog(val wireGuard: WireGuard) : BaseDialog<DialogWiregua
                             val wg = WireGuard()
                             wg.parse(binding.editor.getText())
                             binding.editor.initViewAsync(
-                                lifecycle, "${wg.raw}\n\n" + wg.generateNewPeer().toString(), "ini"
+                                lifecycle,
+                                "${wg.raw}\n\n" + wg.generateNewPeer().toString(),
+                                "ini",
                             )
                         }
                     }
@@ -106,15 +111,16 @@ class WireGuardConfigDialog(val wireGuard: WireGuard) : BaseDialog<DialogWiregua
             val wg = WireGuard()
             wg.parse(binding.editor.getText())
             val content = wg.toString()
-            val r = withIO {
-                BoxApi.mixMutateAsync(
-                    ApplyWireGuardMutation(
-                        wireGuard.id,
-                        content,
-                        wireGuard.isEnabled
+            val r =
+                withIO {
+                    BoxApi.mixMutateAsync(
+                        ApplyWireGuardMutation(
+                            wireGuard.id,
+                            content,
+                            wireGuard.isEnabled,
+                        ),
                     )
-                )
-            }
+                }
             DialogHelper.hideLoading()
             if (!r.isSuccess()) {
                 DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())

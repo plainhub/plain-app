@@ -9,8 +9,8 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.preference.AudioPlayingPreference
-import com.ismartcoding.plain.features.AudioActionEvent
 import com.ismartcoding.plain.databinding.ViewBottomAudioPlayerBinding
+import com.ismartcoding.plain.features.AudioActionEvent
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.services.AudioPlayerService
@@ -23,24 +23,27 @@ class BottomAudioPlayerView(context: Context, attrs: AttributeSet?) : CustomView
     private val seekBarUpdateDelayMillis: Long = 1000
 
     private fun initSeekBarUpdateRunnable() {
-        seekBarUpdateRunnable = Runnable {
-            binding.audioProgress.run {
-                progress++
-                postDelayed(seekBarUpdateRunnable, seekBarUpdateDelayMillis)
+        seekBarUpdateRunnable =
+            Runnable {
+                binding.audioProgress.run {
+                    progress++
+                    postDelayed(seekBarUpdateRunnable, seekBarUpdateDelayMillis)
+                }
             }
-        }
     }
 
     fun initView() {
-        events.add(receiveEventHandler<AudioActionEvent> { event ->
-            when (event.action) {
-                AudioAction.PLAY, AudioAction.PAUSE, AudioAction.SEEK -> {
-                    updateUI()
-                }
+        events.add(
+            receiveEventHandler<AudioActionEvent> { event ->
+                when (event.action) {
+                    AudioAction.PLAY, AudioAction.PAUSE, AudioAction.SEEK -> {
+                        updateUI()
+                    }
 
-                else -> {}
-            }
-        })
+                    else -> {}
+                }
+            },
+        )
         initSeekBarUpdateRunnable()
         setListen()
     }
@@ -94,5 +97,4 @@ class BottomAudioPlayerView(context: Context, attrs: AttributeSet?) : CustomView
             binding.audioProgress.removeCallbacks(it)
         }
     }
-
 }

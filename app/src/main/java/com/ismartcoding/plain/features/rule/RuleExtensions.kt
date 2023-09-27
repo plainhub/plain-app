@@ -2,19 +2,19 @@ package com.ismartcoding.plain.features.rule
 
 import android.content.Context
 import androidx.lifecycle.LifecycleCoroutineScope
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.UpdateConfigMutation
 import com.ismartcoding.plain.api.BoxApi
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.ViewListItemBinding
-import com.ismartcoding.plain.ui.rule.RuleDialog
 import com.ismartcoding.plain.extensions.*
-import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.ApplyTo
 import com.ismartcoding.plain.features.Target
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.extensions.*
+import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.rule.RuleDialog
 import kotlinx.coroutines.launch
 
 fun Rule.toRuleEdit(): RuleEdit {
@@ -26,11 +26,15 @@ fun Rule.toRuleEdit(): RuleEdit {
         RuleProtocol.parse(protocol),
         Target.parse(target),
         isEnabled,
-        notes
+        notes,
     )
 }
 
-fun ViewListItemBinding.bindRule(context: Context, lifecycleScope: LifecycleCoroutineScope, item: Rule) {
+fun ViewListItemBinding.bindRule(
+    context: Context,
+    lifecycleScope: LifecycleCoroutineScope,
+    item: Rule,
+) {
     clearTextRows()
     setKeyText(item.getTitle())
     addTextRow(item.getMessage())
@@ -41,9 +45,10 @@ fun ViewListItemBinding.bindRule(context: Context, lifecycleScope: LifecycleCoro
         lifecycleScope.launch {
             DialogHelper.showLoading()
             item.isEnabled = isEnabled
-            val r = withIO {
-                BoxApi.mixMutateAsync(UpdateConfigMutation(item.id, item.toRuleEdit().toRuleInput()))
-            }
+            val r =
+                withIO {
+                    BoxApi.mixMutateAsync(UpdateConfigMutation(item.id, item.toRuleEdit().toRuleInput()))
+                }
             DialogHelper.hideLoading()
             if (!r.isSuccess()) {
                 DialogHelper.showErrorDialog(context, r.getErrorMessage())
@@ -74,5 +79,11 @@ fun Rule.getTitle(): String {
 fun Rule.getMessage(): String {
     val targetData = Target.parse(target)
     val key = if (direction == RuleDirection.INBOUND.value) R.string.rule_item_description_inbound else R.string.rule_item_description_outbound
-    return LocaleHelper.getStringF(key, "action", RuleAction.parse(action).getText(), "target", targetData.getText(UIDataCache.current().getNetworks()))
+    return LocaleHelper.getStringF(
+        key,
+        "action",
+        RuleAction.parse(action).getText(),
+        "target",
+        targetData.getText(UIDataCache.current().getNetworks()),
+    )
 }

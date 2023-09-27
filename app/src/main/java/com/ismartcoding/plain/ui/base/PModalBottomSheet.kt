@@ -31,9 +31,10 @@ fun PModalBottomSheet(
             TopAppBar(
                 title = { Text(topBarTitle) },
                 actions = { actions?.invoke(this) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                    ),
             )
             VerticalSpace(dp = 16.dp)
             content()

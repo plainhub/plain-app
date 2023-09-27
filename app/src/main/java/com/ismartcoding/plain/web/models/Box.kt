@@ -9,7 +9,7 @@ data class Box(
     val bluetoothMac: String,
     val ips: List<String>,
     val createdAt: Instant,
-    val updatedAt: Instant
+    val updatedAt: Instant,
 )
 
 fun DBox.toModel(): Box {

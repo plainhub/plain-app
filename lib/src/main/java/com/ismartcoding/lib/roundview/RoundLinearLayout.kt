@@ -5,15 +5,20 @@ import android.graphics.Canvas
 import android.util.AttributeSet
 import android.widget.LinearLayout
 
-open class RoundLinearLayout(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = -1)
-    : LinearLayout(context, attrs, defStyleAttr), RoundMethodInterface {
+open class RoundLinearLayout(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = -1) :
+    LinearLayout(context, attrs, defStyleAttr), RoundMethodInterface {
     override val helper: RoundHelper = RoundHelperImpl()
 
     init {
         helper.init(context, attrs, this)
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+    override fun onSizeChanged(
+        w: Int,
+        h: Int,
+        oldw: Int,
+        oldh: Int,
+    ) {
         super.onSizeChanged(w, h, oldw, oldh)
         helper.onSizeChanged(w, h)
     }

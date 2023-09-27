@@ -20,13 +20,13 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.DataType
+import com.ismartcoding.plain.data.enums.MediaType
 import com.ismartcoding.plain.data.preference.ImageSortByPreference
 import com.ismartcoding.plain.databinding.ItemImageGridBinding
 import com.ismartcoding.plain.databinding.ItemMediaBucketGridBinding
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionResultEvent
-import com.ismartcoding.plain.data.enums.MediaType
 import com.ismartcoding.plain.features.image.ImageHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.CastDialog
@@ -49,7 +49,10 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
     override val dataType: DataType
         get() = DataType.IMAGE
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         viewModel.data = bucket
         super.onViewCreated(view, savedInstanceState)
         checkPermission()
@@ -73,12 +76,24 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
         lifecycleScope.launch {
             val context = requireContext()
             initTopAppBar(R.menu.media_items_top) {
-                FileSortHelper.bindSortMenuItemClick(context, lifecycleScope, binding.topAppBar.toolbar.menu, this, MediaType.IMAGE, viewModel, binding.list)
+                FileSortHelper.bindSortMenuItemClick(
+                    context,
+                    lifecycleScope,
+                    binding.topAppBar.toolbar.menu,
+                    this,
+                    MediaType.IMAGE,
+                    viewModel,
+                    binding.list,
+                )
             }
-            FileSortHelper.getSelectedSortItem(binding.topAppBar.toolbar.menu, withIO { ImageSortByPreference.getValueAsync(context) }).highlightTitle(context)
+            FileSortHelper.getSelectedSortItem(
+                binding.topAppBar.toolbar.menu,
+                withIO {
+                    ImageSortByPreference.getValueAsync(context)
+                },
+            ).highlightTitle(context)
         }
     }
-
 
     override fun initList() {
         val spanCount = 3
@@ -93,22 +108,24 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
                     val m = getModel<DMediaBucket>()
                     val b = getBinding<ItemMediaBucketGridBinding>()
                     coMain {
-                        val bitmaps = withIO {
-                            val bms = mutableListOf<Bitmap>()
-                            m.topItems.forEach { path ->
-                                val bm = BitmapHelper.decodeBitmapFromFileAsync(context, path, 200, 200)
-                                if (bm != null) {
-                                    bms.add(bm)
+                        val bitmaps =
+                            withIO {
+                                val bms = mutableListOf<Bitmap>()
+                                m.topItems.forEach { path ->
+                                    val bm = BitmapHelper.decodeBitmapFromFileAsync(context, path, 200, 200)
+                                    if (bm != null) {
+                                        bms.add(bm)
+                                    }
                                 }
+                                bms
                             }
-                            bms
-                        }
                         try {
                             b.image.setImageBitmap(
                                 CombineBitmapTools.combineBitmap(
-                                    200, 200,
-                                    bitmaps
-                                )
+                                    200,
+                                    200,
+                                    bitmaps,
+                                ),
                             )
                         } catch (ex: Exception) {
                             LogCat.e(ex.toString())
@@ -171,22 +188,26 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
     private suspend fun updateImages() {
         val query = viewModel.getQuery()
         val context = requireContext()
-        val items = withIO { ImageHelper.search(context, query, viewModel.limit, viewModel.offset, ImageSortByPreference.getValueAsync(context)) }
+        val items =
+            withIO { ImageHelper.search(context, query, viewModel.limit, viewModel.offset, ImageSortByPreference.getValueAsync(context)) }
         viewModel.total = withIO { ImageHelper.count(context, query) }
 
         val bindingAdapter = binding.list.rv.bindingAdapter
         val toggleMode = bindingAdapter.toggleMode
         val checkedItems = bindingAdapter.getCheckedModels<ImageModel>()
-        binding.list.page.addData(items.map { a ->
-            ImageModel(a).apply {
-                title = a.title
-                this.toggleMode = toggleMode
-                size = FormatHelper.formatBytes(a.size)
-                isChecked = checkedItems.any { it.data.id == data.id }
-            }
-        }, hasMore = {
-            items.size == viewModel.limit
-        })
+        binding.list.page.addData(
+            items.map { a ->
+                ImageModel(a).apply {
+                    title = a.title
+                    this.toggleMode = toggleMode
+                    size = FormatHelper.formatBytes(a.size)
+                    isChecked = checkedItems.any { it.data.id == data.id }
+                }
+            },
+            hasMore = {
+                items.size == viewModel.limit
+            },
+        )
     }
 
     private suspend fun updateFolders() {
@@ -198,6 +219,4 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
     override fun updateDrawerMenu() {
         updateDrawerMenu(DrawerMenuGroupType.ALL, DrawerMenuGroupType.FOLDERS, DrawerMenuGroupType.TAGS)
     }
-
 }
-

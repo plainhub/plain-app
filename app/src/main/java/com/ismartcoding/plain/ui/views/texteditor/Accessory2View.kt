@@ -13,36 +13,38 @@ import com.ismartcoding.plain.ui.helpers.WebHelper
 class Accessory2View(context: Context, attrs: AttributeSet?) : RecyclerView(context, attrs) {
     private data class AccessoryItem(val icon: Int = 0, val before: String = "", val after: String = "")
 
-    private val items = listOf(
-        AccessoryItem(R.drawable.ic_undo),
-        AccessoryItem(R.drawable.ic_redo),
-        AccessoryItem(R.drawable.ic_paste),
-        AccessoryItem(R.drawable.ic_format_bold, "**", "**"),
-        AccessoryItem(R.drawable.ic_format_italic, "*", "*"),
-        AccessoryItem(R.drawable.ic_format_underlined, "<u>", "</u>"),
-        AccessoryItem(R.drawable.ic_format_strikethrough, "~~", "~~"),
-        AccessoryItem(R.drawable.ic_code, "```\n", "\n```"),
-        AccessoryItem(R.drawable.ic_superscript, "\$\$\n", "\n\$\$"),
-        AccessoryItem(
-            R.drawable.ic_table, """
+    private val items =
+        listOf(
+            AccessoryItem(R.drawable.ic_undo),
+            AccessoryItem(R.drawable.ic_redo),
+            AccessoryItem(R.drawable.ic_paste),
+            AccessoryItem(R.drawable.ic_format_bold, "**", "**"),
+            AccessoryItem(R.drawable.ic_format_italic, "*", "*"),
+            AccessoryItem(R.drawable.ic_format_underlined, "<u>", "</u>"),
+            AccessoryItem(R.drawable.ic_format_strikethrough, "~~", "~~"),
+            AccessoryItem(R.drawable.ic_code, "```\n", "\n```"),
+            AccessoryItem(R.drawable.ic_superscript, "\$\$\n", "\n\$\$"),
+            AccessoryItem(
+                R.drawable.ic_table,
+                """
 | HEADER | HEADER | HEADER |
 |:----:|:----:|:----:|
 |      |      |      |
 |      |      |      |
 |      |      |      |
-"""
-        ),
-        AccessoryItem(R.drawable.ic_check_box, "- [x] "),
-        AccessoryItem(R.drawable.ic_check_box_blank, "- [ ] "),
-        AccessoryItem(R.drawable.ic_link, "[Link](", ")"),
-        AccessoryItem(R.drawable.ic_image),
-        AccessoryItem(R.drawable.ic_format_color, "<font color=\"\">", "</font>"),
-        AccessoryItem(R.drawable.ic_to_top),
-        AccessoryItem(R.drawable.ic_to_bottom),
+""",
+            ),
+            AccessoryItem(R.drawable.ic_check_box, "- [x] "),
+            AccessoryItem(R.drawable.ic_check_box_blank, "- [ ] "),
+            AccessoryItem(R.drawable.ic_link, "[Link](", ")"),
+            AccessoryItem(R.drawable.ic_image),
+            AccessoryItem(R.drawable.ic_format_color, "<font color=\"\">", "</font>"),
+            AccessoryItem(R.drawable.ic_to_top),
+            AccessoryItem(R.drawable.ic_to_bottom),
 //        AccessoryItem(R.drawable.ic_find_replace),
-        AccessoryItem(R.drawable.ic_help),
-        AccessoryItem(R.drawable.ic_settings),
-    )
+            AccessoryItem(R.drawable.ic_help),
+            AccessoryItem(R.drawable.ic_settings),
+        )
     private val outValue = TypedValue()
     lateinit var getEditor: (() -> Editor)
 
@@ -90,7 +92,6 @@ class Accessory2View(context: Context, attrs: AttributeSet?) : RecyclerView(cont
                     }
                 }
             }
-
         }.models = items
     }
 }

@@ -19,9 +19,7 @@ import com.ismartcoding.plain.ui.base.GridItem
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.box.AddNewBoxDialog
 import com.ismartcoding.plain.ui.box.BoxDetailDialog
-import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.models.MainViewModel
-import com.ismartcoding.plain.ui.page.RouteName
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -38,15 +36,16 @@ fun HomeItemHardware(
 
     Column {
         Subtitle(
-            text = stringResource(R.string.home_item_title_hardware)
+            text = stringResource(R.string.home_item_title_hardware),
         )
         HomeItemFlow {
             boxesState.forEach {
                 GridItem(
                     icon = Icons.Outlined.Router,
                     it.name,
-                    modifier = Modifier
-                        .width(itemWidth)
+                    modifier =
+                        Modifier
+                            .width(itemWidth),
                 ) {
                     BoxDetailDialog(it.id).show()
                 }
@@ -54,11 +53,11 @@ fun HomeItemHardware(
             GridItem(
                 icon = Icons.Outlined.Add,
                 stringResource(id = R.string.add_new_box_button),
-                modifier = Modifier
-                    .width(itemWidth)
+                modifier =
+                    Modifier
+                        .width(itemWidth),
             ) {
                 AddNewBoxDialog {
-
                 }.show()
             }
         }

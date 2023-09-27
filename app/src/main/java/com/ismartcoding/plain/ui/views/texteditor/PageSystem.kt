@@ -72,7 +72,10 @@ class PageSystem(var text: String = "") {
         }
     }
 
-    fun updateStartingLines(fromPage: Int, difference: Int) {
+    fun updateStartingLines(
+        fromPage: Int,
+        difference: Int,
+    ) {
         var newFromPage = fromPage
         if (difference == 0) return
         if (newFromPage < 1) newFromPage = 1

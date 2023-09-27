@@ -22,7 +22,6 @@ import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.datetime.Clock
 import java.io.Reader
 import java.io.Writer
-import java.net.URL
 import java.util.*
 
 object FeedHelper {
@@ -49,7 +48,10 @@ object FeedHelper {
         return item.id
     }
 
-    fun updateAsync(id: String, updateItem: DFeed.() -> Unit): String {
+    fun updateAsync(
+        id: String,
+        updateItem: DFeed.() -> Unit,
+    ): String {
         val item = feedDao.getById(id) ?: return id
         item.updatedAt = Clock.System.now()
         updateItem(item)
@@ -71,19 +73,23 @@ object FeedHelper {
         opml.body.outlines.forEach {
             if (it.subElements.isEmpty()) {
                 if (it.attributes["xmlUrl"] != null) {
-                    feedList.add(DFeed().apply {
-                        name = it.getName()
-                        url = it.getUrl()
-                        fetchContent = it.attributes["fetchContent"] == "true"
-                    })
+                    feedList.add(
+                        DFeed().apply {
+                            name = it.getName()
+                            url = it.getUrl()
+                            fetchContent = it.attributes["fetchContent"] == "true"
+                        },
+                    )
                 }
             } else {
                 it.subElements.forEach { outline ->
-                    feedList.add(DFeed().apply {
-                        name = outline.getName()
-                        url = outline.getUrl()
-                        fetchContent = outline.attributes["fetchContent"] == "true"
-                    })
+                    feedList.add(
+                        DFeed().apply {
+                            name = outline.getName()
+                            url = outline.getUrl()
+                            fetchContent = outline.attributes["fetchContent"] == "true"
+                        },
+                    )
                 }
             }
         }
@@ -94,27 +100,29 @@ object FeedHelper {
 
     suspend fun export(writer: Writer) {
         val feeds = getAll()
-        val result = OpmlWriter().write(
-            Opml(
-                "2.0",
-                Head(
-                    LocaleHelper.getString(R.string.app_name),
-                    Date().toString()
+        val result =
+            OpmlWriter().write(
+                Opml(
+                    "2.0",
+                    Head(
+                        LocaleHelper.getString(R.string.app_name),
+                        Date().toString(),
+                    ),
+                    Body(
+                        feeds.map { feed ->
+                            Outline(
+                                mapOf(
+                                    "text" to feed.name,
+                                    "title" to feed.name,
+                                    "xmlUrl" to feed.url,
+                                    "fetchContent" to feed.fetchContent.toString(),
+                                ),
+                                listOf(),
+                            )
+                        },
+                    ),
                 ),
-                Body(
-                    feeds.map { feed ->
-                        Outline(
-                            mapOf(
-                                "text" to feed.name,
-                                "title" to feed.name,
-                                "xmlUrl" to feed.url,
-                                "fetchContent" to feed.fetchContent.toString(),
-                            ),
-                            listOf()
-                        )
-                    }
-                )
-            ))
+            )
         writer.write(result)
         writer.close()
     }

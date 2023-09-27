@@ -2,7 +2,6 @@
 
 package com.ismartcoding.lib.brv
 
-
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Handler
@@ -24,12 +23,12 @@ import androidx.recyclerview.widget.RecyclerView.NO_ID
 import androidx.viewbinding.ViewBinding
 import com.ismartcoding.lib.brv.animation.*
 import com.ismartcoding.lib.brv.annotaion.AnimationType
-import com.ismartcoding.lib.brv.utils.BRV
-import com.ismartcoding.lib.brv.utils.setDifferModels
 import com.ismartcoding.lib.brv.item.*
 import com.ismartcoding.lib.brv.listener.*
 import com.ismartcoding.lib.brv.listener.ProxyDiffCallback
+import com.ismartcoding.lib.brv.utils.BRV
 import com.ismartcoding.lib.brv.utils.models
+import com.ismartcoding.lib.brv.utils.setDifferModels
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Modifier
 import java.util.concurrent.*
@@ -37,7 +36,6 @@ import kotlin.math.min
 
 @Suppress("UNCHECKED_CAST", "MemberVisibilityCanBePrivate")
 open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolder>() {
-
     /** 当前Adapter被setAdapter才不为null */
     var rv: RecyclerView? = null
 
@@ -61,7 +59,6 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
         }
     }
 
-
     // <editor-fold desc="生命周期">
     private var onCreate: (BindingViewHolder.(viewType: Int) -> Unit)? = null
     private var onBind: (BindingViewHolder.() -> Unit)? = null
@@ -70,7 +67,6 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     private var onLongClick: (BindingViewHolder.(viewId: Int) -> Unit)? = null
     private var onChecked: ((position: Int, checked: Boolean, allChecked: Boolean) -> Unit)? = null
     private var onToggle: ((position: Int, toggleMode: Boolean, end: Boolean) -> Unit)? = null
-
 
     /**
      * [onCreateViewHolder]执行时回调
@@ -102,36 +98,47 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
 
     // </editor-fold>
 
-
     // <editor-fold desc="覆写函数">
 
     private var context: Context? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingViewHolder {
-        val vh = if (dataBindingEnable) {
-            val viewBinding = DataBindingUtil.inflate<ViewDataBinding>(
-                LayoutInflater.from(parent.context),
-                viewType,
-                parent,
-                false
-            )
-            if (viewBinding == null) {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): BindingViewHolder {
+        val vh =
+            if (dataBindingEnable) {
+                val viewBinding =
+                    DataBindingUtil.inflate<ViewDataBinding>(
+                        LayoutInflater.from(parent.context),
+                        viewType,
+                        parent,
+                        false,
+                    )
+                if (viewBinding == null) {
+                    BindingViewHolder(parent.getView(viewType))
+                } else {
+                    BindingViewHolder(
+                        viewBinding,
+                    )
+                }
+            } else {
                 BindingViewHolder(parent.getView(viewType))
-            } else BindingViewHolder(
-                viewBinding
-            )
-        } else {
-            BindingViewHolder(parent.getView(viewType))
-        }
+            }
         onCreate?.invoke(vh, viewType)
         return vh
     }
 
-    fun ViewGroup.getView(@LayoutRes layout: Int): View {
+    fun ViewGroup.getView(
+        @LayoutRes layout: Int,
+    ): View {
         return LayoutInflater.from(context).inflate(layout, this, false)
     }
 
-    override fun onBindViewHolder(holder: BindingViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: BindingViewHolder,
+        position: Int,
+    ) {
         holder.bind(getModel(position))
     }
 
@@ -148,18 +155,19 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     }
 
     override fun getItemViewType(position: Int): Int {
-
         val model = getModel<Any>(position)
         val modelClass: Class<*> = model.javaClass
-        return (typePool[modelClass]?.invoke(model, position) ?: interfacePool?.run {
-            for (interfaceType in this) {
-                if (interfaceType.key.isAssignableFrom(modelClass)) {
-                    return@run interfaceType.value.invoke(model, position)
+        return (
+            typePool[modelClass]?.invoke(model, position) ?: interfacePool?.run {
+                for (interfaceType in this) {
+                    if (interfaceType.key.isAssignableFrom(modelClass)) {
+                        return@run interfaceType.value.invoke(model, position)
+                    }
                 }
+                null
             }
-            null
-        }
-        ?: throw NoSuchPropertyException("please add item model type : addType<${model.javaClass.name}>(R.layout.item)"))
+                ?: throw NoSuchPropertyException("please add item model type : addType<${model.javaClass.name}>(R.layout.item)")
+        )
     }
 
     override fun getItemCount(): Int {
@@ -189,7 +197,6 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
 
     // </editor-fold>
 
-
     // <editor-fold desc="多类型">
 
     /** 类型池 */
@@ -201,7 +208,9 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
      * 在BRV中一个Item类型就是对应一个唯一的布局文件Id, 而[M]即为对应该类型所需的数据类型. 只要使用该函数添加的元素类型才被允许赋值给[models].
      * 然后假设你使用DataBinding的话, 则该类型对应在[models]中的对象会被DataBinding绑定都对应的布局上. 前提是你有在xml中声明数据类型
      */
-    inline fun <reified M> addType(@LayoutRes layout: Int) {
+    inline fun <reified M> addType(
+        @LayoutRes layout: Int,
+    ) {
         if (Modifier.isInterface(M::class.java.modifiers)) {
             M::class.java.addInterfaceType { layout }
         } else {
@@ -227,12 +236,13 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
      * @see addType
      */
     fun Class<*>.addInterfaceType(block: Any.(Int) -> Int) {
-        (interfacePool ?: mutableMapOf<Class<*>, Any.(Int) -> Int>().also {
-            interfacePool = it
-        })[this] = block
+        (
+            interfacePool ?: mutableMapOf<Class<*>, Any.(Int) -> Int>().also {
+                interfacePool = it
+            }
+        )[this] = block
     }
     // </editor-fold>
-
 
     // <editor-fold desc="触摸事件">
     private val clickListeners = HashMap<Int, Pair<(BindingViewHolder.(Int) -> Unit)?, Boolean>>()
@@ -251,7 +261,10 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     /**
      * 监听指定Id控件的点击事件, 包含防抖动
      */
-    fun onClick(@IdRes vararg id: Int, block: BindingViewHolder.(viewId: Int) -> Unit) {
+    fun onClick(
+        @IdRes vararg id: Int,
+        block: BindingViewHolder.(viewId: Int) -> Unit,
+    ) {
         for (i in id) {
             clickListeners[i] = Pair(block, false)
         }
@@ -261,7 +274,10 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     /**
      * 监听指定Id控件的点击事件
      */
-    fun onFastClick(@IdRes vararg id: Int, block: BindingViewHolder.(viewId: Int) -> Unit) {
+    fun onFastClick(
+        @IdRes vararg id: Int,
+        block: BindingViewHolder.(viewId: Int) -> Unit,
+    ) {
         for (i in id) {
             clickListeners[i] = Pair(block, true)
         }
@@ -271,7 +287,10 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     /**
      * 长按点击事件回调
      */
-    fun onLongClick(@IdRes vararg id: Int, block: BindingViewHolder.(viewId: Int) -> Unit) {
+    fun onLongClick(
+        @IdRes vararg id: Int,
+        block: BindingViewHolder.(viewId: Int) -> Unit,
+    ) {
         for (i in id) {
             longClickListeners[i] = block
         }
@@ -286,9 +305,9 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     }
 
     fun @receiver:IdRes Int.checkable() {
-       this.onClick {
-           checkedSwitch(bindingAdapterPosition)
-       }
+        this.onClick {
+            checkedSwitch(bindingAdapterPosition)
+        }
     }
 
     /**
@@ -318,7 +337,6 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     }
 
     // </editor-fold>
-
 
     // <editor-fold desc="列表动画">
 
@@ -351,7 +369,6 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
         }
     }
 
-
     // </editor-fold>
 
     // <editor-fold desc="头布局">
@@ -372,8 +389,11 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
      * @param index 插入头布局中的索引
      * @param animation 是否显示动画
      */
-    fun addHeader(model: Any?, @IntRange(from = -1) index: Int = -1, animation: Boolean = false) {
-
+    fun addHeader(
+        model: Any?,
+        @IntRange(from = -1) index: Int = -1,
+        animation: Boolean = false,
+    ) {
         if (index == -1) {
             (headers as MutableList).add(0, model)
             if (animation) notifyItemInserted(0)
@@ -388,21 +408,29 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     /**
      * 通过数据删除头布局
      */
-    fun removeHeader(model: Any?, animation: Boolean = false) {
+    fun removeHeader(
+        model: Any?,
+        animation: Boolean = false,
+    ) {
         if (headerCount != 0 && headers.contains(model)) {
             val headerIndex = headers.indexOf(model)
 
             (headers as MutableList).remove(model)
             if (animation) {
                 notifyItemRemoved(headerIndex)
-            } else notifyDataSetChanged()
+            } else {
+                notifyDataSetChanged()
+            }
         }
     }
 
     /**
      * 通过索引删除头布局
      */
-    fun removeHeaderAt(@IntRange(from = 0) index: Int = 0, animation: Boolean = false) {
+    fun removeHeaderAt(
+        @IntRange(from = 0) index: Int = 0,
+        animation: Boolean = false,
+    ) {
         if (headerCount <= 0 || headerCount < index) return
         (headers as MutableList).removeAt(index)
         if (animation) notifyItemRemoved(index) else notifyDataSetChanged()
@@ -419,11 +447,11 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     /**
      * 指定position是否为头布局
      */
-    fun isHeader(@IntRange(from = 0) position: Int): Boolean =
-        (headerCount > 0 && position < headerCount)
+    fun isHeader(
+        @IntRange(from = 0) position: Int,
+    ): Boolean = (headerCount > 0 && position < headerCount)
 
     // </editor-fold>
-
 
     // <editor-fold desc="脚布局">
 
@@ -455,7 +483,11 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
      * @param index 指定插入的脚布局索引
      * @param animation 是否显示动画
      */
-    fun addFooter(model: Any?, @IntRange(from = -1) index: Int = -1, animation: Boolean = false) {
+    fun addFooter(
+        model: Any?,
+        @IntRange(from = -1) index: Int = -1,
+        animation: Boolean = false,
+    ) {
         if (index == -1) {
             (footers as MutableList).add(model)
             if (animation) {
@@ -476,21 +508,28 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     /**
      * 通过数据模型删除脚布局
      */
-    fun removeFooter(model: Any?, animation: Boolean = false) {
+    fun removeFooter(
+        model: Any?,
+        animation: Boolean = false,
+    ) {
         if (footerCount != 0 && footers.contains(model)) {
             val footerIndex = headerCount + modelCount + footers.indexOf(model)
             (footers as MutableList).remove(model)
             if (animation) {
                 notifyItemRemoved(footerIndex)
-            } else notifyDataSetChanged()
+            } else {
+                notifyDataSetChanged()
+            }
         }
     }
 
     /**
      * 通过索引删除脚布局
      */
-    fun removeFooterAt(@IntRange(from = -1) index: Int = -1, animation: Boolean = false) {
-
+    fun removeFooterAt(
+        @IntRange(from = -1) index: Int = -1,
+        animation: Boolean = false,
+    ) {
         if (footerCount <= 0 || footerCount < index) return
 
         if (index == -1) {
@@ -520,18 +559,20 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
             (footers as MutableList).clear()
             if (animation) {
                 notifyItemRangeRemoved(headerCount + modelCount, itemCount + footerCount)
-            } else notifyDataSetChanged()
+            } else {
+                notifyDataSetChanged()
+            }
         }
     }
 
     /**
      * 指定position是否为脚布局
      */
-    fun isFooter(@IntRange(from = 0) position: Int): Boolean =
-        (footerCount > 0 && position >= headerCount + modelCount && position < itemCount)
+    fun isFooter(
+        @IntRange(from = 0) position: Int,
+    ): Boolean = (footerCount > 0 && position >= headerCount + modelCount && position < itemCount)
 
     // </editor-fold>
-
 
     // <editor-fold desc="数据">
 
@@ -550,13 +591,15 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
      */
     var models: List<Any>?
         get() = _data
+
         @SuppressLint("NotifyDataSetChanged")
         set(value) {
-            _data = when (value) {
-                is ArrayList -> flat(value)
-                is List -> flat(value.toMutableList())
-                else -> null
-            }
+            _data =
+                when (value) {
+                    is ArrayList -> flat(value)
+                    is List -> flat(value.toMutableList())
+                    else -> null
+                }
             notifyDataSetChanged()
             checkedPosition.clear()
             if (isFirst) {
@@ -589,14 +632,15 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     fun setDifferModels(
         newModels: List<Any>?,
         detectMoves: Boolean = true,
-        commitCallback: Runnable? = null
+        commitCallback: Runnable? = null,
     ) {
         val oldModels = _data
-        _data = when (newModels) {
-            is ArrayList -> flat(newModels)
-            is List -> flat(newModels.toMutableList())
-            else -> null
-        }
+        _data =
+            when (newModels) {
+                is ArrayList -> flat(newModels)
+                is List -> flat(newModels.toMutableList())
+                else -> null
+            }
         val diffResult = DiffUtil.calculateDiff(ProxyDiffCallback(newModels, oldModels, itemDifferCallback), detectMoves)
         val mainLooper = Looper.getMainLooper()
         if (Looper.myLooper() != mainLooper) {
@@ -635,7 +679,6 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
         expand: Boolean? = null,
         @IntRange(from = -1) depth: Int = 0,
     ): MutableList<Any> {
-
         if (models.isEmpty()) return models
         val arrayList = ArrayList(models)
         models.clear()
@@ -663,8 +706,9 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     /**
      * 指定position是否为models
      */
-    fun isModel(@IntRange(from = 0) position: Int): Boolean =
-        !(isHeader(position) || isFooter(position))
+    fun isModel(
+        @IntRange(from = 0) position: Int,
+    ): Boolean = !(isHeader(position) || isFooter(position))
 
     /**
      * 根据索引返回数据模型, 如果不存在该模型则返回Null
@@ -680,14 +724,15 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     /**
      * 根据索引返回数据模型, 不存在该模型则抛出异常
      */
-    fun <M> getModel(@IntRange(from = 0) position: Int): M {
+    fun <M> getModel(
+        @IntRange(from = 0) position: Int,
+    ): M {
         return when {
             isHeader(position) -> headers[position] as M
             isFooter(position) -> footers[position - headerCount - modelCount] as M
             else -> models!!.let { it[position - headerCount] as M }
         }
     }
-
 
     /**
      * 添加新的数据
@@ -699,13 +744,14 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     fun addModels(
         models: List<Any>?,
         animation: Boolean = true,
-        @IntRange(from = -1) index: Int = -1
+        @IntRange(from = -1) index: Int = -1,
     ) {
         if (models.isNullOrEmpty()) return
-        val data: MutableList<Any> = when (models) {
-            is ArrayList -> models
-            else -> models.toMutableList()
-        }
+        val data: MutableList<Any> =
+            when (models) {
+                is ArrayList -> models
+                else -> models.toMutableList()
+            }
         when {
             this.models == null -> {
                 this.models = flat(data)
@@ -746,7 +792,6 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
         }
     }
 
-
     /**
      * 对应models中的index
      */
@@ -754,7 +799,7 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
 
     // </editor-fold>
 
-    //<editor-fold desc="切换模式">
+    // <editor-fold desc="切换模式">
 
     /** 是否开启切换模式 */
     var toggleMode = false
@@ -768,12 +813,14 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
         onToggle?.let {
             toggleMode = !toggleMode
             for (position in 0 until itemCount) {
-                if (position != itemCount - 1) it.invoke(position, toggleMode, false)
-                else it.invoke(position, toggleMode, true)
+                if (position != itemCount - 1) {
+                    it.invoke(position, toggleMode, false)
+                } else {
+                    it.invoke(position, toggleMode, true)
+                }
             }
         }
     }
-
 
     /**
      * 设置切换模式, 切换模式为遍历每个item
@@ -783,7 +830,6 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     fun toggle(toggleMode: Boolean) {
         if (toggleMode != this.toggleMode) toggle()
     }
-
 
     /**
      * 切换模式事件回调
@@ -795,8 +841,7 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     fun onToggle(block: (position: Int, toggleModel: Boolean, end: Boolean) -> Unit) {
         onToggle = block
     }
-    //</editor-fold>
-
+    // </editor-fold>
 
     // <editor-fold desc="选择模式">
 
@@ -805,7 +850,10 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     /** 已选择条目的position */
     val checkedPosition = mutableListOf<Int>()
 
-    fun fixCheckedPosition(position: Int, isChecked: Boolean) {
+    fun fixCheckedPosition(
+        position: Int,
+        isChecked: Boolean,
+    ) {
         if (isChecked) {
             if (!checkedPosition.contains(position)) {
                 checkedPosition.add(position)
@@ -863,10 +911,11 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
      * 设置可以被选择的item类型
      * @see setChecked
      */
-    fun setCheckableType(@LayoutRes vararg checkableItemType: Int) {
+    fun setCheckableType(
+        @LayoutRes vararg checkableItemType: Int,
+    ) {
         checkableItemTypeList = checkableItemType.toMutableList()
     }
-
 
     /**
      * 单选模式下不支持全选, 但支持取消全部选择
@@ -892,7 +941,6 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
      */
     fun isCheckedAll(): Boolean = checkedCount == checkableCount
 
-
     /**
      * 反选
      */
@@ -910,11 +958,15 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     /**
      * 设置选中
      */
-    fun setChecked(@IntRange(from = 0) position: Int, checked: Boolean) {
-
+    fun setChecked(
+        @IntRange(from = 0) position: Int,
+        checked: Boolean,
+    ) {
         if ((checkedPosition.contains(position) && checked) ||
             (!checked && !checkedPosition.contains(position))
-        ) return
+        ) {
+            return
+        }
 
         val itemViewType = getItemViewType(position)
 
@@ -922,8 +974,11 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
 
         if (onChecked == null) return
 
-        if (checked) checkedPosition.add(position)
-        else checkedPosition.remove(Integer.valueOf(position))
+        if (checked) {
+            checkedPosition.add(position)
+        } else {
+            checkedPosition.remove(Integer.valueOf(position))
+        }
 
         if (singleMode && checked && checkedPosition.size > 1) {
             setChecked(checkedPosition[0], false)
@@ -934,14 +989,15 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
     /**
      * 切换选中
      */
-    fun checkedSwitch(@IntRange(from = 0) position: Int) {
+    fun checkedSwitch(
+        @IntRange(from = 0) position: Int,
+    ) {
         if (checkedPosition.contains(position)) {
             setChecked(position, false)
         } else {
             setChecked(position, true)
         }
     }
-
 
     /**
      * 条目选中事件回调
@@ -952,7 +1008,7 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
 
     // </editor-fold>
 
-    //<editor-fold desc="分组">
+    // <editor-fold desc="分组">
 
     private var previousExpandPosition = -1
     private var onExpand: (BindingViewHolder.(Boolean) -> Unit)? = null
@@ -1000,11 +1056,12 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
         scrollTop: Boolean = false,
         @IntRange(from = -1) depth: Int = 0,
     ): Int {
-        val holder = rv?.findViewHolderForLayoutPosition(position) as? BindingViewHolder ?: rv?.run {
-            val holder = createViewHolder(this, getItemViewType(position))
-            bindViewHolder(holder, position)
-            holder
-        } ?: return 0
+        val holder =
+            rv?.findViewHolderForLayoutPosition(position) as? BindingViewHolder ?: rv?.run {
+                val holder = createViewHolder(this, getItemViewType(position))
+                bindViewHolder(holder, position)
+                holder
+            } ?: return 0
         return holder.expand(scrollTop, depth)
     }
 
@@ -1014,12 +1071,16 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
      * @param depth 递归展开子项的深度, 如等于-1则代表展开所有子项, 0表示仅展开当前
      * @return 折叠后消失的条目数量
      */
-    fun collapse(@IntRange(from = 0) position: Int, @IntRange(from = -1) depth: Int = 0): Int {
-        val holder = rv?.findViewHolderForLayoutPosition(position) as? BindingViewHolder ?: rv?.run {
-            val holder = createViewHolder(this, getItemViewType(position))
-            bindViewHolder(holder, position)
-            holder
-        } ?: return 0
+    fun collapse(
+        @IntRange(from = 0) position: Int,
+        @IntRange(from = -1) depth: Int = 0,
+    ): Int {
+        val holder =
+            rv?.findViewHolderForLayoutPosition(position) as? BindingViewHolder ?: rv?.run {
+                val holder = createViewHolder(this, getItemViewType(position))
+                bindViewHolder(holder, position)
+                holder
+            } ?: return 0
         return holder.collapse(depth)
     }
 
@@ -1034,18 +1095,18 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
         scrollTop: Boolean = false,
         @IntRange(from = -1) depth: Int = 0,
     ): Int {
-        val holder = rv?.findViewHolderForLayoutPosition(position) as? BindingViewHolder ?: rv?.run {
-            val holder = createViewHolder(this, getItemViewType(position))
-            bindViewHolder(holder, position)
-            holder
-        } ?: return 0
+        val holder =
+            rv?.findViewHolderForLayoutPosition(position) as? BindingViewHolder ?: rv?.run {
+                val holder = createViewHolder(this, getItemViewType(position))
+                bindViewHolder(holder, position)
+                holder
+            } ?: return 0
         return holder.expandOrCollapse(scrollTop, depth)
     }
 
-    //</editor-fold>
+    // </editor-fold>
 
     inner class BindingViewHolder : RecyclerView.ViewHolder {
-
         lateinit var _data: Any private set
         var context: Context = this@BindingAdapter.context!!
         val adapter: BindingAdapter = this@BindingAdapter
@@ -1112,7 +1173,6 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
             }
         }
 
-
         /**
          * 返回匹配泛型的数据绑定对象ViewDataBinding
          */
@@ -1142,11 +1202,12 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
             }
         }
 
-
         /**
          * 查找ItemView上的视图
          */
-        fun <V : View?> findView(@IdRes id: Int): V = itemView.findViewById(id)
+        fun <V : View?> findView(
+            @IdRes id: Int,
+        ): V = itemView.findViewById(id)
 
         /**
          * 返回数据模型
@@ -1158,14 +1219,18 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
          */
         inline fun <reified M> getModelOrNull(): M? = _data as? M
 
-        //<editor-fold desc="分组">
+        // <editor-fold desc="分组">
+
         /**
          * 展开子项
          * @param scrollTop 展开同时当前条目滑动到顶部
          * @param depth 递归展开子项的深度, 如等于-1则代表展开所有子项, 0表示仅展开当前
          * @return 展开后新增的条目数量
          */
-        fun expand(scrollTop: Boolean = false, @IntRange(from = -1) depth: Int = 0): Int {
+        fun expand(
+            scrollTop: Boolean = false,
+            @IntRange(from = -1) depth: Int = 0,
+        ): Int {
             val itemExpand = getModelOrNull<ItemExpand>()
             if (itemExpand?.itemExpand == true) return 0
 
@@ -1215,7 +1280,9 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
          * @param depth 递归折叠子项的深度, 如等于-1则代表展开所有子项, 0表示仅展开当前
          * @return 折叠后减少的条目数量
          */
-        fun collapse(@IntRange(from = -1) depth: Int = 0): Int {
+        fun collapse(
+            @IntRange(from = -1) depth: Int = 0,
+        ): Int {
             val itemExpand = getModelOrNull<ItemExpand>()
 
             if (itemExpand?.itemExpand == false) return 0
@@ -1232,7 +1299,10 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
                     0
                 } else {
                     val sublistFlat = flat(ArrayList(itemSublist), false, depth)
-                    (this@BindingAdapter.models as MutableList).subList(position + 1 - headerCount, position + 1 - headerCount + sublistFlat.size).clear()
+                    (this@BindingAdapter.models as MutableList).subList(
+                        position + 1 - headerCount,
+                        position + 1 - headerCount + sublistFlat.size,
+                    ).clear()
                     if (expandAnimationEnabled) {
                         notifyItemChanged(position, itemExpand)
                         notifyItemRangeRemoved(position + 1, sublistFlat.size)
@@ -1252,11 +1322,16 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
          * @param depth 递归展开子项的深度, 如等于-1则代表展开所有子项, 0表示仅展开当前
          * @return 展开|折叠后变动的条目数量
          */
-        fun expandOrCollapse(scrollTop: Boolean = false, @IntRange(from = -1) depth: Int = 0): Int {
+        fun expandOrCollapse(
+            scrollTop: Boolean = false,
+            @IntRange(from = -1) depth: Int = 0,
+        ): Int {
             val itemExpand = getModelOrNull<ItemExpand>()
             return if (itemExpand != null) {
                 if (itemExpand.itemExpand) collapse(depth) else expand(scrollTop, depth)
-            } else 0
+            } else {
+                0
+            }
         }
 
         /**
@@ -1281,10 +1356,10 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
             return rv?.findViewHolderForLayoutPosition(findParentPosition()) as? BindingViewHolder
         }
 
-        //</editor-fold>
+        // </editor-fold>
     }
 
-    //<editor-fold desc="悬停">
+    // <editor-fold desc="悬停">
 
     /**
      * 是否启用条目悬停
@@ -1303,5 +1378,5 @@ open class BindingAdapter : RecyclerView.Adapter<BindingAdapter.BindingViewHolde
         val model = getModelOrNull<ItemHover>(position)
         return model != null && model.itemHover && hoverEnabled
     }
-    //</editor-fold>
+    // </editor-fold>
 }

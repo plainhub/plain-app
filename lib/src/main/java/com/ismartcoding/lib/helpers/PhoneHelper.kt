@@ -23,7 +23,9 @@ object PhoneHelper {
             val model = Build.MODEL
             return if (model.startsWith(manufacturer)) {
                 model.capitalize()
-            } else manufacturer.capitalize() + " " + model
+            } else {
+                manufacturer.capitalize() + " " + model
+            }
         }
         return name
     }

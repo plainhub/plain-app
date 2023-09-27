@@ -11,44 +11,48 @@ internal class RefreshLayoutNestedScrollConnection(
     private val composePosition: ComposePosition,
     private val refreshLayoutState: RefreshLayoutState,
     private val dragEfficiency: Float,
-    private val orientationIsHorizontal: Boolean
+    private val orientationIsHorizontal: Boolean,
 ) : NestedScrollConnection {
     override fun onPostScroll(
         consumed: Offset,
         available: Offset,
-        source: NestedScrollSource
+        source: NestedScrollSource,
     ): Offset {
         if (source == NestedScrollSource.Drag) {
             when (composePosition) {
                 ComposePosition.Start -> {
                     val value = available.x
                     if (value > 0) {
-                        if (value > 0.01f)
+                        if (value > 0.01f) {
                             refreshLayoutState.offset(value * dragEfficiency)
+                        }
                         return Offset(value, 0f)
                     }
                 }
                 ComposePosition.End -> {
                     val value = available.x
                     if (value < 0) {
-                        if (value < -0.01f)
+                        if (value < -0.01f) {
                             refreshLayoutState.offset(value * dragEfficiency)
+                        }
                         return Offset(value, 0f)
                     }
                 }
                 ComposePosition.Top -> {
                     val value = available.y
                     if (value > 0) {
-                        if (value > 0.01f)
+                        if (value > 0.01f) {
                             refreshLayoutState.offset(value * dragEfficiency)
+                        }
                         return Offset(0f, value)
                     }
                 }
                 ComposePosition.Bottom -> {
                     val value = available.y
                     if (value < 0) {
-                        if (value < -0.01f)
+                        if (value < -0.01f) {
                             refreshLayoutState.offset(value * dragEfficiency)
+                        }
                         return Offset(0f, value)
                     }
                 }
@@ -57,13 +61,17 @@ internal class RefreshLayoutNestedScrollConnection(
         return Offset.Zero
     }
 
-    //预先处理手势,返回消费的手势
-    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+    // 预先处理手势,返回消费的手势
+    override fun onPreScroll(
+        available: Offset,
+        source: NestedScrollSource,
+    ): Offset {
         if (refreshLayoutState.refreshContentState.value == RefreshContentState.Refreshing) {
-            return if (orientationIsHorizontal)
+            return if (orientationIsHorizontal) {
                 Offset(available.x, 0f)
-            else
+            } else {
                 Offset(0f, available.y)
+            }
         }
         val refreshOffset = refreshLayoutState.refreshContentOffsetState.value
         if (source == NestedScrollSource.Drag) {
@@ -100,7 +108,7 @@ internal class RefreshLayoutNestedScrollConnection(
                 }
                 ComposePosition.Bottom -> {
                     if (available.y > 0 && refreshOffset < 0) {
-                        //消费的手势
+                        // 消费的手势
                         var consumptive = available.y
                         if (-available.y < refreshOffset) {
                             consumptive = available.y - refreshOffset
@@ -131,9 +139,12 @@ internal fun rememberRefreshLayoutNestedScrollConnection(
     composePosition: ComposePosition,
     refreshLayoutState: RefreshLayoutState,
     dragEfficiency: Float,
-    orientationIsHorizontal: Boolean
+    orientationIsHorizontal: Boolean,
 ) = remember(composePosition) {
     RefreshLayoutNestedScrollConnection(
-        composePosition, refreshLayoutState, dragEfficiency, orientationIsHorizontal
+        composePosition,
+        refreshLayoutState,
+        dragEfficiency,
+        orientationIsHorizontal,
     )
 }

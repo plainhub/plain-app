@@ -9,18 +9,25 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.ismartcoding.plain.Constants.CLICK_DRAG_TOLERANCE
 import kotlin.math.abs
 
-class MovableFloatingActionButton(context: Context, attrs: AttributeSet? = null) : FloatingActionButton(context, attrs), View.OnTouchListener {
+class MovableFloatingActionButton(context: Context, attrs: AttributeSet? = null) :
+    FloatingActionButton(
+        context,
+        attrs,
+    ),
+    View.OnTouchListener {
     private var downRawX = 0f
     private var downRawY = 0f
     private var dX = 0f
     private var dY = 0f
 
-
     init {
         setOnTouchListener(this)
     }
 
-    override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
+    override fun onTouch(
+        view: View,
+        motionEvent: MotionEvent,
+    ): Boolean {
         return when (motionEvent.action) {
             MotionEvent.ACTION_DOWN -> {
                 downRawX = motionEvent.rawX
@@ -61,7 +68,10 @@ class MovableFloatingActionButton(context: Context, attrs: AttributeSet? = null)
         }
     }
 
-    fun copyXY(x: Float, y: Float) {
+    fun copyXY(
+        x: Float,
+        y: Float,
+    ) {
         this.x = x
         this.y = y
     }

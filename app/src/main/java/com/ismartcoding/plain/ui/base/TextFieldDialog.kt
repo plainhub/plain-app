@@ -34,10 +34,10 @@ fun TextFieldDialog(
     onValueChange: (String) -> Unit = {},
     onDismissRequest: () -> Unit = {},
     onConfirm: (String) -> Unit = {},
-    keyboardOptions: KeyboardOptions = KeyboardOptions(
-        imeAction = if (singleLine) ImeAction.Done else ImeAction.Default
-    ),
-
+    keyboardOptions: KeyboardOptions =
+        KeyboardOptions(
+            imeAction = if (singleLine) ImeAction.Done else ImeAction.Default,
+        ),
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -77,15 +77,16 @@ fun TextFieldDialog(
                 onClick = {
                     focusManager.clearFocus()
                     onConfirm(value)
-                }
+                },
             ) {
                 Text(
                     text = confirmText,
-                    color = if (value.isNotBlank()) {
-                        Color.Unspecified
-                    } else {
-                        MaterialTheme.colorScheme.outline.copy(alpha = 0.7f)
-                    }
+                    color =
+                        if (value.isNotBlank()) {
+                            Color.Unspecified
+                        } else {
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.7f)
+                        },
                 )
             }
         },

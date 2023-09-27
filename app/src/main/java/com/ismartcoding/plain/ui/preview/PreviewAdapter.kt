@@ -10,7 +10,10 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.ui.preview.viewholders.*
 
 class PreviewAdapter(var key: String) : PagingDataAdapter<PreviewItem, RecyclerView.ViewHolder>(diff) {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): RecyclerView.ViewHolder {
         return when (viewType) {
             ItemType.IMAGE -> SubsamplingViewHolder(parent)
             ItemType.VIDEO -> VideoViewHolder(parent)
@@ -18,7 +21,10 @@ class PreviewAdapter(var key: String) : PagingDataAdapter<PreviewItem, RecyclerV
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+    ) {
         getItem(position)?.let {
             when (holder) {
                 is SubsamplingViewHolder -> holder.bind(it)
@@ -35,18 +41,19 @@ class PreviewAdapter(var key: String) : PagingDataAdapter<PreviewItem, RecyclerV
     override fun getItemViewType(position: Int) = getItem(position)?.itemType(MainApp.instance) ?: ItemType.UNKNOWN
 }
 
-private val diff = object : DiffUtil.ItemCallback<PreviewItem>() {
-    override fun areItemsTheSame(
-        oldItem: PreviewItem,
-        newItem: PreviewItem
-    ): Boolean {
-        return newItem.id == oldItem.id
-    }
+private val diff =
+    object : DiffUtil.ItemCallback<PreviewItem>() {
+        override fun areItemsTheSame(
+            oldItem: PreviewItem,
+            newItem: PreviewItem,
+        ): Boolean {
+            return newItem.id == oldItem.id
+        }
 
-    override fun areContentsTheSame(
-        oldItem: PreviewItem,
-        newItem: PreviewItem
-    ): Boolean {
-        return newItem.id == oldItem.id
+        override fun areContentsTheSame(
+            oldItem: PreviewItem,
+            newItem: PreviewItem,
+        ): Boolean {
+            return newItem.id == oldItem.id
+        }
     }
-}

@@ -27,9 +27,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WebSecurityPage(
-    navController: NavHostController,
-) {
+fun WebSecurityPage(navController: NavHostController) {
     WebSettingsProvider {
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
@@ -45,7 +43,15 @@ fun WebSecurityPage(
                     }
                     item {
                         Subtitle(text = stringResource(id = R.string.https_certificate_signature), Modifier.padding(horizontal = 32.dp))
-                        ClipboardCard(label = stringResource(id = R.string.https_certificate_signature), HttpServerManager.getSSLSignature(context).joinToString(" ") { "%02x".format(it).uppercase() })
+                        ClipboardCard(
+                            label =
+                                stringResource(
+                                    id = R.string.https_certificate_signature,
+                                ),
+                            HttpServerManager.getSSLSignature(context).joinToString(" ") {
+                                "%02x".format(it).uppercase()
+                            },
+                        )
                         Spacer(modifier = Modifier.height(16.dp))
                         Subtitle(text = stringResource(id = R.string.url_token), Modifier.padding(horizontal = 32.dp))
                         ClipboardCard(label = stringResource(id = R.string.url_token), urlToken)
@@ -58,11 +64,12 @@ fun WebSecurityPage(
                                     UrlTokenPreference.resetAsync(context)
                                     urlToken = TempData.urlToken
                                 }
-                            })
+                            },
+                        )
                         BottomSpace()
                     }
                 }
-            }
+            },
         )
     }
 }

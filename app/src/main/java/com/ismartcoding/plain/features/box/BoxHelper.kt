@@ -1,12 +1,12 @@
 package com.ismartcoding.plain.features.box
 
-import com.ismartcoding.plain.api.BoxApi
-import com.ismartcoding.plain.db.AppDatabase
-import com.ismartcoding.plain.db.DBox
-import com.ismartcoding.plain.fragment.InterfaceFragment
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.api.BoxApi
+import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.BoxDao
+import com.ismartcoding.plain.db.DBox
+import com.ismartcoding.plain.fragment.InterfaceFragment
 import kotlinx.datetime.Clock
 
 object BoxHelper {
@@ -18,7 +18,10 @@ object BoxHelper {
         return boxDao.getAll()
     }
 
-    fun addOrUpdateAsync(id: String, updateItem: (DBox) -> Unit) {
+    fun addOrUpdateAsync(
+        id: String,
+        updateItem: (DBox) -> Unit,
+    ) {
         var item = boxDao.getById(id)
         var isInsert = false
         if (item == null) {

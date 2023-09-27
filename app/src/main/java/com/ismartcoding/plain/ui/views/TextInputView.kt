@@ -8,12 +8,9 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.LayoutInflater
-import android.view.View.OnFocusChangeListener
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.LinearLayout
 import com.google.android.material.textfield.TextInputLayout
-import com.google.android.material.textfield.TextInputLayout.EndIconMode
 import com.ismartcoding.lib.softinput.hideSoftInput
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.IFormItem
@@ -65,7 +62,6 @@ class TextInputView(context: Context, attrs: AttributeSet?) : LinearLayout(conte
         set(value) {
             binding.layout.placeholderText = value
         }
-
 
     override fun setEnabled(enabled: Boolean) {
         super.setEnabled(enabled)
@@ -142,11 +138,12 @@ class TextInputView(context: Context, attrs: AttributeSet?) : LinearLayout(conte
                 imeOptions = EditorInfo.IME_FLAG_NO_ENTER_ACTION
                 isSingleLine = false
             } else {
-                inputType = if (aInputType != -1) {
-                    aInputType
-                } else {
-                    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-                }
+                inputType =
+                    if (aInputType != -1) {
+                        aInputType
+                    } else {
+                        InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+                    }
                 gravity = Gravity.CENTER_VERTICAL
                 isSingleLine = true
             }
@@ -168,21 +165,35 @@ class TextInputView(context: Context, attrs: AttributeSet?) : LinearLayout(conte
             endIconMode = aEndIconMode
             endIconDrawable = aEndIconDrawable
             editText?.run {
-                addTextChangedListener(object : TextWatcher {
-                    override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-                    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-                    override fun afterTextChanged(s: Editable) {
-                        binding.layout.editText?.run {
-                            val value = s.toString()
-                            if (isFocused && hasError) {
-                                validate(value)
-                            }
-                            if (!hasError) {
-                                onTextChanged?.invoke(value)
+                addTextChangedListener(
+                    object : TextWatcher {
+                        override fun beforeTextChanged(
+                            s: CharSequence,
+                            start: Int,
+                            count: Int,
+                            after: Int,
+                        ) {}
+
+                        override fun onTextChanged(
+                            s: CharSequence,
+                            start: Int,
+                            before: Int,
+                            count: Int,
+                        ) {}
+
+                        override fun afterTextChanged(s: Editable) {
+                            binding.layout.editText?.run {
+                                val value = s.toString()
+                                if (isFocused && hasError) {
+                                    validate(value)
+                                }
+                                if (!hasError) {
+                                    onTextChanged?.invoke(value)
+                                }
                             }
                         }
-                    }
-                })
+                    },
+                )
 
                 if (lines == 1) {
                     setOnEditorActionListener { _, actionId, event ->

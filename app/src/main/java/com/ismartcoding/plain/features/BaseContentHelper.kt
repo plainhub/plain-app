@@ -5,7 +5,6 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.BaseColumns
-import android.provider.ContactsContract
 import android.provider.MediaStore
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.data.SortBy
@@ -19,7 +18,6 @@ import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.features.image.ImageHelper
 import java.io.File
 
 abstract class BaseContentHelper {
@@ -38,7 +36,10 @@ abstract class BaseContentHelper {
 
     abstract fun getProjection(): Array<String>
 
-    open fun count(context: Context, query: String): Int {
+    open fun count(
+        context: Context,
+        query: String,
+    ): Int {
         return getWheres(query).sumOf { count(context, it) }
     }
 
@@ -46,7 +47,10 @@ abstract class BaseContentHelper {
         return ContentWhere()
     }
 
-    protected open fun getWhere(query: String, field: String): ContentWhere {
+    protected open fun getWhere(
+        query: String,
+        field: String,
+    ): ContentWhere {
         if (query.isNotEmpty()) {
             val queryGroups = SearchHelper.parse(query)
             val where = getBaseWhere(queryGroups)
@@ -63,7 +67,10 @@ abstract class BaseContentHelper {
         return ContentWhere()
     }
 
-    protected open fun getWheres(query: String, field: String): List<ContentWhere> {
+    protected open fun getWheres(
+        query: String,
+        field: String,
+    ): List<ContentWhere> {
         val wheres = mutableListOf<ContentWhere>()
         if (query.isNotEmpty()) {
             val queryGroups = SearchHelper.parse(query)
@@ -90,12 +97,20 @@ abstract class BaseContentHelper {
         return wheres
     }
 
-    private fun count(context: Context, where: ContentWhere): Int {
+    private fun count(
+        context: Context,
+        where: ContentWhere,
+    ): Int {
         var result = 0
         if (isQPlus()) {
-            context.contentResolver.query(uriExternal, null, Bundle().apply {
-                where(where.toSelection(), where.args)
-            }, null)?.run {
+            context.contentResolver.query(
+                uriExternal,
+                null,
+                Bundle().apply {
+                    where(where.toSelection(), where.args)
+                },
+                null,
+            )?.run {
                 moveToFirst()
                 result = count
                 close()
@@ -103,8 +118,11 @@ abstract class BaseContentHelper {
         } else {
             try {
                 context.contentResolver.query(
-                    uriExternal, arrayOf("count(*) AS count"),
-                    where.toSelection(), where.args.toTypedArray(), null
+                    uriExternal,
+                    arrayOf("count(*) AS count"),
+                    where.toSelection(),
+                    where.args.toTypedArray(),
+                    null,
                 )?.run {
                     moveToFirst()
                     if (count > 0) {
@@ -114,9 +132,14 @@ abstract class BaseContentHelper {
                 }
             } catch (ex: Exception) {
                 // Fatal Exception: java.lang.IllegalArgumentException: Non-token detected in 'count(*) AS count'
-                context.contentResolver.query(uriExternal, null, Bundle().apply {
-                    where(where.toSelection(), where.args)
-                }, null)?.run {
+                context.contentResolver.query(
+                    uriExternal,
+                    null,
+                    Bundle().apply {
+                        where(where.toSelection(), where.args)
+                    },
+                    null,
+                )?.run {
                     moveToFirst()
                     result = count
                     close()
@@ -127,7 +150,13 @@ abstract class BaseContentHelper {
         return result
     }
 
-    fun getSearchCursor(context: Context, query: String, limit: Int, offset: Int, sortBy: SortBy): Cursor? {
+    fun getSearchCursor(
+        context: Context,
+        query: String,
+        limit: Int,
+        offset: Int,
+        sortBy: SortBy,
+    ): Cursor? {
         return if (isRPlus()) {
             // From Android 11, LIMIT and OFFSET should be retrieved using Bundle
             getSearchCursorWithBundle(context, query, limit, offset, sortBy)
@@ -141,7 +170,10 @@ abstract class BaseContentHelper {
         }
     }
 
-    fun getIds(context: Context, query: String): Set<String> {
+    fun getIds(
+        context: Context,
+        query: String,
+    ): Set<String> {
         val cursor = getSearchCursor(context, query)
         val ids = mutableSetOf<String>()
         if (cursor?.moveToFirst() == true) {
@@ -154,41 +186,71 @@ abstract class BaseContentHelper {
         return ids
     }
 
-    private fun getSearchCursorWithBundle(context: Context, query: String, limit: Int, offset: Int, sortBy: SortBy): Cursor? {
+    private fun getSearchCursorWithBundle(
+        context: Context,
+        query: String,
+        limit: Int,
+        offset: Int,
+        sortBy: SortBy,
+    ): Cursor? {
         return try {
             val where = getWhere(query)
-            val sourceUri = uriExternal.buildUpon()
-                .appendQueryParameter("limit", limit.toString())
-                .appendQueryParameter("offset", offset.toString())
-                .build()
-            context.contentResolver.query(sourceUri, getProjection(), Bundle().apply {
-                paging(offset, limit)
-                sort(sortBy)
-                where(where.toSelection(), where.args)
-            }, null)
+            val sourceUri =
+                uriExternal.buildUpon()
+                    .appendQueryParameter("limit", limit.toString())
+                    .appendQueryParameter("offset", offset.toString())
+                    .build()
+            context.contentResolver.query(
+                sourceUri,
+                getProjection(),
+                Bundle().apply {
+                    paging(offset, limit)
+                    sort(sortBy)
+                    where(where.toSelection(), where.args)
+                },
+                null,
+            )
         } catch (ex: Exception) {
             LogCat.e(ex.toString())
             null
         }
     }
 
-    protected fun getSearchCursorWithSortOrder(context: Context, query: String, limit: Int, offset: Int, sortBy: SortBy?): Cursor? {
+    protected fun getSearchCursorWithSortOrder(
+        context: Context,
+        query: String,
+        limit: Int,
+        offset: Int,
+        sortBy: SortBy?,
+    ): Cursor? {
         val where = getWhere(query)
         return context.contentResolver.query(
-            uriExternal, getProjection(),
-            where.toSelection(), where.args.toTypedArray(), if (sortBy != null) "${sortBy.field} ${sortBy.direction} LIMIT $offset, $limit" else "LIMIT $offset, $limit"
+            uriExternal,
+            getProjection(),
+            where.toSelection(),
+            where.args.toTypedArray(),
+            if (sortBy != null) "${sortBy.field} ${sortBy.direction} LIMIT $offset, $limit" else "LIMIT $offset, $limit",
         )
     }
 
-    protected fun getSearchCursor(context: Context, query: String): Cursor? {
+    protected fun getSearchCursor(
+        context: Context,
+        query: String,
+    ): Cursor? {
         val where = getWhere(query)
         return context.contentResolver.query(
-            uriExternal, getProjection(),
-            where.toSelection(), where.args.toTypedArray(), null
+            uriExternal,
+            getProjection(),
+            where.toSelection(),
+            where.args.toTypedArray(),
+            null,
         )
     }
 
-    open fun deleteByIds(context: Context, ids: Set<String>) {
+    open fun deleteByIds(
+        context: Context,
+        ids: Set<String>,
+    ) {
         ids.chunked(500).forEach { chunk ->
             val selection = "${BaseColumns._ID} IN (${StringHelper.getQuestionMarks(chunk.size)})"
             val selectionArgs = chunk.map { it }.toTypedArray()
@@ -200,17 +262,24 @@ abstract class BaseContentHelper {
         context.contentResolver.delete(uriExternal, null, null)
     }
 
-    fun deleteRecordsAndFilesByIds(context: Context, ids: Set<String>): Set<String> {
+    fun deleteRecordsAndFilesByIds(
+        context: Context,
+        ids: Set<String>,
+    ): Set<String> {
         val paths = mutableSetOf<String>()
         ids.chunked(500).forEach { chunk ->
             val projection = arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.DATA)
             val where = ContentWhere()
             where.addIn(MediaStore.MediaColumns._ID, chunk)
             var deletedCount = 0
-            val cursor = context.contentResolver.query(
-                uriExternal, projection, where.toSelection(),
-                where.args.toTypedArray(), null
-            )
+            val cursor =
+                context.contentResolver.query(
+                    uriExternal,
+                    projection,
+                    where.toSelection(),
+                    where.args.toTypedArray(),
+                    null,
+                )
             if (cursor != null) {
                 cursor.moveToFirst()
                 val cache = mutableMapOf<String, Int>()
@@ -218,11 +287,14 @@ abstract class BaseContentHelper {
                     val id = cursor.getStringValue(MediaStore.MediaColumns._ID, cache)
                     val path = cursor.getStringValue(MediaStore.MediaColumns.DATA, cache)
                     paths.add(path)
-                    try { // File.delete can throw a security exception
+                    try {
+                        // File.delete can throw a security exception
                         val f = File(path)
                         if (f.deleteRecursively()) {
                             context.contentResolver.delete(
-                                getItemUri(id), null, null
+                                getItemUri(id),
+                                null,
+                                null,
                             )
                             deletedCount++
                         }

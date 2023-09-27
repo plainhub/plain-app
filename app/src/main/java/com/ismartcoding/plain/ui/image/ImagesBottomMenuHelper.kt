@@ -28,7 +28,7 @@ object ImagesBottomMenuHelper {
         viewModel: FilteredItemsViewModel,
         lifecycleScope: LifecycleCoroutineScope,
         binding: DialogListDrawerBinding,
-        menuItem: MenuItem
+        menuItem: MenuItem,
     ) {
         val list = binding.list
         val rv = list.rv

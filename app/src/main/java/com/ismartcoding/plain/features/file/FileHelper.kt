@@ -19,7 +19,7 @@ object FileHelper : BaseContentHelper() {
             MediaStore.Files.FileColumns.DATA,
             MediaStore.Files.FileColumns.SIZE,
             MediaStore.Files.FileColumns.DATE_MODIFIED,
-            MediaStore.Files.FileColumns.MEDIA_TYPE
+            MediaStore.Files.FileColumns.MEDIA_TYPE,
         )
     }
 
@@ -41,7 +41,13 @@ object FileHelper : BaseContentHelper() {
         return where
     }
 
-    fun search(context: Context, query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DFile> {
+    fun search(
+        context: Context,
+        query: String,
+        limit: Int,
+        offset: Int,
+        sortBy: FileSortBy,
+    ): List<DFile> {
         val cursor = getSearchCursor(context, query, limit, offset, sortBy.toSortBy())
         val result = mutableListOf<DFile>()
         if (cursor?.moveToFirst() == true) {
@@ -53,8 +59,17 @@ object FileHelper : BaseContentHelper() {
                 val path = cursor.getStringValue(MediaStore.Files.FileColumns.DATA, cache)
                 val updatedAt = cursor.getTimeValue(MediaStore.Files.FileColumns.DATE_MODIFIED, cache)
                 val mediaType = cursor.getIntValue(MediaStore.Files.FileColumns.MEDIA_TYPE, cache)
-                result.add(DFile(title, path, "", updatedAt, size,
-                    mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_NONE, 0))
+                result.add(
+                    DFile(
+                        title,
+                        path,
+                        "",
+                        updatedAt,
+                        size,
+                        mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_NONE,
+                        0,
+                    ),
+                )
             } while (cursor.moveToNext())
         }
         return result

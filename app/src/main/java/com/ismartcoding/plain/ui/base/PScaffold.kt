@@ -31,9 +31,10 @@ fun PScaffold(
                     title = { Text(topBarTitle) },
                     navigationIcon = { navigationIcon?.invoke() },
                     actions = { actions?.invoke(this) },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent,
-                    )
+                    colors =
+                        TopAppBarDefaults.topAppBarColors(
+                            containerColor = Color.Transparent,
+                        ),
                 )
             }
         },

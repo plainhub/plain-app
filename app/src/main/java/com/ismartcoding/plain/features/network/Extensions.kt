@@ -8,14 +8,17 @@ import com.ismartcoding.plain.ui.extensions.addTextRow
 import com.ismartcoding.plain.ui.extensions.clearTextRows
 import com.ismartcoding.plain.ui.extensions.setKeyText
 
-fun ViewListItemBinding.bindNetwork(context: Context, item: NetworkFragment) {
+fun ViewListItemBinding.bindNetwork(
+    context: Context,
+    item: NetworkFragment,
+) {
     clearTextRows()
     setKeyText(item.name)
     var ip = UIDataCache.current().getInterfaces().find { it.name == item.ifName }?.ip4 ?: ""
     if (ip.isEmpty() && item.type == "vpn") {
         ip =
             UIDataCache.current().wireGuards?.find { it.id == item.ifName }?.interfaze?.addresses?.joinToString(
-                ", "
+                ", ",
             ) ?: ""
     }
     addTextRow(ip)

@@ -3,23 +3,26 @@ package com.ismartcoding.plain.ui.rule
 import android.os.Bundle
 import android.view.View
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.ui.views.ChipItem
 import com.ismartcoding.plain.data.UIDataCache
-import com.ismartcoding.plain.features.rule.RuleProtocol
-import com.ismartcoding.plain.features.TargetType
 import com.ismartcoding.plain.databinding.DialogRuleTargetBinding
+import com.ismartcoding.plain.features.TargetType
+import com.ismartcoding.plain.features.rule.RuleProtocol
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.SelectNetworkDialog
 import com.ismartcoding.plain.ui.extensions.initView
 import com.ismartcoding.plain.ui.extensions.setSafeClick
+import com.ismartcoding.plain.ui.views.ChipItem
 
 class RuleTargetDialog(
     var type: TargetType,
     var value: String = "",
     var protocol: RuleProtocol = RuleProtocol.ALL,
-    val onDone: (TargetType, String, RuleProtocol) -> Unit
+    val onDone: (TargetType, String, RuleProtocol) -> Unit,
 ) : BaseBottomSheetDialog<DialogRuleTargetBinding>() {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         updateUI()
     }
@@ -83,7 +86,9 @@ class RuleTargetDialog(
             if (type == TargetType.INTERFACE) {
                 isRequired = false
                 showMore()
-                setValueText(com.ismartcoding.plain.features.Target(TargetType.INTERFACE, value).getText(UIDataCache.current().getNetworks()))
+                setValueText(
+                    com.ismartcoding.plain.features.Target(TargetType.INTERFACE, value).getText(UIDataCache.current().getNetworks()),
+                )
                 setValueTextColor(R.color.primary)
             } else {
                 isRequired = true

@@ -5,23 +5,23 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.softinput.setWindowSoftInput
 import com.ismartcoding.plain.ApplyHostapdMutation
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.BoxApi
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.DialogHostapdBinding
-import com.ismartcoding.plain.ui.BaseBottomSheetDialog
-import com.ismartcoding.plain.ui.extensions.setSafeClick
 import com.ismartcoding.plain.features.box.ApplyHostapdResultEvent
 import com.ismartcoding.plain.features.box.FetchNetworkConfigEvent
 import com.ismartcoding.plain.features.box.NetworkConfigResultEvent
 import com.ismartcoding.plain.features.hostapd.HostapdConfig
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.softinput.setWindowSoftInput
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.initMenu
 import com.ismartcoding.plain.ui.extensions.onMenuItemClick
+import com.ismartcoding.plain.ui.extensions.setSafeClick
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.views.LoadingButtonView
 import kotlinx.coroutines.launch
 
@@ -33,7 +33,10 @@ class HostapdDialog : BaseBottomSheetDialog<DialogHostapdBinding>() {
         return binding.button
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.topAppBar.run {
             initMenu(R.menu.more)
@@ -126,9 +129,10 @@ class HostapdDialog : BaseBottomSheetDialog<DialogHostapdBinding>() {
 
             lifecycleScope.launch {
                 blockFormUI()
-                val r = withIO {
-                    BoxApi.mixMutateAsync(ApplyHostapdMutation(mConfig.toConfig(), mEnabled))
-                }
+                val r =
+                    withIO {
+                        BoxApi.mixMutateAsync(ApplyHostapdMutation(mConfig.toConfig(), mEnabled))
+                    }
                 unblockFormUI()
                 if (!r.isSuccess()) {
                     DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())

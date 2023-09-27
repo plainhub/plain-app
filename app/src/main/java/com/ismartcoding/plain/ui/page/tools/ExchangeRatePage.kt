@@ -5,7 +5,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -49,9 +48,7 @@ data class RateItem(val rate: DExchangeRate, val value: Double)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExchangeRatePage(
-    navController: NavHostController,
-) {
+fun ExchangeRatePage(navController: NavHostController) {
     ExchangeRateProvider {
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
@@ -63,15 +60,16 @@ fun ExchangeRatePage(
         var editValue by remember { mutableStateOf("") }
         val showContextMenu = remember { mutableStateOf(false) }
 
-        val refreshState = rememberRefreshLayoutState {
-            scope.launch {
-                val r = withIO { ExchangeHelper.getRates() }
-                if (r != null) {
-                    updatedTs = System.currentTimeMillis()
+        val refreshState =
+            rememberRefreshLayoutState {
+                scope.launch {
+                    val r = withIO { ExchangeHelper.getRates() }
+                    if (r != null) {
+                        updatedTs = System.currentTimeMillis()
+                    }
+                    setRefreshState(RefreshContentState.Stop)
                 }
-                setRefreshState(RefreshContentState.Stop)
             }
-        }
 
         LaunchedEffect(updatedTs) {
             rateItems = getItems(config)
@@ -105,7 +103,7 @@ fun ExchangeRatePage(
                                     }
                                 }
                             }.show()
-                        }
+                        },
                     )
                 }
             },
@@ -114,7 +112,7 @@ fun ExchangeRatePage(
                     LazyColumn(
                         Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight()
+                            .fillMaxHeight(),
                     ) {
                         item {
                             DisplayText(
@@ -128,7 +126,10 @@ fun ExchangeRatePage(
                                     PListItem(
                                         title = rate.rate.currency,
                                         value = FormatHelper.formatMoney(rate.value, rate.rate.currency),
-                                        iconPainter = painterResource(id = ResourceHelper.getCurrencyFlagResId(context, rate.rate.currency)),
+                                        iconPainter =
+                                            painterResource(
+                                                id = ResourceHelper.getCurrencyFlagResId(context, rate.rate.currency),
+                                            ),
                                         onLongClick = {
                                             selectedItem = rate.rate
                                             showContextMenu.value = true
@@ -137,17 +138,18 @@ fun ExchangeRatePage(
                                             selectedItem = rate.rate
                                             editValue = FormatHelper.formatDouble(rate.value, isGroupingUsed = false)
                                             editValueDialogVisible = true
-                                        }
+                                        },
                                     )
                                     Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(top = 32.dp)
-                                            .wrapContentSize(Alignment.Center)
+                                        modifier =
+                                            Modifier
+                                                .fillMaxSize()
+                                                .padding(top = 32.dp)
+                                                .wrapContentSize(Alignment.Center),
                                     ) {
                                         PDropdownMenu(
                                             expanded = showContextMenu.value && selectedItem == rate.rate,
-                                            onDismissRequest = { showContextMenu.value = false }
+                                            onDismissRequest = { showContextMenu.value = false },
                                         ) {
                                             DropdownMenuItem(text = { Text(stringResource(id = R.string.delete)) }, onClick = {
                                                 scope.launch {
@@ -164,10 +166,8 @@ fun ExchangeRatePage(
                                     }
                                 }
                             }
-
                         }
                         item {
-
                             BottomSpace()
                         }
                     }
@@ -183,10 +183,11 @@ fun ExchangeRatePage(
                     onDismissRequest = {
                         editValueDialogVisible = false
                     },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done,
-                    ),
+                    keyboardOptions =
+                        KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                        ),
                     onConfirm = {
                         scope.launch {
                             config.base = selectedItem!!.currency
@@ -195,13 +196,12 @@ fun ExchangeRatePage(
                             updatedTs = System.currentTimeMillis()
                             editValueDialogVisible = false
                         }
-                    }
+                    },
                 )
-            }
+            },
         )
     }
 }
-
 
 fun getItems(config: ExchangeConfig): List<RateItem>? {
     val items = mutableListOf<RateItem>()
@@ -218,4 +218,3 @@ fun getItems(config: ExchangeConfig): List<RateItem>? {
 
     return null
 }
-

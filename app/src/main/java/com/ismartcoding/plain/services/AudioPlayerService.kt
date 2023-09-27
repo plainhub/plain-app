@@ -42,27 +42,31 @@ class AudioPlayerService : LifecycleService() {
     private lateinit var intentNext: PendingIntent
     private lateinit var intentCancel: PendingIntent
 
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(p0: Context?, intent: Intent?) {
-            when (intent?.action) {
-                NOTIFICATION_PREVIOUS -> AudioPlayer.instance.skipToPrevious()
-                NOTIFICATION_PLAY -> {
-                    if (AudioPlayer.instance.isPlaying()) {
-                        AudioPlayer.instance.pause()
-                    } else {
-                        AudioPlayer.instance.play()
+    private val receiver =
+        object : BroadcastReceiver() {
+            override fun onReceive(
+                p0: Context?,
+                intent: Intent?,
+            ) {
+                when (intent?.action) {
+                    NOTIFICATION_PREVIOUS -> AudioPlayer.instance.skipToPrevious()
+                    NOTIFICATION_PLAY -> {
+                        if (AudioPlayer.instance.isPlaying()) {
+                            AudioPlayer.instance.pause()
+                        } else {
+                            AudioPlayer.instance.play()
+                        }
                     }
-                }
 
-                NOTIFICATION_NEXT -> AudioPlayer.instance.skipToNext()
-                NOTIFICATION_CANCEL -> {
-                    AudioPlayer.instance.pause()
-                    stopForeground(STOP_FOREGROUND_REMOVE)
-                    stopSelf()
+                    NOTIFICATION_NEXT -> AudioPlayer.instance.skipToNext()
+                    NOTIFICATION_CANCEL -> {
+                        AudioPlayer.instance.pause()
+                        stopForeground(STOP_FOREGROUND_REMOVE)
+                        stopSelf()
+                    }
                 }
             }
         }
-    }
 
     inner class LocalBinder : Binder() {
         val service by Weak {
@@ -142,7 +146,11 @@ class AudioPlayerService : LifecycleService() {
         stopSelf()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         super.onStartCommand(intent, flags, startId)
         when (intent?.action) {
             AudioServiceAction.PLAY.name -> {
@@ -197,29 +205,33 @@ class AudioPlayerService : LifecycleService() {
         smallRemoteView = RemoteViews(packageName, R.layout.view_audio_notification_small)
         largeRemoteView = RemoteViews(packageName, R.layout.view_audio_notification_large)
 
-        intentPREVIOUS = PendingIntent.getBroadcast(
-            this, BROADCAST_ID_AUDIO,
-            Intent(NOTIFICATION_PREVIOUS).setPackage(packageName),
-            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        intentPREVIOUS =
+            PendingIntent.getBroadcast(
+                this, BROADCAST_ID_AUDIO,
+                Intent(NOTIFICATION_PREVIOUS).setPackage(packageName),
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
 
-        intentPlay = PendingIntent.getBroadcast(
-            this, BROADCAST_ID_AUDIO,
-            Intent(NOTIFICATION_PLAY).setPackage(packageName),
-            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        intentPlay =
+            PendingIntent.getBroadcast(
+                this, BROADCAST_ID_AUDIO,
+                Intent(NOTIFICATION_PLAY).setPackage(packageName),
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
 
-        intentNext = PendingIntent.getBroadcast(
-            this, BROADCAST_ID_AUDIO,
-            Intent(NOTIFICATION_NEXT).setPackage(packageName),
-            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        intentNext =
+            PendingIntent.getBroadcast(
+                this, BROADCAST_ID_AUDIO,
+                Intent(NOTIFICATION_NEXT).setPackage(packageName),
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
 
-        intentCancel = PendingIntent.getBroadcast(
-            this, BROADCAST_ID_AUDIO,
-            Intent(NOTIFICATION_CANCEL).setPackage(packageName),
-            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        intentCancel =
+            PendingIntent.getBroadcast(
+                this, BROADCAST_ID_AUDIO,
+                Intent(NOTIFICATION_CANCEL).setPackage(packageName),
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
     }
 
     private fun registerReceiver() {
@@ -241,7 +253,7 @@ class AudioPlayerService : LifecycleService() {
         smallRemoteView.setTextViewText(R.id.tv_name, playing?.title)
         smallRemoteView.setImageViewResource(
             R.id.img_play,
-            if (AudioPlayer.instance.isPlaying()) R.drawable.ic_pause else R.drawable.ic_play
+            if (AudioPlayer.instance.isPlaying()) R.drawable.ic_pause else R.drawable.ic_play,
         )
         smallRemoteView.setOnClickPendingIntent(R.id.img_previous, intentPREVIOUS)
         smallRemoteView.setOnClickPendingIntent(R.id.img_play, intentPlay)
@@ -250,7 +262,7 @@ class AudioPlayerService : LifecycleService() {
         largeRemoteView.setTextViewText(R.id.tv_name, playing?.title)
         largeRemoteView.setImageViewResource(
             R.id.img_play,
-            if (AudioPlayer.instance.isPlaying()) R.drawable.ic_pause else R.drawable.ic_play
+            if (AudioPlayer.instance.isPlaying()) R.drawable.ic_pause else R.drawable.ic_play,
         )
         largeRemoteView.setOnClickPendingIntent(R.id.img_previous, intentPREVIOUS)
         largeRemoteView.setOnClickPendingIntent(R.id.img_play, intentPlay)
@@ -295,7 +307,11 @@ class AudioPlayerService : LifecycleService() {
         const val NOTIFICATION_NEXT = "notification.NEXT"
         const val NOTIFICATION_CANCEL = "notification.CANCEL"
 
-        private fun doAction(context: Context, action: AudioServiceAction, block: suspend (Intent) -> Unit) {
+        private fun doAction(
+            context: Context,
+            action: AudioServiceAction,
+            block: suspend (Intent) -> Unit,
+        ) {
             coIO {
                 val intent = Intent(context, AudioPlayerService::class.java)
                 intent.action = action.name
@@ -304,7 +320,10 @@ class AudioPlayerService : LifecycleService() {
             }
         }
 
-        fun play(context: Context, playlistAudio: DPlaylistAudio? = null) {
+        fun play(
+            context: Context,
+            playlistAudio: DPlaylistAudio? = null,
+        ) {
             doAction(context, AudioServiceAction.PLAY) {
                 val audio: Parcelable? = playlistAudio ?: AudioPlayingPreference.getValueAsync(context)
                 it.putExtra("audio", audio)
@@ -323,7 +342,10 @@ class AudioPlayerService : LifecycleService() {
             doAction(context, AudioServiceAction.SKIP_PREVIOUS) {}
         }
 
-        fun seek(context: Context, process: Int) {
+        fun seek(
+            context: Context,
+            process: Int,
+        ) {
             doAction(context, AudioServiceAction.SEEK) {
                 it.putExtra("progress", process)
             }

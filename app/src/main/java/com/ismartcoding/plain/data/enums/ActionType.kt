@@ -5,5 +5,5 @@ enum class ActionType {
     UPDATED,
     DELETED,
     RESTORED,
-    TRASHED
+    TRASHED,
 }

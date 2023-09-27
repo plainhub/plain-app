@@ -16,7 +16,10 @@ class NoDataView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
         binding.text.text = text
     }
 
-    fun setButton(text: String, onClick: () -> Unit) {
+    fun setButton(
+        text: String,
+        onClick: () -> Unit,
+    ) {
         binding.button.run {
             this.text = text
             isVisible = true

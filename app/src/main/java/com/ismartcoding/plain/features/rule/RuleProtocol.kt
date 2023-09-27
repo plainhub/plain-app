@@ -4,10 +4,14 @@ enum class RuleProtocol(val value: String) {
     ALL("all"),
     TCP("tcp"),
     UDP("udp"),
-    ICMP("icmp");
+    ICMP("icmp"),
+    ;
 
     companion object {
-        fun parse(value: String, default: RuleProtocol = ALL): RuleProtocol {
+        fun parse(
+            value: String,
+            default: RuleProtocol = ALL,
+        ): RuleProtocol {
             return values().find { it.value == value } ?: default
         }
     }

@@ -76,7 +76,10 @@ import kotlin.io.path.moveTo
 class FilesDialog : BaseDialog<DialogFilesBinding>() {
     val viewModel: FilesViewModel by viewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         updatePasteAction()
@@ -136,7 +139,11 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
                 } else if (m.data.path.isVideoFast() || m.data.path.isImageFast()) {
                     val items = getModelList<FileModel>()
                     PreviewDialog().show(
-                        items = items.filter { !it.data.isDir && (it.data.path.isVideoFast() || it.data.path.isImageFast()) }.map { s -> PreviewItem(s.data.path, s.data.path.pathToUri()) },
+                        items =
+                            items.filter { !it.data.isDir && (it.data.path.isVideoFast() || it.data.path.isImageFast()) }.map {
+                                    s ->
+                                PreviewItem(s.data.path, s.data.path.pathToUri())
+                            },
                         initKey = m.data.path,
                     )
                 } else if (m.data.path.isAudioFast()) {
@@ -250,7 +257,6 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
                         binding.pasteAction.performHide()
                     }
                 }
-
             }
         }
     }
@@ -266,13 +272,14 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
             viewModel.breadcrumbs.clear()
             viewModel.breadcrumbs.add(BreadcrumbItem(m.title, viewModel.root))
             viewModel.path = viewModel.root
-            viewModel.type = when (m.iconId) {
-                R.drawable.ic_sd_card -> FilesType.SDCARD
-                R.drawable.ic_usb -> FilesType.USB_STORAGE
-                R.drawable.ic_app_icon -> FilesType.APP
-                R.drawable.ic_history -> FilesType.RECENTS
-                else -> FilesType.INTERNAL_STORAGE
-            }
+            viewModel.type =
+                when (m.iconId) {
+                    R.drawable.ic_sd_card -> FilesType.SDCARD
+                    R.drawable.ic_usb -> FilesType.USB_STORAGE
+                    R.drawable.ic_app_icon -> FilesType.APP
+                    R.drawable.ic_history -> FilesType.RECENTS
+                    else -> FilesType.INTERNAL_STORAGE
+                }
 
             binding.drawer.close()
             binding.layout.setExpanded(true)
@@ -310,19 +317,20 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
         lifecycleScope.launch {
             val p = viewModel.path
             val context = requireContext()
-            val items = withIO {
-                if (viewModel.type == FilesType.RECENTS) {
-                    FileSystemHelper.getRecents(context)
-                } else if (viewModel.searchQ.isNotEmpty()) {
-                    FileSystemHelper.search(viewModel.searchQ, p, ShowHiddenFilesPreference.getAsync(context))
-                } else {
-                    FileSystemHelper.getFilesList(
-                        p,
-                        ShowHiddenFilesPreference.getAsync(context),
-                        FileSortByPreference.getValueAsync(context)
-                    )
+            val items =
+                withIO {
+                    if (viewModel.type == FilesType.RECENTS) {
+                        FileSystemHelper.getRecents(context)
+                    } else if (viewModel.searchQ.isNotEmpty()) {
+                        FileSystemHelper.search(viewModel.searchQ, p, ShowHiddenFilesPreference.getAsync(context))
+                    } else {
+                        FileSystemHelper.getFilesList(
+                            p,
+                            ShowHiddenFilesPreference.getAsync(context),
+                            FileSortByPreference.getValueAsync(context),
+                        )
+                    }
                 }
-            }
             if (p != viewModel.path) {
                 updateList()
                 return@launch
@@ -331,27 +339,29 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
             val bindingAdapter = binding.list.rv.bindingAdapter
             val toggleMode = bindingAdapter.toggleMode
             val checkedItems = bindingAdapter.getCheckedModels<FileModel>()
-            binding.list.page.addData(items.map { f ->
-                FileModel(f).apply {
-                    title = f.name
-                    this.toggleMode = toggleMode
-                    isChecked = checkedItems.any { it.data.path == f.path }
-                    if (f.isDir) {
-                        startIconId = R.drawable.ic_folder
-                        val count = f.children
-                        subtitle = LocaleHelper.getQuantityString(R.plurals.items, count) + ", " + f.updatedAt.formatDateTime()
-                    } else {
-                        if (f.path.isImageFast() || f.path.isVideoFast()) {
-                            image = f.path
-                        } else if (f.path.isAudioFast()) {
-                            startIconId = R.drawable.ic_file_audio
+            binding.list.page.addData(
+                items.map { f ->
+                    FileModel(f).apply {
+                        title = f.name
+                        this.toggleMode = toggleMode
+                        isChecked = checkedItems.any { it.data.path == f.path }
+                        if (f.isDir) {
+                            startIconId = R.drawable.ic_folder
+                            val count = f.children
+                            subtitle = LocaleHelper.getQuantityString(R.plurals.items, count) + ", " + f.updatedAt.formatDateTime()
                         } else {
-                            startIconId = R.drawable.ic_file
+                            if (f.path.isImageFast() || f.path.isVideoFast()) {
+                                image = f.path
+                            } else if (f.path.isAudioFast()) {
+                                startIconId = R.drawable.ic_file_audio
+                            } else {
+                                startIconId = R.drawable.ic_file
+                            }
+                            subtitle = FormatHelper.formatBytes(f.size) + ", " + f.updatedAt.formatDateTime()
                         }
-                        subtitle = FormatHelper.formatBytes(f.size) + ", " + f.updatedAt.formatDateTime()
                     }
-                }
-            })
+                },
+            )
             updateTitle()
         }
     }
@@ -392,4 +402,3 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
         }
     }
 }
-

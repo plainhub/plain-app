@@ -22,7 +22,6 @@ import com.ismartcoding.plain.ui.models.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
 abstract class BaseListDrawerDialog : BaseDialog<DialogListDrawerBinding>() {
     protected val viewModel: FilteredItemsViewModel by viewModels()
 
@@ -30,16 +29,23 @@ abstract class BaseListDrawerDialog : BaseDialog<DialogListDrawerBinding>() {
     protected abstract val dataType: DataType
 
     protected abstract fun initEvents()
+
     protected abstract fun initTopAppBar()
+
     protected abstract fun initList()
+
     protected abstract fun updateList()
+
     protected abstract fun updateDrawerMenu()
 
     override fun getTheme(): Int {
         return R.style.Theme_Plain_TransparentBar
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.dataType = dataType
 
@@ -100,7 +106,10 @@ abstract class BaseListDrawerDialog : BaseDialog<DialogListDrawerBinding>() {
         }
     }
 
-    protected fun initBottomBar(@MenuRes menuId: Int, menuItemClick: MenuItem.() -> Unit) {
+    protected fun initBottomBar(
+        @MenuRes menuId: Int,
+        menuItemClick: MenuItem.() -> Unit,
+    ) {
         binding.bottomAction.run {
             initMenu(menuId)
             onMenuItemClick {
@@ -109,7 +118,10 @@ abstract class BaseListDrawerDialog : BaseDialog<DialogListDrawerBinding>() {
         }
     }
 
-    protected fun initTopAppBar(@MenuRes menuId: Int, menuItemClick: MenuItem.() -> Unit) {
+    protected fun initTopAppBar(
+        @MenuRes menuId: Int,
+        menuItemClick: MenuItem.() -> Unit,
+    ) {
         binding.topAppBar.toolbar.run {
             initMenu(menuId)
 
@@ -175,7 +187,6 @@ abstract class BaseListDrawerDialog : BaseDialog<DialogListDrawerBinding>() {
             binding.bottomAction.performHide()
         }
     }
-
 
     protected open fun updateTitle() {
         binding.topAppBar.toolbar.updateTitle(viewModel, binding.list.rv, titleId, viewModel.total)

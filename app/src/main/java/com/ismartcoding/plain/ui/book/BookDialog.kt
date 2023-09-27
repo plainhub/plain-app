@@ -14,7 +14,10 @@ import com.ismartcoding.plain.ui.extensions.onMenuItemClick
 import com.ismartcoding.plain.ui.tag.SelectTagsDialog
 
 class BookDialog(private val book: DBook) : BaseDialog<DialogFeedEntryBinding>() {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.topAppBar.toolbar.run {

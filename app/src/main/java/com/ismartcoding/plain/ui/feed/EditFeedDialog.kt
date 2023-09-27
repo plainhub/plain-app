@@ -6,11 +6,11 @@ import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.databinding.DialogEditFeedBinding
 import com.ismartcoding.plain.db.DFeed
+import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.addTextRow
@@ -19,13 +19,15 @@ import com.ismartcoding.plain.ui.extensions.setSafeClick
 import com.ismartcoding.plain.ui.views.LoadingButtonView
 import kotlinx.coroutines.launch
 
-
 class EditFeedDialog(val data: DFeed) : BaseBottomSheetDialog<DialogEditFeedBinding>() {
     override fun getSubmitButton(): LoadingButtonView {
         return binding.btn
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         updateUI()
         addFormItem(binding.name)

@@ -17,7 +17,7 @@ fun ChatName(m: VChat) {
         Text(
             text = m.name,
             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.padding(end = 8.dp)
+            modifier = Modifier.padding(end = 8.dp),
         )
         Text(
             text = m.createdAt.formatTime(),

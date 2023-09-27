@@ -3,8 +3,6 @@ package com.ismartcoding.plain.ui.book
 import androidx.databinding.BaseObservable
 import com.ismartcoding.lib.brv.item.ItemCheckable
 import com.ismartcoding.plain.db.DBook
-import com.ismartcoding.plain.db.DFeed
-import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.ui.models.IDataModel
 
 class BookModel(override val data: DBook) : IDataModel, ItemCheckable, BaseObservable() {

@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -21,7 +20,10 @@ abstract class BaseTagsPageDialog : BaseDialog<DialogTabsPageBinding>() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModel.dismissed.observe(viewLifecycleOwner) {

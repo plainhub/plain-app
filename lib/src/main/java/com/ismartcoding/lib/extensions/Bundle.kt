@@ -10,33 +10,43 @@ import com.ismartcoding.lib.isTPlus
 fun Bundle.sort(sortBy: SortBy) {
     putStringArray(
         ContentResolver.QUERY_ARG_SORT_COLUMNS,
-        arrayOf(sortBy.field)
+        arrayOf(sortBy.field),
     )
     putInt(
         ContentResolver.QUERY_ARG_SORT_DIRECTION,
-        if (sortBy.direction == SortDirection.ASC) ContentResolver.QUERY_SORT_DIRECTION_ASCENDING else ContentResolver.QUERY_SORT_DIRECTION_DESCENDING
+        if (sortBy.direction == SortDirection.ASC) ContentResolver.QUERY_SORT_DIRECTION_ASCENDING else ContentResolver.QUERY_SORT_DIRECTION_DESCENDING,
     )
 }
 
-fun Bundle.where(selection: String, args: List<String>) {
+fun Bundle.where(
+    selection: String,
+    args: List<String>,
+) {
     putString(
         ContentResolver.QUERY_ARG_SQL_SELECTION,
-        selection
+        selection,
     )
     putStringArray(
         ContentResolver.QUERY_ARG_SQL_SELECTION_ARGS,
-        args.toTypedArray()
+        args.toTypedArray(),
     )
 }
 
-fun Bundle.paging(offset: Int, limit: Int) {
+fun Bundle.paging(
+    offset: Int,
+    limit: Int,
+) {
     if (offset > 0) {
         putInt(ContentResolver.QUERY_ARG_OFFSET, offset)
     }
     putInt(ContentResolver.QUERY_ARG_LIMIT, limit)
 }
 
-inline fun <reified T : Parcelable> Bundle.parcelable(key: String): T? = when {
-    isTPlus() -> getParcelable(key, T::class.java)
-    else -> @Suppress("DEPRECATION") getParcelable(key) as? T
-}
+inline fun <reified T : Parcelable> Bundle.parcelable(key: String): T? =
+    when {
+        isTPlus() -> getParcelable(key, T::class.java)
+        else ->
+            @Suppress("DEPRECATION")
+            getParcelable(key)
+                as? T
+    }

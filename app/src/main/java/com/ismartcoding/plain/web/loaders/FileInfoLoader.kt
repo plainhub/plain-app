@@ -13,7 +13,10 @@ import com.ismartcoding.plain.web.models.VideoFileInfo
 import java.io.File
 
 object FileInfoLoader {
-    fun loadImage(id: String, path: String): ImageFileInfo {
+    fun loadImage(
+        id: String,
+        path: String,
+    ): ImageFileInfo {
         val file = File(path)
         val tags = if (id.isNotEmpty()) TagsLoader.load(id, DataType.IMAGE) else listOf()
         val exifInterface = ExifInterface(path)
@@ -28,7 +31,11 @@ object FileInfoLoader {
         return ImageFileInfo(tags, options.outWidth, options.outHeight, location)
     }
 
-    fun loadVideo(context: Context, id: String, path: String): VideoFileInfo {
+    fun loadVideo(
+        context: Context,
+        id: String,
+        path: String,
+    ): VideoFileInfo {
         val file = File(path)
         val tags = if (id.isNotEmpty()) TagsLoader.load(id, DataType.VIDEO) else listOf()
         val retriever = MediaMetadataRetriever()
@@ -41,7 +48,11 @@ object FileInfoLoader {
         return VideoFileInfo(tags, width, height, duration, location)
     }
 
-    fun loadAudio(context: Context, id: String, path: String): AudioFileInfo {
+    fun loadAudio(
+        context: Context,
+        id: String,
+        path: String,
+    ): AudioFileInfo {
         val file = File(path)
         val tags = if (id.isNotEmpty()) TagsLoader.load(id, DataType.AUDIO) else listOf()
         val retriever = MediaMetadataRetriever()
@@ -69,5 +80,4 @@ object FileInfoLoader {
         }
         return null
     }
-
 }

@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui
 import android.os.Bundle
 import android.view.View
 import com.ismartcoding.lib.brv.utils.linear
-import com.ismartcoding.lib.brv.utils.models
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
@@ -20,7 +19,10 @@ import com.ismartcoding.plain.ui.extensions.setClick
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 
 class SelectInterfaceDialog(val networks: List<NetworkFragment>, val onSelect: (String) -> Unit) : BaseBottomSheetDialog<DialogSelectItemBinding>() {
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.list.rv.isNestedScrollingEnabled = false

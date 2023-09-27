@@ -9,11 +9,12 @@ class ProspectBinarySearchAlgorithm(data: ByteArray) : BinarySearchAlgorithm(dat
             return null
         }
         val byteBuffer = srcByteBuffer.asReadOnlyBuffer().order(ByteOrder.LITTLE_ENDIAN)
-        val geoId = try {
-            phoneNumber.substring(0, 7).toInt()
-        } catch (e: NumberFormatException) {
-            throw IllegalArgumentException("phone number %s is invalid, is it numeric".format(phoneNumber))
-        }
+        val geoId =
+            try {
+                phoneNumber.substring(0, 7).toInt()
+            } catch (e: NumberFormatException) {
+                throw IllegalArgumentException("phone number %s is invalid, is it numeric".format(phoneNumber))
+            }
         var left = indicesStartOffset
         var right = indicesEndOffset
         val geoIdPrefix = geoId / 100_000

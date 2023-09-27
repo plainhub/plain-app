@@ -11,7 +11,8 @@ import kotlin.experimental.and
 import kotlin.random.Random
 
 object NetworkHelper {
-    private const val IP4_PATTERN = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+    private const val IP4_PATTERN =
+        "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$"
@@ -98,7 +99,10 @@ object NetworkHelper {
         return false
     }
 
-    fun subnetContains(subnet: String, ip: String): Boolean {
+    fun subnetContains(
+        subnet: String,
+        ip: String,
+    ): Boolean {
         val parts1 = subnet.split("/")
         val mask = maskLengthToIP4(parts1[1].toInt())
         return try {
@@ -118,7 +122,12 @@ object NetworkHelper {
         return "192.168.${Random.nextInt(0, 255)}.1"
     }
 
-    fun isSubnetOverlapped(mask1: String, ip1: String, mask2: String, ip2: String): Boolean {
+    fun isSubnetOverlapped(
+        mask1: String,
+        ip1: String,
+        mask2: String,
+        ip2: String,
+    ): Boolean {
         return try {
             val maskInt1 = ip4ToLong(mask1)
             val maskInt2 = ip4ToLong(mask2)
@@ -325,15 +334,24 @@ object NetworkHelper {
 
     private fun ip4ToLong(ip: String): Long {
         val octets = ip.split(".")
-        return ((octets[0].toLong() shl 24) + (octets[1].toInt() shl 16)
-                + (octets[2].toInt() shl 8) + octets[3].toInt())
+        return (
+            (octets[0].toLong() shl 24) + (octets[1].toInt() shl 16) +
+                (octets[2].toInt() shl 8) + octets[3].toInt()
+        )
     }
 
-    private fun checkPattern(input: String, pattern: Pattern): Boolean {
-        return if (input.isEmpty()) false else try {
-            pattern.matcher(input).matches()
-        } catch (e: Exception) {
+    private fun checkPattern(
+        input: String,
+        pattern: Pattern,
+    ): Boolean {
+        return if (input.isEmpty()) {
             false
+        } else {
+            try {
+                pattern.matcher(input).matches()
+            } catch (e: Exception) {
+                false
+            }
         }
     }
 }

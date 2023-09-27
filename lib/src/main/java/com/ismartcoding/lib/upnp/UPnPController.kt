@@ -14,31 +14,34 @@ import org.xmlpull.v1.XmlPullParser
 import java.io.ByteArrayInputStream
 
 object UPnPController {
-
-    suspend fun setAVTransportURIAsync(device: UPnPDevice, url: String): String {
+    suspend fun setAVTransportURIAsync(
+        device: UPnPDevice,
+        url: String,
+    ): String {
         val service = device.getAVTransportService() ?: return ""
         LogCat.e(url)
         try {
             val client = HttpClient(CIO)
-            val response = withIO {
-                client.post(device.getBaseUrl() + "/" + service.controlURL.trimStart('/')) {
-                    headers {
-                        set("Content-Type", "text/xml")
-                        set("SOAPAction", "\"${service.serviceType}#SetAVTransportURI\"")
-                    }
-                    setBody(
-                        getRequestBody(
-                            """
-                <u:SetAVTransportURI xmlns:u="${service.serviceType}">
-                    <InstanceID>0</InstanceID>
-                    <CurrentURI>$url</CurrentURI>
-                    <CurrentURIMetaData></CurrentURIMetaData>
-                </u:SetAVTransportURI>
-            """.trimIndent()
+            val response =
+                withIO {
+                    client.post(device.getBaseUrl() + "/" + service.controlURL.trimStart('/')) {
+                        headers {
+                            set("Content-Type", "text/xml")
+                            set("SOAPAction", "\"${service.serviceType}#SetAVTransportURI\"")
+                        }
+                        setBody(
+                            getRequestBody(
+                                """
+                                <u:SetAVTransportURI xmlns:u="${service.serviceType}">
+                                    <InstanceID>0</InstanceID>
+                                    <CurrentURI>$url</CurrentURI>
+                                    <CurrentURIMetaData></CurrentURIMetaData>
+                                </u:SetAVTransportURI>
+                                """.trimIndent(),
+                            ),
                         )
-                    )
+                    }
                 }
-            }
             LogCat.e(response.toString())
             val xml = response.body<String>()
             LogCat.e(xml)
@@ -53,39 +56,47 @@ object UPnPController {
 
     public suspend inline fun HttpClient.subscribe(
         urlString: String,
-        block: HttpRequestBuilder.() -> Unit = {}
+        block: HttpRequestBuilder.() -> Unit = {},
     ): HttpResponse {
-        return request(HttpRequestBuilder().apply {
-            method = HttpMethod("SUBSCRIBE")
-            url(urlString)
-            block()
-        })
+        return request(
+            HttpRequestBuilder().apply {
+                method = HttpMethod("SUBSCRIBE")
+                url(urlString)
+                block()
+            },
+        )
     }
 
     public suspend inline fun HttpClient.unsubscribe(
         urlString: String,
-        block: HttpRequestBuilder.() -> Unit = {}
+        block: HttpRequestBuilder.() -> Unit = {},
     ): HttpResponse {
-        return request(HttpRequestBuilder().apply {
-            method = HttpMethod("UNSUBSCRIBE")
-            url(urlString)
-            block()
-        })
+        return request(
+            HttpRequestBuilder().apply {
+                method = HttpMethod("UNSUBSCRIBE")
+                url(urlString)
+                block()
+            },
+        )
     }
 
-    suspend fun subscribeEvent(device: UPnPDevice, url: String): String {
+    suspend fun subscribeEvent(
+        device: UPnPDevice,
+        url: String,
+    ): String {
         val service = device.getAVTransportService() ?: return ""
         try {
             val client = HttpClient(CIO)
-            val response = withIO {
-                client.subscribe(device.getBaseUrl() + "/" + service.eventSubURL.trimStart('/')) {
-                    headers {
-                        set("NT", "upnp:event")
-                        set("TIMEOUT", "Second-3600")
-                        set("CALLBACK", "<$url>")
+            val response =
+                withIO {
+                    client.subscribe(device.getBaseUrl() + "/" + service.eventSubURL.trimStart('/')) {
+                        headers {
+                            set("NT", "upnp:event")
+                            set("TIMEOUT", "Second-3600")
+                            set("CALLBACK", "<$url>")
+                        }
                     }
                 }
-            }
             return response.headers["SID"].toString()
         } catch (ex: Exception) {
             ex.printStackTrace()
@@ -93,18 +104,22 @@ object UPnPController {
         return ""
     }
 
-    suspend fun renewEvent(device: UPnPDevice, sid: String): String {
+    suspend fun renewEvent(
+        device: UPnPDevice,
+        sid: String,
+    ): String {
         val service = device.getAVTransportService() ?: return ""
         try {
             val client = HttpClient(CIO)
-            val response = withIO {
-                client.subscribe(device.getBaseUrl() + "/" + service.eventSubURL.trimStart('/')) {
-                    headers {
-                        set("SID", sid)
-                        set("TIMEOUT", "Second-3600")
+            val response =
+                withIO {
+                    client.subscribe(device.getBaseUrl() + "/" + service.eventSubURL.trimStart('/')) {
+                        headers {
+                            set("SID", sid)
+                            set("TIMEOUT", "Second-3600")
+                        }
                     }
                 }
-            }
             return response.headers["SID"].toString()
         } catch (ex: Exception) {
             ex.printStackTrace()
@@ -112,17 +127,22 @@ object UPnPController {
         return ""
     }
 
-    suspend fun unsubscribeEvent(device: UPnPDevice, sid: String, url: String): String {
+    suspend fun unsubscribeEvent(
+        device: UPnPDevice,
+        sid: String,
+        url: String,
+    ): String {
         val service = device.getAVTransportService() ?: return ""
         try {
             val client = HttpClient(CIO)
-            val response = withIO {
-                client.unsubscribe(device.getBaseUrl() + "/" + service.eventSubURL.trimStart('/')) {
-                    headers {
-                        set("SID", sid)
+            val response =
+                withIO {
+                    client.unsubscribe(device.getBaseUrl() + "/" + service.eventSubURL.trimStart('/')) {
+                        headers {
+                            set("SID", sid)
+                        }
                     }
                 }
-            }
             LogCat.e(response.toString())
             val xml = response.body<String>()
             LogCat.e(xml)
@@ -138,23 +158,24 @@ object UPnPController {
     suspend fun getTransportInfoAsync(device: UPnPDevice): GetTransportInfoResponse {
         val service = device.getAVTransportService() ?: return GetTransportInfoResponse()
         val client = HttpClient(CIO)
-        val response = withIO {
-            client.post(device.getBaseUrl() + "/" + service.controlURL.trimStart('/')) {
-                headers {
-                    set("Content-Type", "text/xml")
-                    set("SOAPAction", "\"${service.serviceType}#GetTransportInfo\"")
-                }
-                setBody(
-                    getRequestBody(
-                        """
-                <u:GetTransportInfo xmlns:u="${service.serviceType}">
-                    <InstanceID>0</InstanceID>
-                </u:GetTransportInfo>
-            """.trimIndent()
+        val response =
+            withIO {
+                client.post(device.getBaseUrl() + "/" + service.controlURL.trimStart('/')) {
+                    headers {
+                        set("Content-Type", "text/xml")
+                        set("SOAPAction", "\"${service.serviceType}#GetTransportInfo\"")
+                    }
+                    setBody(
+                        getRequestBody(
+                            """
+                            <u:GetTransportInfo xmlns:u="${service.serviceType}">
+                                <InstanceID>0</InstanceID>
+                            </u:GetTransportInfo>
+                            """.trimIndent(),
+                        ),
                     )
-                )
+                }
             }
-        }
         val xml = response.body<String>()
         return parseData(xml)
     }
@@ -184,17 +205,17 @@ object UPnPController {
     }
 
     private fun getRequestBody(body: String): String {
-        val xml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <s:Envelope s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
-                	xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
-                	<s:Body>
-                		$body
-                	</s:Body>
-                </s:Envelope>
+        val xml =
+            """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <s:Envelope s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+            	xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+            	<s:Body>
+            		$body
+            	</s:Body>
+            </s:Envelope>
             """.trimIndent()
         LogCat.e(xml)
         return xml
     }
 }
-

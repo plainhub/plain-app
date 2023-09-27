@@ -11,8 +11,8 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.ApiResult
 import com.ismartcoding.plain.api.GraphqlApiResult
 import com.ismartcoding.plain.databinding.ViewWidgetStateBinding
-import com.ismartcoding.plain.ui.extensions.setSafeClick
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.ui.extensions.setSafeClick
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -28,7 +28,10 @@ class WidgetStateView(context: Context, attrs: AttributeSet?) : LinearLayout(con
         setSafeClick {}
     }
 
-    fun <D : Operation.Data> update(result: GraphqlApiResult<D>, refresh: () -> Unit) {
+    fun <D : Operation.Data> update(
+        result: GraphqlApiResult<D>,
+        refresh: () -> Unit,
+    ) {
         if (result.isSuccess()) {
             isVisible = false
         } else {
@@ -45,7 +48,10 @@ class WidgetStateView(context: Context, attrs: AttributeSet?) : LinearLayout(con
         }
     }
 
-    fun  update(result: ApiResult, refresh: () -> Unit) {
+    fun update(
+        result: ApiResult,
+        refresh: () -> Unit,
+    ) {
         if (result.isOk()) {
             isVisible = false
         } else {

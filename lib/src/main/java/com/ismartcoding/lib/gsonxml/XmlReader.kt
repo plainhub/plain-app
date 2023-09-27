@@ -17,7 +17,7 @@ class XmlReader(`in`: Reader, val options: Options) : JsonReader(`in`) {
         /**
          * Inside array flag.
          */
-        val insideArray: Boolean
+        val insideArray: Boolean,
     ) {
         /**
          * We are inside an object. Next token should be [JsonToken.NAME] or [JsonToken.END_OBJECT].
@@ -52,7 +52,7 @@ class XmlReader(`in`: Reader, val options: Options) : JsonReader(`in`) {
         /**
          * New start tag met, we returned [JsonToken.NAME]. Object, array, or value can go next.
          */
-        NAME(false);
+        NAME(false),
     }
 
     /**
@@ -63,20 +63,26 @@ class XmlReader(`in`: Reader, val options: Options) : JsonReader(`in`) {
     /**
      * Tokens pool.
      */
-    private val tokensPool = RefsPool(object : Creator<TokenRef> {
-        override fun create(): TokenRef {
-            return TokenRef()
-        }
-    })
+    private val tokensPool =
+        RefsPool(
+            object : Creator<TokenRef> {
+                override fun create(): TokenRef {
+                    return TokenRef()
+                }
+            },
+        )
 
     /**
      * Values pool.
      */
-    private val valuesPool = RefsPool(object : Creator<ValueRef> {
-        override fun create(): ValueRef {
-            return ValueRef()
-        }
-    })
+    private val valuesPool =
+        RefsPool(
+            object : Creator<ValueRef> {
+                override fun create(): ValueRef {
+                    return ValueRef()
+                }
+            },
+        )
 
     /**
      * Tokens queue.
@@ -511,12 +517,13 @@ ${dump()}"""
             }
             mustRepeat = false
             when (xml.type) {
-                START_TAG -> if (firstStart) {
-                    firstStart = false
-                    processRoot(xml)
-                } else {
-                    processStart(xml)
-                }
+                START_TAG ->
+                    if (firstStart) {
+                        firstStart = false
+                        processRoot(xml)
+                    } else {
+                        processStart(xml)
+                    }
                 VALUE -> mustRepeat = processText(xml)
                 END_TAG -> processEnd(xml)
                 else -> {}
@@ -584,7 +591,7 @@ ${dump()}"""
             }
             else -> {}
         }
-        if (processTagName) {                 // ignore tag name inside the array
+        if (processTagName) { // ignore tag name inside the array
             scopeStack.push(Scope.NAME)
             addToQueue(JsonToken.NAME)
             addToQueue(xml.getName(xmlParser))
@@ -627,7 +634,10 @@ ${dump()}"""
         }
     }
 
-    private fun addTextToQueue(value: String?, canBeAppended: Boolean) {
+    private fun addTextToQueue(
+        value: String?,
+        canBeAppended: Boolean,
+    ) {
         if (canBeAppended && tokensQueue != null && tokensQueue!!.token == JsonToken.STRING) {
             if (value!!.length > 0) {
                 valuesQueue!!.value += " $value"
@@ -687,6 +697,7 @@ ${dump()}"""
     private class TokenRef {
         var token: JsonToken? = null
         var next: TokenRef? = null
+
         override fun toString(): String {
             return token.toString() + ", " + next
         }
@@ -695,6 +706,7 @@ ${dump()}"""
     private class ValueRef {
         var value: String? = null
         var next: ValueRef? = null
+
         override fun toString(): String {
             return "$value, $next"
         }
@@ -706,6 +718,7 @@ ${dump()}"""
         var value: String? = null
         var ns: String? = null
         var attributesData: AttributesData? = null
+
         fun clear() {
             type = IGNORE
             name = null
@@ -715,9 +728,19 @@ ${dump()}"""
         }
 
         override fun toString(): String {
-            return ("xml "
-                    + (if (type == START_TAG) "start" else if (type == END_TAG) "end" else "value")
-                    + " <" + ns + ":" + name + ">=" + value + if (attributesData != null) ", $attributesData" else "")
+            return (
+                "xml " +
+                    (
+                        if (type == START_TAG) {
+                            "start"
+                        } else if (type == END_TAG) {
+                            "end"
+                        } else {
+                            "value"
+                        }
+                        ) +
+                    " <" + ns + ":" + name + ">=" + value + if (attributesData != null) ", $attributesData" else ""
+            )
         }
 
         @Throws(IOException::class, XmlPullParserException::class)
@@ -793,7 +816,7 @@ ${dump()}"""
         /**
          * Factory instance.
          */
-        private val creator: Creator<T>
+        private val creator: Creator<T>,
     ) {
         /**
          * Pool.
@@ -811,7 +834,9 @@ ${dump()}"""
         fun get(): T? {
             return if (len == 0) {
                 creator.create()
-            } else store[--len] as T?
+            } else {
+                store[--len] as T?
+            }
         }
 
         /**
@@ -848,7 +873,11 @@ ${dump()}"""
         private const val IGNORE = -1
 
         @Throws(XmlPullParserException::class)
-        fun nameWithNs(name: String?, namespace: String?, parser: XmlPullParser?): String? {
+        fun nameWithNs(
+            name: String?,
+            namespace: String?,
+            parser: XmlPullParser?,
+        ): String? {
             var result = name
             var ns = namespace
             if (ns != null && ns.isNotEmpty()) {

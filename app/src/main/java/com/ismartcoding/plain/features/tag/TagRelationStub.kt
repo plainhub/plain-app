@@ -12,7 +12,10 @@ data class TagRelationStub(
     var title: String = "",
     var size: Long = 0,
 ) {
-    fun toTagRelation(tagId: String, type: DataType): DTagRelation {
+    fun toTagRelation(
+        tagId: String,
+        type: DataType,
+    ): DTagRelation {
         val stub = this
         return DTagRelation(tagId, stub.key, type.value).apply {
             title = stub.title

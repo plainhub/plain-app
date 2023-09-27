@@ -40,6 +40,7 @@ data class ChatItem(
 sealed class ChatItemContent() {
     @Serializable
     data class MessageImages(val ids: List<String>) : ChatItemContent()
+
     @Serializable
     data class MessageFiles(val ids: List<String>) : ChatItemContent()
 }

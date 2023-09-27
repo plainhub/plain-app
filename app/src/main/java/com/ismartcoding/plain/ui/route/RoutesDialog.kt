@@ -7,23 +7,23 @@ import com.ismartcoding.lib.brv.utils.linear
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.DeleteConfigMutation
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.BoxApi
 import com.ismartcoding.plain.data.*
+import com.ismartcoding.plain.data.enums.ActionSourceType
+import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.databinding.DialogRoutesBinding
 import com.ismartcoding.plain.databinding.ViewListItemBinding
-import com.ismartcoding.plain.ui.BaseDialog
+import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.box.FetchNetworksEvent
 import com.ismartcoding.plain.features.box.NetworksResultEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.route.Route
 import com.ismartcoding.plain.features.route.bindRoute
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.data.enums.ActionSourceType
-import com.ismartcoding.plain.data.enums.ActionType
-import com.ismartcoding.plain.features.ActionEvent
+import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.ui.extensions.*
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.launch
@@ -31,7 +31,10 @@ import kotlinx.coroutines.launch
 class RoutesDialog : BaseDialog<DialogRoutesBinding>() {
     private var searchQ: String = ""
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
         binding.list.rv.linear().setup {
             addType<Route>(R.layout.view_list_item)
@@ -120,4 +123,3 @@ class RoutesDialog : BaseDialog<DialogRoutesBinding>() {
         sendEvent(FetchNetworksEvent(TempData.selectedBoxId))
     }
 }
-

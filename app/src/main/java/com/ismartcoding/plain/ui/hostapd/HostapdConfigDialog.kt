@@ -5,27 +5,26 @@ import android.view.View
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.softinput.setWindowSoftInput
 import com.ismartcoding.plain.ApplyHostapdMutation
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.BoxApi
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.DialogHostapdConfigBinding
-import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.features.box.ApplyHostapdResultEvent
 import com.ismartcoding.plain.features.box.FetchNetworkConfigEvent
 import com.ismartcoding.plain.features.box.NetworkConfigResultEvent
 import com.ismartcoding.plain.features.hostapd.HostapdConfig
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.softinput.setWindowSoftInput
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.ui.extensions.initMenu
 import com.ismartcoding.plain.ui.extensions.onBack
 import com.ismartcoding.plain.ui.extensions.onMenuItemClick
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.launch
 
 class HostapdConfigDialog : BaseDialog<DialogHostapdConfigBinding>() {
-
     override fun onBackPressed() {
         if (binding.editor.isChanged()) {
             DialogHelper.confirmToLeave(requireContext()) {
@@ -36,7 +35,10 @@ class HostapdConfigDialog : BaseDialog<DialogHostapdConfigBinding>() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.topAppBar.toolbar.run {
@@ -60,9 +62,10 @@ class HostapdConfigDialog : BaseDialog<DialogHostapdConfigBinding>() {
                             DialogHelper.showLoading()
                             val current = UIDataCache.current()
                             val hostapd = current.hostapd
-                            val r = withIO {
-                                BoxApi.mixMutateAsync(ApplyHostapdMutation(binding.editor.getText(), hostapd?.isEnabled == true))
-                            }
+                            val r =
+                                withIO {
+                                    BoxApi.mixMutateAsync(ApplyHostapdMutation(binding.editor.getText(), hostapd?.isEnabled == true))
+                                }
                             DialogHelper.hideLoading()
                             if (!r.isSuccess()) {
                                 DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())

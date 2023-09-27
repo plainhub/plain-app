@@ -14,7 +14,7 @@ data class DVideo(
     override val path: String,
     override val duration: Long,
     val size: Long,
-    val bucketId: String
+    val bucketId: String,
 ) : IData, IMedia, Parcelable, Serializable {
     companion object {
         private const val serialVersionUID = -2797285L

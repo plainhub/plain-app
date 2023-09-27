@@ -27,22 +27,28 @@ fun HomeItemSocial(
 ) {
     Column {
         Subtitle(
-            text = stringResource(R.string.home_item_title_social)
+            text = stringResource(R.string.home_item_title_social),
         )
         HomeItemFlow {
-            GridItem(icon = Icons.Outlined.Message,
+            GridItem(
+                icon = Icons.Outlined.Message,
                 stringResource(id = R.string.messages),
-                modifier = Modifier.width(itemWidth)) {
+                modifier = Modifier.width(itemWidth),
+            ) {
                 SmsDialog().show()
             }
-            GridItem(icon = Icons.Outlined.Contacts,
+            GridItem(
+                icon = Icons.Outlined.Contacts,
                 stringResource(id = R.string.contacts),
-                modifier = Modifier.width(itemWidth)) {
+                modifier = Modifier.width(itemWidth),
+            ) {
                 ContactsDialog().show()
             }
-            GridItem(icon = Icons.Outlined.Call,
+            GridItem(
+                icon = Icons.Outlined.Call,
                 stringResource(id = R.string.calls),
-                modifier = Modifier.width(itemWidth)) {
+                modifier = Modifier.width(itemWidth),
+            ) {
                 CallsDialog().show()
             }
         }

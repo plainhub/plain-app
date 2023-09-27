@@ -7,7 +7,8 @@ enum class ISP(val carrier: String, val code: Int) {
     CHINA_UNICOM_VIRTUAL("中国联通虚拟运营商", 4),
     CHINA_TELECOM_VIRTUAL("中国电信虚拟运营商", 5),
     CHINA_MOBILE_VIRTUAL("中国移动虚拟运营商", 6),
-    UNKNOWN("未知", 0);
+    UNKNOWN("未知", 0),
+    ;
 
     companion object {
         fun of(ispMark: Int): ISP {

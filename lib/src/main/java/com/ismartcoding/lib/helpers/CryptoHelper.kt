@@ -14,16 +14,21 @@ import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-
 object CryptoHelper {
     fun sha512(input: ByteArray) = hashString("SHA-512", input)
+
     fun sha256(input: ByteArray) = hashString("SHA-256", input)
+
     fun sha1(input: ByteArray) = hashString("SHA-1", input)
 
-    private fun hashString(type: String, input: ByteArray): String {
-        val bytes = MessageDigest
-            .getInstance(type)
-            .digest(input)
+    private fun hashString(
+        type: String,
+        input: ByteArray,
+    ): String {
+        val bytes =
+            MessageDigest
+                .getInstance(type)
+                .digest(input)
 
         return bytesToHash(bytes)
     }
@@ -41,8 +46,9 @@ object CryptoHelper {
     }
 
     fun sha256(path: Path): String {
-        val dig = MessageDigest
-            .getInstance("SHA-256")
+        val dig =
+            MessageDigest
+                .getInstance("SHA-256")
         RandomAccessFile(path.toFile(), "r").use { rafile ->
             val fileChannel = rafile.channel
             val buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size())
@@ -61,15 +67,24 @@ object CryptoHelper {
         }
     }
 
-    fun aesEncrypt(key: String, content: ByteArray): ByteArray {
+    fun aesEncrypt(
+        key: String,
+        content: ByteArray,
+    ): ByteArray {
         return aesEncrypt(Base64.decode(key, Base64.NO_WRAP), content)
     }
 
-    fun aesEncrypt(key: ByteArray, content: String): ByteArray {
+    fun aesEncrypt(
+        key: ByteArray,
+        content: String,
+    ): ByteArray {
         return aesEncrypt(key, content.toByteArray())
     }
 
-    fun aesEncrypt(key: ByteArray, content: ByteArray): ByteArray {
+    fun aesEncrypt(
+        key: ByteArray,
+        content: ByteArray,
+    ): ByteArray {
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
         val secretKey = SecretKeySpec(key, "AES")
         val iv = ByteArray(12)
@@ -78,15 +93,24 @@ object CryptoHelper {
         return iv + cipher.doFinal(content)
     }
 
-    fun aesEncrypt(key: String, content: String): ByteArray {
+    fun aesEncrypt(
+        key: String,
+        content: String,
+    ): ByteArray {
         return aesEncrypt(key, content.toByteArray())
     }
 
-    fun aesDecrypt(key: String, content: ByteArray): ByteArray? {
+    fun aesDecrypt(
+        key: String,
+        content: ByteArray,
+    ): ByteArray? {
         return aesDecrypt(Base64.decode(key, Base64.NO_WRAP), content)
     }
 
-    fun aesDecrypt(key: ByteArray, content: ByteArray): ByteArray? {
+    fun aesDecrypt(
+        key: ByteArray,
+        content: ByteArray,
+    ): ByteArray? {
         return try {
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
             val secretKey = SecretKeySpec(key, "AES")
@@ -99,7 +123,10 @@ object CryptoHelper {
         }
     }
 
-    fun rsaEncrypt(content: String, publicKey: String): ByteArray? {
+    fun rsaEncrypt(
+        content: String,
+        publicKey: String,
+    ): ByteArray? {
         val publicBytes = Base64.decode(publicKey, Base64.DEFAULT)
         val keySpec = X509EncodedKeySpec(publicBytes)
         val keyFactory = KeyFactory.getInstance("RSA")
@@ -109,7 +136,10 @@ object CryptoHelper {
         return cipher.doFinal(content.toByteArray())
     }
 
-    fun rsaDecrypt(content: ByteArray, privateKey: PrivateKey): String {
+    fun rsaDecrypt(
+        content: ByteArray,
+        privateKey: PrivateKey,
+    ): String {
         val cipher = Cipher.getInstance("RSA/ECB/OAEPPadding")
         cipher.init(Cipher.DECRYPT_MODE, privateKey)
         return cipher.doFinal(content).decodeToString()

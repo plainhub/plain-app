@@ -16,62 +16,81 @@ object TransitionStartHelper {
     val transitionAnimating get() = animating
     private var animating = false
 
-    fun start(owner: LifecycleOwner, startView: View?, holder: RecyclerView.ViewHolder) {
+    fun start(
+        owner: LifecycleOwner,
+        startView: View?,
+        holder: RecyclerView.ViewHolder,
+    ) {
         beforeTransition(startView, holder)
         val doTransition = {
-            TransitionManager.beginDelayedTransition(holder.itemView as ViewGroup, transitionSet().also {
-                it.addListener(object : TransitionListenerAdapter() {
-                    override fun onTransitionStart(transition: Transition) {
-                        animating = true
-                    }
+            TransitionManager.beginDelayedTransition(
+                holder.itemView as ViewGroup,
+                transitionSet().also {
+                    it.addListener(
+                        object : TransitionListenerAdapter() {
+                            override fun onTransitionStart(transition: Transition) {
+                                animating = true
+                            }
 
-                    override fun onTransitionEnd(transition: Transition) {
-                        if (!animating) return
-                        animating = false
-                    }
-                })
-            })
+                            override fun onTransitionEnd(transition: Transition) {
+                                if (!animating) return
+                                animating = false
+                            }
+                        },
+                    )
+                },
+            )
             transition(holder)
         }
         holder.itemView.postDelayed(doTransition, 50)
 
-        owner.lifecycle.addObserver(object : LifecycleEventObserver {
-            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-                if (event == Lifecycle.Event.ON_DESTROY) {
-                    owner.lifecycle.removeObserver(this)
-                    animating = false
-                    holder.itemView.removeCallbacks(doTransition)
-                    TransitionManager.endTransitions(holder.itemView as ViewGroup)
+        owner.lifecycle.addObserver(
+            object : LifecycleEventObserver {
+                override fun onStateChanged(
+                    source: LifecycleOwner,
+                    event: Lifecycle.Event,
+                ) {
+                    if (event == Lifecycle.Event.ON_DESTROY) {
+                        owner.lifecycle.removeObserver(this)
+                        animating = false
+                        holder.itemView.removeCallbacks(doTransition)
+                        TransitionManager.endTransitions(holder.itemView as ViewGroup)
+                    }
                 }
-            }
-        })
+            },
+        )
     }
 
-    private fun beforeTransition(startView: View?, holder: RecyclerView.ViewHolder) {
+    private fun beforeTransition(
+        startView: View?,
+        holder: RecyclerView.ViewHolder,
+    ) {
         when (holder) {
             is SubsamplingViewHolder -> {
-                holder.binding.subsamplingView.layoutParams = holder.binding.subsamplingView.layoutParams.apply {
-                    width = startView?.width ?: width
-                    height = startView?.height ?: height
-                    val location = IntArray(2)
-                    getLocationOnScreen(startView, location)
-                    if (this is ViewGroup.MarginLayoutParams) {
-                        marginStart = location[0]
-                        topMargin = location[1] - Config.TRANSITION_OFFSET_Y
+                holder.binding.subsamplingView.layoutParams =
+                    holder.binding.subsamplingView.layoutParams.apply {
+                        width = startView?.width ?: width
+                        height = startView?.height ?: height
+                        val location = IntArray(2)
+                        getLocationOnScreen(startView, location)
+                        if (this is ViewGroup.MarginLayoutParams) {
+                            marginStart = location[0]
+                            topMargin = location[1] - Config.TRANSITION_OFFSET_Y
+                        }
                     }
-                }
             }
             is VideoViewHolder -> {
-                holder.binding.imageView.layoutParams = holder.binding.imageView.layoutParams.apply {
-                    width = startView?.width ?: width
-                    height = startView?.height ?: height
-                    val location = IntArray(2)
-                    getLocationOnScreen(startView, location)
-                    if (this is ViewGroup.MarginLayoutParams) {
-                        marginStart = location[0]
-                        topMargin = location[1] - Config.TRANSITION_OFFSET_Y
+                holder.binding.imageView.layoutParams =
+                    holder.binding.imageView.layoutParams.apply {
+                        width = startView?.width ?: width
+                        height = startView?.height ?: height
+                        val location = IntArray(2)
+                        getLocationOnScreen(startView, location)
+                        if (this is ViewGroup.MarginLayoutParams) {
+                            marginStart = location[0]
+                            topMargin = location[1] - Config.TRANSITION_OFFSET_Y
+                        }
                     }
-                }
             }
         }
     }
@@ -79,24 +98,26 @@ object TransitionStartHelper {
     private fun transition(holder: RecyclerView.ViewHolder) {
         when (holder) {
             is SubsamplingViewHolder -> {
-                holder.binding.subsamplingView.layoutParams = holder.binding.subsamplingView.layoutParams.apply {
-                    width = MATCH_PARENT
-                    height = MATCH_PARENT
-                    if (this is ViewGroup.MarginLayoutParams) {
-                        marginStart = 0
-                        topMargin = 0
+                holder.binding.subsamplingView.layoutParams =
+                    holder.binding.subsamplingView.layoutParams.apply {
+                        width = MATCH_PARENT
+                        height = MATCH_PARENT
+                        if (this is ViewGroup.MarginLayoutParams) {
+                            marginStart = 0
+                            topMargin = 0
+                        }
                     }
-                }
             }
             is VideoViewHolder -> {
-                holder.binding.imageView.layoutParams = holder.binding.imageView.layoutParams.apply {
-                    width = MATCH_PARENT
-                    height = MATCH_PARENT
-                    if (this is ViewGroup.MarginLayoutParams) {
-                        marginStart = 0
-                        topMargin = 0
+                holder.binding.imageView.layoutParams =
+                    holder.binding.imageView.layoutParams.apply {
+                        width = MATCH_PARENT
+                        height = MATCH_PARENT
+                        if (this is ViewGroup.MarginLayoutParams) {
+                            marginStart = 0
+                            topMargin = 0
+                        }
                     }
-                }
             }
         }
     }
@@ -111,7 +132,10 @@ object TransitionStartHelper {
         }
     }
 
-    private fun getLocationOnScreen(startView: View?, location: IntArray) {
+    private fun getLocationOnScreen(
+        startView: View?,
+        location: IntArray,
+    ) {
         startView?.getLocationOnScreen(location)
 
         if (location[0] == 0) {

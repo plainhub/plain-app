@@ -13,14 +13,16 @@ import com.ismartcoding.lib.brv.layoutmanager.HoverLinearLayoutManager
 import com.ismartcoding.lib.brv.layoutmanager.HoverStaggeredGridLayoutManager
 import com.ismartcoding.lib.brv.listener.ItemDifferCallback
 
-//<editor-fold desc="数据集">
+// <editor-fold desc="数据集">
+
 /**
  * 如果Adapter是[BindingAdapter]则返回对象, 否则抛出异常
  * @exception NullPointerException
  */
 val RecyclerView.bindingAdapter
-    get() = adapter as? BindingAdapter
-        ?: throw NullPointerException("RecyclerView without BindingAdapter")
+    get() =
+        adapter as? BindingAdapter
+            ?: throw NullPointerException("RecyclerView without BindingAdapter")
 
 /**
  * 数据模型集合
@@ -45,7 +47,7 @@ var RecyclerView.mutable
 fun <M> RecyclerView.getModelList(): List<M> {
     return bindingAdapter.getModelList()
 }
-//</editor-fold>
+// </editor-fold>
 
 /**
  * 添加新的数据
@@ -56,7 +58,7 @@ fun <M> RecyclerView.getModelList(): List<M> {
 fun RecyclerView.addModels(
     models: List<Any>?,
     animation: Boolean = true,
-    @IntRange(from = -1) index: Int = -1
+    @IntRange(from = -1) index: Int = -1,
 ) {
     bindingAdapter.addModels(models, animation, index)
 }
@@ -75,12 +77,13 @@ fun RecyclerView.addModels(
 fun RecyclerView.setDifferModels(
     newModels: List<Any>?,
     detectMoves: Boolean = true,
-    commitCallback: Runnable? = null
+    commitCallback: Runnable? = null,
 ) {
     bindingAdapter.setDifferModels(newModels, detectMoves, commitCallback)
 }
 
-//<editor-fold desc="配置列表">
+// <editor-fold desc="配置列表">
+
 /**
  * 设置适配器
  */
@@ -90,10 +93,9 @@ fun RecyclerView.setup(block: BindingAdapter.(RecyclerView) -> Unit): BindingAda
     this.adapter = adapter
     return adapter
 }
-//</editor-fold>
+// </editor-fold>
 
-
-//<editor-fold desc="布局管理器">
+// <editor-fold desc="布局管理器">
 
 /**
  * 创建[HoverLinearLayoutManager]  线性列表
@@ -105,12 +107,13 @@ fun RecyclerView.linear(
     @RecyclerView.Orientation orientation: Int = VERTICAL,
     reverseLayout: Boolean = false,
     scrollEnabled: Boolean = true,
-    stackFromEnd: Boolean = false
+    stackFromEnd: Boolean = false,
 ): RecyclerView {
-    layoutManager = HoverLinearLayoutManager(context, orientation, reverseLayout).apply {
-        setScrollEnabled(scrollEnabled)
-        this.stackFromEnd = stackFromEnd
-    }
+    layoutManager =
+        HoverLinearLayoutManager(context, orientation, reverseLayout).apply {
+            setScrollEnabled(scrollEnabled)
+            this.stackFromEnd = stackFromEnd
+        }
     return this
 }
 
@@ -127,9 +130,10 @@ fun RecyclerView.grid(
     reverseLayout: Boolean = false,
     scrollEnabled: Boolean = true,
 ): RecyclerView {
-    layoutManager = HoverGridLayoutManager(context, spanCount, orientation, reverseLayout).apply {
-        setScrollEnabled(scrollEnabled)
-    }
+    layoutManager =
+        HoverGridLayoutManager(context, spanCount, orientation, reverseLayout).apply {
+            setScrollEnabled(scrollEnabled)
+        }
     return this
 }
 
@@ -144,25 +148,24 @@ fun RecyclerView.staggered(
     spanCount: Int,
     @RecyclerView.Orientation orientation: Int = VERTICAL,
     reverseLayout: Boolean = false,
-    scrollEnabled: Boolean = true
+    scrollEnabled: Boolean = true,
 ): RecyclerView {
-    layoutManager = HoverStaggeredGridLayoutManager(spanCount, orientation).apply {
-        setScrollEnabled(scrollEnabled)
-        this.reverseLayout = reverseLayout
-    }
+    layoutManager =
+        HoverStaggeredGridLayoutManager(spanCount, orientation).apply {
+            setScrollEnabled(scrollEnabled)
+            this.reverseLayout = reverseLayout
+        }
     return this
 }
-//</editor-fold>
+// </editor-fold>
 
-//<editor-fold desc="分割线">
+// <editor-fold desc="分割线">
 
 /**
  * 函数配置分割线
  * 具体配置参数查看[DefaultDecoration]
  */
-fun RecyclerView.divider(
-    block: DefaultDecoration.() -> Unit
-): RecyclerView {
+fun RecyclerView.divider(block: DefaultDecoration.() -> Unit): RecyclerView {
     val itemDecoration = DefaultDecoration(context).apply(block)
     addItemDecoration(itemDecoration)
     return this
@@ -175,7 +178,7 @@ fun RecyclerView.divider(
  */
 fun RecyclerView.divider(
     @DrawableRes drawable: Int,
-    orientation: DividerOrientation = DividerOrientation.HORIZONTAL
+    orientation: DividerOrientation = DividerOrientation.HORIZONTAL,
 ): RecyclerView {
     return divider {
         setDrawable(drawable)
@@ -197,10 +200,12 @@ fun RecyclerView.dividerSpace(
         this.orientation = orientation
     }
 }
-//</editor-fold>
+// </editor-fold>
 
-
-fun RecyclerView.removeModel(m: Any, position: Int) {
+fun RecyclerView.removeModel(
+    m: Any,
+    position: Int,
+) {
     mutable.remove(m)
     adapter?.notifyItemRemoved(position)
 }

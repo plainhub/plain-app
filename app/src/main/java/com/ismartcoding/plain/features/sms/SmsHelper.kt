@@ -33,7 +33,7 @@ object SmsHelper : BaseContentHelper() {
             Telephony.Sms.THREAD_ID,
             Telephony.Sms.READ,
             Telephony.Sms.DATE,
-            Telephony.Sms.SERVICE_CENTER
+            Telephony.Sms.SERVICE_CENTER,
         )
     }
 
@@ -58,7 +58,10 @@ object SmsHelper : BaseContentHelper() {
         return where
     }
 
-    override fun count(context: Context, query: String): Int {
+    override fun count(
+        context: Context,
+        query: String,
+    ): Int {
         if (TempData.demoMode) {
             if (demoItems.isEmpty()) {
                 demoSearch()
@@ -76,7 +79,12 @@ object SmsHelper : BaseContentHelper() {
         return super.count(context, query)
     }
 
-    fun search(context: Context, query: String, limit: Int, offset: Int): List<DMessage> {
+    fun search(
+        context: Context,
+        query: String,
+        limit: Int,
+        offset: Int,
+    ): List<DMessage> {
         if (TempData.demoMode) {
             if (demoItems.isEmpty()) {
                 demoSearch()
@@ -105,8 +113,8 @@ object SmsHelper : BaseContentHelper() {
                         cursor.getStringValue(Telephony.Sms.SERVICE_CENTER, cache),
                         cursor.getIntValue(Telephony.Sms.READ, cache) == 1,
                         cursor.getStringValue(Telephony.Sms.THREAD_ID, cache),
-                        cursor.getIntValue(Telephony.Sms.TYPE, cache)
-                    )
+                        cursor.getIntValue(Telephony.Sms.TYPE, cache),
+                    ),
                 )
             } while (cursor.moveToNext())
         }
@@ -121,10 +129,15 @@ object SmsHelper : BaseContentHelper() {
         messages.shuffled().forEachIndexed { index, s ->
             demoItems.add(
                 DMessage(
-                    (index + 4658).toString(), s, Random.nextLong(1234567890, 9234567890).toString(),
+                    (index + 4658).toString(),
+                    s,
+                    Random.nextLong(1234567890, 9234567890).toString(),
                     Instant.fromEpochMilliseconds(System.currentTimeMillis() - Random.nextInt(0, 100 * 3600) * 1000),
-                    "", true, "", if (Random.nextInt() % 2 == 0) Telephony.Sms.MESSAGE_TYPE_INBOX else Telephony.Sms.MESSAGE_TYPE_SENT,
-                )
+                    "",
+                    true,
+                    "",
+                    if (Random.nextInt() % 2 == 0) Telephony.Sms.MESSAGE_TYPE_INBOX else Telephony.Sms.MESSAGE_TYPE_SENT,
+                ),
             )
         }
 

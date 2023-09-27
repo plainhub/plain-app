@@ -36,7 +36,10 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
     private var tag: DTag? = null
     private var id: String = ""
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         note = arguments?.parcelable(ARG_NOTE)
@@ -72,11 +75,12 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
                 lifecycleScope.launch {
                     val isNew = id.isEmpty()
                     withIO {
-                        id = NoteHelper.addOrUpdateAsync(id) {
-                            val text = binding.editor.getText()
-                            title = text.cut(100).replace("\n", "")
-                            content = text
-                        }
+                        id =
+                            NoteHelper.addOrUpdateAsync(id) {
+                                val text = binding.editor.getText()
+                                title = text.cut(100).replace("\n", "")
+                                content = text
+                            }
                         if (isNew && tag != null) {
                             // create note from tag items page.
                             TagHelper.addTagRelations(arrayListOf(TagRelationStub(id).toTagRelation(tag!!.id, DataType.NOTE)))
@@ -115,11 +119,15 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
         }
     }
 
-    fun show(note: DNote?, tag: DTag? = null) {
-        arguments = Bundle().apply {
-            putParcelable(ARG_NOTE, note)
-            putParcelable(ARG_TAG, tag)
-        }
+    fun show(
+        note: DNote?,
+        tag: DTag? = null,
+    ) {
+        arguments =
+            Bundle().apply {
+                putParcelable(ARG_NOTE, note)
+                putParcelable(ARG_TAG, tag)
+            }
         show()
     }
 }

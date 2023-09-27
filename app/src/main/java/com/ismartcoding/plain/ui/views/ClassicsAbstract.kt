@@ -8,14 +8,23 @@ import com.scwang.smart.refresh.layout.api.*
 import com.scwang.smart.refresh.layout.simple.SimpleComponent
 import com.scwang.smart.refresh.layout.util.SmartUtil
 
-abstract class ClassicsAbstract(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : SimpleComponent(context, attrs, defStyleAttr), RefreshComponent {
+abstract class ClassicsAbstract(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
+    SimpleComponent(
+        context,
+        attrs,
+        defStyleAttr,
+    ),
+    RefreshComponent {
     protected var mRefreshKernel: RefreshKernel? = null
     protected var mFinishDuration = 500
     protected var mPaddingTop = 20
     protected var mPaddingBottom = 20
     protected var mMinHeightOfContent = 0
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+    override fun onMeasure(
+        widthMeasureSpec: Int,
+        heightMeasureSpec: Int,
+    ) {
         val thisView: View = this
         if (mMinHeightOfContent == 0) {
             mPaddingTop = thisView.paddingTop
@@ -52,18 +61,33 @@ abstract class ClassicsAbstract(context: Context?, attrs: AttributeSet?, defStyl
         }
     }
 
-    override fun onInitialized(kernel: RefreshKernel, height: Int, maxDragHeight: Int) {
+    override fun onInitialized(
+        kernel: RefreshKernel,
+        height: Int,
+        maxDragHeight: Int,
+    ) {
         mRefreshKernel = kernel
     }
 
-    override fun onStartAnimator(refreshLayout: RefreshLayout, height: Int, maxDragHeight: Int) {
+    override fun onStartAnimator(
+        refreshLayout: RefreshLayout,
+        height: Int,
+        maxDragHeight: Int,
+    ) {
     }
 
-    override fun onReleased(refreshLayout: RefreshLayout, height: Int, maxDragHeight: Int) {
+    override fun onReleased(
+        refreshLayout: RefreshLayout,
+        height: Int,
+        maxDragHeight: Int,
+    ) {
         onStartAnimator(refreshLayout, height, maxDragHeight)
     }
 
-    override fun onFinish(refreshLayout: RefreshLayout, success: Boolean): Int {
-        return mFinishDuration //延迟500毫秒之后再弹回
+    override fun onFinish(
+        refreshLayout: RefreshLayout,
+        success: Boolean,
+    ): Int {
+        return mFinishDuration // 延迟500毫秒之后再弹回
     }
 }

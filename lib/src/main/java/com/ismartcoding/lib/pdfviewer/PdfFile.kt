@@ -14,7 +14,10 @@ import com.shockwave.pdfium.util.SizeF
 import kotlin.math.max
 
 class PdfFile(
-    private val pdfiumCore: PdfiumCore?, private var pdfDocument: PdfDocument?, private val pageFitPolicy: FitPolicy, viewSize: Size,
+    private val pdfiumCore: PdfiumCore?,
+    private var pdfDocument: PdfDocument?,
+    private val pageFitPolicy: FitPolicy,
+    viewSize: Size,
     /**
      * The pages the user want to display in order
      * (ex: 0, 2, 2, 8, 8, 1, 1, 1)
@@ -30,7 +33,7 @@ class PdfFile(
      * True if every page should fit separately according to the FitPolicy,
      * else the largest page fits and other pages scale relatively
      */
-    private val fitEachPage: Boolean
+    private val fitEachPage: Boolean,
 ) {
     var pagesCount = 0
         private set
@@ -70,11 +73,12 @@ class PdfFile(
     }
 
     private fun setup(viewSize: Size) {
-        pagesCount = if (originalUserPages != null) {
-            originalUserPages!!.size
-        } else {
-            pdfiumCore!!.getPageCount(pdfDocument)
-        }
+        pagesCount =
+            if (originalUserPages != null) {
+                originalUserPages!!.size
+            } else {
+                pdfiumCore!!.getPageCount(pdfDocument)
+            }
         for (i in 0 until pagesCount) {
             val pageSize = pdfiumCore!!.getPageSize(pdfDocument, documentPage(i))
             if (pageSize.width > originalMaxWidthPageSize.width) {
@@ -95,10 +99,14 @@ class PdfFile(
      */
     fun recalculatePageSizes(viewSize: Size) {
         pageSizes.clear()
-        val calculator = PageSizeCalculator(
-            pageFitPolicy, originalMaxWidthPageSize,
-            originalMaxHeightPageSize, viewSize, fitEachPage
-        )
+        val calculator =
+            PageSizeCalculator(
+                pageFitPolicy,
+                originalMaxWidthPageSize,
+                originalMaxHeightPageSize,
+                viewSize,
+                fitEachPage,
+            )
         maxWidthPageSize = calculator.optimalMaxWidthPageSize
         maxHeightPageSize = calculator.optimalMaxHeightPageSize
         for (size in originalPageSizes) {
@@ -115,10 +123,15 @@ class PdfFile(
         val docPage = documentPage(pageIndex)
         return if (docPage < 0) {
             SizeF(0F, 0F)
-        } else pageSizes[pageIndex]
+        } else {
+            pageSizes[pageIndex]
+        }
     }
 
-    fun getScaledPageSize(pageIndex: Int, zoom: Float): SizeF {
+    fun getScaledPageSize(
+        pageIndex: Int,
+        zoom: Float,
+    ): SizeF {
         val size = getPageSize(pageIndex)
         return SizeF(size.width * zoom, size.height * zoom)
     }
@@ -190,37 +203,54 @@ class PdfFile(
     /**
      * Get the page's height if swiping vertical, or width if swiping horizontal.
      */
-    fun getPageLength(pageIndex: Int, zoom: Float): Float {
+    fun getPageLength(
+        pageIndex: Int,
+        zoom: Float,
+    ): Float {
         val size = getPageSize(pageIndex)
         return (if (isVertical) size.height else size.width) * zoom
     }
 
-    fun getPageSpacing(pageIndex: Int, zoom: Float): Float {
+    fun getPageSpacing(
+        pageIndex: Int,
+        zoom: Float,
+    ): Float {
         val spacing = if (autoSpacing) pageSpacing[pageIndex] else spacingPx.toFloat()
         return spacing * zoom
     }
 
     /** Get primary page offset, that is Y for vertical scroll and X for horizontal scroll  */
-    fun getPageOffset(pageIndex: Int, zoom: Float): Float {
+    fun getPageOffset(
+        pageIndex: Int,
+        zoom: Float,
+    ): Float {
         val docPage = documentPage(pageIndex)
         return if (docPage < 0) {
             0F
-        } else pageOffsets[pageIndex] * zoom
-    }
-
-    /** Get secondary page offset, that is X for vertical scroll and Y for horizontal scroll  */
-    fun getSecondaryPageOffset(pageIndex: Int, zoom: Float): Float {
-        val pageSize = getPageSize(pageIndex)
-        return if (isVertical) {
-            val maxWidth = maxPageWidth
-            zoom * (maxWidth - pageSize.width) / 2 //x
         } else {
-            val maxHeight = maxPageHeight
-            zoom * (maxHeight - pageSize.height) / 2 //y
+            pageOffsets[pageIndex] * zoom
         }
     }
 
-    fun getPageAtOffset(offset: Float, zoom: Float): Int {
+    /** Get secondary page offset, that is X for vertical scroll and Y for horizontal scroll  */
+    fun getSecondaryPageOffset(
+        pageIndex: Int,
+        zoom: Float,
+    ): Float {
+        val pageSize = getPageSize(pageIndex)
+        return if (isVertical) {
+            val maxWidth = maxPageWidth
+            zoom * (maxWidth - pageSize.width) / 2 // x
+        } else {
+            val maxHeight = maxPageHeight
+            zoom * (maxHeight - pageSize.height) / 2 // y
+        }
+    }
+
+    fun getPageAtOffset(
+        offset: Float,
+        zoom: Float,
+    ): Int {
         var currentPage = 0
         for (i in 0 until pagesCount) {
             val off = pageOffsets[i] * zoom - getPageSpacing(i, zoom) / 2f
@@ -248,7 +278,9 @@ class PdfFile(
                     openedPages.put(docPage, false)
                     throw PageRenderingException(pageIndex, e)
                 }
-            } else false
+            } else {
+                false
+            }
         }
     }
 
@@ -257,22 +289,39 @@ class PdfFile(
         return !openedPages[docPage, false]
     }
 
-    fun renderPageBitmap(bitmap: Bitmap, pageIndex: Int, bounds: Rect, annotationRendering: Boolean) {
+    fun renderPageBitmap(
+        bitmap: Bitmap,
+        pageIndex: Int,
+        bounds: Rect,
+        annotationRendering: Boolean,
+    ) {
         val docPage = documentPage(pageIndex)
         pdfiumCore!!.renderPageBitmap(
-            pdfDocument, bitmap, docPage,
-            bounds.left, bounds.top, bounds.width(), bounds.height(), annotationRendering
+            pdfDocument,
+            bitmap,
+            docPage,
+            bounds.left,
+            bounds.top,
+            bounds.width(),
+            bounds.height(),
+            annotationRendering,
         )
     }
 
     val metaData: Meta?
-        get() = if (pdfDocument == null) {
-            null
-        } else pdfiumCore!!.getDocumentMeta(pdfDocument)
+        get() =
+            if (pdfDocument == null) {
+                null
+            } else {
+                pdfiumCore!!.getDocumentMeta(pdfDocument)
+            }
     val bookmarks: List<Bookmark>
-        get() = if (pdfDocument == null) {
-            ArrayList()
-        } else pdfiumCore!!.getTableOfContents(pdfDocument)
+        get() =
+            if (pdfDocument == null) {
+                ArrayList()
+            } else {
+                pdfiumCore!!.getTableOfContents(pdfDocument)
+            }
 
     fun getPageLinks(pageIndex: Int): List<PdfDocument.Link> {
         val docPage = documentPage(pageIndex)
@@ -280,8 +329,12 @@ class PdfFile(
     }
 
     fun mapRectToDevice(
-        pageIndex: Int, startX: Int, startY: Int, sizeX: Int, sizeY: Int,
-        rect: RectF?
+        pageIndex: Int,
+        startX: Int,
+        startY: Int,
+        sizeX: Int,
+        sizeY: Int,
+        rect: RectF?,
     ): RectF {
         val docPage = documentPage(pageIndex)
         return pdfiumCore!!.mapRectToDevice(pdfDocument, docPage, startX, startY, sizeX, sizeY, 0, rect)

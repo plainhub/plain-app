@@ -1,10 +1,10 @@
 package com.ismartcoding.plain.ui.helpers
 
 import com.ismartcoding.lib.statelayout.StateConfig
-import com.scwang.smart.refresh.layout.SmartRefreshLayout
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.views.ClassicsFooter
 import com.ismartcoding.plain.ui.views.ClassicsHeader
+import com.scwang.smart.refresh.layout.SmartRefreshLayout
 
 object PageHelper {
     fun init() {

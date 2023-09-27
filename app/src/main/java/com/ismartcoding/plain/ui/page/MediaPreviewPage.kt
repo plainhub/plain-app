@@ -12,9 +12,7 @@ import com.ismartcoding.plain.ui.base.PScaffold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MediaPreviewPage(
-    navController: NavHostController,
-) {
+fun MediaPreviewPage(navController: NavHostController) {
     PScaffold(
         navController,
         content = {
@@ -24,7 +22,6 @@ fun MediaPreviewPage(
                     }
                 }
             }
-        }
+        },
     )
 }
-

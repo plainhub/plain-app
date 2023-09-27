@@ -67,7 +67,11 @@ object Pinyin {
      * @param rules 自定义的规则，具有最高优先级
      * @return 中文转为拼音的字符串
      */
-    fun toPinyin(str: String, separator: String = "", rules: PinyinRules? = null): String {
+    fun toPinyin(
+        str: String,
+        separator: String = "",
+        rules: PinyinRules? = null,
+    ): String {
         return if (rules != null) {
             val dicts = mutableListOf<PinyinDict>()
             dicts.add(rules.toPinyinMapDict())
@@ -106,7 +110,10 @@ object Pinyin {
      * @param rules 自定义规则，具有最高优先级
      * @return return pinyin if c is chinese in uppercase, String.valueOf(c) otherwise.
      */
-    fun toPinyin(c: Char, rules: PinyinRules?): String {
+    fun toPinyin(
+        c: Char,
+        rules: PinyinRules?,
+    ): String {
         return if (rules?.toPinyin(c) != null) {
             rules.toPinyin(c)
         } else {
@@ -121,35 +128,43 @@ object Pinyin {
      * @return return whether c is chinese
      */
     fun isChinese(c: Char): Boolean {
-        return (PinyinData.MIN_VALUE <= c && c <= PinyinData.MAX_VALUE && getPinyinCode(c) > 0
-                || PinyinData.CHAR_12295 == c)
+        return (
+            PinyinData.MIN_VALUE <= c && c <= PinyinData.MAX_VALUE && getPinyinCode(c) > 0 ||
+                PinyinData.CHAR_12295 == c
+        )
     }
 
     private fun getPinyinCode(c: Char): Int {
         val offset = c - PinyinData.MIN_VALUE
         return if (0 <= offset && offset < PinyinData.PINYIN_CODE_1_OFFSET) {
             decodeIndex(PinyinCode1.PINYIN_CODE_PADDING, PinyinCode1.PINYIN_CODE, offset)
-        } else if (PinyinData.PINYIN_CODE_1_OFFSET <= offset
-            && offset < PinyinData.PINYIN_CODE_2_OFFSET
+        } else if (PinyinData.PINYIN_CODE_1_OFFSET <= offset &&
+            offset < PinyinData.PINYIN_CODE_2_OFFSET
         ) {
             decodeIndex(
-                PinyinCode2.PINYIN_CODE_PADDING, PinyinCode2.PINYIN_CODE,
-                offset - PinyinData.PINYIN_CODE_1_OFFSET
+                PinyinCode2.PINYIN_CODE_PADDING,
+                PinyinCode2.PINYIN_CODE,
+                offset - PinyinData.PINYIN_CODE_1_OFFSET,
             )
         } else {
             decodeIndex(
-                PinyinCode3.PINYIN_CODE_PADDING, PinyinCode3.PINYIN_CODE,
-                offset - PinyinData.PINYIN_CODE_2_OFFSET
+                PinyinCode3.PINYIN_CODE_PADDING,
+                PinyinCode3.PINYIN_CODE,
+                offset - PinyinData.PINYIN_CODE_2_OFFSET,
             )
         }
     }
 
-    private fun decodeIndex(paddings: ByteArray, indexes: ByteArray, offset: Int): Int {
-        //CHECKSTYLE:OFF
+    private fun decodeIndex(
+        paddings: ByteArray,
+        indexes: ByteArray,
+        offset: Int,
+    ): Int {
+        // CHECKSTYLE:OFF
         val index1 = offset / 8
         val index2 = offset % 8
         var realIndex = (indexes[offset].toShort() and (0xff).toShort())
-        //CHECKSTYLE:ON
+        // CHECKSTYLE:ON
         if (paddings[index1].toShort() and PinyinData.BIT_MASKS[index2] != (0).toShort()) {
             realIndex = realIndex or PinyinData.PADDING_MASK
         }

@@ -110,10 +110,11 @@ fun ChatPage(
     val density = LocalDensity.current
     val imageWidthDp = (configuration.screenWidthDp.dp - 34.dp) / 3
     val imageWidthPx = with(density) { imageWidthDp.toPx().toInt() }
-    val refreshState = rememberRefreshLayoutState {
-        viewModel.fetch(context)
-        setRefreshState(RefreshContentState.Stop)
-    }
+    val refreshState =
+        rememberRefreshLayoutState {
+            viewModel.fetch(context)
+            setRefreshState(RefreshContentState.Stop)
+        }
     val scrollState = rememberLazyListState()
     val focusManager = LocalFocusManager.current
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
@@ -122,88 +123,109 @@ fun ChatPage(
 
     LaunchedEffect(Unit) {
         viewModel.fetch(context)
-        events.add(receiveEventHandler<DeleteChatItemViewEvent> { event ->
-            viewModel.remove(event.id)
-        })
+        events.add(
+            receiveEventHandler<DeleteChatItemViewEvent> { event ->
+                viewModel.remove(event.id)
+            },
+        )
 
-        events.add(receiveEventHandler<HttpServerEvents.MessageCreatedEvent> { event ->
-            viewModel.addAll(event.items)
-            scope.launch {
-                scrollState.scrollToItem(0)
-            }
-        })
-
-        events.add(receiveEventHandler<PickFileResultEvent> { event ->
-            if (event.tag != PickFileTag.SEND_MESSAGE) {
-                return@receiveEventHandler
-            }
-            val items = mutableListOf<DMessageFile>()
-            withIO {
-                val cache = mutableMapOf<String, Int>()
-                event.uris.forEach { uri ->
-                    context.contentResolver.query(uri, null, null, null, null)
-                        ?.use { cursor ->
-                            try {
-                                cursor.moveToFirst()
-                                var fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
-                                if (event.type == PickFileType.IMAGE_VIDEO) {
-                                    val mimeType = context.contentResolver.getType(uri)
-                                    val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
-                                    if (extension.isNotEmpty()) {
-                                        fileName = fileName.getFilenameWithoutExtension() + "." + extension
-                                    }
-                                }
-                                val size = cursor.getLongValue(OpenableColumns.SIZE, cache)
-                                cursor.close()
-                                val dir = when {
-                                    fileName.isVideoFast() -> {
-                                        Environment.DIRECTORY_MOVIES
-                                    }
-
-                                    fileName.isImageFast() -> {
-                                        Environment.DIRECTORY_PICTURES
-                                    }
-
-                                    fileName.isAudioFast() -> {
-                                        Environment.DIRECTORY_MUSIC
-                                    }
-
-                                    else -> {
-                                        Environment.DIRECTORY_DOCUMENTS
-                                    }
-                                }
-                                var dst = context.getExternalFilesDir(dir)!!.path + "/$fileName"
-                                val dstFile = File(dst)
-                                if (dstFile.exists()) {
-                                    dst = dstFile.newPath()
-                                    FileHelper.copyFile(context, uri, dst)
-                                } else {
-                                    FileHelper.copyFile(context, uri, dst)
-                                }
-                                items.add(DMessageFile("app://$dir/${dst.getFilenameFromPath()}", size, dstFile.getDuration(context)))
-                            } catch (ex: Exception) {
-                                // the picked file could be deleted
-                                DialogHelper.showMessage(ex)
-                                ex.printStackTrace()
-                            }
-                        }
-                }
-                val content = if (event.type == PickFileType.IMAGE_VIDEO) DMessageContent(DMessageType.IMAGES.value, DMessageImages(items)) else DMessageContent(
-                    DMessageType.FILES.value,
-                    DMessageFiles(items)
-                )
-                val item = ChatHelper.sendAsync(content)
-                viewModel.addAll(arrayListOf(item))
-                sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(arrayListOf(item.toModel().apply {
-                    data = this.getContentData()
-                }))))
+        events.add(
+            receiveEventHandler<HttpServerEvents.MessageCreatedEvent> { event ->
+                viewModel.addAll(event.items)
                 scope.launch {
                     scrollState.scrollToItem(0)
-                    delay(200)
-                    focusManager.clearFocus()
                 }
-            }
-        })
+            },
+        )
+
+        events.add(
+            receiveEventHandler<PickFileResultEvent> { event ->
+                if (event.tag != PickFileTag.SEND_MESSAGE) {
+                    return@receiveEventHandler
+                }
+                val items = mutableListOf<DMessageFile>()
+                withIO {
+                    val cache = mutableMapOf<String, Int>()
+                    event.uris.forEach { uri ->
+                        context.contentResolver.query(uri, null, null, null, null)
+                            ?.use { cursor ->
+                                try {
+                                    cursor.moveToFirst()
+                                    var fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
+                                    if (event.type == PickFileType.IMAGE_VIDEO) {
+                                        val mimeType = context.contentResolver.getType(uri)
+                                        val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
+                                        if (extension.isNotEmpty()) {
+                                            fileName = fileName.getFilenameWithoutExtension() + "." + extension
+                                        }
+                                    }
+                                    val size = cursor.getLongValue(OpenableColumns.SIZE, cache)
+                                    cursor.close()
+                                    val dir =
+                                        when {
+                                            fileName.isVideoFast() -> {
+                                                Environment.DIRECTORY_MOVIES
+                                            }
+
+                                            fileName.isImageFast() -> {
+                                                Environment.DIRECTORY_PICTURES
+                                            }
+
+                                            fileName.isAudioFast() -> {
+                                                Environment.DIRECTORY_MUSIC
+                                            }
+
+                                            else -> {
+                                                Environment.DIRECTORY_DOCUMENTS
+                                            }
+                                        }
+                                    var dst = context.getExternalFilesDir(dir)!!.path + "/$fileName"
+                                    val dstFile = File(dst)
+                                    if (dstFile.exists()) {
+                                        dst = dstFile.newPath()
+                                        FileHelper.copyFile(context, uri, dst)
+                                    } else {
+                                        FileHelper.copyFile(context, uri, dst)
+                                    }
+                                    items.add(DMessageFile("app://$dir/${dst.getFilenameFromPath()}", size, dstFile.getDuration(context)))
+                                } catch (ex: Exception) {
+                                    // the picked file could be deleted
+                                    DialogHelper.showMessage(ex)
+                                    ex.printStackTrace()
+                                }
+                            }
+                    }
+                    val content =
+                        if (event.type == PickFileType.IMAGE_VIDEO) {
+                            DMessageContent(DMessageType.IMAGES.value, DMessageImages(items))
+                        } else {
+                            DMessageContent(
+                                DMessageType.FILES.value,
+                                DMessageFiles(items),
+                            )
+                        }
+                    val item = ChatHelper.sendAsync(content)
+                    viewModel.addAll(arrayListOf(item))
+                    sendEvent(
+                        WebSocketEvent(
+                            EventType.MESSAGE_CREATED,
+                            JsonHelper.jsonEncode(
+                                arrayListOf(
+                                    item.toModel().apply {
+                                        data = this.getContentData()
+                                    },
+                                ),
+                            ),
+                        ),
+                    )
+                    scope.launch {
+                        scrollState.scrollToItem(0)
+                        delay(200)
+                        focusManager.clearFocus()
+                    }
+                }
+            },
+        )
     }
 
     DisposableEffect(Unit) {
@@ -218,16 +240,19 @@ fun ChatPage(
         content = {
             Column(
                 Modifier
-                    .fillMaxHeight()
+                    .fillMaxHeight(),
             ) {
                 PullToRefresh(
-                    refreshLayoutState = refreshState, modifier = Modifier
-                        .weight(1F)
+                    refreshLayoutState = refreshState,
+                    modifier =
+                        Modifier
+                            .weight(1F),
                 ) {
                     LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(),
                         state = scrollState,
                         reverseLayout = true,
                         verticalArrangement = Arrangement.Top,
@@ -237,16 +262,18 @@ fun ChatPage(
                                 ChatDate(itemsState.value, m, index)
                                 Box(modifier = Modifier.fillMaxSize()) {
                                     Column(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .combinedClickable(
-                                                onClick = {
-                                                    focusManager.clearFocus()
-                                                },
-                                                onLongClick = {
-                                                    selectedItem = m
-                                                    showContextMenu.value = true
-                                                })
+                                        modifier =
+                                            Modifier
+                                                .fillMaxSize()
+                                                .combinedClickable(
+                                                    onClick = {
+                                                        focusManager.clearFocus()
+                                                    },
+                                                    onLongClick = {
+                                                        selectedItem = m
+                                                        showContextMenu.value = true
+                                                    },
+                                                ),
                                     ) {
                                         ChatName(m)
                                         when (m.type) {
@@ -264,29 +291,38 @@ fun ChatPage(
                                         }
                                     }
                                     Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .padding(top = 32.dp)
-                                            .wrapContentSize(Alignment.Center)
+                                        modifier =
+                                            Modifier
+                                                .fillMaxSize()
+                                                .padding(top = 32.dp)
+                                                .wrapContentSize(Alignment.Center),
                                     ) {
                                         PDropdownMenu(
                                             expanded = showContextMenu.value && selectedItem == m,
-                                            onDismissRequest = { showContextMenu.value = false }
+                                            onDismissRequest = { showContextMenu.value = false },
                                         ) {
                                             if (m.value is DMessageText) {
-                                                DropdownMenuItem(text = { Text(stringResource(id = R.string.copy_text)) },
+                                                DropdownMenuItem(
+                                                    text = { Text(stringResource(id = R.string.copy_text)) },
                                                     onClick = {
                                                         showContextMenu.value = false
-                                                        val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.message), (m.value as DMessageText).text)
+                                                        val clip =
+                                                            ClipData.newPlainText(
+                                                                LocaleHelper.getString(R.string.message),
+                                                                (m.value as DMessageText).text,
+                                                            )
                                                         clipboardManager.setPrimaryClip(clip)
                                                         DialogHelper.showMessage(R.string.copied)
-                                                    })
-                                                DropdownMenuItem(text = { Text(stringResource(id = R.string.edit_text)) },
+                                                    },
+                                                )
+                                                DropdownMenuItem(
+                                                    text = { Text(stringResource(id = R.string.edit_text)) },
                                                     onClick = {
                                                         showContextMenu.value = false
                                                         sharedViewModel.chatContent.value = (m.value as DMessageText).text
                                                         navController.navigate("${RouteName.CHAT_EDIT_TEXT.name}?id=${m.id}")
-                                                    })
+                                                    },
+                                                )
                                             }
                                             DropdownMenuItem(
                                                 text = { Text(stringResource(id = R.string.delete)) },
@@ -298,7 +334,8 @@ fun ChatPage(
                                                         json.put(m.id)
                                                         sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, json.toString()))
                                                     }
-                                                })
+                                                },
+                                            )
                                         }
                                     }
                                 }
@@ -308,8 +345,9 @@ fun ChatPage(
                 }
                 ChatInput(
                     value = inputValue,
-                    modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
+                    modifier =
+                        Modifier
+                            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
                     hint = stringResource(id = R.string.chat_input_hint),
                     onValueChange = { inputValue = it },
                     onSend = {
@@ -319,15 +357,24 @@ fun ChatPage(
                         scope.launch {
                             val item = withIO { ChatHelper.sendAsync(DMessageContent(DMessageType.TEXT.value, DMessageText(inputValue))) }
                             viewModel.addAll(arrayListOf(item))
-                            sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(arrayListOf(item.toModel().apply {
-                                data = this.getContentData()
-                            }))))
+                            sendEvent(
+                                WebSocketEvent(
+                                    EventType.MESSAGE_CREATED,
+                                    JsonHelper.jsonEncode(
+                                        arrayListOf(
+                                            item.toModel().apply {
+                                                data = this.getContentData()
+                                            },
+                                        ),
+                                    ),
+                                ),
+                            )
                             inputValue = ""
                             scrollState.scrollToItem(0)
                         }
-                    }
+                    },
                 )
             }
-        }
+        },
     )
 }
