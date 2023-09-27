@@ -11,7 +11,7 @@ plugins {
     id("com.google.devtools.ksp")
     kotlin("android")
     kotlin("kapt")
-    kotlin("plugin.serialization") version "1.9.0"
+    kotlin("plugin.serialization") version "1.9.10"
 }
 
 val keystoreProperties = Properties()
@@ -91,12 +91,12 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.2"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
 
     packaging {
         jniLibs {
-            useLegacyPackaging = true
+            //useLegacyPackaging = true
             excludes += listOf("META-INF/*")
         }
         resources {
@@ -110,10 +110,8 @@ android {
         mapScalar("Time", "java.util.Date")
     }
 
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = JavaVersion.VERSION_17.toString()
-        }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
     applicationVariants.forEach { variant ->
         variant.buildConfigField("String", "applicationId", "\"${variant.applicationId}\"")
@@ -138,7 +136,7 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.2.0-alpha08")
     implementation("androidx.compose.material:material-icons-extended")
 
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha12")
+//    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha12")
 
     // https://developer.android.com/jetpack/androidx/releases/navigation
     implementation("androidx.navigation:navigation-compose:2.7.3")
