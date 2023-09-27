@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.config.KotlinCompilerVersion
 import java.io.FileInputStream
 import java.util.Properties
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 
 plugins {
     id("com.android.application")
@@ -65,13 +66,19 @@ android {
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"
             }
+            configure<CrashlyticsExtension> {
+                mappingFileUploadEnabled = false
+            }
         }
         release {
             signingConfig = signingConfigs.getByName("release")
-            isShrinkResources = false
-            isMinifyEnabled = false
+            isShrinkResources = true
+            isMinifyEnabled = true
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"
+            }
+            configure<CrashlyticsExtension> {
+                mappingFileUploadEnabled = false
             }
             setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
         }
@@ -80,7 +87,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-//        isCoreLibraryDesugaringEnabled = true
     }
 
     buildFeatures {
@@ -121,7 +127,7 @@ android {
 dependencies {
     val room = "2.6.0-rc01"
     val apollo = "3.2.1"
-    val kgraphql = "0.18.1"
+    val kgraphql = "0.19.0"
     val ktor = "2.1.0" // don't upgrade, TLS handshake failed
 
     implementation(platform("androidx.compose:compose-bom:2023.09.01"))

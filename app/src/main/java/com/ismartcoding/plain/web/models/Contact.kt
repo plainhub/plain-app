@@ -4,6 +4,25 @@ import com.ismartcoding.plain.features.contact.*
 import com.ismartcoding.plain.helpers.FileHelper
 import kotlinx.datetime.Instant
 
+data class ContentItem(var value: String, var type: Int, var label: String)
+
+fun DContentItem.toModel(): ContentItem {
+    return ContentItem(value, type, label)
+}
+
+
+data class Organization(var company: String, var title: String)
+
+fun DOrganization.toModel(): Organization {
+    return Organization(company, title)
+}
+
+data class PhoneNumber(var value: String, var type: Int, var label: String, var normalizedNumber: String)
+
+fun DPhoneNumber.toModel(): PhoneNumber {
+    return PhoneNumber(value, type, label, normalizedNumber)
+}
+
 data class Contact(
     var id: ID,
     var prefix: String,
@@ -32,9 +51,10 @@ data class Contact(
 
 fun DContact.toModel(): Contact {
     return Contact(
-        ID(id.toString()), prefix, givenName, middleName, familyName, suffix,
-        nickname, FileHelper.getFileId(photoUri), phoneNumbers, emails, addresses, events, source,
-        starred == 1, ID(contactId.toString()), FileHelper.getFileId(thumbnailUri),
-        notes, groups.map { it.toModel() }, organization, websites, ims, ringtone, updatedAt,
+        ID(id), prefix, givenName, middleName, familyName, suffix,
+        nickname, FileHelper.getFileId(photoUri), phoneNumbers.map { it.toModel() }, emails.map { it.toModel() }, addresses.map { it.toModel() },
+        events.map { it.toModel() }, source,
+        starred == 1, ID(contactId), FileHelper.getFileId(thumbnailUri),
+        notes, groups.map { it.toModel() }, organization?.toModel(), websites.map { it.toModel() }, ims.map { it.toModel() }, ringtone, updatedAt,
     )
 }

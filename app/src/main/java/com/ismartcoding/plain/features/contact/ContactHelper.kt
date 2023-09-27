@@ -286,7 +286,7 @@ object ContactHelper : BaseContentHelper() {
                         contactId, thumbnailUri,
                         if (notes.isNotEmpty()) notes[0] else "",
                         groups,
-                        if (organizations.isNotEmpty()) organizations[0] else Organization("", ""),
+                        if (organizations.isNotEmpty()) organizations[0] else DOrganization("", ""),
                         websites,
                         ims,
                         ringtone,

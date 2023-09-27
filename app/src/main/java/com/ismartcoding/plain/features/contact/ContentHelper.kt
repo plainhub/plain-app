@@ -11,21 +11,21 @@ import com.ismartcoding.plain.web.models.ContentItemInput
 import com.ismartcoding.plain.web.models.OrganizationInput
 import java.util.ArrayList
 
-data class ContentItem(var value: String, var type: Int, var label: String)
+data class DContentItem(var value: String, var type: Int, var label: String)
 
-data class Organization(var company: String, var title: String)
+data class DOrganization(var company: String, var title: String)
 
-data class PhoneNumber(var value: String, var type: Int, var label: String, var normalizedNumber: String)
+data class DPhoneNumber(var value: String, var type: Int, var label: String, var normalizedNumber: String)
 
 data class Content(
-    val events: MutableList<ContentItem> = ArrayList(),
-    val websites: MutableList<ContentItem> = ArrayList(),
-    val phoneNumbers: MutableList<PhoneNumber> = ArrayList(),
-    val emails: MutableList<ContentItem> = ArrayList(),
-    val addresses: MutableList<ContentItem> = ArrayList(),
+    val events: MutableList<DContentItem> = ArrayList(),
+    val websites: MutableList<DContentItem> = ArrayList(),
+    val phoneNumbers: MutableList<DPhoneNumber> = ArrayList(),
+    val emails: MutableList<DContentItem> = ArrayList(),
+    val addresses: MutableList<DContentItem> = ArrayList(),
     val nicknames: MutableList<String> = ArrayList(),
-    val ims: MutableList<ContentItem> = ArrayList(),
-    val organizations: MutableList<Organization> = ArrayList(),
+    val ims: MutableList<DContentItem> = ArrayList(),
+    val organizations: MutableList<DOrganization> = ArrayList(),
     val notes: MutableList<String> = ArrayList(),
     val groupIds: MutableList<Int> = ArrayList(),
 )
@@ -57,32 +57,32 @@ object ContentHelper {
                     val startDate = cursor.getStringValue(ContactsContract.CommonDataKinds.Event.START_DATE, cache)
                     val type = cursor.getIntValue(ContactsContract.CommonDataKinds.Event.TYPE, cache)
                     val label = cursor.getStringValue(ContactsContract.CommonDataKinds.Event.LABEL, cache)
-                    map[id]?.events?.add(ContentItem(startDate, type, label))
+                    map[id]?.events?.add(DContentItem(startDate, type, label))
                 }
                 ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE -> {
                     val address = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS, cache)
                     val type = cursor.getIntValue(ContactsContract.CommonDataKinds.StructuredPostal.TYPE, cache)
                     val label = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredPostal.LABEL, cache)
-                    map[id]?.addresses?.add(ContentItem(address, type, label))
+                    map[id]?.addresses?.add(DContentItem(address, type, label))
                 }
                 ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE -> {
                     val email = cursor.getStringValue(ContactsContract.CommonDataKinds.Email.DATA, cache)
                     val type = cursor.getIntValue(ContactsContract.CommonDataKinds.Email.TYPE, cache)
                     val label = cursor.getStringValue(ContactsContract.CommonDataKinds.Email.LABEL, cache)
-                    map[id]?.emails?.add(ContentItem(email, type, label))
+                    map[id]?.emails?.add(DContentItem(email, type, label))
                 }
                 ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE -> {
                     val number = cursor.getStringValue(ContactsContract.CommonDataKinds.Phone.NUMBER, cache)
                     val normalizedNumber = cursor.getStringValue(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER, cache)
                     val type = cursor.getIntValue(ContactsContract.CommonDataKinds.Phone.TYPE, cache)
                     val label = cursor.getStringValue(ContactsContract.CommonDataKinds.Phone.LABEL, cache)
-                    map[id]?.phoneNumbers?.add(PhoneNumber(number, type, label, normalizedNumber))
+                    map[id]?.phoneNumbers?.add(DPhoneNumber(number, type, label, normalizedNumber))
                 }
                 ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE -> {
                     val url = cursor.getStringValue(ContactsContract.CommonDataKinds.Website.URL, cache)
                     val type = cursor.getIntValue(ContactsContract.CommonDataKinds.Website.TYPE, cache)
                     val label = cursor.getStringValue(ContactsContract.CommonDataKinds.Website.LABEL, cache)
-                    map[id]?.websites?.add(ContentItem(url, type, label))
+                    map[id]?.websites?.add(DContentItem(url, type, label))
                 }
                 ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE -> {
                     val name = cursor.getStringValue(ContactsContract.CommonDataKinds.Nickname.NAME, cache)
@@ -92,7 +92,7 @@ object ContentHelper {
                     val value = cursor.getStringValue(ContactsContract.CommonDataKinds.Im.DATA, cache)
                     val type = cursor.getIntValue(ContactsContract.CommonDataKinds.Im.PROTOCOL, cache)
                     val label = cursor.getStringValue(ContactsContract.CommonDataKinds.Im.CUSTOM_PROTOCOL, cache)
-                    map[id]?.ims?.add(ContentItem(value, type, label))
+                    map[id]?.ims?.add(DContentItem(value, type, label))
                 }
                 ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE -> {
                     val note = cursor.getStringValue(ContactsContract.CommonDataKinds.Note.NOTE, cache)
@@ -101,7 +101,7 @@ object ContentHelper {
                 ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE -> {
                     val company = cursor.getStringValue(ContactsContract.CommonDataKinds.Organization.COMPANY, cache)
                     val title = cursor.getStringValue(ContactsContract.CommonDataKinds.Organization.TITLE, cache)
-                    map[id]?.organizations?.add(Organization(company, title))
+                    map[id]?.organizations?.add(DOrganization(company, title))
                 }
                 ContactsContract.CommonDataKinds.GroupMembership.CONTENT_ITEM_TYPE -> {
                     val groupId = cursor.getIntValue(ContactsContract.CommonDataKinds.GroupMembership.GROUP_ROW_ID, cache)
