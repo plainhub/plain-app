@@ -60,7 +60,6 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
-            resValue("string", "app_name", "PlainApp-Debug")
             isShrinkResources = true
             isMinifyEnabled = true
             ndk {
@@ -81,6 +80,20 @@ android {
                 mappingFileUploadEnabled = false
             }
             setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
+        }
+    }
+
+    flavorDimensions += "pricing"
+    productFlavors {
+        create("free") {
+            dimension = "pricing"
+            buildConfigField("boolean", "isPro", "false")
+        }
+        create("pro") {
+            dimension = "pricing"
+            applicationIdSuffix = ".pro"
+            buildConfigField("boolean", "isPro", "true")
+            resValue("string", "app_name", "PlainApp Pro")
         }
     }
 
@@ -118,9 +131,6 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
-    }
-    applicationVariants.forEach { variant ->
-        variant.buildConfigField("String", "applicationId", "\"${variant.applicationId}\"")
     }
 }
 

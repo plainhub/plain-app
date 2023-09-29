@@ -26,6 +26,7 @@ import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.PhoneHelper
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.BoxProxyApi
@@ -199,8 +200,7 @@ class SXGraphQL(val schema: Schema) {
                                     if (c.items.any { i -> !i.uri.startsWith("app://") }) {
                                         it.content.value =
                                             DMessageImages(
-                                                c.items.map {
-                                                        i ->
+                                                c.items.map { i ->
                                                     DMessageFile(i.uri.toAppUrl(context), i.size, i.duration)
                                                 },
                                             )
@@ -211,8 +211,7 @@ class SXGraphQL(val schema: Schema) {
                                     if (c.items.any { i -> !i.uri.startsWith("app://") }) {
                                         it.content.value =
                                             DMessageFiles(
-                                                c.items.map {
-                                                        i ->
+                                                c.items.map { i ->
                                                     DMessageFile(i.uri.toAppUrl(context), i.size, i.duration)
                                                 },
                                             )
@@ -602,7 +601,9 @@ class SXGraphQL(val schema: Schema) {
                             externalFilesDir = context.getExternalFilesDir(null)?.path ?: "",
                             if (TempData.demoMode) "Demo phone" else PhoneHelper.getDeviceName(context),
                             PhoneHelper.getBatteryPercentage(context),
-                            MainApp.getAppVersion(),
+                            BuildConfig.VERSION_CODE,
+                            android.os.Build.VERSION.SDK_INT,
+                            BuildConfig.isPro,
                             Permission.values().filter { apiPermissions.contains(it.name) && it.can(MainApp.instance) },
                             AudioPlaylistPreference.getValueAsync(context).map { it.toModel() },
                             AudioPlayModePreference.getValueAsync(context),
