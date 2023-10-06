@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui
 
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -29,6 +30,8 @@ class PdfViewerDialog(val uri: Uri) :
         }
 
         lifecycleScope.launch {
+            val nightModeFlags = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            val darkMode = nightModeFlags == Configuration.UI_MODE_NIGHT_YES
             binding.pdfView.fromUri(uri)
                 .defaultPage(0)
                 .enableAnnotationRendering(true)
@@ -36,6 +39,7 @@ class PdfViewerDialog(val uri: Uri) :
                 .spacing(10)
                 .onPageError(this@PdfViewerDialog)
                 .pageFitPolicy(FitPolicy.BOTH)
+                .nightMode(darkMode)
                 .load()
         }
     }
