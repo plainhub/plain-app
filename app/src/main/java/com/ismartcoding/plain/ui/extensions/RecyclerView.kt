@@ -197,7 +197,6 @@ suspend fun RecyclerView.updateDrawerMenuAsync(
                     },
                 )
             }
-            else -> {}
         }
     }
     models = groups

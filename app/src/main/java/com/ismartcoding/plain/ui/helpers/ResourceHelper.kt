@@ -8,6 +8,6 @@ object ResourceHelper {
         context: Context,
         currencyCode: String,
     ): Int {
-        return context.getDrawableId("currency_flag_" + currencyCode.lowercase())
+        return context.getDrawableId("cflag_" + currencyCode.lowercase())
     }
 }

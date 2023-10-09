@@ -13,7 +13,7 @@ object ExchangeHelper {
     suspend fun getRates(): DExchangeRates? {
         val client = HttpClientManager.httpClient()
         try {
-            val r = client.get("https://api.exchangerate.host/latest")
+            val r = client.get("https://raw.githubusercontent.com/ismartcoding/currency-api/main/latest/data.json")
             if (r.status == HttpStatusCode.OK) {
                 val json = r.body<String>()
                 val rates = DExchangeRates()

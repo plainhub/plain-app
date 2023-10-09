@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.features.DExchangeRates
+import kotlinx.datetime.Instant
 
 data class ExchangeRate(
     val k: String = "",
@@ -8,7 +9,7 @@ data class ExchangeRate(
 )
 
 data class ExchangeRates(
-    val date: String = "",
+    val date: Instant,
     val rates: List<ExchangeRate>,
 )
 

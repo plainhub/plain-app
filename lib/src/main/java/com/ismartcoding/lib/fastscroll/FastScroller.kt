@@ -68,7 +68,7 @@ class FastScroller : LinearLayout {
     private var hideScrollbar = true
     private var showBubble = true
     private var showBubbleAlways = false
-    private var bubbleSize = Size.NORMAL
+    private var bubbleSize = Size.SMALL
     private var bubbleImage: Drawable? = null
     private var handleImage: Drawable? = null
     private var trackImage: Drawable? = null
@@ -147,7 +147,7 @@ class FastScroller : LinearLayout {
         }
 
     @JvmOverloads
-    constructor(context: Context, size: Size = Size.NORMAL) : super(context) {
+    constructor(context: Context, size: Size = Size.SMALL) : super(context) {
         context.layout(size = size)
         layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT)
     }
@@ -600,12 +600,12 @@ class FastScroller : LinearLayout {
         @StyleableRes index: Int,
         defValue: Int,
     ) = getInt(index, defValue).let { ordinal ->
-        Size.values().find { it.ordinal == ordinal } ?: Size.NORMAL
+        Size.values().find { it.ordinal == ordinal } ?: Size.SMALL
     }
 
     private fun Context.layout(
         attrs: AttributeSet? = null,
-        size: Size = Size.NORMAL,
+        size: Size = Size.SMALL,
     ) {
         inflate(this, R.layout.fast_scroller, this@FastScroller)
 

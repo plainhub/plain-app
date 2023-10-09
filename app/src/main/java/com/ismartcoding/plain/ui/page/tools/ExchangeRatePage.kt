@@ -34,6 +34,7 @@ import com.ismartcoding.plain.data.preference.ExchangeConfig
 import com.ismartcoding.plain.data.preference.ExchangeRatePreference
 import com.ismartcoding.plain.data.preference.ExchangeRateProvider
 import com.ismartcoding.plain.data.preference.LocalExchangeRate
+import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.DExchangeRate
 import com.ismartcoding.plain.helpers.ExchangeHelper
 import com.ismartcoding.plain.ui.base.*
@@ -117,7 +118,7 @@ fun ExchangeRatePage(navController: NavHostController) {
                         item {
                             DisplayText(
                                 text = stringResource(id = R.string.exchange_rate),
-                                desc = if (rateItems != null) stringResource(R.string.date) + " " + UIDataCache.current().latestExchangeRates?.date else "",
+                                desc = if (rateItems != null) stringResource(R.string.date) + " " + UIDataCache.current().latestExchangeRates?.date?.formatDateTime() else "",
                             )
                         }
                         item {
