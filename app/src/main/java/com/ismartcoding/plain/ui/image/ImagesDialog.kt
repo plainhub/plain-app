@@ -155,7 +155,7 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
                         CastDialog(arrayListOf(), m.data.path).show()
                     } else {
                         PreviewDialog().show(
-                            items = getModelList<ImageModel>().map { s -> PreviewItem(s.data.id, s.data.path.pathToUri()) },
+                            items = getModelList<ImageModel>().map { s -> PreviewItem(s.data.id, s.data.path.pathToUri(), s.data.path) },
                             initKey = m.data.id,
                         )
                     }

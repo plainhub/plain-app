@@ -8,6 +8,7 @@ import com.ismartcoding.lib.extensions.isVideoFast
 data class PreviewItem(
     val id: String,
     val uri: Uri,
+    val path: String = "",
 ) {
     fun itemType(context: Context): Int {
         return when {

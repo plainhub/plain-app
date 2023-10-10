@@ -143,7 +143,7 @@ class VideosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
                         CastDialog(arrayListOf(), m.data.path).show()
                     } else {
                         PreviewDialog().show(
-                            items = getModelList<VideoModel>().map { s -> PreviewItem(s.data.id, s.data.path.pathToUri()) },
+                            items = getModelList<VideoModel>().map { s -> PreviewItem(s.data.id, s.data.path.pathToUri(), s.data.path) },
                             initKey = getModel<VideoModel>().data.id,
                         )
                     }

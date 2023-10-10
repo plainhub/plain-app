@@ -5,16 +5,23 @@ import android.content.Context
 import android.net.Uri
 import android.os.Environment
 import android.util.Base64
+import com.ismartcoding.lib.extensions.getFileName
+import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.hasPermission
+import com.ismartcoding.lib.extensions.newFile
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.isRPlus
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
 import java.io.IOException
+import java.io.InputStream
 
 object FileHelper {
     fun fileFromAsset(
@@ -104,5 +111,64 @@ object FileHelper {
                 }
             }
         }
+    }
+
+    fun copyFileToDownloads(path: String): String {
+        try {
+            val fileName = path.getFilenameFromPath()
+            val file = createDownloadFile(fileName)
+            File(path).copyTo(file)
+            return file.absolutePath
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            LogCat.e(ex.toString())
+        }
+        return ""
+    }
+
+    fun copyFileToDownloads(context: Context,  uri: Uri): String {
+        try {
+            val fileName = uri.getFileName(context)
+            val file = createDownloadFile(fileName)
+            val outputStream = FileOutputStream(file)
+            if (uri.scheme == "content") {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                inputStream?.copyTo(outputStream)
+                inputStream?.close()
+                outputStream.close()
+            } else {
+                val client = OkHttpClient()
+                val request = Request.Builder()
+                    .url(uri.toString())
+                    .build()
+                val response = client.newCall(request).execute()
+                if (response.isSuccessful) {
+                    val inputStream = response.body?.byteStream()
+                    inputStream?.copyTo(outputStream)
+                    inputStream?.close()
+                    outputStream.close()
+                }
+            }
+            return file.absolutePath
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            LogCat.e(ex.toString())
+        }
+        return ""
+    }
+
+    private fun createDownloadFile(fileName: String): File {
+        val downloadsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val plainAppDirectory = File(downloadsDirectory, "PlainApp")
+        if (!plainAppDirectory.exists()) {
+            plainAppDirectory.mkdirs()
+        }
+
+        var file = File(plainAppDirectory, fileName)
+        if (file.exists()) {
+            file = file.newFile()
+        }
+
+        return file
     }
 }

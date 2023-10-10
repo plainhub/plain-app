@@ -81,7 +81,8 @@ fun ChatFiles(
                                                 i,
                                                 s,
                                             ->
-                                            PreviewItem(m.id + "|" + i, s.uri.getFinalPath(context).pathToUri())
+                                            val p = s.uri.getFinalPath(context)
+                                            PreviewItem(m.id + "|" + i, p.pathToUri(), p)
                                         },
                                     initKey = m.id + "|" + items.indexOf(item),
                                 )

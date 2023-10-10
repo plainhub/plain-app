@@ -13,7 +13,11 @@ import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.databinding.ItemImageviewerSubsamplingBinding
+import com.ismartcoding.plain.helpers.FileHelper
+import com.ismartcoding.plain.ui.extensions.setSafeClick
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import com.ismartcoding.plain.ui.preview.utils.initTag
 import kotlinx.coroutines.delay
@@ -29,6 +33,16 @@ class SubsamplingViewHolder(
 
     fun bind(item: PreviewItem) {
         val holder = this
+        binding.download.setSafeClick {
+            coMain {
+                val r = withIO { if (item.path.isNotEmpty()) FileHelper.copyFileToDownloads(item.path) else FileHelper.copyFileToDownloads(binding.download.context, item.uri) }
+                if (r.isNotEmpty()) {
+                    DialogHelper.showMessage("Downloaded to $r")
+                } else {
+                    DialogHelper.showMessage("Failed to download.")
+                }
+            }
+        }
 //        if (item.uri.endsWith(".gif", true)) {
 //            binding.imageView.isVisible = true
 //            binding.subsamplingView.isVisible = false

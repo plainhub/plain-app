@@ -31,8 +31,8 @@
             android:layout_height="@dimen/icon_size_xl"
             android:layout_centerInParent="true"
             android:src="@drawable/ic_play_circle"
-            app:tint="@color/white"
             android:visibility="gone"
+            app:tint="@color/white"
             tools:visibility="visible" />
 
         <LinearLayout
@@ -43,7 +43,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="56dp"
                 android:layout_marginStart="@dimen/size_sm"
                 android:layout_marginTop="@dimen/size_normal"
                 android:layout_marginEnd="@dimen/size_sm">
@@ -52,27 +52,44 @@
                     android:id="@+id/title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/noto_medium"
                     android:layout_marginStart="0dp"
                     android:layout_marginEnd="@dimen/size_sm"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/noto_medium"
+                    android:lines="2"
                     android:textColor="@color/white"
-                    android:textIsSelectable="true"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/iv_cast"
+                    app:layout_constraintEnd_toStartOf="@id/end"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <ImageView
-                    android:id="@+id/iv_cast"
-                    android:layout_width="@dimen/icon_size_lg"
-                    android:layout_height="@dimen/icon_size_lg"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/ic_airplay"
-                    app:tint="@color/white"
+                <LinearLayout
+                    android:id="@+id/end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/download"
+                        android:layout_width="@dimen/icon_size_lg"
+                        android:layout_height="@dimen/icon_size_lg"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_download"
+                        android:layout_marginEnd="@dimen/size_normal"
+                        app:tint="@color/white" />
+
+                    <ImageView
+                        android:id="@+id/iv_cast"
+                        android:layout_width="@dimen/icon_size_lg"
+                        android:layout_height="@dimen/icon_size_lg"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/ic_airplay"
+                        app:tint="@color/white" />
+                </LinearLayout>
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <RelativeLayout
@@ -86,8 +103,8 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="@dimen/size_mini"
-                    app:tint="@color/white"
-                    android:src="@drawable/ic_play" />
+                    android:src="@drawable/ic_play"
+                    app:tint="@color/white" />
 
                 <TextView
                     android:id="@+id/current_time"

@@ -91,7 +91,7 @@ class VideoPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
                 val m = getModel<SortableVideoModel>()
                 val items = getModelList<SortableVideoModel>()
                 PreviewDialog().show(
-                    items = items.map { s -> PreviewItem(s.data.id, s.data.path.pathToUri()) },
+                    items = items.map { s -> PreviewItem(s.data.id, s.data.path.pathToUri(), s.data.path) },
                     initKey = m.data.id,
                 )
             }

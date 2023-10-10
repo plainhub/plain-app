@@ -42,9 +42,9 @@ fun ChatImages(
 ) {
     FlowRow(
         modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         maxItemsInEachRow = 3,
         horizontalArrangement = Arrangement.spacedBy(1.dp, Alignment.Start),
         verticalArrangement = Arrangement.spacedBy(1.dp, Alignment.Top),
@@ -54,19 +54,20 @@ fun ChatImages(
                 val path = item.uri.getFinalPath(context)
                 Box(
                     modifier =
-                        Modifier.clickable {
-                            sendEvent(ChatItemClickEvent())
-                            PreviewDialog().show(
-                                items =
-                                    imageItems.mapIndexed {
-                                            i,
-                                            s,
-                                        ->
-                                        PreviewItem(m.id + "|" + i, s.uri.getFinalPath(context).pathToUri())
-                                    },
-                                initKey = m.id + "|" + index,
-                            )
-                        },
+                    Modifier.clickable {
+                        sendEvent(ChatItemClickEvent())
+                        PreviewDialog().show(
+                            items =
+                            imageItems.mapIndexed {
+                                    i,
+                                    s,
+                                ->
+                                val p = s.uri.getFinalPath(context)
+                                PreviewItem(m.id + "|" + i, p.pathToUri(), p)
+                            },
+                            initKey = m.id + "|" + index,
+                        )
+                    },
                 ) {
                     PAsyncImage(
                         modifier = Modifier.size(imageWidthDp),
@@ -76,22 +77,22 @@ fun ChatImages(
                     )
                     Box(
                         modifier =
-                            Modifier
-                                .align(Alignment.BottomEnd)
-                                .background(Color.Black.copy(alpha = 0.4f)),
+                        Modifier
+                            .align(Alignment.BottomEnd)
+                            .background(Color.Black.copy(alpha = 0.4f)),
                     ) {
                         Text(
                             modifier =
-                                Modifier
-                                    .padding(horizontal = 4.dp, vertical = 2.dp),
+                            Modifier
+                                .padding(horizontal = 4.dp, vertical = 2.dp),
                             text =
-                                if (item.duration > 0) {
-                                    FormatHelper.formatDuration(
-                                        item.duration,
-                                    )
-                                } else {
-                                    FormatHelper.formatBytes(item.size)
-                                },
+                            if (item.duration > 0) {
+                                FormatHelper.formatDuration(
+                                    item.duration,
+                                )
+                            } else {
+                                FormatHelper.formatBytes(item.size)
+                            },
                             color = Color.White,
                             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
                         )

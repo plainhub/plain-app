@@ -5,6 +5,19 @@
 -keep class io.ktor.server.** { *; }
 -keep class io.netty.** { *; }
 
+-keepclassmembers class **.R$* {
+    public static <fields>;
+}
+
+-keepclassmembers class **.R {
+    public static <fields>;
+}
+
+-keepclassmembers class **.R$* {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
 # Please add these rules to your existing keep rules in order to suppress warnings.
 # This is generated automatically by the Android Gradle plugin.
 -dontwarn com.aayushatharva.brotli4j.Brotli4jLoader
