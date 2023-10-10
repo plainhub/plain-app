@@ -95,459 +95,462 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.collections.set
 
-fun Application.module() {
-    install(CachingHeaders) {
-        options { _, outgoingContent ->
-            when (outgoingContent.contentType?.withoutParameters()) {
-                ContentType.Text.CSS, ContentType.Application.JavaScript ->
-                    CachingOptions(
-                        CacheControl.MaxAge(maxAgeSeconds = 3600 * 24 * 30),
-                    )
-                else -> null
-            }
-        }
-    }
-
-    install(CORS) {
-        if (BuildConfig.DEBUG) {
-            allowHost("*")
-        } else {
-            allowHost("localhost:3000")
-            allowHost("127.0.0.1:3000")
-        }
-        allowHeadersPrefixed("c-")
-        allowHeader("x-box-api")
-    }
-
-    install(ConditionalHeaders)
-    install(WebSockets)
-    install(Compression)
-    install(ForwardedHeaders)
-    install(PartialContent)
-    install(AutoHeadResponse)
-    install(ContentNegotiation) {
-        json(
-            Json {
-                prettyPrint = true
-                isLenient = true
-            },
-        )
-    }
-
-    routing {
-        singlePageApplication {
-            useResources = true
-            vue("web")
-        }
-
-        get("/health_check") {
-            call.respond(HttpStatusCode.OK, "Server is running well")
-        }
-
-        get("/media/{id}") {
-            val id = call.parameters["id"]?.split(".")?.get(0) ?: ""
-            if (id.isEmpty()) {
-                call.respond(HttpStatusCode.BadRequest)
-                return@get
-            }
-            try {
-                val path = UrlHelper.getMediaPath(id)
-                if (path.isEmpty()) {
-                    call.respond(HttpStatusCode.BadRequest)
-                    return@get
-                }
-
-                if (path.startsWith("content://")) {
-                    val bytes = MainApp.instance.contentResolver.openInputStream(Uri.parse(path))?.buffered()?.use { it.readBytes() }
-                    call.respondBytes(bytes!!)
-                } else if (path.isImageFast()) {
-                    call.respondFile(File(path))
-                } else {
-                    val file = File(path)
-                    call.response.run {
-                        header("realTimeInfo.dlna.org", "DLNA.ORG_TLAG=*")
-                        header("contentFeatures.dlna.org", "")
-                        header("transferMode.dlna.org", "Streaming")
-                        header("Connection", "keep-alive")
-                        header(
-                            "Server",
-                            "DLNADOC/1.50 UPnP/1.0 Plain/1.0 Android/" + Build.VERSION.RELEASE,
+object HttpModule {
+    val module: Application.() -> Unit = {
+        install(CachingHeaders) {
+            options { _, outgoingContent ->
+                when (outgoingContent.contentType?.withoutParameters()) {
+                    ContentType.Text.CSS, ContentType.Application.JavaScript ->
+                        CachingOptions(
+                            CacheControl.MaxAge(maxAgeSeconds = 3600 * 24 * 30),
                         )
 
-                        EntityTagVersion(file.lastModified().hashCode().toString())
-                        LastModifiedVersion(Date(file.lastModified()))
-                        status(HttpStatusCode.PartialContent) // some TV os only accepts 206
+                    else -> null
+                }
+            }
+        }
+
+        install(CORS) {
+            if (BuildConfig.DEBUG) {
+                allowHost("*")
+            } else {
+                allowHost("localhost:3000")
+                allowHost("127.0.0.1:3000")
+            }
+            allowHeadersPrefixed("c-")
+            allowHeader("x-box-api")
+        }
+
+        install(ConditionalHeaders)
+        install(WebSockets)
+        install(Compression)
+        install(ForwardedHeaders)
+        install(PartialContent)
+        install(AutoHeadResponse)
+        install(ContentNegotiation) {
+            json(
+                Json {
+                    prettyPrint = true
+                    isLenient = true
+                },
+            )
+        }
+
+        routing {
+            singlePageApplication {
+                useResources = true
+                vue("web")
+            }
+
+            get("/health_check") {
+                call.respond(HttpStatusCode.OK, "Server is running well")
+            }
+
+            get("/media/{id}") {
+                val id = call.parameters["id"]?.split(".")?.get(0) ?: ""
+                if (id.isEmpty()) {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@get
+                }
+                try {
+                    val path = UrlHelper.getMediaPath(id)
+                    if (path.isEmpty()) {
+                        call.respond(HttpStatusCode.BadRequest)
+                        return@get
                     }
-                    call.respondFile(file)
-                }
-            } catch (ex: Exception) {
-                // ex.printStackTrace()
-                call.respondText("File is expired or does not exist. $ex", status = HttpStatusCode.Forbidden)
-            }
-        }
 
-        get("/zip/dir") {
-            val q = call.request.queryParameters
-            val id = q["id"] ?: ""
-            if (id.isEmpty()) {
-                call.respond(HttpStatusCode.BadRequest)
-                return@get
-            }
+                    if (path.startsWith("content://")) {
+                        val bytes = MainApp.instance.contentResolver.openInputStream(Uri.parse(path))?.buffered()?.use { it.readBytes() }
+                        call.respondBytes(bytes!!)
+                    } else if (path.isImageFast()) {
+                        call.respondFile(File(path))
+                    } else {
+                        val file = File(path)
+                        call.response.run {
+                            header("realTimeInfo.dlna.org", "DLNA.ORG_TLAG=*")
+                            header("contentFeatures.dlna.org", "")
+                            header("transferMode.dlna.org", "Streaming")
+                            header("Connection", "keep-alive")
+                            header(
+                                "Server",
+                                "DLNADOC/1.50 UPnP/1.0 Plain/1.0 Android/" + Build.VERSION.RELEASE,
+                            )
 
-            val path = UrlHelper.decrypt(id)
-            val folder = File(path)
-            if (!folder.exists() || !folder.isDirectory) {
-                call.respond(HttpStatusCode.NotFound)
-                return@get
-            }
-
-            val fileName = URLEncoder.encode(q["name"] ?: "${folder.name}.zip", "UTF-8")
-            call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
-            call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
-            call.respondOutputStream(ContentType.Application.Zip) {
-                ZipOutputStream(this).use { zip ->
-                    ZipHelper.zipFolderToStreamAsync(folder, zip)
+                            EntityTagVersion(file.lastModified().hashCode().toString())
+                            LastModifiedVersion(Date(file.lastModified()))
+                            status(HttpStatusCode.PartialContent) // some TV os only accepts 206
+                        }
+                        call.respondFile(file)
+                    }
+                } catch (ex: Exception) {
+                    // ex.printStackTrace()
+                    call.respondText("File is expired or does not exist. $ex", status = HttpStatusCode.Forbidden)
                 }
             }
-        }
 
-        get("/zip/files") {
-            val query = call.request.queryParameters
-            val id = query["id"] ?: ""
-            if (id.isEmpty()) {
-                call.respond(HttpStatusCode.BadRequest)
-                return@get
-            }
-
-            try {
-                val json = JSONObject(UrlHelper.decrypt(id))
-                var paths: List<DownloadFileItem> = arrayListOf()
-                val type = json.optString("type")
-                if (type.isEmpty()) {
+            get("/zip/dir") {
+                val q = call.request.queryParameters
+                val id = q["id"] ?: ""
+                if (id.isEmpty()) {
                     call.respond(HttpStatusCode.BadRequest)
                     return@get
                 }
 
-                val q = json.optString("query")
-                val context = MainApp.instance
-                when (type) {
-                    DataType.PACKAGE.name -> {
-                        paths = PackageHelper.search(q, Int.MAX_VALUE, 0).map { DownloadFileItem(it.path, "${it.name.replace(" ", "")}-${it.id}.apk") }
-                    }
-
-                    DataType.VIDEO.name -> {
-                        paths = VideoHelper.search(context, q, Int.MAX_VALUE, 0, FileSortBy.DATE_DESC).map { DownloadFileItem(it.path, "") }
-                    }
-
-                    DataType.AUDIO.name -> {
-                        paths = AudioHelper.search(context, q, Int.MAX_VALUE, 0, FileSortBy.DATE_DESC).map { DownloadFileItem(it.path, "") }
-                    }
-
-                    DataType.IMAGE.name -> {
-                        paths = ImageHelper.search(context, q, Int.MAX_VALUE, 0, FileSortBy.DATE_DESC).map { DownloadFileItem(it.path, "") }
-                    }
-
-                    DataType.FILE.name -> {
-                        val tmpId = json.optString("id")
-                        val value = TempHelper.getValue(tmpId)
-                        TempHelper.clearValue(tmpId)
-                        if (value.isEmpty()) {
-                            call.respond(HttpStatusCode.NotFound)
-                            return@get
-                        }
-
-                        paths = JSONArray(value).parse { DownloadFileItem(it.optString("path"), it.optString("name")) }
-                    }
+                val path = UrlHelper.decrypt(id)
+                val folder = File(path)
+                if (!folder.exists() || !folder.isDirectory) {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@get
                 }
 
-                val items = paths.map { DownloadFileItemWrap(File(it.path), it.name) }.filter { it.file.exists() }
-                val dirs = items.filter { it.file.isDirectory }
-                val fileName = URLEncoder.encode(json.optString("name").ifEmpty { "download.zip" }, "UTF-8")
+                val fileName = URLEncoder.encode(q["name"] ?: "${folder.name}.zip", "UTF-8")
                 call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
                 call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
                 call.respondOutputStream(ContentType.Application.Zip) {
                     ZipOutputStream(this).use { zip ->
-                        items.forEach { item ->
-                            if (dirs.any { item.file.absolutePath != it.file.absolutePath && item.file.absolutePath.startsWith(it.file.absolutePath) }) {
-                            } else {
-                                val filePath = item.name.ifEmpty { item.file.name }
-                                if (item.file.isDirectory) {
-                                    zip.putNextEntry(ZipEntry("$filePath/"))
-                                    ZipHelper.zipFolderToStreamAsync(item.file, zip, filePath)
+                        ZipHelper.zipFolderToStreamAsync(folder, zip)
+                    }
+                }
+            }
+
+            get("/zip/files") {
+                val query = call.request.queryParameters
+                val id = query["id"] ?: ""
+                if (id.isEmpty()) {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@get
+                }
+
+                try {
+                    val json = JSONObject(UrlHelper.decrypt(id))
+                    var paths: List<DownloadFileItem> = arrayListOf()
+                    val type = json.optString("type")
+                    if (type.isEmpty()) {
+                        call.respond(HttpStatusCode.BadRequest)
+                        return@get
+                    }
+
+                    val q = json.optString("query")
+                    val context = MainApp.instance
+                    when (type) {
+                        DataType.PACKAGE.name -> {
+                            paths = PackageHelper.search(q, Int.MAX_VALUE, 0).map { DownloadFileItem(it.path, "${it.name.replace(" ", "")}-${it.id}.apk") }
+                        }
+
+                        DataType.VIDEO.name -> {
+                            paths = VideoHelper.search(context, q, Int.MAX_VALUE, 0, FileSortBy.DATE_DESC).map { DownloadFileItem(it.path, "") }
+                        }
+
+                        DataType.AUDIO.name -> {
+                            paths = AudioHelper.search(context, q, Int.MAX_VALUE, 0, FileSortBy.DATE_DESC).map { DownloadFileItem(it.path, "") }
+                        }
+
+                        DataType.IMAGE.name -> {
+                            paths = ImageHelper.search(context, q, Int.MAX_VALUE, 0, FileSortBy.DATE_DESC).map { DownloadFileItem(it.path, "") }
+                        }
+
+                        DataType.FILE.name -> {
+                            val tmpId = json.optString("id")
+                            val value = TempHelper.getValue(tmpId)
+                            TempHelper.clearValue(tmpId)
+                            if (value.isEmpty()) {
+                                call.respond(HttpStatusCode.NotFound)
+                                return@get
+                            }
+
+                            paths = JSONArray(value).parse { DownloadFileItem(it.optString("path"), it.optString("name")) }
+                        }
+                    }
+
+                    val items = paths.map { DownloadFileItemWrap(File(it.path), it.name) }.filter { it.file.exists() }
+                    val dirs = items.filter { it.file.isDirectory }
+                    val fileName = URLEncoder.encode(json.optString("name").ifEmpty { "download.zip" }, "UTF-8")
+                    call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
+                    call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
+                    call.respondOutputStream(ContentType.Application.Zip) {
+                        ZipOutputStream(this).use { zip ->
+                            items.forEach { item ->
+                                if (dirs.any { item.file.absolutePath != it.file.absolutePath && item.file.absolutePath.startsWith(it.file.absolutePath) }) {
                                 } else {
-                                    zip.putNextEntry(ZipEntry(filePath))
-                                    item.file.inputStream().copyTo(zip)
-                                }
-                                zip.closeEntry()
-                            }
-                        }
-                    }
-                }
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-                call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
-            }
-        }
-
-        get("/fs") {
-            val q = call.request.queryParameters
-            val id = q["id"] ?: ""
-            if (id.isEmpty()) {
-                call.respond(HttpStatusCode.BadRequest)
-                return@get
-            }
-            try {
-                val context = MainApp.instance
-                val path = UrlHelper.decrypt(id).getFinalPath(context)
-                if (path.startsWith("content://")) {
-                    val bytes = context.contentResolver.openInputStream(Uri.parse(path))?.buffered()?.use { it.readBytes() }
-                    if (bytes != null) {
-                        call.respondBytes(bytes)
-                    } else {
-                        call.respond(HttpStatusCode.NotFound)
-                    }
-                } else {
-                    val file = File(path)
-                    if (!file.exists()) {
-                        call.respond(HttpStatusCode.NotFound)
-                        return@get
-                    }
-
-                    val fileName = URLEncoder.encode(q["name"] ?: file.name, "UTF-8")
-                    if (q["dl"] == "1") {
-                        call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
-                    } else {
-                        call.response.header("Content-Disposition", "inline;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
-                    }
-
-                    val w = q["w"]?.toIntOrNull()
-                    val h = q["h"]?.toIntOrNull()
-                    val centerCrop = q["cc"]?.toBooleanStrictOrNull() ?: true
-                    // get video/image thumbnail
-                    if (w != null && h != null) {
-                        call.respondBytes(file.toThumbBytesAsync(MainApp.instance, w, h, centerCrop))
-                        return@get
-                    }
-
-                    call.respondFile(file)
-                }
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-                call.respondText("File is expired or does not exist. $ex", status = HttpStatusCode.Forbidden)
-            }
-        }
-
-        route("/callback/cast", HttpMethod("NOTIFY")) {
-            handle {
-                val xml = call.receiveText()
-                LogCat.d(xml)
-                // the TV could send the callback twice in short time, the second one should be ignore if it has AVTransportURIMetaData field.
-                if (xml.contains("TransportState val=\"STOPPED\"") && !xml.contains("AVTransportURIMetaData")) {
-                    withIO {
-                        if (CastPlayer.items?.isNotEmpty() == true) {
-                            CastPlayer.currentDevice?.let { device ->
-                                val currentUri = CastPlayer.currentUri
-                                var index = CastPlayer.items!!.indexOfFirst { it.path == currentUri }
-                                index++
-                                if (index > CastPlayer.items!!.size - 1) {
-                                    index = 0
-                                }
-                                val current = CastPlayer.items!![index]
-                                if (current.path != currentUri) {
-                                    LogCat.d(current.path)
-                                    UPnPController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(current.path))
-                                    CastPlayer.currentUri = current.path
-                                }
-                            }
-                        }
-                    }
-                }
-                call.respond(HttpStatusCode.OK)
-            }
-        }
-
-        post("/upload") {
-            val clientId = call.request.header("c-id") ?: ""
-            if (clientId.isEmpty()) {
-                call.respond(HttpStatusCode.BadRequest)
-                return@post
-            }
-
-            val token = HttpServerManager.tokenCache[clientId]
-            if (token == null) {
-                call.response.status(HttpStatusCode.Unauthorized)
-                return@post
-            }
-            try {
-                lateinit var info: UploadInfo
-                var fileName = ""
-                call.receiveMultipart().forEachPart { part ->
-                    when (part) {
-                        is PartData.FileItem -> {
-                            when (part.name) {
-                                "info" -> {
-                                    var requestStr = ""
-                                    val decryptedBytes = CryptoHelper.aesDecrypt(token, part.streamProvider().readBytes())
-                                    if (decryptedBytes != null) {
-                                        requestStr = decryptedBytes.decodeToString()
-                                    }
-                                    if (requestStr.isEmpty()) {
-                                        call.response.status(HttpStatusCode.Unauthorized)
-                                        return@forEachPart
-                                    }
-
-                                    info = Json.decodeFromString<UploadInfo>(requestStr)
-                                }
-
-                                "file" -> {
-                                    fileName = part.originalFileName as String
-                                    if (info.dir.isEmpty() || fileName.isEmpty()) {
-                                        call.respond(HttpStatusCode.BadRequest)
-                                        return@forEachPart
-                                    }
-                                    File(info.dir).mkdirs()
-                                    var destFile = File("${info.dir}/$fileName")
-                                    if (info.index == 0 && destFile.exists()) {
-                                        if (info.replace) {
-                                            destFile.delete()
-                                        } else {
-                                            destFile = destFile.newFile()
-                                            fileName = destFile.name
-                                        }
-                                    }
-
-                                    // use append file way
-                                    val noSplitFiles = false
-                                    if (noSplitFiles) {
-                                        FileOutputStream(destFile, true).use { part.streamProvider().use { input -> input.copyTo(it) } }
-                                        if (info.total - 1 == info.index) {
-                                            MainApp.instance.scanFileByConnection(destFile, null)
-                                        }
+                                    val filePath = item.name.ifEmpty { item.file.name }
+                                    if (item.file.isDirectory) {
+                                        zip.putNextEntry(ZipEntry("$filePath/"))
+                                        ZipHelper.zipFolderToStreamAsync(item.file, zip, filePath)
                                     } else {
-                                        if (info.total > 1) {
-                                            destFile = File("${info.dir}/$fileName.part${String.format("%03d", info.index)}")
-                                            if (destFile.exists() && destFile.length() == info.size) {
-                                                // skip if the part file is already uploaded
+                                        zip.putNextEntry(ZipEntry(filePath))
+                                        item.file.inputStream().copyTo(zip)
+                                    }
+                                    zip.closeEntry()
+                                }
+                            }
+                        }
+                    }
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                    call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
+                }
+            }
+
+            get("/fs") {
+                val q = call.request.queryParameters
+                val id = q["id"] ?: ""
+                if (id.isEmpty()) {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@get
+                }
+                try {
+                    val context = MainApp.instance
+                    val path = UrlHelper.decrypt(id).getFinalPath(context)
+                    if (path.startsWith("content://")) {
+                        val bytes = context.contentResolver.openInputStream(Uri.parse(path))?.buffered()?.use { it.readBytes() }
+                        if (bytes != null) {
+                            call.respondBytes(bytes)
+                        } else {
+                            call.respond(HttpStatusCode.NotFound)
+                        }
+                    } else {
+                        val file = File(path)
+                        if (!file.exists()) {
+                            call.respond(HttpStatusCode.NotFound)
+                            return@get
+                        }
+
+                        val fileName = URLEncoder.encode(q["name"] ?: file.name, "UTF-8")
+                        if (q["dl"] == "1") {
+                            call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
+                        } else {
+                            call.response.header("Content-Disposition", "inline;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
+                        }
+
+                        val w = q["w"]?.toIntOrNull()
+                        val h = q["h"]?.toIntOrNull()
+                        val centerCrop = q["cc"]?.toBooleanStrictOrNull() ?: true
+                        // get video/image thumbnail
+                        if (w != null && h != null) {
+                            call.respondBytes(file.toThumbBytesAsync(MainApp.instance, w, h, centerCrop))
+                            return@get
+                        }
+
+                        call.respondFile(file)
+                    }
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                    call.respondText("File is expired or does not exist. $ex", status = HttpStatusCode.Forbidden)
+                }
+            }
+
+            route("/callback/cast", HttpMethod("NOTIFY")) {
+                handle {
+                    val xml = call.receiveText()
+                    LogCat.d(xml)
+                    // the TV could send the callback twice in short time, the second one should be ignore if it has AVTransportURIMetaData field.
+                    if (xml.contains("TransportState val=\"STOPPED\"") && !xml.contains("AVTransportURIMetaData")) {
+                        withIO {
+                            if (CastPlayer.items?.isNotEmpty() == true) {
+                                CastPlayer.currentDevice?.let { device ->
+                                    val currentUri = CastPlayer.currentUri
+                                    var index = CastPlayer.items!!.indexOfFirst { it.path == currentUri }
+                                    index++
+                                    if (index > CastPlayer.items!!.size - 1) {
+                                        index = 0
+                                    }
+                                    val current = CastPlayer.items!![index]
+                                    if (current.path != currentUri) {
+                                        LogCat.d(current.path)
+                                        UPnPController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(current.path))
+                                        CastPlayer.currentUri = current.path
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    call.respond(HttpStatusCode.OK)
+                }
+            }
+
+            post("/upload") {
+                val clientId = call.request.header("c-id") ?: ""
+                if (clientId.isEmpty()) {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@post
+                }
+
+                val token = HttpServerManager.tokenCache[clientId]
+                if (token == null) {
+                    call.response.status(HttpStatusCode.Unauthorized)
+                    return@post
+                }
+                try {
+                    lateinit var info: UploadInfo
+                    var fileName = ""
+                    call.receiveMultipart().forEachPart { part ->
+                        when (part) {
+                            is PartData.FileItem -> {
+                                when (part.name) {
+                                    "info" -> {
+                                        var requestStr = ""
+                                        val decryptedBytes = CryptoHelper.aesDecrypt(token, part.streamProvider().readBytes())
+                                        if (decryptedBytes != null) {
+                                            requestStr = decryptedBytes.decodeToString()
+                                        }
+                                        if (requestStr.isEmpty()) {
+                                            call.response.status(HttpStatusCode.Unauthorized)
+                                            return@forEachPart
+                                        }
+
+                                        info = Json.decodeFromString<UploadInfo>(requestStr)
+                                    }
+
+                                    "file" -> {
+                                        fileName = part.originalFileName as String
+                                        if (info.dir.isEmpty() || fileName.isEmpty()) {
+                                            call.respond(HttpStatusCode.BadRequest)
+                                            return@forEachPart
+                                        }
+                                        File(info.dir).mkdirs()
+                                        var destFile = File("${info.dir}/$fileName")
+                                        if (info.index == 0 && destFile.exists()) {
+                                            if (info.replace) {
+                                                destFile.delete()
+                                            } else {
+                                                destFile = destFile.newFile()
+                                                fileName = destFile.name
+                                            }
+                                        }
+
+                                        // use append file way
+                                        val noSplitFiles = false
+                                        if (noSplitFiles) {
+                                            FileOutputStream(destFile, true).use { part.streamProvider().use { input -> input.copyTo(it) } }
+                                            if (info.total - 1 == info.index) {
+                                                MainApp.instance.scanFileByConnection(destFile, null)
+                                            }
+                                        } else {
+                                            if (info.total > 1) {
+                                                destFile = File("${info.dir}/$fileName.part${String.format("%03d", info.index)}")
+                                                if (destFile.exists() && destFile.length() == info.size) {
+                                                    // skip if the part file is already uploaded
+                                                } else {
+                                                    destFile.outputStream().use { part.streamProvider().use { input -> input.copyTo(it) } }
+                                                }
                                             } else {
                                                 destFile.outputStream().use { part.streamProvider().use { input -> input.copyTo(it) } }
                                             }
-                                        } else {
-                                            destFile.outputStream().use { part.streamProvider().use { input -> input.copyTo(it) } }
-                                        }
 
-                                        if (info.total - 1 == info.index) {
-                                            if (info.total > 1) {
-                                                // merge part files into original file
-                                                destFile = File("${info.dir}/$fileName")
-                                                val partFiles = File(info.dir).listFiles()?.filter { it.name.startsWith("$fileName.part") }?.sortedBy { it.name } ?: arrayListOf()
-                                                val fos = FileOutputStream(destFile, true)
-                                                partFiles.forEach {
-                                                    it.inputStream().use { input -> input.copyTo(fos) }
-                                                    it.delete()
+                                            if (info.total - 1 == info.index) {
+                                                if (info.total > 1) {
+                                                    // merge part files into original file
+                                                    destFile = File("${info.dir}/$fileName")
+                                                    val partFiles = File(info.dir).listFiles()?.filter { it.name.startsWith("$fileName.part") }?.sortedBy { it.name } ?: arrayListOf()
+                                                    val fos = FileOutputStream(destFile, true)
+                                                    partFiles.forEach {
+                                                        it.inputStream().use { input -> input.copyTo(fos) }
+                                                        it.delete()
+                                                    }
                                                 }
+                                                MainApp.instance.scanFileByConnection(destFile, null)
                                             }
-                                            MainApp.instance.scanFileByConnection(destFile, null)
                                         }
                                     }
-                                }
 
-                                else -> {}
+                                    else -> {}
+                                }
+                            }
+
+                            else -> {
+                                part.dispose()
                             }
                         }
-
-                        else -> {
-                            part.dispose()
-                        }
                     }
+                    call.respond(HttpStatusCode.Created, fileName)
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                    call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
                 }
-                call.respond(HttpStatusCode.Created, fileName)
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-                call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
-            }
-        }
-
-        // this api is to fix the websocket takes 10s to get remoteAddress on some phones.
-        post("/init") {
-            val clientId = call.request.headers["c-id"] ?: ""
-            if (clientId.isEmpty()) {
-                call.respond(HttpStatusCode.BadRequest, "`c-id` is missing in the headers")
-                return@post
-            }
-            if (!TempData.webEnabled) {
-                call.respond(HttpStatusCode.Forbidden, "web_access_disabled")
-                return@post
-            }
-            HttpServerManager.clientIpCache[clientId] = call.request.origin.remoteHost
-            if (PasswordTypePreference.getValueAsync(MainApp.instance) == PasswordType.NONE) {
-                call.respondText(HttpServerManager.resetPasswordAsync())
-            } else {
-                call.respond(HttpStatusCode.NoContent)
-            }
-        }
-
-        webSocket("/") {
-            val q = call.request.queryParameters
-            val clientId = q["cid"] ?: ""
-            if (clientId.isEmpty()) {
-                close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "`cid` is missing"))
-                return@webSocket
             }
 
-            val session = WebSocketSession(System.currentTimeMillis(), clientId, this)
-            try {
-                for (frame in incoming) {
-                    when (frame) {
-                        is Frame.Binary -> {
-                            if (q["auth"] == "1") {
-                                var r: AuthRequest? = null
-                                val hash = CryptoHelper.sha512(PasswordPreference.getAsync(MainApp.instance).toByteArray())
-                                val token = HttpServerManager.hashToToken(hash)
-                                val decryptedBytes = CryptoHelper.aesDecrypt(token, frame.readBytes())
-                                if (decryptedBytes != null) {
-                                    r = Json.decodeFromString<AuthRequest>(decryptedBytes.decodeToString())
-                                }
-                                if (r?.password == hash) {
-                                    val event = ConfirmToAcceptLoginEvent(this, clientId, r)
-                                    if (AuthTwoFactorPreference.getAsync(MainApp.instance)) {
-                                        send(CryptoHelper.aesEncrypt(token, JsonHelper.jsonEncode(AuthResponse(AuthStatus.PENDING))))
-                                        sendEvent(event)
-                                    } else {
-                                        coIO {
-                                            val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
-                                            HttpServerManager.respondTokenAsync(event, clientIp)
-                                        }
-                                    }
-                                } else {
-                                    close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "invalid_password"))
-                                }
-                            } else {
-                                val token = HttpServerManager.tokenCache[clientId]
-                                if (token != null) {
+            // this api is to fix the websocket takes 10s to get remoteAddress on some phones.
+            post("/init") {
+                val clientId = call.request.headers["c-id"] ?: ""
+                if (clientId.isEmpty()) {
+                    call.respond(HttpStatusCode.BadRequest, "`c-id` is missing in the headers")
+                    return@post
+                }
+                if (!TempData.webEnabled) {
+                    call.respond(HttpStatusCode.Forbidden, "web_access_disabled")
+                    return@post
+                }
+                HttpServerManager.clientIpCache[clientId] = call.request.origin.remoteHost
+                if (PasswordTypePreference.getValueAsync(MainApp.instance) == PasswordType.NONE) {
+                    call.respondText(HttpServerManager.resetPasswordAsync())
+                } else {
+                    call.respond(HttpStatusCode.NoContent)
+                }
+            }
+
+            webSocket("/") {
+                val q = call.request.queryParameters
+                val clientId = q["cid"] ?: ""
+                if (clientId.isEmpty()) {
+                    close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "`cid` is missing"))
+                    return@webSocket
+                }
+
+                val session = WebSocketSession(System.currentTimeMillis(), clientId, this)
+                try {
+                    for (frame in incoming) {
+                        when (frame) {
+                            is Frame.Binary -> {
+                                if (q["auth"] == "1") {
+                                    var r: AuthRequest? = null
+                                    val hash = CryptoHelper.sha512(PasswordPreference.getAsync(MainApp.instance).toByteArray())
+                                    val token = HttpServerManager.hashToToken(hash)
                                     val decryptedBytes = CryptoHelper.aesDecrypt(token, frame.readBytes())
                                     if (decryptedBytes != null) {
-                                        LogCat.d("add session ${session.id}, ts: ${decryptedBytes.decodeToString()}")
-                                        HttpServerManager.wsSessions.add(session)
+                                        r = Json.decodeFromString<AuthRequest>(decryptedBytes.decodeToString())
+                                    }
+                                    if (r?.password == hash) {
+                                        val event = ConfirmToAcceptLoginEvent(this, clientId, r)
+                                        if (AuthTwoFactorPreference.getAsync(MainApp.instance)) {
+                                            send(CryptoHelper.aesEncrypt(token, JsonHelper.jsonEncode(AuthResponse(AuthStatus.PENDING))))
+                                            sendEvent(event)
+                                        } else {
+                                            coIO {
+                                                val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
+                                                HttpServerManager.respondTokenAsync(event, clientIp)
+                                            }
+                                        }
+                                    } else {
+                                        close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "invalid_password"))
+                                    }
+                                } else {
+                                    val token = HttpServerManager.tokenCache[clientId]
+                                    if (token != null) {
+                                        val decryptedBytes = CryptoHelper.aesDecrypt(token, frame.readBytes())
+                                        if (decryptedBytes != null) {
+                                            LogCat.d("add session ${session.id}, ts: ${decryptedBytes.decodeToString()}")
+                                            HttpServerManager.wsSessions.add(session)
+                                        } else {
+                                            close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "invalid_request"))
+                                        }
                                     } else {
                                         close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "invalid_request"))
                                     }
-                                } else {
-                                    close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "invalid_request"))
                                 }
                             }
-                        }
 
-                        else -> {}
+                            else -> {}
+                        }
                     }
+                } catch (e: Exception) {
+                } finally {
+                    LogCat.d("remove session ${session.id}")
+                    HttpServerManager.wsSessions.removeIf { it.id == session.id }
                 }
-            } catch (e: Exception) {
-            } finally {
-                LogCat.d("remove session ${session.id}")
-                HttpServerManager.wsSessions.removeIf { it.id == session.id }
             }
         }
-    }
-    install(SXGraphQL) {
-        init()
+        install(SXGraphQL) {
+            init()
+        }
     }
 }

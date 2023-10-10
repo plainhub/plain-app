@@ -98,7 +98,7 @@ object HttpServerManager {
                 ) {
                     port = httpsPort
                 }
-                module(Application::module)
+                module(HttpModule.module)
             }
         return embeddedServer(Netty, environment)
     }

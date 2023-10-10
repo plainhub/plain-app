@@ -1,0 +1,20 @@
+{
+  "version": 3,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "com.ismartcoding.plain",
+  "variantName": "freeRelease",
+  "elements": [
+    {
+      "type": "SINGLE",
+      "filters": [],
+      "attributes": [],
+      "versionCode": 163,
+      "versionName": "1.2.10",
+      "outputFile": "app-free-release.apk"
+    }
+  ],
+  "elementType": "File"
+}
