@@ -13,6 +13,8 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
+import com.ismartcoding.lib.isRPlus
+import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.preference.AudioSleepTimerFinishLastPreference
 import com.ismartcoding.plain.data.preference.AudioSleepTimerFutureTimePreference
@@ -123,11 +125,28 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
                                 context,
                                 SystemClock.elapsedRealtime() + AudioSleepTimerMinutesPreference.getAsync(context) * 60 * 1000,
                             )
-                            context.getSystemService<AlarmManager>()?.setExact(
-                                AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                AudioSleepTimerFutureTimePreference.getAsync(context),
-                                makeTimerPendingIntent(PendingIntent.FLAG_CANCEL_CURRENT),
-                            )
+                            val alarmManager = context.getSystemService<AlarmManager>()
+                            if (isSPlus()) {
+                                if (alarmManager?.canScheduleExactAlarms() == true) {
+                                    context.getSystemService<AlarmManager>()?.setExact(
+                                        AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                        AudioSleepTimerFutureTimePreference.getAsync(context),
+                                        makeTimerPendingIntent(PendingIntent.FLAG_CANCEL_CURRENT),
+                                    )
+                                } else {
+                                    context.getSystemService<AlarmManager>()?.setExactAndAllowWhileIdle(
+                                        AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                        AudioSleepTimerFutureTimePreference.getAsync(context),
+                                        makeTimerPendingIntent(PendingIntent.FLAG_CANCEL_CURRENT),
+                                    )
+                                }
+                            } else {
+                                context.getSystemService<AlarmManager>()?.setExact(
+                                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                    AudioSleepTimerFutureTimePreference.getAsync(context),
+                                    makeTimerPendingIntent(PendingIntent.FLAG_CANCEL_CURRENT),
+                                )
+                            }
                         }
                         updateUI()
                     }
