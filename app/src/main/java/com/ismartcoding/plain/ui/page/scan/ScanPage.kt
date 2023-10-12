@@ -97,6 +97,7 @@ fun ScanPage(navController: NavHostController) {
     val view = LocalView.current
     val window = (view.context as Activity).window
     val insetsController = WindowCompat.getInsetsController(window, view)
+    insetsController.hide(WindowInsetsCompat.Type.systemBars())
 
     var cameraProvider: ProcessCameraProvider? = null
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
@@ -106,9 +107,6 @@ fun ScanPage(navController: NavHostController) {
     }
     var showScanResultSheet by remember { mutableStateOf(false) }
     var scanResult by remember { mutableStateOf("") }
-
-    // https://developer.android.com/develop/ui/views/layout/edge-to-edge
-    insetsController.hide(WindowInsetsCompat.Type.systemBars())
 
     LaunchedEffect(Unit) {
         events.add(

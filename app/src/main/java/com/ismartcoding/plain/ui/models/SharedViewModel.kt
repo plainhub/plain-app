@@ -10,4 +10,5 @@ class SharedViewModel : ViewModel() {
     val textContent = mutableStateOf("")
     var previewItems = mutableStateOf(listOf<PreviewItem>())
     val previewKey = mutableStateOf("")
+    val previewIndex = mutableStateOf(0)
 }

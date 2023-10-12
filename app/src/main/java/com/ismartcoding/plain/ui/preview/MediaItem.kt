@@ -4,6 +4,9 @@ import android.content.Context
 import android.net.Uri
 import com.ismartcoding.lib.extensions.getFileName
 import com.ismartcoding.lib.extensions.isVideoFast
+import java.io.File
+import java.io.FileInputStream
+import java.io.InputStream
 
 data class PreviewItem(
     val id: String,
@@ -15,6 +18,10 @@ data class PreviewItem(
             uri.getFileName(context).isVideoFast() -> ItemType.VIDEO
             else -> ItemType.IMAGE
         }
+    }
+
+    fun toInputStream(context: Context): InputStream? {
+        return if (path.isNotEmpty()) FileInputStream(File(path)) else context.contentResolver.openInputStream(uri)
     }
 }
 

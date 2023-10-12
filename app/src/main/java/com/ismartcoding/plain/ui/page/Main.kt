@@ -161,7 +161,7 @@ fun Main(viewModel: MainViewModel) {
                 RouteName.TEXT to { TextPage(navController, sharedViewModel) },
                 RouteName.SCAN_HISTORY to { ScanHistoryPage(navController) },
                 RouteName.SCAN to { ScanPage(navController) },
-                RouteName.MEDIA_PREVIEW to { MediaPreviewPage(navController) },
+                RouteName.MEDIA_PREVIEW to { MediaPreviewPage(navController, sharedViewModel) },
             ).forEach { (routeName, content) ->
                 slideHorizontallyComposable(routeName.name) {
                     content()

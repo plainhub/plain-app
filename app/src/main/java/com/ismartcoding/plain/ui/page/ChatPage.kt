@@ -245,14 +245,14 @@ fun ChatPage(
                 PullToRefresh(
                     refreshLayoutState = refreshState,
                     modifier =
-                        Modifier
-                            .weight(1F),
+                    Modifier
+                        .weight(1F),
                 ) {
                     LazyColumn(
                         modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight(),
+                        Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(),
                         state = scrollState,
                         reverseLayout = true,
                         verticalArrangement = Arrangement.Top,
@@ -263,22 +263,22 @@ fun ChatPage(
                                 Box(modifier = Modifier.fillMaxSize()) {
                                     Column(
                                         modifier =
-                                            Modifier
-                                                .fillMaxSize()
-                                                .combinedClickable(
-                                                    onClick = {
-                                                        focusManager.clearFocus()
-                                                    },
-                                                    onLongClick = {
-                                                        selectedItem = m
-                                                        showContextMenu.value = true
-                                                    },
-                                                ),
+                                        Modifier
+                                            .fillMaxSize()
+                                            .combinedClickable(
+                                                onClick = {
+                                                    focusManager.clearFocus()
+                                                },
+                                                onLongClick = {
+                                                    selectedItem = m
+                                                    showContextMenu.value = true
+                                                },
+                                            ),
                                     ) {
                                         ChatName(m)
                                         when (m.type) {
                                             DMessageType.IMAGES.value -> {
-                                                ChatImages(context, m, imageWidthDp, imageWidthPx)
+                                                ChatImages(context, navController, sharedViewModel, m, imageWidthDp, imageWidthPx)
                                             }
 
                                             DMessageType.FILES.value -> {
@@ -292,10 +292,10 @@ fun ChatPage(
                                     }
                                     Box(
                                         modifier =
-                                            Modifier
-                                                .fillMaxSize()
-                                                .padding(top = 32.dp)
-                                                .wrapContentSize(Alignment.Center),
+                                        Modifier
+                                            .fillMaxSize()
+                                            .padding(top = 32.dp)
+                                            .wrapContentSize(Alignment.Center),
                                     ) {
                                         PDropdownMenu(
                                             expanded = showContextMenu.value && selectedItem == m,
@@ -346,8 +346,8 @@ fun ChatPage(
                 ChatInput(
                     value = inputValue,
                     modifier =
-                        Modifier
-                            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
+                    Modifier
+                        .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
                     hint = stringResource(id = R.string.chat_input_hint),
                     onValueChange = { inputValue = it },
                     onSend = {

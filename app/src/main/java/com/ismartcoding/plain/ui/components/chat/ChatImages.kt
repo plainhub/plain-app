@@ -20,6 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import coil.size.Size
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.getFinalPath
@@ -28,7 +29,10 @@ import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.features.ChatItemClickEvent
 import com.ismartcoding.plain.ui.base.PAsyncImage
+import com.ismartcoding.plain.ui.extensions.navigate
+import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.models.VChat
+import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 
@@ -36,6 +40,8 @@ import com.ismartcoding.plain.ui.preview.PreviewItem
 @Composable
 fun ChatImages(
     context: Context,
+    navController: NavHostController,
+    sharedViewModel: SharedViewModel,
     m: VChat,
     imageWidthDp: Dp,
     imageWidthPx: Int,
@@ -55,18 +61,18 @@ fun ChatImages(
                 Box(
                     modifier =
                     Modifier.clickable {
-                        sendEvent(ChatItemClickEvent())
-                        PreviewDialog().show(
-                            items =
-                            imageItems.mapIndexed {
-                                    i,
-                                    s,
-                                ->
-                                val p = s.uri.getFinalPath(context)
-                                PreviewItem(m.id + "|" + i, p.pathToUri(), p)
-                            },
-                            initKey = m.id + "|" + index,
-                        )
+                        val items = imageItems.mapIndexed { i, s ->
+                            val p = s.uri.getFinalPath(context)
+                            PreviewItem(m.id + "|" + i, p.pathToUri(), p)
+                        }
+//                        PreviewDialog().show(
+//                            items = items,
+//                            initKey = m.id + "|" + index,
+//                        )
+                        sharedViewModel.previewItems.value = items
+                        sharedViewModel.previewKey.value = m.id + "|" + index
+                        sharedViewModel.previewIndex.value = index
+                        navController.navigate(RouteName.MEDIA_PREVIEW)
                     },
                 ) {
                     PAsyncImage(
