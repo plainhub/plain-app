@@ -50,9 +50,11 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isTV
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.data.preference.*
@@ -60,12 +62,15 @@ import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.RequestPermissionEvent
+import com.ismartcoding.plain.features.StartHttpServerErrorEvent
+import com.ismartcoding.plain.features.StopHttpServerDoneEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.ui.base.*
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.models.WebConsoleViewModel
 import com.ismartcoding.plain.ui.page.RouteName
@@ -80,7 +85,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun WebConsolePage(
     navController: NavHostController,
-    sharedViewModel: SharedViewModel,
+    mainViewModel: MainViewModel,
     viewModel: WebConsoleViewModel = viewModel(),
 ) {
     WebSettingsProvider {
@@ -102,7 +107,19 @@ fun WebConsolePage(
             events.add(
                 receiveEventHandler<PermissionResultEvent> {
                     permissionList = Permissions.getWebList(context)
-                },
+                }
+            )
+
+            events.add(
+                receiveEventHandler<StartHttpServerErrorEvent> {
+                    mainViewModel.httpServerError.value = HttpServerManager.getErrorMessage()
+                }
+            )
+
+            events.add(
+                receiveEventHandler<StopHttpServerDoneEvent> {
+                    mainViewModel.httpServerError.value = HttpServerManager.getErrorMessage()
+                }
             )
         }
 
@@ -145,24 +162,39 @@ fun WebConsolePage(
         }, content = {
             LazyColumn {
                 item {
-                    val errorMessage =
-                        if (HttpServerManager.httpServerError.isNotEmpty()) {
-                            HttpServerManager.httpServerError
-                        } else if (webConsole && HttpServerManager.stoppedByUser) {
-                            stringResource(id = R.string.http_server_stopped)
-                        } else if (webConsole && HttpServerManager.httpServer == null) {
-                            stringResource(id = R.string.http_server_failed)
-                        } else {
-                            ""
-                        }
-                    if (errorMessage.isNotEmpty()) {
-                        Alert(title = stringResource(id = R.string.error), description = errorMessage, AlertType.ERROR) {
-                            MiniOutlineButton(
-                                text = stringResource(R.string.relaunch_app),
-                                onClick = {
-                                    AppHelper.relaunch(context)
-                                },
-                            )
+                    if (mainViewModel.httpServerError.value.isNotEmpty()) {
+                        Alert(title = stringResource(id = R.string.error), description = mainViewModel.httpServerError.value, AlertType.ERROR) {
+                            if (HttpServerManager.portsInUse.isNotEmpty()) {
+                                MiniOutlineButton(
+                                    text = stringResource(R.string.fix),
+                                    onClick = {
+                                        scope.launch(Dispatchers.IO) {
+                                            if (HttpServerManager.portsInUse.contains(TempData.httpPort)) {
+                                                HttpPortPreference.putAsync(context, HttpServerManager.httpPorts.filter { it != TempData.httpPort }.random())
+                                            }
+                                            if (HttpServerManager.portsInUse.contains(TempData.httpsPort)) {
+                                                HttpsPortPreference.putAsync(context, HttpServerManager.httpsPorts.filter { it != TempData.httpsPort }.random())
+                                            }
+                                            coMain {
+                                                DialogHelper.showConfirmDialog(
+                                                    context,
+                                                    context.getString(R.string.restart_app_title),
+                                                    context.getString(R.string.restart_app_message),
+                                                ) {
+                                                    AppHelper.relaunch(context)
+                                                }
+                                            }
+                                        }
+                                    },
+                                )
+                            } else {
+                                MiniOutlineButton(
+                                    text = stringResource(R.string.relaunch_app),
+                                    onClick = {
+                                        AppHelper.relaunch(context)
+                                    },
+                                )
+                            }
                         }
                     } else if (NetworkHelper.isVPNConnected(context)) {
                         Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
@@ -188,16 +220,16 @@ fun WebConsolePage(
                         selected = if (isHttps) 0 else 1,
                         onSelected = { isHttps = it == 0 },
                         itemRadioGroups =
-                            listOf(
-                                BlockRadioGroupButtonItem(
-                                    text = stringResource(R.string.recommended_https),
-                                    onClick = {},
-                                ) {},
-                                BlockRadioGroupButtonItem(
-                                    text = "HTTP",
-                                    onClick = {},
-                                ) {},
-                            ),
+                        listOf(
+                            BlockRadioGroupButtonItem(
+                                text = stringResource(R.string.recommended_https),
+                                onClick = {},
+                            ) {},
+                            BlockRadioGroupButtonItem(
+                                text = "HTTP",
+                                onClick = {},
+                            ) {},
+                        ),
                     )
                     BrowserPreview(context, isHttps, httpPort, httpsPort, onEditPort = {
                         portDialogVisible = true
@@ -247,9 +279,9 @@ fun WebConsolePage(
                         PListItem(
                             title = permission.getText(),
                             desc =
-                                stringResource(
-                                    if (m.granted) R.string.system_permission_granted else R.string.system_permission_not_granted,
-                                ),
+                            stringResource(
+                                if (m.granted) R.string.system_permission_granted else R.string.system_permission_not_granted,
+                            ),
                             showMore = permission == Permission.SYSTEM_ALERT_WINDOW,
                             onClick = {
                                 scope.launch {
@@ -296,27 +328,27 @@ fun WebConsolePage(
             visible = portDialogVisible,
             title = stringResource(if (isHttps) R.string.https_port else R.string.http_port),
             options =
-                (if (isHttps) listOf(8043, 8143, 8243, 8343, 8443, 8543, 8643, 8743, 8843, 8943) else listOf(8080, 8180, 8280, 8380, 8480, 8580, 8680, 8780, 8880, 8980)).map {
-                    RadioDialogOption(
-                        text = it.toString(),
-                        selected = if (isHttps) it == httpsPort else it == httpPort,
-                    ) {
-                        scope.launch(Dispatchers.IO) {
-                            if (isHttps) {
-                                HttpsPortPreference.putAsync(context, it)
-                            } else {
-                                HttpPortPreference.putAsync(context, it)
-                            }
-                        }
-                        DialogHelper.showConfirmDialog(
-                            context,
-                            context.getString(R.string.restart_app_title),
-                            context.getString(R.string.restart_app_message),
-                        ) {
-                            AppHelper.relaunch(context)
+            (if (isHttps) HttpServerManager.httpsPorts else HttpServerManager.httpPorts).map {
+                RadioDialogOption(
+                    text = it.toString(),
+                    selected = if (isHttps) it == httpsPort else it == httpPort,
+                ) {
+                    scope.launch(Dispatchers.IO) {
+                        if (isHttps) {
+                            HttpsPortPreference.putAsync(context, it)
+                        } else {
+                            HttpPortPreference.putAsync(context, it)
                         }
                     }
-                },
+                    DialogHelper.showConfirmDialog(
+                        context,
+                        context.getString(R.string.restart_app_title),
+                        context.getString(R.string.restart_app_message),
+                    ) {
+                        AppHelper.relaunch(context)
+                    }
+                }
+            },
         ) {
             portDialogVisible = false
         }
@@ -360,10 +392,10 @@ fun BrowserPreview(
                     text = AnnotatedString(defaultUrl),
                     modifier = Modifier.padding(start = 16.dp),
                     style =
-                        TextStyle(
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 16.sp,
-                        ),
+                    TextStyle(
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 16.sp,
+                    ),
                     onClick = {
                         val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), defaultUrl)
                         clipboardManager.setPrimaryClip(clip)
@@ -387,8 +419,8 @@ fun BrowserPreview(
                 Spacer(modifier = Modifier.weight(1f))
                 Box(
                     modifier =
-                        Modifier
-                            .wrapContentSize(Alignment.TopEnd),
+                    Modifier
+                        .wrapContentSize(Alignment.TopEnd),
                 ) {
                     PIconButton(
                         imageVector = Icons.Rounded.MoreVert,

@@ -23,6 +23,7 @@ fun PIconButton(
     contentDescription: String?,
     tint: Color = LocalContentColor.current,
     showBadge: Boolean = false,
+    badgeColor: Color = MaterialTheme.colorScheme.primary,
     isHaptic: Boolean? = false,
     isSound: Boolean? = false,
     onClick: () -> Unit = {},
@@ -46,8 +47,7 @@ fun PIconButton(
                                 .size(8.dp)
                                 .offset(x = (-3).dp, y = 9.dp)
                                 .clip(CircleShape),
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        containerColor = badgeColor,
                     )
                 },
             ) {

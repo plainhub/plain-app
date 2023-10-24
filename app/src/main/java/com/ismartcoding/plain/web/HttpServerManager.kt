@@ -2,19 +2,21 @@ package com.ismartcoding.plain.web
 
 import android.content.Context
 import android.util.Base64
+import androidx.compose.ui.res.stringResource
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JksHelper
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.preference.PasswordPreference
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.SessionClientTsUpdate
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.web.websocket.WebSocketSession
-import io.ktor.server.application.Application
 import io.ktor.server.engine.applicationEngineEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
@@ -40,8 +42,11 @@ object HttpServerManager {
     val wsSessions = Collections.synchronizedSet<WebSocketSession>(LinkedHashSet())
     val clientRequestTs = mutableMapOf<String, Long>()
     var httpServerError: String = ""
+    val portsInUse = mutableSetOf<Int>()
     var httpServer: NettyApplicationEngine? = null
     var stoppedByUser = false
+    val httpsPorts = setOf(8043, 8143, 8243, 8343, 8443, 8543, 8643, 8743, 8843, 8943)
+    val httpPorts = setOf(8080, 8180, 8280, 8380, 8480, 8580, 8680, 8780, 8880, 8980)
 
     suspend fun resetPasswordAsync(): String {
         val password = CryptoHelper.randomPassword(6)
@@ -154,5 +159,25 @@ object HttpServerManager {
                 ),
             ),
         )
+    }
+
+    fun getErrorMessage(): String {
+        return if (portsInUse.isNotEmpty()) {
+            LocaleHelper.getStringF(
+                if (portsInUse.size > 1) {
+                    R.string.http_port_conflict_errors
+                } else {
+                    R.string.http_port_conflict_error
+                }, "port", HttpServerManager.portsInUse.joinToString(", ")
+            )
+        } else if (httpServerError.isNotEmpty()) {
+            httpServerError
+        } else if (stoppedByUser) {
+            LocaleHelper.getString(R.string.http_server_stopped)
+        } else if (httpServer == null) {
+            LocaleHelper.getString(R.string.http_server_failed)
+        } else {
+            ""
+        }
     }
 }

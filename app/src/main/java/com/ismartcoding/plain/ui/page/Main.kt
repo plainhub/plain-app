@@ -149,7 +149,7 @@ fun Main(viewModel: MainViewModel) {
                 RouteName.BACKUP_RESTORE to { BackupRestorePage(navController) },
                 RouteName.ABOUT to { AboutPage(navController) },
                 RouteName.LOGS to { LogsPage(navController) },
-                RouteName.WEB_CONSOLE to { WebConsolePage(navController, sharedViewModel) },
+                RouteName.WEB_CONSOLE to { WebConsolePage(navController, viewModel) },
                 RouteName.PASSWORD to { PasswordPage(navController) },
                 RouteName.SESSIONS to { SessionsPage(navController) },
                 RouteName.WEB_DEV to { WebDevPage(navController) },

@@ -2,6 +2,9 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Attualmente, il tuo VPN è attivo sul tuo dispositivo, il che potrebbe portare a problemi di connessione web quando si accede da un PC. Per risolvere questo problema, ti consigliamo di regolare le impostazioni del tuo VPN per consentire il traffico LAN o disattivare il tuo VPN.</string>
     <string name="warning">Attenzione</string>
+    <string name="http_port_conflict_error">La porta {{ port }} è attualmente in uso. Puoi premere il pulsante \'Correggi\' per cambiare automaticamente la porta, oppure puoi scegliere di premere l\'icona di modifica accanto all\'indirizzo URL per selezionare manualmente una porta diversa.</string>
+    <string name="http_port_conflict_errors">Le porte {{ port }} sono attualmente in uso. Hai l\'opzione di premere il pulsante \'Correggi\' per cambiare automaticamente la porta, oppure puoi scegliere di premere l\'icona di modifica accanto all\'indirizzo URL per selezionare manualmente una porta diversa.</string>
+    <string name="fix">Correggi</string>
     <string name="security">Sicurezza</string>
     <string name="url_token">Token URL</string>
     <string name="url_token_tips">Il token URL cifra i dati negli URL. Se viene resettato, gli URL cifrati con il vecchio token diventano inaccessibili.</string>

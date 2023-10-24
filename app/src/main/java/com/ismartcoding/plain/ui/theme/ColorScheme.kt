@@ -17,7 +17,10 @@ fun ColorScheme.cardBack(): Color {
     return MaterialTheme.colorScheme.surface onDark MaterialTheme.colorScheme.inverseOnSurface
 }
 
-@Composable
 fun ColorScheme.warning(): Color {
     return Color(android.graphics.Color.parseColor("#FFC107"))
+}
+
+fun ColorScheme.green(): Color {
+    return Color(android.graphics.Color.parseColor("#4CAF50"))
 }

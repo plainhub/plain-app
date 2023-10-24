@@ -73,6 +73,7 @@ fun Alert(
                 .padding(16.dp, 0.dp, 16.dp, 16.dp)
                 .fillMaxWidth(),
             text = description,
+            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
         if (actions != null) {

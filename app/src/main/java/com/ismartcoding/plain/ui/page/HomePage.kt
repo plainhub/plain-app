@@ -16,6 +16,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,11 +29,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.extensions.allowSensitivePermissions
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.preference.LocalKeepScreenOn
 import com.ismartcoding.plain.data.preference.LocalWeb
+import com.ismartcoding.plain.features.StartHttpServerErrorEvent
+import com.ismartcoding.plain.features.StopHttpServerDoneEvent
 import com.ismartcoding.plain.helpers.ScreenHelper
 import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.ActionButtonSettings
@@ -47,8 +52,10 @@ import com.ismartcoding.plain.ui.components.home.HomeItemTools
 import com.ismartcoding.plain.ui.components.home.HomeItemWork
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.models.MainViewModel
+import com.ismartcoding.plain.ui.theme.green
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,6 +71,31 @@ fun HomePage(
     val keepScreenOn = LocalKeepScreenOn.current
     val configuration = LocalConfiguration.current
     val itemWidth = (configuration.screenWidthDp.dp - 40.dp) / 4
+    val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
+
+    LaunchedEffect(Unit) {
+        events.add(
+            receiveEventHandler<StartHttpServerErrorEvent> {
+                viewModel.httpServerError.value = HttpServerManager.getErrorMessage()
+            }
+        )
+
+        events.add(
+            receiveEventHandler<StopHttpServerDoneEvent> {
+                viewModel.httpServerError.value = HttpServerManager.getErrorMessage()
+            }
+        )
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            events.forEach { it.cancel() }
+        }
+    }
+
+    if (webConsole) {
+        viewModel.startTimer()
+    }
 
     PScaffold(
         navController,
@@ -77,7 +109,8 @@ fun HomePage(
                 imageVector = Icons.Outlined.Computer,
                 contentDescription = stringResource(R.string.web_console),
                 tint = MaterialTheme.colorScheme.onSurface,
-                showBadge = webConsole && HttpServerManager.httpServer != null && HttpServerManager.httpServerError.isEmpty(),
+                showBadge = viewModel.showWebBadge.value,
+                badgeColor = if (viewModel.httpServerError.value.isNotEmpty()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.green(),
             ) {
                 navController.navigate(RouteName.WEB_CONSOLE)
             }
@@ -116,8 +149,8 @@ fun HomePage(
         floatingActionButton = {
             FloatingActionButton(
                 modifier =
-                    Modifier
-                        .padding(bottom = 32.dp),
+                Modifier
+                    .padding(bottom = 32.dp),
                 onClick = {
                     navController.navigate(RouteName.CHAT)
                 },

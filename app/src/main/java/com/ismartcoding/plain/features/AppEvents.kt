@@ -48,6 +48,10 @@ class BoxConnectivityStateChangedEvent
 
 class StartHttpServerEvent
 
+class StartHttpServerErrorEvent
+
+class StopHttpServerDoneEvent
+
 class StartScreenMirrorEvent
 
 class RestartAppEvent

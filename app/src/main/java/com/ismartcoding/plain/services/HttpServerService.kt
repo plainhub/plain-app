@@ -3,12 +3,16 @@ package com.ismartcoding.plain.services
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.coroutineScope
+import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.lib.helpers.PortHelper
 import com.ismartcoding.lib.isUPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.features.StartHttpServerErrorEvent
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.web.HttpServerManager
 import io.ktor.server.application.ApplicationStopPreparing
@@ -34,15 +38,23 @@ class HttpServerService : LifecycleService() {
         lifecycle.coroutineScope.launch(Dispatchers.IO) {
             try {
                 if (HttpServerManager.httpServer == null) {
-                    HttpServerManager.httpServer = HttpServerManager.createHttpServer(MainApp.instance)
-                    HttpServerManager.httpServer?.start(wait = true)
+                    HttpServerManager.portsInUse.clear()
                     HttpServerManager.stoppedByUser = false
                     HttpServerManager.httpServerError = ""
+                    HttpServerManager.httpServer = HttpServerManager.createHttpServer(MainApp.instance)
+                    HttpServerManager.httpServer?.start(wait = true)
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
                 HttpServerManager.httpServer = null
                 HttpServerManager.httpServerError = ex.toString()
+                if (PortHelper.isPortInUse(TempData.httpPort)) {
+                    HttpServerManager.portsInUse.add(TempData.httpPort)
+                }
+                if (PortHelper.isPortInUse(TempData.httpsPort)) {
+                    HttpServerManager.portsInUse.add(TempData.httpsPort)
+                }
+                sendEvent(StartHttpServerErrorEvent())
                 LogCat.e(ex.toString())
             }
         }
