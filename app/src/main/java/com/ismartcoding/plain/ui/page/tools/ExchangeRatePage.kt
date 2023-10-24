@@ -117,8 +117,8 @@ fun ExchangeRatePage(navController: NavHostController) {
                     ) {
                         item {
                             DisplayText(
-                                text = stringResource(id = R.string.exchange_rate),
-                                desc = if (rateItems != null) stringResource(R.string.date) + " " + UIDataCache.current().latestExchangeRates?.date?.formatDateTime() else "",
+                                title = stringResource(id = R.string.exchange_rate),
+                                description = if (rateItems != null) stringResource(R.string.date) + " " + UIDataCache.current().latestExchangeRates?.date?.formatDateTime() else "",
                             )
                         }
                         item {

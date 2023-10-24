@@ -8,11 +8,16 @@ import com.ismartcoding.plain.ui.theme.palette.onDark
 import com.ismartcoding.plain.ui.theme.palette.onLight
 
 @Composable
-fun ColorScheme.backColor(): Color {
+fun ColorScheme.canvas(): Color {
     return MaterialTheme.colorScheme.surface onLight MaterialTheme.colorScheme.inverseOnSurface
 }
 
 @Composable
-fun ColorScheme.cardBackColor(): Color {
+fun ColorScheme.cardBack(): Color {
     return MaterialTheme.colorScheme.surface onDark MaterialTheme.colorScheme.inverseOnSurface
+}
+
+@Composable
+fun ColorScheme.warning(): Color {
+    return Color(android.graphics.Color.parseColor("#FFC107"))
 }

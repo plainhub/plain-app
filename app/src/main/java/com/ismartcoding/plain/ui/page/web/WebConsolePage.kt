@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -70,8 +69,8 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.models.WebConsoleViewModel
 import com.ismartcoding.plain.ui.page.RouteName
-import com.ismartcoding.plain.ui.theme.backColor
-import com.ismartcoding.plain.ui.theme.cardBackColor
+import com.ismartcoding.plain.ui.theme.canvas
+import com.ismartcoding.plain.ui.theme.cardBack
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -113,7 +112,7 @@ fun WebConsolePage(
             }
         }
 
-        PScaffold(navController, actions = {
+        PScaffold(navController, topBarTitle = stringResource(id = R.string.web_console), actions = {
             MiniOutlineButton(
                 text = stringResource(R.string.sessions),
                 onClick = {
@@ -157,37 +156,19 @@ fun WebConsolePage(
                             ""
                         }
                     if (errorMessage.isNotEmpty()) {
-                        Column(
-                            modifier =
-                                Modifier
-                                    .padding(horizontal = 16.dp)
-                                    .fillMaxWidth()
-                                    .background(
-                                        color = MaterialTheme.colorScheme.cardBackColor(),
-                                        shape = RoundedCornerShape(16.dp),
-                                    ),
-                        ) {
-                            Text(
-                                modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                                text = errorMessage,
-                                color = MaterialTheme.colorScheme.error,
+                        Alert(title = stringResource(id = R.string.error), description = errorMessage, AlertType.ERROR) {
+                            MiniOutlineButton(
+                                text = stringResource(R.string.relaunch_app),
+                                onClick = {
+                                    AppHelper.relaunch(context)
+                                },
                             )
-                            Row(
-                                modifier = Modifier.padding(16.dp, 0.dp, 16.dp, 16.dp).fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End,
-                            ) {
-                                MiniOutlineButton(
-                                    text = stringResource(R.string.relaunch_app),
-                                    onClick = {
-                                        AppHelper.relaunch(context)
-                                    },
-                                )
-                            }
                         }
+                    } else if (NetworkHelper.isVPNConnected(context)) {
+                        Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
                     }
                     DisplayText(
-                        text = stringResource(R.string.web_console),
-                        desc = stringResource(id = R.string.web_console_desc),
+                        description = stringResource(id = R.string.web_console_desc),
                     )
                 }
                 item {
@@ -357,19 +338,19 @@ fun BrowserPreview(
     val defaultUrl = "${if (isHttps) "https" else "http"}://$ip4:${if (isHttps) httpsPort else httpPort}"
     Column(
         modifier =
-            Modifier
-                .padding(horizontal = 16.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.cardBackColor(),
-                    shape = RoundedCornerShape(16.dp),
-                ),
+        Modifier
+            .padding(horizontal = 16.dp)
+            .background(
+                color = MaterialTheme.colorScheme.cardBack(),
+                shape = RoundedCornerShape(16.dp),
+            ),
     ) {
         Row(
             Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
                 .background(
-                    color = MaterialTheme.colorScheme.backColor(),
+                    color = MaterialTheme.colorScheme.canvas(),
                     shape = RoundedCornerShape(8.dp),
                 ),
             verticalAlignment = Alignment.CenterVertically,
@@ -393,9 +374,9 @@ fun BrowserPreview(
             PIconButton(
                 imageVector = Icons.Rounded.Edit,
                 modifier =
-                    Modifier
-                        .height(16.dp)
-                        .width(16.dp),
+                Modifier
+                    .height(16.dp)
+                    .width(16.dp),
                 contentDescription = stringResource(id = R.string.edit),
                 tint = MaterialTheme.colorScheme.onSurface,
                 onClick = {
@@ -412,9 +393,9 @@ fun BrowserPreview(
                     PIconButton(
                         imageVector = Icons.Rounded.MoreVert,
                         modifier =
-                            Modifier
-                                .height(16.dp)
-                                .width(16.dp),
+                        Modifier
+                            .height(16.dp)
+                            .width(16.dp),
                         contentDescription = stringResource(id = R.string.more),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         onClick = {
@@ -440,9 +421,9 @@ fun BrowserPreview(
         }
         Text(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             text = stringResource(id = R.string.enter_this_address_tips),
             style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Light),
             color = MaterialTheme.colorScheme.onSurfaceVariant,

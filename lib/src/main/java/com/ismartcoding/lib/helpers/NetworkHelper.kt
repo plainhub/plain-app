@@ -13,9 +13,9 @@ import kotlin.random.Random
 object NetworkHelper {
     private const val IP4_PATTERN =
         "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-            "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-            "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
-            "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$"
+                "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+                "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
+                "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$"
 
     private const val IP6_PATTERN =
         "^s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:)))(%.+)?s*$"
@@ -88,13 +88,17 @@ object NetworkHelper {
     }
 
     fun isVPNConnected(context: Context): Boolean {
-        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networks = cm.allNetworks
-        for (i in networks.indices) {
-            val caps = cm.getNetworkCapabilities(networks[i])
-            if (caps?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true) {
-                return true
+        try {
+            val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val networks = cm.allNetworks
+            for (i in networks.indices) {
+                val caps = cm.getNetworkCapabilities(networks[i])
+                if (caps?.hasTransport(NetworkCapabilities.TRANSPORT_VPN) == true) {
+                    return true
+                }
             }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
         }
         return false
     }
@@ -335,9 +339,9 @@ object NetworkHelper {
     private fun ip4ToLong(ip: String): Long {
         val octets = ip.split(".")
         return (
-            (octets[0].toLong() shl 24) + (octets[1].toInt() shl 16) +
-                (octets[2].toInt() shl 8) + octets[3].toInt()
-        )
+                (octets[0].toLong() shl 24) + (octets[1].toInt() shl 16) +
+                        (octets[2].toInt() shl 8) + octets[3].toInt()
+                )
     }
 
     private fun checkPattern(

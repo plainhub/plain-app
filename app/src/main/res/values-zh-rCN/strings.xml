@@ -1,5 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">简朴</string>
+    <string name="vpn_web_conflict_warning">您的VPN当前在设备上启用，这可能会导致从PC访问时出现Web连接问题。为解决此问题，我们建议调整VPN设置以允许局域网流量或禁用VPN。</string>
+    <string name="warning">警告</string>
     <string name="security">安全</string>
     <string name="url_token">URL令牌</string>
     <string name="url_token_tips">URL令牌用于加密URL中的数据。如果重置，使用旧令牌加密的URL将不再可访问。</string>

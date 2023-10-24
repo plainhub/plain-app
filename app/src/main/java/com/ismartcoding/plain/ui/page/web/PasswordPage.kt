@@ -74,7 +74,7 @@ fun PasswordPage(navController: NavHostController) {
             content = {
                 LazyColumn {
                     item {
-                        DisplayText(text = stringResource(R.string.password_settings))
+                        DisplayText(title = stringResource(R.string.password_settings))
                         BlockRadioButton(
                             selected = passwordType,
                             onSelected = {

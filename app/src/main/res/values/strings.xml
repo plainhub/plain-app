@@ -1,5 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
+    <string name="vpn_web_conflict_warning">Your VPN is currently enabled on your device, which could potentially lead to web connection issues when accessed from PC. To resolve this, we recommend adjusting your VPN settings to allow LAN traffic or disabling your VPN.</string>
+    <string name="warning">Warning</string>
     <string name="security">Security</string>
     <string name="url_token">URL token</string>
     <string name="url_token_tips">The URL token encrypts data in URLs. If it\'s reset, old token-encrypted URLs become inaccessible.</string>

@@ -7,13 +7,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.extensions.*
-import com.ismartcoding.plain.ui.theme.backColor
+import com.ismartcoding.plain.ui.theme.canvas
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PScaffold(
     navController: NavHostController,
-    containerColor: Color = MaterialTheme.colorScheme.backColor(),
+    containerColor: Color = MaterialTheme.colorScheme.canvas(),
     navigationIcon: (@Composable () -> Unit)? = {
         NavigationBackIcon(navController)
     },

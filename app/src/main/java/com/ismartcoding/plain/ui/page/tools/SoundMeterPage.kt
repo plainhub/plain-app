@@ -264,7 +264,7 @@ fun SoundMeterPage(navController: NavHostController) {
         }) {
             LazyColumn {
                 item {
-                    DisplayText(text = stringResource(id = R.string.decibel_values))
+                    DisplayText(title = stringResource(id = R.string.decibel_values))
                     decibelValueStrings.forEach {
                         SelectionContainer {
                             Text(

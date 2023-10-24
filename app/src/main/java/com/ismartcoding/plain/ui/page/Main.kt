@@ -64,7 +64,7 @@ import com.ismartcoding.plain.ui.page.web.WebSecurityPage
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import com.ismartcoding.plain.ui.theme.AppTheme
-import com.ismartcoding.plain.ui.theme.backColor
+import com.ismartcoding.plain.ui.theme.canvas
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -131,7 +131,7 @@ fun Main(viewModel: MainViewModel) {
 
     AppTheme(useDarkTheme = useDarkTheme) {
         window.statusBarColor = Color.Transparent.toArgb()
-        window.navigationBarColor = MaterialTheme.colorScheme.backColor().toArgb()
+        window.navigationBarColor = MaterialTheme.colorScheme.canvas().toArgb()
         insetsController.isAppearanceLightStatusBars = !useDarkTheme
         insetsController.isAppearanceLightNavigationBars = !useDarkTheme
 

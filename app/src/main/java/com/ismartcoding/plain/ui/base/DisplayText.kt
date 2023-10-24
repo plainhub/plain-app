@@ -14,8 +14,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun DisplayText(
     modifier: Modifier = Modifier,
-    text: String,
-    desc: String = "",
+    title: String = "",
+    description: String = "",
 ) {
     Column(
         modifier =
@@ -23,22 +23,25 @@ fun DisplayText(
                 .fillMaxWidth()
                 .padding(
                     start = 16.dp,
-                    top = 48.dp,
+                    top = 24.dp,
                     end = 16.dp,
                     bottom = 24.dp,
                 ),
     ) {
-        Text(
-            text = text,
-            style =
+        if (title.isNotEmpty()) {
+            Text(
+                text = title,
+                modifier = Modifier.padding(top = 24.dp),
+                style =
                 MaterialTheme.typography.displaySmall.copy(
                     baselineShift = BaselineShift.Superscript,
                 ),
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        if (desc.isNotEmpty()) {
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        if (description.isNotEmpty()) {
             Text(
-                text = desc,
+                text = description,
                 style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Light),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

@@ -25,7 +25,7 @@ fun TextPage(
         content = {
             LazyColumn {
                 item {
-                    DisplayText(text = sharedViewModel.textTitle.value)
+                    DisplayText(title = sharedViewModel.textTitle.value)
                 }
                 item {
                     Box(modifier = Modifier.padding(horizontal = 16.dp)) {

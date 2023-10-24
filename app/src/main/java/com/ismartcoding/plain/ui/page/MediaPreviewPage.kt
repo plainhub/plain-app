@@ -139,6 +139,7 @@ fun MediaPreviewPage(
                         LogCat.d("DisplayFullImage: Image long tapped at $offset")
                     },
                     fullImageLoadingContent = {
+                        LogCat.d("fullImageLoadingContent: Image")
                         Text(text="Loading...")
                         CircularProgressIndicator(
                             modifier = Modifier.width(64.dp),

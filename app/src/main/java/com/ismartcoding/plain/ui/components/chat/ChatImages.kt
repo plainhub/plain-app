@@ -65,14 +65,14 @@ fun ChatImages(
                             val p = s.uri.getFinalPath(context)
                             PreviewItem(m.id + "|" + i, p.pathToUri(), p)
                         }
-//                        PreviewDialog().show(
-//                            items = items,
-//                            initKey = m.id + "|" + index,
-//                        )
-                        sharedViewModel.previewItems.value = items
-                        sharedViewModel.previewKey.value = m.id + "|" + index
-                        sharedViewModel.previewIndex.value = index
-                        navController.navigate(RouteName.MEDIA_PREVIEW)
+                        PreviewDialog().show(
+                            items = items,
+                            initKey = m.id + "|" + index,
+                        )
+//                        sharedViewModel.previewItems.value = items
+//                        sharedViewModel.previewKey.value = m.id + "|" + index
+//                        sharedViewModel.previewIndex.value = index
+//                        navController.navigate(RouteName.MEDIA_PREVIEW)
                     },
                 ) {
                     PAsyncImage(

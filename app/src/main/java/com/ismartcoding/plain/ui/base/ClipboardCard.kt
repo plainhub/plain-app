@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.theme.cardBackColor
+import com.ismartcoding.plain.ui.theme.cardBack
 
 @Composable
 fun ClipboardCard(
@@ -32,7 +32,7 @@ fun ClipboardCard(
                 .padding(horizontal = 16.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .background(
-                    color = MaterialTheme.colorScheme.cardBackColor(),
+                    color = MaterialTheme.colorScheme.cardBack(),
                     shape = RoundedCornerShape(16.dp),
                 ),
     ) {

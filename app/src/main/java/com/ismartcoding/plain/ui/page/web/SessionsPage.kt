@@ -41,7 +41,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.SessionsViewModel
-import com.ismartcoding.plain.ui.theme.cardBackColor
+import com.ismartcoding.plain.ui.theme.cardBack
 import com.ismartcoding.plain.web.HttpServerManager
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -105,7 +105,7 @@ fun SessionsPage(
                                         .padding(horizontal = 16.dp)
                                         .fillMaxWidth()
                                         .background(
-                                            color = MaterialTheme.colorScheme.cardBackColor(),
+                                            color = MaterialTheme.colorScheme.cardBack(),
                                             shape = RoundedCornerShape(16.dp),
                                         ),
                             ) {

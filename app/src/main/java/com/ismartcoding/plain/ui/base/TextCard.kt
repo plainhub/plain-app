@@ -17,7 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.ui.theme.cardBackColor
+import com.ismartcoding.plain.ui.theme.cardBack
 
 @Composable
 fun TextCard(
@@ -30,7 +30,7 @@ fun TextCard(
                 .padding(horizontal = 16.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .background(
-                    color = MaterialTheme.colorScheme.cardBackColor(),
+                    color = MaterialTheme.colorScheme.cardBack(),
                     shape = RoundedCornerShape(16.dp),
                 ),
     ) {
