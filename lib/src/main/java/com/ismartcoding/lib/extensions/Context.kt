@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.content.pm.ShortcutManager
 import android.content.res.Configuration
+import android.content.res.Resources
 import android.database.Cursor
 import android.media.MediaScannerConnection
 import android.net.ConnectivityManager
@@ -23,6 +24,7 @@ import androidx.core.content.ContextCompat
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.isTPlus
 import java.io.File
+import kotlin.math.roundToInt
 
 fun Context.px(
     @DimenRes dimen: Int,
@@ -35,6 +37,11 @@ fun Context.dp(
 fun Context.getTextWidth(text: String): Float = TextView(this).paint.measureText(text)
 
 fun Context.dp2px(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
+
+fun dp2px(dp: Int): Int {
+    val density: Float = Resources.getSystem().displayMetrics.density
+    return (dp * density).roundToInt()
+}
 
 fun Context.getWindowHeight(): Int {
     if (isRPlus()) {

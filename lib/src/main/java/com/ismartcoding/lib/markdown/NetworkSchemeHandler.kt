@@ -1,8 +1,8 @@
 package com.ismartcoding.lib.markdown
 
 import android.net.Uri
-import io.noties.markwon.image.ImageItem
-import io.noties.markwon.image.SchemeHandler
+import com.ismartcoding.lib.markdown.image.ImageItem
+import com.ismartcoding.lib.markdown.image.SchemeHandler
 import java.io.BufferedInputStream
 import java.io.IOException
 import java.net.HttpURLConnection

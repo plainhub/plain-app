@@ -94,9 +94,13 @@ dependencies {
     api("io.noties.markwon:ext-tasklist:$markwon")
     api("io.noties.markwon:ext-tables:$markwon")
     api("io.noties.markwon:ext-latex:$markwon")
-    api("io.noties.markwon:image:$markwon")
     api("io.noties.markwon:linkify:$markwon")
-    api("io.noties.markwon:image-coil:$markwon")
+    api("io.noties.markwon:image-glide:$markwon")
+    //api("com.caverock:androidsvg:1.4")
+    api("com.caverock:androidsvg-aar:1.4")
+
+    implementation("pl.droidsonroids.gif:android-gif-drawable:1.2.23")
+    implementation("pl.droidsonroids.gif:android-gif-drawable:1.2.23")
 
     // https://coil-kt.github.io/coil/changelog/
     api("io.coil-kt:coil:$coil")

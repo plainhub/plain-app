@@ -4,8 +4,8 @@ import android.content.Context
 import android.net.Uri
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.getMimeType
-import io.noties.markwon.image.ImageItem
-import io.noties.markwon.image.SchemeHandler
+import com.ismartcoding.lib.markdown.image.ImageItem
+import com.ismartcoding.lib.markdown.image.SchemeHandler
 import java.io.FileInputStream
 import java.util.*
 
