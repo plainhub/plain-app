@@ -3,6 +3,7 @@ package com.ismartcoding.lib.markdown.image
 import android.graphics.Paint
 import android.graphics.Paint.FontMetricsInt
 import androidx.annotation.IntRange
+import androidx.compose.ui.Modifier
 import com.ismartcoding.lib.extensions.dp2px
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.image.AsyncDrawable
@@ -28,10 +29,15 @@ class ImageAsyncDrawableSpan(
         if (drawable.hasResult()) {
             val rect = drawable.bounds
             if (fm != null) {
-                fm.ascent = -rect.bottom + dp2px(40)
-                fm.descent = 0
+                // FIXME: make sure the image is in the vertical center of the text, and there is not too much space above and below the image
+                val height = rect.height()
+                val need = height - (fm.descent - fm.ascent)
+                if (need > 0) {
+                    fm.descent += need / 2
+                    fm.ascent -= need / 2
+                }
                 fm.top = fm.ascent
-                fm.bottom = 0
+                fm.bottom = fm.descent
             }
             size = rect.right
         } else {
