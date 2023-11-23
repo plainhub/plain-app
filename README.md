@@ -88,6 +88,28 @@ PlainApp requires Android 9.0 or higher.
 
 The ultimate goal is to turn smartphones into personal data and knowledge managers, allowing individuals to more easily exchange knowledge and data with each other through PlainApp.
 
+## FAQ
+
+1. Why can't I find Messages or Calls in the Social section on my webpage's Home tab?
+
+Google Play Store doesn't allow PlainApp to use SMS and Call Permissions. 
+You can access these features on versions from F-droid and GitHub.
+
+2. When connecting my mobile to my PC using HTTPS, a warning appears in the browser saying, 
+"Your connection is not private. Attackers may try to steal your information from x.x.x.x (e.g., passwords, messages, or credit cards)."
+
+The warning is because of a self-signed TLS certificate, and there's no direct way to remove it. 
+You can proceed by clicking "Proceed to x.x.x.x (unsafe)." Despite the warning, data between the mobile app and web interface is encrypted.
+
+3. Why screen mirror is not working?
+
+Try use the latest version of Chrome.
+
+4. I don't believe this app.
+
+It's worth mentioning that this is an open-source application. 
+If you have doubts, you can either build your own version or choose not to use it.
+
 ## Support
 
 If you encounter any issues, feel free to open an issue on GitHub. I am always happy to help. Please do not give a one-star rating arbitrarily.
