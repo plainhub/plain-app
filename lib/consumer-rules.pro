@@ -4,6 +4,7 @@
 -keep class com.ismartcoding.plain.** { *; }
 -keep class io.ktor.server.** { *; }
 -keep class io.netty.** { *; }
+-keep class com.rometools.rome.** { *; }
 
 -keepclassmembers class **.R$* {
     public static <fields>;
