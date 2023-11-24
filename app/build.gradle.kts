@@ -217,4 +217,9 @@ dependencies {
     implementation(project(":lib"))
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.9.1")
     implementation(kotlin("stdlib", KotlinCompilerVersion.VERSION))
+
+
+    // by skydoves
+    implementation("com.github.skydoves:colorpicker-compose:1.0.5")
+
 }
