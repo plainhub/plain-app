@@ -203,7 +203,7 @@ object HttpModule {
                     return@get
                 }
 
-                val fileName = URLEncoder.encode(q["name"] ?: "${folder.name}.zip", "UTF-8")
+                val fileName = URLEncoder.encode(q["name"] ?: "${folder.name}.zip", "UTF-8").replace("+", "%20")
                 call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
                 call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
                 call.respondOutputStream(ContentType.Application.Zip) {
@@ -264,7 +264,7 @@ object HttpModule {
 
                     val items = paths.map { DownloadFileItemWrap(File(it.path), it.name) }.filter { it.file.exists() }
                     val dirs = items.filter { it.file.isDirectory }
-                    val fileName = URLEncoder.encode(json.optString("name").ifEmpty { "download.zip" }, "UTF-8")
+                    val fileName = URLEncoder.encode(json.optString("name").ifEmpty { "download.zip" }, "UTF-8").replace("+", "%20")
                     call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
                     call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
                     call.respondOutputStream(ContentType.Application.Zip) {

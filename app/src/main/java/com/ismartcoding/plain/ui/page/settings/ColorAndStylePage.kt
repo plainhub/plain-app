@@ -54,9 +54,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.github.skydoves.colorpicker.compose.ColorEnvelope
-import com.github.skydoves.colorpicker.compose.HsvColorPicker
-import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.DarkTheme
@@ -76,6 +73,9 @@ import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.base.colorpicker.ColorEnvelope
+import com.ismartcoding.plain.ui.base.colorpicker.HsvColorPicker
+import com.ismartcoding.plain.ui.base.colorpicker.rememberColorPickerController
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.svg.PALETTE
@@ -217,7 +217,7 @@ fun Palettes(
     var customColorValue by remember { mutableStateOf(customPrimaryColor) }
 
     fun saveColor() {
-        if(customColorValue.checkColorHex() != null) {
+        if (customColorValue.checkColorHex() != null) {
             scope.launch(Dispatchers.IO) {
                 CustomPrimaryColorPreference.putAsync(context, customColorValue.checkColorHex()!!)
                 ThemeIndexPreference.putAsync(context, 4)
@@ -283,7 +283,7 @@ fun Palettes(
         }
     }
 
-    if(addDialogVisible) {
+    if (addDialogVisible) {
         AlertDialog(
             onDismissRequest = {
                 addDialogVisible = false
@@ -306,7 +306,7 @@ fun Palettes(
                 Text(text = stringResource(R.string.primary_color))
             },
             text = {
-                Column (
+                Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -317,8 +317,9 @@ fun Palettes(
                             .fillMaxWidth(0.8f)
                             .height(300.dp),
                         controller = colorPickerController,
+                        initialColor = customColorValue.safeHexToColor(),
                         onColorChanged = { colorEnvelope: ColorEnvelope ->
-                            customColorValue = colorEnvelope.hexCode
+                                customColorValue = colorEnvelope.hexCode
                         }
                     )
                     Row(
@@ -343,7 +344,7 @@ fun Palettes(
                                 }
                             }
                         )
-                        Card (
+                        Card(
                             modifier = Modifier
                                 .height(50.dp)
                                 .width(50.dp),
