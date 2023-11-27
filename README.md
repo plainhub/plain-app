@@ -90,6 +90,15 @@ The ultimate goal is to turn smartphones into personal data and knowledge manage
 
 ## FAQ
 
+### Doesn't work. Neither https nor http.
+
+1. Double check the IP address and port number.
+2. Your PC and mobile device must be in the same Wi-Fi network. 
+3. Try open the webpage on your mobile device see if it works. If it works, then it's a network issue.
+4. Try open the webpage on your PC using incognito mode see if it works. If it works, then it's a browser extension issue.
+5. Try open the webpage on your PC using another browser see if it works. If it works, then it's a browser issue.
+6. Try open the webpage on your PC using another PC see if it works. If it works, then it's a PC issue.
+
 ### Why can't I find Messages or Calls in the Social section on my webpage's Home tab?
 
 Google Play Store doesn't allow PlainApp to use SMS and Call Permissions. You can access these features on versions from F-droid and GitHub.
