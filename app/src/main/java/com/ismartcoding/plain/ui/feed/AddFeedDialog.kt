@@ -54,7 +54,7 @@ class AddFeedDialog() : BaseBottomSheetDialog<DialogAddFeedBinding>() {
                         withIO {
                             FeedHelper.addAsync {
                                 this.url = url
-                                this.name = syndFeed.title
+                                this.name = syndFeed.title ?: ""
                             }
                         }
                     FeedFetchWorker.oneTimeRequest(id)

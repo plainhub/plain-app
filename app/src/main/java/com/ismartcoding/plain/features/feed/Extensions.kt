@@ -7,11 +7,12 @@ import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.isOk
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.html2md.MDConverter
+import com.ismartcoding.lib.rss.DateParser
+import com.ismartcoding.lib.rss.model.RssItem
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.api.ApiResult
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.db.DFeedEntry
-import com.rometools.rome.feed.synd.SyndEntry
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -24,50 +25,39 @@ import net.dankito.readability4j.extended.util.RegExUtilExtended
 import net.dankito.readability4j.model.ReadabilityOptions
 import net.dankito.readability4j.processor.MetadataParser
 import java.io.File
+import java.time.format.DateTimeFormatter
 import java.util.*
 
-fun SyndEntry.toDFeedEntry(
+fun RssItem.toDFeedEntry(
     feedId: String,
     feedUrl: String,
 ): DFeedEntry {
     val item = DFeedEntry()
     item.rawId =
         CryptoHelper.sha1(
-            (feedId + "_" + (link ?: uri ?: title ?: UUID.randomUUID().toString())).toByteArray(),
+            (feedId + "_" + (link ?: title ?: UUID.randomUUID().toString())).toByteArray(),
         )
     item.feedId = feedId
     if (title != null) {
-        item.title = HtmlCompat.fromHtml(title, HtmlCompat.FROM_HTML_MODE_LEGACY).toString().replace("\n", " ").trim()
+        item.title = HtmlCompat.fromHtml(title!!, HtmlCompat.FROM_HTML_MODE_LEGACY).toString().replace("\n", " ").trim()
     } else {
         item.title = ""
     }
 
     val feedBaseUrl = HtmlUtils.getBaseUrl(feedUrl)
-    item.description = HtmlUtils.improveHtmlContent(contents.getOrNull(0)?.value ?: description?.value ?: "", feedBaseUrl)
+    item.description = HtmlUtils.improveHtmlContent(content ?: description ?: "", feedBaseUrl)
     item.description = MDConverter().convert(item.description)
-    item.url = link
+    item.url = link ?: ""
 
-    enclosures?.forEach {
-        if (it.type.contains("image")) {
-            item.image = it.url
+    item.image = image ?: ""
+
+    item.author = author?.ifEmpty { sourceName ?: "" } ?: ""
+
+    if (pubDate != null) {
+        val date = DateParser.parseDate(pubDate!!, Locale.US)
+        if (date != null && date.time < item.publishedAt.toEpochMilliseconds()) {
+            item.publishedAt = Instant.fromEpochMilliseconds(date.time)
         }
-    }
-
-    foreignMarkup?.forEach {
-        if (it.namespace?.prefix == "media" && it.name == "content") {
-            it.attributes.forEach { mc ->
-                if (mc.name == "url") {
-                    item.image = mc.value
-                }
-            }
-        }
-    }
-
-    item.author = author.ifEmpty { source?.title ?: "" }
-
-    val date = publishedDate ?: updatedDate
-    if (date != null && date.time < item.publishedAt.toEpochMilliseconds()) {
-        item.publishedAt = Instant.fromEpochMilliseconds(date.time)
     }
 
     return item

@@ -1,11 +1,16 @@
 package com.ismartcoding.plain.features.feed
 
+import com.ismartcoding.lib.helpers.AssetsHelper
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.opml.OpmlParser
 import com.ismartcoding.lib.opml.OpmlWriter
 import com.ismartcoding.lib.opml.entity.Body
 import com.ismartcoding.lib.opml.entity.Head
 import com.ismartcoding.lib.opml.entity.Opml
 import com.ismartcoding.lib.opml.entity.Outline
+import com.ismartcoding.lib.rss.RssParser
+import com.ismartcoding.lib.rss.model.RssChannel
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.db.AppDatabase
@@ -13,16 +18,13 @@ import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.FeedDao
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.workers.FeedFetchWorker
-import com.rometools.rome.feed.synd.SyndFeed
-import com.rometools.rome.io.SyndFeedInput
-import com.rometools.rome.io.XmlReader
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.utils.io.jvm.javaio.*
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpStatusCode
 import kotlinx.datetime.Clock
 import java.io.Reader
 import java.io.Writer
-import java.util.*
+import java.util.Date
 
 object FeedHelper {
     val feedDao: FeedDao by lazy {
@@ -127,9 +129,13 @@ object FeedHelper {
         writer.close()
     }
 
-    suspend fun fetchAsync(url: String): SyndFeed {
+    suspend fun fetchAsync(url: String): RssChannel {
         val r = HttpClientManager.httpClient().get(url)
-        val input = r.bodyAsChannel().toInputStream()
-        return SyndFeedInput().build(XmlReader(input))
+        if (r.status != HttpStatusCode.OK) {
+            throw Exception("HTTP ${r.status.value} ${r.status.description}")
+        }
+        val xmlString = r.bodyAsText()
+        val rssParser = RssParser()
+        return rssParser.parse(xmlString)
     }
 }

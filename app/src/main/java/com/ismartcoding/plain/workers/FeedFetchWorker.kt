@@ -79,7 +79,7 @@ class FeedFetchWorker(
         try {
             LogCat.d("Syncing feed: ${feed.id}, ${feed.name}, ${feed.url}")
             val syndFeed = FeedHelper.fetchAsync(feed.url)
-            val list = syndFeed.entries.map { it.toDFeedEntry(feed.id, feed.url) }
+            val list = syndFeed.items.map { it.toDFeedEntry(feed.id, feed.url) }
             val inserted = FeedEntryHelper.feedEntryDao.insertListIfNotExist(list)
             if (feed.fetchContent) {
                 inserted.chunked(4)
@@ -141,7 +141,7 @@ class FeedFetchWorker(
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 REPEAT_WORK_NAME,
-                ExistingPeriodicWorkPolicy.REPLACE,
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
                 request.build(),
             )
         }

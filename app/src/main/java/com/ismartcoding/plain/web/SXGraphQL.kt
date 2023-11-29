@@ -940,7 +940,7 @@ class SXGraphQL(val schema: Schema) {
                         val id =
                             FeedHelper.addAsync {
                                 this.url = url
-                                this.name = syndFeed.title
+                                this.name = syndFeed.title ?: ""
                             }
                         FeedFetchWorker.oneTimeRequest(id)
                         sendEvent(ActionEvent(ActionSourceType.FEED, ActionType.CREATED, setOf(id)))

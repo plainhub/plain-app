@@ -45,7 +45,7 @@ fun PIconButton(
                         modifier =
                             Modifier
                                 .size(8.dp)
-                                .offset(x = (-3).dp, y = 9.dp)
+                                .offset(x = (-1).dp, y = 0.dp)
                                 .clip(CircleShape),
                         containerColor = badgeColor,
                     )

@@ -125,7 +125,6 @@ class MainActivity : AppCompatActivity() {
         fixSystemBarsAnimation()
 
         instance = WeakReference(this)
-
         // https://stackoverflow.com/questions/51959944/sqliteblobtoobigexception-row-too-big-to-fit-into-cursorwindow-requiredpos-0-t
         try {
             val field = CursorWindow::class.java.getDeclaredField("sCursorWindowSize")

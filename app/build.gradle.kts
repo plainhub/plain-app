@@ -144,21 +144,21 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2023.10.01"))
 
     // https://github.com/google/accompanist/releases
-    implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("androidx.activity:activity-compose:1.8.1")
     implementation("androidx.compose.runtime:runtime")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.foundation:foundation-layout")
-    implementation("androidx.compose.material3:material3:1.2.0-alpha09")
+    implementation("androidx.compose.material3:material3:1.2.0-alpha11")
     implementation("androidx.compose.material:material-icons-extended")
 
 //    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha12")
 
     // https://developer.android.com/jetpack/androidx/releases/navigation
-    implementation("androidx.navigation:navigation-compose:2.7.4")
+    implementation("androidx.navigation:navigation-compose:2.7.5")
 
     releaseImplementation(platform("com.google.firebase:firebase-bom:32.2.3"))
-    releaseImplementation("com.google.firebase:firebase-crashlytics-ktx:18.4.3")
+    releaseImplementation("com.google.firebase:firebase-crashlytics-ktx:18.6.0")
 
     implementation("com.apollographql.apollo3:apollo-runtime:$apollo")
     implementation("com.apollographql.apollo3:apollo-normalized-cache:$apollo")
@@ -173,10 +173,10 @@ dependencies {
     implementation("com.github.bmoliveira:snake-yaml:v1.18-android")
 
     // CameraX
-    implementation("androidx.camera:camera-core:1.4.0-alpha01")
-    implementation("androidx.camera:camera-camera2:1.4.0-alpha01")
-    implementation("androidx.camera:camera-lifecycle:1.4.0-alpha01")
-    implementation("androidx.camera:camera-view:1.4.0-alpha01")
+    implementation("androidx.camera:camera-core:1.4.0-alpha02")
+    implementation("androidx.camera:camera-camera2:1.4.0-alpha02")
+    implementation("androidx.camera:camera-lifecycle:1.4.0-alpha02")
+    implementation("androidx.camera:camera-view:1.4.0-alpha02")
 
     implementation("io.ktor:ktor-server-core:$ktor")
     implementation("io.ktor:ktor-server-netty:$ktor")
@@ -204,8 +204,6 @@ dependencies {
     implementation("com.aallam.openai:openai-client:3.2.0")
 
     implementation("com.google.zxing:core:3.5.2")
-    // Feed
-    implementation("com.rometools:rome:2.1.0")
 
     implementation("androidx.work:work-runtime-ktx:2.8.1")
 
