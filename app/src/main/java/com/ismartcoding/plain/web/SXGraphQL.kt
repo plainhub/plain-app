@@ -750,9 +750,10 @@ class SXGraphQL(val schema: Schema) {
                     }
                 }
                 mutation("updateFeed") {
-                    resolver { id: ID, name: String ->
+                    resolver { id: ID, name: String, fetchContent: Boolean ->
                         FeedHelper.updateAsync(id.value) {
                             this.name = name
+                            this.fetchContent = fetchContent
                         }
                         FeedHelper.getById(id.value)?.toModel()
                     }
@@ -935,12 +936,13 @@ class SXGraphQL(val schema: Schema) {
                     }
                 }
                 mutation("createFeed") {
-                    resolver { url: String ->
+                    resolver { url: String, fetchContent: Boolean ->
                         val syndFeed = withIO { FeedHelper.fetchAsync(url) }
                         val id =
                             FeedHelper.addAsync {
                                 this.url = url
                                 this.name = syndFeed.title ?: ""
+                                this.fetchContent = fetchContent
                             }
                         FeedFetchWorker.oneTimeRequest(id)
                         sendEvent(ActionEvent(ActionSourceType.FEED, ActionType.CREATED, setOf(id)))
