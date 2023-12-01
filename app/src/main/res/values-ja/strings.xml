@@ -290,6 +290,7 @@
     <string name="feature_CALL_PHONE">Webが電話をかけることを許可</string>
     <string name="feature_READ_CONTACTS">Webが連絡先を読み取ることを許可</string>
     <string name="feature_WRITE_CONTACTS">Webが連絡先を記録することを許可</string>
+    <string name="feature_NOTIFICATION_LISTENER">ウェブに通知の読み取りを許可する</string>
     <string name="system_permission_granted">システムの許可が与えられました</string>
     <string name="system_permission_not_granted">システムの許可が与えられていません</string>
     <string name="open_permission_settings">許可設定を開く</string>

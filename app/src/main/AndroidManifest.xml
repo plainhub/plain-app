@@ -5,7 +5,6 @@
 
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <!--    <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />-->
-
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
@@ -142,6 +141,15 @@
             android:name=".services.ScreenMirrorService"
             android:exported="false"
             android:foregroundServiceType="mediaProjection" />
+
+        <service
+            android:name=".services.NotificationListenerService"
+            android:exported="true"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
 
         <receiver
             android:name=".receivers.PlugInControlReceiver"

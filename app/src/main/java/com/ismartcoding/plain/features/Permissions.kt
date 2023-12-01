@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.features
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -23,6 +24,7 @@ import com.ismartcoding.plain.data.preference.ApiPermissionsPreference
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.packageManager
+import com.ismartcoding.plain.services.NotificationListenerService
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Job
@@ -45,6 +47,7 @@ enum class Permission {
     READ_MEDIA_IMAGES,
     READ_MEDIA_VIDEOS,
     READ_MEDIA_AUDIO,
+    NOTIFICATION_LISTENER,
     NONE,
     ;
 
@@ -85,6 +88,13 @@ enum class Permission {
 
             this == SYSTEM_ALERT_WINDOW -> {
                 Settings.canDrawOverlays(context)
+            }
+
+            this == NOTIFICATION_LISTENER -> {
+                val componentName = ComponentName(context, NotificationListenerService::class.java)
+                val enabledListeners =
+                    Settings.Secure.getString(context.contentResolver, "enabled_notification_listeners")
+                return enabledListeners?.contains(componentName.flattenToString()) == true
             }
 
             else -> context.hasPermission(this.toSysPermission())
@@ -192,6 +202,15 @@ enum class Permission {
                     "ActivityNotFoundException: No Activity found to handle Intent act=android.settings.action.MANAGE_WRITE_SETTINGS",
                 )
             }
+        } else if (this == NOTIFICATION_LISTENER) {
+            val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+            if (intent.resolveActivity(packageManager) != null) {
+                intentLauncher?.launch(intent)
+            } else {
+                DialogHelper.showMessage(
+                    "ActivityNotFoundException: No Activity found to handle Intent act=android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS",
+                )
+            }
         } else if (this == SYSTEM_ALERT_WINDOW) {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}"))
             if (intent.resolveActivity(packageManager) != null) {
@@ -231,7 +250,7 @@ object Permissions {
         if (context.allowSensitivePermissions()) {
             permissions.addAll(listOf(Permission.READ_SMS, Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG))
         }
-        permissions.addAll(listOf(Permission.CALL_PHONE, Permission.SYSTEM_ALERT_WINDOW, Permission.NONE))
+        permissions.addAll(listOf(Permission.CALL_PHONE, Permission.NOTIFICATION_LISTENER, Permission.SYSTEM_ALERT_WINDOW,  Permission.NONE))
 
         return permissions.map { PermissionItem(it, it.can(context)) }
     }
@@ -266,6 +285,7 @@ object Permissions {
             Permission.WRITE_EXTERNAL_STORAGE,
             Permission.SYSTEM_ALERT_WINDOW,
             Permission.POST_NOTIFICATIONS,
+            Permission.NOTIFICATION_LISTENER,
         ).forEach { permission ->
             intentLauncherMap[permission] =
                 activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {

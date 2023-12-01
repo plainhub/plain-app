@@ -290,6 +290,7 @@
     <string name="feature_CALL_PHONE">Consenti effettuazione chiamate dal web</string>
     <string name="feature_READ_CONTACTS">Consenti lettura contatti dal web</string>
     <string name="feature_WRITE_CONTACTS">Consenti scrittura contatti dal web</string>
+    <string name="feature_NOTIFICATION_LISTENER">Consenti al sito web di leggere le notifiche</string>
     <string name="system_permission_granted">Permesso di sistema concessa</string>
     <string name="system_permission_not_granted">Permesso di sistema non concessa</string>
     <string name="open_permission_settings">Apri impostazioni permessi</string>

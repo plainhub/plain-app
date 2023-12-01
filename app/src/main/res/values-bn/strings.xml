@@ -290,6 +290,7 @@
     <string name="feature_CALL_PHONE">ওয়েবটিকে ফোন কল করতে অনুমতি দিন</string>
     <string name="feature_READ_CONTACTS">ওয়েবটিকে যোগাযোগ পড়তে অনুমতি দিন</string>
     <string name="feature_WRITE_CONTACTS">ওয়েবটিকে যোগাযোগ লিখতে অনুমতি দিন</string>
+    <string name="feature_NOTIFICATION_LISTENER">ওয়েবকে বিজ্ঞপ্তি পড়তে অনুমতি দিন</string>
     <string name="system_permission_granted">সিস্টেম অনুমতি দেওয়া হয়েছে</string>
     <string name="system_permission_not_granted">সিস্টেম অনুমতি দেওয়া হয়নি</string>
     <string name="open_permission_settings">অনুমতি সেটিংস খুলুন</string>

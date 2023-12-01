@@ -521,6 +521,11 @@ class SXGraphQL(val schema: Schema) {
                         }
                     }
                 }
+                query("notifications") {
+                    resolver { ->
+                        TempData.notifications.map { it.toModel() }
+                    }
+                }
                 query("feeds") {
                     resolver { ->
                         val items = FeedHelper.getAll()

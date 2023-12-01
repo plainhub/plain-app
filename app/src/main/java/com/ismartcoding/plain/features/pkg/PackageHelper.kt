@@ -4,14 +4,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
+import android.content.pm.Signature
 import android.net.Uri
+import android.util.Log
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.packageManager
 import kotlinx.datetime.Instant
 import java.io.File
-import android.content.pm.PackageManager
-import android.content.pm.Signature
 import javax.security.cert.X509Certificate
 
 object PackageHelper {
@@ -149,6 +150,12 @@ object PackageHelper {
         }
 
         return appLabelCache[key] ?: ""
+    }
+
+    fun getLabel(context: Context, packageName: String): String {
+        val pm = context.packageManager
+        val packageInfo = pm.getApplicationInfo(packageName, 0)
+        return getLabel(packageInfo)
     }
 
     private fun signatures(packageInfo: PackageInfo): MutableSet<Signature> {

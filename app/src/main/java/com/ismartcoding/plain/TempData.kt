@@ -1,5 +1,7 @@
 package com.ismartcoding.plain
 
+import com.ismartcoding.plain.data.DNotification
+
 object TempData {
     var webEnabled = false
     var demoMode = false
@@ -12,4 +14,5 @@ object TempData {
     var httpsPort: Int = 8443
     var urlToken = "" // use to encrypt or decrypt params in url
     var chatItemsMigrated = false
+    val notifications = mutableListOf<DNotification>()
 }

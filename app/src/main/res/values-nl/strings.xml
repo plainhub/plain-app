@@ -290,6 +290,7 @@
     <string name="feature_CALL_PHONE">Toestaan dat web een telefoongesprek voert</string>
     <string name="feature_READ_CONTACTS">Toestaan dat web contacten leest</string>
     <string name="feature_WRITE_CONTACTS">Toestaan dat web contacten bijhoudt</string>
+    <string name="feature_NOTIFICATION_LISTENER">Toestaan dat de website meldingen leest</string>
     <string name="system_permission_granted">Systeemtoestemming verleend</string>
     <string name="system_permission_not_granted">Systeemtoestemming niet verleend</string>
     <string name="open_permission_settings">Toestemmingsinstellingen openen</string>
