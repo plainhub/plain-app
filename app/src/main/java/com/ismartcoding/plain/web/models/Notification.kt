@@ -4,17 +4,18 @@ import com.ismartcoding.plain.data.DNotification
 import kotlinx.datetime.Instant
 
 data class Notification(
-    val id: String,
+    val id: ID,
     val onlyOnce: Boolean,
     val isClearable: Boolean,
+    val appId: String,
     val appName: String,
     val time: Instant,
     val silent: Boolean,
     val title: String,
-    val text: String,
+    val body: String,
     val actions: List<String>
 )
 
 fun DNotification.toModel(): Notification {
-    return Notification(id, onlyOnce, isClearable, appName, time, silent, title, text, actions)
+    return Notification(ID(id), onlyOnce, isClearable, appId, appName, time, silent, title, body, actions)
 }

@@ -6,8 +6,10 @@ import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.Signature
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.util.Log
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.packageManager
@@ -17,6 +19,8 @@ import javax.security.cert.X509Certificate
 
 object PackageHelper {
     private val appLabelCache: MutableMap<String, String> = HashMap()
+    private val appTypeCache: MutableMap<String, String> = HashMap()
+    private val appCertsCache: MutableMap<String, List<DCertificate>> = HashMap()
 
     fun getPackageStatuses(ids: List<String>): Map<String, Boolean> {
         val packages = packageManager.getInstalledPackages(0)
@@ -54,24 +58,32 @@ object PackageHelper {
         val applications = packageManager.getInstalledApplications(0).associateBy { it.packageName }
         packages.forEach { pkg ->
             val appInfo = applications[pkg.packageName] ?: return@forEach
-            val signatures = signatures(pkg)
-            val certs = mutableListOf<DCertificate>()
-            for (signature in signatures) {
-                val cert = X509Certificate.getInstance(signature.toByteArray())
-                certs.add(
-                    DCertificate(
-                        cert.issuerDN.name,
-                        cert.subjectDN.name,
-                        cert.serialNumber.toString(),
-                        Instant.fromEpochMilliseconds(cert.notBefore.time),
-                        Instant.fromEpochMilliseconds(cert.notAfter.time)
+            var certs = appCertsCache[pkg.packageName]
+            if (certs == null) {
+                certs = mutableListOf<DCertificate>()
+                val signatures = signatures(pkg)
+                for (signature in signatures) {
+                    val cert = X509Certificate.getInstance(signature.toByteArray())
+                    certs.add(
+                        DCertificate(
+                            cert.issuerDN.name,
+                            cert.subjectDN.name,
+                            cert.serialNumber.toString(),
+                            Instant.fromEpochMilliseconds(cert.notBefore.time),
+                            Instant.fromEpochMilliseconds(cert.notAfter.time)
+                        )
                     )
-                )
+                }
+                appCertsCache[pkg.packageName] = certs
             }
 
-            val file = File(appInfo.publicSourceDir)
-            val isSystemApp = appInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
-            val appType = if (isSystemApp) "system" else "user"
+            var appType = appTypeCache[pkg.packageName]
+            if (appType == null) {
+                val isSystemApp = appInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
+                appType = if (isSystemApp) "system" else "user"
+                appTypeCache[pkg.packageName] = appType
+            }
+
             if (type.isNotEmpty() && appType != type) {
                 return@forEach
             }
@@ -87,7 +99,7 @@ object PackageHelper {
                     appType,
                     pkg.versionName ?: "",
                     appInfo.sourceDir,
-                    file.length(),
+                    File(appInfo.publicSourceDir).length(),
                     certs,
                     Instant.fromEpochMilliseconds(pkg.firstInstallTime),
                     Instant.fromEpochMilliseconds(pkg.lastUpdateTime),
@@ -132,9 +144,14 @@ object PackageHelper {
                 if (t != null) {
                     val type = t.value
                     return packageManager.getInstalledPackages(0).count { app ->
-                        val packageInfo = packageManager.getApplicationInfo(app.packageName, 0)
-                        val isSystemApp = packageInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
-                        val appType = if (isSystemApp) "system" else "user"
+                        val key = app.packageName
+                        var appType = appTypeCache[key]
+                        if (appType == null) {
+                            val packageInfo = packageManager.getApplicationInfo(key, 0)
+                            val isSystemApp = packageInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
+                            appType = if (isSystemApp) "system" else "user"
+                            appTypeCache[key] = type
+                        }
                         appType == type
                     }
                 }
@@ -156,6 +173,26 @@ object PackageHelper {
         val pm = context.packageManager
         val packageInfo = pm.getApplicationInfo(packageName, 0)
         return getLabel(packageInfo)
+    }
+
+    private fun drawableToBitmap(drawable: Drawable): Bitmap {
+        val res = if (drawable.intrinsicWidth > 128 || drawable.intrinsicHeight > 128) {
+            Bitmap.createBitmap(96, 96, Bitmap.Config.ARGB_8888)
+        } else if (drawable.intrinsicWidth <= 64 || drawable.intrinsicHeight <= 64) {
+            Bitmap.createBitmap(96, 96, Bitmap.Config.ARGB_8888)
+        } else {
+            Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+        }
+        val canvas = Canvas(res)
+        drawable.setBounds(0, 0, res.width, res.height)
+        drawable.draw(canvas)
+        return res
+    }
+
+    fun getIcon(packageName: String): Bitmap {
+        val applicationInfo = packageManager.getApplicationInfo(packageName, 0)
+        val iconDrawable = packageManager.getApplicationIcon(applicationInfo)
+        return drawableToBitmap(iconDrawable)
     }
 
     private fun signatures(packageInfo: PackageInfo): MutableSet<Signature> {

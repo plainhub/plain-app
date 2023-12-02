@@ -1,12 +1,10 @@
 package com.ismartcoding.plain.services
 
 import android.app.Notification
-import android.content.Context
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import androidx.core.app.NotificationCompat
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.extensions.toDNotification
 
@@ -14,7 +12,7 @@ class NotificationListenerService : NotificationListenerService() {
     var isConnected = false
         private set
 
-    private fun isValidNotification(context: Context, statusBarNotification: StatusBarNotification): Boolean {
+    private fun isValidNotification(statusBarNotification: StatusBarNotification): Boolean {
         val notification = statusBarNotification.notification
         if (notification.flags and Notification.FLAG_FOREGROUND_SERVICE != 0 || notification.flags and Notification.FLAG_ONGOING_EVENT != 0 || notification.flags and Notification.FLAG_LOCAL_ONLY != 0 || notification.flags and NotificationCompat.FLAG_GROUP_SUMMARY != 0 //The notification that groups other notifications
         ) {
@@ -29,7 +27,7 @@ class NotificationListenerService : NotificationListenerService() {
             return false
         }
 
-        if (context.packageName == packageName) {
+        if (applicationContext.packageName == packageName) {
             // Don't send our own notifications
             return false
         }
@@ -38,9 +36,8 @@ class NotificationListenerService : NotificationListenerService() {
     }
 
     override fun onNotificationPosted(statusBarNotification: StatusBarNotification) {
-        val context = MainApp.instance
-        if (isValidNotification(context, statusBarNotification)) {
-            val n = statusBarNotification.toDNotification(context)
+        if (isValidNotification(statusBarNotification)) {
+            val n = statusBarNotification.toDNotification(applicationContext)
             if (!TempData.notifications.any { it.id == n.id }) {
                 TempData.notifications.add(n)
             }
@@ -48,8 +45,7 @@ class NotificationListenerService : NotificationListenerService() {
     }
 
     override fun onNotificationRemoved(statusBarNotification: StatusBarNotification) {
-        val context = MainApp.instance
-        if (isValidNotification(context, statusBarNotification)) {
+        if (isValidNotification(statusBarNotification)) {
             TempData.notifications.removeIf { it.id == statusBarNotification.key }
         }
     }
@@ -59,11 +55,10 @@ class NotificationListenerService : NotificationListenerService() {
         isConnected = true
         LogCat.d("NotificationListenerService: onListenerConnected")
         val notifications = activeNotifications
-        val context = MainApp.instance
         if (notifications != null) {
             for (notification in notifications) {
-                if (isValidNotification(context, notification)) {
-                    val n = notification.toDNotification(context)
+                if (isValidNotification(notification)) {
+                    val n = notification.toDNotification(applicationContext)
                     TempData.notifications.add(n)
                 }
             }

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.web
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import com.ismartcoding.lib.channel.sendEvent
@@ -87,6 +88,7 @@ import io.ktor.websocket.send
 import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URLEncoder
@@ -308,6 +310,14 @@ object HttpModule {
                         } else {
                             call.respond(HttpStatusCode.NotFound)
                         }
+                    } else if (path.startsWith("pkgicon://")) {
+                        val packageName = path.substring(10)
+                        val bitmap = PackageHelper.getIcon(packageName)
+                        val bytes = ByteArrayOutputStream().use {
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+                            it.toByteArray()
+                        }
+                        call.respond(bytes)
                     } else {
                         val file = File(path)
                         if (!file.exists()) {

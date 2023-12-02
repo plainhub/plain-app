@@ -3,6 +3,8 @@ package com.ismartcoding.lib.extensions
 import android.content.ContentResolver
 import android.os.Bundle
 import android.os.Parcelable
+import android.text.SpannableString
+import android.util.Log
 import com.ismartcoding.lib.data.SortBy
 import com.ismartcoding.lib.data.enums.SortDirection
 import com.ismartcoding.lib.isTPlus
@@ -40,6 +42,25 @@ fun Bundle.paging(
         putInt(ContentResolver.QUERY_ARG_OFFSET, offset)
     }
     putInt(ContentResolver.QUERY_ARG_LIMIT, limit)
+}
+
+fun Bundle.getString2(key: String): String {
+    return when (val extra = get(key)) {
+        null -> {
+            ""
+        }
+        is String -> {
+            extra
+        }
+
+        is SpannableString -> {
+            extra.toString()
+        }
+
+        else -> {
+            ""
+        }
+    }
 }
 
 inline fun <reified T : Parcelable> Bundle.parcelable(key: String): T? =

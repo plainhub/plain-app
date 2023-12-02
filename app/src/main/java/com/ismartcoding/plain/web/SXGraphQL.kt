@@ -523,6 +523,8 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("notifications") {
                     resolver { ->
+                        val context = MainApp.instance
+                        Permission.NOTIFICATION_LISTENER.checkAsync(context)
                         TempData.notifications.map { it.toModel() }
                     }
                 }
