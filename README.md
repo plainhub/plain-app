@@ -28,6 +28,7 @@ PlainApp is an open-source application that allows you to manage your phone thro
 - Apps: View your apps and download apk from phone.(web only)
 - Screen mirror: Mirror your phone on webpage.
 - Tools: Exchange rate, Sound meter.
+- Notifications: You can manage push notifications on the webpage.
 - And more features are planned for the future.
 
 PlainApp's minimalist design is intentional, so you can focus on what matters most: your valuable data.
@@ -110,6 +111,11 @@ The warning is because of a self-signed TLS certificate, and there's no direct w
 ### Why screen mirror is not working?
 
 Try use the latest version of Chrome.
+
+### Why can't I receive the desktop notifications?
+
+Grant Chrome Notification Permission on Windows/Mac/Linux
+Go to Settings > System > Notifications & actions and make sure the Notifications option is toggled on for Chrome.
 
 ### I don't believe this app.
 
