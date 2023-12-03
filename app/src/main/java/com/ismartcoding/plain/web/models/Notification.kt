@@ -2,7 +2,9 @@ package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.data.DNotification
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Notification(
     val id: ID,
     val onlyOnce: Boolean,

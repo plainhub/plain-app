@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.data
 
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
 data class DNotification(
     val id: String,

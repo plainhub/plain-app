@@ -53,6 +53,7 @@ import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.features.AIChatCreatedEvent
 import com.ismartcoding.plain.features.ActionEvent
+import com.ismartcoding.plain.features.CancelNotificationsEvent
 import com.ismartcoding.plain.features.ClearAudioPlaylistEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.QueryHelper
@@ -525,7 +526,7 @@ class SXGraphQL(val schema: Schema) {
                     resolver { ->
                         val context = MainApp.instance
                         Permission.NOTIFICATION_LISTENER.checkAsync(context)
-                        TempData.notifications.map { it.toModel() }
+                        TempData.notifications.sortedByDescending { it.time }.map { it.toModel() }
                     }
                 }
                 query("feeds") {
@@ -639,6 +640,12 @@ class SXGraphQL(val schema: Schema) {
                         ids.forEach {
                             PackageHelper.uninstall(MainActivity.instance.get()!!, it.value)
                         }
+                        true
+                    }
+                }
+                mutation("cancelNotifications") {
+                    resolver { ids: List<ID> ->
+                        sendEvent(CancelNotificationsEvent(ids.map { it.value }.toSet()))
                         true
                     }
                 }

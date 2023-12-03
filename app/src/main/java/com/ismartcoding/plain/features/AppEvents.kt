@@ -94,6 +94,8 @@ class ActionEvent(val source: ActionSourceType, val action: ActionType, val ids:
 
 class AudioActionEvent(val action: AudioAction)
 
+class CancelNotificationsEvent(val ids: Set<String>)
+
 class ClearAudioPlaylistEvent
 
 class FeedStatusEvent(val feedId: String, val status: FeedWorkerStatus)
