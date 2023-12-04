@@ -55,19 +55,11 @@ class NotificationListenerService : NotificationListenerService() {
             val old = TempData.notifications.find { it.id == n.id }
             if (old != null) {
                 TempData.notifications.remove(old)
-                sendEvent(
-                    WebSocketEvent(
-                        EventType.NOTIFICATION_DELETED,
-                        JsonHelper.jsonEncode(
-                            old.toModel()
-                        ),
-                    )
-                )
             }
             TempData.notifications.add(n)
             sendEvent(
                 WebSocketEvent(
-                    EventType.NOTIFICATION_CREATED,
+                    if (old == null) EventType.NOTIFICATION_CREATED else EventType.NOTIFICATION_UPDATED,
                     JsonHelper.jsonEncode(
                         n.toModel()
                     ),
