@@ -91,6 +91,7 @@ class NotificationListenerService : NotificationListenerService() {
         LogCat.d("NotificationListenerService: onListenerConnected")
         val notifications = activeNotifications
         if (notifications != null) {
+            TempData.notifications.clear()
             for (notification in notifications) {
                 if (isValidNotification(notification)) {
                     val n = notification.toDNotification(applicationContext)

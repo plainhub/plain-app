@@ -37,8 +37,7 @@ fun extractTonalPalettesFromUserWallpaper(): List<TonalPalettes> {
 
     if (!LocalView.current.isInEditMode) {
         val colors =
-            WallpaperManager.getInstance(LocalContext.current)
-                .getWallpaperColors(WallpaperManager.FLAG_SYSTEM)
+            WallpaperManager.getInstance(LocalContext.current)?.getWallpaperColors(WallpaperManager.FLAG_SYSTEM)
         val primary = colors?.primaryColor?.toArgb()
         val secondary = colors?.secondaryColor?.toArgb()
         val tertiary = colors?.tertiaryColor?.toArgb()

@@ -136,7 +136,7 @@ android {
 }
 
 dependencies {
-    val room = "2.6.0"
+    val room = "2.6.1"
     val apollo = "3.2.1"
     val kgraphql = "0.19.0"
     val ktor = "2.1.0" // don't upgrade, TLS handshake failed
@@ -149,7 +149,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.foundation:foundation-layout")
-    implementation("androidx.compose.material3:material3:1.2.0-alpha11")
+    implementation("androidx.compose.material3:material3:1.2.0-alpha12")
     implementation("androidx.compose.material:material-icons-extended")
 
 //    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha12")
@@ -205,7 +205,7 @@ dependencies {
 
     implementation("com.google.zxing:core:3.5.2")
 
-    implementation("androidx.work:work-runtime-ktx:2.8.1")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
 
     // https://developer.android.com/jetpack/androidx/releases/datastore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
