@@ -28,7 +28,10 @@ class NotificationListenerService : NotificationListenerService() {
 
     private fun isValidNotification(statusBarNotification: StatusBarNotification): Boolean {
         val notification = statusBarNotification.notification
-        if (notification.flags and Notification.FLAG_FOREGROUND_SERVICE != 0 || notification.flags and Notification.FLAG_ONGOING_EVENT != 0 || notification.flags and Notification.FLAG_LOCAL_ONLY != 0 || notification.flags and NotificationCompat.FLAG_GROUP_SUMMARY != 0 //The notification that groups other notifications
+        if (notification.flags and Notification.FLAG_FOREGROUND_SERVICE != 0
+            || notification.flags and Notification.FLAG_ONGOING_EVENT != 0
+            || notification.flags and Notification.FLAG_LOCAL_ONLY != 0
+            || notification.flags and NotificationCompat.FLAG_GROUP_SUMMARY != 0 //The notification that groups other notifications
         ) {
             //This is not a notification we want!
             return false

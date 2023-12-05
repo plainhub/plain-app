@@ -1,0 +1,40 @@
+name: Generated APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    env:
+      ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set version name as env variable
+        run: echo "version_name=$(echo $(grep versionName ./app/build.gradle.kts | awk -F '"' '{print $2}'))" >> $GITHUB_ENV
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu' # See 'Supported distributions' for available options
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+
+      - name: Build apk
+        run: bash build-apk.sh
+
+      - uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ env.version_name }}
+          name: Release ${{ env.version_name }}
+          draft: true
+          prerelease: false
+          bodyFile: /app/build/outputs/apk/free/release/app/Plain-${{ env.version_name }}.apk
