@@ -31,10 +31,15 @@ jobs:
       - name: Build apk
         run: bash build-apk.sh
 
+      # - uses: actions/upload-artifact@v3
+      #   with:
+      #     name: PlainApp-${{ env.version_name }}.apk
+      #     path: ./app/build/outputs/apk/free/release/PlainApp-${{ env.version_name }}.apk
+
       - uses: ncipollo/release-action@v1
         with:
           tag: v${{ env.version_name }}
           name: Release ${{ env.version_name }}
           draft: true
           prerelease: false
-          bodyFile: /app/build/outputs/apk/free/release/app/Plain-${{ env.version_name }}.apk
+          artifacts: ./app/build/outputs/apk/free/release/PlainApp-${{ env.version_name }}.apk

@@ -105,7 +105,11 @@ class NotificationListenerService : NotificationListenerService() {
 
         events.add(receiveEventHandler<CancelNotificationsEvent> { event ->
             event.ids.forEach {
-                cancelNotification(it)
+                try {
+                    cancelNotification(it)
+                } catch (ex: Exception) {
+                    LogCat.e(ex.toString())
+                }
             }
         })
     }
