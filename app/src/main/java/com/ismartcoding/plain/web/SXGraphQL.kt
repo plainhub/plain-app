@@ -603,7 +603,9 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("deviceInfo") {
                     resolver { ->
-                        DeviceInfoHelper.getDeviceInfo(MainApp.instance).toModel()
+                        val apiPermissions = ApiPermissionsPreference.getAsync(MainApp.instance)
+                        val readPhoneNumber = apiPermissions.contains(Permission.READ_PHONE_STATE.toString()) && apiPermissions.contains(Permission.READ_PHONE_NUMBERS.toString())
+                        DeviceInfoHelper.getDeviceInfo(MainApp.instance, readPhoneNumber).toModel()
                     }
                 }
                 query("battery") {

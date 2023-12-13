@@ -66,7 +66,7 @@ enum class Permission {
         return apiPermissions.contains(this.toString())
     }
 
-    fun toSysPermission(): String {
+    private fun toSysPermission(): String {
         return "android.permission.${this.name}"
     }
 

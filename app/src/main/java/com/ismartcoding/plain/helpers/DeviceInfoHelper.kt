@@ -20,7 +20,7 @@ import kotlinx.datetime.Instant
 
 object DeviceInfoHelper {
     @SuppressLint("HardwareIds")
-    fun getDeviceInfo(context: Context): DDeviceInfo {
+    fun getDeviceInfo(context: Context, readPhoneNumber: Boolean): DDeviceInfo {
         val deviceInfo = DDeviceInfo()
         deviceInfo.deviceName = PhoneHelper.getDeviceName(context)
         deviceInfo.releaseBuildVersion = Build.VERSION.RELEASE
@@ -51,7 +51,9 @@ object DeviceInfoHelper {
         deviceInfo.screenHeight = android.util.DisplayMetrics().heightPixels
         deviceInfo.screenWidth = android.util.DisplayMetrics().widthPixels
         deviceInfo.uptime = SystemClock.elapsedRealtime()
-        deviceInfo.phoneNumbers = getPhoneNumbers(context)
+        if (readPhoneNumber) {
+            deviceInfo.phoneNumbers = getPhoneNumbers(context)
+        }
         return deviceInfo
     }
 
