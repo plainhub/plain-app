@@ -291,6 +291,8 @@
     <string name="feature_READ_CONTACTS">वेब को संपर्क पढ़ने की अनुमति दें</string>
     <string name="feature_WRITE_CONTACTS">वेब को संपर्क लिखने की अनुमति दें</string>
     <string name="feature_NOTIFICATION_LISTENER">वेब को सूचनाएँ पढ़ने की अनुमति दें</string>
+    <string name="feature_READ_PHONE_STATE">वेब को फोन की स्थिति पढ़ने की अनुमति दें</string>
+    <string name="feature_READ_PHONE_NUMBERS">वेब को फोन नंबर पढ़ने की अनुमति दें</string>
     <string name="system_permission_granted">सिस्टम अनुमति प्रदान की गई है</string>
     <string name="system_permission_not_granted">सिस्टम अनुमति प्रदान नहीं की गई है</string>
     <string name="open_permission_settings">अनुमति सेटिंग्स खोलें</string>

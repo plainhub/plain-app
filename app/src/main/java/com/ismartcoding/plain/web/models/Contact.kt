@@ -17,10 +17,10 @@ fun DOrganization.toModel(): Organization {
     return Organization(company, title)
 }
 
-data class PhoneNumber(var value: String, var type: Int, var label: String, var normalizedNumber: String)
+data class ContactPhoneNumber(var value: String, var type: Int, var label: String, var normalizedNumber: String)
 
-fun DPhoneNumber.toModel(): PhoneNumber {
-    return PhoneNumber(value, type, label, normalizedNumber)
+fun DContactPhoneNumber.toModel(): ContactPhoneNumber {
+    return ContactPhoneNumber(value, type, label, normalizedNumber)
 }
 
 data class Contact(
@@ -32,7 +32,7 @@ data class Contact(
     var suffix: String,
     var nickname: String,
     var photoId: String,
-    var phoneNumbers: List<PhoneNumber>,
+    var phoneNumbers: List<ContactPhoneNumber>,
     var emails: List<ContentItem>,
     var addresses: List<ContentItem>,
     var events: List<ContentItem>,

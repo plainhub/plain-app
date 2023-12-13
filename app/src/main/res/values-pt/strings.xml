@@ -291,6 +291,8 @@
     <string name="feature_READ_CONTACTS">Permitir leitura de contatos pela web</string>
     <string name="feature_WRITE_CONTACTS">Permitir escrita de contatos pela web</string>
     <string name="feature_NOTIFICATION_LISTENER">Permitir que o site leia notificações</string>
+    <string name="feature_READ_PHONE_STATE">Permitir leitura do estado do telefone pela web</string>
+    <string name="feature_READ_PHONE_NUMBERS">Permitir leitura do número do telefone pela web</string>
     <string name="system_permission_granted">Permissão do sistema concedida</string>
     <string name="system_permission_not_granted">Permissão do sistema não concedida</string>
     <string name="open_permission_settings">Abrir configurações de permissão</string>

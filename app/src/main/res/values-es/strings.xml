@@ -291,6 +291,8 @@
     <string name="feature_READ_CONTACTS">Permitir que la web lea contactos</string>
     <string name="feature_WRITE_CONTACTS">Permitir que la web escriba contactos</string>
     <string name="feature_NOTIFICATION_LISTENER">Permitir que la web lea las notificaciones</string>
+    <string name="feature_READ_PHONE_STATE">Permitir que la web lea el estado del teléfono</string>
+    <string name="feature_READ_PHONE_NUMBERS">Permitir que la web lea los números de teléfono</string>
     <string name="system_permission_granted">Permiso del sistema concedido</string>
     <string name="system_permission_not_granted">Permiso del sistema no concedido</string>
     <string name="open_permission_settings">Abrir configuración de permisos</string>

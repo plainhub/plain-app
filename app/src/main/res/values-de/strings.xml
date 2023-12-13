@@ -291,6 +291,8 @@
     <string name="feature_READ_CONTACTS">Webzugriff auf Kontakte erlauben</string>
     <string name="feature_WRITE_CONTACTS">Webzugriff auf Kontakte schreiben erlauben</string>
     <string name="feature_NOTIFICATION_LISTENER">Erlaube der Webseite, Benachrichtigungen zu lesen</string>
+    <string name="feature_READ_PHONE_STATE">Webzugriff auf Telefonstatus erlauben</string>
+    <string name="feature_READ_PHONE_NUMBERS">Webzugriff auf Telefonnummern erlauben</string>
     <string name="system_permission_granted">Systemberechtigung erteilt</string>
     <string name="system_permission_not_granted">Systemberechtigung nicht erteilt</string>
     <string name="open_permission_settings">Berechtigungseinstellungen öffnen</string>

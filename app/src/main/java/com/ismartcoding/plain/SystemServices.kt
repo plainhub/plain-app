@@ -1,5 +1,6 @@
 package com.ismartcoding.plain
 
+import android.app.ActivityManager
 import android.app.usage.StorageStatsManager
 import android.content.ClipboardManager
 import android.content.ContentResolver
@@ -8,8 +9,11 @@ import android.media.projection.MediaProjectionManager
 import android.net.ConnectivityManager
 import android.net.nsd.NsdManager
 import android.net.wifi.WifiManager
+import android.os.BatteryManager
 import android.os.PowerManager
 import android.os.storage.StorageManager
+import android.telephony.SubscriptionManager
+import android.telephony.TelephonyManager
 import android.view.inputmethod.InputMethodManager
 import androidx.core.app.NotificationManagerCompat
 import com.ismartcoding.lib.extensions.getSystemServiceCompat
@@ -56,4 +60,20 @@ val mediaProjectionManager: MediaProjectionManager by lazy {
 
 val storageStatsManager: StorageStatsManager by lazy {
     MainApp.instance.getSystemServiceCompat(StorageStatsManager::class.java)
+}
+
+val activityManager: ActivityManager by lazy {
+    MainApp.instance.getSystemServiceCompat(ActivityManager::class.java)
+}
+
+val batteryManager: BatteryManager by lazy {
+    MainApp.instance.getSystemServiceCompat(android.os.BatteryManager::class.java)
+}
+
+val subscriptionManager: SubscriptionManager by lazy {
+    MainApp.instance.getSystemServiceCompat(SubscriptionManager::class.java)
+}
+
+val telephonyManager: TelephonyManager by lazy {
+    MainApp.instance.getSystemServiceCompat(TelephonyManager::class.java)
 }

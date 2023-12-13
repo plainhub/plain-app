@@ -17,7 +17,7 @@ PlainApp is an open-source application that allows you to manage your phone thro
 - User-friendly: PlainApp has a modern, customizable interface with multi-language support, light/dark theme options, and e-ink screen compatibility.
 - Desktop management: You can manage your phone from your desktop by visiting a self-hosted webpage wirelessly.
 - Contacts management: You can manage these features on the self-hosted webpage as well.
-- File management: Manage files, images, videos, and audio on the self-hosted webpage.
+- File management: Manage files(Internal storage, SD card, USB storage), images, videos, and audio on the self-hosted webpage.
 - Note-taking: Use PlainApp to manage your notes with a built-in Markdown editor.
 - RSS reader: Read articles in a clean UI.
 - TV casting: Cast your videos, images, and audio to your TV.
@@ -116,6 +116,10 @@ Try use the latest version of Chrome.
 
 Grant Chrome Notification Permission on Windows/Mac/Linux
 Go to Settings > System > Notifications & actions and make sure the Notifications option is toggled on for Chrome.
+
+### Context menu isn't working on web page. What should I do?
+
+If you're experiencing issues with the context menu, try opening the page in an Incognito window. Some Chrome extensions, such as the "Allow Right Click" extension, may interfere with the functionality. Disabling or removing such extensions might resolve the problem.
 
 ### I don't believe this app.
 

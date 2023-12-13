@@ -48,6 +48,8 @@ enum class Permission {
     READ_MEDIA_VIDEOS,
     READ_MEDIA_AUDIO,
     NOTIFICATION_LISTENER,
+    READ_PHONE_STATE,
+    READ_PHONE_NUMBERS,
     NONE,
     ;
 
@@ -250,7 +252,7 @@ object Permissions {
         if (context.allowSensitivePermissions()) {
             permissions.addAll(listOf(Permission.READ_SMS, Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG))
         }
-        permissions.addAll(listOf(Permission.CALL_PHONE, Permission.NOTIFICATION_LISTENER, Permission.SYSTEM_ALERT_WINDOW,  Permission.NONE))
+        permissions.addAll(listOf(Permission.CALL_PHONE, Permission.NOTIFICATION_LISTENER, Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS, Permission.SYSTEM_ALERT_WINDOW,  Permission.NONE))
 
         return permissions.map { PermissionItem(it, it.can(context)) }
     }
@@ -272,6 +274,8 @@ object Permissions {
             Permission.READ_MEDIA_IMAGES,
             Permission.READ_MEDIA_VIDEOS,
             Permission.READ_MEDIA_AUDIO,
+            Permission.READ_PHONE_STATE,
+            Permission.READ_PHONE_NUMBERS,
         ).forEach { permission ->
             map[permission] =
                 activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {

@@ -291,6 +291,8 @@
     <string name="feature_WRITE_CALL_LOG">允许网页修改通话记录</string>
     <string name="feature_CALL_PHONE">允许网页拨打电话</string>
     <string name="feature_NOTIFICATION_LISTENER">允许网站读取通知</string>
+    <string name="feature_READ_PHONE_STATE">允许网页读取设备信息</string>
+    <string name="feature_READ_PHONE_NUMBERS">允许网页读取电话号码</string>
     <string name="system_permission_granted">已获取系统权限</string>
     <string name="system_permission_not_granted">未获取系统权限</string>
     <string name="open_permission_settings">打开系统权限设置</string>

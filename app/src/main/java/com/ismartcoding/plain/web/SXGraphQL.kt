@@ -82,9 +82,11 @@ import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.features.tag.TagRelationStub
 import com.ismartcoding.plain.features.video.VideoHelper
 import com.ismartcoding.plain.helpers.AppHelper
+import com.ismartcoding.plain.helpers.DeviceInfoHelper
 import com.ismartcoding.plain.helpers.ExchangeHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.TempHelper
+import com.ismartcoding.plain.receivers.BatteryReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.MainActivity
@@ -597,6 +599,16 @@ class SXGraphQL(val schema: Schema) {
                             ExchangeHelper.getRates()
                         }
                         UIDataCache.current().latestExchangeRates?.toModel()
+                    }
+                }
+                query("deviceInfo") {
+                    resolver { ->
+                        DeviceInfoHelper.getDeviceInfo(MainApp.instance).toModel()
+                    }
+                }
+                query("battery") {
+                    resolver { ->
+                        BatteryReceiver.get(MainApp.instance).toModel()
                     }
                 }
                 query("app") {

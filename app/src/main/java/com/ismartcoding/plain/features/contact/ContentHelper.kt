@@ -15,12 +15,12 @@ data class DContentItem(var value: String, var type: Int, var label: String)
 
 data class DOrganization(var company: String, var title: String)
 
-data class DPhoneNumber(var value: String, var type: Int, var label: String, var normalizedNumber: String)
+data class DContactPhoneNumber(var value: String, var type: Int, var label: String, var normalizedNumber: String)
 
 data class Content(
     val events: MutableList<DContentItem> = ArrayList(),
     val websites: MutableList<DContentItem> = ArrayList(),
-    val phoneNumbers: MutableList<DPhoneNumber> = ArrayList(),
+    val phoneNumbers: MutableList<DContactPhoneNumber> = ArrayList(),
     val emails: MutableList<DContentItem> = ArrayList(),
     val addresses: MutableList<DContentItem> = ArrayList(),
     val nicknames: MutableList<String> = ArrayList(),
@@ -76,7 +76,7 @@ object ContentHelper {
                     val normalizedNumber = cursor.getStringValue(ContactsContract.CommonDataKinds.Phone.NORMALIZED_NUMBER, cache)
                     val type = cursor.getIntValue(ContactsContract.CommonDataKinds.Phone.TYPE, cache)
                     val label = cursor.getStringValue(ContactsContract.CommonDataKinds.Phone.LABEL, cache)
-                    map[id]?.phoneNumbers?.add(DPhoneNumber(number, type, label, normalizedNumber))
+                    map[id]?.phoneNumbers?.add(DContactPhoneNumber(number, type, label, normalizedNumber))
                 }
                 ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE -> {
                     val url = cursor.getStringValue(ContactsContract.CommonDataKinds.Website.URL, cache)

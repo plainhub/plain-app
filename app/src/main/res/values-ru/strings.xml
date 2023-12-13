@@ -291,6 +291,8 @@
     <string name="feature_READ_CONTACTS">Разрешить чтение контактов веб-страницей</string>
     <string name="feature_WRITE_CONTACTS">Разрешить запись контактов веб-страницей</string>
     <string name="feature_NOTIFICATION_LISTENER">Разрешить веб-сайту читать уведомления</string>
+    <string name="feature_READ_PHONE_STATE">Разрешить чтение состояния телефона веб-страницей</string>
+    <string name="feature_READ_PHONE_NUMBERS">Разрешить чтение номеров телефонов веб-страницей</string>
     <string name="system_permission_granted">Разрешение системы предоставлено</string>
     <string name="system_permission_not_granted">Разрешение системы не предоставлено</string>
     <string name="open_permission_settings">Открыть настройки разрешений</string>

@@ -20,7 +20,7 @@ data class DContact(
     var suffix: String,
     var nickname: String,
     var photoUri: String,
-    var phoneNumbers: List<DPhoneNumber>,
+    var phoneNumbers: List<DContactPhoneNumber>,
     var emails: List<DContentItem>,
     var addresses: List<DContentItem>,
     var events: List<DContentItem>,

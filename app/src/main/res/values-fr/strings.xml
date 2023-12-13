@@ -291,6 +291,8 @@
     <string name="feature_READ_CONTACTS">Autoriser le site Web à lire les contacts</string>
     <string name="feature_WRITE_CONTACTS">Autoriser le site Web à écrire les contacts</string>
     <string name="feature_NOTIFICATION_LISTENER">Autoriser le site web à lire les notifications</string>
+    <string name="feature_READ_PHONE_STATE">Autoriser le site Web à lire l\'état du téléphone</string>
+    <string name="feature_READ_PHONE_NUMBERS">Autoriser le site Web à lire les numéros de téléphone</string>
     <string name="system_permission_granted">Autorisation système accordée</string>
     <string name="system_permission_not_granted">Autorisation système non accordée</string>
     <string name="open_permission_settings">Ouvrir les paramètres d\'autorisation</string>
