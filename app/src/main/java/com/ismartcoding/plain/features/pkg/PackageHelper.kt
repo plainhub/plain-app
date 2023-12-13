@@ -163,7 +163,12 @@ object PackageHelper {
     private fun getLabel(packageInfo: ApplicationInfo): String {
         val key = packageInfo.packageName
         if (!appLabelCache.containsKey(key)) {
-            appLabelCache[key] = packageManager.getApplicationLabel(packageInfo).toString()
+            try {
+                appLabelCache[key] = packageManager.getApplicationLabel(packageInfo).toString()
+            } catch (ex: Exception) {
+                appLabelCache[key] = key
+                LogCat.d(ex.toString())
+            }
         }
 
         return appLabelCache[key] ?: ""
