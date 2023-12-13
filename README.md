@@ -29,6 +29,7 @@ PlainApp is an open-source application that allows you to manage your phone thro
 - Screen mirror: Mirror your phone on webpage.
 - Tools: Exchange rate, Sound meter.
 - Notifications: You can manage push notifications on the webpage.
+- PWA support
 - And more features are planned for the future.
 
 PlainApp's minimalist design is intentional, so you can focus on what matters most: your valuable data.
@@ -120,6 +121,18 @@ Go to Settings > System > Notifications & actions and make sure the Notification
 ### Context menu isn't working on web page. What should I do?
 
 If you're experiencing issues with the context menu, try opening the page in an Incognito window. Some Chrome extensions, such as the "Allow Right Click" extension, may interfere with the functionality. Disabling or removing such extensions might resolve the problem.
+
+### Why don't I see PWA install icon?
+
+As the webpage is using self-signed certificate, you need to do extra steps to install PWA. Check this article https://mswjs.io/docs/recipes/using-local-https/
+
+Here is the example for Chrome / Brave
+1. Open chrome://flags (or brave://flags if using Brave);
+2. Search for `unsafely-treat-insecure-origin-as-secure` flag in the list;
+3. Select the “Enabled” option next to the flag.
+4. Enter your URL into the field. e.g. https://10.11.1.128:8443
+
+<img src="assets/chrome-pwa.png" width="600"/>
 
 ### I don't believe this app.
 

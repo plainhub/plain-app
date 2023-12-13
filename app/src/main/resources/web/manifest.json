@@ -1,0 +1,62 @@
+{
+    "name": "PlainApp",
+    "short_name": "PlainApp",
+    "start_url": "/",
+    "display": "standalone",
+    "icons": [
+        {
+            "sizes": "114x114",
+            "src": "/icons/logo-114.png"
+        },
+        {
+            "sizes": "120x120",
+            "src": "/icons/logo-120.png"
+        },
+        {
+            "sizes": "144x144",
+            "src": "/icons/logo-144.png"
+        },
+        {
+            "sizes": "152x152",
+            "src": "/icons/logo-152.png"
+        },
+        {
+            "sizes": "180x180",
+            "src": "/icons/logo-180.png"
+        },
+        {
+            "sizes": "57x57",
+            "src": "/icons/logo-57.png"
+        },
+        {
+            "sizes": "60x60",
+            "src": "/icons/logo-60.png"
+        },
+        {
+            "sizes": "72x72",
+            "src": "/icons/logo-72.png"
+        },
+        {
+            "sizes": "76x76",
+            "src": "/icons/logo-76.png"
+        },
+        {
+            "src": "/icons/logo-192.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "/icons/logo-512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ],
+    "prefer_related_applications": true,
+    "related_applications": [
+        {
+            "platform": "play",
+            "url": "https://play.google.com/store/apps/details?id=com.ismartcoding.plain",
+            "id": "com.ismartcoding.plain"
+        }
+    ]
+}

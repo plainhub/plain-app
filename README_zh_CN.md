@@ -121,6 +121,18 @@ Google Play商店中不允许该应用使用短信和通话权限。您可以在
 
 如果您在使用上下文菜单时遇到问题，请尝试在隐身窗口中打开页面。某些 Chrome 扩展，例如“Allow Right Click”扩展，可能会影响此功能。禁用或移除这些扩展可能会解决问题。
 
+### 为什么我无法看到网页地址栏的 PWA 安装按钮？
+
+由于网页使用自签名证书，您需要执行额外的步骤来安装 PWA。请查看这篇文章 https://mswjs.io/docs/recipes/using-local-https/
+
+以下是 Chrome / Brave 的示例：
+1. 打开 chrome://flags（或者如果使用 Brave 则是 brave://flags）；
+2. 在列表中搜索 `unsafely-treat-insecure-origin-as-secure` 标志；
+3. 选择该标志旁边的“启用”选项。
+4. 将您的地址输入到字段中。比如输入https://10.11.1.128:8443
+
+<img src="assets/chrome-pwa.png" width="400"/>
+
 ### 我不相信这个应用程序。
 
 这是一个开源应用程序。如果你有疑虑，你可以选择构建自己的版本，或者选择不使用它。
