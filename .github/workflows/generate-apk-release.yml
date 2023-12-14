@@ -35,6 +35,7 @@ jobs:
         with:
           tag: v${{ env.version_name }}
           name: Release ${{ env.version_name }}
+          body: "## What's Changed"
           draft: true
           prerelease: false
           artifacts: ./app/build/outputs/apk/free/release/PlainApp-${{ env.version_name }}.apk
