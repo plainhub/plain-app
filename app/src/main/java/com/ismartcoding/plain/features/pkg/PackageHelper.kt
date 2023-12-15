@@ -175,9 +175,15 @@ object PackageHelper {
     }
 
     fun getLabel(context: Context, packageName: String): String {
-        val pm = context.packageManager
-        val packageInfo = pm.getApplicationInfo(packageName, 0)
-        return getLabel(packageInfo)
+        try {
+            val pm = context.packageManager
+            val applicationInfo = pm.getApplicationInfo(packageName, 0)
+            return getLabel(applicationInfo)
+        } catch (ex: Exception) {
+            LogCat.d(ex.toString())
+        }
+
+        return ""
     }
 
     private fun drawableToBitmap(drawable: Drawable): Bitmap {
