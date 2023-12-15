@@ -29,7 +29,8 @@ PlainApp is an open-source application that allows you to manage your phone thro
 - Screen mirror: Mirror your phone on webpage.
 - Tools: Exchange rate, Sound meter.
 - Notifications: You can manage push notifications on the webpage.
-- PWA support
+- Device info: You can view your device info on the webpage.
+- PWA support: You can add webpage to your home screen and experience the convenience of using the webpage like a desktop app.
 - And more features are planned for the future.
 
 PlainApp's minimalist design is intentional, so you can focus on what matters most: your valuable data.
@@ -133,6 +134,7 @@ Here is the example for Chrome / Brave
 4. Enter your URL into the field. e.g. https://10.11.1.128:8443
 
 <img src="assets/chrome-pwa.png" width="600"/>
+<img src="assets/chrome-pwa-address-bar.png" width="600"/>
 
 ### I don't believe this app.
 
