@@ -4,22 +4,17 @@ import android.app.Notification
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import androidx.core.app.NotificationCompat
-import androidx.lifecycle.lifecycleScope
-import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.extensions.toDNotification
-import com.ismartcoding.plain.features.AudioActionEvent
 import com.ismartcoding.plain.features.CancelNotificationsEvent
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 
 class NotificationListenerService : NotificationListenerService() {
     private val events = mutableListOf<Job>()
