@@ -285,11 +285,11 @@ fun WebConsolePage(
                             showMore = permission == Permission.SYSTEM_ALERT_WINDOW,
                             onClick = {
                                 scope.launch {
-                                    val enable = withIO { !permission.isEnabledAsync(context) }
-                                    withIO { ApiPermissionsPreference.putAsync(context, permission, enable) }
                                     if (permission == Permission.SYSTEM_ALERT_WINDOW) {
                                         sendEvent(RequestPermissionEvent(Permission.SYSTEM_ALERT_WINDOW))
                                     } else {
+                                        val enable = withIO { !permission.isEnabledAsync(context) }
+                                        withIO { ApiPermissionsPreference.putAsync(context, permission, enable) }
                                         if (enable) {
                                             if (m.granted) {
                                                 return@launch
@@ -303,9 +303,7 @@ fun WebConsolePage(
                             if (permission != Permission.SYSTEM_ALERT_WINDOW) {
                                 PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
                                     scope.launch {
-                                        withIO {
-                                            ApiPermissionsPreference.putAsync(context, permission, enable)
-                                        }
+                                        withIO { ApiPermissionsPreference.putAsync(context, permission, enable) }
                                         if (enable) {
                                             if (m.granted) {
                                                 return@launch

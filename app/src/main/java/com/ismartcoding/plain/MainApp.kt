@@ -1,6 +1,7 @@
 package com.ismartcoding.plain
 
 import android.app.Application
+import android.content.Intent
 import android.os.Build
 import coil.ImageLoader
 import coil.ImageLoaderFactory
@@ -32,6 +33,7 @@ import com.ismartcoding.plain.data.preference.dataStore
 import com.ismartcoding.plain.features.AppEvents
 import com.ismartcoding.plain.features.bluetooth.BluetoothEvents
 import com.ismartcoding.plain.features.pkg.PackageHelper
+import com.ismartcoding.plain.services.NotificationListenerMonitorService
 import com.ismartcoding.plain.ui.helpers.PageHelper
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
@@ -87,9 +89,8 @@ class MainApp : Application(), ImageLoaderFactory {
         instance = this
 
         LogCat.addLogAdapter(DiskLogAdapter(DiskLogFormatStrategy.getInstance(this)))
-
         BRV.modelId = BR.m
-
+        startService(Intent(this, NotificationListenerMonitorService::class.java))
         PageHelper.init()
 
         BluetoothEvents.register()
