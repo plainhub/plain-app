@@ -502,6 +502,7 @@ object HttpModule {
                 val q = call.request.queryParameters
                 val clientId = q["cid"] ?: ""
                 if (clientId.isEmpty()) {
+                    LogCat.e("ws: `cid` is missing")
                     close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "`cid` is missing"))
                     return@webSocket
                 }
@@ -531,6 +532,7 @@ object HttpModule {
                                             }
                                         }
                                     } else {
+                                        LogCat.e("ws: invalid_password")
                                         close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "invalid_password"))
                                     }
                                 } else {
@@ -538,12 +540,14 @@ object HttpModule {
                                     if (token != null) {
                                         val decryptedBytes = CryptoHelper.aesDecrypt(token, frame.readBytes())
                                         if (decryptedBytes != null) {
-                                            LogCat.d("add session ${session.id}, ts: ${decryptedBytes.decodeToString()}")
+                                            LogCat.d("ws: add session ${session.id}, ts: ${decryptedBytes.decodeToString()}")
                                             HttpServerManager.wsSessions.add(session)
                                         } else {
+                                            LogCat.d("ws: invalid_request")
                                             close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "invalid_request"))
                                         }
                                     } else {
+                                        LogCat.d("ws: invalid_request")
                                         close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "invalid_request"))
                                     }
                                 }
@@ -552,9 +556,10 @@ object HttpModule {
                             else -> {}
                         }
                     }
-                } catch (e: Exception) {
+                } catch (ex: Exception) {
+                    LogCat.e("ws: $ex")
                 } finally {
-                    LogCat.d("remove session ${session.id}")
+                    LogCat.d("ws: remove session ${session.id}")
                     HttpServerManager.wsSessions.removeIf { it.id == session.id }
                 }
             }

@@ -63,11 +63,11 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
     api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-    api("com.google.android.material:material:1.11.0-alpha03")
+    api("com.google.android.material:material:1.12.0-alpha01")
     api("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     api("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
-    api("androidx.fragment:fragment-ktx:1.6.1")
+    api("androidx.fragment:fragment-ktx:1.6.2")
     api("androidx.appcompat:appcompat:1.6.1")
     api("androidx.core:core-ktx:1.12.0")
     api("androidx.transition:transition:1.4.1")

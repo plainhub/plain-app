@@ -171,11 +171,9 @@ object HttpServerManager {
                 }, "port", HttpServerManager.portsInUse.joinToString(", ")
             )
         } else if (httpServerError.isNotEmpty()) {
-            httpServerError
+            LocaleHelper.getString(R.string.http_server_failed) + " ($httpServerError)"
         } else if (stoppedByUser) {
             LocaleHelper.getString(R.string.http_server_stopped)
-        } else if (httpServer == null) {
-            LocaleHelper.getString(R.string.http_server_failed)
         } else {
             ""
         }
