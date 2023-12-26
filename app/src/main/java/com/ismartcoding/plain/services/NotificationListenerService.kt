@@ -87,26 +87,30 @@ class NotificationListenerService : NotificationListenerService() {
         super.onListenerConnected()
         isConnected = true
         LogCat.d("NotificationListenerService: onListenerConnected")
-        val notifications = activeNotifications
-        if (notifications != null) {
-            TempData.notifications.clear()
-            for (notification in notifications) {
-                if (isValidNotification(notification)) {
-                    val n = notification.toDNotification(applicationContext)
-                    TempData.notifications.add(n)
+        try {
+            val notifications = activeNotifications
+            if (notifications != null) {
+                TempData.notifications.clear()
+                for (notification in notifications) {
+                    if (isValidNotification(notification)) {
+                        val n = notification.toDNotification(applicationContext)
+                        TempData.notifications.add(n)
+                    }
                 }
             }
-        }
 
-        events.add(receiveEventHandler<CancelNotificationsEvent> { event ->
-            event.ids.forEach {
-                try {
-                    cancelNotification(it)
-                } catch (ex: Exception) {
-                    LogCat.e(ex.toString())
+            events.add(receiveEventHandler<CancelNotificationsEvent> { event ->
+                event.ids.forEach {
+                    try {
+                        cancelNotification(it)
+                    } catch (ex: Exception) {
+                        LogCat.e(ex.toString())
+                    }
                 }
-            }
-        })
+            })
+        } catch (ex: Exception) {
+            LogCat.e(ex.toString())
+        }
     }
 
     override fun onListenerDisconnected() {
