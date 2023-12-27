@@ -61,12 +61,8 @@ object DeviceInfoHelper {
     fun getPhoneNumbers(context: Context): List<DPhoneNumber> {
         if (Permission.READ_PHONE_STATE.can(context) && Permission.READ_PHONE_NUMBERS.can(context)) {
             val sims = mutableListOf<DPhoneNumber>()
-            val tm = telephonyManager
-            val defaultId = SubscriptionManager.getDefaultSubscriptionId()
             getActiveSimCards(context).forEach {
-                if (it.subscriptionId == defaultId) {
-                    sims.add(DPhoneNumber(it.subscriptionId, it.displayName.toString(), tm.line1Number))
-                }
+                sims.add(DPhoneNumber(it.subscriptionId, it.displayName.toString(), it.number))
             }
             return sims
         }
