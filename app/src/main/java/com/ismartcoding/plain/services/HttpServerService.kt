@@ -1,8 +1,10 @@
 package com.ismartcoding.plain.services
 
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.coroutineScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.PortHelper
@@ -16,13 +18,10 @@ import com.ismartcoding.plain.features.StartHttpServerErrorEvent
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.web.HttpServerManager
 import io.ktor.server.application.ApplicationStopPreparing
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class HttpServerService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
-        instance = this
         NotificationHelper.ensureDefaultChannel()
         val notification =
             NotificationHelper.createServiceNotification(
@@ -30,12 +29,26 @@ class HttpServerService : LifecycleService() {
                 "${BuildConfig.APPLICATION_ID}.action.stop_http_server",
                 getString(R.string.api_service_is_running),
             )
+        val id = NotificationHelper.generateId()
         if (isUPlus()) {
-            startForeground(1, notification, FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+            startForeground(id, notification, FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
         } else {
-            startForeground(1, notification)
+            startForeground(id, notification)
         }
-        lifecycle.coroutineScope.launch(Dispatchers.IO) {
+
+        lifecycle.addObserver(object : LifecycleEventObserver {
+            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+                when (event) {
+                    Lifecycle.Event.ON_START -> startHttpServer()
+                    Lifecycle.Event.ON_STOP -> stopHttpServer()
+                    else -> Unit
+                }
+            }
+        })
+    }
+
+    private fun startHttpServer() {
+        coIO {
             try {
                 if (HttpServerManager.httpServer == null) {
                     HttpServerManager.portsInUse.clear()
@@ -60,9 +73,7 @@ class HttpServerService : LifecycleService() {
         }
     }
 
-    fun stop() {
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        stopSelf()
+    private fun stopHttpServer() {
         coIO {
             try {
                 HttpServerManager.httpServer?.let { h ->
@@ -75,9 +86,5 @@ class HttpServerService : LifecycleService() {
                 ex.printStackTrace()
             }
         }
-    }
-
-    companion object {
-        var instance: HttpServerService? = null
     }
 }

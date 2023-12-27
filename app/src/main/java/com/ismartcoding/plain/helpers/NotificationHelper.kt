@@ -39,6 +39,10 @@ object NotificationHelper {
         }
     }
 
+    fun generateId(): Int {
+        return (System.currentTimeMillis() % Int.MAX_VALUE).toInt()
+    }
+
     fun ensureDefaultChannel() {
         val notificationManager = MainApp.instance.notificationManager
         if (notificationManager.getNotificationChannel(Constants.NOTIFICATION_CHANNEL_ID) == null) {
