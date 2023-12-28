@@ -9,6 +9,7 @@ import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
 import com.ismartcoding.lib.helpers.PhoneHelper
 import com.ismartcoding.lib.isQPlus
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.activityManager
 import com.ismartcoding.plain.data.DDeviceInfo
 import com.ismartcoding.plain.features.Permission
@@ -61,8 +62,16 @@ object DeviceInfoHelper {
     fun getPhoneNumbers(context: Context): List<DPhoneNumber> {
         if (Permission.READ_PHONE_STATE.can(context) && Permission.READ_PHONE_NUMBERS.can(context)) {
             val sims = mutableListOf<DPhoneNumber>()
-            getActiveSimCards(context).forEach {
-                sims.add(DPhoneNumber(it.subscriptionId, it.displayName.toString(), it.number))
+            try {
+                val tm = telephonyManager
+                val defaultId = SubscriptionManager.getDefaultSubscriptionId()
+                getActiveSimCards(context).forEach {
+                    if (it.subscriptionId == defaultId) {
+                        sims.add(DPhoneNumber(it.subscriptionId, it.displayName.toString(), tm.line1Number))
+                    }
+                }
+            } catch (ex: Exception) {
+                LogCat.e(ex.toString())
             }
             return sims
         }
