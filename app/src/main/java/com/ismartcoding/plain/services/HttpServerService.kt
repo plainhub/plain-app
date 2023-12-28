@@ -77,9 +77,10 @@ class HttpServerService : LifecycleService() {
         coIO {
             try {
                 HttpServerManager.httpServer?.let { h ->
-                    val environment = h.environment
-                    environment.monitor.raise(ApplicationStopPreparing, environment)
-                    environment.stop()
+                    val application = h.application
+                    val environment = application.environment
+                    application.monitor.raise(ApplicationStopPreparing, environment)
+                    application.dispose()
                 }
                 HttpServerManager.httpServer = null
             } catch (ex: Exception) {

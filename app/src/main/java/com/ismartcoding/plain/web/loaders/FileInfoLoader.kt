@@ -17,7 +17,6 @@ object FileInfoLoader {
         id: String,
         path: String,
     ): ImageFileInfo {
-        val file = File(path)
         val tags = if (id.isNotEmpty()) TagsLoader.load(id, DataType.IMAGE) else listOf()
         val exifInterface = ExifInterface(path)
         val latLong = exifInterface.latLong

@@ -377,7 +377,12 @@ class SXGraphQL(val schema: Schema) {
                     }
                     resolver { offset: Int, limit: Int, query: String ->
                         Permission.READ_CONTACTS.checkAsync(MainApp.instance)
-                        ContactHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
+                        try {
+                            ContactHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
+                        } catch (ex: Exception) {
+                            LogCat.e(ex)
+                            emptyList()
+                        }
                     }
                     type<Contact> {
                         dataProperty("tags") {
@@ -1269,7 +1274,7 @@ class SXGraphQL(val schema: Schema) {
                 }
             }
 
-            pipeline.pluginOrNull(Routing)?.apply(routing) ?: pipeline.install(Routing, routing)
+            pipeline.pluginOrNull(Routing)?.apply(routing)
 
             pipeline.intercept(ApplicationCallPipeline.Monitoring) {
                 try {

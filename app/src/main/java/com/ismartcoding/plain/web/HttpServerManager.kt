@@ -2,7 +2,6 @@ package com.ismartcoding.plain.web
 
 import android.content.Context
 import android.util.Base64
-import androidx.compose.ui.res.stringResource
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JksHelper
@@ -17,7 +16,8 @@ import com.ismartcoding.plain.db.SessionClientTsUpdate
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.web.websocket.WebSocketSession
-import io.ktor.server.engine.applicationEngineEnvironment
+import io.ktor.server.engine.EmbeddedServer
+import io.ktor.server.engine.applicationEnvironment
 import io.ktor.server.engine.connector
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.engine.sslConnector
@@ -43,7 +43,7 @@ object HttpServerManager {
     val clientRequestTs = mutableMapOf<String, Long>()
     var httpServerError: String = ""
     val portsInUse = mutableSetOf<Int>()
-    var httpServer: NettyApplicationEngine? = null
+    var httpServer: EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration>? = null
     var stoppedByUser = false
     val httpsPorts = setOf(8043, 8143, 8243, 8343, 8443, 8543, 8643, 8743, 8843, 8943)
     val httpPorts = setOf(8080, 8180, 8280, 8380, 8480, 8580, 8680, 8780, 8880, 8980)
@@ -85,27 +85,28 @@ object HttpServerManager {
         }
     }
 
-    suspend fun createHttpServer(context: Context): NettyApplicationEngine {
+    suspend fun createHttpServer(context: Context): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
         val password = TempData.keyStorePassword.toCharArray()
         val httpPort = TempData.httpPort
         val httpsPort = TempData.httpsPort
-        val environment =
-            applicationEngineEnvironment {
-                log = LoggerFactory.getLogger("ktor.application")
-                connector {
-                    port = httpPort
-                }
-                sslConnector(
-                    keyStore = getSSLKeyStore(context),
-                    keyAlias = SSL_KEY_ALIAS,
-                    keyStorePassword = { password },
-                    privateKeyPassword = { password },
-                ) {
-                    port = httpsPort
-                }
-                module(HttpModule.module)
+        val environment = applicationEnvironment {
+            log = LoggerFactory.getLogger("ktor.application")
+        }
+
+        return embeddedServer(Netty, environment, configure = {
+            connector {
+                port = httpPort
             }
-        return embeddedServer(Netty, environment)
+            enableHttp2 = false
+            sslConnector(
+                keyStore = getSSLKeyStore(context),
+                keyAlias = SSL_KEY_ALIAS,
+                keyStorePassword = { password },
+                privateKeyPassword = { password },
+            ) {
+                port = httpsPort
+            }
+        }, HttpModule.module)
     }
 
     fun getSSLSignature(context: Context): ByteArray {
@@ -168,7 +169,7 @@ object HttpServerManager {
                     R.string.http_port_conflict_errors
                 } else {
                     R.string.http_port_conflict_error
-                }, "port", HttpServerManager.portsInUse.joinToString(", ")
+                }, "port", portsInUse.joinToString(", ")
             )
         } else if (httpServerError.isNotEmpty()) {
             LocaleHelper.getString(R.string.http_server_failed) + " ($httpServerError)"
