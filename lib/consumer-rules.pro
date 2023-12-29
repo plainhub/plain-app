@@ -21,6 +21,18 @@
 
 # Please add these rules to your existing keep rules in order to suppress warnings.
 # This is generated automatically by the Android Gradle plugin.
+-dontwarn com.aayushatharva.brotli4j.encoder.BrotliEncoderChannel
+-dontwarn io.ktor.client.plugins.HttpRequestRetry$Configuration
+-dontwarn io.ktor.client.plugins.HttpRequestRetry$Plugin
+-dontwarn io.ktor.client.plugins.HttpRequestRetry$ShouldRetryContext
+-dontwarn io.ktor.client.plugins.HttpRequestRetry
+-dontwarn io.ktor.client.plugins.HttpTimeout$HttpTimeoutCapabilityConfiguration
+-dontwarn io.ktor.client.plugins.HttpTimeout$Plugin
+-dontwarn io.ktor.client.plugins.HttpTimeout
+-dontwarn io.ktor.client.plugins.logging.Logging$Companion
+-dontwarn io.ktor.client.plugins.logging.Logging$Config
+-dontwarn io.ktor.client.plugins.logging.Logging
+-dontwarn io.ktor.util.KtorDsl
 -dontwarn com.aayushatharva.brotli4j.Brotli4jLoader
 -dontwarn com.aayushatharva.brotli4j.decoder.DecoderJNI$Status
 -dontwarn com.aayushatharva.brotli4j.decoder.DecoderJNI$Wrapper
