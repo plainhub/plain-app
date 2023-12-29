@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.web
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
@@ -51,7 +52,6 @@ import io.ktor.http.content.forEachPart
 import io.ktor.http.content.streamProvider
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
-import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.http.content.singlePageApplication
 import io.ktor.server.http.content.vue
@@ -92,12 +92,14 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URLEncoder
+import java.nio.ByteBuffer
 import java.util.Date
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.collections.set
 
 object HttpModule {
+    @SuppressLint("SuspiciousIndentation")
     val module: Application.() -> Unit = {
         install(CachingHeaders) {
             options { _, outgoingContent ->
@@ -438,11 +440,11 @@ object HttpModule {
                                         } else {
                                             if (info.total > 1) {
                                                 destFile = File("${info.dir}/$fileName.part${String.format("%03d", info.index)}")
-                                                if (destFile.exists() && destFile.length() == info.size) {
-                                                    // skip if the part file is already uploaded
-                                                } else {
-                                                    destFile.outputStream().use { part.streamProvider().use { input -> input.copyTo(it) } }
-                                                }
+//                                                if (destFile.exists() && destFile.length() == info.size) {
+//                                                    // skip if the part file is already uploaded
+//                                                } else {
+                                                destFile.outputStream().use { part.streamProvider().use { input -> input.copyTo(it) } }
+                                                //  }
                                             } else {
                                                 destFile.outputStream().use { part.streamProvider().use { input -> input.copyTo(it) } }
                                             }
@@ -468,9 +470,9 @@ object HttpModule {
                             }
 
                             else -> {
-                                part.dispose()
                             }
                         }
+                        part.dispose()
                     }
                     call.respond(HttpStatusCode.Created, fileName)
                 } catch (ex: Exception) {
