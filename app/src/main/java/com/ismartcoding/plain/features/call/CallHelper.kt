@@ -122,9 +122,9 @@ object CallHelper : BaseContentHelper() {
         context: Context,
         number: String,
     ) {
-        val callIntent = Intent(Intent.ACTION_CALL)
-        callIntent.data = Uri.parse("tel:$number")
-        context.startActivity(callIntent)
+        val intent = Intent(Intent.ACTION_CALL)
+        intent.data = Uri.parse("tel:$number")
+        context.startActivity(intent)
     }
 
     private fun demoSearch(): List<DCall> {

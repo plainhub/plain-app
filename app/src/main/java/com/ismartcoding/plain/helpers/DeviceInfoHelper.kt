@@ -63,12 +63,8 @@ object DeviceInfoHelper {
         if (Permission.READ_PHONE_STATE.can(context) && Permission.READ_PHONE_NUMBERS.can(context)) {
             val sims = mutableListOf<DPhoneNumber>()
             try {
-                val tm = telephonyManager
-                val defaultId = SubscriptionManager.getDefaultSubscriptionId()
                 getActiveSimCards(context).forEach {
-                    if (it.subscriptionId == defaultId) {
-                        sims.add(DPhoneNumber(it.subscriptionId, it.displayName.toString(), tm.line1Number))
-                    }
+                    sims.add(DPhoneNumber(it.subscriptionId, it.displayName.toString(), it.number))
                 }
             } catch (ex: Exception) {
                 LogCat.e(ex.toString())
@@ -84,9 +80,7 @@ object DeviceInfoHelper {
         if (!Permission.READ_PHONE_STATE.can(context)) {
             return emptyList()
         }
-        val m = subscriptionManager
-        val activeSubscriptionInfoList = m.activeSubscriptionInfoList
 
-        return activeSubscriptionInfoList ?: emptyList()
+        return subscriptionManager.activeSubscriptionInfoList ?: emptyList()
     }
 }
