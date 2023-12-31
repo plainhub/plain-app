@@ -427,11 +427,6 @@ object AudioSleepTimerMinutesPreference : BasePreference<Int>() {
     override val key = intPreferencesKey("audio_sleep_timer_minutes")
 }
 
-object AudioSleepTimerFutureTimePreference : BasePreference<Long>() {
-    override val default = 0L
-    override val key = longPreferencesKey("audio_sleep_timer_future_time")
-}
-
 object AudioSleepTimerFinishLastPreference : BasePreference<Boolean>() {
     override val default = false
     override val key = booleanPreferencesKey("audio_sleep_timer_finish_last")

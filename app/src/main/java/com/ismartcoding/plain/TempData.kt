@@ -15,4 +15,6 @@ object TempData {
     var urlToken = "" // use to encrypt or decrypt params in url
     var chatItemsMigrated = false
     val notifications = mutableListOf<DNotification>()
+
+    var audioSleepTimerFutureTime = 0L
 }

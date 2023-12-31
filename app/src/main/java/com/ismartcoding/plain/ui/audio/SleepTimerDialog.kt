@@ -13,11 +13,10 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
-import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.preference.AudioSleepTimerFinishLastPreference
-import com.ismartcoding.plain.data.preference.AudioSleepTimerFutureTimePreference
 import com.ismartcoding.plain.data.preference.AudioSleepTimerMinutesPreference
 import com.ismartcoding.plain.databinding.DialogSleepTimerBinding
 import com.ismartcoding.plain.features.audio.AudioPlayer
@@ -89,27 +88,35 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
     fun updateUI() {
         lifecycleScope.launch {
             val context = requireContext()
-            if (withIO { AudioSleepTimerFutureTimePreference.getAsync(context) } > SystemClock.elapsedRealtime()) {
+            val leftTime = TempData.audioSleepTimerFutureTime - SystemClock.elapsedRealtime()
+            if (leftTime > 0) {
                 binding.seekBar.isVisible = false
                 binding.shouldFinishLastAudio.isVisible = false
-                timerUpdater =
-                    TimerUpdater(
-                        WeakReference(this@SleepTimerDialog),
-                        withIO {
-                            AudioSleepTimerFutureTimePreference.getAsync(requireContext()) - SystemClock.elapsedRealtime()
-                        },
-                    )
+                timerUpdater = TimerUpdater(
+                    WeakReference(this@SleepTimerDialog),
+                    leftTime,
+                )
+                binding.minutes.text = FormatHelper.formatDuration(leftTime / 1000)
                 timerUpdater?.start()
                 binding.start.text = getString(R.string.stop)
                 binding.start.setSafeClick {
                     lifecycleScope.launch {
                         timerUpdater?.cancel()
-                        val previous = withIO { makeTimerPendingIntent(PendingIntent.FLAG_NO_CREATE) }
+                        val previous = withIO {
+                            PendingIntent.getService(
+                                requireContext(),
+                                0,
+                                makeTimerIntent(),
+                                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
+                            )
+                        }
                         val am = context.getSystemService<AlarmManager>()
-                        am?.cancel(previous)
-                        previous.cancel()
+                        if (previous != null) {
+                            am?.cancel(previous)
+                            previous.cancel()
+                        }
                         AudioPlayer.instance.pendingQuit = false
-                        withIO { AudioSleepTimerFutureTimePreference.putAsync(context, 0) }
+                        TempData.audioSleepTimerFutureTime = 0
                         updateTimeDisplayTime()
                         updateUI()
                     }
@@ -121,29 +128,26 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
                 binding.start.setSafeClick {
                     lifecycleScope.launch {
                         withIO {
-                            AudioSleepTimerFutureTimePreference.putAsync(
-                                context,
-                                SystemClock.elapsedRealtime() + AudioSleepTimerMinutesPreference.getAsync(context) * 60 * 1000,
-                            )
+                            TempData.audioSleepTimerFutureTime = SystemClock.elapsedRealtime() + AudioSleepTimerMinutesPreference.getAsync(context) * 60 * 1000
                             val alarmManager = context.getSystemService<AlarmManager>()
                             if (isSPlus()) {
                                 if (alarmManager?.canScheduleExactAlarms() == true) {
                                     context.getSystemService<AlarmManager>()?.setExact(
                                         AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                        AudioSleepTimerFutureTimePreference.getAsync(context),
+                                        TempData.audioSleepTimerFutureTime,
                                         makeTimerPendingIntent(PendingIntent.FLAG_CANCEL_CURRENT),
                                     )
                                 } else {
                                     context.getSystemService<AlarmManager>()?.setExactAndAllowWhileIdle(
                                         AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                        AudioSleepTimerFutureTimePreference.getAsync(context),
+                                        TempData.audioSleepTimerFutureTime,
                                         makeTimerPendingIntent(PendingIntent.FLAG_CANCEL_CURRENT),
                                     )
                                 }
                             } else {
                                 context.getSystemService<AlarmManager>()?.setExact(
                                     AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                    AudioSleepTimerFutureTimePreference.getAsync(context),
+                                    TempData.audioSleepTimerFutureTime,
                                     makeTimerPendingIntent(PendingIntent.FLAG_CANCEL_CURRENT),
                                 )
                             }
@@ -171,7 +175,7 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
 
     private suspend fun makeTimerPendingIntent(flag: Int): PendingIntent {
         return PendingIntent.getService(
-            requireActivity(),
+            requireContext(),
             0,
             makeTimerIntent(),
             flag or PendingIntent.FLAG_IMMUTABLE,
@@ -202,7 +206,7 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
 
         override fun onFinish() {
             lifecycleScope.launch {
-                withIO { AudioSleepTimerFutureTimePreference.putAsync(requireContext(), 0) }
+                TempData.audioSleepTimerFutureTime = 0
                 dialog.get()?.let {
                     if (it.isActive) {
                         it.updateTimeDisplayTime()
