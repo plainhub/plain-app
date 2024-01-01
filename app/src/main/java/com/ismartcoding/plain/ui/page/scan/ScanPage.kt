@@ -355,7 +355,7 @@ fun ScanResultBottomSheet(
         actions = {
             PIconButton(
                 imageVector = Icons.Outlined.ContentCopy,
-                contentDescription = stringResource(R.string.copy),
+                contentDescription = stringResource(android.R.string.copy),
                 tint = MaterialTheme.colorScheme.onSurface,
             ) {
                 val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.scan_result), value)

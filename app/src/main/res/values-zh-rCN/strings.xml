@@ -3,6 +3,8 @@
     <string name="vpn_web_conflict_warning">您的VPN当前在设备上启用，这可能会导致从PC访问时出现Web连接问题。为解决此问题，我们建议调整VPN设置以允许局域网流量或禁用VPN。</string>
     <string name="warning">警告</string>
     <string name="apps">应用</string>
+    <string name="app_type_user">用户</string>
+    <string name="app_type_system">系统</string>
     <string name="http_port_conflict_error">端口 {{ port }} 当前被占用。您可以点击\'修复\'按钮自动更改端口，或者您可以选择点击URL地址旁边的编辑图标手动选择不同的端口。</string>
     <string name="http_port_conflict_errors">端口 {{ port }} 当前被占用。您可以点击\'修复\'按钮自动更改端口，或者您可以选择点击URL地址旁边的编辑图标手动选择不同的端口。</string>
     <string name="fix">修复</string>
@@ -361,7 +363,6 @@
     <string name="x_min">{{num}}分钟</string>
     <string name="copy_path">复制路径</string>
     <string name="cut">剪切</string>
-    <string name="copy" tools:override="true">复制</string>
     <string name="show_hidden_files">显示隐藏文件</string>
     <string name="add_new_folder">添加目录</string>
     <string name="newest_date_first">日期(从新到旧)</string>
@@ -460,7 +461,6 @@
     <string name="fetch_content_automatically">自动拉取正文内容</string>
     <string name="app_restored">应用数据已经恢复，您需要重启应用。</string>
     <string name="welcome_text">欢迎使用！您可以轻松地将文本、图片和视频发送到本页面，并在您的电脑上查看。\n如果您遇到问题，请发送邮件至ismartcoding@gmail.com寻求帮助，或者加入Discord讨论: https://discord.gg/RQWcS6DEEe。</string>
-    <string name="note_sample1"># 我的 Markdown 示例文本\n\n## 二级标题\n\n### 三级标题\n\n这是一些**粗体文本**和一些*斜体文本*。\n\n这里是一个无序列表：\n\n- 项目1\n- 项目2\n- 项目3\n\n这里是一个有序列表：\n\n1. 第一项\n2. 第二项\n3. 第三项\n\n以下是一个块引用的示例：\n\n> “生命中最伟大的荣耀不在于从不跌倒，而在于每次跌倒后都能爬起来。” - 纳尔逊·曼德拉\n\n你还可以像这样添加链接：[谷歌](https://www.google.com)\n\n以及像这样的图像：\n\n![Markdown logo](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### 表格\n\n以下是一个表格的示例：\n\n| 名字    | 年龄 | 性别   |\n| ------ | --- | ------ |\n| 爱丽丝  | 20  | 女性 |\n| 鲍勃    | 25  | 男性   |\n| 查理 | 30  | 男性   |\n\n### 数学公式\n\n你还可以使用 KaTeX 包括数学公式。以下是一个示例：\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
     <string name="demo_mode">Demo模式</string>
     <string name="donation">捐赠</string>
     <string name="logs">日志</string>
@@ -520,4 +520,5 @@
     <string name="text_file_size_limit">仅允许打开大小不超过10MB的文件。</string>
     <string name="keep_screen_on_confirm">您选择了投射多个{{type}}。为确保平稳播放，我们将在投射过程中保持您的手机屏幕开启。您可以随时从主屏幕菜单中取消此操作。</string>
     <string name="call_phone_permission_required">为了通过应用程序进行电话通话，请允许访问电话。</string>
+    <string name="note_sample1"># 我的 Markdown 示例文本\n\n## 二级标题\n\n### 三级标题\n\n这是一些**粗体文本**和一些*斜体文本*。\n\n这里是一个无序列表：\n\n- 项目1\n- 项目2\n- 项目3\n\n这里是一个有序列表：\n\n1. 第一项\n2. 第二项\n3. 第三项\n\n以下是一个块引用的示例：\n\n> “生命中最伟大的荣耀不在于从不跌倒，而在于每次跌倒后都能爬起来。” - 纳尔逊·曼德拉\n\n你还可以像这样添加链接：[谷歌](https://www.google.com)\n\n以及像这样的图像：\n\n![Markdown logo](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### 表格\n\n以下是一个表格的示例：\n\n| 名字    | 年龄 | 性别   |\n| ------ | --- | ------ |\n| 爱丽丝  | 20  | 女性 |\n| 鲍勃    | 25  | 男性   |\n| 查理 | 30  | 男性   |\n\n### 数学公式\n\n你还可以使用 KaTeX 包括数学公式。以下是一个示例：\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
 </resources>

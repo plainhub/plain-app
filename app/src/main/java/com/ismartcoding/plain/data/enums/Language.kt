@@ -10,6 +10,7 @@ object Language {
         listOf(
             Locale("en", "US"),
             Locale("zh", "CN"),
+            Locale("zh", "TW"),
             Locale("es", ""),
             Locale("ja", ""),
             Locale("nl", ""),
@@ -20,6 +21,8 @@ object Language {
             Locale("bn", ""),
             Locale("de", ""),
             Locale("pt", ""),
+            Locale("ta", ""),
+            Locale("ko", ""),
         )
 
     fun setLocale(

@@ -3,6 +3,8 @@
     <string name="vpn_web_conflict_warning">আপনার ডিভাইসে সক্রিয় ভিপিএন আছে, যা একটি পিসি থেকে অ্যাক্সেস করার সময় ওয়েব সংযোগের সমস্যা উত্পন্ন করতে পারে। এটি সমাধান করতে, আমরা আপনাকে আপনার ভিপিএন সেটিংস পরিবর্তন করে এলএএন ট্র্যাফিক অনুমতি দেওয়া বা আপনার ভিপিএন নিষ্ক্রিয় করতে প্রস্তাবনা দিচ্ছি।</string>
     <string name="warning">সতর্কবার্তা</string>
     <string name="apps">অ্যাপস</string>
+    <string name="app_type_user">ব্যবহারকারী</string>
+    <string name="app_type_system">সিস্টেম</string>
     <string name="http_port_conflict_error">পোর্ট {{ port }} বর্তমানে ব্যবহৃত হচ্ছে। আপনি পোর্ট স্বয়ংক্রিয়ভাবে পরিবর্তন করতে \'ঠিক করুন\' বোতামটি ট্যাপ করতে পারেন, অথবা আপনি URL ঠিকানার পাশের সম্পাদনা আইকনটি ট্যাপ করে একটি পৃথক পোর্ট নির্বাচন করতে পারেন।</string>
     <string name="http_port_conflict_errors">পোর্ট {{ port }} বর্তমানে ব্যবহৃত হচ্ছে। আপনি পোর্ট স্বয়ংক্রিয়ভাবে পরিবর্তন করতে \'ঠিক করুন\' বোতামটি ট্যাপ করতে পারেন, অথবা আপনি URL ঠিকানার পাশের সম্পাদনা আইকনটি ট্যাপ করে একটি পৃথক পোর্ট নির্বাচন করতে পারেন।</string>
     <string name="fix">ঠিক করুন</string>
@@ -361,7 +363,6 @@
     <string name="x_min">{{num}} মিনিট</string>
     <string name="copy_path">পাথ কপি করুন</string>
     <string name="cut">কাটুন</string>
-    <string name="copy" tools:override="true">কপি</string>
     <string name="show_hidden_files">গোপন ফাইল দেখান</string>
     <string name="add_new_folder">নতুন ফোল্ডার যোগ করুন</string>
     <string name="newest_date_first">সাবসেবা তারিখের নতুনতম</string>

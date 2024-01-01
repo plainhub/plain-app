@@ -3,6 +3,8 @@
     <string name="vpn_web_conflict_warning">Ihr VPN ist derzeit auf Ihrem Gerät aktiviert, was potenziell zu Webverbindungsproblemen führen kann, wenn es von Ihrem PC aus zugegriffen wird. Um dies zu lösen, empfehlen wir Ihnen, Ihre VPN-Einstellungen anzupassen, um LAN-Verkehr zuzulassen oder Ihr VPN zu deaktivieren.</string>
     <string name="warning">Warnung</string>
     <string name="apps">Apps</string>
+    <string name="app_type_user">Benutzer</string>
+    <string name="app_type_system">System</string>
     <string name="http_port_conflict_error">Der Port {{ port }} wird derzeit verwendet. Sie können die Schaltfläche \'Beheben\' drücken, um den Port automatisch zu ändern, oder Sie können das Bearbeitungssymbol neben der URL-Adresse antippen, um manuell einen anderen Port auszuwählen.</string>
     <string name="http_port_conflict_errors">Die Ports {{ port }} werden derzeit verwendet. Sie haben die Möglichkeit, die Schaltfläche \'Beheben\' zu drücken, um den Port automatisch zu ändern, oder Sie können das Bearbeitungssymbol neben der URL-Adresse antippen, um manuell einen anderen Port auszuwählen.</string>
     <string name="fix">Beheben</string>
@@ -361,7 +363,6 @@
     <string name="x_min">{{num}} Min.</string>
     <string name="copy_path">Pfad kopieren</string>
     <string name="cut">Ausschneiden</string>
-    <string name="copy" tools:override="true">Kopieren</string>
     <string name="show_hidden_files">Versteckte Dateien anzeigen</string>
     <string name="add_new_folder">Neuen Ordner hinzufügen</string>
     <string name="newest_date_first">Neuestes Datum zuerst</string>

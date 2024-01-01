@@ -40,7 +40,7 @@ fun LanguagePage(navController: NavHostController) {
                     VerticalSpace(dp = 16.dp)
                     list.forEach {
                         PListItem(
-                            title = it?.getDisplayLanguage(it) ?: stringResource(id = R.string.use_device_language),
+                            title = it?.getDisplayName(it) ?: stringResource(id = R.string.use_device_language),
                             onClick = {
                                 scope.launch(Dispatchers.IO) {
                                     LanguagePreference.putAsync(context, it)

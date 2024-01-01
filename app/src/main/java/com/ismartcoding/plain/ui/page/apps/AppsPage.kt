@@ -14,15 +14,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NoDataColumn
-import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.VerticalRefreshableLayout
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
+import com.ismartcoding.plain.ui.components.PackageListItem
 import com.ismartcoding.plain.ui.models.AppsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,10 +64,8 @@ fun AppsPage(
                             .fillMaxHeight(),
                     ) {
                         items(itemsState) { m ->
-                            PListItem(
-                                title = m.name,
-                                desc = m.id,
-                                iconPainter = rememberDrawablePainter(m.icon)
+                            PackageListItem(
+                                item = m
                             )
                         }
                     }

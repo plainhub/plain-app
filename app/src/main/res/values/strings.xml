@@ -3,6 +3,8 @@
     <string name="vpn_web_conflict_warning">Your VPN is currently enabled on your device, which could potentially lead to web connection issues when accessed from PC. To resolve this, we recommend adjusting your VPN settings to allow LAN traffic or disabling your VPN.</string>
     <string name="warning">Warning</string>
     <string name="apps">Apps</string>
+    <string name="app_type_user">User</string>
+    <string name="app_type_system">System</string>
     <string name="http_port_conflict_error">Port {{ port }} is currently in use. You can tap the \'Fix\' button to automatically change the port, or you can choose to tap the edit icon next to the URL address to manually select a different port.</string>
     <string name="http_port_conflict_errors">The ports {{ port }} are currently in use. You have the option to tap the \'Fix\' button to automatically change the port, or you can choose to tap the edit icon next to the URL address to manually select a different port.</string>
     <string name="fix">Fix</string>
@@ -361,7 +363,6 @@
     <string name="x_min">{{num}} min</string>
     <string name="copy_path">Copy path</string>
     <string name="cut">Cut</string>
-    <string name="copy" tools:override="true">Copy</string>
     <string name="show_hidden_files">Show hidden files</string>
     <string name="add_new_folder">Add new folder</string>
     <string name="copied_to_clipboard_format" translatable="false">@string/preference_copied</string>

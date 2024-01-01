@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.lib.pinyin.Pinyin
 import com.ismartcoding.plain.packageManager
 import kotlinx.datetime.Instant
 import java.io.File
@@ -120,7 +121,7 @@ object PackageHelper {
                             || c.subject.contains(text, true)
                 }
             }.drop(offset).take(limit)
-        }
+        }.sortedBy { Pinyin.toPinyin(it.name).lowercase() }
     }
 
     fun cacheAppLabels() {

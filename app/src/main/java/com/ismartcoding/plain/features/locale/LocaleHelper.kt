@@ -19,6 +19,10 @@ object LocaleHelper {
         }
     }
 
+    fun getStringIdentifier(identifierName: String): Int {
+        return MainApp.instance.resources.getIdentifier(identifierName, "string", MainApp.instance.packageName)
+    }
+
     fun getString(identifierName: String): String {
         val identifier = MainApp.instance.resources.getIdentifier(identifierName, "string", MainApp.instance.packageName)
         return try {

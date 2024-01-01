@@ -3,6 +3,8 @@
     <string name="vpn_web_conflict_warning">Attualmente, il tuo VPN è attivo sul tuo dispositivo, il che potrebbe portare a problemi di connessione web quando si accede da un PC. Per risolvere questo problema, ti consigliamo di regolare le impostazioni del tuo VPN per consentire il traffico LAN o disattivare il tuo VPN.</string>
     <string name="warning">Attenzione</string>
     <string name="apps">App</string>
+    <string name="app_type_user">Utente</string>
+    <string name="app_type_system">Sistema</string>
     <string name="http_port_conflict_error">La porta {{ port }} è attualmente in uso. Puoi premere il pulsante \'Correggi\' per cambiare automaticamente la porta, oppure puoi scegliere di premere l\'icona di modifica accanto all\'indirizzo URL per selezionare manualmente una porta diversa.</string>
     <string name="http_port_conflict_errors">Le porte {{ port }} sono attualmente in uso. Hai l\'opzione di premere il pulsante \'Correggi\' per cambiare automaticamente la porta, oppure puoi scegliere di premere l\'icona di modifica accanto all\'indirizzo URL per selezionare manualmente una porta diversa.</string>
     <string name="fix">Correggi</string>
@@ -361,7 +363,6 @@
     <string name="x_min">{{num}} min</string>
     <string name="copy_path">Copia percorso</string>
     <string name="cut">Taglia</string>
-    <string name="copy" tools:override="true">Copia</string>
     <string name="show_hidden_files">Mostra file nascosti</string>
     <string name="add_new_folder">Aggiungi nuova cartella</string>
     <string name="newest_date_first">Più recenti prima</string>
