@@ -45,6 +45,7 @@ import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.SharedViewModel
+import com.ismartcoding.plain.ui.page.apps.AppsPage
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.page.scan.ScanPage
 import com.ismartcoding.plain.ui.page.settings.AboutPage
@@ -162,6 +163,7 @@ fun Main(viewModel: MainViewModel) {
                 RouteName.SCAN_HISTORY to { ScanHistoryPage(navController) },
                 RouteName.SCAN to { ScanPage(navController) },
                 RouteName.MEDIA_PREVIEW to { MediaPreviewPage(navController, sharedViewModel) },
+                RouteName.APPS to { AppsPage(navController) },
             ).forEach { (routeName, content) ->
                 slideHorizontallyComposable(routeName.name) {
                     content()

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Chat
 import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.Computer
 import androidx.compose.material3.Checkbox
@@ -156,7 +157,7 @@ fun HomePage(
                 },
             ) {
                 Icon(
-                    Icons.Outlined.Chat,
+                    Icons.AutoMirrored.Outlined.Chat,
                     stringResource(R.string.my_phone),
                 )
             }

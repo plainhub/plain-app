@@ -14,10 +14,10 @@ fun VerticalRefreshableLayout(
         remember {
             { PullToRefreshContent() }
         },
-    bottomIsLoadFinish: Boolean = false,
+    bottomNoMore: Boolean = false,
     bottomRefreshContent: @Composable RefreshLayoutState.() -> Unit =
-        remember(bottomIsLoadFinish) {
-            { LoadMoreRefreshContent(bottomIsLoadFinish) }
+        remember(bottomNoMore) {
+            { LoadMoreRefreshContent(bottomNoMore) }
         },
     topUserEnable: Boolean = true,
     bottomUserEnable: Boolean = true,

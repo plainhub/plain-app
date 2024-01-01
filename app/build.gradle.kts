@@ -151,7 +151,7 @@ dependencies {
     implementation("androidx.compose.foundation:foundation-layout")
     implementation("androidx.compose.material3:material3:1.2.0-beta01")
     implementation("androidx.compose.material:material-icons-extended")
-
+    implementation("com.google.accompanist:accompanist-drawablepainter:0.33.2-alpha")
 //    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha12")
 
     // https://developer.android.com/jetpack/androidx/releases/navigation

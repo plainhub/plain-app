@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Apps
 import androidx.compose.material.icons.outlined.AudioFile
 import androidx.compose.material.icons.outlined.FilePresent
 import androidx.compose.material.icons.outlined.Image
@@ -17,8 +18,10 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.audio.AudiosDialog
 import com.ismartcoding.plain.ui.base.GridItem
 import com.ismartcoding.plain.ui.base.Subtitle
+import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.file.FilesDialog
 import com.ismartcoding.plain.ui.image.ImagesDialog
+import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.video.VideosDialog
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -59,6 +62,13 @@ fun HomeItemStorage(
                 modifier = Modifier.width(itemWidth),
             ) {
                 FilesDialog().show()
+            }
+            GridItem(
+                icon = Icons.Outlined.Apps,
+                stringResource(id = R.string.apps),
+                modifier = Modifier.width(itemWidth),
+            ) {
+                navController.navigate(RouteName.APPS)
             }
         }
     }

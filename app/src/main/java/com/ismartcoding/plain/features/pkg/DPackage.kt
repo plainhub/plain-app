@@ -1,8 +1,10 @@
 package com.ismartcoding.plain.features.pkg
 
+import android.content.pm.ApplicationInfo
 import kotlinx.datetime.Instant
 
 data class DPackage(
+    val app: ApplicationInfo,
     val id: String,
     val name: String,
     val type: String,

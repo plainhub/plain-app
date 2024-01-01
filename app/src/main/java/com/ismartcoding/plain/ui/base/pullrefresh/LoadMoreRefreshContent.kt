@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.R
 
 @Composable
-fun RefreshLayoutState.LoadMoreRefreshContent(isLoadFinish: Boolean = false) {
+fun RefreshLayoutState.LoadMoreRefreshContent(bottomNoMoreData: Boolean = false) {
     val rotate =
-        if (isLoadFinish || getRefreshContentOffset() == 0f) {
+        if (bottomNoMoreData || getRefreshContentOffset() == 0f) {
             0f
         } else {
             val infiniteTransition = rememberInfiniteTransition()
@@ -47,7 +47,7 @@ fun RefreshLayoutState.LoadMoreRefreshContent(isLoadFinish: Boolean = false) {
     ) {
         Text(
             text =
-                if (isLoadFinish) {
+                if (bottomNoMoreData) {
                     stringResource(id = R.string.load_no_more)
                 } else {
                     stringResource(id = R.string.loading)

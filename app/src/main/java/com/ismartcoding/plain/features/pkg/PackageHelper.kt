@@ -94,6 +94,7 @@ object PackageHelper {
 
             apps.add(
                 DPackage(
+                    appInfo,
                     appInfo.packageName,
                     getLabel(appInfo),
                     appType,
