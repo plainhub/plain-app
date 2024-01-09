@@ -15,6 +15,7 @@ import coil.request.CachePolicy
 import coil.util.DebugLogger
 import com.ismartcoding.lib.brv.utils.BRV
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.lib.isUPlus
 import com.ismartcoding.lib.logcat.DiskLogAdapter
 import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.lib.logcat.LogCat
@@ -37,6 +38,7 @@ import com.ismartcoding.plain.services.NotificationListenerMonitorService
 import com.ismartcoding.plain.ui.helpers.PageHelper
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
+import dalvik.system.ZipPathValidator
 import kotlinx.coroutines.flow.first
 import okhttp3.Dispatcher
 import okhttp3.OkHttpClient
@@ -100,6 +102,11 @@ class MainApp : Application(), ImageLoaderFactory {
         BluetoothEvents.register()
         AppEvents.register()
         // BoxEvents.register()
+
+        // https://stackoverflow.com/questions/77683434/the-getnextentry-method-of-zipinputstream-throws-a-zipexception-invalid-zip-ent
+        if (isUPlus()) {
+            ZipPathValidator.clearCallback()
+        }
 
         coIO {
             val preferences = dataStore.data.first()
