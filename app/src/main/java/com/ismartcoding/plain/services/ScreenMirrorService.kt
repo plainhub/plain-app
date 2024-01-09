@@ -66,14 +66,7 @@ class ScreenMirrorService : LifecycleService() {
         orientationEventListener =
             object : OrientationEventListener(this) {
                 override fun onOrientationChanged(orientation: Int) {
-                    val r =
-                        when (orientation) {
-                            in 45..134 -> Surface.ROTATION_270
-                            in 135..224 -> Surface.ROTATION_180
-                            in 225..314 -> Surface.ROTATION_90
-                            else -> Surface.ROTATION_0
-                        }
-                    val newIsPortrait = r == Surface.ROTATION_0 || r == Surface.ROTATION_180
+                    val newIsPortrait = isPortrait()
                     if (isPortrait != newIsPortrait) {
                         isPortrait = newIsPortrait
                         resize()
