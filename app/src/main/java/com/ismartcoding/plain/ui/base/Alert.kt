@@ -42,7 +42,7 @@ fun Alert(
     Column(
         modifier =
         Modifier
-            .padding(horizontal = 16.dp)
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp)
             .fillMaxWidth()
             .background(
                 color = MaterialTheme.colorScheme.cardBack(),

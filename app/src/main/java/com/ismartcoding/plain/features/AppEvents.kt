@@ -94,6 +94,10 @@ class ActionEvent(val source: ActionSourceType, val action: ActionType, val ids:
 
 class AudioActionEvent(val action: AudioAction)
 
+class IgnoreBatteryOptimizationEvent
+
+class IgnoreBatteryOptimizationResultEvent
+
 class CancelNotificationsEvent(val ids: Set<String>)
 
 class ClearAudioPlaylistEvent

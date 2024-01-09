@@ -5,7 +5,9 @@ import android.app.Activity
 import android.content.Intent
 import android.content.res.Configuration
 import android.database.CursorWindow
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -106,6 +108,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    private val ignoreBatteryOptimizationActivityLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
+            sendEvent(IgnoreBatteryOptimizationResultEvent())
+        }
+
     private fun fixSystemBarsAnimation() {
         val windowInsetsController =
             WindowCompat.getInsetsController(window, window.decorView)
@@ -179,6 +186,13 @@ class MainActivity : AppCompatActivity() {
 
         receiveEvent<StartScreenMirrorEvent> {
             screenCapture.launch(mediaProjectionManager.createScreenCaptureIntent())
+        }
+
+        receiveEvent<IgnoreBatteryOptimizationEvent> {
+            val intent = Intent()
+            intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+            intent.data = Uri.parse("package:$packageName")
+            ignoreBatteryOptimizationActivityLauncher.launch(intent)
         }
 
         receiveEvent<RestartAppEvent> {

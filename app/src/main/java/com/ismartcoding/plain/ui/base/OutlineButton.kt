@@ -37,12 +37,13 @@ fun OutlineButton(
 @Composable
 fun MiniOutlineButton(
     text: String,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
     Button(
         onClick,
         modifier =
-            Modifier
+        modifier
                 .height(32.dp),
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
         shape = RoundedCornerShape(8.dp),

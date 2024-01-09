@@ -2,7 +2,9 @@
     <string name="app_name">प्लेन ऐप</string>
     <string name="vpn_web_conflict_warning">आपके डिवाइस पर वर्तमान में आपका VPN सक्रिय है, जिससे PC से एक्सेस करते समay वेब कनेक्शन समस्याएँ उत्पन्न हो सकती हैं। इसे हल करने के लिए, हम सुझाव देते हैं कि आप अपने VPN सेटिंग्स को LAN ट्रैफ़िक की अनुमति देने या अपने VPN को अक्षम करने के लिए समायोजित करें।</string>
     <string name="warning">चेतावनी</string>
+    <string name="optimized_batter_usage_warning">अद्यतित बैटरी उपयोग सतर्कता वर्तमान में सक्रिय है। अविघातित प्रदर्शन सुनिश्चित करने के लिए, कृपया इस एप्लिकेशन के लिए विशेष रूप से बैटरी अनुकूलन को अक्षम करने का विचार करें।</string>
     <string name="apps">ऐप्स</string>
+    <string name="change_port">पोर्ट बदलें</string>
     <string name="app_type_user">उपयोगकर्ता</string>
     <string name="app_type_system">सिस्टम</string>
     <string name="http_port_conflict_error">पोर्ट {{ port }} वर्तमान में उपयोग में है। आप पोर्ट को स्वचालित रूप से बदलने के लिए \'सुधारें\' बटन पर टैप कर सकते हैं, या आप URL पते के पास विभिन्न पोर्ट का चयन करने के लिए संपादन आइकन पर टैप कर सकते हैं।</string>

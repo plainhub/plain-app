@@ -170,7 +170,7 @@ object HttpServerManager {
                 } else {
                     R.string.http_port_conflict_error
                 }, "port", portsInUse.joinToString(", ")
-            )
+            ) + " ($httpServerError)"
         } else if (httpServerError.isNotEmpty()) {
             LocaleHelper.getString(R.string.http_server_failed) + " ($httpServerError)"
         } else if (stoppedByUser) {

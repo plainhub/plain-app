@@ -1,10 +1,8 @@
 package com.ismartcoding.plain.ui.models
 
-import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.PowerManager
 import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,9 +13,10 @@ import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.data.preference.WebPreference
+import com.ismartcoding.plain.features.IgnoreBatteryOptimizationEvent
 import com.ismartcoding.plain.features.StartHttpServerEvent
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.AppHelper
+import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
@@ -31,7 +30,7 @@ class WebConsoleViewModel : ViewModel() {
         viewModelScope.launch {
             withIO { WebPreference.putAsync(context, enable) }
             if (enable) {
-                requestIgnoreBatteryOptimization(context)
+                requestIgnoreBatteryOptimization()
                 sendEvent(StartHttpServerEvent())
             }
         }
@@ -78,18 +77,10 @@ class WebConsoleViewModel : ViewModel() {
         }
     }
 
-    private fun requestIgnoreBatteryOptimization(context: Context) {
-        try {
-            val packageName = BuildConfig.APPLICATION_ID
-            val pm = context.getSystemService(Application.POWER_SERVICE) as PowerManager
-            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-                val intent = Intent()
-                intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-                intent.data = Uri.parse("package:$packageName")
-                context.startActivity(intent)
-            }
-        } catch (ex: Exception) {
-            ex.printStackTrace()
+    fun requestIgnoreBatteryOptimization() {
+        val packageName = BuildConfig.APPLICATION_ID
+        if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
+            sendEvent(IgnoreBatteryOptimizationEvent())
         }
     }
 }

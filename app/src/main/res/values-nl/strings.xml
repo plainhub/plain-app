@@ -2,7 +2,9 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Uw VPN is momenteel ingeschakeld op uw apparaat, wat mogelijk kan leiden tot webverbinding problemen bij toegang vanaf uw pc. Om dit op te lossen, raden we aan om uw VPN-instellingen aan te passen om LAN-verkeer toe te staan of uw VPN uit te schakelen.</string>
     <string name="warning">Waarschuwing</string>
+    <string name="optimized_batter_usage_warning">Geoptimaliseerd batterijgebruik is momenteel actief. Om ononderbroken prestaties te garanderen, overweeg batterijoptimalisatie specifiek voor deze app uit te schakelen.</string>
     <string name="apps">Apps</string>
+    <string name="change_port">Poort wijzigen</string>
     <string name="app_type_user">Gebruiker</string>
     <string name="app_type_system">Systeem</string>
     <string name="http_port_conflict_error">Poort {{ port }} wordt momenteel gebruikt. U kunt op de \'Herstellen\' knop tikken om de poort automatisch te wijzigen, of u kunt ervoor kiezen om op het bewerkingspictogram naast het URL-adres te tikken om handmatig een andere poort te selecteren.</string>

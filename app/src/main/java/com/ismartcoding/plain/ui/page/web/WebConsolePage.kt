@@ -53,11 +53,13 @@ import com.ismartcoding.lib.extensions.isTV
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.data.preference.*
+import com.ismartcoding.plain.features.IgnoreBatteryOptimizationResultEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.Permissions
@@ -67,11 +69,11 @@ import com.ismartcoding.plain.features.StopHttpServerDoneEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.packageManager
+import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.ui.base.*
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.MainViewModel
-import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.models.WebConsoleViewModel
 import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.theme.canvas
@@ -101,6 +103,7 @@ fun WebConsolePage(
         val enabledPermissions = LocalApiPermissions.current
         var permissionList by remember { mutableStateOf(Permissions.getWebList(context)) }
         var portDialogVisible by remember { mutableStateOf(false) }
+        var showIgnoreOptimizeWarning by remember { mutableStateOf(!powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)) }
         val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
 
         LaunchedEffect(Unit) {
@@ -121,6 +124,10 @@ fun WebConsolePage(
                     mainViewModel.httpServerError.value = HttpServerManager.getErrorMessage()
                 }
             )
+
+            events.add(receiveEventHandler<IgnoreBatteryOptimizationResultEvent> {
+                showIgnoreOptimizeWarning = !powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)
+            })
         }
 
         DisposableEffect(Unit) {
@@ -166,7 +173,7 @@ fun WebConsolePage(
                         Alert(title = stringResource(id = R.string.error), description = mainViewModel.httpServerError.value, AlertType.ERROR) {
                             if (HttpServerManager.portsInUse.isNotEmpty()) {
                                 MiniOutlineButton(
-                                    text = stringResource(R.string.fix),
+                                    text = stringResource(R.string.change_port),
                                     onClick = {
                                         scope.launch(Dispatchers.IO) {
                                             if (HttpServerManager.portsInUse.contains(TempData.httpPort)) {
@@ -187,17 +194,29 @@ fun WebConsolePage(
                                         }
                                     },
                                 )
-                            } else {
+                            }
+                            MiniOutlineButton(
+                                text = stringResource(R.string.relaunch_app),
+                                modifier = Modifier.padding(start = 16.dp),
+                                onClick = {
+                                    AppHelper.relaunch(context)
+                                },
+                            )
+                        }
+                    } else {
+                        if (NetworkHelper.isVPNConnected(context)) {
+                            Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
+                        }
+                        if (showIgnoreOptimizeWarning) {
+                            Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.optimized_batter_usage_warning), AlertType.WARNING) {
                                 MiniOutlineButton(
-                                    text = stringResource(R.string.relaunch_app),
+                                    text = stringResource(R.string.fix),
                                     onClick = {
-                                        AppHelper.relaunch(context)
+                                        viewModel.requestIgnoreBatteryOptimization()
                                     },
                                 )
                             }
                         }
-                    } else if (NetworkHelper.isVPNConnected(context)) {
-                        Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
                     }
                     DisplayText(
                         description = stringResource(id = R.string.web_console_desc),
