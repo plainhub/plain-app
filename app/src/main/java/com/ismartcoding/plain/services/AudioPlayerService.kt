@@ -7,11 +7,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
 import android.os.Binder
 import android.os.IBinder
 import android.os.Parcelable
 import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
+import androidx.core.app.ServiceCompat
 import androidx.core.content.getSystemService
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
@@ -112,7 +114,8 @@ class AudioPlayerService : LifecycleService() {
                     }
 
                     AudioAction.PLAY, AudioAction.PAUSE, AudioAction.NOTIFICATION -> {
-                        startForeground(2, createNotification())
+                        val id = NotificationHelper.generateId()
+                        ServiceCompat.startForeground(this@AudioPlayerService, id, createNotification(), FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
                     }
 
                     AudioAction.STOP -> {
@@ -128,7 +131,8 @@ class AudioPlayerService : LifecycleService() {
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
-            startForeground(2, createNotification())
+            val id = NotificationHelper.generateId()
+            ServiceCompat.startForeground(this@AudioPlayerService, id, createNotification(), FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
         }
 
         binder = LocalBinder()

@@ -163,7 +163,7 @@ object AppEvents {
             coIO {
                 try {
                     val context = MainApp.instance
-                    context.startForegroundService(Intent(context, HttpServerService::class.java))
+                    context.startService(Intent(context, HttpServerService::class.java))
                 } catch (ex: Exception) {
                     LogCat.e(ex.toString())
                 }
@@ -172,26 +172,26 @@ object AppEvents {
 
         receiveEventHandler<AIChatCreatedEvent> { event ->
             coIO {
-                val openAI =
-                    OpenAI(
-                        OpenAIConfig(
-                            token = ChatGPTApiKeyPreference.getAsync(MainApp.instance),
-                            timeout = Timeout(socket = 60.seconds),
-                        ),
+                val parentId = event.item.parentId.ifEmpty { event.item.id }
+                try {
+                    val openAI =
+                        OpenAI(
+                            OpenAIConfig(
+                                token = ChatGPTApiKeyPreference.getAsync(MainApp.instance),
+                                timeout = Timeout(socket = 60.seconds),
+                            ),
+                        )
+
+                    val messages = mutableListOf<ChatMessage>()
+                    messages.addAll(
+                        AIChatHelper.getChats(parentId).map {
+                            ChatMessage(
+                                role = if (it.isMe) ChatRole.User else ChatRole.Assistant,
+                                content = it.content,
+                            )
+                        },
                     )
 
-                val messages = mutableListOf<ChatMessage>()
-                val parentId = event.item.parentId.ifEmpty { event.item.id }
-                messages.addAll(
-                    AIChatHelper.getChats(parentId).map {
-                        ChatMessage(
-                            role = if (it.isMe) ChatRole.User else ChatRole.Assistant,
-                            content = it.content,
-                        )
-                    },
-                )
-
-                try {
                     val chatCompletionRequest =
                         ChatCompletionRequest(
                             model = ModelId("gpt-3.5-turbo"),

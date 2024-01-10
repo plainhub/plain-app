@@ -201,7 +201,7 @@ dependencies {
     implementation("androidx.room:room-ktx:$room")
     // implementation("com.github.skydoves:balloon:1.5.2")
 
-    implementation("com.aallam.openai:openai-client:3.2.0")
+    implementation("com.aallam.openai:openai-client:3.6.2")
 
     implementation("com.google.zxing:core:3.5.2")
 

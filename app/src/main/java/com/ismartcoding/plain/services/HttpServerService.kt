@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.services
 
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+import androidx.core.app.ServiceCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -8,7 +9,6 @@ import androidx.lifecycle.LifecycleService
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.PortHelper
-import com.ismartcoding.lib.isUPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
@@ -30,11 +30,7 @@ class HttpServerService : LifecycleService() {
                 getString(R.string.api_service_is_running),
             )
         val id = NotificationHelper.generateId()
-        if (isUPlus()) {
-            startForeground(id, notification, FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
-        } else {
-            startForeground(id, notification)
-        }
+        ServiceCompat.startForeground(this, id, notification, FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
 
         lifecycle.addObserver(object : LifecycleEventObserver {
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {

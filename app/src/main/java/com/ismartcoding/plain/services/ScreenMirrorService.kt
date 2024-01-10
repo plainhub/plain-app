@@ -13,13 +13,12 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.util.Base64
 import android.view.OrientationEventListener
-import android.view.Surface
+import androidx.core.app.ServiceCompat
 import androidx.core.graphics.scale
 import androidx.lifecycle.LifecycleService
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isPortrait
 import com.ismartcoding.lib.extensions.parcelable
-import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
@@ -79,11 +78,8 @@ class ScreenMirrorService : LifecycleService() {
                 "${BuildConfig.APPLICATION_ID}.action.stop_screen_mirror",
                 getString(R.string.screen_mirror_service_is_running),
             )
-        if (isQPlus()) {
-            startForeground(3, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
-        } else {
-            startForeground(3, notification)
-        }
+        val id = NotificationHelper.generateId()
+        ServiceCompat.startForeground(this, id, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
     }
 
     @SuppressLint("WrongConstant")
