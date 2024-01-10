@@ -30,7 +30,7 @@ class WebConsoleViewModel : ViewModel() {
         viewModelScope.launch {
             withIO { WebPreference.putAsync(context, enable) }
             if (enable) {
-                requestIgnoreBatteryOptimization()
+                //requestIgnoreBatteryOptimization()
                 sendEvent(StartHttpServerEvent())
             }
         }

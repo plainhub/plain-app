@@ -26,6 +26,7 @@ import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.*
 import com.ismartcoding.plain.data.enums.ExportFileType
@@ -109,7 +110,7 @@ class MainActivity : AppCompatActivity() {
         }
 
     private val ignoreBatteryOptimizationActivityLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             sendEvent(IgnoreBatteryOptimizationResultEvent())
         }
 

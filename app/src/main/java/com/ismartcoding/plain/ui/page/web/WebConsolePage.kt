@@ -50,6 +50,7 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isTV
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.NetworkHelper
@@ -81,6 +82,7 @@ import com.ismartcoding.plain.ui.theme.cardBack
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,6 +108,14 @@ fun WebConsolePage(
         var showIgnoreOptimizeWarning by remember { mutableStateOf(!powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)) }
         val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
 
+//        val lifecycleEvent = rememberLifecycleEvent()
+//        LaunchedEffect(lifecycleEvent) {
+//            if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
+//                showIgnoreOptimizeWarning = !powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)
+//                LogCat.d("ON_RESUME: ${showIgnoreOptimizeWarning}")
+//            }
+//        }
+
         LaunchedEffect(Unit) {
             events.add(
                 receiveEventHandler<PermissionResultEvent> {
@@ -126,7 +136,12 @@ fun WebConsolePage(
             )
 
             events.add(receiveEventHandler<IgnoreBatteryOptimizationResultEvent> {
-                showIgnoreOptimizeWarning = !powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)
+                coIO {
+                    DialogHelper.showLoading()
+                    delay(1000) // MIUI 12 test 1 second to get the final correct result.
+                    DialogHelper.hideLoading()
+                    showIgnoreOptimizeWarning = !powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)
+                }
             })
         }
 
@@ -207,16 +222,16 @@ fun WebConsolePage(
                         if (NetworkHelper.isVPNConnected(context)) {
                             Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
                         }
-                        if (showIgnoreOptimizeWarning) {
-                            Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.optimized_batter_usage_warning), AlertType.WARNING) {
-                                MiniOutlineButton(
-                                    text = stringResource(R.string.fix),
-                                    onClick = {
-                                        viewModel.requestIgnoreBatteryOptimization()
-                                    },
-                                )
-                            }
-                        }
+//                        if (showIgnoreOptimizeWarning) {
+//                            Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.optimized_batter_usage_warning), AlertType.WARNING) {
+//                                MiniOutlineButton(
+//                                    text = stringResource(R.string.fix),
+//                                    onClick = {
+//                                        viewModel.requestIgnoreBatteryOptimization()
+//                                    },
+//                                )
+//                            }
+//                        }
                     }
                     DisplayText(
                         description = stringResource(id = R.string.web_console_desc),
