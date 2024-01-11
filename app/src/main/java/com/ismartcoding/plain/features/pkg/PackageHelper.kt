@@ -128,8 +128,12 @@ object PackageHelper {
         try {
             val packages = packageManager.getInstalledPackages(0)
             packages.forEach { app ->
-                val packageInfo = packageManager.getApplicationInfo(app.packageName, 0)
-                appLabelCache[packageInfo.packageName] = packageManager.getApplicationLabel(packageInfo).toString()
+                try {
+                    val packageInfo = packageManager.getApplicationInfo(app.packageName, 0)
+                    appLabelCache[packageInfo.packageName] = packageManager.getApplicationLabel(packageInfo).toString()
+                } catch (ex: Exception) {
+                    LogCat.d(ex.toString())
+                }
             }
         } catch (ex: Exception) {
             LogCat.d(ex.toString())

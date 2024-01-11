@@ -12,7 +12,7 @@ plugins {
     id("com.google.devtools.ksp")
     kotlin("android")
     kotlin("kapt")
-    kotlin("plugin.serialization") version "1.9.10"
+    kotlin("plugin.serialization") version "1.9.22"
 }
 
 val keystoreProperties = Properties()
@@ -42,6 +42,7 @@ android {
         versionName = "1.2.27"
 
         ndk {
+            //noinspection ChromeOsAbiSupport
             abiFilters += abiFilterList.ifEmpty {
                 listOf("arm64-v8a", "x86_64")
             }
@@ -111,7 +112,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
 
     packaging {
@@ -131,7 +132,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
+        jvmTarget = "17"
     }
 }
 
@@ -149,7 +150,7 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.foundation:foundation-layout")
-    implementation("androidx.compose.material3:material3:1.2.0-beta01")
+    implementation("androidx.compose.material3:material3:1.2.0-beta02")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("com.google.accompanist:accompanist-drawablepainter:0.33.2-alpha")
 //    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha12")

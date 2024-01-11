@@ -25,6 +25,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.*
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
@@ -42,6 +43,7 @@ import com.ismartcoding.plain.features.bluetooth.BluetoothPermission
 import com.ismartcoding.plain.features.locale.LocaleHelper.getStringF
 import com.ismartcoding.plain.helpers.ScreenHelper
 import com.ismartcoding.plain.mediaProjectionManager
+import com.ismartcoding.plain.services.NotificationListenerMonitorService
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.extensions.*
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
@@ -154,6 +156,14 @@ class MainActivity : AppCompatActivity() {
 
         Permissions.checkNotification(this@MainActivity, R.string.foreground_service_notification_prompt) {
             sendEvent(StartHttpServerEvent())
+        }
+
+        coIO {
+            try {
+                startService(Intent(this@MainActivity, NotificationListenerMonitorService::class.java))
+            } catch (ex: Exception) {
+                LogCat.e(ex.toString())
+            }
         }
     }
 

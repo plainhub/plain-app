@@ -3,7 +3,7 @@ plugins {
     id("com.google.devtools.ksp")
     kotlin("android")
     kotlin("kapt")
-    kotlin("plugin.serialization") version "1.9.10"
+    kotlin("plugin.serialization") version "1.9.22"
 }
 
 android {
@@ -45,13 +45,14 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.12.0")
-    api("androidx.appcompat:appcompat:1.6.1")
-
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     val ktor = "3.0.0-beta-1"
     val markwon = "4.6.2"
     val coil = "2.4.0"
+
+    implementation("androidx.core:core-ktx:1.12.0")
+    api("androidx.appcompat:appcompat:1.6.1")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
 
 //    api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
@@ -61,10 +62,10 @@ dependencies {
 
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.1")
     api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-    api("com.google.android.material:material:1.12.0-alpha01")
-    api("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    api("com.google.android.material:material:1.12.0-alpha03")
+    api("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     api("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
     api("androidx.fragment:fragment-ktx:1.6.2")
@@ -99,7 +100,6 @@ dependencies {
     //api("com.caverock:androidsvg:1.4")
     api("com.caverock:androidsvg-aar:1.4")
 
-    implementation("pl.droidsonroids.gif:android-gif-drawable:1.2.23")
     implementation("pl.droidsonroids.gif:android-gif-drawable:1.2.23")
 
     // https://coil-kt.github.io/coil/changelog/

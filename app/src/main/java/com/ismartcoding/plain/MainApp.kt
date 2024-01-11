@@ -92,11 +92,7 @@ class MainApp : Application(), ImageLoaderFactory {
 
         LogCat.addLogAdapter(DiskLogAdapter(DiskLogFormatStrategy.getInstance(this)))
         BRV.modelId = BR.m
-        try {
-            startService(Intent(this, NotificationListenerMonitorService::class.java))
-        } catch (ex: Exception) {
-            LogCat.e(ex.toString())
-        }
+
         PageHelper.init()
 
         BluetoothEvents.register()
