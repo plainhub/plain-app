@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.ismartcoding.lib.helpers.CryptoHelper
@@ -31,7 +30,7 @@ object PasswordPreference : BasePreference<String>() {
 }
 
 object PasswordTypePreference : BasePreference<Int>() {
-    override val default = PasswordType.RANDOM.value
+    override val default = PasswordType.NONE.value
     override val key = intPreferencesKey("password_type")
 
     suspend fun putAsync(
