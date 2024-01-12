@@ -40,6 +40,8 @@ Reddit: https://www.reddit.com/r/plainapp
 
 Discord: https://discord.gg/RQWcS6DEEe
 
+QQ Group: 812409393
+
 ## Disclaimer
 
 - ⚠️ The project is under **very active** development.

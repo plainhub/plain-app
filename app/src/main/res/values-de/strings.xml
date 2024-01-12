@@ -472,9 +472,9 @@
     <string name="password_type_fixed">Fest</string>
     <string name="password_type_none">Kein Passwort</string>
     <string name="restart_app_title">App neu starten</string>
-    <string name="http_server_failed">Der HTTP-Server konnte nicht gestartet werden. Sie müssen die App zwangsweise beenden und die App dann erneut öffnen.</string>
-    <string name="http_server_stopped">Der HTTP-Server wurde gestoppt.</string>
-    <string name="restart_app_message">Sie müssen die App zwangsweise beenden und die App dann erneut öffnen.</string>
+    <string name="http_server_failed">Der HTTP-Server konnte nicht gestartet werden. Um ihn neu zu starten, tippen Sie bitte auf die Schaltfläche "APP neu starten".</string>
+    <string name="http_server_stopped">Der HTTP-Server wurde absichtlich gestoppt. Um ihn neu zu starten, tippen Sie bitte auf die Schaltfläche "APP neu starten".</string>
+    <string name="restart_app_message">Fast geschafft! Tippen Sie einfach auf "APP neu starten", um die Änderungen zu übernehmen.</string>
     <string name="keep_screen_on">Bildschirm eingeschaltet lassen</string>
     <string name="cast_mode">Gussmodus</string>
     <string name="my_phone">Mein Handy</string>

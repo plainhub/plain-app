@@ -52,7 +52,12 @@ import io.ktor.http.content.forEachPart
 import io.ktor.http.content.streamProvider
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCallPipeline
+import io.ktor.server.application.ApplicationStopPreparing
+import io.ktor.server.application.call
 import io.ktor.server.application.install
+import io.ktor.server.application.uninstallAllPlugins
+import io.ktor.server.engine.embeddedServer
 import io.ktor.server.http.content.singlePageApplication
 import io.ktor.server.http.content.vue
 import io.ktor.server.plugins.autohead.AutoHeadResponse
@@ -85,6 +90,9 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readBytes
 import io.ktor.websocket.send
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONObject
@@ -97,6 +105,7 @@ import java.util.Date
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.collections.set
+import kotlin.system.exitProcess
 
 object HttpModule {
     @SuppressLint("SuspiciousIndentation")
@@ -140,6 +149,13 @@ object HttpModule {
             )
         }
 
+        intercept(ApplicationCallPipeline.Plugins) {
+            if (HttpServerManager.stoppedByUser) {
+                call.respond(HttpStatusCode.NotFound)
+                return@intercept finish()
+            }
+        }
+
         routing {
             singlePageApplication {
                 useResources = true
@@ -148,6 +164,34 @@ object HttpModule {
 
             get("/health_check") {
                 call.respond(HttpStatusCode.OK, "Server is running well")
+            }
+
+            get("/shutdown") {
+                val ip = call.request.origin.remoteHost
+                LogCat.d("$ip is shutting down the server")
+                if (ip != "localhost") {
+                    call.respond(HttpStatusCode.Forbidden)
+                    return@get
+                }
+
+                HttpServerManager.wsSessions.forEach {
+                    it.session.close()
+                }
+                HttpServerManager.wsSessions.clear()
+                val latch = CompletableDeferred<Nothing>()
+                val application = call.application
+                val environment = application.environment
+                application.launch {
+                    latch.join()
+                    application.monitor.raise(ApplicationStopPreparing, environment)
+                    application.dispose()
+                }
+
+                try {
+                    call.respond(HttpStatusCode.Gone)
+                } finally {
+                    latch.cancel()
+                }
             }
 
             get("/media/{id}") {

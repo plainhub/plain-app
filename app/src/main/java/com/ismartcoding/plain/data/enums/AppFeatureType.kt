@@ -9,17 +9,14 @@ enum class AppFeatureType {
     EXCHANGE_RATE;
 
     fun has(): Boolean {
-        when {
-            this == SOCIAL -> {
+        when(this) {
+            SOCIAL -> {
                 return BuildConfig.CHANNEL != AppChannelType.GOOGLE.name
             }
-            this == EXCHANGE_RATE -> {
+            EXCHANGE_RATE -> {
                 return BuildConfig.CHANNEL != AppChannelType.CHINA.name
             }
-            this == EDUCATION -> {
-                return BuildConfig.DEBUG
-            }
-            this == HARDWARE -> {
+            EDUCATION, HARDWARE -> {
                 return BuildConfig.DEBUG
             }
             else -> return true

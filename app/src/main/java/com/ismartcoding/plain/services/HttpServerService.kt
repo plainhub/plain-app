@@ -14,10 +14,13 @@ import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.features.StartHttpServerErrorEvent
 import com.ismartcoding.plain.helpers.NotificationHelper
+import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.web.HttpServerManager
-import io.ktor.server.application.ApplicationStopPreparing
+import io.ktor.client.request.get
+import io.ktor.http.HttpStatusCode
 
 class HttpServerService : LifecycleService() {
     override fun onCreate() {
@@ -35,53 +38,71 @@ class HttpServerService : LifecycleService() {
         lifecycle.addObserver(object : LifecycleEventObserver {
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                 when (event) {
-                    Lifecycle.Event.ON_START -> startHttpServer()
-                    Lifecycle.Event.ON_STOP -> stopHttpServer()
+                    Lifecycle.Event.ON_START -> {
+                        coIO {
+                            startHttpServerAsync()
+                        }
+                    }
+
+                    Lifecycle.Event.ON_STOP -> coIO {
+                        stopHttpServerAsync()
+                    }
+
                     else -> Unit
                 }
             }
         })
     }
 
-    private fun startHttpServer() {
-        coIO {
-            try {
-                if (HttpServerManager.httpServer == null) {
-                    HttpServerManager.portsInUse.clear()
-                    HttpServerManager.stoppedByUser = false
-                    HttpServerManager.httpServerError = ""
-                    HttpServerManager.httpServer = HttpServerManager.createHttpServer(MainApp.instance)
-                    HttpServerManager.httpServer?.start(wait = true)
-                }
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-                HttpServerManager.httpServer = null
-                HttpServerManager.httpServerError = ex.toString()
-                if (PortHelper.isPortInUse(TempData.httpPort)) {
-                    HttpServerManager.portsInUse.add(TempData.httpPort)
-                }
-                if (PortHelper.isPortInUse(TempData.httpsPort)) {
-                    HttpServerManager.portsInUse.add(TempData.httpsPort)
-                }
-                sendEvent(StartHttpServerErrorEvent())
-                LogCat.e(ex.toString())
+    private suspend fun startHttpServerAsync() {
+        LogCat.d("startHttpServer")
+        try {
+            HttpServerManager.portsInUse.clear()
+            HttpServerManager.stoppedByUser = false
+            HttpServerManager.httpServerError = ""
+            HttpServerManager.createHttpServer(MainApp.instance).start(wait = true)
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            LogCat.e(ex.toString())
+
+            if (PortHelper.isPortInUse(TempData.httpPort)) {
+                HttpServerManager.portsInUse.add(TempData.httpPort)
             }
+
+            if (PortHelper.isPortInUse(TempData.httpsPort)) {
+                HttpServerManager.portsInUse.add(TempData.httpsPort)
+            }
+
+            if (HttpServerManager.portsInUse.isNotEmpty()) {
+                try {
+                    val client = HttpClientManager.httpClient()
+                    val r = client.get(UrlHelper.getHealthCheckUrl())
+                    if (r.status == HttpStatusCode.OK) {
+                        LogCat.d("http server is running")
+                        HttpServerManager.portsInUse.clear()
+                        return
+                    }
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                    LogCat.e(ex.toString())
+                }
+            }
+            HttpServerManager.httpServerError = ex.toString()
+            sendEvent(StartHttpServerErrorEvent())
         }
     }
 
-    private fun stopHttpServer() {
-        coIO {
-            try {
-                HttpServerManager.httpServer?.let { h ->
-                    val application = h.application
-                    val environment = application.environment
-                    application.monitor.raise(ApplicationStopPreparing, environment)
-                    application.dispose()
-                }
-                HttpServerManager.httpServer = null
-            } catch (ex: Exception) {
-                ex.printStackTrace()
+    private suspend fun stopHttpServerAsync() {
+        LogCat.d("stopHttpServer")
+        try {
+            val client = HttpClientManager.httpClient()
+            val r = client.get(UrlHelper.getShutdownUrl())
+            if (r.status == HttpStatusCode.Gone) {
+                LogCat.d("http server is stopped")
             }
+        } catch (ex: Exception) {
+            LogCat.e(ex.toString())
+            ex.printStackTrace()
         }
     }
 }

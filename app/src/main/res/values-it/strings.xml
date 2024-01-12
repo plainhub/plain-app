@@ -472,9 +472,9 @@
     <string name="password_type_fixed">Fissa</string>
     <string name="password_type_none">Nessuna password</string>
     <string name="restart_app_title">Riavvia app</string>
-    <string name="http_server_failed">Avvio del server HTTP fallito, devi forzare la chiusura dell\'app e poi aprirla nuovamente.</string>
-    <string name="http_server_stopped">Server HTTP arrestato</string>
-    <string name="restart_app_message">Devi forzare la chiusura dell\'app e poi aprirla nuovamente.</string>
+    <string name="http_server_failed">Impossibile avviare il server HTTP. Per riavviarlo, tocca il pulsante "Rilancia APP".</string>
+    <string name="http_server_stopped">Il server HTTP è stato fermato intenzionalmente. Per riavviarlo, tocca il pulsante "Rilancia APP".</string>
+    <string name="restart_app_message">Quasi fatto! Tocca semplicemente "Rilancia APP" per rendere effettive le modifiche.</string>
     <string name="keep_screen_on">Mantieni schermo attivo</string>
     <string name="cast_mode">Modalità Cast</string>
     <string name="my_phone">Il mio telefono</string>

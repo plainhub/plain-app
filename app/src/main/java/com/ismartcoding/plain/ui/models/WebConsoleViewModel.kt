@@ -16,6 +16,7 @@ import com.ismartcoding.plain.data.preference.WebPreference
 import com.ismartcoding.plain.features.IgnoreBatteryOptimizationEvent
 import com.ismartcoding.plain.features.StartHttpServerEvent
 import com.ismartcoding.plain.helpers.AppHelper
+import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import io.ktor.client.request.get
@@ -45,7 +46,7 @@ class WebConsoleViewModel : ViewModel() {
             DialogHelper.showLoading()
             val errorMessage = context.getString(R.string.http_server_error)
             try {
-                val r = withIO { client.get("http://127.0.0.1:$httpPort/health_check") }
+                val r = withIO { client.get(UrlHelper.getHealthCheckUrl()) }
                 DialogHelper.hideLoading()
                 if (r.status == HttpStatusCode.OK) {
                     DialogHelper.showConfirmDialog(context, context.getString(R.string.confirm), context.getString(R.string.http_server_ok))

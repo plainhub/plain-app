@@ -472,9 +472,9 @@
     <string name="password_type_fixed">फिक्स्ड</string>
     <string name="password_type_none">कोई पासवर्ड नहीं</string>
     <string name="restart_app_title">ऐप पुनः शुरू करें</string>
-    <string name="http_server_failed">HTTP सर्वर शुरू करने में विफल, आपको ऐप को मजबूरी से बंद करना होगा और फिर से खोलना होगा।</string>
-    <string name="http_server_stopped">HTTP सर्वर बंद कर दिया गया है।</string>
-    <string name="restart_app_message">आपको ऐप को मजबूरी से बंद करना होगा और फिर से खोलना होगा।</string>
+    <string name="http_server_failed">HTTP सर्वर चालना असफल हुआ। इसे पुनरारंभ करने के लिए, कृपया "ऐप फिर से चालना" बटन पर टैप करें।</string>
+    <string name="http_server_stopped">HTTP सर्वर को इच्छापूर्वक बंद किया गया है। इसे पुनरारंभ करने के लिए, कृपया "ऐप फिर से चालना" बटन पर टैप करें।</string>
+    <string name="restart_app_message">लगभग हो गया! केवल प्रभावी बनाने के लिए "ऐप फिर से चालना" टैप करें।</string>
     <string name="keep_screen_on">स्क्रीन चालित रखें</string>
     <string name="cast_mode">कास्ट मोड</string>
     <string name="my_phone">मेरा फोन</string>

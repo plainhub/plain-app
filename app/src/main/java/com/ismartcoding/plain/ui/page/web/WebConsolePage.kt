@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isTV
@@ -198,13 +199,15 @@ fun WebConsolePage(
                                                 HttpsPortPreference.putAsync(context, HttpServerManager.httpsPorts.filter { it != TempData.httpsPort }.random())
                                             }
                                             coMain {
-                                                DialogHelper.showConfirmDialog(
-                                                    context,
-                                                    context.getString(R.string.restart_app_title),
-                                                    context.getString(R.string.restart_app_message),
-                                                ) {
-                                                    AppHelper.relaunch(context)
-                                                }
+                                                MaterialAlertDialogBuilder(context)
+                                                    .setTitle(R.string.restart_app_title)
+                                                    .setMessage(R.string.restart_app_message)
+                                                    .setPositiveButton(R.string.relaunch_app) { _, _ ->
+                                                        AppHelper.relaunch(context)
+                                                    }
+                                                    .setCancelable(false)
+                                                    .create()
+                                                    .show()
                                             }
                                         }
                                     },
@@ -372,13 +375,15 @@ fun WebConsolePage(
                             HttpPortPreference.putAsync(context, it)
                         }
                     }
-                    DialogHelper.showConfirmDialog(
-                        context,
-                        context.getString(R.string.restart_app_title),
-                        context.getString(R.string.restart_app_message),
-                    ) {
-                        AppHelper.relaunch(context)
-                    }
+                    MaterialAlertDialogBuilder(context)
+                        .setTitle(R.string.restart_app_title)
+                        .setMessage(R.string.restart_app_message)
+                        .setPositiveButton(R.string.relaunch_app) { _, _ ->
+                            AppHelper.relaunch(context)
+                        }
+                        .setCancelable(false)
+                        .create()
+                        .show()
                 }
             },
         ) {

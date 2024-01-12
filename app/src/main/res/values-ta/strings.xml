@@ -472,9 +472,9 @@
     <string name="password_type_fixed">நிலையானது</string>
     <string name="password_type_none">கடவுச்சொல் இல்லை</string>
     <string name="restart_app_title">ஆப்லிகேஷனை மீளமை</string>
-    <string name="http_server_failed">HTTP சேவை தொடங்க தோல்வியுற்றது, நீங்கள் பயன்பாட்டை விரும்பியுள்ளது முக்கியமாக இற்றைவாக நிறுத்தி, பின்னர் அதை மீண்டும் திறக்க வேண்டும்.</string>
-    <string name="http_server_stopped">HTTP சேவை நிறுத்தப்பட்டுள்ளது.</string>
-    <string name="restart_app_message">நீங்கள் பிரிக்கவேண்டும் முக்கியமாக இற்றைவாக அப்லிகேஷனை நிறுத்தி, பின்னர் அதை மீண்டும் திறக்க வேண்டும்.</string>
+    <string name="http_server_failed">HTTP சர்வர் தொடங்க முடியவில்லை. அதை மீண்டும் ஆரம்பிக்க தயவுசெய்து "பராமரிக்க APP" பொத்தானை தட்டவும்.</string>
+    <string name="http_server_stopped">HTTP சர்வர் உள்நிறுக்கப்பட்டுள்ளது. அதை மீண்டும் ஆரம்பிக்க தயவுசெய்து "பராமரிக்க APP" பொத்தானை தட்டவும்.</string>
+    <string name="restart_app_message">விரைவில் முடிந்தது! பிராப்தியை அடைய விட்டு "பராமரிக்க APP" ஐ தட்டவும்.</string>
     <string name="keep_screen_on">திரையை நிரப்பிடு</string>
     <string name="cast_mode">பரிசு முறை</string>
     <string name="my_phone">என் போன்</string>

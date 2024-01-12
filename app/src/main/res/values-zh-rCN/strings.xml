@@ -14,7 +14,7 @@
     <string name="url_token">URL令牌</string>
     <string name="url_token_tips">URL令牌用于加密URL中的数据。如果重置，使用旧令牌加密的URL将不再可访问。</string>
     <string name="http_server_ok">HTTP服务运行中</string>
-    <string name="http_server_error">HTTP服务器未启动。重新启动PlainApp并重试。确保没有其他应用程序占用HTTP或HTTPS端口。如果问题仍然存在，请通过ismartcoding@gmail.com提供有关问题的更多详细信息。</string>
+    <string name="http_server_error">HTTP服务器未启动。重新启动PlainApp并重试。</string>
     <string name="relaunch_app">重启应用</string>
     <string name="load_no_more">完</string>
     <string name="list_empty">暂无数据</string>
@@ -472,9 +472,9 @@
     <string name="password_type_fixed">固定</string>
     <string name="password_type_none">无密码</string>
     <string name="restart_app_title">重启应用</string>
-    <string name="http_server_failed">HTTP服务器启动失败，请强制退出应用并重新打开。</string>
-    <string name="http_server_stopped">HTTP服务器未启动。</string>
-    <string name="restart_app_message">您需要退出当前应用并重新打开应用才能生效。</string>
+    <string name="http_server_failed">HTTP 服务器启动失败。要重新启动，请点击“重新启动应用”按钮。</string>
+    <string name="http_server_stopped">HTTP 服务器已经被故意停止。要重新启动，请点击“重新启动应用”按钮。</string>
+    <string name="restart_app_message">差一点了！只需点击“重新启动应用”即可生效。</string>
     <string name="keep_screen_on">保持屏幕常亮</string>
     <string name="cast_mode">投屏模式</string>
     <string name="my_phone">我的手机</string>

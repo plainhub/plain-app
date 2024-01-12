@@ -472,9 +472,9 @@
     <string name="password_type_fixed">固定</string>
     <string name="password_type_none">パスワードなし</string>
     <string name="restart_app_title">アプリを再起動</string>
-    <string name="http_server_failed">HTTPサーバーの起動に失敗しました。アプリを強制終了してから再度開いてください。</string>
-    <string name="http_server_stopped">HTTPサーバーが停止しました。</string>
-    <string name="restart_app_message">アプリを強制終了してから再度開いてください。</string>
+    <string name="http_server_failed">HTTPサーバーの起動に失敗しました。再起動するには、「アプリを再起動」ボタンをタップしてください。</string>
+    <string name="http_server_stopped">HTTPサーバーは意図的に停止されました。再起動するには、「アプリを再起動」ボタンをタップしてください。</string>
+    <string name="restart_app_message">ほとんど完了！効果を確認するには、「アプリを再起動」をタップしてください。</string>
     <string name="keep_screen_on">画面を常にオンにする</string>
     <string name="cast_mode">キャストモード</string>
     <string name="my_phone">マイフォン</string>

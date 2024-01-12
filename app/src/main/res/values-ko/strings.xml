@@ -472,9 +472,9 @@
     <string name="password_type_fixed">고정</string>
     <string name="password_type_none">비밀번호 없음</string>
     <string name="restart_app_title">앱 다시 시작</string>
-    <string name="http_server_failed">HTTP 서버 시작 실패, 앱을 강제로 종료한 다음 다시 열어야 합니다.</string>
-    <string name="http_server_stopped">HTTP 서버가 중지되었습니다.</string>
-    <string name="restart_app_message">앱을 강제로 종료한 다음 다시 열어야 합니다.</string>
+    <string name="http_server_failed">HTTP 서버를 시작하지 못했습니다. 다시 시작하려면 "앱 다시 시작" 버튼을 탭하세요.</string>
+    <string name="http_server_stopped">HTTP 서버가 의도적으로 중지되었습니다. 다시 시작하려면 "앱 다시 시작" 버튼을 탭하세요.</string>
+    <string name="restart_app_message">거의 완료되었습니다! 효과를 적용하려면 "앱 다시 시작"을 탭하세요.</string>
     <string name="keep_screen_on">화면 켜짐 유지</string>
     <string name="cast_mode">캐스트 모드</string>
     <string name="my_phone">내 폰</string>

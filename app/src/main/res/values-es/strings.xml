@@ -472,9 +472,9 @@
     <string name="password_type_fixed">Fija</string>
     <string name="password_type_none">Sin contraseña</string>
     <string name="restart_app_title">Reiniciar la aplicación</string>
-    <string name="http_server_failed">No se pudo iniciar el servidor HTTP. Debe salir forzosamente de la aplicación y luego abrirla nuevamente.</string>
-    <string name="http_server_stopped">El servidor HTTP se detuvo.</string>
-    <string name="restart_app_message">Debe salir forzosamente de la aplicación y luego abrirla nuevamente.</string>
+    <string name="http_server_failed">Falló el inicio del servidor HTTP. Para reiniciarlo, toque el botón "Volver a lanzar APP".</string>
+    <string name="http_server_stopped">El servidor HTTP ha sido detenido intencionalmente. Para reiniciarlo, toque el botón "Volver a lanzar APP".</string>
+    <string name="restart_app_message">¡Casi listo! Solo toque "Volver a lanzar APP" para que surtan efecto los cambios.</string>
     <string name="keep_screen_on">Mantener pantalla encendida</string>
     <string name="cast_mode">Modo de transmisión</string>
     <string name="my_phone">Mi teléfono</string>

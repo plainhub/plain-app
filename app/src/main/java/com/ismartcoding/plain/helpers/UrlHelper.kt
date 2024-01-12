@@ -21,6 +21,14 @@ object UrlHelper {
         return "http://${NetworkHelper.getDeviceIP4()}:${TempData.httpPort}/callback/cast"
     }
 
+    fun getHealthCheckUrl(): String {
+        return "http://localhost:${TempData.httpPort}/health_check"
+    }
+
+    fun getShutdownUrl(): String {
+        return "http://localhost:${TempData.httpPort}/shutdown"
+    }
+
     fun getMediaPath(id: String): String {
         return mediaPathMap[id] ?: ""
     }

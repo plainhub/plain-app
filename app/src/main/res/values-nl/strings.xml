@@ -472,9 +472,9 @@
     <string name="password_type_fixed">Vast</string>
     <string name="password_type_none">Geen wachtwoord</string>
     <string name="restart_app_title">App herstarten</string>
-    <string name="http_server_failed">HTTP-server kon niet worden gestart. U moet de app geforceerd afsluiten en deze vervolgens opnieuw openen.</string>
-    <string name="http_server_stopped">HTTP-server is gestopt.</string>
-    <string name="restart_app_message">U moet de app geforceerd afsluiten en deze vervolgens opnieuw openen.</string>
+    <string name="http_server_failed">HTTP-server starten mislukt. Om het opnieuw te starten, tik op de knop "APP opnieuw starten".</string>
+    <string name="http_server_stopped">De HTTP-server is opzettelijk gestopt. Om het opnieuw te starten, tik op de knop "APP opnieuw starten".</string>
+    <string name="restart_app_message">Bijna klaar! Tik gewoon op "APP opnieuw starten" om het effect te zien.</string>
     <string name="keep_screen_on">Scherm aan houden</string>
     <string name="cast_mode">Cast-modus</string>
     <string name="my_phone">Mijn telefoon</string>
