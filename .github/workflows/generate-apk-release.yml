@@ -38,4 +38,4 @@ jobs:
           body: "## What's Changed"
           draft: true
           prerelease: false
-          artifacts: ./app/build/outputs/apk/free/release/PlainApp-${{ env.version_name }}.apk
+          artifacts: ./app/build/outputs/apk/github/release/PlainApp-${{ env.version_name }}.apk

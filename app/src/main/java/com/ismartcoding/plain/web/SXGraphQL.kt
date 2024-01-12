@@ -12,7 +12,6 @@ import com.apurebase.kgraphql.schema.dsl.SchemaConfigurationDSL
 import com.apurebase.kgraphql.schema.execution.Execution
 import com.apurebase.kgraphql.schema.execution.Executor
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.allowSensitivePermissions
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isAudioFast
 import com.ismartcoding.lib.extensions.isImageFast
@@ -630,12 +629,11 @@ class SXGraphQL(val schema: Schema) {
                             PhoneHelper.getBatteryPercentage(context),
                             BuildConfig.VERSION_CODE,
                             android.os.Build.VERSION.SDK_INT,
-                            BuildConfig.isPro,
+                            BuildConfig.CHANNEL,
                             Permission.values().filter { apiPermissions.contains(it.name) && it.can(MainApp.instance) },
                             AudioPlaylistPreference.getValueAsync(context).map { it.toModel() },
                             AudioPlayModePreference.getValueAsync(context),
                             AudioPlayingPreference.getValueAsync(context)?.path ?: "",
-                            context.allowSensitivePermissions(),
                             sdcardPath = FileSystemHelper.getSDCardPath(context),
                             usbDiskPaths = FileSystemHelper.getUsbDiskPaths(),
                             internalStoragePath = FileSystemHelper.getInternalStoragePath(),

@@ -23,7 +23,6 @@ PlainApp is an open-source application that allows you to manage your phone thro
 - TV casting: Cast your videos, images, and audio to your TV.
 - Video and audio playback: Play videos and audio in the app and on the webpage.
 - Backup and export: Backup and export your app data for safekeeping.
-- ChatGPT conversation UI (web only)
 - SMS, Calls: Read your SMS and calls on webpage.(Apk only)
 - Apps: View your apps and download apk from phone.(web only)
 - Screen mirror: Mirror your phone on webpage.
@@ -62,13 +61,13 @@ Your donation is highly appreciated. Thank you!
 
 ## Screenshots
 
-| ![sound meter](screenshots/1.jpeg)   | ![files](screenshots/2.jpeg)            | ![web](screenshots/3.jpeg)                    | ![notes](screenshots/4.jpeg)                     |
-|--------------------------------------|-----------------------------------------|-----------------------------------------------|--------------------------------------------------|
-| ![audio](screenshots/5.jpeg)         | ![images](screenshots/6.jpeg)           | ![videos](screenshots/7.jpeg)                 | ![rss](screenshots/8.jpeg)                       |
-| ![home](screenshots/web-home.png)    | ![images](screenshots/web-images.png)   | ![videos](screenshots/web-videos.png)         | ![notes](screenshots/web-notes.png)              |
-| ![files](screenshots/web-files.png)  | ![chatgpt](screenshots/web-chatgpt.png) | ![messages](screenshots/web-messages.png)     | ![contacts](screenshots/web-contacts.png)        |
+| ![sound meter](screenshots/1.jpeg)   | ![files](screenshots/2.jpeg)            | ![web](screenshots/3.jpeg)                   | ![notes](screenshots/4.jpeg)                     |
+|--------------------------------------|-----------------------------------------|----------------------------------------------|--------------------------------------------------|
+| ![audio](screenshots/5.jpeg)         | ![images](screenshots/6.jpeg)           | ![videos](screenshots/7.jpeg)                | ![rss](screenshots/8.jpeg)                       |
+| ![home](screenshots/web-home.png)    | ![images](screenshots/web-images.png)   | ![videos](screenshots/web-videos.png)        | ![notes](screenshots/web-notes.png)              |
+| ![files](screenshots/web-files.png)  |  ![encryption](screenshots/web-calls.png)  | ![messages](screenshots/web-messages.png)    | ![contacts](screenshots/web-contacts.png)        |
 | ![audio](screenshots/web-audios.png) | ![rss](screenshots/web-rss.png)         | ![encryption](screenshots/web-encryption.png) | ![encryption](screenshots/web-screen-mirror.png) |
-| ![audio](screenshots/web-image.png)  | ![rss](screenshots/web-video.png)       | ![encryption](screenshots/web-calls.png)      |                                                  |
+| ![audio](screenshots/web-image.png)  | ![rss](screenshots/web-video.png)       |                                              |                                                  |
 
 ## Compatibility
 

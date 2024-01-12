@@ -11,7 +11,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.enums.AppChannelType
+import com.ismartcoding.plain.data.enums.AppFeatureType
 import com.ismartcoding.plain.ui.base.GridItem
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.extensions.navigate
@@ -28,12 +31,14 @@ fun HomeItemTools(
             text = stringResource(R.string.home_item_title_tools),
         )
         HomeItemFlow {
-            GridItem(
-                icon = Icons.Outlined.CurrencyExchange,
-                stringResource(id = R.string.exchange_rate),
-                modifier = Modifier.width(itemWidth),
-            ) {
-                navController.navigate(RouteName.EXCHANGE_RATE)
+            if (AppFeatureType.EXCHANGE_RATE.has()) {
+                GridItem(
+                    icon = Icons.Outlined.CurrencyExchange,
+                    stringResource(id = R.string.exchange_rate),
+                    modifier = Modifier.width(itemWidth),
+                ) {
+                    navController.navigate(RouteName.EXCHANGE_RATE)
+                }
             }
             GridItem(
                 icon = Icons.Outlined.GraphicEq,

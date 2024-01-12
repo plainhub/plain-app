@@ -12,7 +12,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.allowSensitivePermissions
 import com.ismartcoding.lib.extensions.hasPermission
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.isRPlus
@@ -20,6 +19,7 @@ import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.enums.AppFeatureType
 import com.ismartcoding.plain.data.preference.ApiPermissionsPreference
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.FileHelper
@@ -249,7 +249,7 @@ object Permissions {
 
     fun getWebList(context: Context): List<PermissionItem> {
         val permissions = mutableListOf(Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_CONTACTS, Permission.WRITE_CONTACTS)
-        if (context.allowSensitivePermissions()) {
+        if (AppFeatureType.SOCIAL.has()) {
             permissions.addAll(listOf(Permission.READ_SMS, Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG))
         }
         permissions.addAll(listOf(Permission.CALL_PHONE, Permission.NOTIFICATION_LISTENER, Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS, Permission.SYSTEM_ALERT_WINDOW,  Permission.NONE))

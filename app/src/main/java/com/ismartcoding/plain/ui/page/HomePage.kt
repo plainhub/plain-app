@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Chat
-import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.Computer
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
@@ -31,9 +30,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
-import com.ismartcoding.lib.extensions.allowSensitivePermissions
-import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.enums.AppFeatureType
 import com.ismartcoding.plain.data.preference.LocalKeepScreenOn
 import com.ismartcoding.plain.data.preference.LocalWeb
 import com.ismartcoding.plain.features.StartHttpServerErrorEvent
@@ -172,13 +170,13 @@ fun HomePage(
                 HomeItemWork(itemWidth)
                 Spacer(modifier = Modifier.height(16.dp))
             }
-            if (context.allowSensitivePermissions()) {
+            if (AppFeatureType.SOCIAL.has()) {
                 item {
                     HomeItemSocial(navController, itemWidth)
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             }
-            if (BuildConfig.DEBUG) {
+            if (AppFeatureType.EDUCATION.has()) {
                 item {
                     HomeItemEducation(navController, itemWidth)
                     Spacer(modifier = Modifier.height(16.dp))
@@ -188,7 +186,7 @@ fun HomePage(
                 HomeItemTools(navController, itemWidth)
                 Spacer(modifier = Modifier.height(16.dp))
             }
-            if (BuildConfig.DEBUG) {
+            if (AppFeatureType.HARDWARE.has()) {
                 item {
                     HomeItemHardware(navController, itemWidth, viewModel)
                 }

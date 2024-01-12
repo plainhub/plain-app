@@ -23,7 +23,6 @@
 - 电视投射：将您的视频、图像和音频投射到您的电视上。
 - 视频和音频播放：在应用内和网页上播放视频和音频。
 - 备份和导出：备份和导出您的应用数据以进行安全保存。
-- ChatGPT 对话界面（仅限网页）
 - 短信、通话：在网页上阅读您的短信和通话记录。（仅限Apk版）
 - 应用程序：查看您的应用程序并从手机下载apk。（仅限网页）
 - 屏幕镜像：在网页上镜像您的手机屏幕。
@@ -66,9 +65,9 @@ Discord: https://discord.gg/RQWcS6DEEe
 |--------------------------------------|-----------------------------------------|-----------------------------------------------|--------------------------------------------------|
 | ![audio](screenshots/5.jpeg)         | ![images](screenshots/6.jpeg)           | ![videos](screenshots/7.jpeg)                 | ![rss](screenshots/8.jpeg)                       |
 | ![home](screenshots/web-home.png)    | ![images](screenshots/web-images.png)   | ![videos](screenshots/web-videos.png)         | ![notes](screenshots/web-notes.png)              |
-| ![files](screenshots/web-files.png)  | ![chatgpt](screenshots/web-chatgpt.png) | ![messages](screenshots/web-messages.png)     | ![contacts](screenshots/web-contacts.png)        |
+| ![files](screenshots/web-files.png)  | ![encryption](screenshots/web-calls.png)  | ![messages](screenshots/web-messages.png)     | ![contacts](screenshots/web-contacts.png)        |
 | ![audio](screenshots/web-audios.png) | ![rss](screenshots/web-rss.png)         | ![encryption](screenshots/web-encryption.png) | ![encryption](screenshots/web-screen-mirror.png) |
-| ![audio](screenshots/web-image.png)  | ![rss](screenshots/web-video.png)       | ![encryption](screenshots/web-calls.png)      |                                                  |
+| ![audio](screenshots/web-image.png)  | ![rss](screenshots/web-video.png)       |                                               |                                                  |
 
 ## 兼容性
 

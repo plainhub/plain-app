@@ -69,6 +69,7 @@ android {
             configure<CrashlyticsExtension> {
                 mappingFileUploadEnabled = false
             }
+            buildConfigField("String", "CHANNEL", "\"\"")
 //            setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
         }
         release {
@@ -85,17 +86,19 @@ android {
         }
     }
 
-    flavorDimensions += "pricing"
+    flavorDimensions += "channel"
     productFlavors {
-        create("free") {
-            dimension = "pricing"
-            buildConfigField("boolean", "isPro", "false")
+        create("github") {
+            dimension = "channel"
+            buildConfigField("String", "CHANNEL", "\"GITHUB\"")
         }
-        create("pro") {
-            dimension = "pricing"
-            applicationIdSuffix = ".pro"
-            buildConfigField("boolean", "isPro", "true")
-            resValue("string", "app_name", "PlainApp Pro")
+        create("china") {
+            dimension = "channel"
+            buildConfigField("String", "CHANNEL", "\"CHINA\"")
+        }
+        create("google") {
+            dimension = "channel"
+            buildConfigField("String", "CHANNEL", "\"GOOGLE\"")
         }
     }
 
@@ -140,7 +143,7 @@ dependencies {
     val room = "2.6.1"
     val apollo = "3.2.1"
     val kgraphql = "0.19.0"
-    val ktor = "3.0.0-beta-1" // don't upgrade, TLS handshake failed
+    val ktor = "3.0.0-beta-1"
 
     implementation(platform("androidx.compose:compose-bom:2023.10.01"))
 

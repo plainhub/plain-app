@@ -23,6 +23,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.isTPlus
+import pl.droidsonroids.gif.BuildConfig
 import java.io.File
 import kotlin.math.roundToInt
 
@@ -278,10 +279,6 @@ fun Context.hasPermissionInManifest(vararg permissions: String): Boolean {
             packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
         }
     return packageInfo.requestedPermissions?.any { permissions.contains(it) } ?: false
-}
-
-fun Context.allowSensitivePermissions(): Boolean {
-    return hasPermissionInManifest(Manifest.permission.READ_SMS)
 }
 
 fun Context.isPortrait(): Boolean {
