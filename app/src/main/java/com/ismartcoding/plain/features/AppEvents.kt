@@ -3,7 +3,6 @@ package com.ismartcoding.plain.features
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
-import androidx.core.content.ContextCompat
 import com.aallam.openai.api.BetaOpenAI
 import com.aallam.openai.api.chat.ChatCompletionRequest
 import com.aallam.openai.api.chat.ChatMessage
@@ -30,13 +29,6 @@ import com.ismartcoding.plain.web.AuthRequest
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import com.ismartcoding.plain.web.websocket.WebSocketHelper
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.engine.*
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
@@ -48,7 +40,7 @@ class BoxConnectivityStateChangedEvent
 
 class StartHttpServerEvent
 
-class StartHttpServerErrorEvent
+class StartHttpServerStateEvent
 
 class StopHttpServerDoneEvent
 

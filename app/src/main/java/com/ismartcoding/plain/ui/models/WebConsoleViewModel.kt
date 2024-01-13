@@ -1,14 +1,12 @@
 package com.ismartcoding.plain.ui.models
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.HttpClientManager
@@ -19,7 +17,9 @@ import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import io.ktor.client.plugins.websocket.ws
 import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.launch
 
@@ -46,11 +46,23 @@ class WebConsoleViewModel : ViewModel() {
             DialogHelper.showLoading()
             val errorMessage = context.getString(R.string.http_server_error)
             try {
-                val r = withIO { client.get(UrlHelper.getHealthCheckUrl()) }
+                var hasError = false
+                withIO {
+                    client.ws(urlString = UrlHelper.getWsTestUrl()) {
+                        val reason = this.closeReason.getCompleted()
+                        LogCat.d("closeReason: $reason")
+                        if (reason?.message != BuildConfig.APPLICATION_ID) {
+                            hasError = true
+                        }
+                    }
+                }
+
+                if (!hasError) {
+                    val r = withIO { client.get(UrlHelper.getHealthCheckUrl()) }
+                    hasError = r.status != HttpStatusCode.OK || r.bodyAsText() != BuildConfig.APPLICATION_ID
+                }
                 DialogHelper.hideLoading()
-                if (r.status == HttpStatusCode.OK) {
-                    DialogHelper.showConfirmDialog(context, context.getString(R.string.confirm), context.getString(R.string.http_server_ok))
-                } else {
+                if (hasError) {
                     MaterialAlertDialogBuilder(context)
                         .setTitle(context.getString(R.string.error))
                         .setMessage(errorMessage)
@@ -61,8 +73,12 @@ class WebConsoleViewModel : ViewModel() {
                         }
                         .create()
                         .show()
+                } else {
+                    DialogHelper.showConfirmDialog(context, context.getString(R.string.confirm), context.getString(R.string.http_server_ok))
                 }
             } catch (ex: Exception) {
+                ex.printStackTrace()
+                LogCat.e(ex.toString())
                 DialogHelper.hideLoading()
                 MaterialAlertDialogBuilder(context)
                     .setTitle(context.getString(R.string.error))

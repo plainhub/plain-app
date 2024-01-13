@@ -15,11 +15,13 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.HttpClientManager
-import com.ismartcoding.plain.features.StartHttpServerErrorEvent
+import com.ismartcoding.plain.features.StartHttpServerStateEvent
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.web.HttpServerManager
+import io.ktor.client.plugins.websocket.ws
 import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 
 class HttpServerService : LifecycleService() {
@@ -64,6 +66,7 @@ class HttpServerService : LifecycleService() {
         } catch (ex: Exception) {
             ex.printStackTrace()
             LogCat.e(ex.toString())
+            HttpServerManager.httpServerError = ex.toString()
 
             if (PortHelper.isPortInUse(TempData.httpPort)) {
                 HttpServerManager.portsInUse.add(TempData.httpPort)
@@ -77,18 +80,26 @@ class HttpServerService : LifecycleService() {
                 try {
                     val client = HttpClientManager.httpClient()
                     val r = client.get(UrlHelper.getHealthCheckUrl())
-                    if (r.status == HttpStatusCode.OK) {
+                    if (r.status == HttpStatusCode.OK && r.bodyAsText() == BuildConfig.APPLICATION_ID) {
                         LogCat.d("http server is running")
                         HttpServerManager.portsInUse.clear()
-                        return
+                        client.ws(urlString = UrlHelper.getWsTestUrl()) {
+                            val reason = this.closeReason.getCompleted()
+                            LogCat.d("closeReason: $reason")
+                            if (reason?.message == BuildConfig.APPLICATION_ID) {
+                                HttpServerManager.httpServerError = ""
+                            }
+                            sendEvent(StartHttpServerStateEvent())
+                        }
+                    } else {
+                        sendEvent(StartHttpServerStateEvent())
                     }
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                    LogCat.e(ex.toString())
+                } catch (ex2: Exception) {
+                    ex2.printStackTrace()
+                    LogCat.e(ex2.toString())
+                    sendEvent(StartHttpServerStateEvent())
                 }
             }
-            HttpServerManager.httpServerError = ex.toString()
-            sendEvent(StartHttpServerErrorEvent())
         }
     }
 

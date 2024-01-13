@@ -163,7 +163,7 @@ object HttpModule {
             }
 
             get("/health_check") {
-                call.respond(HttpStatusCode.OK, "Server is running well")
+                call.respond(HttpStatusCode.OK, BuildConfig.APPLICATION_ID)
             }
 
             get("/shutdown") {
@@ -546,6 +546,10 @@ object HttpModule {
 
             webSocket("/") {
                 val q = call.request.queryParameters
+                if (q["test"] == "1") {
+                    close(CloseReason(CloseReason.Codes.NORMAL, BuildConfig.APPLICATION_ID))
+                    return@webSocket
+                }
                 val clientId = q["cid"] ?: ""
                 if (clientId.isEmpty()) {
                     LogCat.e("ws: `cid` is missing")

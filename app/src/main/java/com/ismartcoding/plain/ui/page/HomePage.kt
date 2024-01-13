@@ -30,11 +30,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.AppFeatureType
 import com.ismartcoding.plain.data.preference.LocalKeepScreenOn
 import com.ismartcoding.plain.data.preference.LocalWeb
-import com.ismartcoding.plain.features.StartHttpServerErrorEvent
+import com.ismartcoding.plain.features.StartHttpServerStateEvent
 import com.ismartcoding.plain.features.StopHttpServerDoneEvent
 import com.ismartcoding.plain.helpers.ScreenHelper
 import com.ismartcoding.plain.ui.base.ActionButtonMore
@@ -74,7 +75,7 @@ fun HomePage(
 
     LaunchedEffect(Unit) {
         events.add(
-            receiveEventHandler<StartHttpServerErrorEvent> {
+            receiveEventHandler<StartHttpServerStateEvent> {
                 viewModel.httpServerError.value = HttpServerManager.getErrorMessage()
             }
         )
@@ -103,6 +104,7 @@ fun HomePage(
                 navController.navigate(RouteName.SETTINGS)
             }
         },
+        topBarTitle = if (BuildConfig.DEBUG) "DEBUG" else "",
         actions = {
             PIconButton(
                 imageVector = Icons.Outlined.Computer,

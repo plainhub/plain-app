@@ -66,7 +66,7 @@ import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.RequestPermissionEvent
-import com.ismartcoding.plain.features.StartHttpServerErrorEvent
+import com.ismartcoding.plain.features.StartHttpServerStateEvent
 import com.ismartcoding.plain.features.StopHttpServerDoneEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.AppHelper
@@ -125,7 +125,7 @@ fun WebConsolePage(
             )
 
             events.add(
-                receiveEventHandler<StartHttpServerErrorEvent> {
+                receiveEventHandler<StartHttpServerStateEvent> {
                     mainViewModel.httpServerError.value = HttpServerManager.getErrorMessage()
                 }
             )

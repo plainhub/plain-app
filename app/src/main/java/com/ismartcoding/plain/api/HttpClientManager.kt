@@ -11,6 +11,7 @@ import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.cookies.*
 import io.ktor.client.plugins.logging.*
+import io.ktor.client.plugins.websocket.WebSockets
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -46,6 +47,7 @@ object HttpClientManager {
             install(HttpTimeout) {
                 requestTimeoutMillis = HttpApiTimeout.MEDIUM_SECONDS * 1000L
             }
+            install(WebSockets)
         }
 
     private fun OkHttpClient.Builder.ignoreAllSSLErrors(): OkHttpClient.Builder {
