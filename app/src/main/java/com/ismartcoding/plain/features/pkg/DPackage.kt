@@ -1,10 +1,12 @@
 package com.ismartcoding.plain.features.pkg
 
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
 import kotlinx.datetime.Instant
 
 data class DPackage(
-    val app: ApplicationInfo,
+    val appInfo: ApplicationInfo,
+    val packageInfo: PackageInfo,
     val id: String,
     val name: String,
     val type: String,
@@ -14,6 +16,10 @@ data class DPackage(
     val certs: List<DCertificate>,
     val installedAt: Instant,
     val updatedAt: Instant,
-)
+) {
+    val hasLargeHeap: Boolean
+        get() = appInfo.flags and ApplicationInfo.FLAG_LARGE_HEAP != 0
+
+}
 
 data class DCertificate(val issuer: String, val subject: String, val serialNumber: String, val validFrom: Instant, val validTo: Instant)

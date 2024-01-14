@@ -24,18 +24,20 @@ object PackageHelper {
     private val appCertsCache: MutableMap<String, List<DCertificate>> = HashMap()
 
     fun getPackageStatuses(ids: List<String>): Map<String, Boolean> {
-        val packages = packageManager.getInstalledPackages(0)
+        val packages = packageManager.getInstalledPackages(0).map { it.packageName }
         val map = mutableMapOf<String, Boolean>()
         ids.forEach { id ->
-            map[id] = packages.any { it.packageName == id }
+            map[id] = packages.contains(id)
         }
 
         return map
     }
 
+    fun isUninstalled(packageName: String): Boolean {
+        return getPackageStatuses(listOf(packageName))[packageName] == false
+    }
+
     fun search(query: String, limit: Int, offset: Int): List<DPackage> {
-        val flags = PackageManager.GET_SIGNING_CERTIFICATES
-        val packages = if (query.isEmpty()) packageManager.getInstalledPackages(flags).drop(offset).take(limit) else packageManager.getInstalledPackages(flags)
         val apps = mutableListOf<DPackage>()
         var type = ""
         var text = ""
@@ -56,57 +58,22 @@ object PackageHelper {
             }
         }
 
-        val applications = packageManager.getInstalledApplications(0).associateBy { it.packageName }
-        packages.forEach { pkg ->
-            val appInfo = applications[pkg.packageName] ?: return@forEach
-            var certs = appCertsCache[pkg.packageName]
-            if (certs == null) {
-                certs = mutableListOf<DCertificate>()
-                val signatures = signatures(pkg)
-                for (signature in signatures) {
-                    val cert = X509Certificate.getInstance(signature.toByteArray())
-                    certs.add(
-                        DCertificate(
-                            cert.issuerDN.name,
-                            cert.subjectDN.name,
-                            cert.serialNumber.toString(),
-                            Instant.fromEpochMilliseconds(cert.notBefore.time),
-                            Instant.fromEpochMilliseconds(cert.notAfter.time)
-                        )
-                    )
-                }
-                appCertsCache[pkg.packageName] = certs
-            }
-
-            var appType = appTypeCache[pkg.packageName]
-            if (appType == null) {
-                val isSystemApp = appInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
-                appType = if (isSystemApp) "system" else "user"
-                appTypeCache[pkg.packageName] = appType
-            }
-
-            if (type.isNotEmpty() && appType != type) {
-                return@forEach
-            }
-
+        val appInfos = packageManager.getInstalledApplications(0)
+        appInfos.forEach { appInfo ->
             if (ids.isNotEmpty() && !ids.contains(appInfo.packageName)) {
                 return@forEach
             }
 
-            apps.add(
-                DPackage(
-                    appInfo,
-                    appInfo.packageName,
-                    getLabel(appInfo),
-                    appType,
-                    pkg.versionName ?: "",
-                    appInfo.sourceDir,
-                    File(appInfo.publicSourceDir).length(),
-                    certs,
-                    Instant.fromEpochMilliseconds(pkg.firstInstallTime),
-                    Instant.fromEpochMilliseconds(pkg.lastUpdateTime),
-                )
-            )
+            if (type.isNotEmpty()) {
+                val appType = getAppType(appInfo)
+                if (appType != type) {
+                    return@forEach
+                }
+            }
+
+            val packageInfo = packageManager.getPackageInfo(appInfo.packageName, PackageManager.GET_SIGNING_CERTIFICATES)
+
+            apps.add(getPackage(appInfo, packageInfo))
         }
 
         return if (query.isEmpty()) {
@@ -120,17 +87,75 @@ object PackageHelper {
                     c.issuer.contains(text, true)
                             || c.subject.contains(text, true)
                 }
-            }.drop(offset).take(limit)
-        }.sortedBy { Pinyin.toPinyin(it.name).lowercase() }
+            }
+        }.sortedBy { Pinyin.toPinyin(it.name).lowercase() }.drop(offset).take(limit)
+    }
+
+    private fun getAppType(appInfo: ApplicationInfo): String {
+        var appType = appTypeCache[appInfo.packageName]
+        if (appType == null) {
+            appType = if (ApplicationInfoCompat.isSystemApp(appInfo)) "system" else "user"
+            appTypeCache.put(appInfo.packageName, appType)
+        }
+
+        return appType
+    }
+
+    private fun getCerts(packageInfo: PackageInfo): List<DCertificate> {
+        var certs = appCertsCache[packageInfo.packageName]
+        if (certs == null) {
+            certs = mutableListOf<DCertificate>()
+            val signatures = signatures(packageInfo)
+            for (signature in signatures) {
+                val cert = X509Certificate.getInstance(signature.toByteArray())
+                certs.add(
+                    DCertificate(
+                        cert.issuerDN.name,
+                        cert.subjectDN.name,
+                        cert.serialNumber.toString(),
+                        Instant.fromEpochMilliseconds(cert.notBefore.time),
+                        Instant.fromEpochMilliseconds(cert.notAfter.time)
+                    )
+                )
+            }
+            appCertsCache.put(packageInfo.packageName, certs)
+        } else {
+            certs = mutableListOf()
+        }
+
+        return certs
+    }
+
+    fun getPackage(packageName: String): DPackage {
+        val flags = PackageManager.GET_SIGNING_CERTIFICATES
+        val packageInfo = packageManager.getPackageInfo(packageName, flags)
+        val appInfo = packageManager.getApplicationInfo(packageName, 0)
+
+        return getPackage(appInfo, packageInfo)
+    }
+
+    fun getPackage(appInfo: ApplicationInfo, packageInfo: PackageInfo): DPackage {
+        return DPackage(
+            appInfo,
+            packageInfo,
+            appInfo.packageName,
+            getLabel(appInfo),
+            getAppType(appInfo),
+            packageInfo.versionName ?: "",
+            appInfo.sourceDir,
+            File(appInfo.publicSourceDir).length(),
+            getCerts(packageInfo),
+            Instant.fromEpochMilliseconds(packageInfo.firstInstallTime),
+            Instant.fromEpochMilliseconds(packageInfo.lastUpdateTime),
+        )
     }
 
     fun cacheAppLabels() {
         try {
-            val packages = packageManager.getInstalledPackages(0)
-            packages.forEach { app ->
+            val appInfos = packageManager.getInstalledApplications(0)
+            appInfos.forEach { appInfo ->
                 try {
-                    val packageInfo = packageManager.getApplicationInfo(app.packageName, 0)
-                    appLabelCache[packageInfo.packageName] = packageManager.getApplicationLabel(packageInfo).toString()
+                    appLabelCache.put(appInfo.packageName, packageManager.getApplicationLabel(appInfo).toString())
                 } catch (ex: Exception) {
                     LogCat.d(ex.toString())
                 }
@@ -142,23 +167,15 @@ object PackageHelper {
 
     fun count(query: String): Int {
         if (query.isEmpty()) {
-            return packageManager.getInstalledPackages(0).count()
+            return packageManager.getInstalledApplications(0).count()
         } else {
             val queryGroups = SearchHelper.parse(query)
             if (queryGroups.size == 1) {
                 val t = queryGroups.find { it.name == "type" }
                 if (t != null) {
                     val type = t.value
-                    return packageManager.getInstalledPackages(0).count { app ->
-                        val key = app.packageName
-                        var appType = appTypeCache[key]
-                        if (appType == null) {
-                            val packageInfo = packageManager.getApplicationInfo(key, 0)
-                            val isSystemApp = packageInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
-                            appType = if (isSystemApp) "system" else "user"
-                            appTypeCache[key] = type
-                        }
-                        appType == type
+                    return packageManager.getInstalledApplications(0).count { appInfo ->
+                        getAppType(appInfo) == type
                     }
                 }
             }
@@ -226,6 +243,24 @@ object PackageHelper {
 
     fun uninstall(context: Context, packageName: String) {
         context.startActivity(Intent(Intent.ACTION_DELETE, Uri.parse("package:$packageName")).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        })
+    }
+
+    fun canLaunch(packageName: String): Boolean {
+        return packageManager.getLaunchIntentForPackage(packageName) != null
+    }
+
+    fun launch(context: Context, packageName: String) {
+        context.startActivity(packageManager.getLaunchIntentForPackage(packageName)?.apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        })
+    }
+
+    fun viewInSettings(context: Context, packageName: String) {
+        context.startActivity(Intent().apply {
+            action = android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            data = Uri.parse("package:$packageName")
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         })
     }

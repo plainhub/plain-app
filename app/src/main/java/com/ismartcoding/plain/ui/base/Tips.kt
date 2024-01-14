@@ -22,7 +22,7 @@ fun Tips(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 16.dp),
             text = text,
-            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Light),
+            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Normal),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }

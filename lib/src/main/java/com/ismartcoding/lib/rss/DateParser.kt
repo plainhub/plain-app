@@ -70,7 +70,7 @@ object DateParser {
      */
     private fun parseUsingMask(masks: Array<String>, input: String, locale: Locale): Date? {
         val newDate = input.trim()
-        var pp: ParsePosition? = null
+        var pp: ParsePosition?
         var d: Date? = null
         var i = 0
         while (d == null && i < masks.size) {
@@ -200,7 +200,7 @@ object DateParser {
      *
      */
     fun parseDate(sDate: String, locale: Locale): Date? {
-        var date: Date? = null
+        var date: Date?
         if (ADDITIONAL_MASKS.isNotEmpty()) {
             date = parseUsingMask(ADDITIONAL_MASKS, sDate, locale)
             if (date != null) {

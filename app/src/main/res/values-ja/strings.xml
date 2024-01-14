@@ -2,9 +2,13 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">お使いのデバイスでは現在VPNが有効になっており、PCからアクセスした際にWeb接続の問題が発生する可能性があります。これを解決するために、LANトラフィックを許可するようにVPNの設定を調整するか、VPNを無効にすることをお勧めします。</string>
     <string name="warning">警告</string>
+    <string name="version_name_with_code">バージョン {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">最適化されたバッテリー使用が現在有効です。中断のないパフォーマンスを確保するために、このアプリケーションのために特にバッテリーオプティマイゼーションを無効にすることを検討してください。</string>
     <string name="apps">アプリ</string>
     <string name="change_port">ポートを変更</string>
+    <string name="user_app">ユーザーアプリ</string>
+    <string name="system_app">システムアプリ</string>
+    <string name="large_heap">大きなヒープ</string>
     <string name="app_type_user">ユーザー</string>
     <string name="app_type_system">システム</string>
     <string name="http_port_conflict_error">ポート{{ port }}は現在使用中です。ポートを自動的に変更するには \'修正\' ボタンをタップするか、URLアドレスの横にある編集アイコンをタップして手動で異なるポートを選択することができます。</string>

@@ -2,9 +2,13 @@
     <string name="app_name">簡樸</string>
     <string name="vpn_web_conflict_warning">您的VPN目前在設備上啟用，這可能會導致從PC訪問時出現Web連接問題。為解決此問題，我們建議調整VPN設置以允許局域網流量或禁用VPN。</string>
     <string name="warning">警告</string>
+    <string name="version_name_with_code">版本 {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">優化電池使用目前已啟用。為確保不中斷效能，請考慮為此應用停用電池優化。</string>
     <string name="apps">應用</string>
     <string name="change_port">更改端口</string>
+    <string name="user_app">用戶應用</string>
+    <string name="system_app">系統應用</string>
+    <string name="large_heap">大堆內存</string>
     <string name="app_type_user">用戶</string>
     <string name="app_type_system">系統</string>
     <string name="http_port_conflict_error">端口 {{ port }} 當前被佔用。您可以點擊\'修復\'按鈕自動更改端口，或者您可以選擇點擊URL地址旁邊的編輯圖標手動選擇不同的端口。</string>

@@ -88,7 +88,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WebConsolePage(
+fun WebSettingsPage(
     navController: NavHostController,
     mainViewModel: MainViewModel,
     viewModel: WebConsoleViewModel = viewModel(),
@@ -494,7 +494,7 @@ fun BrowserPreview(
                 .fillMaxWidth()
                 .padding(16.dp),
             text = stringResource(id = R.string.enter_this_address_tips),
-            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Light),
+            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Normal),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )

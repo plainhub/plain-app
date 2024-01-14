@@ -22,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -45,6 +46,7 @@ import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.SharedViewModel
+import com.ismartcoding.plain.ui.page.apps.AppPage
 import com.ismartcoding.plain.ui.page.apps.AppsPage
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.page.scan.ScanPage
@@ -59,7 +61,7 @@ import com.ismartcoding.plain.ui.page.tools.ExchangeRatePage
 import com.ismartcoding.plain.ui.page.tools.SoundMeterPage
 import com.ismartcoding.plain.ui.page.web.PasswordPage
 import com.ismartcoding.plain.ui.page.web.SessionsPage
-import com.ismartcoding.plain.ui.page.web.WebConsolePage
+import com.ismartcoding.plain.ui.page.web.WebSettingsPage
 import com.ismartcoding.plain.ui.page.web.WebDevPage
 import com.ismartcoding.plain.ui.page.web.WebSecurityPage
 import com.ismartcoding.plain.ui.preview.PreviewDialog
@@ -150,7 +152,7 @@ fun Main(viewModel: MainViewModel) {
                 RouteName.BACKUP_RESTORE to { BackupRestorePage(navController) },
                 RouteName.ABOUT to { AboutPage(navController) },
                 RouteName.LOGS to { LogsPage(navController) },
-                RouteName.WEB_CONSOLE to { WebConsolePage(navController, viewModel) },
+                RouteName.WEB_SETTINGS to { WebSettingsPage(navController, viewModel) },
                 RouteName.PASSWORD to { PasswordPage(navController) },
                 RouteName.SESSIONS to { SessionsPage(navController) },
                 RouteName.WEB_DEV to { WebDevPage(navController) },
@@ -171,8 +173,17 @@ fun Main(viewModel: MainViewModel) {
             }
 
             slideHorizontallyComposable(
-                "${RouteName.CHAT_EDIT_TEXT.name}?id={id}",
-                arguments = listOf(navArgument("id") { }),
+                "${RouteName.APPS.name}/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.StringType }),
+            ) { backStackEntry ->
+                val arguments = requireNotNull(backStackEntry.arguments)
+                val id = arguments.getString("id", "")
+                AppPage(navController, id)
+            }
+
+            slideHorizontallyComposable(
+                "${RouteName.CHAT_EDIT_TEXT.name}/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.StringType }),
             ) { backStackEntry ->
                 val arguments = requireNotNull(backStackEntry.arguments)
                 val id = arguments.getString("id", "")

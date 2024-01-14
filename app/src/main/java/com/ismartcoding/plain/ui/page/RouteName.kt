@@ -9,7 +9,7 @@ enum class RouteName {
     BACKUP_RESTORE,
     ABOUT,
     LOGS,
-    WEB_CONSOLE,
+    WEB_SETTINGS,
     WEB_SECURITY,
     PASSWORD,
     TEXT,

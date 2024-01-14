@@ -2,9 +2,13 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Su VPN está actualmente habilitado en su dispositivo, lo que podría provocar problemas de conexión web cuando se accede desde su PC. Para resolver esto, le recomendamos ajustar la configuración de su VPN para permitir el tráfico de LAN o desactivar su VPN.</string>
     <string name="warning">Advertencia</string>
+    <string name="version_name_with_code">Versión {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">La optimización de la batería está actualmente activa. Para garantizar un rendimiento ininterrumpido, considere desactivar la optimización de la batería específicamente para esta aplicación.</string>
     <string name="apps">Aplicaciones</string>
     <string name="change_port">Cambiar puerto</string>
+    <string name="user_app">Aplicación de usuario</string>
+    <string name="system_app">Aplicación del sistema</string>
+    <string name="large_heap">Gran montón</string>
     <string name="app_type_user">Usuario</string>
     <string name="app_type_system">Sistema</string>
     <string name="http_port_conflict_error">El puerto {{ port }} está actualmente en uso. Puede tocar el botón \'Corregir\' para cambiar automáticamente el puerto, o puede optar por tocar el ícono de edición junto a la dirección URL para seleccionar manualmente un puerto diferente.</string>

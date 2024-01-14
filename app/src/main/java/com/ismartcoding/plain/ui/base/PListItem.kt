@@ -48,19 +48,19 @@ fun PListItem(
     val tonalPalettes = LocalTonalPalettes.current
     Surface(
         modifier =
-            modifier
-                .combinedClickable(
-                    onClick = onClick,
-                    onLongClick = onLongClick,
-                )
-                .alpha(if (enable) 1f else 0.5f),
+        modifier
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick,
+            )
+            .alpha(if (enable) 1f else 0.5f),
         color = Color.Unspecified,
     ) {
         Row(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp, 8.dp, 8.dp, 8.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp, 8.dp, 8.dp, 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (icon != null) {
@@ -74,9 +74,9 @@ fun PListItem(
                 iconPainter?.let {
                     Image(
                         modifier =
-                            Modifier
-                                .padding(end = 24.dp)
-                                .size(24.dp),
+                        Modifier
+                            .padding(end = 24.dp)
+                            .size(24.dp),
                         painter = it,
                         contentDescription = title,
                     )
@@ -88,11 +88,12 @@ fun PListItem(
                     style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
                 )
                 desc?.let {
+                    VerticalSpace(dp = 8.dp)
                     SelectionContainer {
                         Text(
                             text = it,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodyLarge,
                         )
                     }
                 }

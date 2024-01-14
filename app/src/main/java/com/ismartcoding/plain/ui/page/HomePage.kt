@@ -113,7 +113,7 @@ fun HomePage(
                 showBadge = viewModel.showWebBadge.value,
                 badgeColor = if (viewModel.httpServerError.value.isNotEmpty()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.green(),
             ) {
-                navController.navigate(RouteName.WEB_CONSOLE)
+                navController.navigate(RouteName.WEB_SETTINGS)
             }
             ActionButtonMore {
                 isMenuOpen = !isMenuOpen

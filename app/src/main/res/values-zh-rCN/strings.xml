@@ -2,9 +2,13 @@
     <string name="app_name">简朴</string>
     <string name="vpn_web_conflict_warning">您的VPN当前在设备上启用，这可能会导致从PC访问时出现Web连接问题。为解决此问题，我们建议调整VPN设置以允许局域网流量或禁用VPN。</string>
     <string name="warning">警告</string>
+    <string name="version_name_with_code">版本 {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">优化电池使用目前已激活。为确保流畅的使用性能，请考虑为此应用禁用电池优化。</string>
     <string name="apps">应用</string>
     <string name="change_port">更改端口</string>
+    <string name="user_app">用户应用</string>
+    <string name="system_app">系统应用</string>
+    <string name="large_heap">大堆内存(Large heap)</string>
     <string name="app_type_user">用户</string>
     <string name="app_type_system">系统</string>
     <string name="http_port_conflict_error">端口 {{ port }} 当前被占用。您可以点击\'修复\'按钮自动更改端口，或者您可以选择点击URL地址旁边的编辑图标手动选择不同的端口。</string>
@@ -462,7 +466,7 @@
     <string name="web_console_desc">您的电脑和手机必须在同一个子网中。为了最大化手机的性能，请将 USB 适配器连接到电源插座。</string>
     <string name="fetch_content_automatically">自动拉取正文内容</string>
     <string name="app_restored">应用数据已经恢复，您需要重启应用。</string>
-    <string name="welcome_text">欢迎使用！您可以轻松地将文本、图片和视频发送到本页面，并在您的电脑上查看。\n如果您遇到问题，请发送邮件至ismartcoding@gmail.com寻求帮助，或者加入Discord讨论: https://discord.gg/RQWcS6DEEe。</string>
+    <string name="welcome_text">欢迎使用！您可以轻松地将文本、图片和视频发送到本页面，并在您的电脑上查看。\n如果您遇到问题，请发送邮件至ismartcoding@gmail.com寻求帮助，或者加入QQ群讨论: 812409393。</string>
     <string name="demo_mode">Demo模式</string>
     <string name="donation">捐赠</string>
     <string name="logs">日志</string>

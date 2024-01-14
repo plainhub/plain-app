@@ -22,6 +22,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.VerticalRefreshableLayout
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.PackageListItem
 import com.ismartcoding.plain.ui.models.AppsViewModel
+import com.ismartcoding.plain.ui.page.RouteName
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +30,6 @@ fun AppsPage(
     navController: NavHostController,
     viewModel: AppsViewModel = viewModel(),
 ) {
-    val context = LocalContext.current
     val itemsState by viewModel.itemsFlow.collectAsState()
 
     val topRefreshLayoutState =
@@ -65,7 +65,10 @@ fun AppsPage(
                     ) {
                         items(itemsState) { m ->
                             PackageListItem(
-                                item = m
+                                item = m,
+                                onClick = {
+                                    navController.navigate("${RouteName.APPS.name}/${m.id}")
+                                }
                             )
                         }
                     }
