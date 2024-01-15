@@ -5,17 +5,17 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.content.pm.PackageManager.GET_META_DATA
 import android.content.pm.Signature
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.os.UserHandle
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.pinyin.Pinyin
 import com.ismartcoding.plain.packageManager
-import kotlinx.datetime.Clock
+import com.ismartcoding.plain.storageStatsManager
 import kotlinx.datetime.Instant
 import java.io.File
 import javax.security.cert.X509Certificate
@@ -135,8 +135,27 @@ object PackageHelper {
         return getPackage(appInfo, packageInfo)
     }
 
-    fun getPackage(appInfo: ApplicationInfo, packageInfo: PackageInfo): DPackage {
+    private fun getPackage(appInfo: ApplicationInfo, packageInfo: PackageInfo): DPackage {
         return DPackage(
+            appInfo,
+            packageInfo,
+            appInfo.packageName,
+            getLabel(appInfo),
+            getAppType(appInfo),
+            packageInfo.versionName ?: "",
+            appInfo.sourceDir,
+            File(appInfo.publicSourceDir).length(),
+            getCerts(packageInfo),
+            Instant.fromEpochMilliseconds(packageInfo.firstInstallTime),
+            Instant.fromEpochMilliseconds(packageInfo.lastUpdateTime),
+        )
+    }
+
+    fun getPackageDetail(packageName: String): DPackageDetail {
+        val flags = PackageManager.GET_SIGNING_CERTIFICATES
+        val packageInfo = packageManager.getPackageInfo(packageName, flags)
+        val appInfo = packageManager.getApplicationInfo(packageName, 0)
+        return DPackageDetail(
             appInfo,
             packageInfo,
             appInfo.packageName,
@@ -264,33 +283,5 @@ object PackageHelper {
             data = Uri.parse("package:$packageName")
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         })
-    }
-
-    fun getManifest(context: Context, packageName: String): String {
-        try {
-            val packageManager: PackageManager = context.packageManager
-            val applicationInfo = packageManager.getApplicationInfo(packageName, GET_META_DATA)
-            val xmlResourceName = applicationInfo.metaData?.getInt("android.content.pm.ApplicationInfo.DOCUMENTATION_RESOURCE")
-
-            if (xmlResourceName != null) {
-                val xmlResource = context.resources.getXml(xmlResourceName)
-                val content = StringBuilder()
-
-                while (xmlResource.eventType != org.xmlpull.v1.XmlPullParser.END_DOCUMENT) {
-                    when (xmlResource.eventType) {
-                        org.xmlpull.v1.XmlPullParser.START_TAG -> content.append("<${xmlResource.name}>")
-                        org.xmlpull.v1.XmlPullParser.TEXT -> content.append(xmlResource.text)
-                        org.xmlpull.v1.XmlPullParser.END_TAG -> content.append("</${xmlResource.name}>")
-                    }
-                    xmlResource.next()
-                }
-
-                return content.toString()
-            }
-        } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
-        }
-
-        return ""
     }
 }

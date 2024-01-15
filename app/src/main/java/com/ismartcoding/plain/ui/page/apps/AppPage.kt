@@ -2,6 +2,10 @@ package com.ismartcoding.plain.ui.page.apps
 
 
 import android.annotation.SuppressLint
+import android.app.usage.StorageStats
+import android.content.Context
+import android.net.Uri
+import android.os.UserHandle
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,29 +33,41 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.pm.PackageInfoCompat
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import com.ismartcoding.lib.apk.ApkParsers
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.helpers.FormatHelper
+import com.ismartcoding.lib.helpers.ShareHelper
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.pkg.DPackage
+import com.ismartcoding.plain.features.pkg.DPackageDetail
 import com.ismartcoding.plain.features.pkg.PackageHelper
 import com.ismartcoding.plain.packageManager
+import com.ismartcoding.plain.storageStatsManager
 import com.ismartcoding.plain.ui.base.*
+import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.models.SharedViewModel
+import com.ismartcoding.plain.ui.page.RouteName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import androidx.lifecycle.Lifecycle
 
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppPage(
     navController: NavHostController,
+    sharedViewModel: SharedViewModel,
     id: String,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var item by remember { mutableStateOf<DPackage?>(null) }
+    var item by remember { mutableStateOf<DPackageDetail?>(null) }
     var groupsButtons by remember { mutableStateOf(listOf<GroupButton>()) }
 
     val lifecycleEvent = rememberLifecycleEvent()
@@ -65,11 +81,11 @@ fun AppPage(
 
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.IO) {
-            item = PackageHelper.getPackage(id)
+            item = PackageHelper.getPackageDetail(id)
             val buttons = mutableListOf<GroupButton>()
             if (PackageHelper.canLaunch(item!!.id)) {
                 buttons.add(
-                    GroupButton(Icons.AutoMirrored.Outlined.Launch, "Launch") {
+                    GroupButton(Icons.AutoMirrored.Outlined.Launch, LocaleHelper.getString(R.string.launch)) {
                         try {
                             PackageHelper.launch(context, item?.id ?: "")
                         } catch (ex: Exception) {
@@ -79,7 +95,9 @@ fun AppPage(
                 )
             }
             buttons.add(
-                GroupButton(Icons.Outlined.DeleteOutline, "Uninstall") {
+                GroupButton(
+                    Icons.Outlined.DeleteOutline, LocaleHelper.getString(R.string.uninstall)
+                ) {
                     try {
                         PackageHelper.uninstall(context, item?.id ?: "")
                     } catch (ex: Exception) {
@@ -88,7 +106,7 @@ fun AppPage(
                 }
             )
             buttons.add(
-                GroupButton(Icons.Outlined.Settings, "View in settings") {
+                GroupButton(Icons.Outlined.Settings, LocaleHelper.getString(R.string.view_in_settings)) {
                     try {
                         PackageHelper.viewInSettings(context, item?.id ?: "")
                     } catch (ex: Exception) {
@@ -99,7 +117,13 @@ fun AppPage(
             buttons.add(
                 GroupButton(Icons.Outlined.Outbox, "Manifest") {
                     try {
-                        DialogHelper.showMessage(PackageHelper.getManifest(context, item?.id ?: ""))
+                        coMain {
+                            DialogHelper.showLoading()
+                            sharedViewModel.textTitle.value = "Manifest"
+                            sharedViewModel.textContent.value = withIO { ApkParsers.getManifestXml(item?.path ?: "") }
+                            DialogHelper.hideLoading()
+                            navController.navigate(RouteName.TEXT)
+                        }
                     } catch (ex: Exception) {
                         DialogHelper.showMessage(ex)
                     }
@@ -118,6 +142,7 @@ fun AppPage(
                 contentDescription = stringResource(R.string.share),
                 tint = MaterialTheme.colorScheme.onSurface,
             ) {
+                ShareHelper.share(context, Uri.parse(item?.path ?: ""))
             }
         },
         content = {
@@ -186,6 +211,38 @@ fun AppPage(
                             VerticalSpace(dp = 16.dp)
                             GroupButtons(
                                 buttons = groupsButtons
+                            )
+                            VerticalSpace(dp = 24.dp)
+                            Subtitle(
+                                text = stringResource(R.string.paths_directories),
+                            )
+                            PListItem(
+                                title = stringResource(R.string.source_directory),
+                                desc = item?.appInfo?.sourceDir ?: "",
+                            )
+                            PListItem(
+                                title = stringResource(R.string.data_directory),
+                                desc = item?.appInfo?.dataDir ?: "",
+                            )
+                            VerticalSpace(dp = 16.dp)
+                            Subtitle(
+                                text = stringResource(R.string.more_info),
+                            )
+                            PListItem(
+                                title = stringResource(R.string.app_size),
+                                desc = FormatHelper.formatBytes(item?.size ?: 0),
+                            )
+                            PListItem(
+                                title = "SDK",
+                                desc = LocaleHelper.getStringF(R.string.sdk, "target", item?.appInfo?.targetSdkVersion ?: "", "min", item?.appInfo?.minSdkVersion ?: ""),
+                            )
+                            PListItem(
+                                title = stringResource(R.string.installed_at),
+                                desc = item?.installedAt?.formatDateTime(),
+                            )
+                            PListItem(
+                                title = stringResource(R.string.updated_at),
+                                desc = item?.updatedAt?.formatDateTime(),
                             )
                         }
                     }

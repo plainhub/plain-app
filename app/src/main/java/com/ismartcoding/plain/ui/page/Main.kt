@@ -178,7 +178,7 @@ fun Main(viewModel: MainViewModel) {
             ) { backStackEntry ->
                 val arguments = requireNotNull(backStackEntry.arguments)
                 val id = arguments.getString("id", "")
-                AppPage(navController, id)
+                AppPage(navController, sharedViewModel, id)
             }
 
             slideHorizontallyComposable(

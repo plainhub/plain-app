@@ -38,7 +38,7 @@ fun GroupButtons(buttons: List<GroupButton>) {
         Modifier
             .fillMaxWidth()
             .horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         HorizontalSpace(dp = 16.dp)
         buttons.forEachIndexed { index, button ->

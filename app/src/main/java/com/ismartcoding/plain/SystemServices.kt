@@ -77,3 +77,5 @@ val subscriptionManager: SubscriptionManager by lazy {
 val telephonyManager: TelephonyManager by lazy {
     MainApp.instance.getSystemServiceCompat(TelephonyManager::class.java)
 }
+
+
