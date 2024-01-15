@@ -98,7 +98,11 @@ fun AppPage(
             )
             buttons.add(
                 GroupButton(Icons.Outlined.Outbox, "Manifest") {
-
+                    try {
+                        DialogHelper.showMessage(PackageHelper.getManifest(context, item?.id ?: ""))
+                    } catch (ex: Exception) {
+                        DialogHelper.showMessage(ex)
+                    }
                 }
             )
             groupsButtons = buttons

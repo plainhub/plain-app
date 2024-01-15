@@ -65,7 +65,7 @@ fun GroupButtons(buttons: List<GroupButton>) {
                     Icon(
                         imageVector = button.icon,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.inverseSurface,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(28.dp),
                     )
                 }
@@ -76,7 +76,7 @@ fun GroupButtons(buttons: List<GroupButton>) {
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Normal
                     ),
-                    color = MaterialTheme.colorScheme.inverseSurface,
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
         }

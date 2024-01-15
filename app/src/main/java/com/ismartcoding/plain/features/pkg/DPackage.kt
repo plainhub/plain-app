@@ -22,4 +22,10 @@ data class DPackage(
 
 }
 
+data class DPackageLight(
+    val appInfo: ApplicationInfo,
+    val id: String,
+    val name: String,
+)
+
 data class DCertificate(val issuer: String, val subject: String, val serialNumber: String, val validFrom: Instant, val validTo: Instant)

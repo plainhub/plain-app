@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.GET_META_DATA
 import android.content.pm.Signature
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -14,6 +15,7 @@ import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.pinyin.Pinyin
 import com.ismartcoding.plain.packageManager
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import java.io.File
 import javax.security.cert.X509Certificate
@@ -38,7 +40,6 @@ object PackageHelper {
     }
 
     fun search(query: String, limit: Int, offset: Int): List<DPackage> {
-        val apps = mutableListOf<DPackage>()
         var type = ""
         var text = ""
         var ids = setOf<String>()
@@ -58,6 +59,7 @@ object PackageHelper {
             }
         }
 
+        val apps = mutableListOf<DPackageLight>()
         val appInfos = packageManager.getInstalledApplications(0)
         appInfos.forEach { appInfo ->
             if (ids.isNotEmpty() && !ids.contains(appInfo.packageName)) {
@@ -70,32 +72,31 @@ object PackageHelper {
                     return@forEach
                 }
             }
-
-            val packageInfo = packageManager.getPackageInfo(appInfo.packageName, PackageManager.GET_SIGNING_CERTIFICATES)
-
-            apps.add(getPackage(appInfo, packageInfo))
+            apps.add(DPackageLight(appInfo, appInfo.packageName, getLabel(appInfo)))
         }
 
-        return if (query.isEmpty()) {
-            apps
-        } else {
-            apps.filter {
-                text.isEmpty()
-                        || it.name.contains(text, true)
-                        || it.id.contains(text, true)
-                        || it.certs.any { c ->
-                    c.issuer.contains(text, true)
-                            || c.subject.contains(text, true)
-                }
+        if (query.isEmpty() || text.isEmpty()) {
+            return apps.sortedBy { Pinyin.toPinyin(it.name).lowercase() }.drop(offset).take(limit).map {
+                getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES))
             }
-        }.sortedBy { Pinyin.toPinyin(it.name).lowercase() }.drop(offset).take(limit)
+        }
+
+        return apps.asSequence().map { getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES)) }.filter {
+            text.isEmpty()
+                    || it.name.contains(text, true)
+                    || it.id.contains(text, true)
+                    || it.certs.any { c ->
+                c.issuer.contains(text, true)
+                        || c.subject.contains(text, true)
+            }
+        }.sortedBy { Pinyin.toPinyin(it.name).lowercase() }.drop(offset).take(limit).toList()
     }
 
     private fun getAppType(appInfo: ApplicationInfo): String {
         var appType = appTypeCache[appInfo.packageName]
         if (appType == null) {
             appType = if (ApplicationInfoCompat.isSystemApp(appInfo)) "system" else "user"
-            appTypeCache.put(appInfo.packageName, appType)
+            appTypeCache[appInfo.packageName] = appType
         }
 
         return appType
@@ -263,5 +264,33 @@ object PackageHelper {
             data = Uri.parse("package:$packageName")
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         })
+    }
+
+    fun getManifest(context: Context, packageName: String): String {
+        try {
+            val packageManager: PackageManager = context.packageManager
+            val applicationInfo = packageManager.getApplicationInfo(packageName, GET_META_DATA)
+            val xmlResourceName = applicationInfo.metaData?.getInt("android.content.pm.ApplicationInfo.DOCUMENTATION_RESOURCE")
+
+            if (xmlResourceName != null) {
+                val xmlResource = context.resources.getXml(xmlResourceName)
+                val content = StringBuilder()
+
+                while (xmlResource.eventType != org.xmlpull.v1.XmlPullParser.END_DOCUMENT) {
+                    when (xmlResource.eventType) {
+                        org.xmlpull.v1.XmlPullParser.START_TAG -> content.append("<${xmlResource.name}>")
+                        org.xmlpull.v1.XmlPullParser.TEXT -> content.append(xmlResource.text)
+                        org.xmlpull.v1.XmlPullParser.END_TAG -> content.append("</${xmlResource.name}>")
+                    }
+                    xmlResource.next()
+                }
+
+                return content.toString()
+            }
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+
+        return ""
     }
 }
