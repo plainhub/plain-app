@@ -7,13 +7,22 @@
     <link rel="manifest" href="/manifest.json" crossOrigin="use-credentials">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes" />
     <title>PlainApp</title>
-  <script type="module" crossorigin src="/assets/index-f62f2ff2.js"></script>
+  <script type="module" crossorigin src="/assets/index-0c42270c.js"></script>
   <link rel="stylesheet" href="/assets/index-dbf96a40.css">
 </head>
 
 <body>
+    <div id="browser-issue">Your browser is not supported or up-to-date. Please try updating it.</div>
     <div id="app"></div>
     
 </body>
-
+<script type="text/javascript">
+    if ('customElements' in window) {
+        document.getElementById('browser-issue').style.display = 'none';
+    } else {
+        if (navigator.language === 'zh-CN') {
+            document.getElementById('browser-issue').innerHTML = '您的浏览器不支持或者版本过低，请尝试更新。';
+        }
+    }
+</script>
 </html>
