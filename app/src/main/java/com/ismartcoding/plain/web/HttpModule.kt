@@ -4,6 +4,9 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
+import com.google.common.io.ByteStreams
+import com.google.common.io.FileWriteMode
+import com.google.common.io.Files
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isImageFast
@@ -29,6 +32,7 @@ import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.data.preference.AuthTwoFactorPreference
 import com.ismartcoding.plain.data.preference.PasswordPreference
 import com.ismartcoding.plain.data.preference.PasswordTypePreference
+import com.ismartcoding.plain.extensions.toFile
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.audio.AudioHelper
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -60,6 +64,7 @@ import io.ktor.server.application.uninstallAllPlugins
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.http.content.singlePageApplication
 import io.ktor.server.http.content.vue
+import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.autohead.AutoHeadResponse
 import io.ktor.server.plugins.cachingheaders.CachingHeaders
 import io.ktor.server.plugins.compression.Compression
@@ -84,6 +89,7 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.webSocket
+import io.ktor.util.cio.writeChannel
 import io.ktor.utils.io.core.use
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
@@ -477,7 +483,9 @@ object HttpModule {
                                         // use append file way
                                         val noSplitFiles = false
                                         if (noSplitFiles) {
-                                            FileOutputStream(destFile, true).use { part.streamProvider().use { input -> input.copyTo(it) } }
+                                            part.streamProvider().use { input ->
+                                                Files.asByteSink(destFile).writeFrom(input)
+                                            }
                                             if (info.total - 1 == info.index) {
                                                 MainApp.instance.scanFileByConnection(destFile, null)
                                             }
@@ -487,10 +495,14 @@ object HttpModule {
 //                                                if (destFile.exists() && destFile.length() == info.size) {
 //                                                    // skip if the part file is already uploaded
 //                                                } else {
-                                                destFile.outputStream().use { part.streamProvider().use { input -> input.copyTo(it) } }
+                                                part.streamProvider().use { input ->
+                                                    Files.asByteSink(destFile).writeFrom(input)
+                                                }
                                                 //  }
                                             } else {
-                                                destFile.outputStream().use { part.streamProvider().use { input -> input.copyTo(it) } }
+                                                part.streamProvider().use { input ->
+                                                    Files.asByteSink(destFile).writeFrom(input)
+                                                }
                                             }
 
                                             if (info.total - 1 == info.index) {
@@ -498,10 +510,14 @@ object HttpModule {
                                                     // merge part files into original file
                                                     destFile = File("${info.dir}/$fileName")
                                                     val partFiles = File(info.dir).listFiles()?.filter { it.name.startsWith("$fileName.part") }?.sortedBy { it.name } ?: arrayListOf()
-                                                    val fos = FileOutputStream(destFile, true)
-                                                    partFiles.forEach {
-                                                        it.inputStream().use { input -> input.copyTo(fos) }
-                                                        it.delete()
+                                                    val fos = Files.asByteSink(destFile, FileWriteMode.APPEND).openStream()
+                                                    fos.use { fos ->
+                                                        partFiles.forEach { partFile ->
+                                                            Files.asByteSource(partFile).openStream().use { input ->
+                                                                ByteStreams.copy(input, fos)
+                                                            }
+                                                            partFile.delete()
+                                                        }
                                                     }
                                                 }
                                                 MainApp.instance.scanFileByConnection(destFile, null)

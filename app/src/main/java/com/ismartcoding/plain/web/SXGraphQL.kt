@@ -257,7 +257,7 @@ class SXGraphQL(val schema: Schema) {
                         if (Permission.READ_SMS.can(MainApp.instance)) {
                             SmsHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
-                            -1
+                            0
                         }
                     }
                 }
@@ -286,7 +286,7 @@ class SXGraphQL(val schema: Schema) {
                         if (Permission.WRITE_EXTERNAL_STORAGE.can(MainApp.instance)) {
                             ImageHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
-                            -1
+                            0
                         }
                     }
                 }
@@ -337,7 +337,7 @@ class SXGraphQL(val schema: Schema) {
                         if (Permission.WRITE_EXTERNAL_STORAGE.can(MainApp.instance)) {
                             VideoHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
-                            -1
+                            0
                         }
                     }
                 }
@@ -366,7 +366,7 @@ class SXGraphQL(val schema: Schema) {
                         if (Permission.WRITE_EXTERNAL_STORAGE.can(MainApp.instance)) {
                             AudioHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
-                            -1
+                            0
                         }
                     }
                 }
@@ -397,7 +397,7 @@ class SXGraphQL(val schema: Schema) {
                         if (Permission.READ_CONTACTS.can(MainApp.instance)) {
                             ContactHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
-                            -1
+                            0
                         }
                     }
                 }
@@ -440,7 +440,7 @@ class SXGraphQL(val schema: Schema) {
                         if (Permission.READ_CALL_LOG.can(MainApp.instance)) {
                             CallHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
-                            -1
+                            0
                         }
                     }
                 }

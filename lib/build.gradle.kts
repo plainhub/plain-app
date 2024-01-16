@@ -74,6 +74,7 @@ dependencies {
     api("androidx.transition:transition:1.4.1")
 //    api("com.squareup.picasso:picasso:2.71828")
 
+    api("com.google.guava:guava:33.0.0-android")
     api("com.google.android.exoplayer:exoplayer:2.19.1")
     // https://developer.android.com/topic/performance/graphics/load-bitmap
     api("com.github.bumptech.glide:glide:4.16.0")

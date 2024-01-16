@@ -105,6 +105,9 @@ object HttpServerManager {
             ) {
                 port = httpsPort
             }
+            channelPipelineConfig = {
+                addLast("cancellationDetector", AbortableRequestHandler())
+            }
         }, HttpModule.module)
     }
 
