@@ -61,8 +61,7 @@ class TextEditorDialog(val uri: Uri) : BaseDialog<DialogTextEditorBinding>() {
         setWindowSoftInput(binding.editor)
 
         lifecycleScope.launch {
-            var text = ""
-            text =
+            val text =
                 if (uri.scheme == ContentResolver.SCHEME_CONTENT) {
                     val context = requireContext()
                     withIO {

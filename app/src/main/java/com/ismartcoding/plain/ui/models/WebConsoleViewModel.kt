@@ -39,7 +39,6 @@ class WebConsoleViewModel : ViewModel() {
 
     fun dig(
         context: Context,
-        httpPort: Int,
     ) {
         viewModelScope.launch {
             val client = HttpClientManager.httpClient()

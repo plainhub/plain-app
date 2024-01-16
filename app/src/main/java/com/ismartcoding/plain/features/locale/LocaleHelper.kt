@@ -13,7 +13,7 @@ object LocaleHelper {
 
     fun getString(resourceKey: Int): String {
         return try {
-            MainApp.instance.resources.getString(resourceKey) ?: ""
+            MainApp.instance.resources.getString(resourceKey)
         } catch (e: Exception) {
             resourceKey.toString()
         }
@@ -57,7 +57,7 @@ object LocaleHelper {
             val params: MutableMap<String, Any> = HashMap()
             var i = 0
             while (i < formatArguments.size) {
-                params[formatArguments[i].toString()] = (formatArguments[i + 1] ?: "")
+                params[formatArguments[i].toString()] = formatArguments[i + 1]
                 i += 2
             }
             tmpl.execute(params)

@@ -177,7 +177,7 @@ object FileSystemHelper {
 
         if (!rawSecondaryStoragesStr.isNullOrEmpty()) {
             val rawSecondaryStorages =
-                rawSecondaryStoragesStr!!.split(
+                rawSecondaryStoragesStr.split(
                     File.pathSeparator.toRegex(),
                 ).dropLastWhile(String::isEmpty).toTypedArray()
             Collections.addAll(paths, *rawSecondaryStorages)
@@ -303,12 +303,6 @@ object FileSystemHelper {
         }
 
         return items.take(50)
-    }
-
-    private fun parseFilePermission(f: File): String {
-        val attributes = Files.readAttributes(f.toPath(), PosixFileAttributes::class.java, LinkOption.NOFOLLOW_LINKS)
-        val p = attributes.permissions()
-        return ""
     }
 }
 

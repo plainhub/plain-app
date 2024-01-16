@@ -755,7 +755,7 @@ object Mustache {
             delims: Delims,
             into: StringBuilder,
         ) {
-            delims.addTag('^', _name, into!!)
+            delims.addTag('^', _name, into)
             for (seg in _segs) seg.decompile(delims, into)
             delims.addTag('/', _name, into)
         }
@@ -843,7 +843,7 @@ object Mustache {
             into: StringBuilder,
         ) {} // nada
 
-        override fun visit(visit: Visitor) {}
+        override fun visit(visitor: Visitor) {}
 
         override fun toString(): String {
             return "Faux"

@@ -171,7 +171,7 @@ fun WebSettingsPage(
                 })
                 DropdownMenuItem(onClick = {
                     isMenuOpen = false
-                    viewModel.dig(context, httpPort = httpPort)
+                    viewModel.dig(context)
                 }, text = {
                     Text(text = stringResource(R.string.http_server_diagnostics))
                 })
