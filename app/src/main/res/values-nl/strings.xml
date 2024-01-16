@@ -5,6 +5,16 @@
     <string name="version_name_with_code">Versie {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">Geoptimaliseerd batterijgebruik is momenteel actief. Om ononderbroken prestaties te garanderen, overweeg batterijoptimalisatie specifiek voor deze app uit te schakelen.</string>
     <string name="apps">Apps</string>
+    <string name="launch">Starten</string>
+    <string name="uninstall">Deïnstalleren</string>
+    <string name="view_in_settings">Bekijken in instellingen</string>
+    <string name="paths_directories">Paden en Mappen</string>
+    <string name="source_directory">Bronmap</string>
+    <string name="data_directory">Gegevensmap</string>
+    <string name="more_info">Meer informatie</string>
+    <string name="sdk">Doel: {{ target }}, Min: {{ min }}</string>
+    <string name="installed_at">Geïnstalleerd op</string>
+    <string name="app_size">App-grootte</string>
     <string name="change_port">Poort wijzigen</string>
     <string name="user_app">Gebruikersapp</string>
     <string name="system_app">Systeemapp</string>

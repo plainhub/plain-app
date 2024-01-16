@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="posts">
+        <item quantity="one">%,d 篇貼文</item>
+        <item quantity="other">%,d 篇貼文</item>
+    </plurals>
+    <plurals name="items">
+        <item quantity="one">%,d 項目</item>
+        <item quantity="other">%,d 項目</item>
+    </plurals>
+    <plurals name="x_folders">
+        <item quantity="one">%,d 資料夾</item>
+        <item quantity="other">%,d 資料夾</item>
+    </plurals>
+    <plurals name="x_files">
+        <item quantity="one">%,d 檔案</item>
+        <item quantity="other">%,d 檔案</item>
+    </plurals>
+    <plurals name="copying_items">
+        <item quantity="one">複製 %,d 項目</item>
+        <item quantity="other">複製 %,d 項目</item>
+    </plurals>
+    <plurals name="moving_items">
+        <item quantity="one">移動 %,d 項目</item>
+        <item quantity="other">移動 %,d 項目</item>
+    </plurals>
+    <plurals name="n_hours">
+        <item quantity="one">%,d 小時</item>
+        <item quantity="other">%,d 小時</item>
+    </plurals>
+    <plurals name="n_minutes">
+        <item quantity="one">%,d 分鐘</item>
+        <item quantity="other">%,d 分鐘</item>
+    </plurals>
+    <plurals name="n_seconds">
+        <item quantity="one">%,d 秒</item>
+        <item quantity="other">%,d 秒</item>
+    </plurals>
+</resources>

@@ -5,6 +5,16 @@
     <string name="version_name_with_code">版本 {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">優化電池使用目前已啟用。為確保不中斷效能，請考慮為此應用停用電池優化。</string>
     <string name="apps">應用</string>
+    <string name="launch">啟動</string>
+    <string name="uninstall">解除安裝</string>
+    <string name="view_in_settings">在設定中檢視</string>
+    <string name="paths_directories">路徑與目錄</string>
+    <string name="source_directory">來源目錄</string>
+    <string name="data_directory">資料目錄</string>
+    <string name="more_info">更多資訊</string>
+    <string name="sdk">目標: {{ target }}, 最小: {{ min }}</string>
+    <string name="installed_at">安裝時間</string>
+    <string name="app_size">應用程式大小</string>
     <string name="change_port">更改端口</string>
     <string name="user_app">用戶應用</string>
     <string name="system_app">系統應用</string>

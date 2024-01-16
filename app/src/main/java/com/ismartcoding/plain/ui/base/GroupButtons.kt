@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -53,6 +54,7 @@ fun GroupButtons(buttons: List<GroupButton>) {
                             bottomEnd = if (index == buttons.size - 1) 24.dp else 0.dp
                         )
                     )
+                    .height(96.dp)
                     .background(MaterialTheme.colorScheme.surface.copy(0.7f) onDark MaterialTheme.colorScheme.inverseOnSurface)
                     .clickable(onClick = button.onClick),
                 verticalArrangement = Arrangement.Center,

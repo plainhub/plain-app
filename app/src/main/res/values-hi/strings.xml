@@ -5,6 +5,16 @@
     <string name="version_name_with_code">संस्करण {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">अद्यतित बैटरी उपयोग सतर्कता वर्तमान में सक्रिय है। अविघातित प्रदर्शन सुनिश्चित करने के लिए, कृपया इस एप्लिकेशन के लिए विशेष रूप से बैटरी अनुकूलन को अक्षम करने का विचार करें।</string>
     <string name="apps">ऐप्स</string>
+    <string name="launch">लॉन्च करें</string>
+    <string name="uninstall">अनइंस्टॉल करें</string>
+    <string name="view_in_settings">सेटिंग्स में देखें</string>
+    <string name="paths_directories">पथ और निर्देशिकाएँ</string>
+    <string name="source_directory">स्रोत निर्देशिका</string>
+    <string name="data_directory">डेटा निर्देशिका</string>
+    <string name="more_info">अधिक जानकारी</string>
+    <string name="sdk">लक्ष्य: {{ target }}, न्यूनतम: {{ min }}</string>
+    <string name="installed_at">इंस्टॉल किया गया</string>
+    <string name="app_size">एप्लिकेशन का आकार</string>
     <string name="change_port">पोर्ट बदलें</string>
     <string name="user_app">उपयोगकर्ता ऐप</string>
     <string name="system_app">सिस्टम ऐप</string>

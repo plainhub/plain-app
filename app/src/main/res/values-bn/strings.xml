@@ -5,6 +5,16 @@
     <string name="version_name_with_code">সংস্করণ {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">অপটিমাইজড ব্যাটারি ব্যবহার সক্রিয় আছে। অবিরত কাজের জন্য, এই অ্যাপ এর জন্য ব্যাটারি অপটিমাইজেশন অক্ষম করতে বিবেচনা করুন।</string>
     <string name="apps">অ্যাপস</string>
+    <string name="launch">চালাও</string>
+    <string name="uninstall">আনইনস্টল</string>
+    <string name="view_in_settings">সেটিংসে দেখুন</string>
+    <string name="paths_directories">পাথ এবং ডিরেক্টরিস</string>
+    <string name="source_directory">উৎস ডিরেক্টরি</string>
+    <string name="data_directory">ডেটা ডিরেক্টরি</string>
+    <string name="more_info">আরও তথ্য</string>
+    <string name="sdk">লক্ষ্য: {{ target }}, ন্যূনতম: {{ min }}</string>
+    <string name="installed_at">ইনস্টল হয়েছে</string>
+    <string name="app_size">অ্যাপ সাইজ</string>
     <string name="change_port">পোর্ট পরিবর্তন করুন</string>
     <string name="user_app">ব্যবহারকারী অ্যাপ</string>
     <string name="system_app">সিস্টেম অ্যাপ</string>

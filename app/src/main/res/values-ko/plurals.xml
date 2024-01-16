@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="posts">
+        <item quantity="one">%d개 게시물</item>
+        <item quantity="other">%d개 게시물</item>
+    </plurals>
+    <plurals name="items">
+        <item quantity="one">%d개 항목</item>
+        <item quantity="other">%d개 항목</item>
+    </plurals>
+    <plurals name="x_folders">
+        <item quantity="one">%d개 폴더</item>
+        <item quantity="other">%d개 폴더</item>
+    </plurals>
+    <plurals name="x_files">
+        <item quantity="one">%d개 파일</item>
+        <item quantity="other">%d개 파일</item>
+    </plurals>
+    <plurals name="copying_items">
+        <item quantity="one">%d개 항목 복사 중</item>
+        <item quantity="other">%d개 항목 복사 중</item>
+    </plurals>
+    <plurals name="moving_items">
+        <item quantity="one">%d개 항목 이동 중</item>
+        <item quantity="other">%d개 항목 이동 중</item>
+    </plurals>
+    <plurals name="n_hours">
+        <item quantity="one">%d시간</item>
+        <item quantity="other">%d시간</item>
+    </plurals>
+    <plurals name="n_minutes">
+        <item quantity="one">%d분</item>
+        <item quantity="other">%d분</item>
+    </plurals>
+    <plurals name="n_seconds">
+        <item quantity="one">%d초</item>
+        <item quantity="other">%d초</item>
+    </plurals>
+</resources>

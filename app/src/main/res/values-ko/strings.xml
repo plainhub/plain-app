@@ -5,6 +5,16 @@
     <string name="version_name_with_code">버전 {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">최적화된 배터리 사용이 현재 활성화되어 있습니다. 중단없는 성능을 보장하기 위해 이 앱에 대한 배터리 최적화를 비활성화하는 것을 고려해보십시오.</string>
     <string name="apps">앱</string>
+    <string name="launch">실행</string>
+    <string name="uninstall">제거</string>
+    <string name="view_in_settings">설정에서 보기</string>
+    <string name="paths_directories">경로 및 디렉터리</string>
+    <string name="source_directory">소스 디렉터리</string>
+    <string name="data_directory">데이터 디렉터리</string>
+    <string name="more_info">더보기</string>
+    <string name="sdk">대상: {{ target }}, 최소: {{ min }}</string>
+    <string name="installed_at">설치 날짜</string>
+    <string name="app_size">앱 크기</string>
     <string name="change_port">포트 변경</string>
     <string name="user_app">사용자 앱</string>
     <string name="system_app">시스템 앱</string>

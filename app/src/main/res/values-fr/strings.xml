@@ -5,6 +5,16 @@
     <string name="version_name_with_code">Version {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">L\'optimisation de l\'utilisation de la batterie est actuellement active. Pour garantir des performances ininterrompues, veuillez envisager de désactiver l\'optimisation de la batterie spécifiquement pour cette application.</string>
     <string name="apps">Applications</string>
+    <string name="launch">Lancer</string>
+    <string name="uninstall">Désinstaller</string>
+    <string name="view_in_settings">Voir dans les paramètres</string>
+    <string name="paths_directories">Chemins et Répertoires</string>
+    <string name="source_directory">Répertoire source</string>
+    <string name="data_directory">Répertoire de données</string>
+    <string name="more_info">Plus d\'informations</string>
+    <string name="sdk">Cible : {{ target }}, Min : {{ min }}</string>
+    <string name="installed_at">Installé le</string>
+    <string name="app_size">Taille de l\'application</string>
     <string name="change_port">Changer de port</string>
     <string name="user_app">Application utilisateur</string>
     <string name="system_app">Application système</string>

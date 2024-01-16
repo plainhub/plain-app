@@ -5,6 +5,16 @@
     <string name="version_name_with_code">版本 {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">优化电池使用目前已激活。为确保流畅的使用性能，请考虑为此应用禁用电池优化。</string>
     <string name="apps">应用</string>
+    <string name="launch">启动</string>
+    <string name="uninstall">卸载</string>
+    <string name="view_in_settings">在设置中查看</string>
+    <string name="paths_directories">路径和目录</string>
+    <string name="source_directory">源目录</string>
+    <string name="data_directory">数据目录</string>
+    <string name="more_info">更多信息</string>
+    <string name="sdk">目标：{{ target }}，最小：{{ min }}</string>
+    <string name="installed_at">安装时间</string>
+    <string name="app_size">应用大小</string>
     <string name="change_port">更改端口</string>
     <string name="user_app">用户应用</string>
     <string name="system_app">系统应用</string>

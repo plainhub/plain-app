@@ -5,6 +5,16 @@
     <string name="version_name_with_code">Версия {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">Оптимизированное использование батареи в настоящее время активно. Для обеспечения бесперебойной работы рекомендуется отключить оптимизацию батареи именно для этого приложения.</string>
     <string name="apps">Приложения</string>
+    <string name="launch">Запустить</string>
+    <string name="uninstall">Удалить</string>
+    <string name="view_in_settings">Посмотреть в настройках</string>
+    <string name="paths_directories">Пути и каталоги</string>
+    <string name="source_directory">Исходный каталог</string>
+    <string name="data_directory">Каталог данных</string>
+    <string name="more_info">Дополнительная информация</string>
+    <string name="sdk">Цель: {{ target }}, Мин: {{ min }}</string>
+    <string name="installed_at">Установлено</string>
+    <string name="app_size">Размер приложения</string>
     <string name="change_port">Изменить порт</string>
     <string name="user_app">Пользовательское приложение</string>
     <string name="system_app">Системное приложение</string>

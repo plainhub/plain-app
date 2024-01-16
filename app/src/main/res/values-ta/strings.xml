@@ -5,6 +5,16 @@
     <string name="version_name_with_code">பதிப்பு {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">செயலில் பருவத்தை சீராக பயன்படுத்துவது தற்போது செயல்படுகின்றது. விரைவாக பரிசோதனை முடக்குவதற்கு, இந்த பயன்பாடுகளுக்கு குழுவியாக பருவத்தை சீராக பயன்படுத்துவதை பார்க்கவும்.</string>
     <string name="apps">பயன்பாடுகள்</string>
+    <string name="launch">தொடங்கு</string>
+    <string name="uninstall">அணுகுதல்</string>
+    <string name="view_in_settings">அமைப்புகளில் காண்க</string>
+    <string name="paths_directories">பாதைகளும் கோப்புறைகளும்</string>
+    <string name="source_directory">மூல கோப்புறை</string>
+    <string name="data_directory">தரவு கோப்புறை</string>
+    <string name="more_info">மேலும் தகவல்</string>
+    <string name="sdk">இலக்கு: {{ target }}, குறைந்த: {{ min }}</string>
+    <string name="installed_at">நிறுவப்பட்ட நேரம்</string>
+    <string name="app_size">பயன்பாட்டின் அளவு</string>
     <string name="change_port">போர்டை மாற்று</string>
     <string name="user_app">பயனர் பயன்பாடு</string>
     <string name="system_app">கணினி பயன்பாடு</string>

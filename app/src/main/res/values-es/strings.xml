@@ -5,6 +5,16 @@
     <string name="version_name_with_code">Versión {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">La optimización de la batería está actualmente activa. Para garantizar un rendimiento ininterrumpido, considere desactivar la optimización de la batería específicamente para esta aplicación.</string>
     <string name="apps">Aplicaciones</string>
+    <string name="launch">Iniciar</string>
+    <string name="uninstall">Desinstalar</string>
+    <string name="view_in_settings">Ver en ajustes</string>
+    <string name="paths_directories">Rutas y Directorios</string>
+    <string name="source_directory">Directorio de origen</string>
+    <string name="data_directory">Directorio de datos</string>
+    <string name="more_info">Más información</string>
+    <string name="sdk">Objetivo: {{ target }}, Mín: {{ min }}</string>
+    <string name="installed_at">Instalado en</string>
+    <string name="app_size">Tamaño de la aplicación</string>
     <string name="change_port">Cambiar puerto</string>
     <string name="user_app">Aplicación de usuario</string>
     <string name="system_app">Aplicación del sistema</string>

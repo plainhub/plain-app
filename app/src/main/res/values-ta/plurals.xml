@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="posts">
+        <item quantity="one">%d பதிவு</item>
+        <item quantity="other">%d பதிவுகள்</item>
+    </plurals>
+    <plurals name="items">
+        <item quantity="one">%d பொருள்</item>
+        <item quantity="other">%d பொருட்கள்</item>
+    </plurals>
+    <plurals name="x_folders">
+        <item quantity="one">%d கோப்புறை</item>
+        <item quantity="other">%d கோப்புறைகள்</item>
+    </plurals>
+    <plurals name="x_files">
+        <item quantity="one">%d கோப்பு</item>
+        <item quantity="other">%d கோப்புகள்</item>
+    </plurals>
+    <plurals name="copying_items">
+        <item quantity="one">%d பொருள் நகலை நகலெடுக்கின்றன</item>
+        <item quantity="other">%d பொருள்கள் நகலை நகலெடுக்கின்றன</item>
+    </plurals>
+    <plurals name="moving_items">
+        <item quantity="one">%d பொருள் நகலை நகலெடுக்கின்றன</item>
+        <item quantity="other">%d பொருள்கள் நகலை நகலெடுக்கின்றன</item>
+    </plurals>
+    <plurals name="n_hours">
+        <item quantity="one">%d மணிநேரம்</item>
+        <item quantity="other">%d மணிநேரம்</item>
+    </plurals>
+    <plurals name="n_minutes">
+        <item quantity="one">%d நிமிடம்</item>
+        <item quantity="other">%d நிமிடங்கள்</item>
+    </plurals>
+    <plurals name="n_seconds">
+        <item quantity="one">%d விநாடி</item>
+        <item quantity="other">%d விநாடிகள்</item>
+    </plurals>
+</resources>

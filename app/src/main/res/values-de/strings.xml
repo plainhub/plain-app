@@ -5,6 +5,16 @@
     <string name="version_name_with_code">Version {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">Optimierte Batterienutzung ist derzeit aktiv. Um eine unterbrechungsfreie Leistung zu gewährleisten, erwägen Sie bitte, die Batterieoptimierung speziell für diese App zu deaktivieren.</string>
     <string name="apps">Apps</string>
+    <string name="launch">Starten</string>
+    <string name="uninstall">Deinstallieren</string>
+    <string name="view_in_settings">In den Einstellungen anzeigen</string>
+    <string name="paths_directories">Pfade und Verzeichnisse</string>
+    <string name="source_directory">Quellverzeichnis</string>
+    <string name="data_directory">Datenverzeichnis</string>
+    <string name="more_info">Mehr Infos</string>
+    <string name="sdk">Ziel: {{ target }}, Min: {{ min }}</string>
+    <string name="installed_at">Installiert am</string>
+    <string name="app_size">App Größe</string>
     <string name="change_port">Port ändern</string>
     <string name="user_app">Benutzer-App</string>
     <string name="system_app">System-App</string>
