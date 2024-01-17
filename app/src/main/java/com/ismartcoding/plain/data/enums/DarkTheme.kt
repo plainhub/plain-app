@@ -31,7 +31,7 @@ enum class DarkTheme(val value: Int) {
             }
 
         fun parse(value: Int): DarkTheme {
-            return DarkTheme.values().find { it.value == value } ?: UseDeviceTheme
+            return entries.find { it.value == value } ?: UseDeviceTheme
         }
     }
 }

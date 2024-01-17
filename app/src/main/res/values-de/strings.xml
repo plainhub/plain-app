@@ -2,6 +2,7 @@
     <string name="app_name">EinfacheApp</string>
     <string name="vpn_web_conflict_warning">Ihr VPN ist derzeit auf Ihrem Gerät aktiviert, was potenziell zu Webverbindungsproblemen führen kann, wenn es von Ihrem PC aus zugegriffen wird. Um dies zu lösen, empfehlen wir Ihnen, Ihre VPN-Einstellungen anzupassen, um LAN-Verkehr zuzulassen oder Ihr VPN zu deaktivieren.</string>
     <string name="warning">Warnung</string>
+    <string name="advanced_https">HTTPS (Fortgeschritten)</string>
     <string name="version_name_with_code">Version {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">Optimierte Batterienutzung ist derzeit aktiv. Um eine unterbrechungsfreie Leistung zu gewährleisten, erwägen Sie bitte, die Batterieoptimierung speziell für diese App zu deaktivieren.</string>
     <string name="apps">Apps</string>

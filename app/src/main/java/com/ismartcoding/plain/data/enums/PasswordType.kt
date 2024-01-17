@@ -18,7 +18,7 @@ enum class PasswordType(val value: Int) {
         }
 
         fun parse(value: Int): PasswordType {
-            return PasswordType.values().find { it.value == value } ?: RANDOM
+            return entries.find { it.value == value } ?: RANDOM
         }
     }
 }

@@ -42,7 +42,7 @@ fun DarkThemePage(navController: NavHostController) {
                     VerticalSpace(dp = 16.dp)
                 }
                 item {
-                    DarkTheme.values().map {
+                    DarkTheme.entries.map {
                         PListItem(
                             title = it.getText(context),
                             onClick = {

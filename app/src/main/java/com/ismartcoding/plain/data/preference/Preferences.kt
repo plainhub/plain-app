@@ -282,7 +282,7 @@ object DeviceSortByPreference : BasePreference<Int>() {
 
     suspend fun getValueAsync(context: Context): DeviceSortBy {
         val value = getAsync(context)
-        return DeviceSortBy.values().find { it.ordinal == value } ?: DeviceSortBy.LAST_ACTIVE
+        return DeviceSortBy.entries.find { it.ordinal == value } ?: DeviceSortBy.LAST_ACTIVE
     }
 }
 
@@ -299,7 +299,7 @@ object AudioPlayModePreference : BasePreference<Int>() {
 
     suspend fun getValueAsync(context: Context): MediaPlayMode {
         val value = getAsync(context)
-        return MediaPlayMode.values().find { it.ordinal == value } ?: MediaPlayMode.REPEAT
+        return MediaPlayMode.entries.find { it.ordinal == value } ?: MediaPlayMode.REPEAT
     }
 }
 
@@ -316,7 +316,7 @@ object AudioSortByPreference : BasePreference<Int>() {
 
     suspend fun getValueAsync(context: Context): FileSortBy {
         val value = getAsync(context)
-        return FileSortBy.values().find { it.ordinal == value } ?: FileSortBy.DATE_DESC
+        return FileSortBy.entries.find { it.ordinal == value } ?: FileSortBy.DATE_DESC
     }
 }
 
@@ -333,7 +333,7 @@ object VideoSortByPreference : BasePreference<Int>() {
 
     suspend fun getValueAsync(context: Context): FileSortBy {
         val value = getAsync(context)
-        return FileSortBy.values().find { it.ordinal == value } ?: FileSortBy.DATE_DESC
+        return FileSortBy.entries.find { it.ordinal == value } ?: FileSortBy.DATE_DESC
     }
 }
 
@@ -350,7 +350,7 @@ object ImageSortByPreference : BasePreference<Int>() {
 
     suspend fun getValueAsync(context: Context): FileSortBy {
         val value = getAsync(context)
-        return FileSortBy.values().find { it.ordinal == value } ?: FileSortBy.DATE_DESC
+        return FileSortBy.entries.find { it.ordinal == value } ?: FileSortBy.DATE_DESC
     }
 }
 
@@ -367,7 +367,7 @@ object FileSortByPreference : BasePreference<Int>() {
 
     suspend fun getValueAsync(context: Context): FileSortBy {
         val value = getAsync(context)
-        return FileSortBy.values().find { it.ordinal == value } ?: FileSortBy.NAME_ASC
+        return FileSortBy.entries.find { it.ordinal == value } ?: FileSortBy.NAME_ASC
     }
 }
 

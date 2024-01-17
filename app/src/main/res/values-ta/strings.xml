@@ -2,6 +2,7 @@
     <string name="app_name">பிளேன் ஆப்</string>
     <string name="vpn_web_conflict_warning">உங்கள் உலாவியில் தற்போது VPN செல்லுபடி உள்ளது, இது பிரச்சனைகளைக் கொண்டுவரலாம் பாராட்டும் நேரத்தில். இதை தீர்மானிக்க, உங்கள் VPN அமைப்புகளை LAN பரிமாறத்தை அனுமதிக்க அல்லது உங்கள் VPN முடக்குதலை கொண்டுவிடுவதை பரிந்துரைக்கிறோம்.</string>
     <string name="warning">எச்சரிக்கை</string>
+    <string name="advanced_https">எசடிடபிஎஸ் (உயர்த்துதல்)</string>
     <string name="version_name_with_code">பதிப்பு {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">செயலில் பருவத்தை சீராக பயன்படுத்துவது தற்போது செயல்படுகின்றது. விரைவாக பரிசோதனை முடக்குவதற்கு, இந்த பயன்பாடுகளுக்கு குழுவியாக பருவத்தை சீராக பயன்படுத்துவதை பார்க்கவும்.</string>
     <string name="apps">பயன்பாடுகள்</string>

@@ -179,7 +179,7 @@ fun ColorAndStylePage(navController: NavHostController) {
                     )
                     PListItem(
                         title = stringResource(R.string.dark_theme),
-                        desc = DarkTheme.values().find { it.value == darkTheme }?.getText(context) ?: "",
+                        desc = DarkTheme.entries.find { it.value == darkTheme }?.getText(context) ?: "",
                         separatedActions = true,
                         onClick = {
                             navController.navigate(RouteName.DARK_THEME)

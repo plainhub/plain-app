@@ -62,7 +62,7 @@ class LoadingButtonView(context: Context, attrs: AttributeSet?) : LinearLayout(c
         val a = context.obtainStyledAttributes(attrs, R.styleable.LoadingButtonView)
         normalText = a.getString(R.styleable.LoadingButtonView_text) ?: ""
         loadingText = a.getString(R.styleable.LoadingButtonView_loadingText) ?: ""
-        buttonType = ButtonType.values()[a.getInt(R.styleable.LoadingButtonView_buttonType, 0)]
+        buttonType = ButtonType.entries.toTypedArray()[a.getInt(R.styleable.LoadingButtonView_buttonType, 0)]
 
         a.recycle()
         binding.text.text = normalText

@@ -6,6 +6,8 @@ import com.ismartcoding.plain.features.audio.MediaPlayMode
 data class App(
     val usbConnected: Boolean,
     val urlToken: String,
+    val httpPort: Int,
+    val httpsPort: Int,
     val externalFilesDir: String,
     val deviceName: String,
     val battery: Int,

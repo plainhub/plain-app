@@ -2,6 +2,7 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">O seu VPN está atualmente ativado no seu dispositivo, o que pode potencialmente levar a problemas de conexão web quando acessado a partir do PC. Para resolver isso, recomendamos ajustar as configurações do seu VPN para permitir o tráfego de LAN ou desativar o seu VPN.</string>
     <string name="warning">Aviso</string>
+    <string name="advanced_https">HTTPS (Avançado)</string>
     <string name="version_name_with_code">Versão {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">A otimização do uso da bateria está atualmente ativa. Para garantir um desempenho ininterrupto, considere desativar a otimização da bateria especificamente para este aplicativo.</string>
     <string name="apps">Aplicativos</string>

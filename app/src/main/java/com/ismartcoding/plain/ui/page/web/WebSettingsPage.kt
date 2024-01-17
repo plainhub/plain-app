@@ -97,7 +97,7 @@ fun WebSettingsPage(
         val context = LocalContext.current
         val webConsole = LocalWeb.current
         val scope = rememberCoroutineScope()
-        var isHttps by remember { mutableStateOf(true) }
+        var isHttps by remember { mutableStateOf(false) }
         val httpsPort = LocalHttpsPort.current
         val httpPort = LocalHttpPort.current
         val passwordType = LocalPasswordType.current
@@ -254,16 +254,16 @@ fun WebSettingsPage(
                 }
                 item {
                     BlockRadioButton(
-                        selected = if (isHttps) 0 else 1,
-                        onSelected = { isHttps = it == 0 },
+                        selected = if (isHttps) 1 else 0,
+                        onSelected = { isHttps = it == 1 },
                         itemRadioGroups =
                         listOf(
                             BlockRadioGroupButtonItem(
-                                text = stringResource(R.string.recommended_https),
+                                text = "HTTP",
                                 onClick = {},
                             ) {},
                             BlockRadioGroupButtonItem(
-                                text = "HTTP",
+                                text = stringResource(R.string.advanced_https),
                                 onClick = {},
                             ) {},
                         ),

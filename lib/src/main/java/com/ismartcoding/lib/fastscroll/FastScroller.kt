@@ -600,7 +600,7 @@ class FastScroller : LinearLayout {
         @StyleableRes index: Int,
         defValue: Int,
     ) = getInt(index, defValue).let { ordinal ->
-        Size.values().find { it.ordinal == ordinal } ?: Size.SMALL
+        Size.entries.find { it.ordinal == ordinal } ?: Size.SMALL
     }
 
     private fun Context.layout(

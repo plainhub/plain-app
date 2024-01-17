@@ -2,6 +2,7 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">현재 기기에서 VPN이 활성화되어 있어 PC에서 액세스할 때 웹 연결 문제가 발생할 수 있습니다. 이를 해결하기 위해 LAN 트래픽을 허용하거나 VPN을 비활성화하는 것을 권장합니다.</string>
     <string name="warning">경고</string>
+    <string name="advanced_https">HTTPS (고급)</string>
     <string name="version_name_with_code">버전 {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">최적화된 배터리 사용이 현재 활성화되어 있습니다. 중단없는 성능을 보장하기 위해 이 앱에 대한 배터리 최적화를 비활성화하는 것을 고려해보십시오.</string>
     <string name="apps">앱</string>

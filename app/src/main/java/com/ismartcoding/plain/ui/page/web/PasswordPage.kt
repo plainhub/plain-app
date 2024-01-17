@@ -83,7 +83,7 @@ fun PasswordPage(navController: NavHostController) {
                                 }
                             },
                             itemRadioGroups =
-                                PasswordType.values().map {
+                                PasswordType.entries.map {
                                     BlockRadioGroupButtonItem(
                                         text = it.getText(),
                                         onClick = {},

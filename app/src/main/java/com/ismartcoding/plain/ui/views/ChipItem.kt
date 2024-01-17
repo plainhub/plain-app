@@ -25,7 +25,7 @@ data class ChipItem(val text: String, val value: String) {
     companion object {
         fun getRuleActions(): List<ChipItem> {
             val items = mutableListOf<ChipItem>()
-            RuleAction.values().forEach {
+            RuleAction.entries.forEach {
                 items.add(ChipItem(it.getText(), it.value))
             }
             return items
@@ -33,7 +33,7 @@ data class ChipItem(val text: String, val value: String) {
 
         fun getRuleDirections(): List<ChipItem> {
             val items = mutableListOf<ChipItem>()
-            RuleDirection.values().forEach {
+            RuleDirection.entries.forEach {
                 items.add(ChipItem(it.getText(), it.value))
             }
             return items
@@ -41,7 +41,7 @@ data class ChipItem(val text: String, val value: String) {
 
         fun getPasswordTypes(): List<ChipItem> {
             val items = mutableListOf<ChipItem>()
-            PasswordType.values().forEach {
+            PasswordType.entries.forEach {
                 items.add(ChipItem(it.getText(), it.name))
             }
             return items
@@ -49,7 +49,7 @@ data class ChipItem(val text: String, val value: String) {
 
         fun getRuleTargetTypes(): List<ChipItem> {
             val items = mutableListOf<ChipItem>()
-            TargetType.values().forEach {
+            TargetType.entries.forEach {
                 items.add(ChipItem(it.getText(), it.value))
             }
             return items
