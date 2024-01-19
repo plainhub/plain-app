@@ -62,7 +62,9 @@ import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.application.uninstallAllPlugins
 import io.ktor.server.engine.embeddedServer
+import io.ktor.server.http.content.SPAConfig
 import io.ktor.server.http.content.singlePageApplication
+import io.ktor.server.http.content.staticResources
 import io.ktor.server.http.content.vue
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.autohead.AutoHeadResponse
@@ -163,9 +165,16 @@ object HttpModule {
         }
 
         routing {
-            singlePageApplication {
-                useResources = true
-                vue("web")
+            val config = SPAConfig()
+            config.filesPath = "web"
+            staticResources(config.applicationRoute, config.filesPath, index = config.defaultPage) {
+                cacheControl {
+                    arrayListOf(
+                        CacheControl.NoCache(CacheControl.Visibility.Public),
+                        CacheControl.NoStore(CacheControl.Visibility.Public),
+                    )
+                }
+                default(config.defaultPage)
             }
 
             get("/health_check") {

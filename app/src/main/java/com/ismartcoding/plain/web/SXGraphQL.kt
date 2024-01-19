@@ -265,10 +265,10 @@ class SXGraphQL(val schema: Schema) {
                     configure {
                         executor = Executor.DataLoaderPrepared
                     }
-                    resolver { offset: Int, limit: Int, query: String ->
+                    resolver { offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-                        ImageHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, ImageSortByPreference.getValueAsync(context)).map {
+                        ImageHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, sortBy).map {
                             it.toModel()
                         }
                     }
@@ -316,10 +316,10 @@ class SXGraphQL(val schema: Schema) {
                     configure {
                         executor = Executor.DataLoaderPrepared
                     }
-                    resolver { offset: Int, limit: Int, query: String ->
+                    resolver { offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-                        VideoHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, VideoSortByPreference.getValueAsync(context)).map {
+                        VideoHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, sortBy).map {
                             it.toModel()
                         }
                     }
@@ -345,10 +345,10 @@ class SXGraphQL(val schema: Schema) {
                     configure {
                         executor = Executor.DataLoaderPrepared
                     }
-                    resolver { offset: Int, limit: Int, query: String ->
+                    resolver { offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-                        AudioHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, AudioSortByPreference.getValueAsync(context)).map {
+                        AudioHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, sortBy).map {
                             it.toModel()
                         }
                     }
