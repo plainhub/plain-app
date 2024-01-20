@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.enums.AppFeatureType
 import com.ismartcoding.plain.ui.audio.AudiosDialog
 import com.ismartcoding.plain.ui.base.GridItem
 import com.ismartcoding.plain.ui.base.Subtitle
@@ -63,12 +64,14 @@ fun HomeItemStorage(
             ) {
                 FilesDialog().show()
             }
-            GridItem(
-                icon = Icons.Outlined.Apps,
-                stringResource(id = R.string.apps),
-                modifier = Modifier.width(itemWidth),
-            ) {
-                navController.navigate(RouteName.APPS)
+            if (AppFeatureType.APPS.has()) {
+                GridItem(
+                    icon = Icons.Outlined.Apps,
+                    stringResource(id = R.string.apps),
+                    modifier = Modifier.width(itemWidth),
+                ) {
+                    navController.navigate(RouteName.APPS)
+                }
             }
         }
     }

@@ -302,7 +302,6 @@
     <string name="web_url">Web URL</string>
     <string name="auth_dev_token_tips">The token is only for api request testing, return cleartext in the api response.\nPut \"Authorization: Bearer &lt;token&gt;\" in the api request headers.</string>
     <string name="browser_https_error_tips">If you see \"Your connection is not private\" error, simply click the "Advanced" button and click "Proceed to …" button, then Chrome will trust this URL for the remainder of the browser session.</string>
-    <string name="feature_SYSTEM_ALERT_WINDOW">Allow background pop-up windows</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">Manage files</string>
     <string name="feature_READ_SMS">Read messages</string>
     <string name="feature_WRITE_CALL_LOG">Manage call log</string>

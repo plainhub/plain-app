@@ -6,12 +6,13 @@ enum class AppFeatureType {
     SOCIAL,
     EDUCATION,
     HARDWARE,
+    APPS,
     NOTIFICATIONS,
     EXCHANGE_RATE;
 
     fun has(): Boolean {
         when(this) {
-            SOCIAL, NOTIFICATIONS -> {
+            SOCIAL, NOTIFICATIONS, APPS -> {
                 return BuildConfig.CHANNEL != AppChannelType.GOOGLE.name
             }
             EXCHANGE_RATE, EDUCATION, HARDWARE -> {

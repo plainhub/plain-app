@@ -9,10 +9,12 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Contacts
 import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Numbers
 import androidx.compose.material.icons.outlined.Sms
@@ -276,25 +278,24 @@ object Permissions {
             PermissionItem(Icons.Outlined.Folder, Permission.WRITE_EXTERNAL_STORAGE, setOf(Permission.WRITE_EXTERNAL_STORAGE),
                 setOf(Permission.WRITE_EXTERNAL_STORAGE).all { it.can(context) })
         )
-        list.add(
-            PermissionItem(Icons.Outlined.Contacts, Permission.WRITE_CONTACTS, setOf(Permission.WRITE_CONTACTS),
-                setOf(Permission.WRITE_CONTACTS).all { it.can(context) })
-        )
-        if (AppFeatureType.SOCIAL.has()) {
-            list.add(PermissionItem(Icons.Outlined.Sms, Permission.READ_SMS, setOf(Permission.READ_SMS), setOf(Permission.READ_SMS).all { it.can(context) }))
-            list.add(PermissionItem(Icons.Default.Call, Permission.WRITE_CALL_LOG, setOf(Permission.WRITE_CALL_LOG), setOf(Permission.WRITE_CALL_LOG).all { it.can(context) }))
-        }
-
-        list.add(
-            PermissionItem(Icons.Outlined.Call, Permission.CALL_PHONE, setOf(Permission.CALL_PHONE),
-                setOf(Permission.CALL_PHONE).all { it.can(context) })
-        )
         if (AppFeatureType.NOTIFICATIONS.has()) {
             list.add(
                 PermissionItem(Icons.Outlined.Notifications, Permission.NOTIFICATION_LISTENER, setOf(Permission.NOTIFICATION_LISTENER),
                     setOf(Permission.NOTIFICATION_LISTENER).all { it.can(context) })
             )
         }
+        list.add(
+            PermissionItem(Icons.Outlined.Contacts, Permission.WRITE_CONTACTS, setOf(Permission.WRITE_CONTACTS),
+                setOf(Permission.WRITE_CONTACTS).all { it.can(context) })
+        )
+        if (AppFeatureType.SOCIAL.has()) {
+            list.add(PermissionItem(Icons.Outlined.Sms, Permission.READ_SMS, setOf(Permission.READ_SMS), setOf(Permission.READ_SMS).all { it.can(context) }))
+            list.add(PermissionItem(Icons.AutoMirrored.Outlined.List, Permission.WRITE_CALL_LOG, setOf(Permission.WRITE_CALL_LOG), setOf(Permission.WRITE_CALL_LOG).all { it.can(context) }))
+        }
+        list.add(
+            PermissionItem(Icons.Outlined.Call, Permission.CALL_PHONE, setOf(Permission.CALL_PHONE),
+                setOf(Permission.CALL_PHONE).all { it.can(context) })
+        )
         list.add(
             PermissionItem(Icons.Outlined.Numbers, Permission.READ_PHONE_NUMBERS, setOf(Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS),
                 setOf(Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS).all { it.can(context) })
