@@ -429,7 +429,7 @@ object Asn1DerEncoder {
             val sourceType: Class<*> = source.javaClass
             if (Asn1OpaqueObject::class.java == sourceType) {
                 val buf = (source as Asn1OpaqueObject).encoded
-                val result = ByteArray(buf!!.remaining())
+                val result = ByteArray(buf.remaining())
                 buf[result]
                 return result
             }

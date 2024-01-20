@@ -247,16 +247,12 @@ object Asn1BerParser {
         val result: MutableList<T?> = ArrayList()
         val elementsReader = container!!.contentsReader()
         while (true) {
-            var dataValue: BerDataValue?
-            dataValue = try {
-                elementsReader!!.readDataValue()
+            val dataValue = try {
+                elementsReader.readDataValue()
             } catch (e: BerDataValueFormatException) {
                 throw Asn1DecodingException("Malformed data value", e)
-            }
-            if (dataValue == null) {
-                break
-            }
-            var element: T? = if (ByteBuffer::class.java == elementClass) {
+            } ?: break
+            val element: T? = if (ByteBuffer::class.java == elementClass) {
                 dataValue.encodedContents as T
             } else if (Asn1OpaqueObject::class.java == elementClass) {
                 Asn1OpaqueObject(dataValue.encoded) as T
@@ -540,7 +536,7 @@ object Asn1BerParser {
                 if (!resultBuf!!.hasRemaining()) {
                     return EMPTY_BYTE_ARRAY as T
                 }
-                val result = ByteArray(resultBuf!!.remaining())
+                val result = ByteArray(resultBuf.remaining())
                 resultBuf[result]
                 return result as T
             } else if (Asn1OpaqueObject::class.java == targetType) {

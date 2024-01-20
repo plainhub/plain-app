@@ -69,7 +69,7 @@ abstract class ResourceValue protected constructor(protected val value: Int) {
                 val type = resource.type
                 typeSpec = resource.typeSpec
                 val resourceEntry = resource.resourceEntry
-                val localMatchLevel = Locales.match(locale, type!!.locale)
+                val localMatchLevel = Locales.match(locale, type.locale)
                 val densityLevel = densityLevel(type.density)
                 if (localMatchLevel > currentLocalMatchLevel) {
                     selected = resourceEntry

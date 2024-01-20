@@ -101,22 +101,22 @@ object AttributeValues {
 
     //http://developer.android.com/reference/android/content/pm/PermissionInfo.html
     fun getProtectionLevel(value: Int): String? {
-        var value = value
+        var newValue = value
         val levels: MutableList<String> = ArrayList(3)
-        if (value and 0x10 != 0) {
-            value = value xor 0x10
+        if (newValue and 0x10 != 0) {
+            newValue = newValue xor 0x10
             levels.add("system")
         }
-        if (value and 0x20 != 0) {
-            value = value xor 0x20
+        if (newValue and 0x20 != 0) {
+            newValue = newValue xor 0x20
             levels.add("development")
         }
-        when (value) {
+        when (newValue) {
             0 -> levels.add("normal")
             1 -> levels.add("dangerous")
             2 -> levels.add("signature")
             3 -> levels.add("signatureOrSystem")
-            else -> levels.add("ProtectionLevel:" + Integer.toHexString(value))
+            else -> levels.add("ProtectionLevel:" + Integer.toHexString(newValue))
         }
         return Strings.join(levels, "|")
     }

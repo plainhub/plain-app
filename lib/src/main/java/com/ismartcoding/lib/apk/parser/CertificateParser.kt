@@ -4,7 +4,7 @@ import com.ismartcoding.lib.apk.ApkParsers
 import com.ismartcoding.lib.apk.bean.CertificateMeta
 
 abstract class CertificateParser(protected val data: ByteArray) {
-    abstract fun parse(): List<CertificateMeta>?
+    abstract fun parse(): List<CertificateMeta>
 
     companion object {
         fun getInstance(data: ByteArray): CertificateParser {

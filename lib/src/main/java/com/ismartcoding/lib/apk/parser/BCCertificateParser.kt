@@ -7,7 +7,6 @@ import org.bouncycastle.cms.CMSException
 import org.bouncycastle.cms.CMSSignedData
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.util.Selector
-import org.bouncycastle.util.Store
 import java.security.Provider
 import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
@@ -25,7 +24,7 @@ internal class BCCertificateParser(data: ByteArray) : CertificateParser(data) {
         val certificates: MutableList<X509Certificate?> = ArrayList()
         for (signer in signers) {
             val signerId : Selector<X509CertificateHolder> = signer.sid as Selector<X509CertificateHolder>
-            val matches = certStore.getMatches(signerId!!)
+            val matches = certStore.getMatches(signerId)
             for (holder in matches) {
                 certificates.add(
                     JcaX509CertificateConverter().setProvider(provider).getCertificate(holder)

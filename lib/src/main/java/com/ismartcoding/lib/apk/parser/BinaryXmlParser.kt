@@ -187,7 +187,7 @@ class BinaryXmlParser(
     init {
         this.buffer = buffer.duplicate()
         this.buffer.order(byteOrder)
-        this.locale = locale ?: Locales.any
+        this.locale = locale
     }
 
     //trans int attr value to string
