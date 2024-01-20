@@ -2,6 +2,7 @@
     <string name="app_name">EinfacheApp</string>
     <string name="vpn_web_conflict_warning">Ihr VPN ist derzeit auf Ihrem Gerät aktiviert, was potenziell zu Webverbindungsproblemen führen kann, wenn es von Ihrem PC aus zugegriffen wird. Um dies zu lösen, empfehlen wir Ihnen, Ihre VPN-Einstellungen anzupassen, um LAN-Verkehr zuzulassen oder Ihr VPN zu deaktivieren.</string>
     <string name="warning">Warnung</string>
+    <string name="privacy_policy">Datenschutzrichtlinie</string>
     <string name="grant_permission">Berechtigung erteilen</string>
     <string name="system_alert_window_warning">Die Gewährung der \'Über anderen Apps anzeigen\'-Berechtigung ist unerlässlich. Ohne diese Berechtigung könnten bei laufender App im Hintergrund wichtige Systemdialoge, wie etwa Deinstallationsbestätigungsdialoge, übersehen werden.</string>
     <string name="advanced_https">HTTPS (Fortgeschritten)</string>

@@ -64,10 +64,10 @@ fun AboutPage(
                         },
                     )
                     PListItem(
-                        title = stringResource(R.string.donation),
+                        title = stringResource(R.string.privacy_policy),
                         showMore = true,
                         onClick = {
-                            WebHelper.open(context, "https://ko-fi.com/ismartcoding")
+                            WebHelper.open(context, "https://ismartcoding.github.io/plain-app/policy.html")
                         },
                     )
                     if (BuildConfig.DEBUG) {

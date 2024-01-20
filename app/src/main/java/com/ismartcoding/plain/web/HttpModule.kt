@@ -519,8 +519,7 @@ object HttpModule {
                                                     // merge part files into original file
                                                     destFile = File("${info.dir}/$fileName")
                                                     val partFiles = File(info.dir).listFiles()?.filter { it.name.startsWith("$fileName.part") }?.sortedBy { it.name } ?: arrayListOf()
-                                                    val fos = Files.asByteSink(destFile, FileWriteMode.APPEND).openStream()
-                                                    fos.use { fos ->
+                                                    Files.asByteSink(destFile, FileWriteMode.APPEND).openStream().use { fos ->
                                                         partFiles.forEach { partFile ->
                                                             Files.asByteSource(partFile).openStream().use { input ->
                                                                 ByteStreams.copy(input, fos)

@@ -2,6 +2,7 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Uw VPN is momenteel ingeschakeld op uw apparaat, wat mogelijk kan leiden tot webverbinding problemen bij toegang vanaf uw pc. Om dit op te lossen, raden we aan om uw VPN-instellingen aan te passen om LAN-verkeer toe te staan of uw VPN uit te schakelen.</string>
     <string name="warning">Waarschuwing</string>
+    <string name="privacy_policy">Privacybeleid</string>
     <string name="grant_permission">Toestemming verlenen</string>
     <string name="system_alert_window_warning">Het verlenen van de \'Weergeven over andere apps\'-toestemming is essentieel. Zonder deze toestemming kunnen bij een app die op de achtergrond draait, cruciale systeemdialogen, zoals bevestigingsdialogen voor verwijdering, worden gemist.</string>
     <string name="advanced_https">HTTPS (Geavanceerd)</string>
