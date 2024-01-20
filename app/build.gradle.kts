@@ -162,7 +162,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.6")
 
     releaseImplementation(platform("com.google.firebase:firebase-bom:32.2.3"))
-    releaseImplementation("com.google.firebase:firebase-crashlytics-ktx:18.6.0")
+    releaseImplementation("com.google.firebase:firebase-crashlytics-ktx:18.6.1")
 
     implementation("com.apollographql.apollo3:apollo-runtime:$apollo")
     implementation("com.apollographql.apollo3:apollo-normalized-cache:$apollo")
