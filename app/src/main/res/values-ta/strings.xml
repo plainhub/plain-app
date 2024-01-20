@@ -2,6 +2,8 @@
     <string name="app_name">பிளேன் ஆப்</string>
     <string name="vpn_web_conflict_warning">உங்கள் உலாவியில் தற்போது VPN செல்லுபடி உள்ளது, இது பிரச்சனைகளைக் கொண்டுவரலாம் பாராட்டும் நேரத்தில். இதை தீர்மானிக்க, உங்கள் VPN அமைப்புகளை LAN பரிமாறத்தை அனுமதிக்க அல்லது உங்கள் VPN முடக்குதலை கொண்டுவிடுவதை பரிந்துரைக்கிறோம்.</string>
     <string name="warning">எச்சரிக்கை</string>
+    <string name="grant_permission">அனுமதி அளிக்கவும்</string>
+    <string name="system_alert_window_warning">‘மற்ற பயன்பாடுகளின் மேல் காட்ட’ அனுமதி அளிக்குதல் முக்கியம். இந்த அனுமதி இல்லையின், பயன்பாடு பின்னர் ஓடி விடுகின்றதும், ஐப்பிள் உருவாக்கப்பட்ட குறுக்கேற்ற சிஸ்டம் டயலாக், உடைந்தது அனப்ரூபியேஷன் டயலாக் போன்றவற்றை விட நீங்கள் அவசியமாக காட்டாதல்.</string>
     <string name="advanced_https">எசடிடபிஎஸ் (உயர்த்துதல்)</string>
     <string name="version_name_with_code">பதிப்பு {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">செயலில் பருவத்தை சீராக பயன்படுத்துவது தற்போது செயல்படுகின்றது. விரைவாக பரிசோதனை முடக்குவதற்கு, இந்த பயன்பாடுகளுக்கு குழுவியாக பருவத்தை சீராக பயன்படுத்துவதை பார்க்கவும்.</string>
@@ -301,17 +303,12 @@
     <string name="auth_dev_token_tips">இந்த டோக்கன் எந்த குறிப்பிலும் API கோரிக்கை சோதனைக்கும், API பதிலில் ஐந்துரைத்தொடரில் கிளீர்டெக்ஸ்ட் திருப்தி கொண்டுள்ளது. கட்டாயமாக, API கோரிக்கை தலைப்புக்கு "Authorization: Bearer &lt;டோக்கன்&gt;" எனும் தலைப்பை கொண்டு வாரியாக உள்ளமைத்துக் கொள்ளவும்.</string>
     <string name="browser_https_error_tips">நீங்களில் "உங்கள் இணைப்பு தனிநபராகுகிறது" பிழையைக் காண்க, எளிதாக "மேம்படுத்தவும்" பொத்தானை அழுத்தி "தொலைநிலை அவாற்கு ..." எனும் பொத்தானை அழுத்திக் கொள்ளவும், அப்போது குரோம் இந்த URL ஐ உங்களுக்கு மீதமுள்ள அந்தரங்கம் விரிவு கொள்ளும்.</string>
     <string name="feature_SYSTEM_ALERT_WINDOW">பின்னல் உலோக வாரியாகுகைகளை அனுமதிக்கவும்</string>
-    <string name="feature_READ_EXTERNAL_STORAGE">கோப்புகளை வாசிக்க அனுமதி</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">கோப்புகளை மேலும் அமைப்பதற்கு அனுமதி</string>
     <string name="feature_READ_SMS">செய்திகளை வாசிக்க அனுமதி</string>
-    <string name="feature_SEND_SMS">செய்திகளை அனுப்ப அனுமதி</string>
-    <string name="feature_READ_CALL_LOG">அழிப்பு பதிவை வாசிக்க அனுமதி</string>
     <string name="feature_WRITE_CALL_LOG">அழிப்பு பதிவை எழுத அனுமதி</string>
     <string name="feature_CALL_PHONE">போன் கோள் செய்ய அனுமதி</string>
-    <string name="feature_READ_CONTACTS">தொடர்புகளை வாசிக்க அனுமதி</string>
     <string name="feature_WRITE_CONTACTS">தொடர்புகளை எழுத அனுமதி</string>
     <string name="feature_NOTIFICATION_LISTENER">அறிவித்தல்களை வாசிக்க அனுமதி</string>
-    <string name="feature_READ_PHONE_STATE">போன் நிலையை வாசிக்க அனுமதி</string>
     <string name="feature_READ_PHONE_NUMBERS">போன் எண்களை வாசிக்க அனுமதி</string>
     <string name="system_permission_granted">கணக்கு அனுமதி வழங்கப்பட்டது</string>
     <string name="system_permission_not_granted">கணக்கு அனுமதி அனுப்பப்படவில்லை</string>

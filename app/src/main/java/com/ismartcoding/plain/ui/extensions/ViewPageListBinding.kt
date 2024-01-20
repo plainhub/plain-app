@@ -6,13 +6,15 @@ import androidx.core.view.isVisible
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.ViewPageListBinding
 import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 
 fun ViewPageListBinding.checkPermission(
     context: Context,
+    permissions: Set<Permission>,
     permission: Permission,
 ) {
-    if (permission.can(context)) {
+    if (Permissions.anyCan(context, permissions)) {
         page.visibility = View.VISIBLE
         empty.root.isVisible = false
         page.showLoading()

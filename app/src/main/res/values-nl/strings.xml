@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Uw VPN is momenteel ingeschakeld op uw apparaat, wat mogelijk kan leiden tot webverbinding problemen bij toegang vanaf uw pc. Om dit op te lossen, raden we aan om uw VPN-instellingen aan te passen om LAN-verkeer toe te staan of uw VPN uit te schakelen.</string>
     <string name="warning">Waarschuwing</string>
+    <string name="grant_permission">Toestemming verlenen</string>
+    <string name="system_alert_window_warning">Het verlenen van de \'Weergeven over andere apps\'-toestemming is essentieel. Zonder deze toestemming kunnen bij een app die op de achtergrond draait, cruciale systeemdialogen, zoals bevestigingsdialogen voor verwijdering, worden gemist.</string>
     <string name="advanced_https">HTTPS (Geavanceerd)</string>
     <string name="version_name_with_code">Versie {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">Geoptimaliseerd batterijgebruik is momenteel actief. Om ononderbroken prestaties te garanderen, overweeg batterijoptimalisatie specifiek voor deze app uit te schakelen.</string>
@@ -301,17 +303,12 @@
     <string name="auth_dev_token_tips">Deze token is alleen bedoeld voor het testen van API-verzoeken en retourneert tekst in de API-reactie.\nZet "Authorization: Bearer &lt;token&gt;" in de kopteksten van het API-verzoek.</string>
     <string name="browser_https_error_tips">Als u de fout "Uw verbinding is niet privé" ziet, klikt u eenvoudig op de knop "Geavanceerd" en vervolgens op de knop "Doorgaan naar …", dan zal Chrome deze URL vertrouwen voor de rest van de browsersessie.</string>
     <string name="feature_SYSTEM_ALERT_WINDOW">Achtergrondpop-upvensters toestaan</string>
-    <string name="feature_READ_EXTERNAL_STORAGE">Toestaan dat web bestanden leest</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">Toestaan dat web bestanden beheert</string>
     <string name="feature_READ_SMS">Toestaan dat web berichten leest</string>
-    <string name="feature_SEND_SMS">Toestaan dat web berichten verstuurt</string>
-    <string name="feature_READ_CALL_LOG">Toestaan dat web het oproeplogboek leest</string>
     <string name="feature_WRITE_CALL_LOG">Toestaan dat web het oproeplogboek bijhoudt</string>
     <string name="feature_CALL_PHONE">Toestaan dat web een telefoongesprek voert</string>
-    <string name="feature_READ_CONTACTS">Toestaan dat web contacten leest</string>
     <string name="feature_WRITE_CONTACTS">Toestaan dat web contacten bijhoudt</string>
     <string name="feature_NOTIFICATION_LISTENER">Toestaan dat de website meldingen leest</string>
-    <string name="feature_READ_PHONE_STATE">Toestaan dat web de telefoonstatus leest</string>
     <string name="feature_READ_PHONE_NUMBERS">Toestaan dat web telefoonnummers leest</string>
     <string name="system_permission_granted">Systeemtoestemming verleend</string>
     <string name="system_permission_not_granted">Systeemtoestemming niet verleend</string>

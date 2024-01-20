@@ -171,7 +171,7 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
     }
 
     private fun checkPermission() {
-        binding.list.checkPermission(requireContext(), Permission.WRITE_EXTERNAL_STORAGE)
+        binding.list.checkPermission(requireContext(), setOf(Permission.WRITE_EXTERNAL_STORAGE), Permission.WRITE_EXTERNAL_STORAGE)
     }
 
     override fun updateList() {

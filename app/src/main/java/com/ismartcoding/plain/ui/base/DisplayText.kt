@@ -42,7 +42,7 @@ fun DisplayText(
         if (description.isNotEmpty()) {
             Text(
                 text = description,
-                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Normal),
+                style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }

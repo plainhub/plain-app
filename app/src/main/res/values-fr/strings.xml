@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Votre VPN est actuellement activé sur votre appareil, ce qui pourrait potentiellement entraîner des problèmes de connexion Web lorsqu\'il est accédé depuis un PC. Pour résoudre cela, nous vous recommandons d\'ajuster les paramètres de votre VPN pour autoriser le trafic LAN ou de désactiver votre VPN.</string>
     <string name="warning">Avertissement</string>
+    <string name="grant_permission">Accorder l\'autorisation</string>
+    <string name="system_alert_window_warning">Accorder l\'autorisation \'Affichage par-dessus d\'autres applications\' est essentiel. Sans cette autorisation, si l\'application est en cours d\'exécution en arrière-plan, vous pourriez manquer des dialogues système cruciaux déclenchés par l\'application, tels que les dialogues de confirmation de désinstallation.</string>
     <string name="advanced_https">HTTPS (Avancé)</string>
     <string name="version_name_with_code">Version {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">L\'optimisation de l\'utilisation de la batterie est actuellement active. Pour garantir des performances ininterrompues, veuillez envisager de désactiver l\'optimisation de la batterie spécifiquement pour cette application.</string>
@@ -301,17 +303,12 @@
     <string name="auth_dev_token_tips">Le jeton est uniquement destiné aux tests de requêtes API, renvoyez du texte en clair dans la réponse API.\nPlacez "Authorization: Bearer &lt;jeton&gt;" dans les en-têtes de la requête API.</string>
     <string name="browser_https_error_tips">Si vous voyez l\'erreur "Votre connexion n'est pas privée", cliquez simplement sur le bouton "Avancé" et sur le bouton "Continuer vers…", puis Chrome fera confiance à cette URL pour le reste de la session du navigateur.</string>
     <string name="feature_SYSTEM_ALERT_WINDOW">Autoriser les fenêtres contextuelles en arrière-plan</string>
-    <string name="feature_READ_EXTERNAL_STORAGE">Autoriser le site Web à lire les fichiers</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">Autoriser le site Web à gérer les fichiers</string>
     <string name="feature_READ_SMS">Autoriser le site Web à lire les messages</string>
-    <string name="feature_SEND_SMS">Autoriser le site Web à envoyer des messages</string>
-    <string name="feature_READ_CALL_LOG">Autoriser le site Web à lire le journal d\'appels</string>
     <string name="feature_WRITE_CALL_LOG">Autoriser le site Web à écrire le journal d\'appels</string>
     <string name="feature_CALL_PHONE">Autoriser le site Web à passer des appels téléphoniques</string>
-    <string name="feature_READ_CONTACTS">Autoriser le site Web à lire les contacts</string>
     <string name="feature_WRITE_CONTACTS">Autoriser le site Web à écrire les contacts</string>
     <string name="feature_NOTIFICATION_LISTENER">Autoriser le site web à lire les notifications</string>
-    <string name="feature_READ_PHONE_STATE">Autoriser le site Web à lire l\'état du téléphone</string>
     <string name="feature_READ_PHONE_NUMBERS">Autoriser le site Web à lire les numéros de téléphone</string>
     <string name="system_permission_granted">Autorisation système accordée</string>
     <string name="system_permission_not_granted">Autorisation système non accordée</string>

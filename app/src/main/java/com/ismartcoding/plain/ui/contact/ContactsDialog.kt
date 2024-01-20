@@ -115,7 +115,7 @@ class ContactsDialog : BaseListDrawerDialog() {
     }
 
     private fun checkPermission() {
-        binding.list.checkPermission(requireContext(), Permission.READ_CONTACTS)
+        binding.list.checkPermission(requireContext(), setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS), Permission.READ_CONTACTS)
     }
 
     override fun updateList() {

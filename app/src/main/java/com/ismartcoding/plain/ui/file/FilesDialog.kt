@@ -310,7 +310,7 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
 
     private fun checkPermission() {
         binding.breadcrumb.isVisible = Permission.WRITE_EXTERNAL_STORAGE.can(requireContext())
-        binding.list.checkPermission(requireContext(), Permission.WRITE_EXTERNAL_STORAGE)
+        binding.list.checkPermission(requireContext(), setOf(Permission.WRITE_EXTERNAL_STORAGE), Permission.WRITE_EXTERNAL_STORAGE)
     }
 
     private fun updateList() {

@@ -2,6 +2,8 @@
     <string name="app_name">简朴</string>
     <string name="vpn_web_conflict_warning">您的VPN当前在设备上启用，这可能会导致从PC访问时出现Web连接问题。为解决此问题，我们建议调整VPN设置以允许局域网流量或禁用VPN。</string>
     <string name="warning">警告</string>
+    <string name="grant_permission">授予权限</string>
+    <string name="system_alert_window_warning">授予‘在其他应用程序上显示’权限是至关重要的。如果没有此权限，在应用程序在后台运行时，您可能会错过由应用程序触发的关键系统对话框，例如卸载确认对话框。</string>
     <string name="advanced_https">HTTPS（高级）</string>
     <string name="version_name_with_code">版本 {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">优化电池使用目前已激活。为确保流畅的使用性能，请考虑为此应用禁用电池优化。</string>
@@ -301,17 +303,12 @@
     <string name="auth_dev_token_tips">令牌仅用于api请求测试，返回明文数据。\n将\"Authorization: Bearer &lt;token&gt;\"放在请求头部即可。</string>
     <string name="browser_https_error_tips">如果Chrome浏览器显示\"您的连接不是私密连接\"，请点击页面"高级"按钮继续。</string>
     <string name="feature_SYSTEM_ALERT_WINDOW">允许后台弹窗</string>
-    <string name="feature_READ_EXTERNAL_STORAGE">允许网页读设备文件</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">允许网页管理设备文件</string>
     <string name="feature_READ_SMS">允许网页读取短信数据</string>
-    <string name="feature_SEND_SMS">允许网页发送短信</string>
-    <string name="feature_READ_CONTACTS">允许网页读取联系人数据</string>
     <string name="feature_WRITE_CONTACTS">允许网页修改联系人数据</string>
-    <string name="feature_READ_CALL_LOG">允许网页读取通话记录</string>
     <string name="feature_WRITE_CALL_LOG">允许网页修改通话记录</string>
     <string name="feature_CALL_PHONE">允许网页拨打电话</string>
     <string name="feature_NOTIFICATION_LISTENER">允许网站读取通知</string>
-    <string name="feature_READ_PHONE_STATE">允许网页读取设备信息</string>
     <string name="feature_READ_PHONE_NUMBERS">允许网页读取电话号码</string>
     <string name="system_permission_granted">已获取系统权限</string>
     <string name="system_permission_not_granted">未获取系统权限</string>

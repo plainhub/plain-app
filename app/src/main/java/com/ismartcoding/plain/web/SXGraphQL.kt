@@ -55,6 +55,7 @@ import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.CancelNotificationsEvent
 import com.ismartcoding.plain.features.ClearAudioPlaylistEvent
 import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.QueryHelper
 import com.ismartcoding.plain.features.StartScreenMirrorEvent
 import com.ismartcoding.plain.features.aichat.AIChatHelper
@@ -375,7 +376,7 @@ class SXGraphQL(val schema: Schema) {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
-                        Permission.READ_CONTACTS.checkAsync(MainApp.instance)
+                        Permissions.checkAsync(MainApp.instance, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))
                         try {
                             ContactHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
                         } catch (ex: Exception) {
@@ -394,7 +395,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("contactCount") {
                     resolver { query: String ->
-                        if (Permission.READ_CONTACTS.can(MainApp.instance)) {
+                        if (Permissions.anyCan(MainApp.instance, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))) {
                             ContactHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
                             0
@@ -403,13 +404,13 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("contactSources") {
                     resolver { ->
-                        Permission.READ_CONTACTS.checkAsync(MainApp.instance)
+                        Permissions.checkAsync(MainApp.instance, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))
                         SourceHelper.getAll().map { it.toModel() }
                     }
                 }
                 query("contactGroups") {
                     resolver { node: Execution.Node ->
-                        Permission.READ_CONTACTS.checkAsync(MainApp.instance)
+                        Permissions.checkAsync(MainApp.instance, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))
                         val groups = GroupHelper.getAll().map { it.toModel() }
                         val fields = node.getFields()
                         if (fields.contains(ContactGroup::contactCount.name)) {
@@ -423,7 +424,7 @@ class SXGraphQL(val schema: Schema) {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
-                        Permission.READ_CALL_LOG.checkAsync(MainApp.instance)
+                        Permissions.checkAsync(MainApp.instance, setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG))
                         CallHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
                     }
                     type<Call> {
@@ -437,7 +438,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("callCount") {
                     resolver { query: String ->
-                        if (Permission.READ_CALL_LOG.can(MainApp.instance)) {
+                        if (Permissions.anyCan(MainApp.instance, setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG))) {
                             CallHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
                             0

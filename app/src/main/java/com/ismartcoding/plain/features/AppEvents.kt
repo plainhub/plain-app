@@ -73,6 +73,8 @@ class ConfirmToAcceptLoginEvent(
 class PermissionResultEvent(val permission: Permission)
 
 class RequestPermissionEvent(val permission: Permission)
+class RequestPermissionsEvent(val permissions: Set<Permission>)
+class PermissionsResultEvent(val map: Map<String, Boolean>)
 
 class PickFileEvent(val tag: PickFileTag, val type: PickFileType, val multiple: Boolean)
 

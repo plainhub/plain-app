@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">お使いのデバイスでは現在VPNが有効になっており、PCからアクセスした際にWeb接続の問題が発生する可能性があります。これを解決するために、LANトラフィックを許可するようにVPNの設定を調整するか、VPNを無効にすることをお勧めします。</string>
     <string name="warning">警告</string>
+    <string name="grant_permission">許可を付与</string>
+    <string name="system_alert_window_warning">「他のアプリの上に表示」の許可を付与することが不可欠です。この許可がないと、アプリがバックグラウンドで実行されている場合に、アンインストール確認ダイアログなど、アプリによってトリガーされた重要なシステムダイアログが見逃される可能性があります。</string>
     <string name="advanced_https">HTTPS（高度）</string>
     <string name="version_name_with_code">バージョン {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">最適化されたバッテリー使用が現在有効です。中断のないパフォーマンスを確保するために、このアプリケーションのために特にバッテリーオプティマイゼーションを無効にすることを検討してください。</string>
@@ -301,17 +303,12 @@
     <string name="auth_dev_token_tips">トークンは、APIリクエストのテストにのみ使用され、APIレスポンスでクリアテキストが返されます。\nAPIリクエストのヘッダーに \"Authorization: Bearer &lt;token&gt;\" を追加します。</string>
     <string name="browser_https_error_tips">"Your connection is not private"エラーが表示された場合は、「詳細」ボタンをクリックし、「...に進む」ボタンをクリックするだけで、ChromeがこのURLをブラウザセッションの残りの期間信頼します。</string>
     <string name="feature_SYSTEM_ALERT_WINDOW">バックグラウンドでポップアップウィンドウを許可</string>
-    <string name="feature_READ_EXTERNAL_STORAGE">Webがファイルを読み取ることを許可</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">Webがファイルを管理することを許可</string>
     <string name="feature_READ_SMS">Webがメッセージを読み取ることを許可</string>
-    <string name="feature_SEND_SMS">Webがメッセージを送信することを許可</string>
-    <string name="feature_READ_CALL_LOG">Webが通話履歴を読み取ることを許可</string>
     <string name="feature_WRITE_CALL_LOG">Webが通話履歴を記録することを許可</string>
     <string name="feature_CALL_PHONE">Webが電話をかけることを許可</string>
-    <string name="feature_READ_CONTACTS">Webが連絡先を読み取ることを許可</string>
     <string name="feature_WRITE_CONTACTS">Webが連絡先を記録することを許可</string>
     <string name="feature_NOTIFICATION_LISTENER">ウェブに通知の読み取りを許可する</string>
-    <string name="feature_READ_PHONE_STATE">Webが電話の状態を読み取ることを許可</string>
     <string name="feature_READ_PHONE_NUMBERS">Webが電話番号を読み取ることを許可</string>
     <string name="system_permission_granted">システムの許可が与えられました</string>
     <string name="system_permission_not_granted">システムの許可が与えられていません</string>

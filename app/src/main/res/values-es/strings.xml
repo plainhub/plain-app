@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Su VPN está actualmente habilitado en su dispositivo, lo que podría provocar problemas de conexión web cuando se accede desde su PC. Para resolver esto, le recomendamos ajustar la configuración de su VPN para permitir el tráfico de LAN o desactivar su VPN.</string>
     <string name="warning">Advertencia</string>
+    <string name="grant_permission">Conceder permiso</string>
+    <string name="system_alert_window_warning">Conceder el permiso de \'Mostrar sobre otras aplicaciones\' es esencial. Sin este permiso, si la aplicación se está ejecutando en segundo plano, podrías perder diálogos cruciales del sistema provocados por la aplicación, como los diálogos de confirmación de desinstalación.</string>
     <string name="advanced_https">HTTPS (Avanzado)</string>
     <string name="version_name_with_code">Versión {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">La optimización de la batería está actualmente activa. Para garantizar un rendimiento ininterrumpido, considere desactivar la optimización de la batería específicamente para esta aplicación.</string>
@@ -301,17 +303,12 @@
     <string name="auth_dev_token_tips">El token es solo para pruebas de solicitud de API, devuelve texto sin formato en la respuesta de la API. Coloca \"Authorization: Bearer &lt;token&gt;\" en las cabeceras de la solicitud de API.</string>
     <string name="browser_https_error_tips">Si ves el error "Tu conexión no es privada", simplemente haz clic en el botón "Avanzado" y luego en el botón "Continuar a ...", así Chrome confiará en esta URL durante el resto de la sesión del navegador.</string>
     <string name="feature_SYSTEM_ALERT_WINDOW">Permitir ventanas emergentes en segundo plano</string>
-    <string name="feature_READ_EXTERNAL_STORAGE">Permitir que la web lea archivos</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">Permitir que la web administre archivos</string>
     <string name="feature_READ_SMS">Permitir que la web lea mensajes</string>
-    <string name="feature_SEND_SMS">Permitir que la web envíe mensajes</string>
-    <string name="feature_READ_CALL_LOG">Permitir que la web lea el registro de llamadas</string>
     <string name="feature_WRITE_CALL_LOG">Permitir que la web escriba el registro de llamadas</string>
     <string name="feature_CALL_PHONE">Permitir que la web realice llamadas telefónicas</string>
-    <string name="feature_READ_CONTACTS">Permitir que la web lea contactos</string>
     <string name="feature_WRITE_CONTACTS">Permitir que la web escriba contactos</string>
     <string name="feature_NOTIFICATION_LISTENER">Permitir que la web lea las notificaciones</string>
-    <string name="feature_READ_PHONE_STATE">Permitir que la web lea el estado del teléfono</string>
     <string name="feature_READ_PHONE_NUMBERS">Permitir que la web lea los números de teléfono</string>
     <string name="system_permission_granted">Permiso del sistema concedido</string>
     <string name="system_permission_not_granted">Permiso del sistema no concedido</string>

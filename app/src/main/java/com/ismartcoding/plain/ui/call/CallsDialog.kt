@@ -87,7 +87,7 @@ class CallsDialog : BaseListDrawerDialog() {
 
     override fun initEvents() {
         receiveEvent<PermissionResultEvent> { event ->
-            if (event.permission == Permission.READ_CALL_LOG) {
+            if (setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG).contains(event.permission)) {
                 checkPermission()
             } else if (event.permission == Permission.CALL_PHONE) {
                 if (Permission.CALL_PHONE.can(requireContext())) {
@@ -110,7 +110,7 @@ class CallsDialog : BaseListDrawerDialog() {
     }
 
     private fun checkPermission() {
-        binding.list.checkPermission(requireContext(), Permission.READ_CALL_LOG)
+        binding.list.checkPermission(requireContext(), setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG), Permission.READ_CALL_LOG)
     }
 
     override fun updateList() {

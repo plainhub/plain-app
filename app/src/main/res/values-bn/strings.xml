@@ -2,6 +2,8 @@
     <string name="app_name">প্লেনঅ্যাপ</string>
     <string name="vpn_web_conflict_warning">আপনার ডিভাইসে সক্রিয় ভিপিএন আছে, যা একটি পিসি থেকে অ্যাক্সেস করার সময় ওয়েব সংযোগের সমস্যা উত্পন্ন করতে পারে। এটি সমাধান করতে, আমরা আপনাকে আপনার ভিপিএন সেটিংস পরিবর্তন করে এলএএন ট্র্যাফিক অনুমতি দেওয়া বা আপনার ভিপিএন নিষ্ক্রিয় করতে প্রস্তাবনা দিচ্ছি।</string>
     <string name="warning">সতর্কবার্তা</string>
+    <string name="grant_permission">অনুমতি দান করুন</string>
+    <string name="system_alert_window_warning">‘অন্য অ্যাপস উপর প্রদর্শন’ অনুমতি দেওয়া গুরুত্বপূর্ণ। এই অনুমতি না থাকলে, যদি অ্যাপটি ব্যাকগ্রাউন্ডে চলছে, আপনি অ্যাপ দ্বারা সৃষ্টিকৃত মৌলিক সিস্টেম ডায়ালগ, যেমন অনইনস্টলেশন নিশ্চিতকরণ ডায়ালগ, অনুমতি দেওয়া না থাকলে আপনি এটি হারতে পারেন।</string>
     <string name="advanced_https">এইচটিপিএস (উন্নত)</string>
     <string name="version_name_with_code">সংস্করণ {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">অপটিমাইজড ব্যাটারি ব্যবহার সক্রিয় আছে। অবিরত কাজের জন্য, এই অ্যাপ এর জন্য ব্যাটারি অপটিমাইজেশন অক্ষম করতে বিবেচনা করুন।</string>
@@ -301,17 +303,12 @@
     <string name="auth_dev_token_tips">টোকেনটি কেবলমাত্র API অনুরোধ পরীক্ষা জন্য, এপি প্রতিক্রিয়ায় প্লেইনটেক্সট ফিরে দেয়। অনুরোধ শিরোনামে প্রস্তাবনা আসানোর জন্য \"Authorization: Bearer &lt;token&gt;\" ব্যবহার করুন।</string>
     <string name="browser_https_error_tips">আপনি যদি "আপনার সংযোগ ব্যক্তিগত নয়" ত্রুটি দেখেন, তাহলে সহজভাবে "উন্নত" বোতামে ক্লিক করুন এবং "এগিয়ে যান" বোতামে ক্লিক করুন, তারপর ক্রোম এই URL টি ব্রাউজার সেশনের বাকি অংশের জন্য আত্মবিশ্বাস করবে।</string>
     <string name="feature_SYSTEM_ALERT_WINDOW">পপ-আপ উইন্ডোগুলির অনুমতি দিন</string>
-    <string name="feature_READ_EXTERNAL_STORAGE">ওয়েবটি ফাইল পড়তে অনুমতি দিন</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">ওয়েবটি ফাইল পরিচালনা করতে অনুমতি দিন</string>
     <string name="feature_READ_SMS">ওয়েবটি বার্তা পড়তে অনুমতি দিন</string>
-    <string name="feature_SEND_SMS">ওয়েবটি বার্তা প্রেরণ করতে অনুমতি দিন</string>
-    <string name="feature_READ_CALL_LOG">ওয়েবটি কল লগ পড়তে অনুমতি দিন</string>
     <string name="feature_WRITE_CALL_LOG">ওয়েবটিকে কল লগ লিখতে অনুমতি দিন</string>
     <string name="feature_CALL_PHONE">ওয়েবটিকে ফোন কল করতে অনুমতি দিন</string>
-    <string name="feature_READ_CONTACTS">ওয়েবটিকে যোগাযোগ পড়তে অনুমতি দিন</string>
     <string name="feature_WRITE_CONTACTS">ওয়েবটিকে যোগাযোগ লিখতে অনুমতি দিন</string>
     <string name="feature_NOTIFICATION_LISTENER">ওয়েবকে বিজ্ঞপ্তি পড়তে অনুমতি দিন</string>
-    <string name="feature_READ_PHONE_STATE">ওয়েবটিকে ফোন স্টেট পড়তে অনুমতি দিন</string>
     <string name="feature_READ_PHONE_NUMBERS">ওয়েবটিকে ফোন নম্বর পড়তে অনুমতি দিন</string>
     <string name="system_permission_granted">সিস্টেম অনুমতি দেওয়া হয়েছে</string>
     <string name="system_permission_not_granted">সিস্টেম অনুমতি দেওয়া হয়নি</string>

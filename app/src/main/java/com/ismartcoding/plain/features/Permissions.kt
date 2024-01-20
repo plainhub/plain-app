@@ -8,6 +8,15 @@ import android.provider.Settings
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.outlined.Call
+import androidx.compose.material.icons.outlined.Contacts
+import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Numbers
+import androidx.compose.material.icons.outlined.Sms
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import com.ismartcoding.lib.channel.receiveEventHandler
@@ -66,7 +75,7 @@ enum class Permission {
         return apiPermissions.contains(this.toString())
     }
 
-    private fun toSysPermission(): String {
+    fun toSysPermission(): String {
         return "android.permission.${this.name}"
     }
 
@@ -240,21 +249,58 @@ enum class Permission {
     }
 }
 
-data class PermissionItem(val permission: Permission, val granted: Boolean)
+data class PermissionItem(val icon: ImageVector?, val permission: Permission, val permissions: Set<Permission>, val granted: Boolean)
 
 object Permissions {
-    private val map = mutableMapOf<Permission, ActivityResultLauncher<String>>()
+    private val launcherMap = mutableMapOf<Permission, ActivityResultLauncher<String>>()
     private val events = mutableListOf<Job>()
     private val intentLauncherMap = mutableMapOf<Permission, ActivityResultLauncher<Intent>>()
+    private lateinit var multipleLauncher: ActivityResultLauncher<Array<String>>
+
+
+    suspend fun checkAsync(context: Context, permissions: Set<Permission>) {
+        val ps = permissions.map { it.toString() }
+        val apiPermissions = ApiPermissionsPreference.getAsync(context)
+        if (!apiPermissions.all { ps.contains(it) }) {
+            throw Exception("no_permission")
+        }
+    }
+
+    fun anyCan(context: Context, permissions: Set<Permission>): Boolean {
+        return permissions.any { it.can(context) }
+    }
 
     fun getWebList(context: Context): List<PermissionItem> {
-        val permissions = mutableListOf(Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_CONTACTS, Permission.WRITE_CONTACTS)
+        val list = mutableListOf<PermissionItem>()
+        list.add(
+            PermissionItem(Icons.Outlined.Folder, Permission.WRITE_EXTERNAL_STORAGE, setOf(Permission.WRITE_EXTERNAL_STORAGE),
+                setOf(Permission.WRITE_EXTERNAL_STORAGE).all { it.can(context) })
+        )
+        list.add(
+            PermissionItem(Icons.Outlined.Contacts, Permission.WRITE_CONTACTS, setOf(Permission.WRITE_CONTACTS),
+                setOf(Permission.WRITE_CONTACTS).all { it.can(context) })
+        )
         if (AppFeatureType.SOCIAL.has()) {
-            permissions.addAll(listOf(Permission.READ_SMS, Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG))
+            list.add(PermissionItem(Icons.Outlined.Sms, Permission.READ_SMS, setOf(Permission.READ_SMS), setOf(Permission.READ_SMS).all { it.can(context) }))
+            list.add(PermissionItem(Icons.Default.Call, Permission.WRITE_CALL_LOG, setOf(Permission.WRITE_CALL_LOG), setOf(Permission.WRITE_CALL_LOG).all { it.can(context) }))
         }
-        permissions.addAll(listOf(Permission.CALL_PHONE, Permission.NOTIFICATION_LISTENER, Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS, Permission.SYSTEM_ALERT_WINDOW,  Permission.NONE))
 
-        return permissions.map { PermissionItem(it, it.can(context)) }
+        list.add(
+            PermissionItem(Icons.Outlined.Call, Permission.CALL_PHONE, setOf(Permission.CALL_PHONE),
+                setOf(Permission.CALL_PHONE).all { it.can(context) })
+        )
+        if (AppFeatureType.NOTIFICATIONS.has()) {
+            list.add(
+                PermissionItem(Icons.Outlined.Notifications, Permission.NOTIFICATION_LISTENER, setOf(Permission.NOTIFICATION_LISTENER),
+                    setOf(Permission.NOTIFICATION_LISTENER).all { it.can(context) })
+            )
+        }
+        list.add(
+            PermissionItem(Icons.Outlined.Numbers, Permission.READ_PHONE_NUMBERS, setOf(Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS),
+                setOf(Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS).all { it.can(context) })
+        )
+        list.add(PermissionItem(null, Permission.NONE, setOf(Permission.NONE), false))
+        return list
     }
 
     fun init(activity: AppCompatActivity) {
@@ -277,7 +323,7 @@ object Permissions {
             Permission.READ_PHONE_STATE,
             Permission.READ_PHONE_NUMBERS,
         ).forEach { permission ->
-            map[permission] =
+            launcherMap[permission] =
                 activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
                     canContinue = true
                     sendEvent(PermissionResultEvent(permission))
@@ -298,9 +344,20 @@ object Permissions {
                 }
         }
 
+        multipleLauncher = activity.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            canContinue = true
+            sendEvent(PermissionsResultEvent(permissions))
+        }
+
         events.add(
             receiveEventHandler<RequestPermissionEvent> { event ->
-                event.permission.request(MainApp.instance, map[event.permission], intentLauncherMap[event.permission])
+                event.permission.request(MainApp.instance, launcherMap[event.permission], intentLauncherMap[event.permission])
+            },
+        )
+
+        events.add(
+            receiveEventHandler<RequestPermissionsEvent> { event ->
+                multipleLauncher.launch(event.permissions.map { it.toSysPermission() }.toTypedArray())
             },
         )
     }

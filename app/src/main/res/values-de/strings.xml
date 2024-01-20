@@ -2,6 +2,8 @@
     <string name="app_name">EinfacheApp</string>
     <string name="vpn_web_conflict_warning">Ihr VPN ist derzeit auf Ihrem Gerät aktiviert, was potenziell zu Webverbindungsproblemen führen kann, wenn es von Ihrem PC aus zugegriffen wird. Um dies zu lösen, empfehlen wir Ihnen, Ihre VPN-Einstellungen anzupassen, um LAN-Verkehr zuzulassen oder Ihr VPN zu deaktivieren.</string>
     <string name="warning">Warnung</string>
+    <string name="grant_permission">Berechtigung erteilen</string>
+    <string name="system_alert_window_warning">Die Gewährung der \'Über anderen Apps anzeigen\'-Berechtigung ist unerlässlich. Ohne diese Berechtigung könnten bei laufender App im Hintergrund wichtige Systemdialoge, wie etwa Deinstallationsbestätigungsdialoge, übersehen werden.</string>
     <string name="advanced_https">HTTPS (Fortgeschritten)</string>
     <string name="version_name_with_code">Version {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">Optimierte Batterienutzung ist derzeit aktiv. Um eine unterbrechungsfreie Leistung zu gewährleisten, erwägen Sie bitte, die Batterieoptimierung speziell für diese App zu deaktivieren.</string>
@@ -301,17 +303,12 @@
     <string name="auth_dev_token_tips">Das Token dient nur zum Testen von API-Anfragen und wird im Klartext in der API-Antwort zurückgegeben.\nFüge "Authorization: Bearer &lt;token&gt;" in die Kopfzeilen der API-Anfrage ein.</string>
     <string name="browser_https_error_tips">Wenn du den Fehler "Deine Verbindung ist nicht privat" siehst, klicke einfach auf die Schaltfläche "Erweitert" und dann auf die Schaltfläche "Zu … fortsetzen", dann vertraut Chrome dieser URL für den Rest der Browsersitzung.</string>
     <string name="feature_SYSTEM_ALERT_WINDOW">Hintergrund-Popup-Fenster erlauben</string>
-    <string name="feature_READ_EXTERNAL_STORAGE">Webzugriff auf Dateien erlauben</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">Webzugriff auf Dateiverwaltung erlauben</string>
     <string name="feature_READ_SMS">Webzugriff auf Nachrichten erlauben</string>
-    <string name="feature_SEND_SMS">Webzugriff auf Nachrichten senden erlauben</string>
-    <string name="feature_READ_CALL_LOG">Webzugriff auf Anrufprotokoll erlauben</string>
     <string name="feature_WRITE_CALL_LOG">Webzugriff auf Anrufprotokoll schreiben erlauben</string>
     <string name="feature_CALL_PHONE">Webzugriff auf Telefonanrufe erlauben</string>
-    <string name="feature_READ_CONTACTS">Webzugriff auf Kontakte erlauben</string>
     <string name="feature_WRITE_CONTACTS">Webzugriff auf Kontakte schreiben erlauben</string>
     <string name="feature_NOTIFICATION_LISTENER">Erlaube der Webseite, Benachrichtigungen zu lesen</string>
-    <string name="feature_READ_PHONE_STATE">Webzugriff auf Telefonstatus erlauben</string>
     <string name="feature_READ_PHONE_NUMBERS">Webzugriff auf Telefonnummern erlauben</string>
     <string name="system_permission_granted">Systemberechtigung erteilt</string>
     <string name="system_permission_not_granted">Systemberechtigung nicht erteilt</string>

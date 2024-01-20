@@ -41,10 +41,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -60,19 +60,47 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.enums.PasswordType
-import com.ismartcoding.plain.data.preference.*
+import com.ismartcoding.plain.data.preference.ApiPermissionsPreference
+import com.ismartcoding.plain.data.preference.HttpPortPreference
+import com.ismartcoding.plain.data.preference.HttpsPortPreference
+import com.ismartcoding.plain.data.preference.LocalApiPermissions
+import com.ismartcoding.plain.data.preference.LocalHttpPort
+import com.ismartcoding.plain.data.preference.LocalHttpsPort
+import com.ismartcoding.plain.data.preference.LocalPassword
+import com.ismartcoding.plain.data.preference.LocalPasswordType
+import com.ismartcoding.plain.data.preference.LocalWeb
+import com.ismartcoding.plain.data.preference.WebSettingsProvider
 import com.ismartcoding.plain.features.IgnoreBatteryOptimizationResultEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.Permissions
+import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.RequestPermissionEvent
+import com.ismartcoding.plain.features.RequestPermissionsEvent
 import com.ismartcoding.plain.features.StartHttpServerStateEvent
 import com.ismartcoding.plain.features.StopHttpServerDoneEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.powerManager
-import com.ismartcoding.plain.ui.base.*
+import com.ismartcoding.plain.ui.base.ActionButtonMore
+import com.ismartcoding.plain.ui.base.Alert
+import com.ismartcoding.plain.ui.base.AlertType
+import com.ismartcoding.plain.ui.base.BlockRadioButton
+import com.ismartcoding.plain.ui.base.BlockRadioGroupButtonItem
+import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.DisplayText
+import com.ismartcoding.plain.ui.base.MiniOutlineButton
+import com.ismartcoding.plain.ui.base.PDropdownMenu
+import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PSwitch
+import com.ismartcoding.plain.ui.base.RadioDialog
+import com.ismartcoding.plain.ui.base.RadioDialogOption
+import com.ismartcoding.plain.ui.base.Subtitle
+import com.ismartcoding.plain.ui.base.Tips
+import com.ismartcoding.plain.ui.base.rememberLifecycleEvent
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.MainViewModel
@@ -107,19 +135,28 @@ fun WebSettingsPage(
         var permissionList by remember { mutableStateOf(Permissions.getWebList(context)) }
         var portDialogVisible by remember { mutableStateOf(false) }
         var showIgnoreOptimizeWarning by remember { mutableStateOf(!powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)) }
+        var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.can(context)) }
+        var isVPNConnected by remember { mutableStateOf(NetworkHelper.isVPNConnected(context)) }
         val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
 
-//        val lifecycleEvent = rememberLifecycleEvent()
-//        LaunchedEffect(lifecycleEvent) {
-//            if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
-//                showIgnoreOptimizeWarning = !powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)
-//                LogCat.d("ON_RESUME: ${showIgnoreOptimizeWarning}")
-//            }
-//        }
+        val lifecycleEvent = rememberLifecycleEvent()
+        LaunchedEffect(lifecycleEvent) {
+            if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
+                showIgnoreOptimizeWarning = !powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)
+                isVPNConnected = NetworkHelper.isVPNConnected(context)
+            }
+        }
 
         LaunchedEffect(Unit) {
             events.add(
                 receiveEventHandler<PermissionResultEvent> {
+                    permissionList = Permissions.getWebList(context)
+                    systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.can(context)
+                }
+            )
+
+            events.add(
+                receiveEventHandler<PermissionsResultEvent> {
                     permissionList = Permissions.getWebList(context)
                 }
             )
@@ -225,6 +262,16 @@ fun WebSettingsPage(
                         if (NetworkHelper.isVPNConnected(context)) {
                             Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
                         }
+                        if (!systemAlertWindow) {
+                            Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.system_alert_window_warning), AlertType.WARNING) {
+                                MiniOutlineButton(
+                                    text = stringResource(R.string.grant_permission),
+                                    onClick = {
+                                        sendEvent(RequestPermissionEvent(Permission.SYSTEM_ALERT_WINDOW))
+                                    },
+                                )
+                            }
+                        }
 //                        if (showIgnoreOptimizeWarning) {
 //                            Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.optimized_batter_usage_warning), AlertType.WARNING) {
 //                                MiniOutlineButton(
@@ -296,6 +343,7 @@ fun WebSettingsPage(
                     val permission = m.permission
                     if (permission == Permission.NONE) {
                         PListItem(
+                            icon = m.icon,
                             title = permission.getText(),
                             showMore = true,
                             onClick = {
@@ -314,24 +362,24 @@ fun WebSettingsPage(
                         )
                     } else {
                         PListItem(
+                            icon = m.icon,
                             title = permission.getText(),
                             desc =
                             stringResource(
                                 if (m.granted) R.string.system_permission_granted else R.string.system_permission_not_granted,
                             ),
-                            showMore = permission == Permission.SYSTEM_ALERT_WINDOW,
                             onClick = {
                                 scope.launch {
-                                    if (permission == Permission.SYSTEM_ALERT_WINDOW) {
-                                        sendEvent(RequestPermissionEvent(Permission.SYSTEM_ALERT_WINDOW))
-                                    } else {
-                                        val enable = withIO { !permission.isEnabledAsync(context) }
-                                        withIO { ApiPermissionsPreference.putAsync(context, permission, enable) }
-                                        if (enable) {
-                                            if (m.granted) {
-                                                return@launch
+                                    val enable = withIO { !permission.isEnabledAsync(context) }
+                                    withIO { ApiPermissionsPreference.putAsync(context, permission, enable) }
+                                    if (enable) {
+                                        val ps = m.permissions.filter { !it.can(context) }
+                                        if (ps.isNotEmpty()) {
+                                            if (ps.size == 1) {
+                                                sendEvent(RequestPermissionEvent(ps[0]))
+                                            } else {
+                                                sendEvent(RequestPermissionsEvent(ps.toSet()))
                                             }
-                                            sendEvent(RequestPermissionEvent(permission))
                                         }
                                     }
                                 }
@@ -342,10 +390,14 @@ fun WebSettingsPage(
                                     scope.launch {
                                         withIO { ApiPermissionsPreference.putAsync(context, permission, enable) }
                                         if (enable) {
-                                            if (m.granted) {
-                                                return@launch
+                                            val ps = m.permissions.filter { !it.can(context) }
+                                            if (ps.isNotEmpty()) {
+                                                if (ps.size == 1) {
+                                                    sendEvent(RequestPermissionEvent(ps[0]))
+                                                } else {
+                                                    sendEvent(RequestPermissionsEvent(ps.toSet()))
+                                                }
                                             }
-                                            sendEvent(RequestPermissionEvent(permission))
                                         }
                                     }
                                 }
@@ -494,7 +546,7 @@ fun BrowserPreview(
                 .fillMaxWidth()
                 .padding(16.dp),
             text = stringResource(id = R.string.enter_this_address_tips),
-            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Normal),
+            style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )

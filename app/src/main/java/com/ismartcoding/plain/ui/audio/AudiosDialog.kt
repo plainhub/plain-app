@@ -63,7 +63,7 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     }
 
     private fun checkPermission() {
-        binding.list.checkPermission(requireContext(), Permission.WRITE_EXTERNAL_STORAGE)
+        binding.list.checkPermission(requireContext(), setOf(Permission.WRITE_EXTERNAL_STORAGE), Permission.WRITE_EXTERNAL_STORAGE)
     }
 
     override fun initEvents() {
