@@ -56,8 +56,14 @@ android {
             storeFile = file(keystoreProperties.getProperty("storeFile", "release.jks"))
             storePassword = keystoreProperties.getProperty("storePassword")
         }
-    }
 
+
+    // https://stackoverflow.com/questions/52731670/android-app-bundle-with-in-app-locale-change/52733674#52733674
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
