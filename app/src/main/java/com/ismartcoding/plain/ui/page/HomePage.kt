@@ -104,7 +104,6 @@ fun HomePage(
                 navController.navigate(RouteName.SETTINGS)
             }
         },
-        topBarTitle = if (BuildConfig.DEBUG) "DEBUG" else "",
         actions = {
             PIconButton(
                 imageVector = Icons.Outlined.Computer,

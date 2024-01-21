@@ -137,7 +137,11 @@
         <service
             android:name=".services.AudioPlayerService"
             android:exported="false"
-            android:foregroundServiceType="mediaPlayback" />
+            android:foregroundServiceType="mediaPlayback">
+<!--            <intent-filter>-->
+<!--                <action android:name="android.media.browse.MediaBrowserService" />-->
+<!--            </intent-filter>-->
+        </service>
 
         <service
             android:name=".services.ScreenMirrorService"

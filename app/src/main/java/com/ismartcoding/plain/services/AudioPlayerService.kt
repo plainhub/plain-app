@@ -43,6 +43,7 @@ class AudioPlayerService : LifecycleService() {
     private lateinit var intentPlay: PendingIntent
     private lateinit var intentNext: PendingIntent
     private lateinit var intentCancel: PendingIntent
+    private val notificationId = NotificationHelper.generateId()
 
     private val receiver =
         object : BroadcastReceiver() {
@@ -114,8 +115,7 @@ class AudioPlayerService : LifecycleService() {
                     }
 
                     AudioAction.PLAY, AudioAction.PAUSE, AudioAction.NOTIFICATION -> {
-                        val id = NotificationHelper.generateId()
-                        ServiceCompat.startForeground(this@AudioPlayerService, id, createNotification(), FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+                        ServiceCompat.startForeground(this@AudioPlayerService, notificationId, createNotification(), FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
                     }
 
                     AudioAction.STOP -> {
@@ -131,8 +131,7 @@ class AudioPlayerService : LifecycleService() {
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val id = NotificationHelper.generateId()
-            ServiceCompat.startForeground(this@AudioPlayerService, id, createNotification(), FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+            ServiceCompat.startForeground(this@AudioPlayerService, notificationId, createNotification(), FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
         }
 
         binder = LocalBinder()
