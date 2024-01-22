@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
@@ -16,6 +17,7 @@ import com.ismartcoding.plain.data.enums.DarkTheme
 import com.ismartcoding.plain.data.enums.Language
 import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
 import com.ismartcoding.plain.features.audio.MediaPlayMode
 import com.ismartcoding.plain.features.device.DeviceSortBy
@@ -295,10 +297,19 @@ object AudioPlayModePreference : BasePreference<Int>() {
         value: MediaPlayMode,
     ) {
         putAsync(context, value.ordinal)
+        TempData.audioPlayMode = value
+        coMain {
+            AudioPlayer.setRepeatMode()
+        }
     }
 
     suspend fun getValueAsync(context: Context): MediaPlayMode {
         val value = getAsync(context)
+        return MediaPlayMode.entries.find { it.ordinal == value } ?: MediaPlayMode.REPEAT
+    }
+
+    fun getValue(preferences: Preferences): MediaPlayMode {
+        val value = preferences[key]
         return MediaPlayMode.entries.find { it.ordinal == value } ?: MediaPlayMode.REPEAT
     }
 }
@@ -485,11 +496,12 @@ object AudioPlaylistPreference : BasePreference<String>() {
     suspend fun addAsync(
         context: Context,
         audios: List<DPlaylistAudio>,
-    ) {
+    ): List<DPlaylistAudio> {
         val items = getValueAsync(context).toMutableList()
         items.removeIf { i -> audios.any { it.path == i.path } }
         items.addAll(audios)
         putAsync(context, items)
+        return items
     }
 }
 
@@ -497,19 +509,12 @@ object AudioPlayingPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("audio_playing")
 
-    suspend fun getValueAsync(context: Context): DPlaylistAudio? {
+    suspend fun getValueAsync(context: Context): String {
         val str = getAsync(context)
-        if (str.isEmpty()) {
-            return null
+        if (str.isEmpty() || str.startsWith("{")) {
+            return ""
         }
-        return Json.decodeFromString(str)
-    }
-
-    suspend fun putAsync(
-        context: Context,
-        value: DPlaylistAudio?,
-    ) {
-        putAsync(context, if (value == null) "" else jsonEncode(value))
+        return str
     }
 }
 

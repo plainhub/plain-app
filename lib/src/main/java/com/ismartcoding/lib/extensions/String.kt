@@ -6,6 +6,8 @@ import android.provider.MediaStore
 import android.telephony.PhoneNumberUtils
 import com.ismartcoding.lib.Constants
 import java.io.File
+import java.net.URLEncoder
+import java.nio.charset.Charset
 import java.text.Normalizer
 import java.text.SimpleDateFormat
 import java.util.*
@@ -768,4 +770,14 @@ fun String.splitInParts(
 
 fun String.capitalize(): String {
     return this.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+}
+
+fun String.urlEncoded(): String {
+    return if (Charset.isSupported("UTF-8")) {
+        URLEncoder.encode(this ?: "", "UTF-8")
+    } else {
+        // If UTF-8 is not supported, use the default charset.
+        @Suppress("deprecation")
+        URLEncoder.encode(this ?: "")
+    }
 }

@@ -34,8 +34,8 @@ import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.features.Permissions
+import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
-import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.PdfViewerDialog
 import com.ismartcoding.plain.ui.TextEditorDialog
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
@@ -89,7 +89,7 @@ fun ChatFiles(
                             } else if (path.isAudioFast()) {
                                 AudioPlayerDialog().show()
                                 Permissions.checkNotification(context, R.string.audio_notification_prompt) {
-                                    AudioPlayerService.play(context, DPlaylistAudio.fromPath(context, path))
+                                    AudioPlayer.play(context, DPlaylistAudio.fromPath(context, path))
                                 }
                             } else if (path.isTextFile()) {
                                 if (item.size <= Constants.MAX_READABLE_TEXT_FILE_SIZE) {

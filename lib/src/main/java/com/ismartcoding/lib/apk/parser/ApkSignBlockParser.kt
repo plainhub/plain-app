@@ -8,6 +8,7 @@ import com.ismartcoding.lib.apk.struct.signingv2.SignerBlock
 import com.ismartcoding.lib.apk.utils.Buffers
 import com.ismartcoding.lib.apk.utils.Buffers.readBytes
 import com.ismartcoding.lib.apk.utils.Unsigned
+import com.ismartcoding.lib.logcat.LogCat
 import java.io.ByteArrayInputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -25,10 +26,10 @@ class ApkSignBlockParser(data: ByteBuffer) {
         while (data.remaining() >= 8) {
             val id = data.int
             val size = Unsigned.ensureUInt(id.toLong())
-            Log.d("ApkSigningBlock", "id:$id size:$size remaining:${data.remaining()}")
+            LogCat.d("ApkSigningBlock: id:$id size:$size remaining:${data.remaining()}")
             if (id == ApkSigningBlock.SIGNING_V2_ID) {
                 val signingV2Buffer = Buffers.sliceAndSkip(data, size)
-                Log.d("signingV2Buffer", "signingV2Buffer:${signingV2Buffer.hasRemaining()}")
+                LogCat.d("signingV2Buffer:${signingV2Buffer.hasRemaining()}")
                 // now only care about apk signing v2 entry
                 while (signingV2Buffer.hasRemaining()) {
                     val signerBlock = readSigningV2(signingV2Buffer)
@@ -37,7 +38,7 @@ class ApkSignBlockParser(data: ByteBuffer) {
             } else {
                 // just ignore now
                 val index = data.position() + size
-                Log.d("ApkSigningBlock", "index:$index")
+                LogCat.d("ApkSigningBlock: index:$index")
                 val  limit = data.limit()
                 if ((index > limit) || (index < 0)) {
                     continue

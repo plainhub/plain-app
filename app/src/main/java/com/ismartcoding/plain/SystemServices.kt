@@ -1,6 +1,7 @@
 package com.ismartcoding.plain
 
 import android.app.ActivityManager
+import android.app.AlarmManager
 import android.app.usage.StorageStatsManager
 import android.content.ClipboardManager
 import android.content.ContentResolver
@@ -77,5 +78,10 @@ val subscriptionManager: SubscriptionManager by lazy {
 val telephonyManager: TelephonyManager by lazy {
     MainApp.instance.getSystemServiceCompat(TelephonyManager::class.java)
 }
+
+val alarmManager: AlarmManager by lazy {
+    MainApp.instance.getSystemServiceCompat(AlarmManager::class.java)
+}
+
 
 

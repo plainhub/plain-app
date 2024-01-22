@@ -20,7 +20,6 @@ import com.ismartcoding.plain.databinding.DialogPlaylistBinding
 import com.ismartcoding.plain.features.*
 import com.ismartcoding.plain.features.audio.*
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.*
 import kotlinx.coroutines.Dispatchers
@@ -50,9 +49,9 @@ class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
                     R.id.clear_list -> {
                         lifecycleScope.launch {
                             val context = requireContext()
+                            AudioPlayer.pause()
                             withIO {
-                                AudioPlayer.instance.pause()
-                                AudioPlayingPreference.putAsync(context, null)
+                                AudioPlayingPreference.putAsync(context, "")
                                 AudioPlaylistPreference.putAsync(context, arrayListOf())
                                 sendEvent(ClearAudioPlaylistEvent())
                             }
@@ -74,7 +73,7 @@ class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
             R.id.container.onClick {
                 val m = getModel<AudioModel>()
                 Permissions.checkNotification(requireContext(), R.string.audio_notification_prompt) {
-                    AudioPlayerService.play(requireContext(), m.audio)
+                    AudioPlayer.play(requireContext(), m.audio)
                 }
             }
 
@@ -122,8 +121,8 @@ class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
     private fun updatePlayingState() {
         val context = requireContext()
         lifecycleScope.launch {
-            val currentPath = withIO { AudioPlayingPreference.getValueAsync(context)?.path }
-            val isAudioPlaying = AudioPlayer.instance.isPlaying()
+            val currentPath = withIO { AudioPlayingPreference.getValueAsync(context) }
+            val isAudioPlaying = AudioPlayer.isPlaying()
             binding.list.rv.getModelList<AudioModel>().forEach {
                 val old = it.isPlaying
                 it.isPlaying = isAudioPlaying && currentPath == it.audio.path
@@ -146,8 +145,8 @@ class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
                                 it.artist.contains(searchQ, true)
                         }
                 }
-            val currentPath = withIO { AudioPlayingPreference.getValueAsync(context)?.path }
-            val isAudioPlaying = AudioPlayer.instance.isPlaying()
+            val currentPath = withIO { AudioPlayingPreference.getValueAsync(context) }
+            val isAudioPlaying = AudioPlayer.isPlaying()
             binding.list.page.addData(
                 audios
                     .map { audio ->

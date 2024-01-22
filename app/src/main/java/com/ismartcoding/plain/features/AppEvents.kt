@@ -149,7 +149,7 @@ object AppEvents {
 
         receiveEventHandler<PermissionResultEvent> { event ->
             if (event.permission == Permission.POST_NOTIFICATIONS) {
-                AudioPlayer.instance.showNotification()
+                AudioPlayer.showNotification()
             }
         }
 

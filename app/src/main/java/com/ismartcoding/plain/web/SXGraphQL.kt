@@ -635,8 +635,8 @@ class SXGraphQL(val schema: Schema) {
                             BuildConfig.CHANNEL,
                             Permission.entries.filter { apiPermissions.contains(it.name) && it.can(MainApp.instance) },
                             AudioPlaylistPreference.getValueAsync(context).map { it.toModel() },
-                            AudioPlayModePreference.getValueAsync(context),
-                            AudioPlayingPreference.getValueAsync(context)?.path ?: "",
+                            TempData.audioPlayMode,
+                            AudioPlayingPreference.getValueAsync(context),
                             sdcardPath = FileSystemHelper.getSDCardPath(context),
                             usbDiskPaths = FileSystemHelper.getUsbDiskPaths(),
                             internalStoragePath = FileSystemHelper.getInternalStoragePath(),
@@ -890,7 +890,7 @@ class SXGraphQL(val schema: Schema) {
                     resolver { path: String ->
                         val context = MainApp.instance
                         val audio = DPlaylistAudio.fromPath(context, path)
-                        AudioPlayingPreference.putAsync(context, audio)
+                        AudioPlayingPreference.putAsync(context, audio.path)
                         if (!AudioPlaylistPreference.getValueAsync(context).any { it.path == audio.path }) {
                             AudioPlaylistPreference.addAsync(context, listOf(audio))
                         }
@@ -906,8 +906,8 @@ class SXGraphQL(val schema: Schema) {
                 mutation("clearAudioPlaylist") {
                     resolver { ->
                         val context = MainApp.instance
-                        AudioPlayer.instance.pause()
-                        AudioPlayingPreference.putAsync(context, null)
+                        AudioPlayer.pause()
+                        AudioPlayingPreference.putAsync(context, "")
                         AudioPlaylistPreference.putAsync(context, arrayListOf())
                         sendEvent(ClearAudioPlaylistEvent())
                         true

@@ -37,8 +37,8 @@ import com.ismartcoding.plain.data.enums.PickFileType
 import com.ismartcoding.plain.data.preference.LocalDarkTheme
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.PickFileResultEvent
+import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
-import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.PdfViewerDialog
 import com.ismartcoding.plain.ui.TextEditorDialog
@@ -96,7 +96,7 @@ fun Main(viewModel: MainViewModel) {
                     ) {
                         AudioPlayerDialog().show()
                         Permissions.checkNotification(context, R.string.audio_notification_prompt) {
-                            AudioPlayerService.play(context, DPlaylistAudio.fromPath(context, uri.toString()))
+                            AudioPlayer.play(context, DPlaylistAudio.fromPath(context, uri.toString()))
                         }
                     } else if (mimeType.startsWith("text/")) {
                         TextEditorDialog(uri).show()

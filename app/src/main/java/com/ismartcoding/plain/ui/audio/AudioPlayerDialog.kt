@@ -7,7 +7,9 @@ import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.preference.AudioPlayModePreference
 import com.ismartcoding.plain.data.preference.AudioPlayingPreference
 import com.ismartcoding.plain.databinding.DialogAudioPlayerBinding
@@ -15,7 +17,6 @@ import com.ismartcoding.plain.features.AudioActionEvent
 import com.ismartcoding.plain.features.ClearAudioPlaylistEvent
 import com.ismartcoding.plain.features.audio.*
 import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.setSafeClick
 import kotlinx.coroutines.launch
@@ -73,19 +74,20 @@ class AudioPlayerDialog() : BaseBottomSheetDialog<DialogAudioPlayerBinding>() {
     private fun updateUI() {
         lifecycleScope.launch {
             binding.seekBar.removeCallbacks(seekBarUpdateRunnable)
-            val process = AudioPlayer.instance.getPlayerProgress()
-            binding.process.text = FormatHelper.formatDuration(process.toLong())
-            val audio = withIO { AudioPlayingPreference.getValueAsync(requireContext()) }
-            if (audio != null) {
+            val process = AudioPlayer.getPlayerProgress()
+            binding.process.text = FormatHelper.formatDuration(process)
+            val path = withIO { AudioPlayingPreference.getValueAsync(requireContext()) }
+            if (path.isNotEmpty()) {
+                val audio = withIO { DPlaylistAudio.fromPath(requireContext(), path) }
                 binding.seekBar.max = audio.duration.toInt()
-                binding.seekBar.progress = process
+                binding.seekBar.progress = process.toInt()
                 binding.duration.text = FormatHelper.formatDuration(audio.duration)
                 binding.title.text = audio.title
                 binding.title.isSelected = true // need for marquee
                 binding.artist.text = audio.artist
             }
 
-            val isPlaying = AudioPlayer.instance.isPlaying()
+            val isPlaying = AudioPlayer.isPlaying()
             if (isPlaying) {
                 binding.seekBar.postDelayed(seekBarUpdateRunnable, seekBarUpdateDelayMillis)
             }
@@ -96,7 +98,7 @@ class AudioPlayerDialog() : BaseBottomSheetDialog<DialogAudioPlayerBinding>() {
 
     private fun updatePlayMode() {
         lifecycleScope.launch {
-            val mode = withIO { AudioPlayModePreference.getValueAsync(requireContext()) }
+            val mode = TempData.audioPlayMode
             binding.repeat.setImageResource(
                 when (mode) {
                     MediaPlayMode.REPEAT -> R.drawable.ic_repeat
@@ -111,7 +113,7 @@ class AudioPlayerDialog() : BaseBottomSheetDialog<DialogAudioPlayerBinding>() {
         binding.repeat.setSafeClick {
             lifecycleScope.launch {
                 val newMode =
-                    when (AudioPlayModePreference.getValueAsync(requireContext())) {
+                    when (TempData.audioPlayMode) {
                         MediaPlayMode.REPEAT -> MediaPlayMode.REPEAT_ONE
                         MediaPlayMode.REPEAT_ONE -> MediaPlayMode.SHUFFLE
                         MediaPlayMode.SHUFFLE -> MediaPlayMode.REPEAT
@@ -140,26 +142,26 @@ class AudioPlayerDialog() : BaseBottomSheetDialog<DialogAudioPlayerBinding>() {
                 override fun onStopTrackingTouch(s: SeekBar) {
                     s.removeCallbacks(seekBarUpdateRunnable)
                     binding.process.text = FormatHelper.formatDuration(s.progress.toLong())
-                    AudioPlayerService.seek(requireContext(), s.progress)
+                    AudioPlayer.seekTo(s.progress.toLong())
                     s.postDelayed(seekBarUpdateRunnable, seekBarUpdateDelayMillis)
                 }
             },
         )
 
         binding.skipPrev.setSafeClick {
-            AudioPlayerService.skipPrevious(requireContext())
+            AudioPlayer.skipToPrevious()
         }
 
         binding.play.setSafeClick {
-            if (AudioPlayer.instance.isPlaying()) {
-                AudioPlayerService.pause(requireContext())
+            if (AudioPlayer.isPlaying()) {
+                AudioPlayer.pause()
             } else {
-                AudioPlayerService.play(requireContext())
+                AudioPlayer.play()
             }
         }
 
         binding.skipNext.setSafeClick {
-            AudioPlayerService.skipNext(requireContext())
+            AudioPlayer.skipToNext()
         }
 
         binding.queue.setSafeClick {

@@ -14,6 +14,7 @@ import com.ismartcoding.lib.apk.struct.xml.XmlNamespaceEndTag
 import com.ismartcoding.lib.apk.struct.xml.XmlNamespaceStartTag
 import com.ismartcoding.lib.apk.struct.xml.XmlNodeEndTag
 import com.ismartcoding.lib.apk.struct.xml.XmlNodeStartTag
+import com.ismartcoding.lib.logcat.LogCat
 import java.util.Locale
 
 class ApkMetaTranslator(resourceTable: ResourceTable, locale: Locale?) : XmlStreamer {
@@ -168,7 +169,7 @@ class ApkMetaTranslator(resourceTable: ResourceTable, locale: Locale?) : XmlStre
                 apkMetaBuilder.addPermissions(permission)
             }
 
-            else -> xmlNodeStartTag.name?.let { Log.d("Unexpected value", it) }
+            else -> xmlNodeStartTag.name?.let { LogCat.d("Unexpected value: $it") }
         }
         tagStack[depth++] = xmlNodeStartTag.name
     }

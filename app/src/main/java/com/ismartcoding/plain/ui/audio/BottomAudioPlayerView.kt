@@ -13,7 +13,7 @@ import com.ismartcoding.plain.databinding.ViewBottomAudioPlayerBinding
 import com.ismartcoding.plain.features.AudioActionEvent
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.services.AudioPlayerService
+import com.ismartcoding.plain.features.audio.DPlaylistAudio
 import com.ismartcoding.plain.ui.extensions.setSafeClick
 import com.ismartcoding.plain.ui.views.CustomViewBase
 
@@ -51,21 +51,22 @@ class BottomAudioPlayerView(context: Context, attrs: AttributeSet?) : CustomView
     fun updateUI() {
         coMain {
             binding.audioProgress.removeCallbacks(seekBarUpdateRunnable)
-            val audio = withIO { AudioPlayingPreference.getValueAsync(context) }
-            if (audio == null) {
+            val path = withIO { AudioPlayingPreference.getValueAsync(context) }
+            if (path.isEmpty()) {
                 this@BottomAudioPlayerView.visibility = View.GONE
                 return@coMain
             } else {
                 this@BottomAudioPlayerView.visibility = View.VISIBLE
             }
 
+            val audio = DPlaylistAudio.fromPath(context, path)
             binding.audioProgress.apply {
-                progress = AudioPlayer.instance.getPlayerProgress()
+                progress = AudioPlayer.getPlayerProgress().toInt()
                 max = audio.duration.toInt()
             }
             binding.audioTitle.text = audio.title
             binding.audioArtist.text = audio.artist
-            val isPlaying = AudioPlayer.instance.isPlaying()
+            val isPlaying = AudioPlayer.isPlaying()
             if (isPlaying) {
                 binding.audioProgress.postDelayed(seekBarUpdateRunnable, seekBarUpdateDelayMillis)
             }
@@ -75,10 +76,10 @@ class BottomAudioPlayerView(context: Context, attrs: AttributeSet?) : CustomView
 
     private fun setListen() {
         binding.playPauseButton.setSafeClick {
-            if (AudioPlayer.instance.isPlaying()) {
-                AudioPlayerService.pause(context)
+            if (AudioPlayer.isPlaying()) {
+                AudioPlayer.pause()
             } else {
-                AudioPlayerService.play(context)
+                AudioPlayer.play()
             }
         }
 

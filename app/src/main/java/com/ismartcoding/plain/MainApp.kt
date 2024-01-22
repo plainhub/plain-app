@@ -21,6 +21,7 @@ import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.data.enums.DarkTheme
 import com.ismartcoding.plain.data.enums.PasswordType
+import com.ismartcoding.plain.data.preference.AudioPlayModePreference
 import com.ismartcoding.plain.data.preference.ClientIdPreference
 import com.ismartcoding.plain.data.preference.DarkThemePreference
 import com.ismartcoding.plain.data.preference.FeedAutoRefreshPreference
@@ -109,6 +110,7 @@ class MainApp : Application(), ImageLoaderFactory {
             TempData.webEnabled = WebPreference.get(preferences)
             TempData.httpPort = HttpPortPreference.get(preferences)
             TempData.httpsPort = HttpsPortPreference.get(preferences)
+            TempData.audioPlayMode = AudioPlayModePreference.getValue(preferences)
             ClientIdPreference.ensureValueAsync(instance, preferences)
             KeyStorePasswordPreference.ensureValueAsync(instance, preferences)
             UrlTokenPreference.ensureValueAsync(instance, preferences)

@@ -37,10 +37,10 @@ import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.Permissions
+import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.PdfViewerDialog
@@ -150,7 +150,7 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
                     try {
                         AudioPlayerDialog().show()
                         Permissions.checkNotification(requireContext(), R.string.audio_notification_prompt) {
-                            AudioPlayerService.play(requireContext(), DPlaylistAudio.fromPath(context, m.data.path))
+                            AudioPlayer.play(requireContext(), DPlaylistAudio.fromPath(context, m.data.path))
                         }
                     } catch (ex: Exception) {
                     }

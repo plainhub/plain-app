@@ -216,7 +216,7 @@ class BinaryXmlParser(
         if (namespace == null || namespace.isEmpty() || "http://schemas.android.com/apk/res/android" == namespace) {
             //TODO parse namespaces better
             //workaround for a weird case that there is no namespace found: https://github.com/hsiafan/apk-parser/issues/122
-            // Log.d("AppLog", "Got a weird namespace, so setting as empty (namespace isn't supposed to be a URL): " + attribute.getName());
+            // LogCat.d("Got a weird namespace, so setting as empty (namespace isn't supposed to be a URL): " + attribute.getName());
             namespace = "android"
         }
         val rawValueRef = buffer.int

@@ -152,6 +152,7 @@ dependencies {
     val apollo = "3.2.1"
     val kgraphql = "0.19.0"
     val ktor = "3.0.0-beta-1"
+    val media3 = "1.2.1"
 
     implementation(platform("androidx.compose:compose-bom:2023.10.01"))
 
@@ -171,6 +172,13 @@ dependencies {
 
     releaseImplementation(platform("com.google.firebase:firebase-bom:32.2.3"))
     releaseImplementation("com.google.firebase:firebase-crashlytics-ktx:18.6.1")
+
+    // Media3
+    implementation("androidx.media3:media3-exoplayer:$media3")
+    implementation("androidx.media3:media3-datasource:$media3")
+    implementation("androidx.media3:media3-ui:$media3")
+    implementation("androidx.media3:media3-session:$media3")
+    implementation("androidx.media3:media3-cast:$media3")
 
     implementation("com.apollographql.apollo3:apollo-runtime:$apollo")
     implementation("com.apollographql.apollo3:apollo-normalized-cache:$apollo")

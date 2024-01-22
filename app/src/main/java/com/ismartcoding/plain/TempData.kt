@@ -1,6 +1,7 @@
 package com.ismartcoding.plain
 
 import com.ismartcoding.plain.data.DNotification
+import com.ismartcoding.plain.features.audio.MediaPlayMode
 
 object TempData {
     var webEnabled = false
@@ -15,6 +16,7 @@ object TempData {
     var urlToken = "" // use to encrypt or decrypt params in url
     var chatItemsMigrated = false
     val notifications = mutableListOf<DNotification>()
+    var audioPlayMode = MediaPlayMode.REPEAT
 
     var audioSleepTimerFutureTime = 0L
 }

@@ -136,11 +136,13 @@
 
         <service
             android:name=".services.AudioPlayerService"
-            android:exported="false"
+            android:enabled="true"
+            android:exported="true"
             android:foregroundServiceType="mediaPlayback">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.media.browse.MediaBrowserService" />-->
-<!--            </intent-filter>-->
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaLibraryService"/>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
         </service>
 
         <service

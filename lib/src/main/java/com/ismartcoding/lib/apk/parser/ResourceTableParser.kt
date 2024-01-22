@@ -20,6 +20,7 @@ import com.ismartcoding.lib.apk.struct.resource.TypeSpecHeader
 import com.ismartcoding.lib.apk.utils.Buffers
 import com.ismartcoding.lib.apk.utils.Pair
 import com.ismartcoding.lib.apk.utils.ParseUtils
+import com.ismartcoding.lib.logcat.LogCat
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.Locale
@@ -55,14 +56,13 @@ class ResourceTableParser(buffer: ByteBuffer) {
         val packageCount = resourceTableHeader.packageCount;
         if (packageCount != 0) {
             var packageHeader = readChunkHeader() as PackageHeader
-            Log.d(
-                "packageHeader",
+            LogCat.d(
                 "packageHeader: ${packageHeader.name} packageCount:$packageCount id:${packageHeader.id}"
             )
             for (i in 0 until packageCount) {
                 val pair = readPackage(packageHeader)
                 val right = pair.right
-                Log.d("readPackage", "parse.left: ${pair.left} parse.right: $right")
+                LogCat.d("parse.left: ${pair.left} parse.right: $right")
                 if (pair.left != null) {
                     resourceTable?.addPackage(pair.left!!)
                 }
@@ -99,15 +99,14 @@ class ResourceTableParser(buffer: ByteBuffer) {
                 buffer, readChunkHeader() as StringPoolHeader
             )
         }
-        Log.d(
-            "readPackage",
+        LogCat.d(
             "hasRemaining: ${buffer.hasRemaining()} beginPos:$beginPos typeStrings: ${packageHeader.typeStrings}" +
                     " keyStrings:${packageHeader.keyStrings} keyStringPool:${resourcePackage.keyStringPool.toString()}"
         )
         outer@ while (this.buffer.hasRemaining()) {
             val chunkHeader = readChunkHeader()
             val chunkBegin = buffer.position().toLong()
-            Log.d("chunkHeader", "chunkHeader: ${chunkHeader.chunkType} chunkBegin:$chunkBegin")
+            LogCat.d( "chunkHeader: ${chunkHeader.chunkType} chunkBegin:$chunkBegin")
             when (chunkHeader.chunkType) {
                 // 514
                 ChunkType.TABLE_TYPE_SPEC.toShort() -> {
@@ -189,8 +188,7 @@ class ResourceTableParser(buffer: ByteBuffer) {
         val chunkType = Buffers.readUShort(buffer)
         val headerSize = Buffers.readUShort(buffer)
         val chunkSize = Buffers.readUInt(buffer)
-        Log.d(
-            "readChunkHeader",
+        LogCat.d(
             "begin:$begin chunkType:$chunkType headerSize:$headerSize chunkSize:$chunkSize"
         )
         return when (chunkType) {

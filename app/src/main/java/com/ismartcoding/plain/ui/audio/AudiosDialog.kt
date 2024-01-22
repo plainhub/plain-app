@@ -6,7 +6,10 @@ import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import com.ismartcoding.lib.brv.utils.*
+import com.ismartcoding.lib.brv.utils.bindingAdapter
+import com.ismartcoding.lib.brv.utils.linear
+import com.ismartcoding.lib.brv.utils.models
+import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
@@ -19,11 +22,15 @@ import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.data.enums.MediaType
 import com.ismartcoding.plain.data.preference.AudioPlayingPreference
 import com.ismartcoding.plain.data.preference.AudioSortByPreference
-import com.ismartcoding.plain.features.*
+import com.ismartcoding.plain.features.ActionEvent
+import com.ismartcoding.plain.features.AudioActionEvent
+import com.ismartcoding.plain.features.ClearAudioPlaylistEvent
+import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.features.PermissionResultEvent
+import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioHelper
 import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.CastDialog
 import com.ismartcoding.plain.ui.extensions.checkPermission
@@ -92,8 +99,8 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     private fun updatePlayingState() {
         val context = requireContext()
         lifecycleScope.launch {
-            val currentPath = withIO { AudioPlayingPreference.getValueAsync(context)?.path }
-            val isAudioPlaying = AudioPlayer.instance.isPlaying()
+            val currentPath = withIO { AudioPlayingPreference.getValueAsync(context) }
+            val isAudioPlaying = AudioPlayer.isPlaying()
             binding.list.rv.models?.forEach {
                 if (it is AudioModel) {
                     val old = it.isPlaying
@@ -158,8 +165,9 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
                     if (viewModel.castMode) {
                         CastDialog(arrayListOf(), m.data.path).show()
                     } else {
-                        Permissions.checkNotification(requireContext(), R.string.audio_notification_prompt) {
-                            AudioPlayerService.play(requireContext(), getModel<AudioModel>().data.toPlaylistAudio())
+                        val context = requireContext()
+                        Permissions.checkNotification(context, R.string.audio_notification_prompt) {
+                            AudioPlayer.play(context, m.data.toPlaylistAudio())
                         }
                     }
                 }
@@ -190,8 +198,8 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
         val bindingAdapter = binding.list.rv.bindingAdapter
         val toggleMode = bindingAdapter.toggleMode
         val checkedItems = bindingAdapter.getCheckedModels<AudioModel>()
-        val currentPath = withIO { AudioPlayingPreference.getValueAsync(context)?.path }
-        val isAudioPlaying = AudioPlayer.instance.isPlaying()
+        val currentPath = withIO { AudioPlayingPreference.getValueAsync(context) }
+        val isAudioPlaying = AudioPlayer.isPlaying()
         binding.list.page.addData(
             items.map { a ->
                 AudioModel(a).apply {
