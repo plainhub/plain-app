@@ -36,7 +36,7 @@ class BottomAudioPlayerView(context: Context, attrs: AttributeSet?) : CustomView
         events.add(
             receiveEventHandler<AudioActionEvent> { event ->
                 when (event.action) {
-                    AudioAction.PLAY, AudioAction.PAUSE, AudioAction.SEEK -> {
+                    AudioAction.PLAYBACK_STATE_CHANGED, AudioAction.MEDIA_ITEM_TRANSITION -> {
                         updateUI()
                     }
 
@@ -61,7 +61,7 @@ class BottomAudioPlayerView(context: Context, attrs: AttributeSet?) : CustomView
 
             val audio = DPlaylistAudio.fromPath(context, path)
             binding.audioProgress.apply {
-                progress = AudioPlayer.getPlayerProgress().toInt()
+                progress = (AudioPlayer.playerProgress / 1000).toInt()
                 max = audio.duration.toInt()
             }
             binding.audioTitle.text = audio.title

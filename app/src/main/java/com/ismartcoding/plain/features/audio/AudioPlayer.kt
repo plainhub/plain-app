@@ -2,15 +2,12 @@ package com.ismartcoding.plain.features.audio
 
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.MoreExecutors
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
@@ -27,56 +24,16 @@ object AudioPlayer {
     }
 
     private var player: Player? = null
-    private var playerProgress: Long = 0 // player progress
-    var ignoreStateEnd = false
+    var playerProgress: Long = 0 // player progress in milliseconds
+        get() {
+            return if (player?.isPlaying == true) {
+                player?.currentPosition ?: 0
+            } else {
+                field
+            }
+        }
+
     var pendingQuit: Boolean = false
-
-    private var listener = object : Player.Listener {
-        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-            LogCat.d("onMediaItemTransition: ${mediaItem?.mediaId}, $reason")
-            coIO {
-                val context = MainApp.instance
-                if (mediaItem == null) {
-                    AudioPlayingPreference.putAsync(context, "")
-                    return@coIO
-                }
-                AudioPlayingPreference.putAsync(context, mediaItem.mediaId)
-                setChangedNotify(AudioAction.PLAY)
-            }
-        }
-
-        override fun onPlaybackStateChanged(playbackState: Int) {
-            LogCat.d("onPlaybackStateChanged: $playbackState")
-            when (playbackState) {
-                Player.STATE_READY -> {
-                    ignoreStateEnd = false
-                    LogCat.d("Player: STATE_READY, ${player?.currentPosition}")
-                    if (player?.isPlaying == true) {
-                        setChangedNotify(AudioAction.PLAY)
-                    } else {
-                        setChangedNotify(AudioAction.PAUSE)
-                    }
-                }
-
-                Player.STATE_ENDED -> {
-                    LogCat.d("Player: STATE_ENDED, ignoreStateEnd: $ignoreStateEnd")
-                    if (ignoreStateEnd) {
-                        return
-                    }
-                    if (pendingQuit) {
-                        pendingQuit = false
-                        pause()
-                        return
-                    }
-                }
-
-                Player.STATE_IDLE -> {
-                    LogCat.d("Player: STATE_IDLE")
-                    setChangedNotify(AudioAction.PAUSE)
-                }
-            }
-        }
-    }
 
     fun setRepeatMode() {
         when (TempData.audioPlayMode) {
@@ -87,23 +44,14 @@ object AudioPlayer {
         player?.shuffleModeEnabled = TempData.audioPlayMode == MediaPlayMode.SHUFFLE
     }
 
-    private fun ensurePlayer(context: Context, callback: () -> Unit = {}) {
+    private fun ensurePlayer(context: Context, callback: () -> Unit) {
         val sessionToken = SessionToken(context, ComponentName(context, AudioPlayerService::class.java))
         val mediaControllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
         mediaControllerFuture.addListener({
             player = mediaControllerFuture.get()
             setRepeatMode()
-            player?.addListener(listener)
             callback()
         }, MoreExecutors.directExecutor())
-    }
-
-    fun getPlayerProgress(): Long {
-        return if (player?.isPlaying == true) {
-            (player?.currentPosition ?: 0) / 1000
-        } else {
-            playerProgress / 1000
-        }
     }
 
     fun play(
@@ -152,80 +100,32 @@ object AudioPlayer {
     fun seekTo(progress: Long) {
         playerProgress = progress * 1000
         if (player?.isPlaying == true) {
-            player?.seekTo(playerProgress)
+            if (player?.availableCommands?.contains(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM) == true) {
+                player?.pause()
+                player?.seekTo(playerProgress)
+                player?.prepare()
+                player?.play()
+            }
         } else {
             play()
         }
-        setChangedNotify(AudioAction.SEEK)
     }
 
     fun skipToNext() {
+        playerProgress = 0
         player?.seekToNext()
-        //skipTo(isNext = true)
     }
 
     fun skipToPrevious() {
+        playerProgress = 0
         player?.seekToPrevious()
-        skipTo(isNext = false)
-    }
-
-    private fun skipTo(isNext: Boolean) {
-        val context = MainApp.instance
-        coMain {
-            var path = ""
-            var playerAudioList = withIO { AudioPlaylistPreference.getValueAsync(context) }
-            if (playerAudioList.isEmpty()) {
-                path = withIO { AudioPlayingPreference.getValueAsync(context) }
-                if (path.isNotEmpty()) {
-                    val item = withIO { DPlaylistAudio.fromPath(context, path) }
-                    playerAudioList = arrayListOf(item)
-                    AudioPlaylistPreference.putAsync(context, playerAudioList)
-                } else {
-                    return@coMain
-                }
-            }
-
-            if (TempData.audioPlayMode == MediaPlayMode.SHUFFLE) {
-                path = playerAudioList.random().path
-            } else {
-                path = withIO { AudioPlayingPreference.getValueAsync(context) }
-                if (path.isNotEmpty()) {
-                    var index = playerAudioList.indexOfFirst { it.path == path }
-                    if (isNext) {
-                        index++
-                        if (index > playerAudioList.size - 1) {
-                            index = 0
-                        }
-                    } else {
-                        index--
-                        if (index < 0) {
-                            index = playerAudioList.size - 1
-                        }
-                    }
-                    path = playerAudioList[index].path
-                } else {
-                    path = playerAudioList[if (isNext) 0 else (playerAudioList.size - 1)].path
-                }
-            }
-
-            withIO { AudioPlayingPreference.putAsync(context, path) }
-            playerProgress = 0
-            doPlay(playerAudioList.map { it.path }, path)
-        }
     }
 
     fun pause() {
         playerProgress = player?.currentPosition ?: 0
-
         if (player?.isPlaying == true) {
             player?.pause()
         }
-
-        setChangedNotify(AudioAction.PAUSE)
-    }
-
-    fun showNotification() {
-        setChangedNotify(AudioAction.NOTIFICATION)
     }
 
     fun release() {
@@ -248,14 +148,13 @@ object AudioPlayer {
         val index = paths.indexOf(path)
         LogCat.d("doPlay: ${path}, $index, $playerProgress")
         if (index != -1) {
-            ignoreStateEnd = true
             player?.seekTo(index, playerProgress)
             player?.prepare()
             player?.play()
         }
     }
 
-    private fun setChangedNotify(action: AudioAction) {
+    fun setChangedNotify(action: AudioAction) {
         sendEvent(AudioActionEvent(action))
     }
 }

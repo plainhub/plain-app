@@ -84,7 +84,7 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
         }
         receiveEvent<AudioActionEvent> { event ->
             when (event.action) {
-                AudioAction.PLAY, AudioAction.PAUSE -> {
+                AudioAction.PLAYBACK_STATE_CHANGED, AudioAction.MEDIA_ITEM_TRANSITION -> {
                     updatePlayingState()
                 }
 

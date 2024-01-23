@@ -20,6 +20,7 @@ import com.ismartcoding.lib.extensions.newPath
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.extensions.toAppUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.PhoneHelper
@@ -905,11 +906,15 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("clearAudioPlaylist") {
                     resolver { ->
-                        val context = MainApp.instance
-                        AudioPlayer.pause()
-                        AudioPlayingPreference.putAsync(context, "")
-                        AudioPlaylistPreference.putAsync(context, arrayListOf())
-                        sendEvent(ClearAudioPlaylistEvent())
+                        coMain {
+                            val context = MainApp.instance
+                            AudioPlayer.pause()
+                            withIO {
+                                AudioPlayingPreference.putAsync(context, "")
+                                AudioPlaylistPreference.putAsync(context, arrayListOf())
+                            }
+                            sendEvent(ClearAudioPlaylistEvent())
+                        }
                         true
                     }
                 }

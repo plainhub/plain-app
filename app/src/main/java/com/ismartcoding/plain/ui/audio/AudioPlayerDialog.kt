@@ -38,7 +38,7 @@ class AudioPlayerDialog() : BaseBottomSheetDialog<DialogAudioPlayerBinding>() {
     private fun initEvents() {
         receiveEvent<AudioActionEvent> { event ->
             when (event.action) {
-                AudioAction.PLAY, AudioAction.PAUSE -> {
+                AudioAction.PLAYBACK_STATE_CHANGED, AudioAction.MEDIA_ITEM_TRANSITION -> {
                     updateUI()
                 }
 
@@ -74,7 +74,7 @@ class AudioPlayerDialog() : BaseBottomSheetDialog<DialogAudioPlayerBinding>() {
     private fun updateUI() {
         lifecycleScope.launch {
             binding.seekBar.removeCallbacks(seekBarUpdateRunnable)
-            val process = AudioPlayer.getPlayerProgress()
+            val process = AudioPlayer.playerProgress / 1000
             binding.process.text = FormatHelper.formatDuration(process)
             val path = withIO { AudioPlayingPreference.getValueAsync(requireContext()) }
             if (path.isNotEmpty()) {

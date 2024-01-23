@@ -103,7 +103,7 @@ class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
 
     private fun initEvents() {
         receiveEvent<AudioActionEvent> { event ->
-            if (setOf(AudioAction.PLAY, AudioAction.PAUSE).contains(event.action)) {
+            if (event.action == AudioAction.PLAYBACK_STATE_CHANGED) {
                 updatePlayingState()
             }
         }
