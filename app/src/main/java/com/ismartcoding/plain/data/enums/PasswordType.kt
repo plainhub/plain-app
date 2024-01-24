@@ -3,9 +3,8 @@ package com.ismartcoding.plain.data.enums
 import com.ismartcoding.plain.features.locale.LocaleHelper
 
 enum class PasswordType(val value: Int) {
-    RANDOM(0),
-    FIXED(1),
     NONE(2),
+    FIXED(1),
     ;
 
     fun getText(): String {
@@ -18,7 +17,7 @@ enum class PasswordType(val value: Int) {
         }
 
         fun parse(value: Int): PasswordType {
-            return entries.find { it.value == value } ?: RANDOM
+            return entries.find { it.value == value } ?: FIXED
         }
     }
 }

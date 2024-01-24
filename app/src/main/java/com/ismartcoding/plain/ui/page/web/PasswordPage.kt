@@ -51,6 +51,8 @@ import com.ismartcoding.plain.ui.base.OutlineButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
+import com.ismartcoding.plain.ui.base.Tips
+import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -76,32 +78,26 @@ fun PasswordPage(navController: NavHostController) {
                     item {
                         DisplayText(title = stringResource(R.string.password_settings))
                         BlockRadioButton(
-                            selected = passwordType,
+                            selected = if (passwordType == PasswordType.NONE.value) {
+                                0
+                            } else {
+                                1
+                            },
                             onSelected = {
                                 scope.launch {
-                                    withIO { PasswordTypePreference.putAsync(context, PasswordType.parse(it)) }
+                                    withIO { PasswordTypePreference.putAsync(context, if (it == 1) PasswordType.FIXED.value else PasswordType.NONE.value) }
                                 }
                             },
                             itemRadioGroups =
-                                PasswordType.entries.map {
-                                    BlockRadioGroupButtonItem(
-                                        text = it.getText(),
-                                        onClick = {},
-                                    ) {
-                                    }
-                                },
+                            PasswordType.entries.map {
+                                BlockRadioGroupButtonItem(
+                                    text = it.getText(),
+                                    onClick = {},
+                                ) {
+                                }
+                            },
                         )
-                        if (passwordType == PasswordType.RANDOM.value) {
-                            PListItem(
-                                title = password,
-                            ) {
-                                OutlineButton(text = stringResource(id = R.string.reset), onClick = {
-                                    scope.launch(Dispatchers.IO) {
-                                        PasswordPreference.putAsync(context, CryptoHelper.randomPassword(6))
-                                    }
-                                })
-                            }
-                        } else if (passwordType == PasswordType.FIXED.value) {
+                        if (passwordType == PasswordType.FIXED.value) {
                             PasswordTextField(
                                 value = editPassword.value,
                                 isChanged = {
@@ -116,7 +112,13 @@ fun PasswordPage(navController: NavHostController) {
                                     }
                                 },
                             )
-                            Spacer(modifier = Modifier.height(16.dp))
+                            OutlineButton(text = stringResource(id = R.string.generate_password),
+                                Modifier.padding(start = 16.dp, top = 8.dp, bottom = 16.dp),
+                                onClick = {
+                                    scope.launch(Dispatchers.IO) {
+                                        HttpServerManager.resetPasswordAsync()
+                                    }
+                                })
                         }
                         PListItem(
                             title = stringResource(R.string.require_confirmation),
@@ -149,15 +151,15 @@ fun PasswordTextField(
         val focusRequester = remember { FocusRequester() }
         TextField(
             modifier =
-                Modifier
-                    .focusRequester(focusRequester)
-                    .fillMaxWidth(),
+            Modifier
+                .focusRequester(focusRequester)
+                .fillMaxWidth(),
             colors =
-                TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                ),
+            TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+            ),
             maxLines = 1,
             value = value,
             onValueChange = {
@@ -195,9 +197,9 @@ fun PasswordTextField(
                 }
             },
             keyboardOptions =
-                KeyboardOptions(
-                    imeAction = ImeAction.Done,
-                ),
+            KeyboardOptions(
+                imeAction = ImeAction.Done,
+            ),
         )
     }
 }

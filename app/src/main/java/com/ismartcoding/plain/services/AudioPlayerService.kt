@@ -2,6 +2,7 @@ package com.ismartcoding.plain.services
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.net.Uri
 import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
@@ -14,6 +15,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.mp3.Mp3Extractor
+import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
 import com.google.common.util.concurrent.Futures
@@ -26,6 +28,7 @@ import com.ismartcoding.plain.data.preference.AudioPlayingPreference
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.audio.AudioServiceAction
+import java.io.File
 
 @OptIn(UnstableApi::class)
 class AudioPlayerService : MediaLibraryService() {
@@ -90,12 +93,6 @@ class AudioPlayerService : MediaLibraryService() {
         player.addListener(listener)
 
         val s = MediaLibrarySession.Builder(this, player, object : MediaLibrarySession.Callback {
-            override fun onAddMediaItems(
-                mediaSession: MediaSession, controller: MediaSession.ControllerInfo, mediaItems: MutableList<MediaItem>
-            ): ListenableFuture<MutableList<MediaItem>> {
-                val updatedMediaItems = mediaItems.map { it.buildUpon().setUri(it.mediaId).build() }.toMutableList()
-                return Futures.immediateFuture(updatedMediaItems)
-            }
         }).setId(packageName)
         packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
             s.setSessionActivity(

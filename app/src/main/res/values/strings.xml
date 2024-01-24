@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Your VPN is currently enabled on your device, which could potentially lead to web connection issues when accessed from PC. To resolve this, we recommend adjusting your VPN settings to allow LAN traffic or disabling your VPN.</string>
     <string name="warning">Warning</string>
+    <string name="generate_password">Generate password</string>
+    <string name="allow_remote_access_from_pc">Allow remote access from PC</string>
     <string name="privacy_policy">Privacy policy</string>
     <string name="grant_permission">Grant permission</string>
     <string name="system_alert_window_warning">Granting the \'Display over other apps\' permission is essential. Without this permission, if the app is running in the background, you may miss crucial system dialogs triggered by the app, such as uninstallation confirmation dialogs.</string>
@@ -481,8 +483,7 @@
     <string name="logs">Logs</string>
     <string name="password_type">Password type</string>
     <string name="password_settings">Password settings</string>
-    <string name="password_type_random">Random</string>
-    <string name="password_type_fixed">Fixed</string>
+    <string name="password_type_fixed">Fixed password</string>
     <string name="password_type_none">No password</string>
     <string name="restart_app_title">Restart app</string>
     <string name="http_server_failed">HTTP server started failed. To restart it, please tap the "Relaunch APP" button.</string>

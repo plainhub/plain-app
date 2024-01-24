@@ -2,6 +2,8 @@
     <string name="app_name">简朴</string>
     <string name="vpn_web_conflict_warning">您的VPN当前在设备上启用，这可能会导致从PC访问时出现Web连接问题。为解决此问题，我们建议调整VPN设置以允许局域网流量或禁用VPN。</string>
     <string name="warning">警告</string>
+    <string name="generate_password">生成密码</string>
+    <string name="allow_remote_access_from_pc">允许电脑远程访问网页</string>
     <string name="privacy_policy">隐私政策</string>
     <string name="grant_permission">授予权限</string>
     <string name="system_alert_window_warning">授予‘在其他应用程序上显示’权限是至关重要的。如果没有此权限，在应用程序在后台运行时，您可能会错过由应用程序触发的关键系统对话框，例如卸载确认对话框。</string>
@@ -480,8 +482,7 @@
     <string name="logs">日志</string>
     <string name="password_type">密码类型</string>
     <string name="password_settings">密码设置</string>
-    <string name="password_type_random">随机</string>
-    <string name="password_type_fixed">固定</string>
+    <string name="password_type_fixed">固定密码</string>
     <string name="password_type_none">无密码</string>
     <string name="restart_app_title">重启应用</string>
     <string name="http_server_failed">HTTP 服务器启动失败。要重新启动，请点击“重启应用”按钮。</string>

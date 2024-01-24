@@ -2,6 +2,7 @@ package com.ismartcoding.plain.features.audio
 
 import android.content.ComponentName
 import android.content.Context
+import android.net.Uri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
@@ -17,6 +18,7 @@ import com.ismartcoding.plain.data.preference.AudioPlayingPreference
 import com.ismartcoding.plain.data.preference.AudioPlaylistPreference
 import com.ismartcoding.plain.features.AudioActionEvent
 import com.ismartcoding.plain.services.AudioPlayerService
+import java.io.File
 
 object AudioPlayer {
     fun isPlaying(): Boolean {
@@ -141,6 +143,7 @@ object AudioPlayer {
         paths.forEach {
             player?.addMediaItem(
                 MediaItem.Builder()
+                    .setUri(Uri.fromFile(File(it)))
                     .setMediaId(it)
                     .build()
             )

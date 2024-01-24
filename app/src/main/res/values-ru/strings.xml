@@ -2,6 +2,8 @@
     <string name="app_name">Простое Приложение</string>
     <string name="vpn_web_conflict_warning">Ваш VPN в настоящее время включен на вашем устройстве, что может потенциально привести к проблемам с веб-подключением при доступе с ПК. Для устранения этой проблемы мы рекомендуем настроить параметры вашего VPN для разрешения локального сетевого трафика или отключить ваш VPN.</string>
     <string name="warning">Предупреждение</string>
+    <string name="generate_password">Сгенерировать пароль</string>
+    <string name="allow_remote_access_from_pc">Разрешить удаленный доступ с ПК</string>
     <string name="privacy_policy">Политика конфиденциальности</string>
     <string name="grant_permission">Предоставить разрешение</string>
     <string name="system_alert_window_warning">Предоставление разрешения \'Показывать поверх других приложений\' является неотъемлемым. Без этого разрешения приложение, работающее в фоновом режиме, может пропустить важные системные диалоги, вызванные приложением, такие как диалоги подтверждения удаления.</string>
@@ -480,8 +482,7 @@
     <string name="logs">Логи</string>
     <string name="password_type">Тип пароля</string>
     <string name="password_settings">Настройки пароля</string>
-    <string name="password_type_random">Случайный</string>
-    <string name="password_type_fixed">Фиксированный</string>
+    <string name="password_type_fixed">Фиксированный пароль</string>
     <string name="password_type_none">Без пароля</string>
     <string name="restart_app_title">Перезапустить приложение</string>
     <string name="http_server_failed">Не удалось запустить HTTP-сервер. Чтобы перезапустить его, нажмите кнопку "Перезапустить приложение".</string>

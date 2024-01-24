@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">현재 기기에서 VPN이 활성화되어 있어 PC에서 액세스할 때 웹 연결 문제가 발생할 수 있습니다. 이를 해결하기 위해 LAN 트래픽을 허용하거나 VPN을 비활성화하는 것을 권장합니다.</string>
     <string name="warning">경고</string>
+    <string name="generate_password">비밀번호 생성</string>
+    <string name="allow_remote_access_from_pc">PC에서 원격 액세스 허용</string>
     <string name="privacy_policy">개인 정보 보호 정책</string>
     <string name="grant_permission">권한 부여</string>
     <string name="system_alert_window_warning">\'다른 앱 위에 표시\' 권한을 부여하는 것이 중요합니다. 이 권한이 없으면 앱이 백그라운드에서 실행 중인 경우 앱에 의해 생성된 중요한 시스템 대화 상자, 예를 들면 언인스톨 확인 대화 상자 등을 놓칠 수 있습니다.</string>
@@ -480,8 +482,7 @@
     <string name="logs">로그</string>
     <string name="password_type">비밀번호 유형</string>
     <string name="password_settings">비밀번호 설정</string>
-    <string name="password_type_random">랜덤</string>
-    <string name="password_type_fixed">고정</string>
+    <string name="password_type_fixed">고정된 비밀번호</string>
     <string name="password_type_none">비밀번호 없음</string>
     <string name="restart_app_title">앱 다시 시작</string>
     <string name="http_server_failed">HTTP 서버를 시작하지 못했습니다. 다시 시작하려면 "앱 다시 시작" 버튼을 탭하세요.</string>

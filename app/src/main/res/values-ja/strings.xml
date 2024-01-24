@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">お使いのデバイスでは現在VPNが有効になっており、PCからアクセスした際にWeb接続の問題が発生する可能性があります。これを解決するために、LANトラフィックを許可するようにVPNの設定を調整するか、VPNを無効にすることをお勧めします。</string>
     <string name="warning">警告</string>
+    <string name="generate_password">パスワードを生成</string>
+    <string name="allow_remote_access_from_pc">PCからのリモートアクセスを許可する</string>
     <string name="privacy_policy">プライバシーポリシー</string>
     <string name="grant_permission">許可を付与</string>
     <string name="system_alert_window_warning">「他のアプリの上に表示」の許可を付与することが不可欠です。この許可がないと、アプリがバックグラウンドで実行されている場合に、アンインストール確認ダイアログなど、アプリによってトリガーされた重要なシステムダイアログが見逃される可能性があります。</string>
@@ -480,8 +482,7 @@
     <string name="logs">ログ</string>
     <string name="password_type">パスワードタイプ</string>
     <string name="password_settings">パスワード設定</string>
-    <string name="password_type_random">ランダム</string>
-    <string name="password_type_fixed">固定</string>
+    <string name="password_type_fixed">固定パスワード</string>
     <string name="password_type_none">パスワードなし</string>
     <string name="restart_app_title">アプリを再起動</string>
     <string name="http_server_failed">HTTPサーバーの起動に失敗しました。再起動するには、「アプリを再起動」ボタンをタップしてください。</string>

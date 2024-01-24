@@ -4,6 +4,8 @@
     android:installLocation="internalOnly">
 
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <!--    <uses-permission android:name="android.permission.SYSTEM_OVERLAY_WINDOW" />-->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />

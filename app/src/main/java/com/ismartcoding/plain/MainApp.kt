@@ -28,6 +28,7 @@ import com.ismartcoding.plain.data.preference.FeedAutoRefreshPreference
 import com.ismartcoding.plain.data.preference.HttpPortPreference
 import com.ismartcoding.plain.data.preference.HttpsPortPreference
 import com.ismartcoding.plain.data.preference.KeyStorePasswordPreference
+import com.ismartcoding.plain.data.preference.PasswordPreference
 import com.ismartcoding.plain.data.preference.PasswordTypePreference
 import com.ismartcoding.plain.data.preference.UrlTokenPreference
 import com.ismartcoding.plain.data.preference.WebPreference
@@ -117,7 +118,7 @@ class MainApp : Application(), ImageLoaderFactory {
 
             DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(preferences)))
 
-            if (PasswordTypePreference.getValue(preferences) == PasswordType.RANDOM) {
+            if (PasswordPreference.get(preferences).isEmpty()) {
                 HttpServerManager.resetPasswordAsync()
             }
             HttpServerManager.loadTokenCache()

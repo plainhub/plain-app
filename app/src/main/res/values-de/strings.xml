@@ -2,6 +2,8 @@
     <string name="app_name">EinfacheApp</string>
     <string name="vpn_web_conflict_warning">Ihr VPN ist derzeit auf Ihrem Gerät aktiviert, was potenziell zu Webverbindungsproblemen führen kann, wenn es von Ihrem PC aus zugegriffen wird. Um dies zu lösen, empfehlen wir Ihnen, Ihre VPN-Einstellungen anzupassen, um LAN-Verkehr zuzulassen oder Ihr VPN zu deaktivieren.</string>
     <string name="warning">Warnung</string>
+    <string name="generate_password">Passwort generieren</string>
+    <string name="allow_remote_access_from_pc">Remote-Zugriff vom PC erlauben</string>
     <string name="privacy_policy">Datenschutzrichtlinie</string>
     <string name="grant_permission">Berechtigung erteilen</string>
     <string name="system_alert_window_warning">Die Gewährung der \'Über anderen Apps anzeigen\'-Berechtigung ist unerlässlich. Ohne diese Berechtigung könnten bei laufender App im Hintergrund wichtige Systemdialoge, wie etwa Deinstallationsbestätigungsdialoge, übersehen werden.</string>
@@ -480,8 +482,7 @@
     <string name="logs">Protokolle</string>
     <string name="password_type">Passworttyp</string>
     <string name="password_settings">Passworteinstellungen</string>
-    <string name="password_type_random">Zufällig</string>
-    <string name="password_type_fixed">Fest</string>
+    <string name="password_type_fixed">Festes Passwort</string>
     <string name="password_type_none">Kein Passwort</string>
     <string name="restart_app_title">App neu starten</string>
     <string name="http_server_failed">Der HTTP-Server konnte nicht gestartet werden. Um ihn neu zu starten, tippen Sie bitte auf die Schaltfläche "APP neu starten".</string>

@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.services
 
 import android.content.pm.ServiceInfo
+import android.os.PowerManager
 import androidx.core.app.ServiceCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -18,13 +19,16 @@ import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.features.StartHttpServerStateEvent
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
+import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.web.HttpServerManager
 import io.ktor.client.plugins.websocket.ws
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 
+
 class HttpServerService : LifecycleService() {
+    private var wakeLock: PowerManager.WakeLock? = null
     override fun onCreate() {
         super.onCreate()
         NotificationHelper.ensureDefaultChannel()
@@ -59,6 +63,8 @@ class HttpServerService : LifecycleService() {
     private suspend fun startHttpServerAsync() {
         LogCat.d("startHttpServer")
         try {
+            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "${BuildConfig.APPLICATION_ID}:http_server")
+            wakeLock?.acquire()
             HttpServerManager.portsInUse.clear()
             HttpServerManager.stoppedByUser = false
             HttpServerManager.httpServerError = ""
@@ -106,6 +112,7 @@ class HttpServerService : LifecycleService() {
     override fun onDestroy() {
         super.onDestroy()
         stopForeground(STOP_FOREGROUND_REMOVE)
+        wakeLock?.release()
     }
 
     private suspend fun stopHttpServerAsync() {

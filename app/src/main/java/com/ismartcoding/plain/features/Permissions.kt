@@ -11,11 +11,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.List
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Contacts
 import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Numbers
 import androidx.compose.material.icons.outlined.Sms
@@ -131,7 +129,6 @@ enum class Permission {
         fun getEnableNotificationIntent(context: Context): Intent {
             return Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
                 .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
     }
 
@@ -171,14 +168,12 @@ enum class Permission {
         if (this == WRITE_EXTERNAL_STORAGE && isRPlus()) {
             try {
                 val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 intent.addCategory("android.intent.category.DEFAULT")
                 intent.data = Uri.parse("package:${context.packageName}")
                 intentLauncher?.launch(intent)
             } catch (e: Exception) {
                 val intent = Intent()
                 intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 if (intent.resolveActivity(packageManager) != null) {
                     intentLauncher?.launch(intent)
                 } else {
@@ -190,7 +185,6 @@ enum class Permission {
         } else if (this == WRITE_SETTINGS) {
             val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
             intent.addCategory(Intent.CATEGORY_DEFAULT)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.data = Uri.parse("package:${context.packageName}")
             if (intent.resolveActivity(packageManager) != null) {
                 intentLauncher?.launch(intent)
@@ -201,7 +195,6 @@ enum class Permission {
             }
         } else if (this == NOTIFICATION_LISTENER) {
             val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             if (intent.resolveActivity(packageManager) != null) {
                 intentLauncher?.launch(intent)
             } else {
@@ -211,7 +204,6 @@ enum class Permission {
             }
         } else if (this == SYSTEM_ALERT_WINDOW) {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}"))
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             if (intent.resolveActivity(packageManager) != null) {
                 intentLauncher?.launch(intent)
             } else {
@@ -240,7 +232,6 @@ enum class Permission {
                 val activity = MainActivity.instance.get()!!
                 if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
                     val intent = Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     if (intent.resolveActivity(packageManager) != null) {
                         intentLauncher?.launch(intent)
                     } else {

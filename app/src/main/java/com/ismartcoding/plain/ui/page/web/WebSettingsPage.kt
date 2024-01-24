@@ -94,12 +94,14 @@ import com.ismartcoding.plain.ui.base.MiniOutlineButton
 import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.PMainSwitch
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.RadioDialog
 import com.ismartcoding.plain.ui.base.RadioDialogOption
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.Tips
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.rememberLifecycleEvent
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -288,16 +290,13 @@ fun WebSettingsPage(
                     )
                 }
                 item {
-                    PListItem(
-                        title = stringResource(R.string.enable),
+                    PMainSwitch(
+                        title = stringResource(id = R.string.allow_remote_access_from_pc),
+                        activated = webConsole,
                     ) {
-                        PSwitch(
-                            activated = webConsole,
-                        ) {
-                            viewModel.enableWebConsole(context, !webConsole)
-                        }
+                        viewModel.enableWebConsole(context, it)
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
                 }
                 item {
                     BlockRadioButton(
@@ -326,9 +325,8 @@ fun WebSettingsPage(
                 }
                 item {
                     PListItem(
-                        title = stringResource(R.string.password),
-                        desc = PasswordType.getText(passwordType),
-                        value = if (passwordType != PasswordType.NONE.value) password else "",
+                        title = if (passwordType == PasswordType.NONE.value) stringResource(id = R.string.password_type_none) else stringResource(R.string.password),
+                        value = if (passwordType == PasswordType.NONE.value) "" else password,
                         onClick = {
                             navController.navigate(RouteName.PASSWORD)
                         },
@@ -342,6 +340,7 @@ fun WebSettingsPage(
                 items(permissionList) { m ->
                     val permission = m.permission
                     if (permission == Permission.NONE) {
+                        VerticalSpace(dp = 16.dp)
                         PListItem(
                             icon = m.icon,
                             title = permission.getText(),

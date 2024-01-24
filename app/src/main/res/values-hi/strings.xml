@@ -2,6 +2,8 @@
     <string name="app_name">प्लेन ऐप</string>
     <string name="vpn_web_conflict_warning">आपके डिवाइस पर वर्तमान में आपका VPN सक्रिय है, जिससे PC से एक्सेस करते समay वेब कनेक्शन समस्याएँ उत्पन्न हो सकती हैं। इसे हल करने के लिए, हम सुझाव देते हैं कि आप अपने VPN सेटिंग्स को LAN ट्रैफ़िक की अनुमति देने या अपने VPN को अक्षम करने के लिए समायोजित करें।</string>
     <string name="warning">चेतावनी</string>
+    <string name="generate_password">पासवर्ड बनाएं</string>
+    <string name="allow_remote_access_from_pc">पीसी से दूरस्थ पहुंच की अनुमति दें</string>
     <string name="privacy_policy">गोपनीयता नीति</string>
     <string name="grant_permission">अनुमति प्रदान करें</string>
     <string name="system_alert_window_warning">‘अन्य एप्लिकेशन्स पर प्रदर्शन’ अनुमति देना अत्यंत आवश्यक है। इस अनुमति के बिना, यदि ऐप बैकग्राउंड में चल रहा है, तो आप एप्लिकेशन द्वारा उत्पन्न होने वाले महत्वपूर्ण सिस्टम डायलॉग, जैसे कि अनइंस्टॉल की पुष्टि करने वाले डायलॉग, को छू सकते हैं।</string>
@@ -480,8 +482,7 @@
     <string name="logs">लॉग</string>
     <string name="password_type">पासवर्ड प्रकार</string>
     <string name="password_settings">पासवर्ड सेटिंग्स</string>
-    <string name="password_type_random">रैंडम</string>
-    <string name="password_type_fixed">फिक्स्ड</string>
+    <string name="password_type_fixed">स्थिर पासवर्ड</string>
     <string name="password_type_none">कोई पासवर्ड नहीं</string>
     <string name="restart_app_title">ऐप पुनः शुरू करें</string>
     <string name="http_server_failed">HTTP सर्वर चालना असफल हुआ। इसे पुनरारंभ करने के लिए, कृपया "ऐप फिर से चालना" बटन पर टैप करें।</string>

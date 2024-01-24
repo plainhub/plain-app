@@ -2,6 +2,8 @@
     <string name="app_name">பிளேன் ஆப்</string>
     <string name="vpn_web_conflict_warning">உங்கள் உலாவியில் தற்போது VPN செல்லுபடி உள்ளது, இது பிரச்சனைகளைக் கொண்டுவரலாம் பாராட்டும் நேரத்தில். இதை தீர்மானிக்க, உங்கள் VPN அமைப்புகளை LAN பரிமாறத்தை அனுமதிக்க அல்லது உங்கள் VPN முடக்குதலை கொண்டுவிடுவதை பரிந்துரைக்கிறோம்.</string>
     <string name="warning">எச்சரிக்கை</string>
+    <string name="generate_password">கடவுச்சொல் உருவாக்கு</string>
+    <string name="allow_remote_access_from_pc">கணினியிலிருந்து தொலைநோக்கி அணுகல் அனுமதி</string>
     <string name="privacy_policy">தனியுரிமை கொள்கை</string>
     <string name="grant_permission">அனுமதி அளிக்கவும்</string>
     <string name="system_alert_window_warning">‘மற்ற பயன்பாடுகளின் மேல் காட்ட’ அனுமதி அளிக்குதல் முக்கியம். இந்த அனுமதி இல்லையின், பயன்பாடு பின்னர் ஓடி விடுகின்றதும், ஐப்பிள் உருவாக்கப்பட்ட குறுக்கேற்ற சிஸ்டம் டயலாக், உடைந்தது அனப்ரூபியேஷன் டயலாக் போன்றவற்றை விட நீங்கள் அவசியமாக காட்டாதல்.</string>
@@ -480,8 +482,7 @@
     <string name="logs">பதிவுகள்</string>
     <string name="password_type">கடவுச்சொல் வகை</string>
     <string name="password_settings">கடவுச்சொல் அமைப்புகள்</string>
-    <string name="password_type_random">குறியீடுத்தனமானது</string>
-    <string name="password_type_fixed">நிலையானது</string>
+    <string name="password_type_fixed">நிலையான கடவுச்சொல்</string>
     <string name="password_type_none">கடவுச்சொல் இல்லை</string>
     <string name="restart_app_title">ஆப்லிகேஷனை மீளமை</string>
     <string name="http_server_failed">HTTP சர்வர் தொடங்க முடியவில்லை. அதை மீண்டும் ஆரம்பிக்க தயவுசெய்து "பராமரிக்க APP" பொத்தானை தட்டவும்.</string>

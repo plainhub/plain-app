@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Uw VPN is momenteel ingeschakeld op uw apparaat, wat mogelijk kan leiden tot webverbinding problemen bij toegang vanaf uw pc. Om dit op te lossen, raden we aan om uw VPN-instellingen aan te passen om LAN-verkeer toe te staan of uw VPN uit te schakelen.</string>
     <string name="warning">Waarschuwing</string>
+    <string name="generate_password">Genereer wachtwoord</string>
+    <string name="allow_remote_access_from_pc">Toegang op afstand vanaf de pc toestaan</string>
     <string name="privacy_policy">Privacybeleid</string>
     <string name="grant_permission">Toestemming verlenen</string>
     <string name="system_alert_window_warning">Het verlenen van de \'Weergeven over andere apps\'-toestemming is essentieel. Zonder deze toestemming kunnen bij een app die op de achtergrond draait, cruciale systeemdialogen, zoals bevestigingsdialogen voor verwijdering, worden gemist.</string>
@@ -480,8 +482,7 @@
     <string name="logs">Logs</string>
     <string name="password_type">Wachtwoordtype</string>
     <string name="password_settings">Wachtwoordinstellingen</string>
-    <string name="password_type_random">Willekeurig</string>
-    <string name="password_type_fixed">Vast</string>
+    <string name="password_type_fixed">Vast wachtwoord</string>
     <string name="password_type_none">Geen wachtwoord</string>
     <string name="restart_app_title">App herstarten</string>
     <string name="http_server_failed">HTTP-server starten mislukt. Om het opnieuw te starten, tik op de knop "APP opnieuw starten".</string>

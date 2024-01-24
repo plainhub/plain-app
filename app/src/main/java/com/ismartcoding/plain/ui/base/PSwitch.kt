@@ -43,6 +43,7 @@ fun PSwitch(
                 } else {
                     (tonalPalettes neutralVariant 50) onDark (tonalPalettes neutral 30)
                 },
+                label = "",
             ).value,
     ) {
         Box(
@@ -64,6 +65,7 @@ fun PSwitch(
                         } else {
                             (tonalPalettes neutralVariant 70) onDark (tonalPalettes neutral 60)
                         },
+                        label = "",
                     ).value,
             ) {}
         }
