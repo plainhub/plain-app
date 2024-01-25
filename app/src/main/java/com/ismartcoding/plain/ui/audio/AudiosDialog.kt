@@ -93,6 +93,7 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
         }
         receiveEvent<ClearAudioPlaylistEvent> {
             binding.player.updateUI()
+            updatePlayingState()
         }
     }
 
@@ -194,7 +195,6 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
         val sortBy = AudioSortByPreference.getValueAsync(context)
         val items = withIO { AudioHelper.search(context, query, viewModel.limit, viewModel.offset, sortBy) }
         viewModel.total = withIO { AudioHelper.count(context, query) }
-
         val bindingAdapter = binding.list.rv.bindingAdapter
         val toggleMode = bindingAdapter.toggleMode
         val checkedItems = bindingAdapter.getCheckedModels<AudioModel>()

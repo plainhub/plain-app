@@ -7,7 +7,6 @@ import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.FormatHelper
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.preference.AudioPlayModePreference
@@ -66,7 +65,7 @@ class AudioPlayerDialog() : BaseBottomSheetDialog<DialogAudioPlayerBinding>() {
                 if (view == null) {
                     return@Runnable
                 }
-                binding.seekBar.progress = binding.seekBar.progress + 1
+                binding.seekBar.progress = (AudioPlayer.playerProgress / 1000).toInt()
                 binding.seekBar.postDelayed(seekBarUpdateRunnable, seekBarUpdateDelayMillis)
             }
     }

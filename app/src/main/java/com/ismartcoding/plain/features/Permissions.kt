@@ -228,19 +228,13 @@ enum class Permission {
             }
         } else if (this == SCHEDULE_EXACT_ALARM) {
             if (isSPlus()) {
-                val permission = this.toSysPermission()
-                val activity = MainActivity.instance.get()!!
-                if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-                    val intent = Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                    if (intent.resolveActivity(packageManager) != null) {
-                        intentLauncher?.launch(intent)
-                    } else {
-                        DialogHelper.showMessage(
-                            "ActivityNotFoundException: No Activity found to handle Intent act=android.settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM",
-                        )
-                    }
+                val intent = Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                if (intent.resolveActivity(packageManager) != null) {
+                    intentLauncher?.launch(intent)
                 } else {
-                    launcher?.launch(permission)
+                    DialogHelper.showMessage(
+                        "ActivityNotFoundException: No Activity found to handle Intent act=android.settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM",
+                    )
                 }
             }
         } else {
@@ -364,7 +358,7 @@ object Permissions {
 
     private var canContinue = false
 
-    private suspend fun ensureNotificationAsync(context: Context): Boolean {
+    suspend fun ensureNotificationAsync(context: Context): Boolean {
         val permission = Permission.POST_NOTIFICATIONS
         val ready = isNotificationPermissionReadyWithRequest(context)
         if (!ready) {

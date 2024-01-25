@@ -97,7 +97,7 @@ object FeedHelper {
         }
 
         val urls = getAll().map { it.url }
-        feedDao.insert(*feedList.filter { !urls.contains(it.url) }.toTypedArray())
+        feedDao.insert(*feedList.distinctBy { it.url }.filter { !urls.contains(it.url) }.toTypedArray())
     }
 
     suspend fun export(writer: Writer) {

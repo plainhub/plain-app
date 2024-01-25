@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.db
 
 import androidx.room.*
+import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.R
@@ -78,13 +80,13 @@ data class DChat(
             val valueJson = obj.optString("value")
             when (message.type) {
                 DMessageType.TEXT.value -> {
-                    message.value = Json.decodeFromString<DMessageText>(valueJson)
+                    message.value = jsonDecode<DMessageText>(valueJson)
                 }
                 DMessageType.IMAGES.value -> {
-                    message.value = Json.decodeFromString<DMessageImages>(valueJson)
+                    message.value = jsonDecode<DMessageImages>(valueJson)
                 }
                 DMessageType.FILES.value -> {
-                    message.value = Json.decodeFromString<DMessageFiles>(valueJson)
+                    message.value = jsonDecode<DMessageFiles>(valueJson)
                 }
             }
 

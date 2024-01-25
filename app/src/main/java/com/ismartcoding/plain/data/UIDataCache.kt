@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.data
 
+import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.plain.InitQuery
 import com.ismartcoding.plain.NetworkQuery
 import com.ismartcoding.plain.TempData
@@ -49,12 +51,8 @@ class UIDataCache {
         configs = data.configs.map { it.configFragment }.toMutableList()
         rules = configs?.filter { it.group == ConfigType.RULE.value }?.map { it.toRule() }?.toMutableList()
         routes = configs?.filter { it.group == ConfigType.ROUTE.value }?.map { it.toRoute() }?.toMutableList()
-        val json =
-            Json {
-                ignoreUnknownKeys = true
-            }
         configs?.find { it.group == ConfigType.SYSTEM.value }?.let {
-            systemConfig = json.decodeFromString(it.value)
+            systemConfig = jsonDecode(it.value)
         }
         wireGuards = data.wireGuards.map { it.wireGuardFragment.toWireGuard() }.toMutableList()
     }

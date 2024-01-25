@@ -15,6 +15,7 @@ import com.ismartcoding.plain.data.preference.AudioPlaylistPreference
 import com.ismartcoding.plain.databinding.DialogListDrawerBinding
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.audio.AudioHelper
+import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.audio.DAudio
 import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.ui.CastDialog
@@ -40,11 +41,13 @@ object AudiosBottomMenuHelper {
                     ShareHelper.share(context, ArrayList(items.map { AudioHelper.getItemUri(it.data.id) }))
                 }
             }
+
             R.id.cast -> {
                 rv.ensureSelect { items ->
                     CastDialog(items.map { it.data as DAudio }).show()
                 }
             }
+
             R.id.add_to_playlist -> {
                 rv.ensureSelect { items ->
                     lifecycleScope.launch {
@@ -56,6 +59,7 @@ object AudiosBottomMenuHelper {
                     }
                 }
             }
+
             R.id.delete -> {
                 rv.ensureSelect { items ->
                     DialogHelper.confirmToDelete(context) {
@@ -78,6 +82,7 @@ object AudiosBottomMenuHelper {
                     }
                 }
             }
+
             else -> {
                 BottomMenuHelper.onMenuItemClick(viewModel, binding, menuItem)
             }

@@ -14,6 +14,7 @@ import com.aallam.openai.client.OpenAIConfig
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.SslHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
@@ -200,7 +201,7 @@ object AppEvents {
                         val c = completion.choices.getOrNull(0)
                         data.put("content", c?.delta?.content ?: "")
                         data.put("finishReason", c?.finishReason ?: "")
-                        LogCat.d(Json.encodeToString(completion))
+                        LogCat.d(jsonEncode(completion))
                         sendEvent(WebSocketEvent(EventType.AI_CHAT_REPLIED, data.toString()))
                     }
                 } catch (ex: Exception) {

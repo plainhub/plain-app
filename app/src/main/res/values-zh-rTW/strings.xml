@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">簡樸</string>
+    <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">您的VPN目前在設備上啟用，這可能會導致從PC訪問時出現Web連接問題。為解決此問題，我們建議調整VPN設置以允許局域網流量或禁用VPN。</string>
     <string name="warning">警告</string>
     <string name="generate_password">生成密碼</string>

@@ -60,7 +60,7 @@ fun PMainSwitch(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
+                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
                     color = MaterialTheme.colorScheme.onSurface alwaysLight true
                 )
             }

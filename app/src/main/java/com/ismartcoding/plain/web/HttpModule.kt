@@ -18,6 +18,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.ZipHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.upnp.UPnPController
@@ -469,7 +470,7 @@ object HttpModule {
                                             return@forEachPart
                                         }
 
-                                        info = Json.decodeFromString<UploadInfo>(requestStr)
+                                        info = jsonDecode<UploadInfo>(requestStr)
                                     }
 
                                     "file" -> {
@@ -592,7 +593,7 @@ object HttpModule {
                                     val token = HttpServerManager.hashToToken(hash)
                                     val decryptedBytes = CryptoHelper.aesDecrypt(token, frame.readBytes())
                                     if (decryptedBytes != null) {
-                                        r = Json.decodeFromString<AuthRequest>(decryptedBytes.decodeToString())
+                                        r = jsonDecode<AuthRequest>(decryptedBytes.decodeToString())
                                     }
                                     if (r?.password == hash) {
                                         val event = ConfirmToAcceptLoginEvent(this, clientId, r)

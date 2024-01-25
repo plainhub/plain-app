@@ -26,7 +26,7 @@ class BottomAudioPlayerView(context: Context, attrs: AttributeSet?) : CustomView
         seekBarUpdateRunnable =
             Runnable {
                 binding.audioProgress.run {
-                    progress++
+                    progress = (AudioPlayer.playerProgress / 1000).toInt()
                     postDelayed(seekBarUpdateRunnable, seekBarUpdateDelayMillis)
                 }
             }

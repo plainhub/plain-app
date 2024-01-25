@@ -8,7 +8,6 @@ import android.os.CountDownTimer
 import android.os.SystemClock
 import android.view.View
 import android.widget.SeekBar
-import androidx.core.content.getSystemService
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.receiveEvent
@@ -82,9 +81,8 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
                                 PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
                             )
                         }
-                        val am = context.getSystemService<AlarmManager>()
                         if (previous != null) {
-                            am?.cancel(previous)
+                            alarmManager.cancel(previous)
                             previous.cancel()
                         }
                         AudioPlayer.pendingQuit = false
@@ -146,6 +144,7 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
                     lifecycleScope.launch {
                         withIO {
                             TempData.audioSleepTimerFutureTime = SystemClock.elapsedRealtime() + AudioSleepTimerMinutesPreference.getAsync(context) * 60 * 1000
+
                             if (isSPlus()) {
                                 if (alarmManager.canScheduleExactAlarms()) {
                                     alarmManager.setExact(

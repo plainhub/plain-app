@@ -39,13 +39,17 @@ import com.ismartcoding.plain.data.preference.SettingsProvider
 import com.ismartcoding.plain.data.preference.SystemScreenTimeoutPreference
 import com.ismartcoding.plain.db.*
 import com.ismartcoding.plain.features.*
+import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.bluetooth.BluetoothPermission
+import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getStringF
+import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.ScreenHelper
 import com.ismartcoding.plain.mediaProjectionManager
 import com.ismartcoding.plain.services.NotificationListenerMonitorService
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.extensions.*
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.ShowMessageEvent
@@ -56,6 +60,7 @@ import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import io.ktor.server.request.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
@@ -154,15 +159,37 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        Permissions.checkNotification(this@MainActivity, R.string.foreground_service_notification_prompt) {
-            sendEvent(StartHttpServerEvent())
-        }
+        checkNotificationPermission()
 
+        AudioPlayer.ensurePlayer(this@MainActivity)
         coIO {
             try {
                 startService(Intent(this@MainActivity, NotificationListenerMonitorService::class.java))
             } catch (ex: Exception) {
                 LogCat.e(ex.toString())
+            }
+        }
+    }
+
+    private fun checkNotificationPermission() {
+        val permission = Permission.POST_NOTIFICATIONS
+        val context = this@MainActivity
+        if (permission.can(context)) {
+            sendEvent(StartHttpServerEvent())
+        } else {
+            DialogHelper.showConfirmDialog(
+                context,
+                LocaleHelper.getString(R.string.confirm),
+                LocaleHelper.getString(R.string.foreground_service_notification_prompt)
+            ) {
+                coIO {
+                    Permissions.ensureNotificationAsync(context)
+                    while (!AppHelper.foregrounded()) {
+                        LogCat.d("Waiting for foreground")
+                        delay(800)
+                    }
+                    sendEvent(StartHttpServerEvent())
+                }
             }
         }
     }

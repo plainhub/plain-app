@@ -2,11 +2,10 @@ package com.ismartcoding.plain.services
 
 import android.app.PendingIntent
 import android.content.Intent
-import android.net.Uri
 import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
-import androidx.media3.common.MediaItem
+import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultDataSource
@@ -15,11 +14,8 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.extractor.DefaultExtractorsFactory
 import androidx.media3.extractor.mp3.Mp3Extractor
-import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
-import com.google.common.util.concurrent.Futures
-import com.google.common.util.concurrent.ListenableFuture
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
@@ -28,13 +24,12 @@ import com.ismartcoding.plain.data.preference.AudioPlayingPreference
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.audio.AudioServiceAction
-import java.io.File
 
 @OptIn(UnstableApi::class)
 class AudioPlayerService : MediaLibraryService() {
-
     private lateinit var player: Player
     private lateinit var session: MediaLibrarySession
+
     private val listener = object : Player.Listener {
 
         override fun onEvents(player: Player, events: Player.Events) {
@@ -45,11 +40,6 @@ class AudioPlayerService : MediaLibraryService() {
             LogCat.d("onEvents: ${eventItems.joinToString(",")}")
             if (events.contains(Player.EVENT_MEDIA_ITEM_TRANSITION)) {
                 LogCat.d("onEvents: EVENT_MEDIA_ITEM_TRANSITION, pendingQuit: ${AudioPlayer.pendingQuit}")
-                if (AudioPlayer.pendingQuit) {
-                    AudioPlayer.pendingQuit = false
-                    AudioPlayer.pause()
-                    return
-                }
                 coMain {
                     val context = MainApp.instance
                     val mediaItem = player.currentMediaItem
@@ -68,18 +58,28 @@ class AudioPlayerService : MediaLibraryService() {
                 AudioPlayer.setChangedNotify(AudioAction.PLAYBACK_STATE_CHANGED)
             }
         }
+
+        override fun onPlaybackStateChanged(playbackState: Int) {
+            if (playbackState == Player.STATE_ENDED) {
+                if (AudioPlayer.pendingQuit) {
+                    AudioPlayer.pendingQuit = false
+                    AudioPlayer.pause()
+                    return
+                }
+                AudioPlayer.skipToNext()
+            }
+        }
+
     }
 
-    override fun onCreate() {
-        super.onCreate()
-
+    private fun createPlayer(): Player {
         val attributes = AudioAttributes.Builder().setContentType(C.AUDIO_CONTENT_TYPE_MUSIC).setUsage(C.USAGE_MEDIA).build()
         val dataSourceFactory = DefaultDataSource.Factory(this)
         val extractorsFactory = DefaultExtractorsFactory()
         extractorsFactory.setConstantBitrateSeekingAlwaysEnabled(false)
         extractorsFactory.setMp3ExtractorFlags(Mp3Extractor.FLAG_ENABLE_INDEX_SEEKING)
         val mediaSourceFactory = DefaultMediaSourceFactory(dataSourceFactory, extractorsFactory)
-        player = ExoPlayer.Builder(applicationContext)
+        return ExoPlayer.Builder(applicationContext)
             .setMediaSourceFactory(mediaSourceFactory)
             .setAudioAttributes(
                 attributes, true
@@ -89,10 +89,32 @@ class AudioPlayerService : MediaLibraryService() {
                     DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER
                 )
             ).build()
+    }
 
+    override fun onCreate() {
+        super.onCreate()
+        player = createPlayer()
         player.addListener(listener)
+        val forwardingPlayer = object : ForwardingPlayer(player) {
+            override fun seekToPrevious() {
+                AudioPlayer.skipToPrevious()
+            }
 
-        val s = MediaLibrarySession.Builder(this, player, object : MediaLibrarySession.Callback {
+            override fun getAvailableCommands(): Player.Commands {
+                // make sure play next is always visible in notification center
+                return MediaSession.ConnectionResult.DEFAULT_PLAYER_COMMANDS
+            }
+
+            override fun isCommandAvailable(command: Int): Boolean {
+                // make sure play next is always visible in notification center
+                return true
+            }
+
+            override fun seekToNext() {
+                AudioPlayer.skipToNext()
+            }
+        }
+        val s = MediaLibrarySession.Builder(this, forwardingPlayer, object : MediaLibrarySession.Callback {
         }).setId(packageName)
         packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
             s.setSessionActivity(
@@ -144,3 +166,5 @@ class AudioPlayerService : MediaLibraryService() {
         }
     }
 }
+
+

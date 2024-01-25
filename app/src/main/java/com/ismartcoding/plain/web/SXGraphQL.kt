@@ -42,9 +42,7 @@ import com.ismartcoding.plain.data.preference.AudioPlaylistPreference
 import com.ismartcoding.plain.data.preference.AudioSortByPreference
 import com.ismartcoding.plain.data.preference.AuthDevTokenPreference
 import com.ismartcoding.plain.data.preference.ChatGPTApiKeyPreference
-import com.ismartcoding.plain.data.preference.ImageSortByPreference
 import com.ismartcoding.plain.data.preference.VideoPlaylistPreference
-import com.ismartcoding.plain.data.preference.VideoSortByPreference
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageFile
@@ -122,7 +120,6 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.application.BaseApplicationPlugin
 import io.ktor.server.application.call
-import io.ktor.server.application.install
 import io.ktor.server.application.pluginOrNull
 import io.ktor.server.request.header
 import io.ktor.server.request.receive
@@ -906,15 +903,13 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("clearAudioPlaylist") {
                     resolver { ->
+                        val context = MainApp.instance
+                        AudioPlayingPreference.putAsync(context, "")
+                        AudioPlaylistPreference.putAsync(context, arrayListOf())
                         coMain {
-                            val context = MainApp.instance
-                            AudioPlayer.pause()
-                            withIO {
-                                AudioPlayingPreference.putAsync(context, "")
-                                AudioPlaylistPreference.putAsync(context, arrayListOf())
-                            }
-                            sendEvent(ClearAudioPlaylistEvent())
+                            AudioPlayer.clear()
                         }
+                        sendEvent(ClearAudioPlaylistEvent())
                         true
                     }
                 }
@@ -970,7 +965,7 @@ class SXGraphQL(val schema: Schema) {
                         val context = MainApp.instance
                         // 1000 items at most
                         val items = AudioHelper.search(context, query, 1000, 0, AudioSortByPreference.getValueAsync(context))
-                        AudioPlaylistPreference.addAsync(context, items.map { DPlaylistAudio(it.title, it.path, it.artist, it.duration) })
+                        AudioPlaylistPreference.addAsync(context, items.map { it.toPlaylistAudio() })
                         true
                     }
                 }

@@ -3,6 +3,11 @@ package com.ismartcoding.plain.features.audio
 import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.os.Parcelable
+import androidx.annotation.OptIn
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
+import androidx.media3.common.MediaMetadata.MEDIA_TYPE_MUSIC
+import androidx.media3.common.util.UnstableApi
 import com.ismartcoding.lib.extensions.getFilenameWithoutExtensionFromPath
 import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.plain.R
@@ -10,6 +15,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
+@OptIn(UnstableApi::class)
 @Parcelize
 @kotlinx.serialization.Serializable
 data class DPlaylistAudio(
@@ -18,6 +24,23 @@ data class DPlaylistAudio(
     val artist: String,
     val duration: Long,
 ) : Parcelable, Serializable {
+
+    fun toMediaItem(): MediaItem {
+        return MediaItem.Builder()
+            .setUri(path.pathToUri())
+            .setMediaId(path)
+            .setCustomCacheKey(path)
+            .setMediaMetadata(
+                MediaMetadata.Builder()
+                    .setTitle(title)
+                    .setSubtitle(artist)
+                    .setArtist(artist)
+                    .setMediaType(MEDIA_TYPE_MUSIC)
+                    .build()
+            )
+            .build()
+    }
+
     companion object {
         fun fromPath(
             context: Context,

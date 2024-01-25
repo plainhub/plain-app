@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CryptoHelper
+import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.TempData
@@ -228,7 +229,7 @@ object ExchangeRatePreference : BasePreference<String>() {
         if (str.isEmpty()) {
             return ExchangeConfig()
         }
-        return Json.decodeFromString(str)
+        return jsonDecode(str)
     }
 
     suspend fun putAsync(
@@ -298,9 +299,6 @@ object AudioPlayModePreference : BasePreference<Int>() {
     ) {
         putAsync(context, value.ordinal)
         TempData.audioPlayMode = value
-        coMain {
-            AudioPlayer.setRepeatMode()
-        }
     }
 
     suspend fun getValueAsync(context: Context): MediaPlayMode {
@@ -451,7 +449,7 @@ object ScanHistoryPreference : BasePreference<String>() {
         if (str.isEmpty()) {
             return listOf()
         }
-        return Json.decodeFromString(str)
+        return jsonDecode(str)
     }
 
     suspend fun putAsync(
@@ -471,7 +469,7 @@ object AudioPlaylistPreference : BasePreference<String>() {
         if (str.isEmpty()) {
             return listOf()
         }
-        return Json.decodeFromString(str)
+        return jsonDecode(str)
     }
 
     suspend fun putAsync(
@@ -527,7 +525,7 @@ object VideoPlaylistPreference : BasePreference<String>() {
         if (str.isEmpty()) {
             return listOf()
         }
-        return Json.decodeFromString(str)
+        return jsonDecode(str)
     }
 
     suspend fun putAsync(
