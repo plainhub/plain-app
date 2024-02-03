@@ -13,6 +13,7 @@ import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.enums.DarkTheme
 import com.ismartcoding.plain.data.enums.Language
@@ -496,7 +497,8 @@ object AudioPlaylistPreference : BasePreference<String>() {
         audios: List<DPlaylistAudio>,
     ): List<DPlaylistAudio> {
         val items = getValueAsync(context).toMutableList()
-        items.removeIf { i -> audios.any { it.path == i.path } }
+        val paths = audios.map { it.path }
+        items.removeIf { paths.contains(it.path) }
         items.addAll(audios)
         putAsync(context, items)
         return items

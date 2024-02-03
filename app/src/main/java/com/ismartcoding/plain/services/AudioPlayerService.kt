@@ -39,7 +39,7 @@ class AudioPlayerService : MediaLibraryService() {
             }
             LogCat.d("onEvents: ${eventItems.joinToString(",")}")
             if (events.contains(Player.EVENT_MEDIA_ITEM_TRANSITION)) {
-                LogCat.d("onEvents: EVENT_MEDIA_ITEM_TRANSITION, pendingQuit: ${AudioPlayer.pendingQuit}")
+                LogCat.d("onEvents: EVENT_MEDIA_ITEM_TRANSITION")
                 coMain {
                     val context = MainApp.instance
                     val mediaItem = player.currentMediaItem

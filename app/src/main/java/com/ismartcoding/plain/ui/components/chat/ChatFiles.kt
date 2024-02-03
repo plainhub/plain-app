@@ -30,6 +30,7 @@ import com.ismartcoding.lib.extensions.isTextFile
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.lib.helpers.FormatHelper
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DMessageFiles

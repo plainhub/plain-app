@@ -55,7 +55,18 @@ object AudioPlayer {
         coMain {
             playerProgress = 0
             withIO { AudioPlaylistPreference.addAsync(context, listOf(playlistAudio)) }
-            withIO { AudioPlayingPreference.putAsync(context, playlistAudio.path) }
+            ensurePlayer(context) {
+                doPlay(playlistAudio)
+            }
+        }
+    }
+
+    fun justPlay(
+        context: Context,
+        playlistAudio: DPlaylistAudio
+    ) {
+        coMain {
+            playerProgress = 0
             ensurePlayer(context) {
                 doPlay(playlistAudio)
             }
@@ -159,7 +170,6 @@ object AudioPlayer {
             }
 
             LogCat.d("skipTo: ${audio.path}")
-            AudioPlayingPreference.putAsync(context, audio.path)
             playerProgress = 0
             coMain {
                 ensurePlayer(context) {

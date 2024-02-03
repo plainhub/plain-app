@@ -64,7 +64,6 @@ data class DPlaylistAudio(
                 retriever.release()
             } catch (ex: Throwable) {
                 ex.printStackTrace()
-            } finally {
             }
             return DPlaylistAudio(title, path, artist, duration / 1000)
         }
