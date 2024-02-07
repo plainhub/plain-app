@@ -561,7 +561,7 @@ object HttpModule {
                     call.respond(HttpStatusCode.Forbidden, "web_access_disabled")
                     return@post
                 }
-                HttpServerManager.clientIpCache[clientId] = call.request.origin.remoteHost
+                HttpServerManager.clientIpCache[clientId] = call.request.origin.remoteAddress
                 if (PasswordTypePreference.getValueAsync(MainApp.instance) == PasswordType.NONE) {
                     call.respondText(HttpServerManager.resetPasswordAsync())
                 } else {

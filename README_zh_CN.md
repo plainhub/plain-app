@@ -34,7 +34,7 @@
 
 简朴的极简设计是有意为之，让您能够专注于最重要的事情：您宝贵的数据。
 
-视频: https://www.youtube.com/watch?v=RvO18j4r95o
+视频: https://www.youtube.com/watch?v=TjRhC8pSQ6Q
 
 Reddit: https://www.reddit.com/r/plainapp
 

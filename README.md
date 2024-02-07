@@ -34,7 +34,7 @@ PlainApp is an open-source application that allows you to manage your phone thro
 
 PlainApp's minimalist design is intentional, so you can focus on what matters most: your valuable data.
 
-Video: https://www.youtube.com/watch?v=RvO18j4r95o
+Video: https://www.youtube.com/watch?v=TjRhC8pSQ6Q
 
 Reddit: https://www.reddit.com/r/plainapp
 
