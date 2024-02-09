@@ -54,6 +54,7 @@ import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.extensions.newPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.enums.PickFileTag
@@ -147,53 +148,58 @@ fun ChatPage(
                 withIO {
                     val cache = mutableMapOf<String, Int>()
                     event.uris.forEach { uri ->
-                        context.contentResolver.query(uri, null, null, null, null)
-                            ?.use { cursor ->
-                                try {
-                                    cursor.moveToFirst()
-                                    var fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
-                                    if (event.type == PickFileType.IMAGE_VIDEO) {
-                                        val mimeType = context.contentResolver.getType(uri)
-                                        val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
-                                        if (extension.isNotEmpty()) {
-                                            fileName = fileName.getFilenameWithoutExtension() + "." + extension
-                                        }
-                                    }
-                                    val size = cursor.getLongValue(OpenableColumns.SIZE, cache)
-                                    cursor.close()
-                                    val dir =
-                                        when {
-                                            fileName.isVideoFast() -> {
-                                                Environment.DIRECTORY_MOVIES
-                                            }
-
-                                            fileName.isImageFast() -> {
-                                                Environment.DIRECTORY_PICTURES
-                                            }
-
-                                            fileName.isAudioFast() -> {
-                                                Environment.DIRECTORY_MUSIC
-                                            }
-
-                                            else -> {
-                                                Environment.DIRECTORY_DOCUMENTS
+                        try {
+                            context.contentResolver.query(uri, null, null, null, null)
+                                ?.use { cursor ->
+                                    try {
+                                        cursor.moveToFirst()
+                                        var fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
+                                        if (event.type == PickFileType.IMAGE_VIDEO) {
+                                            val mimeType = context.contentResolver.getType(uri)
+                                            val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
+                                            if (extension.isNotEmpty()) {
+                                                fileName = fileName.getFilenameWithoutExtension() + "." + extension
                                             }
                                         }
-                                    var dst = context.getExternalFilesDir(dir)!!.path + "/$fileName"
-                                    val dstFile = File(dst)
-                                    if (dstFile.exists()) {
-                                        dst = dstFile.newPath()
-                                        FileHelper.copyFile(context, uri, dst)
-                                    } else {
-                                        FileHelper.copyFile(context, uri, dst)
+                                        val size = cursor.getLongValue(OpenableColumns.SIZE, cache)
+                                        cursor.close()
+                                        val dir =
+                                            when {
+                                                fileName.isVideoFast() -> {
+                                                    Environment.DIRECTORY_MOVIES
+                                                }
+
+                                                fileName.isImageFast() -> {
+                                                    Environment.DIRECTORY_PICTURES
+                                                }
+
+                                                fileName.isAudioFast() -> {
+                                                    Environment.DIRECTORY_MUSIC
+                                                }
+
+                                                else -> {
+                                                    Environment.DIRECTORY_DOCUMENTS
+                                                }
+                                            }
+                                        var dst = context.getExternalFilesDir(dir)!!.path + "/$fileName"
+                                        val dstFile = File(dst)
+                                        if (dstFile.exists()) {
+                                            dst = dstFile.newPath()
+                                            FileHelper.copyFile(context, uri, dst)
+                                        } else {
+                                            FileHelper.copyFile(context, uri, dst)
+                                        }
+                                        items.add(DMessageFile("app://$dir/${dst.getFilenameFromPath()}", size, dstFile.getDuration(context)))
+                                    } catch (ex: Exception) {
+                                        // the picked file could be deleted
+                                        DialogHelper.showMessage(ex)
+                                        ex.printStackTrace()
                                     }
-                                    items.add(DMessageFile("app://$dir/${dst.getFilenameFromPath()}", size, dstFile.getDuration(context)))
-                                } catch (ex: Exception) {
-                                    // the picked file could be deleted
-                                    DialogHelper.showMessage(ex)
-                                    ex.printStackTrace()
                                 }
-                            }
+                        } catch (ex: Exception) {
+                            // the picked file could be deleted
+                            LogCat.e(ex.toString())
+                        }
                     }
                     val content =
                         if (event.type == PickFileType.IMAGE_VIDEO) {
