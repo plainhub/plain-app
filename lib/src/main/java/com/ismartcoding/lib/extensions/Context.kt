@@ -21,6 +21,7 @@ import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.isTPlus
 import pl.droidsonroids.gif.BuildConfig
@@ -216,8 +217,9 @@ fun Context.getMimeTypeFromUri(uri: Uri): String {
 fun Context.getMediaContentUri(path: String): Uri? {
     val uri =
         when {
-            path.isImageFast() -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-            path.isVideoFast() -> MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            path.isImageFast() -> if (isQPlus()) MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            path.isVideoFast() -> if (isQPlus()) MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            path.isAudioFast() -> if (isQPlus()) MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
             else -> MediaStore.Files.getContentUri("external")
         }
 

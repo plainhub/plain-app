@@ -326,7 +326,7 @@ fun ChatPage(
                                                     onClick = {
                                                         showContextMenu.value = false
                                                         sharedViewModel.chatContent.value = (m.value as DMessageText).text
-                                                        navController.navigate("${RouteName.CHAT_EDIT_TEXT.name}?id=${m.id}")
+                                                        navController.navigate("${RouteName.CHAT_EDIT_TEXT.name}/${m.id}")
                                                     },
                                                 )
                                             }

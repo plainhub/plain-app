@@ -9,14 +9,14 @@ import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.helpers.FilterField
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.features.BaseContentHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.tag.TagRelationStub
 
 object AudioHelper : BaseContentHelper() {
-    override val uriExternal: Uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+    override val uriExternal: Uri = if (isQPlus()) MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
     override val idKey: String = MediaStore.Audio.Media._ID
 
     override fun getProjection(): Array<String> {
@@ -46,12 +46,15 @@ object AudioHelper : BaseContentHelper() {
                         arrayListOf(it.value, it.value),
                     )
                 }
+
                 "name" -> {
                     where.addEqual(MediaStore.Audio.Media.TITLE, it.value)
                 }
+
                 "bucket_id" -> {
                     where.add("${MediaStore.Audio.Media.BUCKET_ID} = ?", it.value)
                 }
+
                 "artist" -> {
                     where.addEqual(MediaStore.Audio.Media.ARTIST, it.value)
                 }

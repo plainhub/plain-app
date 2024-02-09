@@ -7,13 +7,15 @@ import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.helpers.FilterField
+import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.features.BaseContentHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.tag.TagRelationStub
 
 object VideoHelper : BaseContentHelper() {
-    override val uriExternal: Uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+    // https://stackoverflow.com/questions/63111091/java-lang-illegalargumentexception-volume-external-primary-not-found-in-android
+    override val uriExternal: Uri = if (isQPlus()) MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Video.Media.EXTERNAL_CONTENT_URI
     override val idKey: String = MediaStore.Video.Media._ID
 
     override fun getProjection(): Array<String> {

@@ -7,13 +7,14 @@ import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.helpers.FilterField
+import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.features.BaseContentHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.tag.TagRelationStub
 
 object ImageHelper : BaseContentHelper() {
-    override val uriExternal: Uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+    override val uriExternal: Uri = if (isQPlus()) MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Images.Media.EXTERNAL_CONTENT_URI
     override val idKey: String = MediaStore.Images.Media._ID
 
     override fun getProjection(): Array<String> {
