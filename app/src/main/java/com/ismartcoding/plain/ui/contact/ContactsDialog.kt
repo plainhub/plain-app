@@ -17,6 +17,7 @@ import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionResultEvent
+import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.call.CallHelper
 import com.ismartcoding.plain.features.contact.ContactHelper
 import com.ismartcoding.plain.features.contact.DContact
@@ -62,6 +63,7 @@ class ContactsDialog : BaseListDrawerDialog() {
                         }
                     }
                 }
+
                 R.id.delete -> {
                     if (!Permission.WRITE_CONTACTS.can(requireContext())) {
                         Permission.WRITE_CONTACTS.grant(requireContext())
@@ -83,6 +85,7 @@ class ContactsDialog : BaseListDrawerDialog() {
                         }
                     }
                 }
+
                 else -> {
                     BottomMenuHelper.onMenuItemClick(viewModel, binding, this)
                 }
@@ -97,15 +100,16 @@ class ContactsDialog : BaseListDrawerDialog() {
 
     override fun initEvents() {
         receiveEvent<PermissionResultEvent> { event ->
-            if (event.permission == Permission.READ_CONTACTS) {
-                checkPermission()
-            } else if (event.permission == Permission.CALL_PHONE) {
+            if (event.permission == Permission.CALL_PHONE) {
                 if (Permission.CALL_PHONE.can(requireContext())) {
                     CallHelper.call(requireContext(), phoneNumberToCall)
                 } else {
                     DialogHelper.showMessage(R.string.call_phone_permission_required)
                 }
             }
+        }
+        receiveEvent<PermissionsResultEvent> { event ->
+            checkPermission()
         }
         receiveEvent<ActionEvent> { event ->
             if (event.source == ActionSourceType.CONTACT) {

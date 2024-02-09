@@ -17,6 +17,7 @@ import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionResultEvent
+import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.call.CallHelper
 import com.ismartcoding.plain.features.call.DCall
 import com.ismartcoding.plain.features.tag.TagHelper
@@ -57,6 +58,7 @@ class CallsDialog : BaseListDrawerDialog() {
                         }
                     }
                 }
+
                 R.id.delete -> {
                     if (!Permission.WRITE_CALL_LOG.can(requireContext())) {
                         Permission.WRITE_CALL_LOG.grant(requireContext())
@@ -78,6 +80,7 @@ class CallsDialog : BaseListDrawerDialog() {
                         }
                     }
                 }
+
                 else -> {
                     BottomMenuHelper.onMenuItemClick(viewModel, binding, this)
                 }
@@ -87,15 +90,16 @@ class CallsDialog : BaseListDrawerDialog() {
 
     override fun initEvents() {
         receiveEvent<PermissionResultEvent> { event ->
-            if (setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG).contains(event.permission)) {
-                checkPermission()
-            } else if (event.permission == Permission.CALL_PHONE) {
+            if (event.permission == Permission.CALL_PHONE) {
                 if (Permission.CALL_PHONE.can(requireContext())) {
                     CallHelper.call(requireContext(), phoneNumberToCall)
                 } else {
                     DialogHelper.showMessage(R.string.call_phone_permission_required)
                 }
             }
+        }
+        receiveEvent<PermissionsResultEvent> { event ->
+            checkPermission()
         }
         receiveEvent<ActionEvent> { event ->
             if (event.source == ActionSourceType.CALL) {

@@ -7,6 +7,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
+import com.ismartcoding.plain.R
+import com.ismartcoding.plain.packageManager
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -93,13 +96,21 @@ fun AnnotatedString.urlAt(
 
             "EMAIL" -> {
                 val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:${it.item}"))
-                context.startActivity(emailIntent)
+                if (emailIntent.resolveActivity(packageManager) != null) {
+                    context.startActivity(emailIntent)
+                } else {
+                    DialogHelper.showMessage(R.string.not_supported_error)
+                }
                 return
             }
 
             "PHONE" -> {
                 val phoneIntent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${it.item}"))
-                context.startActivity(phoneIntent)
+                if (phoneIntent.resolveActivity(packageManager) != null) {
+                    context.startActivity(phoneIntent)
+                } else {
+                    DialogHelper.showMessage(R.string.not_supported_error)
+                }
                 return
             }
         }

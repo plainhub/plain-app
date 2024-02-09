@@ -3,10 +3,12 @@ package com.ismartcoding.plain.ui.extensions
 import android.content.Context
 import android.view.View
 import androidx.core.view.isVisible
+import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.ViewPageListBinding
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
+import com.ismartcoding.plain.features.RequestPermissionsEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 
 fun ViewPageListBinding.checkPermission(
@@ -14,7 +16,7 @@ fun ViewPageListBinding.checkPermission(
     permissions: Set<Permission>,
     permission: Permission,
 ) {
-    if (Permissions.anyCan(context, permissions)) {
+    if (Permissions.allCan(context, permissions)) {
         page.visibility = View.VISIBLE
         empty.root.isVisible = false
         page.showLoading()
@@ -26,7 +28,7 @@ fun ViewPageListBinding.checkPermission(
             button.text = getString(R.string.grant_access)
             button.isVisible = true
             button.setSafeClick {
-                permission.grant(context)
+                sendEvent(RequestPermissionsEvent(permissions.toSet()))
             }
         }
     }

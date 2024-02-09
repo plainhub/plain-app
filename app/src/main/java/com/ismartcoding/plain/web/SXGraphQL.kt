@@ -282,8 +282,9 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("imageCount") {
                     resolver { query: String ->
-                        if (Permission.WRITE_EXTERNAL_STORAGE.can(MainApp.instance)) {
-                            ImageHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
+                        val context = MainApp.instance
+                        if (Permission.WRITE_EXTERNAL_STORAGE.can(context)) {
+                            ImageHelper.count(context, QueryHelper.prepareQuery(query))
                         } else {
                             0
                         }
@@ -374,9 +375,10 @@ class SXGraphQL(val schema: Schema) {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
-                        Permissions.checkAsync(MainApp.instance, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))
+                        val context = MainApp.instance
+                        Permissions.checkAsync(context, setOf(Permission.READ_CONTACTS))
                         try {
-                            ContactHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
+                            ContactHelper.search(context, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
                         } catch (ex: Exception) {
                             LogCat.e(ex)
                             emptyList()
@@ -393,8 +395,9 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("contactCount") {
                     resolver { query: String ->
-                        if (Permissions.anyCan(MainApp.instance, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))) {
-                            ContactHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
+                        val context = MainApp.instance
+                        if (Permission.READ_CONTACTS.can(context)) {
+                            ContactHelper.count(context, QueryHelper.prepareQuery(query))
                         } else {
                             0
                         }
@@ -402,13 +405,13 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("contactSources") {
                     resolver { ->
-                        Permissions.checkAsync(MainApp.instance, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))
+                        Permissions.checkAsync(MainApp.instance, setOf(Permission.READ_CONTACTS))
                         SourceHelper.getAll().map { it.toModel() }
                     }
                 }
                 query("contactGroups") {
                     resolver { node: Execution.Node ->
-                        Permissions.checkAsync(MainApp.instance, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))
+                        Permissions.checkAsync(MainApp.instance, setOf(Permission.READ_CONTACTS))
                         val groups = GroupHelper.getAll().map { it.toModel() }
                         val fields = node.getFields()
                         if (fields.contains(ContactGroup::contactCount.name)) {
@@ -422,7 +425,7 @@ class SXGraphQL(val schema: Schema) {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
-                        Permissions.checkAsync(MainApp.instance, setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG))
+                        Permissions.checkAsync(MainApp.instance, setOf(Permission.READ_CALL_LOG))
                         CallHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
                     }
                     type<Call> {
@@ -436,8 +439,9 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("callCount") {
                     resolver { query: String ->
-                        if (Permissions.anyCan(MainApp.instance, setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG))) {
-                            CallHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
+                        val context = MainApp.instance
+                        if (Permission.READ_CALL_LOG.can(context)) {
+                            CallHelper.count(context, QueryHelper.prepareQuery(query))
                         } else {
                             0
                         }
@@ -606,9 +610,10 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("deviceInfo") {
                     resolver { ->
-                        val apiPermissions = ApiPermissionsPreference.getAsync(MainApp.instance)
-                        val readPhoneNumber = apiPermissions.contains(Permission.READ_PHONE_STATE.toString()) && apiPermissions.contains(Permission.READ_PHONE_NUMBERS.toString())
-                        DeviceInfoHelper.getDeviceInfo(MainApp.instance, readPhoneNumber).toModel()
+                        val context = MainApp.instance
+                        val apiPermissions = ApiPermissionsPreference.getAsync(context)
+                        val readPhoneNumber = apiPermissions.contains(Permission.READ_PHONE_NUMBERS.toString())
+                        DeviceInfoHelper.getDeviceInfo(context, readPhoneNumber).toModel()
                     }
                 }
                 query("battery") {

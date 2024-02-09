@@ -243,7 +243,16 @@ enum class Permission {
     }
 }
 
-data class PermissionItem(val icon: ImageVector?, val permission: Permission, val permissions: Set<Permission>, val granted: Boolean)
+data class PermissionItem(val icon: ImageVector?, val permission: Permission, val permissions: Set<Permission>, var granted: Boolean = false) {
+
+    companion object {
+        fun create(context: Context, icon: ImageVector?, permission: Permission, permissions: Set<Permission> = setOf(permission)): PermissionItem {
+            return PermissionItem(icon, permission, permissions).apply {
+                granted = permissions.all { it.can(context) }
+            }
+        }
+    }
+}
 
 object Permissions {
     private val launcherMap = mutableMapOf<Permission, ActivityResultLauncher<String>>()
@@ -252,46 +261,51 @@ object Permissions {
     private lateinit var multipleLauncher: ActivityResultLauncher<Array<String>>
 
     suspend fun checkAsync(context: Context, permissions: Set<Permission>) {
-        val ps = permissions.map { it.toString() }
-        val apiPermissions = ApiPermissionsPreference.getAsync(context)
-        if (!apiPermissions.all { ps.contains(it) }) {
-            throw Exception("no_permission")
+        val apiPermissions = ApiPermissionsPreference.getAsync(context).toMutableSet()
+        if (apiPermissions.contains(Permission.WRITE_CONTACTS.toString())) {
+            apiPermissions.add(Permission.READ_CONTACTS.toString())
+        }
+        if (apiPermissions.contains(Permission.WRITE_CALL_LOG.toString())) {
+            apiPermissions.add(Permission.READ_CALL_LOG.toString())
+        }
+        for (item in permissions.map { it.toString() }) {
+            if (!apiPermissions.contains(item)) {
+                throw Exception("no_permission")
+            }
         }
     }
 
-    fun anyCan(context: Context, permissions: Set<Permission>): Boolean {
-        return permissions.any { it.can(context) }
+    fun allCan(context: Context, permissions: Set<Permission>): Boolean {
+        return permissions.all { it.can(context) }
     }
 
     fun getWebList(context: Context): List<PermissionItem> {
         val list = mutableListOf<PermissionItem>()
         list.add(
-            PermissionItem(Icons.Outlined.Folder, Permission.WRITE_EXTERNAL_STORAGE, setOf(Permission.WRITE_EXTERNAL_STORAGE),
-                setOf(Permission.WRITE_EXTERNAL_STORAGE).all { it.can(context) })
+            PermissionItem.create(
+                context, Icons.Outlined.Folder, Permission.WRITE_EXTERNAL_STORAGE
+            )
         )
         if (AppFeatureType.NOTIFICATIONS.has()) {
             list.add(
-                PermissionItem(Icons.Outlined.Notifications, Permission.NOTIFICATION_LISTENER, setOf(Permission.NOTIFICATION_LISTENER),
-                    setOf(Permission.NOTIFICATION_LISTENER).all { it.can(context) })
+                PermissionItem.create(context, Icons.Outlined.Notifications, Permission.NOTIFICATION_LISTENER)
             )
         }
         list.add(
-            PermissionItem(Icons.Outlined.Contacts, Permission.WRITE_CONTACTS, setOf(Permission.WRITE_CONTACTS),
-                setOf(Permission.WRITE_CONTACTS).all { it.can(context) })
+            PermissionItem.create(context, Icons.Outlined.Contacts, Permission.WRITE_CONTACTS, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))
         )
+
         if (AppFeatureType.SOCIAL.has()) {
-            list.add(PermissionItem(Icons.Outlined.Sms, Permission.READ_SMS, setOf(Permission.READ_SMS), setOf(Permission.READ_SMS).all { it.can(context) }))
-            list.add(PermissionItem(Icons.AutoMirrored.Outlined.List, Permission.WRITE_CALL_LOG, setOf(Permission.WRITE_CALL_LOG), setOf(Permission.WRITE_CALL_LOG).all { it.can(context) }))
+            list.add(PermissionItem.create(context, Icons.Outlined.Sms, Permission.READ_SMS))
+            list.add(PermissionItem.create(context, Icons.AutoMirrored.Outlined.List, Permission.WRITE_CALL_LOG, setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG)))
         }
         list.add(
-            PermissionItem(Icons.Outlined.Call, Permission.CALL_PHONE, setOf(Permission.CALL_PHONE),
-                setOf(Permission.CALL_PHONE).all { it.can(context) })
+            PermissionItem.create(context, Icons.Outlined.Call, Permission.CALL_PHONE)
         )
         list.add(
-            PermissionItem(Icons.Outlined.Numbers, Permission.READ_PHONE_NUMBERS, setOf(Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS),
-                setOf(Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS).all { it.can(context) })
+            PermissionItem.create(context, Icons.Outlined.Numbers, Permission.READ_PHONE_NUMBERS, setOf(Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS))
         )
-        list.add(PermissionItem(null, Permission.NONE, setOf(Permission.NONE), false))
+        list.add(PermissionItem(null, Permission.NONE, setOf(Permission.NONE)))
         return list
     }
 

@@ -15,6 +15,7 @@ import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionResultEvent
+import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.sms.DMessage
 import com.ismartcoding.plain.features.sms.SmsHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
@@ -45,7 +46,7 @@ class SmsDialog : BaseListDrawerDialog() {
     }
 
     override fun initEvents() {
-        receiveEvent<PermissionResultEvent> {
+        receiveEvent<PermissionsResultEvent> {
             checkPermission()
         }
         receiveEvent<ActionEvent> { event ->
