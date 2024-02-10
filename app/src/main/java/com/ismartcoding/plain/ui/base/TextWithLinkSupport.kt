@@ -85,13 +85,13 @@ fun String.linkify(linkStyle: SpanStyle) =
 fun AnnotatedString.urlAt(
     context: Context,
     position: Int,
-) {
+): Boolean {
     val annotations = getStringAnnotations(position, position)
     annotations.forEach {
         when (it.tag) {
             "URL" -> {
                 WebHelper.open(context, it.item)
-                return
+                return true
             }
 
             "EMAIL" -> {
@@ -101,7 +101,8 @@ fun AnnotatedString.urlAt(
                 } else {
                     DialogHelper.showMessage(R.string.not_supported_error)
                 }
-                return
+                return true
+
             }
 
             "PHONE" -> {
@@ -111,8 +112,10 @@ fun AnnotatedString.urlAt(
                 } else {
                     DialogHelper.showMessage(R.string.not_supported_error)
                 }
-                return
+                return true
             }
         }
     }
+
+    return false
 }

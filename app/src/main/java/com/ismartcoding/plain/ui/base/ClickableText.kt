@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.base
 
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.text.BasicText
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,32 +23,21 @@ fun ClickableText(
     onTextLayout: (TextLayoutResult) -> Unit = {},
     onClick: (Int) -> Unit,
     onDoubleClick: () -> Unit,
-    doubleClickTimeoutMillis: Long = 300,
+    onLongClick: () -> Unit = {},
 ) {
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
-    val lastClickTime = remember { mutableStateOf(0L) }
-
     val pressIndicator =
         Modifier.pointerInput(onClick) {
-            detectTapGestures { pos ->
-                val currentTime = System.currentTimeMillis()
+            detectTapGestures(onDoubleTap = { onDoubleClick() }, onTap = {
                 val layout = layoutResult.value
                 if (layout != null) {
-                    val offset = layout.getOffsetForPosition(pos)
-                    val timeSinceLastClick = currentTime - lastClickTime.value
-                    if (timeSinceLastClick <= doubleClickTimeoutMillis) {
-                        // Double-click detected
-                        onDoubleClick()
-                    } else {
-                        // Single click
-                        onClick(offset)
-                    }
-                    lastClickTime.value = currentTime
+                    val offset = layout.getOffsetForPosition(it)
+                    onClick(offset)
                 }
-            }
+            }, onLongPress = { onLongClick() })
         }
 
-    BasicText(
+    Text(
         text = text,
         modifier = modifier.then(pressIndicator),
         style = style,

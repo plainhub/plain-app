@@ -81,6 +81,7 @@ import com.ismartcoding.plain.ui.components.chat.ChatImages
 import com.ismartcoding.plain.ui.components.chat.ChatInput
 import com.ismartcoding.plain.ui.components.chat.ChatName
 import com.ismartcoding.plain.ui.components.chat.ChatText
+import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.SharedViewModel
@@ -279,6 +280,12 @@ fun ChatPage(
                                                     selectedItem = m
                                                     showContextMenu.value = true
                                                 },
+                                                onDoubleClick = {
+                                                    if (m.value is DMessageText) {
+                                                        sharedViewModel.chatContent.value = (m.value as DMessageText).text
+                                                        navController.navigate(RouteName.CHAT_TEXT)
+                                                    }
+                                                },
                                             ),
                                     ) {
                                         ChatName(m)
@@ -292,7 +299,14 @@ fun ChatPage(
                                             }
 
                                             DMessageType.TEXT.value -> {
-                                                ChatText(context, navController, sharedViewModel, focusManager, m)
+                                                ChatText(context, focusManager, m, onDoubleClick = {
+                                                    val content = (m.value as DMessageText).text
+                                                    sharedViewModel.chatContent.value = content
+                                                    navController.navigate(RouteName.CHAT_TEXT)
+                                                }, onLongClick = {
+                                                    selectedItem = m
+                                                    showContextMenu.value = true
+                                                })
                                             }
                                         }
                                     }

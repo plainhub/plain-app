@@ -63,13 +63,12 @@ import kotlinx.coroutines.launch
 fun AppPage(
     navController: NavHostController,
     sharedViewModel: SharedViewModel,
-    id: String,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var item by remember { mutableStateOf<DPackageDetail?>(null) }
     var groupsButtons by remember { mutableStateOf(listOf<GroupButton>()) }
-
+    val id = navController.currentBackStackEntry?.arguments?.getString("id") ?: ""
     val lifecycleEvent = rememberLifecycleEvent()
     LaunchedEffect(lifecycleEvent) {
         if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {

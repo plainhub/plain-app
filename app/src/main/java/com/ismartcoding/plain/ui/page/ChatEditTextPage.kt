@@ -44,11 +44,11 @@ import kotlinx.coroutines.launch
 fun ChatEditTextPage(
     navController: NavHostController,
     sharedViewModel: SharedViewModel,
-    id: String,
 ) {
     val scope = rememberCoroutineScope()
     var inputValue by remember { mutableStateOf(sharedViewModel.chatContent.value) }
     val focusManager = LocalFocusManager.current
+    val id = navController.currentBackStackEntry?.arguments?.getString("id") ?: ""
 
     PScaffold(
         navController,

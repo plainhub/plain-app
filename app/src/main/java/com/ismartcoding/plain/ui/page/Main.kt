@@ -175,19 +175,15 @@ fun Main(viewModel: MainViewModel) {
             slideHorizontallyComposable(
                 "${RouteName.APPS.name}/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
-            ) { backStackEntry ->
-                val arguments = requireNotNull(backStackEntry.arguments)
-                val id = arguments.getString("id", "")
-                AppPage(navController, sharedViewModel, id)
+            ) {
+                AppPage(navController, sharedViewModel)
             }
 
             slideHorizontallyComposable(
                 "${RouteName.CHAT_EDIT_TEXT.name}/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
             ) { backStackEntry ->
-                val arguments = requireNotNull(backStackEntry.arguments)
-                val id = arguments.getString("id", "")
-                ChatEditTextPage(navController, sharedViewModel, id)
+                ChatEditTextPage(navController, sharedViewModel)
             }
         }
     }
