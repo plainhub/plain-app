@@ -33,7 +33,6 @@ import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.data.preference.AuthTwoFactorPreference
 import com.ismartcoding.plain.data.preference.PasswordPreference
 import com.ismartcoding.plain.data.preference.PasswordTypePreference
-import com.ismartcoding.plain.extensions.toFile
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.audio.AudioHelper
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -61,16 +60,10 @@ import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.application.ApplicationStopPreparing
 import io.ktor.server.application.call
 import io.ktor.server.application.install
-import io.ktor.server.application.uninstallAllPlugins
-import io.ktor.server.engine.embeddedServer
 import io.ktor.server.http.content.SPAConfig
-import io.ktor.server.http.content.singlePageApplication
 import io.ktor.server.http.content.staticResources
-import io.ktor.server.http.content.vue
-import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.autohead.AutoHeadResponse
 import io.ktor.server.plugins.cachingheaders.CachingHeaders
-import io.ktor.server.plugins.compression.Compression
 import io.ktor.server.plugins.conditionalheaders.ConditionalHeaders
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
@@ -92,7 +85,6 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.webSocket
-import io.ktor.util.cio.writeChannel
 import io.ktor.utils.io.core.use
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
@@ -100,21 +92,17 @@ import io.ktor.websocket.close
 import io.ktor.websocket.readBytes
 import io.ktor.websocket.send
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileOutputStream
 import java.net.URLEncoder
-import java.nio.ByteBuffer
 import java.util.Date
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import kotlin.collections.set
-import kotlin.system.exitProcess
 
 object HttpModule {
     @SuppressLint("SuspiciousIndentation")
@@ -399,7 +387,10 @@ object HttpModule {
                         val centerCrop = q["cc"]?.toBooleanStrictOrNull() ?: true
                         // get video/image thumbnail
                         if (w != null && h != null) {
-                            call.respondBytes(file.toThumbBytesAsync(MainApp.instance, w, h, centerCrop))
+                            val bytes = file.toThumbBytesAsync(MainApp.instance, w, h, centerCrop)
+                            if (bytes != null) {
+                                call.respondBytes(bytes)
+                            }
                             return@get
                         }
 

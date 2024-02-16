@@ -52,7 +52,7 @@ fun File.newFile(): File {
     return File(newPath())
 }
 
-suspend fun File.getBitmapAsync(
+fun File.getBitmapAsync(
     context: Context,
     width: Int,
     height: Int,
@@ -93,21 +93,22 @@ suspend fun File.getBitmapAsync(
     return bitmap
 }
 
-suspend fun File.toThumbBytesAsync(
+fun File.toThumbBytesAsync(
     context: Context,
     width: Int,
     height: Int,
     centerCrop: Boolean,
-): ByteArray {
-    val stream = ByteArrayOutputStream()
+): ByteArray? {
     getBitmapAsync(context, width, height, centerCrop)?.let {
+        val stream = ByteArrayOutputStream()
         if (this@toThumbBytesAsync.name.endsWith(".png", true)) {
             it.compress(Bitmap.CompressFormat.PNG, 70, stream)
         } else {
             it.compress(Bitmap.CompressFormat.JPEG, 80, stream)
         }
+        return stream.toByteArray()
     }
-    return stream.toByteArray()
+    return null
 }
 
 fun File.getDuration(context: Context): Long {
