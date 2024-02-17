@@ -214,7 +214,7 @@ enum class Permission {
         } else if (this == POST_NOTIFICATIONS) {
             val permission = this.toSysPermission()
             val activity = MainActivity.instance.get()!!
-            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission) || !isTPlus()) {
                 val intent = Permission.getEnableNotificationIntent(context)
                 if (intent.resolveActivity(packageManager) != null) {
                     intentLauncher?.launch(intent)
