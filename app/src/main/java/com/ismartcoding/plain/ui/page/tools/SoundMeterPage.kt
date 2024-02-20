@@ -38,8 +38,8 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.PermissionResultEvent
-import com.ismartcoding.plain.features.RequestPermissionEvent
+import com.ismartcoding.plain.features.PermissionsResultEvent
+import com.ismartcoding.plain.features.RequestPermissionsEvent
 import com.ismartcoding.plain.helpers.SoundMeterHelper
 import com.ismartcoding.plain.ui.base.*
 import kotlinx.coroutines.Dispatchers
@@ -77,7 +77,7 @@ fun SoundMeterPage(navController: NavHostController) {
 
     LaunchedEffect(Unit) {
         events.add(
-            receiveEventHandler<PermissionResultEvent> {
+            receiveEventHandler<PermissionsResultEvent> {
                 isRunning = Permission.RECORD_AUDIO.can(context)
             },
         )
@@ -237,7 +237,7 @@ fun SoundMeterPage(navController: NavHostController) {
                             if (Permission.RECORD_AUDIO.can(context)) {
                                 isRunning = true
                             } else {
-                                sendEvent(RequestPermissionEvent(Permission.RECORD_AUDIO))
+                                sendEvent(RequestPermissionsEvent(Permission.RECORD_AUDIO))
                             }
                         }
                     }

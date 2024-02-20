@@ -27,7 +27,7 @@ import com.ismartcoding.plain.databinding.ItemMediaBucketGridBinding
 import com.ismartcoding.plain.databinding.ItemVideoGridBinding
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.PermissionResultEvent
+import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.video.VideoHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.CastDialog
@@ -65,7 +65,7 @@ class VideosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     }
 
     override fun initEvents() {
-        receiveEvent<PermissionResultEvent> {
+        receiveEvent<PermissionsResultEvent> {
             checkPermission()
         }
         receiveEvent<ActionEvent> { event ->

@@ -26,8 +26,8 @@ import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.AudioActionEvent
 import com.ismartcoding.plain.features.ClearAudioPlaylistEvent
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.Permissions
+import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioHelper
 import com.ismartcoding.plain.features.audio.AudioPlayer
@@ -74,7 +74,7 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     }
 
     override fun initEvents() {
-        receiveEvent<PermissionResultEvent> {
+        receiveEvent<PermissionsResultEvent> {
             checkPermission()
         }
         receiveEvent<ActionEvent> { event ->

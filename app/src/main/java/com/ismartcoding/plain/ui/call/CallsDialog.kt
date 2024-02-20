@@ -16,7 +16,6 @@ import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.call.CallHelper
 import com.ismartcoding.plain.features.call.DCall
@@ -89,8 +88,8 @@ class CallsDialog : BaseListDrawerDialog() {
     }
 
     override fun initEvents() {
-        receiveEvent<PermissionResultEvent> { event ->
-            if (event.permission == Permission.CALL_PHONE) {
+        receiveEvent<PermissionsResultEvent> { event ->
+            if (event.has(Permission.CALL_PHONE)) {
                 if (Permission.CALL_PHONE.can(requireContext())) {
                     CallHelper.call(requireContext(), phoneNumberToCall)
                 } else {

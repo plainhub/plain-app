@@ -70,10 +70,10 @@ import com.ismartcoding.plain.data.enums.PickFileTag
 import com.ismartcoding.plain.data.enums.PickFileType
 import com.ismartcoding.plain.data.preference.ScanHistoryPreference
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.PermissionResultEvent
+import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.PickFileEvent
 import com.ismartcoding.plain.features.PickFileResultEvent
-import com.ismartcoding.plain.features.RequestPermissionEvent
+import com.ismartcoding.plain.features.RequestPermissionsEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
@@ -110,7 +110,7 @@ fun ScanPage(navController: NavHostController) {
 
     LaunchedEffect(Unit) {
         events.add(
-            receiveEventHandler<PermissionResultEvent> {
+            receiveEventHandler<PermissionsResultEvent> {
                 hasCamPermission = Permission.CAMERA.can(context)
                 if (!hasCamPermission) {
                     DialogHelper.showMessage(LocaleHelper.getString(R.string.scan_needs_camera_warning))
@@ -150,7 +150,7 @@ fun ScanPage(navController: NavHostController) {
         )
     }
     if (!hasCamPermission) {
-        sendEvent(RequestPermissionEvent(Permission.CAMERA))
+        sendEvent(RequestPermissionsEvent(Permission.CAMERA))
     }
 
     DisposableEffect(Unit) {

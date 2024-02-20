@@ -32,8 +32,6 @@ import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import com.ismartcoding.plain.web.websocket.WebSocketHelper
 import io.ktor.server.websocket.*
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import org.json.JSONObject
 import kotlin.time.Duration.Companion.seconds
 
@@ -71,11 +69,12 @@ class ConfirmToAcceptLoginEvent(
     val request: AuthRequest,
 )
 
-class PermissionResultEvent(val permission: Permission)
-
-class RequestPermissionEvent(val permission: Permission)
-class RequestPermissionsEvent(val permissions: Set<Permission>)
-class PermissionsResultEvent(val map: Map<String, Boolean>)
+class RequestPermissionsEvent(vararg val permissions: Permission)
+class PermissionsResultEvent(val map: Map<String, Boolean>) {
+    fun has(permission: Permission): Boolean {
+        return map.containsKey(permission.toSysPermission())
+    }
+}
 
 class PickFileEvent(val tag: PickFileTag, val type: PickFileType, val multiple: Boolean)
 
@@ -148,8 +147,8 @@ object AppEvents {
             }
         }
 
-        receiveEventHandler<PermissionResultEvent> { event ->
-            if (event.permission == Permission.POST_NOTIFICATIONS) {
+        receiveEventHandler<PermissionsResultEvent> { event ->
+            if (event.map.containsKey(Permission.POST_NOTIFICATIONS.toSysPermission())) {
                 if (AudioPlayer.isPlaying()) {
                     AudioPlayer.pause()
                     AudioPlayer.play()

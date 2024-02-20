@@ -21,7 +21,7 @@ import com.ismartcoding.plain.data.preference.AudioSleepTimerFinishLastPreferenc
 import com.ismartcoding.plain.data.preference.AudioSleepTimerMinutesPreference
 import com.ismartcoding.plain.databinding.DialogSleepTimerBinding
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.PermissionResultEvent
+import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.audio.AudioServiceAction
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -41,7 +41,7 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        receiveEvent<PermissionResultEvent> { event ->
+        receiveEvent<PermissionsResultEvent> { event ->
             if (isSPlus()) {
                 if (alarmManager.canScheduleExactAlarms()) {
                     alarmManager.setExact(

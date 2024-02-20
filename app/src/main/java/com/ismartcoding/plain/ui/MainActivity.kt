@@ -206,8 +206,8 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(instance.get()!!, event.message, event.duration).show()
         }
 
-        receiveEvent<PermissionResultEvent> { event ->
-            if (event.permission == Permission.WRITE_SETTINGS && Permission.WRITE_SETTINGS.can(this@MainActivity)) {
+        receiveEvent<PermissionsResultEvent> { event ->
+            if (event.map.containsKey(Permission.WRITE_SETTINGS.toSysPermission()) && Permission.WRITE_SETTINGS.can(this@MainActivity)) {
                 val enable = !KeepScreenOnPreference.getAsync(this@MainActivity)
                 ScreenHelper.saveOn(this@MainActivity, enable)
                 if (enable) {

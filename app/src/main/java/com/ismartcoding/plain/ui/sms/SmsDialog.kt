@@ -14,7 +14,6 @@ import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.sms.DMessage
 import com.ismartcoding.plain.features.sms.SmsHelper

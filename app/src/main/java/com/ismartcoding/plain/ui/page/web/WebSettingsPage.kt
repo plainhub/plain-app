@@ -72,10 +72,8 @@ import com.ismartcoding.plain.data.preference.LocalWeb
 import com.ismartcoding.plain.data.preference.WebSettingsProvider
 import com.ismartcoding.plain.features.IgnoreBatteryOptimizationResultEvent
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.PermissionsResultEvent
-import com.ismartcoding.plain.features.RequestPermissionEvent
 import com.ismartcoding.plain.features.RequestPermissionsEvent
 import com.ismartcoding.plain.features.StartHttpServerStateEvent
 import com.ismartcoding.plain.features.StopHttpServerDoneEvent
@@ -151,7 +149,7 @@ fun WebSettingsPage(
 
         LaunchedEffect(Unit) {
             events.add(
-                receiveEventHandler<PermissionResultEvent> {
+                receiveEventHandler<PermissionsResultEvent> {
                     permissionList = Permissions.getWebList(context)
                     systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.can(context)
                 }
@@ -269,7 +267,7 @@ fun WebSettingsPage(
                                 MiniOutlineButton(
                                     text = stringResource(R.string.grant_permission),
                                     onClick = {
-                                        sendEvent(RequestPermissionEvent(Permission.SYSTEM_ALERT_WINDOW))
+                                        sendEvent(RequestPermissionsEvent(Permission.SYSTEM_ALERT_WINDOW))
                                     },
                                 )
                             }
@@ -374,11 +372,7 @@ fun WebSettingsPage(
                                     if (enable) {
                                         val ps = m.permissions.filter { !it.can(context) }
                                         if (ps.isNotEmpty()) {
-                                            if (ps.size == 1) {
-                                                sendEvent(RequestPermissionEvent(ps[0]))
-                                            } else {
-                                                sendEvent(RequestPermissionsEvent(ps.toSet()))
-                                            }
+                                            sendEvent(RequestPermissionsEvent(*ps.toTypedArray()))
                                         }
                                     }
                                 }
@@ -391,11 +385,7 @@ fun WebSettingsPage(
                                         if (enable) {
                                             val ps = m.permissions.filter { !it.can(context) }
                                             if (ps.isNotEmpty()) {
-                                                if (ps.size == 1) {
-                                                    sendEvent(RequestPermissionEvent(ps[0]))
-                                                } else {
-                                                    sendEvent(RequestPermissionsEvent(ps.toSet()))
-                                                }
+                                                sendEvent(RequestPermissionsEvent(*ps.toTypedArray()))
                                             }
                                         }
                                     }

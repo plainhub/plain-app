@@ -119,7 +119,7 @@ enum class Permission {
         if (can(context)) {
             return true
         } else {
-            sendEvent(RequestPermissionEvent(this))
+            sendEvent(RequestPermissionsEvent(this))
         }
 
         return false
@@ -333,7 +333,8 @@ object Permissions {
             launcherMap[permission] =
                 activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
                     canContinue = true
-                    sendEvent(PermissionResultEvent(permission))
+                    val map = mapOf(permission.toSysPermission() to permission.can(MainApp.instance))
+                    sendEvent(PermissionsResultEvent(map))
                 }
         }
 
@@ -348,7 +349,8 @@ object Permissions {
             intentLauncherMap[permission] =
                 activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                     canContinue = true
-                    sendEvent(PermissionResultEvent(permission))
+                    val map = mapOf(permission.toSysPermission() to permission.can(MainApp.instance))
+                    sendEvent(PermissionsResultEvent(map))
                 }
         }
 
@@ -358,14 +360,13 @@ object Permissions {
         }
 
         events.add(
-            receiveEventHandler<RequestPermissionEvent> { event ->
-                event.permission.request(MainApp.instance, launcherMap[event.permission], intentLauncherMap[event.permission])
-            },
-        )
-
-        events.add(
             receiveEventHandler<RequestPermissionsEvent> { event ->
-                multipleLauncher.launch(event.permissions.map { it.toSysPermission() }.toTypedArray())
+                if (event.permissions.size == 1) {
+                    val permission = event.permissions.first()
+                    permission.request(MainApp.instance, launcherMap[permission], intentLauncherMap[permission])
+                } else {
+                    multipleLauncher.launch(event.permissions.map { it.toSysPermission() }.toTypedArray())
+                }
             },
         )
     }
@@ -392,7 +393,7 @@ object Permissions {
     private fun isNotificationPermissionReadyWithRequest(context: Context): Boolean {
         val permission = Permission.POST_NOTIFICATIONS
         if (!permission.can(context)) {
-            sendEvent(RequestPermissionEvent(permission))
+            sendEvent(RequestPermissionsEvent(permission))
             return false
         }
 

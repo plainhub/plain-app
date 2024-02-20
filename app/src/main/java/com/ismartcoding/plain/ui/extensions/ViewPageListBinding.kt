@@ -28,7 +28,7 @@ fun ViewPageListBinding.checkPermission(
             button.text = getString(R.string.grant_access)
             button.isVisible = true
             button.setSafeClick {
-                sendEvent(RequestPermissionsEvent(permissions.toSet()))
+                sendEvent(RequestPermissionsEvent(*permissions.toTypedArray()))
             }
         }
     }

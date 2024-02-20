@@ -35,8 +35,8 @@ import com.ismartcoding.plain.databinding.DialogFilesBinding
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.PermissionResultEvent
 import com.ismartcoding.plain.features.Permissions
+import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
 import com.ismartcoding.plain.features.file.FileSystemHelper
@@ -262,7 +262,7 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
     }
 
     private fun initEvents() {
-        receiveEvent<PermissionResultEvent> {
+        receiveEvent<PermissionsResultEvent> {
             checkPermission()
         }
         receiveEvent<DrawerMenuItemClickedEvent> { event ->
