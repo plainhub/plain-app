@@ -16,6 +16,7 @@ import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -74,7 +75,7 @@ fun AboutPage(
                         title = stringResource(R.string.privacy_policy),
                         showMore = true,
                         onClick = {
-                            WebHelper.open(context, "https://ismartcoding.github.io/plain-app/policy.html")
+                            WebHelper.open(context, UrlHelper.getPolicyUrl())
                         },
                     )
                     if (BuildConfig.DEBUG) {

@@ -4,7 +4,9 @@ import android.util.Base64
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.data.enums.AppChannelType
 
 object UrlHelper {
     private val mediaPathMap = mutableMapOf<String, String>() // format: <short_path>:<raw_path>
@@ -40,5 +42,13 @@ object UrlHelper {
     fun decrypt(id: String): String {
         val bytes = Base64.decode(id, Base64.NO_WRAP)
         return CryptoHelper.aesDecrypt(TempData.urlToken, bytes)?.decodeToString() ?: ""
+    }
+
+    fun getPolicyUrl(): String {
+        if (BuildConfig.CHANNEL == AppChannelType.CHINA.name) {
+            return "https://policy.plain.icu/policy-cn.html"
+        }
+
+        return "https://policy.plain.icu/policy.html"
     }
 }
