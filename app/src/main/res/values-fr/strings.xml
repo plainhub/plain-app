@@ -5,6 +5,7 @@
     <string name="generate_password">Générer un mot de passe</string>
     <string name="allow_remote_access_from_pc">Autoriser l\'accès à distance depuis un PC</string>
     <string name="privacy_policy">Politique de confidentialité</string>
+    <string name="terms_of_use">Conditions d\'utilisation</string>
     <string name="grant_permission">Accorder l\'autorisation</string>
     <string name="system_alert_window_warning">Accorder l\'autorisation \'Affichage par-dessus d\'autres applications\' est essentiel. Sans cette autorisation, si l\'application est en cours d\'exécution en arrière-plan, vous pourriez manquer des dialogues système cruciaux déclenchés par l\'application, tels que les dialogues de confirmation de désinstallation.</string>
     <string name="advanced_https">HTTPS (Avancé)</string>

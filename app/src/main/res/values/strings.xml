@@ -5,6 +5,7 @@
     <string name="generate_password">Generate password</string>
     <string name="allow_remote_access_from_pc">Allow remote access from PC</string>
     <string name="privacy_policy">Privacy policy</string>
+    <string name="terms_of_use">Terms of use</string>
     <string name="grant_permission">Grant permission</string>
     <string name="system_alert_window_warning">Granting the \'Display over other apps\' permission is essential. Without this permission, if the app is running in the background, you may miss crucial system dialogs triggered by the app, such as uninstallation confirmation dialogs.</string>
     <string name="advanced_https">HTTPS (Advanced)</string>

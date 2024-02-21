@@ -182,7 +182,7 @@ fun Main(viewModel: MainViewModel) {
             slideHorizontallyComposable(
                 "${RouteName.CHAT_EDIT_TEXT.name}/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
-            ) { backStackEntry ->
+            ) {
                 ChatEditTextPage(navController, sharedViewModel)
             }
         }

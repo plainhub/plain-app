@@ -35,6 +35,7 @@ fun RefreshLayoutState.LoadMoreRefreshContent(bottomNoMoreData: Boolean = false)
                         animation = tween(durationMillis = 1000, easing = LinearEasing),
                         repeatMode = RepeatMode.Restart,
                     ),
+                label = "",
             ).value
         }
     Row(

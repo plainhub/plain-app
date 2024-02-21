@@ -72,6 +72,13 @@ fun AboutPage(
                         },
                     )
                     PListItem(
+                        title = stringResource(R.string.terms_of_use),
+                        showMore = true,
+                        onClick = {
+                            WebHelper.open(context, UrlHelper.getTermsUrl())
+                        },
+                    )
+                    PListItem(
                         title = stringResource(R.string.privacy_policy),
                         showMore = true,
                         onClick = {

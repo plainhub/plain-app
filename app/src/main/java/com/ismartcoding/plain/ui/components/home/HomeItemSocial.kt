@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Message
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Contacts
 import androidx.compose.material.icons.outlined.Message
@@ -31,7 +32,7 @@ fun HomeItemSocial(
         )
         HomeItemFlow {
             GridItem(
-                icon = Icons.Outlined.Message,
+                icon = Icons.AutoMirrored.Outlined.Message,
                 stringResource(id = R.string.messages),
                 modifier = Modifier.width(itemWidth),
             ) {

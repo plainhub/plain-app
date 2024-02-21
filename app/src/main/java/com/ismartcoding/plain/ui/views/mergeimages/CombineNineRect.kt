@@ -9,7 +9,7 @@ object CombineNineRect {
         count: Int,
     ): List<CombineBitmapEntity> {
         val mCRC = generateColumnRowCountByCount(count)
-        var mBitmapEntity: CombineBitmapEntity? = null
+        var mBitmapEntity: CombineBitmapEntity?
         val perBitmapWidth =
             (
                 (combineWidth - 1 * 2 * mCRC.columns) /

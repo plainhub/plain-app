@@ -51,4 +51,12 @@ object UrlHelper {
 
         return "https://policy.plain.icu/policy.html"
     }
+
+    fun getTermsUrl(): String {
+        if (BuildConfig.CHANNEL == AppChannelType.CHINA.name) {
+            return "https://policy.plain.icu/policy-cn.html"
+        }
+
+        return "https://policy.plain.icu/terms.html"
+    }
 }

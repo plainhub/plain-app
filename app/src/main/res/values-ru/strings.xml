@@ -5,6 +5,7 @@
     <string name="generate_password">Сгенерировать пароль</string>
     <string name="allow_remote_access_from_pc">Разрешить удаленный доступ с ПК</string>
     <string name="privacy_policy">Политика конфиденциальности</string>
+    <string name="terms_of_use">Условия использования</string>
     <string name="grant_permission">Предоставить разрешение</string>
     <string name="system_alert_window_warning">Предоставление разрешения \'Показывать поверх других приложений\' является неотъемлемым. Без этого разрешения приложение, работающее в фоновом режиме, может пропустить важные системные диалоги, вызванные приложением, такие как диалоги подтверждения удаления.</string>
     <string name="advanced_https">HTTPS (Расширенный)</string>

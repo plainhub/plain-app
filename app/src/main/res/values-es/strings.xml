@@ -5,6 +5,7 @@
     <string name="generate_password">Generar contraseña</string>
     <string name="allow_remote_access_from_pc">Permitir acceso remoto desde PC</string>
     <string name="privacy_policy">Política de privacidad</string>
+    <string name="terms_of_use">Términos de uso</string>
     <string name="grant_permission">Conceder permiso</string>
     <string name="system_alert_window_warning">Conceder el permiso de \'Mostrar sobre otras aplicaciones\' es esencial. Sin este permiso, si la aplicación se está ejecutando en segundo plano, podrías perder diálogos cruciales del sistema provocados por la aplicación, como los diálogos de confirmación de desinstalación.</string>
     <string name="advanced_https">HTTPS (Avanzado)</string>

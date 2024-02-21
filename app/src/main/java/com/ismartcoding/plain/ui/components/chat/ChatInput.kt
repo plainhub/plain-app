@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Send
@@ -93,7 +94,7 @@ fun ChatInput(
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 PIconButton(
-                    imageVector = Icons.Outlined.Send,
+                    imageVector = Icons.AutoMirrored.Outlined.Send,
                     contentDescription = stringResource(R.string.send_message),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {

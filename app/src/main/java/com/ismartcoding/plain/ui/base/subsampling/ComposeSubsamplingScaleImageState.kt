@@ -968,7 +968,6 @@ class ComposeSubsamplingScaleImageState internal constructor(
         return when (gestureAnimationEasing) {
             GestureAnimationEasing.EaseInOutQuad -> easeInOutQuad(time, from, change, duration)
             GestureAnimationEasing.EaseOutQuad -> easeOutQuad(time, from, change, duration)
-            else -> throw java.lang.IllegalStateException("Unexpected easing type: $gestureAnimationEasing")
         }
     }
 

@@ -221,6 +221,11 @@ object WebPreference : BasePreference<Boolean>() {
     }
 }
 
+object AgreeTermsPreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("agree_terms")
+}
+
 object ExchangeRatePreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("exchange")

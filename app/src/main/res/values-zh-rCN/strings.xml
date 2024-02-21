@@ -5,6 +5,7 @@
     <string name="generate_password">生成密码</string>
     <string name="allow_remote_access_from_pc">允许电脑远程访问网页</string>
     <string name="privacy_policy">隐私政策</string>
+    <string name="terms_of_use">用户协议</string>
     <string name="grant_permission">授予权限</string>
     <string name="system_alert_window_warning">授予‘在其他应用程序上显示’权限是至关重要的。如果没有此权限，在应用程序在后台运行时，您可能会错过由应用程序触发的关键系统对话框，例如卸载确认对话框。</string>
     <string name="advanced_https">HTTPS（高级）</string>

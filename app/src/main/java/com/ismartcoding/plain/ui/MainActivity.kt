@@ -2,13 +2,20 @@ package com.ismartcoding.plain.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.database.CursorWindow
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.view.View
 import android.view.WindowManager
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -26,14 +33,18 @@ import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.*
+import com.ismartcoding.plain.data.enums.AppChannelType
 import com.ismartcoding.plain.data.enums.ExportFileType
 import com.ismartcoding.plain.data.enums.Language
 import com.ismartcoding.plain.data.enums.PickFileTag
 import com.ismartcoding.plain.data.enums.PickFileType
+import com.ismartcoding.plain.data.preference.AgreeTermsPreference
 import com.ismartcoding.plain.data.preference.KeepScreenOnPreference
 import com.ismartcoding.plain.data.preference.SettingsProvider
 import com.ismartcoding.plain.data.preference.SystemScreenTimeoutPreference
@@ -45,12 +56,14 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getStringF
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.ScreenHelper
+import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.mediaProjectionManager
 import com.ismartcoding.plain.services.NotificationListenerMonitorService
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.extensions.*
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
+import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.ShowMessageEvent
 import com.ismartcoding.plain.ui.page.Main
@@ -63,6 +76,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
+import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
     private var pickFileType = PickFileType.IMAGE
@@ -159,11 +173,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        checkNotificationPermission()
-
         AudioPlayer.ensurePlayer(this@MainActivity)
         coIO {
             try {
+                if (BuildConfig.CHANNEL == AppChannelType.CHINA.name && !AgreeTermsPreference.getAsync(this@MainActivity)) {
+                    coMain {
+                        showTermsAndPrivacyDialog(this@MainActivity)
+                    }
+                } else {
+                    coMain {
+                        checkNotificationPermission()
+                    }
+                }
                 startService(Intent(this@MainActivity, NotificationListenerMonitorService::class.java))
             } catch (ex: Exception) {
                 LogCat.e(ex.toString())
@@ -321,6 +342,44 @@ class MainActivity : AppCompatActivity() {
 
     private fun doPickFile(event: PickFileEvent) {
         pickFileActivityLauncher.launch(FilePickHelper.getPickFileIntent(event.multiple))
+    }
+
+    private fun showTermsAndPrivacyDialog(context: Context) {
+        val message = "请您认真阅读《用户协议》和《隐私政策》的全部条款，接受后可开始使用我们的服务。"
+
+        val startIndexUserAgreement = message.indexOf("《用户协议》")
+        val startIndexPrivacyPolicy = message.indexOf("《隐私政策》")
+
+        val spannableString = SpannableString(message)
+        spannableString.setSpan(object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                WebHelper.open(context, UrlHelper.getTermsUrl())
+            }
+        }, startIndexUserAgreement, startIndexUserAgreement + 6, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        spannableString.setSpan(object : ClickableSpan() {
+            override fun onClick(widget: View) {
+                WebHelper.open(context, UrlHelper.getPolicyUrl())
+            }
+        }, startIndexPrivacyPolicy, startIndexPrivacyPolicy + 6, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        val dialog = MaterialAlertDialogBuilder(context)
+            .setTitle("温馨提示")
+            .setCancelable(false)
+            .setPositiveButton("同意并继续") { _, _ ->
+                checkNotificationPermission()
+                coIO {
+                    AgreeTermsPreference.putAsync(context, true)
+                }
+            }
+            .setNegativeButton("不同意") { _, _ ->
+                this@MainActivity.finish()
+            }
+            .create()
+
+        dialog.setView(TextView(context).apply {
+            text = spannableString
+            movementMethod = LinkMovementMethod.getInstance()
+        }, context.dp2px(24), context.dp2px(28), context.dp2px(24), context.dp2px(28))
+        dialog.show()
     }
 
     companion object {

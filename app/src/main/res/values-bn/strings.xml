@@ -5,6 +5,7 @@
     <string name="generate_password">পাসওয়ার্ড তৈরি করুন</string>
     <string name="allow_remote_access_from_pc">পিসি থেকে দূরবর্তী অ্যাক্সেস অনুমোদন দিন</string>
     <string name="privacy_policy">গোপনীয়তা নীতি</string>
+    <string name="terms_of_use">ব্যবহারের শর্তাবলী</string>
     <string name="grant_permission">অনুমতি দান করুন</string>
     <string name="system_alert_window_warning">‘অন্য অ্যাপস উপর প্রদর্শন’ অনুমতি দেওয়া গুরুত্বপূর্ণ। এই অনুমতি না থাকলে, যদি অ্যাপটি ব্যাকগ্রাউন্ডে চলছে, আপনি অ্যাপ দ্বারা সৃষ্টিকৃত মৌলিক সিস্টেম ডায়ালগ, যেমন অনইনস্টলেশন নিশ্চিতকরণ ডায়ালগ, অনুমতি দেওয়া না থাকলে আপনি এটি হারতে পারেন।</string>
     <string name="advanced_https">এইচটিপিএস (উন্নত)</string>

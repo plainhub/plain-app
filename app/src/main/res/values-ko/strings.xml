@@ -5,6 +5,7 @@
     <string name="generate_password">비밀번호 생성</string>
     <string name="allow_remote_access_from_pc">PC에서 원격 액세스 허용</string>
     <string name="privacy_policy">개인 정보 보호 정책</string>
+    <string name="terms_of_use">이용 약관</string>
     <string name="grant_permission">권한 부여</string>
     <string name="system_alert_window_warning">\'다른 앱 위에 표시\' 권한을 부여하는 것이 중요합니다. 이 권한이 없으면 앱이 백그라운드에서 실행 중인 경우 앱에 의해 생성된 중요한 시스템 대화 상자, 예를 들면 언인스톨 확인 대화 상자 등을 놓칠 수 있습니다.</string>
     <string name="advanced_https">HTTPS (고급)</string>

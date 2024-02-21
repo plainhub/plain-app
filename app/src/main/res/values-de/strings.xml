@@ -5,6 +5,7 @@
     <string name="generate_password">Passwort generieren</string>
     <string name="allow_remote_access_from_pc">Remote-Zugriff vom PC erlauben</string>
     <string name="privacy_policy">Datenschutzrichtlinie</string>
+    <string name="terms_of_use">Nutzungsbedingungen</string>
     <string name="grant_permission">Berechtigung erteilen</string>
     <string name="system_alert_window_warning">Die Gewährung der \'Über anderen Apps anzeigen\'-Berechtigung ist unerlässlich. Ohne diese Berechtigung könnten bei laufender App im Hintergrund wichtige Systemdialoge, wie etwa Deinstallationsbestätigungsdialoge, übersehen werden.</string>
     <string name="advanced_https">HTTPS (Fortgeschritten)</string>

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Notes
 import androidx.compose.material.icons.outlined.Notes
 import androidx.compose.material.icons.outlined.RssFeed
 import androidx.compose.runtime.Composable
@@ -25,7 +26,7 @@ fun HomeItemWork(itemWidth: Dp) {
         )
         HomeItemFlow {
             GridItem(
-                icon = Icons.Outlined.Notes,
+                icon = Icons.AutoMirrored.Outlined.Notes,
                 stringResource(id = R.string.notes),
                 modifier = Modifier.width(itemWidth),
             ) {
