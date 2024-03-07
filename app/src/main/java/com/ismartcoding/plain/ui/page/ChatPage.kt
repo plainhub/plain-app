@@ -295,7 +295,7 @@ fun ChatPage(
                                             }
 
                                             DMessageType.FILES.value -> {
-                                                ChatFiles(context, m)
+                                                ChatFiles(context, navController, m)
                                             }
 
                                             DMessageType.TEXT.value -> {

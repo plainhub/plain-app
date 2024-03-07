@@ -1,7 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">PlainApp</string>
+    <string name="app_name">簡樸</string>
     <string name="vpn_web_conflict_warning">您的VPN目前在設備上啟用，這可能會導致從PC訪問時出現Web連接問題。為解決此問題，我們建議調整VPN設置以允許局域網流量或禁用VPN。</string>
     <string name="warning">警告</string>
+    <string name="open_with_other_app">使用其他應用程式開啟</string>
+    <string name="unknown_file_description">簡樸目前不支援開啟此類型的檔案。您可以使用其他應用程式開啟它。</string>
     <string name="generate_password">生成密碼</string>
     <string name="allow_remote_access_from_pc">允許電腦遠端存取網頁</string>
     <string name="privacy_policy">隱私政策</string>

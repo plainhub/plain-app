@@ -24,4 +24,5 @@ enum class RouteName {
     SCAN_HISTORY,
     MEDIA_PREVIEW,
     APPS,
+    OTHER_FILE,
 }

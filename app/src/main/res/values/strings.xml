@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Your VPN is currently enabled on your device, which could potentially lead to web connection issues when accessed from PC. To resolve this, we recommend adjusting your VPN settings to allow LAN traffic or disabling your VPN.</string>
     <string name="warning">Warning</string>
+    <string name="open_with_other_app">Open with other app</string>
+    <string name="unknown_file_description">PlainApp does not currently support opening this type of file. You can use other app to open it.</string>
     <string name="generate_password">Generate password</string>
     <string name="allow_remote_access_from_pc">Allow remote access from PC</string>
     <string name="privacy_policy">Privacy policy</string>

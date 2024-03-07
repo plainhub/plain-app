@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">현재 기기에서 VPN이 활성화되어 있어 PC에서 액세스할 때 웹 연결 문제가 발생할 수 있습니다. 이를 해결하기 위해 LAN 트래픽을 허용하거나 VPN을 비활성화하는 것을 권장합니다.</string>
     <string name="warning">경고</string>
+    <string name="open_with_other_app">다른 앱으로 열기</string>
+    <string name="unknown_file_description">PlainApp은 현재 이 유형의 파일을 열지 않습니다. 다른 앱을 사용하여 열 수 있습니다.</string>
     <string name="generate_password">비밀번호 생성</string>
     <string name="allow_remote_access_from_pc">PC에서 원격 액세스 허용</string>
     <string name="privacy_policy">개인 정보 보호 정책</string>

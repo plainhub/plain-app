@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">आपके डिवाइस पर वर्तमान में आपका VPN सक्रिय है, जिससे PC से एक्सेस करते समay वेब कनेक्शन समस्याएँ उत्पन्न हो सकती हैं। इसे हल करने के लिए, हम सुझाव देते हैं कि आप अपने VPN सेटिंग्स को LAN ट्रैफ़िक की अनुमति देने या अपने VPN को अक्षम करने के लिए समायोजित करें।</string>
     <string name="warning">चेतावनी</string>
+    <string name="open_with_other_app">अन्य एप्लिकेशन के साथ खोलें</string>
+    <string name="unknown_file_description">PlainApp वर्तमान में इस प्रकार के फ़ाइल खोलने का समर्थन नहीं करता है। आप इसे खोलने के लिए एक अन्य ऐप का उपयोग कर सकते हैं।</string>
     <string name="generate_password">पासवर्ड बनाएं</string>
     <string name="allow_remote_access_from_pc">पीसी से दूरस्थ पहुंच की अनुमति दें</string>
     <string name="privacy_policy">गोपनीयता नीति</string>

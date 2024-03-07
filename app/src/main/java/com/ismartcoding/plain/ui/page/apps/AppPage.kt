@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.lifecycle.Lifecycle
@@ -170,11 +171,11 @@ fun AppPage(
                             SelectionContainer {
                                 Text(
                                     text = item?.id ?: "",
+                                    textAlign = TextAlign.Center,
                                     modifier = Modifier
-                                        .align(Alignment.CenterHorizontally)
                                         .padding(horizontal = 32.dp),
-                                    style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                 )
                             }
                             VerticalSpace(dp = 8.dp)
@@ -184,16 +185,15 @@ fun AppPage(
                                         R.string.version_name_with_code,
                                         "version_name", item?.version ?: "", "version_code", PackageInfoCompat.getLongVersionCode(item!!.packageInfo)
                                     ),
+                                    textAlign = TextAlign.Center,
                                     modifier = Modifier
-                                        .align(Alignment.CenterHorizontally)
                                         .padding(horizontal = 32.dp),
-                                    style = MaterialTheme.typography.titleMedium,
+                                    style = MaterialTheme.typography.titleSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                             Row(
                                 Modifier
-                                    .align(Alignment.CenterHorizontally)
                                     .padding(start = 32.dp, end = 32.dp, top = 8.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {

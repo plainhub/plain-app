@@ -46,17 +46,17 @@ object UrlHelper {
 
     fun getPolicyUrl(): String {
         if (BuildConfig.CHANNEL == AppChannelType.CHINA.name) {
-            return "https://policy.plain.icu/policy-cn.html"
+            return "https://www.plain.icu/policy-cn.html"
         }
 
-        return "https://policy.plain.icu/policy.html"
+        return "https://www.plain.icu/policy.html"
     }
 
     fun getTermsUrl(): String {
         if (BuildConfig.CHANNEL == AppChannelType.CHINA.name) {
-            return "https://policy.plain.icu/policy-cn.html"
+            return "https://www.plain.icu/policy-cn.html"
         }
 
-        return "https://policy.plain.icu/terms.html"
+        return "https://www.plain.icu/terms.html"
     }
 }

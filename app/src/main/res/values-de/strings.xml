@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Ihr VPN ist derzeit auf Ihrem Gerät aktiviert, was potenziell zu Webverbindungsproblemen führen kann, wenn es von Ihrem PC aus zugegriffen wird. Um dies zu lösen, empfehlen wir Ihnen, Ihre VPN-Einstellungen anzupassen, um LAN-Verkehr zuzulassen oder Ihr VPN zu deaktivieren.</string>
     <string name="warning">Warnung</string>
+    <string name="open_with_other_app">Mit anderer App öffnen</string>
+    <string name="unknown_file_description">PlainApp unterstützt derzeit nicht das Öffnen dieses Dateityps. Sie können eine andere App verwenden, um sie zu öffnen.</string>
     <string name="generate_password">Passwort generieren</string>
     <string name="allow_remote_access_from_pc">Remote-Zugriff vom PC erlauben</string>
     <string name="privacy_policy">Datenschutzrichtlinie</string>

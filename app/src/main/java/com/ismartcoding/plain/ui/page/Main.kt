@@ -185,6 +185,13 @@ fun Main(viewModel: MainViewModel) {
             ) {
                 ChatEditTextPage(navController, sharedViewModel)
             }
+
+            slideHorizontallyComposable(
+                "${RouteName.OTHER_FILE.name}?path={path}",
+                arguments = listOf(navArgument("path") { type = NavType.StringType }),
+            ) {
+                OtherFilePage(navController)
+            }
         }
     }
 }

@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">আপনার ডিভাইসে সক্রিয় ভিপিএন আছে, যা একটি পিসি থেকে অ্যাক্সেস করার সময় ওয়েব সংযোগের সমস্যা উত্পন্ন করতে পারে। এটি সমাধান করতে, আমরা আপনাকে আপনার ভিপিএন সেটিংস পরিবর্তন করে এলএএন ট্র্যাফিক অনুমতি দেওয়া বা আপনার ভিপিএন নিষ্ক্রিয় করতে প্রস্তাবনা দিচ্ছি।</string>
     <string name="warning">সতর্কবার্তা</string>
+    <string name="open_with_other_app">অন্য অ্যাপ দিয়ে খোলুন</string>
+    <string name="unknown_file_description">প্লেইনঅ্যাপ বর্তমানে এই ধরনের ফাইল খোলার সমর্থন প্রদান করে না। আপনি এটি খোলার জন্য অন্য একটি অ্যাপ্লিকেশন ব্যবহার করতে পারেন।</string>
     <string name="generate_password">পাসওয়ার্ড তৈরি করুন</string>
     <string name="allow_remote_access_from_pc">পিসি থেকে দূরবর্তী অ্যাক্সেস অনুমোদন দিন</string>
     <string name="privacy_policy">গোপনীয়তা নীতি</string>

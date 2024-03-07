@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Ваш VPN в настоящее время включен на вашем устройстве, что может потенциально привести к проблемам с веб-подключением при доступе с ПК. Для устранения этой проблемы мы рекомендуем настроить параметры вашего VPN для разрешения локального сетевого трафика или отключить ваш VPN.</string>
     <string name="warning">Предупреждение</string>
+    <string name="open_with_other_app">Открыть с помощью другого приложения</string>
+    <string name="unknown_file_description">PlainApp в настоящее время не поддерживает открытие этого типа файла. Вы можете использовать другое приложение для его открытия.</string>
     <string name="generate_password">Сгенерировать пароль</string>
     <string name="allow_remote_access_from_pc">Разрешить удаленный доступ с ПК</string>
     <string name="privacy_policy">Политика конфиденциальности</string>

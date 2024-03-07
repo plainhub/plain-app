@@ -2,6 +2,8 @@
     <string name="app_name">简朴</string>
     <string name="vpn_web_conflict_warning">您的VPN当前在设备上启用，这可能会导致从PC访问时出现Web连接问题。为解决此问题，我们建议调整VPN设置以允许局域网流量或禁用VPN。</string>
     <string name="warning">警告</string>
+    <string name="open_with_other_app">使用其他应用打开</string>
+    <string name="unknown_file_description">简朴当前不支持打开此类型的文件。您可以使用其他应用程序打开它。</string>
     <string name="generate_password">生成密码</string>
     <string name="allow_remote_access_from_pc">允许电脑远程访问网页</string>
     <string name="privacy_policy">隐私政策</string>

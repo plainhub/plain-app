@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import coil.size.Size
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.extensions.getFilenameFromPath
@@ -43,6 +44,7 @@ import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
 import com.ismartcoding.plain.ui.base.PAsyncImage
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.VChat
+import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import java.io.File
@@ -50,6 +52,7 @@ import java.io.File
 @Composable
 fun ChatFiles(
     context: Context,
+    navController: NavHostController,
     m: VChat,
 ) {
     val fileItems = (m.value as DMessageFiles).items
@@ -100,6 +103,8 @@ fun ChatFiles(
                                 }
                             } else if (path.isPdfFile()) {
                                 PdfViewerDialog(Uri.fromFile(File(path))).show()
+                            } else {
+                                navController.navigate("${RouteName.OTHER_FILE.name}?path=${path}")
                             }
                         },
             ) {
