@@ -37,6 +37,7 @@ import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.enums.ButtonType
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.RequestPermissionsEvent
@@ -169,9 +170,9 @@ fun SoundMeterPage(navController: NavHostController) {
                 item {
                     Column(
                         modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(top = 56.dp),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 56.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Row(verticalAlignment = Alignment.Bottom) {
@@ -193,9 +194,9 @@ fun SoundMeterPage(navController: NavHostController) {
                 item {
                     Row(
                         modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 40.dp, vertical = 24.dp),
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 40.dp, vertical = 24.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Column(
@@ -224,16 +225,18 @@ fun SoundMeterPage(navController: NavHostController) {
                         text = decibelValueString,
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .height(96.dp)
-                                .padding(16.dp),
+                        Modifier
+                            .fillMaxWidth()
+                            .height(96.dp)
+                            .padding(16.dp),
                         textAlign = TextAlign.Center,
                     )
-                    BlockOutlineButton(text = stringResource(id = if (isRunning) R.string.stop else R.string.start)) {
-                        if (isRunning) {
+                    if (isRunning) {
+                        PBlockButton(text = stringResource(id = R.string.stop), type = ButtonType.SECONDARY) {
                             isRunning = false
-                        } else {
+                        }
+                    } else {
+                        PBlockButton(text = stringResource(id = R.string.start)) {
                             if (Permission.RECORD_AUDIO.can(context)) {
                                 isRunning = true
                             } else {
@@ -243,7 +246,7 @@ fun SoundMeterPage(navController: NavHostController) {
                     }
                     if (count > 0) {
                         VerticalSpace(dp = 40.dp)
-                        BlockOutlineButton(text = stringResource(id = R.string.reset)) {
+                        PBlockButton(text = stringResource(id = R.string.reset), type = ButtonType.DANGER) {
                             total = 0f
                             count = 0
                             decibel = 0f
@@ -264,6 +267,7 @@ fun SoundMeterPage(navController: NavHostController) {
         }) {
             LazyColumn {
                 item {
+                    TopSpace()
                     DisplayText(title = stringResource(id = R.string.decibel_values))
                     decibelValueStrings.forEach {
                         SelectionContainer {

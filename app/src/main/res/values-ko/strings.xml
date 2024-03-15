@@ -2,6 +2,20 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">현재 기기에서 VPN이 활성화되어 있어 PC에서 액세스할 때 웹 연결 문제가 발생할 수 있습니다. 이를 해결하기 위해 LAN 트래픽을 허용하거나 VPN을 비활성화하는 것을 권장합니다.</string>
     <string name="warning">경고</string>
+    <string name="storage_permission_confirm">거의 다 왔어요! 웹을 통해 휴대폰 파일을 쉽게 관리하려면 저장소 권한을 허용해주세요.</string>
+    <string name="instruction_for_use">사용 설명서</string>
+    <string name="web_how_to">단계 1: 핸드폰과 컴퓨터를 동일한 무선 네트워크에 연결합니다.\n\n방법 1: 컴퓨터와 핸드폰을 동일한 Wi-Fi 네트워크에 연결합니다.\n방법 2: 핸드폰의 핫스팟을 켜고 컴퓨터를 핸드폰의 핫스팟에 연결합니다.\n\n단계 2: 컴퓨터에서 웹 브라우저를 열고 앱 홈페이지에 표시된 웹 주소를 입력합니다.</string>
+    <string name="web_dig">1. 컴퓨터 브라우저가 웹 페이지를 열 수 없습니다.\n\n무선 라우터에서 AP 분리가 활성화되어 있을 수 있으며, 컴퓨터와 핸드폰 간 통신을 방지합니다. AP 분리 기능을 비활성화하려면 라우터 설정 인터페이스로 이동하십시오.\n\n2. HTTPS 웹 페이지 주소를 입력한 후 컴퓨터 브라우저에 경고가 표시됩니다. "연결이 개인적이지 않습니다."를 클릭하여 계속할 수 있습니다. Simple은 웹 사이트를 암호화하기 위해 자체 서명된 TLS 인증서를 사용합니다.</string>
+    <string name="learn_more">더 알아보기…</string>
+    <string name="http_server_state_on">서비스가 실행 중입니다</string>
+    <string name="http_server_state_starting">서비스 시작 중...</string>
+    <string name="http_server_state_stopping">서비스 중지 중...</string>
+    <string name="http_server_state_error">시작 실패</string>
+    <string name="change_port">포트 변경</string>
+    <string name="start_service">서비스 시작</string>
+    <string name="stop_service">서비스 중지</string>
+    <string name="run">실행</string>
+    <string name="troubleshoot">문제 해결</string>
     <string name="open_with_other_app">다른 앱으로 열기</string>
     <string name="unknown_file_description">PlainApp은 현재 이 유형의 파일을 열지 않습니다. 다른 앱을 사용하여 열 수 있습니다.</string>
     <string name="generate_password">비밀번호 생성</string>
@@ -10,7 +24,6 @@
     <string name="terms_of_use">이용 약관</string>
     <string name="grant_permission">권한 부여</string>
     <string name="system_alert_window_warning">\'다른 앱 위에 표시\' 권한을 부여하는 것이 중요합니다. 이 권한이 없으면 앱이 백그라운드에서 실행 중인 경우 앱에 의해 생성된 중요한 시스템 대화 상자, 예를 들면 언인스톨 확인 대화 상자 등을 놓칠 수 있습니다.</string>
-    <string name="advanced_https">HTTPS (고급)</string>
     <string name="version_name_with_code">버전 {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">최적화된 배터리 사용이 현재 활성화되어 있습니다. 중단없는 성능을 보장하기 위해 이 앱에 대한 배터리 최적화를 비활성화하는 것을 고려해보십시오.</string>
     <string name="apps">앱</string>
@@ -24,7 +37,6 @@
     <string name="sdk">대상: {{ target }}, 최소: {{ min }}</string>
     <string name="installed_at">설치 날짜</string>
     <string name="app_size">앱 크기</string>
-    <string name="change_port">포트 변경</string>
     <string name="user_app">사용자 앱</string>
     <string name="system_app">시스템 앱</string>
     <string name="large_heap">대형 힙</string>
@@ -320,7 +332,6 @@
     <string name="open_permission_settings">권한 설정 열기</string>
     <string name="api_service_is_running">API 서비스가 실행 중입니다</string>
     <string name="screen_mirror_service_is_running">화면 미러 서비스가 실행 중입니다</string>
-    <string name="stop_service">서비스 중지</string>
     <string name="cast">캐스트</string>
     <string name="images">이미지</string>
     <string name="audios">오디오</string>
@@ -473,10 +484,9 @@
     <string name="audio_notification_prompt">앱에서 미디어 컨트롤을 확인하려면 푸시 알림 수신에 대한 권한을 허용해주세요.</string>
     <string name="foreground_service_notification_prompt">백그라운드에서 실행되고 필수 기능 또는 서비스를 제공하기 위해 알림을 표시하려면 이 앱에 허용해주세요.</string>
     <string name="internal_storage">내부 저장소</string>
-    <string name="recommended_https">HTTPS (권장)</string>
-    <string name="enter_this_address_tips">위의 주소를 PC 웹 브라우저에 입력하세요.</string>
+    <string name="enter_this_address_tips">컴퓨터 브라우저에서 위의 주소를 입력하고 휴대전화와 컴퓨터가 동일한 로컬 네트워크에 있는지 확인하십시오.</string>
     <string name="last_visit_at">마지막 방문 날짜</string>
-    <string name="web_console_desc">PC 및 모바일 기기는 동일한 서브넷에 있어야 합니다. 전화의 성능을 최대화하려면 USB 어댑터를 전원 소켓에 연결하세요.</string>
+    <string name="web_console_desc">데이터 케이블이 필요 없이 컴퓨터를 통해 휴대폰의 사진, 비디오, 파일, 알림 등을 관리합니다.</string>
     <string name="fetch_content_automatically">콘텐츨 자동으로 가져오기</string>
     <string name="app_restored">앱 데이터가 복원되었습니다. 앱을 강제 종료하고 새로 시작해야 합니다.</string>
     <string name="welcome_text">환영합니다! 이 페이지로 텍스트, 이미지 및 비디오를 쉽게 보내고 컴퓨터에서 볼 수 있습니다.\n문제가 발생하면 도움이 필요하면 ismartcoding@gmail.com으로 이메일을 보내거나 https://discord.gg/RQWcS6DEEe에서 디스코드 토론에 참여하세요.</string>
@@ -494,6 +504,7 @@
     <string name="keep_screen_on">화면 켜짐 유지</string>
     <string name="cast_mode">캐스트 모드</string>
     <string name="my_phone">내 폰</string>
+    <string name="file_transfer_assistant">파일 전송 보조</string>
     <string name="back">뒤로</string>
     <string name="wallpaper_colors">배경 화면 색상</string>
     <string name="no_palettes">팔레트 없음</string>

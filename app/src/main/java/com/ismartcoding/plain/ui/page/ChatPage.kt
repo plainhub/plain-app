@@ -243,7 +243,7 @@ fun ChatPage(
 
     PScaffold(
         navController,
-        topBarTitle = stringResource(id = R.string.my_phone),
+        topBarTitle = stringResource(id = R.string.file_transfer_assistant),
         content = {
             Column(
                 Modifier

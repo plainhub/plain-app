@@ -2,6 +2,20 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">আপনার ডিভাইসে সক্রিয় ভিপিএন আছে, যা একটি পিসি থেকে অ্যাক্সেস করার সময় ওয়েব সংযোগের সমস্যা উত্পন্ন করতে পারে। এটি সমাধান করতে, আমরা আপনাকে আপনার ভিপিএন সেটিংস পরিবর্তন করে এলএএন ট্র্যাফিক অনুমতি দেওয়া বা আপনার ভিপিএন নিষ্ক্রিয় করতে প্রস্তাবনা দিচ্ছি।</string>
     <string name="warning">সতর্কবার্তা</string>
+    <string name="storage_permission_confirm">প্রায় সমাপ্ত! ওয়েব মাধ্যমে সহজেই ফোন ফাইলগুলি ব্যবস্থাপনা করতে আপনার স্টোরেজ অনুমতি সক্রিয় করুন।</string>
+    <string name="instruction_for_use">ব্যবহারের নির্দেশ</string>
+    <string name="web_how_to">ধাপ ১: আপনার ফোন এবং কম্পিউটারকে একই ওয়াইফাই নেটওয়ার্কে সংযুক্ত করুন।\n\nপদ্ধতি ১: আপনার কম্পিউটার এবং ফোনকে একই ওয়াইফাই নেটওয়ার্কে সংযুক্ত করুন।\nপদ্ধতি ২: আপনার ফোনের হটস্পট চালু করুন এবং কম্পিউটারকে ফোনের হটস্পটে সংযুক্ত করুন।\n\nধাপ ২: আপনার কম্পিউটারে একটি ওয়েব ব্রাউজার খুলুন এবং এপিপি হোমপেজে প্রদর্শিত ওয়েব ঠিকানাটি লিখুন।</string>
+    <string name="web_dig">১। কম্পিউটার ব্রাউজার ওয়েব পৃষ্ঠাটি খোলা যায় না।\n\nওয়ায়ারলেস রাউটারটির এপিআই আইসোলেশন সক্রিয় হতে পারে, যা কম্পিউটার এবং ফোন মধ্যে যোগাযোগ প্রতিরোধ করে। দয়া করে এপিআই আইসোলেশন ফাংশন অক্ষম করতে রাউটারের সেটিংস ইন্টারফেসে যান।\n\n২। কম্পিউটার ব্রাউজার একটি HTTPS ওয়েব পৃষ্ঠার ঠিকানা লিখার পর একটি সতর্কতা প্রদর্শন করে: "আপনার সংযোগ ব্যক্তিগত নয়।"\n\nআপনি পরে চাপুন "পরবর্তী x.x.x.x (অনিরাপ্ত)" এ। সহজে ওয়েবসাইট এনক্রিপ্ট করতে একটি স্ব-সাইনড টিএলএস সার্টিফিকেট ব্যবহার করে।</string>
+    <string name="learn_more">আরও জানুন</string>
+    <string name="http_server_state_on">সেবা চলছে</string>
+    <string name="http_server_state_starting">সেবা চালু করা হচ্ছে…</string>
+    <string name="http_server_state_stopping">সেবা বন্ধ করা হচ্ছে...</string>
+    <string name="http_server_state_error">চালু করা ব্যর্থ হয়েছে</string>
+    <string name="change_port">পোর্ট পরিবর্তন</string>
+    <string name="start_service">সেবা চালুন</string>
+    <string name="stop_service">সেবা বন্ধ করুন</string>
+    <string name="run">চালান</string>
+    <string name="troubleshoot">সমস্যা সমাধান করা</string>
     <string name="open_with_other_app">অন্য অ্যাপ দিয়ে খোলুন</string>
     <string name="unknown_file_description">প্লেইনঅ্যাপ বর্তমানে এই ধরনের ফাইল খোলার সমর্থন প্রদান করে না। আপনি এটি খোলার জন্য অন্য একটি অ্যাপ্লিকেশন ব্যবহার করতে পারেন।</string>
     <string name="generate_password">পাসওয়ার্ড তৈরি করুন</string>
@@ -10,7 +24,6 @@
     <string name="terms_of_use">ব্যবহারের শর্তাবলী</string>
     <string name="grant_permission">অনুমতি দান করুন</string>
     <string name="system_alert_window_warning">‘অন্য অ্যাপস উপর প্রদর্শন’ অনুমতি দেওয়া গুরুত্বপূর্ণ। এই অনুমতি না থাকলে, যদি অ্যাপটি ব্যাকগ্রাউন্ডে চলছে, আপনি অ্যাপ দ্বারা সৃষ্টিকৃত মৌলিক সিস্টেম ডায়ালগ, যেমন অনইনস্টলেশন নিশ্চিতকরণ ডায়ালগ, অনুমতি দেওয়া না থাকলে আপনি এটি হারতে পারেন।</string>
-    <string name="advanced_https">এইচটিপিএস (উন্নত)</string>
     <string name="version_name_with_code">সংস্করণ {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">অপটিমাইজড ব্যাটারি ব্যবহার সক্রিয় আছে। অবিরত কাজের জন্য, এই অ্যাপ এর জন্য ব্যাটারি অপটিমাইজেশন অক্ষম করতে বিবেচনা করুন।</string>
     <string name="apps">অ্যাপস</string>
@@ -24,7 +37,6 @@
     <string name="sdk">লক্ষ্য: {{ target }}, ন্যূনতম: {{ min }}</string>
     <string name="installed_at">ইনস্টল হয়েছে</string>
     <string name="app_size">অ্যাপ সাইজ</string>
-    <string name="change_port">পোর্ট পরিবর্তন করুন</string>
     <string name="user_app">ব্যবহারকারী অ্যাপ</string>
     <string name="system_app">সিস্টেম অ্যাপ</string>
     <string name="large_heap">বড় হিপ</string>
@@ -320,7 +332,6 @@
     <string name="open_permission_settings">অনুমতি সেটিংস খুলুন</string>
     <string name="api_service_is_running">API সেবা চলছে</string>
     <string name="screen_mirror_service_is_running">স্ক্রিন মিরর সেবা চলছে</string>
-    <string name="stop_service">সেবা বন্ধ করুন</string>
     <string name="cast">প্রসারণ করুন</string>
     <string name="images">চিত্র</string>
     <string name="audios">অডিও</string>
@@ -473,10 +484,9 @@
     <string name="audio_notification_prompt">নোটিফিকেশন সেন্টারে মিডিয়া নিয়ন্ত্রণ দেখতে, দয়া করে অ্যাপটি থেকে পুশ নোটিফিকেশন প্রাপ্ত করার অনুমতি দিন।</string>
     <string name="foreground_service_notification_prompt">প্রাথমিক কাজ বা সেবা প্রদান করতে এই অ্যাপটি ব্যাকগ্রাউন্ডে চালান এবং বিশেষ মাধ্যমে বিজ্ঞপ্তি দেখাতে এই অ্যাপটির অনুমতি দিন।</string>
     <string name="internal_storage">অভ্যন্তরীণ স্টোরেজ</string>
-    <string name="recommended_https">HTTPS (শ্রেষ্ঠ)</string>
-    <string name="enter_this_address_tips">দয়া করে এই ঠিকানাটি আপনার পিসি ওয়েব ব্রাউজারে এন্ট্রি করুন।</string>
+    <string name="enter_this_address_tips">আপনার কম্পিউটারের ব্রাউজারে উপরের ঠিকানা লিখুন, নিশ্চিত করুন যে আপনার ফোন এবং কম্পিউটারটি একই স্থানীয় নেটওয়ার্কে আছে।</string>
     <string name="last_visit_at">শেষ দেখা</string>
-    <string name="web_console_desc">আপনার পিসি এবং মোবাইল ডিভাইসটি একই সাবনেটে থাকতে হবে। আপনার ফোনের সামগ্রী প্রদর্শনের জন্য কৃপয়া বৃদ্ধি সংযোগিত করতে, দয়া করে ইউএসবি অ্যাডাপ্টারটি একটি পাওয়ার আউটলেটে সংযুক্ত করুন।</string>
+    <string name="web_console_desc">ডেটা কেবলের প্রয়োজন ছাড়াই কম্পিউটারের মাধ্যমে ফোনের ছবি, ভিডিও, ফাইল, বিজ্ঞপ্তি এবং অন্যান্য তথ্য পরিচালনা করুন।</string>
     <string name="fetch_content_automatically">স্বয়ংক্রিয়ভাবে সামগ্রী পূর্ণ করুন</string>
     <string name="app_restored">এপ্লিকেশন ডেটা পুনরুদ্ধার করা হয়েছে, আপনাকে অ্যাপটি বন্ধ করে নিতে এবং এপ্লিকেশনটি আবার একটি নতুন অবস্থায় শুরু করতে বাধ্য করা হবে।</string>
     <string name="welcome_text">স্বাগতম! আপনি সহজেই এই পৃষ্ঠাতে টেক্সট, চিত্র, এবং ভিডিও প্রেরণ করতে পারেন এবং তাদের আপনার কম্পিউটারে দেখতে পারেন।\nযদি আপনি যে কোনও সমস্যার সম্মুখীন হন, তবে সাহায্যের জন্য অনুগ্রহ করে ismartcoding@gmail.com ঠিকানায় একটি ইমেল পাঠাতে বা আমাদের Discord আলোচনায় যোগদান করতে স্বাগতম: https://discord.gg/RQWcS6DEEe।</string>
@@ -494,6 +504,7 @@
     <string name="keep_screen_on">পর্দায় রাখুন</string>
     <string name="cast_mode">কাস্ট মোড</string>
     <string name="my_phone">আমার ফোন</string>
+    <string name="file_transfer_assistant">ফাইল স্থানান্তর সহায়ক</string>
     <string name="back">পেছনে</string>
     <string name="wallpaper_colors">ওয়ালপেপার রঙ</string>
     <string name="no_palettes">কোন প্যালেট নেই</string>

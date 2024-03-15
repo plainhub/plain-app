@@ -2,6 +2,20 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Attualmente, il tuo VPN è attivo sul tuo dispositivo, il che potrebbe portare a problemi di connessione web quando si accede da un PC. Per risolvere questo problema, ti consigliamo di regolare le impostazioni del tuo VPN per consentire il traffico LAN o disattivare il tuo VPN.</string>
     <string name="warning">Attenzione</string>
+    <string name="storage_permission_confirm">Quasi fatto! Si prega di abilitare l\'autorizzazione di archiviazione per gestire facilmente i file del telefono tramite il web.</string>
+    <string name="instruction_for_use">Istruzioni per l\'uso</string>
+    <string name="web_how_to">Passaggio 1: Collega il tuo telefono e il tuo computer alla stessa rete wireless.\n\nMetodo 1: Collega il tuo computer e il tuo telefono alla stessa rete Wi-Fi.\nMetodo 2: Attiva l\'hotspot del tuo telefono e collega il tuo computer all\'hotspot del telefono.\n\nPassaggio 2: Apri un browser web sul tuo computer e inserisci l\'indirizzo web visualizzato sulla homepage dell\'app.</string>
+    <string name="web_dig">1. Il browser del computer non riesce ad aprire la pagina web.\n\nIl router wireless potrebbe avere l\'isolamento AP abilitato, impedendo la comunicazione tra il computer e il telefono. Si prega di andare all\'interfaccia delle impostazioni del router per disabilitare la funzione di isolamento AP.\n\n2. Il browser del computer visualizza un avviso dopo aver inserito un indirizzo di pagina web HTTPS: "La tua connessione non è privata."\n\nPuoi fare clic su "Procedi su x.x.x.x (non sicuro)" per continuare. Simple utilizza un certificato TLS autenticato per crittografare il sito web.</string>
+    <string name="learn_more">Ulteriori informazioni…</string>
+    <string name="http_server_state_on">Servizio in esecuzione</string>
+    <string name="http_server_state_starting">Avvio del servizio...</string>
+    <string name="http_server_state_stopping">Arresto del servizio...</string>
+    <string name="http_server_state_error">Avvio non riuscito</string>
+    <string name="change_port">Cambia porta</string>
+    <string name="start_service">Avvia servizio</string>
+    <string name="stop_service">Arresta servizio</string>
+    <string name="run">Esegui</string>
+    <string name="troubleshoot">Risoluzione dei problemi</string>
     <string name="open_with_other_app">Apri con un\'altra app</string>
     <string name="unknown_file_description">Attualmente PlainApp non supporta l\'apertura di questo tipo di file. Puoi utilizzare un\'altra app per aprirlo.</string>
     <string name="generate_password">Genera password</string>
@@ -10,7 +24,6 @@
     <string name="terms_of_use">Termini di utilizzo</string>
     <string name="grant_permission">Concedi il permesso</string>
     <string name="system_alert_window_warning">Concedere il permesso \'Mostra sopra le altre app\' è essenziale. Senza questo permesso, se l\'app è in esecuzione in background, potresti perdere dialoghi di sistema cruciali generati dall\'app, come i dialoghi di conferma della disinstallazione.</string>
-    <string name="advanced_https">HTTPS (Avanzato)</string>
     <string name="version_name_with_code">Versione {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">L\'ottimizzazione dell\'uso della batteria è attualmente attiva. Per garantire prestazioni ininterrotte, considera di disabilitare l\'ottimizzazione della batteria specificamente per questa app.</string>
     <string name="apps">App</string>
@@ -24,7 +37,6 @@
     <string name="sdk">Obiettivo: {{ target }}, Minimo: {{ min }}</string>
     <string name="installed_at">Installato il</string>
     <string name="app_size">Dimensione app</string>
-    <string name="change_port">Cambia porta</string>
     <string name="user_app">App utente</string>
     <string name="system_app">App di sistema</string>
     <string name="large_heap">Grande heap</string>
@@ -320,7 +332,6 @@
     <string name="open_permission_settings">Apri impostazioni permessi</string>
     <string name="api_service_is_running">Il servizio API è in esecuzione</string>
     <string name="screen_mirror_service_is_running">Il servizio di duplicazione dello schermo è in esecuzione</string>
-    <string name="stop_service">Ferma servizio</string>
     <string name="cast">Trasmetti</string>
     <string name="images">Immagini</string>
     <string name="audios">Audio</string>
@@ -473,10 +484,9 @@
     <string name="audio_notification_prompt">Per visualizzare i controlli multimediali nel centro notifiche, concedi il permesso di ricevere notifiche push dall\'app.</string>
     <string name="foreground_service_notification_prompt">Per favore, permetti a questa app di funzionare in background e mostrare notifiche per fornire funzionalità o servizi essenziali.</string>
     <string name="internal_storage">Memoria interna</string>
-    <string name="recommended_https">HTTPS (Consigliato)</string>
-    <string name="enter_this_address_tips">Per favore, inserisci l\'indirizzo sopra nel browser web del PC.</string>
+    <string name="enter_this_address_tips">Inserisci l\'indirizzo sopra nel browser del tuo computer, assicurandoti che il telefono e il computer siano sulla stessa rete locale.</string>
     <string name="last_visit_at">Ultima visita il</string>
-    <string name="web_console_desc">Il tuo PC e il dispositivo mobile devono essere nella stessa sottorete. Per massimizzare le prestazioni del tuo telefono, collega l\'adattatore USB a una presa di corrente.</string>
+    <string name="web_console_desc">Gestisci foto, video, file, notifiche e altri dati sul tuo telefono tramite computer senza la necessità di un cavo dati.</string>
     <string name="fetch_content_automatically">Carica automaticamente il contenuto</string>
     <string name="app_restored">I dati dell\'app sono stati ripristinati, devi chiudere forzatamente questa app e riavviare l\'app come nuova.</string>
     <string name="welcome_text">Benvenuto! Puoi facilmente inviare testi, immagini e video su questa pagina e visualizzarli sul tuo computer.\nSe incontri problemi, non esitare a inviare una e-mail a ismartcoding@gmail.com per assistenza o unirti alla nostra discussione su Discord su: https://discord.gg/RQWcS6DEEe.</string>
@@ -494,6 +504,7 @@
     <string name="keep_screen_on">Mantieni schermo attivo</string>
     <string name="cast_mode">Modalità Cast</string>
     <string name="my_phone">Il mio telefono</string>
+    <string name="file_transfer_assistant">Assistente di trasferimento file</string>
     <string name="back">Indietro</string>
     <string name="wallpaper_colors">Colori sfondo</string>
     <string name="no_palettes">Nessuna palette</string>

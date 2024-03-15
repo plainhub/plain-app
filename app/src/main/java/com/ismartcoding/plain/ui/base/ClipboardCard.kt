@@ -24,28 +24,18 @@ import com.ismartcoding.plain.ui.theme.cardBack
 fun ClipboardCard(
     label: String,
     text: String,
-    modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier =
-            modifier
-                .padding(horizontal = 16.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(
-                    color = MaterialTheme.colorScheme.cardBack(),
-                    shape = RoundedCornerShape(16.dp),
-                ),
-    ) {
+    PCard {
         Row(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        val clip = ClipData.newPlainText(label, text)
-                        clipboardManager.setPrimaryClip(clip)
-                        DialogHelper.showMessage(R.string.copied)
-                    }
-                    .padding(16.dp),
+            Modifier
+                .fillMaxWidth()
+                .clickable {
+                    val clip = ClipData.newPlainText(label, text)
+                    clipboardManager.setPrimaryClip(clip)
+                    DialogHelper.showMessage(R.string.copied)
+                }
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(

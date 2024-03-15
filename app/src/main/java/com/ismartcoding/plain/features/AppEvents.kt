@@ -39,13 +39,13 @@ class BoxConnectivityStateChangedEvent
 
 class StartHttpServerEvent
 
-class StartHttpServerStateEvent
-
-class StopHttpServerDoneEvent
+class HttpServerStateChangedEvent(val state: HttpServerState)
 
 class StartScreenMirrorEvent
 
 class RestartAppEvent
+
+class WindowFocusChangedEvent(val hasFocus: Boolean)
 
 class DeleteChatItemViewEvent(val id: String)
 
@@ -103,8 +103,6 @@ data class PlayAudioEvent(val uri: Uri)
 data class PlayAudioResultEvent(val uri: Uri)
 
 class AIChatCreatedEvent(val item: DAIChat)
-
-class ChatItemClickEvent
 
 object AppEvents {
     private lateinit var mediaPlayer: MediaPlayer

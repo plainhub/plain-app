@@ -11,6 +11,7 @@ enum class RouteName {
     LOGS,
     WEB_SETTINGS,
     WEB_SECURITY,
+    WEB_LEARN_MORE,
     PASSWORD,
     TEXT,
     SESSIONS,

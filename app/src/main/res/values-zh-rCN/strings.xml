@@ -2,6 +2,20 @@
     <string name="app_name">简朴</string>
     <string name="vpn_web_conflict_warning">您的VPN当前在设备上启用，这可能会导致从PC访问时出现Web连接问题。为解决此问题，我们建议调整VPN设置以允许局域网流量或禁用VPN。</string>
     <string name="warning">警告</string>
+    <string name="storage_permission_confirm">再一步就完成了！请开启存储权限，以便您通过网页轻松管理手机文件。</string>
+    <string name="instruction_for_use">使用说明</string>
+    <string name="web_how_to">步骤1：将您的手机和电脑连接到同一无线网络。\n\n\u0020\u0020\u0020\u0020方法①：将您的电脑和手机连接到同一Wi-Fi网络。\n\u0020\u0020\u0020\u0020方法②：打开您手机的热点，并将您的电脑连接到手机的热点。\n\n步骤2：在您的电脑上打开网络浏览器，并输入在应用主页上显示的网址。</string>
+    <string name="web_dig">1. 计算机浏览器无法打开网页。\n\n无线路由器可能已启用AP隔离，阻止电脑与手机之间的通信。 请前往路由器设置界面禁用AP隔离功能。\n\n2. 在输入HTTPS网页地址后，电脑浏览器显示警告：“您的连接不是私密的。”\n\n您可以单击“继续前往x.x.x.x（不安全）”以继续。 简朴使用自签名的TLS证书加密网站。</string>
+    <string name="learn_more">了解更多…</string>
+    <string name="http_server_state_on">服务运行中</string>
+    <string name="http_server_state_starting">启动服务中...</string>
+    <string name="http_server_state_stopping">停止服务中...</string>
+    <string name="http_server_state_error">启动失败</string>
+    <string name="change_port">更改端口</string>
+    <string name="start_service">启动服务</string>
+    <string name="stop_service">停止服务</string>
+    <string name="run">启动</string>
+    <string name="troubleshoot">排查问题</string>
     <string name="open_with_other_app">使用其他应用打开</string>
     <string name="unknown_file_description">简朴当前不支持打开此类型的文件。您可以使用其他应用程序打开它。</string>
     <string name="generate_password">生成密码</string>
@@ -10,7 +24,6 @@
     <string name="terms_of_use">用户协议</string>
     <string name="grant_permission">授予权限</string>
     <string name="system_alert_window_warning">授予‘在其他应用程序上显示’权限是至关重要的。如果没有此权限，在应用程序在后台运行时，您可能会错过由应用程序触发的关键系统对话框，例如卸载确认对话框。</string>
-    <string name="advanced_https">HTTPS（高级）</string>
     <string name="version_name_with_code">版本 {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">优化电池使用目前已激活。为确保流畅的使用性能，请考虑为此应用禁用电池优化。</string>
     <string name="apps">应用</string>
@@ -24,7 +37,6 @@
     <string name="sdk">目标：{{ target }}，最小：{{ min }}</string>
     <string name="installed_at">安装时间</string>
     <string name="app_size">应用大小</string>
-    <string name="change_port">更改端口</string>
     <string name="user_app">用户应用</string>
     <string name="system_app">系统应用</string>
     <string name="large_heap">大堆内存(Large heap)</string>
@@ -103,7 +115,7 @@
     <string name="about">关于</string>
     <string name="about_desc">客户端ID、版本、日志、捐赠</string>
     <string name="require_confirmation">需要二次确认</string>
-    <string name="web_console">电脑浏览器访问</string>
+    <string name="web_console">电脑网页</string>
     <string name="backup_restore">备份与恢复</string>
     <string name="backup">备份</string>
     <string name="backup_desc">备份或者恢复简朴应用数据</string>
@@ -307,7 +319,7 @@
     <string name="api_url">API地址</string>
     <string name="web_url">网站地址</string>
     <string name="auth_dev_token_tips">令牌仅用于api请求测试，返回明文数据。\n将\"Authorization: Bearer &lt;token&gt;\"放在请求头部即可。</string>
-    <string name="browser_https_error_tips">如果Chrome浏览器显示\"您的连接不是私密连接\"，请点击页面"高级"按钮继续。</string>
+    <string name="browser_https_error_tips">如果使用 HTTPS 地址，Chrome浏览器将会显示\"您的连接不是私密连接\"，请点击页面"高级"按钮继续。</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">管理文件</string>
     <string name="feature_READ_SMS">阅读短信</string>
     <string name="feature_WRITE_CALL_LOG">管理通话记录</string>
@@ -320,7 +332,6 @@
     <string name="open_permission_settings">打开系统权限设置</string>
     <string name="api_service_is_running">API服务运行中</string>
     <string name="screen_mirror_service_is_running">屏幕镜像服务运行中</string>
-    <string name="stop_service">停止服务</string>
     <string name="cast">投屏</string>
     <string name="images">图片</string>
     <string name="audios">音频</string>
@@ -473,10 +484,9 @@
     <string name="audio_notification_prompt">为了在通知中心查看媒体控制，请允许该应用接收推送通知。</string>
     <string name="foreground_service_notification_prompt">请允许此应用在后台运行并显示通知，以便提供必要的功能或服务。</string>
     <string name="internal_storage">内部存储</string>
-    <string name="recommended_https">HTTPS（推荐）</string>
-    <string name="enter_this_address_tips">在您的电脑浏览器中输入以上地址。</string>
+    <string name="enter_this_address_tips">在电脑浏览器中输入以上地址，需确保手机和电脑在同一局域网中。</string>
     <string name="last_visit_at">最后访问时间</string>
-    <string name="web_console_desc">您的电脑和手机必须在同一个子网中。为了最大化手机的性能，请将 USB 适配器连接到电源插座。</string>
+    <string name="web_console_desc">无需数据线即可通过电脑管理手机照片、视频、文件、通知等数据。</string>
     <string name="fetch_content_automatically">自动拉取正文内容</string>
     <string name="app_restored">应用数据已经恢复，您需要重启应用。</string>
     <string name="welcome_text">欢迎使用！您可以轻松地将文本、图片和视频发送到本页面，并在您的电脑上查看。\n如果您遇到问题，请发送邮件至ismartcoding@gmail.com寻求帮助，或者加入QQ群讨论: 812409393。</string>
@@ -494,6 +504,7 @@
     <string name="keep_screen_on">保持屏幕常亮</string>
     <string name="cast_mode">投屏模式</string>
     <string name="my_phone">我的手机</string>
+    <string name="file_transfer_assistant">文件传输助手</string>
     <string name="back">后退</string>
     <string name="wallpaper_colors">壁纸颜色</string>
     <string name="no_palettes">暂无色板</string>

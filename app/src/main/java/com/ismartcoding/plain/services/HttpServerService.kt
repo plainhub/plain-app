@@ -7,6 +7,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleService
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.PortHelper
 import com.ismartcoding.lib.logcat.LogCat
@@ -15,7 +16,9 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.HttpClientManager
-import com.ismartcoding.plain.features.StartHttpServerStateEvent
+import com.ismartcoding.plain.data.enums.HttpServerState
+import com.ismartcoding.plain.features.HttpServerStateChangedEvent
+import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.web.HttpServerManager
@@ -24,6 +27,7 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 
 
 class HttpServerService : LifecycleService() {
@@ -58,51 +62,51 @@ class HttpServerService : LifecycleService() {
         })
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun startHttpServerAsync() {
         LogCat.d("startHttpServer")
+        sendEvent(HttpServerStateChangedEvent(HttpServerState.STARTING))
         try {
             HttpServerManager.portsInUse.clear()
-            HttpServerManager.stoppedByUser = false
             HttpServerManager.httpServerError = ""
-            HttpServerManager.createHttpServer(MainApp.instance).start(wait = true)
+            HttpServerManager.createHttpServer(MainApp.instance).start(wait = false)
         } catch (ex: Exception) {
             ex.printStackTrace()
             LogCat.e(ex.toString())
             HttpServerManager.httpServerError = ex.toString()
+        }
 
-            if (PortHelper.isPortInUse(TempData.httpPort)) {
-                HttpServerManager.portsInUse.add(TempData.httpPort)
-            }
+        delay(1000) // make sure server is running
+        val checkResult = HttpServerManager.checkServerAsync()
+        if (checkResult.websocket && checkResult.http) {
+            HttpServerManager.httpServerError = ""
+            HttpServerManager.portsInUse.clear()
+            sendEvent(HttpServerStateChangedEvent(HttpServerState.ON))
+        } else {
+            if (!checkResult.http) {
+                if (PortHelper.isPortInUse(TempData.httpPort)) {
+                    HttpServerManager.portsInUse.add(TempData.httpPort)
+                }
 
-            if (PortHelper.isPortInUse(TempData.httpsPort)) {
-                HttpServerManager.portsInUse.add(TempData.httpsPort)
-            }
-
-            if (HttpServerManager.portsInUse.isNotEmpty()) {
-                try {
-                    val client = HttpClientManager.httpClient()
-                    val r = client.get(UrlHelper.getHealthCheckUrl())
-                    if (r.status == HttpStatusCode.OK && r.bodyAsText() == BuildConfig.APPLICATION_ID) {
-                        LogCat.d("http server is running")
-                        HttpServerManager.portsInUse.clear()
-                        client.ws(urlString = UrlHelper.getWsTestUrl()) {
-                            val reason = this.closeReason.getCompleted()
-                            LogCat.d("closeReason: $reason")
-                            if (reason?.message == BuildConfig.APPLICATION_ID) {
-                                HttpServerManager.httpServerError = ""
-                            }
-                            sendEvent(StartHttpServerStateEvent())
-                        }
-                    } else {
-                        sendEvent(StartHttpServerStateEvent())
-                    }
-                } catch (ex2: Exception) {
-                    ex2.printStackTrace()
-                    LogCat.e(ex2.toString())
-                    sendEvent(StartHttpServerStateEvent())
+                if (PortHelper.isPortInUse(TempData.httpsPort)) {
+                    HttpServerManager.portsInUse.add(TempData.httpsPort)
                 }
             }
+
+            HttpServerManager.httpServerError = if (HttpServerManager.portsInUse.isNotEmpty()) {
+                LocaleHelper.getStringF(
+                    if (HttpServerManager.portsInUse.size > 1) {
+                        R.string.http_port_conflict_errors
+                    } else {
+                        R.string.http_port_conflict_error
+                    }, "port", HttpServerManager.portsInUse.joinToString(", ")
+                )
+            } else if (HttpServerManager.httpServerError.isNotEmpty()) {
+                LocaleHelper.getString(R.string.http_server_failed) + " (${HttpServerManager.httpServerError})"
+            } else {
+                LocaleHelper.getString(R.string.http_server_failed)
+            }
+
+            sendEvent(HttpServerStateChangedEvent(HttpServerState.ERROR))
         }
     }
 

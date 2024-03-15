@@ -27,6 +27,7 @@ import com.ismartcoding.plain.data.preference.DarkThemePreference
 import com.ismartcoding.plain.data.preference.FeedAutoRefreshPreference
 import com.ismartcoding.plain.data.preference.HttpPortPreference
 import com.ismartcoding.plain.data.preference.HttpsPortPreference
+import com.ismartcoding.plain.data.preference.HttpsPreference
 import com.ismartcoding.plain.data.preference.KeyStorePasswordPreference
 import com.ismartcoding.plain.data.preference.PasswordPreference
 import com.ismartcoding.plain.data.preference.PasswordTypePreference
@@ -109,6 +110,7 @@ class MainApp : Application(), ImageLoaderFactory {
         coIO {
             val preferences = dataStore.data.first()
             TempData.webEnabled = WebPreference.get(preferences)
+            TempData.webHttps = HttpsPreference.get(preferences)
             TempData.httpPort = HttpPortPreference.get(preferences)
             TempData.httpsPort = HttpsPortPreference.get(preferences)
             TempData.audioPlayMode = AudioPlayModePreference.getValue(preferences)
@@ -125,7 +127,6 @@ class MainApp : Application(), ImageLoaderFactory {
             if (FeedAutoRefreshPreference.get(preferences)) {
                 FeedFetchWorker.startRepeatWorkerAsync(instance)
             }
-            PackageHelper.cacheAppLabels()
             HttpServerManager.clientTsInterval()
         }
     }

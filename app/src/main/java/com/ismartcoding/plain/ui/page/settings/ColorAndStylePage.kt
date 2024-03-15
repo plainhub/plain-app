@@ -68,10 +68,12 @@ import com.ismartcoding.plain.ui.base.BlockRadioGroupButtonItem
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.ClipboardTextField
 import com.ismartcoding.plain.ui.base.DynamicSVGImage
+import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.Subtitle
+import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.colorpicker.ColorEnvelope
 import com.ismartcoding.plain.ui.base.colorpicker.HsvColorPicker
@@ -80,6 +82,7 @@ import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.svg.PALETTE
 import com.ismartcoding.plain.ui.svg.SVGString
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.palette.TonalPalettes
 import com.ismartcoding.plain.ui.theme.palette.TonalPalettes.Companion.toTonalPalettes
 import com.ismartcoding.plain.ui.theme.palette.checkColorHex
@@ -107,14 +110,14 @@ fun ColorAndStylePage(navController: NavHostController) {
         content = {
             LazyColumn {
                 item {
-                    VerticalSpace(dp = 16.dp)
+                    TopSpace()
                 }
                 item {
                     Row(
                         modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
+                            .padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)
                             .aspectRatio(1.38f)
                             .clip(RoundedCornerShape(24.dp))
                             .background(
@@ -131,7 +134,7 @@ fun ColorAndStylePage(navController: NavHostController) {
                             contentDescription = stringResource(R.string.color_and_style),
                         )
                     }
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
                 item {
                     BlockRadioButton(
@@ -171,26 +174,28 @@ fun ColorAndStylePage(navController: NavHostController) {
                             },
                         ),
                     )
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
                 item {
                     Subtitle(
                         text = stringResource(R.string.appearance),
                     )
-                    PListItem(
-                        title = stringResource(R.string.dark_theme),
-                        desc = DarkTheme.entries.find { it.value == darkTheme }?.getText(context) ?: "",
-                        separatedActions = true,
-                        onClick = {
-                            navController.navigate(RouteName.DARK_THEME)
-                        },
-                    ) {
-                        PSwitch(
-                            activated = DarkTheme.isDarkTheme(darkTheme),
+                    PCard {
+                        PListItem(
+                            title = stringResource(R.string.dark_theme),
+                            desc = DarkTheme.entries.find { it.value == darkTheme }?.getText(context) ?: "",
+                            separatedActions = true,
+                            onClick = {
+                                navController.navigate(RouteName.DARK_THEME)
+                            },
                         ) {
-                            scope.launch {
-                                withIO {
-                                    DarkThemePreference.putAsync(context, if (it) DarkTheme.ON else DarkTheme.OFF)
+                            PSwitch(
+                                activated = DarkTheme.isDarkTheme(darkTheme),
+                            ) {
+                                scope.launch {
+                                    withIO {
+                                        DarkThemePreference.putAsync(context, if (it) DarkTheme.ON else DarkTheme.OFF)
+                                    }
                                 }
                             }
                         }
@@ -235,7 +240,7 @@ fun Palettes(
         Row(
             modifier =
             Modifier
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)
                 .fillMaxWidth()
                 .height(80.dp)
                 .clip(RoundedCornerShape(16.dp))
@@ -258,7 +263,7 @@ fun Palettes(
             modifier =
             Modifier
                 .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             palettes.forEachIndexed { index, palette ->

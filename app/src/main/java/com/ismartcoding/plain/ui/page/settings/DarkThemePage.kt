@@ -17,11 +17,14 @@ import com.ismartcoding.plain.data.preference.DarkThemePreference
 import com.ismartcoding.plain.data.preference.LocalAmoledDarkTheme
 import com.ismartcoding.plain.data.preference.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.Subtitle
+import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -39,43 +42,50 @@ fun DarkThemePage(navController: NavHostController) {
         content = {
             LazyColumn {
                 item {
-                    VerticalSpace(dp = 16.dp)
+                    TopSpace()
                 }
                 item {
-                    DarkTheme.entries.map {
-                        PListItem(
-                            title = it.getText(context),
-                            onClick = {
-                                scope.launch {
-                                    withIO {
-                                        DarkThemePreference.putAsync(context, it)
+                    PCard {
+                        DarkTheme.entries.map {
+                            PListItem(
+                                title = it.getText(context),
+                                onClick = {
+                                    scope.launch {
+                                        withIO {
+                                            DarkThemePreference.putAsync(context, it)
+                                        }
                                     }
-                                }
-                            },
-                        ) {
-                            RadioButton(selected = it.value == darkTheme, onClick = {
-                                scope.launch {
-                                    withIO {
-                                        DarkThemePreference.putAsync(context, it)
+                                },
+                            ) {
+                                RadioButton(selected = it.value == darkTheme, onClick = {
+                                    scope.launch {
+                                        withIO {
+                                            DarkThemePreference.putAsync(context, it)
+                                        }
                                     }
-                                }
-                            })
+                                })
+                            }
                         }
                     }
+                }
+                item {
+                    VerticalSpace(dp = 16.dp)
                     Subtitle(
                         text = stringResource(R.string.other),
                     )
-                    PListItem(
-                        title = stringResource(R.string.amoled_dark_theme),
-                        onClick = {
-                            scope.launch(Dispatchers.IO) {
-                                AmoledDarkThemePreference.putAsync(context, !amoledDarkTheme)
-                            }
-                        },
-                    ) {
-                        PSwitch(activated = amoledDarkTheme) {
-                            scope.launch(Dispatchers.IO) {
-                                AmoledDarkThemePreference.putAsync(context, !amoledDarkTheme)
+                    PCard {
+                        PListItem(
+                            title = stringResource(R.string.amoled_dark_theme),
+                            onClick = {
+                                scope.launch(Dispatchers.IO) {
+                                    AmoledDarkThemePreference.putAsync(context, !amoledDarkTheme)
+                                }
+                            },
+                        ) {
+                            PSwitch(activated = amoledDarkTheme) {
+                                scope.launch(Dispatchers.IO) {
+                                    AmoledDarkThemePreference.putAsync(context, !amoledDarkTheme)
+                                }
                             }
                         }
                     }

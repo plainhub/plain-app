@@ -8,24 +8,20 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.enums.DarkTheme
 import com.ismartcoding.plain.data.enums.Language
 import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
 import com.ismartcoding.plain.features.audio.MediaPlayMode
 import com.ismartcoding.plain.features.device.DeviceSortBy
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.video.DVideo
-import kotlinx.serialization.json.Json
 import java.util.Locale
 
 object PasswordPreference : BasePreference<String>() {
@@ -209,7 +205,7 @@ object LanguagePreference : BasePreference<String>() {
 }
 
 object WebPreference : BasePreference<Boolean>() {
-    override val default = true
+    override val default = false
     override val key = booleanPreferencesKey("web")
 
     override suspend fun putAsync(
@@ -217,6 +213,19 @@ object WebPreference : BasePreference<Boolean>() {
         value: Boolean,
     ) {
         TempData.webEnabled = value
+        super.putAsync(context, value)
+    }
+}
+
+object HttpsPreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("https")
+
+    override suspend fun putAsync(
+        context: Context,
+        value: Boolean,
+    ) {
+        TempData.webHttps = value
         super.putAsync(context, value)
     }
 }

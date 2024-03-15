@@ -101,7 +101,7 @@ fun OtherFilePage(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         VerticalSpace(dp = 64.dp)
-                        BlockOutlineButton(text = stringResource(id = R.string.open_with_other_app)) {
+                        PBlockButton(text = stringResource(id = R.string.open_with_other_app)) {
                             MainActivity.instance.get()?.openPathIntent(path)
                         }
                     }

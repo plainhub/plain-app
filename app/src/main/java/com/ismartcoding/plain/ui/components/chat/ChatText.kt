@@ -11,7 +11,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.db.DMessageText
-import com.ismartcoding.plain.ui.base.ClickableText
+import com.ismartcoding.plain.ui.base.PClickableText
 import com.ismartcoding.plain.ui.base.linkify
 import com.ismartcoding.plain.ui.base.urlAt
 import com.ismartcoding.plain.ui.models.VChat
@@ -24,14 +24,8 @@ fun ChatText(
     onDoubleClick: () -> Unit,
     onLongClick: () -> Unit,
     ) {
-    val text =
-        (m.value as DMessageText).text.linkify(
-            SpanStyle(
-                color = MaterialTheme.colorScheme.primary,
-                textDecoration = TextDecoration.Underline,
-            ),
-        )
-    ClickableText(
+    val text = (m.value as DMessageText).text.linkify()
+    PClickableText(
         text = text,
         style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
         modifier = Modifier

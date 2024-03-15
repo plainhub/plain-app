@@ -2,6 +2,20 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Your VPN is currently enabled on your device, which could potentially lead to web connection issues when accessed from PC. To resolve this, we recommend adjusting your VPN settings to allow LAN traffic or disabling your VPN.</string>
     <string name="warning">Warning</string>
+    <string name="storage_permission_confirm">Almost there! Please enable storage permission to easily manage your phone files via the web.</string>
+    <string name="instruction_for_use">Instructions for use</string>
+    <string name="web_how_to">Step 1: Connect your phone and computer to the same wireless network.\n\nMethod 1: Connect your computer and phone to the same Wi-Fi network.\nMethod 2: Turn on your phone\'s hotspot and connect your computer to the phone\'s hotspot.\n\nStep 2: Open a web browser on your computer and enter the web address displayed on the APP homepage.</string>
+    <string name="web_dig">1. The computer browser cannot open web page.\n\nThe wireless router may have AP isolation enabled, preventing communication between the computer and the phone. Please go to the router settings interface to disable the AP isolation function.\n\n2. The computer browser displays a warning after entering an HTTPS web page address: "Your connection is not private."\n\nYou can click "Proceed to x.x.x.x (unsafe)" to continue. Simple uses a self-signed TLS certificate to encrypt the website.</string>
+    <string name="learn_more">Learn more…</string>
+    <string name="http_server_state_on">Service is running</string>
+    <string name="http_server_state_starting">Starting service…</string>
+    <string name="http_server_state_stopping">Stopping service…</string>
+    <string name="http_server_state_error">Started failed</string>
+    <string name="change_port">Change port</string>
+    <string name="start_service">Start service</string>
+    <string name="stop_service">Stop service</string>
+    <string name="run">Run</string>
+    <string name="troubleshoot">Troubleshoot</string>
     <string name="open_with_other_app">Open with other app</string>
     <string name="unknown_file_description">PlainApp does not currently support opening this type of file. You can use other app to open it.</string>
     <string name="generate_password">Generate password</string>
@@ -10,7 +24,6 @@
     <string name="terms_of_use">Terms of use</string>
     <string name="grant_permission">Grant permission</string>
     <string name="system_alert_window_warning">Granting the \'Display over other apps\' permission is essential. Without this permission, if the app is running in the background, you may miss crucial system dialogs triggered by the app, such as uninstallation confirmation dialogs.</string>
-    <string name="advanced_https">HTTPS (Advanced)</string>
     <string name="version_name_with_code">Version {{ version_name }} ({{ version_code }})</string>
     <string name="optimized_batter_usage_warning">Optimized battery usage is currently active. To ensure uninterrupted performance, please consider disabling battery optimization specifically for this app.</string>
     <string name="apps">Apps</string>
@@ -24,7 +37,6 @@
     <string name="sdk">Target: {{ target }}, Min: {{ min }}</string>
     <string name="installed_at">Installed at</string>
     <string name="app_size">App size</string>
-    <string name="change_port">Change port</string>
     <string name="user_app">User app</string>
     <string name="system_app">System app</string>
     <string name="large_heap">Large heap</string>
@@ -320,7 +332,6 @@
     <string name="open_permission_settings">Open permission settings</string>
     <string name="api_service_is_running">API service is running</string>
     <string name="screen_mirror_service_is_running">Screen mirror service is running</string>
-    <string name="stop_service">Stop service</string>
     <string name="cast">Cast</string>
     <string name="images">Images</string>
     <string name="audios">Audio</string>
@@ -474,10 +485,9 @@
     <string name="audio_notification_prompt">To view media controls in the notifications center, kindly grant permission to receive push notifications from the app.</string>
     <string name="foreground_service_notification_prompt">Please allow this app to run in the background and show notifications to provide essential functionality or services.</string>
     <string name="internal_storage">Internal storage</string>
-    <string name="recommended_https">HTTPS (Recommended)</string>
-    <string name="enter_this_address_tips">Please enter the above address in your PC web browser.</string>
+    <string name="enter_this_address_tips">Enter the above address in your computer\'s browser, ensuring that your phone and computer are on the same local network.</string>
     <string name="last_visit_at">Last visit at</string>
-    <string name="web_console_desc">Your PC and mobile device must be in the same subnet. To maximize your phone\'s performance, please connect the USB adapter to a power outlet.</string>
+    <string name="web_console_desc">Manage photos, videos, files, notifications, and other data on your phone via computer without the need for a data cable.</string>
     <string name="fetch_content_automatically">Fetch content automatically</string>
     <string name="app_restored">APP data is restored, you need to force quit this app and start the app again as new.</string>
     <string name="welcome_text">Welcome! You can easily send text, images, and videos to this page and view them on your computer.\nIf you encounter any issues, please feel free to send an email to ismartcoding@gmail.com for assistance or join our Discord discussion at: https://discord.gg/RQWcS6DEEe.</string>
@@ -495,6 +505,7 @@
     <string name="keep_screen_on">Keep screen on</string>
     <string name="cast_mode">Cast mode</string>
     <string name="my_phone">My phone</string>
+    <string name="file_transfer_assistant">File Transfer Assistant</string>
     <string name="back">Back</string>
     <string name="wallpaper_colors">Wallpaper colors</string>
     <string name="no_palettes">No Palettes</string>

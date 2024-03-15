@@ -2,6 +2,20 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Uw VPN is momenteel ingeschakeld op uw apparaat, wat mogelijk kan leiden tot webverbinding problemen bij toegang vanaf uw pc. Om dit op te lossen, raden we aan om uw VPN-instellingen aan te passen om LAN-verkeer toe te staan of uw VPN uit te schakelen.</string>
     <string name="warning">Waarschuwing</string>
+    <string name="storage_permission_confirm">Bijna klaar! Schakel alstublieft de opslagtoestemming in om uw telefoonbestanden eenvoudig via het web te beheren.</string>
+    <string name="instruction_for_use">Gebruiksaanwijzing</string>
+    <string name="web_how_to">Stap 1: Sluit uw telefoon en computer aan op hetzelfde draadloze netwerk.\n\nMethode 1: Sluit uw computer en telefoon aan op hetzelfde Wi-Fi-netwerk.\nMethode 2: Schakel de hotspot van uw telefoon in en sluit uw computer aan op de hotspot van de telefoon.\n\nStap 2: Open een webbrowser op uw computer en voer het webadres in dat wordt weergegeven op de startpagina van de app.</string>
+    <string name="web_dig">1. De computerbrowser kan de webpagina niet openen.\n\nDe draadloze router heeft mogelijk AP-isolatie ingeschakeld, waardoor communicatie tussen de computer en de telefoon wordt voorkomen. Ga naar de instellingeninterface van de router om de AP-isolatiefunctie uit te schakelen.\n\n2. De computerbrowser geeft een waarschuwing weer nadat u een HTTPS-webpagina-adres hebt ingevoerd: "Uw verbinding is niet privé."\n\nU kunt op "Doorgaan naar x.x.x.x (onveilig)" klikken om door te gaan. Simple gebruikt een zelfondertekend TLS-certificaat om de website te versleutelen.</string>
+    <string name="learn_more">Meer informatie…</string>
+    <string name="http_server_state_on">Service draait</string>
+    <string name="http_server_state_starting">Service wordt gestart...</string>
+    <string name="http_server_state_stopping">Service wordt gestopt...</string>
+    <string name="http_server_state_error">Starten mislukt</string>
+    <string name="change_port">Poort wijzigen</string>
+    <string name="start_service">Start service</string>
+    <string name="stop_service">Stop service</string>
+    <string name="run">Uitvoeren</string>
+    <string name="troubleshoot">Problemen oplossen</string>
     <string name="open_with_other_app">Openen met een andere app</string>
     <string name="unknown_file_description">PlainApp ondersteunt op dit moment het openen van dit type bestand niet. U kunt een andere app gebruiken om het te openen.</string>
     <string name="generate_password">Genereer wachtwoord</string>
@@ -10,7 +24,6 @@
     <string name="terms_of_use">Gebruiksvoorwaarden</string>
     <string name="grant_permission">Toestemming verlenen</string>
     <string name="system_alert_window_warning">Het verlenen van de \'Weergeven over andere apps\'-toestemming is essentieel. Zonder deze toestemming kunnen bij een app die op de achtergrond draait, cruciale systeemdialogen, zoals bevestigingsdialogen voor verwijdering, worden gemist.</string>
-    <string name="advanced_https">HTTPS (Geavanceerd)</string>
     <string name="version_name_with_code">Versie {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">Geoptimaliseerd batterijgebruik is momenteel actief. Om ononderbroken prestaties te garanderen, overweeg batterijoptimalisatie specifiek voor deze app uit te schakelen.</string>
     <string name="apps">Apps</string>
@@ -24,7 +37,6 @@
     <string name="sdk">Doel: {{ target }}, Min: {{ min }}</string>
     <string name="installed_at">Geïnstalleerd op</string>
     <string name="app_size">App-grootte</string>
-    <string name="change_port">Poort wijzigen</string>
     <string name="user_app">Gebruikersapp</string>
     <string name="system_app">Systeemapp</string>
     <string name="large_heap">Grote heap</string>
@@ -320,7 +332,6 @@
     <string name="open_permission_settings">Toestemmingsinstellingen openen</string>
     <string name="api_service_is_running">API-service wordt uitgevoerd</string>
     <string name="screen_mirror_service_is_running">Screen mirror service is running</string>
-    <string name="stop_service">Stop service</string>
     <string name="cast">Cast</string>
     <string name="images">Afbeeldingen</string>
     <string name="audios">Audio</string>
@@ -473,10 +484,9 @@
     <string name="audio_notification_prompt">Om mediacontrols in het meldingencentrum te bekijken, verleen vriendelijk toestemming om pushmeldingen van de app te ontvangen.</string>
     <string name="foreground_service_notification_prompt">Sta deze app toe om op de achtergrond uit te voeren en meldingen weer te geven om essentiële functionaliteit of services te bieden.</string>
     <string name="internal_storage">Interne opslag</string>
-    <string name="recommended_https">HTTPS (Aanbevolen)</string>
-    <string name="enter_this_address_tips">Voer het bovenstaande adres in uw PC-webbrowser in.</string>
+    <string name="enter_this_address_tips">Voer het bovenstaande adres in uw computerbrowser in en zorg ervoor dat uw telefoon en computer zich in hetzelfde lokale netwerk bevinden.</string>
     <string name="last_visit_at">Laatst bezocht op</string>
-    <string name="web_console_desc">Uw pc en mobiele apparaat moeten zich in hetzelfde subnet bevinden. Om de prestaties van uw telefoon te maximaliseren, sluit u de USB-adapter aan op een stopcontact.</string>
+    <string name="web_console_desc">Beheer foto\'s, video\'s, bestanden, meldingen en andere gegevens op uw telefoon via de computer zonder dat een gegevenskabel nodig is.</string>
     <string name="fetch_content_automatically">Inhoud automatisch ophalen</string>
     <string name="app_restored">APP-gegevens zijn hersteld, u moet de app geforceerd afsluiten en de app opnieuw starten als nieuw.</string>
     <string name="welcome_text">Welkom! U kunt eenvoudig tekst, afbeeldingen en video\'s naar deze pagina sturen en ze op uw computer bekijken.\nAls u problemen ondervindt, aarzel dan niet om een e-mail te sturen naar ismartcoding@gmail.com voor hulp of neem deel aan onze Discord-discussie op: https://discord.gg/RQWcS6DEEe.</string>
@@ -494,6 +504,7 @@
     <string name="keep_screen_on">Scherm aan houden</string>
     <string name="cast_mode">Cast-modus</string>
     <string name="my_phone">Mijn telefoon</string>
+    <string name="file_transfer_assistant">Bestandsoverdrachtassistent</string>
     <string name="back">Terug</string>
     <string name="wallpaper_colors">Achtergrondkleuren</string>
     <string name="no_palettes">Geen paletten</string>

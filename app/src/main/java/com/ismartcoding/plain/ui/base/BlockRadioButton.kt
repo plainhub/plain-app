@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 @Composable
 fun BlockRadioButton(
@@ -15,7 +16,7 @@ fun BlockRadioButton(
 ) {
     Column {
         Row(
-            modifier = modifier.padding(horizontal = 16.dp),
+            modifier = modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -33,7 +34,7 @@ fun BlockRadioButton(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         itemRadioGroups[selected].content()
     }
 }

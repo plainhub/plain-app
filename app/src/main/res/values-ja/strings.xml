@@ -2,6 +2,20 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">お使いのデバイスでは現在VPNが有効になっており、PCからアクセスした際にWeb接続の問題が発生する可能性があります。これを解決するために、LANトラフィックを許可するようにVPNの設定を調整するか、VPNを無効にすることをお勧めします。</string>
     <string name="warning">警告</string>
+    <string name="storage_permission_confirm">もう少しで完了です！ウェブを介して簡単に携帯電話のファイルを管理するために、ストレージ許可を有効にしてください。</string>
+    <string name="instruction_for_use">使用説明書</string>
+    <string name="web_how_to">ステップ1：携帯電話とコンピューターを同じ無線ネットワークに接続します。\n\n方法1：コンピューターと携帯電話を同じWi-Fiネットワークに接続します。\n方法2：携帯電話のホットスポットをオンにして、コンピューターを携帯電話のホットスポットに接続します。\n\nステップ2：コンピューターでウェブブラウザーを開き、アプリのホームページに表示されるウェブアドレスを入力します。</string>
+    <string name="web_dig">1. コンピューターブラウザーでウェブページを開くことができません。\n\n無線ルーターにはAP分離が有効になっている可能性があり、コンピューターと電話の間の通信を防いでいます。 ルーターの設定インターフェイスにアクセスして、AP分離機能を無効にしてください。\n\n2. HTTPSウェブページアドレスを入力した後、コンピューターブラウザーに警告が表示されます。「接続がプライベートではありません。」\n\n「x.x.x.x (安全ではない) に進む」をクリックして続行できます。 Simpleは、ウェブサイトを暗号化するために自己署名TLS証明書を使用しています。</string>
+    <string name="learn_more">詳細を見る…</string>
+    <string name="http_server_state_on">サービスが実行されています</string>
+    <string name="http_server_state_starting">サービスを開始しています...</string>
+    <string name="http_server_state_stopping">サービスを停止しています...</string>
+    <string name="http_server_state_error">起動に失敗しました</string>
+    <string name="change_port">ポートの変更</string>
+    <string name="start_service">サービスを開始</string>
+    <string name="stop_service">サービスを停止</string>
+    <string name="run">実行</string>
+    <string name="troubleshoot">トラブルシューティング</string>
     <string name="open_with_other_app">他のアプリで開く</string>
     <string name="unknown_file_description">現在、PlainAppはこのタイプのファイルの開くことをサポートしていません。別のアプリを使用して開くことができます。</string>
     <string name="generate_password">パスワードを生成</string>
@@ -10,7 +24,6 @@
     <string name="terms_of_use">利用規約</string>
     <string name="grant_permission">許可を付与</string>
     <string name="system_alert_window_warning">「他のアプリの上に表示」の許可を付与することが不可欠です。この許可がないと、アプリがバックグラウンドで実行されている場合に、アンインストール確認ダイアログなど、アプリによってトリガーされた重要なシステムダイアログが見逃される可能性があります。</string>
-    <string name="advanced_https">HTTPS（高度）</string>
     <string name="version_name_with_code">バージョン {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">最適化されたバッテリー使用が現在有効です。中断のないパフォーマンスを確保するために、このアプリケーションのために特にバッテリーオプティマイゼーションを無効にすることを検討してください。</string>
     <string name="apps">アプリ</string>
@@ -24,7 +37,6 @@
     <string name="sdk">ターゲット: {{ target }}, 最小: {{ min }}</string>
     <string name="installed_at">インストール日時</string>
     <string name="app_size">アプリサイズ</string>
-    <string name="change_port">ポートを変更</string>
     <string name="user_app">ユーザーアプリ</string>
     <string name="system_app">システムアプリ</string>
     <string name="large_heap">大きなヒープ</string>
@@ -320,7 +332,6 @@
     <string name="open_permission_settings">許可設定を開く</string>
     <string name="api_service_is_running">APIサービスが実行されています</string>
     <string name="screen_mirror_service_is_running">スクリーンミラーサービスが実行されています</string>
-    <string name="stop_service">サービスを停止</string>
     <string name="cast">キャスト</string>
     <string name="images">画像</string>
     <string name="audios">オーディオ</string>
@@ -473,10 +484,9 @@
     <string name="audio_notification_prompt">通知センターでメディアコントロールを表示するには、アプリからプッシュ通知を受信する許可をお願いします。</string>
     <string name="foreground_service_notification_prompt">本アプリをバックグラウンドで実行し、重要な機能やサービスを提供するために通知を表示する許可をお願いします。</string>
     <string name="internal_storage">内部ストレージ</string>
-    <string name="recommended_https">HTTPS（推奨）</string>
-    <string name="enter_this_address_tips">このアドレスをPCのWebブラウザに入力してください。</string>
+    <string name="enter_this_address_tips">上記のアドレスをコンピューターのブラウザに入力して、電話とコンピューターが同じローカルネットワークにあることを確認してください。</string>
     <string name="last_visit_at">前回の訪問時刻</string>
-    <string name="web_console_desc">PCとモバイルデバイスは同じサブネット内にある必要があります。スマートフォンのパフォーマンスを最大限に活用するには、USBアダプターを電源に接続してください。</string>
+    <string name="web_console_desc">データケーブルが不要で、コンピュータを介して携帯電話の写真、ビデオ、ファイル、通知などのデータを管理します。</string>
     <string name="fetch_content_automatically">コンテンツを自動的に取得</string>
     <string name="app_restored">アプリのデータが復元されました。新しい状態でアプリを再起動する必要があります。</string>
     <string name="welcome_text">ようこそ！このページにテキスト、画像、動画を簡単に送信し、コンピュータで表示することができます。\n問題が発生した場合は、お手伝いが必要な場合はismartcoding@gmail.comにメールを送信するか、次のDiscordのディスカッションに参加してください：https://discord.gg/RQWcS6DEEe。</string>
@@ -494,6 +504,7 @@
     <string name="keep_screen_on">画面を常にオンにする</string>
     <string name="cast_mode">キャストモード</string>
     <string name="my_phone">マイフォン</string>
+    <string name="file_transfer_assistant">ファイル転送アシスタント</string>
     <string name="back">戻る</string>
     <string name="wallpaper_colors">壁紙の色</string>
     <string name="no_palettes">パレットなし</string>

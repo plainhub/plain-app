@@ -48,10 +48,12 @@ import com.ismartcoding.plain.ui.base.BlockRadioGroupButtonItem
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.OutlineButton
+import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.Tips
+import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -76,6 +78,7 @@ fun PasswordPage(navController: NavHostController) {
             content = {
                 LazyColumn {
                     item {
+                        TopSpace()
                         DisplayText(title = stringResource(R.string.password_settings))
                         BlockRadioButton(
                             selected = if (passwordType == PasswordType.NONE.value) {
@@ -120,14 +123,16 @@ fun PasswordPage(navController: NavHostController) {
                                     }
                                 })
                         }
-                        PListItem(
-                            title = stringResource(R.string.require_confirmation),
-                        ) {
-                            PSwitch(
-                                activated = authTwoFactor,
+                        PCard {
+                            PListItem(
+                                title = stringResource(R.string.require_confirmation),
                             ) {
-                                scope.launch(Dispatchers.IO) {
-                                    AuthTwoFactorPreference.putAsync(context, it)
+                                PSwitch(
+                                    activated = authTwoFactor,
+                                ) {
+                                    scope.launch(Dispatchers.IO) {
+                                        AuthTwoFactorPreference.putAsync(context, it)
+                                    }
                                 }
                             }
                         }

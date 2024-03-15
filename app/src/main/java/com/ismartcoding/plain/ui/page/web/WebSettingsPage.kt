@@ -1,28 +1,13 @@
 package com.ismartcoding.plain.ui.page.web
 
-import android.content.ClipData
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -35,15 +20,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -58,16 +38,10 @@ import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.clipboardManager
-import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.data.preference.ApiPermissionsPreference
 import com.ismartcoding.plain.data.preference.HttpPortPreference
 import com.ismartcoding.plain.data.preference.HttpsPortPreference
 import com.ismartcoding.plain.data.preference.LocalApiPermissions
-import com.ismartcoding.plain.data.preference.LocalHttpPort
-import com.ismartcoding.plain.data.preference.LocalHttpsPort
-import com.ismartcoding.plain.data.preference.LocalPassword
-import com.ismartcoding.plain.data.preference.LocalPasswordType
 import com.ismartcoding.plain.data.preference.LocalWeb
 import com.ismartcoding.plain.data.preference.WebSettingsProvider
 import com.ismartcoding.plain.features.IgnoreBatteryOptimizationResultEvent
@@ -75,46 +49,40 @@ import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.RequestPermissionsEvent
-import com.ismartcoding.plain.features.StartHttpServerStateEvent
-import com.ismartcoding.plain.features.StopHttpServerDoneEvent
-import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.Alert
 import com.ismartcoding.plain.ui.base.AlertType
-import com.ismartcoding.plain.ui.base.BlockRadioButton
-import com.ismartcoding.plain.ui.base.BlockRadioGroupButtonItem
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.DisplayText
 import com.ismartcoding.plain.ui.base.MiniOutlineButton
+import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.base.PClickableText
 import com.ismartcoding.plain.ui.base.PDropdownMenu
-import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PMainSwitch
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
-import com.ismartcoding.plain.ui.base.RadioDialog
-import com.ismartcoding.plain.ui.base.RadioDialogOption
 import com.ismartcoding.plain.ui.base.Subtitle
-import com.ismartcoding.plain.ui.base.Tips
+import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.rememberLifecycleEvent
+import com.ismartcoding.plain.ui.components.WebAddress
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.MainViewModel
+import com.ismartcoding.plain.ui.models.VClickText
 import com.ismartcoding.plain.ui.models.WebConsoleViewModel
 import com.ismartcoding.plain.ui.page.RouteName
-import com.ismartcoding.plain.ui.theme.canvas
-import com.ismartcoding.plain.ui.theme.cardBack
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun WebSettingsPage(
     navController: NavHostController,
@@ -125,19 +93,16 @@ fun WebSettingsPage(
         val context = LocalContext.current
         val webConsole = LocalWeb.current
         val scope = rememberCoroutineScope()
-        var isHttps by remember { mutableStateOf(false) }
-        val httpsPort = LocalHttpsPort.current
-        val httpPort = LocalHttpPort.current
-        val passwordType = LocalPasswordType.current
-        val password = LocalPassword.current
         var isMenuOpen by remember { mutableStateOf(false) }
         val enabledPermissions = LocalApiPermissions.current
         var permissionList by remember { mutableStateOf(Permissions.getWebList(context)) }
-        var portDialogVisible by remember { mutableStateOf(false) }
         var showIgnoreOptimizeWarning by remember { mutableStateOf(!powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)) }
         var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.can(context)) }
         var isVPNConnected by remember { mutableStateOf(NetworkHelper.isVPNConnected(context)) }
         val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
+
+        val learnMore = stringResource(id = R.string.learn_more)
+        val fullText = (stringResource(id = R.string.web_console_desc) + " " + learnMore)
 
         val lifecycleEvent = rememberLifecycleEvent()
         LaunchedEffect(lifecycleEvent) {
@@ -158,18 +123,6 @@ fun WebSettingsPage(
             events.add(
                 receiveEventHandler<PermissionsResultEvent> {
                     permissionList = Permissions.getWebList(context)
-                }
-            )
-
-            events.add(
-                receiveEventHandler<StartHttpServerStateEvent> {
-                    mainViewModel.httpServerError.value = HttpServerManager.getErrorMessage()
-                }
-            )
-
-            events.add(
-                receiveEventHandler<StopHttpServerDoneEvent> {
-                    mainViewModel.httpServerError.value = HttpServerManager.getErrorMessage()
                 }
             )
 
@@ -222,56 +175,58 @@ fun WebSettingsPage(
         }, content = {
             LazyColumn {
                 item {
-                    if (mainViewModel.httpServerError.value.isNotEmpty()) {
-                        Alert(title = stringResource(id = R.string.error), description = mainViewModel.httpServerError.value, AlertType.ERROR) {
-                            if (HttpServerManager.portsInUse.isNotEmpty()) {
+                    TopSpace()
+                    if (webConsole) {
+                        if (mainViewModel.httpServerError.value.isNotEmpty()) {
+                            Alert(title = stringResource(id = R.string.error), description = mainViewModel.httpServerError.value, AlertType.ERROR) {
+                                if (HttpServerManager.portsInUse.isNotEmpty()) {
+                                    MiniOutlineButton(
+                                        text = stringResource(R.string.change_port),
+                                        onClick = {
+                                            scope.launch(Dispatchers.IO) {
+                                                if (HttpServerManager.portsInUse.contains(TempData.httpPort)) {
+                                                    HttpPortPreference.putAsync(context, HttpServerManager.httpPorts.filter { it != TempData.httpPort }.random())
+                                                }
+                                                if (HttpServerManager.portsInUse.contains(TempData.httpsPort)) {
+                                                    HttpsPortPreference.putAsync(context, HttpServerManager.httpsPorts.filter { it != TempData.httpsPort }.random())
+                                                }
+                                                coMain {
+                                                    MaterialAlertDialogBuilder(context)
+                                                        .setTitle(R.string.restart_app_title)
+                                                        .setMessage(R.string.restart_app_message)
+                                                        .setPositiveButton(R.string.relaunch_app) { _, _ ->
+                                                            AppHelper.relaunch(context)
+                                                        }
+                                                        .setCancelable(false)
+                                                        .create()
+                                                        .show()
+                                                }
+                                            }
+                                        },
+                                    )
+                                }
                                 MiniOutlineButton(
-                                    text = stringResource(R.string.change_port),
+                                    text = stringResource(R.string.relaunch_app),
+                                    modifier = Modifier.padding(start = 16.dp),
                                     onClick = {
-                                        scope.launch(Dispatchers.IO) {
-                                            if (HttpServerManager.portsInUse.contains(TempData.httpPort)) {
-                                                HttpPortPreference.putAsync(context, HttpServerManager.httpPorts.filter { it != TempData.httpPort }.random())
-                                            }
-                                            if (HttpServerManager.portsInUse.contains(TempData.httpsPort)) {
-                                                HttpsPortPreference.putAsync(context, HttpServerManager.httpsPorts.filter { it != TempData.httpsPort }.random())
-                                            }
-                                            coMain {
-                                                MaterialAlertDialogBuilder(context)
-                                                    .setTitle(R.string.restart_app_title)
-                                                    .setMessage(R.string.restart_app_message)
-                                                    .setPositiveButton(R.string.relaunch_app) { _, _ ->
-                                                        AppHelper.relaunch(context)
-                                                    }
-                                                    .setCancelable(false)
-                                                    .create()
-                                                    .show()
-                                            }
-                                        }
+                                        AppHelper.relaunch(context)
                                     },
                                 )
                             }
-                            MiniOutlineButton(
-                                text = stringResource(R.string.relaunch_app),
-                                modifier = Modifier.padding(start = 16.dp),
-                                onClick = {
-                                    AppHelper.relaunch(context)
-                                },
-                            )
-                        }
-                    } else {
-                        if (NetworkHelper.isVPNConnected(context)) {
-                            Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
-                        }
-                        if (!systemAlertWindow) {
-                            Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.system_alert_window_warning), AlertType.WARNING) {
-                                MiniOutlineButton(
-                                    text = stringResource(R.string.grant_permission),
-                                    onClick = {
-                                        sendEvent(RequestPermissionsEvent(Permission.SYSTEM_ALERT_WINDOW))
-                                    },
-                                )
+                        } else {
+                            if (isVPNConnected) {
+                                Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
                             }
-                        }
+                            if (!systemAlertWindow) {
+                                Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.system_alert_window_warning), AlertType.WARNING) {
+                                    MiniOutlineButton(
+                                        text = stringResource(R.string.grant_permission),
+                                        onClick = {
+                                            sendEvent(RequestPermissionsEvent(Permission.SYSTEM_ALERT_WINDOW))
+                                        },
+                                    )
+                                }
+                            }
 //                        if (showIgnoreOptimizeWarning) {
 //                            Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.optimized_batter_usage_warning), AlertType.WARNING) {
 //                                MiniOutlineButton(
@@ -282,83 +237,73 @@ fun WebSettingsPage(
 //                                )
 //                            }
 //                        }
+                        }
                     }
-                    DisplayText(
-                        description = stringResource(id = R.string.web_console_desc),
-                    )
-                }
-                item {
-                    PMainSwitch(
-                        title = stringResource(id = R.string.allow_remote_access_from_pc),
-                        activated = webConsole,
-                    ) {
-                        viewModel.enableWebConsole(context, it)
-                    }
-                    Spacer(modifier = Modifier.height(24.dp))
-                }
-                item {
-                    BlockRadioButton(
-                        selected = if (isHttps) 1 else 0,
-                        onSelected = { isHttps = it == 1 },
-                        itemRadioGroups =
-                        listOf(
-                            BlockRadioGroupButtonItem(
-                                text = "HTTP",
-                                onClick = {},
-                            ) {},
-                            BlockRadioGroupButtonItem(
-                                text = stringResource(R.string.advanced_https),
-                                onClick = {},
-                            ) {},
+                    PClickableText(
+                        text = fullText,
+                        clickTexts = listOf(
+                            VClickText(learnMore) {
+                                navController.navigate(RouteName.WEB_LEARN_MORE)
+                            }
                         ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                     )
-                    BrowserPreview(context, isHttps, httpPort, httpsPort, onEditPort = {
-                        portDialogVisible = true
-                    })
-                    if (isHttps) {
-                        Tips(text = stringResource(id = R.string.browser_https_error_tips))
-                    } else {
-                        Spacer(modifier = Modifier.height(16.dp))
+                }
+                item {
+                    VerticalSpace(dp = 8.dp)
+                    PMainSwitch(
+                        title = stringResource(id = mainViewModel.httpServerState.value.getTextId()),
+                        activated = webConsole,
+                        enable = !mainViewModel.httpServerState.value.isProcessing()
+                    ) {
+                        mainViewModel.enableHttpServer(context, it)
+                    }
+                }
+                if (webConsole) {
+                    item {
+                        VerticalSpace(dp = 16.dp)
+                        PCard {
+                            WebAddress(context)
+                            VerticalSpace(dp = 16.dp)
+                        }
                     }
                 }
                 item {
-                    PListItem(
-                        title = if (passwordType == PasswordType.NONE.value) stringResource(id = R.string.password_type_none) else stringResource(R.string.password),
-                        value = if (passwordType == PasswordType.NONE.value) "" else password,
-                        onClick = {
-                            navController.navigate(RouteName.PASSWORD)
-                        },
-                        showMore = true,
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    VerticalSpace(dp = 16.dp)
                     Subtitle(
                         text = stringResource(R.string.permissions),
                     )
                 }
-                items(permissionList) { m ->
+                itemsIndexed(permissionList) { index, m ->
                     val permission = m.permission
                     if (permission == Permission.NONE) {
                         VerticalSpace(dp = 16.dp)
-                        PListItem(
-                            icon = m.icon,
-                            title = permission.getText(),
-                            showMore = true,
-                            onClick = {
-                                val intent =
-                                    Intent(
-                                        if (context.isTV()) Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS else Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                    )
-                                intent.addCategory(Intent.CATEGORY_DEFAULT)
-                                intent.data = Uri.fromParts("package", context.packageName, null)
-                                if (intent.resolveActivity(packageManager) != null) {
-                                    context.startActivity(intent)
-                                } else {
-                                    DialogHelper.showMessage(R.string.not_supported_error)
-                                }
-                            },
-                        )
+                        PCard {
+                            PListItem(
+                                icon = m.icon,
+                                title = permission.getText(),
+                                showMore = true,
+                                onClick = {
+                                    val intent =
+                                        Intent(
+                                            if (context.isTV()) Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS else Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                        )
+                                    intent.addCategory(Intent.CATEGORY_DEFAULT)
+                                    intent.data = Uri.fromParts("package", context.packageName, null)
+                                    if (intent.resolveActivity(packageManager) != null) {
+                                        context.startActivity(intent)
+                                    } else {
+                                        DialogHelper.showMessage(R.string.not_supported_error)
+                                    }
+                                },
+                            )
+                        }
                     } else {
                         PListItem(
+                            modifier = PlainTheme.getCardModifier(index = index, size = permissionList.size - 1),
                             icon = m.icon,
                             title = permission.getText(),
                             desc =
@@ -399,146 +344,5 @@ fun WebSettingsPage(
                 }
             }
         })
-
-        RadioDialog(
-            visible = portDialogVisible,
-            title = stringResource(if (isHttps) R.string.https_port else R.string.http_port),
-            options =
-            (if (isHttps) HttpServerManager.httpsPorts else HttpServerManager.httpPorts).map {
-                RadioDialogOption(
-                    text = it.toString(),
-                    selected = if (isHttps) it == httpsPort else it == httpPort,
-                ) {
-                    scope.launch(Dispatchers.IO) {
-                        if (isHttps) {
-                            HttpsPortPreference.putAsync(context, it)
-                        } else {
-                            HttpPortPreference.putAsync(context, it)
-                        }
-                    }
-                    MaterialAlertDialogBuilder(context)
-                        .setTitle(R.string.restart_app_title)
-                        .setMessage(R.string.restart_app_message)
-                        .setPositiveButton(R.string.relaunch_app) { _, _ ->
-                            AppHelper.relaunch(context)
-                        }
-                        .setCancelable(false)
-                        .create()
-                        .show()
-                }
-            },
-        ) {
-            portDialogVisible = false
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun BrowserPreview(
-    context: Context,
-    isHttps: Boolean,
-    httpPort: Int,
-    httpsPort: Int,
-    onEditPort: () -> Unit,
-) {
-    val ip4 = remember { NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" } }
-    val ip4s = remember { NetworkHelper.getDeviceIP4s().filter { it != ip4 } }
-    val showContextMenu = remember { mutableStateOf(false) }
-    val defaultUrl = "${if (isHttps) "https" else "http"}://$ip4:${if (isHttps) httpsPort else httpPort}"
-    Column(
-        modifier =
-        Modifier
-            .padding(horizontal = 16.dp)
-            .background(
-                color = MaterialTheme.colorScheme.cardBack(),
-                shape = RoundedCornerShape(16.dp),
-            ),
-    ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.canvas(),
-                    shape = RoundedCornerShape(8.dp),
-                ),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            SelectionContainer {
-                ClickableText(
-                    text = AnnotatedString(defaultUrl),
-                    modifier = Modifier.padding(start = 16.dp),
-                    style =
-                    TextStyle(
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontSize = 16.sp,
-                    ),
-                    onClick = {
-                        val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), defaultUrl)
-                        clipboardManager.setPrimaryClip(clip)
-                        DialogHelper.showConfirmDialog(context, "", context.getString(R.string.copied_to_clipboard_format, defaultUrl))
-                    },
-                )
-            }
-            PIconButton(
-                imageVector = Icons.Rounded.Edit,
-                modifier =
-                Modifier
-                    .height(16.dp)
-                    .width(16.dp),
-                contentDescription = stringResource(id = R.string.edit),
-                tint = MaterialTheme.colorScheme.onSurface,
-                onClick = {
-                    onEditPort()
-                },
-            )
-            if (ip4s.isNotEmpty()) {
-                Spacer(modifier = Modifier.weight(1f))
-                Box(
-                    modifier =
-                    Modifier
-                        .wrapContentSize(Alignment.TopEnd),
-                ) {
-                    PIconButton(
-                        imageVector = Icons.Rounded.MoreVert,
-                        modifier =
-                        Modifier
-                            .height(16.dp)
-                            .width(16.dp),
-                        contentDescription = stringResource(id = R.string.more),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        onClick = {
-                            showContextMenu.value = true
-                        },
-                    )
-                    PDropdownMenu(
-                        expanded = showContextMenu.value,
-                        onDismissRequest = { showContextMenu.value = false },
-                    ) {
-                        ip4s.forEach { ip ->
-                            val url = "${if (isHttps) "https" else "http"}://$ip:${if (isHttps) httpsPort else httpPort}"
-                            DropdownMenuItem(text = { Text(url) }, onClick = {
-                                showContextMenu.value = false
-                                val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), url)
-                                clipboardManager.setPrimaryClip(clip)
-                                DialogHelper.showConfirmDialog(context, "", context.getString(R.string.copied_to_clipboard_format, url))
-                            })
-                        }
-                    }
-                }
-            }
-        }
-        Text(
-            modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            text = stringResource(id = R.string.enter_this_address_tips),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(modifier = Modifier.height(24.dp))
     }
 }

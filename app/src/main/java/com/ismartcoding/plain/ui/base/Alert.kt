@@ -39,16 +39,7 @@ fun Alert(
     type: AlertType,
     actions: (@Composable RowScope.() -> Unit)? = null,
 ) {
-    Column(
-        modifier =
-        Modifier
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 0.dp)
-            .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.cardBack(),
-                shape = RoundedCornerShape(16.dp),
-            ),
-    ) {
+    PCard {
         Row(
             modifier = Modifier
                 .padding(16.dp)
@@ -87,4 +78,5 @@ fun Alert(
             }
         }
     }
+    VerticalSpace(dp = 16.dp)
 }

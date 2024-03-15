@@ -2,6 +2,20 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">आपके डिवाइस पर वर्तमान में आपका VPN सक्रिय है, जिससे PC से एक्सेस करते समay वेब कनेक्शन समस्याएँ उत्पन्न हो सकती हैं। इसे हल करने के लिए, हम सुझाव देते हैं कि आप अपने VPN सेटिंग्स को LAN ट्रैफ़िक की अनुमति देने या अपने VPN को अक्षम करने के लिए समायोजित करें।</string>
     <string name="warning">चेतावनी</string>
+    <string name="storage_permission_confirm">अब बस एक कदम दूरी पर है! वेब के माध्यम से अपने फ़ोन फ़ाइलों को आसानी से प्रबंधित करने के लिए कृपया स्टोरेज अनुमति सक्षम करें।</string>
+    <string name="instruction_for_use">उपयोग के निर्देश</string>
+    <string name="web_how_to">चरण 1: अपने फोन और कंप्यूटर को समान वायरलेस नेटवर्क से जोड़ें।\n\nविधि 1: अपने कंप्यूटर और फोन को समान वाई-फाई नेटवर्क से जोड़ें।\nविधि 2: अपने फोन का हॉटस्पॉट चालू करें और कंप्यूटर को फोन के हॉटस्पॉट से जोड़ें।\n\nचरण 2: अपने कंप्यूटर पर एक वेब ब्राउज़र खोलें और एपीपी होमपेज पर प्रदर्शित वेब पता दर्ज करें।</string>
+    <string name="web_dig">1. कंप्यूटर ब्राउज़र वेब पृष्ठ को नहीं खोल सकता।\n\nवायरलेस राउटर में एपी आइसोलेशन सक्रिय हो सकता है, जिससे कंप्यूटर और फोन के बीच संचार बाधित होता है। कृपया एपी आइसोलेशन कार्य को निष्क्रिय करने के लिए राउटर सेटिंग्स इंटरफेस पर जाएं।\n\n2. कंप्यूटर ब्राउज़र एक HTTPS वेब पृष्ठ पता दर्ज करने के बाद चेतावनी दिखाता है: "आपका कनेक्शन निजी नहीं है।"\n\nआप "आगे बढ़ें x.x.x.x (असुरक्षित)" पर क्लिक करके आगे बढ़ सकते हैं। सिम्पल वेबसाइट को एन्क्रिप्ट करने के लिए एक स्व-साइन किए गए TLS प्रमाणपत्र का उपयोग करता है।</string>
+    <string name="learn_more">अधिक जानें…</string>
+    <string name="http_server_state_on">सेवा चल रही है</string>
+    <string name="http_server_state_starting">सेवा शुरू हो रही है...</string>
+    <string name="http_server_state_stopping">सेवा बंद हो रही है...</string>
+    <string name="http_server_state_error">प्रारंभ विफल हुआ</string>
+    <string name="change_port">पोर्ट बदलें</string>
+    <string name="start_service">सेवा शुरू करें</string>
+    <string name="stop_service">सेवा बंद करें</string>
+    <string name="run">चलाएं</string>
+    <string name="troubleshoot">समस्या समाधान करें</string>
     <string name="open_with_other_app">अन्य एप्लिकेशन के साथ खोलें</string>
     <string name="unknown_file_description">PlainApp वर्तमान में इस प्रकार के फ़ाइल खोलने का समर्थन नहीं करता है। आप इसे खोलने के लिए एक अन्य ऐप का उपयोग कर सकते हैं।</string>
     <string name="generate_password">पासवर्ड बनाएं</string>
@@ -10,7 +24,6 @@
     <string name="terms_of_use">उपयोग की शर्तें</string>
     <string name="grant_permission">अनुमति प्रदान करें</string>
     <string name="system_alert_window_warning">‘अन्य एप्लिकेशन्स पर प्रदर्शन’ अनुमति देना अत्यंत आवश्यक है। इस अनुमति के बिना, यदि ऐप बैकग्राउंड में चल रहा है, तो आप एप्लिकेशन द्वारा उत्पन्न होने वाले महत्वपूर्ण सिस्टम डायलॉग, जैसे कि अनइंस्टॉल की पुष्टि करने वाले डायलॉग, को छू सकते हैं।</string>
-    <string name="advanced_https">एचटीटपीएस (उन्नत)</string>
     <string name="version_name_with_code">संस्करण {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">अद्यतित बैटरी उपयोग सतर्कता वर्तमान में सक्रिय है। अविघातित प्रदर्शन सुनिश्चित करने के लिए, कृपया इस एप्लिकेशन के लिए विशेष रूप से बैटरी अनुकूलन को अक्षम करने का विचार करें।</string>
     <string name="apps">ऐप्स</string>
@@ -24,7 +37,6 @@
     <string name="sdk">लक्ष्य: {{ target }}, न्यूनतम: {{ min }}</string>
     <string name="installed_at">इंस्टॉल किया गया</string>
     <string name="app_size">एप्लिकेशन का आकार</string>
-    <string name="change_port">पोर्ट बदलें</string>
     <string name="user_app">उपयोगकर्ता ऐप</string>
     <string name="system_app">सिस्टम ऐप</string>
     <string name="large_heap">बड़ा ढेर</string>
@@ -320,7 +332,6 @@
     <string name="open_permission_settings">अनुमति सेटिंग्स खोलें</string>
     <string name="api_service_is_running">एपीआई सेवा चल रही है</string>
     <string name="screen_mirror_service_is_running">स्क्रीन मिरर सेवा चल रही है</string>
-    <string name="stop_service">सेवा बंद करें</string>
     <string name="cast">कास्ट करें</string>
     <string name="images">तस्वीरें</string>
     <string name="audios">ऑडियो</string>
@@ -452,7 +463,7 @@
     <string name="syncing_data_from_box">डेटा सिंक कर रहा है...बॉक्स से</string>
     <string name="sync_data_from_box">डेटा सिंक करें...बॉक्स से</string>
     <string name="syncing_all_feeds">सभी फ़ीड्स सिंक कर रहा है...</string>
-    <string name="syncing">सिंक कर रहा है...</string>
+    <string name="syncing">सिंक कर रहा है…</string>
     <string name="sync_failed">सिंक विफल हो गया</string>
     <string name="sync_feeds_from_server">सर्वर से फ़ीड्स सिंक करें</string>
     <string name="scan_needs_camera_warning">स्कैनर को कैमरा अनुमति की आवश्यकता है!</string>
@@ -473,10 +484,9 @@
     <string name="audio_notification_prompt">नोटिफिकेशन सेंटर में मीडिया नियंत्रण दिखाने के लिए, कृपया ऐप से पुश नोटिफिकेशन प्राप्त करने की अनुमति दें।</string>
     <string name="foreground_service_notification_prompt">कृपया इस ऐप को पृष्ठभूमि में चलने और महत्वपूर्ण फ़ंक्शन या सेवाओं की पेशेवरता के लिए सूचनाएँ दिखाने की अनुमति दें।</string>
     <string name="internal_storage">आंतरिक स्टोरेज</string>
-    <string name="recommended_https">HTTPS (सिफारिश की जाती है)</string>
-    <string name="enter_this_address_tips">कृपया अपने पीसी वेब ब्राउज़र में ऊपर दिए गए पते को दर्ज करें।</string>
+    <string name="enter_this_address_tips">अपने कंप्यूटर के ब्राउज़र में ऊपर दिए गए पते को डालें, यह सुनिश्चित करें कि आपका फोन और कंप्यूटर एक ही स्थानीय नेटवर्क में हैं।</string>
     <string name="last_visit_at">आखिरी बार दौरा किया गया</string>
-    <string name="web_console_desc">आपके पीसी और मोबाइल डिवाइस को एक ही सबनेट में होना चाहिए। अपने फोन के प्रदर्शन को अधिकतम करने के लिए, कृपया यूएसबी एडेप्टर को बिजली सेट पर लगाएं।</string>
+    <string name="web_console_desc">डेटा केबल की आवश्यकता के बिना कंप्यूटर के माध्यम से अपने फोन पर फोटो, वीडियो, फ़ाइलें, सूचनाएँ और अन्य डेटा का प्रबंधन करें।</string>
     <string name="fetch_content_automatically">स्वचालित रूप से सामग्री प्राप्त करें</string>
     <string name="app_restored">ऐप डेटा पुनः प्राप्त हो गया है, आपको ऐप को मजबूरी से बंद करना होगा और उसे फिर से नए रूप में शुरू करना होगा।</string>
     <string name="welcome_text">स्वागत है! आप इस पृष्ठ पर टेक्स्ट, चित्र, और वीडियो आसानी से भेज सकते हैं, और उन्हें अपने कंप्यूटर पर देख सकते हैं।\nअगर आपको कोई समस्या आती है, तो कृपया सहायता के लिए ismartcoding@gmail.com पर एक ईमेल भेजें या हमारे Discord चर्चा में शामिल हों: https://discord.gg/RQWcS6DEEe।</string>
@@ -494,6 +504,7 @@
     <string name="keep_screen_on">स्क्रीन चालित रखें</string>
     <string name="cast_mode">कास्ट मोड</string>
     <string name="my_phone">मेरा फोन</string>
+    <string name="file_transfer_assistant">फ़ाइल स्थानांतरण सहायक</string>
     <string name="back">वापस</string>
     <string name="wallpaper_colors">वॉलपेपर रंग</string>
     <string name="no_palettes">कोई पैलेट्स नहीं</string>

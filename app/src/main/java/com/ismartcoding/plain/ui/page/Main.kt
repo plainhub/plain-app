@@ -63,6 +63,7 @@ import com.ismartcoding.plain.ui.page.web.PasswordPage
 import com.ismartcoding.plain.ui.page.web.SessionsPage
 import com.ismartcoding.plain.ui.page.web.WebSettingsPage
 import com.ismartcoding.plain.ui.page.web.WebDevPage
+import com.ismartcoding.plain.ui.page.web.WebLearnMorePage
 import com.ismartcoding.plain.ui.page.web.WebSecurityPage
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
@@ -166,6 +167,7 @@ fun Main(viewModel: MainViewModel) {
                 RouteName.SCAN to { ScanPage(navController) },
                 RouteName.MEDIA_PREVIEW to { MediaPreviewPage(navController, sharedViewModel) },
                 RouteName.APPS to { AppsPage(navController) },
+                RouteName.WEB_LEARN_MORE to { WebLearnMorePage(navController) },
             ).forEach { (routeName, content) ->
                 slideHorizontallyComposable(routeName.name) {
                     content()

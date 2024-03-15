@@ -17,8 +17,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.formatName
-import com.ismartcoding.plain.ui.base.BlockOutlineButton
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.PBlockButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
@@ -60,7 +60,7 @@ fun BackupRestorePage(
                     VerticalSpace(dp = 56.dp)
                 }
                 item {
-                    BlockOutlineButton(
+                    PBlockButton(
                         text = stringResource(R.string.backup),
                         onClick = {
                             exportLauncher.launch(
@@ -73,7 +73,7 @@ fun BackupRestorePage(
                         },
                     )
                     Spacer(modifier = Modifier.height(40.dp))
-                    BlockOutlineButton(
+                    PBlockButton(
                         text = stringResource(R.string.restore),
                         onClick = {
                             restoreLauncher.launch(FilePickHelper.getPickFileIntent(false))

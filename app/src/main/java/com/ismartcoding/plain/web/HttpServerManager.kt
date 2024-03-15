@@ -1,21 +1,33 @@
 package com.ismartcoding.plain.web
 
 import android.content.Context
+import android.content.Intent
 import android.util.Base64
+import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JksHelper
 import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.data.HttpServerCheckResult
+import com.ismartcoding.plain.data.enums.HttpServerState
 import com.ismartcoding.plain.data.preference.PasswordPreference
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.SessionClientTsUpdate
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
-import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.features.HttpServerStateChangedEvent
+import com.ismartcoding.plain.helpers.UrlHelper
+import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.web.websocket.WebSocketSession
+import io.ktor.client.plugins.websocket.ws
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.engine.applicationEnvironment
 import io.ktor.server.engine.connector
@@ -24,6 +36,7 @@ import io.ktor.server.engine.sslConnector
 import io.ktor.server.netty.Netty
 import io.ktor.server.netty.NettyApplicationEngine
 import io.ktor.websocket.send
+import kotlinx.coroutines.delay
 import kotlinx.datetime.Instant
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -43,7 +56,6 @@ object HttpServerManager {
     val clientRequestTs = mutableMapOf<String, Long>()
     var httpServerError: String = ""
     val portsInUse = mutableSetOf<Int>()
-    var stoppedByUser = false
     val httpsPorts = setOf(8043, 8143, 8243, 8343, 8443, 8543, 8643, 8743, 8843, 8943)
     val httpPorts = setOf(8080, 8180, 8280, 8380, 8480, 8580, 8680, 8780, 8880, 8980)
 
@@ -51,6 +63,57 @@ object HttpServerManager {
         val password = CryptoHelper.randomPassword(6)
         PasswordPreference.putAsync(MainApp.instance, password)
         return password
+    }
+
+    suspend fun stopServiceAsync(context: Context) {
+        sendEvent(HttpServerStateChangedEvent(HttpServerState.STOPPING))
+        try {
+            val client = HttpClientManager.httpClient()
+            val r = client.get(UrlHelper.getShutdownUrl())
+            if (r.status == HttpStatusCode.Gone) {
+                LogCat.d("http server is stopped")
+            }
+        } catch (ex: Exception) {
+            LogCat.e(ex.toString())
+            ex.printStackTrace()
+        }
+        context.stopService(Intent(context, HttpServerService::class.java))
+        httpServerError = ""
+        portsInUse.clear()
+        sendEvent(HttpServerStateChangedEvent(HttpServerState.OFF))
+    }
+
+    suspend fun checkServerAsync(): HttpServerCheckResult {
+        var websocket = false
+        var http = false
+        var retry = 3
+        val client = HttpClientManager.httpClient()
+        while (retry-- > 0) {
+            try {
+                client.ws(urlString = UrlHelper.getWsTestUrl()) {
+                    val reason = this.closeReason.getCompleted()
+                    LogCat.d("closeReason: $reason")
+                    if (reason?.message == BuildConfig.APPLICATION_ID) {
+                        websocket = true
+                    }
+                }
+                retry = 0
+            } catch (ex: Exception) {
+                delay(1000)
+                ex.printStackTrace()
+                LogCat.e(ex.toString())
+            }
+        }
+
+        try {
+            val r = client.get(UrlHelper.getHealthCheckUrl())
+            http = r.bodyAsText() == BuildConfig.APPLICATION_ID
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            LogCat.e(ex.toString())
+        }
+
+        return HttpServerCheckResult(websocket, http)
     }
 
     private suspend fun passwordToToken(): ByteArray {
@@ -162,23 +225,5 @@ object HttpServerManager {
                 ),
             ),
         )
-    }
-
-    fun getErrorMessage(): String {
-        return if (portsInUse.isNotEmpty()) {
-            LocaleHelper.getStringF(
-                if (portsInUse.size > 1) {
-                    R.string.http_port_conflict_errors
-                } else {
-                    R.string.http_port_conflict_error
-                }, "port", portsInUse.joinToString(", ")
-            ) + " ($httpServerError)"
-        } else if (httpServerError.isNotEmpty()) {
-            LocaleHelper.getString(R.string.http_server_failed) + " ($httpServerError)"
-        } else if (stoppedByUser) {
-            LocaleHelper.getString(R.string.http_server_stopped)
-        } else {
-            ""
-        }
     }
 }

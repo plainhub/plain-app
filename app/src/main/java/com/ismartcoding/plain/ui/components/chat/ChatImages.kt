@@ -22,17 +22,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.size.Size
-import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.plain.db.DMessageImages
-import com.ismartcoding.plain.features.ChatItemClickEvent
 import com.ismartcoding.plain.ui.base.PAsyncImage
-import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.models.VChat
-import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 

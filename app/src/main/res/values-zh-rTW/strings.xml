@@ -2,6 +2,20 @@
     <string name="app_name">簡樸</string>
     <string name="vpn_web_conflict_warning">您的VPN目前在設備上啟用，這可能會導致從PC訪問時出現Web連接問題。為解決此問題，我們建議調整VPN設置以允許局域網流量或禁用VPN。</string>
     <string name="warning">警告</string>
+    <string name="storage_permission_confirm">再一步就完成了！請開啟存儲權限，以便您透過網頁輕鬆管理手機檔案。</string>
+    <string name="instruction_for_use">使用說明</string>
+    <string name="web_how_to">步驟1：將您的手機和電腦連接到同一個無線網路。\n\n方法1：將您的電腦和手機連接到同一個Wi-Fi網路。\n方法2：打開您手機的熱點，並將您的電腦連接到手機的熱點。\n\n步驟2：在您的電腦上開啟一個網頁瀏覽器，並輸入在應用程式首頁上顯示的網址。</string>
+    <string name="web_dig">1. 電腦瀏覽器無法開啟網頁。\n\n無線路由器可能已啟用AP隔離，阻止電腦與手機之間的通訊。 請前往路由器設置界面禁用AP隔離功能。\n\n2. 在輸入HTTPS網頁地址後，電腦瀏覽器顯示警告：“您的連線不是私密的。”\n\n您可以點擊“繼續前往x.x.x.x（不安全）”以繼續。 Simple使用自簽名的TLS憑證加密網站。</string>
+    <string name="learn_more">進一步了解…</string>
+    <string name="http_server_state_on">服務正在運行中</string>
+    <string name="http_server_state_starting">正在啟動服務…</string>
+    <string name="http_server_state_stopping">正在停止服務…</string>
+    <string name="http_server_state_error">啟動失敗</string>
+    <string name="change_port">更改端口</string>
+    <string name="start_service">啟動服務</string>
+    <string name="stop_service">停止服務</string>
+    <string name="run">運行</string>
+    <string name="troubleshoot">排除問題</string>
     <string name="open_with_other_app">使用其他應用程式開啟</string>
     <string name="unknown_file_description">簡樸目前不支援開啟此類型的檔案。您可以使用其他應用程式開啟它。</string>
     <string name="generate_password">生成密碼</string>
@@ -10,7 +24,6 @@
     <string name="terms_of_use">使用條款</string>
     <string name="grant_permission">授權</string>
     <string name="system_alert_window_warning">授予‘在其他應用程式上顯示’權限是至關重要的。如果沒有此權限，在應用程式在背景運行時，您可能會錯過由應用程式觸發的關鍵系統對話方塊，例如卸載確認對話方塊。</string>
-    <string name="advanced_https">HTTPS（高級）</string>
     <string name="version_name_with_code">版本 {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">優化電池使用目前已啟用。為確保不中斷效能，請考慮為此應用停用電池優化。</string>
     <string name="apps">應用</string>
@@ -24,7 +37,6 @@
     <string name="sdk">目標: {{ target }}, 最小: {{ min }}</string>
     <string name="installed_at">安裝時間</string>
     <string name="app_size">應用程式大小</string>
-    <string name="change_port">更改端口</string>
     <string name="user_app">用戶應用</string>
     <string name="system_app">系統應用</string>
     <string name="large_heap">大堆內存</string>
@@ -320,7 +332,6 @@
     <string name="open_permission_settings">打開系統權限設置</string>
     <string name="api_service_is_running">API服務運行中</string>
     <string name="screen_mirror_service_is_running">屏幕鏡像服務運行中</string>
-    <string name="stop_service">停止服務</string>
     <string name="cast">投屏</string>
     <string name="images">圖片</string>
     <string name="audios">音頻</string>
@@ -473,10 +484,9 @@
     <string name="audio_notification_prompt">為了在通知中心查看媒體控制，請允許該應用接收推送通知。</string>
     <string name="foreground_service_notification_prompt">請允許此應用在後台運行並顯示通知，以便提供必要的功能或服務。</string>
     <string name="internal_storage">內部存儲</string>
-    <string name="recommended_https">HTTPS（推薦）</string>
-    <string name="enter_this_address_tips">在您的電腦浏覽器中輸入以上地址。</string>
+    <string name="enter_this_address_tips">在電腦瀏覽器中輸入上述地址，請確保您的手機和電腦位於同一局域網中。</string>
     <string name="last_visit_at">最後訪問時間</string>
-    <string name="web_console_desc">您的電腦和手機必須在同一個子網中。為了最大化手機的性能，請將 USB 適配器連接到電源插座。</string>
+    <string name="web_console_desc">無需資料線即可透過電腦管理手機照片、影片、檔案、通知等資料。</string>
     <string name="fetch_content_automatically">自動拉取正文內容</string>
     <string name="app_restored">應用數據已經恢復，您需要重啟應用。</string>
     <string name="welcome_text">歡迎使用！您可以輕鬆地將文本、圖片和視頻發送到本頁面，並在您的電腦上查看。\n如果您遇到問題，請發送郵件至ismartcoding@gmail.com尋求幫助，或者加入Discord討論: https://discord.gg/RQWcS6DEEe。</string>
@@ -494,6 +504,7 @@
     <string name="keep_screen_on">保持屏幕常亮</string>
     <string name="cast_mode">投屏模式</string>
     <string name="my_phone">我的手機</string>
+    <string name="file_transfer_assistant">檔案傳輸助手</string>
     <string name="back">後退</string>
     <string name="wallpaper_colors">壁紙顏色</string>
     <string name="no_palettes">暫無色板</string>

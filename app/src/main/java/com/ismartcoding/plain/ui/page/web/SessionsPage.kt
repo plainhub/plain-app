@@ -34,8 +34,10 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NoDataColumn
+import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
@@ -84,8 +86,8 @@ fun SessionsPage(
                                 Text(
                                     text = stringResource(R.string.last_visit_at) + " " + m.updatedAt.formatDateTime(),
                                     modifier =
-                                        Modifier
-                                            .weight(1f),
+                                    Modifier
+                                        .weight(1f),
                                     color = MaterialTheme.colorScheme.primary,
                                     style = MaterialTheme.typography.labelLarge,
                                 )
@@ -99,20 +101,11 @@ fun SessionsPage(
                                     }
                                 }
                             }
-                            Column(
-                                modifier =
-                                    Modifier
-                                        .padding(horizontal = 16.dp)
-                                        .fillMaxWidth()
-                                        .background(
-                                            color = MaterialTheme.colorScheme.cardBack(),
-                                            shape = RoundedCornerShape(16.dp),
-                                        ),
-                            ) {
+                            PCard {
                                 Column(
                                     modifier =
-                                        Modifier
-                                            .padding(16.dp, 16.dp, 16.dp, 8.dp),
+                                    Modifier
+                                        .padding(16.dp, 16.dp, 16.dp, 8.dp),
                                 ) {
                                     SubItem(R.string.client_id, m.clientId)
                                     SubItem(R.string.ip_address, m.clientIP)
@@ -123,19 +116,19 @@ fun SessionsPage(
                                         R.string.status,
                                         stringResource(
                                             id =
-                                                if (HttpServerManager.wsSessions.any {
-                                                        it.clientId == m.clientId
-                                                    }
-                                                ) {
-                                                    R.string.online
-                                                } else {
-                                                    R.string.offline
-                                                },
+                                            if (HttpServerManager.wsSessions.any {
+                                                    it.clientId == m.clientId
+                                                }
+                                            ) {
+                                                R.string.online
+                                            } else {
+                                                R.string.offline
+                                            },
                                         ),
                                     )
                                 }
                             }
-                            Spacer(modifier = Modifier.height(16.dp))
+                            VerticalSpace(dp = 16.dp)
                         }
                         item {
                             BottomSpace()

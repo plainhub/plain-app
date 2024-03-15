@@ -147,7 +147,7 @@ object HttpModule {
         }
 
         intercept(ApplicationCallPipeline.Plugins) {
-            if (HttpServerManager.stoppedByUser) {
+            if (!TempData.webEnabled) {
                 call.respond(HttpStatusCode.NotFound)
                 return@intercept finish()
             }

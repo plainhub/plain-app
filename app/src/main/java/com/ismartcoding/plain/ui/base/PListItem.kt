@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.base
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -62,7 +64,7 @@ fun PListItem(
             modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp, 8.dp, 8.dp, 8.dp),
+                .padding(16.dp, 4.dp, 8.dp, 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (icon != null) {

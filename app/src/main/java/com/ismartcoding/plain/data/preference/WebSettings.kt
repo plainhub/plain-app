@@ -11,8 +11,6 @@ import kotlinx.coroutines.flow.map
 data class WebSettings(
     val passwordType: Int,
     val password: String,
-    val httpPort: Int,
-    val httpsPort: Int,
     val authTwoFactor: Boolean,
     val authDevToken: String,
     val apiPermissions: Set<String>,
@@ -20,8 +18,6 @@ data class WebSettings(
 
 val LocalPasswordType = compositionLocalOf { PasswordTypePreference.default }
 val LocalPassword = compositionLocalOf { PasswordPreference.default }
-val LocalHttpPort = compositionLocalOf { HttpPortPreference.default }
-val LocalHttpsPort = compositionLocalOf { HttpsPortPreference.default }
 val LocalAuthTwoFactor = compositionLocalOf { AuthTwoFactorPreference.default }
 val LocalApiPermissions = compositionLocalOf { ApiPermissionsPreference.default }
 val LocalAuthDevToken = compositionLocalOf { AuthDevTokenPreference.default }
@@ -33,8 +29,6 @@ fun WebSettingsProvider(content: @Composable () -> Unit) {
         WebSettings(
             passwordType = PasswordTypePreference.default,
             password = PasswordPreference.default,
-            httpPort = HttpPortPreference.default,
-            httpsPort = HttpsPortPreference.default,
             authTwoFactor = AuthTwoFactorPreference.default,
             authDevToken = AuthDevTokenPreference.default,
             apiPermissions = ApiPermissionsPreference.default,
@@ -45,8 +39,6 @@ fun WebSettingsProvider(content: @Composable () -> Unit) {
                 WebSettings(
                     passwordType = PasswordTypePreference.get(it),
                     password = PasswordPreference.get(it),
-                    httpPort = HttpPortPreference.get(it),
-                    httpsPort = HttpsPortPreference.get(it),
                     authTwoFactor = AuthTwoFactorPreference.get(it),
                     authDevToken = AuthDevTokenPreference.get(it),
                     apiPermissions = ApiPermissionsPreference.get(it),
@@ -59,8 +51,6 @@ fun WebSettingsProvider(content: @Composable () -> Unit) {
     CompositionLocalProvider(
         LocalPasswordType provides settings.passwordType,
         LocalPassword provides settings.password,
-        LocalHttpPort provides settings.httpPort,
-        LocalHttpsPort provides settings.httpsPort,
         LocalAuthTwoFactor provides settings.authTwoFactor,
         LocalAuthDevToken provides settings.authDevToken,
         LocalApiPermissions provides settings.apiPermissions,

@@ -29,13 +29,7 @@ fun ChatTextPage(
     sharedViewModel: SharedViewModel,
 ) {
     val context = LocalContext.current
-    val text =
-        sharedViewModel.chatContent.value.linkify(
-            SpanStyle(
-                color = MaterialTheme.colorScheme.primary,
-                textDecoration = TextDecoration.Underline,
-            ),
-        )
+    val text = sharedViewModel.chatContent.value.linkify()
     PScaffold(
         navController,
         content = {

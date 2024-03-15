@@ -2,6 +2,20 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Ihr VPN ist derzeit auf Ihrem Gerät aktiviert, was potenziell zu Webverbindungsproblemen führen kann, wenn es von Ihrem PC aus zugegriffen wird. Um dies zu lösen, empfehlen wir Ihnen, Ihre VPN-Einstellungen anzupassen, um LAN-Verkehr zuzulassen oder Ihr VPN zu deaktivieren.</string>
     <string name="warning">Warnung</string>
+    <string name="storage_permission_confirm">Fast geschafft! Bitte aktivieren Sie die Speicherberechtigung, um Ihre Telefondateien über das Web einfach verwalten zu können.</string>
+    <string name="instruction_for_use">Gebrauchsanweisung</string>
+    <string name="web_how_to">Schritt 1: Verbinden Sie Ihr Telefon und Ihren Computer mit demselben drahtlosen Netzwerk.\n\nMethode 1: Verbinden Sie Ihren Computer und Ihr Telefon mit demselben WLAN-Netzwerk.\nMethode 2: Schalten Sie den Hotspot Ihres Telefons ein und verbinden Sie Ihren Computer mit dem Hotspot Ihres Telefons.\n\nSchritt 2: Öffnen Sie einen Webbrowser auf Ihrem Computer und geben Sie die auf der APP-Startseite angezeigte Webadresse ein.</string>
+    <string name="web_dig">1. Der Computerbrowser kann die Webseite nicht öffnen.\n\nDer drahtlose Router kann die AP-Isolation aktiviert haben, was die Kommunikation zwischen dem Computer und dem Telefon verhindert. Gehen Sie bitte zur Router-Einstellungsschnittstelle, um die AP-Isolationsfunktion zu deaktivieren.\n\n2. Der Computerbrowser zeigt eine Warnung an, nachdem Sie eine HTTPS-Webseitenadresse eingegeben haben: "Ihre Verbindung ist nicht privat."\n\nSie können auf "Fortfahren zu x.x.x.x (unsicher)" klicken, um fortzufahren. Einfach verwendet ein selbstsigniertes TLS-Zertifikat, um die Website zu verschlüsseln.</string>
+    <string name="learn_more">Weitere Informationen…</string>
+    <string name="http_server_state_on">Dienst läuft</string>
+    <string name="http_server_state_starting">Dienst wird gestartet...</string>
+    <string name="http_server_state_stopping">Dienst wird gestoppt...</string>
+    <string name="http_server_state_error">Start fehlgeschlagen</string>
+    <string name="change_port">Port ändern</string>
+    <string name="start_service">Dienst starten</string>
+    <string name="stop_service">Dienst stoppen</string>
+    <string name="run">Ausführen</string>
+    <string name="troubleshoot">Fehlerbehebung</string>
     <string name="open_with_other_app">Mit anderer App öffnen</string>
     <string name="unknown_file_description">PlainApp unterstützt derzeit nicht das Öffnen dieses Dateityps. Sie können eine andere App verwenden, um sie zu öffnen.</string>
     <string name="generate_password">Passwort generieren</string>
@@ -10,7 +24,6 @@
     <string name="terms_of_use">Nutzungsbedingungen</string>
     <string name="grant_permission">Berechtigung erteilen</string>
     <string name="system_alert_window_warning">Die Gewährung der \'Über anderen Apps anzeigen\'-Berechtigung ist unerlässlich. Ohne diese Berechtigung könnten bei laufender App im Hintergrund wichtige Systemdialoge, wie etwa Deinstallationsbestätigungsdialoge, übersehen werden.</string>
-    <string name="advanced_https">HTTPS (Fortgeschritten)</string>
     <string name="version_name_with_code">Version {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">Optimierte Batterienutzung ist derzeit aktiv. Um eine unterbrechungsfreie Leistung zu gewährleisten, erwägen Sie bitte, die Batterieoptimierung speziell für diese App zu deaktivieren.</string>
     <string name="apps">Apps</string>
@@ -24,7 +37,6 @@
     <string name="sdk">Ziel: {{ target }}, Min: {{ min }}</string>
     <string name="installed_at">Installiert am</string>
     <string name="app_size">App Größe</string>
-    <string name="change_port">Port ändern</string>
     <string name="user_app">Benutzer-App</string>
     <string name="system_app">System-App</string>
     <string name="large_heap">Großer Heap</string>
@@ -320,7 +332,6 @@
     <string name="open_permission_settings">Berechtigungseinstellungen öffnen</string>
     <string name="api_service_is_running">API-Dienst läuft</string>
     <string name="screen_mirror_service_is_running">Bildschirmspiegelungsdienst läuft</string>
-    <string name="stop_service">Dienst stoppen</string>
     <string name="cast">Übertragen</string>
     <string name="images">Bilder</string>
     <string name="audios">Audio</string>
@@ -473,10 +484,9 @@
     <string name="audio_notification_prompt">Um die Mediasteuerungen im Benachrichtigungscenter anzuzeigen, gewähren Sie bitte die Berechtigung zum Empfang von Push-Benachrichtigungen von der App.</string>
     <string name="foreground_service_notification_prompt">Bitte erlauben Sie dieser App, im Hintergrund ausgeführt zu werden und Benachrichtigungen anzuzeigen, um wesentliche Funktionen oder Dienste bereitzustellen.</string>
     <string name="internal_storage">Interner Speicher</string>
-    <string name="recommended_https">HTTPS (Empfohlen)</string>
-    <string name="enter_this_address_tips">Bitte geben Sie die oben genannte Adresse in Ihrem PC-Webbrowser ein.</string>
+    <string name="enter_this_address_tips">Geben Sie die obige Adresse in den Browser Ihres Computers ein und stellen Sie sicher, dass Ihr Telefon und Ihr Computer im selben lokalen Netzwerk sind.</string>
     <string name="last_visit_at">Zuletzt besucht um</string>
-    <string name="web_console_desc">Ihr PC und Ihr Mobilgerät müssen sich im gleichen Subnetz befinden. Um die Leistung Ihres Telefons zu maximieren, schließen Sie bitte den USB-Adapter an eine Stromquelle an.</string>
+    <string name="web_console_desc">Verwalten Sie Fotos, Videos, Dateien, Benachrichtigungen und andere Daten auf Ihrem Telefon über den Computer, ohne dass ein Datenkabel erforderlich ist.</string>
     <string name="fetch_content_automatically">Inhalt automatisch abrufen</string>
     <string name="app_restored">APP-Daten wurden wiederhergestellt. Sie müssen die App zwangsweise beenden und die App erneut als neu starten.</string>
     <string name="welcome_text">Willkommen! Sie können ganz einfach Text, Bilder und Videos auf dieser Seite senden und sie auf Ihrem Computer anzeigen.\nWenn Sie auf Probleme stoßen, senden Sie bitte eine E-Mail an ismartcoding@gmail.com, um Unterstützung zu erhalten, oder nehmen Sie an unserer Discord-Diskussion teil unter: https://discord.gg/RQWcS6DEEe.</string>
@@ -494,6 +504,7 @@
     <string name="keep_screen_on">Bildschirm eingeschaltet lassen</string>
     <string name="cast_mode">Gussmodus</string>
     <string name="my_phone">Mein Handy</string>
+    <string name="file_transfer_assistant">Dateiübertragungsassistent</string>
     <string name="back">Zurück</string>
     <string name="wallpaper_colors">Hintergrundfarben</string>
     <string name="no_palettes">Keine Paletten</string>

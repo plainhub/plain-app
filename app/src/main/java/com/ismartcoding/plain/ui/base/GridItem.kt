@@ -31,7 +31,6 @@ fun GridItem(
         modifier =
             modifier
                 .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.surface.copy(0.7f) onDark MaterialTheme.colorScheme.inverseOnSurface)
                 .clickable {
                     click()
                 },

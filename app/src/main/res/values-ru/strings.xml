@@ -2,6 +2,20 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Ваш VPN в настоящее время включен на вашем устройстве, что может потенциально привести к проблемам с веб-подключением при доступе с ПК. Для устранения этой проблемы мы рекомендуем настроить параметры вашего VPN для разрешения локального сетевого трафика или отключить ваш VPN.</string>
     <string name="warning">Предупреждение</string>
+    <string name="storage_permission_confirm">Почти готово! Пожалуйста, включите разрешение на хранение, чтобы легко управлять файлами телефона через веб.</string>
+    <string name="instruction_for_use">Инструкция по использованию</string>
+    <string name="web_how_to">Шаг 1: Подключите ваш телефон и компьютер к одной и той же беспроводной сети.\n\nМетод 1: Подключите ваш компьютер и телефон к одной и той же Wi-Fi сети.\nМетод 2: Включите хотспот на вашем телефоне и подключите ваш компьютер к хотспоту телефона.\n\nШаг 2: Откройте веб-браузер на вашем компьютере и введите веб-адрес, отображаемый на главной странице приложения.</string>
+    <string name="web_dig">1. Браузер компьютера не может открыть веб-страницу.\n\nБеспроводной маршрутизатор может иметь включенную изоляцию AP, что препятствует связи между компьютером и телефоном. Пожалуйста, перейдите на интерфейс настроек маршрутизатора, чтобы отключить функцию изоляции AP.\n\n2. Браузер компьютера отображает предупреждение после ввода адреса веб-страницы HTTPS: "Ваше соединение не является частным."\n\nВы можете нажать "Перейти к x.x.x.x (небезопасно)" для продолжения. Simple использует самоподписанный сертификат TLS для шифрования веб-сайта.</string>
+    <string name="learn_more">Узнать больше…</string>
+    <string name="http_server_state_on">Служба запущена</string>
+    <string name="http_server_state_starting">Запуск службы...</string>
+    <string name="http_server_state_stopping">Остановка службы...</string>
+    <string name="http_server_state_error">Не удалось запустить</string>
+    <string name="change_port">Изменить порт</string>
+    <string name="start_service">Запустить службу</string>
+    <string name="stop_service">Остановить службу</string>
+    <string name="run">Запустить</string>
+    <string name="troubleshoot">Устранить неполадки</string>
     <string name="open_with_other_app">Открыть с помощью другого приложения</string>
     <string name="unknown_file_description">PlainApp в настоящее время не поддерживает открытие этого типа файла. Вы можете использовать другое приложение для его открытия.</string>
     <string name="generate_password">Сгенерировать пароль</string>
@@ -10,7 +24,6 @@
     <string name="terms_of_use">Условия использования</string>
     <string name="grant_permission">Предоставить разрешение</string>
     <string name="system_alert_window_warning">Предоставление разрешения \'Показывать поверх других приложений\' является неотъемлемым. Без этого разрешения приложение, работающее в фоновом режиме, может пропустить важные системные диалоги, вызванные приложением, такие как диалоги подтверждения удаления.</string>
-    <string name="advanced_https">HTTPS (Расширенный)</string>
     <string name="version_name_with_code">Версия {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">Оптимизированное использование батареи в настоящее время активно. Для обеспечения бесперебойной работы рекомендуется отключить оптимизацию батареи именно для этого приложения.</string>
     <string name="apps">Приложения</string>
@@ -24,7 +37,6 @@
     <string name="sdk">Цель: {{ target }}, Мин: {{ min }}</string>
     <string name="installed_at">Установлено</string>
     <string name="app_size">Размер приложения</string>
-    <string name="change_port">Изменить порт</string>
     <string name="user_app">Пользовательское приложение</string>
     <string name="system_app">Системное приложение</string>
     <string name="large_heap">Большая куча</string>
@@ -320,7 +332,6 @@
     <string name="open_permission_settings">Открыть настройки разрешений</string>
     <string name="api_service_is_running">Служба API запущена</string>
     <string name="screen_mirror_service_is_running">Служба зеркального отображения экрана запущена</string>
-    <string name="stop_service">Остановить службу</string>
     <string name="cast">Транслировать</string>
     <string name="images">Изображения</string>
     <string name="audios">Аудио</string>
@@ -473,10 +484,9 @@
     <string name="audio_notification_prompt">Чтобы увидеть элементы управления мультимедийным воспроизведением в центре уведомлений, предоставьте разрешение на получение уведомлений от приложения.</string>
     <string name="foreground_service_notification_prompt">Пожалуйста, разрешите этому приложению работать в фоновом режиме и отображать уведомления для обеспечения важных функций или услуг.</string>
     <string name="internal_storage">Внутреннее хранилище</string>
-    <string name="recommended_https">HTTPS (Рекомендуется)</string>
-    <string name="enter_this_address_tips">Пожалуйста, введите вышеуказанный адрес в веб-браузере на вашем ПК.</string>
+    <string name="enter_this_address_tips">Введите вышеуказанный адрес в браузер вашего компьютера, убедившись, что ваш телефон и компьютер находятся в одной локальной сети.</string>
     <string name="last_visit_at">Последнее посещение в</string>
-    <string name="web_console_desc">Ваш ПК и мобильное устройство должны находиться в одной подсети. Для максимальной производительности вашего телефона подключите USB-адаптер к источнику питания.</string>
+    <string name="web_console_desc">Управляйте фотографиями, видео, файлами, уведомлениями и другими данными на своем телефоне через компьютер без необходимости использования кабеля для передачи данных.</string>
     <string name="fetch_content_automatically">Автоматически загружать контент</string>
     <string name="app_restored">Данные приложения восстановлены, вам нужно выйти из приложения и снова запустить его, как новое.</string>
     <string name="welcome_text">Добро пожаловать! Вы можете легко отправлять текст, изображения и видео на эту страницу и просматривать их на своем компьютере.\nЕсли у вас возникнут проблемы, не стесняйтесь отправить электронное письмо на адрес ismartcoding@gmail.com для получения помощи или присоединиться к нашей дискуссии в Discord по адресу: https://discord.gg/RQWcS6DEEe.</string>
@@ -494,6 +504,7 @@
     <string name="keep_screen_on">Не выключать экран</string>
     <string name="cast_mode">Режим передачи</string>
     <string name="my_phone">Мой телефон</string>
+    <string name="file_transfer_assistant">Помощник по передаче файлов</string>
     <string name="back">Назад</string>
     <string name="wallpaper_colors">Цвета обоев</string>
     <string name="no_palettes">Нет палитр</string>

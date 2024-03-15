@@ -2,6 +2,20 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Votre VPN est actuellement activé sur votre appareil, ce qui pourrait potentiellement entraîner des problèmes de connexion Web lorsqu\'il est accédé depuis un PC. Pour résoudre cela, nous vous recommandons d\'ajuster les paramètres de votre VPN pour autoriser le trafic LAN ou de désactiver votre VPN.</string>
     <string name="warning">Avertissement</string>
+    <string name="storage_permission_confirm">Presque terminé ! Veuillez autoriser l\'accès au stockage pour gérer facilement vos fichiers téléphoniques via le web.</string>
+    <string name="instruction_for_use">Instructions d\'utilisation</string>
+    <string name="web_how_to">Étape 1 : Connectez votre téléphone et votre ordinateur au même réseau sans fil.\n\nMéthode 1 : Connectez votre ordinateur et votre téléphone au même réseau Wi-Fi.\nMéthode 2 : Activez le point d\'accès de votre téléphone et connectez votre ordinateur au point d\'accès de votre téléphone.\n\nÉtape 2 : Ouvrez un navigateur web sur votre ordinateur et saisissez l\'adresse web affichée sur la page d\'accueil de l\'application.</string>
+    <string name="web_dig">1. Le navigateur de l\'ordinateur ne peut pas ouvrir la page web.\n\nLe routeur sans fil peut avoir l\'isolation AP activée, ce qui empêche la communication entre l\'ordinateur et le téléphone. Veuillez accéder à l\'interface de configuration du routeur pour désactiver la fonction d\'isolation AP.\n\n2. Le navigateur de l\'ordinateur affiche un avertissement après avoir saisi une adresse de page web HTTPS : "Votre connexion n\'est pas privée."\n\nVous pouvez cliquer sur "Continuer vers x.x.x.x (non sécurisé)" pour continuer. Simple utilise un certificat TLS auto-signé pour chiffrer le site web.</string>
+    <string name="learn_more">En savoir plus…</string>
+    <string name="http_server_state_on">Le service est en cours d\'exécution</string>
+    <string name="http_server_state_starting">Démarrage du service...</string>
+    <string name="http_server_state_stopping">Arrêt du service...</string>
+    <string name="http_server_state_error">Échec du démarrage</string>
+    <string name="change_port">Changer de port</string>
+    <string name="start_service">Démarrer le service</string>
+    <string name="stop_service">Arrêter le service</string>
+    <string name="run">Exécuter</string>
+    <string name="troubleshoot">Dépanner</string>
     <string name="open_with_other_app">Ouvrir avec une autre application</string>
     <string name="unknown_file_description">PlainApp ne prend pas en charge l\'ouverture de ce type de fichier pour le moment. Vous pouvez utiliser une autre application pour l\'ouvrir.</string>
     <string name="generate_password">Générer un mot de passe</string>
@@ -10,7 +24,6 @@
     <string name="terms_of_use">Conditions d\'utilisation</string>
     <string name="grant_permission">Accorder l\'autorisation</string>
     <string name="system_alert_window_warning">Accorder l\'autorisation \'Affichage par-dessus d\'autres applications\' est essentiel. Sans cette autorisation, si l\'application est en cours d\'exécution en arrière-plan, vous pourriez manquer des dialogues système cruciaux déclenchés par l\'application, tels que les dialogues de confirmation de désinstallation.</string>
-    <string name="advanced_https">HTTPS (Avancé)</string>
     <string name="version_name_with_code">Version {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">L\'optimisation de l\'utilisation de la batterie est actuellement active. Pour garantir des performances ininterrompues, veuillez envisager de désactiver l\'optimisation de la batterie spécifiquement pour cette application.</string>
     <string name="apps">Applications</string>
@@ -24,7 +37,6 @@
     <string name="sdk">Cible : {{ target }}, Min : {{ min }}</string>
     <string name="installed_at">Installé le</string>
     <string name="app_size">Taille de l\'application</string>
-    <string name="change_port">Changer de port</string>
     <string name="user_app">Application utilisateur</string>
     <string name="system_app">Application système</string>
     <string name="large_heap">Grand tas</string>
@@ -320,7 +332,6 @@
     <string name="open_permission_settings">Ouvrir les paramètres d\'autorisation</string>
     <string name="api_service_is_running">Le service API est en cours d\'exécution</string>
     <string name="screen_mirror_service_is_running">Le service de mise en miroir de l\'écran est en cours d\'exécution</string>
-    <string name="stop_service">Arrêter le service</string>
     <string name="cast">Diffuser</string>
     <string name="images">Images</string>
     <string name="audios">Audio</string>
@@ -473,10 +484,9 @@
     <string name="audio_notification_prompt">Pour afficher les commandes multimédias dans le centre de notifications, veuillez autoriser la réception des notifications push depuis l\'application.</string>
     <string name="foreground_service_notification_prompt">Veuillez autoriser cette application à s\'exécuter en arrière-plan et à afficher des notifications pour fournir des fonctionnalités ou des services essentiels.</string>
     <string name="internal_storage">Stockage interne</string>
-    <string name="recommended_https">HTTPS (Recommandé)</string>
-    <string name="enter_this_address_tips">Veuillez entrer l\'adresse ci-dessus dans le navigateur Web de votre PC.</string>
+    <string name="enter_this_address_tips">Entrez l\'adresse ci-dessus dans le navigateur de votre ordinateur, en vous assurant que votre téléphone et votre ordinateur sont sur le même réseau local.</string>
     <string name="last_visit_at">Dernière visite le</string>
-    <string name="web_console_desc">Votre PC et votre appareil mobile doivent être dans le même sous-réseau. Pour maximiser les performances de votre téléphone, veuillez connecter l\'adaptateur USB à une prise de courant.</string>
+    <string name="web_console_desc">Gérez les photos, vidéos, fichiers, notifications et autres données de votre téléphone via l\'ordinateur sans avoir besoin d\'un câble de données.</string>
     <string name="fetch_content_automatically">Récupération automatique du contenu</string>
     <string name="app_restored">Les données de l\'application sont restaurées, vous devez quitter l\'application de force et la redémarrer comme nouvelle.</string>
     <string name="welcome_text">Bienvenue ! Vous pouvez facilement envoyer du texte, des images et des vidéos sur cette page et les visualiser sur votre ordinateur.\nSi vous rencontrez des problèmes, n\'hésitez pas à envoyer un e-mail à ismartcoding@gmail.com pour obtenir de l\'aide ou rejoignez notre discussion sur Discord à l\'adresse : https://discord.gg/RQWcS6DEEe.</string>
@@ -494,6 +504,7 @@
     <string name="keep_screen_on">Garder l\'écran allumé</string>
     <string name="cast_mode">Mode de diffusion</string>
     <string name="my_phone">Mon téléphone</string>
+    <string name="file_transfer_assistant">Assistant de transfert de fichier</string>
     <string name="back">Retour</string>
     <string name="wallpaper_colors">Couleurs du fond d\'écran</string>
     <string name="no_palettes">Aucune palette</string>

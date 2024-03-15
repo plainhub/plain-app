@@ -30,6 +30,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ismartcoding.lib.channel.receiveEvent
+import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
@@ -38,13 +39,16 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.*
 import com.ismartcoding.plain.data.enums.AppChannelType
 import com.ismartcoding.plain.data.enums.ExportFileType
+import com.ismartcoding.plain.data.enums.HttpServerState
 import com.ismartcoding.plain.data.enums.Language
 import com.ismartcoding.plain.data.enums.PickFileTag
 import com.ismartcoding.plain.data.enums.PickFileType
 import com.ismartcoding.plain.data.preference.AgreeTermsPreference
+import com.ismartcoding.plain.data.preference.ApiPermissionsPreference
 import com.ismartcoding.plain.data.preference.KeepScreenOnPreference
 import com.ismartcoding.plain.data.preference.SettingsProvider
 import com.ismartcoding.plain.data.preference.SystemScreenTimeoutPreference
@@ -54,6 +58,7 @@ import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.bluetooth.BluetoothPermission
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getStringF
+import com.ismartcoding.plain.features.pkg.PackageHelper
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.ScreenHelper
 import com.ismartcoding.plain.helpers.UrlHelper
@@ -142,6 +147,11 @@ class MainActivity : AppCompatActivity() {
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        LogCat.d("onWindowFocusChanged: $hasFocus")
+        sendEvent(WindowFocusChangedEvent(hasFocus))
+    }
+
     @SuppressLint("ClickableViewAccessibility", "DiscouragedPrivateApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -181,36 +191,14 @@ class MainActivity : AppCompatActivity() {
                         showTermsAndPrivacyDialog(this@MainActivity)
                     }
                 } else {
-                    coMain {
-                        checkNotificationPermission()
+                    if (TempData.webEnabled) {
+                        viewModel.enableHttpServer(this@MainActivity, true)
                     }
+                    PackageHelper.cacheAppLabels()
+                    startService(Intent(this@MainActivity, NotificationListenerMonitorService::class.java))
                 }
-                startService(Intent(this@MainActivity, NotificationListenerMonitorService::class.java))
             } catch (ex: Exception) {
                 LogCat.e(ex.toString())
-            }
-        }
-    }
-
-    private fun checkNotificationPermission() {
-        val permission = Permission.POST_NOTIFICATIONS
-        val context = this@MainActivity
-        if (permission.can(context)) {
-            sendEvent(StartHttpServerEvent())
-        } else {
-            DialogHelper.showConfirmDialog(
-                context,
-                LocaleHelper.getString(R.string.confirm),
-                LocaleHelper.getString(R.string.foreground_service_notification_prompt)
-            ) {
-                coIO {
-                    Permissions.ensureNotificationAsync(context)
-                    while (!AppHelper.foregrounded()) {
-                        LogCat.d("Waiting for foreground")
-                        delay(800)
-                    }
-                    sendEvent(StartHttpServerEvent())
-                }
             }
         }
     }
@@ -225,6 +213,23 @@ class MainActivity : AppCompatActivity() {
     private fun initEvents() {
         receiveEvent<ShowMessageEvent> { event ->
             Toast.makeText(instance.get()!!, event.message, event.duration).show()
+        }
+
+        receiveEvent<HttpServerStateChangedEvent> {
+            viewModel.httpServerError.value = HttpServerManager.httpServerError
+            viewModel.httpServerState.value = it.state
+            if (it.state == HttpServerState.ON && !Permission.WRITE_EXTERNAL_STORAGE.can(this@MainActivity)) {
+                DialogHelper.showConfirmDialog(
+                    this@MainActivity,
+                    LocaleHelper.getString(R.string.confirm),
+                    LocaleHelper.getString(R.string.storage_permission_confirm)
+                ) {
+                    coIO {
+                        ApiPermissionsPreference.putAsync(this@MainActivity, Permission.WRITE_EXTERNAL_STORAGE, true)
+                        sendEvent(RequestPermissionsEvent(Permission.WRITE_EXTERNAL_STORAGE))
+                    }
+                }
+            }
         }
 
         receiveEvent<PermissionsResultEvent> { event ->
@@ -365,9 +370,10 @@ class MainActivity : AppCompatActivity() {
             .setTitle("温馨提示")
             .setCancelable(false)
             .setPositiveButton("同意并继续") { _, _ ->
-                checkNotificationPermission()
                 coIO {
                     AgreeTermsPreference.putAsync(context, true)
+                    PackageHelper.cacheAppLabels()
+                    startService(Intent(this@MainActivity, NotificationListenerMonitorService::class.java))
                 }
             }
             .setNegativeButton("不同意") { _, _ ->

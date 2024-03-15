@@ -7,25 +7,26 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.models.VClickText
 
 @Composable
 fun DisplayText(
     modifier: Modifier = Modifier,
     title: String = "",
     description: String = "",
+    clickTexts: List<VClickText> = listOf()
 ) {
     Column(
         modifier =
             modifier
                 .fillMaxWidth()
                 .padding(
-                    start = 16.dp,
-                    top = 24.dp,
-                    end = 16.dp,
-                    bottom = 24.dp,
+                    start = 24.dp,
+                    top = 0.dp,
+                    end = 24.dp,
+                    bottom = 16.dp,
                 ),
     ) {
         if (title.isNotEmpty()) {
@@ -40,11 +41,19 @@ fun DisplayText(
             )
         }
         if (description.isNotEmpty()) {
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            val style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+            if (clickTexts.isEmpty()) {
+                Text(
+                    text = description,
+                    style = style,
+                )
+            } else {
+                PClickableText(
+                    text = description,
+                    clickTexts,
+                    style = style,
+                )
+            }
         }
     }
 }

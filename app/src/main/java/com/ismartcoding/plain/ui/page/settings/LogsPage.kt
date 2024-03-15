@@ -19,14 +19,18 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.enums.ButtonType
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
-import com.ismartcoding.plain.ui.base.BlockOutlineButton
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.PBlockButton
+import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.LogsViewModel
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,37 +48,47 @@ fun LogsPage(
         content = {
             LazyColumn {
                 item {
-                    VerticalSpace(dp = 16.dp)
+                    TopSpace()
                 }
                 item {
-                    PListItem(
-                        title = stringResource(R.string.file_size),
-                        value = FormatHelper.formatBytes(fileSize),
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
-                    BlockOutlineButton(
-                        text = stringResource(R.string.share_logs),
-                        onClick = {
-                            if (fileSize == 0L) {
-                                DialogHelper.showMessage(getString(R.string.no_logs_error))
-                                return@BlockOutlineButton
-                            }
-                            viewModel.export(context)
-                        },
-                    )
-                    Spacer(modifier = Modifier.height(40.dp))
-                    BlockOutlineButton(
-                        text = stringResource(R.string.clear_logs),
-                        onClick = {
-                            DialogHelper.confirmToAction(context, R.string.confirm_to_clear_logs) {
-                                val dir = File(DiskLogFormatStrategy.getLogFolder(context))
-                                if (dir.exists()) {
-                                    dir.deleteRecursively()
+                    PCard {
+                        PListItem(
+                            title = stringResource(R.string.file_size),
+                            value = FormatHelper.formatBytes(fileSize),
+                        )
+                        if (fileSize > 0L) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            PBlockButton(
+                                text = stringResource(R.string.clear_logs),
+                                type = ButtonType.DANGER,
+                                onClick = {
+                                    DialogHelper.confirmToAction(context, R.string.confirm_to_clear_logs) {
+                                        val dir = File(DiskLogFormatStrategy.getLogFolder(context))
+                                        if (dir.exists()) {
+                                            dir.deleteRecursively()
+                                        }
+                                        fileSize = 0
+                                    }
+                                },
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                    }
+                }
+                item {
+                    if (fileSize > 0L) {
+                        Spacer(modifier = Modifier.height(24.dp))
+                        PBlockButton(
+                            text = stringResource(R.string.share_logs),
+                            onClick = {
+                                if (fileSize == 0L) {
+                                    DialogHelper.showMessage(getString(R.string.no_logs_error))
+                                    return@PBlockButton
                                 }
-                                fileSize = 0
-                            }
-                        },
-                    )
+                                viewModel.export(context)
+                            },
+                        )
+                    }
                     BottomSpace()
                 }
             }

@@ -24,30 +24,15 @@ fun TextCard(
     context: Context,
     text: String,
 ) {
-    Column(
-        modifier =
-            Modifier
-                .padding(horizontal = 16.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(
-                    color = MaterialTheme.colorScheme.cardBack(),
-                    shape = RoundedCornerShape(16.dp),
-                ),
-    ) {
+    PCard {
         Row(
             modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            val newText =
-                text.linkify(
-                    SpanStyle(
-                        color = MaterialTheme.colorScheme.primary,
-                        textDecoration = TextDecoration.Underline,
-                    ),
-                )
+            val newText = text.linkify()
             SelectionContainer {
                 ClickableText(
                     text = newText,

@@ -2,6 +2,20 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">உங்கள் உலாவியில் தற்போது VPN செல்லுபடி உள்ளது, இது பிரச்சனைகளைக் கொண்டுவரலாம் பாராட்டும் நேரத்தில். இதை தீர்மானிக்க, உங்கள் VPN அமைப்புகளை LAN பரிமாறத்தை அனுமதிக்க அல்லது உங்கள் VPN முடக்குதலை கொண்டுவிடுவதை பரிந்துரைக்கிறோம்.</string>
     <string name="warning">எச்சரிக்கை</string>
+    <string name="storage_permission_confirm">அருமையாகும்! உங்கள் தொலைபேசி கோப்புகளை இணையத்தில் எளிதாக நிர்வகிக்க சூழல் அனுமதியை செயல்படுத்துக.</string>
+    <string name="instruction_for_use">பயன்படுத்தும் விதிகள்</string>
+    <string name="web_how_to">படி 1: உங்கள் கைபேசி மற்றும் கணினியை ஒரே வாயர்லஸ் நெட்வொர்க்கில் இணைக்கவும்.\n\nமுறை 1: உங்கள் கணினியை மற்றும் உங்கள் கைபேசியை ஒரே Wi-Fi நெட்வொர்க்கில் இணைக்கவும்.\nமுறை 2: உங்கள் கைபேசின் ஹாட்ஸ்பாட்டை இயக்கி உங்கள் கணினியை கைபேசின் ஹாட்ஸ்பாட்டுக்கு இணைக்கவும்.\n\nபடி 2: உங்கள் கணினியில் ஒரு வலை உலாவி திறந்து அப்பிக்கேடு தளத்தில் காட்சிப்படும் வலை முகவரியை உள்ளிடுங்கள்.</string>
+    <string name="web_dig">1. கணினியின் உலாவி வலைப்பக்கம் திறக்க முடியவில்லை.\n\nவாயர்லஸ் ரூட்டரில் ஏபிகளை தடுக்கும் பாதிப்பு இயக்கப்பட்டுள்ளதாக இருக்கலாம், கணினி மற்றும் கைபேசி இடையே தொடர்பு கொள்ளும் படைப்பை தடுக்கின்றது. அபித் தடுக்கும் செயல்பாட்டை முடக்க ரூட்டர் அமைப்பு இடைமுகத்திற்கு செல்லுங்கள்.\n\n2. HTTPS வலைப்பக்க முகவரியை உள்ளிட்ட பிறகு, கணினி உலாவி பிரதி ஒரு எச்சரிக்கையைக் காட்டுகின்றது: "உங்கள் இணைப்பு தனியாக இல்லை."\n\n"தொடருக x.x.x.x (பாதிக்கப்படாதது)" என்பதைக் கிளிக் செய்யவும் தொடரலாம். சிம்பிள் வலைத்தளத்தை குறியீடு செய்வதற்கு தன்னியக்க பதிவு செய்யப்பட்ட TLS சான்றிதழைப் பயன்படுத்துகிறது.</string>
+    <string name="learn_more">மேலும் அறிக…</string>
+    <string name="http_server_state_on">சேவை இயங்குகின்றது</string>
+    <string name="http_server_state_starting">சேவை தொடங்குகிறது...</string>
+    <string name="http_server_state_stopping">சேவை நிறுத்தப்படுகிறது...</string>
+    <string name="http_server_state_error">தொடங்க முடியவில்லை</string>
+    <string name="change_port">போர்ட் மாற்றம்</string>
+    <string name="start_service">சேவை தொடங்கு</string>
+    <string name="stop_service">சேவை நிறுத்து</string>
+    <string name="run">இயக்கு</string>
+    <string name="troubleshoot">சிக்கல்களை தீர்க்க</string>
     <string name="open_with_other_app">மற்ற பயன்பாட்டுடன் திறக்கவும்</string>
     <string name="unknown_file_description">பிளேனப் தற்காலிகமாக இந்த வகையான கோப்பு திறக்க உதவியை வழங்கவில்லை. அதை திறக்க மற்றொரு பயன்பாட்டை பயன்படுத்தலாம்.</string>
     <string name="generate_password">கடவுச்சொல் உருவாக்கு</string>
@@ -10,7 +24,6 @@
     <string name="terms_of_use">பயன்பாடு விதிகள்</string>
     <string name="grant_permission">அனுமதி அளிக்கவும்</string>
     <string name="system_alert_window_warning">‘மற்ற பயன்பாடுகளின் மேல் காட்ட’ அனுமதி அளிக்குதல் முக்கியம். இந்த அனுமதி இல்லையின், பயன்பாடு பின்னர் ஓடி விடுகின்றதும், ஐப்பிள் உருவாக்கப்பட்ட குறுக்கேற்ற சிஸ்டம் டயலாக், உடைந்தது அனப்ரூபியேஷன் டயலாக் போன்றவற்றை விட நீங்கள் அவசியமாக காட்டாதல்.</string>
-    <string name="advanced_https">எசடிடபிஎஸ் (உயர்த்துதல்)</string>
     <string name="version_name_with_code">பதிப்பு {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">செயலில் பருவத்தை சீராக பயன்படுத்துவது தற்போது செயல்படுகின்றது. விரைவாக பரிசோதனை முடக்குவதற்கு, இந்த பயன்பாடுகளுக்கு குழுவியாக பருவத்தை சீராக பயன்படுத்துவதை பார்க்கவும்.</string>
     <string name="apps">பயன்பாடுகள்</string>
@@ -24,7 +37,6 @@
     <string name="sdk">இலக்கு: {{ target }}, குறைந்த: {{ min }}</string>
     <string name="installed_at">நிறுவப்பட்ட நேரம்</string>
     <string name="app_size">பயன்பாட்டின் அளவு</string>
-    <string name="change_port">போர்டை மாற்று</string>
     <string name="user_app">பயனர் பயன்பாடு</string>
     <string name="system_app">கணினி பயன்பாடு</string>
     <string name="large_heap">பெரிய தொகுப்பு</string>
@@ -320,7 +332,6 @@
     <string name="open_permission_settings">அனுமதி அமைப்புகளை திற</string>
     <string name="api_service_is_running">API சேவை செயல்பாடு நடக்கின்றது</string>
     <string name="screen_mirror_service_is_running">திரை மிரர் சேவை செயல்படுகின்றது</string>
-    <string name="stop_service">சேவை நிறுத்து</string>
     <string name="cast">அறிவிக்க</string>
     <string name="images">படங்கள்</string>
     <string name="audios">ஒலிகள்</string>
@@ -473,10 +484,9 @@
     <string name="audio_notification_prompt">அலைகள் மேலும் கட்டளைகளை பெற அனுமதியை கொடுங்கள், எனவே தயவுசெய்து அப்பில் இருந்து புஷ் அறிவிக்க அனுமதியை அளிக்க வேண்டும்.</string>
     <string name="foreground_service_notification_prompt">இந்த ஆப்ஸ் பின்னியின் இயல்புநிலையில் ஓடுவதும் அறிவிக்குவதும் பெற அனுமதிக்குத் தயவுசெய்து அனுமதியை கொடுங்கள்.</string>
     <string name="internal_storage">உள் சேமிப்பு</string>
-    <string name="recommended_https">HTTPS (பரிந்திருத்தமானது)</string>
-    <string name="enter_this_address_tips">தயவுசெய்து உங்கள் கணினி வலைப்பகுதியில் மேலும் கீழே குறிப்பிடப்பட்ட முகவரத்தை உள்ளிடவும்.</string>
+    <string name="enter_this_address_tips">உங்கள் கணினியின் உலாவியில் மேலே குறிப்பிட்ட முகவரியை உள்ளிடுக, உங்கள் போன் மற்றும் கணினியை ஒரே உள்ளாக்க வலிமையானதாக உறுதிப்படுத்துங்கள்.</string>
     <string name="last_visit_at">கடைசி பரிந்துரை</string>
-    <string name="web_console_desc">உங்கள் கணினி மற்றும் கைபேசி சாதாரண பின்வருமானத்தில் இருக்க வேண்டும். உங்கள் ஃபோனின் சுழற்சி அதிகபடுத்த கிடத்தை ஒரு விதிவிதி பின்செல்ல தயவுசெய்து USB எதிர்காலத்தில் ஏடக்குகொள்கின்றது.</string>
+    <string name="web_console_desc">டேட்டா கேபிள் தேவையற்று கணினியில் உங்கள் மொபைலில் புகைப்படங்கள், வீடியோகள், கோப்புகள், அறிவிப்புகள் மற்றும் பிற தரவுகளை மேலாண்மை செய்யுங்கள்.</string>
     <string name="fetch_content_automatically">கொண்டன பொருநர் தகவலை தானியங்கி எடு</string>
     <string name="app_restored">ஆப்லிகேஷன் தரவு மீட்கப்பட்டுள்ளது, இதை புரிந்திருக்க உங்கள் ஆப்லிகேஷனை புதுப்பிக்கவும்.</string>
     <string name="welcome_text">வரவேற்கிறோம்! நீங்கள் எளிதாக உங்கள் கணினியில் உருவாக்கப்பட்ட உரை, புகைப்படங்கள் மற்றும் காணொளிகளை அனுப்ப முடியும்.\nஏனெனில் உங்களிடம் ஏதும் பிரச்சினை ஏற்பட்டால், தயவுசெய்து உதவி பெற இஸ்மார்ட் கோடிங்குமின்றி மின்னஞ்சல் அனுப்பவும் அல்லது எங்கள் டிஸ்கார்ட் உரையில் இணைந்துகொள்கின்றது: https://discord.gg/RQWcS6DEEe.</string>
@@ -494,6 +504,7 @@
     <string name="keep_screen_on">திரையை நிரப்பிடு</string>
     <string name="cast_mode">பரிசு முறை</string>
     <string name="my_phone">என் போன்</string>
+    <string name="file_transfer_assistant">கோப்பு பரிமாற்ற உதவி</string>
     <string name="back">பின்</string>
     <string name="wallpaper_colors">வால்பேப்பர் பண்கள்</string>
     <string name="no_palettes">எந்த பாலட்டுகளும் இல்லை</string>
