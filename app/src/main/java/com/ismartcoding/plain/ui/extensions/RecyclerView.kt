@@ -242,9 +242,9 @@ suspend fun RecyclerView.updateDrawerMenuAsync(viewModel: FilesViewModel) {
         }
     }
     groups.add(
-        MenuItemModel(context.getExternalFilesDir(null)!!.absolutePath).apply {
+        MenuItemModel(FileSystemHelper.getExternalFilesDirPath(context)).apply {
             isChecked = viewModel.type == FilesType.APP
-            title = getString(R.string.app_name)
+            title = getString(R.string.file_transfer_assistant)
             iconId = R.drawable.ic_app_icon
         },
     )

@@ -29,6 +29,7 @@ import com.ismartcoding.lib.helpers.FormatHelper
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.ActionSourceType
+import com.ismartcoding.plain.data.enums.ExportFileType
 import com.ismartcoding.plain.data.preference.FileSortByPreference
 import com.ismartcoding.plain.data.preference.ShowHiddenFilesPreference
 import com.ismartcoding.plain.databinding.DialogFilesBinding
@@ -73,7 +74,7 @@ import java.io.File
 import kotlin.io.path.Path
 import kotlin.io.path.moveTo
 
-class FilesDialog : BaseDialog<DialogFilesBinding>() {
+class FilesDialog(val fileType: FilesType = FilesType.INTERNAL_STORAGE) : BaseDialog<DialogFilesBinding>() {
     val viewModel: FilesViewModel by viewModels()
 
     override fun onViewCreated(
@@ -81,7 +82,13 @@ class FilesDialog : BaseDialog<DialogFilesBinding>() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-
+        if (fileType == FilesType.APP) {
+            viewModel.root = FileSystemHelper.getExternalFilesDirPath(requireContext())
+            viewModel.breadcrumbs.clear()
+            viewModel.breadcrumbs.add(BreadcrumbItem(LocaleHelper.getString(R.string.file_transfer_assistant), viewModel.root))
+            viewModel.path = viewModel.root
+            viewModel.type = FilesType.APP
+        }
         updatePasteAction()
 
         binding.bottomAction.run {

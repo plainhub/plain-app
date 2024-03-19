@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.extensions.fullScreen
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.DialogPreviewBinding
 import com.ismartcoding.plain.ui.CastDialog
@@ -86,8 +87,9 @@ class PreviewDialog : DialogFragment() {
 
         val pagingData = PagingData.from(list)
         adapter.submitData(lifecycle, pagingData)
-        binding.viewer.setCurrentItem(list.indexOfFirst { it.id == initKey }, false)
-
+        coMain {
+            binding.viewer.setCurrentItem(list.indexOfFirst { it.id == initKey }, false)
+        }
         viewModel.viewerUserInputEnabled.observe(viewLifecycleOwner) {
             binding.viewer.isUserInputEnabled = it ?: true
         }

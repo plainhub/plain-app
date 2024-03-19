@@ -2,6 +2,16 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">আপনার ডিভাইসে সক্রিয় ভিপিএন আছে, যা একটি পিসি থেকে অ্যাক্সেস করার সময় ওয়েব সংযোগের সমস্যা উত্পন্ন করতে পারে। এটি সমাধান করতে, আমরা আপনাকে আপনার ভিপিএন সেটিংস পরিবর্তন করে এলএএন ট্র্যাফিক অনুমতি দেওয়া বা আপনার ভিপিএন নিষ্ক্রিয় করতে প্রস্তাবনা দিচ্ছি।</string>
     <string name="warning">সতর্কবার্তা</string>
+    <string name="no_results_found">কোনো ফলাফল পাওয়া যায়নি</string>
+    <string name="search">অনুসন্ধান</string>
+    <string name="attention">মনোযোগ</string>
+    <string name="recommendation">সুপারিশ</string>
+    <string name="usb_connect_recommendation">ইউএসবি চার্জিং কেবল সংযোগ করা নিশ্চিত করে যে ফোনটি জাগ্রত থাকে, অতএব যে কোনও আইনতন বা ব্যবহারের সিস্টেম দ্বারা এর কার্য সীমাবদ্ধ না হওয়ার জন্য।</string>
+    <string name="performance">কার্যক্ষমতা</string>
+    <string name="disable_battery_optimization">ব্যাটারি অপ্টিমাইজেশন নিষ্ক্রিয় করুন</string>
+    <string name="battery_optimization_disabled">ব্যাটারি অপ্টিমাইজেশন নিষ্ক্রিয় করা হয়েছে</string>
+    <string name="keep_awake">জাগরিত রাখুন</string>
+    <string name="keep_awake_tips">ডিফল্টভাবে, ইউএসবি চার্জিং সংযোগ করা হলে, ফোনটি জাগ্রত থাকে। এই অপশনটি চালু করা ফোনটি ইউএসবি চার্জিং সংযোগ না থাকলেও জাগ্রত রাখে, যাতে ব্যাটারি ব্যবহার বৃদ্ধি করা হতে পারে।</string>
     <string name="storage_permission_confirm">প্রায় সমাপ্ত! ওয়েব মাধ্যমে সহজেই ফোন ফাইলগুলি ব্যবস্থাপনা করতে আপনার স্টোরেজ অনুমতি সক্রিয় করুন।</string>
     <string name="instruction_for_use">ব্যবহারের নির্দেশ</string>
     <string name="web_how_to">ধাপ ১: আপনার ফোন এবং কম্পিউটারকে একই ওয়াইফাই নেটওয়ার্কে সংযুক্ত করুন।\n\nপদ্ধতি ১: আপনার কম্পিউটার এবং ফোনকে একই ওয়াইফাই নেটওয়ার্কে সংযুক্ত করুন।\nপদ্ধতি ২: আপনার ফোনের হটস্পট চালু করুন এবং কম্পিউটারকে ফোনের হটস্পটে সংযুক্ত করুন।\n\nধাপ ২: আপনার কম্পিউটারে একটি ওয়েব ব্রাউজার খুলুন এবং এপিপি হোমপেজে প্রদর্শিত ওয়েব ঠিকানাটি লিখুন।</string>
@@ -51,7 +61,7 @@
     <string name="http_server_ok">সার্ভার চালু হয়েছে</string>
     <string name="http_server_error">HTTP সার্ভার চালানো হয়নি। PlainApp পুনরায় চালিয়ে দেখুন এবং আবার চেষ্টা করুন। HTTP বা HTTPS পোর্ট দখল করা অন্য কোন অ্যাপস নেই সেটা নিশ্চিত করুন। সমস্যা অবিরত থাকলে, দয়া করে আইসমার্টকোডিং@gmail.com এ যোগাযোগ করে সমস্যার বিশদ বিবরণ সরবরাহ করুন।</string>
     <string name="relaunch_app">পুনরায় চালু করুন</string>
-    <string name="load_no_more">শেষ</string>
+    <string name="load_no_more">আরও ডেটা নেই</string>
     <string name="list_empty">তালিকা খালি</string>
     <string name="select_box_title">একটি বাক্স নির্বাচন করুন</string>
     <string name="add_new_box_button">বাক্স যোগ করুন</string>

@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun Tips(
     text: String,
-    modifier: Modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 8.dp),
+    modifier: Modifier = Modifier.padding(start = 32.dp, end = 24.dp, top = 8.dp),
 ) {
     SelectionContainer {
         Text(

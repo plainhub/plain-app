@@ -2,6 +2,16 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Su VPN está actualmente habilitado en su dispositivo, lo que podría provocar problemas de conexión web cuando se accede desde su PC. Para resolver esto, le recomendamos ajustar la configuración de su VPN para permitir el tráfico de LAN o desactivar su VPN.</string>
     <string name="warning">Advertencia</string>
+    <string name="no_results_found">No se encontraron resultados</string>
+    <string name="search">Buscar</string>
+    <string name="attention">Atención</string>
+    <string name="recommendation">Recomendación</string>
+    <string name="usb_connect_recommendation">Conectar el cable de carga USB asegura que el teléfono permanezca despierto, evitando así cualquier interceptación o restricción de sus funciones por parte del sistema.</string>
+    <string name="performance">Rendimiento</string>
+    <string name="disable_battery_optimization">Desactivar optimización de batería</string>
+    <string name="battery_optimization_disabled">La optimización de batería está desactivada</string>
+    <string name="keep_awake">Mantener despierto</string>
+    <string name="keep_awake_tips">Por defecto, cuando está conectado a la carga USB, el teléfono permanece despierto. Habilitar esta opción mantiene el teléfono despierto incluso cuando no está conectado a la carga USB, lo que puede resultar en un aumento del consumo de batería.</string>
     <string name="storage_permission_confirm">¡Casi terminamos! Por favor, habilite el permiso de almacenamiento para poder gestionar fácilmente sus archivos telefónicos a través de la web.</string>
     <string name="instruction_for_use">Instrucciones de uso</string>
     <string name="web_how_to">Paso 1: Conecta tu teléfono y tu computadora a la misma red inalámbrica.\n\nMétodo 1: Conecta tu computadora y tu teléfono a la misma red Wi-Fi.\nMétodo 2: Activa el hotspot de tu teléfono y conecta tu computadora al hotspot del teléfono.\n\nPaso 2: Abre un navegador web en tu computadora e ingresa la dirección web que se muestra en la página de inicio de la aplicación.</string>
@@ -51,7 +61,7 @@
     <string name="http_server_ok">Servidor HTTP iniciado</string>
     <string name="http_server_error">El servidor HTTP no está iniciado. Vuelve a abrir PlainApp e inténtalo de nuevo. Asegúrate de que no haya otras aplicaciones ocupando los puertos HTTP o HTTPS. Si el problema persiste, proporciona más detalles sobre el problema contactando a ismartcoding@gmail.com.</string>
     <string name="relaunch_app">Vuelve a abrir PlainApp</string>
-    <string name="load_no_more">Fin</string>
+    <string name="load_no_more">No hay más datos</string>
     <string name="list_empty">La lista está vacía</string>
     <string name="select_box_title">Seleccionar una caja</string>
     <string name="add_new_box_button">Añadir caja</string>

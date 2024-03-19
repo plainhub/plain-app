@@ -22,7 +22,7 @@ fun RefreshLayoutState.PullToRefreshContent() {
     Row(
         Modifier
             .fillMaxWidth()
-            .height(35.dp),
+            .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
     ) {

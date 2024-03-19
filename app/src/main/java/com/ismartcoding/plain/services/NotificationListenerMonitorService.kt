@@ -12,7 +12,7 @@ import com.ismartcoding.lib.logcat.LogCat
 class NotificationListenerMonitorService : Service() {
     override fun onCreate() {
         super.onCreate()
-        LogCat.d("onCreate() called")
+        LogCat.d("NotificationListenerMonitorService.onCreate() called")
         ensureCollectorRunning()
     }
 

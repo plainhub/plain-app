@@ -2,6 +2,16 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Your VPN is currently enabled on your device, which could potentially lead to web connection issues when accessed from PC. To resolve this, we recommend adjusting your VPN settings to allow LAN traffic or disabling your VPN.</string>
     <string name="warning">Warning</string>
+    <string name="search">Search</string>
+    <string name="no_results_found">No results found</string>
+    <string name="attention">Attention</string>
+    <string name="recommendation">Recommendation</string>
+    <string name="usb_connect_recommendation">Connecting the USB charging cable ensures that the phone remains awake, thus avoiding any interception or restriction of its functions by the system.</string>
+    <string name="performance">Performance</string>
+    <string name="disable_battery_optimization">Disable battery optimization</string>
+    <string name="battery_optimization_disabled">Battery optimization is disabled</string>
+    <string name="keep_awake">Keep awake</string>
+    <string name="keep_awake_tips">By default, when connected to USB charging, the phone remains awake. Enabling this option keeps the phone awake even when not connected to USB charging, potentially resulting in increased battery consumption.</string>
     <string name="storage_permission_confirm">Almost there! Please enable storage permission to easily manage your phone files via the web.</string>
     <string name="instruction_for_use">Instructions for use</string>
     <string name="web_how_to">Step 1: Connect your phone and computer to the same wireless network.\n\nMethod 1: Connect your computer and phone to the same Wi-Fi network.\nMethod 2: Turn on your phone\'s hotspot and connect your computer to the phone\'s hotspot.\n\nStep 2: Open a web browser on your computer and enter the web address displayed on the APP homepage.</string>
@@ -51,7 +61,7 @@
     <string name="http_server_ok">HTTP server is running well.</string>
     <string name="http_server_error">HTTP server is not started. Relaunch the PlainApp and try again.</string>
     <string name="relaunch_app">Relaunch APP</string>
-    <string name="load_no_more">End</string>
+    <string name="load_no_more">No more data</string>
     <string name="list_empty">List is empty</string>
     <string name="select_box_title">Select a box</string>
     <string name="add_new_box_button">Add box</string>

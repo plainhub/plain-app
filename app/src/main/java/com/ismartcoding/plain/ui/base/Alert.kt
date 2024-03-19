@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,9 +55,11 @@ fun Alert(
             HorizontalSpace(dp = 8.dp)
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.SemiBold
+                ),
                 textAlign = TextAlign.Start,
-                color = MaterialTheme.colorScheme.onSurface,
             )
         }
         Text(
@@ -64,8 +67,7 @@ fun Alert(
                 .padding(16.dp, 0.dp, 16.dp, 16.dp)
                 .fillMaxWidth(),
             text = description,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
         )
         if (actions != null) {
             Row(

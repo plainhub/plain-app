@@ -2,6 +2,16 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Ваш VPN в настоящее время включен на вашем устройстве, что может потенциально привести к проблемам с веб-подключением при доступе с ПК. Для устранения этой проблемы мы рекомендуем настроить параметры вашего VPN для разрешения локального сетевого трафика или отключить ваш VPN.</string>
     <string name="warning">Предупреждение</string>
+    <string name="no_results_found">Результатов не найдено</string>
+    <string name="search">Поиск</string>
+    <string name="attention">Внимание</string>
+    <string name="recommendation">Рекомендация</string>
+    <string name="usb_connect_recommendation">Подключение USB-кабеля для зарядки гарантирует, что телефон остается активным, тем самым избегая любого перехвата или ограничения его функций системой.</string>
+    <string name="performance">Производительность</string>
+    <string name="disable_battery_optimization">Отключить оптимизацию батареи</string>
+    <string name="battery_optimization_disabled">Оптимизация батареи отключена</string>
+    <string name="keep_awake">Держать активным</string>
+    <string name="keep_awake_tips">По умолчанию, когда подключено к USB-зарядке, телефон остается активным. Включение этой опции сохраняет активность телефона даже при отсутствии подключения к USB-зарядке, что может привести к увеличению расхода заряда батареи.</string>
     <string name="storage_permission_confirm">Почти готово! Пожалуйста, включите разрешение на хранение, чтобы легко управлять файлами телефона через веб.</string>
     <string name="instruction_for_use">Инструкция по использованию</string>
     <string name="web_how_to">Шаг 1: Подключите ваш телефон и компьютер к одной и той же беспроводной сети.\n\nМетод 1: Подключите ваш компьютер и телефон к одной и той же Wi-Fi сети.\nМетод 2: Включите хотспот на вашем телефоне и подключите ваш компьютер к хотспоту телефона.\n\nШаг 2: Откройте веб-браузер на вашем компьютере и введите веб-адрес, отображаемый на главной странице приложения.</string>
@@ -51,7 +61,7 @@
     <string name="http_server_ok">HTTP-сервер запущен</string>
     <string name="http_server_error">HTTP-сервер не запущен. Перезапустите PlainApp и попробуйте снова. Убедитесь, что нет других приложений, занимающих порты HTTP или HTTPS. Если проблема сохраняется, предоставьте более подробную информацию о проблеме, связавшись с ismartcoding@gmail.com.</string>
     <string name="relaunch_app">Перезапустите приложение</string>
-    <string name="load_no_more">Конец</string>
+    <string name="load_no_more">Больше нет данных</string>
     <string name="list_empty">Список пуст</string>
     <string name="select_box_title">Выберите ящик</string>
     <string name="add_new_box_button">Добавить ящик</string>

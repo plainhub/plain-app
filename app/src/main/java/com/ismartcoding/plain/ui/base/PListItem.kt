@@ -54,7 +54,8 @@ fun PListItem(
         modifier =
         modifier
             .combinedClickable(
-                onClick = onClick,
+                enabled = enable,
+                onClick =  onClick,
                 onLongClick = onLongClick,
             )
             .alpha(if (enable) 1f else 0.5f),
@@ -64,7 +65,7 @@ fun PListItem(
             modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp, 4.dp, 8.dp, 4.dp),
+                .padding(16.dp, 8.dp, 8.dp, 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (icon != null) {

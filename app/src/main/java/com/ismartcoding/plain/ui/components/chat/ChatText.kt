@@ -7,10 +7,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.db.DMessageText
+import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PClickableText
 import com.ismartcoding.plain.ui.base.linkify
 import com.ismartcoding.plain.ui.base.urlAt
@@ -23,13 +22,13 @@ fun ChatText(
     m: VChat,
     onDoubleClick: () -> Unit,
     onLongClick: () -> Unit,
-    ) {
+) {
     val text = (m.value as DMessageText).text.linkify()
     PClickableText(
         text = text,
         style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
         modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(16.dp)
             .fillMaxWidth(),
         onClick = { position ->
             focusManager.clearFocus()

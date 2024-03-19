@@ -40,6 +40,17 @@ fun WebLearnMorePage(navController: NavHostController) {
                         }
                         VerticalSpace(dp = 16.dp)
                     }
+                    item{
+                        Subtitle(text = stringResource(id = R.string.recommendation))
+                        PCard {
+                            Text(
+                                stringResource(id = R.string.usb_connect_recommendation),
+                                modifier = Modifier.padding(16.dp),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        }
+                        VerticalSpace(dp = 16.dp)
+                    }
                     item {
                         Subtitle(text = stringResource(id = R.string.troubleshoot))
                         PCard {

@@ -8,11 +8,16 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.preference.KeepAwakePreference
+import com.ismartcoding.plain.features.AcquireWakeLockEvent
 import com.ismartcoding.plain.features.IgnoreBatteryOptimizationEvent
+import com.ismartcoding.plain.features.ReleaseWakeLockEvent
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.powerManager
+import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.web.HttpServerManager
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class WebConsoleViewModel : ViewModel() {
@@ -45,6 +50,17 @@ class WebConsoleViewModel : ViewModel() {
         val packageName = BuildConfig.APPLICATION_ID
         if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
             sendEvent(IgnoreBatteryOptimizationEvent())
+        }
+    }
+
+    fun enableKeepAwake(context: Context, enable: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            KeepAwakePreference.putAsync(context, enable)
+            if (enable) {
+                sendEvent(AcquireWakeLockEvent())
+            } else if (!PlugInControlReceiver.isUSBConnected(context)) {
+                sendEvent(ReleaseWakeLockEvent())
+            }
         }
     }
 }

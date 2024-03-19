@@ -158,6 +158,11 @@ object KeepScreenOnPreference : BasePreference<Boolean>() {
     override val key = booleanPreferencesKey("keep_screen_on")
 }
 
+object KeepAwakePreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("keep_awake")
+}
+
 object SystemScreenTimeoutPreference : BasePreference<Int>() {
     override val default = 0
     override val key = intPreferencesKey("system_screen_timeout")

@@ -2,6 +2,16 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">உங்கள் உலாவியில் தற்போது VPN செல்லுபடி உள்ளது, இது பிரச்சனைகளைக் கொண்டுவரலாம் பாராட்டும் நேரத்தில். இதை தீர்மானிக்க, உங்கள் VPN அமைப்புகளை LAN பரிமாறத்தை அனுமதிக்க அல்லது உங்கள் VPN முடக்குதலை கொண்டுவிடுவதை பரிந்துரைக்கிறோம்.</string>
     <string name="warning">எச்சரிக்கை</string>
+    <string name="no_results_found">முடிவுகள் கண்டுபிடிக்கப்படவில்லை</string>
+    <string name="search">தேடு</string>
+    <string name="attention">கவனத்தை</string>
+    <string name="recommendation">பரிந்துரை</string>
+    <string name="usb_connect_recommendation">USB சார்ஜ் கேபிளை இணைக்கும்போது தொலைபேசியின் மேம்பட்டதை உள்ளிட்டுத் தூண்டுவது, அதன் செயல்களை அரசாங்கம் மூலம் தடுக்காமல் அல்லது கட்டுப்படுத்தலால் எதிர்காலத்திற்கு உட்படுத்தப்பட்டுள்ளதை உறுதிசெய்கின்றது.</string>
+    <string name="performance">செயல்பாடு</string>
+    <string name="disable_battery_optimization">பேட்டரி ஒப்டிமைசேஷனை முடக்கு</string>
+    <string name="battery_optimization_disabled">பேட்டரி ஒப்டிமைசேஷன் முடக்கப்பட்டுள்ளது</string>
+    <string name="keep_awake">எழில்கள் செய்யுங்கள்</string>
+    <string name="keep_awake_tips">இயல்புப் படிப்பின்னர், USB சார்ஜிங்கு இணைந்திருந்தால், தொலைபேசி எழில் இருக்கின்றது. இந்த விருப்பத்தை இயல்பாக்கும் மூலம், USB சார்ஜிங்கு இணைந்திருந்தால் இல்லாவிட்டாலும் தொலைபேசி எழில் இருக்கும், அதன் விருப்பத்தின் மூலம் பேட்டரி பயன்படுத்தல் அதிகரிக்க முடியும்.</string>
     <string name="storage_permission_confirm">அருமையாகும்! உங்கள் தொலைபேசி கோப்புகளை இணையத்தில் எளிதாக நிர்வகிக்க சூழல் அனுமதியை செயல்படுத்துக.</string>
     <string name="instruction_for_use">பயன்படுத்தும் விதிகள்</string>
     <string name="web_how_to">படி 1: உங்கள் கைபேசி மற்றும் கணினியை ஒரே வாயர்லஸ் நெட்வொர்க்கில் இணைக்கவும்.\n\nமுறை 1: உங்கள் கணினியை மற்றும் உங்கள் கைபேசியை ஒரே Wi-Fi நெட்வொர்க்கில் இணைக்கவும்.\nமுறை 2: உங்கள் கைபேசின் ஹாட்ஸ்பாட்டை இயக்கி உங்கள் கணினியை கைபேசின் ஹாட்ஸ்பாட்டுக்கு இணைக்கவும்.\n\nபடி 2: உங்கள் கணினியில் ஒரு வலை உலாவி திறந்து அப்பிக்கேடு தளத்தில் காட்சிப்படும் வலை முகவரியை உள்ளிடுங்கள்.</string>
@@ -51,7 +61,7 @@
     <string name="http_server_ok">Http சேவையகம் நலமாக பயன்படுகின்றது.</string>
     <string name="http_server_error">Http சேவையகம் ஆரம்பிக்கப்படவில்லை. PlainApp ஐ மீண்டும் தொடங்கி முயற்சிக்கவும். HTTP அல்லது HTTPS போர்ட்களை பயன்படுகின்ற பிற பயன்பாடுகள் இல்லையெனில் உள்ளிட்ட பிரச்சினைக்கு மேலும் விவரங்களை ismartcoding@gmail.com உடைகளுக்கு அனுப்புக.</string>
     <string name="relaunch_app">புதுப்பிக்க APP</string>
-    <string name="load_no_more">முடிந்தது</string>
+    <string name="load_no_more">மேலும் தரவு இல்லை</string>
     <string name="list_empty">பட்டியல் காலியாகுது</string>
     <string name="select_box_title">ஒரு பெட்டியைத் தேர்ந்தெடு</string>
     <string name="add_new_box_button">பெட்டியைச் சேர்க்க</string>

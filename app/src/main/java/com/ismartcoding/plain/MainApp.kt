@@ -14,6 +14,7 @@ import coil.memory.MemoryCache
 import coil.request.CachePolicy
 import coil.util.DebugLogger
 import com.ismartcoding.lib.brv.utils.BRV
+import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.isUPlus
 import com.ismartcoding.lib.logcat.DiskLogAdapter
@@ -34,9 +35,11 @@ import com.ismartcoding.plain.data.preference.PasswordTypePreference
 import com.ismartcoding.plain.data.preference.UrlTokenPreference
 import com.ismartcoding.plain.data.preference.WebPreference
 import com.ismartcoding.plain.data.preference.dataStore
+import com.ismartcoding.plain.features.AcquireWakeLockEvent
 import com.ismartcoding.plain.features.AppEvents
 import com.ismartcoding.plain.features.bluetooth.BluetoothEvents
 import com.ismartcoding.plain.features.pkg.PackageHelper
+import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.NotificationListenerMonitorService
 import com.ismartcoding.plain.ui.helpers.PageHelper
 import com.ismartcoding.plain.web.HttpServerManager
@@ -119,7 +122,9 @@ class MainApp : Application(), ImageLoaderFactory {
             UrlTokenPreference.ensureValueAsync(instance, preferences)
 
             DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(preferences)))
-
+            if (PlugInControlReceiver.isUSBConnected(this@MainApp)) {
+                sendEvent(AcquireWakeLockEvent())
+            }
             if (PasswordPreference.get(preferences).isEmpty()) {
                 HttpServerManager.resetPasswordAsync()
             }

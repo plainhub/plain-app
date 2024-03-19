@@ -2,6 +2,16 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Votre VPN est actuellement activé sur votre appareil, ce qui pourrait potentiellement entraîner des problèmes de connexion Web lorsqu\'il est accédé depuis un PC. Pour résoudre cela, nous vous recommandons d\'ajuster les paramètres de votre VPN pour autoriser le trafic LAN ou de désactiver votre VPN.</string>
     <string name="warning">Avertissement</string>
+    <string name="no_results_found">Aucun résultat trouvé</string>
+    <string name="search">Rechercher</string>
+    <string name="attention">Attention</string>
+    <string name="recommendation">Recommandation</string>
+    <string name="usb_connect_recommendation">Connecter le câble de chargement USB assure que le téléphone reste éveillé, évitant ainsi toute interception ou restriction de ses fonctions par le système.</string>
+    <string name="performance">Performance</string>
+    <string name="disable_battery_optimization">Désactiver l\'optimisation de la batterie</string>
+    <string name="battery_optimization_disabled">L\'optimisation de la batterie est désactivée</string>
+    <string name="keep_awake">Garder éveillé</string>
+    <string name="keep_awake_tips">Par défaut, lorsque connecté au chargement USB, le téléphone reste éveillé. Activer cette option maintient le téléphone éveillé même lorsqu\'il n\'est pas connecté au chargement USB, ce qui peut entraîner une augmentation de la consommation de batterie.</string>
     <string name="storage_permission_confirm">Presque terminé ! Veuillez autoriser l\'accès au stockage pour gérer facilement vos fichiers téléphoniques via le web.</string>
     <string name="instruction_for_use">Instructions d\'utilisation</string>
     <string name="web_how_to">Étape 1 : Connectez votre téléphone et votre ordinateur au même réseau sans fil.\n\nMéthode 1 : Connectez votre ordinateur et votre téléphone au même réseau Wi-Fi.\nMéthode 2 : Activez le point d\'accès de votre téléphone et connectez votre ordinateur au point d\'accès de votre téléphone.\n\nÉtape 2 : Ouvrez un navigateur web sur votre ordinateur et saisissez l\'adresse web affichée sur la page d\'accueil de l\'application.</string>
@@ -51,7 +61,7 @@
     <string name="http_server_ok">Servidor HTTP iniciado</string>
     <string name="http_server_error">Le serveur HTTP n\'est pas démarré. Relancez PlainApp et réessayez. Assurez-vous qu\'aucune autre application n\'occupe les ports HTTP ou HTTPS. Si le problème persiste, veuillez fournir plus de détails sur le problème en contactant ismartcoding@gmail.com.</string>
     <string name="relaunch_app">Relancer l\'application</string>
-    <string name="load_no_more">Fin</string>
+    <string name="load_no_more">Pas plus de données</string>
     <string name="list_empty">La liste est vide</string>
     <string name="select_box_title">Sélectionner une boîte</string>
     <string name="add_new_box_button">Ajouter une boîte</string>

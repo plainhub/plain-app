@@ -2,6 +2,16 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Uw VPN is momenteel ingeschakeld op uw apparaat, wat mogelijk kan leiden tot webverbinding problemen bij toegang vanaf uw pc. Om dit op te lossen, raden we aan om uw VPN-instellingen aan te passen om LAN-verkeer toe te staan of uw VPN uit te schakelen.</string>
     <string name="warning">Waarschuwing</string>
+    <string name="no_results_found">Geen resultaten gevonden</string>
+    <string name="search">Zoeken</string>
+    <string name="attention">Aandacht</string>
+    <string name="recommendation">Aanbeveling</string>
+    <string name="usb_connect_recommendation">Door de USB-oplaadkabel aan te sluiten, blijft de telefoon wakker, waardoor eventuele onderschepping of beperking van de functies door het systeem wordt vermeden.</string>
+    <string name="performance">Prestatie</string>
+    <string name="disable_battery_optimization">Batterijoptimalisatie uitschakelen</string>
+    <string name="battery_optimization_disabled">Batterijoptimalisatie is uitgeschakeld</string>
+    <string name="keep_awake">Wakker houden</string>
+    <string name="keep_awake_tips">Standaard blijft de telefoon wakker wanneer deze is aangesloten op USB-opladen. Door deze optie in te schakelen, blijft de telefoon wakker, zelfs wanneer deze niet is aangesloten op USB-opladen, wat mogelijk resulteert in een verhoogd batterijverbruik.</string>
     <string name="storage_permission_confirm">Bijna klaar! Schakel alstublieft de opslagtoestemming in om uw telefoonbestanden eenvoudig via het web te beheren.</string>
     <string name="instruction_for_use">Gebruiksaanwijzing</string>
     <string name="web_how_to">Stap 1: Sluit uw telefoon en computer aan op hetzelfde draadloze netwerk.\n\nMethode 1: Sluit uw computer en telefoon aan op hetzelfde Wi-Fi-netwerk.\nMethode 2: Schakel de hotspot van uw telefoon in en sluit uw computer aan op de hotspot van de telefoon.\n\nStap 2: Open een webbrowser op uw computer en voer het webadres in dat wordt weergegeven op de startpagina van de app.</string>
@@ -51,7 +61,7 @@
     <string name="http_server_ok">HTTP-server is gestart</string>
     <string name="http_server_error">De HTTP-server is niet gestart. Start PlainApp opnieuw en probeer het opnieuw. Zorg ervoor dat er geen andere apps zijn die de HTTP- of HTTPS-poorten bezetten. Als het probleem aanhoudt, geef dan meer details over het probleem door contact op te nemen met ismartcoding@gmail.com.</string>
     <string name="relaunch_app">App opnieuw starten</string>
-    <string name="load_no_more">Einde</string>
+    <string name="load_no_more">Geen verdere gegevens</string>
     <string name="list_empty">Lijst is leeg</string>
     <string name="select_box_title">Selecteer een box</string>
     <string name="add_new_box_button">Voeg box toe</string>

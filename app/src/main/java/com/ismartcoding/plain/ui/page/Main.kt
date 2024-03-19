@@ -48,6 +48,7 @@ import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.page.apps.AppPage
 import com.ismartcoding.plain.ui.page.apps.AppsPage
+import com.ismartcoding.plain.ui.page.apps.AppsSearchPage
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.page.scan.ScanPage
 import com.ismartcoding.plain.ui.page.settings.AboutPage
@@ -68,6 +69,7 @@ import com.ismartcoding.plain.ui.page.web.WebSecurityPage
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import com.ismartcoding.plain.ui.theme.AppTheme
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.canvas
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -175,6 +177,13 @@ fun Main(viewModel: MainViewModel) {
             }
 
             slideHorizontallyComposable(
+                "${RouteName.APPS.name}/search?q={q}",
+                arguments = listOf(navArgument("q") { type = NavType.StringType }),
+            ) {
+                AppsSearchPage(navController)
+            }
+
+            slideHorizontallyComposable(
                 "${RouteName.APPS.name}/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
             ) {
@@ -209,25 +218,25 @@ fun NavGraphBuilder.slideHorizontallyComposable(
         enterTransition = {
             slideIntoContainer(
                 towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-                animationSpec = tween(400),
+                animationSpec = tween(PlainTheme.ANIMATION_DURATION),
             )
         },
         exitTransition = {
             slideOutOfContainer(
                 towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-                animationSpec = tween(400),
+                animationSpec = tween(PlainTheme.ANIMATION_DURATION),
             )
         },
         popEnterTransition = {
             slideIntoContainer(
                 towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
-                animationSpec = tween(400),
+                animationSpec = tween(PlainTheme.ANIMATION_DURATION),
             )
         },
         popExitTransition = {
             slideOutOfContainer(
                 towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
-                animationSpec = tween(400),
+                animationSpec = tween(PlainTheme.ANIMATION_DURATION),
             )
         },
     ) {

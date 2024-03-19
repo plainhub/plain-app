@@ -60,8 +60,8 @@ dependencies {
 
     api("com.google.code.gson:gson:2.10.1")
 
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.7.3")
     api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.1")
     api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")

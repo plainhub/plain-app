@@ -1,12 +1,23 @@
 package com.ismartcoding.plain.ui.base
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.ui.extensions.*
 import com.ismartcoding.plain.ui.theme.canvas
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,13 +39,14 @@ fun PScaffold(
         topBar = {
             if (navigationIcon != null || actions != null) {
                 TopAppBar(
-                    title = { Text(topBarTitle) },
+                    title = { Text(topBarTitle, maxLines = 2, overflow = TextOverflow.Ellipsis) },
                     navigationIcon = { navigationIcon?.invoke() },
                     actions = { actions?.invoke(this) },
+                    modifier = Modifier.padding(horizontal = 8.dp),
                     colors =
-                        TopAppBarDefaults.topAppBarColors(
-                            containerColor = Color.Transparent,
-                        ),
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                    ),
                 )
             }
         },

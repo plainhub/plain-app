@@ -2,6 +2,16 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">お使いのデバイスでは現在VPNが有効になっており、PCからアクセスした際にWeb接続の問題が発生する可能性があります。これを解決するために、LANトラフィックを許可するようにVPNの設定を調整するか、VPNを無効にすることをお勧めします。</string>
     <string name="warning">警告</string>
+    <string name="no_results_found">結果が見つかりませんでした</string>
+    <string name="search">検索</string>
+    <string name="attention">注意</string>
+    <string name="recommendation">推奨</string>
+    <string name="usb_connect_recommendation">USB充電ケーブルを接続することで、電話が起動し続けるため、システムによる機能の妨害や制限を回避します。</string>
+    <string name="performance">パフォーマンス</string>
+    <string name="disable_battery_optimization">バッテリーの最適化を無効にする</string>
+    <string name="battery_optimization_disabled">バッテリーの最適化が無効になっています</string>
+    <string name="keep_awake">起きている</string>
+    <string name="keep_awake_tips">デフォルトでは、USB充電に接続されている場合、電話は起きています。このオプションを有効にすると、USB充電に接続されていない場合でも電話を起きたままにしておくことができ、バッテリー消費量が増加する可能性があります。</string>
     <string name="storage_permission_confirm">もう少しで完了です！ウェブを介して簡単に携帯電話のファイルを管理するために、ストレージ許可を有効にしてください。</string>
     <string name="instruction_for_use">使用説明書</string>
     <string name="web_how_to">ステップ1：携帯電話とコンピューターを同じ無線ネットワークに接続します。\n\n方法1：コンピューターと携帯電話を同じWi-Fiネットワークに接続します。\n方法2：携帯電話のホットスポットをオンにして、コンピューターを携帯電話のホットスポットに接続します。\n\nステップ2：コンピューターでウェブブラウザーを開き、アプリのホームページに表示されるウェブアドレスを入力します。</string>
@@ -51,7 +61,7 @@
     <string name="http_server_ok">HTTPサーバーが起動しました</string>
     <string name="http_server_error">HTTPサーバーが起動していません。PlainAppを再起動して、もう一度試してみてください。HTTPまたはHTTPSポートを占有している他のアプリケーションがないことを確認してください。問題が解決しない場合は、ismartcoding@gmail.com に連絡して問題の詳細を提供してください。</string>
     <string name="relaunch_app">アプリを再起動</string>
-    <string name="load_no_more">終わり</string>
+    <string name="load_no_more">データがありません</string>
     <string name="list_empty">リストは空です</string>
     <string name="select_box_title">ボックスを選択</string>
     <string name="add_new_box_button">ボックスを追加</string>

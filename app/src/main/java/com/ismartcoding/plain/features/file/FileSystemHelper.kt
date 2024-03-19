@@ -73,16 +73,20 @@ object FileSystemHelper {
 
     fun getInternalStoragePath(): String {
         return (
-            if (isRPlus()) {
-                storageManager.primaryStorageVolume.directory?.path
-            } else {
-                null
-            }
-        ) ?: Environment.getExternalStorageDirectory()?.absolutePath?.trimEnd('/') ?: ""
+                if (isRPlus()) {
+                    storageManager.primaryStorageVolume.directory?.path
+                } else {
+                    null
+                }
+                ) ?: Environment.getExternalStorageDirectory()?.absolutePath?.trimEnd('/') ?: ""
     }
 
     fun getInternalStorageName(context: Context): String {
         return storageManager.primaryStorageVolume.getDescription(context) ?: getString(R.string.internal_storage)
+    }
+
+    fun getExternalFilesDirPath(context: Context): String {
+        return context.getExternalFilesDir(null)!!.absolutePath
     }
 
     fun getSDCardPath(context: Context): String {
@@ -90,10 +94,10 @@ object FileSystemHelper {
         val directories =
             getStorageDirectories(context).filter {
                 it != internalPath &&
-                    !it.equals(
-                        "/storage/emulated/0",
-                        true,
-                    )
+                        !it.equals(
+                            "/storage/emulated/0",
+                            true,
+                        )
             }
 
         val fullSDPattern = Pattern.compile("^/storage/[A-Za-z0-9]{4}-[A-Za-z0-9]{4}$")

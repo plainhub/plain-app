@@ -37,9 +37,9 @@ android {
                 else -> 0
             }
 
-        val vCode = 256
+        val vCode = 259
         versionCode = vCode - singleAbiNum
-        versionName = "1.2.41"
+        versionName = "1.2.42"
 
         ndk {
             //noinspection ChromeOsAbiSupport
@@ -152,8 +152,8 @@ dependencies {
     val apollo = "3.2.1"
     val kgraphql = "0.19.0"
     val ktor = "3.0.0-beta-1"
-    val media3 = "1.2.1"
-    val compose = "1.6.1"
+    val media3 = "1.3.0"
+    val compose = "1.6.3"
 
     implementation(platform("androidx.compose:compose-bom:2024.01.00"))
 
@@ -163,7 +163,7 @@ dependencies {
     implementation("androidx.compose.ui:ui:$compose")
     implementation("androidx.compose.foundation:foundation:$compose")
     implementation("androidx.compose.foundation:foundation-layout:$compose")
-    implementation("androidx.compose.material3:material3:1.2.0")
+    implementation("androidx.compose.material3:material3:1.2.1")
     implementation("androidx.compose.material:material-icons-extended:$compose")
     implementation("com.google.accompanist:accompanist-drawablepainter:0.34.0")
 //    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha12")

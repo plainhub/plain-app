@@ -215,34 +215,42 @@ fun AppPage(
                             Subtitle(
                                 text = stringResource(R.string.paths_directories),
                             )
-                            PListItem(
-                                title = stringResource(R.string.source_directory),
-                                desc = item?.appInfo?.sourceDir ?: "",
-                            )
-                            PListItem(
-                                title = stringResource(R.string.data_directory),
-                                desc = item?.appInfo?.dataDir ?: "",
-                            )
+
+                            PCard {
+                                PListItem(
+                                    title = stringResource(R.string.source_directory),
+                                    desc = item?.appInfo?.sourceDir ?: "",
+                                )
+                                PListItem(
+                                    title = stringResource(R.string.data_directory),
+                                    desc = item?.appInfo?.dataDir ?: "",
+                                )
+                            }
+
                             VerticalSpace(dp = 16.dp)
+
                             Subtitle(
                                 text = stringResource(R.string.more_info),
                             )
-                            PListItem(
-                                title = stringResource(R.string.app_size),
-                                desc = FormatHelper.formatBytes(item?.size ?: 0),
-                            )
-                            PListItem(
-                                title = "SDK",
-                                desc = LocaleHelper.getStringF(R.string.sdk, "target", item?.appInfo?.targetSdkVersion ?: "", "min", item?.appInfo?.minSdkVersion ?: ""),
-                            )
-                            PListItem(
-                                title = stringResource(R.string.installed_at),
-                                desc = item?.installedAt?.formatDateTime(),
-                            )
-                            PListItem(
-                                title = stringResource(R.string.updated_at),
-                                desc = item?.updatedAt?.formatDateTime(),
-                            )
+
+                            PCard {
+                                PListItem(
+                                    title = stringResource(R.string.app_size),
+                                    desc = FormatHelper.formatBytes(item?.size ?: 0),
+                                )
+                                PListItem(
+                                    title = "SDK",
+                                    desc = LocaleHelper.getStringF(R.string.sdk, "target", item?.appInfo?.targetSdkVersion ?: "", "min", item?.appInfo?.minSdkVersion ?: ""),
+                                )
+                                PListItem(
+                                    title = stringResource(R.string.installed_at),
+                                    desc = item?.installedAt?.formatDateTime(),
+                                )
+                                PListItem(
+                                    title = stringResource(R.string.updated_at),
+                                    desc = item?.updatedAt?.formatDateTime(),
+                                )
+                            }
                         }
                     }
                 }

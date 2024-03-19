@@ -2,6 +2,16 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">आपके डिवाइस पर वर्तमान में आपका VPN सक्रिय है, जिससे PC से एक्सेस करते समay वेब कनेक्शन समस्याएँ उत्पन्न हो सकती हैं। इसे हल करने के लिए, हम सुझाव देते हैं कि आप अपने VPN सेटिंग्स को LAN ट्रैफ़िक की अनुमति देने या अपने VPN को अक्षम करने के लिए समायोजित करें।</string>
     <string name="warning">चेतावनी</string>
+    <string name="no_results_found">कोई परिणाम नहीं मिला</string>
+    <string name="search">खोजें</string>
+    <string name="attention">ध्यान</string>
+    <string name="recommendation">सिफारिश</string>
+    <string name="usb_connect_recommendation">USB चार्जिंग केबल कनेक्ट करने से यह सुनिश्चित होता है कि फोन जागरूक रहता है, जिससे किसी भी प्रणाली द्वारा इसके कार्यों को अवरोधित या सीमित किया नहीं जा सकता।</string>
+    <string name="performance">प्रदर्शन</string>
+    <string name="disable_battery_optimization">बैटरी अनुकूलन निष्क्रिय करें</string>
+    <string name="battery_optimization_disabled">बैटरी अनुकूलन निष्क्रिय किया गया है</string>
+    <string name="keep_awake">जागरूक रखें</string>
+    <string name="keep_awake_tips">डिफ़ॉल्ट रूप से, जब USB चार्जिंग से कनेक्ट किया जाता है, तो फोन जागरूक रहता है। इस विकल्प को सक्षम करने से फोन जागरूक रहता है, यहाँ तक कि USB चार्जिंग से कनेक्ट न होने पर भी, बैटरी की अधिक खपत के संभावित होने की संभावना है।</string>
     <string name="storage_permission_confirm">अब बस एक कदम दूरी पर है! वेब के माध्यम से अपने फ़ोन फ़ाइलों को आसानी से प्रबंधित करने के लिए कृपया स्टोरेज अनुमति सक्षम करें।</string>
     <string name="instruction_for_use">उपयोग के निर्देश</string>
     <string name="web_how_to">चरण 1: अपने फोन और कंप्यूटर को समान वायरलेस नेटवर्क से जोड़ें।\n\nविधि 1: अपने कंप्यूटर और फोन को समान वाई-फाई नेटवर्क से जोड़ें।\nविधि 2: अपने फोन का हॉटस्पॉट चालू करें और कंप्यूटर को फोन के हॉटस्पॉट से जोड़ें।\n\nचरण 2: अपने कंप्यूटर पर एक वेब ब्राउज़र खोलें और एपीपी होमपेज पर प्रदर्शित वेब पता दर्ज करें।</string>
@@ -51,7 +61,7 @@
     <string name="http_server_ok">एचटीटीपी सर्वर शुरू हो गया है</string>
     <string name="http_server_error">HTTP सर्वर शुरू नहीं हुआ है। PlainApp को फिर से चालने का प्रयास करें और पुन: प्रयास करें। सुनिश्चित करें कि HTTP या HTTPS पोर्ट पर कोई अन्य एप्लिकेशन नहीं है। यदि समस्या बरकरार रहती है, तो कृपया ismartcoding@gmail.com पर समस्या के बारे में अधिक विवरण प्रदान करें।</string>
     <string name="relaunch_app">ऐप फिर से चालू करें</string>
-    <string name="load_no_more">समाप्त</string>
+    <string name="load_no_more">कोई और डेटा नहीं</string>
     <string name="list_empty">सूची खाली है</string>
     <string name="select_box_title">एक बॉक्स चुनें</string>
     <string name="add_new_box_button">बॉक्स जोड़ें</string>

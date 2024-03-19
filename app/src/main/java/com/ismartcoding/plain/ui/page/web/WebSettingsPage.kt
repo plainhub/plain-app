@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -42,6 +41,7 @@ import com.ismartcoding.plain.data.preference.ApiPermissionsPreference
 import com.ismartcoding.plain.data.preference.HttpPortPreference
 import com.ismartcoding.plain.data.preference.HttpsPortPreference
 import com.ismartcoding.plain.data.preference.LocalApiPermissions
+import com.ismartcoding.plain.data.preference.LocalKeepAwake
 import com.ismartcoding.plain.data.preference.LocalWeb
 import com.ismartcoding.plain.data.preference.WebSettingsProvider
 import com.ismartcoding.plain.features.IgnoreBatteryOptimizationResultEvent
@@ -49,6 +49,7 @@ import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.RequestPermissionsEvent
+import com.ismartcoding.plain.features.WindowFocusChangedEvent
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.powerManager
@@ -65,9 +66,9 @@ import com.ismartcoding.plain.ui.base.PMainSwitch
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.Subtitle
+import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.base.rememberLifecycleEvent
 import com.ismartcoding.plain.ui.components.WebAddress
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -92,11 +93,12 @@ fun WebSettingsPage(
     WebSettingsProvider {
         val context = LocalContext.current
         val webConsole = LocalWeb.current
+        val keepAwake = LocalKeepAwake.current
         val scope = rememberCoroutineScope()
         var isMenuOpen by remember { mutableStateOf(false) }
         val enabledPermissions = LocalApiPermissions.current
         var permissionList by remember { mutableStateOf(Permissions.getWebList(context)) }
-        var showIgnoreOptimizeWarning by remember { mutableStateOf(!powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)) }
+        var shouldIgnoreOptimize by remember { mutableStateOf(!powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)) }
         var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.can(context)) }
         var isVPNConnected by remember { mutableStateOf(NetworkHelper.isVPNConnected(context)) }
         val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
@@ -104,19 +106,18 @@ fun WebSettingsPage(
         val learnMore = stringResource(id = R.string.learn_more)
         val fullText = (stringResource(id = R.string.web_console_desc) + " " + learnMore)
 
-        val lifecycleEvent = rememberLifecycleEvent()
-        LaunchedEffect(lifecycleEvent) {
-            if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
-                showIgnoreOptimizeWarning = !powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)
-                isVPNConnected = NetworkHelper.isVPNConnected(context)
-            }
-        }
-
         LaunchedEffect(Unit) {
             events.add(
                 receiveEventHandler<PermissionsResultEvent> {
                     permissionList = Permissions.getWebList(context)
                     systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.can(context)
+                }
+            )
+
+            events.add(
+                receiveEventHandler<WindowFocusChangedEvent> {
+                    shouldIgnoreOptimize = !powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)
+                    isVPNConnected = NetworkHelper.isVPNConnected(context)
                 }
             )
 
@@ -131,7 +132,7 @@ fun WebSettingsPage(
                     DialogHelper.showLoading()
                     delay(1000) // MIUI 12 test 1 second to get the final correct result.
                     DialogHelper.hideLoading()
-                    showIgnoreOptimizeWarning = !powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)
+                    shouldIgnoreOptimize = !powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)
                 }
             })
         }
@@ -215,10 +216,10 @@ fun WebSettingsPage(
                             }
                         } else {
                             if (isVPNConnected) {
-                                Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
+                                Alert(title = stringResource(id = R.string.attention), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
                             }
                             if (!systemAlertWindow) {
-                                Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.system_alert_window_warning), AlertType.WARNING) {
+                                Alert(title = stringResource(id = R.string.attention), description = stringResource(id = R.string.system_alert_window_warning), AlertType.WARNING) {
                                     MiniOutlineButton(
                                         text = stringResource(R.string.grant_permission),
                                         onClick = {
@@ -227,16 +228,6 @@ fun WebSettingsPage(
                                     )
                                 }
                             }
-//                        if (showIgnoreOptimizeWarning) {
-//                            Alert(title = stringResource(id = R.string.warning), description = stringResource(id = R.string.optimized_batter_usage_warning), AlertType.WARNING) {
-//                                MiniOutlineButton(
-//                                    text = stringResource(R.string.fix),
-//                                    onClick = {
-//                                        viewModel.requestIgnoreBatteryOptimization()
-//                                    },
-//                                )
-//                            }
-//                        }
                         }
                     }
                     PClickableText(
@@ -248,7 +239,7 @@ fun WebSettingsPage(
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                            .padding(start = 24.dp, end = 24.dp, bottom = 16.dp),
                         style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                     )
                 }
@@ -323,20 +314,48 @@ fun WebSettingsPage(
                                 }
                             },
                         ) {
-                            if (permission != Permission.SYSTEM_ALERT_WINDOW) {
-                                PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
-                                    scope.launch {
-                                        withIO { ApiPermissionsPreference.putAsync(context, permission, enable) }
-                                        if (enable) {
-                                            val ps = m.permissions.filter { !it.can(context) }
-                                            if (ps.isNotEmpty()) {
-                                                sendEvent(RequestPermissionsEvent(*ps.toTypedArray()))
-                                            }
+                            PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
+                                scope.launch {
+                                    withIO { ApiPermissionsPreference.putAsync(context, permission, enable) }
+                                    if (enable) {
+                                        val ps = m.permissions.filter { !it.can(context) }
+                                        if (ps.isNotEmpty()) {
+                                            sendEvent(RequestPermissionsEvent(*ps.toTypedArray()))
                                         }
                                     }
                                 }
                             }
                         }
+                    }
+                }
+                item {
+                    VerticalSpace(dp = 16.dp)
+                    Subtitle(
+                        text = stringResource(id = R.string.performance),
+                    )
+                    PCard {
+                        PListItem(title = stringResource(id = R.string.keep_awake), onClick = {
+                            viewModel.enableKeepAwake(context, !keepAwake)
+                        }) {
+                            PSwitch(activated = keepAwake) { enable ->
+                                viewModel.enableKeepAwake(context, enable)
+                            }
+                        }
+                    }
+                    Tips(stringResource(id = R.string.keep_awake_tips))
+                    VerticalSpace(dp = 16.dp)
+                    PCard {
+                        PListItem(title = stringResource(id = if (shouldIgnoreOptimize) R.string.disable_battery_optimization else R.string.battery_optimization_disabled),
+                            showMore = true,
+                            onClick = {
+                                if (shouldIgnoreOptimize) {
+                                    viewModel.requestIgnoreBatteryOptimization()
+                                } else {
+                                    val intent = Intent()
+                                    intent.action = Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+                                    context.startActivity(intent)
+                                }
+                            })
                     }
                 }
                 item {

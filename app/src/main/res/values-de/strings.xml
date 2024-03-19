@@ -2,6 +2,16 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Ihr VPN ist derzeit auf Ihrem Gerät aktiviert, was potenziell zu Webverbindungsproblemen führen kann, wenn es von Ihrem PC aus zugegriffen wird. Um dies zu lösen, empfehlen wir Ihnen, Ihre VPN-Einstellungen anzupassen, um LAN-Verkehr zuzulassen oder Ihr VPN zu deaktivieren.</string>
     <string name="warning">Warnung</string>
+    <string name="no_results_found">Keine Ergebnisse gefunden</string>
+    <string name="search">Suche</string>
+    <string name="attention">Achtung</string>
+    <string name="recommendation">Empfehlung</string>
+    <string name="usb_connect_recommendation">Das Anschließen des USB-Ladekabels stellt sicher, dass das Telefon wach bleibt und somit eine Unterbrechung oder Einschränkung seiner Funktionen durch das System vermieden wird.</string>
+    <string name="performance">Leistung</string>
+    <string name="disable_battery_optimization">Akkuoptimierung deaktivieren</string>
+    <string name="battery_optimization_disabled">Akkuoptimierung ist deaktiviert</string>
+    <string name="keep_awake">Wach halten</string>
+    <string name="keep_awake_tips">Standardmäßig bleibt das Telefon wach, wenn es an das USB-Ladegerät angeschlossen ist. Durch Aktivieren dieser Option bleibt das Telefon auch dann wach, wenn es nicht an das USB-Ladegerät angeschlossen ist, was möglicherweise zu erhöhtem Batterieverbrauch führt.</string>
     <string name="storage_permission_confirm">Fast geschafft! Bitte aktivieren Sie die Speicherberechtigung, um Ihre Telefondateien über das Web einfach verwalten zu können.</string>
     <string name="instruction_for_use">Gebrauchsanweisung</string>
     <string name="web_how_to">Schritt 1: Verbinden Sie Ihr Telefon und Ihren Computer mit demselben drahtlosen Netzwerk.\n\nMethode 1: Verbinden Sie Ihren Computer und Ihr Telefon mit demselben WLAN-Netzwerk.\nMethode 2: Schalten Sie den Hotspot Ihres Telefons ein und verbinden Sie Ihren Computer mit dem Hotspot Ihres Telefons.\n\nSchritt 2: Öffnen Sie einen Webbrowser auf Ihrem Computer und geben Sie die auf der APP-Startseite angezeigte Webadresse ein.</string>
@@ -51,7 +61,7 @@
     <string name="http_server_ok">HTTP-Server läuft</string>
     <string name="http_server_error">Der HTTP-Server ist nicht gestartet. Starten Sie die PlainApp erneut und versuchen Sie es erneut. Stellen Sie sicher, dass keine anderen Apps die HTTP- oder HTTPS-Ports belegen. Wenn das Problem weiterhin besteht, geben Sie bitte weitere Details zum Problem an, indem Sie ismartcoding@gmail.com kontaktieren.</string>
     <string name="relaunch_app">App neu starten</string>
-    <string name="load_no_more">Ende</string>
+    <string name="load_no_more">Keine weiteren Daten</string>
     <string name="list_empty">Liste ist leer</string>
     <string name="select_box_title">Wähle eine Box</string>
     <string name="add_new_box_button">Box hinzufügen</string>

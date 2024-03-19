@@ -3,6 +3,7 @@ package com.ismartcoding.plain.features
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.PowerManager
 import com.aallam.openai.api.BetaOpenAI
 import com.aallam.openai.api.chat.ChatCompletionRequest
 import com.aallam.openai.api.chat.ChatMessage
@@ -17,6 +18,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.SslHelper
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.enums.*
 import com.ismartcoding.plain.data.preference.ChatGPTApiKeyPreference
@@ -25,6 +27,7 @@ import com.ismartcoding.plain.features.aichat.AIChatHelper
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
+import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.web.AuthRequest
 import com.ismartcoding.plain.web.websocket.EventType
@@ -89,6 +92,8 @@ class ActionEvent(val source: ActionSourceType, val action: ActionType, val ids:
 class AudioActionEvent(val action: AudioAction)
 
 class IgnoreBatteryOptimizationEvent
+class AcquireWakeLockEvent
+class ReleaseWakeLockEvent
 
 class IgnoreBatteryOptimizationResultEvent
 
@@ -107,6 +112,7 @@ class AIChatCreatedEvent(val item: DAIChat)
 object AppEvents {
     private lateinit var mediaPlayer: MediaPlayer
     private var mediaPlayingUri: Uri? = null
+    private val wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "${BuildConfig.APPLICATION_ID}:http_server")
 
     @OptIn(BetaOpenAI::class)
     fun register() {
@@ -142,6 +148,22 @@ object AppEvents {
         receiveEventHandler<WebSocketEvent> { event ->
             coIO {
                 WebSocketHelper.sendEventAsync(event)
+            }
+        }
+
+        receiveEventHandler<AcquireWakeLockEvent> {
+            coIO {
+                LogCat.d("AcquireWakeLockEvent")
+                if (!wakeLock.isHeld) {
+                    wakeLock.acquire()
+                }
+            }
+        }
+
+        receiveEventHandler<ReleaseWakeLockEvent> {
+            coIO {
+                LogCat.d("ReleaseWakeLockEvent")
+                wakeLock.release()
             }
         }
 

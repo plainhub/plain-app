@@ -15,6 +15,8 @@ object PlainTheme {
     val PAGE_HORIZONTAL_MARGIN = 16.dp
     val PAGE_TOP_MARGIN = 8.dp
     val CARD_CORNER = 16.dp
+    val APP_BAR_HEIGHT = 64.dp
+    const val ANIMATION_DURATION = 350
 
     @Composable
     fun getCardModifier(index: Int, size: Int): Modifier {

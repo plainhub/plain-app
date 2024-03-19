@@ -19,8 +19,11 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -70,8 +73,11 @@ import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.features.chat.ChatHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FileHelper
+import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PDropdownMenu
+import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
@@ -82,10 +88,13 @@ import com.ismartcoding.plain.ui.components.chat.ChatInput
 import com.ismartcoding.plain.ui.components.chat.ChatName
 import com.ismartcoding.plain.ui.components.chat.ChatText
 import com.ismartcoding.plain.ui.extensions.navigate
+import com.ismartcoding.plain.ui.file.FilesDialog
+import com.ismartcoding.plain.ui.file.FilesType
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.models.VChat
+import com.ismartcoding.plain.ui.views.BreadcrumbItem
 import com.ismartcoding.plain.web.HttpServerEvents
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.EventType
@@ -110,7 +119,7 @@ fun ChatPage(
     var inputValue by remember { mutableStateOf("") }
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
-    val imageWidthDp = (configuration.screenWidthDp.dp - 34.dp) / 3
+    val imageWidthDp = (configuration.screenWidthDp.dp - 74.dp) / 3
     val imageWidthPx = with(density) { imageWidthDp.toPx().toInt() }
     val refreshState =
         rememberRefreshLayoutState {
@@ -244,6 +253,16 @@ fun ChatPage(
     PScaffold(
         navController,
         topBarTitle = stringResource(id = R.string.file_transfer_assistant),
+        actions = {
+            PIconButton(
+                imageVector = Icons.Outlined.Folder,
+                contentDescription = stringResource(R.string.folder),
+                tint = MaterialTheme.colorScheme.onSurface,
+                onClick = {
+                    FilesDialog(FilesType.APP).show()
+                },
+            )
+        },
         content = {
             Column(
                 Modifier
@@ -289,26 +308,29 @@ fun ChatPage(
                                             ),
                                     ) {
                                         ChatName(m)
-                                        when (m.type) {
-                                            DMessageType.IMAGES.value -> {
-                                                ChatImages(context, navController, sharedViewModel, m, imageWidthDp, imageWidthPx)
-                                            }
+                                        PCard {
+                                            when (m.type) {
+                                                DMessageType.IMAGES.value -> {
+                                                    ChatImages(context, navController, sharedViewModel, m, imageWidthDp, imageWidthPx)
+                                                }
 
-                                            DMessageType.FILES.value -> {
-                                                ChatFiles(context, navController, m)
-                                            }
+                                                DMessageType.FILES.value -> {
+                                                    ChatFiles(context, navController, m)
+                                                }
 
-                                            DMessageType.TEXT.value -> {
-                                                ChatText(context, focusManager, m, onDoubleClick = {
-                                                    val content = (m.value as DMessageText).text
-                                                    sharedViewModel.chatContent.value = content
-                                                    navController.navigate(RouteName.CHAT_TEXT)
-                                                }, onLongClick = {
-                                                    selectedItem = m
-                                                    showContextMenu.value = true
-                                                })
+                                                DMessageType.TEXT.value -> {
+                                                    ChatText(context, focusManager, m, onDoubleClick = {
+                                                        val content = (m.value as DMessageText).text
+                                                        sharedViewModel.chatContent.value = content
+                                                        navController.navigate(RouteName.CHAT_TEXT)
+                                                    }, onLongClick = {
+                                                        selectedItem = m
+                                                        showContextMenu.value = true
+                                                    })
+                                                }
                                             }
                                         }
+                                        VerticalSpace(dp = 8.dp)
                                     }
                                     Box(
                                         modifier =

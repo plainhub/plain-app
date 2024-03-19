@@ -10,65 +10,104 @@ import kotlin.math.abs
 
 @Stable
 class RefreshLayoutState(
-    internal val onRefreshListener: RefreshLayoutState.() -> Unit,
+    internal val onRefreshListener: RefreshLayoutState.() -> Unit
 ) {
+    //刷新布局内容区域的组件状态
     internal val refreshContentState = mutableStateOf(RefreshContentState.Stop)
 
+    //刷新布局内容区域的Offset(位移)的状态和子内容区域的Offset(位移)的状态,如果contentIsMove==false,则一直为0,单位px
     internal val refreshContentOffsetState = Animatable(0f)
 
+    //composePosition的状态,参考[RefreshLayout]的参数
     internal val composePositionState = mutableStateOf(ComposePosition.Top)
 
+    //刷新布局拖动的阈值,单位px
     internal val refreshContentThresholdState = mutableFloatStateOf(0f)
 
+    //协程作用域
     internal lateinit var coroutineScope: CoroutineScope
 
+    //是否可以触发[onRefreshListener]
+    var canCallRefreshListener = true
+
+    /**
+     * 获取刷新布局内容区域的组件状态
+     * Get the [State] of the refresh content
+     */
     fun getRefreshContentState(): State<RefreshContentState> = refreshContentState
 
-    fun createRefreshContentOffsetFlow(): Flow<Float> = snapshotFlow { refreshContentOffsetState.value }
+    /**
+     * 创建刷新布局内容区域的Offset(位移)的flow
+     * Create the [Flow] of the offset
+     */
+    fun createRefreshContentOffsetFlow(): Flow<Float> =
+        snapshotFlow { refreshContentOffsetState.value }
 
+    /**
+     * 获取composePosition的状态,参考[RefreshLayout]的参数
+     * Get the [State] of the [ComposePosition]
+     */
     fun getComposePositionState(): State<ComposePosition> = composePositionState
 
+    /**
+     * 获取刷新布局拖动的阈值,单位px
+     * Get threshold of the refresh content
+     */
     fun getRefreshContentThreshold(): Float = refreshContentThresholdState.value
 
+    /**
+     * 刷新布局内容区域的Offset的值,单位px
+     * Get the offset of content area
+     */
     fun getRefreshContentOffset(): Float = refreshContentOffsetState.value
 
+    /**
+     * 设置刷新布局的状态
+     * Set the state of refresh content
+     */
     fun setRefreshState(state: RefreshContentState) {
         when (state) {
             RefreshContentState.Stop -> {
-                if (refreshContentState.value == RefreshContentState.Stop) {
+                if (refreshContentState.value == RefreshContentState.Stop)
                     return
-                }
-                if (!this::coroutineScope.isInitialized) {
+                if (!this::coroutineScope.isInitialized)
                     throw IllegalStateException("[RefreshLayoutState]还未初始化完成,请在[LaunchedEffect]中或composable至少组合一次后使用此方法")
-                }
                 coroutineScope.launch {
                     refreshContentState.value = RefreshContentState.Stop
                     delay(300)
                     refreshContentOffsetState.animateTo(0f)
                 }
             }
+
             RefreshContentState.Refreshing -> {
-                if (refreshContentState.value == RefreshContentState.Refreshing) {
+                if (refreshContentState.value == RefreshContentState.Refreshing)
                     return
-                }
-                if (!this::coroutineScope.isInitialized) {
+                if (!this::coroutineScope.isInitialized)
                     throw IllegalStateException("[RefreshLayoutState]还未初始化完成,请在[LaunchedEffect]中或composable至少组合一次后使用此方法")
-                }
                 coroutineScope.launch {
                     refreshContentState.value = RefreshContentState.Refreshing
-                    onRefreshListener()
+                    if (canCallRefreshListener)
+                        onRefreshListener()
+                    else
+                        setRefreshState(RefreshContentState.Stop)
                     animateToThreshold()
                 }
             }
-            RefreshContentState.Dragging -> throw IllegalStateException("设置为[RefreshContentStateEnum.Dragging]无意义")
+
+            RefreshContentState.Dragging -> throw IllegalStateException("设置为[RefreshContentState.Dragging]无意义")
         }
     }
 
+    //偏移量归位,并检查是否超过了刷新阈值,如果超过了执行刷新逻辑
     internal fun offsetHoming() {
         coroutineScope.launch {
+            //检查是否进入了刷新状态
             if (abs(refreshContentOffsetState.value) >= refreshContentThresholdState.value) {
                 refreshContentState.value = RefreshContentState.Refreshing
-                onRefreshListener()
+                if (canCallRefreshListener)
+                    onRefreshListener()
+                else
+                    setRefreshState(RefreshContentState.Stop)
                 animateToThreshold()
             } else {
                 refreshContentOffsetState.animateTo(0f)
@@ -77,15 +116,16 @@ class RefreshLayoutState(
         }
     }
 
+    //动画滑动至阈值处
     private suspend fun animateToThreshold() {
         val composePosition = composePositionState.value
-        if (composePosition == ComposePosition.Start || composePosition == ComposePosition.Top) {
+        if (composePosition == ComposePosition.Start || composePosition == ComposePosition.Top)
             refreshContentOffsetState.animateTo(refreshContentThresholdState.value)
-        } else {
+        else
             refreshContentOffsetState.animateTo(-refreshContentThresholdState.value)
-        }
     }
 
+    //增加偏移量
     internal fun offset(refreshContentOffset: Float) {
         coroutineScope.launch {
             val targetValue = refreshContentOffsetState.value + refreshContentOffset
@@ -98,4 +138,5 @@ class RefreshLayoutState(
 }
 
 @Composable
-fun rememberRefreshLayoutState(onRefreshListener: RefreshLayoutState.() -> Unit) = remember { RefreshLayoutState(onRefreshListener) }
+fun rememberRefreshLayoutState(onRefreshListener: RefreshLayoutState.() -> Unit) =
+    remember { RefreshLayoutState(onRefreshListener) }
