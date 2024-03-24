@@ -1,4 +1,4 @@
-name: Generated APK
+name: Generated AAB
 
 on:
   workflow_dispatch:
@@ -28,14 +28,11 @@ jobs:
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
-      - name: Build apk
-        run: bash build-apk.sh
+      - name: Build aab
+        run: bash build-aab.sh
 
-      - uses: ncipollo/release-action@v1
+      - name: Save aab
+        uses: actions/upload-artifact@v4
         with:
-          tag: v${{ env.version_name }}
-          name: Release ${{ env.version_name }}
-          body: "## What's Changed"
-          draft: true
-          prerelease: false
-          artifacts: ./app/build/outputs/apk/github/release/PlainApp-${{ env.version_name }}.apk,./app/build/outputs/apk/china/release/PlainApp-${{ env.version_name }}-china.apk
+          name: PlainApp-${{ env.version_name }}.aab
+          path: ./PlainApp-${{ env.version_name }}.aab
