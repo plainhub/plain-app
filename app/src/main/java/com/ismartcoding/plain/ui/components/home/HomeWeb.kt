@@ -56,9 +56,9 @@ fun HomeWeb(
         )
         VerticalSpace(dp = 8.dp)
         PMainSwitch(
-            title = stringResource(id = viewModel.httpServerState.value.getTextId()),
+            title = stringResource(id = viewModel.httpServerState.getTextId()),
             activated = webEnabled,
-            enable = !viewModel.httpServerState.value.isProcessing()
+            enable = !viewModel.httpServerState.isProcessing()
         ) { it ->
             viewModel.enableHttpServer(context, it)
         }

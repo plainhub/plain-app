@@ -29,7 +29,7 @@ import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.audio.AudioAction
-import com.ismartcoding.plain.features.audio.AudioHelper
+import com.ismartcoding.plain.features.audio.AudioMediaStoreHelper
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.CastDialog
@@ -193,8 +193,8 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
         val query = viewModel.getQuery()
         val context = requireContext()
         val sortBy = AudioSortByPreference.getValueAsync(context)
-        val items = withIO { AudioHelper.search(context, query, viewModel.limit, viewModel.offset, sortBy) }
-        viewModel.total = withIO { AudioHelper.count(context, query) }
+        val items = withIO { AudioMediaStoreHelper.search(context, query, viewModel.limit, viewModel.offset, sortBy) }
+        viewModel.total = withIO { AudioMediaStoreHelper.count(context, query) }
         val bindingAdapter = binding.list.rv.bindingAdapter
         val toggleMode = bindingAdapter.toggleMode
         val checkedItems = bindingAdapter.getCheckedModels<AudioModel>()
@@ -218,7 +218,7 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private suspend fun updateFolders() {
-        val items = withIO { AudioHelper.getBuckets(requireContext()) }
+        val items = withIO { AudioMediaStoreHelper.getBuckets(requireContext()) }
         viewModel.total = items.size
         binding.list.page.addData(items, hasMore = { false })
     }

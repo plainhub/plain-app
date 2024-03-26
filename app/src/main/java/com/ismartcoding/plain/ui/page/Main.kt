@@ -49,6 +49,10 @@ import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.page.apps.AppPage
 import com.ismartcoding.plain.ui.page.apps.AppsPage
 import com.ismartcoding.plain.ui.page.apps.AppsSearchPage
+import com.ismartcoding.plain.ui.page.docs.DocsPage
+import com.ismartcoding.plain.ui.page.docs.DocsSearchPage
+import com.ismartcoding.plain.ui.page.notes.NotesPage
+import com.ismartcoding.plain.ui.page.notes.NotesSearchPage
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.page.scan.ScanPage
 import com.ismartcoding.plain.ui.page.settings.AboutPage
@@ -70,7 +74,6 @@ import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import com.ismartcoding.plain.ui.theme.AppTheme
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import com.ismartcoding.plain.ui.theme.canvas
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -137,7 +140,7 @@ fun Main(viewModel: MainViewModel) {
 
     AppTheme(useDarkTheme = useDarkTheme) {
         window.statusBarColor = Color.Transparent.toArgb()
-        window.navigationBarColor = MaterialTheme.colorScheme.canvas().toArgb()
+        window.navigationBarColor = MaterialTheme.colorScheme.background.toArgb()
         insetsController.isAppearanceLightStatusBars = !useDarkTheme
         insetsController.isAppearanceLightNavigationBars = !useDarkTheme
 
@@ -169,6 +172,8 @@ fun Main(viewModel: MainViewModel) {
                 RouteName.SCAN to { ScanPage(navController) },
                 RouteName.MEDIA_PREVIEW to { MediaPreviewPage(navController, sharedViewModel) },
                 RouteName.APPS to { AppsPage(navController) },
+                RouteName.DOCS to { DocsPage(navController) },
+                RouteName.NOTES to { NotesPage(navController) },
                 RouteName.WEB_LEARN_MORE to { WebLearnMorePage(navController) },
             ).forEach { (routeName, content) ->
                 slideHorizontallyComposable(routeName.name) {
@@ -176,18 +181,27 @@ fun Main(viewModel: MainViewModel) {
                 }
             }
 
-            slideHorizontallyComposable(
-                "${RouteName.APPS.name}/search?q={q}",
-                arguments = listOf(navArgument("q") { type = NavType.StringType }),
-            ) {
+            routeSearch(RouteName.APPS) {
                 AppsSearchPage(navController)
             }
 
-            slideHorizontallyComposable(
-                "${RouteName.APPS.name}/{id}",
-                arguments = listOf(navArgument("id") { type = NavType.StringType }),
-            ) {
+            routeSearch(RouteName.DOCS) {
+                DocsSearchPage(navController)
+            }
+
+            routeSearch(RouteName.NOTES) {
+                NotesSearchPage(navController)
+            }
+
+            routeDetail(RouteName.APPS) {
                 AppPage(navController, sharedViewModel)
+            }
+
+            slideHorizontallyComposable(
+                "${RouteName.TAGS.name}?dataType={dataType}",
+                arguments = listOf(navArgument("dataType") { type = NavType.IntType }),
+            ) {
+                TagsPage(navController)
             }
 
             slideHorizontallyComposable(
@@ -204,6 +218,24 @@ fun Main(viewModel: MainViewModel) {
                 OtherFilePage(navController)
             }
         }
+    }
+}
+
+fun NavGraphBuilder.routeSearch(routeName: RouteName, action: @Composable () -> Unit) {
+    slideHorizontallyComposable(
+        "${routeName.name}/search?q={q}",
+        arguments = listOf(navArgument("q") { type = NavType.StringType }),
+    ) {
+        action()
+    }
+}
+
+fun NavGraphBuilder.routeDetail(routeName: RouteName, action: @Composable () -> Unit) {
+    slideHorizontallyComposable(
+        "${routeName.name}/{id}",
+        arguments = listOf(navArgument("id") { type = NavType.StringType }),
+    ) {
+        action()
     }
 }
 

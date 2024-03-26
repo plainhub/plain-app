@@ -8,8 +8,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DeveloperMode
+import androidx.compose.material.icons.outlined.Password
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,13 +57,14 @@ import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.ui.base.ActionButtonMore
-import com.ismartcoding.plain.ui.base.Alert
+import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.MiniOutlineButton
+import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PClickableText
 import com.ismartcoding.plain.ui.base.PDropdownMenu
+import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PMainSwitch
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -92,7 +96,7 @@ fun WebSettingsPage(
 ) {
     WebSettingsProvider {
         val context = LocalContext.current
-        val webConsole = LocalWeb.current
+        val webEnabled = LocalWeb.current
         val keepAwake = LocalKeepAwake.current
         val scope = rememberCoroutineScope()
         var isMenuOpen by remember { mutableStateOf(false) }
@@ -144,7 +148,7 @@ fun WebSettingsPage(
         }
 
         PScaffold(navController, topBarTitle = stringResource(id = R.string.web_console), actions = {
-            MiniOutlineButton(
+            PMiniOutlineButton(
                 text = stringResource(R.string.sessions),
                 onClick = {
                     navController.navigate(RouteName.SESSIONS)
@@ -154,19 +158,23 @@ fun WebSettingsPage(
                 isMenuOpen = !isMenuOpen
             }
             PDropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }, content = {
-                DropdownMenuItem(onClick = {
+                PDropdownMenuItem(leadingIcon = {
+                    Icon(
+                        Icons.Outlined.Password,
+                        contentDescription = stringResource(id = R.string.security)
+                    )
+                }, onClick = {
                     isMenuOpen = false
                     navController.navigate(RouteName.WEB_SECURITY)
                 }, text = {
                     Text(text = stringResource(R.string.security))
                 })
-                DropdownMenuItem(onClick = {
-                    isMenuOpen = false
-                    viewModel.dig(context)
-                }, text = {
-                    Text(text = stringResource(R.string.http_server_diagnostics))
-                })
-                DropdownMenuItem(onClick = {
+                PDropdownMenuItem(leadingIcon = {
+                    Icon(
+                        Icons.Outlined.DeveloperMode,
+                        contentDescription = stringResource(id = R.string.testing_token)
+                    )
+                }, onClick = {
                     isMenuOpen = false
                     navController.navigate(RouteName.WEB_DEV)
                 }, text = {
@@ -177,11 +185,11 @@ fun WebSettingsPage(
             LazyColumn {
                 item {
                     TopSpace()
-                    if (webConsole) {
-                        if (mainViewModel.httpServerError.value.isNotEmpty()) {
-                            Alert(title = stringResource(id = R.string.error), description = mainViewModel.httpServerError.value, AlertType.ERROR) {
+                    if (webEnabled) {
+                        if (mainViewModel.httpServerError.isNotEmpty()) {
+                            PAlert(title = stringResource(id = R.string.error), description = mainViewModel.httpServerError, AlertType.ERROR) {
                                 if (HttpServerManager.portsInUse.isNotEmpty()) {
-                                    MiniOutlineButton(
+                                    PMiniOutlineButton(
                                         text = stringResource(R.string.change_port),
                                         onClick = {
                                             scope.launch(Dispatchers.IO) {
@@ -206,7 +214,7 @@ fun WebSettingsPage(
                                         },
                                     )
                                 }
-                                MiniOutlineButton(
+                                PMiniOutlineButton(
                                     text = stringResource(R.string.relaunch_app),
                                     modifier = Modifier.padding(start = 16.dp),
                                     onClick = {
@@ -216,11 +224,11 @@ fun WebSettingsPage(
                             }
                         } else {
                             if (isVPNConnected) {
-                                Alert(title = stringResource(id = R.string.attention), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
+                                PAlert(title = stringResource(id = R.string.attention), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
                             }
                             if (!systemAlertWindow) {
-                                Alert(title = stringResource(id = R.string.attention), description = stringResource(id = R.string.system_alert_window_warning), AlertType.WARNING) {
-                                    MiniOutlineButton(
+                                PAlert(title = stringResource(id = R.string.attention), description = stringResource(id = R.string.system_alert_window_warning), AlertType.WARNING) {
+                                    PMiniOutlineButton(
                                         text = stringResource(R.string.grant_permission),
                                         onClick = {
                                             sendEvent(RequestPermissionsEvent(Permission.SYSTEM_ALERT_WINDOW))
@@ -246,14 +254,14 @@ fun WebSettingsPage(
                 item {
                     VerticalSpace(dp = 8.dp)
                     PMainSwitch(
-                        title = stringResource(id = mainViewModel.httpServerState.value.getTextId()),
-                        activated = webConsole,
-                        enable = !mainViewModel.httpServerState.value.isProcessing()
+                        title = stringResource(id = mainViewModel.httpServerState.getTextId()),
+                        activated = webEnabled,
+                        enable = !mainViewModel.httpServerState.isProcessing()
                     ) {
                         mainViewModel.enableHttpServer(context, it)
                     }
                 }
-                if (webConsole) {
+                if (webEnabled) {
                     item {
                         VerticalSpace(dp = 16.dp)
                         PCard {

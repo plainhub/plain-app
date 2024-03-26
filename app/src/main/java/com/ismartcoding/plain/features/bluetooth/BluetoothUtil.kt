@@ -70,7 +70,7 @@ object BluetoothUtil {
     private fun shouldEnableGPS(): Boolean {
         val locationManager = MainApp.instance.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         val hasGPS =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (isSPlus()) {
                 locationManager.getProviderProperties(LocationManager.GPS_PROVIDER) != null
             } else {
                 @Suppress("DEPRECATION")

@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.base
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.ui.theme.palette.alwaysLight
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -36,29 +34,28 @@ fun PMainSwitch(
                     onClick(!activated)
                 }
             })
-            .background(MaterialTheme.colorScheme.primaryContainer alwaysLight true),
+            .background(MaterialTheme.colorScheme.primaryContainer),
     ) {
         Row(
             modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 20.dp),
+                .padding(horizontal = 24.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
-                    color = MaterialTheme.colorScheme.onSurface alwaysLight true
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
-            Box(Modifier.padding(start = 16.dp)) {
-                PSwitch(
-                    activated = activated,
-                    enable = enable,
-                ) {
-                    onClick(it)
-                }
+            HorizontalSpace(dp = 16.dp)
+            PSwitch(
+                activated = activated,
+                enabled = enable,
+            ) {
+                onClick(it)
             }
         }
     }

@@ -5,7 +5,6 @@
     <color name="blur">#95000000</color>
     <color name="secondary">#DDDDDD</color>
     <color name="divider">#20FFFFFF</color>
-    <color name="purple">#512da8</color>
     <color name="purple_light">#b39ddb</color>
     <color name="bg_selected">#90512da8</color>
     <color name="white">#FEFEFE</color>
@@ -20,4 +19,10 @@
     <color name="splash_icon">#FFFFFF</color>
     <color name="fast_scroll_handle">#512da8</color>
     <color name="control_highlight">#40FFFFFF</color>
+
+    <color name="blue">#2196F3</color>
+    <color name="red">#FF5252</color>
+    <color name="yellow">#FFEB3B</color>
+    <color name="purple">#BA68C8</color>
+    <color name="green">#66BB6A</color>
 </resources>

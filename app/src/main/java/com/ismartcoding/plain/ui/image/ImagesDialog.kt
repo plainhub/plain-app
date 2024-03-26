@@ -27,7 +27,7 @@ import com.ismartcoding.plain.databinding.ItemMediaBucketGridBinding
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionsResultEvent
-import com.ismartcoding.plain.features.image.ImageHelper
+import com.ismartcoding.plain.features.image.ImageMediaStoreHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.CastDialog
 import com.ismartcoding.plain.ui.extensions.checkPermission
@@ -189,8 +189,8 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
         val query = viewModel.getQuery()
         val context = requireContext()
         val items =
-            withIO { ImageHelper.search(context, query, viewModel.limit, viewModel.offset, ImageSortByPreference.getValueAsync(context)) }
-        viewModel.total = withIO { ImageHelper.count(context, query) }
+            withIO { ImageMediaStoreHelper.search(context, query, viewModel.limit, viewModel.offset, ImageSortByPreference.getValueAsync(context)) }
+        viewModel.total = withIO { ImageMediaStoreHelper.count(context, query) }
 
         val bindingAdapter = binding.list.rv.bindingAdapter
         val toggleMode = bindingAdapter.toggleMode
@@ -211,7 +211,7 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
     }
 
     private suspend fun updateFolders() {
-        val items = withIO { ImageHelper.getBuckets(requireContext()) }
+        val items = withIO { ImageMediaStoreHelper.getBuckets(requireContext()) }
         viewModel.total = items.size
         binding.list.page.addData(items, hasMore = { false })
     }

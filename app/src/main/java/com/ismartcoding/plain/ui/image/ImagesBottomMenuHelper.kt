@@ -13,7 +13,7 @@ import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.databinding.DialogListDrawerBinding
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.image.DImage
-import com.ismartcoding.plain.features.image.ImageHelper
+import com.ismartcoding.plain.features.image.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.ui.CastDialog
 import com.ismartcoding.plain.ui.extensions.ensureSelect
@@ -35,7 +35,7 @@ object ImagesBottomMenuHelper {
         when (menuItem.itemId) {
             R.id.share -> {
                 rv.ensureSelect { items ->
-                    ShareHelper.share(context, ArrayList(items.map { ImageHelper.getItemUri(it.data.id) }))
+                    ShareHelper.share(context, ArrayList(items.map { ImageMediaStoreHelper.getItemUri(it.data.id) }))
                 }
             }
             R.id.cast -> {
@@ -51,7 +51,7 @@ object ImagesBottomMenuHelper {
                             DialogHelper.showLoading()
                             withIO {
                                 TagHelper.deleteTagRelationByKeys(ids, viewModel.dataType)
-                                ImageHelper.deleteRecordsAndFilesByIds(context, ids)
+                                ImageMediaStoreHelper.deleteRecordsAndFilesByIds(context, ids)
                             }
                             DialogHelper.hideLoading()
                             rv.bindingAdapter.checkedAll(false)

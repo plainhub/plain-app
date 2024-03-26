@@ -153,7 +153,7 @@ dependencies {
     val kgraphql = "0.19.0"
     val ktor = "3.0.0-beta-1"
     val media3 = "1.3.0"
-    val compose = "1.6.3"
+    val compose = "1.6.4"
 
     implementation(platform("androidx.compose:compose-bom:2024.01.00"))
 
@@ -164,7 +164,7 @@ dependencies {
     implementation("androidx.compose.foundation:foundation:$compose")
     implementation("androidx.compose.foundation:foundation-layout:$compose")
     implementation("androidx.compose.material3:material3:1.2.1")
-    implementation("androidx.compose.material:material-icons-extended:$compose")
+    implementation("androidx.compose.material:material-icons-extended:1.7.0-alpha05")
     implementation("com.google.accompanist:accompanist-drawablepainter:0.34.0")
 //    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha12")
 
@@ -172,7 +172,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
     releaseImplementation(platform("com.google.firebase:firebase-bom:32.2.3"))
-    releaseImplementation("com.google.firebase:firebase-crashlytics-ktx:18.6.2")
+    releaseImplementation("com.google.firebase:firebase-crashlytics-ktx:18.6.3")
 
     // Media3
     implementation("androidx.media3:media3-exoplayer:$media3")
@@ -224,7 +224,7 @@ dependencies {
 
     implementation("com.aallam.openai:openai-client:3.6.2")
 
-    implementation("com.google.zxing:core:3.5.2")
+    implementation("com.google.zxing:core:3.5.3")
 
     implementation("androidx.work:work-runtime-ktx:2.9.0")
 

@@ -75,6 +75,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PDropdownMenu
+import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -344,7 +345,7 @@ fun ChatPage(
                                             onDismissRequest = { showContextMenu.value = false },
                                         ) {
                                             if (m.value is DMessageText) {
-                                                DropdownMenuItem(
+                                                PDropdownMenuItem(
                                                     text = { Text(stringResource(id = R.string.copy_text)) },
                                                     onClick = {
                                                         showContextMenu.value = false
@@ -357,7 +358,7 @@ fun ChatPage(
                                                         DialogHelper.showMessage(R.string.copied)
                                                     },
                                                 )
-                                                DropdownMenuItem(
+                                                PDropdownMenuItem(
                                                     text = { Text(stringResource(id = R.string.edit_text)) },
                                                     onClick = {
                                                         showContextMenu.value = false
@@ -366,7 +367,7 @@ fun ChatPage(
                                                     },
                                                 )
                                             }
-                                            DropdownMenuItem(
+                                            PDropdownMenuItem(
                                                 text = { Text(stringResource(id = R.string.delete)) },
                                                 onClick = {
                                                     showContextMenu.value = false

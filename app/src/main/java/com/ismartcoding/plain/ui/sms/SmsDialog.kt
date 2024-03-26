@@ -16,7 +16,7 @@ import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.sms.DMessage
-import com.ismartcoding.plain.features.sms.SmsHelper
+import com.ismartcoding.plain.features.sms.SmsMediaStoreHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.PlainTextDialog
 import com.ismartcoding.plain.ui.extensions.checkPermission
@@ -89,8 +89,8 @@ class SmsDialog : BaseListDrawerDialog() {
     override fun updateList() {
         lifecycleScope.launch {
             val query = viewModel.getQuery()
-            val items = withIO { SmsHelper.search(requireContext(), query, viewModel.limit, viewModel.offset) }
-            viewModel.total = withIO { SmsHelper.count(requireContext(), query) }
+            val items = withIO { SmsMediaStoreHelper.search(requireContext(), query, viewModel.limit, viewModel.offset) }
+            viewModel.total = withIO { SmsMediaStoreHelper.count(requireContext(), query) }
 
             val bindingAdapter = binding.list.rv.bindingAdapter
             val toggleMode = bindingAdapter.toggleMode

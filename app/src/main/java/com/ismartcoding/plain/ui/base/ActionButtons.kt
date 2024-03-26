@@ -1,6 +1,9 @@
 package com.ismartcoding.plain.ui.base
 
-import androidx.compose.material.icons.Icons
+ import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Label
+ import androidx.compose.material.icons.outlined.Add
+ import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
@@ -20,10 +23,40 @@ fun ActionButtonMore(onClick: () -> Unit) {
 }
 
 @Composable
+fun ActionButtonAdd(onClick: () -> Unit) {
+    PIconButton(
+        imageVector = Icons.Outlined.Add,
+        contentDescription = stringResource(R.string.add),
+        tint = MaterialTheme.colorScheme.onSurface,
+        onClick = onClick,
+    )
+}
+
+@Composable
 fun ActionButtonSettings(onClick: () -> Unit) {
     PIconButton(
         imageVector = Icons.Outlined.Settings,
         contentDescription = stringResource(R.string.settings),
+        tint = MaterialTheme.colorScheme.onSurface,
+        onClick = onClick,
+    )
+}
+
+@Composable
+fun ActionButtonSelect(onClick: () -> Unit) {
+    PIconButton(
+        imageVector = Icons.Outlined.Checklist,
+        contentDescription = stringResource(R.string.select),
+        tint = MaterialTheme.colorScheme.onSurface,
+        onClick = onClick,
+    )
+}
+
+@Composable
+fun ActionButtonTags(onClick: () -> Unit) {
+    PIconButton(
+        imageVector = Icons.AutoMirrored.Outlined.Label,
+        contentDescription = stringResource(R.string.tags),
         tint = MaterialTheme.colorScheme.onSurface,
         onClick = onClick,
     )

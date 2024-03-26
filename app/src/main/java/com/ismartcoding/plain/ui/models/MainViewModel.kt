@@ -2,8 +2,10 @@ package com.ismartcoding.plain.ui.models
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.saveable
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
@@ -13,7 +15,6 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.enums.HttpServerState
 import com.ismartcoding.plain.data.preference.WebPreference
 import com.ismartcoding.plain.db.DBox
-import com.ismartcoding.plain.features.HttpServerStateChangedEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.StartHttpServerEvent
@@ -29,11 +30,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+// https://developer.android.com/topic/libraries/architecture/viewmodel/viewmodel-savedstate#savedstate-compose-state
+@OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
+class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     private val _boxes = MutableStateFlow(listOf<DBox>())
     val boxes: StateFlow<List<DBox>> get() = _boxes.asStateFlow()
-    var httpServerError = mutableStateOf("")
-    var httpServerState = mutableStateOf(HttpServerState.OFF)
+    var httpServerError by savedStateHandle.saveable { mutableStateOf("") }
+    var httpServerState by savedStateHandle.saveable {
+        mutableStateOf(HttpServerState.OFF)
+    }
 
     fun fetch() {
         viewModelScope.launch(Dispatchers.IO) {

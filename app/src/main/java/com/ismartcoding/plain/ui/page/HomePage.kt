@@ -5,8 +5,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Chat
+import androidx.compose.material.icons.outlined.PhoneAndroid
+import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -44,11 +45,13 @@ import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.ScreenHelper
 import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.ActionButtonSettings
-import com.ismartcoding.plain.ui.base.Alert
+import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.MiniOutlineButton
+import com.ismartcoding.plain.ui.base.PMiniOutlineButton
+import com.ismartcoding.plain.ui.base.PDraggableElement
 import com.ismartcoding.plain.ui.base.PDropdownMenu
+import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -72,7 +75,7 @@ fun HomePage(
     var isMenuOpen by remember { mutableStateOf(false) }
     val keepScreenOn = LocalKeepScreenOn.current
     val configuration = LocalConfiguration.current
-    val itemWidth = (configuration.screenWidthDp.dp - 96.dp) / 3
+    val itemWidth = (configuration.screenWidthDp.dp - 97.dp) / 3
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
     val webEnabled = LocalWeb.current
     var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.can(context)) }
@@ -110,7 +113,12 @@ fun HomePage(
                 isMenuOpen = !isMenuOpen
             }
             PDropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }, content = {
-                DropdownMenuItem(onClick = {
+                PDropdownMenuItem(leadingIcon = {
+                    Icon(
+                        Icons.Outlined.PhoneAndroid,
+                        contentDescription = stringResource(id = R.string.keep_screen_on)
+                    )
+                }, onClick = {
                     isMenuOpen = false
                     scope.launch(Dispatchers.IO) {
                         ScreenHelper.keepScreenOnAsync(context, !keepScreenOn)
@@ -129,7 +137,12 @@ fun HomePage(
                         })
                     }
                 })
-                DropdownMenuItem(onClick = {
+                PDropdownMenuItem(leadingIcon = {
+                    Icon(
+                        Icons.Outlined.QrCodeScanner,
+                        contentDescription = stringResource(id = R.string.scan_qrcode)
+                    )
+                }, onClick = {
                     isMenuOpen = false
                     navController.navigate(RouteName.SCAN)
                 }, text = {
@@ -138,18 +151,17 @@ fun HomePage(
             })
         },
         floatingActionButton = {
-            FloatingActionButton(
-                modifier =
-                Modifier
-                    .padding(bottom = 32.dp),
-                onClick = {
-                    navController.navigate(RouteName.CHAT)
-                },
-            ) {
-                Icon(
-                    Icons.AutoMirrored.Outlined.Chat,
-                    stringResource(R.string.file_transfer_assistant),
-                )
+            PDraggableElement {
+                FloatingActionButton(
+                    onClick = {
+                        navController.navigate(RouteName.CHAT)
+                    },
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Outlined.Chat,
+                        stringResource(R.string.file_transfer_assistant),
+                    )
+                }
             }
         },
     ) {
@@ -157,10 +169,10 @@ fun HomePage(
             item {
                 TopSpace()
                 if (webEnabled) {
-                    if (viewModel.httpServerError.value.isNotEmpty()) {
-                        Alert(title = stringResource(id = R.string.error), description = viewModel.httpServerError.value, AlertType.ERROR) {
+                    if (viewModel.httpServerError.isNotEmpty()) {
+                        PAlert(title = stringResource(id = R.string.error), description = viewModel.httpServerError, AlertType.ERROR) {
                             if (HttpServerManager.portsInUse.isNotEmpty()) {
-                                MiniOutlineButton(
+                                PMiniOutlineButton(
                                     text = stringResource(R.string.change_port),
                                     onClick = {
                                         scope.launch(Dispatchers.IO) {
@@ -185,7 +197,7 @@ fun HomePage(
                                     },
                                 )
                             }
-                            MiniOutlineButton(
+                            PMiniOutlineButton(
                                 text = stringResource(R.string.relaunch_app),
                                 modifier = Modifier.padding(start = 16.dp),
                                 onClick = {
@@ -195,11 +207,11 @@ fun HomePage(
                         }
                     } else {
                         if (isVPNConnected) {
-                            Alert(title = stringResource(id = R.string.attention), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
+                            PAlert(title = stringResource(id = R.string.attention), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
                         }
                         if (!systemAlertWindow) {
-                            Alert(title = stringResource(id = R.string.attention), description = stringResource(id = R.string.system_alert_window_warning), AlertType.WARNING) {
-                                MiniOutlineButton(
+                            PAlert(title = stringResource(id = R.string.attention), description = stringResource(id = R.string.system_alert_window_warning), AlertType.WARNING) {
+                                PMiniOutlineButton(
                                     text = stringResource(R.string.grant_permission),
                                     onClick = {
                                         sendEvent(RequestPermissionsEvent(Permission.SYSTEM_ALERT_WINDOW))

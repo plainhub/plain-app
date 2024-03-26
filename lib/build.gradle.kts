@@ -47,7 +47,7 @@ android {
 dependencies {
     val ktor = "3.0.0-beta-1"
     val markwon = "4.6.2"
-    val coil = "2.4.0"
+    val coil = "2.6.0"
 
     implementation("androidx.core:core-ktx:1.12.0")
     api("androidx.appcompat:appcompat:1.6.1")
@@ -62,8 +62,8 @@ dependencies {
 
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.7.3")
-    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.1")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.8.0")
+    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
     api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
     api("com.google.android.material:material:1.12.0-alpha03")
     api("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")

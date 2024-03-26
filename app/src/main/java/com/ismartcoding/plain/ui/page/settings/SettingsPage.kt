@@ -54,6 +54,9 @@ fun SettingsPage(navController: NavHostController) {
                                 navController.navigate(RouteName.LANGUAGE)
                             },
                         )
+                    }
+                    VerticalSpace(16.dp)
+                    PCard {
                         PListItem(
                             title = stringResource(R.string.backup_restore),
                             desc = stringResource(R.string.backup_desc),

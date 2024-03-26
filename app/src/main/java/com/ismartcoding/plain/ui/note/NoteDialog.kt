@@ -16,7 +16,6 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.ActionSourceType
 import com.ismartcoding.plain.data.enums.ActionType
 import com.ismartcoding.plain.data.enums.DataType
-import com.ismartcoding.plain.data.preference.NoteEditModePreference
 import com.ismartcoding.plain.databinding.DialogNoteBinding
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
@@ -25,7 +24,11 @@ import com.ismartcoding.plain.features.note.NoteHelper
 import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.features.tag.TagRelationStub
 import com.ismartcoding.plain.ui.BaseDialog
-import com.ismartcoding.plain.ui.extensions.*
+import com.ismartcoding.plain.ui.extensions.initMenu
+import com.ismartcoding.plain.ui.extensions.markdown
+import com.ismartcoding.plain.ui.extensions.onBack
+import com.ismartcoding.plain.ui.extensions.onMenuItemClick
+import com.ismartcoding.plain.ui.extensions.setScrollBehavior
 import kotlinx.coroutines.launch
 
 class NoteDialog() : BaseDialog<DialogNoteBinding>() {
@@ -35,6 +38,7 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
     private var note: DNote? = null
     private var tag: DTag? = null
     private var id: String = ""
+    private var editMode = false
 
     override fun onViewCreated(
         view: View,
@@ -45,6 +49,7 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
         note = arguments?.parcelable(ARG_NOTE)
         tag = arguments?.parcelable(ARG_TAG)
         id = note?.id ?: ""
+        editMode = note == null
 
         binding.topAppBar.toolbar.run {
             initMenu(R.menu.note_edit)
@@ -57,9 +62,7 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
                 when (itemId) {
                     R.id.preview -> {
                         lifecycleScope.launch {
-                            val context = requireContext()
-                            val editMode = withIO { !NoteEditModePreference.getAsync(context) }
-                            withIO { NoteEditModePreference.putAsync(context, editMode) }
+                            editMode = !editMode
                             updateModeUI(editMode)
                         }
                     }
@@ -91,7 +94,6 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
                     sendEvent(ActionEvent(ActionSourceType.NOTE, if (isNew) ActionType.CREATED else ActionType.UPDATED, setOf(id)))
                 }
             }
-            val editMode = withIO { NoteEditModePreference.getAsync(context) }
             updateModeUI(editMode)
         }
     }
@@ -100,7 +102,6 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
         val context = requireContext()
         if (editMode) {
             binding.topAppBar.apply {
-                toolbar.setTitle(R.string.edit_mode)
                 toolbar.menu.findItem(R.id.preview).icon = ContextCompat.getDrawable(context, R.drawable.ic_markdown)
                 setScrollBehavior(false)
             }
@@ -108,7 +109,6 @@ class NoteDialog() : BaseDialog<DialogNoteBinding>() {
             binding.markdownContainer.isVisible = false
         } else {
             binding.topAppBar.apply {
-                toolbar.setTitle(R.string.read_mode)
                 toolbar.menu.findItem(R.id.preview).icon = ContextCompat.getDrawable(context, R.drawable.ic_edit)
                 setScrollBehavior(true)
             }

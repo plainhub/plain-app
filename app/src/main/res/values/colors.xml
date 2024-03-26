@@ -5,12 +5,9 @@
     <color name="blur">#95FFFFFF</color>
     <color name="secondary">#6c757d</color>
     <color name="divider">#12000000</color>
-    <color name="purple">#512da8</color>
     <color name="purple_light">#512da8</color>
     <color name="bg_selected">#20512da8</color>
-    <color name="red">#E30425</color>
     <color name="white">#FFFFFF</color>
-    <color name="yellow">#EF9B43</color>
     <color name="bg_input">#FFFFFF</color>
     <color name="foreground">#FFFFFF</color>
     <color name="switch_track_color">#66512da8</color>
@@ -34,4 +31,11 @@
     <color name="syntax_string">#ffd44950</color>
     <color name="syntax_variable">#ff009688</color>
     <color name="syntax_comment">#ff999999</color>
+
+    <color name="blue">#3F51B5</color>
+    <color name="red">#E53935</color>
+    <color name="yellow">#FFD54F</color>
+    <color name="purple">#9C27B0</color>
+    <color name="green">#4CAF50</color>
+
 </resources>

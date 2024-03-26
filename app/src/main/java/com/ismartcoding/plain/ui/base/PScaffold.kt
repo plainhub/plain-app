@@ -18,15 +18,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.ui.theme.canvas
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PScaffold(
     navController: NavHostController,
-    containerColor: Color = MaterialTheme.colorScheme.canvas(),
+    containerColor: Color = MaterialTheme.colorScheme.background,
     navigationIcon: (@Composable () -> Unit)? = {
-        NavigationBackIcon(navController)
+        NavigationBackIcon { navController.popBackStack() }
     },
     topBarTitle: String = "",
     actions: (@Composable RowScope.() -> Unit)? = null,
@@ -39,7 +38,7 @@ fun PScaffold(
         topBar = {
             if (navigationIcon != null || actions != null) {
                 TopAppBar(
-                    title = { Text(topBarTitle, maxLines = 2, overflow = TextOverflow.Ellipsis) },
+                    title = { Text(topBarTitle, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                     navigationIcon = { navigationIcon?.invoke() },
                     actions = { actions?.invoke(this) },
                     modifier = Modifier.padding(horizontal = 8.dp),

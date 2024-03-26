@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.Language
@@ -43,7 +44,7 @@ fun LanguagePage(navController: NavHostController) {
                 }
                 itemsIndexed(list) { index, item ->
                     PListItem(
-                        modifier = PlainTheme.getCardModifier(index = index, size = list.size),
+                        modifier = PlainTheme.getCardModifier(index = if (index > 0) index - 1 else 0, size = if (index > 0) list.size -1 else 1),
                         title = item?.getDisplayName(item) ?: stringResource(id = R.string.use_device_language),
                         onClick = {
                             scope.launch(Dispatchers.IO) {
@@ -56,6 +57,9 @@ fun LanguagePage(navController: NavHostController) {
                                 LanguagePreference.putAsync(context, item)
                             }
                         })
+                    }
+                    if (index == 0) {
+                        VerticalSpace(16.dp)
                     }
                 }
                 item {

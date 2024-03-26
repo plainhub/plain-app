@@ -48,11 +48,11 @@ import com.ismartcoding.plain.features.WindowFocusChangedEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.ui.base.PDropdownMenu
+import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.RadioDialog
 import com.ismartcoding.plain.ui.base.RadioDialogOption
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.theme.canvas
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -96,7 +96,7 @@ fun WebAddressBar(
             .fillMaxWidth()
             .height(48.dp)
             .background(
-                color = MaterialTheme.colorScheme.canvas(),
+                color = MaterialTheme.colorScheme.surfaceContainerHighest,
                 shape = RoundedCornerShape(12.dp),
             ),
         verticalAlignment = Alignment.CenterVertically,
@@ -154,7 +154,7 @@ fun WebAddressBar(
                 ) {
                     ip4s.forEach { ip ->
                         val url = "${if (isHttps) "https" else "http"}://$ip:${port}"
-                        DropdownMenuItem(text = { Text(url) }, onClick = {
+                        PDropdownMenuItem(text = { Text(url) }, onClick = {
                             showContextMenu.value = false
                             val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), url)
                             clipboardManager.setPrimaryClip(clip)

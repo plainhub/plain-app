@@ -14,20 +14,20 @@ import androidx.compose.ui.unit.dp
 object PlainTheme {
     val PAGE_HORIZONTAL_MARGIN = 16.dp
     val PAGE_TOP_MARGIN = 8.dp
-    val CARD_CORNER = 16.dp
+    val CARD_RADIUS = 12.dp
     val APP_BAR_HEIGHT = 64.dp
     const val ANIMATION_DURATION = 350
 
     @Composable
-    fun getCardModifier(index: Int, size: Int): Modifier {
+    fun getCardModifier(index: Int = 0, size: Int = 1, selected: Boolean = false): Modifier {
         val shape = if (index == 0) {
             if (size == 1) {
-                RoundedCornerShape(CARD_CORNER)
+                RoundedCornerShape(CARD_RADIUS)
             } else {
-                RoundedCornerShape(topStart = CARD_CORNER, topEnd = CARD_CORNER)
+                RoundedCornerShape(topStart = CARD_RADIUS, topEnd = CARD_RADIUS)
             }
         } else if (index == size - 1) {
-            RoundedCornerShape(bottomStart = CARD_CORNER, bottomEnd = CARD_CORNER)
+            RoundedCornerShape(bottomStart = CARD_RADIUS, bottomEnd = CARD_RADIUS)
         } else {
             RectangleShape
         }
@@ -36,7 +36,7 @@ object PlainTheme {
             .padding(horizontal = PAGE_HORIZONTAL_MARGIN)
             .clip(shape)
             .background(
-                color = MaterialTheme.colorScheme.cardBack(),
+                color = if (selected) MaterialTheme.colorScheme.tertiaryContainer else  MaterialTheme.colorScheme.cardContainer(),
                 shape = shape,
             )
     }

@@ -16,7 +16,7 @@ import com.ismartcoding.plain.databinding.DialogListDrawerBinding
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.features.video.DVideo
-import com.ismartcoding.plain.features.video.VideoHelper
+import com.ismartcoding.plain.features.video.VideoMediaStoreHelper
 import com.ismartcoding.plain.ui.CastDialog
 import com.ismartcoding.plain.ui.extensions.ensureSelect
 import com.ismartcoding.plain.ui.helpers.BottomMenuHelper
@@ -37,7 +37,7 @@ object VideosBottomMenuHelper {
         when (menuItem.itemId) {
             R.id.share -> {
                 rv.ensureSelect { items ->
-                    ShareHelper.share(context, ArrayList(items.map { VideoHelper.getItemUri(it.data.id) }))
+                    ShareHelper.share(context, ArrayList(items.map { VideoMediaStoreHelper.getItemUri(it.data.id) }))
                 }
             }
 
@@ -67,11 +67,11 @@ object VideosBottomMenuHelper {
                                     ids,
                                     DataType.VIDEO,
                                 )
-                                VideoHelper.deleteRecordsAndFilesByIds(
+                                VideoMediaStoreHelper.deleteRecordsAndFilesByIds(
                                     context,
                                     ids,
                                 )
-                                VideoPlaylistPreference.deleteAsync(context, ids.map { VideoHelper.getItemUri(it).toString() }.toSet())
+                                VideoPlaylistPreference.deleteAsync(context, ids.map { VideoMediaStoreHelper.getItemUri(it).toString() }.toSet())
                             }
                             list.rv.bindingAdapter.checkedAll(false)
                             sendEvent(ActionEvent(ActionSourceType.VIDEO, ActionType.DELETED, ids))

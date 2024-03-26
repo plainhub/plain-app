@@ -11,17 +11,18 @@ import androidx.core.os.bundleOf
 import com.ismartcoding.lib.extensions.getDirectChildrenCount
 import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
+import com.ismartcoding.lib.extensions.queryCursor
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.enums.FileType
+import com.ismartcoding.plain.extensions.sort
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.storageManager
 import com.ismartcoding.plain.storageStatsManager
 import kotlinx.datetime.Instant
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.LinkOption
-import java.nio.file.attribute.PosixFileAttributes
-import java.util.*
+import java.util.Collections
+import java.util.Locale
 import java.util.regex.Pattern
 
 object FileSystemHelper {
@@ -268,7 +269,7 @@ object FileSystemHelper {
         val items = arrayListOf<DFile>()
         val limit = 100
         val uri =
-            MediaStore.Files.getContentUri("external").buildUpon()
+            MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY).buildUpon()
                 .appendQueryParameter("limit", limit.toString())
                 .appendQueryParameter("offset", "0")
                 .build()
@@ -308,33 +309,20 @@ object FileSystemHelper {
 
         return items.take(50)
     }
-}
 
-fun List<DFile>.sort(sortBy: FileSortBy): List<DFile> {
-    val comparator = compareBy<DFile> { if (it.isDir) 0 else 1 }
-    return when (sortBy) {
-        FileSortBy.NAME_ASC -> {
-            this.sortedWith(comparator.thenBy { it.name.lowercase() })
-        }
-
-        FileSortBy.NAME_DESC -> {
-            this.sortedWith(comparator.thenByDescending { it.name.lowercase() })
-        }
-
-        FileSortBy.SIZE_ASC -> {
-            this.sortedWith(comparator.thenBy { it.size })
-        }
-
-        FileSortBy.SIZE_DESC -> {
-            this.sortedWith(comparator.thenByDescending { it.size })
-        }
-
-        FileSortBy.DATE_ASC -> {
-            this.sortedWith(comparator.thenBy { it.updatedAt })
-        }
-
-        FileSortBy.DATE_DESC -> {
-            this.sortedWith(comparator.thenByDescending { it.updatedAt })
-        }
+    fun getAllVolumeNames(context: Context): List<String> {
+        val volumeNames = mutableListOf(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        context.getExternalFilesDirs(null)
+            .mapNotNull { storageManager.getStorageVolume(it) }
+            .filterNot { it.isPrimary }
+            .mapNotNull { it.uuid?.lowercase(Locale.US) }
+            .forEach {
+                volumeNames.add(it)
+            }
+        return volumeNames
     }
+
+
 }
+
+

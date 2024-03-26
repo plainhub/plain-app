@@ -2,6 +2,8 @@
     <string name="app_name">簡樸</string>
     <string name="vpn_web_conflict_warning">您的手機啟用了VPN，這可能會導致從電腦訪問網頁時出現連接問題。我們建議您調整VPN設置允許區域網路流量或關閉VPN。</string>
     <string name="warning">警告</string>
+    <string name="pin">置頂</string>
+    <string name="docs">文件</string>
     <string name="no_results_found">找不到結果</string>
     <string name="search">搜尋</string>
     <string name="attention">注意</string>

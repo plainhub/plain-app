@@ -14,8 +14,7 @@ import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.data.preference.AudioPlaylistPreference
 import com.ismartcoding.plain.databinding.DialogListDrawerBinding
 import com.ismartcoding.plain.features.ActionEvent
-import com.ismartcoding.plain.features.audio.AudioHelper
-import com.ismartcoding.plain.features.audio.AudioPlayer
+import com.ismartcoding.plain.features.audio.AudioMediaStoreHelper
 import com.ismartcoding.plain.features.audio.DAudio
 import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.ui.CastDialog
@@ -38,7 +37,7 @@ object AudiosBottomMenuHelper {
         when (menuItem.itemId) {
             R.id.share -> {
                 rv.ensureSelect { items ->
-                    ShareHelper.share(context, ArrayList(items.map { AudioHelper.getItemUri(it.data.id) }))
+                    ShareHelper.share(context, ArrayList(items.map { AudioMediaStoreHelper.getItemUri(it.data.id) }))
                 }
             }
 
@@ -70,7 +69,7 @@ object AudiosBottomMenuHelper {
                                     ids,
                                     DataType.AUDIO,
                                 )
-                                AudioHelper.deleteRecordsAndFilesByIds(
+                                AudioMediaStoreHelper.deleteRecordsAndFilesByIds(
                                     context,
                                     ids,
                                 )

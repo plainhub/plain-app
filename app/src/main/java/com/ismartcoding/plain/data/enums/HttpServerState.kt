@@ -1,9 +1,11 @@
 package com.ismartcoding.plain.data.enums
 
+import android.os.Parcelable
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import kotlinx.parcelize.Parcelize
 
-enum class HttpServerState {
+@Parcelize
+enum class HttpServerState: Parcelable {
     OFF,
     ON,
     STARTING,

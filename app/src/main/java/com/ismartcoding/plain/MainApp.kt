@@ -39,6 +39,7 @@ import com.ismartcoding.plain.features.AcquireWakeLockEvent
 import com.ismartcoding.plain.features.AppEvents
 import com.ismartcoding.plain.features.bluetooth.BluetoothEvents
 import com.ismartcoding.plain.features.pkg.PackageHelper
+import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.NotificationListenerMonitorService
 import com.ismartcoding.plain.ui.helpers.PageHelper

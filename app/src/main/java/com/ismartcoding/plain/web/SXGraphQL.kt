@@ -58,14 +58,14 @@ import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.QueryHelper
 import com.ismartcoding.plain.features.StartScreenMirrorEvent
 import com.ismartcoding.plain.features.aichat.AIChatHelper
-import com.ismartcoding.plain.features.audio.AudioHelper
+import com.ismartcoding.plain.features.audio.AudioMediaStoreHelper
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
 import com.ismartcoding.plain.features.audio.MediaPlayMode
-import com.ismartcoding.plain.features.call.CallHelper
+import com.ismartcoding.plain.features.call.CallMediaStoreHelper
 import com.ismartcoding.plain.features.call.SimHelper
 import com.ismartcoding.plain.features.chat.ChatHelper
-import com.ismartcoding.plain.features.contact.ContactHelper
+import com.ismartcoding.plain.features.contact.ContactMediaStoreHelper
 import com.ismartcoding.plain.features.contact.GroupHelper
 import com.ismartcoding.plain.features.contact.SourceHelper
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
@@ -73,13 +73,13 @@ import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.features.feed.fetchContentAsync
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.FileSystemHelper
-import com.ismartcoding.plain.features.image.ImageHelper
+import com.ismartcoding.plain.features.image.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.note.NoteHelper
 import com.ismartcoding.plain.features.pkg.PackageHelper
-import com.ismartcoding.plain.features.sms.SmsHelper
+import com.ismartcoding.plain.features.sms.SmsMediaStoreHelper
 import com.ismartcoding.plain.features.tag.TagHelper
 import com.ismartcoding.plain.features.tag.TagRelationStub
-import com.ismartcoding.plain.features.video.VideoHelper
+import com.ismartcoding.plain.features.video.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.DeviceInfoHelper
 import com.ismartcoding.plain.helpers.ExchangeHelper
@@ -240,7 +240,7 @@ class SXGraphQL(val schema: Schema) {
                     }
                     resolver { offset: Int, limit: Int, query: String ->
                         Permission.READ_SMS.checkAsync(MainApp.instance)
-                        SmsHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
+                        SmsMediaStoreHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
                     }
                     type<Message> {
                         dataProperty("tags") {
@@ -254,7 +254,7 @@ class SXGraphQL(val schema: Schema) {
                 query("messageCount") {
                     resolver { query: String ->
                         if (Permission.READ_SMS.can(MainApp.instance)) {
-                            SmsHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
+                            SmsMediaStoreHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
                             0
                         }
@@ -267,7 +267,7 @@ class SXGraphQL(val schema: Schema) {
                     resolver { offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-                        ImageHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, sortBy).map {
+                        ImageMediaStoreHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, sortBy).map {
                             it.toModel()
                         }
                     }
@@ -284,7 +284,7 @@ class SXGraphQL(val schema: Schema) {
                     resolver { query: String ->
                         val context = MainApp.instance
                         if (Permission.WRITE_EXTERNAL_STORAGE.can(context)) {
-                            ImageHelper.count(context, QueryHelper.prepareQuery(query))
+                            ImageMediaStoreHelper.count(context, QueryHelper.prepareQuery(query))
                         } else {
                             0
                         }
@@ -295,15 +295,15 @@ class SXGraphQL(val schema: Schema) {
                         val context = MainApp.instance
                         if (Permission.WRITE_EXTERNAL_STORAGE.can(context)) {
                             if (type == DataType.IMAGE) {
-                                ImageHelper.getBuckets(context).map { it.toModel() }
+                                ImageMediaStoreHelper.getBuckets(context).map { it.toModel() }
                             } else if (type == DataType.AUDIO) {
                                 if (isQPlus()) {
-                                    AudioHelper.getBuckets(context).map { it.toModel() }
+                                    AudioMediaStoreHelper.getBuckets(context).map { it.toModel() }
                                 } else {
                                     emptyList()
                                 }
                             } else if (type == DataType.VIDEO) {
-                                VideoHelper.getBuckets(context).map { it.toModel() }
+                                VideoMediaStoreHelper.getBuckets(context).map { it.toModel() }
                             } else {
                                 emptyList()
                             }
@@ -319,7 +319,7 @@ class SXGraphQL(val schema: Schema) {
                     resolver { offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-                        VideoHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, sortBy).map {
+                        VideoMediaStoreHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, sortBy).map {
                             it.toModel()
                         }
                     }
@@ -335,7 +335,7 @@ class SXGraphQL(val schema: Schema) {
                 query("videoCount") {
                     resolver { query: String ->
                         if (Permission.WRITE_EXTERNAL_STORAGE.can(MainApp.instance)) {
-                            VideoHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
+                            VideoMediaStoreHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
                             0
                         }
@@ -348,7 +348,7 @@ class SXGraphQL(val schema: Schema) {
                     resolver { offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-                        AudioHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, sortBy).map {
+                        AudioMediaStoreHelper.search(context, QueryHelper.prepareQuery(query), limit, offset, sortBy).map {
                             it.toModel()
                         }
                     }
@@ -364,7 +364,7 @@ class SXGraphQL(val schema: Schema) {
                 query("audioCount") {
                     resolver { query: String ->
                         if (Permission.WRITE_EXTERNAL_STORAGE.can(MainApp.instance)) {
-                            AudioHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
+                            AudioMediaStoreHelper.count(MainApp.instance, QueryHelper.prepareQuery(query))
                         } else {
                             0
                         }
@@ -378,7 +378,7 @@ class SXGraphQL(val schema: Schema) {
                         val context = MainApp.instance
                         Permissions.checkAsync(context, setOf(Permission.READ_CONTACTS))
                         try {
-                            ContactHelper.search(context, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
+                            ContactMediaStoreHelper.search(context, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
                         } catch (ex: Exception) {
                             LogCat.e(ex)
                             emptyList()
@@ -397,7 +397,7 @@ class SXGraphQL(val schema: Schema) {
                     resolver { query: String ->
                         val context = MainApp.instance
                         if (Permission.READ_CONTACTS.can(context)) {
-                            ContactHelper.count(context, QueryHelper.prepareQuery(query))
+                            ContactMediaStoreHelper.count(context, QueryHelper.prepareQuery(query))
                         } else {
                             0
                         }
@@ -426,7 +426,7 @@ class SXGraphQL(val schema: Schema) {
                     }
                     resolver { offset: Int, limit: Int, query: String ->
                         Permissions.checkAsync(MainApp.instance, setOf(Permission.READ_CALL_LOG))
-                        CallHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
+                        CallMediaStoreHelper.search(MainApp.instance, QueryHelper.prepareQuery(query), limit, offset).map { it.toModel() }
                     }
                     type<Call> {
                         dataProperty("tags") {
@@ -441,7 +441,7 @@ class SXGraphQL(val schema: Schema) {
                     resolver { query: String ->
                         val context = MainApp.instance
                         if (Permission.READ_CALL_LOG.can(context)) {
-                            CallHelper.count(context, QueryHelper.prepareQuery(query))
+                            CallMediaStoreHelper.count(context, QueryHelper.prepareQuery(query))
                         } else {
                             0
                         }
@@ -728,9 +728,9 @@ class SXGraphQL(val schema: Schema) {
                     resolver { query: String ->
                         val context = MainApp.instance
                         Permission.WRITE_CONTACTS.checkAsync(context)
-                        val newIds = ContactHelper.getIds(context, query)
+                        val newIds = ContactMediaStoreHelper.getIds(context, query)
                         TagHelper.deleteTagRelationByKeys(newIds, DataType.CONTACT)
-                        ContactHelper.deleteByIds(context, newIds)
+                        ContactMediaStoreHelper.deleteByIds(context, newIds)
                         true
                     }
                 }
@@ -744,15 +744,15 @@ class SXGraphQL(val schema: Schema) {
                 mutation("updateContact") {
                     resolver { id: ID, input: ContactInput ->
                         Permission.WRITE_CONTACTS.checkAsync(MainApp.instance)
-                        ContactHelper.update(id.value, input)
-                        ContactHelper.get(MainApp.instance, id.value)?.toModel()
+                        ContactMediaStoreHelper.update(id.value, input)
+                        ContactMediaStoreHelper.get(MainApp.instance, id.value)?.toModel()
                     }
                 }
                 mutation("createContact") {
                     resolver { input: ContactInput ->
                         Permission.WRITE_CONTACTS.checkAsync(MainApp.instance)
-                        val id = ContactHelper.create(input)
-                        if (id.isEmpty()) null else ContactHelper.get(MainApp.instance, id)?.toModel()
+                        val id = ContactMediaStoreHelper.create(input)
+                        if (id.isEmpty()) null else ContactMediaStoreHelper.get(MainApp.instance, id)?.toModel()
                     }
                 }
                 mutation("createTag") {
@@ -818,7 +818,7 @@ class SXGraphQL(val schema: Schema) {
                 mutation("call") {
                     resolver { number: String ->
                         Permission.CALL_PHONE.checkAsync(MainApp.instance)
-                        CallHelper.call(MainActivity.instance.get()!!, number)
+                        CallMediaStoreHelper.call(MainActivity.instance.get()!!, number)
                         true
                     }
                 }
@@ -841,9 +841,9 @@ class SXGraphQL(val schema: Schema) {
                     resolver { query: String ->
                         val context = MainApp.instance
                         Permission.WRITE_CALL_LOG.checkAsync(context)
-                        val newIds = CallHelper.getIds(context, query)
+                        val newIds = CallMediaStoreHelper.getIds(context, query)
                         TagHelper.deleteTagRelationByKeys(newIds, DataType.CALL)
-                        CallHelper.deleteByIds(context, newIds)
+                        CallMediaStoreHelper.deleteByIds(context, newIds)
                         true
                     }
                 }
@@ -969,7 +969,7 @@ class SXGraphQL(val schema: Schema) {
                     resolver { query: String ->
                         val context = MainApp.instance
                         // 1000 items at most
-                        val items = AudioHelper.search(context, query, 1000, 0, AudioSortByPreference.getValueAsync(context))
+                        val items = AudioMediaStoreHelper.search(context, query, 1000, 0, AudioSortByPreference.getValueAsync(context))
                         AudioPlaylistPreference.addAsync(context, items.map { it.toPlaylistAudio() })
                         true
                     }
@@ -1007,23 +1007,23 @@ class SXGraphQL(val schema: Schema) {
                         val context = MainApp.instance
                         when (type) {
                             DataType.AUDIO -> {
-                                items = AudioHelper.getTagRelationStubs(context, query)
+                                items = AudioMediaStoreHelper.getTagRelationStubs(context, query)
                             }
 
                             DataType.VIDEO -> {
-                                items = VideoHelper.getTagRelationStubs(context, query)
+                                items = VideoMediaStoreHelper.getTagRelationStubs(context, query)
                             }
 
                             DataType.IMAGE -> {
-                                items = ImageHelper.getTagRelationStubs(context, query)
+                                items = ImageMediaStoreHelper.getTagRelationStubs(context, query)
                             }
 
                             DataType.SMS -> {
-                                items = SmsHelper.getIds(context, query).map { TagRelationStub(it) }
+                                items = SmsMediaStoreHelper.getIds(context, query).map { TagRelationStub(it) }
                             }
 
                             DataType.CONTACT -> {
-                                items = ContactHelper.getIds(context, query).map { TagRelationStub(it) }
+                                items = ContactMediaStoreHelper.getIds(context, query).map { TagRelationStub(it) }
                             }
 
                             DataType.NOTE -> {
@@ -1035,7 +1035,7 @@ class SXGraphQL(val schema: Schema) {
                             }
 
                             DataType.CALL -> {
-                                items = CallHelper.getIds(context, query).map { TagRelationStub(it) }
+                                items = CallMediaStoreHelper.getIds(context, query).map { TagRelationStub(it) }
                             }
 
                             DataType.AI_CHAT -> {
@@ -1080,23 +1080,23 @@ class SXGraphQL(val schema: Schema) {
                         var ids = setOf<String>()
                         when (type) {
                             DataType.AUDIO -> {
-                                ids = AudioHelper.getIds(context, query)
+                                ids = AudioMediaStoreHelper.getIds(context, query)
                             }
 
                             DataType.VIDEO -> {
-                                ids = VideoHelper.getIds(context, query)
+                                ids = VideoMediaStoreHelper.getIds(context, query)
                             }
 
                             DataType.IMAGE -> {
-                                ids = ImageHelper.getIds(context, query)
+                                ids = ImageMediaStoreHelper.getIds(context, query)
                             }
 
                             DataType.SMS -> {
-                                ids = SmsHelper.getIds(context, query)
+                                ids = SmsMediaStoreHelper.getIds(context, query)
                             }
 
                             DataType.CONTACT -> {
-                                ids = ContactHelper.getIds(context, query)
+                                ids = ContactMediaStoreHelper.getIds(context, query)
                             }
 
                             DataType.NOTE -> {
@@ -1108,7 +1108,7 @@ class SXGraphQL(val schema: Schema) {
                             }
 
                             DataType.CALL -> {
-                                ids = CallHelper.getIds(context, query)
+                                ids = CallMediaStoreHelper.getIds(context, query)
                             }
 
                             DataType.AI_CHAT -> {
@@ -1128,20 +1128,20 @@ class SXGraphQL(val schema: Schema) {
                         val context = MainApp.instance
                         when (type) {
                             DataType.AUDIO -> {
-                                ids = AudioHelper.getIds(context, query)
-                                val paths = AudioHelper.deleteRecordsAndFilesByIds(context, ids)
+                                ids = AudioMediaStoreHelper.getIds(context, query)
+                                val paths = AudioMediaStoreHelper.deleteRecordsAndFilesByIds(context, ids)
                                 AudioPlaylistPreference.deleteAsync(context, paths)
                             }
 
                             DataType.VIDEO -> {
-                                ids = VideoHelper.getIds(context, query)
-                                val paths = VideoHelper.deleteRecordsAndFilesByIds(context, ids)
+                                ids = VideoMediaStoreHelper.getIds(context, query)
+                                val paths = VideoMediaStoreHelper.deleteRecordsAndFilesByIds(context, ids)
                                 VideoPlaylistPreference.deleteAsync(context, paths)
                             }
 
                             DataType.IMAGE -> {
-                                ids = ImageHelper.getIds(context, query)
-                                ImageHelper.deleteRecordsAndFilesByIds(context, ids)
+                                ids = ImageMediaStoreHelper.getIds(context, query)
+                                ImageMediaStoreHelper.deleteRecordsAndFilesByIds(context, ids)
                             }
 
                             else -> {

@@ -1,13 +1,12 @@
 package com.ismartcoding.plain.ui.base
 
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -68,26 +67,19 @@ fun TextFieldDialog(
                 errorText = errorText,
                 keyboardOptions = keyboardOptions,
                 focusManager = focusManager,
+                requestFocus = true,
                 onConfirm = onConfirm,
             )
         },
         confirmButton = {
-            TextButton(
+            Button(
                 enabled = value.isNotBlank(),
                 onClick = {
                     focusManager.clearFocus()
                     onConfirm(value)
                 },
             ) {
-                Text(
-                    text = confirmText,
-                    color =
-                        if (value.isNotBlank()) {
-                            Color.Unspecified
-                        } else {
-                            MaterialTheme.colorScheme.outline.copy(alpha = 0.7f)
-                        },
-                )
+                Text(confirmText)
             }
         },
         dismissButton = {

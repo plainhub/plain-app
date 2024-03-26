@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.graphics.Matrix
 import android.net.Uri
 import androidx.exifinterface.media.ExifInterface
@@ -12,6 +13,14 @@ import java.io.IOException
 
 object QrCodeBitmapHelper {
     private const val MAX_BITMAP_SIZE = 1024 // Maximum allowed bitmap size (in pixels)
+
+    fun getBitmapFromUri(context: Context, imageUri: Uri): Bitmap {
+        val source = ImageDecoder.createSource(
+            context.contentResolver,
+            imageUri
+        )
+        return ImageDecoder.decodeBitmap(source).copy(Bitmap.Config.ARGB_8888, true)
+    }
 
     fun getBitmapFromContentUri(
         context: Context,
@@ -50,6 +59,7 @@ object QrCodeBitmapHelper {
                 rotationDegrees = 90
                 flipX = true
             }
+
             ExifInterface.ORIENTATION_ROTATE_180 -> rotationDegrees = 180
             ExifInterface.ORIENTATION_FLIP_VERTICAL -> flipY = true
             ExifInterface.ORIENTATION_ROTATE_270 -> rotationDegrees = -90
@@ -57,6 +67,7 @@ object QrCodeBitmapHelper {
                 rotationDegrees = -90
                 flipX = true
             }
+
             ExifInterface.ORIENTATION_UNDEFINED, ExifInterface.ORIENTATION_NORMAL -> {}
             else -> {}
         }

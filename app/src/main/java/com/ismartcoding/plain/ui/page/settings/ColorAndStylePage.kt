@@ -68,13 +68,11 @@ import com.ismartcoding.plain.ui.base.BlockRadioGroupButtonItem
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.ClipboardTextField
 import com.ismartcoding.plain.ui.base.DynamicSVGImage
-import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
-import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.colorpicker.ColorEnvelope
 import com.ismartcoding.plain.ui.base.colorpicker.HsvColorPicker
 import com.ismartcoding.plain.ui.base.colorpicker.rememberColorPickerController
@@ -83,12 +81,12 @@ import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.svg.PALETTE
 import com.ismartcoding.plain.ui.svg.SVGString
 import com.ismartcoding.plain.ui.theme.PlainTheme
+import com.ismartcoding.plain.ui.theme.cardContainer
 import com.ismartcoding.plain.ui.theme.palette.TonalPalettes
 import com.ismartcoding.plain.ui.theme.palette.TonalPalettes.Companion.toTonalPalettes
 import com.ismartcoding.plain.ui.theme.palette.checkColorHex
 import com.ismartcoding.plain.ui.theme.palette.dynamic.extractTonalPalettesFromUserWallpaper
 import com.ismartcoding.plain.ui.theme.palette.onDark
-import com.ismartcoding.plain.ui.theme.palette.onLight
 import com.ismartcoding.plain.ui.theme.palette.safeHexToColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -119,10 +117,9 @@ fun ColorAndStylePage(navController: NavHostController) {
                             .fillMaxWidth()
                             .padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)
                             .aspectRatio(1.38f)
-                            .clip(RoundedCornerShape(24.dp))
+                            .clip(RoundedCornerShape(PlainTheme.CARD_RADIUS))
                             .background(
-                                MaterialTheme.colorScheme.inverseOnSurface
-                                        onLight MaterialTheme.colorScheme.surface.copy(0.7f),
+                                MaterialTheme.colorScheme.cardContainer(),
                             )
                             .clickable { },
                         horizontalArrangement = Arrangement.Center,
@@ -180,22 +177,21 @@ fun ColorAndStylePage(navController: NavHostController) {
                     Subtitle(
                         text = stringResource(R.string.appearance),
                     )
-                    PCard {
-                        PListItem(
-                            title = stringResource(R.string.dark_theme),
-                            desc = DarkTheme.entries.find { it.value == darkTheme }?.getText(context) ?: "",
-                            separatedActions = true,
-                            onClick = {
-                                navController.navigate(RouteName.DARK_THEME)
-                            },
+                    PListItem(
+                        title = stringResource(R.string.dark_theme),
+                        desc = DarkTheme.entries.find { it.value == darkTheme }?.getText(context) ?: "",
+                        separatedActions = true,
+                        modifier = PlainTheme.getCardModifier(),
+                        onClick = {
+                            navController.navigate(RouteName.DARK_THEME)
+                        },
+                    ) {
+                        PSwitch(
+                            activated = DarkTheme.isDarkTheme(darkTheme),
                         ) {
-                            PSwitch(
-                                activated = DarkTheme.isDarkTheme(darkTheme),
-                            ) {
-                                scope.launch {
-                                    withIO {
-                                        DarkThemePreference.putAsync(context, if (it) DarkTheme.ON else DarkTheme.OFF)
-                                    }
+                            scope.launch {
+                                withIO {
+                                    DarkThemePreference.putAsync(context, if (it) DarkTheme.ON else DarkTheme.OFF)
                                 }
                             }
                         }
@@ -245,8 +241,7 @@ fun Palettes(
                 .height(80.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .background(
-                    MaterialTheme.colorScheme.inverseOnSurface
-                            onLight MaterialTheme.colorScheme.surface.copy(0.7f),
+                    MaterialTheme.colorScheme.cardContainer(),
                 )
                 .clickable {},
             horizontalArrangement = Arrangement.Center,
@@ -324,7 +319,7 @@ fun Palettes(
                         controller = colorPickerController,
                         initialColor = customColorValue.safeHexToColor(),
                         onColorChanged = { colorEnvelope: ColorEnvelope ->
-                                customColorValue = colorEnvelope.hexCode
+                            customColorValue = colorEnvelope.hexCode
                         }
                     )
                     Row(
@@ -384,8 +379,7 @@ fun SelectableMiniPalette(
             MaterialTheme.colorScheme.primaryContainer
                 .copy(0.5f) onDark MaterialTheme.colorScheme.onPrimaryContainer.copy(0.3f)
         } else {
-            MaterialTheme.colorScheme
-                .inverseOnSurface onLight MaterialTheme.colorScheme.surface.copy(0.7f)
+            MaterialTheme.colorScheme.cardContainer()
         },
     ) {
         Surface(

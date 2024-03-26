@@ -16,28 +16,28 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.theme.cardContainer
 import com.ismartcoding.plain.ui.theme.palette.alwaysLight
-import com.ismartcoding.plain.ui.theme.palette.onDark
 
 @Composable
 fun BlockButton(
     modifier: Modifier = Modifier,
     text: String = "",
     selected: Boolean = false,
-    containerColor: Color = MaterialTheme.colorScheme.surface.copy(0.7f) onDark MaterialTheme.colorScheme.inverseOnSurface,
-    selectedContainerColor: Color = MaterialTheme.colorScheme.primaryContainer alwaysLight true,
+    containerColor: Color = MaterialTheme.colorScheme.cardContainer(),
+    selectedContainerColor: Color = MaterialTheme.colorScheme.primary,
     contentColor: Color = MaterialTheme.colorScheme.inverseSurface,
-    selectedContentColor: Color = MaterialTheme.colorScheme.onSurface alwaysLight true,
+    selectedContentColor: Color = MaterialTheme.colorScheme.onPrimary,
     onClick: () -> Unit = {},
 ) {
     Column(
         modifier =
-            modifier
-                .height(56.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(if (selected) selectedContainerColor else containerColor)
-                .clickable(onClick = onClick)
-                .padding(horizontal = 5.dp),
+        modifier
+            .height(56.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (selected) selectedContainerColor else containerColor)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 5.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

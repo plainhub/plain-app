@@ -128,7 +128,7 @@ fun ExchangeRatePage(navController: NavHostController) {
                                     PListItem(
                                         title = rate.rate.currency,
                                         value = FormatHelper.formatMoney(rate.value, rate.rate.currency),
-                                        iconPainter =
+                                        icon =
                                             painterResource(
                                                 id = ResourceHelper.getCurrencyFlagResId(context, rate.rate.currency),
                                             ),
@@ -153,7 +153,7 @@ fun ExchangeRatePage(navController: NavHostController) {
                                             expanded = showContextMenu.value && selectedItem == rate.rate,
                                             onDismissRequest = { showContextMenu.value = false },
                                         ) {
-                                            DropdownMenuItem(text = { Text(stringResource(id = R.string.delete)) }, onClick = {
+                                            PDropdownMenuItem(text = { Text(stringResource(id = R.string.delete)) }, onClick = {
                                                 scope.launch {
                                                     showContextMenu.value = false
                                                     val selected = config.selected

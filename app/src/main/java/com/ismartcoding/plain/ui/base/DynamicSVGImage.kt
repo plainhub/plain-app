@@ -42,7 +42,7 @@ fun DynamicSVGImage(
                     }
                 },
     ) {
-        Crossfade(targetState = pic) {
+        Crossfade(targetState = pic, label = "") {
             PAsyncImage(
                 contentDescription = contentDescription,
                 data = it,

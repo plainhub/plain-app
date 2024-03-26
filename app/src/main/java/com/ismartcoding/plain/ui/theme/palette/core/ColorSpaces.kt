@@ -17,26 +17,24 @@ fun rgb(
     r: Double,
     g: Double,
     b: Double,
-): Rgb =
-    Rgb(
-        r = r,
-        g = g,
-        b = b,
-        colorSpace = LocalRgbColorSpace.current,
-    )
+): Rgb = Rgb(
+    r = r,
+    g = g,
+    b = b,
+    colorSpace = LocalRgbColorSpace.current,
+)
 
 @Composable
 fun zcamLch(
     L: Double,
     C: Double,
     h: Double,
-): Zcam =
-    Zcam(
-        hz = h,
-        Jz = L,
-        Cz = C,
-        cond = LocalZcamViewingConditions.current,
-    )
+): Zcam = Zcam(
+    hz = h,
+    Jz = L,
+    Cz = C,
+    cond = LocalZcamViewingConditions.current,
+)
 
 @Composable
 fun zcam(
@@ -49,19 +47,18 @@ fun zcam(
     vividness: Double = Double.NaN,
     blackness: Double = Double.NaN,
     whiteness: Double = Double.NaN,
-): Zcam =
-    Zcam(
-        hz = hue,
-        Qz = brightness,
-        Jz = lightness,
-        Mz = colorfulness,
-        Cz = chroma,
-        Sz = saturation,
-        Vz = vividness,
-        Kz = blackness,
-        Wz = whiteness,
-        cond = LocalZcamViewingConditions.current,
-    )
+): Zcam = Zcam(
+    hz = hue,
+    Qz = brightness,
+    Jz = lightness,
+    Mz = colorfulness,
+    Cz = chroma,
+    Sz = saturation,
+    Vz = vividness,
+    Kz = blackness,
+    Wz = whiteness,
+    cond = LocalZcamViewingConditions.current,
+)
 
 @Composable
 fun CieXyz.toRgb(): Rgb = toRgb(LocalLuminance.current, LocalRgbColorSpace.current)

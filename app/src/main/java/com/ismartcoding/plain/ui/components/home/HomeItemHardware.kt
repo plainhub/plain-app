@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.ui.base.GridItem
+import com.ismartcoding.plain.ui.base.PIconTextButton
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.box.AddNewBoxDialog
 import com.ismartcoding.plain.ui.box.BoxDetailDialog
@@ -40,7 +40,7 @@ fun HomeItemHardware(
         )
         HomeItemFlow {
             boxesState.forEach {
-                GridItem(
+                PIconTextButton(
                     icon = Icons.Outlined.Router,
                     it.name,
                     modifier =
@@ -50,7 +50,7 @@ fun HomeItemHardware(
                     BoxDetailDialog(it.id).show()
                 }
             }
-            GridItem(
+            PIconTextButton(
                 icon = Icons.Outlined.Add,
                 stringResource(id = R.string.add_new_box_button),
                 modifier =

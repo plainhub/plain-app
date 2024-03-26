@@ -5,15 +5,9 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.features.pkg.PackageHelper
-import com.ismartcoding.plain.ui.theme.PlainTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import kotlin.system.measureTimeMillis
 
 class AppsViewModel : ViewModel() {
     private val _itemsFlow = MutableStateFlow(mutableStateListOf<VPackage>())
@@ -31,15 +25,11 @@ class AppsViewModel : ViewModel() {
         noMore.value = items.size < limit.value
     }
 
-    suspend fun loadAsync(query: String = "") {
+    fun loadAsync(query: String = "") {
         offset.value = 0
         _itemsFlow.value = PackageHelper.search(query, limit.value, 0).map { VPackage.from(it) }.toMutableStateList()
         noMore.value = _itemsFlow.value.size < limit.value
         showLoading.value = false
     }
 
-    fun uninstall(id: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-        }
-    }
 }

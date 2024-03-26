@@ -2,13 +2,12 @@ package com.ismartcoding.plain.ui.page.apps
 
 
 import android.annotation.SuppressLint
-import android.app.usage.StorageStats
-import android.content.Context
 import android.net.Uri
-import android.os.UserHandle
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Launch
@@ -45,11 +44,9 @@ import com.ismartcoding.lib.helpers.ShareHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.features.pkg.DPackage
 import com.ismartcoding.plain.features.pkg.DPackageDetail
 import com.ismartcoding.plain.features.pkg.PackageHelper
 import com.ismartcoding.plain.packageManager
-import com.ismartcoding.plain.storageStatsManager
 import com.ismartcoding.plain.ui.base.*
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -68,7 +65,7 @@ fun AppPage(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var item by remember { mutableStateOf<DPackageDetail?>(null) }
-    var groupsButtons by remember { mutableStateOf(listOf<GroupButton>()) }
+    var groupButtons by remember { mutableStateOf(listOf<GroupButton>()) }
     val id = navController.currentBackStackEntry?.arguments?.getString("id") ?: ""
     val lifecycleEvent = rememberLifecycleEvent()
     LaunchedEffect(lifecycleEvent) {
@@ -106,7 +103,7 @@ fun AppPage(
                 }
             )
             buttons.add(
-                GroupButton(Icons.Outlined.Settings, LocaleHelper.getString(R.string.view_in_settings)) {
+                GroupButton(Icons.Outlined.Settings, LocaleHelper.getString(R.string.settings)) {
                     try {
                         PackageHelper.viewInSettings(context, item?.id ?: "")
                     } catch (ex: Exception) {
@@ -129,7 +126,7 @@ fun AppPage(
                     }
                 }
             )
-            groupsButtons = buttons
+            groupButtons = buttons
         }
     }
 
@@ -208,10 +205,20 @@ fun AppPage(
                                 }
                             }
                             VerticalSpace(dp = 16.dp)
-                            GroupButtons(
-                                buttons = groupsButtons
-                            )
-                            VerticalSpace(dp = 24.dp)
+                            Row(
+                                modifier = Modifier
+                                    .align(Alignment.CenterHorizontally),
+                                horizontalArrangement = Arrangement.spacedBy(32.dp),
+                            ) {
+                                groupButtons.forEach { button ->
+                                    PIconTextActionButton(
+                                        icon = button.icon,
+                                        text = button.text,
+                                        click = button.onClick,
+                                    )
+                                }
+                            }
+                            VerticalSpace(dp = 16.dp)
                             Subtitle(
                                 text = stringResource(R.string.paths_directories),
                             )

@@ -1,20 +1,15 @@
 package com.ismartcoding.plain.ui.page.web
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,9 +17,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -33,20 +29,25 @@ import com.ismartcoding.lib.extensions.capitalize
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.DragAnchors
+import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PCard
-import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PSwipeBox
+import com.ismartcoding.plain.ui.base.Subtitle
+import com.ismartcoding.plain.ui.base.SwipeActionButton
+import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.SessionsViewModel
-import com.ismartcoding.plain.ui.theme.cardBack
 import com.ismartcoding.plain.web.HttpServerManager
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun SessionsPage(
     navController: NavHostController,
@@ -54,6 +55,7 @@ fun SessionsPage(
 ) {
     val context = LocalContext.current
     val itemsState by viewModel.itemsFlow.collectAsState()
+    val scope = rememberCoroutineScope()
 
     val refreshState =
         rememberRefreshLayoutState {
@@ -69,6 +71,7 @@ fun SessionsPage(
         navController,
         topBarTitle = stringResource(id = R.string.sessions),
         content = {
+            TopSpace()
             PullToRefresh(refreshLayoutState = refreshState) {
                 if (itemsState.isNotEmpty()) {
                     LazyColumn(
@@ -77,44 +80,34 @@ fun SessionsPage(
                             .fillMaxHeight(),
                     ) {
                         items(itemsState) { m ->
-                            Row(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 32.dp, end = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.last_visit_at) + " " + m.updatedAt.formatDateTime(),
-                                    modifier =
-                                    Modifier
-                                        .weight(1f),
-                                    color = MaterialTheme.colorScheme.primary,
-                                    style = MaterialTheme.typography.labelLarge,
-                                )
-                                PIconButton(
-                                    imageVector = Icons.Outlined.Delete,
-                                    contentDescription = stringResource(R.string.delete),
-                                    tint = MaterialTheme.colorScheme.onSurface,
-                                ) {
-                                    DialogHelper.confirmToAction(context, R.string.confirm_to_delete) {
-                                        viewModel.delete(m.clientId)
-                                    }
+                            Subtitle(
+                                text = stringResource(R.string.last_visit_at) + " " + m.updatedAt.formatDateTime(),
+                            )
+                            PSwipeBox(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                endContent = { state ->
+                                    SwipeActionButton(
+                                        text = stringResource(R.string.delete),
+                                        color = colorResource(id = R.color.red),
+                                        onClick = {
+                                            scope.launch {
+                                                state.animateTo(DragAnchors.Center)
+                                            }
+                                            viewModel.delete(m.clientId)
+                                        })
+                                    HorizontalSpace(dp = 32.dp)
                                 }
-                            }
-                            PCard {
-                                Column(
-                                    modifier =
-                                    Modifier
-                                        .padding(16.dp, 16.dp, 16.dp, 8.dp),
-                                ) {
-                                    SubItem(R.string.client_id, m.clientId)
-                                    SubItem(R.string.ip_address, m.clientIP)
-                                    SubItem(R.string.created_at, m.createdAt.formatDateTime())
-                                    SubItem(R.string.os, m.osName.capitalize() + " " + m.osVersion)
-                                    SubItem(R.string.browser, m.browserName.capitalize() + " " + m.browserVersion)
-                                    SubItem(
-                                        R.string.status,
-                                        stringResource(
+                            ) {
+                                PCard {
+                                    PListItem(title = stringResource(id = R.string.client_id), value = m.clientId)
+                                    PListItem(title = stringResource(id = R.string.ip_address), value = m.clientIP)
+                                    PListItem(title = stringResource(id = R.string.created_at), value = m.createdAt.formatDateTime())
+                                    PListItem(title = stringResource(id = R.string.os), value = m.osName.capitalize() + " " + m.osVersion)
+                                    PListItem(title = stringResource(id = R.string.browser), value = m.browserName.capitalize() + " " + m.browserVersion)
+                                    PListItem(
+                                        title = stringResource(id = R.string.status),
+                                        value = stringResource(
                                             id =
                                             if (HttpServerManager.wsSessions.any {
                                                     it.clientId == m.clientId

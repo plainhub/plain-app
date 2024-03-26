@@ -163,7 +163,9 @@ object AppEvents {
         receiveEventHandler<ReleaseWakeLockEvent> {
             coIO {
                 LogCat.d("ReleaseWakeLockEvent")
-                wakeLock.release()
+                if (wakeLock.isHeld) {
+                    wakeLock.release()
+                }
             }
         }
 

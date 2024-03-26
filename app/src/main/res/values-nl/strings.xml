@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Uw VPN is momenteel ingeschakeld op uw apparaat, wat mogelijk kan leiden tot webverbinding problemen bij toegang vanaf uw pc. Om dit op te lossen, raden we aan om uw VPN-instellingen aan te passen om LAN-verkeer toe te staan of uw VPN uit te schakelen.</string>
     <string name="warning">Waarschuwing</string>
+    <string name="pin">Vastzetten</string>
+    <string name="docs">Documenten</string>
     <string name="no_results_found">Geen resultaten gevonden</string>
     <string name="search">Zoeken</string>
     <string name="attention">Aandacht</string>

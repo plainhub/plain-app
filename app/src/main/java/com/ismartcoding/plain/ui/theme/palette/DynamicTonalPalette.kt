@@ -29,9 +29,9 @@ fun dynamicLightColorScheme(): ColorScheme {
         onTertiary = palettes tertiary 100,
         tertiaryContainer = palettes tertiary 90,
         onTertiaryContainer = palettes tertiary 10,
-        background = palettes neutral 99,
+        background = palettes neutral 98,
         onBackground = palettes neutral 10,
-        surface = palettes neutral 99,
+        surface = palettes neutral 98,
         onSurface = palettes neutral 10,
         surfaceVariant = palettes neutralVariant 90,
         onSurfaceVariant = palettes neutralVariant 30,
@@ -39,6 +39,14 @@ fun dynamicLightColorScheme(): ColorScheme {
         inverseSurface = palettes neutral 20,
         inverseOnSurface = palettes neutral 95,
         outline = palettes neutralVariant 50,
+        outlineVariant = palettes neutralVariant 80,
+        surfaceBright = palettes neutral 98,
+        surfaceDim = palettes neutral 87,
+        surfaceContainerLowest = palettes neutral 100,
+        surfaceContainerLow = palettes neutral 96,
+        surfaceContainer = palettes neutral 94,
+        surfaceContainerHigh = palettes neutral 92,
+        surfaceContainerHighest = palettes neutral 90,
     )
 }
 
@@ -61,9 +69,9 @@ fun dynamicDarkColorScheme(): ColorScheme {
         onTertiary = palettes tertiary 20,
         tertiaryContainer = palettes tertiary 30,
         onTertiaryContainer = palettes tertiary 90,
-        background = palettes neutral 10,
+        background = palettes neutral if (amoledDarkTheme) 0 else 10,
         onBackground = palettes neutral 90,
-        surface = palettes neutral if (amoledDarkTheme) 0 else 10,
+        surface = palettes neutral 10,
         onSurface = palettes neutral 90,
         surfaceVariant = palettes neutralVariant 30,
         onSurfaceVariant = palettes neutralVariant 80,
@@ -71,6 +79,14 @@ fun dynamicDarkColorScheme(): ColorScheme {
         inverseSurface = palettes neutral 90,
         inverseOnSurface = palettes neutral 20,
         outline = palettes neutralVariant 60,
+        outlineVariant = palettes neutralVariant 30,
+        surfaceBright = palettes neutral 24,
+        surfaceDim = palettes neutral 6,
+        surfaceContainerLowest = palettes neutral 4,
+        surfaceContainerLow = palettes neutral 10,
+        surfaceContainer = palettes neutral 12,
+        surfaceContainerHigh = palettes neutral 17,
+        surfaceContainerHighest = palettes neutral 22,
     )
 }
 
@@ -94,6 +110,7 @@ infix fun Color.alwaysLight(isAlways: Boolean): Color {
             colorScheme.error -> colorScheme.onError
             colorScheme.surface -> colorScheme.onSurface
             colorScheme.surfaceVariant -> colorScheme.onSurfaceVariant
+            colorScheme.error -> colorScheme.onError
             colorScheme.primaryContainer -> colorScheme.onPrimaryContainer
             colorScheme.secondaryContainer -> colorScheme.onSecondaryContainer
             colorScheme.tertiaryContainer -> colorScheme.onTertiaryContainer
@@ -107,6 +124,7 @@ infix fun Color.alwaysLight(isAlways: Boolean): Color {
             colorScheme.onError -> colorScheme.error
             colorScheme.onSurface -> colorScheme.surface
             colorScheme.onSurfaceVariant -> colorScheme.surfaceVariant
+            colorScheme.onError -> colorScheme.error
             colorScheme.onPrimaryContainer -> colorScheme.primaryContainer
             colorScheme.onSecondaryContainer -> colorScheme.secondaryContainer
             colorScheme.onTertiaryContainer -> colorScheme.tertiaryContainer
@@ -134,6 +152,7 @@ infix fun Color.alwaysDark(isAlways: Boolean): Color {
             colorScheme.error -> colorScheme.onError
             colorScheme.surface -> colorScheme.onSurface
             colorScheme.surfaceVariant -> colorScheme.onSurfaceVariant
+            colorScheme.error -> colorScheme.onError
             colorScheme.primaryContainer -> colorScheme.onPrimaryContainer
             colorScheme.secondaryContainer -> colorScheme.onSecondaryContainer
             colorScheme.tertiaryContainer -> colorScheme.onTertiaryContainer
@@ -147,6 +166,7 @@ infix fun Color.alwaysDark(isAlways: Boolean): Color {
             colorScheme.onError -> colorScheme.error
             colorScheme.onSurface -> colorScheme.surface
             colorScheme.onSurfaceVariant -> colorScheme.surfaceVariant
+            colorScheme.onError -> colorScheme.error
             colorScheme.onPrimaryContainer -> colorScheme.primaryContainer
             colorScheme.onSecondaryContainer -> colorScheme.secondaryContainer
             colorScheme.onTertiaryContainer -> colorScheme.tertiaryContainer

@@ -22,6 +22,7 @@ data class Zcam(
     val Wz: Double = Double.NaN,
     val cond: ViewingConditions,
 ) {
+
     fun toIzazbz(): Izazbz {
         require(!hz.isNaN()) { "Must provide hz." }
         require(!Qz.isNaN() || !Jz.isNaN()) { "Must provide Qz or Jz." }
@@ -29,32 +30,28 @@ data class Zcam(
             "Must provide Mz, Cz, Sz, Vz, Kz or Wz."
         }
         with(cond) {
-            val Iz =
-                (
+            val Iz = (
                     when {
                         !Qz.isNaN() -> Qz
                         !Jz.isNaN() -> Jz * Qzw / 100.0
                         else -> Double.NaN
                     } / (2700.0 * F_s.pow(2.2) * sqrt(F_b) * F_L.pow(0.2))
-                ).pow(F_b.pow(0.12) / (1.6 * F_s))
-            val Jz =
-                Jz.takeUnless { it.isNaN() } ?: when {
-                    !Qz.isNaN() -> 100.0 * Qz / Qzw
-                    else -> Double.NaN
-                }
-            val Qz =
-                Qz.takeUnless { it.isNaN() } ?: when {
-                    !Jz.isNaN() -> Jz * Qzw / 100.0
-                    else -> Double.NaN
-                }
-            val Cz =
-                Cz.takeUnless { it.isNaN() } ?: when {
-                    !Sz.isNaN() -> Qz * square(Sz) / (100.0 * Qzw * F_L.pow(1.2))
-                    !Vz.isNaN() -> sqrt((square(Vz) - square(Jz - 58.0)) / 3.4)
-                    !Kz.isNaN() -> sqrt((square((100.0 - Kz) / 0.8) - square(Jz)) / 8.0)
-                    !Wz.isNaN() -> sqrt(square(100.0 - Wz) - square(100.0 - Jz))
-                    else -> Double.NaN
-                }
+                    ).pow(F_b.pow(0.12) / (1.6 * F_s))
+            val Jz = Jz.takeUnless { it.isNaN() } ?: when {
+                !Qz.isNaN() -> 100.0 * Qz / Qzw
+                else -> Double.NaN
+            }
+            val Qz = Qz.takeUnless { it.isNaN() } ?: when {
+                !Jz.isNaN() -> Jz * Qzw / 100.0
+                else -> Double.NaN
+            }
+            val Cz = Cz.takeUnless { it.isNaN() } ?: when {
+                !Sz.isNaN() -> Qz * square(Sz) / (100.0 * Qzw * F_L.pow(1.2))
+                !Vz.isNaN() -> sqrt((square(Vz) - square(Jz - 58.0)) / 3.4)
+                !Kz.isNaN() -> sqrt((square((100.0 - Kz) / 0.8) - square(Jz)) / 8.0)
+                !Wz.isNaN() -> sqrt(square(100.0 - Wz) - square(100.0 - Jz))
+                else -> Double.NaN
+            }
             val Mz = Mz.takeUnless { it.isNaN() } ?: (Cz * Qzw / 100.0)
 
             val ez = 1.015 + cos(89.038 + hz).toRadians()
@@ -72,45 +69,43 @@ data class Zcam(
         }
     }
 
-    fun clampToRgb(colorSpace: RgbColorSpace): Rgb =
-        toIzazbz()
+    fun clampToRgb(colorSpace: RgbColorSpace): Rgb = toIzazbz()
+        .toXyz()
+        .toRgb(cond.luminance, colorSpace)
+        .takeIf { it.isInGamut() }
+        ?: copy(Cz = findChromaBoundaryInRgb(colorSpace, 0.001))
+            .toIzazbz()
             .toXyz()
             .toRgb(cond.luminance, colorSpace)
-            .takeIf { it.isInGamut() }
-            ?: copy(Cz = findChromaBoundaryInRgb(colorSpace, 0.001))
-                .toIzazbz()
-                .toXyz()
-                .toRgb(cond.luminance, colorSpace)
-                .clamp()
+            .clamp()
 
     private fun findChromaBoundaryInRgb(
         colorSpace: RgbColorSpace,
         error: Double,
-    ): Double =
-        chromaBoundary.getOrPut(Triple(colorSpace.hashCode(), hz, Jz)) {
-            var low = 0.0
-            var high = Cz
-            var current = this
-            while (high - low >= error) {
-                val mid = (low + high) / 2.0
-                current = copy(Cz = mid)
-                if (!current.toIzazbz().toXyz().toRgb(cond.luminance, colorSpace).isInGamut()) {
-                    high = mid
+    ): Double = chromaBoundary.getOrPut(Triple(colorSpace.hashCode(), hz, Jz)) {
+        var low = 0.0
+        var high = Cz
+        var current = this
+        while (high - low >= error) {
+            val mid = (low + high) / 2.0
+            current = copy(Cz = mid)
+            if (!current.toIzazbz().toXyz().toRgb(cond.luminance, colorSpace).isInGamut()) {
+                high = mid
+            } else {
+                val next = current.copy(Cz = mid + error).toIzazbz().toXyz()
+                    .toRgb(cond.luminance, colorSpace)
+                if (next.isInGamut()) {
+                    low = mid
                 } else {
-                    val next =
-                        current.copy(Cz = mid + error).toIzazbz().toXyz()
-                            .toRgb(cond.luminance, colorSpace)
-                    if (next.isInGamut()) {
-                        low = mid
-                    } else {
-                        break
-                    }
+                    break
                 }
             }
-            current.Cz
         }
+        current.Cz
+    }
 
     companion object {
+
         private val chromaBoundary: MutableMap<Triple<Int, Double, Double>, Double> = mutableMapOf()
 
         data class ViewingConditions(
@@ -120,6 +115,7 @@ data class Zcam(
             val L_a: Double,
             val Y_b: Double,
         ) {
+
             private val absoluteWhitePoint = whitePoint * luminance
             private val Y_w = absoluteWhitePoint.luminance
             val F_b = sqrt(Y_b / Y_w)
@@ -133,15 +129,14 @@ data class Zcam(
             with(cond) {
                 val hz = atan2(bz, az).toDegrees().mod(360.0) // hue angle
                 val Qz =
-                    2700.0 * Iz.pow(1.6 * F_s / F_b.pow(0.12)) * F_s.pow(2.2) * sqrt(F_b) *
-                        F_L.pow(
-                            0.2,
-                        ) // brightness
+                    2700.0 * Iz.pow(1.6 * F_s / F_b.pow(0.12)) * F_s.pow(2.2) * sqrt(F_b) * F_L.pow(
+                        0.2
+                    ) // brightness
                 val Jz = 100.0 * Qz / Qzw // lightness
                 val ez = 1.015 + cos(89.038 + hz).toRadians() // ~ eccentricity factor
                 val Mz =
                     100.0 * (square(az) + square(bz)).pow(0.37) * ez.pow(0.068) * F_L.pow(0.2) /
-                        (F_b.pow(0.1) * Izw.pow(0.78)) // colorfulness
+                            (F_b.pow(0.1) * Izw.pow(0.78)) // colorfulness
                 val Cz = 100.0 * Mz / Qzw // chroma
 
                 val Sz = 100.0 * F_L.pow(0.6) * sqrt(Mz / Qz) // saturation

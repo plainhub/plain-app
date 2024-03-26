@@ -20,13 +20,16 @@ enum class ButtonType {
             }
 
             SECONDARY -> {
-                ButtonDefaults.filledTonalButtonColors()
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                )
             }
 
             DANGER -> {
                 ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.error,
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onError,
                 )
             }
         }

@@ -1,9 +1,6 @@
 package com.ismartcoding.plain.ui.page.apps
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -32,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
@@ -40,6 +38,7 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.TopSpace
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
@@ -48,8 +47,7 @@ import com.ismartcoding.plain.ui.components.PackageListItem
 import com.ismartcoding.plain.ui.models.AppsViewModel
 import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import com.ismartcoding.plain.ui.theme.canvas
-import com.ismartcoding.plain.ui.theme.cardBack
+import com.ismartcoding.plain.ui.theme.cardContainer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -58,8 +56,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun AppsSearchPage(
     navController: NavHostController,
-    viewModel: AppsViewModel = viewModel(),
 ) {
+    val viewModel: AppsViewModel = viewModel()
     val itemsState by viewModel.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
     var q by rememberSaveable { mutableStateOf(navController.currentBackStackEntry?.arguments?.getString("q") ?: "") }
@@ -80,18 +78,10 @@ fun AppsSearchPage(
         }
     }
 
-    LaunchedEffect(q) {
-        if (q.isNotEmpty()) {
-            scope.launch(Dispatchers.IO) {
-                viewModel.loadAsync(q)
-            }
-        }
-    }
-
     Column(
         Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.canvas()),
+            .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         SearchBar(
@@ -105,13 +95,18 @@ fun AppsSearchPage(
                 if (q.isNotEmpty()) {
                     active = false
                     viewModel.showLoading.value = true
+                    scope.launch(Dispatchers.IO) {
+                        viewModel.loadAsync(q)
+                    }
                 }
             },
             active = active,
             onActiveChange = {
-                active = it
-                if (!active && q.isEmpty()) {
-                    navController.popBackStack()
+                if (active != it) {
+                    active = it
+                    if (!active && q.isEmpty()) {
+                        navController.popBackStack()
+                    }
                 }
             },
             placeholder = { Text(stringResource(id = R.string.search)) },
@@ -128,51 +123,46 @@ fun AppsSearchPage(
                     }
                 }
             },
-            colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.cardBack()),
+            colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.cardContainer()),
         ) {
         }
         TopSpace()
         PullToRefresh(
             refreshLayoutState = topRefreshLayoutState,
         ) {
-            AnimatedVisibility(
-                visible = true,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                if (itemsState.isNotEmpty()) {
-                    LazyColumn(
-                        Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(),
-                    ) {
-                        item {
-                            TopSpace()
-                        }
-                        itemsIndexed(itemsState) { index, m ->
-                            PackageListItem(
-                                item = m,
-                                modifier = PlainTheme.getCardModifier(index = index, size = itemsState.size),
-                                onClick = {
-                                    navController.navigate("${RouteName.APPS.name}/${m.id}")
-                                }
-                            )
-                        }
-                        item {
-                            if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
-                                LaunchedEffect(Unit) {
-                                    scope.launch(Dispatchers.IO) {
-                                        withIO { viewModel.moreAsync() }
-                                    }
+            if (itemsState.isNotEmpty()) {
+                LazyColumn(
+                    Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                ) {
+                    item {
+                        TopSpace()
+                    }
+                    itemsIndexed(itemsState) { index, m ->
+                        PackageListItem(
+                            item = m,
+                            modifier = PlainTheme.getCardModifier(),
+                            onClick = {
+                                navController.navigate("${RouteName.APPS.name}/${m.id}")
+                            }
+                        )
+                        VerticalSpace(dp = 8.dp)
+                    }
+                    item {
+                        if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
+                            LaunchedEffect(Unit) {
+                                scope.launch(Dispatchers.IO) {
+                                    withIO { viewModel.moreAsync(q) }
                                 }
                             }
-                            LoadMoreRefreshContent(viewModel.noMore.value)
-                            BottomSpace()
                         }
+                        LoadMoreRefreshContent(viewModel.noMore.value)
+                        BottomSpace()
                     }
-                } else {
-                    NoDataColumn(loading = viewModel.showLoading.value, search = true)
                 }
+            } else {
+                NoDataColumn(loading = viewModel.showLoading.value, search = true)
             }
         }
     }

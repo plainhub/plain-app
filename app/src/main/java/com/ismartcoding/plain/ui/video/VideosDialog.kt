@@ -28,7 +28,7 @@ import com.ismartcoding.plain.databinding.ItemVideoGridBinding
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionsResultEvent
-import com.ismartcoding.plain.features.video.VideoHelper
+import com.ismartcoding.plain.features.video.VideoMediaStoreHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.CastDialog
 import com.ismartcoding.plain.ui.extensions.checkPermission
@@ -206,8 +206,8 @@ class VideosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
         val query = viewModel.getQuery()
         val context = requireContext()
         val items =
-            withIO { VideoHelper.search(context, query, viewModel.limit, viewModel.offset, VideoSortByPreference.getValueAsync(context)) }
-        viewModel.total = withIO { VideoHelper.count(context, query) }
+            withIO { VideoMediaStoreHelper.search(context, query, viewModel.limit, viewModel.offset, VideoSortByPreference.getValueAsync(context)) }
+        viewModel.total = withIO { VideoMediaStoreHelper.count(context, query) }
 
         val bindingAdapter = binding.list.rv.bindingAdapter
         val toggleMode = bindingAdapter.toggleMode
@@ -228,7 +228,7 @@ class VideosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     }
 
     private suspend fun updateFolders() {
-        val items = withIO { VideoHelper.getBuckets(requireContext()) }
+        val items = withIO { VideoMediaStoreHelper.getBuckets(requireContext()) }
         viewModel.total = items.size
         binding.list.page.addData(items, hasMore = { false })
     }

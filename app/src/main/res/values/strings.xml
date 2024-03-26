@@ -2,8 +2,10 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Your VPN is currently enabled on your device, which could potentially lead to web connection issues when accessed from PC. To resolve this, we recommend adjusting your VPN settings to allow LAN traffic or disabling your VPN.</string>
     <string name="warning">Warning</string>
-    <string name="search">Search</string>
+    <string name="pin">Pin</string>
+    <string name="docs">Docs</string>
     <string name="no_results_found">No results found</string>
+    <string name="search">Search</string>
     <string name="attention">Attention</string>
     <string name="recommendation">Recommendation</string>
     <string name="usb_connect_recommendation">Connecting the USB charging cable ensures that the phone remains awake, thus avoiding any interception or restriction of its functions by the system.</string>

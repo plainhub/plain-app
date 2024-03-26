@@ -9,7 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
@@ -25,15 +25,12 @@ import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.WebHelper
-import com.ismartcoding.plain.ui.models.BackupRestoreViewModel
 import com.ismartcoding.plain.ui.page.RouteName
-import com.ismartcoding.plain.ui.theme.PlainTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutPage(
     navController: NavHostController,
-    viewModel: BackupRestoreViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     var demoMode by remember { mutableStateOf(TempData.demoMode) }
@@ -60,6 +57,9 @@ fun AboutPage(
                             title = stringResource(R.string.android_version),
                             value = MainApp.getAndroidVersion(),
                         )
+                    }
+                    VerticalSpace(dp = 16.dp)
+                    PCard {
                         PListItem(
                             title = stringResource(R.string.logs),
                             showMore = true,
@@ -74,6 +74,21 @@ fun AboutPage(
                                 WebHelper.open(context, "https://ko-fi.com/ismartcoding")
                             },
                         )
+                        if (BuildConfig.DEBUG) {
+                            PListItem(
+                                title = stringResource(R.string.demo_mode),
+                            ) {
+                                PSwitch(
+                                    activated = demoMode,
+                                ) {
+                                    demoMode = it
+                                    TempData.demoMode = it
+                                }
+                            }
+                        }
+                    }
+                    VerticalSpace(dp = 16.dp)
+                    PCard {
                         PListItem(
                             title = stringResource(R.string.terms_of_use),
                             showMore = true,
@@ -88,18 +103,6 @@ fun AboutPage(
                                 WebHelper.open(context, UrlHelper.getPolicyUrl())
                             },
                         )
-                        if (BuildConfig.DEBUG) {
-                            PListItem(
-                                title = stringResource(R.string.demo_mode),
-                            ) {
-                                PSwitch(
-                                    activated = demoMode,
-                                ) {
-                                    demoMode = it
-                                    TempData.demoMode = it
-                                }
-                            }
-                        }
                     }
                     BottomSpace()
                 }

@@ -216,8 +216,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         receiveEvent<HttpServerStateChangedEvent> {
-            viewModel.httpServerError.value = HttpServerManager.httpServerError
-            viewModel.httpServerState.value = it.state
+            viewModel.httpServerError = HttpServerManager.httpServerError
+            viewModel.httpServerState = it.state
             if (it.state == HttpServerState.ON && !Permission.WRITE_EXTERNAL_STORAGE.can(this@MainActivity)) {
                 DialogHelper.showConfirmDialog(
                     this@MainActivity,

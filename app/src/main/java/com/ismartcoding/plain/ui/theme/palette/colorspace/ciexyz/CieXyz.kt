@@ -8,6 +8,7 @@ data class CieXyz(
     val y: Double,
     val z: Double,
 ) {
+
     inline val xyz: DoubleArray
         get() = doubleArrayOf(x, y, z)
 
@@ -19,6 +20,7 @@ data class CieXyz(
     operator fun div(luminance: Double): CieXyz = (xyz / luminance).asXyz()
 
     companion object {
+
         internal fun DoubleArray.asXyz(): CieXyz = CieXyz(this[0], this[1], this[2])
     }
 }

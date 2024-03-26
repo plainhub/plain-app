@@ -26,4 +26,7 @@ enum class RouteName {
     MEDIA_PREVIEW,
     APPS,
     OTHER_FILE,
+    DOCS,
+    NOTES,
+    TAGS,
 }

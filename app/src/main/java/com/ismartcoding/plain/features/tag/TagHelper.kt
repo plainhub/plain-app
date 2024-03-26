@@ -65,6 +65,13 @@ object TagHelper {
         return tagRelationDao.getAllByKeys(keys, type.value)
     }
 
+    fun getTagRelationsByKeysMap(
+        keys: Set<String>,
+        type: DataType,
+    ): Map<String, List<DTagRelation>> {
+        return tagRelationDao.getAllByKeys(keys, type.value).groupBy { it.key }
+    }
+
     fun getTagRelationsByKey(
         key: String,
         type: DataType,
