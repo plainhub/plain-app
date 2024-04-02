@@ -2,6 +2,7 @@ package com.ismartcoding.plain.extensions
 
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.helpers.TimeAgoHelper
 import kotlinx.datetime.*
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -29,6 +30,10 @@ fun Instant.formatDateTime(): String {
     c.timeInMillis = epochSeconds * 1000
     return DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT, LocaleHelper.currentLocale())
         .format(c.time)
+}
+
+fun Instant.timeAgo(): String {
+    return TimeAgoHelper.getString(toEpochMilliseconds())
 }
 
 fun Instant.formatDate(): String {

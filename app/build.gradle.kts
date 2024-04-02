@@ -37,9 +37,9 @@ android {
                 else -> 0
             }
 
-        val vCode = 259
+        val vCode = 262
         versionCode = vCode - singleAbiNum
-        versionName = "1.2.42"
+        versionName = "1.2.43"
 
         ndk {
             //noinspection ChromeOsAbiSupport
@@ -234,6 +234,6 @@ dependencies {
 //    implementation("org.eclipse.jgit:org.eclipse.jgit:6.1.0.202203080745-r") // TODO: git support
     implementation("org.zeroturnaround:zt-zip:1.16")
     implementation(project(":lib"))
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.9.1")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.12")
     implementation(kotlin("stdlib", KotlinCompilerVersion.VERSION))
 }

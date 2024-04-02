@@ -23,7 +23,7 @@ fun NavigationBackIcon(onClick: () -> Unit = {}) {
 fun NavigationCloseIcon(onClick: () -> Unit = {}) {
     PIconButton(
         imageVector = Icons.Rounded.Close,
-        contentDescription = stringResource(R.string.back),
+        contentDescription = stringResource(R.string.close),
         tint = MaterialTheme.colorScheme.onSurface,
     ) {
         onClick()

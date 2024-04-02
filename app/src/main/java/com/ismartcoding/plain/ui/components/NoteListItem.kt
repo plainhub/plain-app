@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
-import com.ismartcoding.plain.extensions.formatDateTime
+import com.ismartcoding.plain.extensions.timeAgo
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.NotesViewModel
@@ -105,7 +105,7 @@ fun NoteListItem(
                     }
                     VerticalSpace(dp = 8.dp)
                     Text(
-                        text = m.updatedAt.formatDateTime(),
+                        text = m.updatedAt.timeAgo(),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyLarge,
                     )

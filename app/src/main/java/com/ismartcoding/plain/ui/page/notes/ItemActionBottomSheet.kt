@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.page.notes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -24,10 +23,13 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
+import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.GroupButton
 import com.ismartcoding.plain.ui.base.GroupButtons
+import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PSelectionChip
 import com.ismartcoding.plain.ui.base.Subtitle
@@ -143,8 +145,13 @@ fun ItemActionBottomSheet(
                     tagsViewModel.showAddTagDialog()
                 })
             }
+            VerticalSpace(dp = 16.dp)
+            Subtitle(text = stringResource(id = R.string.other))
+            PCard {
+                PListItem(title = stringResource(id = R.string.created_at), value = m.createdAt.formatDateTime())
+                PListItem(title = stringResource(id = R.string.updated_at), value = m.updatedAt.formatDateTime())
+            }
         }
-
         BottomSpace()
     }
 }
