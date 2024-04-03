@@ -5,8 +5,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
-import com.ismartcoding.plain.data.LatestRelease
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import kotlinx.coroutines.flow.map
 import java.util.Locale
@@ -20,7 +18,12 @@ data class Settings(
     val web: Boolean,
     val keepScreenOn: Boolean,
     val systemScreenTimeout: Int,
-    val latestRelease: LatestRelease?,
+    val newVersion: String,
+    val skipVersion: String,
+    val newVersionPublishDate: String,
+    val newVersionLog: String,
+    val newVersionSize: Long,
+    val newVersionDownloadUrl: String,
 )
 
 val LocalThemeIndex = compositionLocalOf { ThemeIndexPreference.default }
@@ -31,7 +34,15 @@ val LocalLocale = compositionLocalOf<Locale?> { null }
 val LocalWeb = compositionLocalOf { WebPreference.default }
 val LocalKeepScreenOn = compositionLocalOf { KeepScreenOnPreference.default }
 val LocalSystemScreenTimeout = compositionLocalOf { SystemScreenTimeoutPreference.default }
-val LocalLatestRelease = compositionLocalOf<LatestRelease?> { null }
+
+// Version
+val LocalNewVersion = compositionLocalOf { NewVersionPreference.default }
+val LocalSkipVersion = compositionLocalOf { SkipVersionPreference.default }
+val LocalNewVersionPublishDate = compositionLocalOf { NewVersionPublishDatePreference.default }
+val LocalNewVersionLog = compositionLocalOf { NewVersionLogPreference.default }
+val LocalNewVersionSize = compositionLocalOf { NewVersionSizePreference.default }
+val LocalNewVersionDownloadUrl = compositionLocalOf { NewVersionDownloadUrlPreference.default }
+
 
 @Composable
 fun SettingsProvider(content: @Composable () -> Unit) {
@@ -46,7 +57,12 @@ fun SettingsProvider(content: @Composable () -> Unit) {
             web = WebPreference.default,
             keepScreenOn = KeepScreenOnPreference.default,
             systemScreenTimeout = SystemScreenTimeoutPreference.default,
-            latestRelease = null,
+            newVersion = NewVersionPreference.default,
+            skipVersion = SkipVersionPreference.default,
+            newVersionPublishDate = NewVersionPublishDatePreference.default,
+            newVersionLog = NewVersionLogPreference.default,
+            newVersionSize = NewVersionSizePreference.default,
+            newVersionDownloadUrl = NewVersionDownloadUrlPreference.default,
         )
     val settings =
         remember {
@@ -60,9 +76,12 @@ fun SettingsProvider(content: @Composable () -> Unit) {
                     web = WebPreference.get(it),
                     keepScreenOn = KeepScreenOnPreference.get(it),
                     systemScreenTimeout = SystemScreenTimeoutPreference.get(it),
-                    latestRelease = LatestReleasePreference.get(it).let { release ->
-                        if (release.isEmpty()) null else jsonDecode(release)
-                    }
+                      newVersion = NewVersionPreference.get(it),
+                    skipVersion = SkipVersionPreference.get(it),
+                    newVersionPublishDate = NewVersionPublishDatePreference.get(it),
+                    newVersionLog = NewVersionLogPreference.get(it),
+                    newVersionSize = NewVersionSizePreference.get(it),
+                    newVersionDownloadUrl = NewVersionDownloadUrlPreference.get(it),
                 )
             }
         }.collectAsStateValue(
@@ -78,7 +97,12 @@ fun SettingsProvider(content: @Composable () -> Unit) {
         LocalWeb provides settings.web,
         LocalKeepScreenOn provides settings.keepScreenOn,
         LocalSystemScreenTimeout provides settings.systemScreenTimeout,
-        LocalLatestRelease provides settings.latestRelease,
+        LocalNewVersion provides settings.newVersion,
+        LocalSkipVersion provides settings.skipVersion,
+        LocalNewVersionPublishDate provides settings.newVersionPublishDate,
+        LocalNewVersionLog provides settings.newVersionLog,
+        LocalNewVersionSize provides settings.newVersionSize,
+        LocalNewVersionDownloadUrl provides settings.newVersionDownloadUrl,
     ) {
         content()
     }

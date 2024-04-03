@@ -2,6 +2,16 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Uw VPN is momenteel ingeschakeld op uw apparaat, wat mogelijk kan leiden tot webverbinding problemen bij toegang vanaf uw pc. Om dit op te lossen, raden we aan om uw VPN-instellingen aan te passen om LAN-verkeer toe te staan of uw VPN uit te schakelen.</string>
     <string name="warning">Waarschuwing</string>
+    <string name="checking_updates">Controleren op updates...</string>
+    <string name="rate_limit">Het verzoektarief is beperkt</string>
+    <string name="check_failure">Controleren op updates mislukt</string>
+    <string name="check_update">Controleren op updates</string>
+    <string name="is_latest_version">Dit is de nieuwste versie van de app</string>
+    <string name="change_log">Wijzigingslogboek</string>
+    <string name="update">Bijwerken</string>
+    <string name="get_new_updates">Nieuwe updates ophalen</string>
+    <string name="get_new_updates_desc">Nieuwe versie %1$s is beschikbaar</string>
+    <string name="skip_this_version">Deze versie overslaan</string>
     <string name="close">Sluiten</string>
     <string name="timeago_now">zojuist</string>
     <string name="timeago_oneminute_past">1 minuut geleden</string>

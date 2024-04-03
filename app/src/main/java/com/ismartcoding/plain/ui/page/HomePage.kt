@@ -31,12 +31,18 @@ import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.NetworkHelper
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.data.Version
+import com.ismartcoding.plain.data.enums.AppFeatureType
 import com.ismartcoding.plain.data.preference.HttpPortPreference
 import com.ismartcoding.plain.data.preference.HttpsPortPreference
 import com.ismartcoding.plain.data.preference.LocalKeepScreenOn
+import com.ismartcoding.plain.data.preference.LocalNewVersion
+import com.ismartcoding.plain.data.preference.LocalSkipVersion
 import com.ismartcoding.plain.data.preference.LocalWeb
+import com.ismartcoding.plain.data.toVersion
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.RequestPermissionsEvent
@@ -80,6 +86,9 @@ fun HomePage(
     val webEnabled = LocalWeb.current
     var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.can(context)) }
     var isVPNConnected by remember { mutableStateOf(NetworkHelper.isVPNConnected(context)) }
+    val currentVersion = Version(BuildConfig.VERSION_NAME)
+    val newVersion = LocalNewVersion.current.toVersion()
+    val skipVersion = LocalSkipVersion.current.toVersion()
 
     LaunchedEffect(Unit) {
         events.add(
@@ -104,7 +113,7 @@ fun HomePage(
         navController,
         topBarTitle = stringResource(id = R.string.app_name),
         navigationIcon = {
-            ActionButtonSettings {
+            ActionButtonSettings(showBadge = AppFeatureType.CHECK_UPDATES.has() && newVersion.whetherNeedUpdate(currentVersion, skipVersion)) {
                 navController.navigate(RouteName.SETTINGS)
             }
         },

@@ -1,7 +1,6 @@
 package com.ismartcoding.plain
 
 import android.app.Application
-import android.content.Intent
 import android.os.Build
 import coil.ImageLoader
 import coil.ImageLoaderFactory
@@ -20,8 +19,8 @@ import com.ismartcoding.lib.isUPlus
 import com.ismartcoding.lib.logcat.DiskLogAdapter
 import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.data.enums.AppFeatureType
 import com.ismartcoding.plain.data.enums.DarkTheme
-import com.ismartcoding.plain.data.enums.PasswordType
 import com.ismartcoding.plain.data.preference.AudioPlayModePreference
 import com.ismartcoding.plain.data.preference.ClientIdPreference
 import com.ismartcoding.plain.data.preference.DarkThemePreference
@@ -31,17 +30,14 @@ import com.ismartcoding.plain.data.preference.HttpsPortPreference
 import com.ismartcoding.plain.data.preference.HttpsPreference
 import com.ismartcoding.plain.data.preference.KeyStorePasswordPreference
 import com.ismartcoding.plain.data.preference.PasswordPreference
-import com.ismartcoding.plain.data.preference.PasswordTypePreference
 import com.ismartcoding.plain.data.preference.UrlTokenPreference
 import com.ismartcoding.plain.data.preference.WebPreference
 import com.ismartcoding.plain.data.preference.dataStore
 import com.ismartcoding.plain.features.AcquireWakeLockEvent
 import com.ismartcoding.plain.features.AppEvents
 import com.ismartcoding.plain.features.bluetooth.BluetoothEvents
-import com.ismartcoding.plain.features.pkg.PackageHelper
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
-import com.ismartcoding.plain.services.NotificationListenerMonitorService
 import com.ismartcoding.plain.ui.helpers.PageHelper
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
@@ -134,6 +130,9 @@ class MainApp : Application(), ImageLoaderFactory {
                 FeedFetchWorker.startRepeatWorkerAsync(instance)
             }
             HttpServerManager.clientTsInterval()
+            if (AppFeatureType.CHECK_UPDATES.has()) {
+                AppHelper.checkUpdateAsync(this@MainApp, false)
+            }
         }
     }
 

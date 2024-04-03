@@ -9,6 +9,7 @@ enum class AppFeatureType {
     HARDWARE,
     APPS,
     NOTIFICATIONS,
+    CHECK_UPDATES,
     EXCHANGE_RATE;
 
     fun has(): Boolean {
@@ -23,6 +24,10 @@ enum class AppFeatureType {
 
             EXCHANGE_RATE, EDUCATION, HARDWARE -> {
                 return BuildConfig.DEBUG && !TempData.demoMode
+            }
+
+            CHECK_UPDATES -> {
+                return BuildConfig.CHANNEL == AppChannelType.GITHUB.name
             }
 
             else -> return true

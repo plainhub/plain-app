@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.ui.base
 
- import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
- import androidx.compose.material.icons.outlined.Add
- import androidx.compose.material.icons.outlined.Checklist
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
@@ -33,11 +33,15 @@ fun ActionButtonAdd(onClick: () -> Unit) {
 }
 
 @Composable
-fun ActionButtonSettings(onClick: () -> Unit) {
+fun ActionButtonSettings(
+    showBadge: Boolean = false,
+    onClick: () -> Unit
+) {
     PIconButton(
         imageVector = Icons.Outlined.Settings,
         contentDescription = stringResource(R.string.settings),
         tint = MaterialTheme.colorScheme.onSurface,
+        showBadge = showBadge,
         onClick = onClick,
     )
 }

@@ -2,6 +2,16 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">உங்கள் உலாவியில் தற்போது VPN செல்லுபடி உள்ளது, இது பிரச்சனைகளைக் கொண்டுவரலாம் பாராட்டும் நேரத்தில். இதை தீர்மானிக்க, உங்கள் VPN அமைப்புகளை LAN பரிமாறத்தை அனுமதிக்க அல்லது உங்கள் VPN முடக்குதலை கொண்டுவிடுவதை பரிந்துரைக்கிறோம்.</string>
     <string name="warning">எச்சரிக்கை</string>
+    <string name="checking_updates">புதுப்பிப்புகளை சரிபார்க்கின்றன...</string>
+    <string name="rate_limit">கோரிக்கை வேகம் கட்டுப்பட்டுள்ளது</string>
+    <string name="check_failure">புதுப்பிப்புகளை சரிபார்க்க தோல்வியடைந்தது</string>
+    <string name="check_update">புதுப்பிப்புகளை சரிபார்க்கவும்</string>
+    <string name="is_latest_version">இது பயன்பாட்டின் சமீபத்திய பதிப்பு</string>
+    <string name="change_log">மாற்றத்தகவல்</string>
+    <string name="update">புதுப்பிக்க</string>
+    <string name="get_new_updates">புதிய புதுப்பிப்புகளைப் பெறுக</string>
+    <string name="get_new_updates_desc">புதிய பதிப்பு %1$s கிடைக்கும்</string>
+    <string name="skip_this_version">இந்த பதிப்பை பாருங்கள்</string>
     <string name="close">மூடு</string>
     <string name="timeago_now">இப்போது</string>
     <string name="timeago_oneminute_past">1 நிமிடம் முன்பு</string>

@@ -2,6 +2,16 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Ihr VPN ist derzeit auf Ihrem Gerät aktiviert, was potenziell zu Webverbindungsproblemen führen kann, wenn es von Ihrem PC aus zugegriffen wird. Um dies zu lösen, empfehlen wir Ihnen, Ihre VPN-Einstellungen anzupassen, um LAN-Verkehr zuzulassen oder Ihr VPN zu deaktivieren.</string>
     <string name="warning">Warnung</string>
+    <string name="checking_updates">Auf Updates wird überprüft...</string>
+    <string name="rate_limit">Die Anforderungsrate ist begrenzt</string>
+    <string name="check_failure">Aktualisierungen konnten nicht überprüft werden</string>
+    <string name="check_update">Auf Updates überprüfen</string>
+    <string name="is_latest_version">Dies ist die neueste Version der App</string>
+    <string name="change_log">Änderungsprotokoll</string>
+    <string name="update">Aktualisieren</string>
+    <string name="get_new_updates">Neue Updates erhalten</string>
+    <string name="get_new_updates_desc">Neue Version %1$s ist verfügbar</string>
+    <string name="skip_this_version">Diese Version überspringen</string>
     <string name="close">Schließen</string>
     <string name="timeago_now">gerade eben</string>
     <string name="timeago_oneminute_past">vor 1 Minute</string>

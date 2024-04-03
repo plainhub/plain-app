@@ -2,6 +2,16 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">お使いのデバイスでは現在VPNが有効になっており、PCからアクセスした際にWeb接続の問題が発生する可能性があります。これを解決するために、LANトラフィックを許可するようにVPNの設定を調整するか、VPNを無効にすることをお勧めします。</string>
     <string name="warning">警告</string>
+    <string name="checking_updates">アップデートを確認しています...</string>
+    <string name="rate_limit">リクエストレートが制限されています</string>
+    <string name="check_failure">アップデートの確認に失敗しました</string>
+    <string name="check_update">アップデートを確認</string>
+    <string name="is_latest_version">これがアプリの最新バージョンです</string>
+    <string name="change_log">変更ログ</string>
+    <string name="update">アップデート</string>
+    <string name="get_new_updates">新しいアップデートを取得</string>
+    <string name="get_new_updates_desc">新しいバージョン %1$s が利用可能です</string>
+    <string name="skip_this_version">このバージョンをスキップ</string>
     <string name="close">閉じる</string>
     <string name="timeago_now">たった今</string>
     <string name="timeago_oneminute_past">1 分前</string>

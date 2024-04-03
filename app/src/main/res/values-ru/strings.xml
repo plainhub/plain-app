@@ -2,6 +2,16 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Ваш VPN в настоящее время включен на вашем устройстве, что может потенциально привести к проблемам с веб-подключением при доступе с ПК. Для устранения этой проблемы мы рекомендуем настроить параметры вашего VPN для разрешения локального сетевого трафика или отключить ваш VPN.</string>
     <string name="warning">Предупреждение</string>
+    <string name="checking_updates">Проверка обновлений...</string>
+    <string name="rate_limit">Ограниченная скорость запроса</string>
+    <string name="check_failure">Не удалось проверить обновления</string>
+    <string name="check_update">Проверить обновления</string>
+    <string name="is_latest_version">Это последняя версия приложения</string>
+    <string name="change_log">Журнал изменений</string>
+    <string name="update">Обновить</string>
+    <string name="get_new_updates">Получить новые обновления</string>
+    <string name="get_new_updates_desc">Новая версия %1$s доступна</string>
+    <string name="skip_this_version">Пропустить эту версию</string>
     <string name="close">Закрыть</string>
     <string name="timeago_now">только что</string>
     <string name="timeago_oneminute_past">1 минуту назад</string>

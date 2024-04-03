@@ -4,27 +4,41 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Backup
 import androidx.compose.material.icons.outlined.Language
+import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.TipsAndUpdates
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.Version
+import com.ismartcoding.plain.data.enums.AppFeatureType
+import com.ismartcoding.plain.data.preference.LocalNewVersion
+import com.ismartcoding.plain.data.preference.LocalSkipVersion
+import com.ismartcoding.plain.data.toVersion
+import com.ismartcoding.plain.ui.base.PBanner
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.SelectableGroupItem
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.navigate
+import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.page.RouteName
-import com.ismartcoding.plain.ui.theme.PlainTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsPage(navController: NavHostController) {
+fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewModel = viewModel()) {
+    val currentVersion = Version(BuildConfig.VERSION_NAME)
+    val newVersion = LocalNewVersion.current.toVersion()
+    val skipVersion = LocalSkipVersion.current.toVersion()
+
+    UpdateDialog(updateViewModel)
+
     PScaffold(
         navController,
         topBarTitle = stringResource(R.string.settings),
@@ -34,8 +48,22 @@ fun SettingsPage(navController: NavHostController) {
                     TopSpace()
                 }
                 item {
+                    if (AppFeatureType.CHECK_UPDATES.has() && newVersion.whetherNeedUpdate(currentVersion, skipVersion)) {
+                        PBanner(
+                            title = stringResource(R.string.get_new_updates),
+                            desc = stringResource(
+                                R.string.get_new_updates_desc,
+                                newVersion.toString(),
+                            ),
+                            icon = Icons.Outlined.Lightbulb,
+                        ) {
+                            updateViewModel.showDialog()
+                        }
+                        VerticalSpace(dp = 16.dp)
+                    }
+                }
+                item {
                     PCard {
-
                         PListItem(
                             title = stringResource(R.string.color_and_style),
                             desc = stringResource(R.string.color_and_style_desc),

@@ -2,6 +2,16 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">현재 기기에서 VPN이 활성화되어 있어 PC에서 액세스할 때 웹 연결 문제가 발생할 수 있습니다. 이를 해결하기 위해 LAN 트래픽을 허용하거나 VPN을 비활성화하는 것을 권장합니다.</string>
     <string name="warning">경고</string>
+    <string name="checking_updates">업데이트 확인 중...</string>
+    <string name="rate_limit">요청 속도가 제한됨</string>
+    <string name="check_failure">업데이트 확인에 실패했습니다</string>
+    <string name="check_update">업데이트 확인</string>
+    <string name="is_latest_version">이것이 앱의 최신 버전입니다</string>
+    <string name="change_log">변경 로그</string>
+    <string name="update">업데이트</string>
+    <string name="get_new_updates">새로운 업데이트 받기</string>
+    <string name="get_new_updates_desc">%1$s 새 버전을 사용할 수 있습니다</string>
+    <string name="skip_this_version">이 버전 건너뛰기</string>
     <string name="close">닫기</string>
     <string name="timeago_now">지금</string>
     <string name="timeago_oneminute_past">1분 전</string>

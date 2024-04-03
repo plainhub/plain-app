@@ -14,7 +14,12 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.data.LatestRelease
 import com.ismartcoding.plain.data.Version
-import com.ismartcoding.plain.data.preference.LatestReleasePreference
+import com.ismartcoding.plain.data.preference.NewVersionDownloadUrlPreference
+import com.ismartcoding.plain.data.preference.NewVersionLogPreference
+import com.ismartcoding.plain.data.preference.NewVersionPreference
+import com.ismartcoding.plain.data.preference.NewVersionPublishDatePreference
+import com.ismartcoding.plain.data.preference.NewVersionSizePreference
+import com.ismartcoding.plain.data.preference.SkipVersionPreference
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import io.ktor.client.request.get
@@ -38,8 +43,8 @@ object AppHelper {
         return (appProcessInfo.importance == IMPORTANCE_FOREGROUND || appProcessInfo.importance == IMPORTANCE_VISIBLE)
     }
 
-    suspend fun checkUpdateAsync(context: Context, showToast: Boolean = true): Boolean? {
-       return try {
+    suspend fun checkUpdateAsync(context: Context, showToast: Boolean): Boolean? {
+        return try {
             val client = HttpClientManager.httpClient()
             val r = client.get(Constants.LATEST_RELEASE_URL)
             if (r.status == HttpStatusCode.Forbidden) {
@@ -58,11 +63,16 @@ object AppHelper {
             }
 
             val latest = jsonDecode<LatestRelease>(latestJSON)
-            val skipVersion = Version("1.0.0")
+            val skipVersion = Version(SkipVersionPreference.getAsync(context))
             val currentVersion = Version(BuildConfig.VERSION_NAME)
             val latestVersion = Version(latest.tagName.substring(1))
             if (latestVersion.whetherNeedUpdate(currentVersion, skipVersion)) {
-                LatestReleasePreference.putAsync(context, jsonEncode(latest))
+                NewVersionPreference.putAsync(context, latestVersion.toString())
+                NewVersionLogPreference.putAsync(context, latest.body ?: "")
+                NewVersionPublishDatePreference.putAsync(context, latest.publishedAt.ifEmpty { latest.createdAt })
+                val apk = latest.assets.firstOrNull()
+                NewVersionSizePreference.putAsync(context, apk?.size ?: 0)
+                NewVersionDownloadUrlPreference.putAsync(context, apk?.browserDownloadUrl ?: "")
                 true
             } else {
                 false

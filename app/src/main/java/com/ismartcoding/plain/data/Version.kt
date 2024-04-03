@@ -1,9 +1,5 @@
 package com.ismartcoding.plain.data
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
-
 class Version(numbers: List<String>) {
 
     private var major: Int = 0
@@ -40,3 +36,5 @@ class Version(numbers: List<String>) {
 
     fun whetherNeedUpdate(current: Version, skip: Version): Boolean = this > current && this > skip
 }
+
+fun String.toVersion(): Version = Version(this)

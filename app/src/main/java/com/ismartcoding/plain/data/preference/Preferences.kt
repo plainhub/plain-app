@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.ismartcoding.lib.helpers.CryptoHelper
@@ -13,6 +14,7 @@ import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.data.Version
 import com.ismartcoding.plain.data.enums.DarkTheme
 import com.ismartcoding.plain.data.enums.Language
 import com.ismartcoding.plain.data.enums.PasswordType
@@ -59,10 +61,34 @@ object AuthDevTokenPreference : BasePreference<String>() {
     override val key = stringPreferencesKey("auth_dev_token")
 }
 
-
-object LatestReleasePreference : BasePreference<String>() {
+object NewVersionPreference: BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("latest_release")
+    override val key = stringPreferencesKey("new_version")
+}
+
+object SkipVersionPreference: BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("skip_version")
+}
+
+object NewVersionPublishDatePreference: BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("new_version_publish_date")
+}
+
+object NewVersionLogPreference: BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("new_version_log")
+}
+
+object NewVersionDownloadUrlPreference: BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("new_version_download_url")
+}
+
+object NewVersionSizePreference: BasePreference<Long>() {
+    override val default = 0L
+    override val key = longPreferencesKey("new_version_size")
 }
 
 object UrlTokenPreference : BasePreference<String>() {

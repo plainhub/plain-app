@@ -23,7 +23,6 @@ fun PIconButton(
     contentDescription: String?,
     tint: Color = LocalContentColor.current,
     showBadge: Boolean = false,
-    badgeColor: Color = MaterialTheme.colorScheme.primary,
     isHaptic: Boolean? = false,
     isSound: Boolean? = false,
     onClick: () -> Unit = {},
@@ -42,14 +41,14 @@ fun PIconButton(
             BadgedBox(
                 badge = {
                     Badge(
-                        modifier =
-                            Modifier
-                                .size(8.dp)
-                                .offset(x = (-1).dp, y = 0.dp)
-                                .clip(CircleShape),
-                        containerColor = badgeColor,
+                        modifier = Modifier
+                            .size(8.dp)
+                            .offset(x = (1).dp, y = (-4).dp)
+                            .clip(CircleShape),
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError,
                     )
-                },
+                }
             ) {
                 Icon(
                     modifier = modifier,
