@@ -87,7 +87,9 @@ fun NoteListItem(
                             tags.forEach { tag ->
                                 ClickableText(
                                     text = AnnotatedString("#" + tag.name),
-                                    modifier = Modifier.wrapContentHeight().align(Alignment.Bottom),
+                                    modifier = Modifier
+                                        .wrapContentHeight()
+                                        .align(Alignment.Bottom),
                                     style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
                                     onClick = {
                                         if (viewModel.selectMode) {
@@ -106,8 +108,7 @@ fun NoteListItem(
                     VerticalSpace(dp = 8.dp)
                     Text(
                         text = m.updatedAt.timeAgo(),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        style = MaterialTheme.typography.bodyLarge,
+                        style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.secondary),
                     )
                 }
             }

@@ -5,6 +5,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
+import com.ismartcoding.plain.data.LatestRelease
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import kotlinx.coroutines.flow.map
 import java.util.Locale
@@ -18,6 +20,7 @@ data class Settings(
     val web: Boolean,
     val keepScreenOn: Boolean,
     val systemScreenTimeout: Int,
+    val latestRelease: LatestRelease?,
 )
 
 val LocalThemeIndex = compositionLocalOf { ThemeIndexPreference.default }
@@ -28,6 +31,7 @@ val LocalLocale = compositionLocalOf<Locale?> { null }
 val LocalWeb = compositionLocalOf { WebPreference.default }
 val LocalKeepScreenOn = compositionLocalOf { KeepScreenOnPreference.default }
 val LocalSystemScreenTimeout = compositionLocalOf { SystemScreenTimeoutPreference.default }
+val LocalLatestRelease = compositionLocalOf<LatestRelease?> { null }
 
 @Composable
 fun SettingsProvider(content: @Composable () -> Unit) {
@@ -42,6 +46,7 @@ fun SettingsProvider(content: @Composable () -> Unit) {
             web = WebPreference.default,
             keepScreenOn = KeepScreenOnPreference.default,
             systemScreenTimeout = SystemScreenTimeoutPreference.default,
+            latestRelease = null,
         )
     val settings =
         remember {
@@ -55,6 +60,9 @@ fun SettingsProvider(content: @Composable () -> Unit) {
                     web = WebPreference.get(it),
                     keepScreenOn = KeepScreenOnPreference.get(it),
                     systemScreenTimeout = SystemScreenTimeoutPreference.get(it),
+                    latestRelease = LatestReleasePreference.get(it).let { release ->
+                        if (release.isEmpty()) null else jsonDecode(release)
+                    }
                 )
             }
         }.collectAsStateValue(
@@ -70,6 +78,7 @@ fun SettingsProvider(content: @Composable () -> Unit) {
         LocalWeb provides settings.web,
         LocalKeepScreenOn provides settings.keepScreenOn,
         LocalSystemScreenTimeout provides settings.systemScreenTimeout,
+        LocalLatestRelease provides settings.latestRelease,
     ) {
         content()
     }

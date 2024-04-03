@@ -59,6 +59,12 @@ object AuthDevTokenPreference : BasePreference<String>() {
     override val key = stringPreferencesKey("auth_dev_token")
 }
 
+
+object LatestReleasePreference : BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("latest_release")
+}
+
 object UrlTokenPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("url_token")

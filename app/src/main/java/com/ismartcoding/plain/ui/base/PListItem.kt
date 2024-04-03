@@ -110,8 +110,7 @@ fun PListItem(
                     SelectionContainer {
                         Text(
                             text = it,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                         )
                     }
                 }
