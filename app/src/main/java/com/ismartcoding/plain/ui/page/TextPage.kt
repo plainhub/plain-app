@@ -36,7 +36,7 @@ fun TextPage(
         topBarTitle = sharedViewModel.textTitle.value,
         actions = {
             PIconButton(
-                imageVector = Icons.Outlined.Share,
+                icon = Icons.Outlined.Share,
                 contentDescription = stringResource(R.string.share),
                 tint = MaterialTheme.colorScheme.onSurface,
             ) {

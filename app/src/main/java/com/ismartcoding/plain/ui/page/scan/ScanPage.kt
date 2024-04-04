@@ -99,7 +99,6 @@ fun ScanPage(navController: NavHostController) {
     val view = LocalView.current
     val window = (view.context as Activity).window
     val insetsController = WindowCompat.getInsetsController(window, view)
-    insetsController.hide(WindowInsetsCompat.Type.systemBars())
 
     var cameraProvider: ProcessCameraProvider? = null
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
@@ -111,6 +110,7 @@ fun ScanPage(navController: NavHostController) {
     var scanResult by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
+        insetsController.hide(WindowInsetsCompat.Type.systemBars())
         events.add(
             receiveEventHandler<PermissionsResultEvent> {
                 hasCamPermission = Permission.CAMERA.can(context)
@@ -270,7 +270,7 @@ fun ScanPage(navController: NavHostController) {
                     modifier = Modifier.padding(top = 24.dp),
                     navigationIcon = {
                         PIconButton(
-                            imageVector = Icons.Rounded.Cancel,
+                            icon = Icons.Rounded.Cancel,
                             contentDescription = stringResource(R.string.back),
                             tint = Color.White,
                         ) {
@@ -292,7 +292,7 @@ fun ScanPage(navController: NavHostController) {
                     PIconButton(
                         modifier = Modifier.size(40.dp),
                         containerModifier = Modifier.size(64.dp),
-                        imageVector = Icons.Rounded.History,
+                        icon = Icons.Rounded.History,
                         contentDescription = stringResource(R.string.scan_history),
                         tint = Color.White,
                     ) {
@@ -302,7 +302,7 @@ fun ScanPage(navController: NavHostController) {
                     PIconButton(
                         modifier = Modifier.size(40.dp),
                         containerModifier = Modifier.size(size = 64.dp),
-                        imageVector = Icons.Rounded.Image,
+                        icon = Icons.Rounded.Image,
                         contentDescription = stringResource(R.string.images),
                         tint = Color.White,
                     ) {
@@ -355,7 +355,7 @@ fun ScanResultBottomSheet(
     ) {
         PBottomSheetTopAppBar(title = stringResource(id = R.string.scan_result)) {
             PIconButton(
-                imageVector = Icons.Outlined.ContentCopy,
+                icon = Icons.Outlined.ContentCopy,
                 contentDescription = stringResource(android.R.string.copy),
                 tint = MaterialTheme.colorScheme.onSurface,
             ) {

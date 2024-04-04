@@ -36,6 +36,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel
     var tag = mutableStateOf<DTag?>(null)
     val dataType = DataType.NOTE
     var queryText by savedStateHandle.saveable { mutableStateOf("") }
+    var search = mutableStateOf(false)
 
     var selectMode by savedStateHandle.saveable { mutableStateOf(false) }
     val selectedIds = mutableStateListOf<String>()

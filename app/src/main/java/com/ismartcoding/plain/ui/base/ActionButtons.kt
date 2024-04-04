@@ -15,7 +15,7 @@ import com.ismartcoding.plain.R
 @Composable
 fun ActionButtonMore(onClick: () -> Unit) {
     PIconButton(
-        imageVector = Icons.Outlined.MoreVert,
+        icon = Icons.Outlined.MoreVert,
         contentDescription = stringResource(R.string.more),
         tint = MaterialTheme.colorScheme.onSurface,
         onClick = onClick,
@@ -25,7 +25,7 @@ fun ActionButtonMore(onClick: () -> Unit) {
 @Composable
 fun ActionButtonAdd(onClick: () -> Unit) {
     PIconButton(
-        imageVector = Icons.Outlined.Add,
+        icon = Icons.Outlined.Add,
         contentDescription = stringResource(R.string.add),
         tint = MaterialTheme.colorScheme.onSurface,
         onClick = onClick,
@@ -38,7 +38,7 @@ fun ActionButtonSettings(
     onClick: () -> Unit
 ) {
     PIconButton(
-        imageVector = Icons.Outlined.Settings,
+        icon = Icons.Outlined.Settings,
         contentDescription = stringResource(R.string.settings),
         tint = MaterialTheme.colorScheme.onSurface,
         showBadge = showBadge,
@@ -49,7 +49,7 @@ fun ActionButtonSettings(
 @Composable
 fun ActionButtonSelect(onClick: () -> Unit) {
     PIconButton(
-        imageVector = Icons.Outlined.Checklist,
+        icon = Icons.Outlined.Checklist,
         contentDescription = stringResource(R.string.select),
         tint = MaterialTheme.colorScheme.onSurface,
         onClick = onClick,
@@ -59,7 +59,7 @@ fun ActionButtonSelect(onClick: () -> Unit) {
 @Composable
 fun ActionButtonTags(onClick: () -> Unit) {
     PIconButton(
-        imageVector = Icons.AutoMirrored.Outlined.Label,
+        icon = Icons.AutoMirrored.Outlined.Label,
         contentDescription = stringResource(R.string.tags),
         tint = MaterialTheme.colorScheme.onSurface,
         onClick = onClick,
@@ -69,7 +69,7 @@ fun ActionButtonTags(onClick: () -> Unit) {
 @Composable
 fun ActionButtonSearch(onClick: () -> Unit) {
     PIconButton(
-        imageVector = Icons.Outlined.Search,
+        icon = Icons.Outlined.Search,
         contentDescription = stringResource(R.string.search),
         tint = MaterialTheme.colorScheme.onSurface,
         onClick = onClick,

@@ -5,6 +5,8 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.horizontalScroll
@@ -24,9 +26,9 @@ import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,11 +37,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
@@ -75,9 +79,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.NoteListItem
 import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import com.ismartcoding.plain.ui.note.NoteDialog
 import com.ismartcoding.plain.ui.page.RouteName
-import com.ismartcoding.plain.ui.theme.bottomAppBarContainer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -89,6 +91,8 @@ fun NotesPage(
     viewModel: NotesViewModel = viewModel(),
     tagsViewModel: TagsViewModel = viewModel(),
 ) {
+    val view = LocalView.current
+    val window = (view.context as Activity).window
     val itemsState by viewModel.itemsFlow.collectAsState()
     val tagsState by tagsViewModel.itemsFlow.collectAsState()
     val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
@@ -97,7 +101,6 @@ fun NotesPage(
     var showActionBottomSheet by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<DNote?>(null) }
     var isMenuOpen by remember { mutableStateOf(false) }
-    val view = LocalView.current
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
 
     val topRefreshLayoutState =
@@ -126,11 +129,19 @@ fun NotesPage(
         }
     }
 
-    val backgroundColor = MaterialTheme.colorScheme.background
-    val bottomAppBarContainerColor = MaterialTheme.colorScheme.bottomAppBarContainer()
+    val insetsController = WindowCompat.getInsetsController(window, view)
     LaunchedEffect(viewModel.selectMode) {
-        val window = (view.context as Activity).window
-        window.navigationBarColor = if (viewModel.selectMode) bottomAppBarContainerColor.toArgb() else backgroundColor.toArgb()
+        if (viewModel.selectMode) {
+            insetsController.hide(WindowInsetsCompat.Type.navigationBars())
+        } else {
+            insetsController.show(WindowInsetsCompat.Type.navigationBars())
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            insetsController.show(WindowInsetsCompat.Type.navigationBars())
+        }
     }
 
     val pageTitle = if (viewModel.selectMode) {
@@ -217,19 +228,20 @@ fun NotesPage(
                     })
             }
         },
-        bottomBar = if (viewModel.selectMode) {
-            {
+        bottomBar = {
+            AnimatedVisibility(
+                visible = viewModel.selectMode,
+                enter = slideInVertically { it },
+                exit = slideOutVertically { it }) {
                 SelectModeBottomAppBar(viewModel, tagsViewModel, tagsState)
             }
-        } else null,
+        },
         floatingActionButton = if (viewModel.selectMode) null else {
             {
                 PDraggableElement {
                     FloatingActionButton(
                         onClick = {
-                            scope.launch {
-                                NoteDialog().show(null, viewModel.tag.value)
-                            }
+                            navController.navigate("${RouteName.NOTES.name}/create?tagId=${viewModel.tag.value?.id ?: ""}")
                         },
                     ) {
                         Icon(
@@ -363,7 +375,7 @@ fun NotesPage(
                                         if (viewModel.selectMode) {
                                             viewModel.select(m.id)
                                         } else {
-                                            NoteDialog().show(m)
+                                            navController.navigate("${RouteName.NOTES.name}/${m.id}")
                                         }
                                     },
                                     onLongClick = {

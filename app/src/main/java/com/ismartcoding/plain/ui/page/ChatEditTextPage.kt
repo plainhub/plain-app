@@ -55,7 +55,7 @@ fun ChatEditTextPage(
         topBarTitle = stringResource(id = R.string.edit_text),
         actions = {
             PIconButton(
-                imageVector = Icons.Outlined.Save,
+                icon = Icons.Outlined.Save,
                 contentDescription = stringResource(R.string.save),
                 tint = MaterialTheme.colorScheme.onSurface,
             ) {

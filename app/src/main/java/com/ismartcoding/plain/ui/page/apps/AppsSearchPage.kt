@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -112,7 +112,7 @@ fun AppsSearchPage(
             placeholder = { Text(stringResource(id = R.string.search)) },
             leadingIcon = {
                 PIconButton(
-                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                    icon = Icons.AutoMirrored.Rounded.ArrowBack,
                     contentDescription = stringResource(R.string.back),
                     tint = MaterialTheme.colorScheme.onSurface,
                 ) {
@@ -139,7 +139,7 @@ fun AppsSearchPage(
                     item {
                         TopSpace()
                     }
-                    itemsIndexed(itemsState) { index, m ->
+                    items(itemsState) {  m ->
                         PackageListItem(
                             item = m,
                             modifier = PlainTheme.getCardModifier(),

@@ -90,7 +90,7 @@ fun ExchangeRatePage(navController: NavHostController) {
             actions = {
                 if (rateItems != null) {
                     PIconButton(
-                        imageVector = Icons.Outlined.Add,
+                        icon = Icons.Outlined.Add,
                         contentDescription = stringResource(R.string.add),
                         tint = MaterialTheme.colorScheme.onSurface,
                         onClick = {

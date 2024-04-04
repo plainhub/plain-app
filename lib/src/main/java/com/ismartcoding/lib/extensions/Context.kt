@@ -40,6 +40,8 @@ fun Context.getTextWidth(text: String): Float = TextView(this).paint.measureText
 
 fun Context.dp2px(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
 
+fun Context.px2dp(px: Float): Int = (px / resources.displayMetrics.density).toInt()
+
 fun dp2px(dp: Int): Int {
     val density: Float = Resources.getSystem().displayMetrics.density
     return (dp * density).roundToInt()

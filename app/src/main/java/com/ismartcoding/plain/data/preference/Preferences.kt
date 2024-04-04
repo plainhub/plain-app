@@ -66,6 +66,11 @@ object NewVersionPreference: BasePreference<String>() {
     override val key = stringPreferencesKey("new_version")
 }
 
+object CheckUpdateTimePreference: BasePreference<Long>() {
+    override val default = 0L
+    override val key = longPreferencesKey("check_update_time")
+}
+
 object SkipVersionPreference: BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("skip_version")

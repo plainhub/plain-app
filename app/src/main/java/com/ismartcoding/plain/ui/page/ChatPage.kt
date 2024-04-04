@@ -256,7 +256,7 @@ fun ChatPage(
         topBarTitle = stringResource(id = R.string.file_transfer_assistant),
         actions = {
             PIconButton(
-                imageVector = Icons.Outlined.Folder,
+                icon = Icons.Outlined.Folder,
                 contentDescription = stringResource(R.string.folder),
                 tint = MaterialTheme.colorScheme.onSurface,
                 onClick = {
