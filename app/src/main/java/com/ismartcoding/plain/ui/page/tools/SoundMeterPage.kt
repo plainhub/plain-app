@@ -6,9 +6,13 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -158,7 +162,7 @@ fun SoundMeterPage(navController: NavHostController) {
         topBarTitle = stringResource(id = R.string.sound_meter),
         actions = {
             PIconButton(
-                imageVector = Icons.Outlined.Info,
+                icon = Icons.Outlined.Info,
                 contentDescription = stringResource(R.string.decibel_values),
                 tint = MaterialTheme.colorScheme.onSurface,
             ) {
@@ -262,25 +266,31 @@ fun SoundMeterPage(navController: NavHostController) {
     )
 
     if (decibelValuesDialogVisible) {
-        PDialog(onClose = {
+        AlertDialog(onDismissRequest = {
             decibelValuesDialogVisible = false
-        }) {
-            LazyColumn {
-                item {
-                    TopSpace()
-                    DisplayText(title = stringResource(id = R.string.decibel_values))
+        }, confirmButton = {
+            Button(
+                onClick = {
+                    decibelValuesDialogVisible = false
+                }
+            ) {
+                Text(stringResource(id = R.string.close))
+            }
+        },
+            title = {
+                Text(text = stringResource(id = R.string.decibel_values))
+            }, text = {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
                     decibelValueStrings.forEach {
                         SelectionContainer {
                             Text(
                                 text = it,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 8.dp),
+                                style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+                                modifier = Modifier.padding(bottom = 8.dp),
                             )
                         }
                     }
-                    BottomSpace()
                 }
-            }
-        }
+            })
     }
 }

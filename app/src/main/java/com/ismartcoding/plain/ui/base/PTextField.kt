@@ -18,8 +18,12 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import com.ismartcoding.lib.helpers.CoroutinesHelper
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.R
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,31 +47,35 @@ fun PTextField(
 
     if (requestFocus) {
         LaunchedEffect(Unit) {
-            delay(100)
-            focusRequester.requestFocus()
+            coIO {
+                delay(100)
+                CoroutinesHelper.coMain {
+                    focusRequester.requestFocus()
+                }
+            }
         }
     }
 
     TextField(
         modifier =
-            Modifier
-                .focusRequester(focusRequester)
-                .fillMaxWidth(),
+        Modifier
+            .focusRequester(focusRequester)
+            .fillMaxWidth(),
         colors =
-            TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
-            ),
+        TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+        ),
         maxLines = if (singleLine) 1 else Int.MAX_VALUE,
         enabled = !readOnly,
         value = value,
         label =
-            if (label.isEmpty()) {
-                null
-            } else {
-                { Text(label) }
-            },
+        if (label.isEmpty()) {
+            null
+        } else {
+            { Text(label) }
+        },
         onValueChange = {
             if (!readOnly) onValueChange(it)
         },
@@ -92,15 +100,15 @@ fun PTextField(
                 }) {
                     Icon(
                         imageVector =
-                            if (isPassword) {
-                                if (showPassword) {
-                                    Icons.Rounded.Visibility
-                                } else {
-                                    Icons.Rounded.VisibilityOff
-                                }
+                        if (isPassword) {
+                            if (showPassword) {
+                                Icons.Rounded.Visibility
                             } else {
-                                Icons.Rounded.Close
-                            },
+                                Icons.Rounded.VisibilityOff
+                            }
+                        } else {
+                            Icons.Rounded.Close
+                        },
                         contentDescription = if (isPassword) stringResource(R.string.password) else stringResource(R.string.clear),
                         tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                     )

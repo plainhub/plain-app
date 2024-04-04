@@ -6,22 +6,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.ui.theme.cardContainer
-import com.ismartcoding.plain.ui.theme.palette.alwaysDark
 
 @Composable
 fun PIconTextButton(
@@ -40,21 +34,11 @@ fun PIconTextButton(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         VerticalSpace(dp = 16.dp)
-        if (icon is ImageVector) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(28.dp)
-            )
-        } else if (icon is Painter) {
-            Icon(
-                painter = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(28.dp)
-            )
-        }
+        PIcon(
+            icon = icon, contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(28.dp)
+        )
         Text(
             text = text,
             style = MaterialTheme.typography.labelMedium,
@@ -81,19 +65,11 @@ fun PIconTextActionButton(
                 ),
             onClick = click
         ) {
-            if (icon is ImageVector) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
-            } else if (icon is Painter) {
-                Icon(
-                    painter = icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+            PIcon(
+                icon = icon,
+                contentDescription = null,
+                modifier = Modifier.size(24.dp)
+            )
         }
         Text(
             text = text,

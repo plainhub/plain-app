@@ -58,10 +58,9 @@ import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.NoteListItem
 import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import com.ismartcoding.plain.ui.note.NoteDialog
+import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.theme.cardContainer
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -80,7 +79,6 @@ fun NotesSearchPage(
     }
     var showActionBottomSheet by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<DNote?>(null) }
-    val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
             scope.launch {
@@ -90,17 +88,9 @@ fun NotesSearchPage(
         }
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) {
+        viewModel.search.value = true
         tagsViewModel.dataType.value = DataType.NOTE
         viewModel.queryText = navController.currentBackStackEntry?.arguments?.getString("q") ?: ""
-        events.add(
-            receiveEventHandler<ActionEvent> { event ->
-                if (event.source == ActionSourceType.NOTE) {
-                    scope.launch(Dispatchers.IO) {
-                        viewModel.loadAsync(tagsViewModel)
-                    }
-                }
-            }
-        )
         if (active) {
             focusRequester.requestFocus()
         }
@@ -154,7 +144,7 @@ fun NotesSearchPage(
             placeholder = { Text(stringResource(id = R.string.search)) },
             leadingIcon = {
                 PIconButton(
-                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                    icon = Icons.AutoMirrored.Rounded.ArrowBack,
                     contentDescription = stringResource(R.string.back),
                     tint = MaterialTheme.colorScheme.onSurface,
                 ) {
@@ -209,7 +199,7 @@ fun NotesSearchPage(
                                 tagsState.filter { tagIds.contains(it.id) },
                                 selectedItem,
                                 onClick = {
-                                    NoteDialog().show(m)
+                                    navController.navigate("${RouteName.NOTES.name}/${m.id}")
                                 },
                                 onLongClick = {
                                     selectedItem = m

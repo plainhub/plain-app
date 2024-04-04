@@ -79,14 +79,14 @@ fun ChatInput(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 PIconButton(
-                    imageVector = Icons.Outlined.Image,
+                    icon = Icons.Outlined.Image,
                     contentDescription = stringResource(R.string.images),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {
                     sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.IMAGE_VIDEO, multiple = true))
                 }
                 PIconButton(
-                    imageVector = Icons.Outlined.Folder,
+                    icon = Icons.Outlined.Folder,
                     contentDescription = stringResource(R.string.files),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {
@@ -94,7 +94,7 @@ fun ChatInput(
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 PIconButton(
-                    imageVector = Icons.AutoMirrored.Outlined.Send,
+                    icon = Icons.AutoMirrored.Outlined.Send,
                     contentDescription = stringResource(R.string.send_message),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {

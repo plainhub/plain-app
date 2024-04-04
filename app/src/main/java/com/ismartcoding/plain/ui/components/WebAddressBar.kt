@@ -118,7 +118,7 @@ fun WebAddressBar(
             )
         }
         PIconButton(
-            imageVector = Icons.Rounded.Edit,
+            icon = Icons.Rounded.Edit,
             modifier =
             Modifier
                 .height(20.dp)
@@ -137,7 +137,7 @@ fun WebAddressBar(
                     .wrapContentSize(Alignment.TopEnd),
             ) {
                 PIconButton(
-                    imageVector = Icons.Rounded.MoreVert,
+                    icon = Icons.Rounded.MoreVert,
                     modifier =
                     Modifier
                         .height(20.dp)

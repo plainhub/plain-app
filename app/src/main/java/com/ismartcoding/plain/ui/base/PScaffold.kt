@@ -23,6 +23,7 @@ import androidx.navigation.NavHostController
 @Composable
 fun PScaffold(
     navController: NavHostController,
+    modifier: Modifier = Modifier,
     containerColor: Color = MaterialTheme.colorScheme.background,
     navigationIcon: (@Composable () -> Unit)? = {
         NavigationBackIcon { navController.popBackStack() }
@@ -34,6 +35,7 @@ fun PScaffold(
     content: @Composable () -> Unit = {},
 ) {
     Scaffold(
+        modifier = modifier,
         containerColor = containerColor,
         topBar = {
             if (navigationIcon != null || actions != null) {

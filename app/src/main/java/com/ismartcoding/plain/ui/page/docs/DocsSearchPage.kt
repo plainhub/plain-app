@@ -110,7 +110,7 @@ fun DocsSearchPage(
             placeholder = { Text(stringResource(id = R.string.search)) },
             leadingIcon = {
                 PIconButton(
-                    imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                    icon = Icons.AutoMirrored.Rounded.ArrowBack,
                     contentDescription = stringResource(R.string.back),
                     tint = MaterialTheme.colorScheme.onSurface,
                 ) {

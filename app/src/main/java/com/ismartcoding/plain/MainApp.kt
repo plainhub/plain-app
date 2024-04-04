@@ -22,6 +22,7 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.data.enums.AppFeatureType
 import com.ismartcoding.plain.data.enums.DarkTheme
 import com.ismartcoding.plain.data.preference.AudioPlayModePreference
+import com.ismartcoding.plain.data.preference.CheckUpdateTimePreference
 import com.ismartcoding.plain.data.preference.ClientIdPreference
 import com.ismartcoding.plain.data.preference.DarkThemePreference
 import com.ismartcoding.plain.data.preference.FeedAutoRefreshPreference
@@ -114,6 +115,7 @@ class MainApp : Application(), ImageLoaderFactory {
             TempData.httpPort = HttpPortPreference.get(preferences)
             TempData.httpsPort = HttpsPortPreference.get(preferences)
             TempData.audioPlayMode = AudioPlayModePreference.getValue(preferences)
+            val checkUpdateTime = CheckUpdateTimePreference.get(preferences)
             ClientIdPreference.ensureValueAsync(instance, preferences)
             KeyStorePasswordPreference.ensureValueAsync(instance, preferences)
             UrlTokenPreference.ensureValueAsync(instance, preferences)
@@ -130,7 +132,7 @@ class MainApp : Application(), ImageLoaderFactory {
                 FeedFetchWorker.startRepeatWorkerAsync(instance)
             }
             HttpServerManager.clientTsInterval()
-            if (AppFeatureType.CHECK_UPDATES.has()) {
+            if (AppFeatureType.CHECK_UPDATES.has() && checkUpdateTime < System.currentTimeMillis() - Constants.ONE_DAY_MS) {
                 AppHelper.checkUpdateAsync(this@MainApp, false)
             }
         }

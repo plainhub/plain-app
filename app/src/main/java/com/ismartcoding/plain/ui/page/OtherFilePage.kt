@@ -45,7 +45,7 @@ fun OtherFilePage(
         navController,
         actions = {
             PIconButton(
-                imageVector = Icons.Outlined.Share,
+                icon = Icons.Outlined.Share,
                 contentDescription = stringResource(R.string.share),
                 tint = MaterialTheme.colorScheme.onSurface,
             ) {

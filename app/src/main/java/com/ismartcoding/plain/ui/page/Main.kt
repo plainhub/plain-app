@@ -51,6 +51,7 @@ import com.ismartcoding.plain.ui.page.apps.AppsPage
 import com.ismartcoding.plain.ui.page.apps.AppsSearchPage
 import com.ismartcoding.plain.ui.page.docs.DocsPage
 import com.ismartcoding.plain.ui.page.docs.DocsSearchPage
+import com.ismartcoding.plain.ui.page.notes.NotePage
 import com.ismartcoding.plain.ui.page.notes.NotesPage
 import com.ismartcoding.plain.ui.page.notes.NotesSearchPage
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
@@ -185,6 +186,10 @@ fun Main(viewModel: MainViewModel) {
                 AppsSearchPage(navController)
             }
 
+            routeDetail(RouteName.APPS) {
+                AppPage(navController, sharedViewModel)
+            }
+
             routeSearch(RouteName.DOCS) {
                 DocsSearchPage(navController)
             }
@@ -193,8 +198,15 @@ fun Main(viewModel: MainViewModel) {
                 NotesSearchPage(navController)
             }
 
-            routeDetail(RouteName.APPS) {
-                AppPage(navController, sharedViewModel)
+            slideHorizontallyComposable(
+                "${RouteName.NOTES.name}/{id}?tagId={tagId}",
+                arguments = listOf(navArgument("id") { type = NavType.StringType }, navArgument("tagId") {
+                    nullable = true
+                    defaultValue = ""
+                    type = NavType.StringType
+                }),
+            ) {
+                NotePage(navController)
             }
 
             slideHorizontallyComposable(
@@ -224,7 +236,11 @@ fun Main(viewModel: MainViewModel) {
 fun NavGraphBuilder.routeSearch(routeName: RouteName, action: @Composable () -> Unit) {
     slideHorizontallyComposable(
         "${routeName.name}/search?q={q}",
-        arguments = listOf(navArgument("q") { type = NavType.StringType }),
+        arguments = listOf(navArgument("q") {
+            nullable = true
+            defaultValue = ""
+            type = NavType.StringType
+        }),
     ) {
         action()
     }

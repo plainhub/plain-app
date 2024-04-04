@@ -55,17 +55,19 @@ fun ItemActionBottomSheet(
     }
     LaunchedEffect(Unit) {
         tagIds.addAll(tagsMap[m.id]?.map { it.tagId } ?: emptyList())
-        groupButtons.add(
-            GroupButton(
-                icon = Icons.Outlined.Checklist,
-                text = LocaleHelper.getString(R.string.select),
-                onClick = {
-                    viewModel.enterSelectMode()
-                    viewModel.select(m.id)
-                    onDismiss()
-                }
+        if (!viewModel.search.value) {
+            groupButtons.add(
+                GroupButton(
+                    icon = Icons.Outlined.Checklist,
+                    text = LocaleHelper.getString(R.string.select),
+                    onClick = {
+                        viewModel.enterSelectMode()
+                        viewModel.select(m.id)
+                        onDismiss()
+                    }
+                )
             )
-        )
+        }
         if (viewModel.trash.value) {
             groupButtons.addAll(listOf(
                 GroupButton(

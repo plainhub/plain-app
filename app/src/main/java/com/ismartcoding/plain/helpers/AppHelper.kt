@@ -6,7 +6,6 @@ import android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE
 import android.content.Context
 import android.content.Intent
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
-import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
@@ -14,6 +13,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.data.LatestRelease
 import com.ismartcoding.plain.data.Version
+import com.ismartcoding.plain.data.preference.CheckUpdateTimePreference
 import com.ismartcoding.plain.data.preference.NewVersionDownloadUrlPreference
 import com.ismartcoding.plain.data.preference.NewVersionLogPreference
 import com.ismartcoding.plain.data.preference.NewVersionPreference
@@ -47,6 +47,7 @@ object AppHelper {
         return try {
             val client = HttpClientManager.httpClient()
             val r = client.get(Constants.LATEST_RELEASE_URL)
+            CheckUpdateTimePreference.putAsync(context, System.currentTimeMillis())
             if (r.status == HttpStatusCode.Forbidden) {
                 if (showToast) {
                     DialogHelper.showMessage(getString(R.string.rate_limit))

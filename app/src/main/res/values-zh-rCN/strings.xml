@@ -2,6 +2,9 @@
     <string name="app_name">简朴</string>
     <string name="vpn_web_conflict_warning">您的手机启用了VPN，这可能会导致从电脑访问网页时出现连接问题。我们建议您调整VPN设置允许局域网流量或关闭VPN。</string>
     <string name="warning">警告</string>
+    <string name="undo">撤销</string>
+    <string name="redo">重做</string>
+    <string name="pick_color">选择颜色</string>
     <string name="checking_updates">检查更新中...</string>
     <string name="rate_limit">请求速率受限</string>
     <string name="check_failure">检查更新失败</string>

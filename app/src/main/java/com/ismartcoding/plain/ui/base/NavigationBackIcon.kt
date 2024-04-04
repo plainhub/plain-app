@@ -11,7 +11,7 @@ import com.ismartcoding.plain.R
 @Composable
 fun NavigationBackIcon(onClick: () -> Unit = {}) {
     PIconButton(
-        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+        icon = Icons.AutoMirrored.Rounded.ArrowBack,
         contentDescription = stringResource(R.string.back),
         tint = MaterialTheme.colorScheme.onSurface,
     ) {
@@ -22,7 +22,7 @@ fun NavigationBackIcon(onClick: () -> Unit = {}) {
 @Composable
 fun NavigationCloseIcon(onClick: () -> Unit = {}) {
     PIconButton(
-        imageVector = Icons.Rounded.Close,
+        icon = Icons.Rounded.Close,
         contentDescription = stringResource(R.string.close),
         tint = MaterialTheme.colorScheme.onSurface,
     ) {
