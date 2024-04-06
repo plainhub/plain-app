@@ -3,7 +3,9 @@ package com.ismartcoding.plain.ui.page.settings
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -38,6 +40,7 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.page.RouteName
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,7 +51,14 @@ fun AboutPage(
 ) {
     val context = LocalContext.current
     var demoMode by remember { mutableStateOf(TempData.demoMode) }
+    var cacheSize by remember { mutableLongStateOf(0L) }
     val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        scope.launch(Dispatchers.IO) {
+            cacheSize = AppHelper.getCacheSize(context)
+        }
+    }
 
     UpdateDialog(updateViewModel)
 
@@ -157,7 +167,7 @@ fun AboutPage(
                     PCard {
                         PListItem(
                             title = stringResource(R.string.local_cache),
-                            desc = FormatHelper.formatBytes(AppHelper.getCacheSize(context)),
+                            desc = FormatHelper.formatBytes(cacheSize),
                             action = {
                                 PMiniOutlineButton(text = stringResource(R.string.clear_cache)) {
                                     scope.launch {
@@ -166,6 +176,7 @@ fun AboutPage(
                                             AppHelper.clearCacheAsync(context)
                                         }
                                         Glide.get(context).clearMemory()
+                                        cacheSize = AppHelper.getCacheSize(context)
                                         DialogHelper.hideLoading()
                                         DialogHelper.showMessage(R.string.local_cache_cleared)
                                     }

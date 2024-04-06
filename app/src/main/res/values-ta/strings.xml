@@ -2,6 +2,9 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">உங்கள் உலாவியில் தற்போது VPN செல்லுபடி உள்ளது, இது பிரச்சனைகளைக் கொண்டுவரலாம் பாராட்டும் நேரத்தில். இதை தீர்மானிக்க, உங்கள் VPN அமைப்புகளை LAN பரிமாறத்தை அனுமதிக்க அல்லது உங்கள் VPN முடக்குதலை கொண்டுவிடுவதை பரிந்துரைக்கிறோம்.</string>
     <string name="warning">எச்சரிக்கை</string>
+    <string name="local_cache">உள்ளூர் காசே</string>
+    <string name="clear_cache">காசே அழி</string>
+    <string name="local_cache_cleared">உள்ளூர் காசே அழிக்கப்பட்டது.</string>
     <string name="undo">மீள்பதிவு செய்</string>
     <string name="redo">மீண்டும் செய்</string>
     <string name="pick_color">நிறம் தேர்ந்தெடு</string>

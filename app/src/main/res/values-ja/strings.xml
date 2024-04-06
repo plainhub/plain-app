@@ -2,6 +2,9 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">お使いのデバイスでは現在VPNが有効になっており、PCからアクセスした際にWeb接続の問題が発生する可能性があります。これを解決するために、LANトラフィックを許可するようにVPNの設定を調整するか、VPNを無効にすることをお勧めします。</string>
     <string name="warning">警告</string>
+    <string name="local_cache">ローカルキャッシュ</string>
+    <string name="clear_cache">キャッシュをクリア</string>
+    <string name="local_cache_cleared">ローカルキャッシュがクリアされました。</string>
     <string name="undo">元に戻す</string>
     <string name="redo">やり直す</string>
     <string name="pick_color">色を選択</string>

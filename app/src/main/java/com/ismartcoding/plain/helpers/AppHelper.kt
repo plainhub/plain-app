@@ -115,7 +115,7 @@ object AppHelper {
         val cacheDir = context.cacheDir
         val files = cacheDir.listFiles()
         files?.forEach {
-            it.delete()
+            it.deleteRecursively()
         }
         Glide.get(context).clearDiskCache()
     }
