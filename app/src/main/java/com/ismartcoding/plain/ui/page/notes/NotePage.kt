@@ -9,6 +9,8 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text2.input.textAsFlow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Redo
@@ -78,6 +80,12 @@ fun NotePage(
         val v = navController.currentBackStackEntry?.arguments?.getString("id") ?: ""
         mutableStateOf(if (v == "create") "" else v)
     }
+    val mdListState = rememberLazyListState()
+    val editorScrollState = rememberScrollState()
+    var shouldRequestFocus by remember {
+        mutableStateOf(true)
+    }
+
     LaunchedEffect(Unit) {
         viewModel.editMode = id.isEmpty()
         mdEditorViewModel.load(context)
@@ -129,7 +137,10 @@ fun NotePage(
                 delay(500)
                 coMain {
                     insetsController.hide(WindowInsetsCompat.Type.navigationBars())
-                    focusRequester.requestFocus()
+                    if (shouldRequestFocus) {
+                        focusRequester.requestFocus()
+                        shouldRequestFocus = false
+                    }
                 }
             }
         } else {
@@ -181,9 +192,9 @@ fun NotePage(
         },
         content = {
             if (viewModel.editMode) {
-                MdEditor(viewModel = mdEditorViewModel, focusRequester = focusRequester)
+                MdEditor(viewModel = mdEditorViewModel, editorScrollState, focusRequester = focusRequester)
             } else {
-                LazyColumn {
+                LazyColumn(state = mdListState) {
                     item {
                         TopSpace()
                     }

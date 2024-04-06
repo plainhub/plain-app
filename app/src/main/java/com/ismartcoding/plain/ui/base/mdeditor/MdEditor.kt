@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.base.mdeditor
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
@@ -41,14 +42,14 @@ import kotlinx.coroutines.flow.debounce
 @Composable
 fun MdEditor(
     viewModel: MdEditorViewModel,
+    scrollState: ScrollState,
     focusRequester: FocusRequester,
 ) {
-    val textFieldScrollState = rememberScrollState()
     val lineNumberState = rememberScrollState()
     var lineCount by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(Unit) {
-        snapshotFlow { textFieldScrollState.value }
+        snapshotFlow { scrollState.value }
             .debounce(10)
             .collectLatest { value ->
                 lineNumberState.scrollTo(value)
@@ -96,7 +97,7 @@ fun MdEditor(
                     .fillMaxSize()
                     .focusRequester(focusRequester),
                 state = viewModel.textFieldState,
-                scrollState = textFieldScrollState,
+                scrollState = scrollState,
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 onTextLayout = { result ->
