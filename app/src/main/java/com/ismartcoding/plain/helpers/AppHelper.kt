@@ -5,6 +5,7 @@ import android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
 import android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE
 import android.content.Context
 import android.content.Intent
+import com.bumptech.glide.Glide
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.Constants
@@ -69,7 +70,7 @@ object AppHelper {
             val latestVersion = Version(latest.tagName.substring(1))
             if (latestVersion.whetherNeedUpdate(currentVersion, skipVersion)) {
                 NewVersionPreference.putAsync(context, latestVersion.toString())
-                NewVersionLogPreference.putAsync(context, latest.body ?: "")
+                NewVersionLogPreference.putAsync(context, latest.body)
                 NewVersionPublishDatePreference.putAsync(context, latest.publishedAt.ifEmpty { latest.createdAt })
                 val apk = latest.assets.firstOrNull()
                 NewVersionSizePreference.putAsync(context, apk?.size ?: 0)
@@ -85,6 +86,38 @@ object AppHelper {
             }
             null
         }
+    }
+
+    fun getCacheSize(context: Context): Long {
+        var size = 0L
+        val cacheDir = context.cacheDir
+        val files = cacheDir.listFiles()
+        files?.forEach {
+            size += it.length()
+        }
+
+        var glideDiskCacheSize: Long
+        try {
+            val diskCache = Glide.getPhotoCacheDir(context)
+            if (diskCache != null && diskCache.exists()) {
+                glideDiskCacheSize = diskCache.listFiles()?.sumOf { it.length() } ?: 0L
+            } else {
+                glideDiskCacheSize = 0
+            }
+        } catch (e: Exception) {
+            glideDiskCacheSize = 0
+        }
+
+        return size + glideDiskCacheSize
+    }
+
+    fun clearCacheAsync(context: Context) {
+        val cacheDir = context.cacheDir
+        val files = cacheDir.listFiles()
+        files?.forEach {
+            it.delete()
+        }
+        Glide.get(context).clearDiskCache()
     }
 
     fun getFileIconPath(extension: String): String {

@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.WindowManager
 import android.widget.PopupWindow
 import android.widget.SeekBar
-import com.ismartcoding.lib.helpers.FormatHelper
+import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.ViewVideoPlayerDmcBinding
 

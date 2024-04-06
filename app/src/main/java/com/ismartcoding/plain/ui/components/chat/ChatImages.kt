@@ -26,7 +26,7 @@ import androidx.navigation.NavHostController
 import coil.size.Size
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.pathToUri
-import com.ismartcoding.lib.helpers.FormatHelper
+import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.ui.base.PAsyncImage
 import com.ismartcoding.plain.ui.models.SharedViewModel

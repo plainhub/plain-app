@@ -7,7 +7,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.SeekBar
-import com.ismartcoding.lib.helpers.FormatHelper
+import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.lib.media.IVideoPlayer
 import com.ismartcoding.lib.media.VideoPlayer
 import com.ismartcoding.plain.R

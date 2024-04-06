@@ -3,7 +3,7 @@ package com.ismartcoding.plain.ui.wireguard
 import android.os.Bundle
 import android.view.View
 import com.ismartcoding.lib.channel.receiveEvent
-import com.ismartcoding.lib.helpers.FormatHelper
+import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.UIDataCache
 import com.ismartcoding.plain.databinding.DialogWireguardBinding

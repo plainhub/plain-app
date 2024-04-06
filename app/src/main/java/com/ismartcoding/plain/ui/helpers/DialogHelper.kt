@@ -13,6 +13,7 @@ import com.ismartcoding.plain.api.GraphqlApiResult
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.LoadingDialog
 import com.ismartcoding.plain.ui.models.ShowMessageEvent
+import kotlinx.coroutines.delay
 
 object DialogHelper {
     private var loadingDialog: LoadingDialog? = null
@@ -57,6 +58,7 @@ object DialogHelper {
 
     fun hideLoading() {
         coMain {
+            delay(200)
             if (loadingDialog?.isAdded == true) {
                 loadingDialog?.dismissAllowingStateLoss()
             }

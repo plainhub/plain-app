@@ -13,6 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.bumptech.glide.Glide
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
@@ -22,6 +23,7 @@ import com.ismartcoding.plain.data.enums.AppFeatureType
 import com.ismartcoding.plain.data.preference.SkipVersionPreference
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.AppHelper
+import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
@@ -98,6 +100,8 @@ fun AboutPage(
                             value = MainApp.getAndroidVersion(),
                         )
                     }
+                }
+                item {
                     VerticalSpace(dp = 16.dp)
                     PCard {
                         PListItem(
@@ -127,6 +131,8 @@ fun AboutPage(
                             }
                         }
                     }
+                }
+                item {
                     VerticalSpace(dp = 16.dp)
                     PCard {
                         PListItem(
@@ -141,6 +147,29 @@ fun AboutPage(
                             showMore = true,
                             onClick = {
                                 WebHelper.open(context, UrlHelper.getPolicyUrl())
+                            },
+                        )
+                    }
+                }
+
+                item {
+                    VerticalSpace(dp = 16.dp)
+                    PCard {
+                        PListItem(
+                            title = stringResource(R.string.local_cache),
+                            desc = FormatHelper.formatBytes(AppHelper.getCacheSize(context)),
+                            action = {
+                                PMiniOutlineButton(text = stringResource(R.string.clear_cache)) {
+                                    scope.launch {
+                                        DialogHelper.showLoading()
+                                        withIO {
+                                            AppHelper.clearCacheAsync(context)
+                                        }
+                                        Glide.get(context).clearMemory()
+                                        DialogHelper.hideLoading()
+                                        DialogHelper.showMessage(R.string.local_cache_cleared)
+                                    }
+                                }
                             },
                         )
                     }

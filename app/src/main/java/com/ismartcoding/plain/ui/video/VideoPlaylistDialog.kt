@@ -13,7 +13,7 @@ import com.ismartcoding.lib.brv.listener.DefaultItemTouchCallback
 import com.ismartcoding.lib.brv.utils.*
 import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.FormatHelper
+import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.preference.VideoPlaylistPreference
 import com.ismartcoding.plain.databinding.DialogPlaylistBinding
