@@ -290,7 +290,7 @@
     <string name="route_item_description">Trafiği {{if_name}} aracılığıyla {{target}} hedefine yönlendirin</string>
     <string name="rule_item_description_inbound">{{target}} üzerinden {{action}} trafik</string>
     <string name="rule_item_description_outbound">{{target}} için {{action}} trafik</string>
-    <string name="traffic_to">'e giden trafik</string>
+    <string name="traffic_to">\'e giden trafik</string>
     <string name="examples_dns">Örnekler\nexample.com\nexample.com:80\nexample.com: 80,443-453</string>
     <string name="examples_net">Örnekler\n10.10.10.0/24\n10.10.10.0/24:80\n10.10.10.0/24:80,443 -453\n[2606:4700:4700::1111/127]: 443 -453</string>
     <string name="examples_ip">Örnekler\n10.10.10.2\n10.10.10.2:80\n10.10.10.2:80,443 -453\n[2606:4700:4700::1111]: 443 -453</string>

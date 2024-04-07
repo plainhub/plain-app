@@ -23,6 +23,7 @@ object Language {
             Locale("pt", ""),
             Locale("ta", ""),
             Locale("ko", ""),
+            Locale("tr", ""),
         )
 
     fun setLocale(
