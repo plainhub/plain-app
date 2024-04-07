@@ -52,6 +52,10 @@ object FeedEntryHelper {
         return feedEntryDao.search(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
     }
 
+    fun getAsync(id: String): DFeedEntry? {
+        return feedEntryDao.getById(id)
+    }
+
     fun updateAsync(
         id: String,
         updateItem: DFeedEntry.() -> Unit,
@@ -62,6 +66,13 @@ object FeedEntryHelper {
         feedEntryDao.update(item)
 
         return item.id
+    }
+
+    fun updateAsync(
+        item: DFeedEntry,
+    ) {
+        item.updatedAt = Clock.System.now()
+        feedEntryDao.update(item)
     }
 
     fun deleteAsync(ids: Set<String>) {

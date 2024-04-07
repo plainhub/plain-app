@@ -46,57 +46,54 @@ fun ClipboardTextField(
             errorMessage = errorText,
             requestFocus = requestFocus,
             keyboardActions =
-                KeyboardActions(
-                    onDone =
-                        if (imeAction == ImeAction.Done) {
-                            action(focusManager, onConfirm, value)
-                        } else {
-                            null
-                        },
-                    onGo =
-                        if (imeAction == ImeAction.Go) {
-                            action(focusManager, onConfirm, value)
-                        } else {
-                            null
-                        },
-                    onNext =
-                        if (imeAction == ImeAction.Next) {
-                            action(focusManager, onConfirm, value)
-                        } else {
-                            null
-                        },
-                    onPrevious =
-                        if (imeAction == ImeAction.Previous) {
-                            action(focusManager, onConfirm, value)
-                        } else {
-                            null
-                        },
-                    onSearch =
-                        if (imeAction == ImeAction.Search) {
-                            action(focusManager, onConfirm, value)
-                        } else {
-                            null
-                        },
-                    onSend =
-                        if (imeAction == ImeAction.Send) {
-                            action(focusManager, onConfirm, value)
-                        } else {
-                            null
-                        },
-                ),
+            KeyboardActions(
+                onDone =
+                if (imeAction == ImeAction.Done) {
+                    action(focusManager, onConfirm, value)
+                } else {
+                    null
+                },
+                onGo =
+                if (imeAction == ImeAction.Go) {
+                    action(focusManager, onConfirm, value)
+                } else {
+                    null
+                },
+                onNext =
+                if (imeAction == ImeAction.Next) {
+                    action(focusManager, onConfirm, value)
+                } else {
+                    null
+                },
+                onPrevious =
+                if (imeAction == ImeAction.Previous) {
+                    action(focusManager, onConfirm, value)
+                } else {
+                    null
+                },
+                onSearch =
+                if (imeAction == ImeAction.Search) {
+                    action(focusManager, onConfirm, value)
+                } else {
+                    null
+                },
+                onSend =
+                if (imeAction == ImeAction.Send) {
+                    action(focusManager, onConfirm, value)
+                } else {
+                    null
+                },
+            ),
             keyboardOptions = keyboardOptions,
         )
         if (errorText.isNotEmpty()) {
             SelectionContainer {
                 Text(
                     modifier =
-                        Modifier
-                            .padding(start = 16.dp)
-                            .horizontalScroll(rememberScrollState()),
+                    Modifier
+                        .padding(horizontal = 16.dp),
                     text = errorText,
                     color = MaterialTheme.colorScheme.error,
-                    maxLines = 1,
-                    softWrap = false,
                 )
             }
         }

@@ -33,7 +33,6 @@ import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
@@ -43,12 +42,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun ChatEditTextPage(
     navController: NavHostController,
-    sharedViewModel: SharedViewModel,
+    id: String,
+    content: String,
 ) {
     val scope = rememberCoroutineScope()
-    var inputValue by remember { mutableStateOf(sharedViewModel.chatContent.value) }
+    var inputValue by remember { mutableStateOf(content) }
     val focusManager = LocalFocusManager.current
-    val id = navController.currentBackStackEntry?.arguments?.getString("id") ?: ""
 
     PScaffold(
         navController,
@@ -91,15 +90,15 @@ fun ChatEditTextPage(
                 value = inputValue,
                 onValueChange = { inputValue = it },
                 modifier =
-                    Modifier
-                        .padding(horizontal = 16.dp)
-                        .imePadding()
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(8.dp),
-                        )
-                        .fillMaxWidth(),
+                Modifier
+                    .padding(horizontal = 16.dp)
+                    .imePadding()
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(8.dp),
+                    )
+                    .fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default,
                 shape = RoundedCornerShape(8.dp),
             )

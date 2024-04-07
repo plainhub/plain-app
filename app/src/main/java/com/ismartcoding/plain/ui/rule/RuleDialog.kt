@@ -91,7 +91,7 @@ class RuleDialog(private var mItem: Rule?) : BaseBottomSheetDialog<DialogRuleBin
             }
         unblockFormUI()
         if (!r.isSuccess()) {
-            DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())
+            DialogHelper.showErrorDialog(r.getErrorMessage())
             return
         }
 
@@ -111,7 +111,7 @@ class RuleDialog(private var mItem: Rule?) : BaseBottomSheetDialog<DialogRuleBin
             }
         unblockFormUI()
         if (!r.isSuccess()) {
-            DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())
+            DialogHelper.showErrorDialog(r.getErrorMessage())
             return
         }
 

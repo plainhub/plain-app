@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 class NetworkConfigDialog : BaseDialog<DialogNetworkConfigBinding>() {
     override fun onBackPressed() {
         if (binding.netplan.isChanged() || binding.netmix.isChanged()) {
-            DialogHelper.confirmToLeave(requireContext()) {
+            DialogHelper.confirmToLeave {
                 dismiss()
             }
         } else {
@@ -54,7 +54,7 @@ class NetworkConfigDialog : BaseDialog<DialogNetworkConfigBinding>() {
                         val netplan = binding.netplan.getText()
                         val netmix = binding.netmix.getText()
                         if (netplan.isEmpty() || netmix.isEmpty()) {
-                            DialogHelper.showErrorDialog(requireContext(), "Network config should not be empty.")
+                            DialogHelper.showErrorDialog( "Network config should not be empty.")
                             return@onMenuItemClick
                         }
 
@@ -69,7 +69,7 @@ class NetworkConfigDialog : BaseDialog<DialogNetworkConfigBinding>() {
                                 }
                             DialogHelper.hideLoading()
                             if (!r.isSuccess()) {
-                                DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())
+                                DialogHelper.showErrorDialog( r.getErrorMessage())
                                 return@launch
                             }
 

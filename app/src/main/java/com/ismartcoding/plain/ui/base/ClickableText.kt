@@ -26,8 +26,8 @@ fun PClickableText(
     overflow: TextOverflow = TextOverflow.Clip,
     maxLines: Int = Int.MAX_VALUE,
     onTextLayout: (TextLayoutResult) -> Unit = {},
-    onClick: (Int) -> Unit,
-    onDoubleClick: () -> Unit,
+    onClick: (Int) -> Unit = {},
+    onDoubleClick: () -> Unit = {},
     onLongClick: () -> Unit = {},
 ) {
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }

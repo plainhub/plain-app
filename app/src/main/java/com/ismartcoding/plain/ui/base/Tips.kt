@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.theme.tipsText
 
 @Composable
 fun Tips(
@@ -19,7 +20,21 @@ fun Tips(
             modifier = modifier
                 .fillMaxWidth(),
             text = text,
-            style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+            style = MaterialTheme.typography.tipsText(),
+        )
+    }
+}
+
+@Composable
+fun PDialogTips(
+    text: String,
+) {
+    SelectionContainer {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth(),
+            text = text,
+            style = MaterialTheme.typography.tipsText(),
         )
     }
 }

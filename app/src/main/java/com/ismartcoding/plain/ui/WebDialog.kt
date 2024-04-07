@@ -54,7 +54,7 @@ class WebDialog(val url: String) : BaseDialog<DialogWebBinding>() {
                     R.id.copy_link -> {
                         val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), url)
                         clipboardManager.setPrimaryClip(clip)
-                        DialogHelper.showConfirmDialog(context, "", context.getString(R.string.copied_to_clipboard_format, url))
+                        DialogHelper.showConfirmDialog("", context.getString(R.string.copied_to_clipboard_format, url))
                     }
                 }
             }

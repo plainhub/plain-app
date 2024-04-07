@@ -87,6 +87,9 @@ class TagsViewModel() : ViewModel() {
                     removeIf { i -> i.id == id }
                 }
             }
+            for (key in _tagsMapFlow.value.keys) {
+                _tagsMapFlow.value[key] = _tagsMapFlow.value[key]?.filter { it.tagId != id } ?: emptyList()
+            }
         }
     }
 
@@ -108,10 +111,8 @@ class TagsViewModel() : ViewModel() {
                 val existingKeys = TagHelper.getKeysByTagId(tagId)
                 val newIds = ids.filter { !existingKeys.contains(it) }
                 if (newIds.isNotEmpty()) {
-                    val relations = newIds.flatMap { id ->
-                        tagIds.map { tagId ->
-                            DTagRelation(tagId, id, dataType.value.value)
-                        }
+                    val relations = newIds.map { id ->
+                        DTagRelation(tagId, id, dataType.value.value)
                     }
                     TagHelper.addTagRelations(relations)
                     for (id in newIds) {
@@ -150,13 +151,13 @@ class TagsViewModel() : ViewModel() {
         }
     }
 
-    fun showAddTagDialog() {
+    fun showAddDialog() {
         editTagName.value = ""
         editItem.value = null
         tagNameDialogVisible.value = true
     }
 
-    fun showEditTagDialog(tag: DTag) {
+    fun showEditDialog(tag: DTag) {
         editTagName.value = tag.name
         editItem.value = tag
         tagNameDialogVisible.value = true

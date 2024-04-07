@@ -56,7 +56,7 @@ class DeviceDialog(private var mItem: DeviceFragment) : BaseDialog<DialogDeviceB
                         val r = withIO { BoxApi.mixMutateAsync((UpdateDeviceNameMutation(mItem.id, binding.value.text.trim()))) }
                         unblockFormUI()
                         if (!r.isSuccess()) {
-                            DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())
+                            DialogHelper.showErrorDialog(r.getErrorMessage())
                             return@launch
                         }
                         dismiss()

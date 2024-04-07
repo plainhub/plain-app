@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -53,7 +54,7 @@ import com.ismartcoding.plain.data.preference.LocalDarkTheme
 import com.ismartcoding.plain.data.preference.LocalThemeIndex
 import com.ismartcoding.plain.data.preference.ThemeIndexPreference
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
-import com.ismartcoding.plain.ui.base.BlockRadioButton
+import com.ismartcoding.plain.ui.base.BlockRadioButtons
 import com.ismartcoding.plain.ui.base.BlockRadioGroupButtonItem
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.DynamicSVGImage
@@ -79,6 +80,7 @@ import com.ismartcoding.plain.ui.theme.palette.safeHexToColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ColorAndStylePage(navController: NavHostController) {
     val context = LocalContext.current
@@ -122,7 +124,7 @@ fun ColorAndStylePage(navController: NavHostController) {
                     Spacer(modifier = Modifier.height(16.dp))
                 }
                 item {
-                    BlockRadioButton(
+                    BlockRadioButtons(
                         selected = radioButtonSelected,
                         onSelected = { radioButtonSelected = it },
                         itemRadioGroups =

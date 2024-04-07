@@ -2,6 +2,13 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">お使いのデバイスでは現在VPNが有効になっており、PCからアクセスした際にWeb接続の問題が発生する可能性があります。これを解決するために、LANトラフィックを許可するようにVPNの設定を調整するか、VPNを無効にすることをお勧めします。</string>
     <string name="warning">警告</string>
+    <string name="open_in_web">ウェブブラウザで開く</string>
+    <string name="require_password">パスワードが必要です</string>
+    <string name="two_factor_auth_tips">ウェブページにログインする際に、アプリ内で確認ポップアップが表示されます。</string>
+    <string name="load_full_content">全コンテンツを読み込む</string>
+    <string name="auto_fetch_full_content">全コンテンツを自動的に取得</string>
+    <string name="auto_fetch_full_content_tips">このオプションをオンにすると、アプリは自動的に各RSSフィードアイテムの完全なコンテンツを取得します。</string>
+    <string name="invalid_url">無効なURL形式です。例：https://www.example.com</string>
     <string name="local_cache">ローカルキャッシュ</string>
     <string name="clear_cache">キャッシュをクリア</string>
     <string name="local_cache_cleared">ローカルキャッシュがクリアされました。</string>
@@ -428,7 +435,6 @@
     <string name="notes_title">メモ（{{count}}）</string>
     <string name="trash_title">ゴミ箱（{{count}}）</string>
     <string name="contacts_title">連絡先（{{count}}）</string>
-    <string name="feeds_title">フィード（{{count}}）</string>
     <string name="books_title">書籍（{{count}}）</string>
     <string name="subscriptions_title">購読（{{count}}）</string>
     <string name="calls_title">通話（{{count}}）</string>
@@ -523,7 +529,6 @@
     <string name="syncing_all_feeds">すべてのフィードを同期しています...</string>
     <string name="syncing">同期中...</string>
     <string name="sync_failed">同期に失敗しました</string>
-    <string name="sync_feeds_from_server">サーバーからフィードを同期</string>
     <string name="scan_needs_camera_warning">スキャナーにはカメラの許可が必要です！</string>
     <string name="exported_to">{{name}}にエクスポートされました。</string>
     <string name="invalid_file">無効なファイル</string>
@@ -545,16 +550,11 @@
     <string name="enter_this_address_tips">上記のアドレスをコンピューターのブラウザに入力して、電話とコンピューターが同じローカルネットワークにあることを確認してください。</string>
     <string name="last_visit_at">前回の訪問時刻</string>
     <string name="web_console_desc">データケーブルが不要で、コンピュータを介して携帯電話の写真、ビデオ、ファイル、通知などのデータを管理します。</string>
-    <string name="fetch_content_automatically">コンテンツを自動的に取得</string>
     <string name="app_restored">アプリのデータが復元されました。新しい状態でアプリを再起動する必要があります。</string>
     <string name="welcome_text">ようこそ！このページにテキスト、画像、動画を簡単に送信し、コンピュータで表示することができます。\n問題が発生した場合は、お手伝いが必要な場合はismartcoding@gmail.comにメールを送信するか、次のDiscordのディスカッションに参加してください：https://discord.gg/RQWcS6DEEe。</string>
     <string name="demo_mode">デモモード</string>
     <string name="donation">寄付</string>
     <string name="logs">ログ</string>
-    <string name="password_type">パスワードタイプ</string>
-    <string name="password_settings">パスワード設定</string>
-    <string name="password_type_fixed">固定パスワード</string>
-    <string name="password_type_none">パスワードなし</string>
     <string name="restart_app_title">アプリを再起動</string>
     <string name="http_server_failed">HTTPサーバーの起動に失敗しました。再起動するには、「アプリを再起動」ボタンをタップしてください。</string>
     <string name="http_server_stopped">HTTPサーバーは意図的に停止されました。再起動するには、「アプリを再起動」ボタンをタップしてください。</string>

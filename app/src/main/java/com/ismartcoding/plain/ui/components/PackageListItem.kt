@@ -17,12 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
-import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.VPackage
 
@@ -46,7 +45,7 @@ fun PackageListItem(
             modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp, 8.dp, 8.dp, 8.dp),
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Image(
@@ -60,27 +59,26 @@ fun PackageListItem(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(vertical = 8.dp)
             ) {
                 Text(
                     text = item.name + " (${item.version})",
-                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp, color = MaterialTheme.colorScheme.onSurface),
+                    style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onSurface),
                 )
-                VerticalSpace(dp = 4.dp)
+                VerticalSpace(dp = 8.dp)
                 Text(
                     text = item.id,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.titleSmall,
                 )
-                VerticalSpace(dp = 4.dp)
+                VerticalSpace(dp = 8.dp)
                 Text(
                     text = stringResource(id = LocaleHelper.getStringIdentifier("app_type_" + item.type)) + " " + FormatHelper.formatBytes(item.size),
-                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                    style = MaterialTheme.typography.labelLarge.copy(color = MaterialTheme.colorScheme.secondary),
                 )
-                VerticalSpace(dp = 4.dp)
+                VerticalSpace(dp = 8.dp)
                 Text(
                     text = stringResource(id = R.string.updated_at) + "  " + item.updatedAt.formatDateTime(),
-                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                    style = MaterialTheme.typography.labelLarge.copy(color = MaterialTheme.colorScheme.secondary),
                 )
             }
         }

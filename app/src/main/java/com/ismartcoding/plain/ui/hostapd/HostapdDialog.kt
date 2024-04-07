@@ -135,7 +135,7 @@ class HostapdDialog : BaseBottomSheetDialog<DialogHostapdBinding>() {
                     }
                 unblockFormUI()
                 if (!r.isSuccess()) {
-                    DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())
+                    DialogHelper.showErrorDialog(r.getErrorMessage())
                     return@launch
                 }
 

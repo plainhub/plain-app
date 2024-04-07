@@ -56,19 +56,20 @@ import kotlinx.coroutines.launch
 @Composable
 fun AppsSearchPage(
     navController: NavHostController,
+    q: String
 ) {
     val viewModel: AppsViewModel = viewModel()
     val itemsState by viewModel.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
-    var q by rememberSaveable { mutableStateOf(navController.currentBackStackEntry?.arguments?.getString("q") ?: "") }
+    var queryText by rememberSaveable { mutableStateOf(q) }
     var active by rememberSaveable {
         mutableStateOf(true)
     }
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
             scope.launch {
-                withIO { viewModel.loadAsync(q) }
-                setRefreshState(RefreshContentState.Stop)
+                withIO { viewModel.loadAsync(queryText) }
+                setRefreshState(RefreshContentState.Finished)
             }
         }
     val focusRequester = remember { FocusRequester() }
@@ -87,16 +88,16 @@ fun AppsSearchPage(
         SearchBar(
             modifier = Modifier
                 .focusRequester(focusRequester),
-            query = q,
+            query = queryText,
             onQueryChange = {
-                q = it
+                queryText = it
             },
             onSearch = {
-                if (q.isNotEmpty()) {
+                if (queryText.isNotEmpty()) {
                     active = false
                     viewModel.showLoading.value = true
                     scope.launch(Dispatchers.IO) {
-                        viewModel.loadAsync(q)
+                        viewModel.loadAsync(queryText)
                     }
                 }
             },
@@ -104,7 +105,7 @@ fun AppsSearchPage(
             onActiveChange = {
                 if (active != it) {
                     active = it
-                    if (!active && q.isEmpty()) {
+                    if (!active && queryText.isEmpty()) {
                         navController.popBackStack()
                     }
                 }
@@ -116,7 +117,7 @@ fun AppsSearchPage(
                     contentDescription = stringResource(R.string.back),
                     tint = MaterialTheme.colorScheme.onSurface,
                 ) {
-                    if (!active || q.isEmpty()) {
+                    if (!active || queryText.isEmpty()) {
                         navController.popBackStack()
                     } else {
                         active = false
@@ -153,7 +154,7 @@ fun AppsSearchPage(
                         if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
                             LaunchedEffect(Unit) {
                                 scope.launch(Dispatchers.IO) {
-                                    withIO { viewModel.moreAsync(q) }
+                                    withIO { viewModel.moreAsync(queryText) }
                                 }
                             }
                         }

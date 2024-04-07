@@ -4,12 +4,12 @@ import android.content.Context
 import android.widget.Toast
 import com.apollographql.apollo3.api.ApolloResponse
 import com.apollographql.apollo3.api.Operation
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.ApiResult
 import com.ismartcoding.plain.api.GraphqlApiResult
+import com.ismartcoding.plain.features.ConfirmDialogEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.LoadingDialog
 import com.ismartcoding.plain.ui.models.ShowMessageEvent
@@ -67,27 +67,27 @@ object DialogHelper {
     }
 
     fun showConfirmDialog(
-        context: Context,
         title: String,
         message: String,
-        callback: (() -> Unit)? = null,
+        confirmButton: Pair<String, () -> Unit> = Pair(getString(R.string.ok)) {},
+        dismissButton: Pair<String, () -> Unit>? = null,
     ) {
-        MaterialAlertDialogBuilder(context)
-            .setTitle(title)
-            .setMessage(message)
-            .setPositiveButton(R.string.ok) { _, _ ->
-                callback?.invoke()
-            }
-            .create()
-            .show()
+        sendEvent(ConfirmDialogEvent(title, message, confirmButton, dismissButton))
+    }
+
+    fun showConfirmDialog(
+        title: String,
+        message: String,
+        callback: () -> Unit = {},
+    ) {
+        showConfirmDialog(title, message, confirmButton = Pair(getString(R.string.ok), callback))
     }
 
     fun showErrorDialog(
-        context: Context,
         message: String,
-        callback: (() -> Unit)? = null,
+        callback: () -> Unit = {},
     ) {
-        showConfirmDialog(context, getString(R.string.error), message, callback)
+        showConfirmDialog(getString(R.string.error), message, confirmButton = Pair(getString(R.string.ok), callback))
     }
 
     fun confirmToAction(
@@ -95,39 +95,28 @@ object DialogHelper {
         messageId: Int,
         callback: () -> Unit,
     ) {
-        confirmToAction(context, getString(messageId), callback)
+        confirmToAction(getString(messageId), callback)
     }
 
     fun confirmToAction(
-        context: Context,
         message: String,
         callback: () -> Unit,
     ) {
-        MaterialAlertDialogBuilder(context)
-            .setMessage(message)
-            .setPositiveButton(R.string.ok) { _, _ ->
-                callback()
-            }
-            .setNegativeButton(R.string.cancel) { _, _ ->
-            }
-            .create()
-            .show()
+        sendEvent(ConfirmDialogEvent("", message, confirmButton = Pair(getString(R.string.ok)) {
+            callback()
+        }, dismissButton = Pair(getString(R.string.cancel)) {
+        }))
     }
 
     fun confirmToLeave(
-        context: Context,
         callback: () -> Unit,
     ) {
-        MaterialAlertDialogBuilder(context)
-            .setTitle(R.string.leave_page_title)
-            .setMessage(R.string.leave_page_message)
-            .setPositiveButton(R.string.leave) { _, _ ->
+        sendEvent(ConfirmDialogEvent(getString(R.string.leave_page_title),
+            getString(R.string.leave_page_message), confirmButton = Pair(getString(R.string.leave)) {
                 callback()
-            }
-            .setNegativeButton(R.string.cancel) { _, _ ->
-            }
-            .create()
-            .show()
+            }, dismissButton = Pair(getString(R.string.cancel)) {
+            })
+        )
     }
 
     fun confirmToDelete(

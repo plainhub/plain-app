@@ -2,6 +2,13 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">आपके डिवाइस पर वर्तमान में आपका VPN सक्रिय है, जिससे PC से एक्सेस करते समay वेब कनेक्शन समस्याएँ उत्पन्न हो सकती हैं। इसे हल करने के लिए, हम सुझाव देते हैं कि आप अपने VPN सेटिंग्स को LAN ट्रैफ़िक की अनुमति देने या अपने VPN को अक्षम करने के लिए समायोजित करें।</string>
     <string name="warning">चेतावनी</string>
+    <string name="open_in_web">वेब ब्राउज़र में खोलें</string>
+    <string name="require_password">पासवर्ड आवश्यक</string>
+    <string name="two_factor_auth_tips">वेबपृष्ठ पर लॉगिन करते समय, हम अतिरिक्त सुरक्षा के लिए ऐप में पुष्टि पॉपअप प्रदर्शित करेंगे।</string>
+    <string name="load_full_content">पूरी सामग्री लोड करें</string>
+    <string name="auto_fetch_full_content">स्वत: फेच पूरी सामग्री</string>
+    <string name="auto_fetch_full_content_tips">जब यह विकल्प चालू होता है, तो ऐप स्वचालित रूप से प्रत्येक आरएसएस फ़ीड आइटम की पूरी सामग्री को फ़ेच करेगा।</string>
+    <string name="invalid_url">अमान्य URL प्रारूप। उदाहरण: https://www.example.com</string>
     <string name="local_cache">स्थानीय कैश</string>
     <string name="clear_cache">कैश साफ़ करें</string>
     <string name="local_cache_cleared">स्थानीय कैश साफ़ किया गया।</string>
@@ -428,7 +435,6 @@
     <string name="notes_title">नोट्स ({{count}})</string>
     <string name="trash_title">कचरा ({{count}})</string>
     <string name="contacts_title">संपर्क ({{count}})</string>
-    <string name="feeds_title">फ़ीड ({{count}})</string>
     <string name="books_title">किताबें ({{count}})</string>
     <string name="subscriptions_title">सदस्यता ({{count}})</string>
     <string name="calls_title">कॉल ({{count}})</string>
@@ -523,7 +529,6 @@
     <string name="syncing_all_feeds">सभी फ़ीड्स सिंक कर रहा है...</string>
     <string name="syncing">सिंक कर रहा है…</string>
     <string name="sync_failed">सिंक विफल हो गया</string>
-    <string name="sync_feeds_from_server">सर्वर से फ़ीड्स सिंक करें</string>
     <string name="scan_needs_camera_warning">स्कैनर को कैमरा अनुमति की आवश्यकता है!</string>
     <string name="exported_to">निर्यातित किया गया {{name}} में।</string>
     <string name="invalid_file">अमान्य फ़ाइल</string>
@@ -545,16 +550,11 @@
     <string name="enter_this_address_tips">अपने कंप्यूटर के ब्राउज़र में ऊपर दिए गए पते को डालें, यह सुनिश्चित करें कि आपका फोन और कंप्यूटर एक ही स्थानीय नेटवर्क में हैं।</string>
     <string name="last_visit_at">आखिरी बार दौरा किया गया</string>
     <string name="web_console_desc">डेटा केबल की आवश्यकता के बिना कंप्यूटर के माध्यम से अपने फोन पर फोटो, वीडियो, फ़ाइलें, सूचनाएँ और अन्य डेटा का प्रबंधन करें।</string>
-    <string name="fetch_content_automatically">स्वचालित रूप से सामग्री प्राप्त करें</string>
     <string name="app_restored">ऐप डेटा पुनः प्राप्त हो गया है, आपको ऐप को मजबूरी से बंद करना होगा और उसे फिर से नए रूप में शुरू करना होगा।</string>
     <string name="welcome_text">स्वागत है! आप इस पृष्ठ पर टेक्स्ट, चित्र, और वीडियो आसानी से भेज सकते हैं, और उन्हें अपने कंप्यूटर पर देख सकते हैं।\nअगर आपको कोई समस्या आती है, तो कृपया सहायता के लिए ismartcoding@gmail.com पर एक ईमेल भेजें या हमारे Discord चर्चा में शामिल हों: https://discord.gg/RQWcS6DEEe।</string>
     <string name="demo_mode">डेमो मोड</string>
     <string name="donation">दान</string>
     <string name="logs">लॉग</string>
-    <string name="password_type">पासवर्ड प्रकार</string>
-    <string name="password_settings">पासवर्ड सेटिंग्स</string>
-    <string name="password_type_fixed">स्थिर पासवर्ड</string>
-    <string name="password_type_none">कोई पासवर्ड नहीं</string>
     <string name="restart_app_title">ऐप पुनः शुरू करें</string>
     <string name="http_server_failed">HTTP सर्वर चालना असफल हुआ। इसे पुनरारंभ करने के लिए, कृपया "ऐप फिर से चालना" बटन पर टैप करें।</string>
     <string name="http_server_stopped">HTTP सर्वर को इच्छापूर्वक बंद किया गया है। इसे पुनरारंभ करने के लिए, कृपया "ऐप फिर से चालना" बटन पर टैप करें।</string>

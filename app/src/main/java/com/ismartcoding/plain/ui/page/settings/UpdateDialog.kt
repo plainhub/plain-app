@@ -7,6 +7,8 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Update
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,7 +31,6 @@ import com.ismartcoding.plain.data.preference.LocalNewVersionPublishDate
 import com.ismartcoding.plain.data.preference.LocalNewVersionSize
 import com.ismartcoding.plain.data.preference.SkipVersionPreference
 import com.ismartcoding.plain.data.toVersion
-import com.ismartcoding.plain.ui.base.PAlertDialog
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.UpdateViewModel
@@ -46,60 +47,61 @@ fun UpdateDialog(viewModel: UpdateViewModel) {
     val newVersionDownloadUrl = LocalNewVersionDownloadUrl.current
     val scope = rememberCoroutineScope()
 
-    PAlertDialog(
-        modifier = Modifier.heightIn(max = 400.dp),
-        visible = viewModel.updateDialogVisible.value,
-        onDismissRequest = { viewModel.updateDialogVisible.value = false },
-        icon = {
-            Icon(
-                imageVector = Icons.Rounded.Update,
-                contentDescription = stringResource(R.string.change_log),
-            )
-        },
-        title = {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(text = "Release $newVersion")
-                VerticalSpace(dp = 16.dp)
-                Text(
-                    text = "$newVersionPublishDate ${FormatHelper.formatBytes(newVersionSize)}",
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.bodyMedium,
+    if (viewModel.updateDialogVisible.value) {
+        AlertDialog(
+            modifier = Modifier.heightIn(max = 400.dp),
+            onDismissRequest = { viewModel.updateDialogVisible.value = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Rounded.Update,
+                    contentDescription = stringResource(R.string.change_log),
                 )
-                VerticalSpace(dp = 16.dp)
-            }
-        },
-        text = {
-            SelectionContainer {
-                Text(
-                    modifier = Modifier.verticalScroll(rememberScrollState()),
-                    text = newVersionLog,
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    WebHelper.open(context, newVersionDownloadUrl)
+            },
+            title = {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    Text(text = "Release $newVersion")
+                    VerticalSpace(dp = 16.dp)
+                    Text(
+                        text = "$newVersionPublishDate ${FormatHelper.formatBytes(newVersionSize)}",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    VerticalSpace(dp = 16.dp)
                 }
-            ) {
-                Text(
-                    text = stringResource(R.string.update)
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    scope.launch {
-                        withIO { SkipVersionPreference.putAsync(context, newVersion.toString()) }
-                        viewModel.hideDialog()
+            },
+            text = {
+                SelectionContainer {
+                    Text(
+                        modifier = Modifier.verticalScroll(rememberScrollState()),
+                        text = newVersionLog,
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        WebHelper.open(context, newVersionDownloadUrl)
                     }
+                ) {
+                    Text(
+                        text = stringResource(R.string.update)
+                    )
                 }
-            ) {
-                Text(text = stringResource(R.string.skip_this_version))
-            }
-        },
-    )
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        scope.launch {
+                            withIO { SkipVersionPreference.putAsync(context, newVersion.toString()) }
+                            viewModel.hideDialog()
+                        }
+                    }
+                ) {
+                    Text(text = stringResource(R.string.skip_this_version))
+                }
+            },
+        )
+    }
 }

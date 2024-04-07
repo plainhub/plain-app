@@ -48,7 +48,7 @@ fun ScanHistoryPage(
     val refreshState =
         rememberRefreshLayoutState {
             viewModel.fetch(context)
-            setRefreshState(RefreshContentState.Stop)
+            setRefreshState(RefreshContentState.Finished)
         }
 
     LaunchedEffect(Unit) {

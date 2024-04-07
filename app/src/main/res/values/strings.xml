@@ -2,6 +2,13 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Your VPN is currently enabled on your device, which could potentially lead to web connection issues when accessed from PC. To resolve this, we recommend adjusting your VPN settings to allow LAN traffic or disabling your VPN.</string>
     <string name="warning">Warning</string>
+    <string name="open_in_web">Open in web browser</string>
+    <string name="require_password">Require password</string>
+    <string name="two_factor_auth_tips">When logging in on the webpage, we\'ll display a confirmation popup in the app for added security.</string>
+    <string name="load_full_content">Load full content</string>
+    <string name="auto_fetch_full_content">Auto-fetch Full Content</string>
+    <string name="auto_fetch_full_content_tips">When this option is turned on, the app will automatically fetch the complete content of each RSS feed item.</string>
+    <string name="invalid_url">Invalid URL format. Example: https://www.example.com</string>
     <string name="local_cache">Local cache</string>
     <string name="clear_cache">Clear cache</string>
     <string name="local_cache_cleared">Local cache cleared.</string>
@@ -428,7 +435,6 @@
     <string name="notes_title">Notes ({{count}})</string>
     <string name="trash_title">Trash ({{count}})</string>
     <string name="contacts_title">Contacts ({{count}})</string>
-    <string name="feeds_title">Feeds ({{count}})</string>
     <string name="books_title">Books ({{count}})</string>
     <string name="subscriptions_title">Subscriptions ({{count}})</string>
     <string name="calls_title">Calls ({{count}})</string>
@@ -524,7 +530,6 @@
     <string name="syncing_all_feeds">Syncing all feeds…</string>
     <string name="syncing">Syncing…</string>
     <string name="sync_failed">Sync failed</string>
-    <string name="sync_feeds_from_server">Sync feeds from server</string>
     <string name="scan_needs_camera_warning">Scanner needs camera permission!</string>
     <string name="exported_to">Exported into {{name}}.</string>
     <string name="invalid_file">Invalid file</string>
@@ -546,16 +551,11 @@
     <string name="enter_this_address_tips">Enter the above address in your computer\'s browser, ensuring that your phone and computer are on the same local network.</string>
     <string name="last_visit_at">Last visit at</string>
     <string name="web_console_desc">Manage photos, videos, files, notifications, and other data on your phone via computer without the need for a data cable.</string>
-    <string name="fetch_content_automatically">Fetch content automatically</string>
     <string name="app_restored">APP data is restored, you need to force quit this app and start the app again as new.</string>
     <string name="welcome_text">Welcome! You can easily send text, images, and videos to this page and view them on your computer.\nIf you encounter any issues, please feel free to send an email to ismartcoding@gmail.com for assistance or join our Discord discussion at: https://discord.gg/RQWcS6DEEe.</string>
     <string name="demo_mode">Demo mode</string>
     <string name="donation">Donation</string>
     <string name="logs">Logs</string>
-    <string name="password_type">Password type</string>
-    <string name="password_settings">Password settings</string>
-    <string name="password_type_fixed">Fixed password</string>
-    <string name="password_type_none">No password</string>
     <string name="restart_app_title">Restart app</string>
     <string name="http_server_failed">HTTP server started failed. To restart it, please tap the "Relaunch APP" button.</string>
     <string name="http_server_stopped">The HTTP server has been intentionally stopped. To restart it, please tap the "Relaunch APP" button.</string>

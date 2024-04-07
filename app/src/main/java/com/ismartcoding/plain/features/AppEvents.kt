@@ -48,6 +48,13 @@ class StartScreenMirrorEvent
 
 class RestartAppEvent
 
+class ConfirmDialogEvent(
+    val title: String,
+    val message: String,
+    val confirmButton: Pair<String, () -> Unit>,
+    val dismissButton: Pair<String, () -> Unit>?
+)
+
 class WindowFocusChangedEvent(val hasFocus: Boolean)
 
 class DeleteChatItemViewEvent(val id: String)

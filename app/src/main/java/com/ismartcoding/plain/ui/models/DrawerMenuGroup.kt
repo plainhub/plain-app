@@ -13,7 +13,6 @@ class DrawerMenuGroup(val title: String) : ItemExpand {
 enum class DrawerMenuGroupType {
     ALL,
     TRASH,
-    FEEDS,
     CALL_TYPES,
     SMS_TYPES,
     FOLDERS,

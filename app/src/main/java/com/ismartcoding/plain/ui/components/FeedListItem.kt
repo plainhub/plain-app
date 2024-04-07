@@ -1,0 +1,83 @@
+package com.ismartcoding.plain.ui.components
+
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.db.DFeed
+import com.ismartcoding.plain.db.DFeedEntry
+import com.ismartcoding.plain.ui.base.HorizontalSpace
+import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.models.FeedsViewModel
+import com.ismartcoding.plain.ui.models.select
+import com.ismartcoding.plain.ui.theme.PlainTheme
+
+@OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
+@Composable
+fun FeedListItem(
+    viewModel: FeedsViewModel,
+    m: DFeed,
+    selectedItem: DFeed?,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+) {
+    Row {
+        if (viewModel.selectMode.value) {
+            HorizontalSpace(dp = 16.dp)
+            Checkbox(checked = viewModel.selectedIds.contains(m.id), onCheckedChange = {
+                viewModel.select(m.id)
+            })
+        }
+
+        Surface(
+            modifier =
+            PlainTheme
+                .getCardModifier(selected = selectedItem?.id == m.id || viewModel.selectedIds.contains(m.id))
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = onLongClick,
+                )
+                .weight(1f),
+            color = Color.Unspecified,
+        ) {
+            Row(
+                modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+                    Text(
+                        text = m.name + " (${m.count})",
+                        style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold),
+                    )
+                    VerticalSpace(dp = 8.dp)
+                    Text(
+                        text = m.url,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                    )
+                }
+            }
+        }
+    }
+}

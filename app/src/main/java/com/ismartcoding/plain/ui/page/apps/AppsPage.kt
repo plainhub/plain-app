@@ -49,7 +49,7 @@ fun AppsPage(
         rememberRefreshLayoutState {
             scope.launch {
                 withIO { viewModel.loadAsync() }
-                setRefreshState(RefreshContentState.Stop)
+                setRefreshState(RefreshContentState.Finished)
             }
         }
 

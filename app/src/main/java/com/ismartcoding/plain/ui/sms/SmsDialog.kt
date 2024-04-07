@@ -18,7 +18,6 @@ import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.sms.DMessage
 import com.ismartcoding.plain.features.sms.SmsMediaStoreHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
-import com.ismartcoding.plain.ui.PlainTextDialog
 import com.ismartcoding.plain.ui.extensions.checkPermission
 import com.ismartcoding.plain.ui.extensions.checkable
 import com.ismartcoding.plain.ui.helpers.BottomMenuHelper
@@ -72,7 +71,7 @@ class SmsDialog : BaseListDrawerDialog() {
 
             checkable(onItemClick = {
                 val d = getModel<DataModel>().data as DMessage
-                PlainTextDialog(d.address, d.body).show()
+//                PlainTextDialog(d.address, d.body).show()
             }, onChecked = {
                 updateBottomActions()
                 updateTitle()

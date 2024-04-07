@@ -59,7 +59,7 @@ class CreateVocabularyDialog : BaseBottomSheetDialog<DialogCreateVocabularyBindi
 
         if (!r.isSuccess()) {
             unblockFormUI()
-            DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())
+            DialogHelper.showErrorDialog(r.getErrorMessage())
             return
         }
 

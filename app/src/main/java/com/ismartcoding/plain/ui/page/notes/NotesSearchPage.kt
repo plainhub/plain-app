@@ -35,13 +35,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.ActionSourceType
-import com.ismartcoding.plain.data.enums.DataType
-import com.ismartcoding.plain.db.DNote
-import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.DragAnchors
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -67,6 +62,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun NotesSearchPage(
     navController: NavHostController,
+    q: String,
     viewModel: NotesViewModel = viewModel(),
     tagsViewModel: TagsViewModel = viewModel()
 ) {
@@ -77,38 +73,31 @@ fun NotesSearchPage(
     var active by rememberSaveable {
         mutableStateOf(true)
     }
-    var showActionBottomSheet by remember { mutableStateOf(false) }
-    var selectedItem by remember { mutableStateOf<DNote?>(null) }
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
             scope.launch {
                 withIO { viewModel.loadAsync(tagsViewModel) }
-                setRefreshState(RefreshContentState.Stop)
+                setRefreshState(RefreshContentState.Finished)
             }
         }
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) {
         viewModel.search.value = true
-        tagsViewModel.dataType.value = DataType.NOTE
-        viewModel.queryText = navController.currentBackStackEntry?.arguments?.getString("q") ?: ""
+        tagsViewModel.dataType.value = viewModel.dataType
+        if (viewModel.queryText.isEmpty()) {
+            viewModel.queryText = q
+        }
         if (active) {
             focusRequester.requestFocus()
         }
     }
 
-    if (showActionBottomSheet) {
-        ItemActionBottomSheet(
-            viewModel,
-            tagsViewModel,
-            m = selectedItem!!,
-            tagsMapState,
-            tagsState,
-            onDismiss = {
-                showActionBottomSheet = false
-                selectedItem = null
-            }
-        )
-    }
+    ViewNoteBottomSheet(
+        viewModel,
+        tagsViewModel,
+        tagsMapState,
+        tagsState,
+    )
 
     Column(
         Modifier
@@ -176,7 +165,7 @@ fun NotesSearchPage(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentHeight(),
-                            enabled = !viewModel.selectMode,
+                            enabled = !viewModel.selectMode.value,
                             endContent = { state ->
                                 SwipeActionButton(
                                     text = stringResource(R.string.move_to_trash),
@@ -197,13 +186,11 @@ fun NotesSearchPage(
                                 tagsViewModel,
                                 m,
                                 tagsState.filter { tagIds.contains(it.id) },
-                                selectedItem,
                                 onClick = {
                                     navController.navigate("${RouteName.NOTES.name}/${m.id}")
                                 },
                                 onLongClick = {
-                                    selectedItem = m
-                                    showActionBottomSheet = true
+                                    viewModel.selectedItem.value = m
                                 }
                             )
                         }

@@ -409,12 +409,12 @@ object Permissions {
         if (permission.can(context)) {
             callback()
         } else {
-            DialogHelper.showConfirmDialog(context, getString(R.string.confirm), getString(stringKey)) {
+            DialogHelper.showConfirmDialog(getString(R.string.confirm), getString(stringKey), confirmButton = Pair(getString(R.string.ok)) {
                 coIO {
                     ensureNotificationAsync(context)
                     callback()
                 }
-            }
+            })
         }
     }
 

@@ -12,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +33,7 @@ fun PScaffold(
     actions: (@Composable RowScope.() -> Unit)? = null,
     bottomBar: (@Composable () -> Unit)? = null,
     floatingActionButton: (@Composable () -> Unit)? = null,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
     content: @Composable () -> Unit = {},
 ) {
     Scaffold(
@@ -48,6 +50,7 @@ fun PScaffold(
                     TopAppBarDefaults.topAppBarColors(
                         containerColor = Color.Transparent,
                     ),
+                    scrollBehavior = scrollBehavior,
                 )
             }
         },

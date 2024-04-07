@@ -148,92 +148,85 @@ android {
 }
 
 dependencies {
-    val room = "2.6.1"
-    val apollo = "3.2.1"
-    val kgraphql = "0.19.0"
-    val ktor = "3.0.0-beta-1"
-    val media3 = "1.3.0"
-    val compose = "1.6.4"
 
-    implementation(platform("androidx.compose:compose-bom:2024.01.00"))
+    implementation(platform(libs.compose.bom))
 
     // https://github.com/google/accompanist/releases
-    implementation("androidx.activity:activity-compose:1.8.2")
-    implementation("androidx.compose.runtime:runtime:$compose")
-    implementation("androidx.compose.ui:ui:$compose")
-    implementation("androidx.compose.foundation:foundation:$compose")
-    implementation("androidx.compose.foundation:foundation-layout:$compose")
-    implementation("androidx.compose.material3:material3:1.2.1")
-    implementation("androidx.compose.material:material-icons-extended:1.7.0-alpha05")
-    implementation("com.google.accompanist:accompanist-drawablepainter:0.34.0")
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.runtime)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.foundation)
+    implementation(libs.androidx.foundation.layout)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.accompanist.drawablepainter)
 //    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha12")
 
     // https://developer.android.com/jetpack/androidx/releases/navigation
-    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation(libs.androidx.navigation.compose)
 
-    releaseImplementation(platform("com.google.firebase:firebase-bom:32.2.3"))
-    releaseImplementation("com.google.firebase:firebase-crashlytics-ktx:18.6.3")
+    releaseImplementation(libs.firebase.bom)
+    releaseImplementation(libs.firebase.crashlytics.ktx)
 
     // Media3
-    implementation("androidx.media3:media3-exoplayer:$media3")
-    implementation("androidx.media3:media3-datasource:$media3")
-    implementation("androidx.media3:media3-ui:$media3")
-    implementation("androidx.media3:media3-session:$media3")
-    implementation("androidx.media3:media3-cast:$media3")
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.datasource)
+    implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.session)
+    implementation(libs.androidx.media3.cast)
 
-    implementation("com.apollographql.apollo3:apollo-runtime:$apollo")
-    implementation("com.apollographql.apollo3:apollo-normalized-cache:$apollo")
-    implementation("com.apollographql.apollo3:apollo-normalized-cache-sqlite:$apollo")
-    implementation("com.apollographql.apollo3:apollo-adapters:$apollo")
+    implementation(libs.apollo.runtime)
+    implementation(libs.apollo.normalized.cache)
+    implementation(libs.apollo.normalized.cache.sqlite)
+    implementation(libs.apollo.adapters)
 
-    implementation("androidx.viewpager2:viewpager2:1.0.0")
-    implementation("androidx.paging:paging-runtime-ktx:3.2.1")
-    implementation("androidx.preference:preference-ktx:1.2.1")
+    implementation(libs.androidx.viewpager2)
+    implementation(libs.androidx.paging.runtime.ktx)
+    implementation(libs.androidx.preference.ktx)
 
-    implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("com.github.bmoliveira:snake-yaml:v1.18-android")
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.snake.yaml)
 
     // CameraX
-    implementation("androidx.camera:camera-core:1.4.0-alpha04")
-    implementation("androidx.camera:camera-camera2:1.4.0-alpha04")
-    implementation("androidx.camera:camera-lifecycle:1.4.0-alpha04")
-    implementation("androidx.camera:camera-view:1.4.0-alpha04")
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
 
-    implementation("io.ktor:ktor-server-core:$ktor")
-    implementation("io.ktor:ktor-server-netty:$ktor")
-    implementation("io.ktor:ktor-server-websockets:$ktor")
-    implementation("io.ktor:ktor-server-compression:$ktor")
-    implementation("io.ktor:ktor-server-content-negotiation:$ktor")
-    implementation("io.ktor:ktor-network-tls-certificates:$ktor")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
-    implementation("io.ktor:ktor-server-caching-headers:$ktor")
-    implementation("io.ktor:ktor-server-cors:$ktor")
-    implementation("io.ktor:ktor-server-forwarded-header:$ktor")
-    implementation("io.ktor:ktor-server-partial-content:$ktor")
-    implementation("io.ktor:ktor-server-auto-head-response:$ktor")
-    implementation("io.ktor:ktor-server-conditional-headers:$ktor")
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.netty)
+    implementation(libs.ktor.server.websockets)
+    implementation(libs.ktor.server.compression)
+    implementation(libs.ktor.server.content.negotiation)
+    implementation(libs.ktor.network.tls.certificates)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    implementation(libs.ktor.server.caching.headers)
+    implementation(libs.ktor.server.cors)
+    implementation(libs.ktor.server.forwarded.header)
+    implementation(libs.ktor.server.partial.content)
+    implementation(libs.ktor.server.auto.head.response)
+    implementation(libs.ktor.server.conditional.headers)
 
-    implementation("com.apurebase:kgraphql:$kgraphql")
-    implementation("com.apurebase:kgraphql-ktor:$kgraphql")
+    implementation(libs.kgraphql)
+    implementation(libs.kgraphql.ktor)
 
     // https://developer.android.com/jetpack/androidx/releases/room
-    implementation("androidx.room:room-common:$room")
-    ksp("androidx.room:room-compiler:$room")
-    implementation("androidx.room:room-ktx:$room")
-    // implementation("com.github.skydoves:balloon:1.5.2")
+    implementation(libs.room.runtime)
+    annotationProcessor(libs.room.compiler)
+    ksp(libs.room.compiler)
 
-    implementation("com.aallam.openai:openai-client:3.6.2")
+    implementation(libs.openai.client)
 
-    implementation("com.google.zxing:core:3.5.3")
+    implementation(libs.core)
 
-    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation(libs.androidx.work.runtime.ktx)
 
     // https://developer.android.com/jetpack/androidx/releases/datastore
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation(libs.androidx.datastore.preferences)
 
 //    implementation("org.eclipse.jgit:org.eclipse.jgit:6.1.0.202203080745-r") // TODO: git support
-    implementation("org.zeroturnaround:zt-zip:1.16")
+    implementation(libs.zt.zip)
     implementation(project(":lib"))
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.12")
+    debugImplementation(libs.leakcanary.android)
     implementation(kotlin("stdlib", KotlinCompilerVersion.VERSION))
 }

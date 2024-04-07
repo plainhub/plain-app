@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.base
 
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -40,52 +41,53 @@ fun TextFieldDialog(
 ) {
     val focusManager = LocalFocusManager.current
 
-    PAlertDialog(
-        modifier = modifier,
-        visible = visible,
-        onDismissRequest = onDismissRequest,
-        icon = {
-            icon?.let {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = title,
+    if (visible) {
+        AlertDialog(
+            modifier = modifier,
+            onDismissRequest = onDismissRequest,
+            icon = {
+                icon?.let {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = title,
+                    )
+                }
+            },
+            title = {
+                Text(text = title, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            },
+            text = {
+                ClipboardTextField(
+                    modifier = modifier,
+                    readOnly = readOnly,
+                    value = value,
+                    singleLine = singleLine,
+                    onValueChange = onValueChange,
+                    placeholder = placeholder,
+                    isPassword = isPassword,
+                    errorText = errorText,
+                    keyboardOptions = keyboardOptions,
+                    focusManager = focusManager,
+                    requestFocus = true,
+                    onConfirm = onConfirm,
                 )
-            }
-        },
-        title = {
-            Text(text = title, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        },
-        text = {
-            ClipboardTextField(
-                modifier = modifier,
-                readOnly = readOnly,
-                value = value,
-                singleLine = singleLine,
-                onValueChange = onValueChange,
-                placeholder = placeholder,
-                isPassword = isPassword,
-                errorText = errorText,
-                keyboardOptions = keyboardOptions,
-                focusManager = focusManager,
-                requestFocus = true,
-                onConfirm = onConfirm,
-            )
-        },
-        confirmButton = {
-            Button(
-                enabled = value.isNotBlank(),
-                onClick = {
-                    focusManager.clearFocus()
-                    onConfirm(value)
-                },
-            ) {
-                Text(confirmText)
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(text = dismissText)
-            }
-        },
-    )
+            },
+            confirmButton = {
+                Button(
+                    enabled = value.isNotBlank(),
+                    onClick = {
+                        focusManager.clearFocus()
+                        onConfirm(value)
+                    },
+                ) {
+                    Text(confirmText)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismissRequest) {
+                    Text(text = dismissText)
+                }
+            },
+        )
+    }
 }

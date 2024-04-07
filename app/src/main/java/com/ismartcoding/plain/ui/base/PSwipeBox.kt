@@ -181,7 +181,7 @@ enum class DragAnchors {
 @Composable
 fun rememberAnchoredDraggableState(
     initialValue: DragAnchors = DragAnchors.Center,
-    positionalThreshold: (distance: Float) -> Float = { distance -> distance * 0.5f },
+    positionalThreshold: (distance: Float) -> Float = { distance -> distance },
     velocityThreshold: Dp = 100.dp,
     animationSpec: TweenSpec<Float> = TweenSpec(durationMillis = 200),
 ): AnchoredDraggableState<DragAnchors> {

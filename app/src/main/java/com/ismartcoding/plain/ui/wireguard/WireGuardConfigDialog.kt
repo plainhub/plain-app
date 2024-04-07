@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 class WireGuardConfigDialog(val wireGuard: WireGuard) : BaseDialog<DialogWireguardConfigBinding>() {
     override fun onBackPressed() {
         if (binding.editor.isChanged()) {
-            DialogHelper.confirmToLeave(requireContext()) {
+            DialogHelper.confirmToLeave {
                 dismiss()
             }
         } else {
@@ -54,6 +54,7 @@ class WireGuardConfigDialog(val wireGuard: WireGuard) : BaseDialog<DialogWiregua
                     R.id.save -> {
                         doSave()
                     }
+
                     R.id.add_peer -> {
                         lifecycleScope.launch {
                             val wg = WireGuard()
@@ -123,7 +124,7 @@ class WireGuardConfigDialog(val wireGuard: WireGuard) : BaseDialog<DialogWiregua
                 }
             DialogHelper.hideLoading()
             if (!r.isSuccess()) {
-                DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())
+                DialogHelper.showErrorDialog(r.getErrorMessage())
                 return@launch
             }
 

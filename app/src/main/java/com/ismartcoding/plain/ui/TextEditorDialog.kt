@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 class TextEditorDialog(val uri: Uri) : BaseDialog<DialogTextEditorBinding>() {
     override fun onBackPressed() {
         if (binding.editor.isChanged()) {
-            DialogHelper.confirmToLeave(requireContext()) {
+            DialogHelper.confirmToLeave {
                 dismiss()
             }
         } else {

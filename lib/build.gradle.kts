@@ -45,74 +45,70 @@ android {
 }
 
 dependencies {
-    val ktor = "3.0.0-beta-1"
-    val markwon = "4.6.2"
-    val coil = "2.6.0"
+    implementation(libs.androidx.core.ktx)
+    api(libs.androidx.appcompat)
 
-    implementation("androidx.core:core-ktx:1.12.0")
-    api("androidx.appcompat:appcompat:1.6.1")
-
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
 //    api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
-    implementation("com.github.barteksc:pdfium-android:1.9.0")
+    implementation(libs.pdfium.android)
 
-    api("com.google.code.gson:gson:2.10.1")
+    api(libs.gson)
 
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.8.0")
-    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-    api("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-    api("com.google.android.material:material:1.12.0-alpha03")
-    api("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-    api("androidx.lifecycle:lifecycle-extensions:2.2.0")
+    api(libs.kotlinx.coroutines.core)
+    api(libs.kotlinx.coroutines.android)
+    api(libs.kotlinx.coroutines.guava)
+    api(libs.kotlinx.serialization.json)
+    api(libs.kotlinx.datetime)
+    api(libs.material)
+    api(libs.androidx.lifecycle.runtime.ktx)
+    api(libs.androidx.lifecycle.extensions)
 
-    api("androidx.fragment:fragment-ktx:1.6.2")
-    api("androidx.appcompat:appcompat:1.6.1")
-    api("androidx.core:core-ktx:1.12.0")
-    api("androidx.transition:transition:1.4.1")
+    api(libs.androidx.fragment.ktx)
+    api(libs.androidx.appcompat)
+    api(libs.androidx.core.ktx)
+    api(libs.androidx.transition)
 //    api("com.squareup.picasso:picasso:2.71828")
 
-    api("com.google.guava:guava:33.0.0-android")
-    api("com.google.android.exoplayer:exoplayer:2.19.1")
+    api(libs.guava)
+    api(libs.exoplayer)
     // https://developer.android.com/topic/performance/graphics/load-bitmap
-    api("com.github.bumptech.glide:glide:4.16.0")
-    ksp("com.github.bumptech.glide:ksp:4.16.0")
+    api(libs.glide)
+    ksp(libs.ksp)
     // https://github.com/davemorrissey/subsampling-scale-image-view
-    api("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
+    api(libs.subsampling.scale.image.view.androidx)
 
-    implementation("org.ahocorasick:ahocorasick:0.6.3") // For pinyin
-    implementation("org.bouncycastle:bcprov-jdk15on:1.70")
-    implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
-    api("io.ktor:ktor-client-core:$ktor")
-    api("io.ktor:ktor-client-cio:$ktor")
-    api("io.ktor:ktor-client-logging:$ktor")
+    implementation(libs.ahocorasick) // For pinyin
+    implementation(libs.bcprov.jdk15on)
+    implementation(libs.bcpkix.jdk15on)
+    api(libs.ktor.client.core)
+    api(libs.ktor.client.cio)
+    api(libs.ktor.client.logging)
 
-    api("io.noties.markwon:core:$markwon")
-    api("io.noties.markwon:html:$markwon")
-    api("io.noties.markwon:ext-strikethrough:$markwon")
-    api("io.noties.markwon:ext-tasklist:$markwon")
-    api("io.noties.markwon:ext-tables:$markwon")
-    api("io.noties.markwon:ext-latex:$markwon")
-    api("io.noties.markwon:linkify:$markwon")
-    api("io.noties.markwon:image-glide:$markwon")
+    api(libs.markwon.core)
+    api(libs.html)
+    api(libs.ext.strikethrough)
+    api(libs.ext.tasklist)
+    api(libs.ext.tables)
+    api(libs.ext.latex)
+    api(libs.linkify)
+    api(libs.image.glide)
     //api("com.caverock:androidsvg:1.4")
-    api("com.caverock:androidsvg-aar:1.4")
+    api(libs.androidsvg.aar)
 
-    implementation("pl.droidsonroids.gif:android-gif-drawable:1.2.23")
+    implementation(libs.android.gif.drawable)
 
     // https://coil-kt.github.io/coil/changelog/
-    api("io.coil-kt:coil:$coil")
-    api("io.coil-kt:coil-compose:$coil")
-    api("io.coil-kt:coil-svg:$coil")
-    api("io.coil-kt:coil-gif:$coil")
-    api("io.coil-kt:coil-video:$coil")
-    api("com.github.Commit451.coil-transformations:transformations:2.0.2")
+    api(libs.coil)
+    api(libs.coil.compose)
+    api(libs.coil.svg)
+    api(libs.coil.gif)
+    api(libs.coil.video)
+    api(libs.transformations)
 
-    api("net.dankito.readability4j:readability4j:1.0.8")
-    api("org.jsoup:jsoup:1.15.3")
+    api(libs.readability4j)
+    api(libs.jsoup)
 
-    api("io.github.scwang90:refresh-layout-kernel:2.0.5")
+    api(libs.refresh.layout.kernel)
 }

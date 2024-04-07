@@ -3,15 +3,21 @@ package com.ismartcoding.plain.ui.page
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -27,14 +33,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.extensions.parcelableArrayList
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.enums.DarkTheme
+import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.data.enums.PickFileTag
 import com.ismartcoding.plain.data.enums.PickFileType
 import com.ismartcoding.plain.data.preference.LocalDarkTheme
+import com.ismartcoding.plain.features.ConfirmDialogEvent
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.features.audio.AudioPlayer
@@ -51,6 +60,11 @@ import com.ismartcoding.plain.ui.page.apps.AppsPage
 import com.ismartcoding.plain.ui.page.apps.AppsSearchPage
 import com.ismartcoding.plain.ui.page.docs.DocsPage
 import com.ismartcoding.plain.ui.page.docs.DocsSearchPage
+import com.ismartcoding.plain.ui.page.feeds.FeedEntriesPage
+import com.ismartcoding.plain.ui.page.feeds.FeedEntriesSearchPage
+import com.ismartcoding.plain.ui.page.feeds.FeedEntryPage
+import com.ismartcoding.plain.ui.page.feeds.FeedSettingsPage
+import com.ismartcoding.plain.ui.page.feeds.FeedsPage
 import com.ismartcoding.plain.ui.page.notes.NotePage
 import com.ismartcoding.plain.ui.page.notes.NotesPage
 import com.ismartcoding.plain.ui.page.notes.NotesSearchPage
@@ -63,19 +77,19 @@ import com.ismartcoding.plain.ui.page.settings.DarkThemePage
 import com.ismartcoding.plain.ui.page.settings.LanguagePage
 import com.ismartcoding.plain.ui.page.settings.LogsPage
 import com.ismartcoding.plain.ui.page.settings.SettingsPage
+import com.ismartcoding.plain.ui.page.tags.TagsPage
 import com.ismartcoding.plain.ui.page.tools.ExchangeRatePage
 import com.ismartcoding.plain.ui.page.tools.SoundMeterPage
-import com.ismartcoding.plain.ui.page.web.PasswordPage
 import com.ismartcoding.plain.ui.page.web.SessionsPage
-import com.ismartcoding.plain.ui.page.web.WebSettingsPage
 import com.ismartcoding.plain.ui.page.web.WebDevPage
 import com.ismartcoding.plain.ui.page.web.WebLearnMorePage
 import com.ismartcoding.plain.ui.page.web.WebSecurityPage
+import com.ismartcoding.plain.ui.page.web.WebSettingsPage
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import com.ismartcoding.plain.ui.theme.AppTheme
-import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -90,6 +104,11 @@ fun Main(viewModel: MainViewModel) {
     val view = LocalView.current
     val window = (view.context as Activity).window
     val insetsController = WindowCompat.getInsetsController(window, view)
+    var confirmDialogEvent by remember {
+        mutableStateOf<ConfirmDialogEvent?>(null)
+    }
+
+    val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
 
     LaunchedEffect(Unit) {
         val intent = MainActivity.instance.get()?.intent
@@ -137,6 +156,11 @@ fun Main(viewModel: MainViewModel) {
                 }
             }
         }
+        events.add(
+            receiveEventHandler<ConfirmDialogEvent> { event ->
+                confirmDialogEvent = event
+            }
+        )
     }
 
     AppTheme(useDarkTheme = useDarkTheme) {
@@ -160,21 +184,20 @@ fun Main(viewModel: MainViewModel) {
                 RouteName.ABOUT to { AboutPage(navController) },
                 RouteName.LOGS to { LogsPage(navController) },
                 RouteName.WEB_SETTINGS to { WebSettingsPage(navController, viewModel) },
-                RouteName.PASSWORD to { PasswordPage(navController) },
                 RouteName.SESSIONS to { SessionsPage(navController) },
                 RouteName.WEB_DEV to { WebDevPage(navController) },
                 RouteName.WEB_SECURITY to { WebSecurityPage(navController) },
                 RouteName.EXCHANGE_RATE to { ExchangeRatePage(navController) },
                 RouteName.SOUND_METER to { SoundMeterPage(navController) },
                 RouteName.CHAT to { ChatPage(navController, sharedViewModel) },
-                RouteName.CHAT_TEXT to { ChatTextPage(navController, sharedViewModel) },
-                RouteName.TEXT to { TextPage(navController, sharedViewModel) },
                 RouteName.SCAN_HISTORY to { ScanHistoryPage(navController) },
                 RouteName.SCAN to { ScanPage(navController) },
                 RouteName.MEDIA_PREVIEW to { MediaPreviewPage(navController, sharedViewModel) },
                 RouteName.APPS to { AppsPage(navController) },
                 RouteName.DOCS to { DocsPage(navController) },
                 RouteName.NOTES to { NotesPage(navController) },
+                RouteName.FEEDS to { FeedsPage(navController) },
+                RouteName.FEED_SETTINGS to { FeedSettingsPage(navController) },
                 RouteName.WEB_LEARN_MORE to { WebLearnMorePage(navController) },
             ).forEach { (routeName, content) ->
                 slideHorizontallyComposable(routeName.name) {
@@ -183,57 +206,146 @@ fun Main(viewModel: MainViewModel) {
             }
 
             routeSearch(RouteName.APPS) {
-                AppsSearchPage(navController)
+                AppsSearchPage(navController, it)
             }
 
             routeDetail(RouteName.APPS) {
-                AppPage(navController, sharedViewModel)
-            }
-
-            routeSearch(RouteName.DOCS) {
-                DocsSearchPage(navController)
-            }
-
-            routeSearch(RouteName.NOTES) {
-                NotesSearchPage(navController)
+                AppPage(navController, it)
             }
 
             slideHorizontallyComposable(
-                "${RouteName.NOTES.name}/{id}?tagId={tagId}",
-                arguments = listOf(navArgument("id") { type = NavType.StringType }, navArgument("tagId") {
+                "${RouteName.FEED_ENTRIES.name}?feedId={feedId}",
+                arguments = listOf(navArgument("feedId") {
                     nullable = true
                     defaultValue = ""
                     type = NavType.StringType
                 }),
             ) {
-                NotePage(navController)
+                val feedId = it.arguments?.getString("feedId") ?: ""
+                FeedEntriesPage(navController, feedId)
+            }
+
+            slideHorizontallyComposable(
+                "${RouteName.FEED_ENTRIES.name}/search?q={q}&feedId={feedId}",
+                arguments = listOf(navArgument("q") {
+                    nullable = true
+                    defaultValue = ""
+                    type = NavType.StringType
+                }, navArgument("feedId") {
+                    nullable = true
+                    defaultValue = ""
+                    type = NavType.StringType
+                }),
+            ) {
+                val q = it.arguments?.getString("q") ?: ""
+                val feedId = it.arguments?.getString("feedId") ?: ""
+                FeedEntriesSearchPage(navController, q, feedId)
+            }
+
+            routeDetail(RouteName.FEED_ENTRIES) {
+                FeedEntryPage(navController, it)
+            }
+
+            routeSearch(RouteName.DOCS) {
+                DocsSearchPage(navController, it)
+            }
+
+            routeSearch(RouteName.NOTES) {
+                NotesSearchPage(navController, it)
+            }
+
+            slideHorizontallyComposable(
+                "${RouteName.NOTES.name}/create?tagId={tagId}",
+                arguments = listOf(navArgument("tagId") {
+                    nullable = true
+                    defaultValue = ""
+                    type = NavType.StringType
+                }),
+            ) {
+                val tagId = it.arguments?.getString("tagId") ?: ""
+                NotePage(navController, "", tagId)
+            }
+
+            slideHorizontallyComposable(
+                "${RouteName.NOTES.name}/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.StringType }),
+            ) {
+                val id = it.arguments?.getString("id") ?: ""
+                NotePage(navController, id, "")
+            }
+
+            slideHorizontallyComposable(RouteName.TEXT.name) {
+                val title = navController.previousBackStackEntry?.savedStateHandle?.get("title") ?: ""
+                val content = navController.previousBackStackEntry?.savedStateHandle?.get("content") ?: ""
+                TextPage(navController, title, content)
+            }
+
+            slideHorizontallyComposable(
+                RouteName.CHAT_TEXT.name
+            ) {
+                val content = navController.previousBackStackEntry?.savedStateHandle?.get("content") ?: ""
+                ChatTextPage(navController, content)
             }
 
             slideHorizontallyComposable(
                 "${RouteName.TAGS.name}?dataType={dataType}",
                 arguments = listOf(navArgument("dataType") { type = NavType.IntType }),
             ) {
-                TagsPage(navController)
+                val dataType = it.arguments?.getInt("dataType") ?: -1
+                TagsPage(navController, DataType.fromInt(dataType))
             }
 
             slideHorizontallyComposable(
                 "${RouteName.CHAT_EDIT_TEXT.name}/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
             ) {
-                ChatEditTextPage(navController, sharedViewModel)
+                val id = it.arguments?.getString("id") ?: ""
+                val content = navController.previousBackStackEntry?.savedStateHandle?.get("content") ?: ""
+                ChatEditTextPage(navController, id, content)
             }
 
             slideHorizontallyComposable(
                 "${RouteName.OTHER_FILE.name}?path={path}",
                 arguments = listOf(navArgument("path") { type = NavType.StringType }),
             ) {
-                OtherFilePage(navController)
+                val path = it.arguments?.getString("path") ?: ""
+                OtherFilePage(navController, path)
             }
+        }
+
+        if (confirmDialogEvent != null) {
+            AlertDialog(onDismissRequest = {
+                confirmDialogEvent = null
+            }, title = if (confirmDialogEvent!!.title.isNotEmpty()) {
+                {
+                    Text(confirmDialogEvent!!.title)
+                }
+            } else null, text = {
+                Text(confirmDialogEvent!!.message)
+            }, confirmButton = {
+                Button(onClick = {
+                    confirmDialogEvent!!.confirmButton.second()
+                    confirmDialogEvent = null
+                }) {
+                    Text(
+                        confirmDialogEvent!!.confirmButton.first,
+                    )
+                }
+            }, dismissButton = {
+                confirmDialogEvent?.dismissButton?.let {
+                    TextButton(onClick = {
+                        it.second()
+                        confirmDialogEvent = null
+                    }) {
+                        Text(it.first)
+                    }
+                }
+            })
         }
     }
 }
 
-fun NavGraphBuilder.routeSearch(routeName: RouteName, action: @Composable () -> Unit) {
+fun NavGraphBuilder.routeSearch(routeName: RouteName, action: @Composable (String) -> Unit) {
     slideHorizontallyComposable(
         "${routeName.name}/search?q={q}",
         arguments = listOf(navArgument("q") {
@@ -242,16 +354,18 @@ fun NavGraphBuilder.routeSearch(routeName: RouteName, action: @Composable () -> 
             type = NavType.StringType
         }),
     ) {
-        action()
+        val q = it.arguments?.getString("q") ?: ""
+        action(q)
     }
 }
 
-fun NavGraphBuilder.routeDetail(routeName: RouteName, action: @Composable () -> Unit) {
+fun NavGraphBuilder.routeDetail(routeName: RouteName, action: @Composable (String) -> Unit) {
     slideHorizontallyComposable(
         "${routeName.name}/{id}",
         arguments = listOf(navArgument("id") { type = NavType.StringType }),
     ) {
-        action()
+        val id = it.arguments?.getString("id") ?: ""
+        action(id)
     }
 }
 
@@ -263,30 +377,30 @@ fun NavGraphBuilder.slideHorizontallyComposable(
     composable(
         route,
         arguments,
-        enterTransition = {
-            slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-                animationSpec = tween(PlainTheme.ANIMATION_DURATION),
-            )
-        },
-        exitTransition = {
-            slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-                animationSpec = tween(PlainTheme.ANIMATION_DURATION),
-            )
-        },
-        popEnterTransition = {
-            slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
-                animationSpec = tween(PlainTheme.ANIMATION_DURATION),
-            )
-        },
-        popExitTransition = {
-            slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
-                animationSpec = tween(PlainTheme.ANIMATION_DURATION),
-            )
-        },
+//        enterTransition = {
+//            slideIntoContainer(
+//                towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+//                animationSpec = tween(PlainTheme.ANIMATION_DURATION),
+//            )
+//        },
+//        exitTransition = {
+//            slideOutOfContainer(
+//                towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
+//                animationSpec = tween(PlainTheme.ANIMATION_DURATION),
+//            )
+//        },
+//        popEnterTransition = {
+//            slideIntoContainer(
+//                towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+//                animationSpec = tween(PlainTheme.ANIMATION_DURATION),
+//            )
+//        },
+//        popExitTransition = {
+//            slideOutOfContainer(
+//                towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
+//                animationSpec = tween(PlainTheme.ANIMATION_DURATION),
+//            )
+//        },
     ) {
         content(it)
     }

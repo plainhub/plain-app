@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.features.feed
 
-import com.ismartcoding.lib.helpers.AssetsHelper
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.opml.OpmlParser
 import com.ismartcoding.lib.opml.OpmlWriter
 import com.ismartcoding.lib.opml.entity.Body
@@ -10,11 +8,11 @@ import com.ismartcoding.lib.opml.entity.Opml
 import com.ismartcoding.lib.opml.entity.Outline
 import com.ismartcoding.lib.rss.RssParser
 import com.ismartcoding.lib.rss.model.RssChannel
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DFeed
+import com.ismartcoding.plain.db.DFeedCount
 import com.ismartcoding.plain.db.FeedDao
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.workers.FeedFetchWorker
@@ -27,12 +25,16 @@ import java.io.Writer
 import java.util.Date
 
 object FeedHelper {
-    val feedDao: FeedDao by lazy {
+    private val feedDao: FeedDao by lazy {
         AppDatabase.instance.feedDao()
     }
 
     fun getAll(): List<DFeed> {
         return feedDao.getAll()
+    }
+
+    fun getFeedCounts(): List<DFeedCount> {
+        return feedDao.getFeedCounts()
     }
 
     fun getById(id: String): DFeed? {
@@ -69,7 +71,7 @@ object FeedHelper {
         feedDao.delete(ids)
     }
 
-    fun import(reader: Reader) {
+    fun importAsync(reader: Reader) {
         val feedList = mutableListOf<DFeed>()
         val opml = OpmlParser().parse(reader)
         opml.body.outlines.forEach {
@@ -100,7 +102,7 @@ object FeedHelper {
         feedDao.insert(*feedList.distinctBy { it.url }.filter { !urls.contains(it.url) }.toTypedArray())
     }
 
-    suspend fun export(writer: Writer) {
+    fun exportAsync(writer: Writer) {
         val feeds = getAll()
         val result =
             OpmlWriter().write(

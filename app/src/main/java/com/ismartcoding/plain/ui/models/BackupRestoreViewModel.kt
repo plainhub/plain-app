@@ -53,7 +53,7 @@ class BackupRestoreViewModel : ViewModel() {
                             val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
                             DialogHelper.hideLoading()
                             coMain {
-                                DialogHelper.showConfirmDialog(context, "", LocaleHelper.getStringF(R.string.exported_to, "name", fileName))
+                                DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(R.string.exported_to, "name", fileName))
                             }
                         }
                     }
@@ -107,7 +107,7 @@ class BackupRestoreViewModel : ViewModel() {
                     }
                     DialogHelper.hideLoading()
                     coMain {
-                        DialogHelper.showConfirmDialog(context, "", getString(R.string.app_restored)) {
+                        DialogHelper.showConfirmDialog("", getString(R.string.app_restored)) {
                             sendEvent(RestartAppEvent())
                         }
                     }

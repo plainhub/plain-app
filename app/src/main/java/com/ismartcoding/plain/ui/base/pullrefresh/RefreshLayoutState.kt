@@ -13,7 +13,7 @@ class RefreshLayoutState(
     internal val onRefreshListener: RefreshLayoutState.() -> Unit
 ) {
     //刷新布局内容区域的组件状态
-    internal val refreshContentState = mutableStateOf(RefreshContentState.Stop)
+    internal val refreshContentState = mutableStateOf(RefreshContentState.Finished)
 
     //刷新布局内容区域的Offset(位移)的状态和子内容区域的Offset(位移)的状态,如果contentIsMove==false,则一直为0,单位px
     internal val refreshContentOffsetState = Animatable(0f)
@@ -67,13 +67,24 @@ class RefreshLayoutState(
      */
     fun setRefreshState(state: RefreshContentState) {
         when (state) {
-            RefreshContentState.Stop -> {
-                if (refreshContentState.value == RefreshContentState.Stop)
+            RefreshContentState.Failed -> {
+                if (refreshContentState.value == RefreshContentState.Failed)
                     return
                 if (!this::coroutineScope.isInitialized)
                     throw IllegalStateException("[RefreshLayoutState]还未初始化完成,请在[LaunchedEffect]中或composable至少组合一次后使用此方法")
                 coroutineScope.launch {
-                    refreshContentState.value = RefreshContentState.Stop
+                    refreshContentState.value = RefreshContentState.Failed
+                    delay(300)
+                    refreshContentOffsetState.animateTo(0f)
+                }
+            }
+            RefreshContentState.Finished -> {
+                if (refreshContentState.value == RefreshContentState.Finished)
+                    return
+                if (!this::coroutineScope.isInitialized)
+                    throw IllegalStateException("[RefreshLayoutState]还未初始化完成,请在[LaunchedEffect]中或composable至少组合一次后使用此方法")
+                coroutineScope.launch {
+                    refreshContentState.value = RefreshContentState.Finished
                     delay(300)
                     refreshContentOffsetState.animateTo(0f)
                 }
@@ -89,7 +100,7 @@ class RefreshLayoutState(
                     if (canCallRefreshListener)
                         onRefreshListener()
                     else
-                        setRefreshState(RefreshContentState.Stop)
+                        setRefreshState(RefreshContentState.Finished)
                     animateToThreshold()
                 }
             }
@@ -107,11 +118,11 @@ class RefreshLayoutState(
                 if (canCallRefreshListener)
                     onRefreshListener()
                 else
-                    setRefreshState(RefreshContentState.Stop)
+                    setRefreshState(RefreshContentState.Finished)
                 animateToThreshold()
             } else {
                 refreshContentOffsetState.animateTo(0f)
-                refreshContentState.value = RefreshContentState.Stop
+                refreshContentState.value = RefreshContentState.Finished
             }
         }
     }

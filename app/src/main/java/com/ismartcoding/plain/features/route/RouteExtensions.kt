@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.features.route
 
-import android.content.Context
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
@@ -29,7 +28,6 @@ fun Route.toRouteEdit(): RouteEdit {
 }
 
 fun ViewListItemBinding.bindRoute(
-    context: Context,
     lifecycleScope: LifecycleCoroutineScope,
     item: Route,
 ) {
@@ -49,7 +47,7 @@ fun ViewListItemBinding.bindRoute(
                 }
             DialogHelper.hideLoading()
             if (!r.isSuccess()) {
-                DialogHelper.showErrorDialog(context, r.getErrorMessage())
+                DialogHelper.showErrorDialog(r.getErrorMessage())
                 item.isEnabled = !isEnabled
                 setSwitchEnable(!isEnabled)
                 return@launch

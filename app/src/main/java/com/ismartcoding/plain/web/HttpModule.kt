@@ -14,6 +14,7 @@ import com.ismartcoding.lib.extensions.newFile
 import com.ismartcoding.lib.extensions.parse
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.extensions.toThumbBytesAsync
+import com.ismartcoding.lib.extensions.urlEncode
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
@@ -98,7 +99,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.net.URLEncoder
 import java.util.Date
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -255,7 +255,7 @@ object HttpModule {
                     return@get
                 }
 
-                val fileName = URLEncoder.encode(q["name"] ?: "${folder.name}.zip", "UTF-8").replace("+", "%20")
+                val fileName = (q["name"] ?: "${folder.name}.zip").urlEncode().replace("+", "%20")
                 call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
                 call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
                 call.respondOutputStream(ContentType.Application.Zip) {
@@ -316,7 +316,7 @@ object HttpModule {
 
                     val items = paths.map { DownloadFileItemWrap(File(it.path), it.name) }.filter { it.file.exists() }
                     val dirs = items.filter { it.file.isDirectory }
-                    val fileName = URLEncoder.encode(json.optString("name").ifEmpty { "download.zip" }, "UTF-8").replace("+", "%20")
+                    val fileName = (json.optString("name").ifEmpty { "download.zip" }).urlEncode().replace("+", "%20")
                     call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
                     call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
                     call.respondOutputStream(ContentType.Application.Zip) {
@@ -375,7 +375,7 @@ object HttpModule {
                             return@get
                         }
 
-                        val fileName = URLEncoder.encode(q["name"] ?: file.name, "UTF-8").replace("+", "%20")
+                        val fileName = (q["name"] ?: file.name).urlEncode().replace("+", "%20")
                         if (q["dl"] == "1") {
                             call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
                         } else {

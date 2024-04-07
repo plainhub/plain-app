@@ -2,6 +2,13 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">உங்கள் உலாவியில் தற்போது VPN செல்லுபடி உள்ளது, இது பிரச்சனைகளைக் கொண்டுவரலாம் பாராட்டும் நேரத்தில். இதை தீர்மானிக்க, உங்கள் VPN அமைப்புகளை LAN பரிமாறத்தை அனுமதிக்க அல்லது உங்கள் VPN முடக்குதலை கொண்டுவிடுவதை பரிந்துரைக்கிறோம்.</string>
     <string name="warning">எச்சரிக்கை</string>
+    <string name="open_in_web">வலையில் திறக்க</string>
+    <string name="require_password">கடவுச்சொல் தேவை</string>
+    <string name="two_factor_auth_tips">வலைத்தளத்தில் உள்நுழையும் போது, சேர்க்கையை கூக்கும் நிறுவலின் ஒரு உறுதியான சாளரம் நாங்கள் பயன்படுத்துகிறோம்.</string>
+    <string name="load_full_content">முழு உள்ளடக்கத்தை ஏற்றுக் கொள்</string>
+    <string name="auto_fetch_full_content">தானாக முழு உள்ளடக்கத்தை பெறுதல்</string>
+    <string name="auto_fetch_full_content_tips">இந்த விருப்பத்தை செயல்படுத்தும்போது, அப்ளிகேஷன் தனது RSS ஃபீட் உரைத்தலின் முழு உள்ளடக்கத்தை தானாகவே பெறும்.</string>
+    <string name="invalid_url">தவறான URL வடிவம். எடுத்துக்காட்டு: https://www.example.com</string>
     <string name="local_cache">உள்ளூர் காசே</string>
     <string name="clear_cache">காசே அழி</string>
     <string name="local_cache_cleared">உள்ளூர் காசே அழிக்கப்பட்டது.</string>
@@ -428,7 +435,6 @@
     <string name="notes_title">குறிப்புகள் ({{count}})</string>
     <string name="trash_title">குப்பை ({{count}})</string>
     <string name="contacts_title">தொடர்புகள் ({{count}})</string>
-    <string name="feeds_title">செய்திகள் ({{count}})</string>
     <string name="books_title">புத்தகங்கள் ({{count}})</string>
     <string name="subscriptions_title">சந்தாக்கள் ({{count}})</string>
     <string name="calls_title">அழிப்புகள் ({{count}})</string>
@@ -523,7 +529,6 @@
     <string name="syncing_all_feeds">அனைத்து செய்திகளையும் ஒத்துகொள்ளுங்கள்...</string>
     <string name="syncing">ஒத்துகொள்ளுங்கள்...</string>
     <string name="sync_failed">ஒத்துகொள்ள தோல்வி</string>
-    <string name="sync_feeds_from_server">சேவையரிலிருந்து செய்திகளை ஒத்துகொள்ளுங்கள்</string>
     <string name="scan_needs_camera_warning">ஸ்கேன்னருக்கு கேமரா அனுமதி தேவை!</string>
     <string name="exported_to">ஏற்றுமதி செய்யப்பட்டது {{name}} இல்.</string>
     <string name="invalid_file">தவறான கோப்பு</string>
@@ -545,16 +550,11 @@
     <string name="enter_this_address_tips">உங்கள் கணினியின் உலாவியில் மேலே குறிப்பிட்ட முகவரியை உள்ளிடுக, உங்கள் போன் மற்றும் கணினியை ஒரே உள்ளாக்க வலிமையானதாக உறுதிப்படுத்துங்கள்.</string>
     <string name="last_visit_at">கடைசி பரிந்துரை</string>
     <string name="web_console_desc">டேட்டா கேபிள் தேவையற்று கணினியில் உங்கள் மொபைலில் புகைப்படங்கள், வீடியோகள், கோப்புகள், அறிவிப்புகள் மற்றும் பிற தரவுகளை மேலாண்மை செய்யுங்கள்.</string>
-    <string name="fetch_content_automatically">கொண்டன பொருநர் தகவலை தானியங்கி எடு</string>
     <string name="app_restored">ஆப்லிகேஷன் தரவு மீட்கப்பட்டுள்ளது, இதை புரிந்திருக்க உங்கள் ஆப்லிகேஷனை புதுப்பிக்கவும்.</string>
     <string name="welcome_text">வரவேற்கிறோம்! நீங்கள் எளிதாக உங்கள் கணினியில் உருவாக்கப்பட்ட உரை, புகைப்படங்கள் மற்றும் காணொளிகளை அனுப்ப முடியும்.\nஏனெனில் உங்களிடம் ஏதும் பிரச்சினை ஏற்பட்டால், தயவுசெய்து உதவி பெற இஸ்மார்ட் கோடிங்குமின்றி மின்னஞ்சல் அனுப்பவும் அல்லது எங்கள் டிஸ்கார்ட் உரையில் இணைந்துகொள்கின்றது: https://discord.gg/RQWcS6DEEe.</string>
     <string name="demo_mode">டெமோ மோடு</string>
     <string name="donation">தானம்</string>
     <string name="logs">பதிவுகள்</string>
-    <string name="password_type">கடவுச்சொல் வகை</string>
-    <string name="password_settings">கடவுச்சொல் அமைப்புகள்</string>
-    <string name="password_type_fixed">நிலையான கடவுச்சொல்</string>
-    <string name="password_type_none">கடவுச்சொல் இல்லை</string>
     <string name="restart_app_title">ஆப்லிகேஷனை மீளமை</string>
     <string name="http_server_failed">HTTP சர்வர் தொடங்க முடியவில்லை. அதை மீண்டும் ஆரம்பிக்க தயவுசெய்து "பராமரிக்க APP" பொத்தானை தட்டவும்.</string>
     <string name="http_server_stopped">HTTP சர்வர் உள்நிறுக்கப்பட்டுள்ளது. அதை மீண்டும் ஆரம்பிக்க தயவுசெய்து "பராமரிக்க APP" பொத்தானை தட்டவும்.</string>

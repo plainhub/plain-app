@@ -7,10 +7,12 @@ import com.ismartcoding.plain.data.IDData
 import com.ismartcoding.plain.data.IData
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
 // https://validator.w3.org/feed/docs/rss2.html
 // https://validator.w3.org/feed/docs/atom.html
 @Entity(tableName = "feed_entries")
+@Serializable
 data class DFeedEntry(
     @PrimaryKey override var id: String = StringHelper.shortUUID(),
 ) : IData, DEntityBase() {
@@ -33,6 +35,9 @@ data class DFeedEntry(
 
     @ColumnInfo(name = "read")
     var read: Boolean = false
+//
+//    @ColumnInfo(name = "deleted_at")
+//    var deletedAt: Instant? = null
 }
 
 @Dao

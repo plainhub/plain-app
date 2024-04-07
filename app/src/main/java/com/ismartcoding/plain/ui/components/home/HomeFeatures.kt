@@ -25,7 +25,6 @@ import com.ismartcoding.plain.ui.audio.AudiosDialog
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconTextButton
 import com.ismartcoding.plain.ui.extensions.navigate
-import com.ismartcoding.plain.ui.feed.FeedEntriesDialog
 import com.ismartcoding.plain.ui.file.FilesDialog
 import com.ismartcoding.plain.ui.image.ImagesDialog
 import com.ismartcoding.plain.ui.page.RouteName
@@ -95,7 +94,7 @@ fun HomeFeatures(
                 stringResource(id = R.string.feeds),
                 modifier = Modifier.width(itemWidth),
             ) {
-                FeedEntriesDialog().show()
+                navController.navigate(RouteName.FEED_ENTRIES)
             }
             PIconTextButton(
                 icon = Icons.Outlined.GraphicEq,

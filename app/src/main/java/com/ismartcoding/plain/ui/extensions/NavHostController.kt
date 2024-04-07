@@ -8,3 +8,22 @@ fun NavHostController.navigate(route: RouteName) {
         launchSingleTop = true
     }
 }
+
+// https://stackoverflow.com/questions/67121433/how-to-pass-object-in-navigation-in-jetpack-compose
+fun NavHostController.navigateText(title: String, content: String) {
+    currentBackStackEntry?.savedStateHandle?.set("title", title)
+    currentBackStackEntry?.savedStateHandle?.set("content", content)
+    navigate(RouteName.TEXT)
+}
+
+fun NavHostController.navigateChatEditText(id: String, content: String) {
+    currentBackStackEntry?.savedStateHandle?.set("content", content)
+    navigate("${RouteName.CHAT_EDIT_TEXT.name}/${id}") {
+        launchSingleTop = true
+    }
+}
+
+fun NavHostController.navigateChatText(content: String) {
+    currentBackStackEntry?.savedStateHandle?.set("content", content)
+    navigate(RouteName.CHAT_TEXT)
+}

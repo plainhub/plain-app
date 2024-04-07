@@ -2,6 +2,13 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Votre VPN est actuellement activé sur votre appareil, ce qui pourrait potentiellement entraîner des problèmes de connexion Web lorsqu\'il est accédé depuis un PC. Pour résoudre cela, nous vous recommandons d\'ajuster les paramètres de votre VPN pour autoriser le trafic LAN ou de désactiver votre VPN.</string>
     <string name="warning">Avertissement</string>
+    <string name="open_in_web">Ouvrir dans le navigateur web</string>
+    <string name="require_password">Mot de passe requis</string>
+    <string name="two_factor_auth_tips">Lors de la connexion sur la page web, nous afficherons une fenêtre de confirmation dans l\'application pour plus de sécurité.</string>
+    <string name="load_full_content">Charger le contenu complet</string>
+    <string name="auto_fetch_full_content">Récupération automatique du contenu complet</string>
+    <string name="auto_fetch_full_content_tips">Lorsque cette option est activée, l\'application récupérera automatiquement le contenu complet de chaque élément du flux RSS.</string>
+    <string name="invalid_url">Format URL invalide. Exemple : https://www.example.com</string>
     <string name="local_cache">Cache local</string>
     <string name="clear_cache">Effacer le cache</string>
     <string name="local_cache_cleared">Cache local effacé.</string>
@@ -428,7 +435,6 @@
     <string name="notes_title">Notes ({{count}})</string>
     <string name="trash_title">Corbeille ({{count}})</string>
     <string name="contacts_title">Contacts ({{count}})</string>
-    <string name="feeds_title">Flux ({{count}})</string>
     <string name="books_title">Livres ({{count}})</string>
     <string name="subscriptions_title">Abonnements ({{count}})</string>
     <string name="calls_title">Appels ({{count}})</string>
@@ -523,7 +529,6 @@
     <string name="syncing_all_feeds">Synchronisation de tous les flux…</string>
     <string name="syncing">Synchronisation…</string>
     <string name="sync_failed">Échec de la synchronisation</string>
-    <string name="sync_feeds_from_server">Synchroniser les flux depuis le serveur</string>
     <string name="scan_needs_camera_warning">Le scanner nécessite l\'autorisation de la caméra !</string>
     <string name="exported_to">Exporté dans {{name}}.</string>
     <string name="invalid_file">Fichier invalide</string>
@@ -545,16 +550,11 @@
     <string name="enter_this_address_tips">Entrez l\'adresse ci-dessus dans le navigateur de votre ordinateur, en vous assurant que votre téléphone et votre ordinateur sont sur le même réseau local.</string>
     <string name="last_visit_at">Dernière visite le</string>
     <string name="web_console_desc">Gérez les photos, vidéos, fichiers, notifications et autres données de votre téléphone via l\'ordinateur sans avoir besoin d\'un câble de données.</string>
-    <string name="fetch_content_automatically">Récupération automatique du contenu</string>
     <string name="app_restored">Les données de l\'application sont restaurées, vous devez quitter l\'application de force et la redémarrer comme nouvelle.</string>
     <string name="welcome_text">Bienvenue ! Vous pouvez facilement envoyer du texte, des images et des vidéos sur cette page et les visualiser sur votre ordinateur.\nSi vous rencontrez des problèmes, n\'hésitez pas à envoyer un e-mail à ismartcoding@gmail.com pour obtenir de l\'aide ou rejoignez notre discussion sur Discord à l\'adresse : https://discord.gg/RQWcS6DEEe.</string>
     <string name="demo_mode">Mode de démonstration</string>
     <string name="donation">Don</string>
     <string name="logs">Journaux</string>
-    <string name="password_type">Type de mot de passe</string>
-    <string name="password_settings">Paramètres du mot de passe</string>
-    <string name="password_type_fixed">Mot de passe fixe</string>
-    <string name="password_type_none">Aucun mot de passe</string>
     <string name="restart_app_title">Redémarrer l\'application</string>
     <string name="http_server_failed">Échec du démarrage du serveur HTTP. Pour le redémarrer, veuillez appuyer sur le bouton "Relancer l'application".</string>
     <string name="http_server_stopped">Le serveur HTTP a été intentionnellement arrêté. Pour le redémarrer, veuillez appuyer sur le bouton "Relancer l'application".</string>

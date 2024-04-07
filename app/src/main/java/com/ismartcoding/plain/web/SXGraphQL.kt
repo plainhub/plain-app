@@ -990,14 +990,14 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("importFeeds") {
                     resolver { content: String ->
-                        FeedHelper.import(StringReader(content))
+                        FeedHelper.importAsync(StringReader(content))
                         true
                     }
                 }
                 mutation("exportFeeds") {
                     resolver { ->
                         val writer = StringWriter()
-                        FeedHelper.export(writer)
+                        FeedHelper.exportAsync(writer)
                         writer.toString()
                     }
                 }

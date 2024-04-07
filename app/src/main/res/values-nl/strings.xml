@@ -2,6 +2,13 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Uw VPN is momenteel ingeschakeld op uw apparaat, wat mogelijk kan leiden tot webverbinding problemen bij toegang vanaf uw pc. Om dit op te lossen, raden we aan om uw VPN-instellingen aan te passen om LAN-verkeer toe te staan of uw VPN uit te schakelen.</string>
     <string name="warning">Waarschuwing</string>
+    <string name="open_in_web">Openen in webbrowser</string>
+    <string name="require_password">Wachtwoord vereist</string>
+    <string name="two_factor_auth_tips">Bij het inloggen op de webpagina tonen we een bevestigingspop-up in de app voor extra beveiliging.</string>
+    <string name="load_full_content">Volledige inhoud laden</string>
+    <string name="auto_fetch_full_content">Volledige inhoud automatisch ophalen</string>
+    <string name="auto_fetch_full_content_tips">Wanneer deze optie is ingeschakeld, haalt de app automatisch de volledige inhoud van elk RSS-feeditem op.</string>
+    <string name="invalid_url">Ongeldig URL-formaat. Voorbeeld: https://www.example.com</string>
     <string name="local_cache">Lokale cache</string>
     <string name="clear_cache">Cache wissen</string>
     <string name="local_cache_cleared">Lokale cache gewist.</string>
@@ -428,7 +435,6 @@
     <string name="notes_title">Notities ({{count}})</string>
     <string name="trash_title">Prullenbak ({{count}})</string>
     <string name="contacts_title">Contacten ({{count}})</string>
-    <string name="feeds_title">Feeds ({{count}})</string>
     <string name="books_title">Boeken ({{count}})</string>
     <string name="subscriptions_title">Abonnementen ({{count}})</string>
     <string name="calls_title">Oproepen ({{count}})</string>
@@ -523,7 +529,6 @@
     <string name="syncing_all_feeds">Alle feeds synchroniseren…</string>
     <string name="syncing">Synchroniseren...</string>
     <string name="sync_failed">Synchronisatie mislukt</string>
-    <string name="sync_feeds_from_server">Feeds synchroniseren vanaf server</string>
     <string name="scan_needs_camera_warning">Scanner heeft cameratoestemming nodig!</string>
     <string name="exported_to">Geëxporteerd naar {{name}}.</string>
     <string name="invalid_file">Ongeldig bestand</string>
@@ -545,16 +550,11 @@
     <string name="enter_this_address_tips">Voer het bovenstaande adres in uw computerbrowser in en zorg ervoor dat uw telefoon en computer zich in hetzelfde lokale netwerk bevinden.</string>
     <string name="last_visit_at">Laatst bezocht op</string>
     <string name="web_console_desc">Beheer foto\'s, video\'s, bestanden, meldingen en andere gegevens op uw telefoon via de computer zonder dat een gegevenskabel nodig is.</string>
-    <string name="fetch_content_automatically">Inhoud automatisch ophalen</string>
     <string name="app_restored">APP-gegevens zijn hersteld, u moet de app geforceerd afsluiten en de app opnieuw starten als nieuw.</string>
     <string name="welcome_text">Welkom! U kunt eenvoudig tekst, afbeeldingen en video\'s naar deze pagina sturen en ze op uw computer bekijken.\nAls u problemen ondervindt, aarzel dan niet om een e-mail te sturen naar ismartcoding@gmail.com voor hulp of neem deel aan onze Discord-discussie op: https://discord.gg/RQWcS6DEEe.</string>
     <string name="demo_mode">Demonstratiemodus</string>
     <string name="donation">Donatie</string>
     <string name="logs">Logs</string>
-    <string name="password_type">Wachtwoordtype</string>
-    <string name="password_settings">Wachtwoordinstellingen</string>
-    <string name="password_type_fixed">Vast wachtwoord</string>
-    <string name="password_type_none">Geen wachtwoord</string>
     <string name="restart_app_title">App herstarten</string>
     <string name="http_server_failed">HTTP-server starten mislukt. Om het opnieuw te starten, tik op de knop "APP opnieuw starten".</string>
     <string name="http_server_stopped">De HTTP-server is opzettelijk gestopt. Om het opnieuw te starten, tik op de knop "APP opnieuw starten".</string>

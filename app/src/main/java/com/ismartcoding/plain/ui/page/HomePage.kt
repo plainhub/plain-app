@@ -106,6 +106,7 @@ fun HomePage(
     DisposableEffect(Unit) {
         onDispose {
             events.forEach { it.cancel() }
+            events.clear()
         }
     }
 

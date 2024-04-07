@@ -36,9 +36,9 @@ import java.io.File
 @Composable
 fun OtherFilePage(
     navController: NavHostController,
+    path: String
 ) {
     val context = LocalContext.current
-    val path = navController.currentBackStackEntry?.arguments?.getString("path") ?: ""
     val file = File(path)
 
     PScaffold(

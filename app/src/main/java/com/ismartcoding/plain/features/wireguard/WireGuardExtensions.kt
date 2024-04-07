@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.features.wireguard
 
-import android.content.Context
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
@@ -36,7 +35,6 @@ fun WireGuardFragment.toWireGuard(): WireGuard {
 }
 
 fun ViewListItemBinding.bindWireGuard(
-    context: Context,
     lifecycleScope: LifecycleCoroutineScope,
     item: WireGuard,
 ) {
@@ -55,7 +53,7 @@ fun ViewListItemBinding.bindWireGuard(
                 }
             DialogHelper.hideLoading()
             if (!r.isSuccess()) {
-                DialogHelper.showErrorDialog(context, r.getErrorMessage())
+                DialogHelper.showErrorDialog(r.getErrorMessage())
                 setSwitchEnable(!isEnabled)
                 return@launch
             }

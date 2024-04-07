@@ -65,7 +65,7 @@ class DevicesDialog : BaseDialog<DialogDevicesBinding>() {
                             val r = withIO { BoxApi.mixMutateAsync(DeleteDeviceMutation(m.id)) }
                             DialogHelper.hideLoading()
                             if (!r.isSuccess()) {
-                                DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())
+                                DialogHelper.showErrorDialog(r.getErrorMessage())
                                 return@launch
                             }
 

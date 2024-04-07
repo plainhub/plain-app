@@ -2,6 +2,13 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">VPN\'iniz şu anda cihazınızda etkinleştirilmiştir, bu da PC\'den erişildiğinde potansiyel olarak web bağlantısı sorunlarına yol açabilir. Bu sorunu çözmek için VPN ayarlarınızı lan trafiğine izin verecek şekilde ayarlamanızı veya VPN\'inizi devre dışı bırakmanızı öneririz.</string>
     <string name="warning">Uyarı</string>
+    <string name="open_in_web">Web tarayıcısında aç</string>
+    <string name="require_password">Şifre gereklidir</string>
+    <string name="two_factor_auth_tips">Web sayfasına giriş yaparken, ek güvenlik için uygulamada onay penceresi göstereceğiz.</string>
+    <string name="load_full_content">Tam içeriği yükle</string>
+    <string name="auto_fetch_full_content">Tam İçeriği Otomatik Getir</string>
+    <string name="auto_fetch_full_content_tips">Bu seçenek etkinleştirildiğinde, uygulama her RSS besleme öğesinin tam içeriğini otomatik olarak alacaktır.</string>
+    <string name="invalid_url">Geçersiz URL formatı. Örnek: https://www.example.com</string>
     <string name="local_cache">Yerel önbellek</string>
     <string name="clear_cache">Önbelleği temizle</string>
     <string name="local_cache_cleared">Yerel önbellek temizlendi.</string>
@@ -428,7 +435,6 @@
     <string name="notes_title">Notlar ({{count}})</string>
     <string name="trash_title">Çöp ({{count}})</string>
     <string name="contacts_title">İletişim ({{count}})</string>
-    <string name="feeds_title">Akışlar ({{count}})</string>
     <string name="books_title">Kitaplar ({{count}})</string>
     <string name="subscriptions_title">Abonelikler ({{count}})</string>
     <string name="calls_title">Aramalar ({{count}})</string>
@@ -524,7 +530,6 @@
     <string name="syncing_all_feeds">Tüm akışlar senkronize ediliyor…</string>
     <string name="syncing">Senkronize ediliyor...</string>
     <string name="sync_failed">Senkronizasyon başarısız</string>
-    <string name="sync_feeds_from_server">Sunucudan beslemeleri senkronize et</string>
     <string name="scan_needs_camera_warning">Tarayıcının kamera iznine ihtiyacı var!</string>
     <string name="exported_to">{{name}} içine aktarıldı.</string>
     <string name="invalid_file">Geçersiz dosya</string>
@@ -546,16 +551,11 @@
     <string name="enter_this_address_tips">Telefonunuzun ve bilgisayarınızın aynı yerel ağda olduğundan emin olarak yukarıdaki adresi bilgisayarınızın tarayıcısına girin.</string>
     <string name="last_visit_at">Son ziyaret saati:</string>
     <string name="web_console_desc">Telefonunuzdaki fotoğrafları, videoları, dosyaları, bildirimleri ve diğer verileri veri kablosuna ihtiyaç duymadan bilgisayar üzerinden yönetin.</string>
-    <string name="fetch_content_automatically">İçeriği otomatik olarak getir</string>
     <string name="app_restored">UYGULAMA verileri geri yüklendi, bu uygulamadan zorla çıkmanız ve uygulamayı yeni olarak yeniden başlatmanız gerekiyor.</string>
     <string name="welcome_text">Hoş geldiniz! Bu sayfaya kolayca metin, resim ve video gönderebilir ve bunları bilgisayarınızda görüntüleyebilirsiniz.\nHerhangi bir sorunla karşılaşırsanız, lütfen yardım için ismartcoding@gmail.com adresine bir e - posta göndermekten veya https://discord.gg/RQWcS6DEEe adresindeki Discord tartışmamıza katılmaktan çekinmeyin.</string>
     <string name="demo_mode">Demo modu</string>
     <string name="donation">Bağış</string>
     <string name="logs">Günlükler</string>
-    <string name="password_type">Parola türü</string>
-    <string name="password_settings">Parola ayarları</string>
-    <string name="password_type_fixed">Sabit şifre</string>
-    <string name="password_type_none">Parola yok</string>
     <string name="restart_app_title">Uygulamayı yeniden başlat</string>
     <string name="http_server_failed">Http sunucusu başlatılamadı. Yeniden başlatmak için lütfen "UYGULAMAYI yeniden başlat" düğmesine dokunun.</string>
     <string name="http_server_stopped">Http sunucusu kasıtlı olarak durduruldu. Yeniden başlatmak için lütfen "UYGULAMAYI yeniden başlat" düğmesine dokunun.</string>

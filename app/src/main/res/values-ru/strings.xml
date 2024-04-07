@@ -2,6 +2,13 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Ваш VPN в настоящее время включен на вашем устройстве, что может потенциально привести к проблемам с веб-подключением при доступе с ПК. Для устранения этой проблемы мы рекомендуем настроить параметры вашего VPN для разрешения локального сетевого трафика или отключить ваш VPN.</string>
     <string name="warning">Предупреждение</string>
+    <string name="open_in_web">Открыть в веб-браузере</string>
+    <string name="require_password">Требуется пароль</string>
+    <string name="two_factor_auth_tips">При входе на веб-странице мы отобразим всплывающее окно подтверждения в приложении для дополнительной безопасности.</string>
+    <string name="load_full_content">Загрузить полное содержимое</string>
+    <string name="auto_fetch_full_content">Автоматически извлекать полное содержимое</string>
+    <string name="auto_fetch_full_content_tips">При включении этой опции приложение автоматически извлекает полное содержимое каждого элемента ленты RSS.</string>
+    <string name="invalid_url">Недопустимый формат URL. Пример: https://www.example.com</string>
     <string name="local_cache">Локальный кеш</string>
     <string name="clear_cache">Очистить кеш</string>
     <string name="local_cache_cleared">Локальный кеш очищен.</string>
@@ -428,7 +435,6 @@
     <string name="notes_title">Заметки ({{count}})</string>
     <string name="trash_title">Корзина ({{count}})</string>
     <string name="contacts_title">Контакты ({{count}})</string>
-    <string name="feeds_title">Ленты ({{count}})</string>
     <string name="books_title">Книги ({{count}})</string>
     <string name="subscriptions_title">Подписки ({{count}})</string>
     <string name="calls_title">Вызовы ({{count}})</string>
@@ -523,7 +529,6 @@
     <string name="syncing_all_feeds">Синхронизация всех подписок...</string>
     <string name="syncing">Синхронизация...</string>
     <string name="sync_failed">Синхронизация не удалась</string>
-    <string name="sync_feeds_from_server">Синхронизация подписок с сервера</string>
     <string name="scan_needs_camera_warning">Сканер требует разрешение на использование камеры!</string>
     <string name="exported_to">Экспортировано в {{name}}.</string>
     <string name="invalid_file">Недопустимый файл</string>
@@ -545,16 +550,11 @@
     <string name="enter_this_address_tips">Введите вышеуказанный адрес в браузер вашего компьютера, убедившись, что ваш телефон и компьютер находятся в одной локальной сети.</string>
     <string name="last_visit_at">Последнее посещение в</string>
     <string name="web_console_desc">Управляйте фотографиями, видео, файлами, уведомлениями и другими данными на своем телефоне через компьютер без необходимости использования кабеля для передачи данных.</string>
-    <string name="fetch_content_automatically">Автоматически загружать контент</string>
     <string name="app_restored">Данные приложения восстановлены, вам нужно выйти из приложения и снова запустить его, как новое.</string>
     <string name="welcome_text">Добро пожаловать! Вы можете легко отправлять текст, изображения и видео на эту страницу и просматривать их на своем компьютере.\nЕсли у вас возникнут проблемы, не стесняйтесь отправить электронное письмо на адрес ismartcoding@gmail.com для получения помощи или присоединиться к нашей дискуссии в Discord по адресу: https://discord.gg/RQWcS6DEEe.</string>
     <string name="demo_mode">Режим демонстрации</string>
     <string name="donation">Пожертвование</string>
     <string name="logs">Логи</string>
-    <string name="password_type">Тип пароля</string>
-    <string name="password_settings">Настройки пароля</string>
-    <string name="password_type_fixed">Фиксированный пароль</string>
-    <string name="password_type_none">Без пароля</string>
     <string name="restart_app_title">Перезапустить приложение</string>
     <string name="http_server_failed">Не удалось запустить HTTP-сервер. Чтобы перезапустить его, нажмите кнопку "Перезапустить приложение".</string>
     <string name="http_server_stopped">HTTP-сервер был намеренно остановлен. Чтобы перезапустить его, нажмите кнопку "Перезапустить приложение".</string>

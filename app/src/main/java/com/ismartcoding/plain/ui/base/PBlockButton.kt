@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.data.enums.ButtonType
+import com.ismartcoding.plain.ui.theme.buttonTextLarge
 
 @Composable
 fun PBlockButton(
@@ -23,13 +24,13 @@ fun PBlockButton(
     Button(
         onClick = onClick,
         modifier = modifier
-            .height(56.dp)
+            .height(48.dp)
             .fillMaxWidth(),
         colors = type.getColors(),
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyMedium.copy(fontSize = 18.sp),
+            style = MaterialTheme.typography.buttonTextLarge(),
         )
     }
 }

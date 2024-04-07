@@ -15,7 +15,22 @@ import com.ismartcoding.plain.R
 import kotlin.math.abs
 
 @Composable
-fun RefreshLayoutState.PullToRefreshContent() {
+fun RefreshLayoutState.PullToRefreshContent(
+    createText: @Composable (RefreshContentState) -> String = {
+        when (it) {
+            RefreshContentState.Failed -> stringResource(id = R.string.srl_header_failed)
+            RefreshContentState.Finished -> stringResource(id = R.string.srl_header_finish)
+            RefreshContentState.Refreshing -> stringResource(id = R.string.srl_header_refreshing)
+            RefreshContentState.Dragging -> {
+                if (abs(getRefreshContentOffset()) < getRefreshContentThreshold()) {
+                    stringResource(id = R.string.srl_header_pulling)
+                } else {
+                    stringResource(id = R.string.srl_header_release)
+                }
+            }
+        }
+    }
+) {
     val refreshContentState by remember {
         getRefreshContentState()
     }
@@ -27,18 +42,7 @@ fun RefreshLayoutState.PullToRefreshContent() {
         horizontalArrangement = Arrangement.Center,
     ) {
         Text(
-            text =
-                when (refreshContentState) {
-                    RefreshContentState.Stop -> stringResource(id = R.string.srl_header_finish)
-                    RefreshContentState.Refreshing -> stringResource(id = R.string.srl_header_refreshing)
-                    RefreshContentState.Dragging -> {
-                        if (abs(getRefreshContentOffset()) < getRefreshContentThreshold()) {
-                            stringResource(id = R.string.srl_header_pulling)
-                        } else {
-                            stringResource(id = R.string.srl_header_release)
-                        }
-                    }
-                },
+            text = createText(refreshContentState),
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.secondary,
         )

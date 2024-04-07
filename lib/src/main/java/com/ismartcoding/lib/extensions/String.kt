@@ -6,8 +6,9 @@ import android.provider.MediaStore
 import android.telephony.PhoneNumberUtils
 import com.ismartcoding.lib.Constants
 import java.io.File
+import java.net.URLDecoder
 import java.net.URLEncoder
-import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 import java.text.Normalizer
 import java.text.SimpleDateFormat
 import java.util.*
@@ -772,12 +773,18 @@ fun String.capitalize(): String {
     return this.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 }
 
-fun String.urlEncoded(): String {
-    return if (Charset.isSupported("UTF-8")) {
-        URLEncoder.encode(this ?: "", "UTF-8")
-    } else {
-        // If UTF-8 is not supported, use the default charset.
-        @Suppress("deprecation")
-        URLEncoder.encode(this ?: "")
-    }
+fun String.urlEncode(): String {
+    return URLEncoder.encode(this, StandardCharsets.UTF_8.toString())
+}
+
+fun String.urlDecode(): String {
+    return URLDecoder.decode(this, StandardCharsets.UTF_8.toString())
+}
+
+fun String.base64Encode(): String {
+    return Base64.getEncoder().encodeToString(this.toByteArray())
+}
+
+fun String.base64Decode(): String {
+    return String(Base64.getDecoder().decode(this))
 }

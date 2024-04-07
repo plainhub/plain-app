@@ -53,11 +53,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun DocsSearchPage(
     navController: NavHostController,
+    q: String,
     viewModel: DocsViewModel = viewModel(),
 ) {
     val itemsState by viewModel.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
-    var q by rememberSaveable { mutableStateOf(navController.currentBackStackEntry?.arguments?.getString("q") ?: "") }
+    var queryText by rememberSaveable { mutableStateOf(q) }
     var active by rememberSaveable {
         mutableStateOf(true)
     }
@@ -65,8 +66,8 @@ fun DocsSearchPage(
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
             scope.launch {
-                withIO { viewModel.loadAsync(context, q) }
-                setRefreshState(RefreshContentState.Stop)
+                withIO { viewModel.loadAsync(context, queryText) }
+                setRefreshState(RefreshContentState.Finished)
             }
         }
     val focusRequester = remember { FocusRequester() }
@@ -85,16 +86,16 @@ fun DocsSearchPage(
         SearchBar(
             modifier = Modifier
                 .focusRequester(focusRequester),
-            query = q,
+            query = queryText,
             onQueryChange = {
-                q = it
+                queryText = it
             },
             onSearch = {
-                if (q.isNotEmpty()) {
+                if (queryText.isNotEmpty()) {
                     active = false
                     viewModel.showLoading.value = true
                     scope.launch(Dispatchers.IO) {
-                        viewModel.loadAsync(context, q)
+                        viewModel.loadAsync(context, queryText)
                     }
                 }
             },
@@ -102,7 +103,7 @@ fun DocsSearchPage(
             onActiveChange = {
                 if (active != it) {
                     active = it
-                    if (!active && q.isEmpty()) {
+                    if (!active && queryText.isEmpty()) {
                         navController.popBackStack()
                     }
                 }
@@ -114,7 +115,7 @@ fun DocsSearchPage(
                     contentDescription = stringResource(R.string.back),
                     tint = MaterialTheme.colorScheme.onSurface,
                 ) {
-                    if (!active || q.isEmpty()) {
+                    if (!active || queryText.isEmpty()) {
                         navController.popBackStack()
                     } else {
                         active = false
@@ -145,7 +146,7 @@ fun DocsSearchPage(
                         if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
                             LaunchedEffect(Unit) {
                                 scope.launch(Dispatchers.IO) {
-                                    withIO { viewModel.moreAsync(context, q) }
+                                    withIO { viewModel.moreAsync(context, queryText) }
                                 }
                             }
                         }

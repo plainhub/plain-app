@@ -60,7 +60,7 @@ fun SessionsPage(
     val refreshState =
         rememberRefreshLayoutState {
             viewModel.fetch()
-            setRefreshState(RefreshContentState.Stop)
+            setRefreshState(RefreshContentState.Finished)
         }
 
     LaunchedEffect(Unit) {

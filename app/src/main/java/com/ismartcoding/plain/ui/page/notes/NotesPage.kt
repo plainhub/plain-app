@@ -47,8 +47,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.DataType
-import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
@@ -75,6 +73,11 @@ import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.NoteListItem
 import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.models.exitSelectMode
+import com.ismartcoding.plain.ui.models.isAllSelected
+import com.ismartcoding.plain.ui.models.select
+import com.ismartcoding.plain.ui.models.toggleSelectAll
+import com.ismartcoding.plain.ui.models.toggleSelectMode
 import com.ismartcoding.plain.ui.page.RouteName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -93,8 +96,6 @@ fun NotesPage(
     val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
     val scope = rememberCoroutineScope()
     val filtersScrollState = rememberScrollState()
-    var showActionBottomSheet by remember { mutableStateOf(false) }
-    var selectedItem by remember { mutableStateOf<DNote?>(null) }
     var isMenuOpen by remember { mutableStateOf(false) }
 
     val topRefreshLayoutState =
@@ -103,20 +104,20 @@ fun NotesPage(
                 withIO {
                     viewModel.loadAsync(tagsViewModel)
                 }
-                setRefreshState(RefreshContentState.Stop)
+                setRefreshState(RefreshContentState.Finished)
             }
         }
 
     LaunchedEffect(Unit) {
-        tagsViewModel.dataType.value = DataType.NOTE
+        tagsViewModel.dataType.value = viewModel.dataType
         scope.launch(Dispatchers.IO) {
             viewModel.loadAsync(tagsViewModel)
         }
     }
 
     val insetsController = WindowCompat.getInsetsController(window, view)
-    LaunchedEffect(viewModel.selectMode) {
-        if (viewModel.selectMode) {
+    LaunchedEffect(viewModel.selectMode.value) {
+        if (viewModel.selectMode.value) {
             insetsController.hide(WindowInsetsCompat.Type.navigationBars())
         } else {
             insetsController.show(WindowInsetsCompat.Type.navigationBars())
@@ -129,38 +130,32 @@ fun NotesPage(
         }
     }
 
-    val pageTitle = if (viewModel.selectMode) {
+    val pageTitle = if (viewModel.selectMode.value) {
         LocaleHelper.getStringF(R.string.x_selected, "count", viewModel.selectedIds.size)
     } else if (viewModel.tag.value != null) {
-        "${viewModel.tag.value!!.name} (${viewModel.tag.value!!.count})"
+        stringResource(id = R.string.notes)  + " - " +  viewModel.tag.value!!.name
+    } else if (viewModel.trash.value) {
+        stringResource(id = R.string.notes) + " - " + stringResource(id = R.string.trash)
     } else {
-        LocaleHelper.getStringF(if (viewModel.trash.value) R.string.trash_title else R.string.notes_title, "count", viewModel.total.value)
+        stringResource(id = R.string.notes)
     }
 
-    if (showActionBottomSheet) {
-        ItemActionBottomSheet(
-            viewModel,
-            tagsViewModel,
-            m = selectedItem!!,
-            tagsMapState,
-            tagsState,
-            onDismiss = {
-                showActionBottomSheet = false
-                selectedItem = null
-            }
-        )
-    }
+    ViewNoteBottomSheet(
+        viewModel,
+        tagsViewModel,
+        tagsMapState,
+        tagsState,
+    )
 
-    BackHandler(enabled = viewModel.selectMode) {
+    BackHandler(enabled = viewModel.selectMode.value) {
         viewModel.exitSelectMode()
     }
-
 
     PScaffold(
         navController,
         topBarTitle = pageTitle,
         navigationIcon = {
-            if (viewModel.selectMode) {
+            if (viewModel.selectMode.value) {
                 NavigationCloseIcon {
                     viewModel.exitSelectMode()
                 }
@@ -171,7 +166,7 @@ fun NotesPage(
             }
         },
         actions = {
-            if (viewModel.selectMode) {
+            if (viewModel.selectMode.value) {
                 PMiniOutlineButton(
                     text = stringResource(if (viewModel.isAllSelected()) R.string.unselect_all else R.string.select_all),
                     onClick = {
@@ -208,20 +203,20 @@ fun NotesPage(
                             )
                         }, onClick = {
                             isMenuOpen = false
-                            navController.navigate("${RouteName.TAGS.name}?dataType=${DataType.NOTE.value}")
+                            navController.navigate("${RouteName.TAGS.name}?dataType=${viewModel.dataType.value}")
                         })
                     })
             }
         },
         bottomBar = {
             AnimatedVisibility(
-                visible = viewModel.selectMode,
+                visible = viewModel.selectMode.value,
                 enter = slideInVertically { it },
                 exit = slideOutVertically { it }) {
-                SelectModeBottomAppBar(viewModel, tagsViewModel, tagsState)
+                SelectModeBottomActions(viewModel, tagsViewModel, tagsState)
             }
         },
-        floatingActionButton = if (viewModel.selectMode) null else {
+        floatingActionButton = if (viewModel.selectMode.value) null else {
             {
                 PDraggableElement {
                     FloatingActionButton(
@@ -238,7 +233,7 @@ fun NotesPage(
             }
         },
     ) {
-        if (!viewModel.selectMode) {
+        if (!viewModel.selectMode.value) {
             Row(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
@@ -254,7 +249,7 @@ fun NotesPage(
                             viewModel.loadAsync(tagsViewModel)
                         }
                     },
-                    label = { Text(stringResource(id = R.string.all)) }
+                    label = { Text(stringResource(id = R.string.all) + " (${viewModel.total.value})") }
                 )
                 PFilterChip(
                     selected = viewModel.trash.value,
@@ -265,7 +260,7 @@ fun NotesPage(
                             viewModel.loadAsync(tagsViewModel)
                         }
                     },
-                    label = { Text(stringResource(id = R.string.trash)) }
+                    label = { Text(stringResource(id = R.string.trash) + " (${viewModel.totalTrash.value})") }
                 )
                 tagsState.forEach { tag ->
                     PFilterChip(
@@ -305,7 +300,7 @@ fun NotesPage(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .wrapContentHeight(),
-                                enabled = !viewModel.selectMode,
+                                enabled = !viewModel.selectMode.value,
                                 startContent = if (viewModel.trash.value) {
                                     { state ->
                                         HorizontalSpace(dp = 32.dp)
@@ -355,20 +350,18 @@ fun NotesPage(
                                     tagsViewModel,
                                     m,
                                     tagsState.filter { tagIds.contains(it.id) },
-                                    selectedItem,
                                     onClick = {
-                                        if (viewModel.selectMode) {
+                                        if (viewModel.selectMode.value) {
                                             viewModel.select(m.id)
                                         } else {
                                             navController.navigate("${RouteName.NOTES.name}/${m.id}")
                                         }
                                     },
                                     onLongClick = {
-                                        if (viewModel.selectMode) {
+                                        if (viewModel.selectMode.value) {
                                             return@NoteListItem
                                         }
-                                        selectedItem = m
-                                        showActionBottomSheet = true
+                                        viewModel.selectedItem.value = m
                                     }
                                 )
                             }

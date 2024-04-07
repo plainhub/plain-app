@@ -70,7 +70,7 @@ fun SoundMeterPage(navController: NavHostController) {
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
     var decibel by remember { mutableFloatStateOf(0f) }
     val decibelValueStrings = stringArrayResource(R.array.decibel_values)
-    val decibelValueString by remember {
+    val decibelValueString by remember(decibel) {
         derivedStateOf {
             if (decibel > 0) {
                 return@derivedStateOf decibelValueStrings.getOrNull((decibel / 10).toInt() - 1) ?: ""
@@ -91,6 +91,7 @@ fun SoundMeterPage(navController: NavHostController) {
     DisposableEffect(Unit) {
         onDispose {
             events.forEach { it.cancel() }
+            events.clear()
         }
     }
 

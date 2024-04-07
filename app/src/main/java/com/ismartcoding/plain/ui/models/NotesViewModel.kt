@@ -1,12 +1,8 @@
 package com.ismartcoding.plain.ui.models
 
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -24,22 +20,24 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
-class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
+class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISelectableViewModel<DNote>, ViewModel() {
     private val _itemsFlow = MutableStateFlow(mutableStateListOf<DNote>())
-    val itemsFlow: StateFlow<List<DNote>> get() = _itemsFlow
+    override val itemsFlow: StateFlow<List<DNote>> get() = _itemsFlow
     var showLoading = mutableStateOf(true)
     var offset = mutableIntStateOf(0)
     var limit = mutableIntStateOf(50)
     var noMore = mutableStateOf(false)
     var trash = mutableStateOf(false)
     var total = mutableIntStateOf(0)
+    var totalTrash = mutableIntStateOf(0)
     var tag = mutableStateOf<DTag?>(null)
     val dataType = DataType.NOTE
     var queryText by savedStateHandle.saveable { mutableStateOf("") }
     var search = mutableStateOf(false)
+    var selectedItem = mutableStateOf<DNote?>(null)
 
-    var selectMode by savedStateHandle.saveable { mutableStateOf(false) }
-    val selectedIds = mutableStateListOf<String>()
+    override var selectMode = mutableStateOf(false)
+    override val selectedIds = mutableStateListOf<String>()
 
     fun moreAsync(tagsViewModel: TagsViewModel) {
         offset.value += limit.value
@@ -59,7 +57,8 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel
         val query = getQuery()
         _itemsFlow.value = NoteHelper.search(query, limit.value, offset.value).toMutableStateList()
         tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
-        total.value = NoteHelper.count(query)
+        total.value = NoteHelper.count(getTotalQuery())
+        totalTrash.value = NoteHelper.count(getTrashQuery())
         noMore.value = _itemsFlow.value.size < limit.value
         showLoading.value = false
     }
@@ -71,7 +70,8 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel
                 DataType.NOTE,
             )
             NoteHelper.trashAsync(ids)
-            total.value = NoteHelper.count(getQuery())
+            total.value = NoteHelper.count(getTotalQuery())
+            totalTrash.value = NoteHelper.count(getTrashQuery())
             _itemsFlow.update {
                 val mutableList = it.toMutableStateList()
                 mutableList.removeIf { m -> ids.contains(m.id) }
@@ -87,7 +87,8 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel
                 DataType.NOTE,
             )
             NoteHelper.untrashAsync(ids)
-            total.value = NoteHelper.count(getQuery())
+            total.value = NoteHelper.count(getTotalQuery())
+            totalTrash.value = NoteHelper.count(getTrashQuery())
             _itemsFlow.update {
                 val mutableList = it.toMutableStateList()
                 mutableList.removeIf { m -> ids.contains(m.id) }
@@ -103,13 +104,21 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel
                 DataType.NOTE,
             )
             NoteHelper.deleteAsync(ids)
-            total.value = NoteHelper.count(getQuery())
+            totalTrash.value = NoteHelper.count(getTrashQuery())
             _itemsFlow.update {
                 val mutableList = it.toMutableStateList()
                 mutableList.removeIf { m -> ids.contains(m.id) }
                 mutableList
             }
         }
+    }
+
+    private fun getTotalQuery(): String {
+        return "trash:false"
+    }
+
+    private fun getTrashQuery(): String {
+        return "trash:true"
     }
 
     private fun getQuery(): String {
@@ -123,38 +132,4 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel
         return query
     }
 
-    fun enterSelectMode() {
-        selectMode = true
-    }
-
-    fun exitSelectMode() {
-        selectMode = false
-        selectedIds.clear()
-    }
-
-    fun toggleSelectMode() {
-        selectMode = !selectMode
-        selectedIds.clear()
-    }
-
-    fun isAllSelected(): Boolean {
-        return selectedIds.size == _itemsFlow.value.size
-    }
-
-    fun toggleSelectAll() {
-        if (isAllSelected()) {
-            selectedIds.clear()
-        } else {
-            selectedIds.clear()
-            selectedIds.addAll(_itemsFlow.value.map { it.id })
-        }
-    }
-
-    fun select(id: String) {
-        if (selectedIds.contains(id)) {
-            selectedIds.remove(id)
-        } else {
-            selectedIds.add(id)
-        }
-    }
 }

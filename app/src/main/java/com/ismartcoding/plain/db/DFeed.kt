@@ -4,7 +4,6 @@ import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.data.IData
-import kotlinx.datetime.*
 
 @Entity(
     tableName = "feeds",
@@ -18,6 +17,9 @@ data class DFeed(
 
     @ColumnInfo(name = "fetch_content")
     var fetchContent: Boolean = false
+
+    @Ignore
+    var count: Int = 0
 }
 
 @Dao
@@ -45,4 +47,11 @@ interface FeedDao {
 
     @Query("DELETE FROM feeds WHERE id in (:ids)")
     fun delete(ids: Set<String>)
+
+    @Query(
+        "SELECT feed_entries.feed_id AS id, count(feed_entries.feed_id) AS count FROM feed_entries GROUP BY feed_entries.feed_id",
+    )
+    fun getFeedCounts(): List<DFeedCount>
 }
+
+data class DFeedCount(var id: String, var count: Int)

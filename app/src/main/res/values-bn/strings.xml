@@ -2,6 +2,13 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">আপনার ডিভাইসে সক্রিয় ভিপিএন আছে, যা একটি পিসি থেকে অ্যাক্সেস করার সময় ওয়েব সংযোগের সমস্যা উত্পন্ন করতে পারে। এটি সমাধান করতে, আমরা আপনাকে আপনার ভিপিএন সেটিংস পরিবর্তন করে এলএএন ট্র্যাফিক অনুমতি দেওয়া বা আপনার ভিপিএন নিষ্ক্রিয় করতে প্রস্তাবনা দিচ্ছি।</string>
     <string name="warning">সতর্কবার্তা</string>
+    <string name="open_in_web">ওয়েব ব্রাউজারে খোলুন</string>
+    <string name="require_password">পাসওয়ার্ড প্রয়োজন</string>
+    <string name="two_factor_auth_tips">ওয়েবপৃষ্ঠে লগইন করার সময়, আমরা অতিরিক্ত নিরাপত্তার জন্য অ্যাপে একটি অনুমোদন পপআপ প্রদর্শন করব।</string>
+    <string name="load_full_content">পূর্ণ কন্টেন্ট লোড করুন</string>
+    <string name="auto_fetch_full_content">অটো-ফেচ পূর্ণ কন্টেন্ট</string>
+    <string name="auto_fetch_full_content_tips">এই বিকল্পটি চালু করা হলে, অ্যাপটি প্রতিটি আরএসএস ফিড আইটেমের সম্পূর্ণ কন্টেন্ট স্বয়ংক্রিয়ভাবে ফেচ করবে।</string>
+    <string name="invalid_url">অবৈধ URL ফরম্যাট। উদাহরণ: https://www.example.com</string>
     <string name="local_cache">স্থানীয় ক্যাশ</string>
     <string name="clear_cache">ক্যাশ মুছুন</string>
     <string name="local_cache_cleared">স্থানীয় ক্যাশ মুছে ফেলা হয়েছে।</string>
@@ -428,7 +435,6 @@
     <string name="notes_title">নোট ({{count}})</string>
     <string name="trash_title">ট্র্যাশ ({{count}})</string>
     <string name="contacts_title">যোগাযোগ ({{count}})</string>
-    <string name="feeds_title">ফিড ({{count}})</string>
     <string name="books_title">বই ({{count}})</string>
     <string name="subscriptions_title">সাবস্ক্রিপশন ({{count}})</string>
     <string name="calls_title">কল ({{count}})</string>
@@ -523,7 +529,6 @@
     <string name="syncing_all_feeds">সমস্ত ফিডস সিঙ্ক করা হচ্ছে ...</string>
     <string name="syncing">সিঙ্ক করা হচ্ছে ...</string>
     <string name="sync_failed">সিঙ্ক ব্যর্থ হয়েছে</string>
-    <string name="sync_feeds_from_server">ফিডস সার্ভার থেকে সিঙ্ক করুন</string>
     <string name="scan_needs_camera_warning">স্ক্যানারের ক্যামেরা অনুমতি প্রয়োজন!</string>
     <string name="exported_to">এই {{name}} এ নির্যাতিত।</string>
     <string name="invalid_file">অবৈধ ফাইল</string>
@@ -545,16 +550,11 @@
     <string name="enter_this_address_tips">আপনার কম্পিউটারের ব্রাউজারে উপরের ঠিকানা লিখুন, নিশ্চিত করুন যে আপনার ফোন এবং কম্পিউটারটি একই স্থানীয় নেটওয়ার্কে আছে।</string>
     <string name="last_visit_at">শেষ দেখা</string>
     <string name="web_console_desc">ডেটা কেবলের প্রয়োজন ছাড়াই কম্পিউটারের মাধ্যমে ফোনের ছবি, ভিডিও, ফাইল, বিজ্ঞপ্তি এবং অন্যান্য তথ্য পরিচালনা করুন।</string>
-    <string name="fetch_content_automatically">স্বয়ংক্রিয়ভাবে সামগ্রী পূর্ণ করুন</string>
     <string name="app_restored">এপ্লিকেশন ডেটা পুনরুদ্ধার করা হয়েছে, আপনাকে অ্যাপটি বন্ধ করে নিতে এবং এপ্লিকেশনটি আবার একটি নতুন অবস্থায় শুরু করতে বাধ্য করা হবে।</string>
     <string name="welcome_text">স্বাগতম! আপনি সহজেই এই পৃষ্ঠাতে টেক্সট, চিত্র, এবং ভিডিও প্রেরণ করতে পারেন এবং তাদের আপনার কম্পিউটারে দেখতে পারেন।\nযদি আপনি যে কোনও সমস্যার সম্মুখীন হন, তবে সাহায্যের জন্য অনুগ্রহ করে ismartcoding@gmail.com ঠিকানায় একটি ইমেল পাঠাতে বা আমাদের Discord আলোচনায় যোগদান করতে স্বাগতম: https://discord.gg/RQWcS6DEEe।</string>
     <string name="demo_mode">ডেমো মোড</string>
     <string name="donation">দান</string>
     <string name="logs">লগ</string>
-    <string name="password_type">পাসওয়ার্ড টাইপ</string>
-    <string name="password_settings">পাসওয়ার্ড সেটিংস</string>
-    <string name="password_type_fixed">স্থির পাসওয়ার্ড</string>
-    <string name="password_type_none">কোনও পাসওয়ার্ড নেই</string>
     <string name="restart_app_title">অ্যাপ পুনরায় চালু করুন</string>
     <string name="http_server_failed">HTTP সার্ভার চালু করা ব্যর্থ। এটি পুনরায় চালাতে, "আবার এপিপি পুনরারম্ভ করুন" বোতামে ট্যাপ করুন।</string>
     <string name="http_server_stopped">HTTP সার্ভারটি ইচ্ছাকৃতভাবে বন্ধ হয়েছে। এটি পুনরায় চালাতে, "আবার এপিপি পুনরারম্ভ করুন" বোতামে ট্যাপ করুন।</string>

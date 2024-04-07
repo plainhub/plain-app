@@ -1,0 +1,285 @@
+package com.ismartcoding.plain.ui.page.feeds
+
+
+import android.annotation.SuppressLint
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Label
+import androidx.compose.material.icons.outlined.OpenInBrowser
+import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.lib.helpers.ShareHelper
+import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.enums.DataType
+import com.ismartcoding.plain.extensions.timeAgo
+import com.ismartcoding.plain.features.feed.FeedEntryHelper
+import com.ismartcoding.plain.features.feed.FeedHelper
+import com.ismartcoding.plain.features.feed.fetchContentAsync
+import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.PClickableText
+import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.TopSpace
+import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.base.markdowntext.MarkdownText
+import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
+import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefreshContent
+import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
+import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
+import com.ismartcoding.plain.ui.extensions.navigateText
+import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.helpers.WebHelper
+import com.ismartcoding.plain.ui.models.FeedEntryViewModel
+import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.page.tags.SelectTagsDialog
+import com.ismartcoding.plain.ui.theme.PlainTheme
+import com.ismartcoding.plain.ui.theme.buttonTextLarge
+import com.ismartcoding.plain.ui.theme.largeBlockButton
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.launch
+import kotlin.math.abs
+
+@SuppressLint("MissingPermission")
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, FlowPreview::class, ExperimentalLayoutApi::class)
+@Composable
+fun FeedEntryPage(
+    navController: NavHostController,
+    id: String,
+    viewModel: FeedEntryViewModel = viewModel(),
+    tagsViewModel: TagsViewModel = viewModel(),
+) {
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val tagsState by tagsViewModel.itemsFlow.collectAsState()
+    val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
+    val tagIds = tagsMapState[id]?.map { it.tagId } ?: emptyList()
+
+    val topRefreshLayoutState =
+        rememberRefreshLayoutState {
+            scope.launch {
+                viewModel.item.value?.let { m ->
+                    val r = withIO {
+                        m.fetchContentAsync()
+                    }
+                    if (r.isOk()) {
+                        viewModel.content.value = m.content
+                        setRefreshState(RefreshContentState.Finished)
+                    } else {
+                        setRefreshState(RefreshContentState.Failed)
+                        DialogHelper.showErrorDialog(r.errorMessage())
+                    }
+                }.also {
+                    if (it == null) {
+                        setRefreshState(RefreshContentState.Finished)
+                    }
+                }
+            }
+        }
+
+
+    LaunchedEffect(Unit) {
+        tagsViewModel.dataType.value = DataType.FEED_ENTRY
+        scope.launch(Dispatchers.IO) {
+            viewModel.item.value = FeedEntryHelper.getAsync(id)
+            tagsViewModel.loadAsync(setOf(id))
+            val m = viewModel.item.value ?: return@launch
+            viewModel.content.value = m.content
+            viewModel.feed.value = FeedHelper.getById(m.feedId)
+        }
+    }
+
+    if (viewModel.showSelectTagsDialog.value) {
+        SelectTagsDialog(tagsViewModel, tagsState, tagsMapState, id = id) {
+            viewModel.showSelectTagsDialog.value = false
+        }
+    }
+
+    PScaffold(
+        navController,
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding(),
+        actions = {
+            PIconButton(
+                icon = Icons.AutoMirrored.Outlined.Label,
+                contentDescription = stringResource(R.string.select_tags),
+                tint = MaterialTheme.colorScheme.onSurface,
+            ) {
+                viewModel.showSelectTagsDialog.value = true
+            }
+            PIconButton(
+                icon = Icons.Outlined.OpenInBrowser,
+                contentDescription = stringResource(R.string.open_in_web),
+                tint = MaterialTheme.colorScheme.onSurface,
+            ) {
+                val m = viewModel.item.value ?: return@PIconButton
+                WebHelper.open(context, m.url)
+            }
+            PIconButton(
+                icon = Icons.Outlined.Share,
+                contentDescription = stringResource(R.string.share),
+                tint = MaterialTheme.colorScheme.onSurface,
+            ) {
+                val m = viewModel.item.value ?: return@PIconButton
+                ShareHelper.shareText(context, m.title.let { it + "\n" } + m.url)
+            }
+        },
+        bottomBar = {
+        },
+        content = {
+            val m = viewModel.item.value ?: return@PScaffold
+            PullToRefresh(
+                refreshLayoutState = topRefreshLayoutState,
+                refreshContent = remember {
+                    {
+                        PullToRefreshContent(
+                            createText = {
+                                when (it) {
+                                    RefreshContentState.Failed -> stringResource(id = R.string.fetch_failed)
+                                    RefreshContentState.Finished -> stringResource(id = R.string.fetched)
+                                    RefreshContentState.Refreshing -> stringResource(id = R.string.fetching_content)
+                                    RefreshContentState.Dragging -> {
+                                        if (abs(getRefreshContentOffset()) < getRefreshContentThreshold()) {
+                                            stringResource(id = R.string.pull_down_to_fecth_content)
+                                        } else {
+                                            stringResource(id = R.string.release_to_fetch)
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    }
+                },
+            ) {
+                LazyColumn(Modifier.fillMaxSize()) {
+                    item {
+                        TopSpace()
+                    }
+                    item {
+                        PClickableText(
+                            text = AnnotatedString(m.title),
+                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                            style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold),
+                            onDoubleClick = {
+                                navController.navigateText("JSON", jsonEncode(m, pretty = true))
+                            },
+                            onClick = {
+                                WebHelper.open(context, m.url)
+                            }
+                        )
+                        VerticalSpace(dp = 8.dp)
+                        val tags = tagsState.filter { tagIds.contains(it.id) }
+                        FlowRow(
+                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Text(
+                                text = arrayOf(viewModel.feed.value?.name ?: "", m.author, m.publishedAt.timeAgo()).filter {
+                                    it.isNotEmpty()
+                                }.joinToString(" · "),
+                                style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp, color = MaterialTheme.colorScheme.secondary),
+                            )
+                            tags.forEach { tag ->
+                                Text(
+                                    text = AnnotatedString("#" + tag.name),
+                                    modifier = Modifier
+                                        .wrapContentHeight()
+                                        .align(Alignment.Bottom),
+                                    style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp, color = MaterialTheme.colorScheme.primary),
+                                )
+                            }
+                        }
+                        VerticalSpace(dp = 16.dp)
+                    }
+                    item {
+                        MarkdownText(
+                            text = viewModel.content.value.ifEmpty { m.description },
+                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                        )
+                    }
+                    if (viewModel.content.value.isEmpty() && topRefreshLayoutState.refreshContentState.value == RefreshContentState.Finished) {
+                        item {
+                            VerticalSpace(dp = 32.dp)
+                            if (viewModel.fetchingContent.value) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(32.dp),
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        strokeWidth = 3.dp
+                                    )
+                                }
+                            } else {
+                                OutlinedButton(
+                                    onClick = {
+                                        scope.launch {
+                                            viewModel.item.value?.let { m ->
+                                                viewModel.fetchingContent.value = true
+                                                val r = withIO {
+                                                    m.fetchContentAsync()
+                                                }
+                                                viewModel.fetchingContent.value = false
+                                                if (r.isOk()) {
+                                                    viewModel.content.value = m.content
+                                                } else {
+                                                    DialogHelper.showErrorDialog(r.errorMessage())
+                                                }
+                                            }
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .largeBlockButton(),
+                                    enabled = !viewModel.fetchingContent.value,
+                                ) {
+                                    Text(
+                                        text = stringResource(id = R.string.load_full_content),
+                                        style = MaterialTheme.typography.buttonTextLarge()
+                                    )
+                                }
+                            }
+
+                        }
+                    }
+
+                    item {
+                        BottomSpace()
+                    }
+                }
+            }
+        },
+    )
+}

@@ -70,6 +70,20 @@ class MdEditorViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         }
     }
 
+    fun toggleLineNumbers(context: Context) {
+        showLineNumbers = !showLineNumbers
+        viewModelScope.launch(Dispatchers.IO) {
+            EditorShowLineNumbersPreference.putAsync(context, showLineNumbers)
+        }
+    }
+
+    fun toggleWrapContent(context: Context) {
+        wrapContent = !wrapContent
+        viewModelScope.launch(Dispatchers.IO) {
+            EditorWrapContentPreference.putAsync(context, wrapContent)
+        }
+    }
+
     fun insertColor(color: String) {
         textFieldState.edit { inlineWrap("<font color=\"$color\">", "</font>") }
         showColorPicker = false

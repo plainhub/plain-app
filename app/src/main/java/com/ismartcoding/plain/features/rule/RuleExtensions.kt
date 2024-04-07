@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.features.rule
 
-import android.content.Context
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
@@ -31,7 +30,6 @@ fun Rule.toRuleEdit(): RuleEdit {
 }
 
 fun ViewListItemBinding.bindRule(
-    context: Context,
     lifecycleScope: LifecycleCoroutineScope,
     item: Rule,
 ) {
@@ -51,7 +49,7 @@ fun ViewListItemBinding.bindRule(
                 }
             DialogHelper.hideLoading()
             if (!r.isSuccess()) {
-                DialogHelper.showErrorDialog(context, r.getErrorMessage())
+                DialogHelper.showErrorDialog(r.getErrorMessage())
                 item.isEnabled = !isEnabled
                 setSwitchEnable(!isEnabled)
                 return@launch

@@ -67,7 +67,7 @@ fun PIconTextActionButton(
         ) {
             PIcon(
                 icon = icon,
-                contentDescription = null,
+                contentDescription = text,
                 modifier = Modifier.size(24.dp)
             )
         }

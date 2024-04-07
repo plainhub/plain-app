@@ -30,9 +30,11 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ismartcoding.lib.channel.receiveEvent
-import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.*
+import com.ismartcoding.lib.extensions.capitalize
+import com.ismartcoding.lib.extensions.dp2px
+import com.ismartcoding.lib.extensions.getSystemScreenTimeout
+import com.ismartcoding.lib.extensions.setSystemScreenTimeout
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
@@ -40,7 +42,6 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.data.*
 import com.ismartcoding.plain.data.enums.AppChannelType
 import com.ismartcoding.plain.data.enums.ExportFileType
 import com.ismartcoding.plain.data.enums.HttpServerState
@@ -52,36 +53,45 @@ import com.ismartcoding.plain.data.preference.ApiPermissionsPreference
 import com.ismartcoding.plain.data.preference.KeepScreenOnPreference
 import com.ismartcoding.plain.data.preference.SettingsProvider
 import com.ismartcoding.plain.data.preference.SystemScreenTimeoutPreference
-import com.ismartcoding.plain.db.*
-import com.ismartcoding.plain.features.*
+import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.features.ExportFileEvent
+import com.ismartcoding.plain.features.ExportFileResultEvent
+import com.ismartcoding.plain.features.HttpServerStateChangedEvent
+import com.ismartcoding.plain.features.IgnoreBatteryOptimizationEvent
+import com.ismartcoding.plain.features.IgnoreBatteryOptimizationResultEvent
+import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.features.Permissions
+import com.ismartcoding.plain.features.PermissionsResultEvent
+import com.ismartcoding.plain.features.PickFileEvent
+import com.ismartcoding.plain.features.PickFileResultEvent
+import com.ismartcoding.plain.features.RequestPermissionsEvent
+import com.ismartcoding.plain.features.RestartAppEvent
+import com.ismartcoding.plain.features.StartScreenMirrorEvent
+import com.ismartcoding.plain.features.WindowFocusChangedEvent
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.bluetooth.BluetoothPermission
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getStringF
 import com.ismartcoding.plain.features.pkg.PackageHelper
-import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.ScreenHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.mediaProjectionManager
 import com.ismartcoding.plain.services.NotificationListenerMonitorService
 import com.ismartcoding.plain.services.ScreenMirrorService
-import com.ismartcoding.plain.ui.extensions.*
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.ShowMessageEvent
 import com.ismartcoding.plain.ui.page.Main
-import com.ismartcoding.plain.web.*
+import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
-import io.ktor.server.request.*
-import io.ktor.websocket.*
+import io.ktor.websocket.CloseReason
+import io.ktor.websocket.close
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
-import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
     private var pickFileType = PickFileType.IMAGE
@@ -220,7 +230,6 @@ class MainActivity : AppCompatActivity() {
             viewModel.httpServerState = it.state
             if (it.state == HttpServerState.ON && !Permission.WRITE_EXTERNAL_STORAGE.can(this@MainActivity)) {
                 DialogHelper.showConfirmDialog(
-                    this@MainActivity,
                     LocaleHelper.getString(R.string.confirm),
                     LocaleHelper.getString(R.string.storage_permission_confirm)
                 ) {
@@ -312,25 +321,29 @@ class MainActivity : AppCompatActivity() {
 
             val r = event.request
             requestToConnectDialog =
-                MaterialAlertDialogBuilder(instance.get()!!).setTitle(getStringF(R.string.request_to_connect, "ip", clientIp)).setMessage(
-                    getStringF(
-                        R.string.client_ua, "os_name", r.osName.capitalize(), "os_version", r.osVersion, "browser_name", r.browserName.capitalize(), "browser_version", r.browserVersion,
-                    ),
-                ).setPositiveButton(getString(R.string.accept)) { _, _ ->
-                    launch {
-                        withIO { HttpServerManager.respondTokenAsync(event, clientIp) }
-                    }
-                }.setNegativeButton(getString(R.string.reject)) { _, _ ->
-                    launch {
-                        withIO {
-                            event.session.close(
-                                CloseReason(
-                                    CloseReason.Codes.TRY_AGAIN_LATER, "rejected",
-                                ),
-                            )
+                MaterialAlertDialogBuilder(instance.get()!!)
+                    .setTitle(getStringF(R.string.request_to_connect, "ip", clientIp))
+                    .setMessage(
+                        getStringF(
+                            R.string.client_ua, "os_name", r.osName.capitalize(), "os_version", r.osVersion, "browser_name", r.browserName.capitalize(), "browser_version", r.browserVersion,
+                        ),
+                    )
+                    .setPositiveButton(getString(R.string.accept)) { _, _ ->
+                        launch {
+                            withIO { HttpServerManager.respondTokenAsync(event, clientIp) }
                         }
                     }
-                }.create()
+                        .setNegativeButton(getString(R.string.reject)) { _, _ ->
+                        launch {
+                            withIO {
+                                event.session.close(
+                                    CloseReason(
+                                        CloseReason.Codes.TRY_AGAIN_LATER, "rejected",
+                                    ),
+                                )
+                            }
+                        }
+                    }.create()
             if (Permission.SYSTEM_ALERT_WINDOW.can(this@MainActivity)) {
                 requestToConnectDialog?.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
             }

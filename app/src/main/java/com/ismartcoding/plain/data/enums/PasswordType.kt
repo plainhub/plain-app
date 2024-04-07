@@ -7,15 +7,7 @@ enum class PasswordType(val value: Int) {
     FIXED(1),
     ;
 
-    fun getText(): String {
-        return LocaleHelper.getString("password_type_" + this.name.lowercase())
-    }
-
     companion object {
-        fun getText(value: Int): String {
-            return parse(value).getText()
-        }
-
         fun parse(value: Int): PasswordType {
             return entries.find { it.value == value } ?: FIXED
         }

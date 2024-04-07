@@ -9,27 +9,23 @@ import com.ismartcoding.lib.brv.utils.models
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.onItemClick
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.ActionSourceType
-import com.ismartcoding.plain.data.enums.ActionType
-import com.ismartcoding.plain.data.enums.DataType
-import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DTag
-import com.ismartcoding.plain.features.ActionEvent
-import com.ismartcoding.plain.features.feed.FeedEntryHelper
-import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
-import com.ismartcoding.plain.features.tag.TagHelper
-import com.ismartcoding.plain.ui.feed.EditFeedDialog
-import com.ismartcoding.plain.ui.feed.FeedsHelper
 import com.ismartcoding.plain.ui.file.FilesType
 import com.ismartcoding.plain.ui.file.FilesViewModel
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.models.*
+import com.ismartcoding.plain.ui.models.DMediaFolders
+import com.ismartcoding.plain.ui.models.DType
+import com.ismartcoding.plain.ui.models.DrawerMenuGroup
+import com.ismartcoding.plain.ui.models.DrawerMenuGroupType
+import com.ismartcoding.plain.ui.models.DrawerMenuItemClickedEvent
+import com.ismartcoding.plain.ui.models.FilteredItemsViewModel
+import com.ismartcoding.plain.ui.models.IDataModel
+import com.ismartcoding.plain.ui.models.MenuItemModel
 import com.ismartcoding.plain.ui.tag.TagUIHelper
 
 fun RecyclerView.ensureSelect(callback: (items: List<IDataModel>) -> Unit) {
@@ -70,43 +66,6 @@ fun RecyclerView.initDrawerMenu() {
                 onItemClick {
                     TagUIHelper.itemLongClick(itemId, tag)
                 }
-            } else if (m.data is DFeed) {
-                val feed = m.data
-                inflate(R.menu.feed)
-                menu.findItem(R.id.title).setTitle(context, feed.name)
-                menu.findItem(R.id.fetch_content).isChecked = feed.fetchContent
-                onItemClick {
-                    when (itemId) {
-                        R.id.edit -> {
-                            EditFeedDialog(m.data).show()
-                        }
-                        R.id.fetch_content -> {
-                            isChecked = !isChecked
-                            feed.fetchContent = isChecked
-                            coMain {
-                                withIO {
-                                    FeedHelper.updateAsync(feed.id) {
-                                        this.fetchContent = isChecked
-                                    }
-                                }
-                            }
-                        }
-                        R.id.delete -> {
-                            coMain {
-                                val ids = setOf(m.data.id)
-                                withIO {
-                                    val entryIds = FeedEntryHelper.feedEntryDao.getIds(ids)
-                                    if (entryIds.isNotEmpty()) {
-                                        TagHelper.deleteTagRelationByKeys(entryIds.toSet(), DataType.FEED_ENTRY)
-                                        FeedEntryHelper.feedEntryDao.deleteByFeedIds(ids)
-                                    }
-                                    FeedHelper.deleteAsync(ids)
-                                }
-                                sendEvent(ActionEvent(ActionSourceType.FEED, ActionType.DELETED, ids))
-                            }
-                        }
-                    }
-                }
             }
         }
 
@@ -141,6 +100,7 @@ suspend fun RecyclerView.updateDrawerMenuAsync(
                     )
                 }
             }
+
             DrawerMenuGroupType.SMS_TYPES -> {
                 arrayOf(
                     DType(Telephony.Sms.MESSAGE_TYPE_INBOX.toString(), R.string.inbox, R.drawable.ic_inbox),
@@ -156,13 +116,7 @@ suspend fun RecyclerView.updateDrawerMenuAsync(
                     )
                 }
             }
-            DrawerMenuGroupType.FEEDS -> {
-                groups.add(
-                    withIO {
-                        FeedsHelper.createMenuGroupAsync(viewModel)
-                    },
-                )
-            }
+
             DrawerMenuGroupType.ALL -> {
                 groups.add(
                     MenuItemModel().apply {
@@ -172,6 +126,7 @@ suspend fun RecyclerView.updateDrawerMenuAsync(
                     },
                 )
             }
+
             DrawerMenuGroupType.FOLDERS -> {
                 groups.add(
                     MenuItemModel(DMediaFolders()).apply {
@@ -181,6 +136,7 @@ suspend fun RecyclerView.updateDrawerMenuAsync(
                     },
                 )
             }
+
             DrawerMenuGroupType.TRASH -> {
                 groups.add(
                     MenuItemModel().apply {
@@ -190,6 +146,7 @@ suspend fun RecyclerView.updateDrawerMenuAsync(
                     },
                 )
             }
+
             DrawerMenuGroupType.TAGS -> {
                 groups.add(
                     withIO {

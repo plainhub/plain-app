@@ -8,4 +8,5 @@ import androidx.lifecycle.viewmodel.compose.saveable
 class NoteViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
     var editMode by savedStateHandle.saveable { mutableStateOf(false) }
     var content by savedStateHandle.saveable { mutableStateOf("") }
+    val showSelectTagsDialog = mutableStateOf(false)
 }

@@ -2,6 +2,13 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">O seu VPN está atualmente ativado no seu dispositivo, o que pode potencialmente levar a problemas de conexão web quando acessado a partir do PC. Para resolver isso, recomendamos ajustar as configurações do seu VPN para permitir o tráfego de LAN ou desativar o seu VPN.</string>
     <string name="warning">Aviso</string>
+    <string name="open_in_web">Abrir no navegador da web</string>
+    <string name="require_password">Requer senha</string>
+    <string name="two_factor_auth_tips">Ao fazer login na página da web, exibiremos uma janela de confirmação no aplicativo para segurança adicional.</string>
+    <string name="load_full_content">Carregar conteúdo completo</string>
+    <string name="auto_fetch_full_content">Buscar conteúdo completo automaticamente</string>
+    <string name="auto_fetch_full_content_tips">Quando esta opção estiver ativada, o aplicativo buscará automaticamente o conteúdo completo de cada item de feed RSS.</string>
+    <string name="invalid_url">Formato de URL inválido. Exemplo: https://www.example.com</string>
     <string name="local_cache">Cache local</string>
     <string name="clear_cache">Limpar cache</string>
     <string name="local_cache_cleared">Cache local limpo.</string>
@@ -428,7 +435,6 @@
     <string name="notes_title">Notas ({{count}})</string>
     <string name="trash_title">Lixeira ({{count}})</string>
     <string name="contacts_title">Contatos ({{count}})</string>
-    <string name="feeds_title">Feeds ({{count}})</string>
     <string name="books_title">Livros ({{count}})</string>
     <string name="subscriptions_title">Inscrições ({{count}})</string>
     <string name="calls_title">Chamadas ({{count}})</string>
@@ -523,7 +529,6 @@
     <string name="syncing_all_feeds">Sincronizando todos os feeds...</string>
     <string name="syncing">Sincronizando...</string>
     <string name="sync_failed">Falha na sincronização</string>
-    <string name="sync_feeds_from_server">Sincronizar feeds do servidor</string>
     <string name="scan_needs_camera_warning">O scanner precisa de permissão de câmera!</string>
     <string name="exported_to">Exportado para {{name}}.</string>
     <string name="invalid_file">Arquivo inválido</string>
@@ -545,16 +550,11 @@
     <string name="enter_this_address_tips">Digite o endereço acima no navegador do seu computador, garantindo que seu telefone e computador estejam na mesma rede local.</string>
     <string name="last_visit_at">Última visita em</string>
     <string name="web_console_desc">Gerencie fotos, vídeos, arquivos, notificações e outros dados no seu telefone via computador sem a necessidade de um cabo de dados.</string>
-    <string name="fetch_content_automatically">Busca automática de conteúdo</string>
     <string name="app_restored">Dados do APP foram restaurados, você precisa sair forçadamente deste app e iniciá-lo novamente como novo.</string>
     <string name="welcome_text">Bem-vindo! Você pode facilmente enviar texto, imagens e vídeos para esta página e visualizá-los no seu computador.\nSe encontrar algum problema, não hesite em enviar um e-mail para ismartcoding@gmail.com para assistência ou junte-se à nossa discussão no Discord em: https://discord.gg/RQWcS6DEEe.</string>
     <string name="demo_mode">Modo de demonstração</string>
     <string name="donation">Doação</string>
     <string name="logs">Logs</string>
-    <string name="password_type">Tipo de senha</string>
-    <string name="password_settings">Configurações de senha</string>
-    <string name="password_type_fixed">Senha fixa</string>
-    <string name="password_type_none">Sem senha</string>
     <string name="restart_app_title">Reiniciar aplicativo</string>
     <string name="http_server_failed">Falha ao iniciar o servidor HTTP. Para reiniciá-lo, toque no botão "Reiniciar APP".</string>
     <string name="http_server_stopped">O servidor HTTP foi intencionalmente interrompido. Para reiniciá-lo, toque no botão "Reiniciar APP".</string>

@@ -88,6 +88,7 @@ fun WebAddressBar(
     DisposableEffect(Unit) {
         onDispose {
             events.forEach { it.cancel() }
+            events.clear()
         }
     }
 
@@ -113,7 +114,7 @@ fun WebAddressBar(
                 onClick = {
                     val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), defaultUrl.value)
                     clipboardManager.setPrimaryClip(clip)
-                    DialogHelper.showConfirmDialog(context, "", context.getString(R.string.copied_to_clipboard_format, defaultUrl.value))
+                    DialogHelper.showConfirmDialog("", context.getString(R.string.copied_to_clipboard_format, defaultUrl.value))
                 },
             )
         }
@@ -158,7 +159,9 @@ fun WebAddressBar(
                             showContextMenu.value = false
                             val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), url)
                             clipboardManager.setPrimaryClip(clip)
-                            DialogHelper.showConfirmDialog(context, "", context.getString(R.string.copied_to_clipboard_format, url))
+                            DialogHelper.showConfirmDialog(
+                                "", context.getString(R.string.copied_to_clipboard_format, url),
+                            )
                         })
                     }
                 }
@@ -166,34 +169,35 @@ fun WebAddressBar(
         }
     }
 
-    RadioDialog(
-        visible = portDialogVisible,
-        title = stringResource(R.string.change_port),
-        options =
-        (if (isHttps) HttpServerManager.httpsPorts else HttpServerManager.httpPorts).map {
-            RadioDialogOption(
-                text = it.toString(),
-                selected = it == port,
-            ) {
-                scope.launch(Dispatchers.IO) {
-                    if (isHttps) {
-                        HttpsPortPreference.putAsync(context, it)
-                    } else {
-                        HttpPortPreference.putAsync(context, it)
+    if (portDialogVisible) {
+        RadioDialog(
+            title = stringResource(R.string.change_port),
+            options =
+            (if (isHttps) HttpServerManager.httpsPorts else HttpServerManager.httpPorts).map {
+                RadioDialogOption(
+                    text = it.toString(),
+                    selected = it == port,
+                ) {
+                    scope.launch(Dispatchers.IO) {
+                        if (isHttps) {
+                            HttpsPortPreference.putAsync(context, it)
+                        } else {
+                            HttpPortPreference.putAsync(context, it)
+                        }
                     }
+                    MaterialAlertDialogBuilder(context)
+                        .setTitle(R.string.restart_app_title)
+                        .setMessage(R.string.restart_app_message)
+                        .setPositiveButton(R.string.relaunch_app) { _, _ ->
+                            AppHelper.relaunch(context)
+                        }
+                        .setCancelable(false)
+                        .create()
+                        .show()
                 }
-                MaterialAlertDialogBuilder(context)
-                    .setTitle(R.string.restart_app_title)
-                    .setMessage(R.string.restart_app_message)
-                    .setPositiveButton(R.string.relaunch_app) { _, _ ->
-                        AppHelper.relaunch(context)
-                    }
-                    .setCancelable(false)
-                    .create()
-                    .show()
-            }
-        },
-    ) {
-        portDialogVisible = false
+            },
+        ) {
+            portDialogVisible = false
+        }
     }
 }

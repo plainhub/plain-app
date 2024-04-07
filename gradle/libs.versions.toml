@@ -1,0 +1,166 @@
+[versions]
+ahocorasickVersion="0.6.3"
+androidGifDrawableVersion="1.2.23"
+androidsvgAarVersion="1.4"
+appcompatVersion="1.6.1"
+bcprovJdk15onVersion="1.70"
+coil="2.6.0"
+coreKtxVersion="1.12.0"
+exoplayerVersion="2.19.1"
+firebaseCrashlyticsGradleVersion="2.9.9"
+fragmentKtxVersion="1.6.2"
+glideVersion="4.16.0"
+googleServicesVersion="4.4.1"
+gradle="8.2.2"
+accompanistDrawablepainterVersion = "0.34.0"
+cameraCoreVersion = "1.4.0-alpha04"
+apollo = "3.2.1"
+compose = "1.6.4"
+activityComposeVersion = "1.8.2"
+composeBom = "2024.01.00"
+coreSplashscreenVersion = "1.0.1"
+coreVersion = "3.5.3"
+datastorePreferencesVersion = "1.0.0"
+firebaseCrashlyticsKtxVersion = "18.6.3"
+firebaseBomVersion = "32.8.0"
+gsonVersion="2.10.1"
+guavaVersion="33.0.0-android"
+jsoupVersion="1.15.3"
+kgraphql = "0.19.0"
+kotlin = "1.9.22"
+kotlinGradlePluginVersion="1.9.22"
+kotlinxDatetimeVersion="0.4.0"
+kotlinxSerializationJsonVersion="1.6.3"
+kotlinxCoroutinesGuavaVersion="1.8.0"
+kotlinxCoroutinesAndroidVersion="1.8.0"
+kotlinxCoroutinesCoreVersion="1.8.0"
+ktor = "3.0.0-beta-1"
+leakcanaryAndroidVersion = "2.12"
+lifecycleExtensionsVersion="2.2.0"
+lifecycleViewmodelKtxVersion="2.7.0"
+markwon="4.6.2"
+materialVersion="1.12.0-alpha03"
+media3DatasourceVersion = "1.3.0"
+media3ExoplayerVersion = "1.3.0"
+navigationComposeVersion = "2.7.7"
+materialIconsExtendedVersion = "1.7.0-alpha05"
+material3Version = "1.2.1"
+openaiClientVersion = "3.6.2"
+pdfiumAndroidVersion="1.9.0"
+preferenceKtxVersion = "1.2.1"
+pagingRuntimeKtxVersion = "3.2.1"
+refreshLayoutKernelVersion="2.0.5"
+readability4jVersion="1.0.8"
+room = "2.6.1"
+snakeYamlVersion = "v1.18-android"
+subsamplingScaleImageViewAndroidxVersion="3.10.0"
+transformationsVersion="2.0.2"
+transitionVersion="1.4.1"
+viewpager2Version = "1.0.0"
+workRuntimeKtxVersion = "2.9.0"
+ztZipVersion = "1.16"
+[libraries]
+ahocorasick = { module = "org.ahocorasick:ahocorasick", version.ref = "ahocorasickVersion" }
+android-gif-drawable = { module = "pl.droidsonroids.gif:android-gif-drawable", version.ref = "androidGifDrawableVersion" }
+androidsvg-aar = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvgAarVersion" }
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
+androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtxVersion" }
+androidx-lifecycle-extensions = { module = "androidx.lifecycle:lifecycle-extensions", version.ref = "lifecycleExtensionsVersion" }
+androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleViewmodelKtxVersion" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtxVersion" }
+bcpkix-jdk15on = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bcprovJdk15onVersion" }
+bcprov-jdk15on = { module = "org.bouncycastle:bcprov-jdk15on", version.ref = "bcprovJdk15onVersion" }
+coil = { module = "io.coil-kt:coil", version.ref = "coil" }
+coil-gif = { module = "io.coil-kt:coil-gif", version.ref = "coil" }
+coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+coil-video = { module = "io.coil-kt:coil-video", version.ref = "coil" }
+exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoplayerVersion" }
+androidx-transition = { module = "androidx.transition:transition", version.ref = "transitionVersion" }
+ext-latex = { module = "io.noties.markwon:ext-latex", version.ref = "markwon" }
+ext-strikethrough = { module = "io.noties.markwon:ext-strikethrough", version.ref = "markwon" }
+ext-tables = { module = "io.noties.markwon:ext-tables", version.ref = "markwon" }
+ext-tasklist = { module = "io.noties.markwon:ext-tasklist", version.ref = "markwon" }
+firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsGradleVersion" }
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glideVersion" }
+google-services = { module = "com.google.gms:google-services", version.ref = "googleServicesVersion" }
+gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanistDrawablepainterVersion" }
+androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCoreVersion" }
+androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraCoreVersion" }
+androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraCoreVersion" }
+androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraCoreVersion" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreenVersion" }
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferencesVersion" }
+androidx-foundation-layout = { module = "androidx.compose.foundation:foundation-layout", version.ref = "compose" }
+androidx-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
+androidx-media3-cast = { module = "androidx.media3:media3-cast", version.ref = "media3DatasourceVersion" }
+androidx-media3-datasource = { module = "androidx.media3:media3-datasource", version.ref = "media3DatasourceVersion" }
+androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3ExoplayerVersion" }
+androidx-media3-session = { module = "androidx.media3:media3-session", version.ref = "media3DatasourceVersion" }
+androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3DatasourceVersion" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationComposeVersion" }
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtendedVersion" }
+androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
+androidx-preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtxVersion" }
+androidx-paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "pagingRuntimeKtxVersion" }
+androidx-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
+androidx-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
+androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2Version" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtxVersion" }
+apollo-adapters = { module = "com.apollographql.apollo3:apollo-adapters", version.ref = "apollo" }
+apollo-normalized-cache-sqlite = { module = "com.apollographql.apollo3:apollo-normalized-cache-sqlite", version.ref = "apollo" }
+apollo-normalized-cache = { module = "com.apollographql.apollo3:apollo-normalized-cache", version.ref = "apollo" }
+apollo-runtime = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+core = { module = "com.google.zxing:core", version.ref = "coreVersion" }
+firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx", version.ref = "firebaseCrashlyticsKtxVersion" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gsonVersion" }
+guava = { module = "com.google.guava:guava", version.ref = "guavaVersion" }
+html = { module = "io.noties.markwon:html", version.ref = "markwon" }
+image-glide = { module = "io.noties.markwon:image-glide", version.ref = "markwon" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoupVersion" }
+kgraphql-ktor = { module = "com.apurebase:kgraphql-ktor", version.ref = "kgraphql" }
+kgraphql = { module = "com.apurebase:kgraphql", version.ref = "kgraphql" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePluginVersion" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetimeVersion" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJsonVersion" }
+kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "kotlinxCoroutinesGuavaVersion" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroidVersion" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCoreVersion" }
+ksp = { module = "com.github.bumptech.glide:ksp", version.ref = "glideVersion" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-network-tls-certificates = { module = "io.ktor:ktor-network-tls-certificates", version.ref = "ktor" }
+ktor-server-auto-head-response = { module = "io.ktor:ktor-server-auto-head-response", version.ref = "ktor" }
+ktor-server-caching-headers = { module = "io.ktor:ktor-server-caching-headers", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-server-compression = { module = "io.ktor:ktor-server-compression", version.ref = "ktor" }
+ktor-server-conditional-headers = { module = "io.ktor:ktor-server-conditional-headers", version.ref = "ktor" }
+ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
+ktor-server-partial-content = { module = "io.ktor:ktor-server-partial-content", version.ref = "ktor" }
+ktor-server-cors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor" }
+ktor-server-forwarded-header = { module = "io.ktor:ktor-server-forwarded-header", version.ref = "ktor" }
+ktor-server-websockets = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
+ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+linkify = { module = "io.noties.markwon:linkify", version.ref = "markwon" }
+markwon-core = { module = "io.noties.markwon:core", version.ref = "markwon" }
+material = { module = "com.google.android.material:material", version.ref = "materialVersion" }
+openai-client = { module = "com.aallam.openai:openai-client", version.ref = "openaiClientVersion" }
+leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroidVersion" }
+pdfium-android = { module = "com.github.barteksc:pdfium-android", version.ref = "pdfiumAndroidVersion" }
+refresh-layout-kernel = { module = "io.github.scwang90:refresh-layout-kernel", version.ref = "refreshLayoutKernelVersion" }
+readability4j = { module = "net.dankito.readability4j:readability4j", version.ref = "readability4jVersion" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+snake-yaml = { module = "com.github.bmoliveira:snake-yaml", version.ref = "snakeYamlVersion" }
+subsampling-scale-image-view-androidx = { module = "com.davemorrissey.labs:subsampling-scale-image-view-androidx", version.ref = "subsamplingScaleImageViewAndroidxVersion" }
+transformations = { module = "com.github.Commit451.coil-transformations:transformations", version.ref = "transformationsVersion" }
+zt-zip = { module = "org.zeroturnaround:zt-zip", version.ref = "ztZipVersion" }
+[plugins]
+

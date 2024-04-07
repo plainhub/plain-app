@@ -165,6 +165,7 @@ fun ScanPage(navController: NavHostController) {
         onDispose {
             insetsController.show(WindowInsetsCompat.Type.systemBars())
             events.forEach { it.cancel() }
+            events.clear()
             cameraProvider?.unbindAll()
         }
     }

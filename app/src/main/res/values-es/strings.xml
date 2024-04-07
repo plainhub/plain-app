@@ -2,6 +2,13 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Su VPN está actualmente habilitado en su dispositivo, lo que podría provocar problemas de conexión web cuando se accede desde su PC. Para resolver esto, le recomendamos ajustar la configuración de su VPN para permitir el tráfico de LAN o desactivar su VPN.</string>
     <string name="warning">Advertencia</string>
+    <string name="open_in_web">Abrir en navegador web</string>
+    <string name="require_password">Requiere contraseña</string>
+    <string name="two_factor_auth_tips">Al iniciar sesión en la página web, mostraremos una ventana emergente de confirmación en la aplicación para añadir seguridad adicional.</string>
+    <string name="load_full_content">Cargar contenido completo</string>
+    <string name="auto_fetch_full_content">Recuperar contenido completo automáticamente</string>
+    <string name="auto_fetch_full_content_tips">Cuando esta opción está activada, la aplicación recuperará automáticamente el contenido completo de cada elemento del feed RSS.</string>
+    <string name="invalid_url">Formato de URL inválido. Ejemplo: https://www.example.com</string>
     <string name="local_cache">Caché local</string>
     <string name="clear_cache">Borrar caché</string>
     <string name="local_cache_cleared">Caché local eliminada.</string>
@@ -428,7 +435,6 @@
     <string name="notes_title">Notas ({{count}})</string>
     <string name="trash_title">Papelera ({{count}})</string>
     <string name="contacts_title">Contactos ({{count}})</string>
-    <string name="feeds_title">Feeds ({{count}})</string>
     <string name="books_title">Libros ({{count}})</string>
     <string name="subscriptions_title">Suscripciones ({{count}})</string>
     <string name="calls_title">Llamadas ({{count}})</string>
@@ -523,7 +529,6 @@
     <string name="syncing_all_feeds">Sincronizando todos los feeds...</string>
     <string name="syncing">Sincronizando...</string>
     <string name="sync_failed">Error de sincronización</string>
-    <string name="sync_feeds_from_server">Sincronizar feeds desde el servidor</string>
     <string name="scan_needs_camera_warning">¡El escáner necesita permiso de cámara!</string>
     <string name="exported_to">Exportado en {{name}}.</string>
     <string name="invalid_file">Archivo no válido</string>
@@ -545,16 +550,11 @@
     <string name="enter_this_address_tips">Ingrese la dirección anterior en el navegador de su computadora, asegurándose de que su teléfono y su computadora estén en la misma red local.</string>
     <string name="last_visit_at">Última visita a las</string>
     <string name="web_console_desc">Administra fotos, videos, archivos, notificaciones y otros datos en tu teléfono a través de la computadora sin necesidad de un cable de datos.</string>
-    <string name="fetch_content_automatically">Obtener contenido automáticamente</string>
     <string name="app_restored">Se restauraron los datos de la APLICACIÓN, debes salir forzosamente de esta aplicación y volver a iniciarla como nueva.</string>
     <string name="welcome_text">¡Bienvenido! Puedes enviar fácilmente texto, imágenes y videos a esta página y verlos en tu computadora.\nSi encuentras algún problema, no dudes en enviar un correo electrónico a ismartcoding@gmail.com para obtener ayuda o unirte a nuestra discusión en Discord en: https://discord.gg/RQWcS6DEEe.</string>
     <string name="demo_mode">Modo de demostración</string>
     <string name="donation">Donación</string>
     <string name="logs">Registros</string>
-    <string name="password_type">Tipo de contraseña</string>
-    <string name="password_settings">Configuración de contraseña</string>
-    <string name="password_type_fixed">Contraseña fija</string>
-    <string name="password_type_none">Sin contraseña</string>
     <string name="restart_app_title">Reiniciar la aplicación</string>
     <string name="http_server_failed">Falló el inicio del servidor HTTP. Para reiniciarlo, toque el botón "Volver a lanzar APP".</string>
     <string name="http_server_stopped">El servidor HTTP ha sido detenido intencionalmente. Para reiniciarlo, toque el botón "Volver a lanzar APP".</string>

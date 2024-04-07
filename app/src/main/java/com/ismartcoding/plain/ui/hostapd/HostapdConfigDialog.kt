@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 class HostapdConfigDialog : BaseDialog<DialogHostapdConfigBinding>() {
     override fun onBackPressed() {
         if (binding.editor.isChanged()) {
-            DialogHelper.confirmToLeave(requireContext()) {
+            DialogHelper.confirmToLeave {
                 dismiss()
             }
         } else {
@@ -54,7 +54,7 @@ class HostapdConfigDialog : BaseDialog<DialogHostapdConfigBinding>() {
                         hostapdConfig.load(binding.editor.getText())
                         val validateResult = hostapdConfig.validate()
                         if (validateResult.isNotEmpty()) {
-                            DialogHelper.showErrorDialog(requireContext(), validateResult)
+                            DialogHelper.showErrorDialog(validateResult)
                             return@onMenuItemClick
                         }
 
@@ -68,7 +68,7 @@ class HostapdConfigDialog : BaseDialog<DialogHostapdConfigBinding>() {
                                 }
                             DialogHelper.hideLoading()
                             if (!r.isSuccess()) {
-                                DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())
+                                DialogHelper.showErrorDialog(r.getErrorMessage())
                                 return@launch
                             }
 

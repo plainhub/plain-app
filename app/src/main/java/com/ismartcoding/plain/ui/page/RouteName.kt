@@ -12,7 +12,6 @@ enum class RouteName {
     WEB_SETTINGS,
     WEB_SECURITY,
     WEB_LEARN_MORE,
-    PASSWORD,
     TEXT,
     SESSIONS,
     WEB_DEV,
@@ -29,4 +28,7 @@ enum class RouteName {
     DOCS,
     NOTES,
     TAGS,
+    FEEDS,
+    FEED_ENTRIES,
+    FEED_SETTINGS,
 }

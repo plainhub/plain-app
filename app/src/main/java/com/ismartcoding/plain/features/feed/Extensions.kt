@@ -13,11 +13,12 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.api.ApiResult
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.db.DFeedEntry
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.util.cio.*
-import io.ktor.utils.io.*
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.headers
+import io.ktor.client.statement.bodyAsChannel
+import io.ktor.util.cio.writeChannel
+import io.ktor.utils.io.copyAndClose
 import kotlinx.datetime.Instant
 import net.dankito.readability4j.extended.Readability4JExtended
 import net.dankito.readability4j.extended.processor.ArticleGrabberExtended
@@ -25,8 +26,8 @@ import net.dankito.readability4j.extended.util.RegExUtilExtended
 import net.dankito.readability4j.model.ReadabilityOptions
 import net.dankito.readability4j.processor.MetadataParser
 import java.io.File
-import java.time.format.DateTimeFormatter
-import java.util.*
+import java.util.Locale
+import java.util.UUID
 
 fun RssItem.toDFeedEntry(
     feedId: String,
@@ -75,7 +76,7 @@ suspend fun DFeedEntry.fetchContentAsync(): ApiResult {
 
         if (response.isOk()) {
             val input = response.body<String>()
-            val options = ReadabilityOptions()
+            val options = ReadabilityOptions(wordThreshold = 200)
             val regExUtil = RegExUtilExtended()
             Readability4JExtended(
                 url,
@@ -117,10 +118,7 @@ suspend fun DFeedEntry.fetchContentAsync(): ApiResult {
                     }
                     content = MDConverter().convert(mobilizedHtml)
 
-                    FeedEntryHelper.updateAsync(id) {
-                        this.image = this@fetchContentAsync.image
-                        this.content = this@fetchContentAsync.content
-                    }
+                    FeedEntryHelper.updateAsync(this)
                 }
             }
         }

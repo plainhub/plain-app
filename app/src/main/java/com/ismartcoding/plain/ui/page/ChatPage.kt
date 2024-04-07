@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -88,14 +87,14 @@ import com.ismartcoding.plain.ui.components.chat.ChatImages
 import com.ismartcoding.plain.ui.components.chat.ChatInput
 import com.ismartcoding.plain.ui.components.chat.ChatName
 import com.ismartcoding.plain.ui.components.chat.ChatText
-import com.ismartcoding.plain.ui.extensions.navigate
+import com.ismartcoding.plain.ui.extensions.navigateChatEditText
+import com.ismartcoding.plain.ui.extensions.navigateChatText
 import com.ismartcoding.plain.ui.file.FilesDialog
 import com.ismartcoding.plain.ui.file.FilesType
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.models.VChat
-import com.ismartcoding.plain.ui.views.BreadcrumbItem
 import com.ismartcoding.plain.web.HttpServerEvents
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.EventType
@@ -125,7 +124,7 @@ fun ChatPage(
     val refreshState =
         rememberRefreshLayoutState {
             viewModel.fetch(context)
-            setRefreshState(RefreshContentState.Stop)
+            setRefreshState(RefreshContentState.Finished)
         }
     val scrollState = rememberLazyListState()
     val focusManager = LocalFocusManager.current
@@ -248,6 +247,7 @@ fun ChatPage(
     DisposableEffect(Unit) {
         onDispose {
             events.forEach { it.cancel() }
+            events.clear()
         }
     }
 
@@ -302,8 +302,8 @@ fun ChatPage(
                                                 },
                                                 onDoubleClick = {
                                                     if (m.value is DMessageText) {
-                                                        sharedViewModel.chatContent.value = (m.value as DMessageText).text
-                                                        navController.navigate(RouteName.CHAT_TEXT)
+                                                        val content = (m.value as DMessageText).text
+                                                        navController.navigateChatText(content)
                                                     }
                                                 },
                                             ),
@@ -322,8 +322,7 @@ fun ChatPage(
                                                 DMessageType.TEXT.value -> {
                                                     ChatText(context, focusManager, m, onDoubleClick = {
                                                         val content = (m.value as DMessageText).text
-                                                        sharedViewModel.chatContent.value = content
-                                                        navController.navigate(RouteName.CHAT_TEXT)
+                                                        navController.navigateChatText(content)
                                                     }, onLongClick = {
                                                         selectedItem = m
                                                         showContextMenu.value = true
@@ -362,8 +361,8 @@ fun ChatPage(
                                                     text = { Text(stringResource(id = R.string.edit_text)) },
                                                     onClick = {
                                                         showContextMenu.value = false
-                                                        sharedViewModel.chatContent.value = (m.value as DMessageText).text
-                                                        navController.navigate("${RouteName.CHAT_EDIT_TEXT.name}/${m.id}")
+                                                        val content = (m.value as DMessageText).text
+                                                        navController.navigateChatEditText(m.id, content)
                                                     },
                                                 )
                                             }

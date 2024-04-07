@@ -60,7 +60,6 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
                     sendEvent(StartHttpServerEvent())
                 } else {
                     DialogHelper.showConfirmDialog(
-                        context,
                         LocaleHelper.getString(R.string.confirm),
                         LocaleHelper.getString(R.string.foreground_service_notification_prompt)
                     ) {

@@ -4,7 +4,12 @@ package com.ismartcoding.plain.ui.page.apps
 import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
@@ -37,19 +42,29 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.ismartcoding.lib.apk.ApkParsers
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.lib.helpers.ShareHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.pkg.DPackageDetail
 import com.ismartcoding.plain.features.pkg.PackageHelper
+import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.packageManager
-import com.ismartcoding.plain.ui.base.*
-import com.ismartcoding.plain.ui.extensions.navigate
+import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.GroupButton
+import com.ismartcoding.plain.ui.base.HorizontalSpace
+import com.ismartcoding.plain.ui.base.NoDataColumn
+import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.base.PIconTextActionButton
+import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.Subtitle
+import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.base.rememberLifecycleEvent
+import com.ismartcoding.plain.ui.extensions.navigateText
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.SharedViewModel
-import com.ismartcoding.plain.ui.page.RouteName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -58,13 +73,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun AppPage(
     navController: NavHostController,
-    sharedViewModel: SharedViewModel,
+    id: String,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var item by remember { mutableStateOf<DPackageDetail?>(null) }
     var groupButtons by remember { mutableStateOf(listOf<GroupButton>()) }
-    val id = navController.currentBackStackEntry?.arguments?.getString("id") ?: ""
     val lifecycleEvent = rememberLifecycleEvent()
     LaunchedEffect(lifecycleEvent) {
         if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
@@ -114,10 +128,9 @@ fun AppPage(
                     try {
                         coMain {
                             DialogHelper.showLoading()
-                            sharedViewModel.textTitle.value = "Manifest"
-                            sharedViewModel.textContent.value = withIO { ApkParsers.getManifestXml(item?.path ?: "") }
+                            val content = withIO { ApkParsers.getManifestXml(item?.path ?: "") }
                             DialogHelper.hideLoading()
-                            navController.navigate(RouteName.TEXT)
+                            navController.navigateText("Manifest", content)
                         }
                     } catch (ex: Exception) {
                         DialogHelper.showMessage(ex)
@@ -169,7 +182,7 @@ fun AppPage(
                                     textAlign = TextAlign.Center,
                                     modifier = Modifier
                                         .padding(horizontal = 32.dp),
-                                    style = MaterialTheme.typography.titleLarge,
+                                    style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.onSurface,
                                 )
                             }
@@ -238,9 +251,6 @@ fun AppPage(
                 }
                 item {
                     VerticalSpace(dp = 16.dp)
-                    Subtitle(
-                        text = stringResource(R.string.more_info),
-                    )
                     PCard {
                         PListItem(
                             title = stringResource(R.string.app_size),
@@ -248,15 +258,15 @@ fun AppPage(
                         )
                         PListItem(
                             title = "SDK",
-                            desc = LocaleHelper.getStringF(R.string.sdk, "target", item?.appInfo?.targetSdkVersion ?: "", "min", item?.appInfo?.minSdkVersion ?: ""),
+                            value = LocaleHelper.getStringF(R.string.sdk, "target", item?.appInfo?.targetSdkVersion ?: "", "min", item?.appInfo?.minSdkVersion ?: ""),
                         )
                         PListItem(
                             title = stringResource(R.string.installed_at),
-                            desc = item?.installedAt?.formatDateTime(),
+                            value = item?.installedAt?.formatDateTime(),
                         )
                         PListItem(
                             title = stringResource(R.string.updated_at),
-                            desc = item?.updatedAt?.formatDateTime(),
+                            value = item?.updatedAt?.formatDateTime(),
                         )
                     }
                 }

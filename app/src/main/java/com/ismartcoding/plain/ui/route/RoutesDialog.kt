@@ -41,7 +41,7 @@ class RoutesDialog : BaseDialog<DialogRoutesBinding>() {
             onBind {
                 val binding = getBinding<ViewListItemBinding>()
                 val m = getModel<Route>()
-                binding.bindRoute(requireContext(), lifecycleScope, m)
+                binding.bindRoute(lifecycleScope, m)
                 binding.enableSwipeMenu(true)
                 binding.setRightSwipeButton(getString(R.string.delete)) {
                     DialogHelper.confirmToAction(requireContext(), R.string.confirm_to_delete) {
@@ -50,7 +50,7 @@ class RoutesDialog : BaseDialog<DialogRoutesBinding>() {
                             val r = withIO { BoxApi.mixMutateAsync(DeleteConfigMutation(m.id)) }
                             DialogHelper.hideLoading()
                             if (!r.isSuccess()) {
-                                DialogHelper.showErrorDialog(requireContext(), r.getErrorMessage())
+                                DialogHelper.showErrorDialog(r.getErrorMessage())
                                 return@launch
                             }
 

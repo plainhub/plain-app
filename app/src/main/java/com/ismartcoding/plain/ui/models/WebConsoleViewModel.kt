@@ -41,7 +41,7 @@ class WebConsoleViewModel : ViewModel() {
                     .create()
                     .show()
             } else {
-                DialogHelper.showConfirmDialog(context, context.getString(R.string.confirm), context.getString(R.string.http_server_ok))
+                DialogHelper.showConfirmDialog(context.getString(R.string.confirm), context.getString(R.string.http_server_ok))
             }
         }
     }
