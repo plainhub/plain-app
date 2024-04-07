@@ -156,6 +156,8 @@ object HttpServerManager {
         }
 
         return embeddedServer(Netty, environment, configure = {
+            runningLimit = 1000
+            tcpKeepAlive = true
             connector {
                 port = httpPort
             }

@@ -9,6 +9,7 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import com.ismartcoding.lib.extensions.notificationManager
+import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
@@ -17,7 +18,7 @@ import com.ismartcoding.plain.receivers.ServiceStopBroadcastReceiver
 import com.ismartcoding.plain.ui.MainActivity
 
 object NotificationHelper {
-    fun createContentIntent(context: Context): PendingIntent {
+    private fun createContentIntent(context: Context): PendingIntent {
         val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
         return if (launchIntent != null) {
             launchIntent.flags =
@@ -82,6 +83,10 @@ object NotificationHelper {
             setSilent(true)
             setWhen(System.currentTimeMillis())
             setAutoCancel(false)
+            if (isSPlus()) {
+                // https://issuetracker.google.com/issues/229000935
+                foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE
+            }
             setContentIntent(createContentIntent(context))
             addAction(-1, getString(R.string.stop_service), stopPendingIntent)
             setStyle(NotificationCompat.DecoratedCustomViewStyle())

@@ -1,16 +1,13 @@
 package com.ismartcoding.plain.ui.base.markdowntext
 
-import android.app.ActionBar.LayoutParams
 import android.text.method.LinkMovementMethod
 import android.widget.TextView
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.ismartcoding.plain.ui.extensions.markdown

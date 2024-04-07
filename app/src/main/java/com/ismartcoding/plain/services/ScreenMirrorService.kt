@@ -48,6 +48,7 @@ class ScreenMirrorService : LifecycleService() {
     private var mVirtualDisplay: VirtualDisplay? = null
     private var handler: Handler? = null
 
+    @SuppressLint("InlinedApi")
     override fun onCreate() {
         super.onCreate()
         instance = this
