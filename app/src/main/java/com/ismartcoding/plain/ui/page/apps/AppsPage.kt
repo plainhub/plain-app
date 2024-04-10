@@ -3,11 +3,17 @@ package com.ismartcoding.plain.ui.page.apps
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -22,6 +28,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.NoDataColumn
+import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -44,6 +51,7 @@ fun AppsPage(
 ) {
     val itemsState by viewModel.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
+    val filtersScrollState = rememberScrollState()
 
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
@@ -68,6 +76,45 @@ fun AppsPage(
             }
         }
     ) {
+        if (!viewModel.showLoading.value) {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .horizontalScroll(filtersScrollState),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                PFilterChip(
+                    selected = viewModel.appType.value.isEmpty(),
+                    onClick = {
+                        viewModel.appType.value = ""
+                        scope.launch(Dispatchers.IO) {
+                            viewModel.loadAsync()
+                        }
+                    },
+                    label = { Text(stringResource(id = R.string.all) + " (${viewModel.total.value})") }
+                )
+                PFilterChip(
+                    selected = viewModel.appType.value == "system",
+                    onClick = {
+                        viewModel.appType.value = "system"
+                        scope.launch(Dispatchers.IO) {
+                            viewModel.loadAsync()
+                        }
+                    },
+                    label = { Text(stringResource(id = R.string.app_type_system) + " (${viewModel.totalSystem.value})") }
+                )
+                PFilterChip(
+                    selected = viewModel.appType.value == "user",
+                    onClick = {
+                        viewModel.appType.value = "user"
+                        scope.launch(Dispatchers.IO) {
+                            viewModel.loadAsync()
+                        }
+                    },
+                    label = { Text(stringResource(id = R.string.app_type_user) + " (${viewModel.total.value - viewModel.totalSystem.value})") }
+                )
+            }
+        }
         PullToRefresh(
             refreshLayoutState = topRefreshLayoutState,
         ) {
