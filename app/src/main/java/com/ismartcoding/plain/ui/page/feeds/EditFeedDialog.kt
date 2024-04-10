@@ -77,17 +77,6 @@ fun EditFeedDialog(viewModel: FeedsViewModel) {
                             )
                         }
                     }
-                    VerticalSpace(dp = 8.dp)
-                    PDialogListItem(
-                        title = stringResource(id = R.string.auto_fetch_full_content),
-                    ) {
-                        PSwitch(
-                            activated = viewModel.editFetchContent.value,
-                        ) {
-                            viewModel.editFetchContent.value = it
-                        }
-                    }
-                    PDialogTips(text = stringResource(id = R.string.auto_fetch_full_content_tips))
                 }
             },
             confirmButton = {

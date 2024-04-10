@@ -105,7 +105,6 @@ dependencies {
     api(libs.coil.svg)
     api(libs.coil.gif)
     api(libs.coil.video)
-    api(libs.transformations)
 
     api(libs.readability4j)
     api(libs.jsoup)

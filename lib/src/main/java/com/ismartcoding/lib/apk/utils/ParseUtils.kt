@@ -168,9 +168,14 @@ object ParseUtils {
                 }
             }
 
-            ResValue.ResType.REFERENCE -> ResourceValue.reference(
-                buffer.int
-            )
+            ResValue.ResType.REFERENCE ->
+                try {
+                    ResourceValue.reference(
+                        buffer.int
+                    )
+                } catch (ex: Exception) {
+                    null
+                }
 
             ResValue.ResType.INT_BOOLEAN -> ResourceValue.bool(
                 buffer.int

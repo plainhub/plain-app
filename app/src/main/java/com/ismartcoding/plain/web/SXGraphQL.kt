@@ -984,7 +984,6 @@ class SXGraphQL(val schema: Schema) {
                                 this.fetchContent = fetchContent
                             }
                         FeedFetchWorker.oneTimeRequest(id)
-                        sendEvent(ActionEvent(ActionSourceType.FEED, ActionType.CREATED, setOf(id)))
                         FeedHelper.getById(id)
                     }
                 }

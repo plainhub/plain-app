@@ -27,7 +27,6 @@ gsonVersion="2.10.1"
 guavaVersion="33.0.0-android"
 jsoupVersion="1.15.3"
 kgraphql = "0.19.0"
-kotlin = "1.9.22"
 kotlinGradlePluginVersion="1.9.22"
 kotlinxDatetimeVersion="0.4.0"
 kotlinxSerializationJsonVersion="1.6.3"
@@ -54,7 +53,6 @@ readability4jVersion="1.0.8"
 room = "2.6.1"
 snakeYamlVersion = "v1.18-android"
 subsamplingScaleImageViewAndroidxVersion="3.10.0"
-transformationsVersion="2.0.2"
 transitionVersion="1.4.1"
 viewpager2Version = "1.0.0"
 workRuntimeKtxVersion = "2.9.0"
@@ -160,7 +158,6 @@ room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 snake-yaml = { module = "com.github.bmoliveira:snake-yaml", version.ref = "snakeYamlVersion" }
 subsampling-scale-image-view-androidx = { module = "com.davemorrissey.labs:subsampling-scale-image-view-androidx", version.ref = "subsamplingScaleImageViewAndroidxVersion" }
-transformations = { module = "com.github.Commit451.coil-transformations:transformations", version.ref = "transformationsVersion" }
 zt-zip = { module = "org.zeroturnaround:zt-zip", version.ref = "ztZipVersion" }
 [plugins]
 

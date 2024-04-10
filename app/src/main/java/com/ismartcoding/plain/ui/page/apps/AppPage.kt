@@ -64,7 +64,6 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.rememberLifecycleEvent
 import com.ismartcoding.plain.ui.extensions.navigateText
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.models.SharedViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -125,15 +124,17 @@ fun AppPage(
             )
             buttons.add(
                 GroupButton(Icons.Outlined.Outbox, "Manifest") {
-                    try {
-                        coMain {
+                    coMain {
+                        try {
                             DialogHelper.showLoading()
                             val content = withIO { ApkParsers.getManifestXml(item?.path ?: "") }
                             DialogHelper.hideLoading()
                             navController.navigateText("Manifest", content)
+                        } catch (ex: Exception) {
+                            ex.printStackTrace()
+                            DialogHelper.hideLoading()
+                            DialogHelper.showErrorDialog(ex.toString())
                         }
-                    } catch (ex: Exception) {
-                        DialogHelper.showMessage(ex)
                     }
                 }
             )

@@ -16,21 +16,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.ButtonType
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PBlockButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.TopSpace
-import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.LogsViewModel
-import com.ismartcoding.plain.ui.theme.PlainTheme
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,25 +52,25 @@ fun LogsPage(
                     PCard {
                         PListItem(
                             title = stringResource(R.string.file_size),
-                            value = FormatHelper.formatBytes(fileSize),
+                            desc = FormatHelper.formatBytes(fileSize),
+                            action = {
+                                if (fileSize > 0L) {
+                                    PMiniOutlineButton(
+                                        text = stringResource(R.string.clear_logs),
+                                        onClick = {
+                                            DialogHelper.confirmToAction(context, R.string.confirm_to_clear_logs) {
+                                                val dir = File(DiskLogFormatStrategy.getLogFolder(context))
+                                                if (dir.exists()) {
+                                                    dir.deleteRecursively()
+                                                }
+                                                fileSize = 0
+                                            }
+                                        },
+                                    )
+                                }
+                            }
                         )
-                        if (fileSize > 0L) {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            PBlockButton(
-                                text = stringResource(R.string.clear_logs),
-                                type = ButtonType.DANGER,
-                                onClick = {
-                                    DialogHelper.confirmToAction(context, R.string.confirm_to_clear_logs) {
-                                        val dir = File(DiskLogFormatStrategy.getLogFolder(context))
-                                        if (dir.exists()) {
-                                            dir.deleteRecursively()
-                                        }
-                                        fileSize = 0
-                                    }
-                                },
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                        }
+
                     }
                 }
                 item {

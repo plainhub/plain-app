@@ -15,11 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DFeed
-import com.ismartcoding.plain.db.DFeedEntry
+import com.ismartcoding.plain.extensions.getText
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FeedsViewModel
@@ -76,6 +78,11 @@ fun FeedListItem(
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                     )
+                        VerticalSpace(dp = 8.dp)
+                        Text(
+                            text = stringResource(id = R.string.auto_fetch_full_content) + ": " + m.fetchContent.getText(),
+                            style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                        )
                 }
             }
         }

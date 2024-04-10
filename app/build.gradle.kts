@@ -165,7 +165,7 @@ dependencies {
     // https://developer.android.com/jetpack/androidx/releases/navigation
     implementation(libs.androidx.navigation.compose)
 
-    releaseImplementation(libs.firebase.bom)
+    releaseImplementation(platform(libs.firebase.bom))
     releaseImplementation(libs.firebase.crashlytics.ktx)
 
     // Media3

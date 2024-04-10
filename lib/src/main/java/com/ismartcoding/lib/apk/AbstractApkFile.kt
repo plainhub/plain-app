@@ -180,7 +180,7 @@ abstract class AbstractApkFile : Closeable {
         parseResourceTable()
         val xmlTranslator = XmlTranslator()
         val apkTranslator = resourceTable?.let { ApkMetaTranslator(it, preferredLocale) }
-        val xmlStreamer: XmlStreamer? = apkTranslator?.let {
+        val xmlStreamer = apkTranslator?.let {
             CompositeXmlStreamer(
                 xmlTranslator,
                 it

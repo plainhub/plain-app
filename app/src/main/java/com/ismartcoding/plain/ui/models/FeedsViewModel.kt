@@ -66,8 +66,7 @@ class FeedsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
                 this.fetchContent = editFetchContent.value
             }
             FeedFetchWorker.oneTimeRequest(id)
-            sendEvent(ActionEvent(ActionSourceType.FEED, ActionType.CREATED, setOf(id)))
-            loadAsync()
+            loadAsync(withCount = true)
             showAddDialog.value = false
         }
     }
@@ -94,6 +93,14 @@ class FeedsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
         }
     }
 
+    fun updateFetchContent(id: String, value: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            FeedHelper.updateAsync(id) {
+                this.fetchContent = value
+            }
+        }
+    }
+
     fun edit() {
         editUrlError.value = ""
         if (!ValidateHelper.isUrl(editUrl.value)) {
@@ -111,7 +118,7 @@ class FeedsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
                 this.url = editUrl.value
                 this.fetchContent = editFetchContent.value
             }
-            loadAsync()
+            loadAsync(withCount = true)
             showEditDialog.value = false
         }
     }

@@ -12,20 +12,12 @@ import java.util.Locale
 class Type(@JvmField val header: TypeHeader) {
     var name: String? = null
     var id: Short = header.id.toShort()
-    var locale: Locale
+    var locale = Locale(header.config.language, header.config.country)
     var keyStringPool: StringPool? = null
     lateinit var buffer: ByteBuffer
     lateinit var offsets: LongArray
     var stringPool: StringPool? = null
-
-    // see Densities.java for values
-    val density: Int
-
-    init {
-        val config = header.config
-        locale = Locale(config.language, config.country)
-        density = config.density.toInt()
-    }
+    val density: Int = header.config.density.toInt()
 
     fun getResourceEntry(id: Int): ResourceEntry? {
         if (id >= offsets.size) {
@@ -36,18 +28,18 @@ class Type(@JvmField val header: TypeHeader) {
         }
 
         // read Resource Entries
-        buffer.let { position(it, offsets[id]) }
+        position(buffer, offsets[id])
         return readResourceEntry()
     }
 
-    private fun readResourceEntry(): ResourceEntry {
+    private fun readResourceEntry(): ResourceEntry? {
         val beginPos = buffer.position().toLong()
         // size is always 8(simple), or 16(complex)
         // size is always 8(simple), or 16(complex)
         val resourceEntrySize = readUShort(buffer)
         val resourceEntryFlags = readUShort(buffer)
         val keyRef = buffer.int.toLong()
-        val resourceEntryKey = keyStringPool?.get(keyRef.toInt())!!
+        val resourceEntryKey = keyStringPool?.get(keyRef.toInt()) ?: return null
         return if (resourceEntryFlags and ResourceEntry.FLAG_COMPLEX != 0) {
             // Resource identifier of the parent mapping, or 0 if there is none.
             val parent = readUInt(buffer)
