@@ -138,7 +138,6 @@ fun FeedEntriesPage(
                     topRefreshLayoutState.setRefreshState(RefreshContentState.Finished)
                 } else if (event.status == FeedWorkerStatus.ERROR) {
                     topRefreshLayoutState.setRefreshState(RefreshContentState.Failed)
-                    val feedId = viewModel.feedId.value
                     if (feedId.isNotEmpty()) {
                         when (FeedFetchWorker.statusMap[feedId]) {
                             FeedWorkerStatus.ERROR -> {
@@ -292,7 +291,7 @@ fun FeedEntriesPage(
             }
         },
     ) {
-        if (!viewModel.selectMode.value && tagsState.isNotEmpty()) {
+        if (!viewModel.selectMode.value) {
             Row(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
@@ -309,6 +308,17 @@ fun FeedEntriesPage(
                         }
                     },
                     label = { Text(stringResource(id = R.string.all) + " (${viewModel.total.value})") }
+                )
+                PFilterChip(
+                    selected = viewModel.filterType == FeedEntryFilterType.TODAY && viewModel.tag.value == null,
+                    onClick = {
+                        viewModel.filterType = FeedEntryFilterType.TODAY
+                        viewModel.tag.value = null
+                        scope.launch(Dispatchers.IO) {
+                            viewModel.loadAsync(tagsViewModel)
+                        }
+                    },
+                    label = { Text(stringResource(id = R.string.today) + " (${viewModel.totalToday.value})") }
                 )
                 tagsState.forEach { tag ->
                     PFilterChip(

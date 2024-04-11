@@ -106,7 +106,6 @@ dependencies {
     api(libs.coil.gif)
     api(libs.coil.video)
 
-    api(libs.readability4j)
     api(libs.jsoup)
 
     api(libs.refresh.layout.kernel)

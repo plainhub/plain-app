@@ -32,6 +32,7 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) : ISe
     var noMore = mutableStateOf(false)
     var filterType by savedStateHandle.saveable { mutableStateOf(FeedEntryFilterType.DEFAULT) }
     var total = mutableIntStateOf(0)
+    var totalToday = mutableIntStateOf(0)
     var tag = mutableStateOf<DTag?>(null)
     var feedId = mutableStateOf<String>("")
     val dataType = DataType.FEED_ENTRY
@@ -61,6 +62,7 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) : ISe
         _itemsFlow.value = FeedEntryHelper.search(query, limit.value, offset.value).toMutableStateList()
         tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
         total.value = FeedEntryHelper.count(getTotalAllQuery())
+        totalToday.value = FeedEntryHelper.count(getTotalTodayQuery())
         noMore.value = _itemsFlow.value.size < limit.value
         showLoading.value = false
     }
@@ -77,6 +79,7 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) : ISe
             )
             FeedEntryHelper.deleteAsync(ids)
             total.value = FeedEntryHelper.count(getTotalAllQuery())
+            totalToday.value = FeedEntryHelper.count(getTotalTodayQuery())
             _itemsFlow.update {
                 val mutableList = it.toMutableStateList()
                 mutableList.removeIf { m -> ids.contains(m.id) }
@@ -94,10 +97,21 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) : ISe
         return query
     }
 
+    private fun getTotalTodayQuery(): String {
+        var query = "today:true"
+        if (feedId.value.isNotEmpty()) {
+            query += " feed_id:${feedId.value}"
+        }
+
+        return query
+    }
+
     private fun getQuery(): String {
         var query = "$queryText"
         if (filterType == FeedEntryFilterType.UNREAD) {
             query += " unread:true"
+        } else if (filterType == FeedEntryFilterType.TODAY) {
+            query += " today:true"
         }
         if (tag.value != null) {
             val tagId = tag.value!!.id

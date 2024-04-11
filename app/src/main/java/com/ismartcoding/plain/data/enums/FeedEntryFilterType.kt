@@ -4,4 +4,5 @@ enum class FeedEntryFilterType {
     DEFAULT,
     TRASH,
     UNREAD,
+    TODAY,
 }

@@ -94,7 +94,7 @@ fun FeedEntryListItem(
                         )
                         VerticalSpace(dp = 8.dp)
                         Text(
-                            text = m.description,
+                            text = m.getSummary(),
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurface),

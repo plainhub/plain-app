@@ -49,7 +49,6 @@ pdfiumAndroidVersion="1.9.0"
 preferenceKtxVersion = "1.2.1"
 pagingRuntimeKtxVersion = "3.2.1"
 refreshLayoutKernelVersion="2.0.5"
-readability4jVersion="1.0.8"
 room = "2.6.1"
 snakeYamlVersion = "v1.18-android"
 subsamplingScaleImageViewAndroidxVersion="3.10.0"
@@ -153,7 +152,6 @@ openai-client = { module = "com.aallam.openai:openai-client", version.ref = "ope
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroidVersion" }
 pdfium-android = { module = "com.github.barteksc:pdfium-android", version.ref = "pdfiumAndroidVersion" }
 refresh-layout-kernel = { module = "io.github.scwang90:refresh-layout-kernel", version.ref = "refreshLayoutKernelVersion" }
-readability4j = { module = "net.dankito.readability4j:readability4j", version.ref = "readability4jVersion" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 snake-yaml = { module = "com.github.bmoliveira:snake-yaml", version.ref = "snakeYamlVersion" }

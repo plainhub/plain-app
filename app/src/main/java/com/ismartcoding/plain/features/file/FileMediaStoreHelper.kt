@@ -172,6 +172,6 @@ object FileMediaStoreHelper : BaseContentHelper() {
             }
         }
 
-        return items
+        return items.sortedByDescending { it.updatedAt }
     }
 }

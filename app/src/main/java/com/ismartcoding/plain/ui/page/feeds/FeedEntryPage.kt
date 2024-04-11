@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.page.feeds
 
 
 import android.annotation.SuppressLint
+import android.content.ClipData
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,10 +17,13 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
+import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.OpenInBrowser
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -27,8 +31,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -43,13 +49,18 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.ShareHelper
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.enums.DataType
 import com.ismartcoding.plain.extensions.timeAgo
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.features.feed.fetchContentAsync
+import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PClickableText
+import com.ismartcoding.plain.ui.base.PDropdownMenu
+import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -87,6 +98,7 @@ fun FeedEntryPage(
     val tagsState by tagsViewModel.itemsFlow.collectAsState()
     val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
     val tagIds = tagsMapState[id]?.map { it.tagId } ?: emptyList()
+    var isMenuOpen by remember { mutableStateOf(false) }
 
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
@@ -142,14 +154,6 @@ fun FeedEntryPage(
                 viewModel.showSelectTagsDialog.value = true
             }
             PIconButton(
-                icon = Icons.Outlined.OpenInBrowser,
-                contentDescription = stringResource(R.string.open_in_web),
-                tint = MaterialTheme.colorScheme.onSurface,
-            ) {
-                val m = viewModel.item.value ?: return@PIconButton
-                WebHelper.open(context, m.url)
-            }
-            PIconButton(
                 icon = Icons.Outlined.Share,
                 contentDescription = stringResource(R.string.share),
                 tint = MaterialTheme.colorScheme.onSurface,
@@ -157,6 +161,36 @@ fun FeedEntryPage(
                 val m = viewModel.item.value ?: return@PIconButton
                 ShareHelper.shareText(context, m.title.let { it + "\n" } + m.url)
             }
+            ActionButtonMore {
+                isMenuOpen = !isMenuOpen
+            }
+            PDropdownMenu(
+                expanded = isMenuOpen,
+                onDismissRequest = { isMenuOpen = false },
+                content = {
+                    PDropdownMenuItem(text = { Text(stringResource(R.string.open_in_web)) }, leadingIcon = {
+                        Icon(
+                            Icons.Outlined.OpenInBrowser,
+                            contentDescription = stringResource(id = R.string.open_in_web)
+                        )
+                    }, onClick = {
+                        isMenuOpen = false
+                        val m = viewModel.item.value ?: return@PDropdownMenuItem
+                        WebHelper.open(context, m.url)
+                    })
+                    PDropdownMenuItem(text = { Text(stringResource(R.string.copy_link)) }, leadingIcon = {
+                        Icon(
+                            Icons.Outlined.Link,
+                            contentDescription = stringResource(id = R.string.copy_link)
+                        )
+                    }, onClick = {
+                        isMenuOpen = false
+                        val m = viewModel.item.value ?: return@PDropdownMenuItem
+                        val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), m.url)
+                        clipboardManager.setPrimaryClip(clip)
+                        DialogHelper.showConfirmDialog("", context.getString(R.string.copied_to_clipboard_format, m.url))
+                    })
+                })
         },
         bottomBar = {
         },

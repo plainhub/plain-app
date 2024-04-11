@@ -33,35 +33,6 @@ object SoftInput {
 }
 
 /**
- * 软键盘弹出后要求指定视图[float]悬浮在软键盘之上
- * 本方法重复调用会互相覆盖, 例如Fragment调用会覆盖其Activity的调用
- *
- *
- * @param float 需要悬浮在软键盘之上的视图
- * @param transition 当软键盘显示隐藏时需要移动的视图, 使用[View.setTranslationY]移动
- * @param editText 指定的视图存在焦点才触发软键盘监听, null则全部视图都触发
- * @param margin 悬浮视图和软键盘间距
- * @param setPadding 使用[View.setPadding]来移动[transition]视图, 让可滚动视图自动收缩, 而不是向上偏移[View.setTranslationY]
- * @param onChanged 监听软键盘是否显示
- *
- * @see getSoftInputHeight 软键盘高度
- */
-@JvmOverloads
-fun Activity.setWindowSoftInput(
-    float: View? = null,
-    transition: View? = float?.parent as? View,
-    editText: View? = null,
-    margin: Int = 0,
-    setPadding: Boolean = false,
-    onChanged: (() -> Unit)? = null,
-) {
-    if (this is ComponentActivity) {
-        lifecycle.addObserver(SoftInput.hideSoftInputObserver)
-    }
-    window.setWindowSoftInput(float, transition, editText, margin, setPadding, onChanged)
-}
-
-/**
  * 如果Fragment不是立即创建, 请为Fragment所在的Activity配置[[WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING]]
  *
  * 软键盘弹出后要求指定视图[float]悬浮在软键盘之上

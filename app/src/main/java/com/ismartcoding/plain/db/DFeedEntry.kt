@@ -38,6 +38,11 @@ data class DFeedEntry(
 //
 //    @ColumnInfo(name = "deleted_at")
 //    var deletedAt: Instant? = null
+
+    fun getSummary(): String {
+        val regex = Regex("!\\[.*?\\]\\(.*?\\)|!\\[.*?\\]\\[.*?\\]")
+        return description.replace(regex, "").replaceFirst("^\\s*".toRegex(), "")
+    }
 }
 
 @Dao

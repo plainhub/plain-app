@@ -3,10 +3,14 @@ package com.ismartcoding.plain.features.feed
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.helpers.SearchHelper
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.FeedEntryDao
 import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.toLocalDateTime
 
 object FeedEntryHelper {
     val feedEntryDao: FeedEntryDao by lazy {
@@ -89,6 +93,13 @@ object FeedEntryHelper {
                 where.addLikes(listOf("description", "content"), listOf(it.value, it.value))
             } else if (it.name == "feed_id") {
                 where.add("feed_id=?", it.value)
+            } else if (it.name == "today" && it.value == "true") {
+                val currentDateTime = Clock.System.now()
+                val timeZone = TimeZone.currentSystemDefault()
+                val startOfDay = currentDateTime.toLocalDateTime(timeZone)
+                    .date
+                    .atStartOfDayIn(timeZone)
+                where.add("published_at>=?", startOfDay.toString())
             } else if (it.name == "ids") {
                 val ids = it.value.split(",")
                 if (ids.isNotEmpty()) {

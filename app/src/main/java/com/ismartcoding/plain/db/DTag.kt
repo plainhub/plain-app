@@ -11,10 +11,10 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class DTag(
     @PrimaryKey override var id: String = StringHelper.shortUUID(),
+    var name: String = "",
+    var type: Int = 0,
+    var count: Int = 0,
 ) : IData, Parcelable, DEntityBase() {
-    var name: String = ""
-    var type: Int = 0
-    var count: Int = 0
 }
 
 @Dao

@@ -2,6 +2,7 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Your VPN is currently enabled on your device, which could potentially lead to web connection issues when accessed from PC. To resolve this, we recommend adjusting your VPN settings to allow LAN traffic or disabling your VPN.</string>
     <string name="warning">Warning</string>
+    <string name="today">Today</string>
     <string name="open_in_web">Open in web browser</string>
     <string name="require_password">Require password</string>
     <string name="two_factor_auth_tips">When logging in on the webpage, we\'ll display a confirmation popup in the app for added security.</string>

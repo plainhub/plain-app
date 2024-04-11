@@ -63,36 +63,7 @@
         <attr name="rNewLayer" />
     </declare-styleable>
 
-    <declare-styleable name="RoundFrameLayout">
-        <attr name="rRadius" />
-        <attr name="rLeftRadius" />
-        <attr name="rRightRadius" />
-        <attr name="rTopRadius" />
-        <attr name="rBottomRadius" />
-        <attr name="rTopLeftRadius" />
-        <attr name="rTopRightRadius" />
-        <attr name="rBottomLeftRadius" />
-        <attr name="rBottomRightRadius" />
-        <attr name="rStrokeWidth" />
-        <attr name="rStrokeColor" />
-        <attr name="rNewLayer" />
-    </declare-styleable>
-
     <declare-styleable name="RoundImageView">
-        <attr name="rRadius" />
-        <attr name="rLeftRadius" />
-        <attr name="rRightRadius" />
-        <attr name="rTopRadius" />
-        <attr name="rBottomRadius" />
-        <attr name="rTopLeftRadius" />
-        <attr name="rTopRightRadius" />
-        <attr name="rBottomLeftRadius" />
-        <attr name="rBottomRightRadius" />
-        <attr name="rStrokeWidth" />
-        <attr name="rStrokeColor" />
-    </declare-styleable>
-
-    <declare-styleable name="RoundTextView">
         <attr name="rRadius" />
         <attr name="rLeftRadius" />
         <attr name="rRightRadius" />
@@ -116,25 +87,6 @@
         <attr name="rTopRightRadius" />
         <attr name="rBottomLeftRadius" />
         <attr name="rBottomRightRadius" />
-        <attr name="rStrokeWidth" />
-        <attr name="rStrokeColor" />
-    </declare-styleable>
-
-    <declare-styleable name="RoundButton">
-        <attr name="rRadius" />
-        <attr name="rLeftRadius" />
-        <attr name="rRightRadius" />
-        <attr name="rTopRadius" />
-        <attr name="rBottomRadius" />
-        <attr name="rTopLeftRadius" />
-        <attr name="rTopRightRadius" />
-        <attr name="rBottomLeftRadius" />
-        <attr name="rBottomRightRadius" />
-        <attr name="rStrokeWidth" />
-        <attr name="rStrokeColor" />
-    </declare-styleable>
-
-    <declare-styleable name="CircleImageView">
         <attr name="rStrokeWidth" />
         <attr name="rStrokeColor" />
     </declare-styleable>
