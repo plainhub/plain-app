@@ -20,10 +20,12 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.preference.AudioPlayingPreference
 import com.ismartcoding.plain.features.audio.AudioAction
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.audio.AudioServiceAction
+import com.ismartcoding.plain.features.audio.MediaPlayMode
 
 @OptIn(UnstableApi::class)
 class AudioPlayerService : MediaLibraryService() {
@@ -66,7 +68,11 @@ class AudioPlayerService : MediaLibraryService() {
                     AudioPlayer.pause()
                     return
                 }
-                AudioPlayer.skipToNext()
+                if (TempData.audioPlayMode == MediaPlayMode.REPEAT_ONE) {
+                    AudioPlayer.repeatCurrent()
+                } else {
+                    AudioPlayer.skipToNext()
+                }
             }
         }
 

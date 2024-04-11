@@ -207,6 +207,12 @@ object AudioPlayer {
         player?.play()
     }
 
+    fun repeatCurrent() {
+        playerProgress = 0
+        player?.seekTo(playerProgress)
+        player?.play()
+    }
+
     fun setChangedNotify(action: AudioAction) {
         sendEvent(AudioActionEvent(action))
     }
