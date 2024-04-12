@@ -50,7 +50,7 @@ import java.lang.ref.WeakReference
  * using [.load]. In this
  * particular case, a userPage of 5 can refer to a documentPage of 17.
  */
-class PDFView(context: Context, set: AttributeSet?) : RelativeLayout(context, set) {
+class PDFView(context: Context, set: AttributeSet? = null) : RelativeLayout(context, set) {
     var minZoom = DEFAULT_MIN_SCALE
     var midZoom = DEFAULT_MID_SCALE
     var maxZoom = DEFAULT_MAX_SCALE

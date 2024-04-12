@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.extensions
 
+import android.net.Uri
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.page.RouteName
 
@@ -26,4 +27,15 @@ fun NavHostController.navigateChatEditText(id: String, content: String) {
 fun NavHostController.navigateChatText(content: String) {
     currentBackStackEntry?.savedStateHandle?.set("content", content)
     navigate(RouteName.CHAT_TEXT)
+}
+
+fun NavHostController.navigatePdf(uri: Uri) {
+    currentBackStackEntry?.savedStateHandle?.set("uri", uri)
+    navigate(RouteName.PDF_VIEWER)
+}
+
+
+fun NavHostController.navigateOtherFile(path: String) {
+    currentBackStackEntry?.savedStateHandle?.set("path", path)
+    navigate(RouteName.OTHER_FILE)
 }

@@ -28,6 +28,7 @@ enum class RouteName {
     DOCS,
     NOTES,
     TAGS,
+    PDF_VIEWER,
     FEEDS,
     FEED_ENTRIES,
     FEED_SETTINGS,

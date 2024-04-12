@@ -23,8 +23,8 @@
     <string name="is_latest_version">Dit is de nieuwste versie van de app</string>
     <string name="change_log">Wijzigingslogboek</string>
     <string name="update">Bijwerken</string>
-    <string name="get_new_updates">Nieuwe updates ophalen</string>
-    <string name="get_new_updates_desc">Nieuwe versie %1$s is beschikbaar</string>
+    <string name="get_new_updates">Update gevonden voor %1$s!</string>
+    <string name="get_new_updates_desc">Upgrade nu, ervaar nieuwe functies!</string>
     <string name="skip_this_version">Deze versie overslaan</string>
     <string name="close">Sluiten</string>
     <string name="timeago_now">zojuist</string>

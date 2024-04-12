@@ -53,6 +53,7 @@ import com.ismartcoding.plain.features.AIChatCreatedEvent
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.CancelNotificationsEvent
 import com.ismartcoding.plain.features.ClearAudioPlaylistEvent
+import com.ismartcoding.plain.features.DeleteChatItemViewEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.QueryHelper
@@ -694,6 +695,7 @@ class SXGraphQL(val schema: Schema) {
                         val item = ChatHelper.getAsync(id.value)
                         if (item != null) {
                             ChatHelper.deleteAsync(MainApp.instance, item.id, item.content.value)
+                            sendEvent(DeleteChatItemViewEvent(item.id))
                         }
                         true
                     }

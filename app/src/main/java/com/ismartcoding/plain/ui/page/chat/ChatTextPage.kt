@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.page
+package com.ismartcoding.plain.ui.page.chat
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.linkify
 import com.ismartcoding.plain.ui.base.urlAt
@@ -29,6 +30,9 @@ fun ChatTextPage(
     val text = content.linkify()
     PScaffold(
         navController,
+        navigationIcon = {
+            NavigationCloseIcon { navController.popBackStack() }
+        },
         content = {
             Column(
                 modifier =

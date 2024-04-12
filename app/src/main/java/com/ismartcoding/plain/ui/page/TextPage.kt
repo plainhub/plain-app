@@ -33,6 +33,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.lib.extensions.getWindowWidth
+import com.ismartcoding.lib.extensions.px2dp
 import com.ismartcoding.lib.helpers.ShareHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -59,6 +61,14 @@ fun TextPage(
     }
 
     val lineNumberWidth = measureTextWidth(" ${lines.size + 1} ", MaterialTheme.typography.bodyLarge)
+    val maxLengthLine = lines.maxByOrNull { it.length } ?: ""
+    var maxLineWidth = context.px2dp(context.getWindowWidth().toFloat()).dp
+    if (maxLengthLine.isNotEmpty()) {
+        val newWidth = measureTextWidth(maxLengthLine, MaterialTheme.typography.bodyLarge)  + lineNumberWidth + 24.dp
+        if (newWidth > maxLineWidth) {
+            maxLineWidth = newWidth
+        }
+    }
 
     PScaffold(
         navController,
@@ -81,9 +91,16 @@ fun TextPage(
         },
         content = {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                modifier = if (wrapContent) {
+                    Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                } else {
+                    Modifier
+                        .fillMaxSize()
+                        .horizontalScroll(rememberScrollState())
+                        .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                }
             ) {
                 VerticalDivider(
                     Modifier
@@ -92,8 +109,14 @@ fun TextPage(
                         .fillMaxHeight()
                 )
                 LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier = if (wrapContent) {
+                        Modifier
+                            .fillMaxSize()
+                    } else {
+                        Modifier
+                            .fillMaxSize()
+                            .width(maxLineWidth)
+                    }
                 ) {
                     itemsIndexed(lines) { index, it ->
                         Row(
@@ -109,16 +132,9 @@ fun TextPage(
                                 textAlign = TextAlign.End,
                             )
                             SelectionContainer(
-                                modifier = if (wrapContent) {
-                                    Modifier
-                                        .weight(1f)
-                                        .padding(start = 8.dp, end = 16.dp)
-                                } else {
-                                    Modifier
-                                        .weight(1f)
-                                        .padding(start = 8.dp, end = 16.dp)
-                                        .horizontalScroll(rememberScrollState())
-                                }
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(start = 8.dp, end = 16.dp)
                             ) {
                                 Text(
                                     text = it,

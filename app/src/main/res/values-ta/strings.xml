@@ -23,8 +23,8 @@
     <string name="is_latest_version">இது பயன்பாட்டின் சமீபத்திய பதிப்பு</string>
     <string name="change_log">மாற்றத்தகவல்</string>
     <string name="update">புதுப்பிக்க</string>
-    <string name="get_new_updates">புதிய புதுப்பிப்புகளைப் பெறுக</string>
-    <string name="get_new_updates_desc">புதிய பதிப்பு %1$s கிடைக்கும்</string>
+    <string name="get_new_updates">%1$s க்கு புதுப்பிப்பு கிடைத்துள்ளது!</string>
+    <string name="get_new_updates_desc">இப்போது மேம்படுத்தவும், புதிய அம்சங்களை அனுபவிக்கவும்!</string>
     <string name="skip_this_version">இந்த பதிப்பை பாருங்கள்</string>
     <string name="close">மூடு</string>
     <string name="timeago_now">இப்போது</string>

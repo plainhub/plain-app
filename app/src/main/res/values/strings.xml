@@ -23,8 +23,8 @@
     <string name="is_latest_version">This is the latest version of the app</string>
     <string name="change_log">Changelog</string>
     <string name="update">Update</string>
-    <string name="get_new_updates">Get new updates</string>
-    <string name="get_new_updates_desc">New version %1$s is available</string>
+    <string name="get_new_updates">Found update for %1$s!</string>
+    <string name="get_new_updates_desc">Upgrade now, experience new features!</string>
     <string name="skip_this_version">Skip This Version</string>
     <string name="close">Close</string>
     <string name="timeago_now">just now</string>

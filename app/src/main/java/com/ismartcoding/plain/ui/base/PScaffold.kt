@@ -1,11 +1,12 @@
 package com.ismartcoding.plain.ui.base
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -17,10 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun PScaffold(
     navController: NavHostController,
@@ -30,6 +30,7 @@ fun PScaffold(
         NavigationBackIcon { navController.popBackStack() }
     },
     topBarTitle: String = "",
+    topBarOnDoubleClick: (() -> Unit)? = null,
     actions: (@Composable RowScope.() -> Unit)? = null,
     bottomBar: (@Composable () -> Unit)? = null,
     floatingActionButton: (@Composable () -> Unit)? = null,
@@ -45,10 +46,14 @@ fun PScaffold(
                     title = { Text(topBarTitle, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                     navigationIcon = { navigationIcon?.invoke() },
                     actions = { actions?.invoke(this) },
-                    modifier = Modifier.padding(horizontal = 8.dp),
+                    modifier = if (topBarOnDoubleClick != null) Modifier
+                        .combinedClickable(
+                            onDoubleClick = topBarOnDoubleClick,
+                            onClick = { },
+                        ) else Modifier,
                     colors =
                     TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent,
+                        containerColor = MaterialTheme.colorScheme.background,
                     ),
                     scrollBehavior = scrollBehavior,
                 )

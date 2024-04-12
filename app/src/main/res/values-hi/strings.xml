@@ -23,8 +23,8 @@
     <string name="is_latest_version">यह ऐप का नवीनतम संस्करण है</string>
     <string name="change_log">परिवर्तन लॉग</string>
     <string name="update">अपडेट</string>
-    <string name="get_new_updates">नए अपडेट प्राप्त करें</string>
-    <string name="get_new_updates_desc">नया संस्करण %1$s उपलब्ध है</string>
+    <string name="get_new_updates">पाया अपडेट %1$s के लिए!</string>
+    <string name="get_new_updates_desc">अब अपग्रेड करें, नए फ़ीचर्स का अनुभव करें!</string>
     <string name="skip_this_version">इस संस्करण को छोड़ें</string>
     <string name="close">बंद करें</string>
     <string name="timeago_now">अभी</string>

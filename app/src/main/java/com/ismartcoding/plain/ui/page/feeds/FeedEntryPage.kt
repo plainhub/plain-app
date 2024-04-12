@@ -15,9 +15,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
-import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.OpenInBrowser
 import androidx.compose.material.icons.outlined.Share
@@ -99,7 +99,8 @@ fun FeedEntryPage(
     val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
     val tagIds = tagsMapState[id]?.map { it.tagId } ?: emptyList()
     var isMenuOpen by remember { mutableStateOf(false) }
-
+    val scrollState = rememberLazyListState()
+    //val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
             scope.launch {
@@ -122,7 +123,6 @@ fun FeedEntryPage(
             }
         }
 
-
     LaunchedEffect(Unit) {
         tagsViewModel.dataType.value = DataType.FEED_ENTRY
         scope.launch(Dispatchers.IO) {
@@ -142,9 +142,16 @@ fun FeedEntryPage(
 
     PScaffold(
         navController,
+        topBarOnDoubleClick = {
+            scope.launch {
+                scrollState.scrollToItem(0)
+            }
+        },
         modifier = Modifier
             .fillMaxSize()
+            //.nestedScroll(scrollBehavior.nestedScrollConnection)
             .imePadding(),
+        // scrollBehavior = scrollBehavior,
         actions = {
             PIconButton(
                 icon = Icons.AutoMirrored.Outlined.Label,
@@ -192,8 +199,6 @@ fun FeedEntryPage(
                     })
                 })
         },
-        bottomBar = {
-        },
         content = {
             val m = viewModel.item.value ?: return@PScaffold
             PullToRefresh(
@@ -219,7 +224,10 @@ fun FeedEntryPage(
                     }
                 },
             ) {
-                LazyColumn(Modifier.fillMaxSize()) {
+                LazyColumn(
+                    Modifier.fillMaxSize(),
+                    state = scrollState,
+                ) {
                     item {
                         TopSpace()
                     }
@@ -261,10 +269,12 @@ fun FeedEntryPage(
                         VerticalSpace(dp = 16.dp)
                     }
                     item {
+
                         MarkdownText(
                             text = viewModel.content.value.ifEmpty { m.description },
                             modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
                         )
+
                     }
                     if (viewModel.content.value.isEmpty() && topRefreshLayoutState.refreshContentState.value == RefreshContentState.Finished) {
                         item {

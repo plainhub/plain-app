@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
@@ -113,6 +114,7 @@ fun FeedEntriesPage(
     val filtersScrollState = rememberScrollState()
     var isMenuOpen by remember { mutableStateOf(false) }
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
+    val scrollState = rememberLazyListState()
 
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
@@ -207,6 +209,11 @@ fun FeedEntriesPage(
     PScaffold(
         navController,
         topBarTitle = pageTitle,
+        topBarOnDoubleClick = {
+            scope.launch {
+                scrollState.scrollToItem(0)
+            }
+        },
         navigationIcon = {
             if (viewModel.selectMode.value) {
                 NavigationCloseIcon {
@@ -369,7 +376,8 @@ fun FeedEntriesPage(
                         Modifier
                             .fillMaxWidth()
                             .fillMaxHeight(),
-                    ) {
+                        state = scrollState,
+                        ) {
                         item {
                             TopSpace()
                         }

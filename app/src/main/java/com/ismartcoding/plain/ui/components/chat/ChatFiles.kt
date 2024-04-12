@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ui.components.chat
 
 import android.content.Context
 import android.net.Uri
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,22 +29,20 @@ import com.ismartcoding.lib.extensions.isPdfFile
 import com.ismartcoding.lib.extensions.isTextFile
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.extensions.pathToUri
-import com.ismartcoding.plain.helpers.FormatHelper
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.audio.DPlaylistAudio
-import com.ismartcoding.plain.ui.PdfViewerDialog
+import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.TextEditorDialog
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
 import com.ismartcoding.plain.ui.base.PAsyncImage
-import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.extensions.navigateOtherFile
+import com.ismartcoding.plain.ui.extensions.navigatePdf
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.VChat
-import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import java.io.File
@@ -57,81 +54,83 @@ fun ChatFiles(
     m: VChat,
 ) {
     val fileItems = (m.value as DMessageFiles).items
-    fileItems.forEachIndexed { index, item ->
-        val path = item.uri.getFinalPath(context)
-        Box(
-            modifier =
-            Modifier
-                .fillMaxWidth()
-                .clickable {
-                    if (path.isImageFast() || path.isVideoFast()) {
-                        val items =
-                            fileItems
-                                .filter { it.uri.isVideoFast() || it.uri.isImageFast() }
-                        PreviewDialog().show(
-                            items =
-                            items.mapIndexed {
-                                    i,
-                                    s,
-                                ->
-                                val p = s.uri.getFinalPath(context)
-                                PreviewItem(m.id + "|" + i, p.pathToUri(), p)
-                            },
-                            initKey = m.id + "|" + items.indexOf(item),
-                        )
-                    } else if (path.isAudioFast()) {
-                        AudioPlayerDialog().show()
-                        Permissions.checkNotification(context, R.string.audio_notification_prompt) {
-                            AudioPlayer.play(context, DPlaylistAudio.fromPath(context, path))
-                        }
-                    } else if (path.isTextFile()) {
-                        if (item.size <= Constants.MAX_READABLE_TEXT_FILE_SIZE) {
-                            TextEditorDialog(Uri.fromFile(File(path))).show()
-                        } else {
-                            DialogHelper.showMessage(R.string.text_file_size_limit)
-                        }
-                    } else if (path.isPdfFile()) {
-                        PdfViewerDialog(Uri.fromFile(File(path))).show()
-                    } else {
-                        navController.navigate("${RouteName.OTHER_FILE.name}?path=${path}")
-                    }
-                },
-        ) {
-            Row(
+    Column {
+        fileItems.forEachIndexed { index, item ->
+            val path = item.uri.getFinalPath(context)
+            Box(
                 modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(top = if (index == 0) 16.dp else 6.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+                    .clickable {
+                        if (path.isImageFast() || path.isVideoFast()) {
+                            val items =
+                                fileItems
+                                    .filter { it.uri.isVideoFast() || it.uri.isImageFast() }
+                            PreviewDialog().show(
+                                items =
+                                items.mapIndexed {
+                                        i,
+                                        s,
+                                    ->
+                                    val p = s.uri.getFinalPath(context)
+                                    PreviewItem(m.id + "|" + i, p.pathToUri(), p)
+                                },
+                                initKey = m.id + "|" + items.indexOf(item),
+                            )
+                        } else if (path.isAudioFast()) {
+                            AudioPlayerDialog().show()
+                            Permissions.checkNotification(context, R.string.audio_notification_prompt) {
+                                AudioPlayer.play(context, DPlaylistAudio.fromPath(context, path))
+                            }
+                        } else if (path.isTextFile()) {
+                            if (item.size <= Constants.MAX_READABLE_TEXT_FILE_SIZE) {
+                                TextEditorDialog(Uri.fromFile(File(path))).show()
+                            } else {
+                                DialogHelper.showMessage(R.string.text_file_size_limit)
+                            }
+                        } else if (path.isPdfFile()) {
+                            navController.navigatePdf(Uri.fromFile(File(path)))
+                        } else {
+                            navController.navigateOtherFile(path)
+                        }
+                    },
             ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp, end = 8.dp),
-                        text = path.getFilenameFromPath(),
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Normal),
-                    )
-                    Text(
-                        modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(end = 8.dp),
-                        text = FormatHelper.formatBytes(item.size) + if (item.duration > 0) " / ${FormatHelper.formatDuration(item.duration)}" else "",
-                        color = MaterialTheme.colorScheme.secondary,
-                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal),
-                    )
-                }
-                if (path.isImageFast() || path.isVideoFast()) {
-                    PAsyncImage(
-                        modifier =
-                        Modifier
-                            .size(48.dp)
-                            .clip(RoundedCornerShape(4.dp)),
-                        data = path,
-                        size = Size(context.dp2px(48), context.dp2px(48)),
-                        contentScale = ContentScale.Crop,
-                    )
+                Row(
+                    modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = if (index == 0) 16.dp else 6.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp, end = 8.dp),
+                            text = path.getFilenameFromPath(),
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Normal),
+                        )
+                        Text(
+                            modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(end = 8.dp),
+                            text = FormatHelper.formatBytes(item.size) + if (item.duration > 0) " / ${FormatHelper.formatDuration(item.duration)}" else "",
+                            color = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal),
+                        )
+                    }
+                    if (path.isImageFast() || path.isVideoFast()) {
+                        PAsyncImage(
+                            modifier =
+                            Modifier
+                                .size(48.dp)
+                                .clip(RoundedCornerShape(4.dp)),
+                            data = path,
+                            size = Size(context.dp2px(48), context.dp2px(48)),
+                            contentScale = ContentScale.Crop,
+                        )
+                    }
                 }
             }
         }

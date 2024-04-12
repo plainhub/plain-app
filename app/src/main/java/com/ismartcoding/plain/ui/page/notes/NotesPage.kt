@@ -13,11 +13,13 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
@@ -97,6 +99,7 @@ fun NotesPage(
     val scope = rememberCoroutineScope()
     val filtersScrollState = rememberScrollState()
     var isMenuOpen by remember { mutableStateOf(false) }
+    val scrollState = rememberLazyListState()
 
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
@@ -154,6 +157,11 @@ fun NotesPage(
     PScaffold(
         navController,
         topBarTitle = pageTitle,
+        topBarOnDoubleClick = {
+            scope.launch {
+                scrollState.scrollToItem(0)
+            }
+        },
         navigationIcon = {
             if (viewModel.selectMode.value) {
                 NavigationCloseIcon {
@@ -289,8 +297,8 @@ fun NotesPage(
                 if (itemsState.isNotEmpty()) {
                     LazyColumn(
                         Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(),
+                            .fillMaxSize(),
+                        state = scrollState,
                     ) {
                         item {
                             TopSpace()

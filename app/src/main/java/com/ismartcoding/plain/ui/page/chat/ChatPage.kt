@@ -1,21 +1,21 @@
-package com.ismartcoding.plain.ui.page
+package com.ismartcoding.plain.ui.page.chat
 
 import android.annotation.SuppressLint
-import android.content.ClipData
+import android.app.Activity
 import android.os.Environment
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -23,7 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -33,14 +32,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
@@ -58,7 +59,6 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.enums.PickFileTag
 import com.ismartcoding.plain.data.enums.PickFileType
 import com.ismartcoding.plain.db.DMessageContent
@@ -72,29 +72,25 @@ import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.features.chat.ChatHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FileHelper
-import com.ismartcoding.plain.ui.base.PCard
-import com.ismartcoding.plain.ui.base.PDropdownMenu
-import com.ismartcoding.plain.ui.base.PDropdownMenuItem
+import com.ismartcoding.plain.ui.base.HorizontalSpace
+import com.ismartcoding.plain.ui.base.NavigationBackIcon
+import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
-import com.ismartcoding.plain.ui.components.chat.ChatDate
-import com.ismartcoding.plain.ui.components.chat.ChatFiles
-import com.ismartcoding.plain.ui.components.chat.ChatImages
+import com.ismartcoding.plain.ui.components.ChatListItem
 import com.ismartcoding.plain.ui.components.chat.ChatInput
-import com.ismartcoding.plain.ui.components.chat.ChatName
-import com.ismartcoding.plain.ui.components.chat.ChatText
-import com.ismartcoding.plain.ui.extensions.navigateChatEditText
-import com.ismartcoding.plain.ui.extensions.navigateChatText
 import com.ismartcoding.plain.ui.file.FilesDialog
 import com.ismartcoding.plain.ui.file.FilesType
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.SharedViewModel
-import com.ismartcoding.plain.ui.models.VChat
+import com.ismartcoding.plain.ui.models.exitSelectMode
+import com.ismartcoding.plain.ui.models.isAllSelected
+import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.web.HttpServerEvents
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.EventType
@@ -102,7 +98,6 @@ import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.json.JSONArray
 import java.io.File
 
 @SuppressLint("MissingPermission")
@@ -113,6 +108,8 @@ fun ChatPage(
     sharedViewModel: SharedViewModel,
     viewModel: ChatViewModel = viewModel(),
 ) {
+    val view = LocalView.current
+    val window = (view.context as Activity).window
     val context = LocalContext.current
     val itemsState = viewModel.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
@@ -129,8 +126,6 @@ fun ChatPage(
     val scrollState = rememberLazyListState()
     val focusManager = LocalFocusManager.current
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
-    var selectedItem by remember { mutableStateOf<VChat?>(null) }
-    val showContextMenu = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.fetch(context)
@@ -244,25 +239,78 @@ fun ChatPage(
         )
     }
 
+    val insetsController = WindowCompat.getInsetsController(window, view)
+    LaunchedEffect(viewModel.selectMode.value) {
+        if (viewModel.selectMode.value) {
+            insetsController.hide(WindowInsetsCompat.Type.navigationBars())
+        } else {
+            insetsController.show(WindowInsetsCompat.Type.navigationBars())
+        }
+    }
+
     DisposableEffect(Unit) {
         onDispose {
             events.forEach { it.cancel() }
             events.clear()
+            insetsController.show(WindowInsetsCompat.Type.navigationBars())
         }
     }
 
+    BackHandler(enabled = viewModel.selectMode.value) {
+        viewModel.exitSelectMode()
+    }
+
+    val pageTitle = if (viewModel.selectMode.value) {
+        LocaleHelper.getStringF(R.string.x_selected, "count", viewModel.selectedIds.size)
+    } else {
+        stringResource(id = R.string.file_transfer_assistant)
+    }
     PScaffold(
         navController,
-        topBarTitle = stringResource(id = R.string.file_transfer_assistant),
+        topBarTitle = pageTitle,
+        topBarOnDoubleClick = {
+            scope.launch {
+                scrollState.scrollToItem(0)
+            }
+        },
+        navigationIcon = {
+            if (viewModel.selectMode.value) {
+                NavigationCloseIcon {
+                    viewModel.exitSelectMode()
+                }
+            } else {
+                NavigationBackIcon {
+                    navController.popBackStack()
+                }
+            }
+        },
         actions = {
-            PIconButton(
-                icon = Icons.Outlined.Folder,
-                contentDescription = stringResource(R.string.folder),
-                tint = MaterialTheme.colorScheme.onSurface,
-                onClick = {
-                    FilesDialog(FilesType.APP).show()
-                },
-            )
+            if (viewModel.selectMode.value) {
+                PMiniOutlineButton(
+                    text = stringResource(if (viewModel.isAllSelected()) R.string.unselect_all else R.string.select_all),
+                    onClick = {
+                        viewModel.toggleSelectAll()
+                    },
+                )
+                HorizontalSpace(dp = 8.dp)
+            } else {
+                PIconButton(
+                    icon = Icons.Outlined.Folder,
+                    contentDescription = stringResource(R.string.folder),
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    onClick = {
+                        FilesDialog(FilesType.APP).show()
+                    },
+                )
+            }
+        },
+        bottomBar = {
+            AnimatedVisibility(
+                visible = viewModel.selectMode.value,
+                enter = slideInVertically { it },
+                exit = slideOutVertically { it }) {
+                SelectModeBottomActions(viewModel)
+            }
         },
         content = {
             Column(
@@ -285,103 +333,17 @@ fun ChatPage(
                         verticalArrangement = Arrangement.Top,
                     ) {
                         itemsIndexed(itemsState.value, key = { _, a -> a.id }) { index, m ->
-                            Column(modifier = Modifier.fillMaxSize()) {
-                                ChatDate(itemsState.value, m, index)
-                                Box(modifier = Modifier.fillMaxSize()) {
-                                    Column(
-                                        modifier =
-                                        Modifier
-                                            .fillMaxSize()
-                                            .combinedClickable(
-                                                onClick = {
-                                                    focusManager.clearFocus()
-                                                },
-                                                onLongClick = {
-                                                    selectedItem = m
-                                                    showContextMenu.value = true
-                                                },
-                                                onDoubleClick = {
-                                                    if (m.value is DMessageText) {
-                                                        val content = (m.value as DMessageText).text
-                                                        navController.navigateChatText(content)
-                                                    }
-                                                },
-                                            ),
-                                    ) {
-                                        ChatName(m)
-                                        PCard {
-                                            when (m.type) {
-                                                DMessageType.IMAGES.value -> {
-                                                    ChatImages(context, navController, sharedViewModel, m, imageWidthDp, imageWidthPx)
-                                                }
-
-                                                DMessageType.FILES.value -> {
-                                                    ChatFiles(context, navController, m)
-                                                }
-
-                                                DMessageType.TEXT.value -> {
-                                                    ChatText(context, focusManager, m, onDoubleClick = {
-                                                        val content = (m.value as DMessageText).text
-                                                        navController.navigateChatText(content)
-                                                    }, onLongClick = {
-                                                        selectedItem = m
-                                                        showContextMenu.value = true
-                                                    })
-                                                }
-                                            }
-                                        }
-                                        VerticalSpace(dp = 8.dp)
-                                    }
-                                    Box(
-                                        modifier =
-                                        Modifier
-                                            .fillMaxSize()
-                                            .padding(top = 32.dp)
-                                            .wrapContentSize(Alignment.Center),
-                                    ) {
-                                        PDropdownMenu(
-                                            expanded = showContextMenu.value && selectedItem == m,
-                                            onDismissRequest = { showContextMenu.value = false },
-                                        ) {
-                                            if (m.value is DMessageText) {
-                                                PDropdownMenuItem(
-                                                    text = { Text(stringResource(id = R.string.copy_text)) },
-                                                    onClick = {
-                                                        showContextMenu.value = false
-                                                        val clip =
-                                                            ClipData.newPlainText(
-                                                                LocaleHelper.getString(R.string.message),
-                                                                (m.value as DMessageText).text,
-                                                            )
-                                                        clipboardManager.setPrimaryClip(clip)
-                                                        DialogHelper.showMessage(R.string.copied)
-                                                    },
-                                                )
-                                                PDropdownMenuItem(
-                                                    text = { Text(stringResource(id = R.string.edit_text)) },
-                                                    onClick = {
-                                                        showContextMenu.value = false
-                                                        val content = (m.value as DMessageText).text
-                                                        navController.navigateChatEditText(m.id, content)
-                                                    },
-                                                )
-                                            }
-                                            PDropdownMenuItem(
-                                                text = { Text(stringResource(id = R.string.delete)) },
-                                                onClick = {
-                                                    showContextMenu.value = false
-                                                    scope.launch {
-                                                        ChatHelper.deleteAsync(context, m.id, m.value)
-                                                        val json = JSONArray()
-                                                        json.put(m.id)
-                                                        sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, json.toString()))
-                                                    }
-                                                },
-                                            )
-                                        }
-                                    }
-                                }
-                            }
+                            ChatListItem(
+                                navController = navController,
+                                viewModel = viewModel,
+                                sharedViewModel = sharedViewModel,
+                                itemsState.value,
+                                m = m,
+                                index = index,
+                                imageWidthDp = imageWidthDp,
+                                imageWidthPx = imageWidthPx,
+                                focusManager = focusManager
+                            )
                         }
                     }
                 }

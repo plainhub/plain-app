@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.page
+package com.ismartcoding.plain.ui.page.chat
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth

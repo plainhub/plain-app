@@ -53,11 +53,15 @@ import com.ismartcoding.plain.ui.PdfViewerDialog
 import com.ismartcoding.plain.ui.TextEditorDialog
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
 import com.ismartcoding.plain.ui.extensions.navigate
+import com.ismartcoding.plain.ui.extensions.navigatePdf
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.page.apps.AppPage
 import com.ismartcoding.plain.ui.page.apps.AppsPage
 import com.ismartcoding.plain.ui.page.apps.AppsSearchPage
+import com.ismartcoding.plain.ui.page.chat.ChatEditTextPage
+import com.ismartcoding.plain.ui.page.chat.ChatPage
+import com.ismartcoding.plain.ui.page.chat.ChatTextPage
 import com.ismartcoding.plain.ui.page.docs.DocsPage
 import com.ismartcoding.plain.ui.page.docs.DocsSearchPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntriesPage
@@ -133,7 +137,7 @@ fun Main(viewModel: MainViewModel) {
                             initKey = link,
                         )
                     } else if (mimeType == "application/pdf") {
-                        PdfViewerDialog(uri).show()
+                        navController.navigatePdf(uri)
                     }
                 }
             }
@@ -305,11 +309,19 @@ fun Main(viewModel: MainViewModel) {
             }
 
             slideHorizontallyComposable(
-                "${RouteName.OTHER_FILE.name}?path={path}",
-                arguments = listOf(navArgument("path") { type = NavType.StringType }),
+                RouteName.OTHER_FILE.name,
             ) {
-                val path = it.arguments?.getString("path") ?: ""
+                val path = navController.previousBackStackEntry?.savedStateHandle?.get("path") ?: ""
                 OtherFilePage(navController, path)
+            }
+
+            slideHorizontallyComposable(
+                RouteName.PDF_VIEWER.name,
+            ) {
+                val uri = navController.previousBackStackEntry?.savedStateHandle?.get("uri") as? Uri
+                if (uri != null) {
+                    PdfPage(navController, uri)
+                }
             }
         }
 

@@ -23,8 +23,8 @@
     <string name="is_latest_version">Это последняя версия приложения</string>
     <string name="change_log">Журнал изменений</string>
     <string name="update">Обновить</string>
-    <string name="get_new_updates">Получить новые обновления</string>
-    <string name="get_new_updates_desc">Новая версия %1$s доступна</string>
+    <string name="get_new_updates">Найдено обновление для %1$s!</string>
+    <string name="get_new_updates_desc">Обновите сейчас, испытайте новые функции!</string>
     <string name="skip_this_version">Пропустить эту версию</string>
     <string name="close">Закрыть</string>
     <string name="timeago_now">только что</string>

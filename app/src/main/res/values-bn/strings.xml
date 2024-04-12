@@ -23,8 +23,8 @@
     <string name="is_latest_version">এটি অ্যাপ এর সর্বশেষ সংস্করণ</string>
     <string name="change_log">পরিবর্তনতালিকা</string>
     <string name="update">আপডেট</string>
-    <string name="get_new_updates">নতুন আপডেট পান</string>
-    <string name="get_new_updates_desc">নতুন সংস্করণ %1$s পাওয়া গেছে</string>
+    <string name="get_new_updates">পাওয়া গেছে আপডেট %1$s এর জন্য!</string>
+    <string name="get_new_updates_desc">এখন আপগ্রেড করুন, নতুন বৈশিষ্ট্য অভিজ্ঞ করুন!</string>
     <string name="skip_this_version">এই সংস্করণ অগ্রাহ্য করুন</string>
     <string name="close">বন্ধ করুন</string>
     <string name="timeago_now">এই মুহূর্তে</string>

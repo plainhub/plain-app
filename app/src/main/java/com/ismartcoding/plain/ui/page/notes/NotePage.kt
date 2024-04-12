@@ -126,7 +126,7 @@ fun NotePage(
                 if (tagsMapState[id]?.isNotEmpty() == true) {
                     delay(200)
                     scope.launch {
-                        mdListState.scrollToItem(0, 0)
+                        mdListState.scrollToItem(0)
                     }
                 }
             }

@@ -13,6 +13,10 @@ object ShareHelper {
         context: Context,
         uri: Uri,
     ) {
+        if (uri.scheme == "file") {
+            sharePaths(context, listOf(uri.path!!))
+            return
+        }
         context.startActivity(
             Intent.createChooser(
                 createFileIntent(context, uri),

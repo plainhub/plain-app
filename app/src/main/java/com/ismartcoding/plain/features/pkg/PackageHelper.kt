@@ -77,7 +77,12 @@ object PackageHelper {
 
         if (query.isEmpty() || text.isEmpty()) {
             return apps.sortedBy { Pinyin.toPinyin(it.name).lowercase() }.drop(offset).take(limit).map {
-                getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES))
+                try {
+                    getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES))
+                } catch (ex: Exception) {
+                    LogCat.d(ex.toString())
+                    getPackage(it.appInfo, PackageInfo())
+                }
             }
         }
 

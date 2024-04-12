@@ -23,8 +23,8 @@
     <string name="is_latest_version">Esta é a versão mais recente do aplicativo</string>
     <string name="change_log">Registro de alterações</string>
     <string name="update">Atualizar</string>
-    <string name="get_new_updates">Obter novas atualizações</string>
-    <string name="get_new_updates_desc">Nova versão %1$s disponível</string>
+    <string name="get_new_updates">Encontrada atualização para %1$s!</string>
+    <string name="get_new_updates_desc">Atualize agora, experimente novos recursos!</string>
     <string name="skip_this_version">Pular esta versão</string>
     <string name="close">Fechar</string>
     <string name="timeago_now">agora mesmo</string>

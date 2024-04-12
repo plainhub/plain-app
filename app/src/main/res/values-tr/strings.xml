@@ -23,8 +23,8 @@
     <string name="is_latest_version">Bu, uygulamanın en son sürümüdür</string>
     <string name="change_log">Değişiklik Günlüğü</string>
     <string name="update">Güncelle</string>
-    <string name="get_new_updates">Yeni güncellemeler alın</string>
-    <string name="get_new_updates_desc">Yeni sürüm %1$s mevcut</string>
+    <string name="get_new_updates">%1$s için güncelleme bulundu!</string>
+    <string name="get_new_updates_desc">Şimdi yükselt, yeni özellikleri deneyimle!</string>
     <string name="skip_this_version">Bu Sürümü Atla</string>
     <string name="close">Kapat</string>
     <string name="timeago_now">az önce</string>

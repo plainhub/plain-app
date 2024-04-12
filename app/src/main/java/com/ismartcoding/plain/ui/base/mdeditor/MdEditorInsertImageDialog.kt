@@ -49,7 +49,6 @@ import java.io.File
 fun MdEditorInsertImageDialog(
     viewModel: MdEditorViewModel,
 ) {
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     var imageUrl by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }

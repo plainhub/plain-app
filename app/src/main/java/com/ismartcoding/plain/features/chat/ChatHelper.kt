@@ -40,6 +40,5 @@ object ChatHelper {
                 }
             }
         }
-        sendEvent(DeleteChatItemViewEvent(id))
     }
 }

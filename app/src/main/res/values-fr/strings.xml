@@ -23,8 +23,8 @@
     <string name="is_latest_version">Il s\'agit de la dernière version de l\'application</string>
     <string name="change_log">Journal des modifications</string>
     <string name="update">Mettre à jour</string>
-    <string name="get_new_updates">Obtenir de nouvelles mises à jour</string>
-    <string name="get_new_updates_desc">La nouvelle version %1$s est disponible</string>
+    <string name="get_new_updates">Mise à jour trouvée pour %1$s !</string>
+    <string name="get_new_updates_desc">Mettez à jour maintenant, découvrez de nouvelles fonctionnalités !</string>
     <string name="skip_this_version">Ignorer cette version</string>
     <string name="close">Fermer</string>
     <string name="timeago_now">à l\'instant</string>

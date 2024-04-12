@@ -19,6 +19,7 @@ import io.ktor.client.request.headers
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.util.cio.writeChannel
 import io.ktor.utils.io.copyAndClose
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import java.io.File
 import java.util.Locale
@@ -103,6 +104,7 @@ suspend fun DFeedEntry.fetchContentAsync(): ApiResult {
                         }
                     }
                     content = MDConverter().convert(mobilizedHtml)
+                    updatedAt = Clock.System.now()
                     FeedEntryHelper.updateAsync(this)
                 }
             }

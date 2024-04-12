@@ -50,10 +50,9 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                 item {
                     if (AppFeatureType.CHECK_UPDATES.has() && newVersion.whetherNeedUpdate(currentVersion, skipVersion)) {
                         PBanner(
-                            title = stringResource(R.string.get_new_updates),
+                            title = stringResource(R.string.get_new_updates, newVersion.toString()),
                             desc = stringResource(
-                                R.string.get_new_updates_desc,
-                                newVersion.toString(),
+                                R.string.get_new_updates_desc
                             ),
                             icon = Icons.Outlined.Lightbulb,
                         ) {

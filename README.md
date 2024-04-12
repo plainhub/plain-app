@@ -23,10 +23,10 @@ PlainApp is an open-source application that allows you to manage your phone thro
 - TV casting: Cast your videos, images, and audio to your TV.
 - Video and audio playback: Play videos and audio in the app and on the webpage.
 - Backup and export: Backup and export your app data for safekeeping.
-- SMS, Calls: Read your SMS and calls on webpage.(Apk only)
-- Apps: View your apps and download apk from phone.(web only)
+- SMS, Calls: Read your SMS and calls on webpage.
+- Apps: View your apps and download apk from phone.
 - Screen mirror: Mirror your phone on webpage.
-- Tools: Exchange rate, Sound meter.
+- Tools: Sound meter.
 - Notifications: You can manage push notifications on the webpage.
 - Device info: You can view your device info on the webpage.
 - PWA support: You can add webpage to your home screen and experience the convenience of using the webpage like a desktop app.
