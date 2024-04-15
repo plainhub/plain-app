@@ -21,8 +21,8 @@ import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.data.enums.AppFeatureType
-import com.ismartcoding.plain.data.preference.SkipVersionPreference
+import com.ismartcoding.plain.enums.AppFeatureType
+import com.ismartcoding.plain.preference.SkipVersionPreference
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.FormatHelper

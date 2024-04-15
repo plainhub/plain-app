@@ -13,7 +13,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.AllItemsOption
 import com.ismartcoding.plain.data.UIDataCache
-import com.ismartcoding.plain.data.preference.DeviceSortByPreference
+import com.ismartcoding.plain.preference.DeviceSortByPreference
 import com.ismartcoding.plain.databinding.DialogSelectItemBinding
 import com.ismartcoding.plain.databinding.ViewListItemBinding
 import com.ismartcoding.plain.features.ApplyToType

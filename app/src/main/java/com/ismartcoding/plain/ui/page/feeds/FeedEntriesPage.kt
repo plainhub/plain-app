@@ -48,7 +48,7 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.FeedEntryFilterType
+import com.ismartcoding.plain.enums.FeedEntryFilterType
 import com.ismartcoding.plain.features.FeedStatusEvent
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.features.locale.LocaleHelper

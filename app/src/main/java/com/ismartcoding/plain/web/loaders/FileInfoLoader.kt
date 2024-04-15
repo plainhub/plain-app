@@ -5,7 +5,7 @@ import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.exifinterface.media.ExifInterface
-import com.ismartcoding.plain.data.enums.DataType
+import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.web.models.AudioFileInfo
 import com.ismartcoding.plain.web.models.ImageFileInfo
 import com.ismartcoding.plain.web.models.Location

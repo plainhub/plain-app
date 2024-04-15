@@ -10,8 +10,8 @@ import com.ismartcoding.lib.pdfviewer.PDFView
 import com.ismartcoding.lib.pdfviewer.listener.OnPageErrorListener
 import com.ismartcoding.lib.pdfviewer.scroll.DefaultScrollHandle
 import com.ismartcoding.lib.pdfviewer.util.FitPolicy
-import com.ismartcoding.plain.data.enums.DarkTheme
-import com.ismartcoding.plain.data.preference.LocalDarkTheme
+import com.ismartcoding.plain.enums.DarkTheme
+import com.ismartcoding.plain.preference.LocalDarkTheme
 
 @Composable
 fun PdfView(

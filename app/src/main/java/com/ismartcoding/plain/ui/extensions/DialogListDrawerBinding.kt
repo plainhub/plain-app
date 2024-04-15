@@ -7,7 +7,7 @@ import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
-import com.ismartcoding.plain.data.enums.DataType
+import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.databinding.DialogListDrawerBinding
 import com.ismartcoding.plain.ui.models.FilteredItemsViewModel
 

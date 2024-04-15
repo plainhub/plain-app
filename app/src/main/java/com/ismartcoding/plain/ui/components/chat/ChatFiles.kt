@@ -34,7 +34,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.features.audio.DPlaylistAudio
+import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.TextEditorDialog
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog

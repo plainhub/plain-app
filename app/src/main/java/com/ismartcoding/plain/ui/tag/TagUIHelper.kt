@@ -5,12 +5,12 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.ActionSourceType
-import com.ismartcoding.plain.data.enums.ActionType
+import com.ismartcoding.plain.enums.ActionSourceType
+import com.ismartcoding.plain.enums.ActionType
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
-import com.ismartcoding.plain.features.tag.TagHelper
+import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.ui.EditValueDialog
 import com.ismartcoding.plain.ui.models.DrawerMenuGroup
 import com.ismartcoding.plain.ui.models.FilteredItemsViewModel

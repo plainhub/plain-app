@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.web.models
 
-import com.ismartcoding.plain.features.call.DCall
+import com.ismartcoding.plain.data.DCall
 import com.ismartcoding.plain.helpers.FileHelper
 import kotlinx.datetime.Instant
 

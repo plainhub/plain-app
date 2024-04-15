@@ -6,7 +6,7 @@ import android.service.notification.StatusBarNotification
 import androidx.core.app.NotificationCompat
 import com.ismartcoding.lib.extensions.getString2
 import com.ismartcoding.plain.data.DNotification
-import com.ismartcoding.plain.features.pkg.PackageHelper
+import com.ismartcoding.plain.features.PackageHelper
 import kotlinx.datetime.Instant
 
 fun StatusBarNotification.toDNotification(context: Context): DNotification {

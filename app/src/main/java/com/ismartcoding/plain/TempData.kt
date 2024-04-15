@@ -1,7 +1,7 @@
 package com.ismartcoding.plain
 
 import com.ismartcoding.plain.data.DNotification
-import com.ismartcoding.plain.features.audio.MediaPlayMode
+import com.ismartcoding.plain.enums.MediaPlayMode
 
 object TempData {
     var webEnabled = false

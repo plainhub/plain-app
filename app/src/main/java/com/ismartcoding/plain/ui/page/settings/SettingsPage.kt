@@ -16,9 +16,9 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.Version
-import com.ismartcoding.plain.data.enums.AppFeatureType
-import com.ismartcoding.plain.data.preference.LocalNewVersion
-import com.ismartcoding.plain.data.preference.LocalSkipVersion
+import com.ismartcoding.plain.enums.AppFeatureType
+import com.ismartcoding.plain.preference.LocalNewVersion
+import com.ismartcoding.plain.preference.LocalSkipVersion
 import com.ismartcoding.plain.data.toVersion
 import com.ismartcoding.plain.ui.base.PBanner
 import com.ismartcoding.plain.ui.base.PCard

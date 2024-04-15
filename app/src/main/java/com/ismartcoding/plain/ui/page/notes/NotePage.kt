@@ -54,10 +54,10 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.DataType
-import com.ismartcoding.plain.features.note.NoteHelper
-import com.ismartcoding.plain.features.tag.TagHelper
-import com.ismartcoding.plain.features.tag.TagRelationStub
+import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.features.NoteHelper
+import com.ismartcoding.plain.features.TagHelper
+import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.ui.base.ActionButtonTags
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard

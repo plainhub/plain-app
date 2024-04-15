@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.net.Uri
 import com.ismartcoding.lib.extensions.telecomManager
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.data.DSim
 
 @SuppressLint("MissingPermission")
 object SimHelper {

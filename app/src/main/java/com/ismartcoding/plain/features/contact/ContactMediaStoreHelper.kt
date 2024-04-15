@@ -12,6 +12,8 @@ import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.data.DContact
+import com.ismartcoding.plain.data.DGroup
 import com.ismartcoding.plain.features.BaseContentHelper
 import com.ismartcoding.plain.web.models.ContactInput
 import java.util.*

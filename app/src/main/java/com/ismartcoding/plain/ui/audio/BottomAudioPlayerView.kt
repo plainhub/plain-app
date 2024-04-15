@@ -8,12 +8,12 @@ import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.preference.AudioPlayingPreference
+import com.ismartcoding.plain.preference.AudioPlayingPreference
 import com.ismartcoding.plain.databinding.ViewBottomAudioPlayerBinding
 import com.ismartcoding.plain.features.AudioActionEvent
-import com.ismartcoding.plain.features.audio.AudioAction
+import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.features.audio.DPlaylistAudio
+import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.ui.extensions.setSafeClick
 import com.ismartcoding.plain.ui.views.CustomViewBase
 

@@ -11,7 +11,7 @@ import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.features.BaseContentHelper
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.features.tag.TagRelationStub
+import com.ismartcoding.plain.data.TagRelationStub
 
 object ImageMediaStoreHelper : BaseContentHelper() {
     override val uriExternal: Uri = if (isQPlus()) MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Images.Media.EXTERNAL_CONTENT_URI

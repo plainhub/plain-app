@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.AppFeatureType
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.ui.audio.AudiosDialog
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconTextButton

@@ -7,8 +7,8 @@ import android.view.View
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.*
-import com.ismartcoding.plain.data.enums.PickFileTag
-import com.ismartcoding.plain.data.enums.PickFileType
+import com.ismartcoding.plain.enums.PickFileTag
+import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.databinding.DialogEditorInsertImageBinding
 import com.ismartcoding.plain.features.PickFileEvent
 import com.ismartcoding.plain.features.PickFileResultEvent

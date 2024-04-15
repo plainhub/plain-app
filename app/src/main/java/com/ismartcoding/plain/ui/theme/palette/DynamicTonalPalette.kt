@@ -8,9 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
-import com.ismartcoding.plain.data.enums.DarkTheme
-import com.ismartcoding.plain.data.preference.LocalAmoledDarkTheme
-import com.ismartcoding.plain.data.preference.LocalDarkTheme
+import com.ismartcoding.plain.enums.DarkTheme
+import com.ismartcoding.plain.preference.LocalAmoledDarkTheme
+import com.ismartcoding.plain.preference.LocalDarkTheme
 
 @Composable
 fun dynamicLightColorScheme(): ColorScheme {

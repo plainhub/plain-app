@@ -42,8 +42,8 @@ import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.clipboardManager
-import com.ismartcoding.plain.data.preference.HttpPortPreference
-import com.ismartcoding.plain.data.preference.HttpsPortPreference
+import com.ismartcoding.plain.preference.HttpPortPreference
+import com.ismartcoding.plain.preference.HttpsPortPreference
 import com.ismartcoding.plain.features.WindowFocusChangedEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.AppHelper

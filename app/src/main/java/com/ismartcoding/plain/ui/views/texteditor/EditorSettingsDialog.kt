@@ -6,9 +6,9 @@ import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.preference.EditorShowLineNumbersPreference
-import com.ismartcoding.plain.data.preference.EditorSyntaxHighlightPreference
-import com.ismartcoding.plain.data.preference.EditorWrapContentPreference
+import com.ismartcoding.plain.preference.EditorShowLineNumbersPreference
+import com.ismartcoding.plain.preference.EditorSyntaxHighlightPreference
+import com.ismartcoding.plain.preference.EditorWrapContentPreference
 import com.ismartcoding.plain.databinding.DialogEditorSettingsBinding
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.setKeyText

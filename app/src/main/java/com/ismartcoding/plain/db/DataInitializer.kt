@@ -7,7 +7,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.DataType
+import com.ismartcoding.plain.enums.DataType
 import kotlinx.datetime.Clock
 
 class DataInitializer(val context: Context, val db: SupportSQLiteDatabase) {

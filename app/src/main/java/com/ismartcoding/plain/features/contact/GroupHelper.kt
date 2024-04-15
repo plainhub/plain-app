@@ -7,6 +7,7 @@ import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.queryCursor
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.data.DGroup
 import java.util.ArrayList
 
 object GroupHelper {

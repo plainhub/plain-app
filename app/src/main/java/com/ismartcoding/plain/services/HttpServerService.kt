@@ -16,7 +16,7 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.HttpClientManager
-import com.ismartcoding.plain.data.enums.HttpServerState
+import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.features.HttpServerStateChangedEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.NotificationHelper

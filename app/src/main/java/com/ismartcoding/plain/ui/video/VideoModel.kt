@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ui.video
 
-import com.ismartcoding.plain.features.video.DVideo
+import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.ui.models.BaseItemModel
 import com.ismartcoding.plain.ui.models.IDataModel
 

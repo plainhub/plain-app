@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.loaders
 
-import com.ismartcoding.plain.data.enums.DataType
-import com.ismartcoding.plain.features.tag.TagHelper
+import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.web.models.Tag
 import com.ismartcoding.plain.web.models.toModel
 import nidomiro.kdataloader.ExecutionResult

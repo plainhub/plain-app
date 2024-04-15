@@ -10,10 +10,11 @@ import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.lib.isQPlus
+import com.ismartcoding.plain.data.DAudio
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.features.BaseContentHelper
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.features.tag.TagRelationStub
+import com.ismartcoding.plain.data.TagRelationStub
 
 object AudioMediaStoreHelper : BaseContentHelper() {
     override val uriExternal: Uri = if (isQPlus()) MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI

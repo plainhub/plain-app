@@ -33,8 +33,8 @@ import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.newPath
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.PickFileTag
-import com.ismartcoding.plain.data.enums.PickFileType
+import com.ismartcoding.plain.enums.PickFileTag
+import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.features.PickFileEvent
 import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.helpers.FileHelper

@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import com.ismartcoding.lib.isSPlus
-import com.ismartcoding.plain.data.preference.LocalCustomPrimaryColor
+import com.ismartcoding.plain.preference.LocalCustomPrimaryColor
 import com.ismartcoding.plain.ui.theme.palette.TonalPalettes
 import com.ismartcoding.plain.ui.theme.palette.TonalPalettes.Companion.getSystemTonalPalettes
 import com.ismartcoding.plain.ui.theme.palette.TonalPalettes.Companion.toTonalPalettes

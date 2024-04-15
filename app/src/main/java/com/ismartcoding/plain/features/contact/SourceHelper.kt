@@ -6,6 +6,7 @@ import android.provider.ContactsContract
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.queryCursor
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.data.DContactSource
 
 object SourceHelper {
     fun getAll(): List<DContactSource> {

@@ -12,8 +12,8 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.data.enums.HttpServerState
-import com.ismartcoding.plain.data.preference.WebPreference
+import com.ismartcoding.plain.enums.HttpServerState
+import com.ismartcoding.plain.preference.WebPreference
 import com.ismartcoding.plain.db.DBox
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions

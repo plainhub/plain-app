@@ -3,7 +3,7 @@ package com.ismartcoding.plain.ui.call
 import android.provider.CallLog
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.call.DCall
+import com.ismartcoding.plain.data.DCall
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.models.IDataModel

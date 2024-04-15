@@ -46,8 +46,8 @@ import com.ismartcoding.lib.helpers.ShareHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.features.pkg.DPackageDetail
-import com.ismartcoding.plain.features.pkg.PackageHelper
+import com.ismartcoding.plain.data.DPackageDetail
+import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.ui.base.BottomSpace

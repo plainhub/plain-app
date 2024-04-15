@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.audio.MediaPlayMode
+import com.ismartcoding.plain.enums.MediaPlayMode
 
 data class App(
     val usbConnected: Boolean,

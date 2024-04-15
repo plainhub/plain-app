@@ -2,7 +2,7 @@ package com.ismartcoding.plain.features.route
 
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.data.UIDataCache
-import com.ismartcoding.plain.data.enums.ConfigType
+import com.ismartcoding.plain.enums.ConfigType
 import com.ismartcoding.plain.features.ApplyTo
 import com.ismartcoding.plain.features.Target
 import com.ismartcoding.plain.features.TargetType

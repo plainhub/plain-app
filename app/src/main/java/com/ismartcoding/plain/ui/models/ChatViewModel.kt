@@ -16,7 +16,7 @@ import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageType
-import com.ismartcoding.plain.features.chat.ChatHelper
+import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import kotlinx.coroutines.Dispatchers

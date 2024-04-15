@@ -41,7 +41,7 @@ import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.ButtonType
+import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.RequestPermissionsEvent

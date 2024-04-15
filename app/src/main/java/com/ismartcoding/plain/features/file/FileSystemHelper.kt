@@ -14,7 +14,7 @@ import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.queryCursor
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.FileType
+import com.ismartcoding.plain.enums.FileType
 import com.ismartcoding.plain.extensions.sort
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.storageManager

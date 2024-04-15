@@ -17,13 +17,13 @@ import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.alarmManager
-import com.ismartcoding.plain.data.preference.AudioSleepTimerFinishLastPreference
-import com.ismartcoding.plain.data.preference.AudioSleepTimerMinutesPreference
+import com.ismartcoding.plain.preference.AudioSleepTimerFinishLastPreference
+import com.ismartcoding.plain.preference.AudioSleepTimerMinutesPreference
 import com.ismartcoding.plain.databinding.DialogSleepTimerBinding
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.features.audio.AudioServiceAction
+import com.ismartcoding.plain.enums.AudioServiceAction
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog

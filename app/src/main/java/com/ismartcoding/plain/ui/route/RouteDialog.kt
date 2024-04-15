@@ -10,9 +10,9 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.UpdateConfigMutation
 import com.ismartcoding.plain.api.BoxApi
 import com.ismartcoding.plain.data.*
-import com.ismartcoding.plain.data.enums.ActionSourceType
-import com.ismartcoding.plain.data.enums.ActionType
-import com.ismartcoding.plain.data.preference.DeviceSortByPreference
+import com.ismartcoding.plain.enums.ActionSourceType
+import com.ismartcoding.plain.enums.ActionType
+import com.ismartcoding.plain.preference.DeviceSortByPreference
 import com.ismartcoding.plain.databinding.DialogRouteBinding
 import com.ismartcoding.plain.extensions.sorted
 import com.ismartcoding.plain.extensions.toRoute

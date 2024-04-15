@@ -6,7 +6,7 @@ import android.provider.MediaStore
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.lib.helpers.SearchHelper
-import com.ismartcoding.plain.data.enums.FileType
+import com.ismartcoding.plain.enums.FileType
 import com.ismartcoding.plain.features.BaseContentHelper
 import kotlinx.datetime.Instant
 import java.util.Locale

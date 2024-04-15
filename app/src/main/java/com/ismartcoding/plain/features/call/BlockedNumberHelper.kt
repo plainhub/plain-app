@@ -7,6 +7,7 @@ import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.queryCursor
 import com.ismartcoding.lib.extensions.trimToComparableNumber
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.data.BlockedNumber
 
 object BlockedNumberHelper {
     fun getAll(): List<BlockedNumber> {

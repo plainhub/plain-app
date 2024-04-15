@@ -4,7 +4,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import com.ismartcoding.plain.data.preference.LocalThemeIndex
+import com.ismartcoding.plain.preference.LocalThemeIndex
 import com.ismartcoding.plain.ui.theme.palette.LocalTonalPalettes
 import com.ismartcoding.plain.ui.theme.palette.TonalPalettes
 import com.ismartcoding.plain.ui.theme.palette.core.ProvideZcamViewingConditions

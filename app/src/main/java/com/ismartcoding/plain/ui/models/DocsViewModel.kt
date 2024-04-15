@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
-import com.ismartcoding.plain.data.enums.FileType
+import com.ismartcoding.plain.enums.FileType
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.FileMediaStoreHelper
 import kotlinx.coroutines.flow.MutableStateFlow

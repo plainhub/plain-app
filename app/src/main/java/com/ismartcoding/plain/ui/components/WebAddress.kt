@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.data.preference.HttpsPreference
+import com.ismartcoding.plain.preference.HttpsPreference
 import com.ismartcoding.plain.ui.base.PageIndicator
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.VerticalSpace

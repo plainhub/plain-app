@@ -8,13 +8,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
-import com.ismartcoding.plain.data.enums.DataType
-import com.ismartcoding.plain.data.enums.FeedEntryFilterType
-import com.ismartcoding.plain.db.DFeed
+import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.enums.FeedEntryFilterType
 import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
-import com.ismartcoding.plain.features.tag.TagHelper
+import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

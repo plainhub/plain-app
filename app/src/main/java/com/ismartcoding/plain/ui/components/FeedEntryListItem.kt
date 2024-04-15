@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import coil.size.Size
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.plain.data.enums.FeedEntryFilterType
+import com.ismartcoding.plain.enums.FeedEntryFilterType
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.DTag

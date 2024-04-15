@@ -5,9 +5,9 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.data.preference.FeedAutoRefreshIntervalPreference
-import com.ismartcoding.plain.data.preference.FeedAutoRefreshOnlyWifiPreference
-import com.ismartcoding.plain.data.preference.FeedAutoRefreshPreference
+import com.ismartcoding.plain.preference.FeedAutoRefreshIntervalPreference
+import com.ismartcoding.plain.preference.FeedAutoRefreshOnlyWifiPreference
+import com.ismartcoding.plain.preference.FeedAutoRefreshPreference
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

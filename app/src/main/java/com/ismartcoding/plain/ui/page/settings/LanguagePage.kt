@@ -11,9 +11,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.Language
-import com.ismartcoding.plain.data.preference.LanguagePreference
-import com.ismartcoding.plain.data.preference.LocalLocale
+import com.ismartcoding.plain.enums.Language
+import com.ismartcoding.plain.preference.LanguagePreference
+import com.ismartcoding.plain.preference.LocalLocale
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold

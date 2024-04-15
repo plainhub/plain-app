@@ -2,7 +2,6 @@ package com.ismartcoding.plain.features
 
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.SearchHelper
-import com.ismartcoding.plain.features.tag.TagHelper
 
 object QueryHelper {
     suspend fun prepareQuery(query: String): String {

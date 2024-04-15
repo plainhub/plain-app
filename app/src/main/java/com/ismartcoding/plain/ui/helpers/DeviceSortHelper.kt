@@ -5,7 +5,7 @@ import android.view.Menu
 import android.view.MenuItem
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.preference.DeviceSortByPreference
+import com.ismartcoding.plain.preference.DeviceSortByPreference
 import com.ismartcoding.plain.features.device.DeviceSortBy
 
 object DeviceSortHelper {

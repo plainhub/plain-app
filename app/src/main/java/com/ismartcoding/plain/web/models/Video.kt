@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.web.models
 
-import com.ismartcoding.plain.features.video.DVideo
+import com.ismartcoding.plain.data.DVideo
 
 data class Video(
     var id: ID,

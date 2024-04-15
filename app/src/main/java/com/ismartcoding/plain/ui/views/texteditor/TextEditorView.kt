@@ -14,10 +14,10 @@ import com.ismartcoding.lib.extensions.getWindowWidth
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.softinput.hideSoftInput
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.preference.EditorAccessoryLevelPreference
-import com.ismartcoding.plain.data.preference.EditorShowLineNumbersPreference
-import com.ismartcoding.plain.data.preference.EditorSyntaxHighlightPreference
-import com.ismartcoding.plain.data.preference.EditorWrapContentPreference
+import com.ismartcoding.plain.preference.EditorAccessoryLevelPreference
+import com.ismartcoding.plain.preference.EditorShowLineNumbersPreference
+import com.ismartcoding.plain.preference.EditorSyntaxHighlightPreference
+import com.ismartcoding.plain.preference.EditorWrapContentPreference
 import com.ismartcoding.plain.databinding.ViewTextEditorBinding
 import com.ismartcoding.plain.ui.extensions.setSafeClick
 import com.ismartcoding.plain.ui.views.CustomViewBase

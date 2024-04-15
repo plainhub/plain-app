@@ -3,7 +3,7 @@ package com.ismartcoding.plain.ui.helpers
 import android.view.MenuItem
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.DialogListDrawerBinding
-import com.ismartcoding.plain.features.tag.TagRelationStub
+import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.ui.extensions.ensureSelect
 import com.ismartcoding.plain.ui.models.FilteredItemsViewModel
 import com.ismartcoding.plain.ui.tag.SelectTagsDialog

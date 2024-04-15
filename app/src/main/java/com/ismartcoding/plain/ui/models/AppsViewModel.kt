@@ -6,11 +6,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
-import com.ismartcoding.plain.features.pkg.PackageHelper
+import com.ismartcoding.plain.features.PackageHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+@OptIn(SavedStateHandleSaveableApi::class)
 class AppsViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
     private val _itemsFlow = MutableStateFlow(mutableStateListOf<VPackage>())
     val itemsFlow: StateFlow<List<VPackage>> get() = _itemsFlow

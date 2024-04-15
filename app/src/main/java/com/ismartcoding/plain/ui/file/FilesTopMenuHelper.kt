@@ -6,8 +6,8 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.preference.FileSortByPreference
-import com.ismartcoding.plain.data.preference.ShowHiddenFilesPreference
+import com.ismartcoding.plain.preference.FileSortByPreference
+import com.ismartcoding.plain.preference.ShowHiddenFilesPreference
 import com.ismartcoding.plain.databinding.DialogFilesBinding
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.FileSystemHelper

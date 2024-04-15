@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.models
 
-import com.ismartcoding.plain.features.audio.DAudio
-import com.ismartcoding.plain.features.audio.DPlaylistAudio
+import com.ismartcoding.plain.data.DAudio
+import com.ismartcoding.plain.data.DPlaylistAudio
 
 data class Audio(
     val id: ID,

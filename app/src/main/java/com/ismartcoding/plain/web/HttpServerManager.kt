@@ -15,8 +15,8 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.data.HttpServerCheckResult
-import com.ismartcoding.plain.data.enums.HttpServerState
-import com.ismartcoding.plain.data.preference.PasswordPreference
+import com.ismartcoding.plain.enums.HttpServerState
+import com.ismartcoding.plain.preference.PasswordPreference
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.SessionClientTsUpdate
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
@@ -36,6 +36,7 @@ import io.ktor.server.engine.sslConnector
 import io.ktor.server.netty.Netty
 import io.ktor.server.netty.NettyApplicationEngine
 import io.ktor.websocket.send
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Instant
 import org.slf4j.LoggerFactory
@@ -83,6 +84,7 @@ object HttpServerManager {
         sendEvent(HttpServerStateChangedEvent(HttpServerState.OFF))
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun checkServerAsync(): HttpServerCheckResult {
         var websocket = false
         var http = false

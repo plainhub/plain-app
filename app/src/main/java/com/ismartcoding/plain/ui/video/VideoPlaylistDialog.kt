@@ -15,11 +15,11 @@ import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.preference.VideoPlaylistPreference
+import com.ismartcoding.plain.preference.VideoPlaylistPreference
 import com.ismartcoding.plain.databinding.DialogPlaylistBinding
 import com.ismartcoding.plain.databinding.ItemVideoBinding
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.features.video.DVideo
+import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.CastDialog
 import com.ismartcoding.plain.ui.extensions.initMenu

@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features.rule
 
 import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.plain.data.enums.ConfigType
+import com.ismartcoding.plain.enums.ConfigType
 import com.ismartcoding.plain.features.ApplyTo
 import com.ismartcoding.plain.features.Target
 import com.ismartcoding.plain.type.ConfigInput

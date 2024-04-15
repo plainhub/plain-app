@@ -11,9 +11,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.preference.EditorShowLineNumbersPreference
-import com.ismartcoding.plain.data.preference.EditorSyntaxHighlightPreference
-import com.ismartcoding.plain.data.preference.EditorWrapContentPreference
+import com.ismartcoding.plain.preference.EditorShowLineNumbersPreference
+import com.ismartcoding.plain.preference.EditorSyntaxHighlightPreference
+import com.ismartcoding.plain.preference.EditorWrapContentPreference
 import com.ismartcoding.plain.ui.base.PDialogListItem
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.models.MdEditorViewModel

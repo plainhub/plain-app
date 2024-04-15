@@ -6,7 +6,7 @@ import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.data.enums.AppChannelType
+import com.ismartcoding.plain.enums.AppChannelType
 
 object UrlHelper {
     private val mediaPathMap = mutableMapOf<String, String>() // format: <short_path>:<raw_path>

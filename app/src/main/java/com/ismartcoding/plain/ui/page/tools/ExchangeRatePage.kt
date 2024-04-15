@@ -29,10 +29,10 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.UIDataCache
-import com.ismartcoding.plain.data.preference.ExchangeConfig
-import com.ismartcoding.plain.data.preference.ExchangeRatePreference
-import com.ismartcoding.plain.data.preference.ExchangeRateProvider
-import com.ismartcoding.plain.data.preference.LocalExchangeRate
+import com.ismartcoding.plain.preference.ExchangeConfig
+import com.ismartcoding.plain.preference.ExchangeRatePreference
+import com.ismartcoding.plain.preference.ExchangeRateProvider
+import com.ismartcoding.plain.preference.LocalExchangeRate
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.DExchangeRate
 import com.ismartcoding.plain.helpers.ExchangeHelper

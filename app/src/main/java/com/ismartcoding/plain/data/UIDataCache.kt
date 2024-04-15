@@ -6,7 +6,7 @@ import com.ismartcoding.plain.InitQuery
 import com.ismartcoding.plain.NetworkQuery
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.VocabulariesQuery
-import com.ismartcoding.plain.data.enums.ConfigType
+import com.ismartcoding.plain.enums.ConfigType
 import com.ismartcoding.plain.db.DBox
 import com.ismartcoding.plain.extensions.toRoute
 import com.ismartcoding.plain.extensions.toRule

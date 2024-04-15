@@ -3,7 +3,7 @@ package com.ismartcoding.plain.features.device
 import android.content.Context
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.ISelectOption
-import com.ismartcoding.plain.data.preference.DeviceSortByPreference
+import com.ismartcoding.plain.preference.DeviceSortByPreference
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 
 enum class DeviceSortBy : ISelectOption {

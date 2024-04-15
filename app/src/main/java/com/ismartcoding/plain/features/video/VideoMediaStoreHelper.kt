@@ -9,9 +9,10 @@ import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.plain.data.DMediaBucket
+import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.features.BaseContentHelper
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.features.tag.TagRelationStub
+import com.ismartcoding.plain.data.TagRelationStub
 
 object VideoMediaStoreHelper : BaseContentHelper() {
     // https://stackoverflow.com/questions/63111091/java-lang-illegalargumentexception-volume-external-primary-not-found-in-android

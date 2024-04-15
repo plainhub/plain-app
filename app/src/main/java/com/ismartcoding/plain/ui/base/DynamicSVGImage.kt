@@ -9,8 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import com.caverock.androidsvg.SVG
-import com.ismartcoding.plain.data.enums.DarkTheme
-import com.ismartcoding.plain.data.preference.LocalDarkTheme
+import com.ismartcoding.plain.enums.DarkTheme
+import com.ismartcoding.plain.preference.LocalDarkTheme
 import com.ismartcoding.plain.ui.svg.parseDynamicColor
 import com.ismartcoding.plain.ui.theme.palette.LocalTonalPalettes
 

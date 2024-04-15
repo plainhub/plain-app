@@ -17,10 +17,10 @@ import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.data.enums.ButtonType
-import com.ismartcoding.plain.data.preference.AuthDevTokenPreference
-import com.ismartcoding.plain.data.preference.LocalAuthDevToken
-import com.ismartcoding.plain.data.preference.WebSettingsProvider
+import com.ismartcoding.plain.enums.ButtonType
+import com.ismartcoding.plain.preference.AuthDevTokenPreference
+import com.ismartcoding.plain.preference.LocalAuthDevToken
+import com.ismartcoding.plain.preference.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.ClipboardCard
 import com.ismartcoding.plain.ui.base.PBlockButton

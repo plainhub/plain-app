@@ -12,8 +12,8 @@ import com.ismartcoding.lib.helpers.ShareHelper
 import com.ismartcoding.lib.helpers.ZipHelper
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.ActionSourceType
-import com.ismartcoding.plain.data.enums.ActionType
+import com.ismartcoding.plain.enums.ActionSourceType
+import com.ismartcoding.plain.enums.ActionType
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString

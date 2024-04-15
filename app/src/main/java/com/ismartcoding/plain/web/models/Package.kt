@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.web.models
 
-import com.ismartcoding.plain.features.pkg.DPackage
+import com.ismartcoding.plain.data.DPackage
 import kotlinx.datetime.Instant
 
 data class Package(

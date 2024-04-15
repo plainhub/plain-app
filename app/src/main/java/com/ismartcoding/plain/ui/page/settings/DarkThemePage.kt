@@ -11,11 +11,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.enums.DarkTheme
-import com.ismartcoding.plain.data.preference.AmoledDarkThemePreference
-import com.ismartcoding.plain.data.preference.DarkThemePreference
-import com.ismartcoding.plain.data.preference.LocalAmoledDarkTheme
-import com.ismartcoding.plain.data.preference.LocalDarkTheme
+import com.ismartcoding.plain.enums.DarkTheme
+import com.ismartcoding.plain.preference.AmoledDarkThemePreference
+import com.ismartcoding.plain.preference.DarkThemePreference
+import com.ismartcoding.plain.preference.LocalAmoledDarkTheme
+import com.ismartcoding.plain.preference.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem

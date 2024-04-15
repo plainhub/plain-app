@@ -21,11 +21,11 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.data.preference.AudioPlayingPreference
-import com.ismartcoding.plain.features.audio.AudioAction
+import com.ismartcoding.plain.preference.AudioPlayingPreference
+import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.features.audio.AudioServiceAction
-import com.ismartcoding.plain.features.audio.MediaPlayMode
+import com.ismartcoding.plain.enums.AudioServiceAction
+import com.ismartcoding.plain.enums.MediaPlayMode
 
 @OptIn(UnstableApi::class)
 class AudioPlayerService : MediaLibraryService() {
