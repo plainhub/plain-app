@@ -9,9 +9,11 @@ import com.ismartcoding.lib.extensions.getFileName
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.hasPermission
 import com.ismartcoding.lib.extensions.newFile
+import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -118,6 +120,7 @@ object FileHelper {
             val fileName = path.getFilenameFromPath()
             val file = createDownloadFile(fileName)
             File(path).copyTo(file)
+            MainApp.instance.scanFileByConnection(file, null)
             return file.absolutePath
         } catch (ex: Exception) {
             ex.printStackTrace()
@@ -149,6 +152,7 @@ object FileHelper {
                     outputStream.close()
                 }
             }
+            MainApp.instance.scanFileByConnection(file, null)
             return file.absolutePath
         } catch (ex: Exception) {
             ex.printStackTrace()

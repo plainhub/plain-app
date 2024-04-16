@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.OpenInBrowser
+import androidx.compose.material.icons.outlined.SaveAs
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -45,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.ShareHelper
@@ -52,6 +54,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.extensions.timeAgo
+import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.features.feed.fetchContentAsync
@@ -184,6 +187,23 @@ fun FeedEntryPage(
                         isMenuOpen = false
                         val m = viewModel.item.value ?: return@PDropdownMenuItem
                         WebHelper.open(context, m.url)
+                    })
+                    PDropdownMenuItem(text = { Text(stringResource(R.string.save_to_notes)) }, leadingIcon = {
+                        Icon(
+                            Icons.Outlined.SaveAs,
+                            contentDescription = stringResource(id = R.string.save_to_notes)
+                        )
+                    }, onClick = {
+                        isMenuOpen = false
+                        val m = viewModel.item.value ?: return@PDropdownMenuItem
+                        scope.launch(Dispatchers.IO) {
+                            val c = "# ${m.title}\n\n" + m.content.ifEmpty { m.description }
+                            NoteHelper.saveToNotesAsync(m.id) {
+                                title = c.cut(100).replace("\n", "")
+                                content = c
+                            }
+                            DialogHelper.showMessage(R.string.saved)
+                        }
                     })
                     PDropdownMenuItem(text = { Text(stringResource(R.string.copy_link)) }, leadingIcon = {
                         Icon(

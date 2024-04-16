@@ -67,6 +67,31 @@ object NoteHelper {
         return noteDao.getById(id)
     }
 
+    fun saveToNotesAsync(
+        id: String,
+        updateItem: DNote.() -> Unit,
+    ): String {
+        var item = noteDao.getById(id)
+        var isInsert = false
+        if (item == null) {
+            item = DNote(id)
+            isInsert = true
+        } else {
+            item.updatedAt = Clock.System.now()
+        }
+
+        updateItem(item)
+
+        if (isInsert) {
+            noteDao.insert(item)
+        } else {
+            noteDao.update(item)
+        }
+
+        return item.id
+    }
+
+
     fun addOrUpdateAsync(
         id: String,
         updateItem: DNote.() -> Unit,
