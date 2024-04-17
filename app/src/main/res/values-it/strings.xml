@@ -3,6 +3,8 @@
     <string name="vpn_web_conflict_warning">Attualmente, il tuo VPN è attivo sul tuo dispositivo, il che potrebbe portare a problemi di connessione web quando si accede da un PC. Per risolvere questo problema, ti consigliamo di regolare le impostazioni del tuo VPN per consentire il traffico LAN o disattivare il tuo VPN.</string>
     <string name="warning">Attenzione</string>
     <string name="save_to_notes">Salva nelle note</string>
+    <string name="confirm_to_send_files_to_file_assistant">Vuoi inviare questi file all\'Assistente di Trasferimento File?</string>
+    <string name="confirm_to_send_file_to_file_assistant">Vuoi inviare questi file all\'Assistente di Trasferimento File?</string>
     <string name="today">Oggi</string>
     <string name="open_in_web">Apri nel browser web</string>
     <string name="require_password">Richiedi password</string>

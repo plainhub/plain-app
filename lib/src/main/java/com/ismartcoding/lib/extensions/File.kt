@@ -57,8 +57,23 @@ fun File.getBitmapAsync(
     width: Int,
     height: Int,
     centerCrop: Boolean = true,
+    mediaId: String = ""
 ): Bitmap? {
     var bitmap: Bitmap? = null
+    if (isQPlus()) {
+        val contentUri = if (mediaId.isNotEmpty()) context.getMediaContentUri(path, mediaId) else context.getMediaContentUri(path)
+        if (contentUri != null) {
+            try {
+                bitmap = context.contentResolver.loadThumbnail(contentUri, Size(width, height), null)
+            } catch (ex: Exception) {
+                LogCat.e(ex.toString())
+            }
+        }
+        if (bitmap != null) {
+            return bitmap
+        }
+    }
+
     if (this.path.isPartialSupportVideo()) {
         try {
             bitmap =
@@ -106,6 +121,7 @@ fun File.toThumbBytesAsync(
         } else {
             it.compress(Bitmap.CompressFormat.JPEG, 80, stream)
         }
+
         return stream.toByteArray()
     }
     return null

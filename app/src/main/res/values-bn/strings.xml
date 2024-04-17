@@ -3,6 +3,8 @@
     <string name="vpn_web_conflict_warning">আপনার ডিভাইসে সক্রিয় ভিপিএন আছে, যা একটি পিসি থেকে অ্যাক্সেস করার সময় ওয়েব সংযোগের সমস্যা উত্পন্ন করতে পারে। এটি সমাধান করতে, আমরা আপনাকে আপনার ভিপিএন সেটিংস পরিবর্তন করে এলএএন ট্র্যাফিক অনুমতি দেওয়া বা আপনার ভিপিএন নিষ্ক্রিয় করতে প্রস্তাবনা দিচ্ছি।</string>
     <string name="warning">সতর্কবার্তা</string>
     <string name="save_to_notes">নোটসে সংরক্ষণ করুন</string>
+    <string name="confirm_to_send_files_to_file_assistant">আপনি কি এই ফাইলগুলি ফাইল ট্রান্সফার এসিস্ট্যান্টে প্রেরণ করতে চান?</string>
+    <string name="confirm_to_send_file_to_file_assistant">আপনি কি এই ফাইলগুলি ফাইল ট্রান্সফার এসিস্ট্যান্টে প্রেরণ করতে চান?</string>
     <string name="today">আজ</string>
     <string name="open_in_web">ওয়েব ব্রাউজারে খোলুন</string>
     <string name="require_password">পাসওয়ার্ড প্রয়োজন</string>

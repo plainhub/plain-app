@@ -24,10 +24,6 @@ open class FilteredItemsViewModel : BaseItemsModel() {
                     val ids = withIO { TagHelper.getKeysByTagId(tagId) }
                     query += " ids:${ids.joinToString(",")}"
                 }
-                is DFeed -> {
-                    val feedId = (data as DFeed).id
-                    query += " feed_id:$feedId"
-                }
                 is DType -> {
                     val type = (data as DType).id
                     query += " type:$type"

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <title>Editor</title>
+    <style media="screen">
+        body {
+            overflow: hidden;
+        }
+        #editor {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            font-size: 16px;
+        }
+        .ace_mobile-button {
+            display: block !important;
+            padding: 8px !important;
+        }
+    </style>
+</head>
+<body>
+<div id="editor">
+</div>
+<script src="./ace/ace.js" type="text/javascript"></script>
+<script>
+let editor
+function loadEditor(data) {
+    editor = ace.edit('editor')
+    editor.renderer.setAnimatedScroll(true)
+
+    if (data.isDarkTheme) {
+        editor.setTheme('ace/theme/monokai')
+    }
+
+    if (data.wrapContent) {
+        editor.session.setUseWrapMode(true)
+    }
+
+    editor.session.setMode('ace/mode/' + data.language)
+    editor.renderer.setPadding(8)
+    editor.setValue(data.content, -1)
+    if (data.readOnly) {
+        editor.setReadOnly(true)
+    } else {
+        editor.session.on('change', function(delta) { AndroidApp.updateContent(editor.getValue()) })
+    }
+    AndroidApp.editorReady()
+}
+
+function updateWrapContent(wrapContent) {
+    editor.session.setUseWrapMode(wrapContent)
+}
+</script>
+</body>
+</html>

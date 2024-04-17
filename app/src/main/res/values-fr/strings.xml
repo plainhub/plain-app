@@ -3,6 +3,8 @@
     <string name="vpn_web_conflict_warning">Votre VPN est actuellement activé sur votre appareil, ce qui pourrait potentiellement entraîner des problèmes de connexion Web lorsqu\'il est accédé depuis un PC. Pour résoudre cela, nous vous recommandons d\'ajuster les paramètres de votre VPN pour autoriser le trafic LAN ou de désactiver votre VPN.</string>
     <string name="warning">Avertissement</string>
     <string name="save_to_notes">Enregistrer dans les notes</string>
+    <string name="confirm_to_send_files_to_file_assistant">Souhaitez-vous envoyer ces fichiers à l\'assistant de transfert de fichiers?</string>
+    <string name="confirm_to_send_file_to_file_assistant">Souhaitez-vous envoyer ces fichiers à l\'assistant de transfert de fichiers?</string>
     <string name="today">Aujourd\'hui</string>
     <string name="open_in_web">Ouvrir dans le navigateur web</string>
     <string name="require_password">Mot de passe requis</string>

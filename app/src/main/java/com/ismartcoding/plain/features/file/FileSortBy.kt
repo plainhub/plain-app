@@ -3,6 +3,7 @@ package com.ismartcoding.plain.features.file
 import android.provider.MediaStore
 import com.ismartcoding.lib.data.SortBy
 import com.ismartcoding.lib.data.enums.SortDirection
+import com.ismartcoding.plain.R
 
 enum class FileSortBy {
     DATE_ASC,
@@ -12,6 +13,29 @@ enum class FileSortBy {
     NAME_ASC,
     NAME_DESC,
     ;
+
+    fun getTextId(): Int {
+        return when (this) {
+            NAME_ASC -> {
+                R.string.name_asc
+            }
+            NAME_DESC -> {
+                R.string.name_desc
+            }
+            DATE_ASC -> {
+                R.string.oldest_date_first
+            }
+            DATE_DESC -> {
+                R.string.newest_date_first
+            }
+            SIZE_ASC -> {
+                R.string.smallest_first
+            }
+            SIZE_DESC -> {
+                R.string.largest_first
+            }
+        }
+    }
 
     fun toSortBy(): SortBy {
         return when (this) {

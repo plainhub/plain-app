@@ -25,6 +25,7 @@ import com.ismartcoding.plain.enums.MediaType
 import com.ismartcoding.plain.preference.VideoSortByPreference
 import com.ismartcoding.plain.databinding.ItemMediaBucketGridBinding
 import com.ismartcoding.plain.databinding.ItemVideoGridBinding
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionsResultEvent
@@ -76,7 +77,7 @@ class VideosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     }
 
     private fun checkPermission() {
-        binding.list.checkPermission(requireContext(), setOf(Permission.WRITE_EXTERNAL_STORAGE), Permission.WRITE_EXTERNAL_STORAGE)
+        binding.list.checkPermission(requireContext(), AppFeatureType.FILES)
     }
 
     override fun initList() {

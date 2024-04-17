@@ -24,6 +24,7 @@ import com.ismartcoding.plain.enums.MediaType
 import com.ismartcoding.plain.preference.ImageSortByPreference
 import com.ismartcoding.plain.databinding.ItemImageGridBinding
 import com.ismartcoding.plain.databinding.ItemMediaBucketGridBinding
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionsResultEvent
@@ -171,7 +172,7 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
     }
 
     private fun checkPermission() {
-        binding.list.checkPermission(requireContext(), setOf(Permission.WRITE_EXTERNAL_STORAGE), Permission.WRITE_EXTERNAL_STORAGE)
+        binding.list.checkPermission(requireContext(), AppFeatureType.FILES)
     }
 
     override fun updateList() {

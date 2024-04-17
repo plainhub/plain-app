@@ -12,6 +12,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Typography
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 object PlainTheme {
@@ -19,7 +20,7 @@ object PlainTheme {
     val PAGE_TOP_MARGIN = 8.dp
     val CARD_RADIUS = 12.dp
     val APP_BAR_HEIGHT = 64.dp
-    const val ANIMATION_DURATION = 200
+    const val ANIMATION_DURATION = 300
 
     @Composable
     fun getCardModifier(index: Int = 0, size: Int = 1, selected: Boolean = false): Modifier {
@@ -55,3 +56,15 @@ fun Typography.buttonTextLarge() = bodyMedium.copy(fontSize = 16.sp)
 
 @Composable
 fun Typography.tipsText() = bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+@Composable
+fun Typography.listItemTitle() = titleMedium.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
+
+@Composable
+fun Typography.listItemDescription() = titleSmall.copy(color = MaterialTheme.colorScheme.onSurface)
+
+@Composable
+fun Typography.listItemSubtitle() = labelLarge.copy(color = MaterialTheme.colorScheme.secondary)
+
+@Composable
+fun Typography.listItemTag() = labelLarge.copy(color = MaterialTheme.colorScheme.primary)

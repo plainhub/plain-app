@@ -228,6 +228,18 @@ fun Context.getMediaContentUri(path: String): Uri? {
     return getMediaContent(path, uri)
 }
 
+fun Context.getMediaContentUri(path: String, id: String): Uri? {
+    val basUri =
+        when {
+            path.isImageFast() -> if (isQPlus()) MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            path.isVideoFast() -> if (isQPlus()) MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+            path.isAudioFast() -> if (isQPlus()) MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+            else -> MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        }
+
+    return Uri.withAppendedPath(basUri, id)
+}
+
 fun Context.getMediaContent(
     path: String,
     baseUri: Uri,

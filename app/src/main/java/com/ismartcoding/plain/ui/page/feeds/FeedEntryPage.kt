@@ -49,7 +49,7 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
-import com.ismartcoding.lib.helpers.ShareHelper
+import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.enums.DataType
@@ -215,7 +215,7 @@ fun FeedEntryPage(
                         val m = viewModel.item.value ?: return@PDropdownMenuItem
                         val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), m.url)
                         clipboardManager.setPrimaryClip(clip)
-                        DialogHelper.showConfirmDialog("", context.getString(R.string.copied_to_clipboard_format, m.url))
+                        DialogHelper.showTextCopiedMessage(m.url)
                     })
                 })
         },
@@ -257,7 +257,7 @@ fun FeedEntryPage(
                             modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
                             style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold),
                             onDoubleClick = {
-                                navController.navigateText("JSON", jsonEncode(m, pretty = true))
+                                navController.navigateText("JSON", jsonEncode(m, pretty = true), "json")
                             },
                             onClick = {
                                 WebHelper.open(context, m.url)

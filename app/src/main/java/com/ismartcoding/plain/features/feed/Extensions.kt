@@ -79,7 +79,8 @@ suspend fun DFeedEntry.fetchContentAsync(): ApiResult {
                 articleContent.selectFirst("h1")?.remove()
                 val c = articleContent.toString()
                 val mobilizedHtml = HtmlUtils.improveHtmlContent(c, HtmlUtils.getBaseUrl(url))
-                if (description.isEmpty() || c.length >= description.length) { // If the retrieved text is smaller than the original one, then we certainly failed...
+                val summary = getSummary()
+                if (summary.isEmpty() || c.length >= summary.length) { // If the retrieved text is smaller than the original one, then we certainly failed...
                     val imagesList = HtmlUtils.getImageURLs(mobilizedHtml)
                     if (imagesList.isNotEmpty()) {
                         if (image.isEmpty()) {

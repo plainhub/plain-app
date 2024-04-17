@@ -99,7 +99,7 @@ fun ViewFeedBottomSheet(
                 PIconButton(icon = Icons.Outlined.ContentCopy, contentDescription = stringResource(id = R.string.copy_link), onClick = {
                     val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), m.url)
                     clipboardManager.setPrimaryClip(clip)
-                    DialogHelper.showConfirmDialog("", context.getString(R.string.copied_to_clipboard_format, m.url))
+                    DialogHelper.showTextCopiedMessage(m.url)
                 })
             })
         }

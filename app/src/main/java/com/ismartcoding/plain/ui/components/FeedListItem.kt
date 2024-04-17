@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
@@ -27,13 +26,15 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.theme.PlainTheme
+import com.ismartcoding.plain.ui.theme.listItemDescription
+import com.ismartcoding.plain.ui.theme.listItemSubtitle
+import com.ismartcoding.plain.ui.theme.listItemTitle
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun FeedListItem(
     viewModel: FeedsViewModel,
     m: DFeed,
-    selectedItem: DFeed?,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
 ) {
@@ -48,7 +49,7 @@ fun FeedListItem(
         Surface(
             modifier =
             PlainTheme
-                .getCardModifier(selected = selectedItem?.id == m.id || viewModel.selectedIds.contains(m.id))
+                .getCardModifier(selected = viewModel.selectedItem.value?.id == m.id || viewModel.selectedIds.contains(m.id))
                 .combinedClickable(
                     onClick = onClick,
                     onLongClick = onLongClick,
@@ -69,20 +70,20 @@ fun FeedListItem(
                 ) {
                     Text(
                         text = m.name + " (${m.count})",
-                        style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold),
+                        style = MaterialTheme.typography.listItemTitle(),
                     )
                     VerticalSpace(dp = 8.dp)
                     Text(
                         text = m.url,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                        style = MaterialTheme.typography.listItemDescription(),
                     )
-                        VerticalSpace(dp = 8.dp)
-                        Text(
-                            text = stringResource(id = R.string.auto_fetch_full_content) + ": " + m.fetchContent.getText(),
-                            style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
-                        )
+                    VerticalSpace(dp = 8.dp)
+                    Text(
+                        text = stringResource(id = R.string.auto_fetch_full_content) + ": " + m.fetchContent.getText(),
+                        style = MaterialTheme.typography.listItemSubtitle(),
+                    )
                 }
             }
         }

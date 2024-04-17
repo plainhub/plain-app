@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ui.page
 
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -24,7 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.helpers.FormatHelper
-import com.ismartcoding.lib.helpers.ShareHelper
+import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.base.*
@@ -49,7 +48,7 @@ fun OtherFilePage(
                 contentDescription = stringResource(R.string.share),
                 tint = MaterialTheme.colorScheme.onSurface,
             ) {
-                ShareHelper.share(context, Uri.parse(path))
+                ShareHelper.shareFile(context, File(path))
             }
         },
         content = {

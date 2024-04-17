@@ -10,7 +10,7 @@ fun ImageView.glide(url: String) {
     val view = this
     if (url.isPartialSupportVideo()) {
         coMain {
-            val t = withIO { File(url).getBitmapAsync(view.context, 400, 400) }
+            val t = withIO { File(url).getBitmapAsync(view.context, 200, 200) }
             Glide.with(view).load(t).into(view)
         }
     } else {

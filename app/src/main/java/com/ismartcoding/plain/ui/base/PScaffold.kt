@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -43,7 +44,12 @@ fun PScaffold(
         topBar = {
             if (navigationIcon != null || actions != null) {
                 TopAppBar(
-                    title = { Text(topBarTitle, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                    title = {
+                        Text(
+                            topBarTitle, style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
+                            maxLines = 1, overflow = TextOverflow.Ellipsis
+                        )
+                    },
                     navigationIcon = { navigationIcon?.invoke() },
                     actions = { actions?.invoke(this) },
                     modifier = if (topBarOnDoubleClick != null) Modifier

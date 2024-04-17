@@ -94,9 +94,7 @@
             android:name=".ui.MainActivity"
             android:configChanges="uiMode|orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="true"
-            android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:screenOrientation="user"
             android:supportsPictureInPicture="true"
             android:windowSoftInputMode="adjustResize"
             tools:ignore="LockedOrientationActivity">
@@ -171,16 +169,6 @@
             <intent-filter>
                 <action android:name="${applicationId}.action.stop_http_server" />
                 <action android:name="${applicationId}.action.stop_screen_mirror" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name=".receivers.PlugInControlReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
-                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
             </intent-filter>
         </receiver>
 

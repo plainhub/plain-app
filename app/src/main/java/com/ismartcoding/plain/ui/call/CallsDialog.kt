@@ -19,6 +19,7 @@ import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.call.CallMediaStoreHelper
 import com.ismartcoding.plain.data.DCall
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.extensions.checkPermission
@@ -64,7 +65,7 @@ class CallsDialog : BaseListDrawerDialog() {
                         return@initBottomBar
                     }
                     binding.list.rv.ensureSelect { items ->
-                        DialogHelper.confirmToDelete(requireContext()) {
+                        DialogHelper.confirmToDelete {
                             lifecycleScope.launch {
                                 val ids = items.map { it.data.id }.toSet()
                                 DialogHelper.showLoading()
@@ -95,11 +96,11 @@ class CallsDialog : BaseListDrawerDialog() {
                 } else {
                     DialogHelper.showMessage(R.string.call_phone_permission_required)
                 }
+            } else {
+                checkPermission()
             }
         }
-        receiveEvent<PermissionsResultEvent> { event ->
-            checkPermission()
-        }
+
         receiveEvent<ActionEvent> { event ->
             if (event.source == ActionSourceType.CALL) {
                 binding.list.page.refresh()
@@ -113,7 +114,7 @@ class CallsDialog : BaseListDrawerDialog() {
     }
 
     private fun checkPermission() {
-        binding.list.checkPermission(requireContext(), setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG), Permission.READ_CALL_LOG)
+        binding.list.checkPermission(requireContext(), AppFeatureType.CALLS)
     }
 
     override fun updateList() {

@@ -39,6 +39,7 @@ import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.data.DPlaylistAudio
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.BaseDialog
@@ -316,7 +317,7 @@ class FilesDialog(val fileType: FilesType = FilesType.INTERNAL_STORAGE) : BaseDi
 
     private fun checkPermission() {
         binding.breadcrumb.isVisible = Permission.WRITE_EXTERNAL_STORAGE.can(requireContext())
-        binding.list.checkPermission(requireContext(), setOf(Permission.WRITE_EXTERNAL_STORAGE), Permission.WRITE_EXTERNAL_STORAGE)
+        binding.list.checkPermission(requireContext(), AppFeatureType.FILES)
     }
 
     private fun updateList() {

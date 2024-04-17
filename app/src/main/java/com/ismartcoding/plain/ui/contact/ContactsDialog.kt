@@ -20,6 +20,7 @@ import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.call.CallMediaStoreHelper
 import com.ismartcoding.plain.features.contact.ContactMediaStoreHelper
 import com.ismartcoding.plain.data.DContact
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.extensions.checkPermission
@@ -69,7 +70,7 @@ class ContactsDialog : BaseListDrawerDialog() {
                         return@initBottomBar
                     }
                     binding.list.rv.ensureSelect { items ->
-                        DialogHelper.confirmToDelete(requireContext()) {
+                        DialogHelper.confirmToDelete {
                             lifecycleScope.launch {
                                 val ids = items.map { it.data.id }.toSet()
                                 DialogHelper.showLoading()
@@ -118,7 +119,7 @@ class ContactsDialog : BaseListDrawerDialog() {
     }
 
     private fun checkPermission() {
-        binding.list.checkPermission(requireContext(), setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS), Permission.READ_CONTACTS)
+        binding.list.checkPermission(requireContext(), AppFeatureType.CONTACTS)
     }
 
     override fun updateList() {

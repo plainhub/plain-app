@@ -419,6 +419,23 @@ object ImageSortByPreference : BasePreference<Int>() {
     }
 }
 
+object DocSortByPreference : BasePreference<Int>() {
+    override val default = FileSortBy.NAME_ASC.ordinal
+    override val key = intPreferencesKey("doc_sort_by")
+
+    suspend fun putAsync(
+        context: Context,
+        value: FileSortBy,
+    ) {
+        putAsync(context, value.ordinal)
+    }
+
+    suspend fun getValueAsync(context: Context): FileSortBy {
+        val value = getAsync(context)
+        return FileSortBy.entries.find { it.ordinal == value } ?: FileSortBy.DATE_DESC
+    }
+}
+
 object FileSortByPreference : BasePreference<Int>() {
     override val default = FileSortBy.NAME_ASC.ordinal
     override val key = intPreferencesKey("file_sort_by")

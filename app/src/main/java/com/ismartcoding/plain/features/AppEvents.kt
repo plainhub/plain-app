@@ -123,7 +123,7 @@ class AIChatCreatedEvent(val item: DAIChat)
 object AppEvents {
     private lateinit var mediaPlayer: MediaPlayer
     private var mediaPlayingUri: Uri? = null
-    private val wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "${BuildConfig.APPLICATION_ID}:http_server")
+    val wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "${BuildConfig.APPLICATION_ID}:http_server")
 
     @OptIn(BetaOpenAI::class)
     fun register() {

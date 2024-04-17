@@ -67,7 +67,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
         viewModelScope.launch(Dispatchers.IO) {
             TagHelper.deleteTagRelationByKeys(
                 ids,
-                DataType.NOTE,
+                dataType,
             )
             NoteHelper.trashAsync(ids)
             total.value = NoteHelper.count(getTotalQuery())
@@ -84,7 +84,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
         viewModelScope.launch(Dispatchers.IO) {
             TagHelper.deleteTagRelationByKeys(
                 ids,
-                DataType.NOTE,
+                dataType,
             )
             NoteHelper.untrashAsync(ids)
             total.value = NoteHelper.count(getTotalQuery())
@@ -101,7 +101,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
         viewModelScope.launch(Dispatchers.IO) {
             TagHelper.deleteTagRelationByKeys(
                 ids,
-                DataType.NOTE,
+                dataType,
             )
             NoteHelper.deleteAsync(ids)
             totalTrash.value = NoteHelper.count(getTrashQuery())

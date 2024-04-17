@@ -114,7 +114,7 @@ fun WebAddressBar(
                 onClick = {
                     val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), defaultUrl.value)
                     clipboardManager.setPrimaryClip(clip)
-                    DialogHelper.showConfirmDialog("", context.getString(R.string.copied_to_clipboard_format, defaultUrl.value))
+                    DialogHelper.showTextCopiedMessage(defaultUrl.value)
                 },
             )
         }
@@ -159,9 +159,7 @@ fun WebAddressBar(
                             showContextMenu.value = false
                             val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), url)
                             clipboardManager.setPrimaryClip(clip)
-                            DialogHelper.showConfirmDialog(
-                                "", context.getString(R.string.copied_to_clipboard_format, url),
-                            )
+                            DialogHelper.showTextCopiedMessage(url)
                         })
                     }
                 }

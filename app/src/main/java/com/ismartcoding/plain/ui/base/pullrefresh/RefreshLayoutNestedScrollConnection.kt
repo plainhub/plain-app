@@ -94,7 +94,7 @@ internal class RefreshLayoutNestedScrollConnection(
                     }
                 }
                 ComposePosition.Top -> {
-                    LogCat.d("ComposePosition.Top: ${available.y} ${refreshOffset}")
+//                    LogCat.d("ComposePosition.Top: ${available.y} ${refreshOffset}")
                     if (available.y < 0 && refreshOffset > 0) {
                         //消费的手势
                         var consumptive = available.y
@@ -106,7 +106,7 @@ internal class RefreshLayoutNestedScrollConnection(
                     }
                 }
                 ComposePosition.Bottom -> {
-                    LogCat.d("ComposePosition.Bottom: ${available.y} ${refreshOffset}")
+//                    LogCat.d("ComposePosition.Bottom: ${available.y} ${refreshOffset}")
                     if (available.y > 0 && refreshOffset < 0) {
                         //消费的手势
                         var consumptive = available.y

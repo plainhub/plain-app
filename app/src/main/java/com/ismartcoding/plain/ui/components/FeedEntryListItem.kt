@@ -43,6 +43,10 @@ import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.theme.PlainTheme
+import com.ismartcoding.plain.ui.theme.listItemDescription
+import com.ismartcoding.plain.ui.theme.listItemSubtitle
+import com.ismartcoding.plain.ui.theme.listItemTag
+import com.ismartcoding.plain.ui.theme.listItemTitle
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
@@ -90,14 +94,14 @@ fun FeedEntryListItem(
                     ) {
                         Text(
                             text = m.title,
-                            style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold),
+                            style = MaterialTheme.typography.listItemTitle()
                         )
                         VerticalSpace(dp = 8.dp)
                         Text(
                             text = m.getSummary(),
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurface),
+                            style = MaterialTheme.typography.listItemDescription(),
                         )
                     }
                     if (m.image.isNotEmpty()) {
@@ -122,7 +126,7 @@ fun FeedEntryListItem(
                         text = arrayOf(feed?.name ?: "", m.author, m.publishedAt.timeAgo()).filter {
                             it.isNotEmpty()
                         }.joinToString(" · "),
-                        style = MaterialTheme.typography.labelLarge.copy(color = MaterialTheme.colorScheme.secondary),
+                        style = MaterialTheme.typography.listItemSubtitle(),
                     )
                     tags.forEach { tag ->
                         ClickableText(
@@ -130,7 +134,7 @@ fun FeedEntryListItem(
                             modifier = Modifier
                                 .wrapContentHeight()
                                 .align(Alignment.Bottom),
-                            style = MaterialTheme.typography.labelLarge.copy(color = MaterialTheme.colorScheme.primary),
+                            style = MaterialTheme.typography.listItemTag(),
                             onClick = {
                                 if (viewModel.selectMode.value) {
                                     return@ClickableText

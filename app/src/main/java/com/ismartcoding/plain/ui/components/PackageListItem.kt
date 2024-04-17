@@ -24,6 +24,9 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.VPackage
+import com.ismartcoding.plain.ui.theme.listItemDescription
+import com.ismartcoding.plain.ui.theme.listItemSubtitle
+import com.ismartcoding.plain.ui.theme.listItemTitle
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -62,23 +65,22 @@ fun PackageListItem(
             ) {
                 Text(
                     text = item.name + " (${item.version})",
-                    style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.onSurface),
+                    style = MaterialTheme.typography.listItemTitle(),
                 )
                 VerticalSpace(dp = 8.dp)
                 Text(
                     text = item.id,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.listItemDescription(),
                 )
                 VerticalSpace(dp = 8.dp)
                 Text(
                     text = stringResource(id = LocaleHelper.getStringIdentifier("app_type_" + item.type)) + " " + FormatHelper.formatBytes(item.size),
-                    style = MaterialTheme.typography.labelLarge.copy(color = MaterialTheme.colorScheme.secondary),
+                    style = MaterialTheme.typography.listItemDescription(),
                 )
                 VerticalSpace(dp = 8.dp)
                 Text(
                     text = stringResource(id = R.string.updated_at) + "  " + item.updatedAt.formatDateTime(),
-                    style = MaterialTheme.typography.labelLarge.copy(color = MaterialTheme.colorScheme.secondary),
+                    style = MaterialTheme.typography.listItemSubtitle()
                 )
             }
         }

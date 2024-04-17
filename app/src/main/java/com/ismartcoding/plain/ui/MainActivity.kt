@@ -2,8 +2,10 @@ package com.ismartcoding.plain.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.res.Configuration
 import android.database.CursorWindow
 import android.net.Uri
@@ -38,6 +40,7 @@ import com.ismartcoding.lib.extensions.setSystemScreenTimeout
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
@@ -76,6 +79,7 @@ import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.helpers.ScreenHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.mediaProjectionManager
+import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.NotificationListenerMonitorService
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -162,6 +166,8 @@ class MainActivity : AppCompatActivity() {
         sendEvent(WindowFocusChangedEvent(hasFocus))
     }
 
+    private val plugInReceiver = PlugInControlReceiver()
+
     @SuppressLint("ClickableViewAccessibility", "DiscouragedPrivateApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -186,6 +192,15 @@ class MainActivity : AppCompatActivity() {
         BluetoothPermission.init(this)
         Permissions.init(this)
         initEvents()
+        val powerConnectionFilter = IntentFilter().apply {
+            addAction(Intent.ACTION_POWER_CONNECTED)
+            addAction(Intent.ACTION_POWER_DISCONNECTED)
+        }
+        if (isTPlus()) {
+            registerReceiver(plugInReceiver, powerConnectionFilter, RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(plugInReceiver, powerConnectionFilter)
+        }
 
         setContent {
             SettingsProvider {
@@ -217,6 +232,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         BluetoothPermission.release()
         Permissions.release()
+        unregisterReceiver(plugInReceiver)
     }
 
     @SuppressLint("CheckResult")
@@ -333,7 +349,7 @@ class MainActivity : AppCompatActivity() {
                             withIO { HttpServerManager.respondTokenAsync(event, clientIp) }
                         }
                     }
-                        .setNegativeButton(getString(R.string.reject)) { _, _ ->
+                    .setNegativeButton(getString(R.string.reject)) { _, _ ->
                         launch {
                             withIO {
                                 event.session.close(

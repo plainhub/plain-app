@@ -101,9 +101,7 @@ fun FeedsPage(
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
             scope.launch {
-                withIO {
-                    viewModel.loadAsync(withCount = true)
-                }
+                withIO { viewModel.loadAsync(withCount = true) }
                 setRefreshState(RefreshContentState.Finished)
             }
         }
@@ -297,7 +295,6 @@ fun FeedsPage(
                             FeedListItem(
                                 viewModel = viewModel,
                                 m,
-                                viewModel.selectedItem.value,
                                 onClick = {
                                     if (viewModel.selectMode.value) {
                                         viewModel.select(m.id)

@@ -32,6 +32,9 @@ import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.theme.PlainTheme
+import com.ismartcoding.plain.ui.theme.listItemDescription
+import com.ismartcoding.plain.ui.theme.listItemSubtitle
+import com.ismartcoding.plain.ui.theme.listItemTag
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
@@ -69,7 +72,7 @@ fun NoteListItem(
             ) {
                 Text(
                     text = m.title,
-                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal, color = MaterialTheme.colorScheme.onSurface),
+                    style = MaterialTheme.typography.listItemDescription(),
                 )
                 VerticalSpace(dp = 8.dp)
                 FlowRow(
@@ -78,7 +81,7 @@ fun NoteListItem(
                 ) {
                     Text(
                         text = m.updatedAt.timeAgo(),
-                        style = MaterialTheme.typography.labelLarge.copy(color = MaterialTheme.colorScheme.secondary),
+                        style = MaterialTheme.typography.listItemSubtitle(),
                     )
                     tags.forEach { tag ->
                         ClickableText(
@@ -86,7 +89,7 @@ fun NoteListItem(
                             modifier = Modifier
                                 .wrapContentHeight()
                                 .align(Alignment.Bottom),
-                            style = MaterialTheme.typography.labelLarge.copy(color = MaterialTheme.colorScheme.primary),
+                            style = MaterialTheme.typography.listItemTag(),
                             onClick = {
                                 if (viewModel.selectMode.value) {
                                     return@ClickableText

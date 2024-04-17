@@ -58,7 +58,6 @@ fun DocsSearchPage(
 ) {
     val itemsState by viewModel.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
-    var queryText by rememberSaveable { mutableStateOf(q) }
     var active by rememberSaveable {
         mutableStateOf(true)
     }
@@ -66,16 +65,22 @@ fun DocsSearchPage(
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
             scope.launch {
-                withIO { viewModel.loadAsync(context, queryText) }
+                withIO { viewModel.loadAsync(context, viewModel.queryText) }
                 setRefreshState(RefreshContentState.Finished)
             }
         }
     val focusRequester = remember { FocusRequester() }
     LaunchedEffect(Unit) {
+        viewModel.search.value = true
+        if (viewModel.queryText.isEmpty()) {
+            viewModel.queryText = q
+        }
         if (active) {
             focusRequester.requestFocus()
         }
     }
+
+    ViewFileBottomSheet(viewModel)
 
     Column(
         Modifier
@@ -86,16 +91,16 @@ fun DocsSearchPage(
         SearchBar(
             modifier = Modifier
                 .focusRequester(focusRequester),
-            query = queryText,
+            query = viewModel.queryText,
             onQueryChange = {
-                queryText = it
+                viewModel.queryText = it
             },
             onSearch = {
-                if (queryText.isNotEmpty()) {
+                if (viewModel.queryText.isNotEmpty()) {
                     active = false
                     viewModel.showLoading.value = true
                     scope.launch(Dispatchers.IO) {
-                        viewModel.loadAsync(context, queryText)
+                        viewModel.loadAsync(context, viewModel.queryText)
                     }
                 }
             },
@@ -103,7 +108,7 @@ fun DocsSearchPage(
             onActiveChange = {
                 if (active != it) {
                     active = it
-                    if (!active && queryText.isEmpty()) {
+                    if (!active && viewModel.queryText.isEmpty()) {
                         navController.popBackStack()
                     }
                 }
@@ -115,7 +120,7 @@ fun DocsSearchPage(
                     contentDescription = stringResource(R.string.back),
                     tint = MaterialTheme.colorScheme.onSurface,
                 ) {
-                    if (!active || queryText.isEmpty()) {
+                    if (!active || viewModel.queryText.isEmpty()) {
                         navController.popBackStack()
                     } else {
                         active = false
@@ -139,14 +144,14 @@ fun DocsSearchPage(
                         TopSpace()
                     }
                     items(itemsState) { m ->
-                        DocItem(navController, m)
+                        DocItem(navController, viewModel, m)
                         VerticalSpace(dp = 8.dp)
                     }
                     item {
                         if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
                             LaunchedEffect(Unit) {
                                 scope.launch(Dispatchers.IO) {
-                                    withIO { viewModel.moreAsync(context, queryText) }
+                                    withIO { viewModel.moreAsync(context, viewModel.queryText) }
                                 }
                             }
                         }

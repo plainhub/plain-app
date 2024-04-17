@@ -6,7 +6,7 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.ShareHelper
+import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.ActionSourceType
 import com.ismartcoding.plain.enums.ActionType
@@ -61,7 +61,7 @@ object AudiosBottomMenuHelper {
 
             R.id.delete -> {
                 rv.ensureSelect { items ->
-                    DialogHelper.confirmToDelete(context) {
+                    DialogHelper.confirmToDelete {
                         lifecycleScope.launch {
                             val ids = items.map { it.data.id }.toSet()
                             withIO {

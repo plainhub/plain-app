@@ -3,6 +3,8 @@
     <string name="vpn_web_conflict_warning">您的手機啟用了VPN，這可能會導致從電腦訪問網頁時出現連接問題。我們建議您調整VPN設置允許區域網路流量或關閉VPN。</string>
     <string name="warning">警告</string>
     <string name="save_to_notes">保存到筆記</string>
+    <string name="confirm_to_send_files_to_file_assistant">您想將這些檔案傳送到檔案傳輸助手嗎？</string>
+    <string name="confirm_to_send_file_to_file_assistant">您想將這些檔案傳送到檔案傳輸助手嗎？</string>
     <string name="today">今天</string>
     <string name="open_in_web">在瀏覽器中開啟</string>
     <string name="require_password">需要密碼</string>

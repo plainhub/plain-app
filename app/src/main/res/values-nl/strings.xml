@@ -3,6 +3,8 @@
     <string name="vpn_web_conflict_warning">Uw VPN is momenteel ingeschakeld op uw apparaat, wat mogelijk kan leiden tot webverbinding problemen bij toegang vanaf uw pc. Om dit op te lossen, raden we aan om uw VPN-instellingen aan te passen om LAN-verkeer toe te staan of uw VPN uit te schakelen.</string>
     <string name="warning">Waarschuwing</string>
     <string name="save_to_notes">Opslaan in notities</string>
+    <string name="confirm_to_send_files_to_file_assistant">Wilt u deze bestanden naar de Bestandsoverdrachtassistent sturen?</string>
+    <string name="confirm_to_send_file_to_file_assistant">Wilt u deze bestanden naar de Bestandsoverdrachtassistent sturen?</string>
     <string name="today">Vandaag</string>
     <string name="open_in_web">Openen in webbrowser</string>
     <string name="require_password">Wachtwoord vereist</string>

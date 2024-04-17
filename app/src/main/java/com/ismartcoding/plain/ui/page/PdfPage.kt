@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.getFileName
-import com.ismartcoding.lib.helpers.ShareHelper
+import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold

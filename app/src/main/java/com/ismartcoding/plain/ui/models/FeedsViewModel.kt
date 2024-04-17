@@ -30,7 +30,7 @@ class FeedsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
     var showAddDialog = mutableStateOf(false)
     var showEditDialog = mutableStateOf(false)
     var selectedItem = mutableStateOf<DFeed?>(null)
-    var editId = mutableStateOf("")
+    private var editId = mutableStateOf("")
     var editUrl = mutableStateOf("")
     var editName = mutableStateOf("")
     var editFetchContent = mutableStateOf(false)
@@ -143,7 +143,6 @@ class FeedsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
         editFetchContent.value = false
         showAddDialog.value = true
     }
-
 
     fun showEditDialog(item: DFeed) {
         editUrlError.value = ""

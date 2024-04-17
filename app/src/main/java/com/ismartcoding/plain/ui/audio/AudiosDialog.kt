@@ -18,6 +18,7 @@ import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.enums.ActionSourceType
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.MediaType
 import com.ismartcoding.plain.preference.AudioPlayingPreference
@@ -70,7 +71,7 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
     }
 
     private fun checkPermission() {
-        binding.list.checkPermission(requireContext(), setOf(Permission.WRITE_EXTERNAL_STORAGE), Permission.WRITE_EXTERNAL_STORAGE)
+        binding.list.checkPermission(requireContext(), AppFeatureType.FILES)
     }
 
     override fun initEvents() {

@@ -38,26 +38,29 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.extensions.parcelableArrayList
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
-import com.ismartcoding.plain.preference.LocalDarkTheme
 import com.ismartcoding.plain.features.ConfirmDialogEvent
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.data.DPlaylistAudio
+import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.preference.LocalDarkTheme
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.TextEditorDialog
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.extensions.navigatePdf
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.page.apps.AppPage
 import com.ismartcoding.plain.ui.page.apps.AppsPage
 import com.ismartcoding.plain.ui.page.apps.AppsSearchPage
+import com.ismartcoding.plain.ui.page.audio.AudioPage
 import com.ismartcoding.plain.ui.page.chat.ChatEditTextPage
 import com.ismartcoding.plain.ui.page.chat.ChatPage
 import com.ismartcoding.plain.ui.page.chat.ChatTextPage
@@ -78,7 +81,6 @@ import com.ismartcoding.plain.ui.page.settings.BackupRestorePage
 import com.ismartcoding.plain.ui.page.settings.ColorAndStylePage
 import com.ismartcoding.plain.ui.page.settings.DarkThemePage
 import com.ismartcoding.plain.ui.page.settings.LanguagePage
-import com.ismartcoding.plain.ui.page.settings.LogsPage
 import com.ismartcoding.plain.ui.page.settings.SettingsPage
 import com.ismartcoding.plain.ui.page.tags.TagsPage
 import com.ismartcoding.plain.ui.page.tools.ExchangeRatePage
@@ -114,6 +116,11 @@ fun Main(viewModel: MainViewModel) {
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
 
     LaunchedEffect(Unit) {
+        events.add(
+            receiveEventHandler<ConfirmDialogEvent> { event ->
+                confirmDialogEvent = event
+            }
+        )
         val intent = MainActivity.instance.get()?.intent
         if (intent?.action == Intent.ACTION_VIEW) {
             val uri = intent.data
@@ -141,29 +148,32 @@ fun Main(viewModel: MainViewModel) {
                 }
             }
         } else if (intent?.action == Intent.ACTION_SEND) {
-            val uri = intent.parcelable(Intent.EXTRA_STREAM) as? Uri
-            if (uri != null) {
-                navController.navigate(RouteName.CHAT)
-                scope.launch(Dispatchers.IO) {
-                    delay(1000)
-                    sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, setOf(uri)))
-                }
-            }
+            DialogHelper.showConfirmDialog("", getString(R.string.confirm_to_send_file_to_file_assistant),
+                confirmButton = getString(R.string.ok) to {
+                    val uri = intent.parcelable(Intent.EXTRA_STREAM) as? Uri
+                    if (uri != null) {
+                        navController.navigate(RouteName.CHAT)
+                        scope.launch(Dispatchers.IO) {
+                            delay(1000)
+                            sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, setOf(uri)))
+                        }
+                    }
+                },
+                dismissButton = getString(R.string.cancel) to {})
         } else if (intent?.action == Intent.ACTION_SEND_MULTIPLE) {
-            val uris = intent.parcelableArrayList<Uri>(Intent.EXTRA_STREAM)
-            if (uris != null) {
-                navController.navigate(RouteName.CHAT)
-                scope.launch(Dispatchers.IO) {
-                    delay(1000)
-                    sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris.toSet()))
-                }
-            }
+            DialogHelper.showConfirmDialog("", getString(R.string.confirm_to_send_files_to_file_assistant),
+                confirmButton = getString(R.string.ok) to {
+                    val uris = intent.parcelableArrayList<Uri>(Intent.EXTRA_STREAM)
+                    if (uris != null) {
+                        navController.navigate(RouteName.CHAT)
+                        scope.launch(Dispatchers.IO) {
+                            delay(1000)
+                            sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris.toSet()))
+                        }
+                    }
+                },
+                dismissButton = getString(R.string.cancel) to {})
         }
-        events.add(
-            receiveEventHandler<ConfirmDialogEvent> { event ->
-                confirmDialogEvent = event
-            }
-        )
     }
 
     AppTheme(useDarkTheme = useDarkTheme) {
@@ -185,7 +195,6 @@ fun Main(viewModel: MainViewModel) {
                 RouteName.LANGUAGE to { LanguagePage(navController) },
                 RouteName.BACKUP_RESTORE to { BackupRestorePage(navController) },
                 RouteName.ABOUT to { AboutPage(navController) },
-                RouteName.LOGS to { LogsPage(navController) },
                 RouteName.WEB_SETTINGS to { WebSettingsPage(navController, viewModel) },
                 RouteName.SESSIONS to { SessionsPage(navController) },
                 RouteName.WEB_DEV to { WebDevPage(navController) },
@@ -202,6 +211,7 @@ fun Main(viewModel: MainViewModel) {
                 RouteName.FEEDS to { FeedsPage(navController) },
                 RouteName.FEED_SETTINGS to { FeedSettingsPage(navController) },
                 RouteName.WEB_LEARN_MORE to { WebLearnMorePage(navController) },
+                RouteName.AUDIO to { AudioPage(navController) },
             ).forEach { (routeName, content) ->
                 slideHorizontallyComposable(routeName.name) {
                     content()
@@ -280,7 +290,17 @@ fun Main(viewModel: MainViewModel) {
             slideHorizontallyComposable(RouteName.TEXT.name) {
                 val title = navController.previousBackStackEntry?.savedStateHandle?.get("title") ?: ""
                 val content = navController.previousBackStackEntry?.savedStateHandle?.get("content") ?: ""
-                TextPage(navController, title, content)
+                val language = navController.previousBackStackEntry?.savedStateHandle?.get("language") ?: ""
+                TextPage(navController, title, content, language)
+            }
+
+            slideHorizontallyComposable(RouteName.TEXT_FILE.name) {
+                val path = navController.previousBackStackEntry?.savedStateHandle?.get("path") ?: ""
+                val title = navController.previousBackStackEntry?.savedStateHandle?.get("title") ?: ""
+                val type = navController.previousBackStackEntry?.savedStateHandle?.get("type") ?: ""
+                val mediaStoreId = navController.previousBackStackEntry?.savedStateHandle?.get("mediaStoreId") ?: ""
+                val readOnly = navController.previousBackStackEntry?.savedStateHandle?.get("readOnly") ?: false
+                TextFilePage(navController, path, title, mediaStoreId, readOnly, type)
             }
 
             slideHorizontallyComposable(

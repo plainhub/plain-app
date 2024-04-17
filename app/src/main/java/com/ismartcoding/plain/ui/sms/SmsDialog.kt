@@ -10,6 +10,7 @@ import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.ActionSourceType
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.ActionEvent
@@ -82,7 +83,7 @@ class SmsDialog : BaseListDrawerDialog() {
     }
 
     private fun checkPermission() {
-        binding.list.checkPermission(requireContext(), setOf(Permission.READ_SMS), Permission.READ_SMS)
+        binding.list.checkPermission(requireContext(), AppFeatureType.SMS)
     }
 
     override fun updateList() {

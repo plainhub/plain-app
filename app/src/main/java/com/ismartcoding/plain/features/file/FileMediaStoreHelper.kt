@@ -6,7 +6,9 @@ import android.provider.MediaStore
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.lib.helpers.SearchHelper
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.FileType
+import com.ismartcoding.plain.extensions.sort
 import com.ismartcoding.plain.features.BaseContentHelper
 import kotlinx.datetime.Instant
 import java.util.Locale
@@ -103,7 +105,39 @@ object FileMediaStoreHelper : BaseContentHelper() {
         return result
     }
 
-    fun getAllByFileType(context: Context, volumeName: String, fileType: FileType, showHidden: Boolean = false): List<DFile> {
+    fun getById(context: Context, id: String): DFile? {
+        var file: DFile? = null
+        context.queryCursor(uriExternal, getProjection(), "${MediaStore.Files.FileColumns._ID} = ?", arrayOf(id)) { cursor, indexCache ->
+            try {
+                val title = cursor.getStringValue(MediaStore.Files.FileColumns.DISPLAY_NAME, indexCache)
+                val size = cursor.getLongValue(MediaStore.Files.FileColumns.SIZE, indexCache)
+                val path = cursor.getStringValue(MediaStore.Files.FileColumns.DATA, indexCache)
+                val updatedAt = Instant.fromEpochMilliseconds(
+                    cursor.getLongValue(MediaStore.Files.FileColumns.DATE_MODIFIED, indexCache) * 1000L,
+                )
+                file = DFile(
+                    title,
+                    path,
+                    "",
+                    updatedAt,
+                    size,
+                    false,
+                    0,
+                    id
+                )
+            } catch (e: Exception) {
+                LogCat.e(e.toString())
+            }
+        }
+
+        return file
+    }
+
+    fun getAllByFileType(
+        context: Context, volumeName: String,
+        fileType: FileType, sortBy: FileSortBy,
+        showHidden: Boolean = false
+    ): List<DFile> {
         val items = ArrayList<DFile>()
         val uri = MediaStore.Files.getContentUri(volumeName)
         val projection = getProjection()
@@ -123,39 +157,38 @@ object FileMediaStoreHelper : BaseContentHelper() {
                 }
 
                 val path = cursor.getStringValue(MediaStore.Files.FileColumns.DATA, cache)
-                val updatedAt =
-                    Instant.fromEpochMilliseconds(
-                        cursor.getLongValue(MediaStore.Files.FileColumns.DATE_MODIFIED, cache) * 1000L,
-                    )
+                val updatedAt = Instant.fromEpochMilliseconds(
+                    cursor.getLongValue(MediaStore.Files.FileColumns.DATE_MODIFIED, cache) * 1000L,
+                )
                 val mimetype = fullMimetype.substringBefore("/")
                 when (fileType) {
                     FileType.IMAGE -> {
                         if (mimetype == "image") {
-                            items.add(DFile(name, path, "", updatedAt, size, false, 0))
+                            items.add(DFile(name, path, "", updatedAt, size, false, 0, id))
                         }
                     }
 
                     FileType.VIDEO -> {
                         if (mimetype == "video") {
-                            items.add(DFile(name, path, "", updatedAt, size, false, 0))
+                            items.add(DFile(name, path, "", updatedAt, size, false, 0, id))
                         }
                     }
 
                     FileType.AUDIO -> {
                         if (mimetype == "audio" || extraAudioMimeTypes.contains(fullMimetype)) {
-                            items.add(DFile(name, path, "", updatedAt, size, false, 0))
+                            items.add(DFile(name, path, "", updatedAt, size, false, 0, id))
                         }
                     }
 
                     FileType.DOCUMENT -> {
                         if (mimetype == "text" || extraDocumentMimeTypes.contains(fullMimetype)) {
-                            items.add(DFile(name, path, "", updatedAt, size, false, 0))
+                            items.add(DFile(name, path, "", updatedAt, size, false, 0, id))
                         }
                     }
 
                     FileType.ARCHIVE -> {
                         if (archiveMimeTypes.contains(fullMimetype)) {
-                            items.add(DFile(name, path, "", updatedAt, size, false, 0))
+                            items.add(DFile(name, path, "", updatedAt, size, false, 0, id))
                         }
                     }
 
@@ -164,7 +197,7 @@ object FileMediaStoreHelper : BaseContentHelper() {
                             !extraAudioMimeTypes.contains(fullMimetype) && !extraDocumentMimeTypes.contains(fullMimetype) &&
                             !archiveMimeTypes.contains(fullMimetype)
                         ) {
-                            items.add(DFile(name, path, "", updatedAt, size, false, 0))
+                            items.add(DFile(name, path, "", updatedAt, size, false, 0, id))
                         }
                     }
                 }
@@ -172,6 +205,6 @@ object FileMediaStoreHelper : BaseContentHelper() {
             }
         }
 
-        return items.sortedByDescending { it.updatedAt }
+        return items.sort(sortBy)
     }
 }

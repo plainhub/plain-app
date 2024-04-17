@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.cut
@@ -165,20 +167,26 @@ fun NotePage(
     LaunchedEffect(viewModel.editMode) {
         if (viewModel.editMode) {
             keyboardController?.show()
-            scope.launch(Dispatchers.IO) {
-                delay(500)
-                coMain {
-                    insetsController.hide(WindowInsetsCompat.Type.navigationBars())
-                    if (shouldRequestFocus) {
+            if (shouldRequestFocus) {
+                scope.launch(Dispatchers.IO) {
+                    delay(500)
+                    coMain {
                         focusRequester.requestFocus()
                         shouldRequestFocus = false
                     }
                 }
             }
         } else {
-            insetsController.show(WindowInsetsCompat.Type.navigationBars())
             keyboardController?.hide()
             focusManager.clearFocus()
+        }
+    }
+
+    SideEffect {
+        if (viewModel.editMode) {
+            insetsController.hide(WindowInsetsCompat.Type.navigationBars())
+        } else {
+            insetsController.show(WindowInsetsCompat.Type.navigationBars())
         }
     }
 

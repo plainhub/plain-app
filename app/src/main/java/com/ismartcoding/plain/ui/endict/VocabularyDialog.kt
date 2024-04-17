@@ -162,7 +162,7 @@ class VocabularyDialog(val vocabulary: DVocabulary) : BaseDialog<DialogVocabular
                     bindingItem.cbContainer.visibility = View.GONE
                     bindingItem.enableSwipeMenu(true)
                     bindingItem.setRightSwipeButton(getString(R.string.delete)) {
-                        DialogHelper.confirmToAction(requireContext(), R.string.confirm_to_delete) {
+                        DialogHelper.confirmToAction(R.string.confirm_to_delete) {
                             lifecycleScope.launch {
                                 withIO {
                                     VocabularyList.addOrUpdateAsync(vocabulary.id) {
@@ -231,7 +231,7 @@ class VocabularyDialog(val vocabulary: DVocabulary) : BaseDialog<DialogVocabular
                 DialogHelper.showMessage(R.string.select_first)
                 return@setSafeClick
             }
-            DialogHelper.confirmToAction(requireContext(), R.string.confirm_to_delete) {
+            DialogHelper.confirmToAction(R.string.confirm_to_delete) {
                 lifecycleScope.launch {
                     withIO {
                         VocabularyList.addOrUpdateAsync(vocabulary.id) {

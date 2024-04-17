@@ -1,11 +1,12 @@
 package com.ismartcoding.plain.ui.helpers
 
-import android.content.Context
 import android.widget.Toast
 import com.apollographql.apollo3.api.ApolloResponse
 import com.apollographql.apollo3.api.Operation
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.lib.isTPlus
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.ApiResult
 import com.ismartcoding.plain.api.GraphqlApiResult
@@ -91,7 +92,6 @@ object DialogHelper {
     }
 
     fun confirmToAction(
-        context: Context,
         messageId: Int,
         callback: () -> Unit,
     ) {
@@ -120,9 +120,14 @@ object DialogHelper {
     }
 
     fun confirmToDelete(
-        context: Context,
         callback: () -> Unit,
     ) {
-        confirmToAction(context, R.string.confirm_to_delete, callback)
+        confirmToAction(R.string.confirm_to_delete, callback)
+    }
+
+    fun showTextCopiedMessage(text: String) {
+        if (!isTPlus()) {
+            showConfirmDialog("", MainApp.instance.getString(R.string.copied_to_clipboard_format, text))
+        }
     }
 }

@@ -35,12 +35,14 @@ import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.data.DPlaylistAudio
+import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.TextEditorDialog
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
 import com.ismartcoding.plain.ui.base.PAsyncImage
 import com.ismartcoding.plain.ui.extensions.navigateOtherFile
 import com.ismartcoding.plain.ui.extensions.navigatePdf
+import com.ismartcoding.plain.ui.extensions.navigateTextFile
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.preview.PreviewDialog
@@ -83,11 +85,7 @@ fun ChatFiles(
                                 AudioPlayer.play(context, DPlaylistAudio.fromPath(context, path))
                             }
                         } else if (path.isTextFile()) {
-                            if (item.size <= Constants.MAX_READABLE_TEXT_FILE_SIZE) {
-                                TextEditorDialog(Uri.fromFile(File(path))).show()
-                            } else {
-                                DialogHelper.showMessage(R.string.text_file_size_limit)
-                            }
+                            navController.navigateTextFile(path, mediaStoreId = "", type = TextFileType.CHAT)
                         } else if (path.isPdfFile()) {
                             navController.navigatePdf(Uri.fromFile(File(path)))
                         } else {

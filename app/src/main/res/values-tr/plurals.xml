@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="posts">
+        <item quantity="one">%,d gönderi</item>
+        <item quantity="other">%,d gönderi</item>
+    </plurals>
+    <plurals name="items">
+        <item quantity="one">%,d öğe</item>
+        <item quantity="other">%,d öğe</item>
+    </plurals>
+    <plurals name="x_folders">
+        <item quantity="one">%,d klasör</item>
+        <item quantity="other">%,d klasör</item>
+    </plurals>
+    <plurals name="x_files">
+        <item quantity="one">%,d dosya</item>
+        <item quantity="other">%,d dosya</item>
+    </plurals>
+    <plurals name="copying_items">
+        <item quantity="one">%d öğe kopyalanıyor</item>
+        <item quantity="other">%d öğe kopyalanıyor</item>
+    </plurals>
+    <plurals name="moving_items">
+        <item quantity="one">%d öğe taşınıyor</item>
+        <item quantity="other">%d öğe taşınıyor</item>
+    </plurals>
+    <plurals name="n_hours">
+        <item quantity="one">%d saat</item>
+        <item quantity="other">%d saat</item>
+    </plurals>
+    <plurals name="n_minutes">
+        <item quantity="one">%d dakika</item>
+        <item quantity="other">%d dakika</item>
+    </plurals>
+    <plurals name="n_seconds">
+        <item quantity="one">%d saniye</item>
+        <item quantity="other">%d saniye</item>
+    </plurals>
+</resources>

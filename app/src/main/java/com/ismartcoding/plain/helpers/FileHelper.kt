@@ -23,7 +23,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
 import java.io.IOException
-import java.io.InputStream
 
 object FileHelper {
     fun fileFromAsset(
@@ -129,7 +128,7 @@ object FileHelper {
         return ""
     }
 
-    fun copyFileToDownloads(context: Context,  uri: Uri): String {
+    fun copyFileToDownloads(context: Context, uri: Uri): String {
         try {
             val fileName = uri.getFileName(context)
             val file = createDownloadFile(fileName)

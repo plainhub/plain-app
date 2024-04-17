@@ -13,7 +13,7 @@ buildscript {
 }
 
 plugins {
-    id("com.google.devtools.ksp") version "1.9.23-1.0.20" apply false
+    alias(libs.plugins.devtools.ksp) apply false
 }
 
 allprojects {
@@ -25,5 +25,5 @@ allprojects {
 }
 
 tasks.register<Delete>("clean").configure {
-    delete(rootProject.buildDir)
+    delete(rootProject.layout.buildDirectory)
 }

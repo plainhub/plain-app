@@ -788,3 +788,30 @@ fun String.base64Encode(): String {
 fun String.base64Decode(): String {
     return String(Base64.getDecoder().decode(this))
 }
+
+fun String.pathToAceMode(): String {
+    return when (getFilenameExtension().lowercase()) {
+        "js", "javascript" -> "javascript"
+        "java" -> "java"
+        "kt", "kotlin" -> "kotlin"
+        "xml", "html", "htm", "xhtml", "jsp", "jspx", "php", "phtml", "volt", "twig" -> "xml"
+        "css", "less", "scss", "sass" -> "css"
+        "json" -> "json"
+        "md", "markdown" -> "markdown"
+        "sql" -> "sql"
+        "txt", "text", "log", "cfg", "ini", "conf", "properties", "bat", "sh" -> "text"
+        "c", "h", "cpp", "hpp" -> "c_cpp"
+        "py" -> "python"
+        "rb" -> "ruby"
+        "pl" -> "perl"
+        "groovy" -> "groovy"
+        "swift" -> "swift"
+        "go" -> "golang"
+        "rust" -> "rust"
+        "dart" -> "dart"
+        "yaml", "yml" -> "yaml"
+        "dockerfile" -> "dockerfile"
+        "r" -> "r"
+        else -> "text" // Default to plain text if no specific mapping found
+    }
+}

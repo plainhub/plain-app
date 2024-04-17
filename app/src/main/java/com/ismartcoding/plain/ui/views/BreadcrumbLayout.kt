@@ -161,7 +161,7 @@ class BreadcrumbLayout : HorizontalScrollView {
                         R.id.copy_path -> {
                             val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.file_path), data.path)
                             clipboardManager.setPrimaryClip(clip)
-                            DialogHelper.showConfirmDialog("", context.getString(R.string.copied_to_clipboard_format, data.path))
+                            DialogHelper.showTextCopiedMessage(data.path)
                             true
                         }
 

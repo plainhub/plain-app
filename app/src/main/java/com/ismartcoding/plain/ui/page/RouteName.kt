@@ -8,7 +8,6 @@ enum class RouteName {
     DARK_THEME,
     BACKUP_RESTORE,
     ABOUT,
-    LOGS,
     WEB_SETTINGS,
     WEB_SECURITY,
     WEB_LEARN_MORE,
@@ -32,4 +31,7 @@ enum class RouteName {
     FEEDS,
     FEED_ENTRIES,
     FEED_SETTINGS,
+    AUDIO,
+    AUDIO_PLAYER,
+    TEXT_FILE,
 }

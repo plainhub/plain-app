@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.base
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
+import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.MoreVert
@@ -65,6 +66,17 @@ fun ActionButtonTags(onClick: () -> Unit) {
         onClick = onClick,
     )
 }
+
+@Composable
+fun ActionButtonSort(onClick: () -> Unit) {
+    PIconButton(
+        icon = Icons.AutoMirrored.Outlined.Sort,
+        contentDescription = stringResource(R.string.sort),
+        tint = MaterialTheme.colorScheme.onSurface,
+        onClick = onClick,
+    )
+}
+
 
 @Composable
 fun ActionButtonSearch(onClick: () -> Unit) {

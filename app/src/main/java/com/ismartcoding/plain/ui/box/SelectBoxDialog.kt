@@ -45,7 +45,7 @@ class SelectBoxDialog() : BaseBottomSheetDialog<DialogSelectBoxBinding>() {
                     }
                     binding.enableSwipeMenu(true)
                     binding.setRightSwipeButton(getString(R.string.delete)) {
-                        DialogHelper.confirmToAction(requireContext(), R.string.confirm_to_delete) {
+                        DialogHelper.confirmToAction(R.string.confirm_to_delete) {
                             lifecycleScope.launch {
                                 withIO {
                                     BoxHelper.unpairAsync(m)

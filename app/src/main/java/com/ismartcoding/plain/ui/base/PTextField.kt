@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.ismartcoding.lib.helpers.CoroutinesHelper
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.plain.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -48,8 +49,8 @@ fun PTextField(
     if (requestFocus) {
         LaunchedEffect(Unit) {
             coIO {
-                delay(100)
-                CoroutinesHelper.coMain {
+                delay(200)
+                coMain {
                     focusRequester.requestFocus()
                 }
             }

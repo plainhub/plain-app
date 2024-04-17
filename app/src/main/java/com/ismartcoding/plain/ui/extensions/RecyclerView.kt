@@ -176,7 +176,7 @@ suspend fun RecyclerView.updateDrawerMenuAsync(viewModel: FilesViewModel) {
             iconId = R.drawable.ic_storage
         },
     )
-    val sdCardPath = FileSystemHelper.getSDCardPath(context)
+    val sdCardPath = withIO { FileSystemHelper.getSDCardPath(context)  }
     if (sdCardPath.isNotEmpty()) {
         groups.add(
             MenuItemModel(sdCardPath).apply {

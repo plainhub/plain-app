@@ -42,7 +42,7 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.ismartcoding.lib.apk.ApkParsers
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.ShareHelper
+import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -129,7 +129,7 @@ fun AppPage(
                             DialogHelper.showLoading()
                             val content = withIO { ApkParsers.getManifestXml(item?.path ?: "") }
                             DialogHelper.hideLoading()
-                            navController.navigateText("Manifest", content)
+                            navController.navigateText("Manifest", content, "xml")
                         } catch (ex: Exception) {
                             ex.printStackTrace()
                             DialogHelper.hideLoading()

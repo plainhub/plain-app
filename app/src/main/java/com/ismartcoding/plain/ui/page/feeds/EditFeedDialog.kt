@@ -19,9 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.ui.base.PDialogListItem
-import com.ismartcoding.plain.ui.base.PDialogTips
-import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 

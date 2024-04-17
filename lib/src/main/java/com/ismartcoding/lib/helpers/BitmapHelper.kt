@@ -4,28 +4,16 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.ismartcoding.lib.extensions.getBitmapAsync
-import com.ismartcoding.lib.extensions.isVideoFast
 import java.io.File
 
 object BitmapHelper {
-    suspend fun decodeBitmapFromFileAsync(
+    fun decodeBitmapFromFileAsync(
         context: Context,
         filePath: String,
         reqWidth: Int,
         reqHeight: Int,
     ): Bitmap? {
-        if (filePath.isVideoFast()) {
-            return File(filePath).getBitmapAsync(context, reqWidth, reqHeight)
-        }
-
-        val options = BitmapFactory.Options()
-        options.inJustDecodeBounds = true
-        BitmapFactory.decodeFile(filePath, options)
-
-        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight)
-        options.inJustDecodeBounds = false
-
-        return BitmapFactory.decodeFile(filePath, options)
+        return File(filePath).getBitmapAsync(context, reqWidth, reqHeight)
     }
 
     fun calculateInSampleSize(

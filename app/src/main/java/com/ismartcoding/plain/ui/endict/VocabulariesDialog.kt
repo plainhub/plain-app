@@ -57,7 +57,7 @@ class VocabulariesDialog : BaseDialog<DialogVocabulariesBinding>() {
                     }.show()
                 }
                 binding.setRightSwipeButton(getString(R.string.delete)) {
-                    DialogHelper.confirmToAction(requireContext(), R.string.confirm_to_delete) {
+                    DialogHelper.confirmToAction(R.string.confirm_to_delete) {
                         lifecycleScope.launch {
                             withIO { VocabularyList.deleteAsync(m) }
                             binding.swipeMenu.quickClose()

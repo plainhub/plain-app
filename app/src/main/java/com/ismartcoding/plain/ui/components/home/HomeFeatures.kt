@@ -52,6 +52,13 @@ fun HomeFeatures(
             ) {
                 AudiosDialog().show()
             }
+//            PIconTextButton(
+//                icon = Icons.Outlined.AudioFile,
+//                stringResource(id = R.string.audios),
+//                modifier = Modifier.width(itemWidth),
+//            ) {
+//                navController.navigate(RouteName.AUDIO)
+//            }
             PIconTextButton(
                 icon = Icons.Outlined.VideoFile,
                 stringResource(id = R.string.videos),

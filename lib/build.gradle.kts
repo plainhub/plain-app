@@ -3,7 +3,7 @@ plugins {
     id("com.google.devtools.ksp")
     kotlin("android")
     kotlin("kapt")
-    kotlin("plugin.serialization") version "1.9.22"
+    kotlin("plugin.serialization") version "1.9.23"
 }
 
 android {
