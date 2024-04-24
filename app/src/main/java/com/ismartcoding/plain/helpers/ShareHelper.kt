@@ -10,7 +10,6 @@ import com.ismartcoding.lib.extensions.getMimeType
 import com.ismartcoding.lib.extensions.getMimeTypeFromUri
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.MainActivity
 import java.io.File
