@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.net.toFile
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.getFileName
 import com.ismartcoding.plain.helpers.ShareHelper
@@ -35,7 +36,11 @@ fun PdfPage(
                 contentDescription = stringResource(R.string.share),
                 tint = MaterialTheme.colorScheme.onSurface,
             ) {
-                ShareHelper.share(context, uri)
+                if (uri.scheme == "content") {
+                    ShareHelper.shareUri(context, uri)
+                } else {
+                    ShareHelper.shareFile(context, uri.toFile())
+                }
             }
         },
         content = {

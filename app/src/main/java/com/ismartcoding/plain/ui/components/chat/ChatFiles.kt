@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import coil.size.Size
 import com.ismartcoding.lib.extensions.dp2px
@@ -87,7 +88,7 @@ fun ChatFiles(
                         } else if (path.isTextFile()) {
                             navController.navigateTextFile(path, mediaStoreId = "", type = TextFileType.CHAT)
                         } else if (path.isPdfFile()) {
-                            navController.navigatePdf(Uri.fromFile(File(path)))
+                            navController.navigatePdf(File(path).toUri())
                         } else {
                             navController.navigateOtherFile(path)
                         }

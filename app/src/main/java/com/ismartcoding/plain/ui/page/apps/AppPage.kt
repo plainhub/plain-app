@@ -66,6 +66,7 @@ import com.ismartcoding.plain.ui.extensions.navigateText
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -151,7 +152,7 @@ fun AppPage(
                 contentDescription = stringResource(R.string.share),
                 tint = MaterialTheme.colorScheme.onSurface,
             ) {
-                ShareHelper.share(context, Uri.parse(item?.path ?: ""))
+                ShareHelper.shareFile(context, File(item?.path ?: ""))
             }
         },
         content = {

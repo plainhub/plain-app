@@ -37,7 +37,7 @@ object VideosBottomMenuHelper {
         when (menuItem.itemId) {
             R.id.share -> {
                 rv.ensureSelect { items ->
-                    ShareHelper.share(context, ArrayList(items.map { VideoMediaStoreHelper.getItemUri(it.data.id) }))
+                    ShareHelper.shareUris(context, ArrayList(items.map { VideoMediaStoreHelper.getItemUri(it.data.id) }))
                 }
             }
 

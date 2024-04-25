@@ -2,9 +2,11 @@ package com.ismartcoding.plain.ui.page
 
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
@@ -22,11 +24,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.helpers.ShareHelper
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.MainActivity
-import com.ismartcoding.plain.ui.base.*
+import com.ismartcoding.plain.ui.base.PBlockButton
+import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.openPathIntent
 import java.io.File
 

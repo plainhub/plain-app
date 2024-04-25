@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.content.FileProvider
-import com.ismartcoding.lib.extensions.getMediaContentUri
 import com.ismartcoding.lib.extensions.getMimeType
 import com.ismartcoding.lib.extensions.getMimeTypeFromUri
 import com.ismartcoding.plain.Constants
@@ -15,18 +14,25 @@ import com.ismartcoding.plain.ui.MainActivity
 import java.io.File
 
 object ShareHelper {
-    fun share(
+    fun shareUri(
         context: Context,
         uri: Uri,
     ) {
-        if (uri.scheme == "file") {
-            shareFile(context, File(uri.path!!))
-            return
-        }
         val shareIntent = createFileIntent(context, uri)
         val chooserIntent = Intent.createChooser(shareIntent, getString(R.string.share))
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
         context.startActivity(chooserIntent)
+    }
+
+    fun shareUris(
+        context: Context,
+        uris: List<Uri>,
+    ) {
+        if (uris.size == 1) {
+            shareUri(context, uris[0])
+        } else {
+            shareFileUris(context, uris)
+        }
     }
 
     fun shareText(
@@ -49,25 +55,18 @@ object ShareHelper {
         context: Context,
         paths: Set<String>,
     ) {
-        share(context, paths.map { Uri.parse(it) })
-    }
-
-    fun share(
-        context: Context,
-        uris: List<Uri>,
-    ) {
-        if (uris.size == 1) {
-            share(context, uris[0])
+        if (paths.size == 1) {
+            shareFile(context, File(paths.first()))
         } else {
-            shareFiles(context, uris)
+            shareFiles(context, paths.map { File(it) })
         }
     }
 
-    private fun shareFiles(
+    private fun shareFileUris(
         context: Context,
         uris: List<Uri>,
     ) {
-        val shareIntent = createFilesIntent(context, uris)
+        val shareIntent = createFilesIntent(uris)
         val chooserIntent = Intent.createChooser(shareIntent, getString(R.string.share))
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
         context.startActivity(chooserIntent)
@@ -84,46 +83,19 @@ object ShareHelper {
         return Intent().apply {
             action = Intent.ACTION_SEND
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            val path = uri.toString()
-            var newUri = uri
-            if (!path.startsWith("content://")) {
-                context.getMediaContentUri(path)?.let {
-                    newUri = it
-                }
-            }
-            putExtra(
-                Intent.EXTRA_STREAM,
-                newUri,
-            )
-            var mimeType = path.getMimeType()
-            if (mimeType.isEmpty()) {
-                mimeType = context.getMimeTypeFromUri(uri)
-            }
-            type = mimeType
+            putExtra(Intent.EXTRA_STREAM, uri)
+            type = context.getMimeTypeFromUri(uri)
         }
     }
 
     private fun createFilesIntent(
-        context: Context,
         uris: List<Uri>,
     ): Intent {
         return Intent().apply {
             action = Intent.ACTION_SEND_MULTIPLE
-            val newUris = mutableListOf<Uri>()
-            val paths = mutableListOf<String>()
-            uris.forEach { uri ->
-                val path = uri.toString()
-                var newUri = uri
-                if (!path.startsWith("content://")) {
-                    context.getMediaContentUri(path)?.let {
-                        newUri = it
-                    }
-                }
-                newUris.add(newUri)
-                paths.add(path)
-            }
-            type = paths.getMimeType()
-            putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(newUris))
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
+            type = "*/*"
         }
     }
 
@@ -132,8 +104,28 @@ object ShareHelper {
         file: File,
     ) {
         val intent = Intent(Intent.ACTION_SEND)
-        intent.type = "*/*"
+        intent.type = file.path.getMimeType()
         intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, Constants.AUTHORITY, file))
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val chooserIntent = Intent.createChooser(intent, getString(R.string.share))
+        chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
+        context.startActivity(chooserIntent)
+    }
+
+    fun shareFiles(
+        context: Context,
+        files: List<File>,
+    ) {
+        val fileUris = arrayListOf<Uri>()
+
+        for (file in files) {
+            fileUris.add(FileProvider.getUriForFile(context, Constants.AUTHORITY, file))
+        }
+
+        val intent = Intent(Intent.ACTION_SEND_MULTIPLE)
+        intent.type = "*/*"
+        intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, fileUris)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         val chooserIntent = Intent.createChooser(intent, getString(R.string.share))
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
         context.startActivity(chooserIntent)

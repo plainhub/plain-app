@@ -35,7 +35,7 @@ object ImagesBottomMenuHelper {
         when (menuItem.itemId) {
             R.id.share -> {
                 rv.ensureSelect { items ->
-                    ShareHelper.share(context, ArrayList(items.map { ImageMediaStoreHelper.getItemUri(it.data.id) }))
+                    ShareHelper.shareUris(context, ArrayList(items.map { ImageMediaStoreHelper.getItemUri(it.data.id) }))
                 }
             }
             R.id.cast -> {

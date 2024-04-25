@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import coil.size.Size
 import com.ismartcoding.lib.extensions.dp2px
@@ -69,7 +70,7 @@ fun DocItem(
                             if (m.path.isTextFile()) {
                                 navController.navigateTextFile(m.path, mediaStoreId = m.mediaStoreId)
                             } else if (m.path.isPdfFile()) {
-                                navController.navigatePdf(Uri.fromFile(File(m.path)))
+                                navController.navigatePdf(File(m.path).toUri())
                             } else {
                                 navController.navigateOtherFile(m.path)
                             }
