@@ -4,10 +4,11 @@ import android.graphics.Color
 import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.viewinterop.AndroidView
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.enums.Language
-import com.ismartcoding.plain.extensions.toJsValue
+import com.ismartcoding.plain.ui.components.EditorData
 import com.ismartcoding.plain.ui.components.EditorWebViewClient
 import com.ismartcoding.plain.ui.components.EditorWebViewInterface
 import com.ismartcoding.plain.ui.models.TextFileViewModel
@@ -19,14 +20,19 @@ import kotlinx.coroutines.launch
 fun AceEditor(
     viewModel: TextFileViewModel,
     scope: CoroutineScope,
-    content: String,
-    language: String,
-    isDarkTheme: Boolean,
-    readOnly: Boolean
+    data: EditorData,
 ) {
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.webView.value?.destroy()
+            viewModel.webView.value = null
+        }
+    }
+
     AndroidView(factory = {
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
-        WebView(it).apply {
+        val webView = WebView(it)
+        webView.apply {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -35,11 +41,7 @@ fun AceEditor(
             settings.javaScriptEnabled = true
             webViewClient = EditorWebViewClient(
                 context,
-                content,
-                language,
-                wrapContent = viewModel.wrapContent.value,
-                isDarkTheme = isDarkTheme,
-                readOnly = readOnly,
+                data
             )
             addJavascriptInterface(
                 EditorWebViewInterface(
@@ -56,7 +58,7 @@ fun AceEditor(
                 Language.initLocaleAsync(context)
             }
         }
-    }, update = {
-        it.evaluateJavascript("updateWrapContent(${viewModel.wrapContent.value.toJsValue()})") {}
+        viewModel.webView.value = webView
+        webView
     })
 }

@@ -137,7 +137,7 @@ fun AboutPage(
                             onClick = {
                                 navController.navigateTextFile(
                                     DiskLogFormatStrategy.getLogFolder(context) + "/latest.log",
-                                    getString(R.string.logs), "", readOnly = true, TextFileType.APP_LOG
+                                    getString(R.string.logs), "", TextFileType.APP_LOG
                                 )
                             },
                         )

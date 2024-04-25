@@ -362,7 +362,7 @@ fun ScanResultBottomSheet(
             ) {
                 val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.scan_result), value)
                 clipboardManager.setPrimaryClip(clip)
-                DialogHelper.showMessage(R.string.copied)
+                DialogHelper.showMessage(value)
             }
         }
         TopSpace()

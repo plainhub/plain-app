@@ -14,7 +14,7 @@
             right: 0;
             bottom: 0;
             left: 0;
-            font-size: 16px;
+            font-size: 14px;
         }
         .ace_mobile-button {
             display: block !important;
@@ -43,16 +43,14 @@ function loadEditor(data) {
     editor.session.setMode('ace/mode/' + data.language)
     editor.renderer.setPadding(8)
     editor.setValue(data.content, -1)
-    if (data.readOnly) {
-        editor.setReadOnly(true)
-    } else {
-        editor.session.on('change', function(delta) { AndroidApp.updateContent(editor.getValue()) })
+    editor.setReadOnly(data.readOnly)
+    editor.session.on('change', function(delta) { AndroidApp.updateContent(editor.getValue()) })
+    if (data.gotoEnd) {
+        setTimeout(() => {
+            editor.gotoLine(editor.session.getLength())
+        }, 1000)
     }
     AndroidApp.editorReady()
-}
-
-function updateWrapContent(wrapContent) {
-    editor.session.setUseWrapMode(wrapContent)
 }
 </script>
 </body>

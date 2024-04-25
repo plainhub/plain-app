@@ -299,8 +299,7 @@ fun Main(viewModel: MainViewModel) {
                 val title = navController.previousBackStackEntry?.savedStateHandle?.get("title") ?: ""
                 val type = navController.previousBackStackEntry?.savedStateHandle?.get("type") ?: ""
                 val mediaStoreId = navController.previousBackStackEntry?.savedStateHandle?.get("mediaStoreId") ?: ""
-                val readOnly = navController.previousBackStackEntry?.savedStateHandle?.get("readOnly") ?: false
-                TextFilePage(navController, path, title, mediaStoreId, readOnly, type)
+                TextFilePage(navController, path, title, mediaStoreId, type)
             }
 
             slideHorizontallyComposable(

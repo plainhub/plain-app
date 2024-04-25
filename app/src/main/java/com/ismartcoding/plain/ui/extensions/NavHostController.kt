@@ -42,11 +42,10 @@ fun NavHostController.navigateOtherFile(path: String) {
     navigate(RouteName.OTHER_FILE)
 }
 
-fun NavHostController.navigateTextFile(path: String, title: String = "", mediaStoreId: String = "", readOnly: Boolean = false, type: TextFileType = TextFileType.DEFAULT) {
+fun NavHostController.navigateTextFile(path: String, title: String = "", mediaStoreId: String = "", type: TextFileType = TextFileType.DEFAULT) {
     currentBackStackEntry?.savedStateHandle?.set("path", path)
     currentBackStackEntry?.savedStateHandle?.set("title", title)
     currentBackStackEntry?.savedStateHandle?.set("mediaStoreId", mediaStoreId)
-    currentBackStackEntry?.savedStateHandle?.set("readOnly", readOnly)
     currentBackStackEntry?.savedStateHandle?.set("type", type.name)
     navigate(RouteName.TEXT_FILE)
 }

@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">VPN\'iniz şu anda cihazınızda etkinleştirilmiştir, bu da PC\'den erişildiğinde potansiyel olarak web bağlantısı sorunlarına yol açabilir. Bu sorunu çözmek için VPN ayarlarınızı lan trafiğine izin verecek şekilde ayarlamanızı veya VPN\'inizi devre dışı bırakmanızı öneririz.</string>
     <string name="warning">Uyarı</string>
+    <string name="jump_to_top">Başa dön</string>
+    <string name="jump_to_bottom">En alta git</string>
     <string name="save_to_notes">Notlara kaydet</string>
     <string name="confirm_to_send_files_to_file_assistant">Bu dosyaları Dosya Aktarım Asistanına göndermek ister misiniz?</string>
     <string name="confirm_to_send_file_to_file_assistant">Bu dosyaları Dosya Aktarım Asistanına göndermek ister misiniz?</string>

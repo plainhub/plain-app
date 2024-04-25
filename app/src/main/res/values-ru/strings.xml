@@ -2,6 +2,8 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Ваш VPN в настоящее время включен на вашем устройстве, что может потенциально привести к проблемам с веб-подключением при доступе с ПК. Для устранения этой проблемы мы рекомендуем настроить параметры вашего VPN для разрешения локального сетевого трафика или отключить ваш VPN.</string>
     <string name="warning">Предупреждение</string>
+    <string name="jump_to_top">Перейти наверх</string>
+    <string name="jump_to_bottom">Перейти вниз</string>
     <string name="save_to_notes">Сохранить в заметки</string>
     <string name="confirm_to_send_files_to_file_assistant">Хотите отправить эти файлы в помощник передачи файлов?</string>
     <string name="confirm_to_send_file_to_file_assistant">Хотите отправить эти файлы в помощник передачи файлов?</string>

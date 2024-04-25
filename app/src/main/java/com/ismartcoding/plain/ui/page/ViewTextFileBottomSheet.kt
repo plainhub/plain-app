@@ -6,6 +6,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.VerticalAlignBottom
+import androidx.compose.material.icons.outlined.VerticalAlignTop
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -59,15 +61,31 @@ fun ViewTextFileBottomSheet(
             listOf(
                 GroupButton(
                     icon = Icons.Outlined.Share,
-                    text = LocaleHelper.getString(R.string.share),
+                    text = context.getString(R.string.share),
                     onClick = {
                         ShareHelper.sharePaths(context, setOf(path))
                         onDismiss()
                     }
                 ),
                 GroupButton(
+                    icon = Icons.Outlined.VerticalAlignTop,
+                    text = context.getString(R.string.jump_to_top),
+                    onClick = {
+                        viewModel.gotoTop()
+                        onDismiss()
+                    }
+                ),
+                GroupButton(
+                    icon = Icons.Outlined.VerticalAlignBottom,
+                    text = context.getString(R.string.jump_to_bottom),
+                    onClick = {
+                        viewModel.gotoEnd()
+                        onDismiss()
+                    }
+                ),
+                GroupButton(
                     icon = Icons.Outlined.DeleteForever,
-                    text = LocaleHelper.getString(R.string.delete),
+                    text = context.getString(R.string.delete),
                     onClick = {
                         DialogHelper.confirmToDelete {
                             scope.launch(Dispatchers.IO) {

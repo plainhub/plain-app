@@ -31,7 +31,6 @@ import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -139,7 +138,10 @@ fun ChatListItem(
                 ) {
                     PDropdownMenu(
                         expanded = showContextMenu.value && viewModel.selectedItem.value == m,
-                        onDismissRequest = { showContextMenu.value = false },
+                        onDismissRequest = {
+                            viewModel.selectedItem.value = null
+                            showContextMenu.value = false
+                                           },
                     ) {
                         PDropdownMenuItem(
                             text = { Text(stringResource(id = R.string.select)) },
@@ -154,19 +156,22 @@ fun ChatListItem(
                             PDropdownMenuItem(
                                 text = { Text(stringResource(id = R.string.copy_text)) },
                                 onClick = {
+                                    viewModel.selectedItem.value = null
                                     showContextMenu.value = false
+                                    val text = (m.value as DMessageText).text
                                     val clip =
                                         ClipData.newPlainText(
                                             LocaleHelper.getString(R.string.message),
-                                            (m.value as DMessageText).text,
+                                            text,
                                         )
                                     clipboardManager.setPrimaryClip(clip)
-                                    DialogHelper.showMessage(R.string.copied)
+                                    DialogHelper.showTextCopiedMessage(text)
                                 },
                             )
                             PDropdownMenuItem(
                                 text = { Text(stringResource(id = R.string.edit_text)) },
                                 onClick = {
+                                    viewModel.selectedItem.value = null
                                     showContextMenu.value = false
                                     val content = (m.value as DMessageText).text
                                     navController.navigateChatEditText(m.id, content)
@@ -176,6 +181,7 @@ fun ChatListItem(
                         PDropdownMenuItem(
                             text = { Text(stringResource(id = R.string.delete)) },
                             onClick = {
+                                viewModel.selectedItem.value = null
                                 showContextMenu.value = false
                                 viewModel.delete(context, setOf(m.id))
                             },

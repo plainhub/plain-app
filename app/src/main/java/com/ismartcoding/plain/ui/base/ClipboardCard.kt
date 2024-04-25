@@ -28,7 +28,7 @@ fun ClipboardCard(
                 .clickable {
                     val clip = ClipData.newPlainText(label, text)
                     clipboardManager.setPrimaryClip(clip)
-                    DialogHelper.showMessage(R.string.copied)
+                    DialogHelper.showTextCopiedMessage(text)
                 }
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,

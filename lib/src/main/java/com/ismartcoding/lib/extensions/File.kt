@@ -60,7 +60,7 @@ fun File.getBitmapAsync(
     mediaId: String = ""
 ): Bitmap? {
     var bitmap: Bitmap? = null
-    if (isQPlus()) {
+    if (isQPlus() && width < 500) {
         val contentUri = if (mediaId.isNotEmpty()) context.getMediaContentUri(path, mediaId) else context.getMediaContentUri(path)
         if (contentUri != null) {
             try {

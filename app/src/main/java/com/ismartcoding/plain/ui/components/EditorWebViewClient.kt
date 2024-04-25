@@ -8,22 +8,19 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import kotlinx.serialization.Serializable
 
+@Serializable
+data class EditorData(val language: String, val wrapContent: Boolean, val isDarkTheme: Boolean, val readOnly: Boolean, val gotoEnd: Boolean, val content: String)
 
 class EditorWebViewClient(
     val context: Context,
-    val content: String,
-    val language: String,
-    val wrapContent: Boolean,
-    val isDarkTheme: Boolean,
-    val readOnly: Boolean,
+    val data: EditorData,
 ) : WebViewClient() {
     override fun onPageFinished(view: WebView, url: String?) {
         coMain {
-            val json = withIO { jsonEncode(EditorData(language, wrapContent, isDarkTheme, readOnly, content)) }
+            val json = withIO { jsonEncode(data) }
             view.evaluateJavascript("loadEditor(${json})") {}
         }
     }
 
-    @Serializable
-    data class EditorData(val language: String, val wrapContent: Boolean, val isDarkTheme: Boolean, val readOnly: Boolean, val content: String)
+
 }

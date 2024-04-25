@@ -107,7 +107,7 @@ fun WebSecurityPage(navController: NavHostController) {
                                     }
                                 }
                             }
-                            if (passwordType == PasswordType.FIXED.value) {
+                            if (passwordType != PasswordType.NONE.value) {
                                 PasswordTextField(
                                     value = editPassword.value,
                                     isChanged = {
@@ -132,7 +132,6 @@ fun WebSecurityPage(navController: NavHostController) {
                                     Text(text = stringResource(id = R.string.generate_password))
                                 }
                             }
-
                         }
                     }
                     item {
