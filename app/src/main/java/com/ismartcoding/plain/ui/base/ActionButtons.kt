@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material.icons.automirrored.outlined.Sort
@@ -10,6 +11,10 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.ismartcoding.plain.R
 
@@ -21,6 +26,27 @@ fun ActionButtonMore(onClick: () -> Unit) {
         tint = MaterialTheme.colorScheme.onSurface,
         onClick = onClick,
     )
+}
+
+@Composable
+fun ActionButtonMoreWithMenu(content: @Composable ColumnScope.(dismiss: () -> Unit) -> Unit) {
+    var isMenuOpen by remember { mutableStateOf(false) }
+    PIconButton(
+        icon = Icons.Outlined.MoreVert,
+        contentDescription = stringResource(R.string.more),
+        tint = MaterialTheme.colorScheme.onSurface,
+        onClick = {
+            isMenuOpen = true
+        },
+    )
+    PDropdownMenu(
+        expanded = isMenuOpen,
+        onDismissRequest = { isMenuOpen = false }
+    ) {
+        content {
+            isMenuOpen = false
+        }
+    }
 }
 
 @Composable

@@ -15,7 +15,7 @@ fun List<DeviceFragment>.sorted(sortBy: DeviceSortBy): List<DeviceFragment> {
     }
 }
 
-fun List<DFile>.sort(sortBy: FileSortBy): List<DFile> {
+fun List<DFile>.sorted(sortBy: FileSortBy): List<DFile> {
     val comparator = compareBy<DFile> { if (it.isDir) 0 else 1 }
     return when (sortBy) {
         FileSortBy.NAME_ASC -> {

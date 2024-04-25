@@ -13,12 +13,10 @@ import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.enums.FileType
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.FileMediaStoreHelper
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.preference.DocSortByPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -74,6 +74,9 @@ object SearchHelper {
 
     // q = "Hello World" username:plain ids:1,2,3 stars:>10 stars:<100 NOT language:javascript
     fun parse(q: String): List<FilterField> {
+        if (q.isEmpty()) {
+            return emptyList()
+        }
         val groups =
             splitInGroup(q).map {
                 parseGroup(it)

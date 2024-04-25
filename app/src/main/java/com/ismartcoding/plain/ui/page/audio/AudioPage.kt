@@ -17,11 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Label
-import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -47,7 +43,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.ui.base.ActionButtonMore
+import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -55,8 +51,8 @@ import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.NoDataColumn
-import com.ismartcoding.plain.ui.base.PDropdownMenu
-import com.ismartcoding.plain.ui.base.PDropdownMenuItem
+import com.ismartcoding.plain.ui.base.PDropdownMenuItemSelect
+import com.ismartcoding.plain.ui.base.PDropdownMenuItemTags
 import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -93,7 +89,6 @@ fun AudioPage(
     val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
     val scope = rememberCoroutineScope()
     val filtersScrollState = rememberScrollState()
-    var isMenuOpen by remember { mutableStateOf(false) }
     val scrollState = rememberLazyListState()
     val context = LocalContext.current
     var hasPermission by remember {
@@ -198,34 +193,16 @@ fun AudioPage(
                 ActionButtonSearch {
                     navController.navigate("${RouteName.NOTES.name}/search?q=")
                 }
-                ActionButtonMore {
-                    isMenuOpen = !isMenuOpen
-                }
-                PDropdownMenu(
-                    expanded = isMenuOpen,
-                    onDismissRequest = { isMenuOpen = false },
-                    content = {
-                        PDropdownMenuItem(text = { Text(stringResource(R.string.select)) }, leadingIcon = {
-                            Icon(
-                                Icons.Outlined.Checklist,
-                                contentDescription = stringResource(id = R.string.select)
-                            )
-                        }, onClick = {
-                            isMenuOpen = false
-                            viewModel.toggleSelectMode()
-                        })
-                        PDropdownMenuItem(text = {
-                            Text(stringResource(R.string.tags))
-                        }, leadingIcon = {
-                            Icon(
-                                Icons.AutoMirrored.Outlined.Label,
-                                contentDescription = stringResource(id = R.string.tags)
-                            )
-                        }, onClick = {
-                            isMenuOpen = false
-                            navController.navigate("${RouteName.TAGS.name}?dataType=${viewModel.dataType.value}")
-                        })
+                ActionButtonMoreWithMenu { dismiss ->
+                    PDropdownMenuItemSelect(onClick = {
+                        dismiss()
+                        viewModel.toggleSelectMode()
                     })
+                    PDropdownMenuItemTags(onClick = {
+                        dismiss()
+                        navController.navigate("${RouteName.TAGS.name}?dataType=${viewModel.dataType.value}")
+                    })
+                }
             }
         },
         bottomBar = {

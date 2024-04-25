@@ -8,7 +8,7 @@ import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.FileType
-import com.ismartcoding.plain.extensions.sort
+import com.ismartcoding.plain.extensions.sorted
 import com.ismartcoding.plain.features.BaseContentHelper
 import kotlinx.datetime.Instant
 import java.util.Locale
@@ -205,6 +205,6 @@ object FileMediaStoreHelper : BaseContentHelper() {
             }
         }
 
-        return items.sort(sortBy)
+        return items.sorted(sortBy)
     }
 }

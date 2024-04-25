@@ -452,7 +452,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("packages") {
                     resolver { offset: Int, limit: Int, query: String ->
-                        PackageHelper.search(query, limit, offset).map { it.toModel() }
+                        PackageHelper.search(query, limit, offset, FileSortBy.NAME_ASC).map { it.toModel() }
                     }
                 }
                 query("packageStatuses") {

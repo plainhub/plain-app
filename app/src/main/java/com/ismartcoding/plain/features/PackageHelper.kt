@@ -16,12 +16,13 @@ import com.ismartcoding.lib.pinyin.Pinyin
 import com.ismartcoding.plain.data.DCertificate
 import com.ismartcoding.plain.data.DPackage
 import com.ismartcoding.plain.data.DPackageDetail
-import com.ismartcoding.plain.data.DPackageLight
+import com.ismartcoding.plain.data.DPackageStub
+import com.ismartcoding.plain.extensions.isSystemApp
+import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.packageManager
 import kotlinx.datetime.Instant
 import java.io.File
 import javax.security.cert.X509Certificate
-import com.ismartcoding.plain.extensions.isSystemApp
 
 object PackageHelper {
     private val appLabelCache: MutableMap<String, String> = HashMap()
@@ -42,7 +43,7 @@ object PackageHelper {
         return getPackageStatuses(listOf(packageName))[packageName] == false
     }
 
-    fun search(query: String, limit: Int, offset: Int): List<DPackage> {
+    fun search(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DPackage> {
         var type = ""
         var text = ""
         var ids = setOf<String>()
@@ -62,7 +63,7 @@ object PackageHelper {
             }
         }
 
-        val apps = mutableListOf<DPackageLight>()
+        val apps = mutableListOf<DPackageStub>()
         val appInfos = packageManager.getInstalledApplications(0)
         appInfos.forEach { appInfo ->
             if (ids.isNotEmpty() && !ids.contains(appInfo.packageName)) {
@@ -75,29 +76,29 @@ object PackageHelper {
                     return@forEach
                 }
             }
-            apps.add(DPackageLight(appInfo, appInfo.packageName, getLabel(appInfo)))
+            apps.add(DPackageStub(appInfo, appInfo.packageName, getLabel(appInfo)))
         }
 
         if (query.isEmpty() || text.isEmpty()) {
-            return apps.sortedBy { Pinyin.toPinyin(it.name).lowercase() }.drop(offset).take(limit).map {
+            return apps.map {
                 try {
                     getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES))
                 } catch (ex: Exception) {
                     LogCat.d(ex.toString())
                     getPackage(it.appInfo, PackageInfo())
                 }
-            }
+            }.sorted(sortBy).drop(offset).take(limit)
         }
 
-        return apps.asSequence().map { getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES)) }.filter {
+        return apps.map { getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES)) }.filter {
             text.isEmpty()
-                    || it.name.contains(text, true)
                     || it.id.contains(text, true)
+                    || it.name.contains(text, true)
                     || it.certs.any { c ->
                 c.issuer.contains(text, true)
                         || c.subject.contains(text, true)
             }
-        }.sortedBy { Pinyin.toPinyin(it.name).lowercase() }.drop(offset).take(limit).toList()
+        }.sorted(sortBy).drop(offset).take(limit).toList()
     }
 
     private fun getAppType(appInfo: ApplicationInfo): String {
@@ -110,7 +111,7 @@ object PackageHelper {
         return appType
     }
 
-    private fun getCerts(packageInfo: PackageInfo): List<DCertificate> {
+    fun getCerts(packageInfo: PackageInfo): List<DCertificate> {
         var certs = appCertsCache[packageInfo.packageName]
         if (certs == null) {
             certs = mutableListOf<DCertificate>()
@@ -127,7 +128,7 @@ object PackageHelper {
                     )
                 )
             }
-            appCertsCache.put(packageInfo.packageName, certs)
+            appCertsCache[packageInfo.packageName] = certs
         } else {
             certs = mutableListOf()
         }
@@ -139,7 +140,6 @@ object PackageHelper {
         val flags = PackageManager.GET_SIGNING_CERTIFICATES
         val packageInfo = packageManager.getPackageInfo(packageName, flags)
         val appInfo = packageManager.getApplicationInfo(packageName, 0)
-
         return getPackage(appInfo, packageInfo)
     }
 
@@ -153,7 +153,6 @@ object PackageHelper {
             packageInfo.versionName ?: "",
             appInfo.sourceDir,
             File(appInfo.publicSourceDir).length(),
-            getCerts(packageInfo),
             Instant.fromEpochMilliseconds(packageInfo.firstInstallTime),
             Instant.fromEpochMilliseconds(packageInfo.lastUpdateTime),
         )
@@ -208,7 +207,7 @@ object PackageHelper {
                 }
             }
         }
-        return search(query, Int.MAX_VALUE, 0).count()
+        return search(query, Int.MAX_VALUE, 0, FileSortBy.SIZE_ASC).count()
     }
 
     private fun getLabel(packageInfo: ApplicationInfo): String {
@@ -291,5 +290,16 @@ object PackageHelper {
             data = Uri.parse("package:$packageName")
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         })
+    }
+
+    private fun List<DPackage>.sorted(sortBy: FileSortBy): List<DPackage> {
+        return when (sortBy) {
+            FileSortBy.NAME_ASC -> this.sortedBy { Pinyin.toPinyin(it.name).lowercase() }
+            FileSortBy.NAME_DESC -> this.sortedBy { Pinyin.toPinyin(it.name).lowercase() }
+            FileSortBy.SIZE_ASC -> this.sortedBy { it.size }
+            FileSortBy.SIZE_DESC -> this.sortedByDescending { it.size }
+            FileSortBy.DATE_ASC -> this.sortedBy { it.updatedAt }
+            FileSortBy.DATE_DESC -> this.sortedByDescending { it.updatedAt }
+        }
     }
 }

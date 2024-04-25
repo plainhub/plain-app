@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.ismartcoding.plain.features.PackageHelper
+import com.ismartcoding.plain.features.file.FileSortBy
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -24,10 +25,12 @@ class AppsViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
     var total = mutableIntStateOf(0)
     var totalSystem = mutableIntStateOf(0)
     var queryText by savedStateHandle.saveable { mutableStateOf("") }
+    val showSortDialog = mutableStateOf(false)
+    val sortBy = mutableStateOf(FileSortBy.NAME_ASC)
 
     fun moreAsync() {
         offset.value += limit.value
-        val items = PackageHelper.search(getQuery(), limit.value, offset.value).map { VPackage.from(it) }
+        val items = PackageHelper.search(getQuery(), limit.value, offset.value, sortBy.value).map { VPackage.from(it) }
         _itemsFlow.value.addAll(items)
         showLoading.value = false
         noMore.value = items.size < limit.value
@@ -35,7 +38,7 @@ class AppsViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
 
     fun loadAsync() {
         offset.value = 0
-        _itemsFlow.value = PackageHelper.search(getQuery(), limit.value, 0).map { VPackage.from(it) }.toMutableStateList()
+        _itemsFlow.value = PackageHelper.search(getQuery(), limit.value, 0, sortBy.value).map { VPackage.from(it) }.toMutableStateList()
         total.value = PackageHelper.count("")
         totalSystem.value = PackageHelper.count("type:system")
         noMore.value = _itemsFlow.value.size < limit.value

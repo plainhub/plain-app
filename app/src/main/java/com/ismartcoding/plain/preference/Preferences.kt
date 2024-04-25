@@ -60,37 +60,37 @@ object AuthDevTokenPreference : BasePreference<String>() {
     override val key = stringPreferencesKey("auth_dev_token")
 }
 
-object NewVersionPreference: BasePreference<String>() {
+object NewVersionPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("new_version")
 }
 
-object CheckUpdateTimePreference: BasePreference<Long>() {
+object CheckUpdateTimePreference : BasePreference<Long>() {
     override val default = 0L
     override val key = longPreferencesKey("check_update_time")
 }
 
-object SkipVersionPreference: BasePreference<String>() {
+object SkipVersionPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("skip_version")
 }
 
-object NewVersionPublishDatePreference: BasePreference<String>() {
+object NewVersionPublishDatePreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("new_version_publish_date")
 }
 
-object NewVersionLogPreference: BasePreference<String>() {
+object NewVersionLogPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("new_version_log")
 }
 
-object NewVersionDownloadUrlPreference: BasePreference<String>() {
+object NewVersionDownloadUrlPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("new_version_download_url")
 }
 
-object NewVersionSizePreference: BasePreference<Long>() {
+object NewVersionSizePreference : BasePreference<Long>() {
     override val default = 0L
     override val key = longPreferencesKey("new_version_size")
 }
@@ -368,9 +368,12 @@ object AudioPlayModePreference : BasePreference<Int>() {
     }
 }
 
-object AudioSortByPreference : BasePreference<Int>() {
-    override val default = FileSortBy.DATE_DESC.ordinal
-    override val key = intPreferencesKey("audio_sort_by")
+abstract class BaseSortByPreference(
+    val prefix: String,
+    private val defaultSort: FileSortBy = FileSortBy.DATE_DESC
+) : BasePreference<Int>() {
+    override val default = defaultSort.ordinal
+    override val key = intPreferencesKey("${prefix}_sort_by")
 
     suspend fun putAsync(
         context: Context,
@@ -381,77 +384,16 @@ object AudioSortByPreference : BasePreference<Int>() {
 
     suspend fun getValueAsync(context: Context): FileSortBy {
         val value = getAsync(context)
-        return FileSortBy.entries.find { it.ordinal == value } ?: FileSortBy.DATE_DESC
+        return FileSortBy.entries.find { it.ordinal == value } ?: defaultSort
     }
 }
 
-object VideoSortByPreference : BasePreference<Int>() {
-    override val default = FileSortBy.DATE_DESC.ordinal
-    override val key = intPreferencesKey("video_sort_by")
-
-    suspend fun putAsync(
-        context: Context,
-        value: FileSortBy,
-    ) {
-        putAsync(context, value.ordinal)
-    }
-
-    suspend fun getValueAsync(context: Context): FileSortBy {
-        val value = getAsync(context)
-        return FileSortBy.entries.find { it.ordinal == value } ?: FileSortBy.DATE_DESC
-    }
-}
-
-object ImageSortByPreference : BasePreference<Int>() {
-    override val default = FileSortBy.DATE_DESC.ordinal
-    override val key = intPreferencesKey("image_sort_by")
-
-    suspend fun putAsync(
-        context: Context,
-        value: FileSortBy,
-    ) {
-        putAsync(context, value.ordinal)
-    }
-
-    suspend fun getValueAsync(context: Context): FileSortBy {
-        val value = getAsync(context)
-        return FileSortBy.entries.find { it.ordinal == value } ?: FileSortBy.DATE_DESC
-    }
-}
-
-object DocSortByPreference : BasePreference<Int>() {
-    override val default = FileSortBy.NAME_ASC.ordinal
-    override val key = intPreferencesKey("doc_sort_by")
-
-    suspend fun putAsync(
-        context: Context,
-        value: FileSortBy,
-    ) {
-        putAsync(context, value.ordinal)
-    }
-
-    suspend fun getValueAsync(context: Context): FileSortBy {
-        val value = getAsync(context)
-        return FileSortBy.entries.find { it.ordinal == value } ?: FileSortBy.DATE_DESC
-    }
-}
-
-object FileSortByPreference : BasePreference<Int>() {
-    override val default = FileSortBy.NAME_ASC.ordinal
-    override val key = intPreferencesKey("file_sort_by")
-
-    suspend fun putAsync(
-        context: Context,
-        value: FileSortBy,
-    ) {
-        putAsync(context, value.ordinal)
-    }
-
-    suspend fun getValueAsync(context: Context): FileSortBy {
-        val value = getAsync(context)
-        return FileSortBy.entries.find { it.ordinal == value } ?: FileSortBy.NAME_ASC
-    }
-}
+object AudioSortByPreference : BaseSortByPreference("audio")
+object VideoSortByPreference : BaseSortByPreference("video")
+object ImageSortByPreference : BaseSortByPreference("image")
+object DocSortByPreference : BaseSortByPreference("doc")
+object FileSortByPreference : BaseSortByPreference("file", FileSortBy.NAME_ASC)
+object PackageSortByPreference : BaseSortByPreference("pkg", FileSortBy.NAME_ASC)
 
 object ShowHiddenFilesPreference : BasePreference<Boolean>() {
     override val default = false

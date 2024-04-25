@@ -30,7 +30,6 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
@@ -38,18 +37,16 @@ import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.preference.DocSortByPreference
-import com.ismartcoding.plain.preference.FileSortByPreference
-import com.ismartcoding.plain.preference.HttpPortPreference
-import com.ismartcoding.plain.preference.HttpsPortPreference
+import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
-import com.ismartcoding.plain.ui.base.ActionButtonSort
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.NoDataColumn
+import com.ismartcoding.plain.ui.base.PDropdownMenuItemSelect
+import com.ismartcoding.plain.ui.base.PDropdownMenuItemSort
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.RadioDialog
@@ -65,8 +62,8 @@ import com.ismartcoding.plain.ui.models.DocsViewModel
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
 import com.ismartcoding.plain.ui.models.toggleSelectAll
+import com.ismartcoding.plain.ui.models.toggleSelectMode
 import com.ismartcoding.plain.ui.page.RouteName
-import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -197,8 +194,15 @@ fun DocsPage(
                 ActionButtonSearch {
                     navController.navigate("${RouteName.DOCS.name}/search?q=")
                 }
-                ActionButtonSort {
-                    viewModel.showSortDialog.value = true
+                ActionButtonMoreWithMenu { dismiss ->
+                    PDropdownMenuItemSelect(onClick = {
+                        dismiss()
+                        viewModel.toggleSelectMode()
+                    })
+                    PDropdownMenuItemSort(onClick = {
+                        dismiss()
+                        viewModel.showSortDialog.value = true
+                    })
                 }
             }
 

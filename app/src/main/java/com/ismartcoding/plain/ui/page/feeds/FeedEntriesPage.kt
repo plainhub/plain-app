@@ -19,12 +19,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Label
-import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.RssFeed
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,7 +32,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -52,15 +47,16 @@ import com.ismartcoding.plain.enums.FeedEntryFilterType
 import com.ismartcoding.plain.features.FeedStatusEvent
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.ui.base.ActionButtonMore
+import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.NoDataColumn
-import com.ismartcoding.plain.ui.base.PDropdownMenu
-import com.ismartcoding.plain.ui.base.PDropdownMenuItem
+import com.ismartcoding.plain.ui.base.PDropdownMenuItemSelect
+import com.ismartcoding.plain.ui.base.PDropdownMenuItemSettings
+import com.ismartcoding.plain.ui.base.PDropdownMenuItemTags
 import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
@@ -112,7 +108,6 @@ fun FeedEntriesPage(
     val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
     val scope = rememberCoroutineScope()
     val filtersScrollState = rememberScrollState()
-    var isMenuOpen by remember { mutableStateOf(false) }
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
     val scrollState = rememberLazyListState()
 
@@ -247,46 +242,22 @@ fun FeedEntriesPage(
                         navController.navigate(RouteName.FEEDS)
                     }
                 }
-                ActionButtonMore {
-                    isMenuOpen = !isMenuOpen
-                }
-                PDropdownMenu(
-                    expanded = isMenuOpen,
-                    onDismissRequest = { isMenuOpen = false },
-                    content = {
-                        PDropdownMenuItem(text = { Text(stringResource(R.string.select)) }, leadingIcon = {
-                            Icon(
-                                Icons.Outlined.Checklist,
-                                contentDescription = stringResource(id = R.string.select)
-                            )
-                        }, onClick = {
-                            isMenuOpen = false
-                            viewModel.toggleSelectMode()
-                        })
-                        PDropdownMenuItem(text = {
-                            Text(stringResource(R.string.tags))
-                        }, leadingIcon = {
-                            Icon(
-                                Icons.AutoMirrored.Outlined.Label,
-                                contentDescription = stringResource(id = R.string.tags)
-                            )
-                        }, onClick = {
-                            isMenuOpen = false
-                            navController.navigate("${RouteName.TAGS.name}?dataType=${viewModel.dataType.value}")
-                        })
-
-                        PDropdownMenuItem(text = {
-                            Text(stringResource(R.string.settings))
-                        }, leadingIcon = {
-                            Icon(
-                                Icons.Outlined.Settings,
-                                contentDescription = stringResource(id = R.string.settings)
-                            )
-                        }, onClick = {
-                            isMenuOpen = false
+                ActionButtonMoreWithMenu { dismiss ->
+                    PDropdownMenuItemSelect(onClick = {
+                        dismiss()
+                        viewModel.toggleSelectMode()
+                    })
+                    PDropdownMenuItemTags(onClick = {
+                        dismiss()
+                        navController.navigate("${RouteName.TAGS.name}?dataType=${viewModel.dataType.value}")
+                    })
+                    if (viewModel.feedId.value.isEmpty()) {
+                        PDropdownMenuItemSettings(onClick = {
+                            dismiss()
                             navController.navigate(RouteName.FEED_SETTINGS)
                         })
-                    })
+                    }
+                }
             }
         },
         bottomBar = {
@@ -377,7 +348,7 @@ fun FeedEntriesPage(
                             .fillMaxWidth()
                             .fillMaxHeight(),
                         state = scrollState,
-                        ) {
+                    ) {
                         item {
                             TopSpace()
                         }

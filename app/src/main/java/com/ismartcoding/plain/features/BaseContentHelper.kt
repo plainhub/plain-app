@@ -51,20 +51,16 @@ abstract class BaseContentHelper {
         query: String,
         field: String,
     ): ContentWhere {
-        if (query.isNotEmpty()) {
-            val queryGroups = SearchHelper.parse(query)
-            val where = getBaseWhere(queryGroups)
-            val idsGroup = queryGroups.firstOrNull { it.name == "ids" }
-            if (idsGroup != null) {
-                val ids = idsGroup.value.split(",")
-                if (ids.isNotEmpty()) {
-                    where.addIn(field, ids)
-                }
+        val queryGroups = SearchHelper.parse(query)
+        val where = getBaseWhere(queryGroups)
+        val idsGroup = queryGroups.find { it.name == "ids" }
+        if (idsGroup != null) {
+            val ids = idsGroup.value.split(",")
+            if (ids.isNotEmpty()) {
+                where.addIn(field, ids)
             }
-            return where
         }
-
-        return ContentWhere()
+        return where
     }
 
     protected open fun getWheres(

@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Upload
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -54,14 +52,14 @@ import com.ismartcoding.plain.features.PickFileEvent
 import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.ui.base.ActionButtonMore
+import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PDraggableElement
-import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
+import com.ismartcoding.plain.ui.base.PDropdownMenuItemSelect
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -95,7 +93,6 @@ fun FeedsPage(
     val window = (view.context as Activity).window
     val itemsState by viewModel.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
-    var isMenuOpen by remember { mutableStateOf(false) }
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
 
     val topRefreshLayoutState =
@@ -209,45 +206,33 @@ fun FeedsPage(
                 )
                 HorizontalSpace(dp = 8.dp)
             } else {
-                ActionButtonMore {
-                    isMenuOpen = !isMenuOpen
-                }
-                PDropdownMenu(
-                    expanded = isMenuOpen,
-                    onDismissRequest = { isMenuOpen = false },
-                    content = {
-                        PDropdownMenuItem(text = { Text(stringResource(R.string.select)) },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Outlined.Checklist,
-                                    contentDescription = stringResource(id = R.string.select)
-                                )
-                            }, onClick = {
-                                isMenuOpen = false
-                                viewModel.toggleSelectMode()
-                            })
-                        PDropdownMenuItem(text = { Text(stringResource(R.string.import_opml_file)) },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Outlined.Upload,
-                                    contentDescription = stringResource(id = R.string.import_opml_file)
-                                )
-                            }, onClick = {
-                                isMenuOpen = false
-                                sendEvent(PickFileEvent(PickFileTag.FEED, PickFileType.FILE, false))
-                            })
-
-                        PDropdownMenuItem(text = { Text(stringResource(R.string.export_opml_file)) },
-                            leadingIcon = {
-                                Icon(
-                                    Icons.Outlined.Download,
-                                    contentDescription = stringResource(id = R.string.export_opml_file)
-                                )
-                            }, onClick = {
-                                isMenuOpen = false
-                                sendEvent(ExportFileEvent(ExportFileType.OPML, "feeds_" + Date().formatName() + ".opml"))
-                            })
+                ActionButtonMoreWithMenu { dismiss ->
+                    PDropdownMenuItemSelect(onClick = {
+                        dismiss()
+                        viewModel.toggleSelectMode()
                     })
+                    PDropdownMenuItem(text = { Text(stringResource(R.string.import_opml_file)) },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Outlined.Upload,
+                                contentDescription = stringResource(id = R.string.import_opml_file)
+                            )
+                        }, onClick = {
+                            dismiss()
+                            sendEvent(PickFileEvent(PickFileTag.FEED, PickFileType.FILE, false))
+                        })
+
+                    PDropdownMenuItem(text = { Text(stringResource(R.string.export_opml_file)) },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Outlined.Download,
+                                contentDescription = stringResource(id = R.string.export_opml_file)
+                            )
+                        }, onClick = {
+                            dismiss()
+                            sendEvent(ExportFileEvent(ExportFileType.OPML, "feeds_" + Date().formatName() + ".opml"))
+                        })
+                }
             }
         },
         bottomBar = {

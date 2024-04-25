@@ -56,14 +56,13 @@ import com.ismartcoding.plain.features.WindowFocusChangedEvent
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.powerManager
-import com.ismartcoding.plain.ui.base.ActionButtonMore
+import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PClickableText
-import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PMainSwitch
@@ -99,7 +98,6 @@ fun WebSettingsPage(
         val webEnabled = LocalWeb.current
         val keepAwake = LocalKeepAwake.current
         val scope = rememberCoroutineScope()
-        var isMenuOpen by remember { mutableStateOf(false) }
         val enabledPermissions = LocalApiPermissions.current
         var permissionList by remember { mutableStateOf(Permissions.getWebList(context)) }
         var shouldIgnoreOptimize by remember { mutableStateOf(!powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)) }
@@ -155,17 +153,14 @@ fun WebSettingsPage(
                     navController.navigate(RouteName.SESSIONS)
                 },
             )
-            ActionButtonMore {
-                isMenuOpen = !isMenuOpen
-            }
-            PDropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }, content = {
+            ActionButtonMoreWithMenu { dismiss ->
                 PDropdownMenuItem(leadingIcon = {
                     Icon(
                         Icons.Outlined.Password,
                         contentDescription = stringResource(id = R.string.security)
                     )
                 }, onClick = {
-                    isMenuOpen = false
+                    dismiss()
                     navController.navigate(RouteName.WEB_SECURITY)
                 }, text = {
                     Text(text = stringResource(R.string.security))
@@ -176,12 +171,12 @@ fun WebSettingsPage(
                         contentDescription = stringResource(id = R.string.testing_token)
                     )
                 }, onClick = {
-                    isMenuOpen = false
+                    dismiss()
                     navController.navigate(RouteName.WEB_DEV)
                 }, text = {
                     Text(text = stringResource(R.string.testing_token))
                 })
-            })
+            }
         }, content = {
             LazyColumn {
                 item {

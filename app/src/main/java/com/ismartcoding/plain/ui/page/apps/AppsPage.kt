@@ -20,16 +20,22 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.preference.PackageSortByPreference
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
+import com.ismartcoding.plain.ui.base.ActionButtonSort
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.RadioDialog
+import com.ismartcoding.plain.ui.base.RadioDialogOption
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
@@ -49,6 +55,7 @@ fun AppsPage(
     navController: NavHostController,
     viewModel: AppsViewModel = viewModel(),
 ) {
+    val context = LocalContext.current
     val itemsState by viewModel.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
     val filtersScrollState = rememberScrollState()
@@ -67,12 +74,36 @@ fun AppsPage(
         }
     }
 
+    if (viewModel.showSortDialog.value) {
+        RadioDialog(
+            title = stringResource(R.string.sort),
+            options =
+            FileSortBy.entries.map {
+                RadioDialogOption(
+                    text = stringResource(id = it.getTextId()),
+                    selected = it == viewModel.sortBy.value,
+                ) {
+                    scope.launch(Dispatchers.IO) {
+                        PackageSortByPreference.putAsync(context, it)
+                        viewModel.sortBy.value = it
+                        viewModel.loadAsync()
+                    }
+                }
+            },
+        ) {
+            viewModel.showSortDialog.value = false
+        }
+    }
+
     PScaffold(
         navController,
         topBarTitle = stringResource(id = R.string.apps),
         actions = {
             ActionButtonSearch {
                 navController.navigate("${RouteName.APPS.name}/search?q=")
+            }
+            ActionButtonSort {
+                viewModel.showSortDialog.value = true
             }
         }
     ) {

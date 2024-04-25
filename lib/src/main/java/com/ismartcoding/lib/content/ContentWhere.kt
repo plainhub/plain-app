@@ -21,6 +21,13 @@ data class ContentWhere(private val selections: MutableList<String> = mutableLis
         }
     }
 
+    fun addGt(
+        field: String,
+        value: String,
+    ) {
+        add("$field > ?", value)
+    }
+
     fun addEqual(
         field: String,
         value: String,

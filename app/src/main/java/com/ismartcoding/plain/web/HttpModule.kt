@@ -286,7 +286,7 @@ object HttpModule {
                     val context = MainApp.instance
                     when (type) {
                         DataType.PACKAGE.name -> {
-                            paths = PackageHelper.search(q, Int.MAX_VALUE, 0).map { DownloadFileItem(it.path, "${it.name.replace(" ", "")}-${it.id}.apk") }
+                            paths = PackageHelper.search(q, Int.MAX_VALUE, 0, FileSortBy.NAME_ASC).map { DownloadFileItem(it.path, "${it.name.replace(" ", "")}-${it.id}.apk") }
                         }
 
                         DataType.VIDEO.name -> {

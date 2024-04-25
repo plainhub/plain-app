@@ -10,6 +10,7 @@ import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.lib.isQPlus
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DAudio
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.features.BaseContentHelper
@@ -38,7 +39,7 @@ object AudioMediaStoreHelper : BaseContentHelper() {
 
     override fun getBaseWhere(groups: List<FilterField>): ContentWhere {
         val where = ContentWhere()
-        where.add("${MediaStore.Audio.Media.DURATION}>0")
+        where.addGt(MediaStore.Audio.Media.DURATION, "0")
         groups.forEach {
             when (it.name) {
                 "text" -> {
@@ -53,7 +54,7 @@ object AudioMediaStoreHelper : BaseContentHelper() {
                 }
 
                 "bucket_id" -> {
-                    where.add("${MediaStore.Audio.Media.BUCKET_ID} = ?", it.value)
+                    where.addEqual(MediaStore.Audio.Media.BUCKET_ID, it.value)
                 }
 
                 "artist" -> {
@@ -126,7 +127,7 @@ object AudioMediaStoreHelper : BaseContentHelper() {
             context.contentResolver.query(
                 uriExternal,
                 projection,
-                "${MediaStore.Audio.Media.BUCKET_DISPLAY_NAME} != ''",
+                "${MediaStore.Audio.Media.DURATION} > 0 AND ${MediaStore.Audio.Media.BUCKET_DISPLAY_NAME} != ''",
                 null,
                 null,
             )

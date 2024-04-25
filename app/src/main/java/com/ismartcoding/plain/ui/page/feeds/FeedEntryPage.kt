@@ -32,10 +32,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -49,7 +47,6 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
-import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.enums.DataType
@@ -59,10 +56,10 @@ import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.features.feed.fetchContentAsync
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.ui.base.ActionButtonMore
+import com.ismartcoding.plain.helpers.ShareHelper
+import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PClickableText
-import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -101,7 +98,6 @@ fun FeedEntryPage(
     val tagsState by tagsViewModel.itemsFlow.collectAsState()
     val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
     val tagIds = tagsMapState[id]?.map { it.tagId } ?: emptyList()
-    var isMenuOpen by remember { mutableStateOf(false) }
     val scrollState = rememberLazyListState()
     //val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val topRefreshLayoutState =
@@ -171,53 +167,47 @@ fun FeedEntryPage(
                 val m = viewModel.item.value ?: return@PIconButton
                 ShareHelper.shareText(context, m.title.let { it + "\n" } + m.url)
             }
-            ActionButtonMore {
-                isMenuOpen = !isMenuOpen
-            }
-            PDropdownMenu(
-                expanded = isMenuOpen,
-                onDismissRequest = { isMenuOpen = false },
-                content = {
-                    PDropdownMenuItem(text = { Text(stringResource(R.string.open_in_web)) }, leadingIcon = {
-                        Icon(
-                            Icons.Outlined.OpenInBrowser,
-                            contentDescription = stringResource(id = R.string.open_in_web)
-                        )
-                    }, onClick = {
-                        isMenuOpen = false
-                        val m = viewModel.item.value ?: return@PDropdownMenuItem
-                        WebHelper.open(context, m.url)
-                    })
-                    PDropdownMenuItem(text = { Text(stringResource(R.string.save_to_notes)) }, leadingIcon = {
-                        Icon(
-                            Icons.Outlined.SaveAs,
-                            contentDescription = stringResource(id = R.string.save_to_notes)
-                        )
-                    }, onClick = {
-                        isMenuOpen = false
-                        val m = viewModel.item.value ?: return@PDropdownMenuItem
-                        scope.launch(Dispatchers.IO) {
-                            val c = "# ${m.title}\n\n" + m.content.ifEmpty { m.description }
-                            NoteHelper.saveToNotesAsync(m.id) {
-                                title = c.cut(100).replace("\n", "")
-                                content = c
-                            }
-                            DialogHelper.showMessage(R.string.saved)
-                        }
-                    })
-                    PDropdownMenuItem(text = { Text(stringResource(R.string.copy_link)) }, leadingIcon = {
-                        Icon(
-                            Icons.Outlined.Link,
-                            contentDescription = stringResource(id = R.string.copy_link)
-                        )
-                    }, onClick = {
-                        isMenuOpen = false
-                        val m = viewModel.item.value ?: return@PDropdownMenuItem
-                        val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), m.url)
-                        clipboardManager.setPrimaryClip(clip)
-                        DialogHelper.showTextCopiedMessage(m.url)
-                    })
+            ActionButtonMoreWithMenu { dismiss ->
+                PDropdownMenuItem(text = { Text(stringResource(R.string.open_in_web)) }, leadingIcon = {
+                    Icon(
+                        Icons.Outlined.OpenInBrowser,
+                        contentDescription = stringResource(id = R.string.open_in_web)
+                    )
+                }, onClick = {
+                    dismiss()
+                    val m = viewModel.item.value ?: return@PDropdownMenuItem
+                    WebHelper.open(context, m.url)
                 })
+                PDropdownMenuItem(text = { Text(stringResource(R.string.save_to_notes)) }, leadingIcon = {
+                    Icon(
+                        Icons.Outlined.SaveAs,
+                        contentDescription = stringResource(id = R.string.save_to_notes)
+                    )
+                }, onClick = {
+                    dismiss()
+                    val m = viewModel.item.value ?: return@PDropdownMenuItem
+                    scope.launch(Dispatchers.IO) {
+                        val c = "# ${m.title}\n\n" + m.content.ifEmpty { m.description }
+                        NoteHelper.saveToNotesAsync(m.id) {
+                            title = c.cut(100).replace("\n", "")
+                            content = c
+                        }
+                        DialogHelper.showMessage(R.string.saved)
+                    }
+                })
+                PDropdownMenuItem(text = { Text(stringResource(R.string.copy_link)) }, leadingIcon = {
+                    Icon(
+                        Icons.Outlined.Link,
+                        contentDescription = stringResource(id = R.string.copy_link)
+                    )
+                }, onClick = {
+                    dismiss()
+                    val m = viewModel.item.value ?: return@PDropdownMenuItem
+                    val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), m.url)
+                    clipboardManager.setPrimaryClip(clip)
+                    DialogHelper.showTextCopiedMessage(m.url)
+                })
+            }
         },
         content = {
             val m = viewModel.item.value ?: return@PScaffold

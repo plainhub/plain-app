@@ -49,14 +49,13 @@ import com.ismartcoding.plain.features.RequestPermissionsEvent
 import com.ismartcoding.plain.features.WindowFocusChangedEvent
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.ScreenHelper
-import com.ismartcoding.plain.ui.base.ActionButtonMore
+import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSettings
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PDraggableElement
-import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -78,7 +77,6 @@ fun HomePage(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var isMenuOpen by remember { mutableStateOf(false) }
     val keepScreenOn = LocalKeepScreenOn.current
     val configuration = LocalConfiguration.current
     val itemWidth = (configuration.screenWidthDp.dp - 97.dp) / 3
@@ -119,17 +117,14 @@ fun HomePage(
             }
         },
         actions = {
-            ActionButtonMore {
-                isMenuOpen = !isMenuOpen
-            }
-            PDropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }, content = {
+            ActionButtonMoreWithMenu { dismiss ->
                 PDropdownMenuItem(leadingIcon = {
                     Icon(
                         Icons.Outlined.PhoneAndroid,
                         contentDescription = stringResource(id = R.string.keep_screen_on)
                     )
                 }, onClick = {
-                    isMenuOpen = false
+                    dismiss()
                     scope.launch(Dispatchers.IO) {
                         ScreenHelper.keepScreenOnAsync(context, !keepScreenOn)
                     }
@@ -140,7 +135,7 @@ fun HomePage(
                             modifier = Modifier.padding(top = 14.dp),
                         )
                         Checkbox(checked = keepScreenOn, onCheckedChange = {
-                            isMenuOpen = false
+                            dismiss()
                             scope.launch(Dispatchers.IO) {
                                 ScreenHelper.keepScreenOnAsync(context, it)
                             }
@@ -153,12 +148,12 @@ fun HomePage(
                         contentDescription = stringResource(id = R.string.scan_qrcode)
                     )
                 }, onClick = {
-                    isMenuOpen = false
+                    dismiss()
                     navController.navigate(RouteName.SCAN)
                 }, text = {
                     Text(text = stringResource(R.string.scan_qrcode))
                 })
-            })
+            }
         },
         floatingActionButton = {
             PDraggableElement {
