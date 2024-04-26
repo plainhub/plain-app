@@ -107,9 +107,7 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) : ISe
 
     private fun getQuery(): String {
         var query = "$queryText"
-        if (filterType == FeedEntryFilterType.UNREAD) {
-            query += " unread:true"
-        } else if (filterType == FeedEntryFilterType.TODAY) {
+        if (filterType == FeedEntryFilterType.TODAY) {
             query += " today:true"
         }
         if (tag.value != null) {

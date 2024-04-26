@@ -38,25 +38,19 @@ interface TagRelationDao {
     fun getAllByTagIds(tagIds: Set<String>): List<DTagRelation>
 
     @Query("DELETE FROM tag_relations WHERE `key` in (:keys) AND type=:type")
-    fun deleteByKeys(
-        keys: Set<String>,
-        type: Int,
-    )
+    fun deleteByKeys(keys: Set<String>, type: Int)
+
+    @Query("DELETE FROM tag_relations WHERE type=:type")
+    fun deleteByType(type: Int)
 
     @Query("DELETE FROM tag_relations WHERE tag_id=:tagId")
     fun deleteByTagId(tagId: String)
 
     @Query("DELETE FROM tag_relations WHERE `key` in (:keys) AND tag_id=:tagId")
-    fun deleteByKeysTagId(
-        keys: Set<String>,
-        tagId: String,
-    )
+    fun deleteByKeysTagId(keys: Set<String>, tagId: String)
 
     @Query("DELETE FROM tag_relations WHERE `key` in (:keys) AND tag_id in (:tagIds)")
-    fun deleteByKeysTagIds(
-        keys: Set<String>,
-        tagIds: Set<String>,
-    )
+    fun deleteByKeysTagIds(keys: Set<String>, tagIds: Set<String>)
 
     @RawQuery
     fun delete(query: SupportSQLiteQuery): Int

@@ -7,11 +7,15 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.SeekBar
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.lib.media.IVideoPlayer
 import com.ismartcoding.lib.media.VideoPlayer
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.ViewVideoPlayerBinding
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 
 open class PlayerControllerView
     @JvmOverloads
@@ -27,7 +31,8 @@ open class PlayerControllerView
                 true,
             )
 
-        private val animIn = AnimationUtils.loadAnimation(context, android.R.anim.fade_in)
+    private var showLoadingJob: Job? = null
+    private val animIn = AnimationUtils.loadAnimation(context, android.R.anim.fade_in)
         private val animOut = AnimationUtils.loadAnimation(context, android.R.anim.fade_out)
 
         private fun hideFloatView() {
@@ -201,11 +206,17 @@ open class PlayerControllerView
 
         override fun onBufferingUpdate(mp: IVideoPlayer) {
             super.onBufferingUpdate(mp)
-            binding.loading.let {
-                if (mp.isBuffering() && !mp.isPlaying()) {
-                    it.visibility = View.VISIBLE
-                } else {
-                    it.visibility = View.GONE
+            showLoadingJob?.cancel()
+            showLoadingJob = coIO {
+                delay(500)
+                coMain {
+                    binding.loading.let {
+                        if (mp.isBuffering() && !mp.isPlaying()) {
+                            it.visibility = View.VISIBLE
+                        } else {
+                            it.visibility = View.GONE
+                        }
+                    }
                 }
             }
         }

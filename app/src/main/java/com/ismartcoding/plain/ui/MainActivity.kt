@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -18,7 +17,6 @@ import android.text.style.ClickableSpan
 import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.PickVisualMediaRequest
@@ -51,17 +49,13 @@ import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.enums.Language
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
-import com.ismartcoding.plain.preference.AgreeTermsPreference
-import com.ismartcoding.plain.preference.ApiPermissionsPreference
-import com.ismartcoding.plain.preference.KeepScreenOnPreference
-import com.ismartcoding.plain.preference.SettingsProvider
-import com.ismartcoding.plain.preference.SystemScreenTimeoutPreference
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.ExportFileEvent
 import com.ismartcoding.plain.features.ExportFileResultEvent
 import com.ismartcoding.plain.features.HttpServerStateChangedEvent
 import com.ismartcoding.plain.features.IgnoreBatteryOptimizationEvent
 import com.ismartcoding.plain.features.IgnoreBatteryOptimizationResultEvent
+import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.PermissionsResultEvent
@@ -75,10 +69,14 @@ import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.bluetooth.BluetoothPermission
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getStringF
-import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.helpers.ScreenHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.mediaProjectionManager
+import com.ismartcoding.plain.preference.AgreeTermsPreference
+import com.ismartcoding.plain.preference.ApiPermissionsPreference
+import com.ismartcoding.plain.preference.KeepScreenOnPreference
+import com.ismartcoding.plain.preference.SettingsProvider
+import com.ismartcoding.plain.preference.SystemScreenTimeoutPreference
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.NotificationListenerMonitorService
 import com.ismartcoding.plain.services.ScreenMirrorService
@@ -86,7 +84,6 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.MainViewModel
-import com.ismartcoding.plain.ui.models.ShowMessageEvent
 import com.ismartcoding.plain.ui.page.Main
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.web.websocket.EventType
@@ -237,10 +234,6 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("CheckResult")
     private fun initEvents() {
-        receiveEvent<ShowMessageEvent> { event ->
-            Toast.makeText(instance.get()!!, event.message, event.duration).show()
-        }
-
         receiveEvent<HttpServerStateChangedEvent> {
             viewModel.httpServerError = HttpServerManager.httpServerError
             viewModel.httpServerState = it.state

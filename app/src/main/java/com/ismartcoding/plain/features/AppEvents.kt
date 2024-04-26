@@ -59,6 +59,11 @@ class ConfirmDialogEvent(
     val dismissButton: Pair<String, () -> Unit>?
 )
 
+class LoadingDialogEvent(
+    val show: Boolean,
+    val message: String = ""
+)
+
 class WindowFocusChangedEvent(val hasFocus: Boolean)
 
 class DeleteChatItemViewEvent(val id: String)

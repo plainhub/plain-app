@@ -68,6 +68,9 @@ interface FeedEntryDao {
     @Update
     fun update(vararg item: DFeedEntry)
 
+    @Query("DELETE FROM feed_entries")
+    fun deleteAll()
+
     @Query("DELETE FROM feed_entries WHERE id in (:ids)")
     fun delete(ids: Set<String>)
 

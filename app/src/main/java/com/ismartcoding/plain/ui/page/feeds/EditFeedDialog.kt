@@ -37,7 +37,9 @@ fun EditFeedDialog(viewModel: FeedsViewModel) {
                 )
             },
             title = {
-                Text(text = stringResource(id = R.string.edit), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(text = stringResource(id = R.string.edit), maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleLarge
+                )
             },
             text = {
                 Column {

@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.size.Size
@@ -97,19 +98,21 @@ fun PListItem(
                     HorizontalSpace(dp = 16.dp)
                 }
             }
-            Column(modifier = Modifier
-                .weight(1f)
-                .padding(vertical = 8.dp)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 8.dp)
+            ) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
+                    style = MaterialTheme.typography.titleMedium,
                 )
                 desc?.let {
                     VerticalSpace(dp = 8.dp)
                     SelectionContainer {
                         Text(
                             text = it,
-                            style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                            style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
                         )
                     }
                 }
@@ -136,8 +139,7 @@ fun PListItem(
                             SelectionContainer {
                                 Text(
                                     text = it,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurface),
                                 )
                             }
                         }
@@ -152,7 +154,7 @@ fun PListItem(
                     Modifier
                         .size(24.dp),
                     contentDescription = title,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    tint = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }

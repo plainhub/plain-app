@@ -2,6 +2,11 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">आपके डिवाइस पर वर्तमान में आपका VPN सक्रिय है, जिससे PC से एक्सेस करते समay वेब कनेक्शन समस्याएँ उत्पन्न हो सकती हैं। इसे हल करने के लिए, हम सुझाव देते हैं कि आप अपने VPN सेटिंग्स को LAN ट्रैफ़िक की अनुमति देने या अपने VPN को अक्षम करने के लिए समायोजित करें।</string>
     <string name="warning">चेतावनी</string>
+    <string name="published_at">प्रकाशित किया गया</string>
+    <string name="older_than_7days_feed_items">7 दिन से पुराना</string>
+    <string name="older_than_30days_feed_items">30 दिन से पुराना</string>
+    <string name="feed_items_cleared">फ़ीड आइटम हटा दिए गए!</string>
+    <string name="clear_feed_items">फ़ीड आइटम साफ़ करें</string>
     <string name="jump_to_top">शीर्ष पर जाएं</string>
     <string name="jump_to_bottom">नीचे जाएं</string>
     <string name="save_to_notes">नोट्स में सहेजें</string>

@@ -6,6 +6,7 @@ import androidx.compose.material.icons.outlined.RssFeed
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,7 +38,9 @@ fun AddFeedDialog(viewModel: FeedsViewModel) {
                 )
             },
             title = {
-                Text(text = stringResource(id = R.string.add_subscription), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(text = stringResource(id = R.string.add_subscription), maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleLarge
+                )
             },
             text = {
                 if (viewModel.rssChannel.value == null) {

@@ -183,8 +183,8 @@ fun FeedEntriesPage(
             viewModel.tag.value!!.name,
         ).joinToString(" - ")
     } else {
-        if (tagsState.isEmpty() && !viewModel.showLoading.value) {
-            feedName + " (${viewModel.total.value})"
+        if (viewModel.filterType == FeedEntryFilterType.TODAY) {
+            feedName + " - " + stringResource(id = R.string.today)
         } else {
             feedName
         }

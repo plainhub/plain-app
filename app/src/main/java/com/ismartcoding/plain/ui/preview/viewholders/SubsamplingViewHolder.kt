@@ -12,14 +12,18 @@ import com.bumptech.glide.request.transition.Transition
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.ismartcoding.lib.extensions.getFinalPath
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.isRPlus
+import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.plain.databinding.ItemImageviewerSubsamplingBinding
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.ui.extensions.setSafeClick
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import com.ismartcoding.plain.ui.preview.utils.initTag
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
 class SubsamplingViewHolder(
@@ -31,6 +35,7 @@ class SubsamplingViewHolder(
         binding.subsamplingView.setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_CENTER_INSIDE)
     }
 
+    private var showLoadingJob: Job? = null
     fun bind(item: PreviewItem) {
         val holder = this
         binding.download.setSafeClick {
@@ -57,7 +62,13 @@ class SubsamplingViewHolder(
             coMain {
                 val path = item.uri.toString()
                 if (path.startsWith("http://", true) || path.startsWith("https://", true)) {
-                    binding.loading.isVisible = true
+                    showLoadingJob?.cancel()
+                    showLoadingJob = coIO {
+                        delay(200)
+                        coMain {
+                            binding.loading.isVisible = true
+                        }
+                    }
                     Glide.with(context)
                         .asBitmap()
                         .load(path)
@@ -67,11 +78,13 @@ class SubsamplingViewHolder(
                                     resource: Bitmap,
                                     transition: Transition<in Bitmap>?,
                                 ) {
+                                    showLoadingJob?.cancel()
                                     binding.loading.isVisible = false
                                     setImage(ImageSource.bitmap(resource))
                                 }
 
                                 override fun onLoadFailed(errorDrawable: Drawable?) {
+                                    showLoadingJob?.cancel()
                                     binding.loading.isVisible = false
                                 }
 
@@ -82,10 +95,16 @@ class SubsamplingViewHolder(
                 } else if (path.startsWith("app://", true)) {
                     setImage(ImageSource.uri(path.getFinalPath(context)))
                 } else {
-                    binding.loading.isVisible = true
-                    delay(100)
-                    binding.loading.isVisible = false
-                    setImage(ImageSource.uri(item.uri.toString()))
+                    if (isSPlus()) {
+                        setImage(ImageSource.uri(item.uri.toString()))
+                    } else { // could be slow on poor performance devices
+                        coIO {
+                            delay(200)
+                            coMain {
+                                setImage(ImageSource.uri(item.uri.toString()))
+                            }
+                        }
+                    }
                 }
             }
         }

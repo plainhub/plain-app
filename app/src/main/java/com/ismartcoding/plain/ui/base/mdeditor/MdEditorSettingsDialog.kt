@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -41,7 +42,9 @@ fun MdEditorSettingsDialog(
             }
         },
         title = {
-            Text(text = stringResource(id = R.string.editor_settings))
+            Text(text = stringResource(id = R.string.editor_settings),
+                style = MaterialTheme.typography.titleLarge
+            )
         },
         text = {
             Column {

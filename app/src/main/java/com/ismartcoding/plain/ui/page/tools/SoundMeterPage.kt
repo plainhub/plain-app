@@ -279,7 +279,10 @@ fun SoundMeterPage(navController: NavHostController) {
             }
         },
             title = {
-                Text(text = stringResource(id = R.string.decibel_values))
+                Text(
+                    text = stringResource(id = R.string.decibel_values),
+                    style = MaterialTheme.typography.titleLarge
+                )
             }, text = {
                 Column(Modifier.verticalScroll(rememberScrollState())) {
                     decibelValueStrings.forEach {

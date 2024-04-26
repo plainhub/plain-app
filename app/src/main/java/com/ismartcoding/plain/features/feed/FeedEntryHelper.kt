@@ -3,7 +3,6 @@ package com.ismartcoding.plain.features.feed
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.helpers.SearchHelper
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.FeedEntryDao
@@ -80,7 +79,13 @@ object FeedEntryHelper {
     }
 
     fun deleteAsync(ids: Set<String>) {
-        feedEntryDao.delete(ids)
+        ids.chunked(50).forEach { chunk ->
+            feedEntryDao.delete(chunk.toSet())
+        }
+    }
+
+    fun deleteAllAsync() {
+        feedEntryDao.deleteAll()
     }
 
     private fun parseQuery(
@@ -105,6 +110,8 @@ object FeedEntryHelper {
                 if (ids.isNotEmpty()) {
                     where.addIn("id", ids)
                 }
+            } else if (it.name == "created_at") {
+                where.add("created_at ${it.op} ?", it.value)
             }
         }
     }

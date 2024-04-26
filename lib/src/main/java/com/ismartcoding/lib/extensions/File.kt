@@ -9,9 +9,11 @@ import android.provider.MediaStore
 import android.util.Size
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
 import com.bumptech.glide.load.resource.bitmap.Downsampler
 import com.bumptech.glide.request.RequestOptions
 import com.ismartcoding.lib.isQPlus
+import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.logcat.LogCat
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -60,7 +62,7 @@ fun File.getBitmapAsync(
     mediaId: String = ""
 ): Bitmap? {
     var bitmap: Bitmap? = null
-    if (isQPlus() && width < 500) {
+    if (isQPlus() && this.path.isVideoFast()) {
         val contentUri = if (mediaId.isNotEmpty()) context.getMediaContentUri(path, mediaId) else context.getMediaContentUri(path)
         if (contentUri != null) {
             try {
@@ -87,20 +89,27 @@ fun File.getBitmapAsync(
         }
     } else {
         try {
-            var options =
-                RequestOptions()
-                    .set(Downsampler.ALLOW_HARDWARE_CONFIG, true)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .override(width, height)
-            if (centerCrop) {
-                options = options.centerCrop()
-            }
-            bitmap =
-                Glide.with(context).asBitmap().load(this)
-                    .apply(options)
-                    .submit().get()
-            // https://stackoverflow.com/questions/58314397/java-lang-illegalstateexception-software-rendering-doesnt-support-hardware-bit
+            // if file size less than 500KB just load it directly
+            if (width == 1024 && height == 1024 && length() < 500 * 1024) {
+                bitmap = Glide.with(context).asBitmap().load(this).submit().get()
+            } else {
+                var options =
+                    RequestOptions()
+                        .set(Downsampler.ALLOW_HARDWARE_CONFIG, true)
+                        .downsample(DownsampleStrategy.CENTER_INSIDE)
+//                    .format(DecodeFormat.PREFER_RGB_565)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .override(width, height)
+                if (centerCrop) {
+                    options = options.centerCrop()
+                }
+                bitmap =
+                    Glide.with(context).asBitmap().load(this)
+                        .apply(options)
+                        .submit().get()
+                // https://stackoverflow.com/questions/58314397/java-lang-illegalstateexception-software-rendering-doesnt-support-hardware-bit
 //            bitmap = d.copy(Bitmap.Config.ARGB_8888, false)
+            }
         } catch (ex: Exception) {
             LogCat.e(ex.toString())
         }
@@ -116,10 +125,19 @@ fun File.toThumbBytesAsync(
 ): ByteArray? {
     getBitmapAsync(context, width, height, centerCrop)?.let {
         val stream = ByteArrayOutputStream()
+        val quality = 80
         if (this@toThumbBytesAsync.name.endsWith(".png", true)) {
-            it.compress(Bitmap.CompressFormat.PNG, 70, stream)
+            if (isRPlus()) {
+                it.compress(Bitmap.CompressFormat.WEBP_LOSSY, quality, stream)
+            } else {
+                it.compress(Bitmap.CompressFormat.PNG, quality, stream) // quality ignored for PNG
+            }
         } else {
-            it.compress(Bitmap.CompressFormat.JPEG, 80, stream)
+            if (isRPlus()) {
+                it.compress(Bitmap.CompressFormat.WEBP_LOSSY, quality, stream)
+            } else {
+                it.compress(Bitmap.CompressFormat.JPEG, quality, stream)
+            }
         }
 
         return stream.toByteArray()

@@ -101,52 +101,51 @@ fun ViewFeedEntryBottomSheet(
         GroupButtons(
             buttons = groupButtons
         )
-        if (viewModel.filterType != FeedEntryFilterType.TRASH) {
-            VerticalSpace(dp = 16.dp)
-            Subtitle(text = stringResource(id = R.string.tags))
-            FlowRow(
-                modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
-                verticalArrangement = Arrangement.SpaceBetween,
-            ) {
-                tagsState.forEach { tag ->
-                    PSelectionChip(
-                        selected = tagIds.contains(tag.id),
-                        onClick = {
-                            tagsViewModel.toggleTag(m.id, tag.id)
-                            if (tagIds.contains(tag.id)) {
-                                tagIds.remove(tag.id)
-                            } else {
-                                tagIds.add(tag.id)
-                            }
-                        },
-                        text = tag.name
-                    )
-                }
-                NewTagButton(click = {
-                    tagsViewModel.showAddDialog()
+        VerticalSpace(dp = 16.dp)
+        Subtitle(text = stringResource(id = R.string.tags))
+        FlowRow(
+            modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            tagsState.forEach { tag ->
+                PSelectionChip(
+                    selected = tagIds.contains(tag.id),
+                    onClick = {
+                        tagsViewModel.toggleTag(m.id, tag.id)
+                        if (tagIds.contains(tag.id)) {
+                            tagIds.remove(tag.id)
+                        } else {
+                            tagIds.add(tag.id)
+                        }
+                    },
+                    text = tag.name
+                )
+            }
+            NewTagButton(click = {
+                tagsViewModel.showAddDialog()
+            })
+        }
+        VerticalSpace(dp = 24.dp)
+        PCard {
+            PListItem(title = m.url, separatedActions = true, onClick = {
+                WebHelper.open(context, m.url)
+            }, action = {
+                PIconButton(icon = Icons.Outlined.ContentCopy, contentDescription = stringResource(id = R.string.copy_link), onClick = {
+                    val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), m.url)
+                    clipboardManager.setPrimaryClip(clip)
+                    DialogHelper.showTextCopiedMessage(m.url)
                 })
-            }
-            VerticalSpace(dp = 24.dp)
-            PCard {
-                PListItem(title = m.url, separatedActions = true, onClick = {
-                    WebHelper.open(context, m.url)
-                }, action = {
-                    PIconButton(icon = Icons.Outlined.ContentCopy, contentDescription = stringResource(id = R.string.copy_link), onClick = {
-                        val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), m.url)
-                        clipboardManager.setPrimaryClip(clip)
-                        DialogHelper.showTextCopiedMessage(m.url)
-                    })
-                })
-            }
-            VerticalSpace(dp = 16.dp)
-            PCard {
-                PListItem(title = stringResource(id = R.string.created_at), value = m.createdAt.formatDateTime())
-                PListItem(title = stringResource(id = R.string.updated_at), value = m.updatedAt.formatDateTime())
-            }
+            })
+        }
+        VerticalSpace(dp = 16.dp)
+        PCard {
+            PListItem(title = stringResource(id = R.string.published_at), value = m.publishedAt.formatDateTime())
+            PListItem(title = stringResource(id = R.string.created_at), value = m.createdAt.formatDateTime())
+            PListItem(title = stringResource(id = R.string.updated_at), value = m.updatedAt.formatDateTime())
         }
         BottomSpace()
     }

@@ -4,26 +4,27 @@ import android.widget.Toast
 import com.apollographql.apollo3.api.ApolloResponse
 import com.apollographql.apollo3.api.Operation
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.ApiResult
 import com.ismartcoding.plain.api.GraphqlApiResult
 import com.ismartcoding.plain.features.ConfirmDialogEvent
+import com.ismartcoding.plain.features.LoadingDialogEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
-import com.ismartcoding.plain.ui.LoadingDialog
-import com.ismartcoding.plain.ui.models.ShowMessageEvent
+import com.ismartcoding.plain.ui.MainActivity
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
 object DialogHelper {
-    private var loadingDialog: LoadingDialog? = null
-
+    private var showLoadingJob: Job? = null
+    private var hideLoadingJob: Job? = null
     fun showMessage(
         message: String,
         duration: Int = Toast.LENGTH_SHORT,
     ) {
-        sendEvent(ShowMessageEvent(message, duration))
+        Toast.makeText(MainActivity.instance.get()!!, message, duration).show()
     }
 
     fun showMessage(resId: Int) {
@@ -47,23 +48,20 @@ object DialogHelper {
     }
 
     fun showLoading(message: String = "") {
-        coMain {
-            if (loadingDialog == null) {
-                loadingDialog = LoadingDialog(message)
-                loadingDialog?.show()
-            } else {
-                loadingDialog?.updateMessage(message)
-            }
+        hideLoadingJob?.cancel()
+        showLoadingJob?.cancel()
+        showLoadingJob = coIO {
+            delay(200)
+            sendEvent(LoadingDialogEvent(true, message))
         }
     }
 
     fun hideLoading() {
-        coMain {
-            delay(200)
-            if (loadingDialog?.isAdded == true) {
-                loadingDialog?.dismissAllowingStateLoss()
-            }
-            loadingDialog = null
+        hideLoadingJob?.cancel()
+        showLoadingJob?.cancel()
+        hideLoadingJob = coIO {
+            delay(500)
+            sendEvent(LoadingDialogEvent(false))
         }
     }
 

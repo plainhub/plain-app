@@ -127,7 +127,9 @@ fun MdEditorInsertImageDialog(
             }
         },
         title = {
-            Text(text = stringResource(id = R.string.insert_image))
+            Text(text = stringResource(id = R.string.insert_image),
+                style = MaterialTheme.typography.titleLarge
+            )
         },
         text = {
             Column {
