@@ -61,8 +61,7 @@ class NotificationListenerService : NotificationListenerService() {
             }
             TempData.notifications.add(n)
             coMain {
-                val context = MainApp.instance
-                val enable = withIO { Permission.NOTIFICATION_LISTENER.isEnabledAsync(context) }
+                val enable = withIO { Permission.NOTIFICATION_LISTENER.isEnabledAsync(MainApp.instance) }
                 if (enable) {
                     sendEvent(
                         WebSocketEvent(

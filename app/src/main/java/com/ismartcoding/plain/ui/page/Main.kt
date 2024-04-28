@@ -45,12 +45,19 @@ import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.extensions.parcelableArrayList
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DPlaylistAudio
+import com.ismartcoding.plain.db.DChat
+import com.ismartcoding.plain.db.DMessageContent
+import com.ismartcoding.plain.db.DMessageText
+import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
+import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.features.ConfirmDialogEvent
 import com.ismartcoding.plain.features.LoadingDialogEvent
 import com.ismartcoding.plain.features.Permissions
@@ -102,6 +109,9 @@ import com.ismartcoding.plain.ui.page.web.WebSettingsPage
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import com.ismartcoding.plain.ui.theme.AppTheme
+import com.ismartcoding.plain.web.models.toModel
+import com.ismartcoding.plain.web.websocket.EventType
+import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -165,15 +175,36 @@ fun Main(viewModel: MainViewModel) {
                 }
             }
         } else if (intent?.action == Intent.ACTION_SEND) {
-            DialogHelper.showConfirmDialog("", getString(R.string.confirm_to_send_file_to_file_assistant),
+            if (intent.type?.startsWith("text/") == true) {
+                val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT) ?: return@LaunchedEffect
+                scope.launch {
+                    val item = withIO {
+                        ChatHelper.sendAsync(DMessageContent(DMessageType.TEXT.value, DMessageText(sharedText)))
+                    }
+                    sendEvent(
+                        WebSocketEvent(
+                            EventType.MESSAGE_CREATED,
+                            JsonHelper.jsonEncode(
+                                arrayListOf(
+                                    item.toModel().apply {
+                                        data = this.getContentData()
+                                    },
+                                ),
+                            ),
+                        ),
+                    )
+                    navController.navigate(RouteName.CHAT)
+                }
+                return@LaunchedEffect
+            }
+
+            val uri = intent.parcelable(Intent.EXTRA_STREAM) as? Uri ?: return@LaunchedEffect
+            DialogHelper.showConfirmDialog(uri.toString(), getString(R.string.confirm_to_send_file_to_file_assistant),
                 confirmButton = getString(R.string.ok) to {
-                    val uri = intent.parcelable(Intent.EXTRA_STREAM) as? Uri
-                    if (uri != null) {
-                        navController.navigate(RouteName.CHAT)
-                        scope.launch(Dispatchers.IO) {
-                            delay(1000)
-                            sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, setOf(uri)))
-                        }
+                    navController.navigate(RouteName.CHAT)
+                    scope.launch(Dispatchers.IO) {
+                        delay(1000)
+                        sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, setOf(uri)))
                     }
                 },
                 dismissButton = getString(R.string.cancel) to {})
@@ -365,7 +396,8 @@ fun Main(viewModel: MainViewModel) {
                 confirmDialogEvent = null
             }, title = if (confirmDialogEvent!!.title.isNotEmpty()) {
                 {
-                    Text(confirmDialogEvent!!.title,
+                    Text(
+                        confirmDialogEvent!!.title,
                         style = MaterialTheme.typography.titleLarge
                     )
                 }
@@ -398,7 +430,7 @@ fun Main(viewModel: MainViewModel) {
                 DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
             ) {
                 Box(
-                    contentAlignment= Alignment.Center,
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .size(96.dp)
                         .background(MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(8.dp))
