@@ -1,18 +1,18 @@
 package com.ismartcoding.plain.web.websocket
 
-import kotlinx.serialization.Serializable
+class WebSocketEvent(
+    val type: EventType,
+    val data: Any, // String or ByteArray
+) // Event will be sent to web client
 
-@Serializable
-class WebSocketEvent(val type: EventType, val data: String = "", val encrypted: Boolean = true) // Event will be sent to web client
-
-enum class EventType {
-    MESSAGE_CREATED,
-    MESSAGE_DELETED,
-    MESSAGE_UPDATED,
-    FEEDS_FETCHED,
-    SCREEN_MIRRORING,
-    AI_CHAT_REPLIED,
-    NOTIFICATION_CREATED,
-    NOTIFICATION_UPDATED,
-    NOTIFICATION_DELETED,
+enum class EventType(val value: Int) {
+    MESSAGE_CREATED(1),
+    MESSAGE_DELETED(2),
+    MESSAGE_UPDATED(3),
+    FEEDS_FETCHED(4),
+    SCREEN_MIRRORING(5),
+    AI_CHAT_REPLIED(6),
+    NOTIFICATION_CREATED(7),
+    NOTIFICATION_UPDATED(8),
+    NOTIFICATION_DELETED(9),
 }

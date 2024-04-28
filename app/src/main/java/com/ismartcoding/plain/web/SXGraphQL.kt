@@ -111,6 +111,8 @@ import com.ismartcoding.plain.web.models.StorageStats
 import com.ismartcoding.plain.web.models.TempValue
 import com.ismartcoding.plain.web.models.Video
 import com.ismartcoding.plain.web.models.toModel
+import com.ismartcoding.plain.web.websocket.EventType
+import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -475,9 +477,15 @@ class SXGraphQL(val schema: Schema) {
                         )
                     }
                 }
-                query("screenMirrorImage") {
+                query("screenMirrorState") {
                     resolver { ->
-                        ScreenMirrorService.instance?.getLatestImageBase64() ?: ""
+                        val image = ScreenMirrorService.instance?.getLatestImage()
+                        if (image != null) {
+                            sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, image))
+                            true
+                        } else {
+                            false
+                        }
                     }
                 }
                 query("recentFiles") {
