@@ -112,9 +112,8 @@ object PackageHelper {
     }
 
     fun getCerts(packageInfo: PackageInfo): List<DCertificate> {
-        var certs = appCertsCache[packageInfo.packageName]
-        if (certs == null) {
-            certs = mutableListOf<DCertificate>()
+        val certs = appCertsCache[packageInfo.packageName]?.toMutableList() ?: mutableListOf()
+        if (certs.isEmpty()) {
             val signatures = signatures(packageInfo)
             for (signature in signatures) {
                 val cert = X509Certificate.getInstance(signature.toByteArray())
@@ -129,8 +128,6 @@ object PackageHelper {
                 )
             }
             appCertsCache[packageInfo.packageName] = certs
-        } else {
-            certs = mutableListOf()
         }
 
         return certs

@@ -23,6 +23,7 @@ import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.features.device.DeviceSortBy
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.data.DVideo
+import com.ismartcoding.plain.data.DScreenMirrorQuality
 import java.util.Locale
 
 object PasswordPreference : BasePreference<String>() {
@@ -291,6 +292,26 @@ object ExchangeRatePreference : BasePreference<String>() {
     suspend fun putAsync(
         context: Context,
         value: ExchangeConfig,
+    ) {
+        putAsync(context, jsonEncode(value))
+    }
+}
+
+object ScreenMirrorQualityPreference : BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("screen_mirror_quality")
+
+    suspend fun getValueAsync(context: Context): DScreenMirrorQuality {
+        val str = getAsync(context)
+        if (str.isEmpty()) {
+            return DScreenMirrorQuality()
+        }
+        return jsonDecode(str)
+    }
+
+    suspend fun putAsync(
+        context: Context,
+        value: DScreenMirrorQuality,
     ) {
         putAsync(context, jsonEncode(value))
     }

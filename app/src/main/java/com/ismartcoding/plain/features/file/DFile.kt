@@ -7,6 +7,7 @@ data class DFile(
     var name: String,
     var path: String,
     val permission: String,
+    val createdAt: Instant?,
     val updatedAt: Instant,
     val size: Long,
     val isDir: Boolean,

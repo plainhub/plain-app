@@ -163,7 +163,9 @@ fun AppsPage(
                         item {
                             TopSpace()
                         }
-                        items(itemsState) { m ->
+                        items(itemsState, key = {
+                            it.id
+                        }) { m ->
                             PackageListItem(
                                 item = m,
                                 modifier = PlainTheme.getCardModifier(),

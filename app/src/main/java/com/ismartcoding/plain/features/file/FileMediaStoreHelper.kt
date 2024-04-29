@@ -46,6 +46,7 @@ object FileMediaStoreHelper : BaseContentHelper() {
             MediaStore.Files.FileColumns.DISPLAY_NAME,
             MediaStore.Files.FileColumns.DATA,
             MediaStore.Files.FileColumns.SIZE,
+            MediaStore.Files.FileColumns.DATE_ADDED,
             MediaStore.Files.FileColumns.DATE_MODIFIED,
             MediaStore.Files.FileColumns.MIME_TYPE,
             MediaStore.Files.FileColumns.MEDIA_TYPE,
@@ -86,6 +87,7 @@ object FileMediaStoreHelper : BaseContentHelper() {
                 val title = cursor.getStringValue(MediaStore.Files.FileColumns.DISPLAY_NAME, cache)
                 val size = cursor.getLongValue(MediaStore.Files.FileColumns.SIZE, cache)
                 val path = cursor.getStringValue(MediaStore.Files.FileColumns.DATA, cache)
+                val createdAt = cursor.getTimeValue(MediaStore.Files.FileColumns.DATE_ADDED, cache)
                 val updatedAt = cursor.getTimeValue(MediaStore.Files.FileColumns.DATE_MODIFIED, cache)
                 val mediaType = cursor.getIntValue(MediaStore.Files.FileColumns.MEDIA_TYPE, cache)
                 result.add(
@@ -93,6 +95,7 @@ object FileMediaStoreHelper : BaseContentHelper() {
                         title,
                         path,
                         "",
+                        createdAt,
                         updatedAt,
                         size,
                         mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_NONE,
@@ -112,6 +115,9 @@ object FileMediaStoreHelper : BaseContentHelper() {
                 val title = cursor.getStringValue(MediaStore.Files.FileColumns.DISPLAY_NAME, indexCache)
                 val size = cursor.getLongValue(MediaStore.Files.FileColumns.SIZE, indexCache)
                 val path = cursor.getStringValue(MediaStore.Files.FileColumns.DATA, indexCache)
+                val createdAt = Instant.fromEpochMilliseconds(
+                    cursor.getLongValue(MediaStore.Files.FileColumns.DATE_ADDED, indexCache) * 1000L,
+                )
                 val updatedAt = Instant.fromEpochMilliseconds(
                     cursor.getLongValue(MediaStore.Files.FileColumns.DATE_MODIFIED, indexCache) * 1000L,
                 )
@@ -119,6 +125,7 @@ object FileMediaStoreHelper : BaseContentHelper() {
                     title,
                     path,
                     "",
+                    createdAt,
                     updatedAt,
                     size,
                     false,
@@ -157,6 +164,9 @@ object FileMediaStoreHelper : BaseContentHelper() {
                 }
 
                 val path = cursor.getStringValue(MediaStore.Files.FileColumns.DATA, cache)
+                val createdAt = Instant.fromEpochMilliseconds(
+                    cursor.getLongValue(MediaStore.Files.FileColumns.DATE_ADDED, cache) * 1000L,
+                )
                 val updatedAt = Instant.fromEpochMilliseconds(
                     cursor.getLongValue(MediaStore.Files.FileColumns.DATE_MODIFIED, cache) * 1000L,
                 )
@@ -164,31 +174,31 @@ object FileMediaStoreHelper : BaseContentHelper() {
                 when (fileType) {
                     FileType.IMAGE -> {
                         if (mimetype == "image") {
-                            items.add(DFile(name, path, "", updatedAt, size, false, 0, id))
+                            items.add(DFile(name, path, "", createdAt, updatedAt, size, false, 0, id))
                         }
                     }
 
                     FileType.VIDEO -> {
                         if (mimetype == "video") {
-                            items.add(DFile(name, path, "", updatedAt, size, false, 0, id))
+                            items.add(DFile(name, path, "", createdAt, updatedAt, size, false, 0, id))
                         }
                     }
 
                     FileType.AUDIO -> {
                         if (mimetype == "audio" || extraAudioMimeTypes.contains(fullMimetype)) {
-                            items.add(DFile(name, path, "", updatedAt, size, false, 0, id))
+                            items.add(DFile(name, path, "", createdAt, updatedAt, size, false, 0, id))
                         }
                     }
 
                     FileType.DOCUMENT -> {
                         if (mimetype == "text" || extraDocumentMimeTypes.contains(fullMimetype)) {
-                            items.add(DFile(name, path, "", updatedAt, size, false, 0, id))
+                            items.add(DFile(name, path, "", createdAt, updatedAt, size, false, 0, id))
                         }
                     }
 
                     FileType.ARCHIVE -> {
                         if (archiveMimeTypes.contains(fullMimetype)) {
-                            items.add(DFile(name, path, "", updatedAt, size, false, 0, id))
+                            items.add(DFile(name, path, "", createdAt, updatedAt, size, false, 0, id))
                         }
                     }
 
@@ -197,7 +207,7 @@ object FileMediaStoreHelper : BaseContentHelper() {
                             !extraAudioMimeTypes.contains(fullMimetype) && !extraDocumentMimeTypes.contains(fullMimetype) &&
                             !archiveMimeTypes.contains(fullMimetype)
                         ) {
-                            items.add(DFile(name, path, "", updatedAt, size, false, 0, id))
+                            items.add(DFile(name, path, "", createdAt, updatedAt, size, false, 0, id))
                         }
                     }
                 }

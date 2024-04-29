@@ -121,11 +121,17 @@ class ImagesDialog(val bucket: DMediaBucket? = null) : BaseListDrawerDialog() {
                                 bms
                             }
                         try {
+                            val softwareBitmaps = mutableListOf<Bitmap>()
+                            for (bitmap in bitmaps) {
+                                // Convert hardware bitmap to software bitmap
+                                val softwareBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+                                softwareBitmaps.add(softwareBitmap)
+                            }
                             b.image.setImageBitmap(
                                 CombineBitmapTools.combineBitmap(
                                     200,
                                     200,
-                                    bitmaps,
+                                    softwareBitmaps,
                                 ),
                             )
                         } catch (ex: Exception) {

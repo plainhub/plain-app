@@ -59,6 +59,7 @@ import com.ismartcoding.plain.features.AIChatHelper
 import com.ismartcoding.plain.features.audio.AudioMediaStoreHelper
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.data.DPlaylistAudio
+import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.features.call.CallMediaStoreHelper
 import com.ismartcoding.plain.features.call.SimHelper
@@ -83,6 +84,7 @@ import com.ismartcoding.plain.helpers.DeviceInfoHelper
 import com.ismartcoding.plain.helpers.ExchangeHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.TempHelper
+import com.ismartcoding.plain.preference.ScreenMirrorQualityPreference
 import com.ismartcoding.plain.receivers.BatteryReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.ScreenMirrorService
@@ -488,6 +490,11 @@ class SXGraphQL(val schema: Schema) {
                         }
                     }
                 }
+                query("screenMirrorQuality") {
+                    resolver { ->
+                        ScreenMirrorQualityPreference.getValueAsync(MainApp.instance).toModel()
+                    }
+                }
                 query("recentFiles") {
                     resolver { ->
                         val context = MainApp.instance
@@ -804,6 +811,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("startScreenMirror") {
                     resolver { ->
+                        ScreenMirrorService.qualityData = ScreenMirrorQualityPreference.getValueAsync(MainApp.instance)
                         sendEvent(StartScreenMirrorEvent())
                         true
                     }
@@ -812,6 +820,14 @@ class SXGraphQL(val schema: Schema) {
                     resolver { ->
                         ScreenMirrorService.instance?.stop()
                         ScreenMirrorService.instance = null
+                        true
+                    }
+                }
+                mutation("updateScreenMirrorQuality") {
+                    resolver { quality: Int, resolution: Int ->
+                        val qualityData = DScreenMirrorQuality(quality, resolution)
+                        ScreenMirrorQualityPreference.putAsync(MainApp.instance, qualityData)
+                        ScreenMirrorService.qualityData = qualityData
                         true
                     }
                 }

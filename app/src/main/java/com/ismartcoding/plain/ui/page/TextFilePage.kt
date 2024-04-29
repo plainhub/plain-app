@@ -17,7 +17,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.pathToAceMode
+import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.TextFileType
@@ -110,6 +112,7 @@ fun TextFilePage(
                     scope.launch {
                         DialogHelper.showLoading()
                         withIO { File(path).writeText(viewModel.content.value) }
+                        context.scanFileByConnection(path)
                         DialogHelper.hideLoading()
                         DialogHelper.showMessage(R.string.saved)
                     }

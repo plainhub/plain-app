@@ -164,7 +164,9 @@ fun FeedEntriesSearchPage(
                     item {
                         TopSpace()
                     }
-                    items(itemsState) { m ->
+                    items(itemsState, key = {
+                        it.id
+                    }) { m ->
                         val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
                         FeedEntryListItem(
                             viewModel,

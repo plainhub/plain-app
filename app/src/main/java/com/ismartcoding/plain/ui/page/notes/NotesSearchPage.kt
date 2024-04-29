@@ -160,7 +160,9 @@ fun NotesSearchPage(
                     item {
                         TopSpace()
                     }
-                    items(itemsState) { m ->
+                    items(itemsState, key = {
+                        it.id
+                    }) { m ->
                         PSwipeBox(
                             modifier = Modifier
                                 .fillMaxWidth()

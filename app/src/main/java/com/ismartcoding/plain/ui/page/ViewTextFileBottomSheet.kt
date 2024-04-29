@@ -126,6 +126,9 @@ fun ViewTextFileBottomSheet(
             PCard {
                 PListItem(title = stringResource(id = R.string.file_size), value = FormatHelper.formatBytes(m.size))
                 PListItem(title = stringResource(id = R.string.type), value = m.path.getMimeType())
+                if (m.createdAt != null) {
+                    PListItem(title = stringResource(id = R.string.created_at), value = m.createdAt.formatDateTime())
+                }
                 PListItem(title = stringResource(id = R.string.updated_at), value = m.updatedAt.formatDateTime())
             }
             VerticalSpace(dp = 16.dp)

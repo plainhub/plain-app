@@ -8,6 +8,7 @@ import com.google.common.io.ByteStreams
 import com.google.common.io.FileWriteMode
 import com.google.common.io.Files
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.compress
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.newFile
@@ -21,6 +22,7 @@ import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.ZipHelper
+import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.upnp.UPnPController
 import com.ismartcoding.plain.BuildConfig
@@ -364,7 +366,7 @@ object HttpModule {
                         val packageName = path.substring(10)
                         val bitmap = PackageHelper.getIcon(packageName)
                         val bytes = ByteArrayOutputStream().use {
-                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+                            bitmap.compress(80, it)
                             it.toByteArray()
                         }
                         call.respond(bytes)

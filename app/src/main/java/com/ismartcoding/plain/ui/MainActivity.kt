@@ -37,7 +37,6 @@ import com.ismartcoding.lib.extensions.getSystemScreenTimeout
 import com.ismartcoding.lib.extensions.setSystemScreenTimeout
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
@@ -338,24 +337,23 @@ class MainActivity : AppCompatActivity() {
                         ),
                     )
                     .setPositiveButton(getString(R.string.accept)) { _, _ ->
-                        launch {
-                            withIO { HttpServerManager.respondTokenAsync(event, clientIp) }
+                        launch(Dispatchers.IO) {
+                            HttpServerManager.respondTokenAsync(event, clientIp)
                         }
                     }
                     .setNegativeButton(getString(R.string.reject)) { _, _ ->
-                        launch {
-                            withIO {
-                                event.session.close(
-                                    CloseReason(
-                                        CloseReason.Codes.TRY_AGAIN_LATER, "rejected",
-                                    ),
-                                )
-                            }
+                        launch(Dispatchers.IO) {
+                            event.session.close(
+                                CloseReason(
+                                    CloseReason.Codes.TRY_AGAIN_LATER, "rejected",
+                                ),
+                            )
                         }
                     }.create()
             if (Permission.SYSTEM_ALERT_WINDOW.can(this@MainActivity)) {
                 requestToConnectDialog?.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
             }
+            requestToConnectDialog?.window?.setDimAmount(0.8f)
             requestToConnectDialog?.show()
         }
     }

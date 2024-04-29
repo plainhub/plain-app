@@ -123,26 +123,10 @@ fun File.toThumbBytesAsync(
     height: Int,
     centerCrop: Boolean,
 ): ByteArray? {
-    getBitmapAsync(context, width, height, centerCrop)?.let {
-        val stream = ByteArrayOutputStream()
-        val quality = 80
-        if (this@toThumbBytesAsync.name.endsWith(".png", true)) {
-            if (isRPlus()) {
-                it.compress(Bitmap.CompressFormat.WEBP_LOSSY, quality, stream)
-            } else {
-                it.compress(Bitmap.CompressFormat.PNG, quality, stream) // quality ignored for PNG
-            }
-        } else {
-            if (isRPlus()) {
-                it.compress(Bitmap.CompressFormat.WEBP_LOSSY, quality, stream)
-            } else {
-                it.compress(Bitmap.CompressFormat.JPEG, quality, stream)
-            }
-        }
-
-        return stream.toByteArray()
-    }
-    return null
+    val bitmap = getBitmapAsync(context, width, height, centerCrop) ?: return null
+    val stream = ByteArrayOutputStream()
+    bitmap.compress(80, stream)
+    return stream.toByteArray()
 }
 
 fun File.getDuration(context: Context): Long {

@@ -16,19 +16,19 @@ import androidx.core.app.ServiceCompat
 import androidx.core.graphics.scale
 import androidx.lifecycle.LifecycleService
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.compress
 import com.ismartcoding.lib.extensions.isPortrait
 import com.ismartcoding.lib.extensions.parcelable
-import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.data.ScreenMirrorQuality
+import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.mediaProjectionManager
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import java.io.ByteArrayOutputStream
+
 
 class ScreenMirrorService : LifecycleService() {
     private var widthPortrait = 720
@@ -44,7 +44,7 @@ class ScreenMirrorService : LifecycleService() {
 
     private var mMediaProjection: MediaProjection? = null
     private var mImageReaderPortrait: ImageReader? = null
-    private var mImageReaderLanscape: ImageReader? = null
+    private var mImageReaderLandscape: ImageReader? = null
     private var mImageReaderHandlerThread: HandlerThread? = null
     private var mVirtualDisplay: VirtualDisplay? = null
     private var handler: Handler? = null
@@ -118,40 +118,37 @@ class ScreenMirrorService : LifecycleService() {
         width: Int,
         height: Int,
     ): ByteArray {
-        val qualityData = TempData.screenMirrorQualityType.getQuality()
-        val maxWidth = qualityData.maxWidth
-        val needCompress =
-            if (isPortrait) {
-                width > maxWidth
-            } else {
-                height > maxWidth
-            }
+        val maxWidth = qualityData.resolution
+        var newWidth = width
+        var newHeight = height
+        val longSide = maxOf(width, height)
+        val shortSide = minOf(width, height)
+        val scale = shortSide.toFloat() / longSide.toFloat()
 
-        var newBitmap = bitmap
-        if (needCompress) {
-            val scaleRatio = if (isPortrait) maxWidth.toFloat() / width.toFloat() else maxWidth.toFloat() / height.toFloat()
-            val newWidth = (width * scaleRatio).toInt()
-            val newHeight = (height * scaleRatio).toInt()
-            newBitmap = bitmap.scale(newWidth, newHeight, true)
+        if (shortSide < maxWidth || longSide < maxWidth) {
+        } else {
+            if (width < height) {
+                newWidth = maxWidth
+                newHeight = (maxWidth / scale).toInt()
+            } else {
+                newWidth = (maxWidth / scale).toInt()
+                newHeight = maxWidth
+            }
         }
+
+        val newBitmap = if (newWidth >= width && newHeight >= height) bitmap else bitmap.scale(newWidth, newHeight, true)
 
         val outputStream = ByteArrayOutputStream()
-        var quality = qualityData.quality
-        if (isRPlus()) {
-            newBitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, quality, outputStream)
-        } else {
-            newBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-        }
-        while (outputStream.size() > qualityData.maxSize && quality > 0) {
-            outputStream.reset()
-            quality -= 10
-            if (isRPlus()) {
-                newBitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, quality, outputStream)
-            } else {
-                newBitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-            }
-            LogCat.d("quality: $quality, size: ${outputStream.size()}")
-        }
+        val quality = qualityData.quality
+        newBitmap.compress(quality, outputStream)
+        val size = outputStream.size()
+//        while (size > qualityData.maxSize && quality > 20) {
+//            outputStream.reset()
+//            quality -= 10
+//            newBitmap.compress(quality, outputStream)
+//            size = outputStream.size()
+//        }
+        LogCat.d("quality: $quality, size: $size, $newWidth x $newHeight")
 
         return outputStream.toByteArray()
     }
@@ -170,7 +167,7 @@ class ScreenMirrorService : LifecycleService() {
                 heightLandscape
             }
 
-        mVirtualDisplay?.surface = if (isPortrait) mImageReaderPortrait!!.surface else mImageReaderLanscape!!.surface
+        mVirtualDisplay?.surface = if (isPortrait) mImageReaderPortrait!!.surface else mImageReaderLandscape!!.surface
         mVirtualDisplay?.resize(width, height, mScreenDensity)
     }
 
@@ -189,7 +186,7 @@ class ScreenMirrorService : LifecycleService() {
                 heightLandscape
             }
         mImageReaderPortrait = ImageReader.newInstance(widthPortrait, heightPortrait, PixelFormat.RGBA_8888, 2)
-        mImageReaderLanscape = ImageReader.newInstance(widthLandscape, heightLandscape, PixelFormat.RGBA_8888, 2)
+        mImageReaderLandscape = ImageReader.newInstance(widthLandscape, heightLandscape, PixelFormat.RGBA_8888, 2)
         mMediaProjection?.registerCallback(
             object : MediaProjection.Callback() {
                 override fun onStop() {
@@ -201,7 +198,7 @@ class ScreenMirrorService : LifecycleService() {
             mMediaProjection?.createVirtualDisplay(
                 "ScreenMirroringService", width, height, mScreenDensity,
                 DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY or DisplayManager.VIRTUAL_DISPLAY_FLAG_PUBLIC,
-                if (isPortrait) mImageReaderPortrait!!.surface else mImageReaderLanscape!!.surface,
+                if (isPortrait) mImageReaderPortrait!!.surface else mImageReaderLandscape!!.surface,
                 object : VirtualDisplay.Callback() {
                 },
                 null,
@@ -231,7 +228,7 @@ class ScreenMirrorService : LifecycleService() {
             }
         }, handler!!)
 
-        mImageReaderLanscape?.setOnImageAvailableListener({
+        mImageReaderLandscape?.setOnImageAvailableListener({
             try {
                 val image = it.acquireLatestImage()
                 if (image != null) {
@@ -262,9 +259,9 @@ class ScreenMirrorService : LifecycleService() {
             mVirtualDisplay = null
         }
         mImageReaderPortrait?.setOnImageAvailableListener(null, null)
-        mImageReaderLanscape?.setOnImageAvailableListener(null, null)
+        mImageReaderLandscape?.setOnImageAvailableListener(null, null)
         mImageReaderPortrait = null
-        mImageReaderLanscape = null
+        mImageReaderLandscape = null
         if (mMediaProjection != null) {
             mMediaProjection?.stop()
             mMediaProjection = null
@@ -282,16 +279,12 @@ class ScreenMirrorService : LifecycleService() {
         }
 
         val outputStream = ByteArrayOutputStream()
-        val quality = ScreenMirrorQuality.HIGH.quality
-        if (isRPlus()) {
-            mBitmap!!.compress(Bitmap.CompressFormat.WEBP_LOSSY, quality, outputStream)
-        } else {
-            mBitmap!!.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-        }
+        mBitmap!!.compress(qualityData.quality, outputStream)
         return outputStream.toByteArray()
     }
 
     companion object {
         var instance: ScreenMirrorService? = null
+        var qualityData: DScreenMirrorQuality = DScreenMirrorQuality()
     }
 }

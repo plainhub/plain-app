@@ -201,6 +201,7 @@ object FileSystemHelper {
             file.name,
             file.path,
             "",
+            null,
             Instant.fromEpochMilliseconds(file.lastModified()),
             size,
             isDir,
@@ -275,6 +276,7 @@ object FileSystemHelper {
             arrayOf(
                 MediaStore.Files.FileColumns.DATA,
                 MediaStore.Files.FileColumns.DISPLAY_NAME,
+                MediaStore.Files.FileColumns.DATE_ADDED,
                 MediaStore.Files.FileColumns.DATE_MODIFIED,
                 MediaStore.Files.FileColumns.SIZE,
             )
@@ -296,11 +298,14 @@ object FileSystemHelper {
 
                     val name = cursor.getStringValue(MediaStore.Files.FileColumns.DISPLAY_NAME, cache)
                     val size = cursor.getLongValue(MediaStore.Files.FileColumns.SIZE, cache)
+                    val createdAt = Instant.fromEpochMilliseconds(
+                        cursor.getLongValue(MediaStore.Files.FileColumns.DATE_ADDED, cache) * 1000L,
+                    )
                     val updatedAt =
                         Instant.fromEpochMilliseconds(
                             cursor.getLongValue(MediaStore.Files.FileColumns.DATE_MODIFIED, cache) * 1000L,
                         )
-                    items.add(DFile(name, path, "", updatedAt, size, false, 0))
+                    items.add(DFile(name, path, "", createdAt, updatedAt, size, false, 0))
                 } while (cursor.moveToNext())
             }
         }
