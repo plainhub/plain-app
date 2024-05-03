@@ -6,12 +6,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.DeleteForever
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -30,10 +32,14 @@ import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.components.FileRenameDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.DocsViewModel
 import com.ismartcoding.plain.ui.models.enterSelectMode
 import com.ismartcoding.plain.ui.models.select
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -45,6 +51,7 @@ fun ViewFileBottomSheet(
     val onDismiss = {
         viewModel.selectedItem.value = null
     }
+    val scope = rememberCoroutineScope()
     val groupButtons = remember { mutableStateListOf<GroupButton>() }
     LaunchedEffect(Unit) {
         if (!viewModel.search.value) {
@@ -71,6 +78,13 @@ fun ViewFileBottomSheet(
                     }
                 ),
                 GroupButton(
+                    icon = Icons.Outlined.Edit,
+                    text = LocaleHelper.getString(R.string.rename),
+                    onClick = {
+                        viewModel.showRenameDialog.value = true
+                    }
+                ),
+                GroupButton(
                     icon = Icons.Outlined.DeleteForever,
                     text = LocaleHelper.getString(R.string.delete),
                     onClick = {
@@ -81,6 +95,15 @@ fun ViewFileBottomSheet(
                     }
                 )
             ))
+    }
+
+    if (viewModel.showRenameDialog.value) {
+        FileRenameDialog(path = m.path, onDismiss = {
+            viewModel.showRenameDialog.value = false
+        }, onDone = {
+            scope.launch(Dispatchers.IO) { viewModel.loadAsync(context) }
+            onDismiss()
+        })
     }
 
     PModalBottomSheet(

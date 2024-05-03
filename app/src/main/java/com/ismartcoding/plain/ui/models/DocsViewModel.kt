@@ -33,6 +33,7 @@ class DocsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectabl
     val noMore = mutableStateOf(false)
     val sortBy = mutableStateOf(FileSortBy.DATE_DESC)
     val selectedItem = mutableStateOf<DFile?>(null)
+    val showRenameDialog = mutableStateOf(false)
     val search = mutableStateOf(false)
     val showSortDialog = mutableStateOf(false)
 
@@ -42,7 +43,8 @@ class DocsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectabl
     override var selectMode = mutableStateOf(false)
     override val selectedIds = mutableStateListOf<String>()
 
-    fun moreAsync(context: Context, query: String = "") {
+    fun moreAsync(context: Context) {
+        val query = queryText
         offset.value += limit.value
         val items = FileMediaStoreHelper.getAllByFileType(context, MediaStore.VOLUME_EXTERNAL_PRIMARY, FileType.DOCUMENT, sortBy.value)
             .filter { query.isEmpty() || it.name.contains(query) }
@@ -51,7 +53,8 @@ class DocsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectabl
         noMore.value = items.size < limit.value
     }
 
-    suspend fun loadAsync(context: Context, query: String = "") {
+    suspend fun loadAsync(context: Context) {
+        val query = queryText
         offset.value = 0
         _itemsFlow.value = FileMediaStoreHelper.getAllByFileType(context, MediaStore.VOLUME_EXTERNAL_PRIMARY, FileType.DOCUMENT, sortBy.value)
             .filter { query.isEmpty() || it.name.contains(query) }.toMutableStateList()

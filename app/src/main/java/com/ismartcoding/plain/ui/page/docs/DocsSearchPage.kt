@@ -65,7 +65,7 @@ fun DocsSearchPage(
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
             scope.launch {
-                withIO { viewModel.loadAsync(context, viewModel.queryText) }
+                withIO { viewModel.loadAsync(context) }
                 setRefreshState(RefreshContentState.Finished)
             }
         }
@@ -100,7 +100,7 @@ fun DocsSearchPage(
                     active = false
                     viewModel.showLoading.value = true
                     scope.launch(Dispatchers.IO) {
-                        viewModel.loadAsync(context, viewModel.queryText)
+                        viewModel.loadAsync(context)
                     }
                 }
             },
@@ -151,7 +151,7 @@ fun DocsSearchPage(
                         if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
                             LaunchedEffect(Unit) {
                                 scope.launch(Dispatchers.IO) {
-                                    withIO { viewModel.moreAsync(context, viewModel.queryText) }
+                                    withIO { viewModel.moreAsync(context) }
                                 }
                             }
                         }

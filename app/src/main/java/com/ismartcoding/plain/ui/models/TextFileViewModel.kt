@@ -5,10 +5,12 @@ import android.webkit.WebView
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.extensions.toJsValue
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.FileMediaStoreHelper
 import com.ismartcoding.plain.preference.EditorWrapContentPreference
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -28,10 +30,16 @@ class TextFileViewModel : ViewModel() {
     }
 
     fun loadFileAsync(context: Context, path: String, mediaStoreId: String) {
-        if (mediaStoreId.isNotEmpty()) {
-            file.value = FileMediaStoreHelper.getById(context, mediaStoreId)
+        try {
+            if (mediaStoreId.isNotEmpty()) {
+                file.value = FileMediaStoreHelper.getById(context, mediaStoreId)
+            }
+            content.value = File(path).readText()
+        } catch (e: Exception) {
+            DialogHelper.showErrorDialog(e.toString())
+            LogCat.e(e.toString())
+            e.printStackTrace()
         }
-        content.value = File(path).readText()
     }
 
     fun toggleWrapContent(context: Context) {

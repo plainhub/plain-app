@@ -14,14 +14,11 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.window.DialogProperties
 import com.ismartcoding.plain.R
 
 @Composable
 fun TextFieldDialog(
     modifier: Modifier = Modifier,
-    properties: DialogProperties = DialogProperties(),
-    visible: Boolean = false,
     readOnly: Boolean = false,
     singleLine: Boolean = true,
     title: String = "",
@@ -41,56 +38,54 @@ fun TextFieldDialog(
         ),
 ) {
     val focusManager = LocalFocusManager.current
-
-    if (visible) {
-        AlertDialog(
-            modifier = modifier,
-            onDismissRequest = onDismissRequest,
-            icon = {
-                icon?.let {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = title,
-                    )
-                }
-            },
-            title = {
-                Text(text = title, maxLines = 1, overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleLarge
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismissRequest,
+        icon = {
+            icon?.let {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = title,
                 )
-            },
-            text = {
-                ClipboardTextField(
-                    modifier = modifier,
-                    readOnly = readOnly,
-                    value = value,
-                    singleLine = singleLine,
-                    onValueChange = onValueChange,
-                    placeholder = placeholder,
-                    isPassword = isPassword,
-                    errorText = errorText,
-                    keyboardOptions = keyboardOptions,
-                    focusManager = focusManager,
-                    requestFocus = true,
-                    onConfirm = onConfirm,
-                )
-            },
-            confirmButton = {
-                Button(
-                    enabled = value.isNotBlank(),
-                    onClick = {
-                        focusManager.clearFocus()
-                        onConfirm(value)
-                    },
-                ) {
-                    Text(confirmText)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = onDismissRequest) {
-                    Text(text = dismissText)
-                }
-            },
-        )
-    }
+            }
+        },
+        title = {
+            Text(
+                text = title, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
+        text = {
+            ClipboardTextField(
+                modifier = modifier,
+                readOnly = readOnly,
+                value = value,
+                singleLine = singleLine,
+                onValueChange = onValueChange,
+                placeholder = placeholder,
+                isPassword = isPassword,
+                errorText = errorText,
+                keyboardOptions = keyboardOptions,
+                focusManager = focusManager,
+                requestFocus = true,
+                onConfirm = onConfirm,
+            )
+        },
+        confirmButton = {
+            Button(
+                enabled = value.isNotBlank(),
+                onClick = {
+                    focusManager.clearFocus()
+                    onConfirm(value)
+                },
+            ) {
+                Text(confirmText)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = dismissText)
+            }
+        },
+    )
 }

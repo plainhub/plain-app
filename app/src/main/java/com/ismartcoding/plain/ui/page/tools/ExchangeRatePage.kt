@@ -173,32 +173,33 @@ fun ExchangeRatePage(navController: NavHostController) {
                         }
                     }
                 }
-                TextFieldDialog(
-                    visible = editValueDialogVisible,
-                    title = selectedItem?.currency ?: "",
-                    value = editValue,
-                    placeholder = "",
-                    onValueChange = {
-                        editValue = it
-                    },
-                    onDismissRequest = {
-                        editValueDialogVisible = false
-                    },
-                    keyboardOptions =
+                if (editValueDialogVisible) {
+                    TextFieldDialog(
+                        title = selectedItem?.currency ?: "",
+                        value = editValue,
+                        placeholder = "",
+                        onValueChange = {
+                            editValue = it
+                        },
+                        onDismissRequest = {
+                            editValueDialogVisible = false
+                        },
+                        keyboardOptions =
                         KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done,
                         ),
-                    onConfirm = {
-                        scope.launch {
-                            config.base = selectedItem!!.currency
-                            config.value = editValue.toDoubleOrNull() ?: 100.0
-                            withIO { ExchangeRatePreference.putAsync(context, config) }
-                            updatedTs = System.currentTimeMillis()
-                            editValueDialogVisible = false
-                        }
-                    },
-                )
+                        onConfirm = {
+                            scope.launch {
+                                config.base = selectedItem!!.currency
+                                config.value = editValue.toDoubleOrNull() ?: 100.0
+                                withIO { ExchangeRatePreference.putAsync(context, config) }
+                                updatedTs = System.currentTimeMillis()
+                                editValueDialogVisible = false
+                            }
+                        },
+                    )
+                }
             },
         )
     }
