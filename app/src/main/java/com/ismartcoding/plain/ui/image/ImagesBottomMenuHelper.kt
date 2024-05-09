@@ -12,8 +12,8 @@ import com.ismartcoding.plain.enums.ActionSourceType
 import com.ismartcoding.plain.enums.ActionType
 import com.ismartcoding.plain.databinding.DialogListDrawerBinding
 import com.ismartcoding.plain.features.ActionEvent
-import com.ismartcoding.plain.features.image.DImage
-import com.ismartcoding.plain.features.image.ImageMediaStoreHelper
+import com.ismartcoding.plain.data.DImage
+import com.ismartcoding.plain.features.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.ui.CastDialog
 import com.ismartcoding.plain.ui.extensions.ensureSelect

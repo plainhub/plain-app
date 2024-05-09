@@ -25,7 +25,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
     override val itemsFlow: StateFlow<List<DNote>> get() = _itemsFlow
     var showLoading = mutableStateOf(true)
     var offset = mutableIntStateOf(0)
-    var limit = mutableIntStateOf(50)
+    var limit = mutableIntStateOf(200)
     var noMore = mutableStateOf(false)
     var trash = mutableStateOf(false)
     var total = mutableIntStateOf(0)

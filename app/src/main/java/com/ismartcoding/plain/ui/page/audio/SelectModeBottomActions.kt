@@ -99,6 +99,7 @@ fun SelectModeBottomActions(
     if (showSelectTagsDialog) {
         BatchSelectTagsDialog(tagsViewModel, tagsState, viewModel.selectedIds.toSet(), removeFromTags) {
             showSelectTagsDialog = false
+            viewModel.exitSelectMode()
         }
     }
 

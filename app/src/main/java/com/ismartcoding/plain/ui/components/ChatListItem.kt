@@ -109,7 +109,7 @@ fun ChatListItem(
                     ) {
                         when (m.type) {
                             DMessageType.IMAGES.value -> {
-                                ChatImages(context, navController, sharedViewModel, m, imageWidthDp, imageWidthPx)
+                                ChatImages(context, navController, m, imageWidthDp, imageWidthPx)
                             }
 
                             DMessageType.FILES.value -> {

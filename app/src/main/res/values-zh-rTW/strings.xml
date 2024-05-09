@@ -2,6 +2,7 @@
     <string name="app_name">簡樸</string>
     <string name="vpn_web_conflict_warning">您的手機啟用了VPN，這可能會導致從電腦訪問網頁時出現連接問題。我們建議您調整VPN設置允許區域網路流量或關閉VPN。</string>
     <string name="warning">警告</string>
+    <string name="taken_at">拍攝時間</string>
     <string name="published_at">發佈時間</string>
     <string name="older_than_7days_feed_items">7天前</string>
     <string name="older_than_30days_feed_items">30天前</string>

@@ -67,6 +67,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.NoteListItem
+import com.ismartcoding.plain.ui.extensions.navigateTags
 import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.exitSelectMode
@@ -186,7 +187,7 @@ fun NotesPage(
                     })
                     PDropdownMenuItemTags(onClick = {
                         dismiss()
-                        navController.navigate("${RouteName.TAGS.name}?dataType=${viewModel.dataType.value}")
+                        navController.navigateTags(viewModel.dataType)
                     })
                 }
             }

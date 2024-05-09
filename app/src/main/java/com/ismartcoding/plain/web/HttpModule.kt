@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.web
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import com.google.common.io.ByteStreams
@@ -22,7 +21,6 @@ import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.ZipHelper
-import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.upnp.UPnPController
 import com.ismartcoding.plain.BuildConfig
@@ -39,7 +37,7 @@ import com.ismartcoding.plain.preference.PasswordTypePreference
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.audio.AudioMediaStoreHelper
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.features.image.ImageMediaStoreHelper
+import com.ismartcoding.plain.features.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.video.VideoMediaStoreHelper
@@ -382,6 +380,11 @@ object HttpModule {
                             call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
                         } else {
                             call.response.header("Content-Disposition", "inline;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
+                        }
+
+                        if (file.path.endsWith(".svg", true)) {
+                            call.respondFile(file)
+                            return@get
                         }
 
                         val w = q["w"]?.toIntOrNull()

@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.enums
 
 import android.content.Context
+import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DFeaturePermission
@@ -18,6 +19,7 @@ enum class AppFeatureType {
     SMS,
     NOTIFICATIONS,
     CHECK_UPDATES,
+    MEDIA_TRASH,
     EXCHANGE_RATE;
 
     fun has(): Boolean {
@@ -25,7 +27,9 @@ enum class AppFeatureType {
             SOCIAL, NOTIFICATIONS -> {
                 return BuildConfig.CHANNEL != AppChannelType.GOOGLE.name && !TempData.demoMode
             }
-
+            MEDIA_TRASH -> {
+                return isRPlus() // Android 11+
+            }
             APPS -> {
                 return BuildConfig.CHANNEL != AppChannelType.GOOGLE.name
             }

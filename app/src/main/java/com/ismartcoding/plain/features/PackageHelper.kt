@@ -221,10 +221,9 @@ object PackageHelper {
         return appLabelCache[key] ?: ""
     }
 
-    fun getLabel(context: Context, packageName: String): String {
+    fun getLabel(packageName: String): String {
         try {
-            val pm = context.packageManager
-            val applicationInfo = pm.getApplicationInfo(packageName, 0)
+            val applicationInfo = packageManager.getApplicationInfo(packageName, 0)
             return getLabel(applicationInfo)
         } catch (ex: Exception) {
             LogCat.d(ex.toString())

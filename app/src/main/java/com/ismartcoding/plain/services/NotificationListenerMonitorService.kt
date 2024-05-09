@@ -21,7 +21,7 @@ class NotificationListenerMonitorService : Service() {
     }
 
     private fun ensureCollectorRunning() {
-        val collectorComponent = ComponentName(this, NotificationListenerService::class.java)
+        val collectorComponent = ComponentName(this, PNotificationListenerService::class.java)
         LogCat.d("ensureCollectorRunning collectorComponent: $collectorComponent")
         val manager = getSystemServiceCompat(ActivityManager::class.java)
         var collectorRunning = false
@@ -47,7 +47,7 @@ class NotificationListenerMonitorService : Service() {
 
     private fun toggleNotificationListenerService() {
         LogCat.d("toggleNotificationListenerService() called")
-        val thisComponent = ComponentName(this, NotificationListenerService::class.java)
+        val thisComponent = ComponentName(this, PNotificationListenerService::class.java)
         packageManager.setComponentEnabledSetting(thisComponent, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
         packageManager.setComponentEnabledSetting(thisComponent, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
     }

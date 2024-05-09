@@ -23,24 +23,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import coil.size.Size
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.pathToUri
-import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.db.DMessageImages
-import com.ismartcoding.plain.ui.base.PAsyncImage
-import com.ismartcoding.plain.ui.models.SharedViewModel
+import com.ismartcoding.plain.helpers.FormatHelper
+import com.ismartcoding.plain.ui.base.PGlideImage
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
-import com.ismartcoding.plain.ui.theme.PlainTheme
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun ChatImages(
     context: Context,
     navController: NavHostController,
-    sharedViewModel: SharedViewModel,
     m: VChat,
     imageWidthDp: Dp,
     imageWidthPx: Int,
@@ -68,18 +65,14 @@ fun ChatImages(
                             items = items,
                             initKey = m.id + "|" + index,
                         )
-//                        sharedViewModel.previewItems.value = items
-//                        sharedViewModel.previewKey.value = m.id + "|" + index
-//                        sharedViewModel.previewIndex.value = index
-//                        navController.navigate(RouteName.MEDIA_PREVIEW)
                     },
                 ) {
-                    PAsyncImage(
+                    PGlideImage(
+                        model = path,
                         modifier = Modifier
                             .size(imageWidthDp)
                             .clip(RoundedCornerShape(6.dp)),
-                        data = path,
-                        size = Size(imageWidthPx, imageWidthPx),
+                        contentDescription = path,
                         contentScale = ContentScale.Crop,
                     )
                     Box(

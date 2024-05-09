@@ -4,6 +4,7 @@ import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.provider.Settings
+import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -21,7 +22,7 @@ object BluetoothPermission {
     private lateinit var requestBluetoothScanConnectPermissionLauncher: ActivityResultLauncher<Array<String>>
     private val events = mutableListOf<Job>()
 
-    fun init(activity: AppCompatActivity) {
+    fun init(activity: ComponentActivity) {
         enableBluetoothActivityLauncher =
             activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 if (it.resultCode == AppCompatActivity.RESULT_OK) {

@@ -96,15 +96,8 @@ dependencies {
     api(libs.image.glide)
     //api("com.caverock:androidsvg:1.4")
     api(libs.androidsvg.aar)
-
+    api(libs.okhttp)
     implementation(libs.android.gif.drawable)
-
-    // https://coil-kt.github.io/coil/changelog/
-    api(libs.coil)
-    api(libs.coil.compose)
-    api(libs.coil.svg)
-    api(libs.coil.gif)
-    api(libs.coil.video)
 
     api(libs.jsoup)
 

@@ -43,6 +43,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.preference.AudioSortByPreference
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -63,6 +64,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.AudioListItem
+import com.ismartcoding.plain.ui.extensions.navigateTags
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.exitSelectMode
@@ -110,6 +112,7 @@ fun AudioPage(
         tagsViewModel.dataType.value = viewModel.dataType
         if (hasPermission) {
             scope.launch(Dispatchers.IO) {
+                viewModel.sortBy.value = AudioSortByPreference.getValueAsync(context)
                 viewModel.loadAsync(context, tagsViewModel)
             }
         }
@@ -117,6 +120,7 @@ fun AudioPage(
             receiveEventHandler<PermissionsResultEvent> {
                 hasPermission = AppFeatureType.FILES.hasPermission(context)
                 scope.launch(Dispatchers.IO) {
+                    viewModel.sortBy.value = AudioSortByPreference.getValueAsync(context)
                     viewModel.loadAsync(context, tagsViewModel)
                 }
             })
@@ -200,7 +204,7 @@ fun AudioPage(
                     })
                     PDropdownMenuItemTags(onClick = {
                         dismiss()
-                        navController.navigate("${RouteName.TAGS.name}?dataType=${viewModel.dataType.value}")
+                        navController.navigateTags(viewModel.dataType)
                     })
                 }
             }

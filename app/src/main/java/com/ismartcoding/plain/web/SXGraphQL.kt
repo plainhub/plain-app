@@ -72,7 +72,7 @@ import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.features.feed.fetchContentAsync
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.FileSystemHelper
-import com.ismartcoding.plain.features.image.ImageMediaStoreHelper
+import com.ismartcoding.plain.features.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.sms.SmsMediaStoreHelper
@@ -105,11 +105,13 @@ import com.ismartcoding.plain.web.models.FileInfo
 import com.ismartcoding.plain.web.models.Files
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.Image
+import com.ismartcoding.plain.web.models.MediaFileInfo
 import com.ismartcoding.plain.web.models.Message
 import com.ismartcoding.plain.web.models.Note
 import com.ismartcoding.plain.web.models.NoteInput
 import com.ismartcoding.plain.web.models.PackageStatus
 import com.ismartcoding.plain.web.models.StorageStats
+import com.ismartcoding.plain.web.models.Tag
 import com.ismartcoding.plain.web.models.TempValue
 import com.ismartcoding.plain.web.models.Video
 import com.ismartcoding.plain.web.models.toModel
@@ -517,16 +519,25 @@ class SXGraphQL(val schema: Schema) {
                         val finalPath = path.getFinalPath(context)
                         val file = File(finalPath)
                         val updatedAt = Instant.fromEpochMilliseconds(file.lastModified())
-                        val size = file.length()
-                        val fileInfo = FileInfo(updatedAt, size)
+                        var tags = emptyList<Tag>()
+                        var data: MediaFileInfo? = null
                         if (finalPath.isImageFast()) {
-                            fileInfo.data = FileInfoLoader.loadImage(id.value, finalPath)
+                            if (id.value.isNotEmpty()) {
+                                tags = TagsLoader.load(id.value, DataType.IMAGE)
+                            }
+                            data = FileInfoLoader.loadImage(finalPath)
                         } else if (finalPath.isVideoFast()) {
-                            fileInfo.data = FileInfoLoader.loadVideo(context, id.value, finalPath)
+                            if (id.value.isNotEmpty()) {
+                                tags = TagsLoader.load(id.value, DataType.VIDEO)
+                            }
+                            data = FileInfoLoader.loadVideo(context, finalPath)
                         } else if (finalPath.isAudioFast()) {
-                            fileInfo.data = FileInfoLoader.loadAudio(context, id.value, finalPath)
+                            if (id.value.isNotEmpty()) {
+                                tags = TagsLoader.load(id.value, DataType.AUDIO)
+                            }
+                            data = FileInfoLoader.loadAudio(context, finalPath)
                         }
-                        fileInfo
+                        FileInfo(updatedAt, size = file.length(), tags, data)
                     }
                 }
                 query("boxes") {

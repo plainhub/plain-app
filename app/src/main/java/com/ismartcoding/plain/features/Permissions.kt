@@ -35,7 +35,7 @@ import com.ismartcoding.plain.preference.ApiPermissionsPreference
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.packageManager
-import com.ismartcoding.plain.services.NotificationListenerService
+import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Job
@@ -105,7 +105,7 @@ enum class Permission {
             }
 
             this == NOTIFICATION_LISTENER -> {
-                val componentName = ComponentName(context, NotificationListenerService::class.java)
+                val componentName = ComponentName(context, PNotificationListenerService::class.java)
                 val enabledListeners =
                     Settings.Secure.getString(context.contentResolver, "enabled_notification_listeners")
                 return enabledListeners?.contains(componentName.flattenToString()) == true

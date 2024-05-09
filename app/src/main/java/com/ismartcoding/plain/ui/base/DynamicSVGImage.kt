@@ -4,16 +4,24 @@ import android.graphics.drawable.PictureDrawable
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.caverock.androidsvg.SVG
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.preference.LocalDarkTheme
 import com.ismartcoding.plain.ui.svg.parseDynamicColor
 import com.ismartcoding.plain.ui.theme.palette.LocalTonalPalettes
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun DynamicSVGImage(
     modifier: Modifier = Modifier,
@@ -43,11 +51,10 @@ fun DynamicSVGImage(
                 },
     ) {
         Crossfade(targetState = pic, label = "") {
-            PAsyncImage(
+            GlideImage(
+                model = it,
                 contentDescription = contentDescription,
-                data = it,
-                placeholder = null,
-                error = null,
+                modifier = Modifier.fillMaxSize(),
             )
         }
     }

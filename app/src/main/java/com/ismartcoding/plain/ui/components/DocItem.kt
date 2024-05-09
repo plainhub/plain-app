@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.components
 
-import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
@@ -18,11 +17,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
-import coil.size.Size
-import com.ismartcoding.lib.extensions.dp2px
+import coil.compose.AsyncImage
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.isPdfFile
 import com.ismartcoding.lib.extensions.isTextFile
@@ -31,7 +29,6 @@ import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.PAsyncImage
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.navigateOtherFile
 import com.ismartcoding.plain.ui.extensions.navigatePdf
@@ -43,7 +40,7 @@ import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import java.io.File
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun DocItem(
     navController: NavHostController,
@@ -93,13 +90,11 @@ fun DocItem(
                     .padding(16.dp, 8.dp, 8.dp, 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-
-                PAsyncImage(
+                AsyncImage(
+                    model =  AppHelper.getFileIconPath(m.name.getFilenameExtension()),
                     contentDescription = m.name,
                     modifier = Modifier
                         .size(24.dp),
-                    data = AppHelper.getFileIconPath(m.name.getFilenameExtension()),
-                    size = Size(context.dp2px(24), context.dp2px(24)),
                 )
                 HorizontalSpace(dp = 16.dp)
                 Column(

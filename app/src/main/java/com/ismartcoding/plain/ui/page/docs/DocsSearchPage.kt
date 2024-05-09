@@ -80,7 +80,7 @@ fun DocsSearchPage(
         }
     }
 
-    ViewFileBottomSheet(viewModel)
+    ViewDocBottomSheet(viewModel)
 
     Column(
         Modifier

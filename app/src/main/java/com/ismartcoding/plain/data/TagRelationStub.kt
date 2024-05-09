@@ -2,7 +2,6 @@ package com.ismartcoding.plain.data
 
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.db.DTagRelation
-import com.ismartcoding.plain.features.image.DImage
 
 data class TagRelationStub(
     var key: String = "",

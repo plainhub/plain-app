@@ -5,7 +5,8 @@ import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.exifinterface.media.ExifInterface
-import com.ismartcoding.plain.enums.DataType
+import com.caverock.androidsvg.SVG
+import com.ismartcoding.plain.helpers.SvgHelper
 import com.ismartcoding.plain.web.models.AudioFileInfo
 import com.ismartcoding.plain.web.models.ImageFileInfo
 import com.ismartcoding.plain.web.models.Location
@@ -14,29 +15,35 @@ import java.io.File
 
 object FileInfoLoader {
     fun loadImage(
-        id: String,
         path: String,
     ): ImageFileInfo {
-        val tags = if (id.isNotEmpty()) TagsLoader.load(id, DataType.IMAGE) else listOf()
-        val exifInterface = ExifInterface(path)
-        val latLong = exifInterface.latLong
         var location: Location? = null
-        if (latLong != null) {
-            location = Location(latLong[0], latLong[1])
+        val width: Int
+        val height: Int
+        if (path.endsWith(".svg", true)) {
+            val size = SvgHelper.getSize(path)
+            width = size.width
+            height = size.height
+        } else {
+            val options = BitmapFactory.Options()
+            options.inJustDecodeBounds = true
+            BitmapFactory.decodeFile(path, options)
+            width = options.outWidth
+            height = options.outHeight
+            val exifInterface = ExifInterface(path)
+            val latLong = exifInterface.latLong
+            if (latLong != null) {
+                location = Location(latLong[0], latLong[1])
+            }
         }
-        val options = BitmapFactory.Options()
-        options.inJustDecodeBounds = true
-        BitmapFactory.decodeFile(path, options)
-        return ImageFileInfo(tags, options.outWidth, options.outHeight, location)
+        return ImageFileInfo(width, height, location)
     }
 
     fun loadVideo(
         context: Context,
-        id: String,
         path: String,
     ): VideoFileInfo {
         val file = File(path)
-        val tags = if (id.isNotEmpty()) TagsLoader.load(id, DataType.VIDEO) else listOf()
         val retriever = MediaMetadataRetriever()
         retriever.setDataSource(context, Uri.fromFile(file))
         val width = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull() ?: 0
@@ -44,22 +51,20 @@ object FileInfoLoader {
         val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong()?.div(1000) ?: 0L
         val location = parseLocationString(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION))
         retriever.release()
-        return VideoFileInfo(tags, width, height, duration, location)
+        return VideoFileInfo(width, height, duration, location)
     }
 
     fun loadAudio(
         context: Context,
-        id: String,
         path: String,
     ): AudioFileInfo {
         val file = File(path)
-        val tags = if (id.isNotEmpty()) TagsLoader.load(id, DataType.AUDIO) else listOf()
         val retriever = MediaMetadataRetriever()
         retriever.setDataSource(context, Uri.fromFile(file))
         val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong()?.div(1000) ?: 0L
         val location = parseLocationString(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION))
         retriever.release()
-        return AudioFileInfo(tags, duration, location)
+        return AudioFileInfo(duration, location)
     }
 
     private fun parseLocationString(location: String?): Location? {

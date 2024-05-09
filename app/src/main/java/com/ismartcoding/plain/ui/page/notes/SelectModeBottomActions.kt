@@ -12,9 +12,7 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -23,8 +21,8 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.ui.base.GroupButton
-import com.ismartcoding.plain.ui.base.GroupButtons
+import com.ismartcoding.plain.ui.base.ActionButtons
+import com.ismartcoding.plain.ui.base.PIconTextActionButton
 import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.exitSelectMode
@@ -38,66 +36,17 @@ fun SelectModeBottomActions(
     tagsViewModel: TagsViewModel,
     tagsState: List<DTag>,
 ) {
-    val groupButtons = remember { mutableStateListOf<GroupButton>() }
     var showSelectTagsDialog by remember {
         mutableStateOf(false)
     }
     var removeFromTags by remember {
         mutableStateOf(false)
     }
-    LaunchedEffect(Unit) {
-        if (viewModel.trash.value) {
-            groupButtons.addAll(listOf(
-                GroupButton(
-                    icon = Icons.Outlined.RestoreFromTrash,
-                    text = LocaleHelper.getString(R.string.restore),
-                    onClick = {
-                        viewModel.untrash(viewModel.selectedIds.toSet())
-                        viewModel.exitSelectMode()
-                    }
-                ),
-                GroupButton(
-                    icon = Icons.Outlined.DeleteForever,
-                    text = LocaleHelper.getString(R.string.delete),
-                    onClick = {
-                        viewModel.delete(viewModel.selectedIds.toSet())
-                        viewModel.exitSelectMode()
-                    }
-                ),
-            ))
-        } else {
-            groupButtons.addAll(listOf(
-                GroupButton(
-                    icon = Icons.AutoMirrored.Outlined.Label,
-                    text = LocaleHelper.getString(R.string.add_to_tags),
-                    onClick = {
-                        showSelectTagsDialog = true
-                        removeFromTags = false
-                    }
-                ),
-                GroupButton(
-                    icon = Icons.AutoMirrored.Outlined.LabelOff,
-                    text = LocaleHelper.getString(R.string.remove_from_tags),
-                    onClick = {
-                        showSelectTagsDialog = true
-                        removeFromTags = true
-                    }
-                ),
-                GroupButton(
-                    icon = Icons.Outlined.DeleteOutline,
-                    text = LocaleHelper.getString(R.string.move_to_trash),
-                    onClick = {
-                        viewModel.trash(viewModel.selectedIds.toSet())
-                        viewModel.exitSelectMode()
-                    }
-                ),
-            ))
-        }
-    }
 
     if (showSelectTagsDialog) {
         BatchSelectTagsDialog(tagsViewModel, tagsState, viewModel.selectedIds.toSet(), removeFromTags) {
             showSelectTagsDialog = false
+            viewModel.exitSelectMode()
         }
     }
 
@@ -106,8 +55,50 @@ fun SelectModeBottomActions(
         tonalElevation = 0.dp,
         containerColor = MaterialTheme.colorScheme.bottomAppBarContainer(),
     ) {
-        GroupButtons(
-            buttons = groupButtons
-        )
+        ActionButtons {
+            if (viewModel.trash.value) {
+                PIconTextActionButton(
+                    icon = Icons.Outlined.RestoreFromTrash,
+                    text = LocaleHelper.getString(R.string.restore),
+                    click = {
+                        viewModel.untrash(viewModel.selectedIds.toSet())
+                        viewModel.exitSelectMode()
+                    }
+                )
+                PIconTextActionButton(
+                    icon = Icons.Outlined.DeleteForever,
+                    text = LocaleHelper.getString(R.string.delete),
+                    click = {
+                        viewModel.delete(viewModel.selectedIds.toSet())
+                        viewModel.exitSelectMode()
+                    }
+                )
+            } else {
+                PIconTextActionButton(
+                    icon = Icons.AutoMirrored.Outlined.Label,
+                    text = LocaleHelper.getString(R.string.add_to_tags),
+                    click = {
+                        showSelectTagsDialog = true
+                        removeFromTags = false
+                    }
+                )
+                PIconTextActionButton(
+                    icon = Icons.AutoMirrored.Outlined.LabelOff,
+                    text = LocaleHelper.getString(R.string.remove_from_tags),
+                    click = {
+                        showSelectTagsDialog = true
+                        removeFromTags = true
+                    }
+                )
+                PIconTextActionButton(
+                    icon = Icons.Outlined.DeleteOutline,
+                    text = LocaleHelper.getString(R.string.move_to_trash),
+                    click = {
+                        viewModel.trash(viewModel.selectedIds.toSet())
+                        viewModel.exitSelectMode()
+                    }
+                )
+            }
+        }
     }
 }

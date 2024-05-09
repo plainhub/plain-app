@@ -3,9 +3,9 @@ package com.ismartcoding.plain.ui.base
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -17,9 +17,11 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.ismartcoding.lib.extensions.isGestureNavigationBar
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -36,10 +38,11 @@ fun PScaffold(
     bottomBar: (@Composable () -> Unit)? = null,
     floatingActionButton: (@Composable () -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
-    content: @Composable () -> Unit = {},
+    content: @Composable (PaddingValues) -> Unit = {},
 ) {
+    val context = LocalContext.current
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         containerColor = containerColor,
         topBar = {
             if (navigationIcon != null || actions != null) {
@@ -65,10 +68,10 @@ fun PScaffold(
                 )
             }
         },
-        content = {
-            Column(modifier = Modifier.navigationBarsPadding()) {
-                Spacer(modifier = Modifier.height(it.calculateTopPadding()))
-                content()
+        content = { paddingValues ->
+            Column(modifier = if (context.isGestureNavigationBar()) Modifier else Modifier.navigationBarsPadding()) {
+                VerticalSpace(dp = paddingValues.calculateTopPadding())
+                content(paddingValues)
             }
         },
         bottomBar = { bottomBar?.invoke() },

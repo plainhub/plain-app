@@ -5,7 +5,6 @@ import android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
 import android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE
 import android.content.Context
 import android.content.Intent
-import com.bumptech.glide.Glide
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.Constants
@@ -14,6 +13,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.data.LatestRelease
 import com.ismartcoding.plain.data.Version
+import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.preference.CheckUpdateTimePreference
 import com.ismartcoding.plain.preference.NewVersionDownloadUrlPreference
 import com.ismartcoding.plain.preference.NewVersionLogPreference
@@ -21,11 +21,11 @@ import com.ismartcoding.plain.preference.NewVersionPreference
 import com.ismartcoding.plain.preference.NewVersionPublishDatePreference
 import com.ismartcoding.plain.preference.NewVersionSizePreference
 import com.ismartcoding.plain.preference.SkipVersionPreference
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
+import java.io.File
 
 object AppHelper {
     private val fileIcons = mutableSetOf<String>()
@@ -89,26 +89,21 @@ object AppHelper {
     }
 
     fun getCacheSize(context: Context): Long {
-        var size = 0L
-        val cacheDir = context.cacheDir
-        val files = cacheDir.listFiles()
-        files?.forEach {
-            size += it.length()
-        }
+        return calculateDirectorySize(context.cacheDir) + calculateDirectorySize(context.filesDir.resolve("image_cache"))
+    }
 
-        var glideDiskCacheSize: Long
-        try {
-            val diskCache = Glide.getPhotoCacheDir(context)
-            if (diskCache != null && diskCache.exists()) {
-                glideDiskCacheSize = diskCache.listFiles()?.sumOf { it.length() } ?: 0L
+    private fun calculateDirectorySize(directory: File): Long {
+        var totalSize: Long = 0
+        val files = directory.listFiles() ?: return 0L
+        for (file in files) {
+            totalSize += if (file.isDirectory) {
+                calculateDirectorySize(file)
             } else {
-                glideDiskCacheSize = 0
+                file.length()
             }
-        } catch (e: Exception) {
-            glideDiskCacheSize = 0
         }
 
-        return size + glideDiskCacheSize
+        return totalSize
     }
 
     fun clearCacheAsync(context: Context) {
@@ -117,7 +112,10 @@ object AppHelper {
         files?.forEach {
             it.deleteRecursively()
         }
-        Glide.get(context).clearDiskCache()
+        val imageCache = context.filesDir.resolve("image_cache")
+        imageCache.listFiles()?.forEach {
+            it.deleteRecursively()
+        }
     }
 
     fun getFileIconPath(extension: String): String {

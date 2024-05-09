@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.web.models
 
-import com.ismartcoding.plain.features.image.DImage
+import com.ismartcoding.plain.data.DImage
 
 data class Image(
     var id: ID,

@@ -24,20 +24,21 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 
+@OptIn(SavedStateHandleSaveableApi::class)
 class DocsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectableViewModel<DFile>, ViewModel() {
     private val _itemsFlow = MutableStateFlow(mutableStateListOf<DFile>())
     override val itemsFlow: StateFlow<List<DFile>> get() = _itemsFlow
     val showLoading = mutableStateOf(true)
     val offset = mutableIntStateOf(0)
-    val limit = mutableIntStateOf(50)
+    val limit = mutableIntStateOf(1000)
     val noMore = mutableStateOf(false)
+    var total = mutableIntStateOf(0)
     val sortBy = mutableStateOf(FileSortBy.DATE_DESC)
     val selectedItem = mutableStateOf<DFile?>(null)
     val showRenameDialog = mutableStateOf(false)
     val search = mutableStateOf(false)
     val showSortDialog = mutableStateOf(false)
 
-    @OptIn(SavedStateHandleSaveableApi::class)
     var queryText by savedStateHandle.saveable { mutableStateOf("") }
 
     override var selectMode = mutableStateOf(false)
@@ -47,7 +48,7 @@ class DocsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectabl
         val query = queryText
         offset.value += limit.value
         val items = FileMediaStoreHelper.getAllByFileType(context, MediaStore.VOLUME_EXTERNAL_PRIMARY, FileType.DOCUMENT, sortBy.value)
-            .filter { query.isEmpty() || it.name.contains(query) }
+            .filter { query.isEmpty() || it.name.contains(query) }.drop(offset.value).take(limit.value)
         _itemsFlow.value.addAll(items)
         showLoading.value = false
         noMore.value = items.size < limit.value
@@ -56,8 +57,9 @@ class DocsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectabl
     suspend fun loadAsync(context: Context) {
         val query = queryText
         offset.value = 0
-        _itemsFlow.value = FileMediaStoreHelper.getAllByFileType(context, MediaStore.VOLUME_EXTERNAL_PRIMARY, FileType.DOCUMENT, sortBy.value)
-            .filter { query.isEmpty() || it.name.contains(query) }.toMutableStateList()
+        val items = FileMediaStoreHelper.getAllByFileType(context, MediaStore.VOLUME_EXTERNAL_PRIMARY, FileType.DOCUMENT, sortBy.value)
+        _itemsFlow.value = items.filter { query.isEmpty() || it.name.contains(query) }.take(limit.value).toMutableStateList()
+        total.value = items.size
         noMore.value = _itemsFlow.value.size < limit.value
         showLoading.value = false
     }

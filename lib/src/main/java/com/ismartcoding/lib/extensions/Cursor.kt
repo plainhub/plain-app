@@ -38,3 +38,16 @@ fun Cursor.getTimeValue(
     key: String,
     cache: MutableMap<String, Int>,
 ): Instant = Instant.fromEpochMilliseconds(getLongValue(key, cache))
+
+fun Cursor.getTimeMillisecondsValue(
+    key: String,
+    cache: MutableMap<String, Int>,
+): Instant? {
+    val value = getLongOrNull(getColumnIndex(key, cache))
+    return if (value != null) Instant.fromEpochMilliseconds(value) else null
+}
+
+fun Cursor.getTimeSecondsValue(
+    key: String,
+    cache: MutableMap<String, Int>,
+): Instant = Instant.fromEpochSeconds(getLongValue(key, cache))

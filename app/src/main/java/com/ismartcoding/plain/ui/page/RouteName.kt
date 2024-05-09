@@ -34,4 +34,5 @@ enum class RouteName {
     AUDIO,
     AUDIO_PLAYER,
     TEXT_FILE,
+    IMAGES,
 }

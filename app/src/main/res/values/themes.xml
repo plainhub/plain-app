@@ -1,11 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <style name="Theme.PlainActivity" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="windowActionModeOverlay">true</item>
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowActionModeOverlay">true</item>
-        <item name="android:windowContentOverlay">@color/canvas</item>
-        <item name="android:windowBackground">@color/canvas</item>
+<!--        <item name="windowActionModeOverlay">true</item>-->
+<!--        <item name="windowActionBar">false</item>-->
+<!--        <item name="windowNoTitle">true</item>-->
+<!--        <item name="android:windowActionModeOverlay">true</item>-->
+<!--        <item name="android:windowContentOverlay">@color/canvas</item>-->
+<!--        <item name="android:windowBackground">@color/canvas</item>-->
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
 
     <style name="Theme.FullScreen" parent="@android:style/Theme.Dialog">

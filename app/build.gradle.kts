@@ -71,6 +71,7 @@ android {
             applicationIdSuffix = ".debug"
             isShrinkResources = false
             isMinifyEnabled = false
+            isDebuggable = true
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"
             }
@@ -216,6 +217,12 @@ dependencies {
     ksp(libs.room.compiler)
 
     implementation(libs.openai.client)
+    implementation(libs.glide.compose)
+
+    // https://coil-kt.github.io/coil/changelog/
+    api(libs.coil)
+    api(libs.coil.compose)
+    api(libs.coil.svg)
 
     implementation(libs.core)
 

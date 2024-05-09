@@ -130,4 +130,21 @@ object ShareHelper {
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
         context.startActivity(chooserIntent)
     }
+
+    fun openPathWith(
+        context: Context,
+        path: String,
+    ) {
+        val intent = Intent()
+        intent.action = Intent.ACTION_VIEW
+        intent.addCategory(Intent.CATEGORY_DEFAULT)
+        val uri = FileProvider.getUriForFile(context, Constants.AUTHORITY, File(path))
+        val mimeType = path.getMimeType()
+        intent.setDataAndType(uri, mimeType)
+        intent.putExtra("mimeType", mimeType)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val chooserIntent = Intent.createChooser(intent, getString(R.string.open_with))
+        chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
+        context.startActivity(chooserIntent)
+    }
 }

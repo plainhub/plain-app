@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.extensions
 
 import android.net.Uri
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.ui.page.RouteName
 
@@ -48,4 +49,8 @@ fun NavHostController.navigateTextFile(path: String, title: String = "", mediaSt
     currentBackStackEntry?.savedStateHandle?.set("mediaStoreId", mediaStoreId)
     currentBackStackEntry?.savedStateHandle?.set("type", type.name)
     navigate(RouteName.TEXT_FILE)
+}
+
+fun NavHostController.navigateTags(dateType: DataType) {
+    navigate("${RouteName.TAGS.name}?dataType=${dateType.value}")
 }

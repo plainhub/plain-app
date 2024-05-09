@@ -104,6 +104,7 @@ fun DocsPage(
             receiveEventHandler<PermissionsResultEvent> {
                 hasPermission = AppFeatureType.FILES.hasPermission(context)
                 scope.launch(Dispatchers.IO) {
+                    viewModel.sortBy.value = DocSortByPreference.getValueAsync(context)
                     viewModel.loadAsync(context)
                 }
             })
@@ -130,7 +131,7 @@ fun DocsPage(
         viewModel.exitSelectMode()
     }
 
-    ViewFileBottomSheet(viewModel)
+    ViewDocBottomSheet(viewModel)
 
     val pageTitle = if (viewModel.selectMode.value) {
         LocaleHelper.getStringF(R.string.x_selected, "count", viewModel.selectedIds.size)

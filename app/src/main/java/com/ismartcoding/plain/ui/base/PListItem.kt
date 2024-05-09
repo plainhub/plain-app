@@ -25,16 +25,15 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.size.Size
-import com.ismartcoding.lib.extensions.dp2px
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.theme.palette.LocalTonalPalettes
 import com.ismartcoding.plain.ui.theme.palette.onDark
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun PListItem(
     modifier: Modifier = Modifier,
@@ -88,12 +87,11 @@ fun PListItem(
                         contentDescription = title,
                     )
                 } else if (icon is String) {
-                    PAsyncImage(
+                    GlideImage(
+                        model = icon,
                         contentDescription = title,
                         modifier = Modifier
                             .size(24.dp),
-                        data = icon,
-                        size = Size(context.dp2px(24), context.dp2px(24)),
                     )
                     HorizontalSpace(dp = 16.dp)
                 }

@@ -14,6 +14,7 @@ import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.audio.AudioMediaStoreHelper
+import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.preference.AudioSortByPreference
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,14 +36,14 @@ class AudioViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
     var queryText by savedStateHandle.saveable { mutableStateOf("") }
     var search = mutableStateOf(false)
     var selectedItem = mutableStateOf<DAudio?>(null)
+    val sortBy = mutableStateOf(FileSortBy.DATE_DESC)
 
     override var selectMode = mutableStateOf(false)
     override val selectedIds = mutableStateListOf<String>()
 
     suspend fun moreAsync(context: Context, tagsViewModel: TagsViewModel) {
         offset.value += limit.value
-        val sortBy = AudioSortByPreference.getValueAsync(context)
-        val items = AudioMediaStoreHelper.search(context, getQuery(), limit.value, offset.value, sortBy)
+        val items = AudioMediaStoreHelper.search(context, getQuery(), limit.value, offset.value, sortBy.value)
         _itemsFlow.update {
             val mutableList = it.toMutableStateList()
             mutableList.addAll(items)
@@ -55,9 +56,7 @@ class AudioViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
 
     suspend fun loadAsync(context: Context, tagsViewModel: TagsViewModel) {
         offset.value = 0
-        val query = getQuery()
-        val sortBy = AudioSortByPreference.getValueAsync(context)
-        _itemsFlow.value = AudioMediaStoreHelper.search(context, query, limit.value, offset.value, sortBy).toMutableStateList()
+        _itemsFlow.value = AudioMediaStoreHelper.search(context, getQuery(), limit.value, offset.value, sortBy.value).toMutableStateList()
         tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
         total.value = AudioMediaStoreHelper.count(context, getTotalQuery())
         noMore.value = _itemsFlow.value.size < limit.value

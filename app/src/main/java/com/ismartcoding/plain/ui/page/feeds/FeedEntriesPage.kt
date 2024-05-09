@@ -70,6 +70,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.FeedEntryListItem
 import com.ismartcoding.plain.ui.extensions.navigate
+import com.ismartcoding.plain.ui.extensions.navigateTags
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
 import com.ismartcoding.plain.ui.models.FeedsViewModel
@@ -249,7 +250,7 @@ fun FeedEntriesPage(
                     })
                     PDropdownMenuItemTags(onClick = {
                         dismiss()
-                        navController.navigate("${RouteName.TAGS.name}?dataType=${viewModel.dataType.value}")
+                        navController.navigateTags(viewModel.dataType)
                     })
                     if (viewModel.feedId.value.isEmpty()) {
                         PDropdownMenuItemSettings(onClick = {

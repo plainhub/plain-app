@@ -25,19 +25,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.size.Size
-import com.ismartcoding.lib.extensions.dp2px
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.plain.enums.FeedEntryFilterType
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.DTag
+import com.ismartcoding.plain.enums.FeedEntryFilterType
 import com.ismartcoding.plain.extensions.timeAgo
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.PAsyncImage
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -48,7 +46,7 @@ import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTag
 import com.ismartcoding.plain.ui.theme.listItemTitle
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun FeedEntryListItem(
     viewModel: FeedEntriesViewModel,
@@ -106,13 +104,12 @@ fun FeedEntryListItem(
                     }
                     if (m.image.isNotEmpty()) {
                         HorizontalSpace(dp = 12.dp)
-                        PAsyncImage(
-                            modifier =
-                            Modifier
+                        GlideImage(
+                            model = m.image,
+                            modifier = Modifier
                                 .size(64.dp)
                                 .clip(RoundedCornerShape(4.dp)),
-                            data = m.image,
-                            size = Size(context.dp2px(64), context.dp2px(64)),
+                            contentDescription = m.image,
                             contentScale = ContentScale.Crop,
                         )
                     }

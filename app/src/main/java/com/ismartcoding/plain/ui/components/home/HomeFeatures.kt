@@ -46,6 +46,13 @@ fun HomeFeatures(
                 ImagesDialog().show()
             }
             PIconTextButton(
+                icon = Icons.Outlined.Image,
+                stringResource(id = R.string.images),
+                modifier = Modifier.width(itemWidth),
+            ) {
+                navController.navigate(RouteName.IMAGES)
+            }
+            PIconTextButton(
                 icon = Icons.Outlined.AudioFile,
                 stringResource(id = R.string.audios),
                 modifier = Modifier.width(itemWidth),

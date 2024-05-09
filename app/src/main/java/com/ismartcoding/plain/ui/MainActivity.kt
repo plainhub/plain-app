@@ -167,9 +167,9 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility", "DiscouragedPrivateApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-//        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        enableEdgeToEdge()
         lifecycleScope.launch(Dispatchers.IO) {
             Language.initLocaleAsync(this@MainActivity)
         }

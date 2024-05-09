@@ -42,6 +42,7 @@ import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.BaseDialog
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.PdfViewerDialog
@@ -56,7 +57,6 @@ import com.ismartcoding.plain.ui.extensions.initToggleMode
 import com.ismartcoding.plain.ui.extensions.onBack
 import com.ismartcoding.plain.ui.extensions.onMenuItemClick
 import com.ismartcoding.plain.ui.extensions.onSearch
-import com.ismartcoding.plain.ui.extensions.openPathIntent
 import com.ismartcoding.plain.ui.extensions.setSafeClick
 import com.ismartcoding.plain.ui.extensions.updateDrawerMenuAsync
 import com.ismartcoding.plain.ui.extensions.updateFilesTitle
@@ -170,7 +170,7 @@ class FilesDialog(val fileType: FilesType = FilesType.INTERNAL_STORAGE) : BaseDi
                 } else if (m.data.path.isPdfFile()) {
                     PdfViewerDialog(Uri.fromFile(File(m.data.path))).show()
                 } else {
-                    MainActivity.instance.get()?.openPathIntent(m.data.path)
+                    ShareHelper.openPathWith(requireContext(), m.data.path)
                 }
             }, onChecked = {
                 updateBottomActions()

@@ -26,9 +26,8 @@ import com.ismartcoding.plain.databinding.ItemImageGridBinding
 import com.ismartcoding.plain.databinding.ItemMediaBucketGridBinding
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.ActionEvent
-import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionsResultEvent
-import com.ismartcoding.plain.features.image.ImageMediaStoreHelper
+import com.ismartcoding.plain.features.ImageMediaStoreHelper
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.CastDialog
 import com.ismartcoding.plain.ui.extensions.checkPermission

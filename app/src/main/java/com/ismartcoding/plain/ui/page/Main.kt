@@ -43,13 +43,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.isGestureNavigationBar
 import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.extensions.parcelableArrayList
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DPlaylistAudio
-import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
@@ -87,6 +87,7 @@ import com.ismartcoding.plain.ui.page.feeds.FeedEntriesSearchPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntryPage
 import com.ismartcoding.plain.ui.page.feeds.FeedSettingsPage
 import com.ismartcoding.plain.ui.page.feeds.FeedsPage
+import com.ismartcoding.plain.ui.page.images.ImagesPage
 import com.ismartcoding.plain.ui.page.notes.NotePage
 import com.ismartcoding.plain.ui.page.notes.NotesPage
 import com.ismartcoding.plain.ui.page.notes.NotesSearchPage
@@ -226,7 +227,7 @@ fun Main(viewModel: MainViewModel) {
 
     AppTheme(useDarkTheme = useDarkTheme) {
         window.statusBarColor = Color.Transparent.toArgb()
-        window.navigationBarColor = MaterialTheme.colorScheme.background.toArgb()
+        window.navigationBarColor = if (context.isGestureNavigationBar()) Color.Transparent.toArgb() else MaterialTheme.colorScheme.background.toArgb()
         insetsController.isAppearanceLightStatusBars = !useDarkTheme
         insetsController.isAppearanceLightNavigationBars = !useDarkTheme
 
@@ -257,6 +258,7 @@ fun Main(viewModel: MainViewModel) {
                 RouteName.DOCS to { DocsPage(navController) },
                 RouteName.NOTES to { NotesPage(navController) },
                 RouteName.FEEDS to { FeedsPage(navController) },
+                RouteName.IMAGES to { ImagesPage(navController) },
                 RouteName.FEED_SETTINGS to { FeedSettingsPage(navController) },
                 RouteName.WEB_LEARN_MORE to { WebLearnMorePage(navController) },
                 RouteName.AUDIO to { AudioPage(navController) },

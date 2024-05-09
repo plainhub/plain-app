@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material.icons.automirrored.outlined.Sort
+import androidx.compose.material.icons.outlined.Cast
 import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.DropdownMenu
@@ -66,6 +67,16 @@ fun PDropdownMenuItemSelect(onClick: () -> Unit) {
         Icon(
             Icons.Outlined.Checklist,
             contentDescription = stringResource(id = R.string.select)
+        )
+    }, onClick = onClick)
+}
+
+@Composable
+fun PDropdownMenuItemCast(onClick: () -> Unit) {
+    PDropdownMenuItem(text = { Text(stringResource(R.string.cast)) }, leadingIcon = {
+        Icon(
+            Icons.Outlined.Cast,
+            contentDescription = stringResource(id = R.string.cast)
         )
     }, onClick = onClick)
 }

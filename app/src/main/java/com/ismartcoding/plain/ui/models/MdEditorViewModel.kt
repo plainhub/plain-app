@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
 import com.ismartcoding.plain.preference.EditorAccessoryLevelPreference
 import com.ismartcoding.plain.preference.EditorShowLineNumbersPreference
@@ -42,7 +43,7 @@ import kotlinx.coroutines.launch
 data class MdAccessoryItem(val text: String, val before: String, val after: String = "")
 data class MdAccessoryItem2(val icon: ImageVector, val click: (MdEditorViewModel) -> Unit = {})
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, SavedStateHandleSaveableApi::class)
 class MdEditorViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     val textFieldState = TextFieldState("")
     var showSettings by savedStateHandle.saveable { mutableStateOf(false) }

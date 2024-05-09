@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.components.chat
 
 import android.content.Context
-import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -20,8 +20,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
-import coil.size.Size
-import com.ismartcoding.lib.extensions.dp2px
+import coil.compose.AsyncImage
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isAudioFast
@@ -30,26 +32,24 @@ import com.ismartcoding.lib.extensions.isPdfFile
 import com.ismartcoding.lib.extensions.isTextFile
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.extensions.pathToUri
-import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.db.DMessageFiles
+import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.data.DPlaylistAudio
-import com.ismartcoding.plain.enums.TextFileType
+import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.FormatHelper
-import com.ismartcoding.plain.ui.TextEditorDialog
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
-import com.ismartcoding.plain.ui.base.PAsyncImage
 import com.ismartcoding.plain.ui.extensions.navigateOtherFile
 import com.ismartcoding.plain.ui.extensions.navigatePdf
 import com.ismartcoding.plain.ui.extensions.navigateTextFile
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.preview.PreviewDialog
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import java.io.File
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ChatFiles(
     context: Context,
@@ -120,14 +120,21 @@ fun ChatFiles(
                         )
                     }
                     if (path.isImageFast() || path.isVideoFast()) {
-                        PAsyncImage(
-                            modifier =
-                            Modifier
+                        GlideImage(
+                            model = path,
+                            modifier = Modifier
                                 .size(48.dp)
                                 .clip(RoundedCornerShape(4.dp)),
-                            data = path,
-                            size = Size(context.dp2px(48), context.dp2px(48)),
+                            contentDescription = path,
                             contentScale = ContentScale.Crop,
+                        )
+                    } else {
+                        AsyncImage(
+                            model = AppHelper.getFileIconPath(path.getFilenameExtension()),
+                            modifier = Modifier
+                                .size(48.dp),
+                            alignment = Alignment.Center,
+                            contentDescription = path,
                         )
                     }
                 }

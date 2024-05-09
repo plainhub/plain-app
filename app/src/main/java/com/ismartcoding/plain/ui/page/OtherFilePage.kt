@@ -27,12 +27,10 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.helpers.ShareHelper
-import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.base.PBlockButton
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.extensions.openPathIntent
 import java.io.File
 
 @SuppressLint("MissingPermission")
@@ -106,7 +104,7 @@ fun OtherFilePage(
                         )
                         VerticalSpace(dp = 64.dp)
                         PBlockButton(text = stringResource(id = R.string.open_with_other_app)) {
-                            MainActivity.instance.get()?.openPathIntent(path)
+                            ShareHelper.openPathWith(context, path)
                         }
                     }
                 }

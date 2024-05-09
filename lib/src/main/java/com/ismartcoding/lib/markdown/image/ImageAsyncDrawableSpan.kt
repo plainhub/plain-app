@@ -3,8 +3,6 @@ package com.ismartcoding.lib.markdown.image
 import android.graphics.Paint
 import android.graphics.Paint.FontMetricsInt
 import androidx.annotation.IntRange
-import androidx.compose.ui.Modifier
-import com.ismartcoding.lib.extensions.dp2px
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.image.AsyncDrawable
 import io.noties.markwon.image.AsyncDrawableSpan
