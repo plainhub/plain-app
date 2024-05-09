@@ -30,6 +30,7 @@ import com.ismartcoding.plain.data.DownloadFileItem
 import com.ismartcoding.plain.data.DownloadFileItemWrap
 import com.ismartcoding.plain.data.UploadInfo
 import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.preference.AuthTwoFactorPreference
 import com.ismartcoding.plain.preference.PasswordPreference
@@ -41,6 +42,7 @@ import com.ismartcoding.plain.features.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.video.VideoMediaStoreHelper
+import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.web.websocket.WebSocketSession
@@ -382,9 +384,12 @@ object HttpModule {
                             call.response.header("Content-Disposition", "inline;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
                         }
 
-                        if (file.path.endsWith(".svg", true)) {
-                            call.respondFile(file)
-                            return@get
+                        if (path.isImageFast()) {
+                            val imageType = ImageHelper.getImageType(path)
+                            if (imageType.isApplicableAnimated() || imageType == ImageType.SVG) {
+                                call.respondFile(file)
+                                return@get
+                            }
                         }
 
                         val w = q["w"]?.toIntOrNull()

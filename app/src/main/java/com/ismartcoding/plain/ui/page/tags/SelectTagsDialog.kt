@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.ui.base.PSelectionChip
@@ -31,7 +32,7 @@ fun SelectTagsDialog(
     tagsViewModel: TagsViewModel,
     tagsState: List<DTag>,
     tagsMap: Map<String, List<DTagRelation>>,
-    id: String,
+    data: IData,
     onDismiss: () -> Unit,
 ) {
     val tagIds = remember {
@@ -41,7 +42,7 @@ fun SelectTagsDialog(
     TagNameDialog(tagsViewModel)
 
     LaunchedEffect(Unit) {
-        tagIds.addAll(tagsMap[id]?.map { it.tagId } ?: emptyList())
+        tagIds.addAll(tagsMap[data.id]?.map { it.tagId } ?: emptyList())
     }
 
     AlertDialog(
@@ -65,7 +66,7 @@ fun SelectTagsDialog(
                     PSelectionChip(
                         selected = tagIds.contains(tag.id),
                         onClick = {
-                            tagsViewModel.toggleTag(id, tag.id)
+                            tagsViewModel.toggleTag(data, tag.id)
                             if (tagIds.contains(tag.id)) {
                                 tagIds.remove(tag.id)
                             } else {

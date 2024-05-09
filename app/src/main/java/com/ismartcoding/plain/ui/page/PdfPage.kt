@@ -17,6 +17,7 @@ import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.PdfView
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,20 +29,24 @@ fun PdfPage(
     val context = LocalContext.current
 
     PScaffold(
-        navController,
-        topBarTitle = uri.getFileName(context),
-        actions = {
-            PIconButton(
-                icon = Icons.Outlined.Share,
-                contentDescription = stringResource(R.string.share),
-                tint = MaterialTheme.colorScheme.onSurface,
-            ) {
-                if (uri.scheme == "content") {
-                    ShareHelper.shareUri(context, uri)
-                } else {
-                    ShareHelper.shareFile(context, uri.toFile())
-                }
-            }
+        topBar = {
+            PTopAppBar(
+                navController = navController,
+                title = uri.getFileName(context),
+                actions = {
+                    PIconButton(
+                        icon = Icons.Outlined.Share,
+                        contentDescription = stringResource(R.string.share),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    ) {
+                        if (uri.scheme == "content") {
+                            ShareHelper.shareUri(context, uri)
+                        } else {
+                            ShareHelper.shareFile(context, uri.toFile())
+                        }
+                    }
+                },
+            )
         },
         content = {
             PdfView(uri = uri, modifier = Modifier.fillMaxSize())

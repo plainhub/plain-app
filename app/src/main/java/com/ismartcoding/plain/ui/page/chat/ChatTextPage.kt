@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.linkify
 import com.ismartcoding.plain.ui.base.urlAt
 
@@ -29,9 +30,14 @@ fun ChatTextPage(
     val context = LocalContext.current
     val text = content.linkify()
     PScaffold(
-        navController,
-        navigationIcon = {
-            NavigationCloseIcon { navController.popBackStack() }
+        topBar = {
+            PTopAppBar(
+                navController = navController,
+                navigationIcon = {
+                    NavigationCloseIcon { navController.popBackStack() }
+                },
+                title = ""
+            )
         },
         content = {
             Column(

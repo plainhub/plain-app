@@ -42,7 +42,7 @@ fun String.toAppUrl(context: Context): String {
 
 fun String.getFilenameWithoutExtension() = substringBeforeLast(".")
 
-fun String.getFilenameExtension() = substring(lastIndexOf(".") + 1)
+fun String.getFilenameExtension() = substring(lastIndexOf(".") + 1).lowercase()
 
 fun String.toUTCDate(): Date? {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ENGLISH)

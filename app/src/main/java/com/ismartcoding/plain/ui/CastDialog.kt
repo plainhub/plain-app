@@ -26,19 +26,19 @@ import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.ui.extensions.setClick
 import com.ismartcoding.plain.ui.extensions.setKeyText
-import com.ismartcoding.plain.ui.models.CastViewModel
+import com.ismartcoding.plain.ui.models.CastViewModelOld
 import kotlinx.coroutines.launch
 
 class CastDialog(val items: List<IMedia>, private val singlePath: String = "") :
     BaseBottomSheetDialog<DialogScreencastBinding>() {
-    private var viewModel: CastViewModel? = null
+    private var viewModel: CastViewModelOld? = null
 
     override fun onViewCreated(
         view: View,
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this)[CastViewModel::class.java]
+        viewModel = ViewModelProvider(this)[CastViewModelOld::class.java]
         sendEvent(StartHttpServerEvent())
         binding.list.rv.isNestedScrollingEnabled = false
         binding.list.rv.linear().setup {

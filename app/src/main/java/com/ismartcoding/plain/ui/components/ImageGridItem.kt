@@ -17,22 +17,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.placeholder
-import com.ismartcoding.lib.extensions.pathToUri
-import com.ismartcoding.plain.R
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.helpers.FormatHelper
-import com.ismartcoding.plain.ui.base.PGlideImage
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.ImagePreviewerState
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.TransformGlideImageView
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberTransformItemState
+import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
+import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.select
-import com.ismartcoding.plain.ui.preview.PreviewDialog
-import com.ismartcoding.plain.ui.preview.PreviewItem
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
 @Composable
@@ -40,23 +40,32 @@ fun ImageGridItem(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     viewModel: ImagesViewModel,
+    castViewModel: CastViewModel,
     m: DImage,
+    previewerState: ImagePreviewerState,
 ) {
     val isSelected = viewModel.selectedIds.contains(m.id) || viewModel.selectedItem.value?.id == m.id
     val selectedSize by animateDpAsState(
         if (isSelected) 12.dp else 0.dp, label = "selectedSize"
     )
+    val context = LocalContext.current
+    val itemState = rememberTransformItemState()
     Box(
         modifier = modifier
             .combinedClickable(
                 onClick = {
-                    if (viewModel.selectMode.value) {
+                    if (castViewModel.castMode.value) {
+                        castViewModel.cast(m.path)
+                    } else if (viewModel.selectMode.value) {
                         viewModel.select(m.id)
                     } else {
-                        PreviewDialog().show(
-                            items = viewModel.itemsFlow.value.map { s -> PreviewItem(s.id, s.path.pathToUri(), s.path) },
-                            initKey = m.id,
-                        )
+                        coMain {
+                            withIO { MediaPreviewData.setDataAsync(context, itemState, viewModel.itemsFlow.value, m) }
+                            previewerState.openTransform(
+                                index = MediaPreviewData.items.indexOfFirst { it.id == m.id },
+                                itemState = itemState,
+                            )
+                        }
                     }
                 },
                 onLongClick = {
@@ -71,18 +80,17 @@ fun ImageGridItem(
             .fillMaxSize()
             .align(Alignment.Center)
             .aspectRatio(1f)
-        PGlideImage(
-            model = m.path,
-            contentDescription = m.path,
+        TransformGlideImageView(
             modifier = if (isSelected) imageModifier
                 .padding(selectedSize)
                 .border(
                     width = 2.dp,
                     color = MaterialTheme.colorScheme.primary
                 ) else imageModifier,
-            contentScale = ContentScale.Crop,
-            transition = CrossFade,
-            failure = placeholder(R.drawable.ic_broken_image),
+            path = m.path,
+            key = m.id,
+            itemState = itemState,
+            previewerState = previewerState,
         )
         if (viewModel.selectMode.value) {
             Checkbox(

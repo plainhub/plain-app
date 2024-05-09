@@ -112,7 +112,12 @@ object PackageHelper {
     }
 
     fun getCerts(packageInfo: PackageInfo): List<DCertificate> {
-        val certs = appCertsCache[packageInfo.packageName]?.toMutableList() ?: mutableListOf()
+        val packageName = packageInfo.packageName
+        // why packageName could be null?
+        if (packageName.isNullOrBlank()) {
+            return emptyList()
+        }
+        val certs = appCertsCache[packageName]?.toMutableList() ?: mutableListOf()
         if (certs.isEmpty()) {
             val signatures = signatures(packageInfo)
             for (signature in signatures) {
@@ -127,7 +132,7 @@ object PackageHelper {
                     )
                 )
             }
-            appCertsCache[packageInfo.packageName] = certs
+            appCertsCache[packageName] = certs
         }
 
         return certs

@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ismartcoding.lib.R
 import com.ismartcoding.lib.brv.PageRefreshLayout
 import com.ismartcoding.lib.extensions.*
+import com.ismartcoding.lib.logcat.LogCat
 import kotlin.math.roundToInt
 
 private const val BUBBLE_ANIM_DURATION = 100L
@@ -269,6 +270,7 @@ class FastScroller : LinearLayout {
         this.recyclerView = recyclerView
 
         if (recyclerView.parent is ViewGroup) {
+            LogCat.d("FastScroller attachRecyclerView: ${recyclerView.parent}")
             val viewGroup = recyclerView.parent as ViewGroup
             viewGroup.removeView(this)
             viewGroup.addView(this)

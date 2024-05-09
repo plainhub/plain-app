@@ -11,6 +11,7 @@ import com.ismartcoding.lib.extensions.getTimeMillisecondsValue
 import com.ismartcoding.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.lib.isQPlus
+import com.ismartcoding.lib.pinyin.Pinyin
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -140,6 +141,6 @@ object ImageMediaStoreHelper : BaseContentHelper() {
             }
         }
 
-        return bucketMap.values.sortedBy { it.name.lowercase() }
+        return bucketMap.values.sortedBy { Pinyin.toPinyin(it.name).lowercase() }
     }
 }

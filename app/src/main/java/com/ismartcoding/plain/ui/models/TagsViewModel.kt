@@ -6,6 +6,8 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
@@ -105,17 +107,18 @@ class TagsViewModel() : ViewModel() {
         }
     }
 
-    fun addToTags(ids: Set<String>, tagIds: Set<String>) {
+    fun addToTags(items: List<IData>, tagIds: Set<String>) {
         viewModelScope.launch(Dispatchers.IO) {
             for (tagId in tagIds) {
                 val existingKeys = TagHelper.getKeysByTagId(tagId)
-                val newIds = ids.filter { !existingKeys.contains(it) }
-                if (newIds.isNotEmpty()) {
-                    val relations = newIds.map { id ->
-                        DTagRelation(tagId, id, dataType.value.value)
+                val newItems = items.filter { !existingKeys.contains(it.id) }
+                if (newItems.isNotEmpty()) {
+                    val relations = newItems.map { item ->
+                        TagRelationStub.create(item).toTagRelation(tagId, dataType.value)
                     }
                     TagHelper.addTagRelations(relations)
-                    for (id in newIds) {
+                    for (item in newItems) {
+                        val id = item.id
                         _tagsMapFlow.value[id] = _tagsMapFlow.value[id]?.toMutableList()?.apply {
                             addAll(relations.filter { it.key == id })
                         } ?: relations.filter { it.key == id }
@@ -127,20 +130,20 @@ class TagsViewModel() : ViewModel() {
     }
 
     fun toggleTag(
-        id: String, tagId: String
+        data: IData, tagId: String
     ) {
-        val tagIds = _tagsMapFlow.value[id]?.map { it.tagId } ?: emptyList()
+        val tagIds = _tagsMapFlow.value[data.id]?.map { it.tagId } ?: emptyList()
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 if (tagIds.contains(tagId)) {
-                    TagHelper.deleteTagRelationByKeysTagId(setOf(id), tagId)
-                    _tagsMapFlow.value[id] = _tagsMapFlow.value[id]?.filter { it.tagId != tagId } ?: emptyList()
+                    TagHelper.deleteTagRelationByKeysTagId(setOf(data.id), tagId)
+                    _tagsMapFlow.value[data.id] = _tagsMapFlow.value[data.id]?.filter { it.tagId != tagId } ?: emptyList()
                 } else {
-                    val relation = DTagRelation(tagId, id, dataType.value.value)
+                    val relation = TagRelationStub.create(data).toTagRelation(tagId, dataType.value)
                     TagHelper.addTagRelations(
                         listOf(relation)
                     )
-                    _tagsMapFlow.value[id] = _tagsMapFlow.value[id]?.toMutableList()?.apply {
+                    _tagsMapFlow.value[data.id] = _tagsMapFlow.value[data.id]?.toMutableList()?.apply {
                         add(relation)
                     } ?: listOf(relation)
                 }

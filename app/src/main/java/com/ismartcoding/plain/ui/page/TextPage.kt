@@ -14,6 +14,7 @@ import com.ismartcoding.plain.ui.base.AceEditor
 import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.components.EditorData
 import com.ismartcoding.plain.ui.models.TextFileViewModel
 import kotlinx.coroutines.Dispatchers
@@ -46,12 +47,12 @@ fun TextPage(
     }
 
     PScaffold(
-        navController,
-        topBarTitle = title,
-        actions = {
-            ActionButtonMore {
-                viewModel.showMoreActions.value = true
-            }
+        topBar = {
+            PTopAppBar(navController = navController, title = title, actions = {
+                ActionButtonMore {
+                    viewModel.showMoreActions.value = true
+                }
+            })
         },
         content = {
             if (viewModel.isDataLoading.value) {

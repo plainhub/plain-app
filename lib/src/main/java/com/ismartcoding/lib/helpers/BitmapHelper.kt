@@ -9,11 +9,11 @@ import java.io.File
 object BitmapHelper {
     fun decodeBitmapFromFileAsync(
         context: Context,
-        filePath: String,
+        path: String,
         reqWidth: Int,
         reqHeight: Int,
     ): Bitmap? {
-        return File(filePath).getBitmapAsync(context, reqWidth, reqHeight)
+        return File(path).getBitmapAsync(context, reqWidth, reqHeight)
     }
 
     fun calculateInSampleSize(

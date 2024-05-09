@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 fun PModalBottomSheet(
     modifier: Modifier = Modifier.defaultMinSize(minHeight = 320.dp),
     onDismissRequest: () -> Unit = {},
-    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
     content: @Composable ColumnScope.() -> Unit = {},
 ) {
     ModalBottomSheet(

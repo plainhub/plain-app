@@ -33,6 +33,7 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.navigate
@@ -50,8 +51,9 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
     UpdateDialog(updateViewModel)
 
     PScaffold(
-        navController,
-        topBarTitle = stringResource(R.string.settings),
+        topBar = {
+            PTopAppBar(navController = navController, title = stringResource(R.string.settings))
+        },
         content = {
             LazyColumn {
                 item {

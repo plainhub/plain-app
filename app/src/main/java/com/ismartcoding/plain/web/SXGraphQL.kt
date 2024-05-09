@@ -206,7 +206,7 @@ class SXGraphQL(val schema: Schema) {
                                         it.content.value =
                                             DMessageImages(
                                                 c.items.map { i ->
-                                                    DMessageFile(i.uri.toAppUrl(context), i.size, i.duration)
+                                                    DMessageFile(i.id, i.uri.toAppUrl(context), i.size, i.duration)
                                                 },
                                             )
                                         dao.update(it)
@@ -217,7 +217,7 @@ class SXGraphQL(val schema: Schema) {
                                         it.content.value =
                                             DMessageFiles(
                                                 c.items.map { i ->
-                                                    DMessageFile(i.uri.toAppUrl(context), i.size, i.duration)
+                                                    DMessageFile(i.id, i.uri.toAppUrl(context), i.size, i.duration)
                                                 },
                                             )
                                         dao.update(it)
@@ -537,7 +537,7 @@ class SXGraphQL(val schema: Schema) {
                             }
                             data = FileInfoLoader.loadAudio(context, finalPath)
                         }
-                        FileInfo(updatedAt, size = file.length(), tags, data)
+                        FileInfo(path, updatedAt, size = file.length(), tags, data)
                     }
                 }
                 query("boxes") {

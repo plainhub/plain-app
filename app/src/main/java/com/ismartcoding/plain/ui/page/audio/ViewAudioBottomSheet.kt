@@ -107,7 +107,7 @@ fun ViewAudioBottomSheet(
             VerticalSpace(dp = 16.dp)
             Subtitle(text = stringResource(id = R.string.tags))
             TagSelector(
-                id = m.id,
+                data = m,
                 tagsViewModel = tagsViewModel,
                 tagsMap = tagsMap,
                 tagsState = tagsState,

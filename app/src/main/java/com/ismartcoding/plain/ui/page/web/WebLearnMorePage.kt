@@ -19,6 +19,7 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PBlockButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -32,8 +33,9 @@ fun WebLearnMorePage(navController: NavHostController, viewModel: WebConsoleView
         val webEnabled = LocalWeb.current
         val context = LocalContext.current
         PScaffold(
-            navController,
-            topBarTitle = stringResource(id = R.string.web_console),
+            topBar = {
+                PTopAppBar(navController = navController, title = stringResource(R.string.web_console))
+            },
             content = {
                 LazyColumn {
                     item {

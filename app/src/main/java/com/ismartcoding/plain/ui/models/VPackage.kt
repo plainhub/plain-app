@@ -3,11 +3,12 @@ package com.ismartcoding.plain.ui.models
 import android.graphics.drawable.Drawable
 import com.ismartcoding.plain.data.DCertificate
 import com.ismartcoding.plain.data.DPackage
+import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.packageManager
 import kotlinx.datetime.Instant
 
 data class VPackage(
-    val id: String,
+    override var id: String,
     val name: String,
     val type: String,
     val version: String,
@@ -17,7 +18,7 @@ data class VPackage(
     val installedAt: Instant,
     val updatedAt: Instant,
     val icon: Drawable,
-) {
+) : IData {
     companion object {
         fun from(data: DPackage): VPackage {
             return VPackage(

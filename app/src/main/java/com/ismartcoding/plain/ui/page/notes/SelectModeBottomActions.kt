@@ -26,6 +26,7 @@ import com.ismartcoding.plain.ui.base.PIconTextActionButton
 import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.exitSelectMode
+import com.ismartcoding.plain.ui.models.getSelectedItems
 import com.ismartcoding.plain.ui.page.tags.BatchSelectTagsDialog
 import com.ismartcoding.plain.ui.theme.bottomAppBarContainer
 
@@ -44,7 +45,7 @@ fun SelectModeBottomActions(
     }
 
     if (showSelectTagsDialog) {
-        BatchSelectTagsDialog(tagsViewModel, tagsState, viewModel.selectedIds.toSet(), removeFromTags) {
+        BatchSelectTagsDialog(tagsViewModel, tagsState, viewModel.getSelectedItems(), removeFromTags) {
             showSelectTagsDialog = false
             viewModel.exitSelectMode()
         }

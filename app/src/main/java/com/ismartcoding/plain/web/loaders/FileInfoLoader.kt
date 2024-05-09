@@ -1,12 +1,10 @@
 package com.ismartcoding.plain.web.loaders
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.exifinterface.media.ExifInterface
-import com.caverock.androidsvg.SVG
-import com.ismartcoding.plain.helpers.SvgHelper
+import com.ismartcoding.plain.helpers.MediaHelper
 import com.ismartcoding.plain.web.models.AudioFileInfo
 import com.ismartcoding.plain.web.models.ImageFileInfo
 import com.ismartcoding.plain.web.models.Location
@@ -17,26 +15,16 @@ object FileInfoLoader {
     fun loadImage(
         path: String,
     ): ImageFileInfo {
+        val size = MediaHelper.getImageIntrinsicSize(path)
         var location: Location? = null
-        val width: Int
-        val height: Int
-        if (path.endsWith(".svg", true)) {
-            val size = SvgHelper.getSize(path)
-            width = size.width
-            height = size.height
-        } else {
-            val options = BitmapFactory.Options()
-            options.inJustDecodeBounds = true
-            BitmapFactory.decodeFile(path, options)
-            width = options.outWidth
-            height = options.outHeight
+        if (!path.endsWith(".svg", true)) {
             val exifInterface = ExifInterface(path)
             val latLong = exifInterface.latLong
             if (latLong != null) {
                 location = Location(latLong[0], latLong[1])
             }
         }
-        return ImageFileInfo(width, height, location)
+        return ImageFileInfo(size.width.toInt(), size.height.toInt(), location)
     }
 
     fun loadVideo(

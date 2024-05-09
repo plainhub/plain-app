@@ -221,8 +221,11 @@ dependencies {
 
     // https://coil-kt.github.io/coil/changelog/
     api(libs.coil)
-    api(libs.coil.compose)
+    api(libs.coil.video)
     api(libs.coil.svg)
+    api(libs.coil.gif)
+    api(libs.coil.compose)
+    api(libs.coil.network.ktor)
 
     implementation(libs.core)
 

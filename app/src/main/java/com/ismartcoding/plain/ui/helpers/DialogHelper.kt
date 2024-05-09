@@ -5,6 +5,7 @@ import com.apollographql.apollo3.api.ApolloResponse
 import com.apollographql.apollo3.api.Operation
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
@@ -24,7 +25,9 @@ object DialogHelper {
         message: String,
         duration: Int = Toast.LENGTH_SHORT,
     ) {
-        Toast.makeText(MainActivity.instance.get()!!, message, duration).show()
+        coMain {
+            Toast.makeText(MainActivity.instance.get()!!, message, duration).show()
+        }
     }
 
     fun showMessage(resId: Int) {

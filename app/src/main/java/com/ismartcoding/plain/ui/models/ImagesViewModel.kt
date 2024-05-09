@@ -9,26 +9,24 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
-import androidx.lifecycle.viewmodel.compose.saveable
-import com.ismartcoding.lib.extensions.scanFileByConnection
-import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.data.DMediaBucket
+import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.features.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.data.DImage
-import com.ismartcoding.plain.features.ImageMediaStoreHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.File
 
 @OptIn(SavedStateHandleSaveableApi::class)
-class ImagesViewModel(private val savedStateHandle: SavedStateHandle) : ISelectableViewModel<DImage>, ViewModel() {
+class ImagesViewModel(private val savedStateHandle: SavedStateHandle) :
+    ISelectableViewModel<DImage>,
+    ISearchableViewModel<DImage>,
+    ViewModel() {
     private val _itemsFlow = MutableStateFlow(mutableStateListOf<DImage>())
     override val itemsFlow: StateFlow<List<DImage>> get() = _itemsFlow
     val showLoading = mutableStateOf(true)
@@ -39,27 +37,30 @@ class ImagesViewModel(private val savedStateHandle: SavedStateHandle) : ISelecta
     var total = mutableIntStateOf(0)
     var totalTrash = mutableIntStateOf(0)
     var tag = mutableStateOf<DTag?>(null)
-    val bucket = mutableStateOf<DMediaBucket?>(null)
+    val bucketId = mutableStateOf<String>("")
     val dataType = DataType.IMAGE
-    var queryText by savedStateHandle.saveable { mutableStateOf("") }
-    val search = mutableStateOf(false)
     val selectedItem = mutableStateOf<DImage?>(null)
     val sortBy = mutableStateOf(FileSortBy.DATE_DESC)
     val showRenameDialog = mutableStateOf(false)
     val showSortDialog = mutableStateOf(false)
 
+    override val showSearchBar = mutableStateOf(false)
+    override val searchActive = mutableStateOf(false)
+    override val queryText = mutableStateOf("")
+
     override var selectMode = mutableStateOf(false)
     override val selectedIds = mutableStateListOf<String>()
 
-    suspend fun moreAsync(context: Context, tagsViewModel: TagsViewModel) {
+    fun moreAsync(context: Context, tagsViewModel: TagsViewModel) {
         offset.value += limit.value
         val items = ImageMediaStoreHelper.search(context, getQuery(), limit.value, offset.value, sortBy.value)
         _itemsFlow.value.addAll(items)
+        tagsViewModel.loadMoreAsync(items.map { it.id }.toSet())
         showLoading.value = false
         noMore.value = items.size < limit.value
     }
 
-    suspend fun loadAsync(context: Context, tagsViewModel: TagsViewModel) {
+    fun loadAsync(context: Context, tagsViewModel: TagsViewModel) {
         offset.value = 0
         _itemsFlow.value = ImageMediaStoreHelper.search(context, getQuery(), limit.value, offset.value, sortBy.value).toMutableStateList()
         tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
@@ -83,23 +84,31 @@ class ImagesViewModel(private val savedStateHandle: SavedStateHandle) : ISelecta
     }
 
     private fun getTotalQuery(): String {
-        return "trash:false"
+        var query = "${queryText.value} trash:false"
+        if (bucketId.value.isNotEmpty()) {
+            query += " bucket_id:${bucketId.value}"
+        }
+        return query
     }
 
     private fun getTrashQuery(): String {
-        return "trash:true"
+        var query = "${queryText.value} trash:true"
+        if (bucketId.value.isNotEmpty()) {
+            query += " bucket_id:${bucketId.value}"
+        }
+        return query
     }
 
     private fun getQuery(): String {
-        var query = "$queryText trash:${trash.value}"
+        var query = "${queryText.value} trash:${trash.value}"
         if (tag.value != null) {
             val tagId = tag.value!!.id
             val ids = TagHelper.getKeysByTagId(tagId)
             query += " ids:${ids.joinToString(",")}"
         }
 
-        if (bucket.value != null) {
-            query += " bucket_id:${bucket.value!!.id}"
+        if (bucketId.value.isNotEmpty()) {
+            query += " bucket_id:${bucketId.value}"
         }
 
         return query

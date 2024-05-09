@@ -28,7 +28,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.theme.palette.LocalTonalPalettes
 import com.ismartcoding.plain.ui.theme.palette.onDark
@@ -87,7 +86,7 @@ fun PListItem(
                         contentDescription = title,
                     )
                 } else if (icon is String) {
-                    GlideImage(
+                    PGlideImage(
                         model = icon,
                         contentDescription = title,
                         modifier = Modifier

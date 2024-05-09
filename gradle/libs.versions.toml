@@ -4,7 +4,7 @@ androidGifDrawableVersion="1.2.23"
 androidsvgAarVersion="1.4"
 appcompatVersion="1.6.1"
 bcprovJdk15onVersion="1.70"
-coil="2.6.0"
+coil="3.0.0-alpha06"
 glideComposeVersion="1.0.0-beta01"
 coreKtxVersion="1.13.0"
 exoplayerVersion="2.19.1"
@@ -73,9 +73,15 @@ bcpkix-jdk15on = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bc
 bcprov-jdk15on = { module = "org.bouncycastle:bcprov-jdk15on", version.ref = "bcprovJdk15onVersion" }
 glide-compose = { module = "com.github.bumptech.glide:compose", version.ref = "glideComposeVersion" }
 exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoplayerVersion" }
-coil = { module = "io.coil-kt:coil", version.ref = "coil" }
-coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil" }
-coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+
+# Coil
+coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
+coil-video = { module = "io.coil-kt.coil3:coil-video", version.ref = "coil" }
+coil-gif = { module = "io.coil-kt.coil3:coil-gif", version.ref = "coil" }
+coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil" }
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
+coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coil" }
+
 androidx-transition = { module = "androidx.transition:transition", version.ref = "transitionVersion" }
 ext-latex = { module = "io.noties.markwon:ext-latex", version.ref = "markwon" }
 ext-strikethrough = { module = "io.noties.markwon:ext-strikethrough", version.ref = "markwon" }

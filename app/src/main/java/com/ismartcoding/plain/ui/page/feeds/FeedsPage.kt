@@ -62,6 +62,7 @@ import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PDropdownMenuItemSelect
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
@@ -73,6 +74,7 @@ import com.ismartcoding.plain.ui.models.FeedsViewModel
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
 import com.ismartcoding.plain.ui.models.select
+import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.ui.models.toggleSelectMode
 import com.ismartcoding.plain.ui.page.RouteName
@@ -183,61 +185,65 @@ fun FeedsPage(
     }
 
     PScaffold(
-        navController,
-        topBarTitle = pageTitle,
-        navigationIcon = {
-            if (viewModel.selectMode.value) {
-                NavigationCloseIcon {
-                    viewModel.exitSelectMode()
-                }
-            } else {
-                NavigationBackIcon {
-                    navController.popBackStack()
-                }
-            }
-        },
-        actions = {
-            if (viewModel.selectMode.value) {
-                PMiniOutlineButton(
-                    text = stringResource(if (viewModel.isAllSelected()) R.string.unselect_all else R.string.select_all),
-                    onClick = {
-                        viewModel.toggleSelectAll()
-                    },
-                )
-                HorizontalSpace(dp = 8.dp)
-            } else {
-                ActionButtonMoreWithMenu { dismiss ->
-                    PDropdownMenuItemSelect(onClick = {
-                        dismiss()
-                        viewModel.toggleSelectMode()
-                    })
-                    PDropdownMenuItem(text = { Text(stringResource(R.string.import_opml_file)) },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Outlined.Upload,
-                                contentDescription = stringResource(id = R.string.import_opml_file)
-                            )
-                        }, onClick = {
-                            dismiss()
-                            sendEvent(PickFileEvent(PickFileTag.FEED, PickFileType.FILE, false))
-                        })
+        topBar = {
+            PTopAppBar(
+                navController = navController,
+                navigationIcon = {
+                    if (viewModel.selectMode.value) {
+                        NavigationCloseIcon {
+                            viewModel.exitSelectMode()
+                        }
+                    } else {
+                        NavigationBackIcon {
+                            navController.popBackStack()
+                        }
+                    }
+                },
+                title = pageTitle,
+                actions = {
+                    if (viewModel.selectMode.value) {
+                        PMiniOutlineButton(
+                            text = stringResource(if (viewModel.isAllSelected()) R.string.unselect_all else R.string.select_all),
+                            onClick = {
+                                viewModel.toggleSelectAll()
+                            },
+                        )
+                        HorizontalSpace(dp = 8.dp)
+                    } else {
+                        ActionButtonMoreWithMenu { dismiss ->
+                            PDropdownMenuItemSelect(onClick = {
+                                dismiss()
+                                viewModel.toggleSelectMode()
+                            })
+                            PDropdownMenuItem(text = { Text(stringResource(R.string.import_opml_file)) },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Outlined.Upload,
+                                        contentDescription = stringResource(id = R.string.import_opml_file)
+                                    )
+                                }, onClick = {
+                                    dismiss()
+                                    sendEvent(PickFileEvent(PickFileTag.FEED, PickFileType.FILE, false))
+                                })
 
-                    PDropdownMenuItem(text = { Text(stringResource(R.string.export_opml_file)) },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Outlined.Download,
-                                contentDescription = stringResource(id = R.string.export_opml_file)
-                            )
-                        }, onClick = {
-                            dismiss()
-                            sendEvent(ExportFileEvent(ExportFileType.OPML, "feeds_" + Date().formatName() + ".opml"))
-                        })
-                }
-            }
+                            PDropdownMenuItem(text = { Text(stringResource(R.string.export_opml_file)) },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Outlined.Download,
+                                        contentDescription = stringResource(id = R.string.export_opml_file)
+                                    )
+                                }, onClick = {
+                                    dismiss()
+                                    sendEvent(ExportFileEvent(ExportFileType.OPML, "feeds_" + Date().formatName() + ".opml"))
+                                })
+                        }
+                    }
+                },
+            )
         },
         bottomBar = {
             AnimatedVisibility(
-                visible = viewModel.selectMode.value,
+                visible = viewModel.showBottomActions(),
                 enter = slideInVertically { it },
                 exit = slideOutVertically { it }) {
                 FeedsSelectModeBottomActions(viewModel)

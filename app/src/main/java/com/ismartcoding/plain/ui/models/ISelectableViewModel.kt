@@ -5,7 +5,7 @@ import com.ismartcoding.plain.data.IData
 import kotlinx.coroutines.flow.StateFlow
 
 interface ISelectableViewModel<T : IData> {
-    var selectMode: MutableState<Boolean>
+    val selectMode: MutableState<Boolean>
     val selectedIds: MutableList<String>
     val itemsFlow: StateFlow<List<T>>
 }
@@ -20,8 +20,16 @@ fun <T : IData> ISelectableViewModel<T>.exitSelectMode() {
     selectedIds.clear()
 }
 
+fun <T : IData> ISelectableViewModel<T>.showBottomActions() : Boolean {
+    return selectMode.value && selectedIds.isNotEmpty()
+}
+
 fun <T : IData> ISelectableViewModel<T>.enterSelectMode() {
     selectMode.value = true
+}
+
+fun <T : IData> ISelectableViewModel<T>.getSelectedItems(): List<IData> {
+    return itemsFlow.value.filter { selectedIds.contains(it.id) }
 }
 
 fun <T : IData> ISelectableViewModel<T>.select(id: String) {

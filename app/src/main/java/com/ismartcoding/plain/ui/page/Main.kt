@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
@@ -41,8 +40,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import coil3.compose.setSingletonImageLoaderFactory
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.isGestureNavigationBar
 import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.extensions.parcelableArrayList
@@ -68,29 +69,26 @@ import com.ismartcoding.plain.preference.LocalDarkTheme
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.TextEditorDialog
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
+import com.ismartcoding.plain.ui.base.coil.newImageLoader
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.extensions.navigatePdf
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.MainViewModel
-import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.page.apps.AppPage
 import com.ismartcoding.plain.ui.page.apps.AppsPage
-import com.ismartcoding.plain.ui.page.apps.AppsSearchPage
 import com.ismartcoding.plain.ui.page.audio.AudioPage
 import com.ismartcoding.plain.ui.page.chat.ChatEditTextPage
 import com.ismartcoding.plain.ui.page.chat.ChatPage
 import com.ismartcoding.plain.ui.page.chat.ChatTextPage
 import com.ismartcoding.plain.ui.page.docs.DocsPage
-import com.ismartcoding.plain.ui.page.docs.DocsSearchPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntriesPage
-import com.ismartcoding.plain.ui.page.feeds.FeedEntriesSearchPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntryPage
 import com.ismartcoding.plain.ui.page.feeds.FeedSettingsPage
 import com.ismartcoding.plain.ui.page.feeds.FeedsPage
+import com.ismartcoding.plain.ui.page.images.ImageFoldersPage
 import com.ismartcoding.plain.ui.page.images.ImagesPage
 import com.ismartcoding.plain.ui.page.notes.NotePage
 import com.ismartcoding.plain.ui.page.notes.NotesPage
-import com.ismartcoding.plain.ui.page.notes.NotesSearchPage
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.page.scan.ScanPage
 import com.ismartcoding.plain.ui.page.settings.AboutPage
@@ -124,7 +122,6 @@ fun Main(viewModel: MainViewModel) {
     val context = LocalContext.current
     val navController = rememberNavController()
     val useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current)
-    val sharedViewModel: SharedViewModel = viewModel()
     val scope = rememberCoroutineScope()
     val view = LocalView.current
     val window = (view.context as Activity).window
@@ -135,7 +132,6 @@ fun Main(viewModel: MainViewModel) {
     var loadingDialogEvent by remember {
         mutableStateOf<LoadingDialogEvent?>(null)
     }
-
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
 
     LaunchedEffect(Unit) {
@@ -200,7 +196,7 @@ fun Main(viewModel: MainViewModel) {
             }
 
             val uri = intent.parcelable(Intent.EXTRA_STREAM) as? Uri ?: return@LaunchedEffect
-            DialogHelper.showConfirmDialog(uri.toString(), getString(R.string.confirm_to_send_file_to_file_assistant),
+            DialogHelper.showConfirmDialog(uri.toString().getFilenameFromPath(), getString(R.string.confirm_to_send_file_to_file_assistant),
                 confirmButton = getString(R.string.ok) to {
                     navController.navigate(RouteName.CHAT)
                     scope.launch(Dispatchers.IO) {
@@ -226,6 +222,8 @@ fun Main(viewModel: MainViewModel) {
     }
 
     AppTheme(useDarkTheme = useDarkTheme) {
+        setSingletonImageLoaderFactory(::newImageLoader)
+
         window.statusBarColor = Color.Transparent.toArgb()
         window.navigationBarColor = if (context.isGestureNavigationBar()) Color.Transparent.toArgb() else MaterialTheme.colorScheme.background.toArgb()
         insetsController.isAppearanceLightStatusBars = !useDarkTheme
@@ -250,26 +248,21 @@ fun Main(viewModel: MainViewModel) {
                 RouteName.WEB_SECURITY to { WebSecurityPage(navController) },
                 RouteName.EXCHANGE_RATE to { ExchangeRatePage(navController) },
                 RouteName.SOUND_METER to { SoundMeterPage(navController) },
-                RouteName.CHAT to { ChatPage(navController, sharedViewModel) },
+                RouteName.CHAT to { ChatPage(navController) },
                 RouteName.SCAN_HISTORY to { ScanHistoryPage(navController) },
                 RouteName.SCAN to { ScanPage(navController) },
-                RouteName.MEDIA_PREVIEW to { MediaPreviewPage(navController, sharedViewModel) },
                 RouteName.APPS to { AppsPage(navController) },
                 RouteName.DOCS to { DocsPage(navController) },
                 RouteName.NOTES to { NotesPage(navController) },
                 RouteName.FEEDS to { FeedsPage(navController) },
-                RouteName.IMAGES to { ImagesPage(navController) },
                 RouteName.FEED_SETTINGS to { FeedSettingsPage(navController) },
                 RouteName.WEB_LEARN_MORE to { WebLearnMorePage(navController) },
                 RouteName.AUDIO to { AudioPage(navController) },
+                RouteName.IMAGE_FOLDERS to { ImageFoldersPage(navController) },
             ).forEach { (routeName, content) ->
                 slideHorizontallyComposable(routeName.name) {
                     content()
                 }
-            }
-
-            routeSearch(RouteName.APPS) {
-                AppsSearchPage(navController, it)
             }
 
             routeDetail(RouteName.APPS) {
@@ -288,33 +281,15 @@ fun Main(viewModel: MainViewModel) {
                 FeedEntriesPage(navController, feedId)
             }
 
-            slideHorizontallyComposable(
-                "${RouteName.FEED_ENTRIES.name}/search?q={q}&feedId={feedId}",
-                arguments = listOf(navArgument("q") {
-                    nullable = true
-                    defaultValue = ""
-                    type = NavType.StringType
-                }, navArgument("feedId") {
-                    nullable = true
-                    defaultValue = ""
-                    type = NavType.StringType
-                }),
-            ) {
-                val q = it.arguments?.getString("q") ?: ""
-                val feedId = it.arguments?.getString("feedId") ?: ""
-                FeedEntriesSearchPage(navController, q, feedId)
-            }
-
             routeDetail(RouteName.FEED_ENTRIES) {
                 FeedEntryPage(navController, it)
             }
 
-            routeSearch(RouteName.DOCS) {
-                DocsSearchPage(navController, it)
-            }
-
-            routeSearch(RouteName.NOTES) {
-                NotesSearchPage(navController, it)
+            slideHorizontallyComposable(
+                RouteName.IMAGES.name,
+            ) {
+                val bucketId = navController.previousBackStackEntry?.savedStateHandle?.get("bucketId") ?: ""
+                ImagesPage(navController, bucketId)
             }
 
             slideHorizontallyComposable(
@@ -441,20 +416,6 @@ fun Main(viewModel: MainViewModel) {
                 }
             }
         }
-    }
-}
-
-fun NavGraphBuilder.routeSearch(routeName: RouteName, action: @Composable (String) -> Unit) {
-    slideHorizontallyComposable(
-        "${routeName.name}/search?q={q}",
-        arguments = listOf(navArgument("q") {
-            nullable = true
-            defaultValue = ""
-            type = NavType.StringType
-        }),
-    ) {
-        val q = it.arguments?.getString("q") ?: ""
-        action(q)
     }
 }
 

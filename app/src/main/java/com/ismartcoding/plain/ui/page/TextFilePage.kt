@@ -33,6 +33,7 @@ import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.components.EditorData
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.TextFileViewModel
@@ -76,72 +77,76 @@ fun TextFilePage(
     }
 
     PScaffold(
-        navController,
-        topBarTitle = title.ifEmpty { path.getFilenameFromPath() },
-        navigationIcon = {
-            if (viewModel.readOnly.value) {
-                NavigationBackIcon {
-                    navController.popBackStack()
-                }
-            } else {
-                NavigationCloseIcon {
-                    viewModel.exitEditMode()
-                }
-            }
-        },
-        actions = {
-            if (!viewModel.isEditorReady.value) {
-                return@PScaffold
-            }
-            if (viewModel.readOnly.value) {
-                if (type != TextFileType.APP_LOG.name) {
-                    PIconButton(
-                        icon = Icons.Outlined.Edit,
-                        contentDescription = stringResource(R.string.edit),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    ) {
-                        viewModel.enterEditMode()
+        topBar = {
+                 PTopAppBar(
+                title = title.ifEmpty { path.getFilenameFromPath() },
+                navController = navController,
+                navigationIcon = {
+                    if (viewModel.readOnly.value) {
+                        NavigationBackIcon {
+                            navController.popBackStack()
+                        }
+                    } else {
+                        NavigationCloseIcon {
+                            viewModel.exitEditMode()
+                        }
                     }
-                }
-            } else {
-                PIconButton(
-                    icon = Icons.Outlined.Save,
-                    contentDescription = stringResource(R.string.save),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                ) {
-                    scope.launch {
-                        DialogHelper.showLoading()
-                        withIO { File(path).writeText(viewModel.content.value) }
-                        context.scanFileByConnection(path)
-                        DialogHelper.hideLoading()
-                        DialogHelper.showMessage(R.string.saved)
+                },
+                actions = {
+                    if (!viewModel.isEditorReady.value) {
+                        return@PTopAppBar
                     }
-                }
-            }
-            if (setOf(TextFileType.APP_LOG.name, TextFileType.CHAT.name).contains(type)) {
-                PIconButton(
-                    icon = Icons.AutoMirrored.Outlined.WrapText,
-                    contentDescription = stringResource(R.string.wrap_content),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                ) {
-                    viewModel.toggleWrapContent(context)
-                }
-                PIconButton(
-                    icon = Icons.Outlined.Share,
-                    contentDescription = stringResource(R.string.share),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                ) {
-                    if (type == TextFileType.APP_LOG.name) {
-                        AppLogHelper.export(context)
-                    } else if (type == TextFileType.CHAT.name) {
-                        ShareHelper.shareFile(context, File(path))
+                    if (viewModel.readOnly.value) {
+                        if (type != TextFileType.APP_LOG.name) {
+                            PIconButton(
+                                icon = Icons.Outlined.Edit,
+                                contentDescription = stringResource(R.string.edit),
+                                tint = MaterialTheme.colorScheme.onSurface,
+                            ) {
+                                viewModel.enterEditMode()
+                            }
+                        }
+                    } else {
+                        PIconButton(
+                            icon = Icons.Outlined.Save,
+                            contentDescription = stringResource(R.string.save),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        ) {
+                            scope.launch {
+                                DialogHelper.showLoading()
+                                withIO { File(path).writeText(viewModel.content.value) }
+                                context.scanFileByConnection(path)
+                                DialogHelper.hideLoading()
+                                DialogHelper.showMessage(R.string.saved)
+                            }
+                        }
                     }
-                }
-            } else {
-                ActionButtonMore {
-                    viewModel.showMoreActions.value = true
-                }
-            }
+                    if (setOf(TextFileType.APP_LOG.name, TextFileType.CHAT.name).contains(type)) {
+                        PIconButton(
+                            icon = Icons.AutoMirrored.Outlined.WrapText,
+                            contentDescription = stringResource(R.string.wrap_content),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        ) {
+                            viewModel.toggleWrapContent(context)
+                        }
+                        PIconButton(
+                            icon = Icons.Outlined.Share,
+                            contentDescription = stringResource(R.string.share),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        ) {
+                            if (type == TextFileType.APP_LOG.name) {
+                                AppLogHelper.export(context)
+                            } else if (type == TextFileType.CHAT.name) {
+                                ShareHelper.shareFile(context, File(path))
+                            }
+                        }
+                    } else {
+                        ActionButtonMore {
+                            viewModel.showMoreActions.value = true
+                        }
+                    }
+                },
+            )
         },
         content = {
             if (viewModel.isDataLoading.value || !viewModel.isEditorReady.value) {

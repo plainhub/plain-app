@@ -46,7 +46,7 @@ enum class DMessageType(val value: String) {
 class DMessageText(val text: String)
 
 @Serializable
-class DMessageFile(val uri: String, val size: Long, val duration: Long = 0)
+class DMessageFile(val id: String = StringHelper.shortUUID(), val uri: String, val size: Long, val duration: Long = 0)
 
 @Serializable
 class DMessageImages(val items: List<DMessageFile>)

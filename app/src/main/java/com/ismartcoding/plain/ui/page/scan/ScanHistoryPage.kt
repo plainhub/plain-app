@@ -26,6 +26,7 @@ import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwipeBox
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.SwipeActionButton
 import com.ismartcoding.plain.ui.base.TextCard
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -56,8 +57,9 @@ fun ScanHistoryPage(
     }
 
     PScaffold(
-        navController,
-        topBarTitle = stringResource(id = R.string.scan_history),
+        topBar = {
+            PTopAppBar(navController = navController, title = stringResource(R.string.scan_history))
+        },
         content = {
             TopSpace()
             PullToRefresh(refreshLayoutState = refreshState) {

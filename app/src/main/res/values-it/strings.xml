@@ -2,6 +2,9 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Attualmente, il tuo VPN è attivo sul tuo dispositivo, il che potrebbe portare a problemi di connessione web quando si accede da un PC. Per risolvere questo problema, ti consigliamo di regolare le impostazioni del tuo VPN per consentire il traffico LAN o disattivare il tuo VPN.</string>
     <string name="warning">Attenzione</string>
+    <string name="resolution">Risoluzione</string>
+    <string name="dimensions">Dimensioni</string>
+    <string name="select_a_device">Seleziona un dispositivo</string>
     <string name="taken_at">Preso il</string>
     <string name="published_at">Pubblicato il</string>
     <string name="older_than_7days_feed_items">Più vecchio di 7 giorni</string>

@@ -31,9 +31,11 @@ import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.preference.PackageSortByPreference
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.ActionButtonSort
+import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.RadioDialog
 import com.ismartcoding.plain.ui.base.RadioDialogOption
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -42,8 +44,10 @@ import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
+import com.ismartcoding.plain.ui.components.ListSearchBar
 import com.ismartcoding.plain.ui.components.PackageListItem
 import com.ismartcoding.plain.ui.models.AppsViewModel
+import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.Dispatchers
@@ -96,17 +100,30 @@ fun AppsPage(
     }
 
     PScaffold(
-        navController,
-        topBarTitle = stringResource(id = R.string.apps),
-        actions = {
-            ActionButtonSearch {
-                navController.navigate("${RouteName.APPS.name}/search?q=")
+        topBar = {
+            if (viewModel.showSearchBar.value) {
+                ListSearchBar(
+                    viewModel = viewModel,
+                    onSearch = {
+                        viewModel.searchActive.value = false
+                        viewModel.showLoading.value = true
+                        scope.launch(Dispatchers.IO) {
+                            viewModel.loadAsync()
+                        }
+                    }
+                )
+                return@PScaffold
             }
-            ActionButtonSort {
-                viewModel.showSortDialog.value = true
-            }
-        }
-    ) {
+            PTopAppBar(navController = navController, title = stringResource(id = R.string.apps),
+                actions = {
+                    ActionButtonSearch {
+                        viewModel.enterSearchMode()
+                    }
+                    ActionButtonSort {
+                        viewModel.showSortDialog.value = true
+                    }
+                })
+        }) {
         if (!viewModel.showLoading.value) {
             Row(
                 modifier = Modifier
@@ -184,10 +201,11 @@ fun AppsPage(
                                 }
                             }
                             LoadMoreRefreshContent(viewModel.noMore.value)
+                            BottomSpace()
                         }
                     }
                 } else {
-                    NoDataColumn(loading = viewModel.showLoading.value)
+                    NoDataColumn(loading = viewModel.showLoading.value, search = viewModel.showSearchBar.value)
                 }
             }
         }

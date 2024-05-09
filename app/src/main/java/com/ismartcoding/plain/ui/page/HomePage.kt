@@ -58,6 +58,7 @@ import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PDraggableElement
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.home.HomeFeatures
@@ -109,51 +110,55 @@ fun HomePage(
     }
 
     PScaffold(
-        navController,
-        topBarTitle = stringResource(id = R.string.app_name),
-        navigationIcon = {
-            ActionButtonSettings(showBadge = AppFeatureType.CHECK_UPDATES.has() && newVersion.whetherNeedUpdate(currentVersion, skipVersion)) {
-                navController.navigate(RouteName.SETTINGS)
-            }
-        },
-        actions = {
-            ActionButtonMoreWithMenu { dismiss ->
-                PDropdownMenuItem(leadingIcon = {
-                    Icon(
-                        Icons.Outlined.PhoneAndroid,
-                        contentDescription = stringResource(id = R.string.keep_screen_on)
-                    )
-                }, onClick = {
-                    dismiss()
-                    scope.launch(Dispatchers.IO) {
-                        ScreenHelper.keepScreenOnAsync(context, !keepScreenOn)
+        topBar = {
+            PTopAppBar(
+                navController = navController,
+                navigationIcon = {
+                    ActionButtonSettings(showBadge = AppFeatureType.CHECK_UPDATES.has() && newVersion.whetherNeedUpdate(currentVersion, skipVersion)) {
+                        navController.navigate(RouteName.SETTINGS)
                     }
-                }, text = {
-                    Row {
-                        Text(
-                            text = stringResource(R.string.keep_screen_on),
-                            modifier = Modifier.padding(top = 14.dp),
-                        )
-                        Checkbox(checked = keepScreenOn, onCheckedChange = {
+                },
+                title = stringResource(id = R.string.app_name),
+                actions = {
+                    ActionButtonMoreWithMenu { dismiss ->
+                        PDropdownMenuItem(leadingIcon = {
+                            Icon(
+                                Icons.Outlined.PhoneAndroid,
+                                contentDescription = stringResource(id = R.string.keep_screen_on)
+                            )
+                        }, onClick = {
                             dismiss()
                             scope.launch(Dispatchers.IO) {
-                                ScreenHelper.keepScreenOnAsync(context, it)
+                                ScreenHelper.keepScreenOnAsync(context, !keepScreenOn)
+                            }
+                        }, text = {
+                            Row {
+                                Text(
+                                    text = stringResource(R.string.keep_screen_on),
+                                    modifier = Modifier.padding(top = 14.dp),
+                                )
+                                Checkbox(checked = keepScreenOn, onCheckedChange = {
+                                    dismiss()
+                                    scope.launch(Dispatchers.IO) {
+                                        ScreenHelper.keepScreenOnAsync(context, it)
+                                    }
+                                })
                             }
                         })
+                        PDropdownMenuItem(leadingIcon = {
+                            Icon(
+                                Icons.Outlined.QrCodeScanner,
+                                contentDescription = stringResource(id = R.string.scan_qrcode)
+                            )
+                        }, onClick = {
+                            dismiss()
+                            navController.navigate(RouteName.SCAN)
+                        }, text = {
+                            Text(text = stringResource(R.string.scan_qrcode))
+                        })
                     }
-                })
-                PDropdownMenuItem(leadingIcon = {
-                    Icon(
-                        Icons.Outlined.QrCodeScanner,
-                        contentDescription = stringResource(id = R.string.scan_qrcode)
-                    )
-                }, onClick = {
-                    dismiss()
-                    navController.navigate(RouteName.SCAN)
-                }, text = {
-                    Text(text = stringResource(R.string.scan_qrcode))
-                })
-            }
+                },
+            )
         },
         floatingActionButton = {
             PDraggableElement {

@@ -18,30 +18,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.ismartcoding.lib.extensions.getFinalPath
-import com.ismartcoding.lib.extensions.pathToUri
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.helpers.FormatHelper
-import com.ismartcoding.plain.ui.base.PGlideImage
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.ImagePreviewerState
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.TransformGlideImageView
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberTransformItemState
+import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.VChat
-import com.ismartcoding.plain.ui.preview.PreviewDialog
-import com.ismartcoding.plain.ui.preview.PreviewItem
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun ChatImages(
     context: Context,
-    navController: NavHostController,
     m: VChat,
     imageWidthDp: Dp,
-    imageWidthPx: Int,
+    previewerState: ImagePreviewerState,
 ) {
+    val imageItems = (m.value as DMessageImages).items
+
     FlowRow(
         modifier =
         Modifier
@@ -51,29 +52,28 @@ fun ChatImages(
         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
         content = {
-            val imageItems = (m.value as DMessageImages).items
-            imageItems.forEachIndexed { index, item ->
-                val path = item.uri.getFinalPath(context)
+            imageItems.forEach { item ->
+                val itemState = rememberTransformItemState()
                 Box(
                     modifier =
                     Modifier.clickable {
-                        val items = imageItems.mapIndexed { i, s ->
-                            val p = s.uri.getFinalPath(context)
-                            PreviewItem(m.id + "|" + i, p.pathToUri(), p)
+                        coMain {
+                            withIO { MediaPreviewData.setDataAsync(context, itemState, imageItems, item.id) }
+                            previewerState.openTransform(
+                                index = MediaPreviewData.items.indexOfFirst { it.id == item.id },
+                                itemState = itemState,
+                            )
                         }
-                        PreviewDialog().show(
-                            items = items,
-                            initKey = m.id + "|" + index,
-                        )
                     },
                 ) {
-                    PGlideImage(
-                        model = path,
+                    TransformGlideImageView(
                         modifier = Modifier
                             .size(imageWidthDp)
                             .clip(RoundedCornerShape(6.dp)),
-                        contentDescription = path,
-                        contentScale = ContentScale.Crop,
+                        path = item.uri.getFinalPath(context),
+                        key = item.id,
+                        itemState = itemState,
+                        previewerState = previewerState,
                     )
                     Box(
                         modifier =

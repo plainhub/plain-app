@@ -33,6 +33,7 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.navigateTextFile
@@ -40,6 +41,7 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -63,8 +65,9 @@ fun AboutPage(
     UpdateDialog(updateViewModel)
 
     PScaffold(
-        navController,
-        topBarTitle = stringResource(R.string.about),
+        topBar = {
+            PTopAppBar(navController = navController, title = stringResource(R.string.about))
+        },
         content = {
             LazyColumn {
                 item {

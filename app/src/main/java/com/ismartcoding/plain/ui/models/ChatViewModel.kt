@@ -55,7 +55,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
                             it.content.value =
                                 DMessageImages(
                                     c.items.map { i ->
-                                        DMessageFile(i.uri.toAppUrl(context), i.size, i.duration)
+                                        DMessageFile(i.id, i.uri.toAppUrl(context), i.size, i.duration)
                                     },
                                 )
                             dao.update(it)
@@ -63,7 +63,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
                     } else if (it.content.value is DMessageFiles) {
                         val c = it.content.value as DMessageFiles
                         if (c.items.any { i -> !i.uri.startsWith("app://") }) {
-                            it.content.value = DMessageFiles(c.items.map { i -> DMessageFile(i.uri.toAppUrl(context), i.size, i.duration) })
+                            it.content.value = DMessageFiles(c.items.map { i -> DMessageFile(i.id, i.uri.toAppUrl(context), i.size, i.duration) })
                             dao.update(it)
                         }
                     }

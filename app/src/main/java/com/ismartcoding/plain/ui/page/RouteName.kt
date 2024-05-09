@@ -21,7 +21,6 @@ enum class RouteName {
     CHAT_EDIT_TEXT,
     SCAN,
     SCAN_HISTORY,
-    MEDIA_PREVIEW,
     APPS,
     OTHER_FILE,
     DOCS,
@@ -35,4 +34,5 @@ enum class RouteName {
     AUDIO_PLAYER,
     TEXT_FILE,
     IMAGES,
+    IMAGE_FOLDERS,
 }

@@ -178,9 +178,7 @@ fun ScanPage(navController: NavHostController) {
     }
 
     PScaffold(
-        navController,
         containerColor = Color.Transparent,
-        navigationIcon = null,
         content = {
             Box(
                 modifier = Modifier.fillMaxSize(),

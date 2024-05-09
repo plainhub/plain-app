@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -16,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Folder
@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,10 +47,11 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.PermissionsResultEvent
-import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.preference.ImageSortByPreference
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
@@ -67,21 +69,30 @@ import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.RadioDialog
-import com.ismartcoding.plain.ui.base.RadioDialogOption
+import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.ImagePreviewer
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.base.pinchzoomgrid.PinchZoomGridLayout
 import com.ismartcoding.plain.ui.base.pinchzoomgrid.rememberPinchZoomGridState
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
+import com.ismartcoding.plain.ui.components.CastDialog
+import com.ismartcoding.plain.ui.components.FileSortDialog
 import com.ismartcoding.plain.ui.components.ImageGridItem
+import com.ismartcoding.plain.ui.components.ListSearchBar
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.extensions.navigateTags
+import com.ismartcoding.plain.ui.models.CastViewModel
+import com.ismartcoding.plain.ui.models.ImageFoldersViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
+import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
+import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.ui.models.toggleSelectMode
 import com.ismartcoding.plain.ui.page.RouteName
@@ -94,22 +105,34 @@ import kotlinx.coroutines.launch
 @Composable
 fun ImagesPage(
     navController: NavHostController,
+    bucketId: String,
     viewModel: ImagesViewModel = viewModel(),
     tagsViewModel: TagsViewModel = viewModel(),
+    bucketViewModel: ImageFoldersViewModel = viewModel(),
+    castViewModel: CastViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     val view = LocalView.current
     val window = (view.context as Activity).window
     val itemsState by viewModel.itemsFlow.collectAsState()
+    val bucketsState by bucketViewModel.itemsFlow.collectAsState()
+    val bucketsMap = remember(bucketsState) {
+        derivedStateOf {
+            bucketsState.associateBy { it.id }
+        }
+    }
+    val previewerState = rememberPreviewerState(
+        pageCount = { MediaPreviewData.items.size },
+        getKey = { MediaPreviewData.items[it].id }
+    )
     val tagsState by tagsViewModel.itemsFlow.collectAsState()
     val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
     val scope = rememberCoroutineScope()
     val filtersScrollState = rememberScrollState()
-    val scrollState = rememberLazyGridState()
     var hasPermission by remember {
         mutableStateOf(AppFeatureType.FILES.hasPermission(context))
     }
-    var lastCellIndex by remember { mutableIntStateOf(3) }
+    var lastCellIndex by remember { mutableIntStateOf(4) }
     var canScroll by rememberSaveable { mutableStateOf(true) }
 
     val pinchState = rememberPinchZoomGridState(
@@ -126,17 +149,22 @@ fun ImagesPage(
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
             scope.launch {
-                withIO { viewModel.loadAsync(context, tagsViewModel) }
+                withIO {
+                    viewModel.loadAsync(context, tagsViewModel)
+                    bucketViewModel.loadAsync(context)
+                }
                 setRefreshState(RefreshContentState.Finished)
             }
         }
 
     LaunchedEffect(Unit) {
+        viewModel.bucketId.value = bucketId
         tagsViewModel.dataType.value = viewModel.dataType
         if (hasPermission) {
             scope.launch(Dispatchers.IO) {
                 viewModel.sortBy.value = ImageSortByPreference.getValueAsync(context)
                 viewModel.loadAsync(context, tagsViewModel)
+                bucketViewModel.loadAsync(context)
             }
         }
         events.add(
@@ -170,105 +198,123 @@ fun ImagesPage(
         viewModel.exitSelectMode()
     }
 
-    ViewImageBottomSheet(viewModel, tagsViewModel, tagsMapState, tagsState)
-
-    val pageTitle = if (viewModel.selectMode.value) {
-        LocaleHelper.getStringF(R.string.x_selected, "count", viewModel.selectedIds.size)
-    } else if (viewModel.tag.value != null) {
-        stringResource(id = R.string.images) + " - " + viewModel.tag.value!!.name
-    } else if (viewModel.trash.value) {
-        stringResource(id = R.string.images) + " - " + stringResource(id = R.string.trash)
-    } else {
-        stringResource(id = R.string.images)
+    BackHandler(enabled = castViewModel.castMode.value) {
+        castViewModel.exitCastMode()
     }
 
-    if (viewModel.showSortDialog.value) {
-        RadioDialog(
-            title = stringResource(R.string.sort),
-            options =
-            FileSortBy.entries.map {
-                RadioDialogOption(
-                    text = stringResource(id = it.getTextId()),
-                    selected = it == viewModel.sortBy.value,
-                ) {
-                    scope.launch(Dispatchers.IO) {
-                        ImageSortByPreference.putAsync(context, it)
-                        viewModel.sortBy.value = it
-                        viewModel.loadAsync(context, tagsViewModel)
-                    }
-                }
-            },
-        ) {
-            viewModel.showSortDialog.value = false
+    BackHandler(previewerState.visible) {
+        scope.launch {
+            previewerState.closeTransform()
         }
     }
 
+    ViewImageBottomSheet(viewModel, tagsViewModel, tagsMapState, tagsState)
+
+    if (viewModel.showSortDialog.value) {
+        FileSortDialog(viewModel.sortBy, onSelected = {
+            scope.launch(Dispatchers.IO) {
+                ImageSortByPreference.putAsync(context, it)
+                viewModel.sortBy.value = it
+                viewModel.loadAsync(context, tagsViewModel)
+            }
+        }, onDismiss = {
+            viewModel.showSortDialog.value = false
+        })
+    }
+
+    CastDialog(castViewModel)
+
     PScaffold(
-        navController,
-        topBarTitle = pageTitle,
-        topBarOnDoubleClick = {
-            scope.launch {
-                scrollState.scrollToItem(0)
-            }
-        },
-        navigationIcon = {
-            if (viewModel.selectMode.value) {
-                NavigationCloseIcon {
-                    viewModel.exitSelectMode()
-                }
-            } else {
-                NavigationBackIcon {
-                    navController.popBackStack()
-                }
-            }
-        },
-        actions = {
-            if (!hasPermission) {
+        topBar = {
+            if (viewModel.showSearchBar.value) {
+                ListSearchBar(
+                    viewModel = viewModel,
+                    onSearch = {
+                        viewModel.searchActive.value = false
+                        viewModel.showLoading.value = true
+                        scope.launch(Dispatchers.IO) {
+                            viewModel.loadAsync(context, tagsViewModel)
+                        }
+                    }
+                )
                 return@PScaffold
             }
-            if (viewModel.selectMode.value) {
-                PMiniOutlineButton(
-                    text = stringResource(if (viewModel.isAllSelected()) R.string.unselect_all else R.string.select_all),
-                    onClick = {
-                        viewModel.toggleSelectAll()
-                    },
-                )
-                HorizontalSpace(dp = 8.dp)
-            } else {
-                ActionButtonSearch {
-                    navController.navigate("${RouteName.DOCS.name}/search?q=")
-                }
-                if (viewModel.bucket.value == null) {
-                    PIconButton(
-                        icon = Icons.Outlined.Folder,
-                        contentDescription = stringResource(R.string.folder),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    ) {
-                        navController.navigate(RouteName.IMAGES)
+            PTopAppBar(
+                modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = {
+                    scope.launch {
+                        pinchState.gridState.scrollToItem(0)
                     }
-                }
-                ActionButtonMoreWithMenu { dismiss ->
-                    PDropdownMenuItemSelect(onClick = {
-                        dismiss()
-                        viewModel.toggleSelectMode()
-                    })
-                    PDropdownMenuItemTags(onClick = {
-                        dismiss()
-                        navController.navigateTags(viewModel.dataType)
-                    })
-                    PDropdownMenuItemSort(onClick = {
-                        dismiss()
-                        viewModel.showSortDialog.value = true
-                    })
-                    PDropdownMenuItemCast(onClick = {
-                        dismiss()
-                    })
-                }
-            }
+                }),
+                navController = navController,
+                navigationIcon = {
+                    if (viewModel.selectMode.value) {
+                        NavigationCloseIcon {
+                            viewModel.exitSelectMode()
+                        }
+                    } else if (castViewModel.castMode.value) {
+                        NavigationCloseIcon {
+                            castViewModel.exitCastMode()
+                        }
+                    } else {
+                        NavigationBackIcon {
+                            navController.popBackStack()
+                        }
+                    }
+                },
+                title = getPageTitle(viewModel, castViewModel, bucketsMap.value[bucketId]),
+                actions = {
+                    if (!hasPermission) {
+                        return@PTopAppBar
+                    }
+                    if (castViewModel.castMode.value) {
+                        return@PTopAppBar
+                    }
+                    if (viewModel.selectMode.value) {
+                        PMiniOutlineButton(
+                            text = stringResource(if (viewModel.isAllSelected()) R.string.unselect_all else R.string.select_all),
+                            onClick = {
+                                viewModel.toggleSelectAll()
+                            },
+                        )
+                        HorizontalSpace(dp = 8.dp)
+                    } else {
+                        ActionButtonSearch {
+                            viewModel.enterSearchMode()
+                        }
+                        if (viewModel.bucketId.value.isEmpty()) {
+                            PIconButton(
+                                icon = Icons.Outlined.Folder,
+                                contentDescription = stringResource(R.string.folders),
+                                tint = MaterialTheme.colorScheme.onSurface,
+                            ) {
+                                navController.navigate(RouteName.IMAGE_FOLDERS)
+                            }
+                        }
+                        ActionButtonMoreWithMenu { dismiss ->
+                            PDropdownMenuItemSelect(onClick = {
+                                dismiss()
+                                viewModel.toggleSelectMode()
+                            })
+                            PDropdownMenuItemTags(onClick = {
+                                dismiss()
+                                navController.navigateTags(viewModel.dataType)
+                            })
+                            PDropdownMenuItemSort(onClick = {
+                                dismiss()
+                                viewModel.showSortDialog.value = true
+                            })
+                            PDropdownMenuItemCast(onClick = {
+                                dismiss()
+                                castViewModel.showCastDialog.value = true
+                            })
+                        }
+                    }
+                },
+            )
         },
         bottomBar = {
             AnimatedVisibility(
-                visible = viewModel.selectMode.value,
+                visible = viewModel.showBottomActions(),
                 enter = slideInVertically { it },
                 exit = slideOutVertically { it }) {
                 FilesSelectModeBottomActions(viewModel, tagsViewModel, tagsState)
@@ -319,7 +365,7 @@ fun ImagesPage(
                                 viewModel.loadAsync(context, tagsViewModel)
                             }
                         },
-                        label = { Text("${tag.name} (${tag.count})") }
+                        label = { Text(if (viewModel.bucketId.value.isNotEmpty() || viewModel.queryText.value.isNotEmpty()) tag.name else "${tag.name} (${tag.count})") }
                     )
                 }
             }
@@ -357,7 +403,11 @@ fun ImagesPage(
                                     modifier = Modifier
                                         .pinchItem(key = m.id)
                                         .animateItemPlacement(),
-                                    navController, viewModel, m
+                                    navController,
+                                    viewModel,
+                                    castViewModel,
+                                    m,
+                                    previewerState
                                 )
                             }
                             item(
@@ -382,11 +432,26 @@ fun ImagesPage(
                         }
                     }
                 } else {
-                    NoDataColumn(loading = viewModel.showLoading.value)
+                    NoDataColumn(loading = viewModel.showLoading.value, search = viewModel.showSearchBar.value)
                 }
             }
         }
     }
+    ImagePreviewer(state = previewerState)
 }
 
-
+@Composable
+fun getPageTitle(viewModel: ImagesViewModel, castViewModel: CastViewModel, bucket: DMediaBucket?): String {
+    val imageName = bucket?.name ?: stringResource(id = R.string.images)
+    return if (castViewModel.castMode.value) {
+        stringResource(id = R.string.cast_mode) + " - " + CastPlayer.currentDevice?.description?.device?.friendlyName
+    } else if (viewModel.selectMode.value) {
+        LocaleHelper.getStringF(R.string.x_selected, "count", viewModel.selectedIds.size)
+    } else if (viewModel.tag.value != null) {
+        imageName + " - " + viewModel.tag.value!!.name
+    } else if (viewModel.trash.value) {
+        stringResource(id = R.string.images) + " - " + stringResource(id = R.string.trash)
+    } else {
+        imageName
+    }
+}

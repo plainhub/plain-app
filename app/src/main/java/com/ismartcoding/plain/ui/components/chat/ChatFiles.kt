@@ -15,14 +15,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.getFinalPath
@@ -31,7 +29,8 @@ import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isPdfFile
 import com.ismartcoding.lib.extensions.isTextFile
 import com.ismartcoding.lib.extensions.isVideoFast
-import com.ismartcoding.lib.extensions.pathToUri
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.db.DMessageFiles
@@ -41,12 +40,14 @@ import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.ImagePreviewerState
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.TransformGlideImageView
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.extensions.navigateOtherFile
 import com.ismartcoding.plain.ui.extensions.navigatePdf
 import com.ismartcoding.plain.ui.extensions.navigateTextFile
+import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.VChat
-import com.ismartcoding.plain.ui.preview.PreviewDialog
-import com.ismartcoding.plain.ui.preview.PreviewItem
 import java.io.File
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -55,10 +56,12 @@ fun ChatFiles(
     context: Context,
     navController: NavHostController,
     m: VChat,
+    previewerState: ImagePreviewerState,
 ) {
     val fileItems = (m.value as DMessageFiles).items
     Column {
         fileItems.forEachIndexed { index, item ->
+            val itemState = rememberTransformItemState()
             val path = item.uri.getFinalPath(context)
             Box(
                 modifier =
@@ -66,20 +69,18 @@ fun ChatFiles(
                     .fillMaxWidth()
                     .clickable {
                         if (path.isImageFast() || path.isVideoFast()) {
-                            val items =
-                                fileItems
-                                    .filter { it.uri.isVideoFast() || it.uri.isImageFast() }
-                            PreviewDialog().show(
-                                items =
-                                items.mapIndexed {
-                                        i,
-                                        s,
-                                    ->
-                                    val p = s.uri.getFinalPath(context)
-                                    PreviewItem(m.id + "|" + i, p.pathToUri(), p)
-                                },
-                                initKey = m.id + "|" + items.indexOf(item),
-                            )
+                            coMain {
+                                withIO {
+                                    MediaPreviewData.setDataAsync(
+                                        context, itemState, fileItems
+                                            .filter { it.uri.isVideoFast() || it.uri.isImageFast() }, item.id
+                                    )
+                                }
+                                previewerState.openTransform(
+                                    index = MediaPreviewData.items.indexOfFirst { it.id == item.id },
+                                    itemState = itemState,
+                                )
+                            }
                         } else if (path.isAudioFast()) {
                             AudioPlayerDialog().show()
                             Permissions.checkNotification(context, R.string.audio_notification_prompt) {
@@ -120,13 +121,14 @@ fun ChatFiles(
                         )
                     }
                     if (path.isImageFast() || path.isVideoFast()) {
-                        GlideImage(
-                            model = path,
+                        TransformGlideImageView(
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(RoundedCornerShape(4.dp)),
-                            contentDescription = path,
-                            contentScale = ContentScale.Crop,
+                            path = path,
+                            key = item.id,
+                            itemState = itemState,
+                            previewerState = previewerState,
                         )
                     } else {
                         AsyncImage(

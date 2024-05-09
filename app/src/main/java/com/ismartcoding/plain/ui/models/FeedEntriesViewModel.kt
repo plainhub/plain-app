@@ -14,6 +14,7 @@ import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.TagHelper
+import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +23,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
-class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) : ISelectableViewModel<DFeedEntry>, ViewModel() {
+class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
+    ISelectableViewModel<DFeedEntry>,
+    ISearchableViewModel<DFeedEntry>,
+    ViewModel() {
     private val _itemsFlow = MutableStateFlow(mutableStateListOf<DFeedEntry>())
     override val itemsFlow: StateFlow<List<DFeedEntry>> get() = _itemsFlow
     var showLoading = mutableStateOf(true)
@@ -35,9 +39,11 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) : ISe
     var tag = mutableStateOf<DTag?>(null)
     var feedId = mutableStateOf<String>("")
     val dataType = DataType.FEED_ENTRY
-    var queryText by savedStateHandle.saveable { mutableStateOf("") }
-    var search = mutableStateOf(false)
     var selectedItem = mutableStateOf<DFeedEntry?>(null)
+
+    override val showSearchBar = mutableStateOf(false)
+    override val searchActive = mutableStateOf(false)
+    override val queryText = mutableStateOf("")
 
     override var selectMode = mutableStateOf(false)
     override val selectedIds = mutableStateListOf<String>()
@@ -45,11 +51,7 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) : ISe
     fun moreAsync(tagsViewModel: TagsViewModel) {
         offset.value += limit.value
         val items = FeedEntryHelper.search(getQuery(), limit.value, offset.value)
-        _itemsFlow.update {
-            val mutableList = it.toMutableStateList()
-            mutableList.addAll(items)
-            mutableList
-        }
+        _itemsFlow.value.addAll(items)
         tagsViewModel.loadMoreAsync(items.map { it.id }.toSet())
         showLoading.value = false
         noMore.value = items.size < limit.value
@@ -88,7 +90,7 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) : ISe
     }
 
     private fun getTotalAllQuery(): String {
-        var query = ""
+        var query = queryText.value
         if (feedId.value.isNotEmpty()) {
             query += " feed_id:${feedId.value}"
         }
@@ -97,7 +99,7 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) : ISe
     }
 
     private fun getTotalTodayQuery(): String {
-        var query = "today:true"
+        var query = "${queryText.value} today:true"
         if (feedId.value.isNotEmpty()) {
             query += " feed_id:${feedId.value}"
         }
@@ -106,7 +108,7 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) : ISe
     }
 
     private fun getQuery(): String {
-        var query = "$queryText"
+        var query = queryText.value
         if (filterType == FeedEntryFilterType.TODAY) {
             query += " today:true"
         }

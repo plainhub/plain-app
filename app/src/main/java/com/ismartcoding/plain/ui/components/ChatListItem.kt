@@ -34,6 +34,7 @@ import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.ImagePreviewerState
 import com.ismartcoding.plain.ui.components.chat.ChatDate
 import com.ismartcoding.plain.ui.components.chat.ChatFiles
 import com.ismartcoding.plain.ui.components.chat.ChatImages
@@ -43,7 +44,6 @@ import com.ismartcoding.plain.ui.extensions.navigateChatEditText
 import com.ismartcoding.plain.ui.extensions.navigateChatText
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChatViewModel
-import com.ismartcoding.plain.ui.models.SharedViewModel
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.models.enterSelectMode
 import com.ismartcoding.plain.ui.models.select
@@ -54,13 +54,12 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 fun ChatListItem(
     navController: NavHostController,
     viewModel: ChatViewModel,
-    sharedViewModel: SharedViewModel,
     items: List<VChat>,
     m: VChat,
     index: Int,
     imageWidthDp: Dp,
-    imageWidthPx: Int,
     focusManager: FocusManager,
+    previewerState: ImagePreviewerState,
 ) {
     val showContextMenu = remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -109,11 +108,11 @@ fun ChatListItem(
                     ) {
                         when (m.type) {
                             DMessageType.IMAGES.value -> {
-                                ChatImages(context, navController, m, imageWidthDp, imageWidthPx)
+                                ChatImages(context, m, imageWidthDp, previewerState)
                             }
 
                             DMessageType.FILES.value -> {
-                                ChatFiles(context, navController, m)
+                                ChatFiles(context, navController, m, previewerState)
                             }
 
                             DMessageType.TEXT.value -> {

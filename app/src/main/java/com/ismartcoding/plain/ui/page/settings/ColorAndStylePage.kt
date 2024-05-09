@@ -61,6 +61,7 @@ import com.ismartcoding.plain.ui.base.DynamicSVGImage
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.components.ColorPickerDialog
@@ -93,8 +94,9 @@ fun ColorAndStylePage(navController: NavHostController) {
     var radioButtonSelected by remember { mutableIntStateOf(if (themeIndex > 4) 0 else 1) }
 
     PScaffold(
-        navController,
-        topBarTitle = stringResource(R.string.color_and_style),
+        topBar = {
+            PTopAppBar(navController = navController, title = stringResource(R.string.color_and_style))
+        },
         content = {
             LazyColumn {
                 item {

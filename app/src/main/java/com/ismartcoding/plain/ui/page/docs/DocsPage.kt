@@ -7,6 +7,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -22,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -35,7 +38,6 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.PermissionsResultEvent
-import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.preference.DocSortByPreference
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
@@ -49,8 +51,7 @@ import com.ismartcoding.plain.ui.base.PDropdownMenuItemSelect
 import com.ismartcoding.plain.ui.base.PDropdownMenuItemSort
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.RadioDialog
-import com.ismartcoding.plain.ui.base.RadioDialogOption
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
@@ -58,9 +59,13 @@ import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.DocItem
+import com.ismartcoding.plain.ui.components.FileSortDialog
+import com.ismartcoding.plain.ui.components.ListSearchBar
 import com.ismartcoding.plain.ui.models.DocsViewModel
+import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
+import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.ui.models.toggleSelectMode
 import com.ismartcoding.plain.ui.page.RouteName
@@ -68,7 +73,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun DocsPage(
     navController: NavHostController,
@@ -140,77 +145,85 @@ fun DocsPage(
     }
 
     if (viewModel.showSortDialog.value) {
-        RadioDialog(
-            title = stringResource(R.string.sort),
-            options =
-            FileSortBy.entries.map {
-                RadioDialogOption(
-                    text = stringResource(id = it.getTextId()),
-                    selected = it == viewModel.sortBy.value,
-                ) {
-                    scope.launch(Dispatchers.IO) {
-                        DocSortByPreference.putAsync(context, it)
-                        viewModel.sortBy.value = it
-                        viewModel.loadAsync(context)
-                    }
-                }
-            },
-        ) {
+        FileSortDialog(viewModel.sortBy, onSelected = {
+            scope.launch(Dispatchers.IO) {
+                DocSortByPreference.putAsync(context, it)
+                viewModel.sortBy.value = it
+                viewModel.loadAsync(context)
+            }
+        }, onDismiss = {
             viewModel.showSortDialog.value = false
-        }
+        })
     }
 
     PScaffold(
-        navController,
-        topBarTitle = pageTitle,
-        topBarOnDoubleClick = {
-            scope.launch {
-                scrollState.scrollToItem(0)
-            }
-        },
-        navigationIcon = {
-            if (viewModel.selectMode.value) {
-                NavigationCloseIcon {
-                    viewModel.exitSelectMode()
-                }
-            } else {
-                NavigationBackIcon {
-                    navController.popBackStack()
-                }
-            }
-        },
-        actions = {
-            if (!hasPermission) {
+        topBar = {
+            if (viewModel.showSearchBar.value) {
+                ListSearchBar(
+                    viewModel = viewModel,
+                    onSearch = {
+                        viewModel.searchActive.value = false
+                        viewModel.showLoading.value = true
+                        scope.launch(Dispatchers.IO) {
+                            viewModel.loadAsync(context)
+                        }
+                    }
+                )
                 return@PScaffold
             }
-            if (viewModel.selectMode.value) {
-                PMiniOutlineButton(
-                    text = stringResource(if (viewModel.isAllSelected()) R.string.unselect_all else R.string.select_all),
-                    onClick = {
-                        viewModel.toggleSelectAll()
-                    },
-                )
-                HorizontalSpace(dp = 8.dp)
-            } else {
-                ActionButtonSearch {
-                    navController.navigate("${RouteName.DOCS.name}/search?q=")
-                }
-                ActionButtonMoreWithMenu { dismiss ->
-                    PDropdownMenuItemSelect(onClick = {
-                        dismiss()
-                        viewModel.toggleSelectMode()
-                    })
-                    PDropdownMenuItemSort(onClick = {
-                        dismiss()
-                        viewModel.showSortDialog.value = true
-                    })
-                }
-            }
+            PTopAppBar(
+                modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = {
+                    scope.launch {
+                        scrollState.scrollToItem(0)
+                    }
+                }),
+                navController = navController,
+                navigationIcon = {
+                    if (viewModel.selectMode.value) {
+                        NavigationCloseIcon {
+                            viewModel.exitSelectMode()
+                        }
+                    } else {
+                        NavigationBackIcon {
+                            navController.popBackStack()
+                        }
+                    }
+                },
+                title = pageTitle,
+                actions = {
+                    if (!hasPermission) {
+                        return@PTopAppBar
+                    }
+                    if (viewModel.selectMode.value) {
+                        PMiniOutlineButton(
+                            text = stringResource(if (viewModel.isAllSelected()) R.string.unselect_all else R.string.select_all),
+                            onClick = {
+                                viewModel.toggleSelectAll()
+                            },
+                        )
+                        HorizontalSpace(dp = 8.dp)
+                    } else {
+                        ActionButtonSearch {
+                            viewModel.enterSearchMode()
+                        }
+                        ActionButtonMoreWithMenu { dismiss ->
+                            PDropdownMenuItemSelect(onClick = {
+                                dismiss()
+                                viewModel.toggleSelectMode()
+                            })
+                            PDropdownMenuItemSort(onClick = {
+                                dismiss()
+                                viewModel.showSortDialog.value = true
+                            })
+                        }
+                    }
 
+                },
+            )
         },
         bottomBar = {
             AnimatedVisibility(
-                visible = viewModel.selectMode.value,
+                visible = viewModel.showBottomActions(),
                 enter = slideInVertically { it },
                 exit = slideOutVertically { it }) {
                 FilesSelectModeBottomActions(viewModel)
@@ -255,7 +268,7 @@ fun DocsPage(
                         }
                     }
                 } else {
-                    NoDataColumn(loading = viewModel.showLoading.value)
+                    NoDataColumn(loading = viewModel.showLoading.value, search = viewModel.showSearchBar.value)
                 }
             }
         }

@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -61,6 +62,7 @@ import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
@@ -69,15 +71,18 @@ import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.FeedEntryListItem
+import com.ismartcoding.plain.ui.components.ListSearchBar
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.extensions.navigateTags
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
 import com.ismartcoding.plain.ui.models.select
+import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.ui.models.toggleSelectMode
 import com.ismartcoding.plain.ui.page.RouteName
@@ -203,67 +208,84 @@ fun FeedEntriesPage(
     }
 
     PScaffold(
-        navController,
-        topBarTitle = pageTitle,
-        topBarOnDoubleClick = {
-            scope.launch {
-                scrollState.scrollToItem(0)
-            }
-        },
-        navigationIcon = {
-            if (viewModel.selectMode.value) {
-                NavigationCloseIcon {
-                    viewModel.exitSelectMode()
-                }
-            } else {
-                NavigationBackIcon {
-                    navController.popBackStack()
-                }
-            }
-        },
-        actions = {
-            if (viewModel.selectMode.value) {
-                PMiniOutlineButton(
-                    text = stringResource(if (viewModel.isAllSelected()) R.string.unselect_all else R.string.select_all),
-                    onClick = {
-                        viewModel.toggleSelectAll()
-                    },
+        topBar = {
+            if (viewModel.showSearchBar.value) {
+                ListSearchBar(
+                    viewModel = viewModel,
+                    onSearch = {
+                        viewModel.searchActive.value = false
+                        viewModel.showLoading.value = true
+                        scope.launch(Dispatchers.IO) {
+                            viewModel.loadAsync(tagsViewModel)
+                        }
+                    }
                 )
-                HorizontalSpace(dp = 8.dp)
-            } else {
-                ActionButtonSearch {
-                    navController.navigate("${RouteName.FEED_ENTRIES.name}/search?q=")
-                }
-                if (viewModel.feedId.value.isEmpty()) {
-                    PIconButton(
-                        icon = Icons.Outlined.RssFeed,
-                        contentDescription = stringResource(R.string.subscriptions),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    ) {
-                        navController.navigate(RouteName.FEEDS)
-                    }
-                }
-                ActionButtonMoreWithMenu { dismiss ->
-                    PDropdownMenuItemSelect(onClick = {
-                        dismiss()
-                        viewModel.toggleSelectMode()
-                    })
-                    PDropdownMenuItemTags(onClick = {
-                        dismiss()
-                        navController.navigateTags(viewModel.dataType)
-                    })
-                    if (viewModel.feedId.value.isEmpty()) {
-                        PDropdownMenuItemSettings(onClick = {
-                            dismiss()
-                            navController.navigate(RouteName.FEED_SETTINGS)
-                        })
-                    }
-                }
+                return@PScaffold
             }
+            PTopAppBar(
+                modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = {
+                    scope.launch {
+                        scrollState.scrollToItem(0)
+                    }
+                }),
+                navController = navController,
+                navigationIcon = {
+                    if (viewModel.selectMode.value) {
+                        NavigationCloseIcon {
+                            viewModel.exitSelectMode()
+                        }
+                    } else {
+                        NavigationBackIcon {
+                            navController.popBackStack()
+                        }
+                    }
+                },
+                title = pageTitle,
+                actions = {
+                    if (viewModel.selectMode.value) {
+                        PMiniOutlineButton(
+                            text = stringResource(if (viewModel.isAllSelected()) R.string.unselect_all else R.string.select_all),
+                            onClick = {
+                                viewModel.toggleSelectAll()
+                            },
+                        )
+                        HorizontalSpace(dp = 8.dp)
+                    } else {
+                        ActionButtonSearch {
+                            viewModel.enterSearchMode()
+                        }
+                        if (viewModel.feedId.value.isEmpty()) {
+                            PIconButton(
+                                icon = Icons.Outlined.RssFeed,
+                                contentDescription = stringResource(R.string.subscriptions),
+                                tint = MaterialTheme.colorScheme.onSurface,
+                            ) {
+                                navController.navigate(RouteName.FEEDS)
+                            }
+                        }
+                        ActionButtonMoreWithMenu { dismiss ->
+                            PDropdownMenuItemSelect(onClick = {
+                                dismiss()
+                                viewModel.toggleSelectMode()
+                            })
+                            PDropdownMenuItemTags(onClick = {
+                                dismiss()
+                                navController.navigateTags(viewModel.dataType)
+                            })
+                            if (viewModel.feedId.value.isEmpty()) {
+                                PDropdownMenuItemSettings(onClick = {
+                                    dismiss()
+                                    navController.navigate(RouteName.FEED_SETTINGS)
+                                })
+                            }
+                        }
+                    }
+                }
+            )
         },
         bottomBar = {
             AnimatedVisibility(
-                visible = viewModel.selectMode.value,
+                visible = viewModel.showBottomActions(),
                 enter = slideInVertically { it },
                 exit = slideOutVertically { it }) {
                 SelectModeBottomActions(viewModel, tagsViewModel, tagsState)
@@ -309,7 +331,7 @@ fun FeedEntriesPage(
                                 viewModel.loadAsync(tagsViewModel)
                             }
                         },
-                        label = { Text(if (viewModel.feedId.value.isNotEmpty()) tag.name else "${tag.name} (${tag.count})") }
+                        label = { Text(if (viewModel.feedId.value.isNotEmpty() || viewModel.queryText.value.isNotEmpty()) tag.name else "${tag.name} (${tag.count})") }
                     )
                 }
             }
@@ -390,7 +412,7 @@ fun FeedEntriesPage(
                         }
                     }
                 } else {
-                    NoDataColumn(loading = viewModel.showLoading.value)
+                    NoDataColumn(loading = viewModel.showLoading.value, search = viewModel.showSearchBar.value)
                 }
             }
         }

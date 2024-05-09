@@ -51,7 +51,7 @@ fun ViewNoteBottomSheet(
         LazyColumn {
             item {
                 ActionButtons {
-                    if (!viewModel.search.value) {
+                    if (!viewModel.showSearchBar.value) {
                         PIconTextActionButton(
                             icon = Icons.Outlined.Checklist,
                             text = LocaleHelper.getString(R.string.select),
@@ -102,7 +102,7 @@ fun ViewNoteBottomSheet(
                     VerticalSpace(dp = 16.dp)
                     Subtitle(text = stringResource(id = R.string.tags))
                     TagSelector(
-                        id = m.id,
+                        data = m,
                         tagsViewModel = tagsViewModel,
                         tagsMap = tagsMap,
                         tagsState = tagsState,

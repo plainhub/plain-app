@@ -7,7 +7,6 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.saveable
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
@@ -20,7 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
-class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISelectableViewModel<DNote>, ViewModel() {
+class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchableViewModel<DNote>, ISelectableViewModel<DNote>, ViewModel() {
     private val _itemsFlow = MutableStateFlow(mutableStateListOf<DNote>())
     override val itemsFlow: StateFlow<List<DNote>> get() = _itemsFlow
     var showLoading = mutableStateOf(true)
@@ -32,9 +31,11 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
     var totalTrash = mutableIntStateOf(0)
     var tag = mutableStateOf<DTag?>(null)
     val dataType = DataType.NOTE
-    var queryText by savedStateHandle.saveable { mutableStateOf("") }
-    var search = mutableStateOf(false)
     var selectedItem = mutableStateOf<DNote?>(null)
+
+    override val showSearchBar = mutableStateOf(false)
+    override val searchActive = mutableStateOf(false)
+    override val queryText = mutableStateOf("")
 
     override var selectMode = mutableStateOf(false)
     override val selectedIds = mutableStateListOf<String>()
@@ -114,15 +115,15 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
     }
 
     private fun getTotalQuery(): String {
-        return "trash:false"
+        return "${queryText.value} trash:false"
     }
 
     private fun getTrashQuery(): String {
-        return "trash:true"
+        return "${queryText.value} trash:true"
     }
 
     private fun getQuery(): String {
-        var query = "$queryText trash:${trash.value}"
+        var query = "${queryText.value} trash:${trash.value}"
         if (tag.value != null) {
             val tagId = tag.value!!.id
             val ids = TagHelper.getKeysByTagId(tagId)

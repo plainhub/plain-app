@@ -6,9 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.automirrored.outlined.Notes
 import androidx.compose.material.icons.outlined.Apps
-import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material.icons.outlined.AudioFile
-import androidx.compose.material.icons.outlined.FileOpen
 import androidx.compose.material.icons.outlined.FilePresent
 import androidx.compose.material.icons.outlined.GraphicEq
 import androidx.compose.material.icons.outlined.Image
@@ -25,8 +23,8 @@ import com.ismartcoding.plain.ui.audio.AudiosDialog
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconTextButton
 import com.ismartcoding.plain.ui.extensions.navigate
+import com.ismartcoding.plain.ui.extensions.navigateImages
 import com.ismartcoding.plain.ui.file.FilesDialog
-import com.ismartcoding.plain.ui.image.ImagesDialog
 import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.video.VideosDialog
 
@@ -43,14 +41,7 @@ fun HomeFeatures(
                 stringResource(id = R.string.images),
                 modifier = Modifier.width(itemWidth),
             ) {
-                ImagesDialog().show()
-            }
-            PIconTextButton(
-                icon = Icons.Outlined.Image,
-                stringResource(id = R.string.images),
-                modifier = Modifier.width(itemWidth),
-            ) {
-                navController.navigate(RouteName.IMAGES)
+                navController.navigateImages()
             }
             PIconTextButton(
                 icon = Icons.Outlined.AudioFile,

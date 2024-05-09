@@ -73,10 +73,10 @@ fun PDropdownMenuItemSelect(onClick: () -> Unit) {
 
 @Composable
 fun PDropdownMenuItemCast(onClick: () -> Unit) {
-    PDropdownMenuItem(text = { Text(stringResource(R.string.cast)) }, leadingIcon = {
+    PDropdownMenuItem(text = { Text(stringResource(R.string.cast_mode)) }, leadingIcon = {
         Icon(
             Icons.Outlined.Cast,
-            contentDescription = stringResource(id = R.string.cast)
+            contentDescription = stringResource(id = R.string.cast_mode)
         )
     }, onClick = onClick)
 }

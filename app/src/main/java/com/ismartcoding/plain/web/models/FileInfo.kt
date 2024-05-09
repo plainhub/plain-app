@@ -13,6 +13,7 @@ data class Location(
 @Polymorphic
 @Serializable
 class FileInfo(
+    val path: String,
     val updatedAt: Instant,
     val size: Long,
     val tags: List<Tag>,

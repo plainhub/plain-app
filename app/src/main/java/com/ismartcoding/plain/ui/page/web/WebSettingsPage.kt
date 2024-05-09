@@ -68,6 +68,7 @@ import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PMainSwitch
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -146,37 +147,41 @@ fun WebSettingsPage(
             }
         }
 
-        PScaffold(navController, topBarTitle = stringResource(id = R.string.web_console), actions = {
-            PMiniOutlineButton(
-                text = stringResource(R.string.sessions),
-                onClick = {
-                    navController.navigate(RouteName.SESSIONS)
-                },
-            )
-            ActionButtonMoreWithMenu { dismiss ->
-                PDropdownMenuItem(leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Password,
-                        contentDescription = stringResource(id = R.string.security)
+        PScaffold(topBar = {
+            PTopAppBar(navController = navController,
+                title = stringResource(id = R.string.web_console),
+                actions = {
+                    PMiniOutlineButton(
+                        text = stringResource(R.string.sessions),
+                        onClick = {
+                            navController.navigate(RouteName.SESSIONS)
+                        },
                     )
-                }, onClick = {
-                    dismiss()
-                    navController.navigate(RouteName.WEB_SECURITY)
-                }, text = {
-                    Text(text = stringResource(R.string.security))
+                    ActionButtonMoreWithMenu { dismiss ->
+                        PDropdownMenuItem(leadingIcon = {
+                            Icon(
+                                Icons.Outlined.Password,
+                                contentDescription = stringResource(id = R.string.security)
+                            )
+                        }, onClick = {
+                            dismiss()
+                            navController.navigate(RouteName.WEB_SECURITY)
+                        }, text = {
+                            Text(text = stringResource(R.string.security))
+                        })
+                        PDropdownMenuItem(leadingIcon = {
+                            Icon(
+                                Icons.Outlined.DeveloperMode,
+                                contentDescription = stringResource(id = R.string.testing_token)
+                            )
+                        }, onClick = {
+                            dismiss()
+                            navController.navigate(RouteName.WEB_DEV)
+                        }, text = {
+                            Text(text = stringResource(R.string.testing_token))
+                        })
+                    }
                 })
-                PDropdownMenuItem(leadingIcon = {
-                    Icon(
-                        Icons.Outlined.DeveloperMode,
-                        contentDescription = stringResource(id = R.string.testing_token)
-                    )
-                }, onClick = {
-                    dismiss()
-                    navController.navigate(RouteName.WEB_DEV)
-                }, text = {
-                    Text(text = stringResource(R.string.testing_token))
-                })
-            }
         }, content = {
             LazyColumn {
                 item {

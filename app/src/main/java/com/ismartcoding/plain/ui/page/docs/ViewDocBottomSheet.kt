@@ -53,7 +53,7 @@ fun ViewDocBottomSheet(
     val scope = rememberCoroutineScope()
     val groupButtons = remember { mutableStateListOf<GroupButton>() }
     LaunchedEffect(Unit) {
-        if (!viewModel.search.value) {
+        if (!viewModel.showSearchBar.value) {
             groupButtons.add(
                 GroupButton(
                     icon = Icons.Outlined.Checklist,

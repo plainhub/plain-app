@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -39,7 +40,7 @@ fun TextFieldDialog(
 ) {
     val focusManager = LocalFocusManager.current
     AlertDialog(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         onDismissRequest = onDismissRequest,
         icon = {
             icon?.let {

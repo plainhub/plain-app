@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.ui.base.PSelectionChip
 import com.ismartcoding.plain.ui.components.NewTagButton
@@ -29,7 +30,7 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 fun BatchSelectTagsDialog(
     tagsViewModel: TagsViewModel,
     tagsState: List<DTag>,
-    ids: Set<String>,
+    items: List<IData>,
     removeFromTags: Boolean = false,
     onDismiss: () -> Unit,
 ) {
@@ -75,9 +76,9 @@ fun BatchSelectTagsDialog(
                 enabled = tagIds.isNotEmpty(),
                 onClick = {
                     if (removeFromTags) {
-                        tagsViewModel.removeFromTags(ids, tagIds.toSet())
+                        tagsViewModel.removeFromTags(items.map { it.id }.toSet(), tagIds.toSet())
                     } else {
-                        tagsViewModel.addToTags(ids, tagIds.toSet())
+                        tagsViewModel.addToTags(items, tagIds.toSet())
                     }
                     onDismiss()
                 },

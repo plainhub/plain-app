@@ -10,6 +10,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -35,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -57,19 +57,20 @@ import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.extensions.newPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.enums.PickFileTag
-import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.enums.PickFileTag
+import com.ismartcoding.plain.enums.PickFileType
+import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.features.DeleteChatItemViewEvent
 import com.ismartcoding.plain.features.PickFileResultEvent
-import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -78,6 +79,9 @@ import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.ImagePreviewer
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
@@ -87,9 +91,10 @@ import com.ismartcoding.plain.ui.file.FilesDialog
 import com.ismartcoding.plain.ui.file.FilesType
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChatViewModel
-import com.ismartcoding.plain.ui.models.SharedViewModel
+import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
+import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.web.HttpServerEvents
 import com.ismartcoding.plain.web.models.toModel
@@ -105,7 +110,6 @@ import java.io.File
 @Composable
 fun ChatPage(
     navController: NavHostController,
-    sharedViewModel: SharedViewModel,
     viewModel: ChatViewModel = viewModel(),
 ) {
     val view = LocalView.current
@@ -115,9 +119,7 @@ fun ChatPage(
     val scope = rememberCoroutineScope()
     var inputValue by remember { mutableStateOf("") }
     val configuration = LocalConfiguration.current
-    val density = LocalDensity.current
     val imageWidthDp = (configuration.screenWidthDp.dp - 74.dp) / 3
-    val imageWidthPx = with(density) { imageWidthDp.toPx().toInt() }
     val refreshState =
         rememberRefreshLayoutState {
             viewModel.fetch(context)
@@ -126,6 +128,16 @@ fun ChatPage(
     val scrollState = rememberLazyListState()
     val focusManager = LocalFocusManager.current
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
+    val previewerState = rememberPreviewerState(
+        pageCount = { MediaPreviewData.items.size },
+        getKey = { MediaPreviewData.items[it].id }
+    )
+
+    BackHandler(previewerState.visible) {
+        scope.launch {
+            previewerState.closeTransform()
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.fetch(context)
@@ -194,7 +206,7 @@ fun ChatPage(
                                         } else {
                                             FileHelper.copyFile(context, uri, dst)
                                         }
-                                        items.add(DMessageFile("app://$dir/${dst.getFilenameFromPath()}", size, dstFile.getDuration(context)))
+                                        items.add(DMessageFile(StringHelper.shortUUID(), "app://$dir/${dst.getFilenameFromPath()}", size, dstFile.getDuration(context)))
                                     } catch (ex: Exception) {
                                         // the picked file could be deleted
                                         DialogHelper.showMessage(ex)
@@ -266,47 +278,52 @@ fun ChatPage(
         stringResource(id = R.string.file_transfer_assistant)
     }
     PScaffold(
-        navController,
-        topBarTitle = pageTitle,
-        topBarOnDoubleClick = {
-            scope.launch {
-                scrollState.scrollToItem(0)
-            }
+        topBar = {
+            PTopAppBar(
+                modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = {
+                    scope.launch {
+                        scrollState.scrollToItem(0)
+                    }
+                }),
+                navController = navController,
+                navigationIcon = {
+                    if (viewModel.selectMode.value) {
+                        NavigationCloseIcon {
+                            viewModel.exitSelectMode()
+                        }
+                    } else {
+                        NavigationBackIcon {
+                            navController.popBackStack()
+                        }
+                    }
+                },
+                title = pageTitle,
+                actions = {
+                    if (viewModel.selectMode.value) {
+                        PMiniOutlineButton(
+                            text = stringResource(if (viewModel.isAllSelected()) R.string.unselect_all else R.string.select_all),
+                            onClick = {
+                                viewModel.toggleSelectAll()
+                            },
+                        )
+                        HorizontalSpace(dp = 8.dp)
+                    } else {
+                        PIconButton(
+                            icon = Icons.Outlined.Folder,
+                            contentDescription = stringResource(R.string.folder),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            onClick = {
+                                FilesDialog(FilesType.APP).show()
+                            },
+                        )
+                    }
+                },
+            )
         },
-        navigationIcon = {
-            if (viewModel.selectMode.value) {
-                NavigationCloseIcon {
-                    viewModel.exitSelectMode()
-                }
-            } else {
-                NavigationBackIcon {
-                    navController.popBackStack()
-                }
-            }
-        },
-        actions = {
-            if (viewModel.selectMode.value) {
-                PMiniOutlineButton(
-                    text = stringResource(if (viewModel.isAllSelected()) R.string.unselect_all else R.string.select_all),
-                    onClick = {
-                        viewModel.toggleSelectAll()
-                    },
-                )
-                HorizontalSpace(dp = 8.dp)
-            } else {
-                PIconButton(
-                    icon = Icons.Outlined.Folder,
-                    contentDescription = stringResource(R.string.folder),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    onClick = {
-                        FilesDialog(FilesType.APP).show()
-                    },
-                )
-            }
-        },
+
         bottomBar = {
             AnimatedVisibility(
-                visible = viewModel.selectMode.value,
+                visible = viewModel.showBottomActions(),
                 enter = slideInVertically { it },
                 exit = slideOutVertically { it }) {
                 SelectModeBottomActions(viewModel)
@@ -336,13 +353,12 @@ fun ChatPage(
                             ChatListItem(
                                 navController = navController,
                                 viewModel = viewModel,
-                                sharedViewModel = sharedViewModel,
                                 itemsState.value,
                                 m = m,
                                 index = index,
                                 imageWidthDp = imageWidthDp,
-                                imageWidthPx = imageWidthPx,
-                                focusManager = focusManager
+                                focusManager = focusManager,
+                                previewerState = previewerState,
                             )
                         }
                     }
@@ -381,4 +397,5 @@ fun ChatPage(
             }
         },
     )
+    ImagePreviewer(state = previewerState)
 }

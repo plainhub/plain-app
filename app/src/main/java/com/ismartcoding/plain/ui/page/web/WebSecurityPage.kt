@@ -55,6 +55,7 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -82,8 +83,9 @@ fun WebSecurityPage(navController: NavHostController) {
         }
 
         PScaffold(
-            navController,
-            topBarTitle = stringResource(R.string.security),
+            topBar = {
+                PTopAppBar(navController = navController, title = stringResource(R.string.security))
+            },
             content = {
                 LazyColumn {
                     item {

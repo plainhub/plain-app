@@ -2,11 +2,6 @@ package com.ismartcoding.plain
 
 import android.app.Application
 import android.os.Build
-import coil.ImageLoader
-import coil.ImageLoaderFactory
-import coil.decode.SvgDecoder
-import coil.disk.DiskCache
-import coil.memory.MemoryCache
 import com.ismartcoding.lib.brv.utils.BRV
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
@@ -40,31 +35,7 @@ import com.ismartcoding.plain.workers.FeedFetchWorker
 import dalvik.system.ZipPathValidator
 import kotlinx.coroutines.flow.first
 
-class MainApp : Application(), ImageLoaderFactory {
-    override fun newImageLoader(): ImageLoader {
-        val memoryPercent = if (activityManager.isLowRamDevice) 0.25 else 0.75
-        return ImageLoader.Builder(this)
-            .components {
-                add(SvgDecoder.Factory(false))
-            }
-            .memoryCache {
-                MemoryCache.Builder(this)
-                    .maxSizePercent(percent = memoryPercent)
-                    .build()
-            }
-            .diskCache {
-                DiskCache.Builder()
-                    .directory(cacheDir.resolve("image_cache").absoluteFile)
-                    .maxSizePercent(1.0)
-                    .build()
-            }
-            .crossfade(100)
-            // Ignore the network cache headers and always read from/write to the disk cache.
-            .respectCacheHeaders(false)
-            .allowRgb565(true)
-            .build()
-    }
-
+class MainApp : Application() {
     override fun onCreate() {
         super.onCreate()
 

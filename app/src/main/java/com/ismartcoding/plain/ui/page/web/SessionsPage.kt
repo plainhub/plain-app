@@ -36,6 +36,7 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwipeBox
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.SwipeActionButton
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -53,7 +54,6 @@ fun SessionsPage(
     navController: NavHostController,
     viewModel: SessionsViewModel = viewModel(),
 ) {
-    val context = LocalContext.current
     val itemsState by viewModel.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
 
@@ -68,8 +68,12 @@ fun SessionsPage(
     }
 
     PScaffold(
-        navController,
-        topBarTitle = stringResource(id = R.string.sessions),
+        topBar = {
+            PTopAppBar(
+                navController = navController,
+                title = stringResource(id = R.string.sessions),
+            )
+        },
         content = {
             TopSpace()
             PullToRefresh(refreshLayoutState = refreshState) {

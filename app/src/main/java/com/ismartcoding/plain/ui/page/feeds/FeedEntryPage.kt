@@ -4,6 +4,7 @@ package com.ismartcoding.plain.ui.page.feeds
 import android.annotation.SuppressLint
 import android.content.ClipData
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -63,6 +64,7 @@ import com.ismartcoding.plain.ui.base.PClickableText
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.markdowntext.MarkdownText
@@ -134,81 +136,89 @@ fun FeedEntryPage(
     }
 
     if (viewModel.showSelectTagsDialog.value) {
-        SelectTagsDialog(tagsViewModel, tagsState, tagsMapState, id = id) {
-            viewModel.showSelectTagsDialog.value = false
+        val m = viewModel.item.value
+        if (m != null) {
+            SelectTagsDialog(tagsViewModel, tagsState, tagsMapState, data = m) {
+                viewModel.showSelectTagsDialog.value = false
+            }
         }
     }
 
     PScaffold(
-        navController,
-        topBarOnDoubleClick = {
-            scope.launch {
-                scrollState.scrollToItem(0)
-            }
+        topBar = {
+            PTopAppBar(
+                modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = {
+                    scope.launch {
+                        scrollState.scrollToItem(0)
+                    }
+                }),
+                navController = navController,
+                title = "",
+                actions = {
+                    PIconButton(
+                        icon = Icons.AutoMirrored.Outlined.Label,
+                        contentDescription = stringResource(R.string.select_tags),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    ) {
+                        viewModel.showSelectTagsDialog.value = true
+                    }
+                    PIconButton(
+                        icon = Icons.Outlined.Share,
+                        contentDescription = stringResource(R.string.share),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    ) {
+                        val m = viewModel.item.value ?: return@PIconButton
+                        ShareHelper.shareText(context, m.title.let { it + "\n" } + m.url)
+                    }
+                    ActionButtonMoreWithMenu { dismiss ->
+                        PDropdownMenuItem(text = { Text(stringResource(R.string.open_in_web)) }, leadingIcon = {
+                            Icon(
+                                Icons.Outlined.OpenInBrowser,
+                                contentDescription = stringResource(id = R.string.open_in_web)
+                            )
+                        }, onClick = {
+                            dismiss()
+                            val m = viewModel.item.value ?: return@PDropdownMenuItem
+                            WebHelper.open(context, m.url)
+                        })
+                        PDropdownMenuItem(text = { Text(stringResource(R.string.save_to_notes)) }, leadingIcon = {
+                            Icon(
+                                Icons.Outlined.SaveAs,
+                                contentDescription = stringResource(id = R.string.save_to_notes)
+                            )
+                        }, onClick = {
+                            dismiss()
+                            val m = viewModel.item.value ?: return@PDropdownMenuItem
+                            scope.launch(Dispatchers.IO) {
+                                val c = "# ${m.title}\n\n" + m.content.ifEmpty { m.description }
+                                NoteHelper.saveToNotesAsync(m.id) {
+                                    title = c.cut(100).replace("\n", "")
+                                    content = c
+                                }
+                                DialogHelper.showMessage(R.string.saved)
+                            }
+                        })
+                        PDropdownMenuItem(text = { Text(stringResource(R.string.copy_link)) }, leadingIcon = {
+                            Icon(
+                                Icons.Outlined.Link,
+                                contentDescription = stringResource(id = R.string.copy_link)
+                            )
+                        }, onClick = {
+                            dismiss()
+                            val m = viewModel.item.value ?: return@PDropdownMenuItem
+                            val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), m.url)
+                            clipboardManager.setPrimaryClip(clip)
+                            DialogHelper.showTextCopiedMessage(m.url)
+                        })
+                    }
+                },
+            )
         },
         modifier = Modifier
             .fillMaxSize()
             //.nestedScroll(scrollBehavior.nestedScrollConnection)
             .imePadding(),
         // scrollBehavior = scrollBehavior,
-        actions = {
-            PIconButton(
-                icon = Icons.AutoMirrored.Outlined.Label,
-                contentDescription = stringResource(R.string.select_tags),
-                tint = MaterialTheme.colorScheme.onSurface,
-            ) {
-                viewModel.showSelectTagsDialog.value = true
-            }
-            PIconButton(
-                icon = Icons.Outlined.Share,
-                contentDescription = stringResource(R.string.share),
-                tint = MaterialTheme.colorScheme.onSurface,
-            ) {
-                val m = viewModel.item.value ?: return@PIconButton
-                ShareHelper.shareText(context, m.title.let { it + "\n" } + m.url)
-            }
-            ActionButtonMoreWithMenu { dismiss ->
-                PDropdownMenuItem(text = { Text(stringResource(R.string.open_in_web)) }, leadingIcon = {
-                    Icon(
-                        Icons.Outlined.OpenInBrowser,
-                        contentDescription = stringResource(id = R.string.open_in_web)
-                    )
-                }, onClick = {
-                    dismiss()
-                    val m = viewModel.item.value ?: return@PDropdownMenuItem
-                    WebHelper.open(context, m.url)
-                })
-                PDropdownMenuItem(text = { Text(stringResource(R.string.save_to_notes)) }, leadingIcon = {
-                    Icon(
-                        Icons.Outlined.SaveAs,
-                        contentDescription = stringResource(id = R.string.save_to_notes)
-                    )
-                }, onClick = {
-                    dismiss()
-                    val m = viewModel.item.value ?: return@PDropdownMenuItem
-                    scope.launch(Dispatchers.IO) {
-                        val c = "# ${m.title}\n\n" + m.content.ifEmpty { m.description }
-                        NoteHelper.saveToNotesAsync(m.id) {
-                            title = c.cut(100).replace("\n", "")
-                            content = c
-                        }
-                        DialogHelper.showMessage(R.string.saved)
-                    }
-                })
-                PDropdownMenuItem(text = { Text(stringResource(R.string.copy_link)) }, leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Link,
-                        contentDescription = stringResource(id = R.string.copy_link)
-                    )
-                }, onClick = {
-                    dismiss()
-                    val m = viewModel.item.value ?: return@PDropdownMenuItem
-                    val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), m.url)
-                    clipboardManager.setPrimaryClip(clip)
-                    DialogHelper.showTextCopiedMessage(m.url)
-                })
-            }
-        },
         content = {
             val m = viewModel.item.value ?: return@PScaffold
             PullToRefresh(

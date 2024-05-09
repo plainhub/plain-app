@@ -21,6 +21,7 @@ import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -37,8 +38,12 @@ fun DarkThemePage(navController: NavHostController) {
     val scope = rememberCoroutineScope()
 
     PScaffold(
-        navController,
-        topBarTitle = stringResource(R.string.dark_theme),
+        topBar = {
+            PTopAppBar(
+                navController = navController,
+                title = stringResource(R.string.dark_theme),
+            )
+        },
         content = {
             LazyColumn {
                 item {

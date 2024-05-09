@@ -20,11 +20,10 @@ import com.ismartcoding.lib.helpers.SslHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.preference.ChatGPTApiKeyPreference
 import com.ismartcoding.plain.db.DAIChat
-import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.enums.ActionSourceType
 import com.ismartcoding.plain.enums.ActionType
+import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.enums.PickFileTag
@@ -32,12 +31,13 @@ import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.powerManager
+import com.ismartcoding.plain.preference.ChatGPTApiKeyPreference
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.web.AuthRequest
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import com.ismartcoding.plain.web.websocket.WebSocketHelper
-import io.ktor.server.websocket.*
+import io.ktor.server.websocket.DefaultWebSocketServerSession
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import kotlin.time.Duration.Companion.seconds

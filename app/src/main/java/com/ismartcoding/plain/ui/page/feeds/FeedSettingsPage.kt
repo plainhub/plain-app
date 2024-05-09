@@ -31,6 +31,7 @@ import com.ismartcoding.plain.ui.base.PDialogRadioRow
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.RadioDialog
 import com.ismartcoding.plain.ui.base.RadioDialogOption
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -46,7 +47,6 @@ fun FeedSettingsPage(
     viewModel: FeedSettingsViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         viewModel.loadSettings(context)
     }
@@ -76,8 +76,9 @@ fun FeedSettingsPage(
     }
 
     PScaffold(
-        navController,
-        topBarTitle = stringResource(id = R.string.settings),
+        topBar = {
+            PTopAppBar(navController = navController, title = stringResource(id = R.string.settings))
+        },
     ) {
         LazyColumn {
             item {
@@ -141,7 +142,6 @@ fun ClearFeedsDialog(
     viewModel: FeedSettingsViewModel,
 ) {
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     AlertDialog(
         onDismissRequest = {
             viewModel.showClearFeedsDialog.value = false

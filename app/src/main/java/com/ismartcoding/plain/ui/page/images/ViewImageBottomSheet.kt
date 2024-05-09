@@ -87,8 +87,8 @@ fun ViewImageBottomSheet(
         scope.launch(Dispatchers.IO) {
             if (m.path.endsWith(".svg", true)) {
                 val size = SvgHelper.getSize(m.path)
-                width = size.width
-                height = size.height
+                width = size.width.toInt()
+                height = size.height.toInt()
             }
         }
     }
@@ -110,7 +110,7 @@ fun ViewImageBottomSheet(
         LazyColumn {
             item {
                 ActionButtons {
-                    if (!viewModel.search.value) {
+                    if (!viewModel.showSearchBar.value) {
                         PIconTextActionButton(
                             icon = Icons.Outlined.Checklist,
                             text = LocaleHelper.getString(R.string.select),
@@ -153,7 +153,7 @@ fun ViewImageBottomSheet(
                     VerticalSpace(dp = 16.dp)
                     Subtitle(text = stringResource(id = R.string.tags))
                     TagSelector(
-                        id = m.id,
+                        data = m,
                         tagsViewModel = tagsViewModel,
                         tagsMap = tagsMap,
                         tagsState = tagsState,

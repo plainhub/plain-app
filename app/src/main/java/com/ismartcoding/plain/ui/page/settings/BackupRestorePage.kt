@@ -20,6 +20,7 @@ import com.ismartcoding.plain.extensions.formatName
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PBlockButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
 import com.ismartcoding.plain.ui.models.BackupRestoreViewModel
@@ -52,8 +53,9 @@ fun BackupRestorePage(
         }
 
     PScaffold(
-        navController,
-        topBarTitle = stringResource(R.string.backup_restore),
+        topBar = {
+            PTopAppBar(navController = navController, title = stringResource(R.string.backup_restore))
+        },
         content = {
             LazyColumn {
                 item {

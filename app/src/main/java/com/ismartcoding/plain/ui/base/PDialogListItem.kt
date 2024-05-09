@@ -32,6 +32,7 @@ import com.ismartcoding.plain.ui.theme.palette.onDark
 @OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun PDialogListItem(
+    modifier: Modifier = Modifier,
     title: String,
     desc: String? = null,
     value: String? = null,
@@ -41,11 +42,10 @@ fun PDialogListItem(
     action: (@Composable () -> Unit)? = null,
 ) {
     val tonalPalettes = LocalTonalPalettes.current
-    val context = LocalContext.current
 
     Row(
         modifier =
-        Modifier
+        modifier
             .fillMaxWidth()
             .padding(0.dp, 8.dp, 8.dp, 8.dp),
         verticalAlignment = Alignment.CenterVertically,

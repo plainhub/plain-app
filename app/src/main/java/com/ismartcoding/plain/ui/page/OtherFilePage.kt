@@ -30,6 +30,7 @@ import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.PBlockButton
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import java.io.File
 
@@ -44,15 +45,20 @@ fun OtherFilePage(
     val file = File(path)
 
     PScaffold(
-        navController,
-        actions = {
-            PIconButton(
-                icon = Icons.Outlined.Share,
-                contentDescription = stringResource(R.string.share),
-                tint = MaterialTheme.colorScheme.onSurface,
-            ) {
-                ShareHelper.shareFile(context, File(path))
-            }
+        topBar = {
+            PTopAppBar(
+                navController = navController,
+                title = file.name,
+                actions = {
+                    PIconButton(
+                        icon = Icons.Outlined.Share,
+                        contentDescription = stringResource(R.string.share),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    ) {
+                        ShareHelper.shareFile(context, File(path))
+                    }
+                },
+            )
         },
         content = {
             LazyColumn {

@@ -2,18 +2,20 @@ package com.ismartcoding.lib.extensions
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.drawable.PictureDrawable
 import android.media.MediaMetadataRetriever
 import android.media.ThumbnailUtils
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Size
+import androidx.core.graphics.drawable.toBitmap
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
 import com.bumptech.glide.load.resource.bitmap.Downsampler
 import com.bumptech.glide.request.RequestOptions
+import com.caverock.androidsvg.SVG
 import com.ismartcoding.lib.isQPlus
-import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.logcat.LogCat
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -61,6 +63,13 @@ fun File.getBitmapAsync(
     centerCrop: Boolean = true,
     mediaId: String = ""
 ): Bitmap? {
+    if (path.endsWith(".svg", true)) {
+        val svg = SVG.getFromString(readText())
+        val picture = svg.renderToPicture(width, height)
+        val drawable = PictureDrawable(picture)
+        return drawable.toBitmap(width, height)
+    }
+
     var bitmap: Bitmap? = null
     if (isQPlus() && this.path.isVideoFast()) {
         val contentUri = if (mediaId.isNotEmpty()) context.getMediaContentUri(path, mediaId) else context.getMediaContentUri(path)

@@ -2,6 +2,9 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">உங்கள் உலாவியில் தற்போது VPN செல்லுபடி உள்ளது, இது பிரச்சனைகளைக் கொண்டுவரலாம் பாராட்டும் நேரத்தில். இதை தீர்மானிக்க, உங்கள் VPN அமைப்புகளை LAN பரிமாறத்தை அனுமதிக்க அல்லது உங்கள் VPN முடக்குதலை கொண்டுவிடுவதை பரிந்துரைக்கிறோம்.</string>
     <string name="warning">எச்சரிக்கை</string>
+    <string name="resolution">தீர்வு</string>
+    <string name="dimensions">அளவுகள்</string>
+    <string name="select_a_device">ஒரு சாதனத்தைத் தேர்ந்தெடு</string>
     <string name="taken_at">எடுத்துக்காட்டப்பட்டது</string>
     <string name="published_at">வெளியிடப்பட்டது</string>
     <string name="older_than_7days_feed_items">7 நாட்களுக்கு மேல்</string>

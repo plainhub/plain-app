@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.base
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
@@ -22,7 +23,7 @@ fun RadioDialog(
     onDismissRequest: () -> Unit = {},
 ) {
     AlertDialog(
-        modifier = modifier,
+        modifier = modifier.fillMaxWidth(),
         onDismissRequest = onDismissRequest,
         title = {
             Text(

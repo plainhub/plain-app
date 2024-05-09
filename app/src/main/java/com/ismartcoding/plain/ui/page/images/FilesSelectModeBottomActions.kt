@@ -11,6 +11,7 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +30,7 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.exitSelectMode
+import com.ismartcoding.plain.ui.models.getSelectedItems
 import com.ismartcoding.plain.ui.page.tags.BatchSelectTagsDialog
 import com.ismartcoding.plain.ui.theme.bottomAppBarContainer
 
@@ -48,7 +50,7 @@ fun FilesSelectModeBottomActions(
     }
 
     if (showSelectTagsDialog) {
-        BatchSelectTagsDialog(tagsViewModel, tagsState, viewModel.selectedIds.toSet(), removeFromTags) {
+        BatchSelectTagsDialog(tagsViewModel, tagsState, viewModel.getSelectedItems(), removeFromTags) {
             showSelectTagsDialog = false
             viewModel.exitSelectMode()
         }

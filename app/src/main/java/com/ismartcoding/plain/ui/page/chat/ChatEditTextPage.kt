@@ -33,6 +33,7 @@ import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
@@ -50,40 +51,43 @@ fun ChatEditTextPage(
     val focusManager = LocalFocusManager.current
 
     PScaffold(
-        navController,
-        topBarTitle = stringResource(id = R.string.edit_text),
-        actions = {
-            PIconButton(
-                icon = Icons.Outlined.Save,
-                contentDescription = stringResource(R.string.save),
-                tint = MaterialTheme.colorScheme.onSurface,
-            ) {
-                if (inputValue.isNotEmpty()) {
-                    scope.launch {
-                        val update = ChatItemDataUpdate(id, DMessageContent(DMessageType.TEXT.value, DMessageText(inputValue)))
-                        withIO {
-                            AppDatabase.instance.chatDao().updateData(update)
-                        }
-                        val c = withIO { AppDatabase.instance.chatDao().getById(id) }
-                        if (c != null) {
-                            sendEvent(
-                                WebSocketEvent(
-                                    EventType.MESSAGE_UPDATED,
-                                    JsonHelper.jsonEncode(
-                                        listOf(
-                                            c.toModel().apply {
-                                                data = this.getContentData()
-                                            },
+        topBar = {
+            PTopAppBar(
+                navController = navController,
+                title = stringResource(id = R.string.edit_text),
+                actions = {
+                    PIconButton(
+                        icon = Icons.Outlined.Save,
+                        contentDescription = stringResource(R.string.save),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    ) {
+                        if (inputValue.isNotEmpty()) {
+                            scope.launch {
+                                val update = ChatItemDataUpdate(id, DMessageContent(DMessageType.TEXT.value, DMessageText(inputValue)))
+                                withIO {
+                                    AppDatabase.instance.chatDao().updateData(update)
+                                }
+                                val c = withIO { AppDatabase.instance.chatDao().getById(id) }
+                                if (c != null) {
+                                    sendEvent(
+                                        WebSocketEvent(
+                                            EventType.MESSAGE_UPDATED,
+                                            JsonHelper.jsonEncode(
+                                                listOf(
+                                                    c.toModel().apply {
+                                                        data = this.getContentData()
+                                                    },
+                                                ),
+                                            ),
                                         ),
-                                    ),
-                                ),
-                            )
+                                    )
+                                }
+                                focusManager.clearFocus()
+                                navController.popBackStack()
+                            }
                         }
-                        focusManager.clearFocus()
-                        navController.popBackStack()
                     }
-                }
-            }
+                })
         },
         content = {
             OutlinedTextField(

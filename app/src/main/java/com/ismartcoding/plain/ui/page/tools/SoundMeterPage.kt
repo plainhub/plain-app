@@ -159,16 +159,20 @@ fun SoundMeterPage(navController: NavHostController) {
     }
 
     PScaffold(
-        navController,
-        topBarTitle = stringResource(id = R.string.sound_meter),
-        actions = {
-            PIconButton(
-                icon = Icons.Outlined.Info,
-                contentDescription = stringResource(R.string.decibel_values),
-                tint = MaterialTheme.colorScheme.onSurface,
-            ) {
-                decibelValuesDialogVisible = true
-            }
+        topBar = {
+            PTopAppBar(
+                navController = navController,
+                title = stringResource(id = R.string.sound_meter),
+                actions = {
+                    PIconButton(
+                        icon = Icons.Outlined.Info,
+                        contentDescription = stringResource(R.string.decibel_values),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    ) {
+                        decibelValuesDialogVisible = true
+                    }
+                },
+            )
         },
         content = {
             LazyColumn {

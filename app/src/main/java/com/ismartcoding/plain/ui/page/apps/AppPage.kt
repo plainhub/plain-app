@@ -59,6 +59,7 @@ import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PIconTextActionButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.rememberLifecycleEvent
@@ -144,16 +145,20 @@ fun AppPage(
     }
 
     PScaffold(
-        navController,
-        topBarTitle = item?.name ?: "",
-        actions = {
-            PIconButton(
-                icon = Icons.Outlined.Share,
-                contentDescription = stringResource(R.string.share),
-                tint = MaterialTheme.colorScheme.onSurface,
-            ) {
-                ShareHelper.shareFile(context, File(item?.path ?: ""))
-            }
+        topBar = {
+            PTopAppBar(
+                navController = navController,
+                title = item?.name ?: "",
+                actions = {
+                    PIconButton(
+                        icon = Icons.Outlined.Share,
+                        contentDescription = stringResource(R.string.share),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    ) {
+                        ShareHelper.shareFile(context, File(item?.path ?: ""))
+                    }
+                },
+            )
         },
         content = {
             if (item == null) {

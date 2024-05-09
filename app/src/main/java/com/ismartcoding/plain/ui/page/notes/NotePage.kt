@@ -50,21 +50,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.TagHelper
-import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.ui.base.ActionButtonTags
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.markdowntext.MarkdownText
 import com.ismartcoding.plain.ui.base.mdeditor.MdEditor
@@ -120,6 +120,7 @@ fun NotePage(
             if (id.isNotEmpty()) {
                 val item = NoteHelper.getById(id)
                 tagsViewModel.loadAsync(setOf(id))
+                viewModel.item.value = item
                 viewModel.content = item?.content ?: ""
                 mdEditorViewModel.textFieldState.edit {
                     append(viewModel.content)
@@ -191,54 +192,63 @@ fun NotePage(
     }
 
     if (viewModel.showSelectTagsDialog.value) {
-        SelectTagsDialog(tagsViewModel, tagsState, tagsMapState, id = id) {
-            viewModel.showSelectTagsDialog.value = false
+        val m = viewModel.item.value
+        if (m != null) {
+            SelectTagsDialog(tagsViewModel, tagsState, tagsMapState, data = m) {
+                viewModel.showSelectTagsDialog.value = false
+            }
         }
     }
     PScaffold(
-        navController,
+        topBar = {
+            PTopAppBar(
+                navController = navController,
+                title = "",
+                actions = {
+                    if (viewModel.editMode) {
+                        PIconButton(
+                            icon = Icons.AutoMirrored.Outlined.Undo,
+                            contentDescription = stringResource(id = R.string.undo),
+                            enabled = mdEditorViewModel.textFieldState.undoState.canUndo,
+                            tint = MaterialTheme.colorScheme.onSurface
+                        ) {
+                            mdEditorViewModel.textFieldState.undoState.undo()
+                        }
+                        PIconButton(
+                            icon = Icons.AutoMirrored.Outlined.Redo,
+                            contentDescription = stringResource(id = R.string.redo),
+                            enabled = mdEditorViewModel.textFieldState.undoState.canRedo,
+                            tint = MaterialTheme.colorScheme.onSurface
+                        ) {
+                            mdEditorViewModel.textFieldState.undoState.redo()
+                        }
+
+                        PIconButton(
+                            icon = Icons.AutoMirrored.Outlined.WrapText,
+                            contentDescription = stringResource(R.string.wrap_content),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        ) {
+                            mdEditorViewModel.toggleWrapContent(context)
+                        }
+                    } else if (id.isNotEmpty()) {
+                        ActionButtonTags {
+                            viewModel.showSelectTagsDialog.value = true
+                        }
+                    }
+                    PIconButton(
+                        icon = if (viewModel.editMode) painterResource(id = R.drawable.ic_markdown) else Icons.Outlined.Edit,
+                        contentDescription = stringResource(if (viewModel.editMode) R.string.view else R.string.edit),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    ) {
+                        viewModel.editMode = !viewModel.editMode
+                    }
+                },
+            )
+        },
         modifier = Modifier
             .fillMaxSize()
             .imePadding(),
-        actions = {
-            if (viewModel.editMode) {
-                PIconButton(
-                    icon = Icons.AutoMirrored.Outlined.Undo,
-                    contentDescription = stringResource(id = R.string.undo),
-                    enabled = mdEditorViewModel.textFieldState.undoState.canUndo,
-                    tint = MaterialTheme.colorScheme.onSurface
-                ) {
-                    mdEditorViewModel.textFieldState.undoState.undo()
-                }
-                PIconButton(
-                    icon = Icons.AutoMirrored.Outlined.Redo,
-                    contentDescription = stringResource(id = R.string.redo),
-                    enabled = mdEditorViewModel.textFieldState.undoState.canRedo,
-                    tint = MaterialTheme.colorScheme.onSurface
-                ) {
-                    mdEditorViewModel.textFieldState.undoState.redo()
-                }
 
-                PIconButton(
-                    icon = Icons.AutoMirrored.Outlined.WrapText,
-                    contentDescription = stringResource(R.string.wrap_content),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                ) {
-                    mdEditorViewModel.toggleWrapContent(context)
-                }
-            } else if (id.isNotEmpty()) {
-                ActionButtonTags {
-                    viewModel.showSelectTagsDialog.value = true
-                }
-            }
-            PIconButton(
-                icon = if (viewModel.editMode) painterResource(id = R.drawable.ic_markdown) else Icons.Outlined.Edit,
-                contentDescription = stringResource(if (viewModel.editMode) R.string.view else R.string.edit),
-                tint = MaterialTheme.colorScheme.onSurface,
-            ) {
-                viewModel.editMode = !viewModel.editMode
-            }
-        },
         bottomBar = {
             AnimatedVisibility(
                 visible = viewModel.editMode,

@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.ui.base.PSelectionChip
@@ -20,7 +21,7 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TagSelector(
-    id: String,
+    data: IData,
     tagsViewModel: TagsViewModel,
     tagsMap: Map<String, List<DTagRelation>>,
     tagsState: List<DTag>,
@@ -29,7 +30,7 @@ fun TagSelector(
         mutableStateListOf<String>()
     }
     LaunchedEffect(Unit) {
-        tagIds.addAll(tagsMap[id]?.map { it.tagId } ?: emptyList())
+        tagIds.addAll(tagsMap[data.id]?.map { it.tagId } ?: emptyList())
     }
     TagNameDialog(tagsViewModel)
     FlowRow(
@@ -44,7 +45,7 @@ fun TagSelector(
             PSelectionChip(
                 selected = tagIds.contains(tag.id),
                 onClick = {
-                    tagsViewModel.toggleTag(id, tag.id)
+                    tagsViewModel.toggleTag(data, tag.id)
                     if (tagIds.contains(tag.id)) {
                         tagIds.remove(tag.id)
                     } else {
