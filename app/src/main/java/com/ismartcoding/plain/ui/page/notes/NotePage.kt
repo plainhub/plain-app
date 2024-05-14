@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.page.notes
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -69,6 +70,8 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.markdowntext.MarkdownText
 import com.ismartcoding.plain.ui.base.mdeditor.MdEditor
 import com.ismartcoding.plain.ui.base.mdeditor.MdEditorBottomAppBar
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.ImagePreviewer
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.extensions.setSelection
 import com.ismartcoding.plain.ui.models.MdEditorViewModel
 import com.ismartcoding.plain.ui.models.NoteViewModel
@@ -104,6 +107,7 @@ fun NotePage(
     var id by remember {
         mutableStateOf(initId)
     }
+    val previewerState = rememberPreviewerState()
     val tagsState by tagsViewModel.itemsFlow.collectAsState()
     val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
     val mdListState = rememberLazyListState()
@@ -162,6 +166,12 @@ fun NotePage(
     DisposableEffect(Unit) {
         onDispose {
             insetsController.show(WindowInsetsCompat.Type.navigationBars())
+        }
+    }
+
+    BackHandler(previewerState.visible) {
+        scope.launch {
+            previewerState.close()
         }
     }
 
@@ -289,6 +299,7 @@ fun NotePage(
                         MarkdownText(
                             text = viewModel.content,
                             modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                            previewerState = previewerState,
                         )
                     }
                     item {
@@ -299,4 +310,6 @@ fun NotePage(
 
         },
     )
+
+    ImagePreviewer(state = previewerState)
 }

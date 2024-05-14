@@ -27,12 +27,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import coil3.compose.AsyncImage
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.theme.palette.LocalTonalPalettes
 import com.ismartcoding.plain.ui.theme.palette.onDark
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PListItem(
     modifier: Modifier = Modifier,
@@ -86,7 +86,7 @@ fun PListItem(
                         contentDescription = title,
                     )
                 } else if (icon is String) {
-                    PGlideImage(
+                    AsyncImage(
                         model = icon,
                         contentDescription = title,
                         modifier = Modifier

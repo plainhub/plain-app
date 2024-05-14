@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.extensions.markdown
 
 @Composable
@@ -18,11 +19,12 @@ fun MarkdownText(
     modifier: Modifier = Modifier,
     truncateOnTextOverflow: Boolean = false,
     isTextSelectable: Boolean = true,
-    style: TextStyle =  TextStyle(
+    style: TextStyle = TextStyle(
         color = MaterialTheme.colorScheme.onSurface,
         fontSize = 16.sp,
         lineHeight = 24.sp,
     ),
+    previewerState: MediaPreviewerState,
 ) {
     val defaultColor = MaterialTheme.colorScheme.onSurface
     val linkTextColor = MaterialTheme.colorScheme.primary
@@ -54,7 +56,7 @@ fun MarkdownText(
                     fontWeight?.let { applyFontWeight(it) }
                 }
             }
-            textView.markdown(text)
+            textView.markdown(text, previewerState)
         }
     )
 }

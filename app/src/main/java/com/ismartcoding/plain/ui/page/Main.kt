@@ -105,8 +105,6 @@ import com.ismartcoding.plain.ui.page.web.WebDevPage
 import com.ismartcoding.plain.ui.page.web.WebLearnMorePage
 import com.ismartcoding.plain.ui.page.web.WebSecurityPage
 import com.ismartcoding.plain.ui.page.web.WebSettingsPage
-import com.ismartcoding.plain.ui.preview.PreviewDialog
-import com.ismartcoding.plain.ui.preview.PreviewItem
 import com.ismartcoding.plain.ui.theme.AppTheme
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.EventType
@@ -161,11 +159,11 @@ fun Main(viewModel: MainViewModel) {
                     } else if (mimeType.startsWith("text/")) {
                         TextEditorDialog(uri).show()
                     } else if (mimeType.startsWith("image/") || mimeType.startsWith("video/")) {
-                        val link = uri.toString()
-                        PreviewDialog().show(
-                            items = arrayListOf(PreviewItem(link, uri)),
-                            initKey = link,
-                        )
+//                        val link = uri.toString()
+//                        PreviewDialog().show(
+//                            items = arrayListOf(PreviewItem(link, uri)),
+//                            initKey = link,
+//                        )
                     } else if (mimeType == "application/pdf") {
                         navController.navigatePdf(uri)
                     }

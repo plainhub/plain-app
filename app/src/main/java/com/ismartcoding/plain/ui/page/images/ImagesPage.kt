@@ -87,9 +87,9 @@ import com.ismartcoding.plain.ui.extensions.navigateTags
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.ImageFoldersViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
-import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
+import com.ismartcoding.plain.ui.models.exitSearchMode
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
 import com.ismartcoding.plain.ui.models.showBottomActions
@@ -121,10 +121,7 @@ fun ImagesPage(
             bucketsState.associateBy { it.id }
         }
     }
-    val previewerState = rememberPreviewerState(
-        pageCount = { MediaPreviewData.items.size },
-        getKey = { MediaPreviewData.items[it].id }
-    )
+    val previewerState = rememberPreviewerState()
     val tagsState by tagsViewModel.itemsFlow.collectAsState()
     val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
     val scope = rememberCoroutineScope()
@@ -186,6 +183,14 @@ fun ImagesPage(
         }
     }
 
+    val onSearch: (String) -> Unit = {
+        viewModel.searchActive.value = false
+        viewModel.showLoading.value = true
+        scope.launch(Dispatchers.IO) {
+            viewModel.loadAsync(context, tagsViewModel)
+        }
+    }
+
     DisposableEffect(Unit) {
         onDispose {
             insetsController.show(WindowInsetsCompat.Type.navigationBars())
@@ -194,17 +199,20 @@ fun ImagesPage(
         }
     }
 
-    BackHandler(enabled = viewModel.selectMode.value) {
-        viewModel.exitSelectMode()
-    }
-
-    BackHandler(enabled = castViewModel.castMode.value) {
-        castViewModel.exitCastMode()
-    }
-
-    BackHandler(previewerState.visible) {
-        scope.launch {
-            previewerState.closeTransform()
+    BackHandler(enabled = viewModel.selectMode.value || castViewModel.castMode.value || viewModel.showSearchBar.value || previewerState.visible) {
+        if (previewerState.visible) {
+            scope.launch {
+                previewerState.closeTransform()
+            }
+        } else if (viewModel.selectMode.value) {
+            viewModel.exitSelectMode()
+        } else if (castViewModel.castMode.value) {
+            castViewModel.exitCastMode()
+        } else if (viewModel.showSearchBar.value) {
+            if (!viewModel.searchActive.value || viewModel.queryText.value.isEmpty()) {
+                viewModel.exitSearchMode()
+                onSearch("")
+            }
         }
     }
 
@@ -229,13 +237,7 @@ fun ImagesPage(
             if (viewModel.showSearchBar.value) {
                 ListSearchBar(
                     viewModel = viewModel,
-                    onSearch = {
-                        viewModel.searchActive.value = false
-                        viewModel.showLoading.value = true
-                        scope.launch(Dispatchers.IO) {
-                            viewModel.loadAsync(context, tagsViewModel)
-                        }
-                    }
+                    onSearch = onSearch
                 )
                 return@PScaffold
             }

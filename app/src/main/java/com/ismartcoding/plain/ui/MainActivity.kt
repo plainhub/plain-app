@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.content.res.Configuration
 import android.database.CursorWindow
 import android.net.Uri
+import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.provider.Settings
 import android.text.SpannableString
@@ -76,6 +77,7 @@ import com.ismartcoding.plain.preference.ApiPermissionsPreference
 import com.ismartcoding.plain.preference.KeepScreenOnPreference
 import com.ismartcoding.plain.preference.SettingsProvider
 import com.ismartcoding.plain.preference.SystemScreenTimeoutPreference
+import com.ismartcoding.plain.receivers.NetworkStateReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.NotificationListenerMonitorService
 import com.ismartcoding.plain.services.ScreenMirrorService
@@ -163,6 +165,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private val plugInReceiver = PlugInControlReceiver()
+    private val networkStateReceiver = NetworkStateReceiver()
 
     @SuppressLint("ClickableViewAccessibility", "DiscouragedPrivateApi")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -194,8 +197,10 @@ class MainActivity : AppCompatActivity() {
         }
         if (isTPlus()) {
             registerReceiver(plugInReceiver, powerConnectionFilter, RECEIVER_NOT_EXPORTED)
+            registerReceiver(networkStateReceiver, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION), RECEIVER_NOT_EXPORTED)
         } else {
             registerReceiver(plugInReceiver, powerConnectionFilter)
+            registerReceiver(networkStateReceiver, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION))
         }
 
         setContent {
@@ -229,6 +234,7 @@ class MainActivity : AppCompatActivity() {
         BluetoothPermission.release()
         Permissions.release()
         unregisterReceiver(plugInReceiver)
+        unregisterReceiver(networkStateReceiver)
     }
 
     @SuppressLint("CheckResult")

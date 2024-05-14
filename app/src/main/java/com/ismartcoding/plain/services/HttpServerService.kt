@@ -26,7 +26,6 @@ import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.delay
 
-
 class HttpServerService : LifecycleService() {
     @SuppressLint("InlinedApi")
     override fun onCreate() {
@@ -37,9 +36,12 @@ class HttpServerService : LifecycleService() {
                 this,
                 "${BuildConfig.APPLICATION_ID}.action.stop_http_server",
                 getString(R.string.api_service_is_running),
+                HttpServerManager.getNotificationContent()
             )
-        val id = NotificationHelper.generateId()
-        ServiceCompat.startForeground(this, id, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+        ServiceCompat.startForeground(
+            this, HttpServerManager.notificationId,
+            notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+        )
 
         lifecycle.addObserver(object : LifecycleEventObserver {
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {

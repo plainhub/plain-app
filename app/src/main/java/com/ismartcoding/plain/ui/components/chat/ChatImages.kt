@@ -21,25 +21,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.helpers.FormatHelper
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.ImagePreviewerState
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.TransformGlideImageView
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.MediaPreviewerState
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.TransformImageView
 import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.VChat
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ChatImages(
     context: Context,
     m: VChat,
     imageWidthDp: Dp,
-    previewerState: ImagePreviewerState,
+    previewerState: MediaPreviewerState,
 ) {
     val imageItems = (m.value as DMessageImages).items
 
@@ -66,7 +65,7 @@ fun ChatImages(
                         }
                     },
                 ) {
-                    TransformGlideImageView(
+                    TransformImageView(
                         modifier = Modifier
                             .size(imageWidthDp)
                             .clip(RoundedCornerShape(6.dp)),

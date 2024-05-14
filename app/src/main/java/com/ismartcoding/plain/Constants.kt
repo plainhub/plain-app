@@ -16,4 +16,6 @@ object Constants {
     const val LATEST_RELEASE_URL = "https://api.github.com/repos/ismartcoding/plain-app/releases/latest"
     const val ONE_DAY = 24 * 60 * 60L
     const val ONE_DAY_MS = ONE_DAY * 1000L
+    const val BROADCAST_ACTION_SERVICE = "${BuildConfig.APPLICATION_ID}.action.service"
+    const val BROADCAST_ACTION_ACTIVITY = "${BuildConfig.APPLICATION_ID}.action.activity"
 }

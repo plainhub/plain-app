@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.getFinalPath
@@ -40,8 +39,8 @@ import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.ImagePreviewerState
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.TransformGlideImageView
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.MediaPreviewerState
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.TransformImageView
 import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.extensions.navigateOtherFile
 import com.ismartcoding.plain.ui.extensions.navigatePdf
@@ -50,13 +49,12 @@ import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.VChat
 import java.io.File
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ChatFiles(
     context: Context,
     navController: NavHostController,
     m: VChat,
-    previewerState: ImagePreviewerState,
+    previewerState: MediaPreviewerState,
 ) {
     val fileItems = (m.value as DMessageFiles).items
     Column {
@@ -121,7 +119,7 @@ fun ChatFiles(
                         )
                     }
                     if (path.isImageFast() || path.isVideoFast()) {
-                        TransformGlideImageView(
+                        TransformImageView(
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(RoundedCornerShape(4.dp)),

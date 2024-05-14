@@ -63,6 +63,7 @@ import com.ismartcoding.plain.ui.components.FileSortDialog
 import com.ismartcoding.plain.ui.components.ListSearchBar
 import com.ismartcoding.plain.ui.models.DocsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
+import com.ismartcoding.plain.ui.models.exitSearchMode
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
 import com.ismartcoding.plain.ui.models.showBottomActions
@@ -132,10 +133,6 @@ fun DocsPage(
         }
     }
 
-    BackHandler(enabled = viewModel.selectMode.value) {
-        viewModel.exitSelectMode()
-    }
-
     ViewDocBottomSheet(viewModel)
 
     val pageTitle = if (viewModel.selectMode.value) {
@@ -156,18 +153,31 @@ fun DocsPage(
         })
     }
 
+    val onSearch: (String) -> Unit = {
+        viewModel.searchActive.value = false
+        viewModel.showLoading.value = true
+        scope.launch(Dispatchers.IO) {
+            viewModel.loadAsync(context)
+        }
+    }
+
+    BackHandler(enabled = viewModel.selectMode.value || viewModel.showSearchBar.value) {
+        if (viewModel.selectMode.value) {
+            viewModel.exitSelectMode()
+        } else if (viewModel.showSearchBar.value) {
+            if (!viewModel.searchActive.value || viewModel.queryText.value.isEmpty()) {
+                viewModel.exitSearchMode()
+                onSearch("")
+            }
+        }
+    }
+
     PScaffold(
         topBar = {
             if (viewModel.showSearchBar.value) {
                 ListSearchBar(
                     viewModel = viewModel,
-                    onSearch = {
-                        viewModel.searchActive.value = false
-                        viewModel.showLoading.value = true
-                        scope.launch(Dispatchers.IO) {
-                            viewModel.loadAsync(context)
-                        }
-                    }
+                    onSearch = onSearch
                 )
                 return@PScaffold
             }

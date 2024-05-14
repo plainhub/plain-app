@@ -23,20 +23,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.bumptech.glide.integration.compose.CrossFade
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.integration.compose.placeholder
+import coil3.compose.AsyncImage
 import com.ismartcoding.lib.helpers.BitmapHelper
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.ui.extensions.navigateImages
 import com.ismartcoding.plain.ui.views.mergeimages.CombineBitmapTools
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MediaBucketGridItem(
     modifier: Modifier = Modifier,
@@ -81,7 +77,7 @@ fun MediaBucketGridItem(
                 navController.navigateImages(m.id)
             },
     ) {
-        GlideImage(
+        AsyncImage(
             model = bitmapResult.value,
             contentDescription = m.name,
             modifier = Modifier
@@ -89,8 +85,6 @@ fun MediaBucketGridItem(
                 .align(Alignment.Center)
                 .aspectRatio(1f),
             contentScale = ContentScale.Crop,
-            transition = CrossFade,
-            failure = placeholder(R.drawable.ic_broken_image),
         )
         Box(
             modifier =

@@ -8,6 +8,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JksHelper
 import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.Constants
@@ -21,6 +22,7 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.SessionClientTsUpdate
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.HttpServerStateChangedEvent
+import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.web.websocket.WebSocketSession
@@ -59,11 +61,17 @@ object HttpServerManager {
     val portsInUse = mutableSetOf<Int>()
     val httpsPorts = setOf(8043, 8143, 8243, 8343, 8443, 8543, 8643, 8743, 8843, 8943)
     val httpPorts = setOf(8080, 8180, 8280, 8380, 8480, 8580, 8680, 8780, 8880, 8980)
+    val notificationId = NotificationHelper.generateId()
 
     suspend fun resetPasswordAsync(): String {
         val password = CryptoHelper.randomPassword(6)
         PasswordPreference.putAsync(MainApp.instance, password)
         return password
+    }
+
+    fun getNotificationContent(): String {
+        val ip = NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }
+        return "http://$ip:${TempData.httpPort}\nhttps://$ip:${TempData.httpsPort}"
     }
 
     suspend fun stopServiceAsync(context: Context) {

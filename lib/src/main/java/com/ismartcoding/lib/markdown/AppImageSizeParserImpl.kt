@@ -3,7 +3,6 @@ package com.ismartcoding.lib.markdown
 import android.text.TextUtils
 import androidx.annotation.VisibleForTesting
 import io.noties.markwon.html.CssInlineStyleParser
-import io.noties.markwon.html.tag.ImageHandler
 import io.noties.markwon.image.ImageSize
 
 class AppImageSizeParserImpl(private val inlineStyleParser: CssInlineStyleParser) : AppImageHandler.ImageSizeParser {
@@ -62,8 +61,7 @@ class AppImageSizeParserImpl(private val inlineStyleParser: CssInlineStyleParser
             if (Character.isDigit(value[i])) {
                 return try {
                     val `val` = value.substring(0, i + 1).toFloat()
-                    val unit: String?
-                    unit = if (i == length - 1) {
+                    val unit: String? = if (i == length - 1) {
                         // no unit info
                         null
                     } else {

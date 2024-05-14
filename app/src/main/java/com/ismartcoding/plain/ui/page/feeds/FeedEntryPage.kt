@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.page.feeds
 
 import android.annotation.SuppressLint
 import android.content.ClipData
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -68,6 +69,8 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.markdowntext.MarkdownText
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.ImagePreviewer
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
@@ -76,6 +79,7 @@ import com.ismartcoding.plain.ui.extensions.navigateText
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.FeedEntryViewModel
+import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.page.tags.SelectTagsDialog
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -102,6 +106,7 @@ fun FeedEntryPage(
     val tagIds = tagsMapState[id]?.map { it.tagId } ?: emptyList()
     val scrollState = rememberLazyListState()
     //val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val previewerState = rememberPreviewerState()
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
             scope.launch {
@@ -141,6 +146,12 @@ fun FeedEntryPage(
             SelectTagsDialog(tagsViewModel, tagsState, tagsMapState, data = m) {
                 viewModel.showSelectTagsDialog.value = false
             }
+        }
+    }
+
+    BackHandler(previewerState.visible) {
+        scope.launch {
+            previewerState.close()
         }
     }
 
@@ -293,6 +304,7 @@ fun FeedEntryPage(
                         MarkdownText(
                             text = viewModel.content.value.ifEmpty { m.description },
                             modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
+                            previewerState = previewerState,
                         )
 
                     }
@@ -346,4 +358,6 @@ fun FeedEntryPage(
             }
         },
     )
+
+    ImagePreviewer(state = previewerState)
 }

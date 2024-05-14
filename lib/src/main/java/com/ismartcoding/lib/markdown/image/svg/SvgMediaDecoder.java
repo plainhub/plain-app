@@ -17,9 +17,6 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
 
-/**
- * @since 1.1.0
- */
 public class SvgMediaDecoder extends MediaDecoder {
 
     public static final String CONTENT_TYPE = "image/svg+xml";
@@ -81,8 +78,5 @@ public class SvgMediaDecoder extends MediaDecoder {
     }
 
     private static void validate() {
-        if (!SvgSupport.hasSvgSupport()) {
-            throw new IllegalStateException(SvgSupport.missingMessage());
-        }
     }
 }

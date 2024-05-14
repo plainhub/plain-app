@@ -5,10 +5,8 @@ import androidx.annotation.Nullable;
 
 import com.ismartcoding.lib.markdown.image.data.DataUriSchemeHandler;
 import com.ismartcoding.lib.markdown.image.gif.GifMediaDecoder;
-import com.ismartcoding.lib.markdown.image.gif.GifSupport;
 import com.ismartcoding.lib.markdown.image.network.NetworkSchemeHandler;
 import com.ismartcoding.lib.markdown.image.svg.SvgMediaDecoder;
-import com.ismartcoding.lib.markdown.image.svg.SvgSupport;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,14 +34,8 @@ class AsyncDrawableLoaderBuilder {
         addSchemeHandler(DataUriSchemeHandler.create());
         addSchemeHandler(NetworkSchemeHandler.create());
 
-        // add SVG and GIF, but only if they are present in the class-path
-        if (SvgSupport.hasSvgSupport()) {
-            addMediaDecoder(SvgMediaDecoder.create());
-        }
-
-        if (GifSupport.hasGifSupport()) {
-            addMediaDecoder(GifMediaDecoder.create());
-        }
+        addMediaDecoder(SvgMediaDecoder.create());
+        addMediaDecoder(GifMediaDecoder.create());
 
         defaultMediaDecoder = DefaultMediaDecoder.create();
     }

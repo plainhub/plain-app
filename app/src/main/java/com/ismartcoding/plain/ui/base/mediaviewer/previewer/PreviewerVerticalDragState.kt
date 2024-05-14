@@ -10,8 +10,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputScope
-import com.ismartcoding.plain.ui.base.mediaviewer.ImageGalleryState
-import kotlinx.coroutines.*
+import com.ismartcoding.plain.ui.base.mediaviewer.MediaGalleryState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 // 默认下拉关闭缩放阈值
@@ -43,7 +47,7 @@ open class PreviewerVerticalDragState(
     // 下拉关闭的缩小的阈值
     scaleToCloseMinValue: Float = DEFAULT_SCALE_TO_CLOSE_MIN_VALUE,
     // 预览状态
-    galleryState: ImageGalleryState,
+    galleryState: MediaGalleryState,
 ) : PreviewerTransformState(scope, defaultAnimationSpec, galleryState) {
 
     /**
@@ -52,28 +56,23 @@ open class PreviewerVerticalDragState(
     private suspend fun viewerContainerShrinkDown() {
         // 标记动作开始
         stateCloseStart()
+        viewerContainerState?.cancelOpenTransform()
         listOf(
-            // 缩小容器
             scope.async {
-                viewerContainerState?.scale?.animateTo(0F, animationSpec = defaultAnimationSpec)
+                // 退出结束后隐藏content
+                viewerContainerState?.transformContentAlpha?.snapTo(0F)
             },
-            // 关闭UI
             scope.async {
-                uiAlpha.animateTo(0F, animationSpec = defaultAnimationSpec)
+                // 动画隐藏UI
+                uiAlpha.animateTo(0F, DEFAULT_SOFT_ANIMATION_SPEC)
+            },
+            scope.async {
+                animateContainerVisibleState = MutableTransitionState(false)
             }
         ).awaitAll()
-        // 等待下一帧
         ticket.awaitNextTicket()
-        // 关闭动画组件
-        animateContainerVisibleState = MutableTransitionState(false)
-        // 等待下一帧
-        ticket.awaitNextTicket()
-        // 重置container
-        viewerContainerState?.reset(defaultAnimationSpec)
-        // 将transform标记为退出
+        stateCloseEnd() // put this line before reset will fix the UI animation bug
         transformState?.setExitState()
-        // 标记动作结束
-        stateCloseEnd()
     }
 
     /**
@@ -114,7 +113,7 @@ open class PreviewerVerticalDragState(
             if (verticalDragType != VerticalDragType.None) detectVerticalDragGestures(
                 onDragStart = OnDragStart@{
                     // 如果imageViewerState不存在，无法进行下拉手势
-                    if (imageViewerState == null) return@OnDragStart
+                    if (mediaViewerState == null) return@OnDragStart
                     var transformItemState: TransformItemState? = null
                     // 查询当前transformItem
                     getKey?.apply {
@@ -132,24 +131,28 @@ open class PreviewerVerticalDragState(
                     // 更新当前transformItem
                     transformState?.itemState = transformItemState
                     // 只有viewer的缩放率为1时才允许下拉手势
-                    if (imageViewerState?.scale?.value == 1F) {
+                    if (mediaViewerState?.scale?.value == 1F) {
                         vStartOffset = it
                         // 进入下拉手势时禁用viewer的手势
-                        imageViewerState?.allowGestureInput = false
+                        mediaViewerState?.allowGestureInput = false
                     }
                 },
                 onDragEnd = OnDragEnd@{
                     // 如果开始位置为空，就退出
+
                     if (vStartOffset == null) return@OnDragEnd
                     // 如果containerState为空，就退出
                     if (viewerContainerState == null) return@OnDragEnd
                     // 重置开始位置和方向
+
                     vStartOffset = null
                     vOrientationDown = null
                     // 解除viewer的手势输入限制
-                    imageViewerState?.allowGestureInput = true
+                    mediaViewerState?.allowGestureInput = true
                     // 缩放小于阈值，执行关闭动画，大于就恢复原样
+
                     if (viewerContainerState!!.scale.value < scaleToCloseMinValue) {
+
                         scope.launch {
                             if (getKey != null && canTransformOut) {
                                 val key = getKey!!.invoke(galleryState.pagerState.currentPage)
@@ -176,7 +179,7 @@ open class PreviewerVerticalDragState(
                     }
                 },
                 onVerticalDrag = OnVerticalDrag@{ change, dragAmount ->
-                    if (imageViewerState == null) return@OnVerticalDrag
+                    if (mediaViewerState == null) return@OnVerticalDrag
                     if (viewerContainerState == null) return@OnVerticalDrag
                     if (vStartOffset == null) return@OnVerticalDrag
                     if (vOrientationDown == null) vOrientationDown = dragAmount > 0
@@ -195,7 +198,7 @@ open class PreviewerVerticalDragState(
                         }
                     } else {
                         // 如果不是向上，就返还输入权，以免页面卡顿
-                        imageViewerState?.allowGestureInput = true
+                        mediaViewerState?.allowGestureInput = true
                     }
                 }
             )

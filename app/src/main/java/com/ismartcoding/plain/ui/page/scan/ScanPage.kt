@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.ui.page.scan
 
-import android.app.Activity
+import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.Context
 import android.graphics.ImageFormat
@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,7 +25,7 @@ import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -42,13 +41,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavHostController
 import com.google.zxing.BinaryBitmap
 import com.google.zxing.MultiFormatReader
@@ -66,7 +62,6 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
-import com.ismartcoding.plain.preference.ScanHistoryPreference
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.PickFileEvent
@@ -74,14 +69,13 @@ import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.features.RequestPermissionsEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.QrCodeScanHelper
+import com.ismartcoding.plain.preference.ScanHistoryPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
-import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.TextCard
 import com.ismartcoding.plain.ui.base.TopSpace
-import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.page.RouteName
@@ -90,15 +84,13 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScanPage(navController: NavHostController) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
-    val view = LocalView.current
-    val window = (view.context as Activity).window
-    val insetsController = WindowCompat.getInsetsController(window, view)
 
     var cameraProvider: ProcessCameraProvider? = null
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
@@ -110,7 +102,6 @@ fun ScanPage(navController: NavHostController) {
     var scanResult by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        insetsController.hide(WindowInsetsCompat.Type.systemBars())
         events.add(
             receiveEventHandler<PermissionsResultEvent> {
                 hasCamPermission = Permission.CAMERA.can(context)
@@ -163,7 +154,6 @@ fun ScanPage(navController: NavHostController) {
 
     DisposableEffect(Unit) {
         onDispose {
-            insetsController.show(WindowInsetsCompat.Type.systemBars())
             events.forEach { it.cancel() }
             events.clear()
             cameraProvider?.unbindAll()
@@ -177,7 +167,8 @@ fun ScanPage(navController: NavHostController) {
         }
     }
 
-    PScaffold(
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
         containerColor = Color.Transparent,
         content = {
             Box(
@@ -266,9 +257,10 @@ fun ScanPage(navController: NavHostController) {
                 }
                 TopAppBar(
                     title = { },
-                    modifier = Modifier.padding(top = 24.dp),
                     navigationIcon = {
                         PIconButton(
+                            modifier = Modifier.size(40.dp).padding(start = 16.dp),
+                            containerModifier = Modifier.size(64.dp),
                             icon = Icons.Rounded.Cancel,
                             contentDescription = stringResource(R.string.back),
                             tint = Color.White,

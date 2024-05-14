@@ -175,6 +175,8 @@ dependencies {
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.media3.session)
     implementation(libs.androidx.media3.cast)
+    implementation(libs.androidx.media3.dash)
+    implementation(libs.androidx.media3.hls)
 
     implementation(libs.apollo.runtime)
     implementation(libs.apollo.normalized.cache)
@@ -217,7 +219,6 @@ dependencies {
     ksp(libs.room.compiler)
 
     implementation(libs.openai.client)
-    implementation(libs.glide.compose)
 
     // https://coil-kt.github.io/coil/changelog/
     api(libs.coil)

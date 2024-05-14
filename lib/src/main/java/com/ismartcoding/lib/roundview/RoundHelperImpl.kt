@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.ismartcoding.lib.R
 import com.ismartcoding.lib.extensions.dp2px
+import com.ismartcoding.lib.isQPlus
 
 class RoundHelperImpl : RoundHelper {
     private var mContext: Context? = null
@@ -101,7 +102,7 @@ class RoundHelperImpl : RoundHelper {
 
     override fun preDraw(canvas: Canvas) {
         canvas.saveLayer(
-            if (isNewLayer && Build.VERSION.SDK_INT > Build.VERSION_CODES.P) mOriginRectF else mRectF,
+            if (isNewLayer && isQPlus()) mOriginRectF else mRectF,
             null,
             Canvas.ALL_SAVE_FLAG,
         )

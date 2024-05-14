@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.components
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
@@ -40,13 +39,6 @@ fun <T : IData> ListSearchBar(
             if (isWindowFocused && viewModel.searchActive.value) {
                 focusRequester.requestFocus()
             }
-        }
-    }
-
-    BackHandler(viewModel.showSearchBar.value) {
-        if (!viewModel.searchActive.value || viewModel.queryText.value.isEmpty()) {
-            viewModel.exitSearchMode()
-            onSearch("")
         }
     }
 

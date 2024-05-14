@@ -162,6 +162,22 @@
             </intent-filter>
         </service>
 
+<!--        <service-->
+<!--            android:exported="true"-->
+<!--            android:name=".services.QSTileService"-->
+<!--            android:icon="@drawable/ic_app_icon"-->
+<!--            android:label="@string/app_name"-->
+<!--            android:foregroundServiceType="specialUse"-->
+<!--            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"-->
+<!--            android:process=":RunPlainServiceDaemon">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.service.quicksettings.action.QS_TILE" />-->
+<!--            </intent-filter>-->
+<!--            <property-->
+<!--                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"-->
+<!--                android:value="tile" />-->
+<!--        </service>-->
+
         <receiver
             android:name=".receivers.ServiceStopBroadcastReceiver"
             android:exported="true">

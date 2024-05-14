@@ -9,15 +9,24 @@ import android.view.MotionEvent
 import android.widget.TextView
 import androidx.core.view.GestureDetectorCompat
 import com.ismartcoding.lib.extensions.dp2px
+import com.ismartcoding.lib.extensions.getFinalPath
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.markdown.AppImageHandler
 import com.ismartcoding.lib.markdown.AppImageSchemeHandler
 import com.ismartcoding.lib.markdown.FontTagHandler
 import com.ismartcoding.lib.markdown.NetworkSchemeHandler
 import com.ismartcoding.lib.markdown.image.ImagesPlugin
+import com.ismartcoding.plain.ui.base.coil.newImageLoader
+import com.ismartcoding.plain.ui.base.markdowntext.CoilImagesPlugin
+import com.ismartcoding.plain.ui.base.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.helpers.WebHelper
-import com.ismartcoding.plain.ui.preview.PreviewDialog
+import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.preview.PreviewItem
-import io.noties.markwon.*
+import io.noties.markwon.AbstractMarkwonPlugin
+import io.noties.markwon.Markwon
+import io.noties.markwon.MarkwonConfiguration
+import io.noties.markwon.MarkwonSpansFactory
+import io.noties.markwon.MarkwonVisitor
 import io.noties.markwon.core.MarkwonTheme
 import io.noties.markwon.core.spans.LinkSpan
 import io.noties.markwon.ext.latex.JLatexMathPlugin
@@ -26,7 +35,6 @@ import io.noties.markwon.ext.tables.TablePlugin
 import io.noties.markwon.ext.tasklist.TaskListPlugin
 import io.noties.markwon.html.HtmlPlugin
 import io.noties.markwon.image.ImageProps
-import io.noties.markwon.image.glide.GlideImagesPlugin
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import org.commonmark.node.Image
@@ -86,10 +94,11 @@ fun TextView.setDoubleCLick(click: () -> Unit) {
     }
 }
 
-fun TextView.markdown(content: String) {
+fun TextView.markdown(content: String, previewerState: MediaPreviewerState) {
     this.movementMethod = LinkMovementMethod.getInstance()
     Markwon.builder(context)
-        .usePlugin(GlideImagesPlugin.create(context))
+        .usePlugin(ImagesPlugin.create())
+        .usePlugin(CoilImagesPlugin.create(context, newImageLoader(context)))
         .usePlugin(
             object : AbstractMarkwonPlugin() {
                 override fun configureTheme(builder: MarkwonTheme.Builder) {
@@ -130,10 +139,12 @@ fun TextView.markdown(content: String) {
                             configuration.theme(),
                             ImageProps.DESTINATION.require(props),
                         ) { _, link ->
-                            PreviewDialog().show(
-                                items = arrayListOf(PreviewItem(link, Uri.parse(link))),
-                                initKey = link,
-                            )
+                            coMain {
+                                MediaPreviewData.items = listOf(PreviewItem(link, Uri.EMPTY, link.getFinalPath(context)))
+                                previewerState.open(
+                                    index = 0,
+                                )
+                            }
                         }
                     }
                 }

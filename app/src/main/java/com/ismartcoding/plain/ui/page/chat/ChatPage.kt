@@ -128,16 +128,7 @@ fun ChatPage(
     val scrollState = rememberLazyListState()
     val focusManager = LocalFocusManager.current
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
-    val previewerState = rememberPreviewerState(
-        pageCount = { MediaPreviewData.items.size },
-        getKey = { MediaPreviewData.items[it].id }
-    )
-
-    BackHandler(previewerState.visible) {
-        scope.launch {
-            previewerState.closeTransform()
-        }
-    }
+    val previewerState = rememberPreviewerState()
 
     LaunchedEffect(Unit) {
         viewModel.fetch(context)
@@ -268,8 +259,14 @@ fun ChatPage(
         }
     }
 
-    BackHandler(enabled = viewModel.selectMode.value) {
-        viewModel.exitSelectMode()
+    BackHandler(enabled = viewModel.selectMode.value || previewerState.visible) {
+        if (previewerState.visible) {
+            scope.launch {
+                previewerState.closeTransform()
+            }
+        } else {
+            viewModel.exitSelectMode()
+        }
     }
 
     val pageTitle = if (viewModel.selectMode.value) {

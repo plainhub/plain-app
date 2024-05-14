@@ -13,15 +13,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
+import coil3.compose.AsyncImage
 import com.caverock.androidsvg.SVG
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.preference.LocalDarkTheme
 import com.ismartcoding.plain.ui.svg.parseDynamicColor
 import com.ismartcoding.plain.ui.theme.palette.LocalTonalPalettes
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun DynamicSVGImage(
     modifier: Modifier = Modifier,
@@ -51,7 +49,7 @@ fun DynamicSVGImage(
                 },
     ) {
         Crossfade(targetState = pic, label = "") {
-            GlideImage(
+            AsyncImage(
                 model = it,
                 contentDescription = contentDescription,
                 modifier = Modifier.fillMaxSize(),

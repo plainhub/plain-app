@@ -7,13 +7,8 @@ import androidx.compose.ui.unit.toSize
 import com.ismartcoding.lib.extensions.getFileName
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
-import com.ismartcoding.lib.helpers.CoroutinesHelper
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.MediaHelper
-import java.io.File
-import java.io.FileInputStream
-import java.io.InputStream
 
 data class PreviewItem(
     val id: String,
@@ -31,9 +26,7 @@ data class PreviewItem(
         } else {
             intrinsicSize = if (path.isImageFast()) MediaHelper.getImageIntrinsicSize(path).toSize() else MediaHelper.getVideoIntrinsicSize(context, path).toSize()
         }
-        LogCat.d("intrinsicSize: $intrinsicSize")
         if (rotation == 90 || rotation == 270) {
-            LogCat.d("intrinsicSize: 2")
             intrinsicSize = Size(intrinsicSize.height, intrinsicSize.width)
         }
     }

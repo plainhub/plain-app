@@ -96,8 +96,5 @@ public class GifMediaDecoder extends MediaDecoder {
     }
 
     private static void validate() {
-        if (!GifSupport.hasGifSupport()) {
-            throw new IllegalStateException(GifSupport.missingMessage());
-        }
     }
 }

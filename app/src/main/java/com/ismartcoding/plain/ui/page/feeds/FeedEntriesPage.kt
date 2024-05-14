@@ -79,6 +79,7 @@ import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
+import com.ismartcoding.plain.ui.models.exitSearchMode
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
 import com.ismartcoding.plain.ui.models.select
@@ -203,8 +204,23 @@ fun FeedEntriesPage(
         tagsState,
     )
 
-    BackHandler(enabled = viewModel.selectMode.value) {
-        viewModel.exitSelectMode()
+    val onSearch: (String) -> Unit = {
+        viewModel.searchActive.value = false
+        viewModel.showLoading.value = true
+        scope.launch(Dispatchers.IO) {
+            viewModel.loadAsync(tagsViewModel)
+        }
+    }
+
+    BackHandler(enabled = viewModel.selectMode.value || viewModel.showSearchBar.value) {
+        if (viewModel.selectMode.value) {
+            viewModel.exitSelectMode()
+        } else if (viewModel.showSearchBar.value) {
+            if (!viewModel.searchActive.value || viewModel.queryText.value.isEmpty()) {
+                viewModel.exitSearchMode()
+                onSearch("")
+            }
+        }
     }
 
     PScaffold(
@@ -212,13 +228,7 @@ fun FeedEntriesPage(
             if (viewModel.showSearchBar.value) {
                 ListSearchBar(
                     viewModel = viewModel,
-                    onSearch = {
-                        viewModel.searchActive.value = false
-                        viewModel.showLoading.value = true
-                        scope.launch(Dispatchers.IO) {
-                            viewModel.loadAsync(tagsViewModel)
-                        }
-                    }
+                    onSearch = onSearch
                 )
                 return@PScaffold
             }

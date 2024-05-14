@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.apps
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -48,6 +49,8 @@ import com.ismartcoding.plain.ui.components.ListSearchBar
 import com.ismartcoding.plain.ui.components.PackageListItem
 import com.ismartcoding.plain.ui.models.AppsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
+import com.ismartcoding.plain.ui.models.exitSearchMode
+import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.Dispatchers
@@ -99,18 +102,29 @@ fun AppsPage(
         }
     }
 
+    val onSearch: (String) -> Unit = {
+        viewModel.searchActive.value = false
+        viewModel.showLoading.value = true
+        scope.launch(Dispatchers.IO) {
+            viewModel.loadAsync()
+        }
+    }
+
+    BackHandler(enabled = viewModel.showSearchBar.value) {
+        if (viewModel.showSearchBar.value) {
+            if (!viewModel.searchActive.value || viewModel.queryText.value.isEmpty()) {
+                viewModel.exitSearchMode()
+                onSearch("")
+            }
+        }
+    }
+
     PScaffold(
         topBar = {
             if (viewModel.showSearchBar.value) {
                 ListSearchBar(
                     viewModel = viewModel,
-                    onSearch = {
-                        viewModel.searchActive.value = false
-                        viewModel.showLoading.value = true
-                        scope.launch(Dispatchers.IO) {
-                            viewModel.loadAsync()
-                        }
-                    }
+                    onSearch = onSearch
                 )
                 return@PScaffold
             }

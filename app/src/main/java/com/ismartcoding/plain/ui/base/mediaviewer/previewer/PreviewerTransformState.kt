@@ -10,8 +10,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.ismartcoding.plain.ui.base.mediaviewer.ImageGalleryState
-import com.ismartcoding.plain.ui.base.mediaviewer.ImageViewerState
+import com.ismartcoding.plain.ui.base.mediaviewer.MediaGalleryState
+import com.ismartcoding.plain.ui.base.mediaviewer.MediaViewerState
 import com.ismartcoding.plain.ui.base.mediaviewer.Ticket
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -26,7 +26,7 @@ open class PreviewerTransformState(
     // 默认动画窗格
     var defaultAnimationSpec: AnimationSpec<Float> = DEFAULT_SOFT_ANIMATION_SPEC,
     // 预览状态
-    val galleryState: ImageGalleryState,
+    val galleryState: MediaGalleryState,
 ) {
 
     /**
@@ -95,7 +95,7 @@ open class PreviewerTransformState(
 
     // 判断是否允许transform结束
     internal val canTransformOut: Boolean
-        get() = (viewerContainerState?.openTransformJob != null) || (imageViewerState?.mountedFlow?.value == true)
+        get() = (viewerContainerState?.openTransformJob != null) || (mediaViewerState?.mountedFlow?.value == true)
 
     // 标记打开动作，执行开始
     internal suspend fun stateOpenStart() =
@@ -161,8 +161,8 @@ open class PreviewerTransformState(
         get() = visible && visibleTarget == null && !animating
 
     // imageViewer状态对象
-    val imageViewerState: ImageViewerState?
-        get() = viewerContainerState?.imageViewerState
+    val mediaViewerState: MediaViewerState?
+        get() = viewerContainerState?.mediaViewerState
 
     /**
      * 根据页面获取当前页码所属的key
@@ -263,13 +263,20 @@ open class PreviewerTransformState(
             stateCloseStart()
             // 关闭正在进行的开启操作
             viewerContainerState?.cancelOpenTransform()
-            // 这里创建一个全新的state是为了让exitTransition的设置得到响应
-            animateContainerVisibleState = MutableTransitionState(true)
-            // 开启container关闭动画
-            animateContainerVisibleState.targetState = false
-            // 等待下一帧
+            listOf(
+                scope.async {
+                    // 退出结束后隐藏content
+                    viewerContainerState?.transformContentAlpha?.snapTo(0F)
+                },
+                scope.async {
+                    // 动画隐藏UI
+                    uiAlpha.animateTo(0F, DEFAULT_SOFT_ANIMATION_SPEC)
+                },
+                scope.async {
+                    animateContainerVisibleState = MutableTransitionState(false)
+                }
+            ).awaitAll()
             ticket.awaitNextTicket()
-            // transformState标记退出
             transformState?.setExitState()
         }
     }
