@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -52,6 +53,7 @@ import com.ismartcoding.lib.extensions.getFilenameWithoutExtension
 import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.isAudioFast
+import com.ismartcoding.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.extensions.newPath
@@ -91,7 +93,6 @@ import com.ismartcoding.plain.ui.file.FilesDialog
 import com.ismartcoding.plain.ui.file.FilesType
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChatViewModel
-import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
 import com.ismartcoding.plain.ui.models.showBottomActions
@@ -152,61 +153,64 @@ fun ChatPage(
                 if (event.tag != PickFileTag.SEND_MESSAGE) {
                     return@receiveEventHandler
                 }
-                val items = mutableListOf<DMessageFile>()
-                withIO {
-                    val cache = mutableMapOf<String, Int>()
-                    event.uris.forEach { uri ->
-                        try {
-                            context.contentResolver.query(uri, null, null, null, null)
-                                ?.use { cursor ->
-                                    try {
-                                        cursor.moveToFirst()
-                                        var fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
-                                        if (event.type == PickFileType.IMAGE_VIDEO) {
-                                            val mimeType = context.contentResolver.getType(uri)
-                                            val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
-                                            if (extension.isNotEmpty()) {
-                                                fileName = fileName.getFilenameWithoutExtension() + "." + extension
-                                            }
-                                        }
-                                        val size = cursor.getLongValue(OpenableColumns.SIZE, cache)
-                                        cursor.close()
-                                        val dir =
-                                            when {
-                                                fileName.isVideoFast() -> {
-                                                    Environment.DIRECTORY_MOVIES
-                                                }
-
-                                                fileName.isImageFast() -> {
-                                                    Environment.DIRECTORY_PICTURES
-                                                }
-
-                                                fileName.isAudioFast() -> {
-                                                    Environment.DIRECTORY_MUSIC
-                                                }
-
-                                                else -> {
-                                                    Environment.DIRECTORY_DOCUMENTS
+                scope.launch {
+                    DialogHelper.showLoading()
+                    val items = mutableListOf<DMessageFile>()
+                    withIO {
+                        val cache = mutableMapOf<String, Int>()
+                        event.uris.forEach { uri ->
+                            try {
+                                context.contentResolver.query(uri, null, null, null, null)
+                                    ?.use { cursor ->
+                                        try {
+                                            cursor.moveToFirst()
+                                            var fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
+                                            if (event.type == PickFileType.IMAGE_VIDEO) {
+                                                val mimeType = context.contentResolver.getType(uri)
+                                                val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
+                                                if (extension.isNotEmpty()) {
+                                                    fileName = fileName.getFilenameWithoutExtension() + "." + extension
                                                 }
                                             }
-                                        var dst = context.getExternalFilesDir(dir)!!.path + "/$fileName"
-                                        val dstFile = File(dst)
-                                        if (dstFile.exists()) {
-                                            dst = dstFile.newPath()
-                                            FileHelper.copyFile(context, uri, dst)
-                                        } else {
-                                            FileHelper.copyFile(context, uri, dst)
+                                            val size = cursor.getLongValue(OpenableColumns.SIZE, cache)
+                                            cursor.close()
+                                            val dir =
+                                                when {
+                                                    fileName.isVideoFast() -> {
+                                                        Environment.DIRECTORY_MOVIES
+                                                    }
+
+                                                    fileName.isImageFast() -> {
+                                                        Environment.DIRECTORY_PICTURES
+                                                    }
+
+                                                    fileName.isAudioFast() -> {
+                                                        Environment.DIRECTORY_MUSIC
+                                                    }
+
+                                                    else -> {
+                                                        Environment.DIRECTORY_DOCUMENTS
+                                                    }
+                                                }
+                                            var dst = context.getExternalFilesDir(dir)!!.path + "/$fileName"
+                                            val dstFile = File(dst)
+                                            if (dstFile.exists()) {
+                                                dst = dstFile.newPath()
+                                                FileHelper.copyFile(context, uri, dst)
+                                            } else {
+                                                FileHelper.copyFile(context, uri, dst)
+                                            }
+                                            items.add(DMessageFile(StringHelper.shortUUID(), "app://$dir/${dst.getFilenameFromPath()}", size, dstFile.getDuration(context)))
+                                        } catch (ex: Exception) {
+                                            // the picked file could be deleted
+                                            DialogHelper.showMessage(ex)
+                                            ex.printStackTrace()
                                         }
-                                        items.add(DMessageFile(StringHelper.shortUUID(), "app://$dir/${dst.getFilenameFromPath()}", size, dstFile.getDuration(context)))
-                                    } catch (ex: Exception) {
-                                        // the picked file could be deleted
-                                        DialogHelper.showMessage(ex)
-                                        ex.printStackTrace()
                                     }
-                                }
-                        } catch (ex: Exception) {
-                            // the picked file could be deleted
-                            LogCat.e(ex.toString())
+                            } catch (ex: Exception) {
+                                // the picked file could be deleted
+                                LogCat.e(ex.toString())
+                            }
                         }
                     }
                     val content =
@@ -218,7 +222,8 @@ fun ChatPage(
                                 DMessageFiles(items),
                             )
                         }
-                    val item = ChatHelper.sendAsync(content)
+                    val item = withIO { ChatHelper.sendAsync(content) }
+                    DialogHelper.hideLoading()
                     viewModel.addAll(arrayListOf(item))
                     sendEvent(
                         WebSocketEvent(
@@ -232,19 +237,17 @@ fun ChatPage(
                             ),
                         ),
                     )
-                    scope.launch {
-                        scrollState.scrollToItem(0)
-                        delay(200)
-                        focusManager.clearFocus()
-                    }
+                    scrollState.scrollToItem(0)
+                    delay(200)
+                    focusManager.clearFocus()
                 }
             },
         )
     }
 
     val insetsController = WindowCompat.getInsetsController(window, view)
-    LaunchedEffect(viewModel.selectMode.value) {
-        if (viewModel.selectMode.value) {
+    LaunchedEffect(viewModel.selectMode.value, (previewerState.visible && !context.isGestureInteractionMode())) {
+        if (viewModel.selectMode.value || (previewerState.visible && !context.isGestureInteractionMode())) {
             insetsController.hide(WindowInsetsCompat.Type.navigationBars())
         } else {
             insetsController.show(WindowInsetsCompat.Type.navigationBars())
@@ -275,6 +278,8 @@ fun ChatPage(
         stringResource(id = R.string.file_transfer_assistant)
     }
     PScaffold(
+        modifier = Modifier
+            .imePadding(),
         topBar = {
             PTopAppBar(
                 modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = {

@@ -226,7 +226,6 @@ fun FeedEntryPage(
             )
         },
         modifier = Modifier
-            .fillMaxSize()
             //.nestedScroll(scrollBehavior.nestedScrollConnection)
             .imePadding(),
         // scrollBehavior = scrollBehavior,

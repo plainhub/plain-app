@@ -1,11 +1,9 @@
 package com.ismartcoding.plain.ui.base
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -14,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import com.ismartcoding.lib.extensions.isGestureNavigationBar
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -26,13 +23,12 @@ fun PScaffold(
     floatingActionButton: (@Composable () -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit = {},
 ) {
-    val context = LocalContext.current
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = containerColor,
         topBar = topBar,
         content = { paddingValues ->
-            Column(modifier = if (context.isGestureNavigationBar()) Modifier.padding(paddingValues) else Modifier.padding(paddingValues).navigationBarsPadding()) {
+            Column(modifier = Modifier.padding(paddingValues)) {
                 content(paddingValues)
             }
         },

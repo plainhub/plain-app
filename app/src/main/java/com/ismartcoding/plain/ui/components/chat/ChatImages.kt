@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.components.chat
 
 import android.content.Context
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,6 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -41,6 +44,8 @@ fun ChatImages(
     previewerState: MediaPreviewerState,
 ) {
     val imageItems = (m.value as DMessageImages).items
+    val context = LocalContext.current as ComponentActivity
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     FlowRow(
         modifier =
@@ -57,6 +62,7 @@ fun ChatImages(
                     modifier =
                     Modifier.clickable {
                         coMain {
+                            keyboardController?.hide()
                             withIO { MediaPreviewData.setDataAsync(context, itemState, imageItems, item.id) }
                             previewerState.openTransform(
                                 index = MediaPreviewData.items.indexOfFirst { it.id == item.id },

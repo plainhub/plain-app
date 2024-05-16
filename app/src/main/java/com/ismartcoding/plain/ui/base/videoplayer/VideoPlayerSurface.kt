@@ -28,7 +28,6 @@ internal fun VideoPlayerSurface(
     defaultPlayerView: PlayerView,
     player: ExoPlayer,
     usePlayerController: Boolean,
-    handleLifecycle: Boolean,
     enablePip: Boolean,
     surfaceResizeMode: ResizeMode,
     onPipEntered: () -> Unit = {},
@@ -54,10 +53,7 @@ internal fun VideoPlayerSurface(
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_PAUSE -> {
-                    if (handleLifecycle) {
-                        player.pause()
-                    }
-
+                    player.pause()
                     if (enablePip && player.playWhenReady) {
                         isPendingPipMode = true
 
@@ -73,21 +69,14 @@ internal fun VideoPlayerSurface(
                 }
 
                 Lifecycle.Event.ON_RESUME -> {
-                    if (handleLifecycle) {
-                        player.play()
-                    }
-
+                    player.play()
                     if (enablePip && player.playWhenReady) {
                         defaultPlayerView.useController = usePlayerController
                     }
                 }
 
                 Lifecycle.Event.ON_STOP -> {
-                    val isPipMode = context.isActivityStatePipMode()
-
-                    if (handleLifecycle || (enablePip && isPipMode && !isPendingPipMode)) {
-                        player.stop()
-                    }
+                   // player.stop()
                 }
 
                 else -> {}

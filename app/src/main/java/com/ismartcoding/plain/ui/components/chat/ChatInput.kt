@@ -74,7 +74,6 @@ fun ChatInput(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .imePadding()
                         .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {

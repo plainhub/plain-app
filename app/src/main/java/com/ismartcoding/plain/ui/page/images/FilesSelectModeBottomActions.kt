@@ -11,7 +11,6 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,11 +25,11 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.PIconTextActionButton
+import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
+import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import com.ismartcoding.plain.ui.models.exitSelectMode
-import com.ismartcoding.plain.ui.models.getSelectedItems
 import com.ismartcoding.plain.ui.page.tags.BatchSelectTagsDialog
 import com.ismartcoding.plain.ui.theme.bottomAppBarContainer
 
@@ -40,6 +39,7 @@ fun FilesSelectModeBottomActions(
     viewModel: ImagesViewModel,
     tagsViewModel: TagsViewModel,
     tagsState: List<DTag>,
+    dragSelectState: DragSelectState,
 ) {
     val context = LocalContext.current
     var showSelectTagsDialog by remember {
@@ -50,9 +50,11 @@ fun FilesSelectModeBottomActions(
     }
 
     if (showSelectTagsDialog) {
-        BatchSelectTagsDialog(tagsViewModel, tagsState, viewModel.getSelectedItems(), removeFromTags) {
+        val selectedIds = dragSelectState.selectedIds
+        val selectedItems = viewModel.itemsFlow.collectAsStateValue().filter { selectedIds.contains(it.id) }
+        BatchSelectTagsDialog(tagsViewModel, tagsState, selectedItems, removeFromTags) {
             showSelectTagsDialog = false
-            viewModel.exitSelectMode()
+            dragSelectState.exitSelectMode()
         }
     }
 
@@ -82,7 +84,7 @@ fun FilesSelectModeBottomActions(
                 icon = Icons.Outlined.Share,
                 text = LocaleHelper.getString(R.string.share),
                 click = {
-                    ShareHelper.shareUris(context, viewModel.selectedIds.map { ImageMediaStoreHelper.getItemUri(it) })
+                    ShareHelper.shareUris(context, dragSelectState.selectedIds.map { ImageMediaStoreHelper.getItemUri(it) })
                 }
             )
             PIconTextActionButton(
@@ -90,8 +92,8 @@ fun FilesSelectModeBottomActions(
                 text = LocaleHelper.getString(R.string.delete),
                 click = {
                     DialogHelper.confirmToDelete {
-                        viewModel.delete(context, viewModel.selectedIds.toSet())
-                        viewModel.exitSelectMode()
+                        viewModel.delete(context, dragSelectState.selectedIds.toSet())
+                        dragSelectState.exitSelectMode()
                     }
                 }
             )

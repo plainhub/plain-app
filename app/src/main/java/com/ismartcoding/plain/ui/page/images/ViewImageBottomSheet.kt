@@ -1,11 +1,7 @@
 package com.ismartcoding.plain.ui.page.images
 
 import android.content.ClipData
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Checklist
@@ -18,12 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -40,25 +33,19 @@ import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.helpers.SvgHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.GroupButton
-import com.ismartcoding.plain.ui.base.GroupButtons
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PIconTextActionButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
-import com.ismartcoding.plain.ui.base.PSelectionChip
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.components.FileRenameDialog
-import com.ismartcoding.plain.ui.components.NewTagButton
-import com.ismartcoding.plain.ui.components.TagNameDialog
 import com.ismartcoding.plain.ui.components.TagSelector
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import com.ismartcoding.plain.ui.models.enterSelectMode
-import com.ismartcoding.plain.ui.models.select
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -69,6 +56,7 @@ fun ViewImageBottomSheet(
     tagsViewModel: TagsViewModel,
     tagsMap: Map<String, List<DTagRelation>>,
     tagsState: List<DTag>,
+    dragSelectState: DragSelectState,
 ) {
     val m = viewModel.selectedItem.value ?: return
     val context = LocalContext.current
@@ -115,8 +103,8 @@ fun ViewImageBottomSheet(
                             icon = Icons.Outlined.Checklist,
                             text = LocaleHelper.getString(R.string.select),
                             click = {
-                                viewModel.enterSelectMode()
-                                viewModel.select(m.id)
+                                dragSelectState.enterSelectMode()
+                                dragSelectState.select(m.id)
                                 onDismiss()
                             }
                         )

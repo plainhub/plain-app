@@ -45,6 +45,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
+import com.ismartcoding.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
@@ -70,6 +71,9 @@ import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
+import com.ismartcoding.plain.ui.base.dragselect.gridDragSelect
+import com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState
 import com.ismartcoding.plain.ui.base.mediaviewer.previewer.ImagePreviewer
 import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.base.pinchzoomgrid.PinchZoomGridLayout
@@ -90,11 +94,6 @@ import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSearchMode
-import com.ismartcoding.plain.ui.models.exitSelectMode
-import com.ismartcoding.plain.ui.models.isAllSelected
-import com.ismartcoding.plain.ui.models.showBottomActions
-import com.ismartcoding.plain.ui.models.toggleSelectAll
-import com.ismartcoding.plain.ui.models.toggleSelectMode
 import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.Dispatchers
@@ -136,6 +135,8 @@ fun ImagesPage(
         cellsList = PlainTheme.cellsList,
         initialCellsIndex = lastCellIndex
     )
+    val dragSelectState = rememberDragSelectState(lazyGridState = pinchState.gridState)
+
     LaunchedEffect(pinchState.isZooming) {
         canScroll = !pinchState.isZooming
         lastCellIndex = PlainTheme.cellsList.indexOf(pinchState.currentCells)
@@ -175,8 +176,8 @@ fun ImagesPage(
     }
 
     val insetsController = WindowCompat.getInsetsController(window, view)
-    LaunchedEffect(viewModel.selectMode.value) {
-        if (viewModel.selectMode.value) {
+    LaunchedEffect(dragSelectState.selectMode, (previewerState.visible && !context.isGestureInteractionMode())) {
+        if (dragSelectState.selectMode || (previewerState.visible && !context.isGestureInteractionMode())) {
             insetsController.hide(WindowInsetsCompat.Type.navigationBars())
         } else {
             insetsController.show(WindowInsetsCompat.Type.navigationBars())
@@ -199,13 +200,13 @@ fun ImagesPage(
         }
     }
 
-    BackHandler(enabled = viewModel.selectMode.value || castViewModel.castMode.value || viewModel.showSearchBar.value || previewerState.visible) {
+    BackHandler(enabled = dragSelectState.selectMode || castViewModel.castMode.value || viewModel.showSearchBar.value || previewerState.visible) {
         if (previewerState.visible) {
             scope.launch {
                 previewerState.closeTransform()
             }
-        } else if (viewModel.selectMode.value) {
-            viewModel.exitSelectMode()
+        } else if (dragSelectState.selectMode) {
+            dragSelectState.exitSelectMode()
         } else if (castViewModel.castMode.value) {
             castViewModel.exitCastMode()
         } else if (viewModel.showSearchBar.value) {
@@ -216,7 +217,7 @@ fun ImagesPage(
         }
     }
 
-    ViewImageBottomSheet(viewModel, tagsViewModel, tagsMapState, tagsState)
+    ViewImageBottomSheet(viewModel, tagsViewModel, tagsMapState, tagsState, dragSelectState)
 
     if (viewModel.showSortDialog.value) {
         FileSortDialog(viewModel.sortBy, onSelected = {
@@ -249,9 +250,9 @@ fun ImagesPage(
                 }),
                 navController = navController,
                 navigationIcon = {
-                    if (viewModel.selectMode.value) {
+                    if (dragSelectState.selectMode) {
                         NavigationCloseIcon {
-                            viewModel.exitSelectMode()
+                            dragSelectState.exitSelectMode()
                         }
                     } else if (castViewModel.castMode.value) {
                         NavigationCloseIcon {
@@ -263,7 +264,7 @@ fun ImagesPage(
                         }
                     }
                 },
-                title = getPageTitle(viewModel, castViewModel, bucketsMap.value[bucketId]),
+                title = getPageTitle(viewModel, castViewModel, bucketsMap.value[bucketId], dragSelectState),
                 actions = {
                     if (!hasPermission) {
                         return@PTopAppBar
@@ -271,11 +272,11 @@ fun ImagesPage(
                     if (castViewModel.castMode.value) {
                         return@PTopAppBar
                     }
-                    if (viewModel.selectMode.value) {
+                    if (dragSelectState.selectMode) {
                         PMiniOutlineButton(
-                            text = stringResource(if (viewModel.isAllSelected()) R.string.unselect_all else R.string.select_all),
+                            text = stringResource(if (dragSelectState.isAllSelected(itemsState)) R.string.unselect_all else R.string.select_all),
                             onClick = {
-                                viewModel.toggleSelectAll()
+                                dragSelectState.toggleSelectAll(itemsState)
                             },
                         )
                         HorizontalSpace(dp = 8.dp)
@@ -295,7 +296,7 @@ fun ImagesPage(
                         ActionButtonMoreWithMenu { dismiss ->
                             PDropdownMenuItemSelect(onClick = {
                                 dismiss()
-                                viewModel.toggleSelectMode()
+                                dragSelectState.enterSelectMode()
                             })
                             PDropdownMenuItemTags(onClick = {
                                 dismiss()
@@ -316,10 +317,10 @@ fun ImagesPage(
         },
         bottomBar = {
             AnimatedVisibility(
-                visible = viewModel.showBottomActions(),
+                visible = dragSelectState.showBottomActions(),
                 enter = slideInVertically { it },
                 exit = slideOutVertically { it }) {
-                FilesSelectModeBottomActions(viewModel, tagsViewModel, tagsState)
+                FilesSelectModeBottomActions(viewModel, tagsViewModel, tagsState, dragSelectState)
             }
         },
     ) {
@@ -328,7 +329,7 @@ fun ImagesPage(
             return@PScaffold
         }
 
-        if (!viewModel.selectMode.value) {
+        if (!dragSelectState.selectMode) {
             Row(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
@@ -385,7 +386,12 @@ fun ImagesPage(
                     PinchZoomGridLayout(state = pinchState) {
                         LazyVerticalGrid(
                             state = gridState,
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .gridDragSelect(
+                                    items = itemsState,
+                                    state = dragSelectState,
+                                ),
                             columns = gridCells,
                             userScrollEnabled = canScroll,
                             horizontalArrangement = Arrangement.spacedBy(1.dp),
@@ -409,7 +415,8 @@ fun ImagesPage(
                                     viewModel,
                                     castViewModel,
                                     m,
-                                    previewerState
+                                    previewerState,
+                                    dragSelectState
                                 )
                             }
                             item(
@@ -443,12 +450,12 @@ fun ImagesPage(
 }
 
 @Composable
-fun getPageTitle(viewModel: ImagesViewModel, castViewModel: CastViewModel, bucket: DMediaBucket?): String {
+fun getPageTitle(viewModel: ImagesViewModel, castViewModel: CastViewModel, bucket: DMediaBucket?, dragSelectState: DragSelectState): String {
     val imageName = bucket?.name ?: stringResource(id = R.string.images)
     return if (castViewModel.castMode.value) {
         stringResource(id = R.string.cast_mode) + " - " + CastPlayer.currentDevice?.description?.device?.friendlyName
-    } else if (viewModel.selectMode.value) {
-        LocaleHelper.getStringF(R.string.x_selected, "count", viewModel.selectedIds.size)
+    } else if (dragSelectState.selectMode) {
+        LocaleHelper.getStringF(R.string.x_selected, "count", dragSelectState.selectedIds.size)
     } else if (viewModel.tag.value != null) {
         imageName + " - " + viewModel.tag.value!!.name
     } else if (viewModel.trash.value) {

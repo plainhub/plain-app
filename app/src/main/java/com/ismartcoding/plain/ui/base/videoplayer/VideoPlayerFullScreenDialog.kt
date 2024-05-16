@@ -108,7 +108,6 @@ internal fun VideoPlayerFullScreenDialog(
                 defaultPlayerView = internalFullScreenPlayerView,
                 player = player,
                 usePlayerController = true,
-                handleLifecycle = !enablePip,
                 autoDispose = false,
                 enablePip = enablePip,
                 surfaceResizeMode = resizeMode,

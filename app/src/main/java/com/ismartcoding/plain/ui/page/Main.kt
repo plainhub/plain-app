@@ -44,7 +44,7 @@ import coil3.compose.setSingletonImageLoaderFactory
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.getFilenameFromPath
-import com.ismartcoding.lib.extensions.isGestureNavigationBar
+import com.ismartcoding.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.extensions.parcelableArrayList
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
@@ -223,7 +223,7 @@ fun Main(viewModel: MainViewModel) {
         setSingletonImageLoaderFactory(::newImageLoader)
 
         window.statusBarColor = Color.Transparent.toArgb()
-        window.navigationBarColor = if (context.isGestureNavigationBar()) Color.Transparent.toArgb() else MaterialTheme.colorScheme.background.toArgb()
+        window.navigationBarColor = if (context.isGestureInteractionMode()) Color.Transparent.toArgb() else MaterialTheme.colorScheme.background.toArgb()
         insetsController.isAppearanceLightStatusBars = !useDarkTheme
         insetsController.isAppearanceLightNavigationBars = !useDarkTheme
 

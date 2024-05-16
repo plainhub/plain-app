@@ -17,11 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.session.MediaSession
+import androidx.media3.ui.PlayerView
 import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.plain.ui.base.mediaviewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
 import com.ismartcoding.plain.ui.base.videoplayer.VideoPlayer
@@ -46,10 +48,13 @@ fun MediaVideo(
 ) {
     val scope = rememberCoroutineScope()
     val viewerAlpha = remember { Animatable(0F) }
-
+    val view = LocalView.current
     val context = LocalContext.current
 
     var mediaSession = remember<MediaSession?> { null }
+    val defaultPlayerView = remember {
+        PlayerView(context)
+    }
     val player = rememberVideoPlayer(context, playerInstance = {
         addAnalyticsListener(object : AnalyticsListener {
             override fun onPlayWhenReadyChanged(
@@ -57,6 +62,10 @@ fun MediaVideo(
                 playWhenReady: Boolean,
                 reason: Int,
             ) {
+            }
+
+            override fun onIsPlayingChanged(eventTime: AnalyticsListener.EventTime, isPlaying: Boolean) {
+                defaultPlayerView.keepScreenOn = isPlaying
             }
 
             override fun onVolumeChanged(
@@ -120,6 +129,7 @@ fun MediaVideo(
             modifier = Modifier
                 .align(Alignment.Center),
             player = player,
+            playerView = defaultPlayerView,
         )
     }
 }

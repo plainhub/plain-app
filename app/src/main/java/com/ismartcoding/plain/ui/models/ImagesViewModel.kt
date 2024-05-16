@@ -24,11 +24,10 @@ import kotlinx.coroutines.launch
 
 @OptIn(SavedStateHandleSaveableApi::class)
 class ImagesViewModel(private val savedStateHandle: SavedStateHandle) :
-    ISelectableViewModel<DImage>,
     ISearchableViewModel<DImage>,
     ViewModel() {
     private val _itemsFlow = MutableStateFlow(mutableStateListOf<DImage>())
-    override val itemsFlow: StateFlow<List<DImage>> get() = _itemsFlow
+    val itemsFlow: StateFlow<List<DImage>> get() = _itemsFlow
     val showLoading = mutableStateOf(true)
     val offset = mutableIntStateOf(0)
     val limit = mutableIntStateOf(1000)
@@ -47,9 +46,6 @@ class ImagesViewModel(private val savedStateHandle: SavedStateHandle) :
     override val showSearchBar = mutableStateOf(false)
     override val searchActive = mutableStateOf(false)
     override val queryText = mutableStateOf("")
-
-    override var selectMode = mutableStateOf(false)
-    override val selectedIds = mutableStateListOf<String>()
 
     fun moreAsync(context: Context, tagsViewModel: TagsViewModel) {
         offset.value += limit.value

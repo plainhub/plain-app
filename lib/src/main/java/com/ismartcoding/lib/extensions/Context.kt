@@ -265,7 +265,7 @@ fun Context.isWifiConnected(): Boolean {
     return capabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
 }
 
-fun Context.isGestureNavigationBar(): Boolean {
+fun Context.isGestureInteractionMode(): Boolean {
     val resourceId = resources.getIdentifier("config_navBarInteractionMode", "integer", "android")
     if (resourceId == 0) {
         return false

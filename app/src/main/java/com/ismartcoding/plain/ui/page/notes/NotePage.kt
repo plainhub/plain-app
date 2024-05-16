@@ -256,9 +256,7 @@ fun NotePage(
             )
         },
         modifier = Modifier
-            .fillMaxSize()
             .imePadding(),
-
         bottomBar = {
             AnimatedVisibility(
                 visible = viewModel.editMode,

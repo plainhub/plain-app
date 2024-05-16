@@ -3,14 +3,19 @@ package com.ismartcoding.plain.ui.components
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,13 +27,13 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.helpers.FormatHelper
+import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.base.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.base.mediaviewer.previewer.TransformImageView
 import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.MediaPreviewData
-import com.ismartcoding.plain.ui.models.select
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -39,8 +44,11 @@ fun ImageGridItem(
     castViewModel: CastViewModel,
     m: DImage,
     previewerState: MediaPreviewerState,
+    dragSelectState: DragSelectState
 ) {
-    val isSelected = viewModel.selectedIds.contains(m.id) || viewModel.selectedItem.value?.id == m.id
+    val isSelected by remember { derivedStateOf { dragSelectState.isSelected(m.id) } }
+    val inSelectionMode = dragSelectState.selectMode
+    val selected = isSelected || viewModel.selectedItem.value?.id == m.id
     val context = LocalContext.current
     val itemState = rememberTransformItemState()
     Box(
@@ -49,8 +57,8 @@ fun ImageGridItem(
                 onClick = {
                     if (castViewModel.castMode.value) {
                         castViewModel.cast(m.path)
-                    } else if (viewModel.selectMode.value) {
-                        viewModel.select(m.id)
+                    } else if (inSelectionMode) {
+                        dragSelectState.addSelected(m.id)
                     } else {
                         coMain {
                             withIO { MediaPreviewData.setDataAsync(context, itemState, viewModel.itemsFlow.value, m) }
@@ -62,10 +70,28 @@ fun ImageGridItem(
                     }
                 },
                 onLongClick = {
-                    if (viewModel.selectMode.value) {
+                    if (inSelectionMode) {
                         return@combinedClickable
                     }
                     viewModel.selectedItem.value = m
+                },
+            )
+            .then(
+                if (!inSelectionMode) {
+                    Modifier
+                } else {
+                    Modifier.toggleable(
+                        value = selected,
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onValueChange = { toggled ->
+                            if (toggled) {
+                                dragSelectState.addSelected(m.id)
+                            } else {
+                                dragSelectState.removeSelected(m.id)
+                            }
+                        }
+                    )
                 },
             ),
     ) {
@@ -81,21 +107,23 @@ fun ImageGridItem(
             previewerState = previewerState,
         )
 
-        if (isSelected) {
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.3f))
-                .aspectRatio(1f))
+        if (selected) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White.copy(alpha = 0.5f))
+                    .aspectRatio(1f)
+            )
         }
 
-        if (viewModel.selectMode.value) {
+        if (inSelectionMode) {
             Checkbox(
                 modifier =
                 Modifier
                     .align(Alignment.TopStart),
-                checked = isSelected,
+                checked = selected,
                 onCheckedChange = {
-                    viewModel.select(m.id)
+                    dragSelectState.select(m.id)
                 })
         }
         Box(

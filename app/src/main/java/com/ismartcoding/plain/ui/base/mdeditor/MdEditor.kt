@@ -60,7 +60,6 @@ fun MdEditor(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceContainerLowest)
-            .padding(bottom = 56.dp)
     ) {
         val lineNumberWidth = if (viewModel.showLineNumbers) measureTextWidth(" ${lineCount + 1} ", MaterialTheme.typography.bodyLarge) else 0.dp
         if (viewModel.showLineNumbers) {

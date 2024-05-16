@@ -19,6 +19,7 @@ import androidx.compose.ui.window.SecureFlagPolicy
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.C.AUDIO_CONTENT_TYPE_MOVIE
+import androidx.media3.common.Player
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_NONE
 import androidx.media3.common.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
@@ -35,7 +36,7 @@ import androidx.media3.ui.PlayerView
 fun VideoPlayer(
     modifier: Modifier = Modifier,
     player: ExoPlayer,
-    handleLifecycle: Boolean = true,
+    playerView: PlayerView,
     usePlayerController: Boolean = true,
     controllerConfig: VideoPlayerControllerConfig = VideoPlayerControllerConfig(),
     repeatMode: RepeatMode = RepeatMode.NONE,
@@ -49,27 +50,23 @@ fun VideoPlayer(
     enablePipWhenBackPressed: Boolean = false,
 ) {
     val context = LocalContext.current
-    val defaultPlayerView = remember {
-        PlayerView(context)
-    }
-
     BackHandler(enablePip && enablePipWhenBackPressed) {
-        enterPIPMode(context, defaultPlayerView)
+        enterPIPMode(context, playerView)
         player.play()
     }
 
     LaunchedEffect(usePlayerController) {
-        defaultPlayerView.useController = usePlayerController
+        playerView.useController = usePlayerController
     }
 
     LaunchedEffect(player) {
-        defaultPlayerView.player = player
+        playerView.player = player
     }
 
     var isFullScreenModeEntered by remember { mutableStateOf(defaultFullScreen) }
 
     LaunchedEffect(controllerConfig) {
-        controllerConfig.applyToExoPlayerView(defaultPlayerView) {
+        controllerConfig.applyToExoPlayerView(playerView) {
             isFullScreenModeEntered = it
 
             if (it) {
@@ -79,7 +76,7 @@ fun VideoPlayer(
     }
 
     LaunchedEffect(controllerConfig, repeatMode) {
-        defaultPlayerView.setRepeatToggleModes(
+        playerView.setRepeatToggleModes(
             if (controllerConfig.showRepeatModeButton) {
                 REPEAT_TOGGLE_MODE_ALL or REPEAT_TOGGLE_MODE_ONE
             } else {
@@ -95,10 +92,9 @@ fun VideoPlayer(
 
     VideoPlayerSurface(
         modifier = modifier,
-        defaultPlayerView = defaultPlayerView,
+        defaultPlayerView = playerView,
         player = player,
         usePlayerController = usePlayerController,
-        handleLifecycle = handleLifecycle,
         enablePip = enablePip,
         surfaceResizeMode = resizeMode
     )
@@ -108,14 +104,14 @@ fun VideoPlayer(
 
         VideoPlayerFullScreenDialog(
             player = player,
-            currentPlayerView = defaultPlayerView,
+            currentPlayerView = playerView,
             controllerConfig = controllerConfig,
             repeatMode = repeatMode,
             resizeMode = resizeMode,
             onDismissRequest = {
                 fullScreenPlayerView?.let {
-                    PlayerView.switchTargetView(player, it, defaultPlayerView)
-                    defaultPlayerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_fullscreen)
+                    PlayerView.switchTargetView(player, it, playerView)
+                    playerView.findViewById<ImageButton>(androidx.media3.ui.R.id.exo_fullscreen)
                         .performClick()
                     val currentActivity = context.findActivity()
                     currentActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT

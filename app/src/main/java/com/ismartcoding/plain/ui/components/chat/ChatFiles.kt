@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.components.chat
 
 import android.content.Context
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -57,6 +60,8 @@ fun ChatFiles(
     previewerState: MediaPreviewerState,
 ) {
     val fileItems = (m.value as DMessageFiles).items
+    val context = LocalContext.current as ComponentActivity
+    val keyboardController = LocalSoftwareKeyboardController.current
     Column {
         fileItems.forEachIndexed { index, item ->
             val itemState = rememberTransformItemState()
@@ -68,6 +73,7 @@ fun ChatFiles(
                     .clickable {
                         if (path.isImageFast() || path.isVideoFast()) {
                             coMain {
+                                keyboardController?.hide()
                                 withIO {
                                     MediaPreviewData.setDataAsync(
                                         context, itemState, fileItems
