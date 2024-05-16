@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -19,10 +20,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.RssFeed
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -34,6 +38,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -65,6 +71,9 @@ import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
+import com.ismartcoding.plain.ui.base.fastscroll.ScrollbarSelectionMode
+import com.ismartcoding.plain.ui.base.fastscroll.ScrollbarSettings
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefreshContent
@@ -376,49 +385,57 @@ fun FeedEntriesPage(
                 exit = fadeOut()
             ) {
                 if (itemsState.isNotEmpty()) {
-                    LazyColumn(
-                        Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(),
-                        state = scrollState,
+                    LazyColumnScrollbar(
+                        scrollState,
+                        settings = ScrollbarSettings(
+                        ),
+                        indicatorContent = { index, isThumbSelected ->
+                        }
                     ) {
-                        item {
-                            TopSpace()
-                        }
-                        items(itemsState, key = { it.id }) { m ->
-                            val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
-                            FeedEntryListItem(
-                                viewModel,
-                                tagsViewModel,
-                                m,
-                                feedsMap.value[m.feedId],
-                                tagsState.filter { tagIds.contains(it.id) },
-                                onClick = {
-                                    if (viewModel.selectMode.value) {
-                                        viewModel.select(m.id)
-                                    } else {
-                                        navController.navigate("${RouteName.FEED_ENTRIES.name}/${m.id}")
-                                    }
-                                },
-                                onLongClick = {
-                                    if (viewModel.selectMode.value) {
-                                        return@FeedEntryListItem
-                                    }
-                                    viewModel.selectedItem.value = m
-                                }
-                            )
-                            VerticalSpace(dp = 8.dp)
-                        }
-                        item {
-                            if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
-                                LaunchedEffect(Unit) {
-                                    scope.launch(Dispatchers.IO) {
-                                        withIO { viewModel.moreAsync(tagsViewModel) }
-                                    }
-                                }
+                        LazyColumn(
+                            Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(),
+                            state = scrollState,
+                        ) {
+                            item {
+                                TopSpace()
                             }
-                            LoadMoreRefreshContent(viewModel.noMore.value)
-                            BottomSpace()
+                            items(itemsState, key = { it.id }) { m ->
+                                val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
+                                FeedEntryListItem(
+                                    viewModel,
+                                    tagsViewModel,
+                                    m,
+                                    feedsMap.value[m.feedId],
+                                    tagsState.filter { tagIds.contains(it.id) },
+                                    onClick = {
+                                        if (viewModel.selectMode.value) {
+                                            viewModel.select(m.id)
+                                        } else {
+                                            navController.navigate("${RouteName.FEED_ENTRIES.name}/${m.id}")
+                                        }
+                                    },
+                                    onLongClick = {
+                                        if (viewModel.selectMode.value) {
+                                            return@FeedEntryListItem
+                                        }
+                                        viewModel.selectedItem.value = m
+                                    }
+                                )
+                                VerticalSpace(dp = 8.dp)
+                            }
+                            item {
+                                if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
+                                    LaunchedEffect(Unit) {
+                                        scope.launch(Dispatchers.IO) {
+                                            withIO { viewModel.moreAsync(tagsViewModel) }
+                                        }
+                                    }
+                                }
+                                LoadMoreRefreshContent(viewModel.noMore.value)
+                                BottomSpace()
+                            }
                         }
                     }
                 } else {
@@ -426,5 +443,27 @@ fun FeedEntriesPage(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun Indicator(text: String, isThumbSelected: Boolean) {
+    Surface {
+        Text(
+            text = text,
+            Modifier
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 20.dp,
+                        bottomStart = 20.dp,
+                        bottomEnd = 16.dp
+                    )
+                )
+                .background(Color.Green)
+                .padding(8.dp)
+                .clip(CircleShape)
+                .background(if (isThumbSelected) Color.Red else MaterialTheme.colorScheme.background)
+                .padding(12.dp)
+        )
     }
 }

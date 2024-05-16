@@ -82,6 +82,7 @@ import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.mediaviewer.previewer.ImagePreviewer
 import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
@@ -331,7 +332,7 @@ fun ChatPage(
                 SelectModeBottomActions(viewModel)
             }
         },
-        content = {
+        content = { paddingValues ->
             Column(
                 Modifier
                     .fillMaxHeight(),
@@ -367,9 +368,7 @@ fun ChatPage(
                 }
                 ChatInput(
                     value = inputValue,
-                    modifier =
-                    Modifier
-                        .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
+                    bottom = paddingValues.calculateBottomPadding(),
                     hint = stringResource(id = R.string.chat_input_hint),
                     onValueChange = { inputValue = it },
                     onSend = {

@@ -28,7 +28,7 @@ fun PScaffold(
         containerColor = containerColor,
         topBar = topBar,
         content = { paddingValues ->
-            Column(modifier = Modifier.padding(paddingValues)) {
+            Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 content(paddingValues)
             }
         },
