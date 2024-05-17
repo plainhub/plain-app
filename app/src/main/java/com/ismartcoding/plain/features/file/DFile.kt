@@ -12,7 +12,7 @@ data class DFile(
     val size: Long,
     val isDir: Boolean,
     val children: Int,
-    val mediaStoreId: String = ""
+    val mediaId: String = ""
 ) : IData {
     override var id: String
         get() = path

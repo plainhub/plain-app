@@ -64,6 +64,7 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.SwipeActionButton
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
@@ -303,98 +304,102 @@ fun NotesPage(
                 exit = fadeOut()
             ) {
                 if (itemsState.isNotEmpty()) {
-                    LazyColumn(
-                        Modifier
-                            .fillMaxSize(),
+                    LazyColumnScrollbar(
                         state = scrollState,
                     ) {
-                        item {
-                            TopSpace()
-                        }
-                        items(itemsState, key = {
-                            it.id
-                        }) { m ->
-                            PSwipeBox(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentHeight(),
-                                enabled = !viewModel.selectMode.value,
-                                startContent = if (viewModel.trash.value) {
-                                    { state ->
-                                        HorizontalSpace(dp = 32.dp)
-                                        SwipeActionButton(
-                                            text = stringResource(R.string.restore),
-                                            color = colorResource(id = R.color.blue),
-                                            onClick = {
-                                                scope.launch {
-                                                    state.animateTo(DragAnchors.Center)
-                                                }
-                                                val ids = setOf(m.id)
-                                                viewModel.untrash(ids)
-                                            })
-                                    }
-                                } else null,
-                                endContent = { state ->
-                                    if (viewModel.trash.value) {
-                                        SwipeActionButton(
-                                            text = stringResource(R.string.delete),
-                                            color = colorResource(id = R.color.red),
-                                            onClick = {
-                                                scope.launch {
-                                                    state.animateTo(DragAnchors.Center)
-                                                }
-                                                val ids = setOf(m.id)
-                                                viewModel.delete(ids)
-                                            })
-                                    } else {
-                                        SwipeActionButton(
-                                            text = stringResource(R.string.move_to_trash),
-                                            color = colorResource(id = R.color.red),
-                                            onClick = {
-                                                scope.launch {
-                                                    state.animateTo(DragAnchors.Center)
-                                                }
-                                                val ids = setOf(m.id)
-                                                viewModel.trash(ids)
-                                            })
-                                    }
-
-                                    HorizontalSpace(dp = 32.dp)
-                                }
-                            ) {
-                                val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
-                                NoteListItem(
-                                    viewModel,
-                                    tagsViewModel,
-                                    m,
-                                    tagsState.filter { tagIds.contains(it.id) },
-                                    onClick = {
-                                        if (viewModel.selectMode.value) {
-                                            viewModel.select(m.id)
+                        LazyColumn(
+                            Modifier
+                                .fillMaxSize(),
+                            state = scrollState,
+                        ) {
+                            item {
+                                TopSpace()
+                            }
+                            items(itemsState, key = {
+                                it.id
+                            }) { m ->
+                                PSwipeBox(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight(),
+                                    enabled = !viewModel.selectMode.value,
+                                    startContent = if (viewModel.trash.value) {
+                                        { state ->
+                                            HorizontalSpace(dp = 32.dp)
+                                            SwipeActionButton(
+                                                text = stringResource(R.string.restore),
+                                                color = colorResource(id = R.color.blue),
+                                                onClick = {
+                                                    scope.launch {
+                                                        state.animateTo(DragAnchors.Center)
+                                                    }
+                                                    val ids = setOf(m.id)
+                                                    viewModel.untrash(ids)
+                                                })
+                                        }
+                                    } else null,
+                                    endContent = { state ->
+                                        if (viewModel.trash.value) {
+                                            SwipeActionButton(
+                                                text = stringResource(R.string.delete),
+                                                color = colorResource(id = R.color.red),
+                                                onClick = {
+                                                    scope.launch {
+                                                        state.animateTo(DragAnchors.Center)
+                                                    }
+                                                    val ids = setOf(m.id)
+                                                    viewModel.delete(ids)
+                                                })
                                         } else {
-                                            navController.navigate("${RouteName.NOTES.name}/${m.id}")
+                                            SwipeActionButton(
+                                                text = stringResource(R.string.move_to_trash),
+                                                color = colorResource(id = R.color.red),
+                                                onClick = {
+                                                    scope.launch {
+                                                        state.animateTo(DragAnchors.Center)
+                                                    }
+                                                    val ids = setOf(m.id)
+                                                    viewModel.trash(ids)
+                                                })
                                         }
-                                    },
-                                    onLongClick = {
-                                        if (viewModel.selectMode.value) {
-                                            return@NoteListItem
-                                        }
-                                        viewModel.selectedItem.value = m
+
+                                        HorizontalSpace(dp = 32.dp)
                                     }
-                                )
+                                ) {
+                                    val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
+                                    NoteListItem(
+                                        viewModel,
+                                        tagsViewModel,
+                                        m,
+                                        tagsState.filter { tagIds.contains(it.id) },
+                                        onClick = {
+                                            if (viewModel.selectMode.value) {
+                                                viewModel.select(m.id)
+                                            } else {
+                                                navController.navigate("${RouteName.NOTES.name}/${m.id}")
+                                            }
+                                        },
+                                        onLongClick = {
+                                            if (viewModel.selectMode.value) {
+                                                return@NoteListItem
+                                            }
+                                            viewModel.selectedItem.value = m
+                                        }
+                                    )
+                                }
+                                VerticalSpace(dp = 8.dp)
                             }
-                            VerticalSpace(dp = 8.dp)
-                        }
-                        item {
-                            if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
-                                LaunchedEffect(Unit) {
-                                    scope.launch(Dispatchers.IO) {
-                                        withIO { viewModel.moreAsync(tagsViewModel) }
+                            item {
+                                if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
+                                    LaunchedEffect(Unit) {
+                                        scope.launch(Dispatchers.IO) {
+                                            withIO { viewModel.moreAsync(tagsViewModel) }
+                                        }
                                     }
                                 }
+                                LoadMoreRefreshContent(viewModel.noMore.value)
+                                BottomSpace()
                             }
-                            LoadMoreRefreshContent(viewModel.noMore.value)
-                            BottomSpace()
                         }
                     }
                 } else {

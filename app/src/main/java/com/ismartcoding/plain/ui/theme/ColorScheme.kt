@@ -18,3 +18,12 @@ fun ColorScheme.bottomAppBarContainer(): Color {
 }
 
 
+@Composable
+fun ColorScheme.lightMask(): Color {
+    return Color.White.copy(alpha = 0.4f)
+}
+
+@Composable
+fun ColorScheme.darkMask(alpha: Float = 0.4f): Color {
+    return Color.Black.copy(alpha = alpha)
+}

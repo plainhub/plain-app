@@ -31,6 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -120,10 +121,7 @@ fun WebAddressBar(
         }
         PIconButton(
             icon = Icons.Rounded.Edit,
-            modifier =
-            Modifier
-                .height(20.dp)
-                .width(20.dp),
+            iconSize = 20.dp,
             contentDescription = stringResource(id = R.string.edit),
             tint = MaterialTheme.colorScheme.onSurface,
             onClick = {
@@ -139,10 +137,7 @@ fun WebAddressBar(
             ) {
                 PIconButton(
                     icon = Icons.Rounded.MoreVert,
-                    modifier =
-                    Modifier
-                        .height(20.dp)
-                        .width(20.dp),
+                    iconSize = 20.dp,
                     contentDescription = stringResource(id = R.string.more),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     onClick = {

@@ -4,28 +4,43 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.Context
 import android.graphics.ImageFormat
+import android.view.HapticFeedbackConstants
+import android.view.SoundEffectConstants
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ContentCopy
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.rounded.Cancel
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Image
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -38,6 +53,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -69,19 +85,28 @@ import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.features.RequestPermissionsEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.QrCodeScanHelper
+import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.preference.ScanHistoryPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.HorizontalSpace
+import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
+import com.ismartcoding.plain.ui.base.PIcon
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
+import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TextCard
 import com.ismartcoding.plain.ui.base.TopSpace
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.page.RouteName
+import com.ismartcoding.plain.ui.theme.darkMask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import java.io.File
 import java.nio.ByteBuffer
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -167,9 +192,22 @@ fun ScanPage(navController: NavHostController) {
         }
     }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = Color.Transparent,
+    PScaffold(
+        topBar = {
+            PTopAppBar(
+                navController = navController,
+                title = stringResource(id = R.string.scan_qrcode),
+                actions = {
+                    PIconButton(
+                        icon = Icons.Rounded.History,
+                        contentDescription = stringResource(R.string.scan_history),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    ) {
+                        navController.navigate(RouteName.SCAN_HISTORY)
+                    }
+                },
+            )
+        },
         content = {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -255,49 +293,29 @@ fun ScanPage(navController: NavHostController) {
                         modifier = Modifier.fillMaxSize(),
                     )
                 }
-                TopAppBar(
-                    title = { },
-                    navigationIcon = {
-                        PIconButton(
-                            modifier = Modifier.size(40.dp).padding(start = 16.dp),
-                            containerModifier = Modifier.size(64.dp),
-                            icon = Icons.Rounded.Cancel,
-                            contentDescription = stringResource(R.string.back),
-                            tint = Color.White,
-                        ) {
-                            navController.popBackStack()
-                        }
-                    },
-                    colors =
-                    TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.Transparent,
-                    ),
-                )
                 Row(
                     modifier =
                     Modifier
                         .fillMaxWidth()
                         .padding(start = 24.dp, end = 24.dp, bottom = 64.dp)
                         .align(Alignment.BottomCenter),
+                    horizontalArrangement = Arrangement.End,
                 ) {
-                    PIconButton(
-                        modifier = Modifier.size(40.dp),
-                        containerModifier = Modifier.size(64.dp),
-                        icon = Icons.Rounded.History,
-                        contentDescription = stringResource(R.string.scan_history),
-                        tint = Color.White,
+                    Box(
+                        modifier = Modifier
+                            .size(56.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.darkMask(0.2f))
+                            .clickable {
+                                sendEvent(PickFileEvent(PickFileTag.SCAN, PickFileType.IMAGE, multiple = false))
+                            },
+                        contentAlignment = Alignment.Center
                     ) {
-                        navController.navigate(RouteName.SCAN_HISTORY)
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    PIconButton(
-                        modifier = Modifier.size(40.dp),
-                        containerModifier = Modifier.size(size = 64.dp),
-                        icon = Icons.Rounded.Image,
-                        contentDescription = stringResource(R.string.images),
-                        tint = Color.White,
-                    ) {
-                        sendEvent(PickFileEvent(PickFileTag.SCAN, PickFileType.IMAGE, multiple = false))
+                        Icon(
+                            imageVector = Icons.Rounded.Image,
+                            contentDescription = stringResource(R.string.images),
+                            tint = Color.White,
+                        )
                     }
                 }
             }

@@ -42,9 +42,9 @@ import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.MediaPreviewerState
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.TransformImageView
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberTransformItemState
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformImageView
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.extensions.navigateOtherFile
 import com.ismartcoding.plain.ui.extensions.navigatePdf
 import com.ismartcoding.plain.ui.extensions.navigateTextFile
@@ -77,7 +77,7 @@ fun ChatFiles(
                                 withIO {
                                     MediaPreviewData.setDataAsync(
                                         context, itemState, fileItems
-                                            .filter { it.uri.isVideoFast() || it.uri.isImageFast() }, item.id
+                                            .filter { it.uri.isVideoFast() || it.uri.isImageFast() }, item
                                     )
                                 }
                                 previewerState.openTransform(
@@ -91,7 +91,7 @@ fun ChatFiles(
                                 AudioPlayer.play(context, DPlaylistAudio.fromPath(context, path))
                             }
                         } else if (path.isTextFile()) {
-                            navController.navigateTextFile(path, mediaStoreId = "", type = TextFileType.CHAT)
+                            navController.navigateTextFile(path, mediaId = "", type = TextFileType.CHAT)
                         } else if (path.isPdfFile()) {
                             navController.navigatePdf(File(path).toUri())
                         } else {

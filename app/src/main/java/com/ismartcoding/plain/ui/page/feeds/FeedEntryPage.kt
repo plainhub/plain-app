@@ -7,6 +7,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -18,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Label
 import androidx.compose.material.icons.outlined.Link
@@ -38,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -61,16 +64,14 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.PClickableText
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.markdowntext.MarkdownText
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.ImagePreviewer
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberPreviewerState
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.ImagePreviewer
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
@@ -79,7 +80,6 @@ import com.ismartcoding.plain.ui.extensions.navigateText
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.FeedEntryViewModel
-import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.page.tags.SelectTagsDialog
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -259,20 +259,25 @@ fun FeedEntryPage(
                     state = scrollState,
                 ) {
                     item {
-                        TopSpace()
-                    }
-                    item {
-                        PClickableText(
-                            text = AnnotatedString(m.title),
-                            modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
-                            style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold),
-                            onDoubleClick = {
-                                navController.navigateText("JSON", jsonEncode(m, pretty = true), "json")
-                            },
-                            onClick = {
-                                WebHelper.open(context, m.url)
-                            }
-                        )
+                        Box(
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .clip(RoundedCornerShape(PlainTheme.CARD_RADIUS))
+                                .combinedClickable(
+                                    onDoubleClick = {
+                                        navController.navigateText("JSON", jsonEncode(m, pretty = true), "json")
+                                    },
+                                    onClick = {
+                                        WebHelper.open(context, m.url)
+                                    }),
+                        ) {
+                            Text(
+                                text = m.title,
+                                modifier = Modifier
+                                    .padding(8.dp),
+                                style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
+                            )
+                        }
                         VerticalSpace(dp = 8.dp)
                         val tags = tagsState.filter { tagIds.contains(it.id) }
                         FlowRow(

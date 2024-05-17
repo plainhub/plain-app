@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.base
 
 import android.graphics.Color
+import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.compose.runtime.Composable
@@ -43,6 +44,7 @@ fun AceEditor(
                 context,
                 data
             )
+            setLayerType(View.LAYER_TYPE_HARDWARE, null)
             addJavascriptInterface(
                 EditorWebViewInterface(
                     ready = {

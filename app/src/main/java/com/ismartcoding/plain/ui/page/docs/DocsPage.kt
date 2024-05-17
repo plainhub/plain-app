@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -25,9 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -37,7 +33,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
-import com.ismartcoding.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
@@ -58,6 +53,7 @@ import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
@@ -73,7 +69,6 @@ import com.ismartcoding.plain.ui.models.isAllSelected
 import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.ui.models.toggleSelectMode
-import com.ismartcoding.plain.ui.page.RouteName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -258,27 +253,31 @@ fun DocsPage(
                 exit = fadeOut()
             ) {
                 if (itemsState.isNotEmpty()) {
-                    LazyColumn(
-                        Modifier
-                            .fillMaxSize(),
+                    LazyColumnScrollbar(
                         state = scrollState,
                     ) {
-                        item {
-                            TopSpace()
-                        }
-                        items(itemsState) { m ->
-                            DocItem(navController, viewModel, m)
-                            VerticalSpace(dp = 8.dp)
-                        }
-                        item {
-                            if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
-                                LaunchedEffect(Unit) {
-                                    scope.launch(Dispatchers.IO) {
-                                        withIO { viewModel.moreAsync(context) }
+                        LazyColumn(
+                            Modifier
+                                .fillMaxSize(),
+                            state = scrollState,
+                        ) {
+                            item {
+                                TopSpace()
+                            }
+                            items(itemsState) { m ->
+                                DocItem(navController, viewModel, m)
+                                VerticalSpace(dp = 8.dp)
+                            }
+                            item {
+                                if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
+                                    LaunchedEffect(Unit) {
+                                        scope.launch(Dispatchers.IO) {
+                                            withIO { viewModel.moreAsync(context) }
+                                        }
                                     }
                                 }
+                                LoadMoreRefreshContent(viewModel.noMore.value)
                             }
-                            LoadMoreRefreshContent(viewModel.noMore.value)
                         }
                     }
                 } else {

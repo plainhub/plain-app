@@ -31,6 +31,11 @@ let editor
 function loadEditor(data) {
     editor = ace.edit('editor')
     editor.renderer.setAnimatedScroll(true)
+    editor.setOptions({
+        autoScrollEditorIntoView: true,
+        copyWithEmptySelection: true,
+        vScrollBarAlwaysVisible: true,
+    })
 
     if (data.isDarkTheme) {
         editor.setTheme('ace/theme/monokai')

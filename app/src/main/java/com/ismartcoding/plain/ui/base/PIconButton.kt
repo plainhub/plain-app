@@ -5,22 +5,28 @@ import android.view.SoundEffectConstants
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PIconButton(
-    modifier: Modifier = Modifier,
-    containerModifier: Modifier = Modifier,
     icon: Any,
-    contentDescription: String?,
+    iconSize: Dp = 24.dp,
     tint: Color = LocalContentColor.current,
+    contentDescription: String? = null,
     showBadge: Boolean = false,
     isHaptic: Boolean? = false,
     isSound: Boolean? = false,
@@ -28,9 +34,7 @@ fun PIconButton(
     onClick: () -> Unit = {},
 ) {
     val view = LocalView.current
-
     IconButton(
-        modifier = containerModifier,
         enabled = enabled,
         colors = IconButtonDefaults.iconButtonColors().copy(
             contentColor = tint,
@@ -56,14 +60,14 @@ fun PIconButton(
                 }
             ) {
                 PIcon(
-                    modifier = modifier,
+                    modifier = Modifier.size(iconSize),
                     icon = icon,
                     contentDescription = contentDescription,
                 )
             }
         } else {
             PIcon(
-                modifier = modifier,
+                modifier = Modifier.size(iconSize),
                 icon = icon,
                 contentDescription = contentDescription,
             )

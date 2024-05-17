@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import com.ismartcoding.lib.logcat.LogCat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import com.ismartcoding.plain.ui.base.fastscroll.ScrollbarSelectionMode
@@ -219,12 +220,17 @@ internal class LazyListStateController(
         val remainder: Float = exactIndex - floor(exactIndex)
 
         coroutineScope.launch {
-            state.scrollToItem(index = index, scrollOffset = 0)
-            val offset = realFirstVisibleItem.value
-                ?.size
-                ?.let { it.toFloat() * remainder }
-                ?: 0f
-            state.scrollBy(offset)
+            try {
+                state.scrollToItem(index = index, scrollOffset = 0)
+                val offset = realFirstVisibleItem.value
+                    ?.size
+                    ?.let { it.toFloat() * remainder }
+                    ?: 0f
+                state.scrollBy(offset)
+            } catch (ex: Throwable) {
+                LogCat.e(ex.toString())
+                ex.printStackTrace()
+            }
         }
     }
 }

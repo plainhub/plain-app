@@ -64,7 +64,7 @@ fun DocItem(
                             viewModel.select(m.id)
                         } else {
                             if (m.path.isTextFile()) {
-                                navController.navigateTextFile(m.path, mediaStoreId = m.mediaStoreId)
+                                navController.navigateTextFile(m.path, mediaId = m.mediaId)
                             } else if (m.path.isPdfFile()) {
                                 navController.navigatePdf(File(m.path).toUri())
                             } else {

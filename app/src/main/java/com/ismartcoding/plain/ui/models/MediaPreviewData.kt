@@ -2,10 +2,11 @@ package com.ismartcoding.plain.ui.models
 
 import android.content.Context
 import android.net.Uri
+import androidx.compose.ui.unit.toSize
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.db.DMessageFile
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.TransformItemState
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.preview.PreviewItem
 
 object MediaPreviewData {
@@ -16,14 +17,14 @@ object MediaPreviewData {
         context: Context,
         itemState: TransformItemState,
         files: List<DMessageFile>,
-        id: String
+        m: DMessageFile
     ) {
         items = files.map { f ->
-            PreviewItem(f.id, Uri.EMPTY, f.uri.getFinalPath(context), f.size)
+            PreviewItem(f.id, Uri.EMPTY, f.uri.getFinalPath(context), f.size, data = f)
         }
-        items.find { it.id == id }?.let {
-            it.initAsync(context, 0, 0)
-            itemState.intrinsicSize = it.intrinsicSize
+        items.find { it.id == m.id }?.let {
+            it.initAsync(context, m)
+            itemState.intrinsicSize = it.intrinsicSize.toSize()
         }
     }
 
@@ -34,11 +35,11 @@ object MediaPreviewData {
         m: DImage
     ) {
         MediaPreviewData.items = items.map { f ->
-            PreviewItem(f.id, Uri.EMPTY, f.path, f.size)
+            PreviewItem(f.id, Uri.EMPTY, f.path, f.size, mediaId = f.id, data = f)
         }
         MediaPreviewData.items.find { it.id == m.id }?.let {
             it.initAsync(context, m.width, m.height)
-            itemState.intrinsicSize = it.intrinsicSize
+            itemState.intrinsicSize = it.intrinsicSize.toSize()
         }
     }
 }

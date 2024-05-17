@@ -18,7 +18,7 @@ import com.ismartcoding.lib.markdown.NetworkSchemeHandler
 import com.ismartcoding.lib.markdown.image.ImagesPlugin
 import com.ismartcoding.plain.ui.base.coil.newImageLoader
 import com.ismartcoding.plain.ui.base.markdowntext.CoilImagesPlugin
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.MediaPreviewerState
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.preview.PreviewItem

@@ -74,8 +74,10 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.base.dragselect.gridDragSelect
 import com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.ImagePreviewer
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberPreviewerState
+import com.ismartcoding.plain.ui.base.fastscroll.LazyVerticalGridScrollbar
+import com.ismartcoding.plain.ui.base.fastscroll.ScrollbarSettings
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.ImagePreviewer
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.base.pinchzoomgrid.PinchZoomGridLayout
 import com.ismartcoding.plain.ui.base.pinchzoomgrid.rememberPinchZoomGridState
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
@@ -384,59 +386,63 @@ fun ImagesPage(
             ) {
                 if (itemsState.isNotEmpty()) {
                     PinchZoomGridLayout(state = pinchState) {
-                        LazyVerticalGrid(
+                        LazyVerticalGridScrollbar(
                             state = gridState,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .gridDragSelect(
-                                    items = itemsState,
-                                    state = dragSelectState,
-                                ),
-                            columns = gridCells,
-                            userScrollEnabled = canScroll,
-                            horizontalArrangement = Arrangement.spacedBy(1.dp),
-                            verticalArrangement = Arrangement.spacedBy(1.dp),
                         ) {
-                            items(itemsState,
-                                key = {
-                                    it.id
-                                },
-                                contentType = {
-                                    "image"
-                                },
-                                span = {
-                                    GridItemSpan(1)
-                                }) { m ->
-                                ImageGridItem(
-                                    modifier = Modifier
-                                        .pinchItem(key = m.id)
-                                        .animateItemPlacement(),
-                                    navController,
-                                    viewModel,
-                                    castViewModel,
-                                    m,
-                                    previewerState,
-                                    dragSelectState
-                                )
-                            }
-                            item(
-                                span = { GridItemSpan(maxLineSpan) },
-                                key = "loadMore"
+                            LazyVerticalGrid(
+                                state = gridState,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .gridDragSelect(
+                                        items = itemsState,
+                                        state = dragSelectState,
+                                    ),
+                                columns = gridCells,
+                                userScrollEnabled = canScroll,
+                                horizontalArrangement = Arrangement.spacedBy(1.dp),
+                                verticalArrangement = Arrangement.spacedBy(1.dp),
                             ) {
-                                if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
-                                    LaunchedEffect(Unit) {
-                                        scope.launch(Dispatchers.IO) {
-                                            withIO { viewModel.moreAsync(context, tagsViewModel) }
+                                items(itemsState,
+                                    key = {
+                                        it.id
+                                    },
+                                    contentType = {
+                                        "image"
+                                    },
+                                    span = {
+                                        GridItemSpan(1)
+                                    }) { m ->
+                                    ImageGridItem(
+                                        modifier = Modifier
+                                            .pinchItem(key = m.id)
+                                            .animateItemPlacement(),
+                                        navController,
+                                        viewModel,
+                                        castViewModel,
+                                        m,
+                                        previewerState,
+                                        dragSelectState
+                                    )
+                                }
+                                item(
+                                    span = { GridItemSpan(maxLineSpan) },
+                                    key = "loadMore"
+                                ) {
+                                    if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
+                                        LaunchedEffect(Unit) {
+                                            scope.launch(Dispatchers.IO) {
+                                                withIO { viewModel.moreAsync(context, tagsViewModel) }
+                                            }
                                         }
                                     }
+                                    LoadMoreRefreshContent(viewModel.noMore.value)
                                 }
-                                LoadMoreRefreshContent(viewModel.noMore.value)
-                            }
-                            item(
-                                span = { GridItemSpan(maxLineSpan) },
-                                key = "bottomSpace"
-                            ) {
-                                BottomSpace()
+                                item(
+                                    span = { GridItemSpan(maxLineSpan) },
+                                    key = "bottomSpace"
+                                ) {
+                                    BottomSpace()
+                                }
                             }
                         }
                     }
@@ -446,7 +452,23 @@ fun ImagesPage(
             }
         }
     }
-    ImagePreviewer(state = previewerState)
+    ImagePreviewer(
+        state = previewerState,
+        tagsViewModel = tagsViewModel,
+        tagsMap = tagsMapState,
+        tagsState = tagsState,
+        onRenamed = {
+            scope.launch(Dispatchers.IO) {
+                viewModel.loadAsync(context, tagsViewModel)
+            }
+        },
+        deleteAction = { item ->
+            scope.launch(Dispatchers.IO) {
+                viewModel.delete(context, setOf(item.mediaId))
+                previewerState.closeTransform()
+            }
+        },
+    )
 }
 
 @Composable

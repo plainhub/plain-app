@@ -29,10 +29,10 @@ class TextFileViewModel : ViewModel() {
         wrapContent.value = EditorWrapContentPreference.getAsync(context)
     }
 
-    fun loadFileAsync(context: Context, path: String, mediaStoreId: String) {
+    fun loadFileAsync(context: Context, path: String, mediaId: String) {
         try {
-            if (mediaStoreId.isNotEmpty()) {
-                file.value = FileMediaStoreHelper.getById(context, mediaStoreId)
+            if (mediaId.isNotEmpty()) {
+                file.value = FileMediaStoreHelper.getById(context, mediaId)
             }
             content.value = File(path).readText()
         } catch (e: Exception) {

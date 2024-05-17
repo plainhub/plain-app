@@ -6,6 +6,7 @@ import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import kotlinx.datetime.*
 import kotlinx.serialization.Serializable
@@ -22,9 +23,11 @@ fun DMessageContent.toJSONString(): String {
             DMessageType.TEXT.value -> {
                 valueJSON = jsonEncode(value as DMessageText)
             }
+
             DMessageType.IMAGES.value -> {
                 valueJSON = jsonEncode(value as DMessageImages)
             }
+
             DMessageType.FILES.value -> {
                 valueJSON = jsonEncode(value as DMessageFiles)
             }
@@ -46,7 +49,14 @@ enum class DMessageType(val value: String) {
 class DMessageText(val text: String)
 
 @Serializable
-class DMessageFile(val id: String = StringHelper.shortUUID(), val uri: String, val size: Long, val duration: Long = 0)
+class DMessageFile(
+    override var id: String = StringHelper.shortUUID(),
+    val uri: String,
+    val size: Long,
+    val duration: Long = 0,
+    val width: Int = 0,
+    val height: Int = 0,
+) : IData
 
 @Serializable
 class DMessageImages(val items: List<DMessageFile>)
@@ -82,9 +92,11 @@ data class DChat(
                 DMessageType.TEXT.value -> {
                     message.value = jsonDecode<DMessageText>(valueJson)
                 }
+
                 DMessageType.IMAGES.value -> {
                     message.value = jsonDecode<DMessageImages>(valueJson)
                 }
+
                 DMessageType.FILES.value -> {
                     message.value = jsonDecode<DMessageFiles>(valueJson)
                 }

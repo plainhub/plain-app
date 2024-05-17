@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.data
 
-import com.ismartcoding.plain.data.IData
 import kotlinx.datetime.Instant
 import java.io.Serializable
+
 
 data class DImage(
     override var id: String,

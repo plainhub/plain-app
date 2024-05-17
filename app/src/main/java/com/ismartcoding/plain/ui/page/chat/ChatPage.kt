@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -40,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -75,6 +75,8 @@ import com.ismartcoding.plain.features.DeleteChatItemViewEvent
 import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FileHelper
+import com.ismartcoding.plain.helpers.ImageHelper
+import com.ismartcoding.plain.helpers.VideoHelper
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
@@ -82,9 +84,9 @@ import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.ImagePreviewer
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberPreviewerState
+import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.ImagePreviewer
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
@@ -194,14 +196,29 @@ fun ChatPage(
                                                     }
                                                 }
                                             var dst = context.getExternalFilesDir(dir)!!.path + "/$fileName"
-                                            val dstFile = File(dst)
+                                            var dstFile = File(dst)
                                             if (dstFile.exists()) {
                                                 dst = dstFile.newPath()
+                                                dstFile = File(dst)
                                                 FileHelper.copyFile(context, uri, dst)
                                             } else {
                                                 FileHelper.copyFile(context, uri, dst)
                                             }
-                                            items.add(DMessageFile(StringHelper.shortUUID(), "app://$dir/${dst.getFilenameFromPath()}", size, dstFile.getDuration(context)))
+                                            val rotation = if (dst.isImageFast()) ImageHelper.getRotation(dst) else 0
+                                            val intrinsicSize = if (dst.isImageFast()) ImageHelper.getIntrinsicSize(dst, rotation) else if (dst.isVideoFast()) VideoHelper.getIntrinsicSize(
+                                                context,
+                                                dst
+                                            ) else IntSize.Zero
+                                            items.add(
+                                                DMessageFile(
+                                                    StringHelper.shortUUID(),
+                                                    "app://$dir/${dst.getFilenameFromPath()}",
+                                                    size,
+                                                    dstFile.getDuration(context),
+                                                    intrinsicSize.width,
+                                                    intrinsicSize.height,
+                                                )
+                                            )
                                         } catch (ex: Exception) {
                                             // the picked file could be deleted
                                             DialogHelper.showMessage(ex)
@@ -343,26 +360,30 @@ fun ChatPage(
                     Modifier
                         .weight(1F),
                 ) {
-                    LazyColumn(
-                        modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(),
+                    LazyColumnScrollbar(
                         state = scrollState,
-                        reverseLayout = true,
-                        verticalArrangement = Arrangement.Top,
                     ) {
-                        itemsIndexed(itemsState.value, key = { _, a -> a.id }) { index, m ->
-                            ChatListItem(
-                                navController = navController,
-                                viewModel = viewModel,
-                                itemsState.value,
-                                m = m,
-                                index = index,
-                                imageWidthDp = imageWidthDp,
-                                focusManager = focusManager,
-                                previewerState = previewerState,
-                            )
+                        LazyColumn(
+                            modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(),
+                            state = scrollState,
+                            reverseLayout = true,
+                            verticalArrangement = Arrangement.Top,
+                        ) {
+                            itemsIndexed(itemsState.value, key = { _, a -> a.id }) { index, m ->
+                                ChatListItem(
+                                    navController = navController,
+                                    viewModel = viewModel,
+                                    itemsState.value,
+                                    m = m,
+                                    index = index,
+                                    imageWidthDp = imageWidthDp,
+                                    focusManager = focusManager,
+                                    previewerState = previewerState,
+                                )
+                            }
                         }
                     }
                 }

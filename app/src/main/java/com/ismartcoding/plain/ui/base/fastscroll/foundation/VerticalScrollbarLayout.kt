@@ -44,10 +44,10 @@ internal fun VerticalScrollbarLayout(
                     .alpha(state.hideAlpha.value)
                     .clip(
                         RoundedCornerShape(
-                            topStart = 48.dp,
-                            bottomStart = 48.dp,
-                            topEnd = 0.dp,
-                            bottomEnd = 0.dp
+                            topStartPercent = 100,
+                            bottomStartPercent = 100,
+                            topEndPercent = 0,
+                            bottomEndPercent = 0
                         )
                     )
                     .width(settings.thumbThickness)

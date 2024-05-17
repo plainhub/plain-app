@@ -4,7 +4,7 @@ import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.exifinterface.media.ExifInterface
-import com.ismartcoding.plain.helpers.MediaHelper
+import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.web.models.AudioFileInfo
 import com.ismartcoding.plain.web.models.ImageFileInfo
 import com.ismartcoding.plain.web.models.Location
@@ -15,7 +15,8 @@ object FileInfoLoader {
     fun loadImage(
         path: String,
     ): ImageFileInfo {
-        val size = MediaHelper.getImageIntrinsicSize(path)
+        val rotation = ImageHelper.getRotation(path)
+        val size = ImageHelper.getIntrinsicSize(path, rotation)
         var location: Location? = null
         if (!path.endsWith(".svg", true)) {
             val exifInterface = ExifInterface(path)
@@ -24,7 +25,7 @@ object FileInfoLoader {
                 location = Location(latLong[0], latLong[1])
             }
         }
-        return ImageFileInfo(size.width.toInt(), size.height.toInt(), location)
+        return ImageFileInfo(size.width, size.height, location)
     }
 
     fun loadVideo(

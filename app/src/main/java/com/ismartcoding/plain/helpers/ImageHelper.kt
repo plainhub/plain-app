@@ -1,5 +1,7 @@
 package com.ismartcoding.plain.helpers
 
+import android.graphics.BitmapFactory
+import androidx.compose.ui.unit.IntSize
 import androidx.exifinterface.media.ExifInterface
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.logcat.LogCat
@@ -37,7 +39,7 @@ object ImageHelper {
             return ImageType.SVG
         } else if (extension == "png") {
             return ImageType.PNG
-        }else if (extension == "jpg" || extension == "jpeg") {
+        } else if (extension == "jpg" || extension == "jpeg") {
             return ImageType.JPG
         }
 
@@ -97,7 +99,7 @@ object ImageHelper {
         return ImageType.UNKNOWN
     }
 
-    fun getImageRotation(path: String): Int {
+    fun getRotation(path: String): Int {
         if (path.endsWith(".svg", true)) {
             return 0
         }
@@ -115,5 +117,22 @@ object ImageHelper {
             LogCat.e(e.toString())
         }
         return 0
+    }
+
+    fun getIntrinsicSize(path: String, rotation: Int): IntSize {
+        val size = if (path.endsWith(".svg", true)) {
+            SvgHelper.getSize(path)
+        } else {
+            val options = BitmapFactory.Options()
+            options.inJustDecodeBounds = true
+            BitmapFactory.decodeFile(path, options)
+            IntSize(options.outWidth, options.outHeight)
+        }
+
+        if (rotation == 90 || rotation == 270) {
+            return IntSize(size.height, size.width)
+        }
+
+        return size
     }
 }

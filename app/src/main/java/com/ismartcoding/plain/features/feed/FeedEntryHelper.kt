@@ -95,7 +95,7 @@ object FeedEntryHelper {
         val queryGroups = SearchHelper.parse(query)
         queryGroups.forEach {
             if (it.name == "text") {
-                where.addLikes(listOf("description", "content"), listOf(it.value, it.value))
+                where.addLikes(listOf("title", "description", "content"), listOf(it.value, it.value, it.value))
             } else if (it.name == "feed_id") {
                 where.add("feed_id=?", it.value)
             } else if (it.name == "today" && it.value == "true") {

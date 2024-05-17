@@ -12,6 +12,8 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.cookies.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.request.headers
+import io.ktor.http.headers
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -39,6 +41,9 @@ object HttpClientManager {
             install(HttpCookies)
             install(HttpTimeout) {
                 requestTimeoutMillis = HttpApiTimeout.BROWSER_SECONDS * 1000L
+            }
+            headers {
+                set("accept", "*/*")
             }
         }
 

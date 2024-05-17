@@ -28,12 +28,14 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.MediaPreviewerState
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.TransformImageView
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberTransformItemState
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformImageView
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.MediaPreviewData
+import com.ismartcoding.plain.ui.theme.darkMask
+import com.ismartcoding.plain.ui.theme.lightMask
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -111,7 +113,7 @@ fun ImageGridItem(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.White.copy(alpha = 0.5f))
+                    .background(MaterialTheme.colorScheme.lightMask())
                     .aspectRatio(1f)
             )
         }
@@ -130,7 +132,7 @@ fun ImageGridItem(
             modifier =
             Modifier
                 .align(Alignment.BottomEnd)
-                .background(Color.Black.copy(alpha = 0.4f)),
+                .background(MaterialTheme.colorScheme.darkMask()),
         ) {
             Text(
                 modifier =

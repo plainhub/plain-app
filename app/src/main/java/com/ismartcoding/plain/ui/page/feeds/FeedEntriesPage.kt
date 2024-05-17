@@ -72,8 +72,6 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
-import com.ismartcoding.plain.ui.base.fastscroll.ScrollbarSelectionMode
-import com.ismartcoding.plain.ui.base.fastscroll.ScrollbarSettings
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefreshContent
@@ -386,11 +384,7 @@ fun FeedEntriesPage(
             ) {
                 if (itemsState.isNotEmpty()) {
                     LazyColumnScrollbar(
-                        scrollState,
-                        settings = ScrollbarSettings(
-                        ),
-                        indicatorContent = { index, isThumbSelected ->
-                        }
+                        state = scrollState,
                     ) {
                         LazyColumn(
                             Modifier

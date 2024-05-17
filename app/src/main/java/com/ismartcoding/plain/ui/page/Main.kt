@@ -40,6 +40,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.setSingletonImageLoaderFactory
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
@@ -114,7 +115,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalCoilApi::class)
 @Composable
 fun Main(viewModel: MainViewModel) {
     val context = LocalContext.current
@@ -321,8 +322,8 @@ fun Main(viewModel: MainViewModel) {
                 val path = navController.previousBackStackEntry?.savedStateHandle?.get("path") ?: ""
                 val title = navController.previousBackStackEntry?.savedStateHandle?.get("title") ?: ""
                 val type = navController.previousBackStackEntry?.savedStateHandle?.get("type") ?: ""
-                val mediaStoreId = navController.previousBackStackEntry?.savedStateHandle?.get("mediaStoreId") ?: ""
-                TextFilePage(navController, path, title, mediaStoreId, type)
+                val mediaId = navController.previousBackStackEntry?.savedStateHandle?.get("mediaId") ?: ""
+                TextFilePage(navController, path, title, mediaId, type)
             }
 
             slideHorizontallyComposable(

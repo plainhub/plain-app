@@ -19,7 +19,6 @@ import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.pathToAceMode
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.TextFileType
@@ -47,7 +46,7 @@ fun TextFilePage(
     navController: NavHostController,
     path: String,
     title: String,
-    mediaStoreId: String = "",
+    mediaId: String = "",
     type: String = TextFileType.DEFAULT.name,
     viewModel: TextFileViewModel = viewModel()
 ) {
@@ -59,7 +58,7 @@ fun TextFilePage(
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.IO) {
             viewModel.loadConfigAsync(context)
-            viewModel.loadFileAsync(context, path, mediaStoreId)
+            viewModel.loadFileAsync(context, path, mediaId)
             viewModel.isDataLoading.value = false
         }
     }

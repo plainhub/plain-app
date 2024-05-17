@@ -46,7 +46,8 @@ fun WebAddress(
     VerticalSpace(dp = 16.dp)
     HorizontalPager(
         modifier = Modifier.padding(horizontal = 16.dp),
-        state = pagerState
+        state = pagerState,
+        pageSpacing = 16.dp,
     ) { page ->
         Column {
             val isHttps = page != 0

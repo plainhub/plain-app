@@ -4,7 +4,6 @@ import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -15,11 +14,9 @@ data class ScrollbarSettings(
     val side: ScrollbarLayoutSide = ScrollbarLayoutSide.End,
     val alwaysShowScrollbar: Boolean = false,
     val scrollbarPadding: Dp = 0.dp,
-    val thumbThickness: Dp = 16.dp,
+    val thumbThickness: Dp = 12.dp,
     val thumbShape: Shape = CircleShape,
     val thumbMinLength: Float = 0.1f,
-    val thumbUnselectedColor: Color = Color(0xFF5281CA),
-    val thumbSelectedColor: Color = Color(0xFF2A59B6),
     val selectionMode: ScrollbarSelectionMode = ScrollbarSelectionMode.Full,
     val selectionActionable: ScrollbarSelectionActionable = ScrollbarSelectionActionable.Always,
     val hideDelayMillis: Int = 3000,

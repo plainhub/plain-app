@@ -31,7 +31,7 @@ object AppLogHelper {
     fun export(context: Context) {
         coMain {
             DialogHelper.showLoading()
-            val zipFile = File(context.filesDir.absolutePath + "/logs.zip")
+            val zipFile = File(context.cacheDir.absolutePath + "/logs.zip")
             val folder = DiskLogFormatStrategy.getLogFolder(context)
             withIO {
                 ZipUtil.pack(File(folder), zipFile)

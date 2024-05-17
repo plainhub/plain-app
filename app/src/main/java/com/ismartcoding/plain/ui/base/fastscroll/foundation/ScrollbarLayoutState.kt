@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -49,7 +50,7 @@ internal fun rememberScrollbarLayoutState(
     }
 
     val thumbColor = animateColorAsState(
-        targetValue = if (thumbIsSelected) settingsUpdated.thumbSelectedColor else settingsUpdated.thumbUnselectedColor,
+        targetValue = if (thumbIsSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
         animationSpec = tween(durationMillis = 50),
         label = "scrollbar thumb color value"
     )

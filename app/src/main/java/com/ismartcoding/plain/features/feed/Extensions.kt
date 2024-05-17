@@ -6,6 +6,7 @@ import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.isOk
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.html2md.MDConverter
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.readability4j.Readability4J
 import com.ismartcoding.lib.rss.DateParser
 import com.ismartcoding.lib.rss.model.RssItem
@@ -63,12 +64,7 @@ fun RssItem.toDFeedEntry(
 suspend fun DFeedEntry.fetchContentAsync(): ApiResult {
     try {
         val httpClient = HttpClientManager.browserClient()
-        val response =
-            httpClient.get(url) {
-                headers {
-                    set("accept", "*/*")
-                }
-            }
+        val response = httpClient.get(url)
 
         if (response.isOk()) {
             val input = response.body<String>()
@@ -89,19 +85,24 @@ suspend fun DFeedEntry.fetchContentAsync(): ApiResult {
                     }
 
                     if (image.isNotEmpty() && !image.startsWith("/")) {
-                        val r = httpClient.get(image)
-                        if (r.isOk()) {
-                            val dir = MainApp.instance.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!.path + "/feeds/${feedId}"
-                            File(dir).mkdirs()
-                            var path = "$dir/main-${CryptoHelper.sha1(image.toByteArray())}"
-                            val extension = image.getFilenameExtension()
-                            if (extension.isNotEmpty()) {
-                                path += ".$extension"
+                        try {
+                            val r = httpClient.get(image)
+                            if (r.isOk()) {
+                                val dir = MainApp.instance.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!.path + "/feeds/${feedId}"
+                                File(dir).mkdirs()
+                                var path = "$dir/main-${CryptoHelper.sha1(image.toByteArray())}"
+                                val extension = image.getFilenameExtension()
+                                if (extension.isNotEmpty()) {
+                                    path += ".$extension"
+                                }
+                                val file = File(path)
+                                file.createNewFile()
+                                r.bodyAsChannel().copyAndClose(file.writeChannel())
+                                image = path
                             }
-                            val file = File(path)
-                            file.createNewFile()
-                            r.bodyAsChannel().copyAndClose(file.writeChannel())
-                            image = path
+                        } catch (ex: Exception) {
+                            LogCat.e(ex.toString())
+                            ex.printStackTrace()
                         }
                     }
                     content = MDConverter().convert(mobilizedHtml)

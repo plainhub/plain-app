@@ -2,6 +2,9 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Your VPN is currently enabled on your device, which could potentially lead to web connection issues when accessed from PC. To resolve this, we recommend adjusting your VPN settings to allow LAN traffic or disabling your VPN.</string>
     <string name="warning">Warning</string>
+    <string name="rotate">Rotate</string>
+    <string name="image_save_to">Image saved to {{path}}</string>
+    <string name="image_save_to_failed">Failed to save image</string>
     <string name="resolution">Resolution</string>
     <string name="dimensions">Dimensions</string>
     <string name="select_a_device">Select a device</string>

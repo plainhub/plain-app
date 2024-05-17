@@ -29,9 +29,9 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.helpers.FormatHelper
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.MediaPreviewerState
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.TransformImageView
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberTransformItemState
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformImageView
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.VChat
 
@@ -63,7 +63,7 @@ fun ChatImages(
                     Modifier.clickable {
                         coMain {
                             keyboardController?.hide()
-                            withIO { MediaPreviewData.setDataAsync(context, itemState, imageItems, item.id) }
+                            withIO { MediaPreviewData.setDataAsync(context, itemState, imageItems, item) }
                             previewerState.openTransform(
                                 index = MediaPreviewData.items.indexOfFirst { it.id == item.id },
                                 itemState = itemState,

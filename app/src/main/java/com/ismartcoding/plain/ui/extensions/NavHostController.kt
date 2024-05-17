@@ -2,12 +2,9 @@ package com.ismartcoding.plain.ui.extensions
 
 import android.net.Uri
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.TextFileType
-import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.page.RouteName
-import com.ismartcoding.plain.ui.preview.PreviewItem
 
 fun NavHostController.navigate(route: RouteName) {
     navigate(route.name) {
@@ -46,10 +43,10 @@ fun NavHostController.navigateOtherFile(path: String) {
     navigate(RouteName.OTHER_FILE)
 }
 
-fun NavHostController.navigateTextFile(path: String, title: String = "", mediaStoreId: String = "", type: TextFileType = TextFileType.DEFAULT) {
+fun NavHostController.navigateTextFile(path: String, title: String = "", mediaId: String = "", type: TextFileType = TextFileType.DEFAULT) {
     currentBackStackEntry?.savedStateHandle?.set("path", path)
     currentBackStackEntry?.savedStateHandle?.set("title", title)
-    currentBackStackEntry?.savedStateHandle?.set("mediaStoreId", mediaStoreId)
+    currentBackStackEntry?.savedStateHandle?.set("mediaId", mediaId)
     currentBackStackEntry?.savedStateHandle?.set("type", type.name)
     navigate(RouteName.TEXT_FILE)
 }

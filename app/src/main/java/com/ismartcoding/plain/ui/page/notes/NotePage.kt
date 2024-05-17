@@ -70,8 +70,8 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.markdowntext.MarkdownText
 import com.ismartcoding.plain.ui.base.mdeditor.MdEditor
 import com.ismartcoding.plain.ui.base.mdeditor.MdEditorBottomAppBar
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.ImagePreviewer
-import com.ismartcoding.plain.ui.base.mediaviewer.previewer.rememberPreviewerState
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.ImagePreviewer
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.extensions.setSelection
 import com.ismartcoding.plain.ui.models.MdEditorViewModel
 import com.ismartcoding.plain.ui.models.NoteViewModel

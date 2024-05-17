@@ -206,7 +206,7 @@ class SXGraphQL(val schema: Schema) {
                                         it.content.value =
                                             DMessageImages(
                                                 c.items.map { i ->
-                                                    DMessageFile(i.id, i.uri.toAppUrl(context), i.size, i.duration)
+                                                    DMessageFile(i.id, i.uri.toAppUrl(context), i.size, i.duration, i.width, i.height)
                                                 },
                                             )
                                         dao.update(it)
@@ -217,7 +217,7 @@ class SXGraphQL(val schema: Schema) {
                                         it.content.value =
                                             DMessageFiles(
                                                 c.items.map { i ->
-                                                    DMessageFile(i.id, i.uri.toAppUrl(context), i.size, i.duration)
+                                                    DMessageFile(i.id, i.uri.toAppUrl(context), i.size, i.duration, i.width, i.height)
                                                 },
                                             )
                                         dao.update(it)

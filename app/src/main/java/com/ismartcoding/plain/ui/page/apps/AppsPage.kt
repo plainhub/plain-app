@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -41,6 +42,7 @@ import com.ismartcoding.plain.ui.base.RadioDialog
 import com.ismartcoding.plain.ui.base.RadioDialogOption
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
@@ -50,7 +52,6 @@ import com.ismartcoding.plain.ui.components.PackageListItem
 import com.ismartcoding.plain.ui.models.AppsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSearchMode
-import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.page.RouteName
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.Dispatchers
@@ -66,6 +67,7 @@ fun AppsPage(
     val itemsState by viewModel.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
     val filtersScrollState = rememberScrollState()
+    val scrollState = rememberLazyListState()
 
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
@@ -186,36 +188,41 @@ fun AppsPage(
                 exit = fadeOut()
             ) {
                 if (itemsState.isNotEmpty()) {
-                    LazyColumn(
-                        Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(),
+                    LazyColumnScrollbar(
+                        state = scrollState,
                     ) {
-                        item {
-                            TopSpace()
-                        }
-                        items(itemsState, key = {
-                            it.id
-                        }) { m ->
-                            PackageListItem(
-                                item = m,
-                                modifier = PlainTheme.getCardModifier(),
-                                onClick = {
-                                    navController.navigate("${RouteName.APPS.name}/${m.id}")
-                                }
-                            )
-                            VerticalSpace(dp = 8.dp)
-                        }
-                        item {
-                            if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
-                                LaunchedEffect(Unit) {
-                                    scope.launch(Dispatchers.IO) {
-                                        withIO { viewModel.moreAsync() }
+                        LazyColumn(
+                            Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(),
+                            state = scrollState,
+                        ) {
+                            item {
+                                TopSpace()
+                            }
+                            items(itemsState, key = {
+                                it.id
+                            }) { m ->
+                                PackageListItem(
+                                    item = m,
+                                    modifier = PlainTheme.getCardModifier(),
+                                    onClick = {
+                                        navController.navigate("${RouteName.APPS.name}/${m.id}")
+                                    }
+                                )
+                                VerticalSpace(dp = 8.dp)
+                            }
+                            item {
+                                if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
+                                    LaunchedEffect(Unit) {
+                                        scope.launch(Dispatchers.IO) {
+                                            withIO { viewModel.moreAsync() }
+                                        }
                                     }
                                 }
+                                LoadMoreRefreshContent(viewModel.noMore.value)
+                                BottomSpace()
                             }
-                            LoadMoreRefreshContent(viewModel.noMore.value)
-                            BottomSpace()
                         }
                     }
                 } else {

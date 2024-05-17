@@ -29,7 +29,7 @@ object FileHelper {
         context: Context,
         name: String,
     ): File {
-        return File("${context.cacheDir}/$name").apply {
+        return File("${context.cacheDir.absolutePath}/$name").apply {
             writeBytes(context.assets.open(name).readBytes())
         }
     }
@@ -115,9 +115,13 @@ object FileHelper {
     }
 
     fun copyFileToDownloads(path: String): String {
+        return copyFileToPublicDir(path, Environment.DIRECTORY_DOWNLOADS)
+    }
+
+    fun copyFileToPublicDir(path: String, dirName: String, newName: String = ""): String {
         try {
-            val fileName = path.getFilenameFromPath()
-            val file = createDownloadFile(fileName)
+            val fileName = newName.ifEmpty { path.getFilenameFromPath() }
+            val file = createPublicFile(fileName, dirName)
             File(path).copyTo(file)
             MainApp.instance.scanFileByConnection(file, null)
             return file.absolutePath
@@ -131,7 +135,7 @@ object FileHelper {
     fun copyFileToDownloads(context: Context, uri: Uri): String {
         try {
             val fileName = uri.getFileName(context)
-            val file = createDownloadFile(fileName)
+            val file = createPublicFile(fileName, Environment.DIRECTORY_DOWNLOADS)
             val outputStream = FileOutputStream(file)
             if (uri.scheme == "content") {
                 val inputStream = context.contentResolver.openInputStream(uri)
@@ -160,18 +164,15 @@ object FileHelper {
         return ""
     }
 
-    private fun createDownloadFile(fileName: String): File {
-        val downloadsDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-        val plainAppDirectory = File(downloadsDirectory, "PlainApp")
-        if (!plainAppDirectory.exists()) {
-            plainAppDirectory.mkdirs()
+    private fun createPublicFile(fileName: String, dirName: String): File {
+        val dir = PathHelper.getPlainPublicDir(dirName)
+        if (!dir.exists()) {
+            dir.mkdirs()
         }
-
-        var file = File(plainAppDirectory, fileName)
+        var file = File(dir, fileName)
         if (file.exists()) {
             file = file.newFile()
         }
-
         return file
     }
 }
