@@ -48,8 +48,8 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
 
         override fun load(drawable: AsyncDrawable) {
             val loaded = AtomicBoolean(false)
-            val target: Target = AsyncDrawableTarget(drawable, loaded)
-            val request: ImageRequest = coilStore.load(drawable).newBuilder()
+            val target = AsyncDrawableTarget(drawable, loaded)
+            val request = coilStore.load(drawable).newBuilder()
                 .target(target)
                 .build()
             // @since 4.5.1 execute can return result _before_ disposable is created,
@@ -75,15 +75,7 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
             return null
         }
 
-        private inner class AsyncDrawableTarget(drawable: AsyncDrawable, loaded: AtomicBoolean) : Target {
-            private val drawable: AsyncDrawable
-            private val loaded: AtomicBoolean
-
-            init {
-                this.drawable = drawable
-                this.loaded = loaded
-            }
-
+        private inner class AsyncDrawableTarget(val drawable: AsyncDrawable,val  loaded: AtomicBoolean) : Target {
             fun onSuccess(loadedDrawable: Drawable) {
                 // @since 4.5.1 check finished flag (result can be delivered _before_ disposable is created)
                 if (cache.remove(drawable) != null
@@ -121,7 +113,7 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
             context: Context,
             imageLoader: ImageLoader
         ): CoilImagesPlugin {
-            return create(object : CoilStore {
+            return CoilImagesPlugin(object : CoilStore {
                 override fun load(drawable: AsyncDrawable): ImageRequest {
                     return ImageRequest.Builder(context)
                         .data(drawable.destination)
@@ -132,13 +124,6 @@ class CoilImagesPlugin internal constructor(coilStore: CoilStore, imageLoader: I
                     disposable.dispose()
                 }
             }, imageLoader)
-        }
-
-        fun create(
-            coilStore: CoilStore,
-            imageLoader: ImageLoader
-        ): CoilImagesPlugin {
-            return CoilImagesPlugin(coilStore, imageLoader)
         }
     }
 }

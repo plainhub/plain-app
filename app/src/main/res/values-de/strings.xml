@@ -2,6 +2,10 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Ihr VPN ist derzeit auf Ihrem Gerät aktiviert, was potenziell zu Webverbindungsproblemen führen kann, wenn es von Ihrem PC aus zugegriffen wird. Um dies zu lösen, empfehlen wir Ihnen, Ihre VPN-Einstellungen anzupassen, um LAN-Verkehr zuzulassen oder Ihr VPN zu deaktivieren.</string>
     <string name="warning">Warnung</string>
+    <string name="exit_cast_mode">Cast-Modus beenden</string>
+    <string name="rotate">Drehen</string>
+    <string name="image_save_to">Bild gespeichert unter {{path}}</string>
+    <string name="image_save_to_failed">Speichern des Bildes fehlgeschlagen</string>
     <string name="resolution">Auflösung</string>
     <string name="dimensions">Abmessungen</string>
     <string name="select_a_device">Bitte ein Gerät auswählen</string>

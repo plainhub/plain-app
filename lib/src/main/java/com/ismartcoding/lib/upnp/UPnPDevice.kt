@@ -14,7 +14,7 @@ class UPnPDevice(
     val uSN = parseHeader(header, "USN: ")
     val sT = parseHeader(header, "ST: ")
 
-    var descriptionXML: String = ""
+    private var descriptionXML: String = ""
     var description: DescriptionModel? = null
 
     fun isAVTransport(): Boolean {

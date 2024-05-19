@@ -16,7 +16,7 @@ fun newImageLoader(context: PlatformContext): ImageLoader {
     val memoryPercent = if (activityManager.isLowRamDevice) 0.25 else 0.75
     return ImageLoader.Builder(context)
         .components {
-            add(SvgDecoder.Factory(false))
+            add(SvgDecoder.Factory(true))
             add(AnimatedImageDecoder.Factory())
             add(ThumbnailDecoder.Factory())
         }

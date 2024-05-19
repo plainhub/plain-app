@@ -2,6 +2,10 @@
     <string name="app_name">簡樸</string>
     <string name="vpn_web_conflict_warning">您的手機啟用了VPN，這可能會導致從電腦訪問網頁時出現連接問題。我們建議您調整VPN設置允許區域網路流量或關閉VPN。</string>
     <string name="warning">警告</string>
+    <string name="exit_cast_mode">退出投影模式</string>
+    <string name="rotate">旋轉</string>
+    <string name="image_save_to">圖片已保存至{{path}}</string>
+    <string name="image_save_to_failed">無法儲存圖片</string>
     <string name="resolution">分辨率</string>
     <string name="dimensions">尺寸</string>
     <string name="select_a_device">請選擇一個設備</string>

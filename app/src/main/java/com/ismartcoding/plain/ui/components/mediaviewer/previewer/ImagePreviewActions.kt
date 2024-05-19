@@ -33,10 +33,9 @@ import androidx.compose.ui.unit.dp
 import coil3.imageLoader
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.getFilenameFromPath
-import com.ismartcoding.lib.helpers.CoroutinesHelper
+import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.ValidateHelper
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -45,8 +44,12 @@ import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.PathHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.HorizontalSpace
+import com.ismartcoding.plain.ui.base.PMiniButton
+import com.ismartcoding.plain.ui.base.PMiniOutlineButton
+import com.ismartcoding.plain.ui.components.CastDialog
 import com.ismartcoding.plain.ui.components.mediaviewer.MediaViewerState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import com.ismartcoding.plain.ui.theme.darkMask
 import com.ismartcoding.plain.ui.theme.lightMask
@@ -54,15 +57,36 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 @Composable
-fun ImagePreviewActions(context: Context, uiAlpha: Float, item: PreviewItem, getViewerState: () -> MediaViewerState?, state: MediaPreviewerState) {
+fun ImagePreviewActions(context: Context, castViewModel: CastViewModel, m: PreviewItem, getViewerState: () -> MediaViewerState?, state: MediaPreviewerState) {
     val scope = rememberCoroutineScope()
+
+    CastDialog(castViewModel)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 48.dp)
-            .alpha(uiAlpha)
+            .alpha(state.uiAlpha.value)
     ) {
         if (!state.showActions) {
+            return
+        }
+        if (castViewModel.castMode.value) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .clip(RoundedCornerShape(50))
+                    .background(MaterialTheme.colorScheme.darkMask())
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+            ) {
+                PMiniButton(text = stringResource(id = R.string.cast)) {
+                    castViewModel.cast(m.path)
+                }
+                HorizontalSpace(dp = 20.dp)
+                PMiniOutlineButton(text = stringResource(id = R.string.exit_cast_mode), color = Color.LightGray) {
+                    castViewModel.exitCastMode()
+                }
+            }
             return
         }
         Row(
@@ -76,19 +100,19 @@ fun ImagePreviewActions(context: Context, uiAlpha: Float, item: PreviewItem, get
                 icon = Icons.Rounded.Share,
                 contentDescription = stringResource(R.string.share),
             ) {
-                if (item.mediaId.isNotEmpty()) {
-                    ShareHelper.shareUris(context, listOf(ImageMediaStoreHelper.getItemUri(item.mediaId)))
-                } else if (ValidateHelper.isUrl(item.path)) {
+                if (m.mediaId.isNotEmpty()) {
+                    ShareHelper.shareUris(context, listOf(ImageMediaStoreHelper.getItemUri(m.mediaId)))
+                } else if (m.path.isUrl()) {
                     scope.launch {
                         val cachedPath = context.imageLoader
-                            .diskCache?.openSnapshot(item.path)?.data
-                        val tempFile = File.createTempFile("imagePreviewShare", "." + item.path.getFilenameExtension(), File(context.cacheDir, "/image_cache"))
+                            .diskCache?.openSnapshot(m.path)?.data
+                        val tempFile = File.createTempFile("imagePreviewShare", "." + m.path.getFilenameExtension(), File(context.cacheDir, "/image_cache"))
                         if (cachedPath != null) {
                             cachedPath.toFile().copyTo(tempFile, true)
                             ShareHelper.shareFile(context, tempFile)
                         } else {
                             DialogHelper.showLoading()
-                            val r = withIO { DownloadHelper.downloadToTempAsync(item.path, tempFile) }
+                            val r = withIO { DownloadHelper.downloadToTempAsync(m.path, tempFile) }
                             DialogHelper.hideLoading()
                             if (r.success) {
                                 ShareHelper.shareFile(context, File(r.path))
@@ -98,7 +122,7 @@ fun ImagePreviewActions(context: Context, uiAlpha: Float, item: PreviewItem, get
                         }
                     }
                 } else {
-                    ShareHelper.shareFile(context, File(item.path))
+                    ShareHelper.shareFile(context, File(m.path))
                 }
             }
             HorizontalSpace(dp = 20.dp)
@@ -106,7 +130,7 @@ fun ImagePreviewActions(context: Context, uiAlpha: Float, item: PreviewItem, get
                 icon = Icons.Rounded.Cast,
                 contentDescription = stringResource(R.string.cast),
             ) {
-
+                castViewModel.showCastDialog.value = true
             }
             HorizontalSpace(dp = 20.dp)
             ActionIconButton(
@@ -125,12 +149,12 @@ fun ImagePreviewActions(context: Context, uiAlpha: Float, item: PreviewItem, get
                 contentDescription = stringResource(R.string.save),
             ) {
                 scope.launch {
-                    if (ValidateHelper.isUrl(item.path)) {
+                    if (m.path.isUrl()) {
                         DialogHelper.showLoading()
                         val cachedPath = context.imageLoader
-                            .diskCache?.openSnapshot(item.path)?.data
+                            .diskCache?.openSnapshot(m.path)?.data
                         if (cachedPath != null) {
-                            val r = withIO { FileHelper.copyFileToPublicDir(cachedPath.toString(), Environment.DIRECTORY_PICTURES, newName = item.path.getFilenameFromPath()) }
+                            val r = withIO { FileHelper.copyFileToPublicDir(cachedPath.toString(), Environment.DIRECTORY_PICTURES, newName = m.path.getFilenameFromPath()) }
                             DialogHelper.hideLoading()
                             if (r.isNotEmpty()) {
                                 DialogHelper.showMessage(LocaleHelper.getStringF(R.string.image_save_to, "path", r))
@@ -140,7 +164,7 @@ fun ImagePreviewActions(context: Context, uiAlpha: Float, item: PreviewItem, get
                             return@launch
                         }
                         val dir = PathHelper.getPlainPublicDir(Environment.DIRECTORY_PICTURES)
-                        val r = withIO { DownloadHelper.downloadAsync(item.path, dir.absolutePath) }
+                        val r = withIO { DownloadHelper.downloadAsync(m.path, dir.absolutePath) }
                         DialogHelper.hideLoading()
                         if (r.success) {
                             DialogHelper.showMessage(LocaleHelper.getStringF(R.string.image_save_to, "path", r.path))
@@ -148,7 +172,7 @@ fun ImagePreviewActions(context: Context, uiAlpha: Float, item: PreviewItem, get
                             DialogHelper.showMessage(r.message)
                         }
                     } else {
-                        val r = withIO { FileHelper.copyFileToPublicDir(item.path, Environment.DIRECTORY_PICTURES) }
+                        val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_PICTURES) }
                         if (r.isNotEmpty()) {
                             DialogHelper.showMessage(LocaleHelper.getStringF(R.string.image_save_to, "path", r))
                         } else {

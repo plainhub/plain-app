@@ -23,10 +23,6 @@ data class PreviewItem(
     var intrinsicSize: IntSize = IntSize.Zero
     var rotation: Int = -1
 
-    fun isWebUrl(): Boolean {
-        return ValidateHelper.isUrl(path)
-    }
-
     fun initAsync(context: Context, width: Int, height: Int) {
         if (path.isImageFast()) {
             rotation = ImageHelper.getRotation(path)

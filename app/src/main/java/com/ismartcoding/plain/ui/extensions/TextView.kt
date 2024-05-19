@@ -8,6 +8,7 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.widget.TextView
 import androidx.core.view.GestureDetectorCompat
+import coil3.imageLoader
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
@@ -39,6 +40,9 @@ import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin
 import io.noties.markwon.linkify.LinkifyPlugin
 import org.commonmark.node.Image
 import org.commonmark.node.SoftLineBreak
+import org.commonmark.parser.Parser
+import org.commonmark.renderer.html.HtmlRenderer
+import org.jsoup.Jsoup
 
 @SuppressLint("ClickableViewAccessibility")
 fun TextView.setSelectableTextClickable(click: () -> Unit) {
@@ -96,21 +100,20 @@ fun TextView.setDoubleCLick(click: () -> Unit) {
 
 fun TextView.markdown(content: String, previewerState: MediaPreviewerState) {
     this.movementMethod = LinkMovementMethod.getInstance()
-    Markwon.builder(context)
-        .usePlugin(ImagesPlugin.create())
-        .usePlugin(CoilImagesPlugin.create(context, newImageLoader(context)))
+    val markdown = Markwon.builder(context)
+        .usePlugin(CoilImagesPlugin.create(context, context.imageLoader))
+        .usePlugin(
+            ImagesPlugin.create { plugin ->
+                plugin.addSchemeHandler(AppImageSchemeHandler(context))
+                plugin.addSchemeHandler(NetworkSchemeHandler())
+            },
+        )
         .usePlugin(
             object : AbstractMarkwonPlugin() {
                 override fun configureTheme(builder: MarkwonTheme.Builder) {
                     builder
                         .bulletWidth(context.dp2px(5))
                 }
-            },
-        )
-        .usePlugin(
-            ImagesPlugin.create { plugin ->
-                plugin.addSchemeHandler(AppImageSchemeHandler(context))
-                plugin.addSchemeHandler(NetworkSchemeHandler())
             },
         )
         .usePlugin(HtmlPlugin.create { plugin ->
@@ -140,10 +143,9 @@ fun TextView.markdown(content: String, previewerState: MediaPreviewerState) {
                             ImageProps.DESTINATION.require(props),
                         ) { _, link ->
                             coMain {
-                                MediaPreviewData.items = listOf(PreviewItem(link, Uri.EMPTY, link.getFinalPath(context)))
-                                previewerState.open(
-                                    index = 0,
-                                )
+                                val links = extractImageLinksFromHtml(convertMarkdownToHtml(content)).map { PreviewItem(it, Uri.EMPTY, it.getFinalPath(context)) }
+                                MediaPreviewData.items = links
+                                previewerState.open(index = links.indexOfFirst { it.id == link })
                             }
                         }
                     }
@@ -157,5 +159,32 @@ fun TextView.markdown(content: String, previewerState: MediaPreviewerState) {
                 }
             },
         )
-        .build().setMarkdown(this, content)
+        .build()
+
+    markdown.setMarkdown(this, content)
+}
+
+fun extractImageLinksFromHtml(htmlContent: String): List<String> {
+    val imageLinks = mutableListOf<String>()
+
+    // Parse the HTML content using Jsoup
+    val doc = Jsoup.parse(htmlContent)
+
+    // Select all <img> tags
+    val imgTags = doc.select("img")
+
+    // Extract src attributes from <img> tags
+    for (imgTag in imgTags) {
+        val imageUrl = imgTag.attr("src")
+        imageLinks.add(imageUrl)
+    }
+
+    return imageLinks
+}
+
+fun convertMarkdownToHtml(markdownText: String): String {
+    val parser = Parser.builder().build()
+    val renderer = HtmlRenderer.builder().build()
+    val document = parser.parse(markdownText)
+    return renderer.render(document)
 }

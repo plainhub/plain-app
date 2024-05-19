@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.media3.common.util.UnstableApi
 import coil3.compose.AsyncImage
 import coil3.imageLoader
+import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import kotlinx.coroutines.launch
@@ -151,7 +152,7 @@ fun MediaNormalImage(
     var painter by remember {
         mutableStateOf<Painter?>(null)
     }
-    if (model.isWebUrl()) {
+    if (model.path.isUrl()) {
         painter = rememberCoilImagePainter(model.path)
         var isMounted by remember { mutableStateOf(false) }
         imageSpecified = painter!!.intrinsicSize.isSpecified

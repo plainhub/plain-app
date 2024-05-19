@@ -22,9 +22,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.features.StartHttpServerEvent
@@ -53,7 +50,7 @@ fun CastDialog(viewModel: CastViewModel) {
         scope.launch(Dispatchers.IO) {
             viewModel.searchAsync(context)
         }
-        coIO {
+        scope.launch(Dispatchers.IO) {
             delay(5000)
             if (itemsState.isEmpty()) {
                 loadingTextId = R.string.no_devices_found
@@ -77,7 +74,7 @@ fun CastDialog(viewModel: CastViewModel) {
                             viewModel.selectDevice(m)
                             viewModel.enterCastMode()
                             scope.launch(Dispatchers.IO) {
-                                if(!TempData.webEnabled) {
+                                if (!TempData.webEnabled) {
                                     WebPreference.putAsync(context, true)
                                     sendEvent(StartHttpServerEvent())
                                 }

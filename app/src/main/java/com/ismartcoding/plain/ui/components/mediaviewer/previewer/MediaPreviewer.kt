@@ -20,26 +20,25 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.ui.components.mediaviewer.MediaGallery
 import com.ismartcoding.plain.ui.components.mediaviewer.MediaGalleryState
 import com.ismartcoding.plain.ui.components.mediaviewer.ViewImageBottomSheet
+import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.preview.PreviewItem
@@ -55,8 +54,6 @@ class MediaPreviewerState(
     galleryState: MediaGalleryState,
 ) : PreviewerVerticalDragState(scope, galleryState = galleryState) {
 
-    var showActions by mutableStateOf(true)
-    var showMediaInfo by mutableStateOf(false)
 
     companion object {
         fun getSaver(galleryState: MediaGalleryState): Saver<MediaPreviewerState, *> {
@@ -151,6 +148,7 @@ fun ImagePreviewer(
     getItem: @Composable (Int) -> PreviewItem = { index ->
         MediaPreviewData.items[index]
     },
+    castViewModel: CastViewModel = viewModel(),
     tagsViewModel: TagsViewModel? = null,
     tagsMap: Map<String, List<DTagRelation>>? = null,
     tagsState: List<DTag> = emptyList(),
@@ -215,7 +213,7 @@ fun ImagePreviewer(
                     this.foreground = { page ->
                         val m = getItem(page)
                         if (!m.path.isVideoFast()) {
-                            ImagePreviewActions(context = context, uiAlpha = state.uiAlpha.value, item = m, getViewerState = { state.currentViewerState }, state)
+                            ImagePreviewActions(context = context, castViewModel = castViewModel, m = m, getViewerState = { state.currentViewerState }, state)
                         }
                     }
                 },

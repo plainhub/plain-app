@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.upnp.UPnPController
@@ -42,6 +43,10 @@ class CastViewModel : ViewModel() {
 
     fun exitCastMode() {
         castMode.value = false
+        val device = CastPlayer.currentDevice ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            UPnPController.stopAVTransportAsync(device)
+        }
     }
 
     fun cast(path: String) {

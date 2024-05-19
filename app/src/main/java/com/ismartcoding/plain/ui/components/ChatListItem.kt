@@ -108,11 +108,11 @@ fun ChatListItem(
                     ) {
                         when (m.type) {
                             DMessageType.IMAGES.value -> {
-                                ChatImages(context, m, imageWidthDp, previewerState)
+                                ChatImages(context, items, m, imageWidthDp, previewerState)
                             }
 
                             DMessageType.FILES.value -> {
-                                ChatFiles(context, navController, m, previewerState)
+                                ChatFiles(context, items, navController, m, previewerState)
                             }
 
                             DMessageType.TEXT.value -> {
@@ -140,7 +140,7 @@ fun ChatListItem(
                         onDismissRequest = {
                             viewModel.selectedItem.value = null
                             showContextMenu.value = false
-                                           },
+                        },
                     ) {
                         PDropdownMenuItem(
                             text = { Text(stringResource(id = R.string.select)) },

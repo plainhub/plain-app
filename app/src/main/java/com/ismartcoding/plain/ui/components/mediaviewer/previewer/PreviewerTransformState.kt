@@ -26,13 +26,6 @@ open class PreviewerTransformState(
     val galleryState: MediaGalleryState,
     var currentViewerState: MediaViewerState? = null,
 ) {
-
-    /**
-     *   +-------------------+
-     *          PRIVATE
-     *   +-------------------+
-     */
-
     // 锁对象
     private var mutex = Mutex()
 
@@ -60,12 +53,6 @@ open class PreviewerTransformState(
         }
     }
 
-    /**
-     *   +-------------------+
-     *         INTERNAL
-     *   +-------------------+
-     */
-
     // 等待界面刷新的ticket
     internal val ticket = Ticket()
 
@@ -90,11 +77,11 @@ open class PreviewerTransformState(
         get() = (viewerContainerState?.openTransformJob != null) || (mediaViewerState?.mountedFlow?.value == true)
 
     // 标记打开动作，执行开始
-    internal suspend fun stateOpenStart() =
+    private suspend fun stateOpenStart() =
         updateState(animating = true, visible = false, visibleTarget = true)
 
     // 标记打开动作，执行结束
-    internal suspend fun stateOpenEnd() =
+    private suspend fun stateOpenEnd() =
         updateState(animating = false, visible = true, visibleTarget = null)
 
     // 标记关闭动作，执行开始
@@ -126,11 +113,8 @@ open class PreviewerTransformState(
         }
     }
 
-    /**
-     *   +-------------------+
-     *          PUBLIC
-     *   +-------------------+
-     */
+    var showActions by mutableStateOf(true)
+    var showMediaInfo by mutableStateOf(false)
 
     // 是否正在进行动画
     var animating by mutableStateOf(false)
@@ -141,8 +125,7 @@ open class PreviewerTransformState(
         internal set
 
     // 是否可见的目标值
-    var visibleTarget by mutableStateOf<Boolean?>(null)
-        internal set
+    private var visibleTarget by mutableStateOf<Boolean?>(null)
 
     // 是否允许执行open操作
     val canOpen: Boolean
@@ -175,11 +158,6 @@ open class PreviewerTransformState(
     // 清除全部transformItems
     fun clearTransformItems() = transformItemStateMap.clear()
 
-    /**
-     * 打开previewer
-     * @param index Int
-     * @param itemState TransformItemState?
-     */
     suspend fun open(
         index: Int = 0,
         itemState: TransformItemState? = null,
@@ -196,6 +174,7 @@ open class PreviewerTransformState(
                 }
             }
             scope.launch {
+                showActions = true
                 // 标记开始
                 stateOpenStart()
                 // 开启UI
@@ -254,6 +233,7 @@ open class PreviewerTransformState(
                     animateContainerVisibleState = MutableTransitionState(false)
                 }
             ).awaitAll()
+            showActions = true
             ticket.awaitNextTicket()
             transformState?.setExitState()
         }
@@ -263,11 +243,8 @@ open class PreviewerTransformState(
         index: Int,
         itemState: TransformItemState
     ) {
-        // 动画开始
         stateOpenStart()
-        // 关闭UI
         uiAlpha.snapTo(0F)
-        // 关闭viewer
         viewerAlpha.snapTo(0F)
         // 设置新的container状态立刻设置为true
         animateContainerVisibleState = MutableTransitionState(true)
@@ -301,7 +278,6 @@ open class PreviewerTransformState(
     }
 
     suspend fun closeTransform() {
-        // 标记开始
         stateCloseStart()
         // 判断当前状态是否允许transform结束
         // 需要在cancel前获取该值
@@ -351,9 +327,10 @@ open class PreviewerTransformState(
             // container动画退出
             animateContainerVisibleState.targetState = false
         }
-        // 允许使用loading
+
         viewerContainerState?.allowLoading = true
-        // 标记结束
+        showActions = true
+
         stateCloseEnd()
     }
 

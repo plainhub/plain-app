@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.components.chat
 
 import android.content.Context
-import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -55,12 +53,12 @@ import java.io.File
 @Composable
 fun ChatFiles(
     context: Context,
+    items: List<VChat>,
     navController: NavHostController,
     m: VChat,
     previewerState: MediaPreviewerState,
 ) {
     val fileItems = (m.value as DMessageFiles).items
-    val context = LocalContext.current as ComponentActivity
     val keyboardController = LocalSoftwareKeyboardController.current
     Column {
         fileItems.forEachIndexed { index, item ->
@@ -74,12 +72,7 @@ fun ChatFiles(
                         if (path.isImageFast() || path.isVideoFast()) {
                             coMain {
                                 keyboardController?.hide()
-                                withIO {
-                                    MediaPreviewData.setDataAsync(
-                                        context, itemState, fileItems
-                                            .filter { it.uri.isVideoFast() || it.uri.isImageFast() }, item
-                                    )
-                                }
+                                withIO { MediaPreviewData.setDataAsync(context, itemState, items.reversed(), item) }
                                 previewerState.openTransform(
                                     index = MediaPreviewData.items.indexOfFirst { it.id == item.id },
                                     itemState = itemState,

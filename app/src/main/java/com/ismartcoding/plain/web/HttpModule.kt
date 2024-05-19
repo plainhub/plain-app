@@ -10,6 +10,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.compress
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isImageFast
+import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.extensions.newFile
 import com.ismartcoding.lib.extensions.parse
 import com.ismartcoding.lib.extensions.scanFileByConnection
@@ -26,26 +27,29 @@ import com.ismartcoding.lib.upnp.UPnPController
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.data.DownloadFileItem
 import com.ismartcoding.plain.data.DownloadFileItemWrap
 import com.ismartcoding.plain.data.UploadInfo
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.enums.PasswordType
-import com.ismartcoding.plain.preference.AuthTwoFactorPreference
-import com.ismartcoding.plain.preference.PasswordPreference
-import com.ismartcoding.plain.preference.PasswordTypePreference
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.features.ImageMediaStoreHelper
+import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.audio.AudioMediaStoreHelper
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.features.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.CastPlayer
-import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.video.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.helpers.UrlHelper
+import com.ismartcoding.plain.preference.AuthTwoFactorPreference
+import com.ismartcoding.plain.preference.PasswordPreference
+import com.ismartcoding.plain.preference.PasswordTypePreference
 import com.ismartcoding.plain.web.websocket.WebSocketSession
+import io.ktor.client.request.get
+import io.ktor.client.statement.readBytes
 import io.ktor.http.CacheControl
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
@@ -57,6 +61,7 @@ import io.ktor.http.content.LastModifiedVersion
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.http.content.streamProvider
+import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCallPipeline
@@ -101,6 +106,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.IOException
 import java.util.Date
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -213,7 +219,15 @@ object HttpModule {
                         return@get
                     }
 
-                    if (path.startsWith("content://")) {
+                    if (path.isUrl()) {
+                        try {
+                            val client = HttpClientManager.browserClient()
+                            val r = client.get(path)
+                            call.respondBytes(r.readBytes(), r.contentType() ?: ContentType.Application.OctetStream)
+                        } catch (e: IOException) {
+                            call.respondText("Failed to fetch data from URL: $path", status = HttpStatusCode.InternalServerError)
+                        }
+                    } else if (path.startsWith("content://")) {
                         val bytes = MainApp.instance.contentResolver.openInputStream(Uri.parse(path))?.buffered()?.use { it.readBytes() }
                         call.respondBytes(bytes!!)
                     } else if (path.isImageFast()) {

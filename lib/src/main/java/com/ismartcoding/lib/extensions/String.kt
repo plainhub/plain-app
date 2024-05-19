@@ -5,7 +5,9 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.telephony.PhoneNumberUtils
 import com.ismartcoding.lib.Constants
+import com.ismartcoding.lib.helpers.ValidateHelper
 import java.io.File
+import java.net.URL
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -33,6 +35,15 @@ fun String.pathToUri(): Uri {
     }
 
     return Uri.parse(this)
+}
+
+fun String.isUrl(): Boolean {
+    return try {
+        URL(this)
+        true
+    } catch (e: Exception) {
+        false
+    }
 }
 
 fun String.toAppUrl(context: Context): String {

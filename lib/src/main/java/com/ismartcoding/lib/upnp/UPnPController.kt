@@ -54,7 +54,43 @@ object UPnPController {
         return ""
     }
 
-    public suspend inline fun HttpClient.subscribe(
+    suspend fun stopAVTransportAsync(
+        device: UPnPDevice,
+    ): String {
+        val service = device.getAVTransportService() ?: return ""
+        try {
+            val client = HttpClient(CIO)
+            val response =
+                withIO {
+                    client.post(device.getBaseUrl() + "/" + service.controlURL.trimStart('/')) {
+                        headers {
+                            set("Content-Type", "text/xml")
+                            set("SOAPAction", "\"${service.serviceType}#Stop\"")
+                        }
+                        setBody(
+                            getRequestBody(
+                                """
+                                <u:Stop xmlns:u="${service.serviceType}">
+                                  <InstanceID>0</InstanceID>
+                                </u:Stop>
+                                """.trimIndent(),
+                            ),
+                        )
+                    }
+                }
+            LogCat.e(response.toString())
+            val xml = response.body<String>()
+            LogCat.e(xml)
+            if (response.status == HttpStatusCode.OK) {
+                return xml
+            }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+        return ""
+    }
+
+     suspend inline fun HttpClient.subscribe(
         urlString: String,
         block: HttpRequestBuilder.() -> Unit = {},
     ): HttpResponse {

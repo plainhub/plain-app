@@ -40,6 +40,7 @@ import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
+import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.ui.components.mediaviewer.hugeimage.ImageDecoder
@@ -499,7 +500,7 @@ fun MediaViewer(
                 state.scale.snapTo(desScale)
                 state.offsetX.snapTo(desX)
                 state.offsetY.snapTo(desY)
-                state.rotation.snapTo(desRotation)
+               // state.rotation.snapTo(desRotation)
             }
 
             // 这里判断是否已运动到边界，如果到了边界，就不消费事件，让上层界面获取到事件
@@ -539,13 +540,11 @@ fun MediaViewer(
                 state.mountedFlow.emit(true)
             }
         }
-        /**
-         * 根据不同类型的model进行不同的渲染
-         */
+
         when (model) {
             is PreviewItem,
             -> {
-                if (model.path.isVideoFast() && !model.isWebUrl()) {
+                if (model.path.isVideoFast() && !model.path.isUrl()) {
                     MediaVideo(
                         pagerState = pagerState,
                         page = page,

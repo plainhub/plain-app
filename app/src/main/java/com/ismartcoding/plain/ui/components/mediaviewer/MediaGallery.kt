@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.ImageType
@@ -100,7 +101,7 @@ fun MediaGallery(
                     key(page) {
                         val item = getItem(page)
                         val model: Any?
-                        if (item.path.isVideoFast()) {
+                        if (item.path.isVideoFast() || item.path.isUrl()) {
                             model = item
                         } else if (item.size <= 2000 * 1000) {
                             // If the image size is less than 2MB, load the image directly

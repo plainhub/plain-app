@@ -4,8 +4,12 @@ import android.content.Context
 import android.net.Uri
 import androidx.compose.ui.unit.toSize
 import com.ismartcoding.lib.extensions.getFinalPath
+import com.ismartcoding.lib.extensions.isImageFast
+import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.db.DMessageFile
+import com.ismartcoding.plain.db.DMessageFiles
+import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.preview.PreviewItem
 
@@ -16,10 +20,18 @@ object MediaPreviewData {
     fun setDataAsync(
         context: Context,
         itemState: TransformItemState,
-        files: List<DMessageFile>,
+        chatItems: List<VChat>,
         m: DMessageFile
     ) {
-        items = files.map { f ->
+        val newItems = mutableListOf<DMessageFile>()
+        chatItems.forEach { item ->
+            if (item.value is DMessageImages) {
+                newItems.addAll((item.value as DMessageImages).items)
+            } else if (item.value is DMessageFiles) {
+                newItems.addAll((item.value as DMessageFiles).items.filter { it.uri.isVideoFast() || it.uri.isImageFast() })
+            }
+        }
+        items = newItems.map { f ->
             PreviewItem(f.id, Uri.EMPTY, f.uri.getFinalPath(context), f.size, data = f)
         }
         items.find { it.id == m.id }?.let {

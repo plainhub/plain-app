@@ -29,12 +29,6 @@ internal class ViewerContainerState(
     var mediaViewerState: MediaViewerState = MediaViewerState(),
 ) {
 
-    /**
-     *   +-------------------+
-     *         INTERNAL
-     *   +-------------------+
-     */
-
     // 转换图层transformContent透明度
     internal var transformContentAlpha = Animatable(0F)
 
