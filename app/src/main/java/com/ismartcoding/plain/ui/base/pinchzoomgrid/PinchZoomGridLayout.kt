@@ -1,20 +1,25 @@
 package com.ismartcoding.plain.ui.base.pinchzoomgrid
 
+import android.content.Context
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.lazy.grid.LazyGridScope
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun PinchZoomGridLayout(
+    context: Context,
     state: PinchZoomGridState,
+    scope: CoroutineScope,
     modifier: Modifier = Modifier,
+    onTap: (Offset) -> Unit = {},
+    onLongPress: (Offset) -> Unit = {},
     content: @Composable PinchZoomGridScope.() -> Unit,
 ) {
     val contentScope = remember(state, state.gridState) {
@@ -29,7 +34,9 @@ fun PinchZoomGridLayout(
 
     Box(
         modifier = modifier
-            .handlePinchGesture(state)
+            .pointerInput(Unit) {
+                handlePinchGesture(context, state, scope, onTap, onLongPress)
+            }
             .handleOverZooming(state),
     ) {
         val nextCells = state.nextCells

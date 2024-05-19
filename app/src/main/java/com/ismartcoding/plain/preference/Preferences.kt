@@ -389,6 +389,11 @@ object AudioPlayModePreference : BasePreference<Int>() {
     }
 }
 
+object ImageGridCellsIndexPreference : BasePreference<Int>() {
+    override val default = 6
+    override val key = intPreferencesKey("image_grid_cells_index")
+}
+
 abstract class BaseSortByPreference(
     val prefix: String,
     private val defaultSort: FileSortBy = FileSortBy.DATE_DESC

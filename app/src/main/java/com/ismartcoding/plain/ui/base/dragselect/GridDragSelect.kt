@@ -78,7 +78,6 @@ fun Modifier.gridDragSelect(
                             state.removeSelected(it)
                         }
                     }
-                    val item = items[itemPosition]
                     this.dragState = dragState.copy(current = itemPosition)
                 }
             },
@@ -108,7 +107,7 @@ private fun LazyGridState.itemIndexAtPosition(hitPoint: Offset): Int? {
     return found?.index
 }
 
-private fun LazyGridState.getItemPosition(hitPoint: Offset): Int? {
+fun LazyGridState.getItemPosition(hitPoint: Offset): Int? {
     return itemIndexAtPosition(hitPoint)
         ?: if (isPastLastItem(hitPoint)) layoutInfo.totalItemsCount - 1 else null
 }

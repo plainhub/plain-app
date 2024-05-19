@@ -24,6 +24,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -70,6 +71,7 @@ fun TransformImageView(
                 modifier = if (path.endsWith(".svg", true)) imageModifier.background(Color.White) else imageModifier,
                 model = path,
                 contentDescription = path,
+                filterQuality = FilterQuality.None,
                 contentScale = ContentScale.Crop,
             )
         }
@@ -210,7 +212,7 @@ class TransformContentState(
 
     var onAction by mutableStateOf(false)
 
-    var onActionTarget by mutableStateOf<Boolean?>(null)
+    private var onActionTarget by mutableStateOf<Boolean?>(null)
 
     var displayWidth = Animatable(0F)
 

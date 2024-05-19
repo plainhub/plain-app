@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.base.pinchzoomgrid
 
-import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.spring
@@ -31,15 +30,11 @@ import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.max
 
-/**
- * Create and remember a [PinchZoomGridState].
- */
 @Composable
 fun rememberPinchZoomGridState(
     cellsList: List<GridCells>,
     initialCellsIndex: Int,
     gridState: LazyGridState = rememberLazyGridState(),
-    animationSpec: AnimationSpec<Float> = defaultAnimationSpec,
 ): PinchZoomGridState {
     val coroutineScope = rememberCoroutineScope()
     return remember(coroutineScope, cellsList, initialCellsIndex, gridState) {
@@ -48,29 +43,22 @@ fun rememberPinchZoomGridState(
             gridState,
             cellsList,
             initialCellsIndex,
-            animationSpec,
         )
-    }.also {
-        it.animationSpec = animationSpec
     }
 }
 
-/**
- * The state used by [PinchZoomGridLayout].
- */
 @Stable
 class PinchZoomGridState(
     private val coroutineScope: CoroutineScope,
     internal val gridState: LazyGridState,
     private val cellsList: List<GridCells>,
     initialCellsIndex: Int,
-    internal var animationSpec: AnimationSpec<Float>,
 ) {
-    /**
-     * The current grid cells.
-     */
     var currentCells by mutableStateOf(cellsList[initialCellsIndex])
         private set
+
+    val currentCellsIndex: Int
+        get() = cellsList.indexOf(currentCells)
 
     internal var nextCells by mutableStateOf<GridCells?>(null)
 
@@ -149,17 +137,14 @@ class PinchZoomGridState(
         val job = coroutineContext.job
         animationJob = job
         val maxVelocity = max(abs(velocity.x), abs(velocity.y))
-        val animationSpec = if (animationSpec == defaultAnimationSpec) {
-            if (maxVelocity > 1500f) {
-                fastAnimationSpec
-            } else if (maxVelocity < 500f) {
-                slowAnimationSpec
-            } else {
-                defaultAnimationSpec
-            }
+        val animationSpec = if (maxVelocity > 1500f) {
+            fastAnimationSpec
+        } else if (maxVelocity < 500f) {
+            slowAnimationSpec
         } else {
-            animationSpec
+            PZ_DEFAULT_ANIMATION_SPEC
         }
+
         if (progress > 0.5f && next != null) {
             job.invokeOnCompletion { onZoomAnimationEnd(next) }
             val targetValue = if (zoomType == ZoomType.ZoomIn) {
@@ -211,7 +196,7 @@ class PinchZoomGridState(
             }
             // Start animation after the new layout is ready
             awaitFrame()
-            animate(zoom, targetZoom, animationSpec = animationSpec) { value, _ ->
+            animate(zoom, targetZoom, animationSpec = PZ_DEFAULT_ANIMATION_SPEC) { value, _ ->
                 zoom = value
             }
         }
@@ -352,7 +337,7 @@ private val slowAnimationSpec = spring<Float>(
     stiffness = Spring.StiffnessLow,
 )
 
-private val defaultAnimationSpec = spring<Float>(
+private val PZ_DEFAULT_ANIMATION_SPEC = spring<Float>(
     dampingRatio = Spring.DampingRatioLowBouncy + 0.15f,
     stiffness = Spring.StiffnessLow + 50f,
 )

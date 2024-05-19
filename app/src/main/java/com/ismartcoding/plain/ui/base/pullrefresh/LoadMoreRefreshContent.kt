@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.base.pullrefresh
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,16 +14,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.ui.base.BottomSpace
 
 @Composable
 fun LoadMoreRefreshContent(isLoadFinish: Boolean = false) {
-    Row(
+    Column(
         modifier =
         Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp, bottom = 16.dp),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
+            .padding(top = 8.dp, bottom = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text =

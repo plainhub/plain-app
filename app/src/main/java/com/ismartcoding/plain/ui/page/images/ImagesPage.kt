@@ -33,7 +33,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -47,12 +46,14 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.CastPlayer
+import com.ismartcoding.plain.preference.ImageGridCellsIndexPreference
 import com.ismartcoding.plain.preference.ImageSortByPreference
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
@@ -72,12 +73,10 @@ import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
+import com.ismartcoding.plain.ui.base.dragselect.getItemPosition
 import com.ismartcoding.plain.ui.base.dragselect.gridDragSelect
 import com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState
 import com.ismartcoding.plain.ui.base.fastscroll.LazyVerticalGridScrollbar
-import com.ismartcoding.plain.ui.base.fastscroll.ScrollbarSettings
-import com.ismartcoding.plain.ui.components.mediaviewer.previewer.ImagePreviewer
-import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.base.pinchzoomgrid.PinchZoomGridLayout
 import com.ismartcoding.plain.ui.base.pinchzoomgrid.rememberPinchZoomGridState
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
@@ -88,11 +87,15 @@ import com.ismartcoding.plain.ui.components.CastDialog
 import com.ismartcoding.plain.ui.components.FileSortDialog
 import com.ismartcoding.plain.ui.components.ImageGridItem
 import com.ismartcoding.plain.ui.components.ListSearchBar
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.ImagePreviewer
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.extensions.navigateTags
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.ImageFoldersViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
+import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSearchMode
@@ -122,6 +125,7 @@ fun ImagesPage(
             bucketsState.associateBy { it.id }
         }
     }
+
     val previewerState = rememberPreviewerState()
     val tagsState by tagsViewModel.itemsFlow.collectAsState()
     val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
@@ -130,19 +134,15 @@ fun ImagesPage(
     var hasPermission by remember {
         mutableStateOf(AppFeatureType.FILES.hasPermission(context))
     }
-    var lastCellIndex by remember { mutableIntStateOf(4) }
-    var canScroll by rememberSaveable { mutableStateOf(true) }
+    val transformItemStateMap = remember { mutableMapOf<String, TransformItemState>() }
 
+    var initialCellsIndex by remember { mutableIntStateOf(ImageGridCellsIndexPreference.default) }
     val pinchState = rememberPinchZoomGridState(
         cellsList = PlainTheme.cellsList,
-        initialCellsIndex = lastCellIndex
+        initialCellsIndex = initialCellsIndex
     )
     val dragSelectState = rememberDragSelectState(lazyGridState = pinchState.gridState)
-
-    LaunchedEffect(pinchState.isZooming) {
-        canScroll = !pinchState.isZooming
-        lastCellIndex = PlainTheme.cellsList.indexOf(pinchState.currentCells)
-    }
+    val canScroll by remember { derivedStateOf { !pinchState.isZooming } }
 
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
 
@@ -162,6 +162,7 @@ fun ImagesPage(
         tagsViewModel.dataType.value = viewModel.dataType
         if (hasPermission) {
             scope.launch(Dispatchers.IO) {
+                initialCellsIndex = ImageGridCellsIndexPreference.getAsync(context)
                 viewModel.sortBy.value = ImageSortByPreference.getValueAsync(context)
                 viewModel.loadAsync(context, tagsViewModel)
                 bucketViewModel.loadAsync(context)
@@ -175,6 +176,12 @@ fun ImagesPage(
                     viewModel.loadAsync(context, tagsViewModel)
                 }
             })
+    }
+
+    LaunchedEffect(pinchState.currentCells) {
+        scope.launch(Dispatchers.IO) {
+            ImageGridCellsIndexPreference.putAsync(context, pinchState.currentCellsIndex)
+        }
     }
 
     val insetsController = WindowCompat.getInsetsController(window, view)
@@ -202,7 +209,7 @@ fun ImagesPage(
         }
     }
 
-    BackHandler(enabled = dragSelectState.selectMode || castViewModel.castMode.value || viewModel.showSearchBar.value || previewerState.visible) {
+    BackHandler {
         if (previewerState.visible) {
             scope.launch {
                 previewerState.closeTransform()
@@ -216,6 +223,8 @@ fun ImagesPage(
                 viewModel.exitSearchMode()
                 onSearch("")
             }
+        } else {
+            navController.popBackStack()
         }
     }
 
@@ -385,11 +394,45 @@ fun ImagesPage(
                 exit = fadeOut()
             ) {
                 if (itemsState.isNotEmpty()) {
-                    PinchZoomGridLayout(state = pinchState) {
+                    PinchZoomGridLayout(context = context,
+                        state = pinchState,
+                        scope = scope,
+
+                        onTap = { offset ->
+                            val itemPosition = pinchState.gridState.getItemPosition(offset) ?: return@PinchZoomGridLayout
+                            val m = itemsState.getOrNull(itemPosition)
+                            if (m != null) {
+                                if (castViewModel.castMode.value) {
+                                    castViewModel.cast(m.path)
+                                } else if (dragSelectState.selectMode) {
+                                    dragSelectState.addSelected(m.id)
+                                } else {
+                                    scope.launch {
+                                        val itemState = transformItemStateMap[m.id] ?: return@launch
+                                        withIO { MediaPreviewData.setDataAsync(context, itemState, viewModel.itemsFlow.value, m) }
+                                        previewerState.openTransform(
+                                            index = MediaPreviewData.items.indexOfFirst { it.id == m.id },
+                                            itemState = itemState,
+                                        )
+                                    }
+                                }
+                            }
+                        },
+                        onLongPress = { offset ->
+                            val itemPosition = pinchState.gridState.getItemPosition(offset) ?: return@PinchZoomGridLayout
+                            val m = itemsState.getOrNull(itemPosition)
+                            if (m != null) {
+                                if (dragSelectState.selectMode) {
+                                    return@PinchZoomGridLayout
+                                }
+                                viewModel.selectedItem.value = m
+                            }
+                        }) {
                         LazyVerticalGridScrollbar(
                             state = gridState,
                         ) {
                             LazyVerticalGrid(
+                                columns = gridCells,
                                 state = gridState,
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -397,10 +440,9 @@ fun ImagesPage(
                                         items = itemsState,
                                         state = dragSelectState,
                                     ),
-                                columns = gridCells,
                                 userScrollEnabled = canScroll,
-                                horizontalArrangement = Arrangement.spacedBy(1.dp),
-                                verticalArrangement = Arrangement.spacedBy(1.dp),
+                                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                                verticalArrangement = Arrangement.spacedBy(2.dp),
                             ) {
                                 items(itemsState,
                                     key = {
@@ -416,12 +458,13 @@ fun ImagesPage(
                                         modifier = Modifier
                                             .pinchItem(key = m.id)
                                             .animateItemPlacement(),
-                                        navController,
                                         viewModel,
                                         castViewModel,
                                         m,
+                                        showSize = pinchState.currentCellsIndex >= Constants.DEFAULT_CELLS_INDEX_WITH_LABEL,
                                         previewerState,
-                                        dragSelectState
+                                        dragSelectState,
+                                        transformItemStateMap
                                     )
                                 }
                                 item(

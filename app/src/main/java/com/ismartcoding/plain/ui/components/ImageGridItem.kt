@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -23,21 +22,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformImageView
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
-import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.theme.darkMask
 import com.ismartcoding.plain.ui.theme.lightMask
 
@@ -45,43 +40,21 @@ import com.ismartcoding.plain.ui.theme.lightMask
 @Composable
 fun ImageGridItem(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
     viewModel: ImagesViewModel,
     castViewModel: CastViewModel,
     m: DImage,
+    showSize: Boolean,
     previewerState: MediaPreviewerState,
-    dragSelectState: DragSelectState
+    dragSelectState: DragSelectState,
+    transformItemStateMap: MutableMap<String, TransformItemState>,
 ) {
     val isSelected by remember { derivedStateOf { dragSelectState.isSelected(m.id) } }
     val inSelectionMode = dragSelectState.selectMode
     val selected = isSelected || viewModel.selectedItem.value?.id == m.id
-    val context = LocalContext.current
     val itemState = rememberTransformItemState()
+    transformItemStateMap[m.id] = itemState
     Box(
         modifier = modifier
-            .combinedClickable(
-                onClick = {
-                    if (castViewModel.castMode.value) {
-                        castViewModel.cast(m.path)
-                    } else if (inSelectionMode) {
-                        dragSelectState.addSelected(m.id)
-                    } else {
-                        coMain {
-                            withIO { MediaPreviewData.setDataAsync(context, itemState, viewModel.itemsFlow.value, m) }
-                            previewerState.openTransform(
-                                index = MediaPreviewData.items.indexOfFirst { it.id == m.id },
-                                itemState = itemState,
-                            )
-                        }
-                    }
-                },
-                onLongClick = {
-                    if (inSelectionMode) {
-                        return@combinedClickable
-                    }
-                    viewModel.selectedItem.value = m
-                },
-            )
             .then(
                 if (!inSelectionMode) {
                     Modifier
@@ -149,20 +122,22 @@ fun ImageGridItem(
                     dragSelectState.select(m.id)
                 })
         }
-        Box(
-            modifier =
-            Modifier
-                .align(Alignment.BottomEnd)
-                .background(MaterialTheme.colorScheme.darkMask()),
-        ) {
-            Text(
+        if (showSize) {
+            Box(
                 modifier =
                 Modifier
-                    .padding(horizontal = 4.dp, vertical = 2.dp),
-                text = FormatHelper.formatBytes(m.size),
-                color = Color.White,
-                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
-            )
+                    .align(Alignment.BottomEnd)
+                    .background(MaterialTheme.colorScheme.darkMask()),
+            ) {
+                Text(
+                    modifier =
+                    Modifier
+                        .padding(horizontal = 4.dp, vertical = 2.dp),
+                    text = FormatHelper.formatBytes(m.size),
+                    color = Color.White,
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+                )
+            }
         }
     }
 }

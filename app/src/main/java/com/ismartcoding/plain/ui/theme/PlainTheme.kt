@@ -22,15 +22,7 @@ object PlainTheme {
     val APP_BAR_HEIGHT = 64.dp
     const val ANIMATION_DURATION = 300
 
-    val cellsList = listOf(
-        GridCells.Fixed(7),
-        GridCells.Fixed(6),
-        GridCells.Fixed(5),
-        GridCells.Fixed(4),
-        GridCells.Fixed(3),
-        GridCells.Fixed(2),
-        GridCells.Fixed(1),
-    )
+    val cellsList = IntRange(2, 10).map { GridCells.Fixed(it) }.reversed()
 
     @Composable
     fun getCardModifier(index: Int = 0, size: Int = 1, selected: Boolean = false): Modifier {

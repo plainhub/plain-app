@@ -6,6 +6,7 @@ import androidx.compose.animation.core.FloatExponentialDecaySpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.generateDecayAnimationSpec
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculateCentroid
 import androidx.compose.foundation.gestures.calculateCentroidSize
@@ -500,7 +501,7 @@ fun MediaViewer(
                 state.scale.snapTo(desScale)
                 state.offsetX.snapTo(desX)
                 state.offsetY.snapTo(desY)
-               // state.rotation.snapTo(desRotation)
+                // state.rotation.snapTo(desRotation)
             }
 
             // 这里判断是否已运动到边界，如果到了边界，就不消费事件，让上层界面获取到事件
@@ -597,93 +598,90 @@ suspend fun PointerInputScope.detectTransformGestures(
 ) {
     var lastReleaseTime = 0L
     var scope: CoroutineScope? = null
-    forEachGesture {
-        awaitPointerEventScope {
-            var rotation = 0f
-            var zoom = 1f
-            var pan = Offset.Zero
-            var pastTouchSlop = false
-            val touchSlop = viewConfiguration.touchSlop
-            var lockedToPanZoom = false
+    awaitEachGesture {
+        var rotation = 0f
+        var zoom = 1f
+        var pan = Offset.Zero
+        var pastTouchSlop = false
+        val touchSlop = viewConfiguration.touchSlop
+        var lockedToPanZoom = false
 
-            awaitFirstDown(requireUnconsumed = false)
-            val t0 = System.currentTimeMillis()
-            var releasedEvent: PointerEvent? = null
-            var moveCount = 0
-            // 这里开始事件
-            gestureStart()
-            do {
-                val event = awaitPointerEvent()
-                if (event.type == PointerEventType.Release) releasedEvent = event
-                if (event.type == PointerEventType.Move) moveCount++
-                val canceled = event.changes.fastAny { it.isConsumed }
-                if (!canceled) {
-                    val zoomChange = event.calculateZoom()
-                    val rotationChange = event.calculateRotation()
-                    val panChange = event.calculatePan()
+        awaitFirstDown(requireUnconsumed = false)
+        val t0 = System.currentTimeMillis()
+        var releasedEvent: PointerEvent? = null
+        var moveCount = 0
 
-                    if (!pastTouchSlop) {
-                        zoom *= zoomChange
-                        rotation += rotationChange
-                        pan += panChange
+        gestureStart()
+        do {
+            val event = awaitPointerEvent()
+            if (event.type == PointerEventType.Release) releasedEvent = event
+            if (event.type == PointerEventType.Move) moveCount++
+            val canceled = event.changes.fastAny { it.isConsumed }
+            if (!canceled) {
+                val zoomChange = event.calculateZoom()
+                val rotationChange = event.calculateRotation()
+                val panChange = event.calculatePan()
 
-                        val centroidSize = event.calculateCentroidSize(useCurrent = false)
-                        val zoomMotion = abs(1 - zoom) * centroidSize
-                        val rotationMotion = abs(rotation * PI.toFloat() * centroidSize / 180f)
-                        val panMotion = pan.getDistance()
+                if (!pastTouchSlop) {
+                    zoom *= zoomChange
+                    rotation += rotationChange
+                    pan += panChange
 
-                        if (zoomMotion > touchSlop ||
-                            rotationMotion > touchSlop ||
-                            panMotion > touchSlop
-                        ) {
-                            pastTouchSlop = true
-                            lockedToPanZoom = panZoomLock && rotationMotion < touchSlop
-                        }
-                    }
-                    if (pastTouchSlop) {
-                        val centroid = event.calculateCentroid(useCurrent = false)
-                        val effectiveRotation = if (lockedToPanZoom) 0f else rotationChange
-                        if (effectiveRotation != 0f ||
-                            zoomChange != 1f ||
-                            panChange != Offset.Zero
-                        ) {
-                            if (!onGesture(
-                                    centroid,
-                                    panChange,
-                                    zoomChange,
-                                    effectiveRotation,
-                                    event
-                                )
-                            ) break
-                        }
+                    val centroidSize = event.calculateCentroidSize(useCurrent = false)
+                    val zoomMotion = abs(1 - zoom) * centroidSize
+                    val rotationMotion = abs(rotation * PI.toFloat() * centroidSize / 180f)
+                    val panMotion = pan.getDistance()
+
+                    if (zoomMotion > touchSlop ||
+                        rotationMotion > touchSlop ||
+                        panMotion > touchSlop
+                    ) {
+                        pastTouchSlop = true
+                        lockedToPanZoom = panZoomLock && rotationMotion < touchSlop
                     }
                 }
-            } while (!canceled && event.changes.fastAny { it.pressed })
-
-            var t1 = System.currentTimeMillis()
-            val dt = t1 - t0
-            val dlt = t1 - lastReleaseTime
-
-            if (moveCount == 0) releasedEvent?.let { e ->
-                if (e.changes.isEmpty()) return@let
-                val offset = e.changes.first().position
-                if (dlt < 272) {
-                    t1 = 0L
-                    scope?.cancel()
-                    onDoubleTap(offset)
-                } else if (dt < 200) {
-                    scope = MainScope()
-                    scope?.launch(Dispatchers.Main) {
-                        delay(272)
-                        onTap(offset)
+                if (pastTouchSlop) {
+                    val centroid = event.calculateCentroid(useCurrent = false)
+                    val effectiveRotation = if (lockedToPanZoom) 0f else rotationChange
+                    if (effectiveRotation != 0f ||
+                        zoomChange != 1f ||
+                        panChange != Offset.Zero
+                    ) {
+                        if (!onGesture(
+                                centroid,
+                                panChange,
+                                zoomChange,
+                                effectiveRotation,
+                                event
+                            )
+                        ) break
                     }
                 }
-                lastReleaseTime = t1
             }
+        } while (!canceled && event.changes.fastAny { it.pressed })
 
-            // 这里是事件结束
-            gestureEnd(moveCount != 0)
+        var t1 = System.currentTimeMillis()
+        val dt = t1 - t0
+        val dlt = t1 - lastReleaseTime
+
+        if (moveCount == 0) releasedEvent?.let { e ->
+            if (e.changes.isEmpty()) return@let
+            val offset = e.changes.first().position
+            if (dlt < 272) {
+                t1 = 0L
+                scope?.cancel()
+                onDoubleTap(offset)
+            } else if (dt < 200) {
+                scope = MainScope()
+                scope?.launch(Dispatchers.Main) {
+                    delay(272)
+                    onTap(offset)
+                }
+            }
+            lastReleaseTime = t1
         }
+
+        gestureEnd(moveCount != 0)
     }
 }
 
