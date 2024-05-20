@@ -8,18 +8,14 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
+import com.ismartcoding.plain.ui.components.mediaviewer.detectTransformGestures
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun PinchZoomGridLayout(
-    context: Context,
     state: PinchZoomGridState,
-    scope: CoroutineScope,
     modifier: Modifier = Modifier,
-    onTap: (Offset) -> Unit = {},
-    onLongPress: (Offset) -> Unit = {},
     content: @Composable PinchZoomGridScope.() -> Unit,
 ) {
     val contentScope = remember(state, state.gridState) {
@@ -35,7 +31,7 @@ fun PinchZoomGridLayout(
     Box(
         modifier = modifier
             .pointerInput(Unit) {
-                handlePinchGesture(context, state, scope, onTap, onLongPress)
+                handlePinchGesture(state)
             }
             .handleOverZooming(state),
     ) {

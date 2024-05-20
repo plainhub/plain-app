@@ -73,7 +73,6 @@ import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
-import com.ismartcoding.plain.ui.base.dragselect.getItemPosition
 import com.ismartcoding.plain.ui.base.dragselect.gridDragSelect
 import com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState
 import com.ismartcoding.plain.ui.base.fastscroll.LazyVerticalGridScrollbar
@@ -88,14 +87,12 @@ import com.ismartcoding.plain.ui.components.FileSortDialog
 import com.ismartcoding.plain.ui.components.ImageGridItem
 import com.ismartcoding.plain.ui.components.ListSearchBar
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.ImagePreviewer
-import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.extensions.navigateTags
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.ImageFoldersViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
-import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSearchMode
@@ -134,7 +131,6 @@ fun ImagesPage(
     var hasPermission by remember {
         mutableStateOf(AppFeatureType.FILES.hasPermission(context))
     }
-    val transformItemStateMap = remember { mutableMapOf<String, TransformItemState>() }
 
     var initialCellsIndex by remember { mutableIntStateOf(ImageGridCellsIndexPreference.default) }
     val pinchState = rememberPinchZoomGridState(
@@ -394,40 +390,9 @@ fun ImagesPage(
                 exit = fadeOut()
             ) {
                 if (itemsState.isNotEmpty()) {
-                    PinchZoomGridLayout(context = context,
-                        state = pinchState,
-                        scope = scope,
-
-                        onTap = { offset ->
-                            val itemPosition = pinchState.gridState.getItemPosition(offset) ?: return@PinchZoomGridLayout
-                            val m = itemsState.getOrNull(itemPosition)
-                            if (m != null) {
-                                if (castViewModel.castMode.value) {
-                                    castViewModel.cast(m.path)
-                                } else if (dragSelectState.selectMode) {
-                                    dragSelectState.addSelected(m.id)
-                                } else {
-                                    scope.launch {
-                                        val itemState = transformItemStateMap[m.id] ?: return@launch
-                                        withIO { MediaPreviewData.setDataAsync(context, itemState, viewModel.itemsFlow.value, m) }
-                                        previewerState.openTransform(
-                                            index = MediaPreviewData.items.indexOfFirst { it.id == m.id },
-                                            itemState = itemState,
-                                        )
-                                    }
-                                }
-                            }
-                        },
-                        onLongPress = { offset ->
-                            val itemPosition = pinchState.gridState.getItemPosition(offset) ?: return@PinchZoomGridLayout
-                            val m = itemsState.getOrNull(itemPosition)
-                            if (m != null) {
-                                if (dragSelectState.selectMode) {
-                                    return@PinchZoomGridLayout
-                                }
-                                viewModel.selectedItem.value = m
-                            }
-                        }) {
+                    PinchZoomGridLayout(
+                        state = pinchState
+                    ) {
                         LazyVerticalGridScrollbar(
                             state = gridState,
                         ) {
@@ -455,6 +420,7 @@ fun ImagesPage(
                                         GridItemSpan(1)
                                     }) { m ->
                                     ImageGridItem(
+                                        context,
                                         modifier = Modifier
                                             .pinchItem(key = m.id)
                                             .animateItemPlacement(),
@@ -464,7 +430,6 @@ fun ImagesPage(
                                         showSize = pinchState.currentCellsIndex >= Constants.DEFAULT_CELLS_INDEX_WITH_LABEL,
                                         previewerState,
                                         dragSelectState,
-                                        transformItemStateMap
                                     )
                                 }
                                 item(

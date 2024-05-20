@@ -94,7 +94,7 @@ fun ImageFoldersPage(
                 exit = fadeOut()
             ) {
                 if (itemsState.isNotEmpty()) {
-                    PinchZoomGridLayout(context = context, state = pinchState, scope = scope) {
+                    PinchZoomGridLayout(state = pinchState) {
                         LazyVerticalGrid(
                             state = gridState,
                             modifier = Modifier.fillMaxSize(),
