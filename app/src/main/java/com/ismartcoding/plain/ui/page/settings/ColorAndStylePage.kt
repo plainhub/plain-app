@@ -68,8 +68,8 @@ import com.ismartcoding.plain.ui.components.ColorPickerDialog
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.page.RouteName
-import com.ismartcoding.plain.ui.svg.PALETTE
-import com.ismartcoding.plain.ui.svg.SVGString
+import com.ismartcoding.plain.ui.base.svg.PALETTE
+import com.ismartcoding.plain.ui.base.svg.SVGString
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.cardContainer
 import com.ismartcoding.plain.ui.theme.palette.TonalPalettes

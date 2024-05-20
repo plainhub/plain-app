@@ -4,8 +4,11 @@ import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import com.ismartcoding.lib.content.ContentWhere
+import com.ismartcoding.lib.extensions.getIntValue
 import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
+import com.ismartcoding.lib.extensions.getTimeMillisecondsValue
+import com.ismartcoding.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.plain.data.DMediaBucket
@@ -26,6 +29,11 @@ object VideoMediaStoreHelper : BaseContentHelper() {
             MediaStore.Video.Media.DATA,
             MediaStore.Video.Media.SIZE,
             MediaStore.Video.Media.DURATION,
+            MediaStore.Video.Media.DATE_ADDED,
+            MediaStore.Video.Media.DATE_MODIFIED,
+            MediaStore.Video.Media.WIDTH,
+            MediaStore.Video.Media.HEIGHT,
+            MediaStore.Video.Media.ORIENTATION,
             MediaStore.Video.Media.BUCKET_ID,
         )
     }
@@ -67,9 +75,14 @@ object VideoMediaStoreHelper : BaseContentHelper() {
                 val title = cursor.getStringValue(MediaStore.Video.Media.TITLE, cache)
                 val size = cursor.getLongValue(MediaStore.Video.Media.SIZE, cache)
                 val duration = cursor.getLongValue(MediaStore.Video.Media.DURATION, cache) / 1000
+                val createdAt = cursor.getTimeSecondsValue(MediaStore.Video.Media.DATE_ADDED, cache)
+                val updatedAt = cursor.getTimeSecondsValue(MediaStore.Video.Media.DATE_MODIFIED, cache)
+                val width = cursor.getIntValue(MediaStore.Video.Media.WIDTH, cache)
+                val height = cursor.getIntValue(MediaStore.Video.Media.HEIGHT, cache)
+                val rotation = cursor.getIntValue(MediaStore.Video.Media.ORIENTATION, cache)
                 val path = cursor.getStringValue(MediaStore.Video.Media.DATA, cache)
                 val bucketId = cursor.getStringValue(MediaStore.Video.Media.BUCKET_ID, cache)
-                result.add(DVideo(id, title, path, duration, size, bucketId))
+                result.add(DVideo(id, title, path, duration, size, width, height, rotation, bucketId, createdAt, updatedAt))
             }
         }
         return result

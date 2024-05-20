@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.images
 
+import android.view.View
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -26,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -34,15 +36,16 @@ import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.MediaBucketGridItem
-import com.ismartcoding.plain.ui.models.ImageFoldersViewModel
+import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun ImageFoldersPage(
+fun MediaFoldersPage(
     navController: NavHostController,
-    viewModel: ImageFoldersViewModel = viewModel(),
+    dataType: DataType,
+    viewModel: MediaFoldersViewModel = viewModel(),
 ) {
     val itemsState by viewModel.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
@@ -58,6 +61,7 @@ fun ImageFoldersPage(
         }
 
     LaunchedEffect(Unit) {
+        viewModel.dataType.value = dataType
         scope.launch(Dispatchers.IO) {
             viewModel.loadAsync(context)
         }
@@ -89,7 +93,7 @@ fun ImageFoldersPage(
                                 it.id
                             },
                             contentType = {
-                                "image"
+                                "bucket"
                             },
                             span = {
                                 GridItemSpan(1)
@@ -97,6 +101,7 @@ fun ImageFoldersPage(
                             MediaBucketGridItem(
                                 navController = navController,
                                 m = m,
+                                dataType = dataType
                             )
                         }
                         item(

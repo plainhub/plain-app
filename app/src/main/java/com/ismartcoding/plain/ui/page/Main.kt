@@ -1,9 +1,7 @@
 package com.ismartcoding.plain.ui.page
 
 import android.app.Activity
-import android.content.Intent
 import android.net.Uri
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -17,10 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,9 +30,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.view.WindowCompat
-import androidx.navigation.NamedNavArgument
-import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -43,37 +40,13 @@ import androidx.navigation.navArgument
 import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.setSingletonImageLoaderFactory
 import com.ismartcoding.lib.channel.receiveEventHandler
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.isGestureInteractionMode
-import com.ismartcoding.lib.extensions.parcelable
-import com.ismartcoding.lib.extensions.parcelableArrayList
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.DPlaylistAudio
-import com.ismartcoding.plain.db.DMessageContent
-import com.ismartcoding.plain.db.DMessageText
-import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.DataType
-import com.ismartcoding.plain.enums.PickFileTag
-import com.ismartcoding.plain.enums.PickFileType
-import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.features.ConfirmDialogEvent
 import com.ismartcoding.plain.features.LoadingDialogEvent
-import com.ismartcoding.plain.features.Permissions
-import com.ismartcoding.plain.features.PickFileResultEvent
-import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.preference.LocalDarkTheme
-import com.ismartcoding.plain.ui.MainActivity
-import com.ismartcoding.plain.ui.TextEditorDialog
-import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
 import com.ismartcoding.plain.ui.base.coil.newImageLoader
-import com.ismartcoding.plain.ui.extensions.navigate
-import com.ismartcoding.plain.ui.extensions.navigatePdf
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.page.apps.AppPage
 import com.ismartcoding.plain.ui.page.apps.AppsPage
@@ -86,8 +59,8 @@ import com.ismartcoding.plain.ui.page.feeds.FeedEntriesPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntryPage
 import com.ismartcoding.plain.ui.page.feeds.FeedSettingsPage
 import com.ismartcoding.plain.ui.page.feeds.FeedsPage
-import com.ismartcoding.plain.ui.page.images.ImageFoldersPage
 import com.ismartcoding.plain.ui.page.images.ImagesPage
+import com.ismartcoding.plain.ui.page.images.MediaFoldersPage
 import com.ismartcoding.plain.ui.page.notes.NotePage
 import com.ismartcoding.plain.ui.page.notes.NotesPage
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
@@ -101,27 +74,22 @@ import com.ismartcoding.plain.ui.page.settings.SettingsPage
 import com.ismartcoding.plain.ui.page.tags.TagsPage
 import com.ismartcoding.plain.ui.page.tools.ExchangeRatePage
 import com.ismartcoding.plain.ui.page.tools.SoundMeterPage
+import com.ismartcoding.plain.ui.page.videos.VideosPage
 import com.ismartcoding.plain.ui.page.web.SessionsPage
 import com.ismartcoding.plain.ui.page.web.WebDevPage
 import com.ismartcoding.plain.ui.page.web.WebLearnMorePage
 import com.ismartcoding.plain.ui.page.web.WebSecurityPage
 import com.ismartcoding.plain.ui.page.web.WebSettingsPage
 import com.ismartcoding.plain.ui.theme.AppTheme
-import com.ismartcoding.plain.web.models.toModel
-import com.ismartcoding.plain.web.websocket.EventType
-import com.ismartcoding.plain.web.websocket.WebSocketEvent
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalCoilApi::class)
 @Composable
-fun Main(viewModel: MainViewModel) {
+fun Main(navControllerState: MutableState<NavHostController?>, onLaunched: () -> Unit, viewModel: MainViewModel) {
     val context = LocalContext.current
     val navController = rememberNavController()
+    navControllerState.value = navController
     val useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current)
-    val scope = rememberCoroutineScope()
     val view = LocalView.current
     val window = (view.context as Activity).window
     val insetsController = WindowCompat.getInsetsController(window, view)
@@ -144,80 +112,7 @@ fun Main(viewModel: MainViewModel) {
                 loadingDialogEvent = if (event.show) event else null
             }
         )
-        val intent = MainActivity.instance.get()?.intent
-        if (intent?.action == Intent.ACTION_VIEW) {
-            val uri = intent.data
-            if (uri != null) {
-                val mimeType = context.contentResolver.getType(uri)
-                if (mimeType != null) {
-                    if (mimeType.startsWith("audio/") ||
-                        setOf("application/ogg", "application/x-ogg", "application/itunes").contains(mimeType)
-                    ) {
-                        AudioPlayerDialog().show()
-                        Permissions.checkNotification(context, R.string.audio_notification_prompt) {
-                            AudioPlayer.play(context, DPlaylistAudio.fromPath(context, uri.toString()))
-                        }
-                    } else if (mimeType.startsWith("text/")) {
-                        TextEditorDialog(uri).show()
-                    } else if (mimeType.startsWith("image/") || mimeType.startsWith("video/")) {
-//                        val link = uri.toString()
-//                        PreviewDialog().show(
-//                            items = arrayListOf(PreviewItem(link, uri)),
-//                            initKey = link,
-//                        )
-                    } else if (mimeType == "application/pdf") {
-                        navController.navigatePdf(uri)
-                    }
-                }
-            }
-        } else if (intent?.action == Intent.ACTION_SEND) {
-            if (intent.type?.startsWith("text/") == true) {
-                val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT) ?: return@LaunchedEffect
-                scope.launch {
-                    val item = withIO {
-                        ChatHelper.sendAsync(DMessageContent(DMessageType.TEXT.value, DMessageText(sharedText)))
-                    }
-                    sendEvent(
-                        WebSocketEvent(
-                            EventType.MESSAGE_CREATED,
-                            JsonHelper.jsonEncode(
-                                arrayListOf(
-                                    item.toModel().apply {
-                                        data = this.getContentData()
-                                    },
-                                ),
-                            ),
-                        ),
-                    )
-                    navController.navigate(RouteName.CHAT)
-                }
-                return@LaunchedEffect
-            }
-
-            val uri = intent.parcelable(Intent.EXTRA_STREAM) as? Uri ?: return@LaunchedEffect
-            DialogHelper.showConfirmDialog(uri.toString().getFilenameFromPath(), getString(R.string.confirm_to_send_file_to_file_assistant),
-                confirmButton = getString(R.string.ok) to {
-                    navController.navigate(RouteName.CHAT)
-                    scope.launch(Dispatchers.IO) {
-                        delay(1000)
-                        sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, setOf(uri)))
-                    }
-                },
-                dismissButton = getString(R.string.cancel) to {})
-        } else if (intent?.action == Intent.ACTION_SEND_MULTIPLE) {
-            DialogHelper.showConfirmDialog("", getString(R.string.confirm_to_send_files_to_file_assistant),
-                confirmButton = getString(R.string.ok) to {
-                    val uris = intent.parcelableArrayList<Uri>(Intent.EXTRA_STREAM)
-                    if (uris != null) {
-                        navController.navigate(RouteName.CHAT)
-                        scope.launch(Dispatchers.IO) {
-                            delay(1000)
-                            sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris.toSet()))
-                        }
-                    }
-                },
-                dismissButton = getString(R.string.cancel) to {})
-        }
+        onLaunched()
     }
 
     AppTheme(useDarkTheme = useDarkTheme) {
@@ -257,9 +152,8 @@ fun Main(viewModel: MainViewModel) {
                 RouteName.FEED_SETTINGS to { FeedSettingsPage(navController) },
                 RouteName.WEB_LEARN_MORE to { WebLearnMorePage(navController) },
                 RouteName.AUDIO to { AudioPage(navController) },
-                RouteName.IMAGE_FOLDERS to { ImageFoldersPage(navController) },
             ).forEach { (routeName, content) ->
-                slideHorizontallyComposable(routeName.name) {
+                composable(routeName.name) {
                     content()
                 }
             }
@@ -268,7 +162,7 @@ fun Main(viewModel: MainViewModel) {
                 AppPage(navController, it)
             }
 
-            slideHorizontallyComposable(
+            composable(
                 "${RouteName.FEED_ENTRIES.name}?feedId={feedId}",
                 arguments = listOf(navArgument("feedId") {
                     nullable = true
@@ -284,14 +178,21 @@ fun Main(viewModel: MainViewModel) {
                 FeedEntryPage(navController, it)
             }
 
-            slideHorizontallyComposable(
+            composable(
                 RouteName.IMAGES.name,
             ) {
                 val bucketId = navController.previousBackStackEntry?.savedStateHandle?.get("bucketId") ?: ""
                 ImagesPage(navController, bucketId)
             }
 
-            slideHorizontallyComposable(
+            composable(
+                RouteName.VIDEOS.name,
+            ) {
+                val bucketId = navController.previousBackStackEntry?.savedStateHandle?.get("bucketId") ?: ""
+                VideosPage(navController, bucketId)
+            }
+
+            composable(
                 "${RouteName.NOTES.name}/create?tagId={tagId}",
                 arguments = listOf(navArgument("tagId") {
                     nullable = true
@@ -303,7 +204,7 @@ fun Main(viewModel: MainViewModel) {
                 NotePage(navController, "", tagId)
             }
 
-            slideHorizontallyComposable(
+            composable(
                 "${RouteName.NOTES.name}/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
             ) {
@@ -311,14 +212,14 @@ fun Main(viewModel: MainViewModel) {
                 NotePage(navController, id, "")
             }
 
-            slideHorizontallyComposable(RouteName.TEXT.name) {
+            composable(RouteName.TEXT.name) {
                 val title = navController.previousBackStackEntry?.savedStateHandle?.get("title") ?: ""
                 val content = navController.previousBackStackEntry?.savedStateHandle?.get("content") ?: ""
                 val language = navController.previousBackStackEntry?.savedStateHandle?.get("language") ?: ""
                 TextPage(navController, title, content, language)
             }
 
-            slideHorizontallyComposable(RouteName.TEXT_FILE.name) {
+            composable(RouteName.TEXT_FILE.name) {
                 val path = navController.previousBackStackEntry?.savedStateHandle?.get("path") ?: ""
                 val title = navController.previousBackStackEntry?.savedStateHandle?.get("title") ?: ""
                 val type = navController.previousBackStackEntry?.savedStateHandle?.get("type") ?: ""
@@ -326,14 +227,14 @@ fun Main(viewModel: MainViewModel) {
                 TextFilePage(navController, path, title, mediaId, type)
             }
 
-            slideHorizontallyComposable(
+            composable(
                 RouteName.CHAT_TEXT.name
             ) {
                 val content = navController.previousBackStackEntry?.savedStateHandle?.get("content") ?: ""
                 ChatTextPage(navController, content)
             }
 
-            slideHorizontallyComposable(
+            composable(
                 "${RouteName.TAGS.name}?dataType={dataType}",
                 arguments = listOf(navArgument("dataType") { type = NavType.IntType }),
             ) {
@@ -341,7 +242,15 @@ fun Main(viewModel: MainViewModel) {
                 TagsPage(navController, DataType.fromInt(dataType))
             }
 
-            slideHorizontallyComposable(
+            composable(
+                "${RouteName.MEDIA_FOLDERS.name}?dataType={dataType}",
+                arguments = listOf(navArgument("dataType") { type = NavType.IntType }),
+            ) {
+                val dataType = it.arguments?.getInt("dataType") ?: -1
+                MediaFoldersPage(navController, DataType.fromInt(dataType))
+            }
+
+            composable(
                 "${RouteName.CHAT_EDIT_TEXT.name}/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
             ) {
@@ -350,14 +259,14 @@ fun Main(viewModel: MainViewModel) {
                 ChatEditTextPage(navController, id, content)
             }
 
-            slideHorizontallyComposable(
+            composable(
                 RouteName.OTHER_FILE.name,
             ) {
                 val path = navController.previousBackStackEntry?.savedStateHandle?.get("path") ?: ""
                 OtherFilePage(navController, path)
             }
 
-            slideHorizontallyComposable(
+            composable(
                 RouteName.PDF_VIEWER.name,
             ) {
                 val uri = navController.previousBackStackEntry?.savedStateHandle?.get("uri") as? Uri
@@ -419,7 +328,7 @@ fun Main(viewModel: MainViewModel) {
 }
 
 fun NavGraphBuilder.routeDetail(routeName: RouteName, action: @Composable (String) -> Unit) {
-    slideHorizontallyComposable(
+    composable(
         "${routeName.name}/{id}",
         arguments = listOf(navArgument("id") { type = NavType.StringType }),
     ) {
@@ -428,39 +337,3 @@ fun NavGraphBuilder.routeDetail(routeName: RouteName, action: @Composable (Strin
     }
 }
 
-fun NavGraphBuilder.slideHorizontallyComposable(
-    route: String,
-    arguments: List<NamedNavArgument> = emptyList(),
-    content: @Composable (AnimatedVisibilityScope.(NavBackStackEntry) -> Unit),
-) {
-    composable(
-        route,
-        arguments,
-//        enterTransition = {
-//            slideIntoContainer(
-//                towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-//                animationSpec = tween(PlainTheme.ANIMATION_DURATION),
-//            )
-//        },
-//        exitTransition = {
-//            slideOutOfContainer(
-//                towards = AnimatedContentTransitionScope.SlideDirection.Companion.Left,
-//                animationSpec = tween(PlainTheme.ANIMATION_DURATION),
-//            )
-//        },
-//        popEnterTransition = {
-//            slideIntoContainer(
-//                towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
-//                animationSpec = tween(PlainTheme.ANIMATION_DURATION),
-//            )
-//        },
-//        popExitTransition = {
-//            slideOutOfContainer(
-//                towards = AnimatedContentTransitionScope.SlideDirection.Companion.Right,
-//                animationSpec = tween(PlainTheme.ANIMATION_DURATION),
-//            )
-//        },
-    ) {
-        content(it)
-    }
-}

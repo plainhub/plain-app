@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.page.images
+package com.ismartcoding.plain.ui.page.videos
 
 import android.app.Activity
 import androidx.activity.compose.BackHandler
@@ -58,8 +58,8 @@ import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.CastPlayer
-import com.ismartcoding.plain.preference.ImageGridCellsPerRowPreference
-import com.ismartcoding.plain.preference.ImageSortByPreference
+import com.ismartcoding.plain.preference.VideoGridCellsPerRowPreference
+import com.ismartcoding.plain.preference.VideoSortByPreference
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -90,8 +90,8 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.CastDialog
 import com.ismartcoding.plain.ui.components.FileSortDialog
-import com.ismartcoding.plain.ui.components.ImageGridItem
 import com.ismartcoding.plain.ui.components.ListSearchBar
+import com.ismartcoding.plain.ui.components.VideoGridItem
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.extensions.navigateMediaFolders
@@ -99,8 +99,8 @@ import com.ismartcoding.plain.ui.extensions.navigateTags
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
-import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.models.VideosViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSearchMode
 import kotlinx.coroutines.Dispatchers
@@ -109,10 +109,10 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun ImagesPage(
+fun VideosPage(
     navController: NavHostController,
     bucketId: String,
-    viewModel: ImagesViewModel = viewModel(),
+    viewModel: VideosViewModel = viewModel(),
     tagsViewModel: TagsViewModel = viewModel(),
     bucketViewModel: MediaFoldersViewModel = viewModel(),
     castViewModel: CastViewModel = viewModel(),
@@ -121,9 +121,8 @@ fun ImagesPage(
     val view = LocalView.current
     val window = (view.context as Activity).window
     val itemsState by viewModel.itemsFlow.collectAsState()
-    val bucketsState by bucketViewModel.itemsFlow.collectAsState()
     val configuration = LocalConfiguration.current
-
+    val bucketsState by bucketViewModel.itemsFlow.collectAsState()
     val bucketsMap = remember(bucketsState) {
         derivedStateOf {
             bucketsState.associateBy { it.id }
@@ -141,12 +140,12 @@ fun ImagesPage(
 
     val gridState = rememberLazyGridState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { gridState.firstVisibleItemIndex > 0 })
-
-    var cellsPerRow by remember { mutableIntStateOf(ImageGridCellsPerRowPreference.default) }
+    var cellsPerRow by remember { mutableIntStateOf(VideoGridCellsPerRowPreference.default) }
     val density = LocalDensity.current
     val imageWidthPx = remember(cellsPerRow) {
         density.run { ((configuration.screenWidthDp.dp - ((cellsPerRow - 1) * 2).dp) / cellsPerRow).toPx().toInt() }
     }
+
     val dragSelectState = rememberDragSelectState(lazyGridState = gridState)
     var showCellsPerRowDialog by remember { mutableStateOf(false) }
 
@@ -165,12 +164,12 @@ fun ImagesPage(
 
     LaunchedEffect(Unit) {
         viewModel.bucketId.value = bucketId
-        tagsViewModel.dataType.value = viewModel.dataType
         bucketViewModel.dataType.value = viewModel.dataType
+        tagsViewModel.dataType.value = viewModel.dataType
         if (hasPermission) {
             scope.launch(Dispatchers.IO) {
-                cellsPerRow = ImageGridCellsPerRowPreference.getAsync(context)
-                viewModel.sortBy.value = ImageSortByPreference.getValueAsync(context)
+                cellsPerRow = VideoGridCellsPerRowPreference.getAsync(context)
+                viewModel.sortBy.value = VideoSortByPreference.getValueAsync(context)
                 viewModel.loadAsync(context, tagsViewModel)
                 bucketViewModel.loadAsync(context)
             }
@@ -179,7 +178,7 @@ fun ImagesPage(
             receiveEventHandler<PermissionsResultEvent> {
                 hasPermission = AppFeatureType.FILES.hasPermission(context)
                 scope.launch(Dispatchers.IO) {
-                    viewModel.sortBy.value = ImageSortByPreference.getValueAsync(context)
+                    viewModel.sortBy.value = VideoSortByPreference.getValueAsync(context)
                     viewModel.loadAsync(context, tagsViewModel)
                 }
             })
@@ -238,7 +237,7 @@ fun ImagesPage(
                     selected = value == cellsPerRow,
                 ) {
                     scope.launch(Dispatchers.IO) {
-                        ImageGridCellsPerRowPreference.putAsync(context, value)
+                        VideoGridCellsPerRowPreference.putAsync(context, value)
                         cellsPerRow = value
                     }
                 }
@@ -248,12 +247,12 @@ fun ImagesPage(
         }
     }
 
-    ViewImageBottomSheet(viewModel, tagsViewModel, tagsMapState, tagsState, dragSelectState)
+    ViewVideoBottomSheet(viewModel, tagsViewModel, tagsMapState, tagsState, dragSelectState)
 
     if (viewModel.showSortDialog.value) {
         FileSortDialog(viewModel.sortBy, onSelected = {
             scope.launch(Dispatchers.IO) {
-                ImageSortByPreference.putAsync(context, it)
+                VideoSortByPreference.putAsync(context, it)
                 viewModel.sortBy.value = it
                 viewModel.loadAsync(context, tagsViewModel)
             }
@@ -452,12 +451,12 @@ fun ImagesPage(
                                     it.id
                                 },
                                 contentType = {
-                                    "image"
+                                    "video"
                                 },
                                 span = {
                                     GridItemSpan(1)
                                 }) { m ->
-                                ImageGridItem(
+                                VideoGridItem(
                                     modifier = Modifier
                                         .animateItemPlacement(),
                                     viewModel,
@@ -467,6 +466,7 @@ fun ImagesPage(
                                     previewerState,
                                     dragSelectState,
                                     imageWidthPx,
+                                    sort = viewModel.sortBy.value,
                                 )
                             }
                             item(
@@ -516,17 +516,17 @@ fun ImagesPage(
 }
 
 @Composable
-fun getPageTitle(viewModel: ImagesViewModel, castViewModel: CastViewModel, bucket: DMediaBucket?, dragSelectState: DragSelectState): String {
-    val imageName = bucket?.name ?: stringResource(id = R.string.images)
+fun getPageTitle(viewModel: VideosViewModel, castViewModel: CastViewModel, bucket: DMediaBucket?, dragSelectState: DragSelectState): String {
+    val videoName = bucket?.name ?: stringResource(id = R.string.videos)
     return if (castViewModel.castMode.value) {
         stringResource(id = R.string.cast_mode) + " - " + CastPlayer.currentDevice?.description?.device?.friendlyName
     } else if (dragSelectState.selectMode) {
         LocaleHelper.getStringF(R.string.x_selected, "count", dragSelectState.selectedIds.size)
     } else if (viewModel.tag.value != null) {
-        imageName + " - " + viewModel.tag.value!!.name
+        videoName + " - " + viewModel.tag.value!!.name
     } else if (viewModel.trash.value) {
-        stringResource(id = R.string.images) + " - " + stringResource(id = R.string.trash)
+        stringResource(id = R.string.videos) + " - " + stringResource(id = R.string.trash)
     } else {
-        imageName
+        videoName
     }
 }

@@ -8,19 +8,32 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.db.DFeed
+import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.ImageMediaStoreHelper
+import com.ismartcoding.plain.features.video.VideoMediaStoreHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
-class ImageFoldersViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
+class MediaFoldersViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel() {
     private val _itemsFlow = MutableStateFlow(mutableStateListOf<DMediaBucket>())
-     val itemsFlow: StateFlow<List<DMediaBucket>> get() = _itemsFlow
+    val itemsFlow: StateFlow<List<DMediaBucket>> get() = _itemsFlow
     var showLoading = mutableStateOf(true)
     var selectedItem = mutableStateOf<DFeed?>(null)
+    var dataType = mutableStateOf(DataType.DEFAULT)
 
     fun loadAsync(context: Context) {
-        _itemsFlow.value = ImageMediaStoreHelper.getBuckets(context).toMutableStateList()
+        _itemsFlow.value = (when (dataType.value) {
+            DataType.IMAGE -> {
+                ImageMediaStoreHelper.getBuckets(context)
+            }
+            DataType.VIDEO -> {
+                VideoMediaStoreHelper.getBuckets(context)
+            }
+            else -> {
+                emptyList()
+            }
+        }).toMutableStateList()
         showLoading.value = false
     }
 

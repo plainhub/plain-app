@@ -8,6 +8,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,12 +17,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -49,6 +52,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.ListSearchBar
 import com.ismartcoding.plain.ui.components.PackageListItem
+import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.AppsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSearchMode
@@ -68,6 +72,7 @@ fun AppsPage(
     val scope = rememberCoroutineScope()
     val filtersScrollState = rememberScrollState()
     val scrollState = rememberLazyListState()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { scrollState.firstVisibleItemIndex > 0 })
 
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
@@ -130,7 +135,9 @@ fun AppsPage(
                 )
                 return@PScaffold
             }
-            PTopAppBar(navController = navController, title = stringResource(id = R.string.apps),
+            PTopAppBar(navController = navController,
+                title = stringResource(id = R.string.apps),
+                scrollBehavior = scrollBehavior,
                 actions = {
                     ActionButtonSearch {
                         viewModel.enterSearchMode()
@@ -151,6 +158,10 @@ fun AppsPage(
                     selected = viewModel.appType.value.isEmpty(),
                     onClick = {
                         viewModel.appType.value = ""
+                        scope.launch {
+                            scrollBehavior.reset()
+                            scrollState.scrollToItem(0)
+                        }
                         scope.launch(Dispatchers.IO) {
                             viewModel.loadAsync()
                         }
@@ -161,6 +172,10 @@ fun AppsPage(
                     selected = viewModel.appType.value == "system",
                     onClick = {
                         viewModel.appType.value = "system"
+                        scope.launch {
+                            scrollBehavior.reset()
+                            scrollState.scrollToItem(0)
+                        }
                         scope.launch(Dispatchers.IO) {
                             viewModel.loadAsync()
                         }
@@ -171,6 +186,10 @@ fun AppsPage(
                     selected = viewModel.appType.value == "user",
                     onClick = {
                         viewModel.appType.value = "user"
+                        scope.launch {
+                            scrollBehavior.reset()
+                            scrollState.scrollToItem(0)
+                        }
                         scope.launch(Dispatchers.IO) {
                             viewModel.loadAsync()
                         }
@@ -193,8 +212,8 @@ fun AppsPage(
                     ) {
                         LazyColumn(
                             Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight(),
+                                .fillMaxSize()
+                                .nestedScroll(scrollBehavior.nestedScrollConnection),
                             state = scrollState,
                         ) {
                             item {

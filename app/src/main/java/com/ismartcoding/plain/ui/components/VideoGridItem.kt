@@ -27,30 +27,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.data.DImage
-import com.ismartcoding.plain.features.ImageMediaStoreHelper
+import com.ismartcoding.plain.data.DVideo
+import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.features.video.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformImageView
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.models.CastViewModel
-import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.MediaPreviewData
+import com.ismartcoding.plain.ui.models.VideosViewModel
 import com.ismartcoding.plain.ui.theme.darkMask
 import com.ismartcoding.plain.ui.theme.lightMask
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ImageGridItem(
+fun VideoGridItem(
     modifier: Modifier = Modifier,
-    viewModel: ImagesViewModel,
+    viewModel: VideosViewModel,
     castViewModel: CastViewModel,
-    m: DImage,
+    m: DVideo,
     showSize: Boolean,
     previewerState: MediaPreviewerState,
     dragSelectState: DragSelectState,
     widthPx: Int,
+    sort: FileSortBy
 ) {
     val isSelected by remember { derivedStateOf { dragSelectState.isSelected(m.id) } }
     val inSelectionMode = dragSelectState.selectMode
@@ -104,12 +106,11 @@ fun ImageGridItem(
             .fillMaxSize()
             .align(Alignment.Center)
             .aspectRatio(1f)
-
         TransformImageView(
             modifier = imageModifier,
-            uri = ImageMediaStoreHelper.getItemUri(m.id),
             path = m.path,
             key = m.id,
+            uri = VideoMediaStoreHelper.getItemUri(m.id),
             itemState = itemState,
             previewerState = previewerState,
             widthPx = widthPx
@@ -162,7 +163,7 @@ fun ImageGridItem(
                     modifier =
                     Modifier
                         .padding(horizontal = 4.dp, vertical = 2.dp),
-                    text = FormatHelper.formatBytes(m.size),
+                    text = if (setOf(FileSortBy.SIZE_ASC, FileSortBy.SIZE_DESC).contains(sort)) FormatHelper.formatBytes(m.size) else FormatHelper.formatDuration(m.duration),
                     color = Color.White,
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
                 )

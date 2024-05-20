@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -24,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -85,6 +87,8 @@ fun DocsPage(
     val itemsState by viewModel.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { scrollState.firstVisibleItemIndex > 0 })
+
     var hasPermission by remember {
         mutableStateOf(AppFeatureType.FILES.hasPermission(context))
     }
@@ -199,6 +203,7 @@ fun DocsPage(
                     }
                 },
                 title = pageTitle,
+                scrollBehavior = scrollBehavior,
                 actions = {
                     if (!hasPermission) {
                         return@PTopAppBar
@@ -258,7 +263,8 @@ fun DocsPage(
                     ) {
                         LazyColumn(
                             Modifier
-                                .fillMaxSize(),
+                                .fillMaxSize()
+                                .nestedScroll(scrollBehavior.nestedScrollConnection),
                             state = scrollState,
                         ) {
                             item {

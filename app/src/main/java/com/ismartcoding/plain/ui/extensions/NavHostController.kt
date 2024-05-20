@@ -60,3 +60,13 @@ fun NavHostController.navigateImages(bucketId: String = "") {
     navigate(RouteName.IMAGES)
 }
 
+fun NavHostController.navigateVideos(bucketId: String = "") {
+    currentBackStackEntry?.savedStateHandle?.set("bucketId", bucketId)
+    navigate(RouteName.VIDEOS)
+}
+
+
+fun NavHostController.navigateMediaFolders(dateType: DataType) {
+    navigate("${RouteName.MEDIA_FOLDERS.name}?dataType=${dateType.value}")
+}
+

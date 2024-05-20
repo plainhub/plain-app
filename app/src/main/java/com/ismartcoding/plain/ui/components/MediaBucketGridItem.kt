@@ -27,9 +27,11 @@ import com.ismartcoding.lib.helpers.BitmapHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
+import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.navigateImages
+import com.ismartcoding.plain.ui.extensions.navigateVideos
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import com.ismartcoding.plain.ui.views.mergeimages.CombineBitmapTools
@@ -42,6 +44,7 @@ fun MediaBucketGridItem(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     m: DMediaBucket,
+    dataType: DataType
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -78,7 +81,11 @@ fun MediaBucketGridItem(
         modifier = modifier
             .clip(MaterialTheme.shapes.medium)
             .clickable {
-                navController.navigateImages(m.id)
+                if (dataType == DataType.IMAGE) {
+                    navController.navigateImages(m.id)
+                } else if (dataType == DataType.VIDEO) {
+                    navController.navigateVideos(m.id)
+                }
             },
     ) {
         Column(

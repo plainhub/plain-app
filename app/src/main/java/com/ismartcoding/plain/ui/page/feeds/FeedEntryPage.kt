@@ -32,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,6 +42,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -70,7 +72,7 @@ import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.markdowntext.MarkdownText
-import com.ismartcoding.plain.ui.components.mediaviewer.previewer.ImagePreviewer
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefreshContent
@@ -105,7 +107,9 @@ fun FeedEntryPage(
     val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
     val tagIds = tagsMapState[id]?.map { it.tagId } ?: emptyList()
     val scrollState = rememberLazyListState()
-    //val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
+        scrollState.firstVisibleItemIndex > 0
+    })
     val previewerState = rememberPreviewerState()
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
@@ -165,6 +169,7 @@ fun FeedEntryPage(
                 }),
                 navController = navController,
                 title = "",
+                scrollBehavior = scrollBehavior,
                 actions = {
                     PIconButton(
                         icon = Icons.AutoMirrored.Outlined.Label,
@@ -226,9 +231,8 @@ fun FeedEntryPage(
             )
         },
         modifier = Modifier
-            //.nestedScroll(scrollBehavior.nestedScrollConnection)
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
             .imePadding(),
-        // scrollBehavior = scrollBehavior,
         content = {
             val m = viewModel.item.value ?: return@PScaffold
             PullToRefresh(
@@ -278,6 +282,8 @@ fun FeedEntryPage(
                                 style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold)
                             )
                         }
+                    }
+                    item {
                         VerticalSpace(dp = 8.dp)
                         val tags = tagsState.filter { tagIds.contains(it.id) }
                         FlowRow(
@@ -363,5 +369,5 @@ fun FeedEntryPage(
         },
     )
 
-    ImagePreviewer(state = previewerState)
+    MediaPreviewer(state = previewerState)
 }

@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.svg
+package com.ismartcoding.plain.ui.base.svg
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb

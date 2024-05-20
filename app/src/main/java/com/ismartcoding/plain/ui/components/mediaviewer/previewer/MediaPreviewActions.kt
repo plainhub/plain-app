@@ -56,7 +56,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 @Composable
-fun ImagePreviewActions(context: Context, castViewModel: CastViewModel, m: PreviewItem, getViewerState: () -> MediaViewerState?, state: MediaPreviewerState) {
+fun MediaPreviewActions(context: Context, castViewModel: CastViewModel, m: PreviewItem, getViewerState: () -> MediaViewerState?, state: MediaPreviewerState) {
     val scope = rememberCoroutineScope()
 
     CastDialog(castViewModel)

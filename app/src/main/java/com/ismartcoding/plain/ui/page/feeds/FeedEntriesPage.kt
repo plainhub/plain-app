@@ -14,6 +14,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,6 +29,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -40,6 +42,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -81,6 +84,7 @@ import com.ismartcoding.plain.ui.components.FeedEntryListItem
 import com.ismartcoding.plain.ui.components.ListSearchBar
 import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.extensions.navigateTags
+import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
 import com.ismartcoding.plain.ui.models.FeedsViewModel
@@ -124,6 +128,7 @@ fun FeedEntriesPage(
     val filtersScrollState = rememberScrollState()
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
     val scrollState = rememberLazyListState()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { scrollState.firstVisibleItemIndex > 0 })
 
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
@@ -258,6 +263,7 @@ fun FeedEntriesPage(
                     }
                 },
                 title = pageTitle,
+                scrollBehavior = scrollBehavior,
                 actions = {
                     if (viewModel.selectMode.value) {
                         PMiniOutlineButton(
@@ -308,7 +314,8 @@ fun FeedEntriesPage(
                 SelectModeBottomActions(viewModel, tagsViewModel, tagsState)
             }
         },
-    ) {
+
+        ) {
         if (!viewModel.selectMode.value) {
             Row(
                 modifier = Modifier
@@ -321,6 +328,10 @@ fun FeedEntriesPage(
                     onClick = {
                         viewModel.filterType = FeedEntryFilterType.DEFAULT
                         viewModel.tag.value = null
+                        scope.launch {
+                            scrollBehavior.reset()
+                            scrollState.scrollToItem(0)
+                        }
                         scope.launch(Dispatchers.IO) {
                             viewModel.loadAsync(tagsViewModel)
                         }
@@ -332,6 +343,10 @@ fun FeedEntriesPage(
                     onClick = {
                         viewModel.filterType = FeedEntryFilterType.TODAY
                         viewModel.tag.value = null
+                        scope.launch {
+                            scrollBehavior.reset()
+                            scrollState.scrollToItem(0)
+                        }
                         scope.launch(Dispatchers.IO) {
                             viewModel.loadAsync(tagsViewModel)
                         }
@@ -344,6 +359,10 @@ fun FeedEntriesPage(
                         onClick = {
                             viewModel.filterType = FeedEntryFilterType.DEFAULT
                             viewModel.tag.value = tag
+                            scope.launch {
+                                scrollBehavior.reset()
+                                scrollState.scrollToItem(0)
+                            }
                             scope.launch(Dispatchers.IO) {
                                 viewModel.loadAsync(tagsViewModel)
                             }
@@ -388,8 +407,8 @@ fun FeedEntriesPage(
                     ) {
                         LazyColumn(
                             Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight(),
+                                .fillMaxSize()
+                                .nestedScroll(scrollBehavior.nestedScrollConnection),
                             state = scrollState,
                         ) {
                             item {

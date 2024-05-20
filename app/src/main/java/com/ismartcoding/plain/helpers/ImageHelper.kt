@@ -5,9 +5,17 @@ import androidx.compose.ui.unit.IntSize
 import androidx.exifinterface.media.ExifInterface
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.DImageMeta
 import com.ismartcoding.plain.enums.ImageType
+import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import kotlinx.datetime.Instant
 import java.io.File
 import java.io.IOException
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import kotlin.experimental.and
 
 object ImageHelper {
@@ -135,4 +143,151 @@ object ImageHelper {
 
         return size
     }
+
+    fun getMeta(path: String): DImageMeta? {
+        val file = File(path)
+        if (!file.exists()) {
+            return null
+        }
+
+        try {
+            val exif = ExifInterface(path)
+            val contentCreated = exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL) ?: return null
+            val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+            val rotation = when (orientation) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> 90
+                ExifInterface.ORIENTATION_ROTATE_180 -> 180
+                ExifInterface.ORIENTATION_ROTATE_270 -> 270
+                else -> 0
+            }
+            val make = exif.getAttribute(ExifInterface.TAG_MAKE) ?: ""
+            val model = exif.getAttribute(ExifInterface.TAG_MODEL) ?: ""
+            val width = exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0)
+            val height = exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0)
+            val colorSpace = exif.getAttributeInt(ExifInterface.TAG_COLOR_SPACE, -1)
+            val apertureValue = exif.getAttributeDouble(ExifInterface.TAG_APERTURE_VALUE, 0.0)
+            val exposureTime = exif.getAttributeDouble(ExifInterface.TAG_EXPOSURE_TIME, 0.0)
+            val focalLength = exif.getAttribute(ExifInterface.TAG_FOCAL_LENGTH) ?: ""
+            val isoSpeed = exif.getAttributeInt(ExifInterface.TAG_PHOTOGRAPHIC_SENSITIVITY, 0)
+            val flash = exif.getAttributeInt(ExifInterface.TAG_FLASH, 0)
+            val fNumber = exif.getAttributeDouble(ExifInterface.TAG_F_NUMBER, 0.0)
+            val exposureProgram = exif.getAttributeInt(ExifInterface.TAG_EXPOSURE_PROGRAM, 0)
+            val meteringMode = exif.getAttributeInt(ExifInterface.TAG_METERING_MODE, 0)
+            val whiteBalance = exif.getAttributeInt(ExifInterface.TAG_WHITE_BALANCE, 0)
+            val creator = exif.getAttribute(ExifInterface.TAG_ARTIST) ?: ""
+            val resolutionX = exif.getAttributeInt(ExifInterface.TAG_X_RESOLUTION, 0)
+            val resolutionY = exif.getAttributeInt(ExifInterface.TAG_Y_RESOLUTION, 0)
+            val description = exif.getAttribute(ExifInterface.TAG_IMAGE_DESCRIPTION) ?: ""
+
+            return DImageMeta(
+                make,
+                model,
+                width,
+                height,
+                rotation,
+                colorSpaceToString(colorSpace),
+                apertureValue,
+                exposureTimeToString(exposureTime),
+                focalLength,
+                isoSpeed,
+                convertExifDateTimeToInstant(contentCreated),
+                flash,
+                fNumber,
+                exposureProgram,
+                meteringMode,
+                whiteBalance,
+                creator,
+                resolutionX,
+                resolutionY,
+                description
+            )
+        } catch (e: IOException) {
+            e.printStackTrace()
+            LogCat.e(e.toString())
+        }
+
+        return null
+    }
+
+    private fun exposureTimeToString(exposureInSeconds: Double): String {
+        val numerator = (1 / exposureInSeconds).toInt()
+        if (numerator == Int.MAX_VALUE) {
+            return ""
+        }
+        return "1/$numerator"
+    }
+
+    private fun colorSpaceToString(colorSpace: Int): String {
+        return when (colorSpace) {
+            ExifInterface.COLOR_SPACE_S_RGB -> {
+                "sRGB"
+            }
+
+            else -> {
+                "RGB"
+            }
+        }
+    }
+
+    private fun convertExifDateTimeToInstant(dateTime: String?): Instant? {
+        if (dateTime == null) {
+            return null
+        }
+
+        val formatter = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss")
+        val localDateTime = LocalDateTime.parse(dateTime, formatter)
+        val javaInstant = ZonedDateTime.of(localDateTime, ZoneOffset.UTC).toInstant()
+
+        return Instant.fromEpochMilliseconds(javaInstant.toEpochMilli())
+    }
+
+    fun getExposureProgramText(exposureProgram: Int): String {
+        return when (exposureProgram.toShort()) {
+            ExifInterface.EXPOSURE_PROGRAM_MANUAL -> getString(R.string.exposure_program_manual)
+            ExifInterface.EXPOSURE_PROGRAM_NORMAL -> getString(R.string.exposure_program_normal)
+            ExifInterface.EXPOSURE_PROGRAM_APERTURE_PRIORITY -> getString(R.string.exposure_program_aperture_priority)
+            ExifInterface.EXPOSURE_PROGRAM_SHUTTER_PRIORITY -> getString(R.string.exposure_program_shutter_priority)
+            ExifInterface.EXPOSURE_PROGRAM_CREATIVE -> getString(R.string.exposure_program_creative)
+            ExifInterface.EXPOSURE_PROGRAM_ACTION -> getString(R.string.exposure_program_action)
+            ExifInterface.EXPOSURE_PROGRAM_PORTRAIT_MODE -> getString(R.string.exposure_program_portrait)
+            ExifInterface.EXPOSURE_PROGRAM_LANDSCAPE_MODE -> getString(R.string.exposure_program_landscape)
+            else -> ""
+        }
+    }
+
+    fun getMeteringModeText(meteringMode: Int): String {
+        return when (meteringMode.toShort()) {
+            ExifInterface.METERING_MODE_AVERAGE -> getString(R.string.metering_mode_average)
+            ExifInterface.METERING_MODE_CENTER_WEIGHT_AVERAGE -> getString(R.string.metering_mode_center_weight_average)
+            ExifInterface.METERING_MODE_MULTI_SPOT -> getString(R.string.metering_mode_multi_spot)
+            ExifInterface.METERING_MODE_OTHER -> getString(R.string.metering_mode_other)
+            ExifInterface.METERING_MODE_PARTIAL -> getString(R.string.metering_mode_partial)
+            ExifInterface.METERING_MODE_PATTERN -> getString(R.string.metering_mode_pattern)
+            ExifInterface.METERING_MODE_SPOT -> getString(R.string.metering_mode_spot)
+            else -> ""
+        }
+    }
+
+    fun getWhiteBalanceText(whiteBalance: Int): String {
+        return when (whiteBalance.toShort()) {
+            ExifInterface.WHITE_BALANCE_AUTO -> getString(R.string.white_balance_auto)
+            ExifInterface.WHITE_BALANCE_MANUAL -> getString(R.string.white_balance_manual)
+            else -> ""
+        }
+    }
+
+    fun getFlashText(flash: Int): String {
+        return when (flash.toShort()) {
+            ExifInterface.FLAG_FLASH_FIRED -> getString(R.string.flash_fired)
+            ExifInterface.FLAG_FLASH_RETURN_LIGHT_NOT_DETECTED -> getString(R.string.flash_return_light_not_detected)
+            ExifInterface.FLAG_FLASH_RETURN_LIGHT_DETECTED -> getString(R.string.flash_return_light_detected)
+            ExifInterface.FLAG_FLASH_MODE_COMPULSORY_FIRING -> getString(R.string.flash_mode_compulsory_firing)
+            ExifInterface.FLAG_FLASH_MODE_COMPULSORY_SUPPRESSION -> getString(R.string.flash_mode_compulsory_suppression)
+            ExifInterface.FLAG_FLASH_MODE_AUTO ->  getString(R.string.flash_mode_auto)
+            ExifInterface.FLAG_FLASH_NO_FLASH_FUNCTION -> getString(R.string.flash_no_flash_function)
+            ExifInterface.FLAG_FLASH_RED_EYE_SUPPORTED -> getString(R.string.flash_red_eye_supported)
+            else -> ""
+        }
+    }
 }
+

@@ -59,14 +59,18 @@ object TagHelper {
         keys: Set<String>,
         type: DataType,
     ): List<DTagRelation> {
-        return tagRelationDao.getAllByKeys(keys, type.value)
+        val items = mutableListOf<DTagRelation>()
+        keys.chunked(50).forEach { chunk ->
+            items.addAll(tagRelationDao.getAllByKeys(chunk.toSet(), type.value))
+        }
+        return items
     }
 
     fun getTagRelationsByKeysMap(
         keys: Set<String>,
         type: DataType,
     ): Map<String, List<DTagRelation>> {
-        return tagRelationDao.getAllByKeys(keys, type.value).groupBy { it.key }
+        return getTagRelationsByKeys(keys, type).groupBy { it.key }
     }
 
     fun getTagRelationsByKey(

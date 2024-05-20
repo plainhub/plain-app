@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.data
 
+import androidx.compose.ui.unit.IntSize
 import kotlinx.datetime.Instant
 import java.io.Serializable
 
@@ -11,9 +12,16 @@ data class DImage(
     val size: Long,
     val width: Int,
     val height: Int,
+    val rotation: Int,
     val bucketId: String,
-    val takenAt: Instant?,
     val createdAt: Instant,
     val updatedAt: Instant,
 ) : IData, Serializable {
+    fun getRotatedSize(): IntSize {
+        if (rotation == 90 || rotation == 270) {
+            return IntSize(height, width)
+        }
+
+        return IntSize(width, height)
+    }
 }

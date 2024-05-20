@@ -26,7 +26,6 @@ import com.ismartcoding.plain.ui.extensions.navigate
 import com.ismartcoding.plain.ui.extensions.navigateImages
 import com.ismartcoding.plain.ui.file.FilesDialog
 import com.ismartcoding.plain.ui.page.RouteName
-import com.ismartcoding.plain.ui.video.VideosDialog
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -62,7 +61,7 @@ fun HomeFeatures(
                 stringResource(id = R.string.videos),
                 modifier = Modifier.width(itemWidth),
             ) {
-                VideosDialog().show()
+                navController.navigate(RouteName.VIDEOS)
             }
             PIconTextButton(
                 icon = Icons.AutoMirrored.Outlined.Article,

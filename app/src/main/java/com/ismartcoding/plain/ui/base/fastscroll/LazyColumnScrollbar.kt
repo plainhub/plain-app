@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.ismartcoding.plain.ui.base.fastscroll.controller.rememberLazyListStateController
-import com.ismartcoding.plain.ui.base.fastscroll.generic.ElementScrollbar
 
 @Composable
 fun LazyColumnScrollbar(

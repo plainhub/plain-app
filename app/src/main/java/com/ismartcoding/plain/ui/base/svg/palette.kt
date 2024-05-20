@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.svg
+package com.ismartcoding.plain.ui.base.svg
 
 val SVGString.PALETTE: String
     get() = """

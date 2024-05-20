@@ -13,7 +13,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -41,6 +41,7 @@ import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
+import com.ismartcoding.plain.ui.components.ImageMetaRows
 import com.ismartcoding.plain.ui.components.FileRenameDialog
 import com.ismartcoding.plain.ui.components.TagSelector
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -63,20 +64,15 @@ fun ViewImageBottomSheet(
     val onDismiss = {
         viewModel.selectedItem.value = null
     }
-    var width by remember {
-        mutableIntStateOf(m.width)
-    }
-    var height by remember {
-        mutableIntStateOf(m.height)
+    var viewSize by remember {
+        mutableStateOf(m.getRotatedSize())
     }
 
     val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.IO) {
             if (m.path.endsWith(".svg", true)) {
-                val size = SvgHelper.getSize(m.path)
-                width = size.width.toInt()
-                height = size.height.toInt()
+                viewSize = SvgHelper.getSize(m.path)
             }
         }
     }
@@ -165,12 +161,10 @@ fun ViewImageBottomSheet(
                 PCard {
                     PListItem(title = stringResource(id = R.string.file_size), value = FormatHelper.formatBytes(m.size))
                     PListItem(title = stringResource(id = R.string.type), value = m.path.getMimeType())
-                    PListItem(title = stringResource(id = R.string.dimensions), value = "${width}x${height}")
-                    if (m.takenAt != null) {
-                        PListItem(title = stringResource(id = R.string.taken_at), value = m.takenAt.formatDateTime())
-                    }
+                    PListItem(title = stringResource(id = R.string.dimensions), value = "${viewSize.width}×${viewSize.height}")
                     PListItem(title = stringResource(id = R.string.created_at), value = m.createdAt.formatDateTime())
                     PListItem(title = stringResource(id = R.string.updated_at), value = m.updatedAt.formatDateTime())
+                    ImageMetaRows(path = m.path)
                 }
             }
             item {

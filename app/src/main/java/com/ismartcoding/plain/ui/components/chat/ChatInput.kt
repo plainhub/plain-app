@@ -25,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.R
@@ -38,7 +37,6 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 @Composable
 fun ChatInput(
     value: String,
-    bottom: Dp,
     hint: String = "",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     onSend: () -> Unit = {},
@@ -101,7 +99,8 @@ fun ChatInput(
                     onSend()
                 }
             }
+        } else {
+            VerticalSpace(dp = 16.dp)
         }
-        VerticalSpace(dp = bottom)
     }
 }

@@ -1,12 +1,21 @@
 package com.ismartcoding.plain.ui.components.mediaviewer.previewer
 
+import android.net.Uri
+import android.widget.ImageView
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.BrokenImage
+import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.outlined.VideoFile
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -30,9 +39,16 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
+import com.ismartcoding.lib.extensions.isImageFast
+import com.ismartcoding.plain.ui.components.mediaviewer.rememberCoilImagePainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
@@ -55,8 +71,10 @@ fun TransformImageView(
     modifier: Modifier = Modifier,
     path: String,
     key: String,
+    uri: Uri? = null,
     itemState: TransformItemState = rememberTransformItemState(),
     previewerState: MediaPreviewerState,
+    widthPx: Int,
 ) {
     TransformImageView(
         modifier = modifier,
@@ -67,13 +85,30 @@ fun TransformImageView(
         key(itemKey) {
             val imageModifier = Modifier
                 .fillMaxSize()
-            AsyncImage(
-                modifier = if (path.endsWith(".svg", true)) imageModifier.background(Color.White) else imageModifier,
-                model = path,
-                contentDescription = path,
-                filterQuality = FilterQuality.None,
-                contentScale = ContentScale.Crop,
+            val painter = rememberAsyncImagePainter(
+                model = ImageRequest
+                    .Builder(LocalContext.current)
+                    .data(uri ?: path)
+                    .size(widthPx)
+                    .build(),
+                filterQuality = FilterQuality.None
             )
+
+            if (painter.state is AsyncImagePainter.State.Error) {
+                Image(
+                    modifier = imageModifier,
+                    imageVector = if (path.isImageFast()) Icons.Outlined.Image else Icons.Outlined.VideoFile,
+                    contentDescription = path,
+                    contentScale = ContentScale.Crop,
+                )
+            } else {
+                Image(
+                    modifier = if (path.endsWith(".svg", true)) imageModifier.background(Color.White) else imageModifier,
+                    painter = painter,
+                    contentDescription = path,
+                    contentScale = ContentScale.Crop,
+                )
+            }
         }
     }
 }

@@ -40,6 +40,7 @@ fun ChatImages(
     items: List<VChat>,
     m: VChat,
     imageWidthDp: Dp,
+    imageWidthPx: Int,
     previewerState: MediaPreviewerState,
 ) {
     val imageItems = (m.value as DMessageImages).items
@@ -77,6 +78,7 @@ fun ChatImages(
                         key = item.id,
                         itemState = itemState,
                         previewerState = previewerState,
+                        widthPx = imageWidthPx
                     )
                     Box(
                         modifier =

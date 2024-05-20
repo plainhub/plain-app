@@ -12,11 +12,10 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -28,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -77,6 +78,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.VideoHelper
+import com.ismartcoding.plain.preference.ChatInputTextPreference
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
@@ -85,13 +87,13 @@ import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
-import com.ismartcoding.plain.ui.components.mediaviewer.previewer.ImagePreviewer
-import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.ChatListItem
 import com.ismartcoding.plain.ui.components.chat.ChatInput
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.file.FilesDialog
 import com.ismartcoding.plain.ui.file.FilesType
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -104,6 +106,7 @@ import com.ismartcoding.plain.web.HttpServerEvents
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -123,7 +126,16 @@ fun ChatPage(
     val scope = rememberCoroutineScope()
     var inputValue by remember { mutableStateOf("") }
     val configuration = LocalConfiguration.current
-    val imageWidthDp = (configuration.screenWidthDp.dp - 74.dp) / 3
+    val density = LocalDensity.current
+
+    val imageWidthDp = remember {
+        (configuration.screenWidthDp.dp - 74.dp) / 3
+    }
+    val imageWidthPx = remember(imageWidthDp) {
+        derivedStateOf {
+            density.run { imageWidthDp.toPx().toInt() }
+        }
+    }
     val refreshState =
         rememberRefreshLayoutState {
             viewModel.fetch(context)
@@ -135,6 +147,7 @@ fun ChatPage(
     val previewerState = rememberPreviewerState()
 
     LaunchedEffect(Unit) {
+        inputValue = ChatInputTextPreference.getAsync(context)
         viewModel.fetch(context)
         events.add(
             receiveEventHandler<DeleteChatItemViewEvent> { event ->
@@ -204,11 +217,10 @@ fun ChatPage(
                                             } else {
                                                 FileHelper.copyFile(context, uri, dst)
                                             }
-                                            val rotation = if (dst.isImageFast()) ImageHelper.getRotation(dst) else 0
-                                            val intrinsicSize = if (dst.isImageFast()) ImageHelper.getIntrinsicSize(dst, rotation) else if (dst.isVideoFast()) VideoHelper.getIntrinsicSize(
-                                                context,
-                                                dst
-                                            ) else IntSize.Zero
+                                            val intrinsicSize = if (dst.isImageFast()) ImageHelper.getIntrinsicSize(
+                                                dst,
+                                                ImageHelper.getRotation(dst)
+                                            ) else if (dst.isVideoFast()) VideoHelper.getIntrinsicSize(dst) else IntSize.Zero
                                             items.add(
                                                 DMessageFile(
                                                     StringHelper.shortUUID(),
@@ -348,50 +360,16 @@ fun ChatPage(
                 exit = slideOutVertically { it }) {
                 SelectModeBottomActions(viewModel)
             }
-        },
-        content = { paddingValues ->
-            Column(
-                Modifier
-                    .fillMaxHeight(),
-            ) {
-                PullToRefresh(
-                    refreshLayoutState = refreshState,
-                    modifier =
-                    Modifier
-                        .weight(1F),
-                ) {
-                    LazyColumnScrollbar(
-                        state = scrollState,
-                    ) {
-                        LazyColumn(
-                            modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight(),
-                            state = scrollState,
-                            reverseLayout = true,
-                            verticalArrangement = Arrangement.Top,
-                        ) {
-                            itemsIndexed(itemsState.value, key = { _, a -> a.id }) { index, m ->
-                                ChatListItem(
-                                    navController = navController,
-                                    viewModel = viewModel,
-                                    itemsState.value,
-                                    m = m,
-                                    index = index,
-                                    imageWidthDp = imageWidthDp,
-                                    focusManager = focusManager,
-                                    previewerState = previewerState,
-                                )
-                            }
-                        }
-                    }
-                }
+            if (!viewModel.showBottomActions()) {
                 ChatInput(
                     value = inputValue,
-                    bottom = paddingValues.calculateBottomPadding(),
                     hint = stringResource(id = R.string.chat_input_hint),
-                    onValueChange = { inputValue = it },
+                    onValueChange = {
+                        inputValue = it
+                        scope.launch(Dispatchers.IO) {
+                            ChatInputTextPreference.putAsync(context, inputValue)
+                        }
+                    },
                     onSend = {
                         if (inputValue.isEmpty()) {
                             return@ChatInput
@@ -412,12 +390,47 @@ fun ChatPage(
                                 ),
                             )
                             inputValue = ""
+                            withIO { ChatInputTextPreference.putAsync(context, inputValue) }
                             scrollState.scrollToItem(0)
                         }
                     },
                 )
             }
         },
+        content = { paddingValues ->
+            PullToRefresh(
+                refreshLayoutState = refreshState,
+            ) {
+                LazyColumnScrollbar(
+                    state = scrollState,
+                ) {
+                    LazyColumn(
+                        modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(bottom = paddingValues.calculateBottomPadding()),
+                        state = scrollState,
+                        reverseLayout = true,
+                        verticalArrangement = Arrangement.Top,
+                    ) {
+                        itemsIndexed(itemsState.value, key = { _, a -> a.id }) { index, m ->
+                            ChatListItem(
+                                navController = navController,
+                                viewModel = viewModel,
+                                itemsState.value,
+                                m = m,
+                                index = index,
+                                imageWidthDp = imageWidthDp,
+                                imageWidthPx = imageWidthPx.value,
+                                focusManager = focusManager,
+                                previewerState = previewerState,
+                            )
+                        }
+                    }
+                }
+            }
+
+        },
     )
-    ImagePreviewer(state = previewerState)
+    MediaPreviewer(state = previewerState)
 }

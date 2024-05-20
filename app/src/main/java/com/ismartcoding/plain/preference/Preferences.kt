@@ -394,6 +394,11 @@ object ImageGridCellsPerRowPreference : BasePreference<Int>() {
     override val key = intPreferencesKey("image_grid_cells_per_row")
 }
 
+object VideoGridCellsPerRowPreference : BasePreference<Int>() {
+    override val default = 3
+    override val key = intPreferencesKey("video_grid_cells_per_row")
+}
+
 abstract class BaseSortByPreference(
     val prefix: String,
     private val defaultSort: FileSortBy = FileSortBy.DATE_DESC
@@ -556,6 +561,11 @@ object AudioPlayingPreference : BasePreference<String>() {
         }
         return str
     }
+}
+
+object ChatInputTextPreference : BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("chat_input_text")
 }
 
 object VideoPlaylistPreference : BasePreference<String>() {

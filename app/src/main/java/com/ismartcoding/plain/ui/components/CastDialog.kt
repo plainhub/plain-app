@@ -10,10 +10,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -22,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.features.StartHttpServerEvent
@@ -29,6 +32,7 @@ import com.ismartcoding.plain.preference.WebPreference
 import com.ismartcoding.plain.ui.base.PDialogListItem
 import com.ismartcoding.plain.ui.models.CastViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -46,17 +50,30 @@ fun CastDialog(viewModel: CastViewModel) {
         viewModel.showCastDialog.value = false
     }
     val context = LocalContext.current
+    var job by remember { mutableStateOf<Job?>(null) }
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.IO) {
-            viewModel.searchAsync(context)
-        }
-        scope.launch(Dispatchers.IO) {
-            delay(5000)
-            if (itemsState.isEmpty()) {
-                loadingTextId = R.string.no_devices_found
+            while (true) {
+                job?.cancel()
+                if (itemsState.isEmpty()) {
+                    job = coIO {
+                        viewModel.searchAsync(context)
+                    }
+                }
+                delay(5000)
+                if (itemsState.isEmpty()) {
+                    loadingTextId = R.string.no_devices_found
+                }
             }
         }
     }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            job?.cancel()
+        }
+    }
+
     AlertDialog(
         modifier = Modifier.fillMaxWidth(),
         onDismissRequest = onDismiss,

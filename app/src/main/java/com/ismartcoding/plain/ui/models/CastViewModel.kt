@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.upnp.UPnPController
 import com.ismartcoding.lib.upnp.UPnPDevice
@@ -65,7 +66,7 @@ class CastViewModel : ViewModel() {
         UPnPDiscovery.search(context).flowOn(Dispatchers.IO).buffer().collect { device ->
             try {
                 val client = HttpClient(CIO)
-                val response = CoroutinesHelper.withIO { client.get(device.location) }
+                val response = withIO { client.get(device.location) }
                 if (response.status != HttpStatusCode.OK) {
                     return@collect
                 }

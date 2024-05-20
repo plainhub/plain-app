@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.extensions.isVideoFast
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.ui.preview.PreviewItem

@@ -27,11 +27,11 @@ object ImageMediaStoreHelper : BaseContentHelper() {
             MediaStore.Images.Media.TITLE,
             MediaStore.Images.Media.DATA,
             MediaStore.Images.Media.SIZE,
-            MediaStore.Images.Media.DATE_TAKEN,
             MediaStore.Images.Media.DATE_ADDED,
             MediaStore.Images.Media.DATE_MODIFIED,
             MediaStore.Images.Media.WIDTH,
             MediaStore.Images.Media.HEIGHT,
+            MediaStore.Images.Media.ORIENTATION,
             MediaStore.Images.Media.BUCKET_ID,
         )
     }
@@ -71,14 +71,14 @@ object ImageMediaStoreHelper : BaseContentHelper() {
                 val id = cursor.getStringValue(MediaStore.Images.Media._ID, cache)
                 val title = cursor.getStringValue(MediaStore.Images.Media.TITLE, cache)
                 val size = cursor.getLongValue(MediaStore.Images.Media.SIZE, cache)
-                val dateTaken = cursor.getTimeMillisecondsValue(MediaStore.Images.Media.DATE_TAKEN, cache)
                 val createdAt = cursor.getTimeSecondsValue(MediaStore.Images.Media.DATE_ADDED, cache)
                 val updatedAt = cursor.getTimeSecondsValue(MediaStore.Images.Media.DATE_MODIFIED, cache)
                 val width = cursor.getIntValue(MediaStore.Images.Media.WIDTH, cache)
                 val height = cursor.getIntValue(MediaStore.Images.Media.HEIGHT, cache)
+                val rotation = cursor.getIntValue(MediaStore.Images.Media.ORIENTATION, cache)
                 val path = cursor.getStringValue(MediaStore.Images.Media.DATA, cache)
                 val bucketId = cursor.getStringValue(MediaStore.Images.Media.BUCKET_ID, cache)
-                result.add(DImage(id, title, path, size, width, height, bucketId, dateTaken, createdAt, updatedAt))
+                result.add(DImage(id, title, path, size, width, height, rotation, bucketId, createdAt, updatedAt))
             } while (cursor.moveToNext())
         }
         return result

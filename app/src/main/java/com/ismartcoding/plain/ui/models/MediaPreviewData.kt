@@ -7,6 +7,7 @@ import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.plain.data.DImage
+import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
@@ -35,13 +36,12 @@ object MediaPreviewData {
             PreviewItem(f.id, Uri.EMPTY, f.uri.getFinalPath(context), f.size, data = f)
         }
         items.find { it.id == m.id }?.let {
-            it.initAsync(context, m)
+            it.initAsync(m)
             itemState.intrinsicSize = it.intrinsicSize.toSize()
         }
     }
 
     fun setDataAsync(
-        context: Context,
         itemState: TransformItemState,
         items: List<DImage>,
         m: DImage
@@ -50,7 +50,21 @@ object MediaPreviewData {
             PreviewItem(f.id, Uri.EMPTY, f.path, f.size, mediaId = f.id, data = f)
         }
         MediaPreviewData.items.find { it.id == m.id }?.let {
-            it.initAsync(context, m.width, m.height)
+            it.initAsync(m)
+            itemState.intrinsicSize = it.intrinsicSize.toSize()
+        }
+    }
+
+    fun setDataAsync(
+        itemState: TransformItemState,
+        items: List<DVideo>,
+        m: DVideo
+    ) {
+        MediaPreviewData.items = items.map { f ->
+            PreviewItem(f.id, Uri.EMPTY, f.path, f.size, mediaId = f.id, data = f)
+        }
+        MediaPreviewData.items.find { it.id == m.id }?.let {
+            it.initAsync(m)
             itemState.intrinsicSize = it.intrinsicSize.toSize()
         }
     }

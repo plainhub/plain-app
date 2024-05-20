@@ -142,7 +142,7 @@ class PreviewerPlaceholder(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ImagePreviewer(
+fun MediaPreviewer(
     modifier: Modifier = Modifier,
     state: MediaPreviewerState,
     getItem: @Composable (Int) -> PreviewItem = { index ->
@@ -213,7 +213,7 @@ fun ImagePreviewer(
                     this.foreground = { page ->
                         val m = getItem(page)
                         if (!m.path.isVideoFast()) {
-                            ImagePreviewActions(context = context, castViewModel = castViewModel, m = m, getViewerState = { state.currentViewerState }, state)
+                            MediaPreviewActions(context = context, castViewModel = castViewModel, m = m, getViewerState = { state.currentViewerState }, state)
                         }
                     }
                 },

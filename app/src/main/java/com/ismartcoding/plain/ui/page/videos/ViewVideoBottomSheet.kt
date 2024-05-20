@@ -1,30 +1,34 @@
-package com.ismartcoding.plain.ui.components.mediaviewer
+package com.ismartcoding.plain.ui.page.videos
 
 import android.content.ClipData
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.getMimeType
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
-import com.ismartcoding.plain.data.DImage
-import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.features.video.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.FormatHelper
+import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
@@ -34,34 +38,41 @@ import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.components.ImageMetaRows
+import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.components.FileRenameDialog
 import com.ismartcoding.plain.ui.components.TagSelector
+import com.ismartcoding.plain.ui.components.VideoMetaRows
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import com.ismartcoding.plain.ui.preview.PreviewItem
+import com.ismartcoding.plain.ui.models.VideosViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun ViewImageBottomSheet(
-    m: PreviewItem,
-    tagsViewModel: TagsViewModel? = null,
-    tagsMap: Map<String, List<DTagRelation>>? = null,
-    tagsState: List<DTag> = emptyList(),
-    onDismiss: () -> Unit = {},
-    onRenamed: () -> Unit = {},
-    deleteAction: () -> Unit = {},
+fun ViewVideoBottomSheet(
+    viewModel: VideosViewModel,
+    tagsViewModel: TagsViewModel,
+    tagsMap: Map<String, List<DTagRelation>>,
+    tagsState: List<DTag>,
+    dragSelectState: DragSelectState,
 ) {
-    var showRenameDialog by remember {
-        mutableStateOf(false)
+    val m = viewModel.selectedItem.value ?: return
+    val context = LocalContext.current
+    val onDismiss = {
+        viewModel.selectedItem.value = null
+    }
+    var viewSize by remember {
+        mutableStateOf(m.getRotatedSize())
     }
 
-    if (showRenameDialog) {
+    val scope = rememberCoroutineScope()
+
+    if (viewModel.showRenameDialog.value) {
         FileRenameDialog(path = m.path, onDismiss = {
-            showRenameDialog = false
+            viewModel.showRenameDialog.value = false
         }, onDone = {
-            m.path = m.path.substring(0, m.path.lastIndexOf("/") + 1) + it
-            onRenamed()
+            scope.launch(Dispatchers.IO) { viewModel.loadAsync(context, tagsViewModel) }
             onDismiss()
         })
     }
@@ -72,42 +83,60 @@ fun ViewImageBottomSheet(
         },
     ) {
         LazyColumn {
-            if (m.data is DImage || m.data is DVideo) {
-                item {
-                    ActionButtons {
+            item {
+                ActionButtons {
+                    if (!viewModel.showSearchBar.value) {
                         PIconTextActionButton(
-                            icon = Icons.Outlined.Edit,
-                            text = LocaleHelper.getString(R.string.rename),
+                            icon = Icons.Outlined.Checklist,
+                            text = LocaleHelper.getString(R.string.select),
                             click = {
-                                showRenameDialog = true
-                            }
-                        )
-                        PIconTextActionButton(
-                            icon = Icons.Outlined.DeleteForever,
-                            text = LocaleHelper.getString(R.string.delete),
-                            click = {
-                                DialogHelper.confirmToDelete {
-                                    deleteAction()
-                                    onDismiss()
-                                }
+                                dragSelectState.enterSelectMode()
+                                dragSelectState.select(m.id)
+                                onDismiss()
                             }
                         )
                     }
+                    PIconTextActionButton(
+                        icon = Icons.Outlined.Share,
+                        text = LocaleHelper.getString(R.string.share),
+                        click = {
+                            ShareHelper.shareUris(context, listOf(VideoMediaStoreHelper.getItemUri(m.id)))
+                            onDismiss()
+                        }
+                    )
+                    PIconTextActionButton(
+                        icon = Icons.Outlined.Edit,
+                        text = LocaleHelper.getString(R.string.rename),
+                        click = {
+                            viewModel.showRenameDialog.value = true
+                        }
+                    )
+                    PIconTextActionButton(
+                        icon = Icons.Outlined.DeleteForever,
+                        text = LocaleHelper.getString(R.string.delete),
+                        click = {
+                            DialogHelper.confirmToDelete {
+                                viewModel.delete(context, setOf(m.id))
+                                onDismiss()
+                            }
+                        }
+                    )
                 }
+            }
+            if (!viewModel.trash.value) {
                 item {
                     VerticalSpace(dp = 16.dp)
                     Subtitle(text = stringResource(id = R.string.tags))
                     TagSelector(
-                        data = m.data,
-                        tagsViewModel = tagsViewModel!!,
-                        tagsMap = tagsMap!!,
+                        data = m,
+                        tagsViewModel = tagsViewModel,
+                        tagsMap = tagsMap,
                         tagsState = tagsState,
                     )
-                    VerticalSpace(dp = 24.dp)
                 }
             }
-
             item {
+                VerticalSpace(dp = 24.dp)
                 PCard {
                     PListItem(title = m.path, action = {
                         PIconButton(icon = Icons.Outlined.ContentCopy, contentDescription = stringResource(id = R.string.copy_path), onClick = {
@@ -123,15 +152,10 @@ fun ViewImageBottomSheet(
                 PCard {
                     PListItem(title = stringResource(id = R.string.file_size), value = FormatHelper.formatBytes(m.size))
                     PListItem(title = stringResource(id = R.string.type), value = m.path.getMimeType())
-                    val intrinsicSize = m.intrinsicSize
-                    if (intrinsicSize.width > 0 && intrinsicSize.height > 0) {
-                        PListItem(title = stringResource(id = R.string.dimensions), value = "${intrinsicSize.width}×${intrinsicSize.height}")
-                    }
-                    if (m.data is DImage) {
-                        PListItem(title = stringResource(id = R.string.created_at), value = m.data.createdAt.formatDateTime())
-                        PListItem(title = stringResource(id = R.string.updated_at), value = m.data.updatedAt.formatDateTime())
-                        ImageMetaRows(path = m.path)
-                    }
+                    PListItem(title = stringResource(id = R.string.dimensions), value = "${viewSize.width}×${viewSize.height}")
+                    PListItem(title = stringResource(id = R.string.created_at), value = m.createdAt.formatDateTime())
+                    PListItem(title = stringResource(id = R.string.updated_at), value = m.updatedAt.formatDateTime())
+                    VideoMetaRows(path = m.path)
                 }
             }
             item {

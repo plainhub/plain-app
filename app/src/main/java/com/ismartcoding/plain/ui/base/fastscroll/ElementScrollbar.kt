@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.base.fastscroll.generic
+package com.ismartcoding.plain.ui.base.fastscroll
 
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.gestures.Orientation
@@ -9,10 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
-import com.ismartcoding.plain.ui.base.fastscroll.ScrollbarSelectionMode
-import com.ismartcoding.plain.ui.base.fastscroll.ScrollbarSettings
 import com.ismartcoding.plain.ui.base.fastscroll.controller.StateController
 import com.ismartcoding.plain.ui.base.fastscroll.foundation.ScrollbarLayoutSettings
+import com.ismartcoding.plain.ui.base.fastscroll.foundation.VerticalScrollbarLayout
 
 @Composable
 internal fun <IndicatorValue> ElementScrollbar(
@@ -43,9 +42,7 @@ internal fun <IndicatorValue> ElementScrollbar(
             Orientation.Horizontal -> constraints.maxWidth
         }.toFloat()
 
-        ScrollbarLayout(
-            orientation = orientation,
-            thumbSizeNormalized = stateController.thumbSizeNormalized.value,
+        VerticalScrollbarLayout(
             thumbOffsetNormalized = stateController.thumbOffsetNormalized.value,
             thumbIsInAction = stateController.thumbIsInAction.value,
             thumbIsSelected = stateController.isSelected.value,

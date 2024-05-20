@@ -58,6 +58,7 @@ fun ChatListItem(
     m: VChat,
     index: Int,
     imageWidthDp: Dp,
+    imageWidthPx: Int,
     focusManager: FocusManager,
     previewerState: MediaPreviewerState,
 ) {
@@ -108,7 +109,7 @@ fun ChatListItem(
                     ) {
                         when (m.type) {
                             DMessageType.IMAGES.value -> {
-                                ChatImages(context, items, m, imageWidthDp, previewerState)
+                                ChatImages(context, items, m, imageWidthDp, imageWidthPx, previewerState)
                             }
 
                             DMessageType.FILES.value -> {

@@ -174,7 +174,7 @@ fun MediaNormalImage(
     } else {
         imageSpecified = true
         if (model.intrinsicSize == IntSize.Zero) {
-            model.initAsync(context, 0, 0)
+            model.initImageAsync()
         }
         oSize = model.intrinsicSize
         goMounted()

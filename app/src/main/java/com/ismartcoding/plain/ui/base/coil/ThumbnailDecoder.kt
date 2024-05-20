@@ -2,9 +2,10 @@
 
 package com.ismartcoding.plain.ui.base.coil
 
-import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.Paint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.core.graphics.applyCanvas
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toDrawable
@@ -24,16 +25,15 @@ import coil3.size.pxOrElse
 import coil3.svg.internal.MIME_TYPE_SVG
 import coil3.svg.isSvg
 import coil3.toAndroidUri
+import com.ismartcoding.lib.isQPlus
 import kotlin.math.roundToInt
 
-/**
- * A [Decoder] that uses [ContentResolver.loadThumbnail] to fetch and decode their thumbnail from MediaStore.
- */
 class ThumbnailDecoder(
     private val source: ImageSource,
     private val options: Options,
 ) : Decoder {
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     @OptIn(ExperimentalCoilApi::class)
     override suspend fun decode(): DecodeResult {
         val metadata = source.metadata as ContentMetadata
@@ -121,7 +121,7 @@ class ThumbnailDecoder(
 
         private fun isApplicable(result: SourceFetchResult): Boolean {
             return with(result) {
-                mimeType != null && mimeType!!.isVideoOrImage &&
+                isQPlus() &&  mimeType != null && mimeType!!.isVideoOrImage &&
                         source.metadata is ContentMetadata && !isSvg(result)
             }
         }

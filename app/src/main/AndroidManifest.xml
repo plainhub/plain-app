@@ -93,8 +93,7 @@
             android:name=".ui.MainActivity"
             android:configChanges="uiMode|orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="true"
-            android:launchMode="singleTop"
-            android:screenOrientation="sensor"
+            android:launchMode="singleInstance"
             android:supportsPictureInPicture="true"
             android:windowSoftInputMode="adjustResize"
             tools:ignore="DiscouragedApi,LockedOrientationActivity">

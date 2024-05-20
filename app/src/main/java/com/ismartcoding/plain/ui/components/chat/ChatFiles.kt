@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.getFinalPath
@@ -126,6 +127,7 @@ fun ChatFiles(
                             key = item.id,
                             itemState = itemState,
                             previewerState = previewerState,
+                            widthPx = context.dp2px(48)
                         )
                     } else {
                         AsyncImage(

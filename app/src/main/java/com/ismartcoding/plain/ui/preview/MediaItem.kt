@@ -6,7 +6,8 @@ import androidx.compose.ui.unit.IntSize
 import com.ismartcoding.lib.extensions.getFileName
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
-import com.ismartcoding.lib.helpers.ValidateHelper
+import com.ismartcoding.plain.data.DImage
+import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.helpers.ImageHelper
@@ -23,36 +24,54 @@ data class PreviewItem(
     var intrinsicSize: IntSize = IntSize.Zero
     var rotation: Int = -1
 
-    fun initAsync(context: Context, width: Int, height: Int) {
-        if (path.isImageFast()) {
-            rotation = ImageHelper.getRotation(path)
+    fun initAsync(m: DImage) {
+        rotation = m.rotation
+        intrinsicSize = m.getRotatedSize()
+        if (intrinsicSize == IntSize.Zero) {
+            initImageAsync()
         }
-        if (width > 0 && height > 0) {
+    }
+
+    fun initImageAsync() {
+        rotation = ImageHelper.getRotation(path)
+        intrinsicSize = ImageHelper.getIntrinsicSize(path, rotation)
+    }
+
+    fun initAsync(m: DVideo) {
+        rotation = m.rotation
+        intrinsicSize = m.getRotatedSize()
+        if (intrinsicSize == IntSize.Zero) {
+            val meta = VideoHelper.getMeta(path) ?: return
+            rotation = meta.rotation
             if (rotation == 90 || rotation == 270) {
-                intrinsicSize = IntSize(height, width)
+                intrinsicSize = IntSize(meta.height, meta.width)
             } else {
-                intrinsicSize = IntSize(width, height)
-            }
-        } else {
-            intrinsicSize = if (path.isImageFast()) {
-                ImageHelper.getIntrinsicSize(path, rotation)
-            } else {
-                VideoHelper.getIntrinsicSize(context, path)
+                intrinsicSize = IntSize(meta.width, meta.height)
             }
         }
     }
 
-    fun initAsync(context: Context, item: DMessageFile) {
+    fun initAsync(item: DMessageFile) {
         if (path.isImageFast()) {
             rotation = ImageHelper.getRotation(path)
-        }
-        if (item.width > 0 && item.height > 0) {
-            intrinsicSize = IntSize(item.width, item.height)
-        } else {
-            intrinsicSize = if (path.isImageFast()) {
-                ImageHelper.getIntrinsicSize(path, rotation)
+            if (item.width > 0 && item.height > 0) {
+                intrinsicSize = IntSize(item.width, item.height)
             } else {
-                VideoHelper.getIntrinsicSize(context, path)
+                intrinsicSize = ImageHelper.getIntrinsicSize(path, rotation)
+            }
+        } else {
+            val meta = VideoHelper.getMeta(path) ?: return
+            rotation = meta.rotation
+            if (item.width > 0 && item.height > 0) {
+                intrinsicSize = IntSize(item.width, item.height)
+            } else {
+                val w = meta.width
+                val h = meta.height
+                if (rotation == 90 || rotation == 270) {
+                    intrinsicSize = IntSize(h, w)
+                } else {
+                    intrinsicSize = IntSize(w, h)
+                }
             }
         }
     }
