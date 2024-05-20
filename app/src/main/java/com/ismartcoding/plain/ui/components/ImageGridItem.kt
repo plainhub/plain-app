@@ -31,7 +31,6 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
-import com.ismartcoding.plain.ui.base.pinchzoomgrid.PinchZoomGridState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformImageView
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState

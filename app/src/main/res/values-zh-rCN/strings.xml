@@ -2,6 +2,7 @@
     <string name="app_name">简朴</string>
     <string name="vpn_web_conflict_warning">您的手机启用了VPN，这可能会导致从电脑访问网页时出现连接问题。我们建议您调整VPN设置允许局域网流量或关闭VPN。</string>
     <string name="warning">警告</string>
+    <string name="cells_per_row">每行格数</string>
     <string name="exit_cast_mode">退出投屏模式</string>
     <string name="rotate">旋转</string>
     <string name="image_save_to">图像已保存至{{path}}</string>

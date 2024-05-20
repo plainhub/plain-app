@@ -119,6 +119,7 @@ object AudioMediaStoreHelper : BaseContentHelper() {
             arrayOf(
                 MediaStore.Audio.Media.BUCKET_ID,
                 MediaStore.Audio.Media.BUCKET_DISPLAY_NAME,
+                MediaStore.Audio.Media.SIZE,
                 MediaStore.Audio.Media.DATA,
             )
 
@@ -136,15 +137,17 @@ object AudioMediaStoreHelper : BaseContentHelper() {
             while (c.moveToNext()) {
                 val bucketId = c.getStringValue(MediaStore.Audio.Media.BUCKET_ID, cache)
                 val bucketName = c.getStringValue(MediaStore.Audio.Media.BUCKET_DISPLAY_NAME, cache)
+                val size = c.getLongValue(MediaStore.Audio.Media.SIZE, cache)
                 val path = c.getStringValue(MediaStore.Audio.Media.DATA, cache)
                 val bucket = bucketMap[bucketName]
                 if (bucket != null) {
                     if (bucket.topItems.size < 4) {
                         bucket.topItems.add(path)
                     }
+                    bucket.size += size
                     bucket.itemCount++
                 } else {
-                    bucketMap[bucketName] = DMediaBucket(bucketId, bucketName, 1, mutableListOf(path))
+                    bucketMap[bucketName] = DMediaBucket(bucketId, bucketName, 1, size, mutableListOf(path))
                 }
             }
         }

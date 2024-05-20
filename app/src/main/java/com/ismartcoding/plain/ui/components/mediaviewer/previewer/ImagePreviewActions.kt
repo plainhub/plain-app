@@ -35,7 +35,6 @@ import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.ValidateHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper

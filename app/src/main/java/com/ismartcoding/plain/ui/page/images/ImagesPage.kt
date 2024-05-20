@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Folder
@@ -46,14 +48,13 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.CastPlayer
-import com.ismartcoding.plain.preference.ImageGridCellsIndexPreference
+import com.ismartcoding.plain.preference.ImageGridCellsPerRowPreference
 import com.ismartcoding.plain.preference.ImageSortByPreference
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
@@ -64,6 +65,7 @@ import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PDropdownMenuItemCast
+import com.ismartcoding.plain.ui.base.PDropdownMenuItemCellsPerRow
 import com.ismartcoding.plain.ui.base.PDropdownMenuItemSelect
 import com.ismartcoding.plain.ui.base.PDropdownMenuItemSort
 import com.ismartcoding.plain.ui.base.PDropdownMenuItemTags
@@ -72,12 +74,12 @@ import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.RadioDialog
+import com.ismartcoding.plain.ui.base.RadioDialogOption
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.base.dragselect.gridDragSelect
 import com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState
 import com.ismartcoding.plain.ui.base.fastscroll.LazyVerticalGridScrollbar
-import com.ismartcoding.plain.ui.base.pinchzoomgrid.PinchZoomGridLayout
-import com.ismartcoding.plain.ui.base.pinchzoomgrid.rememberPinchZoomGridState
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
@@ -97,7 +99,6 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSearchMode
 import com.ismartcoding.plain.ui.page.RouteName
-import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -132,13 +133,10 @@ fun ImagesPage(
         mutableStateOf(AppFeatureType.FILES.hasPermission(context))
     }
 
-    var initialCellsIndex by remember { mutableIntStateOf(ImageGridCellsIndexPreference.default) }
-    val pinchState = rememberPinchZoomGridState(
-        cellsList = PlainTheme.cellsList,
-        initialCellsIndex = initialCellsIndex
-    )
-    val dragSelectState = rememberDragSelectState(lazyGridState = pinchState.gridState)
-    val canScroll by remember { derivedStateOf { !pinchState.isZooming } }
+    val gridState = rememberLazyGridState()
+    var cellsPerRow by remember { mutableIntStateOf(ImageGridCellsPerRowPreference.default) }
+    val dragSelectState = rememberDragSelectState(lazyGridState = gridState)
+    var showCellsPerRowDialog by remember { mutableStateOf(false) }
 
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
 
@@ -158,7 +156,7 @@ fun ImagesPage(
         tagsViewModel.dataType.value = viewModel.dataType
         if (hasPermission) {
             scope.launch(Dispatchers.IO) {
-                initialCellsIndex = ImageGridCellsIndexPreference.getAsync(context)
+                cellsPerRow = ImageGridCellsPerRowPreference.getAsync(context)
                 viewModel.sortBy.value = ImageSortByPreference.getValueAsync(context)
                 viewModel.loadAsync(context, tagsViewModel)
                 bucketViewModel.loadAsync(context)
@@ -172,12 +170,6 @@ fun ImagesPage(
                     viewModel.loadAsync(context, tagsViewModel)
                 }
             })
-    }
-
-    LaunchedEffect(pinchState.currentCells) {
-        scope.launch(Dispatchers.IO) {
-            ImageGridCellsIndexPreference.putAsync(context, pinchState.currentCellsIndex)
-        }
     }
 
     val insetsController = WindowCompat.getInsetsController(window, view)
@@ -224,6 +216,25 @@ fun ImagesPage(
         }
     }
 
+    if (showCellsPerRowDialog) {
+        RadioDialog(
+            title = stringResource(R.string.cells_per_row),
+            options = IntRange(2, 10).map { value ->
+                RadioDialogOption(
+                    text = value.toString(),
+                    selected = value == cellsPerRow,
+                ) {
+                    scope.launch(Dispatchers.IO) {
+                        ImageGridCellsPerRowPreference.putAsync(context, value)
+                        cellsPerRow = value
+                    }
+                }
+            },
+        ) {
+            showCellsPerRowDialog = false
+        }
+    }
+
     ViewImageBottomSheet(viewModel, tagsViewModel, tagsMapState, tagsState, dragSelectState)
 
     if (viewModel.showSortDialog.value) {
@@ -252,7 +263,7 @@ fun ImagesPage(
             PTopAppBar(
                 modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = {
                     scope.launch {
-                        pinchState.gridState.scrollToItem(0)
+                        gridState.scrollToItem(0)
                     }
                 }),
                 navController = navController,
@@ -316,6 +327,10 @@ fun ImagesPage(
                             PDropdownMenuItemCast(onClick = {
                                 dismiss()
                                 castViewModel.showCastDialog.value = true
+                            })
+                            PDropdownMenuItemCellsPerRow(onClick = {
+                                dismiss()
+                                showCellsPerRowDialog = true
                             })
                         }
                     }
@@ -390,67 +405,61 @@ fun ImagesPage(
                 exit = fadeOut()
             ) {
                 if (itemsState.isNotEmpty()) {
-                    PinchZoomGridLayout(
-                        state = pinchState
+                    LazyVerticalGridScrollbar(
+                        state = gridState,
                     ) {
-                        LazyVerticalGridScrollbar(
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(cellsPerRow),
                             state = gridState,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .gridDragSelect(
+                                    items = itemsState,
+                                    state = dragSelectState,
+                                ),
+                            horizontalArrangement = Arrangement.spacedBy(2.dp),
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
                         ) {
-                            LazyVerticalGrid(
-                                columns = gridCells,
-                                state = gridState,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .gridDragSelect(
-                                        items = itemsState,
-                                        state = dragSelectState,
-                                    ),
-                                userScrollEnabled = canScroll,
-                                horizontalArrangement = Arrangement.spacedBy(2.dp),
-                                verticalArrangement = Arrangement.spacedBy(2.dp),
+                            items(itemsState,
+                                key = {
+                                    it.id
+                                },
+                                contentType = {
+                                    "image"
+                                },
+                                span = {
+                                    GridItemSpan(1)
+                                }) { m ->
+                                ImageGridItem(
+                                    context,
+                                    modifier = Modifier
+                                        .animateItemPlacement(),
+                                    viewModel,
+                                    castViewModel,
+                                    m,
+                                    showSize = cellsPerRow < 6,
+                                    previewerState,
+                                    dragSelectState,
+                                )
+                            }
+                            item(
+                                span = { GridItemSpan(maxLineSpan) },
+                                key = "loadMore"
                             ) {
-                                items(itemsState,
-                                    key = {
-                                        it.id
-                                    },
-                                    contentType = {
-                                        "image"
-                                    },
-                                    span = {
-                                        GridItemSpan(1)
-                                    }) { m ->
-                                    ImageGridItem(
-                                        context,
-                                        modifier = Modifier
-                                            .pinchItem(key = m.id)
-                                            .animateItemPlacement(),
-                                        viewModel,
-                                        castViewModel,
-                                        m,
-                                        showSize = pinchState.currentCellsIndex >= Constants.DEFAULT_CELLS_INDEX_WITH_LABEL,
-                                        previewerState,
-                                        dragSelectState,
-                                    )
-                                }
-                                item(
-                                    span = { GridItemSpan(maxLineSpan) },
-                                    key = "loadMore"
-                                ) {
-                                    if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
-                                        LaunchedEffect(Unit) {
-                                            scope.launch(Dispatchers.IO) {
-                                                withIO { viewModel.moreAsync(context, tagsViewModel) }
-                                            }
+                                if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
+                                    LaunchedEffect(Unit) {
+                                        scope.launch(Dispatchers.IO) {
+                                            withIO { viewModel.moreAsync(context, tagsViewModel) }
                                         }
                                     }
-                                    LoadMoreRefreshContent(viewModel.noMore.value)
                                 }
-                                item(
-                                    span = { GridItemSpan(maxLineSpan) },
-                                    key = "bottomSpace"
-                                ) {
-                                    BottomSpace()
-                                }
+                                LoadMoreRefreshContent(viewModel.noMore.value)
+                            }
+                            item(
+                                span = { GridItemSpan(maxLineSpan) },
+                                key = "bottomSpace"
+                            ) {
+                                BottomSpace()
                             }
                         }
                     }

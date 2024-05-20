@@ -2,9 +2,9 @@ package com.ismartcoding.plain.ui.components
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -15,19 +15,23 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.ismartcoding.lib.helpers.BitmapHelper
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
+import com.ismartcoding.plain.helpers.FormatHelper
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.navigateImages
+import com.ismartcoding.plain.ui.theme.listItemSubtitle
+import com.ismartcoding.plain.ui.theme.listItemTitle
 import com.ismartcoding.plain.ui.views.mergeimages.CombineBitmapTools
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -70,35 +74,41 @@ fun MediaBucketGridItem(
             }
         }
     }
-
     Box(
         modifier = modifier
+            .clip(MaterialTheme.shapes.medium)
             .clickable {
                 navController.navigateImages(m.id)
             },
     ) {
-        AsyncImage(
-            model = bitmapResult.value,
-            contentDescription = m.name,
-            modifier = Modifier
-                .fillMaxSize()
-                .align(Alignment.Center)
-                .aspectRatio(1f),
-            contentScale = ContentScale.Crop,
-        )
-        Box(
-            modifier =
-            Modifier
-                .align(Alignment.BottomStart)
-                .background(Color.Black.copy(alpha = 0.4f)),
+        Column(
+            modifier = modifier
+                .padding(8.dp)
         ) {
+            AsyncImage(
+                model = bitmapResult.value,
+                contentDescription = m.name,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .aspectRatio(1f)
+                    .clip(MaterialTheme.shapes.medium),
+                contentScale = ContentScale.Crop,
+            )
+            VerticalSpace(dp = 8.dp)
             Text(
                 modifier =
                 Modifier
-                    .padding(horizontal = 4.dp, vertical = 2.dp),
-                text = m.name + " (${m.itemCount})",
-                color = Color.White,
-                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
+                    .padding(horizontal = 4.dp),
+                text = m.name,
+                style = MaterialTheme.typography.listItemTitle(),
+            )
+            VerticalSpace(dp = 8.dp)
+            Text(
+                modifier =
+                Modifier
+                    .padding(horizontal = 4.dp),
+                text = pluralStringResource(R.plurals.items, m.itemCount, m.itemCount) + " • " + FormatHelper.formatBytes(m.size),
+                style = MaterialTheme.typography.listItemSubtitle(),
             )
         }
     }

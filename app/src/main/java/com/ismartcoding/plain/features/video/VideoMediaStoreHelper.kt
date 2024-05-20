@@ -101,6 +101,7 @@ object VideoMediaStoreHelper : BaseContentHelper() {
             arrayOf(
                 MediaStore.Video.Media.BUCKET_ID,
                 MediaStore.Video.Media.BUCKET_DISPLAY_NAME,
+                MediaStore.Video.Media.SIZE,
                 MediaStore.Video.Media.DATA,
             )
 
@@ -118,15 +119,17 @@ object VideoMediaStoreHelper : BaseContentHelper() {
             while (c.moveToNext()) {
                 val bucketId = c.getStringValue(MediaStore.Video.Media.BUCKET_ID, cache)
                 val bucketName = c.getStringValue(MediaStore.Video.Media.BUCKET_DISPLAY_NAME, cache)
+                val size = c.getLongValue(MediaStore.Video.Media.SIZE, cache)
                 val path = c.getStringValue(MediaStore.Video.Media.DATA, cache)
                 val bucket = bucketMap[bucketId]
                 if (bucket != null) {
                     if (bucket.topItems.size < 4) {
                         bucket.topItems.add(path)
                     }
+                    bucket.size += size
                     bucket.itemCount++
                 } else {
-                    bucketMap[bucketId] = DMediaBucket(bucketId, bucketName, 1, mutableListOf(path))
+                    bucketMap[bucketId] = DMediaBucket(bucketId, bucketName, 1, size, mutableListOf(path))
                 }
             }
         }

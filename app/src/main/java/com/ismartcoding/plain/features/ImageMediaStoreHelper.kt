@@ -110,6 +110,7 @@ object ImageMediaStoreHelper : BaseContentHelper() {
             arrayOf(
                 MediaStore.Images.Media.BUCKET_ID,
                 MediaStore.Images.Media.BUCKET_DISPLAY_NAME,
+                MediaStore.Images.Media.SIZE,
                 MediaStore.Images.Media.DATA,
             )
 
@@ -128,15 +129,17 @@ object ImageMediaStoreHelper : BaseContentHelper() {
             while (c.moveToNext()) {
                 val bucketId = c.getStringValue(MediaStore.Images.Media.BUCKET_ID, cache)
                 val bucketName = c.getStringValue(MediaStore.Images.Media.BUCKET_DISPLAY_NAME, cache)
+                val size = c.getLongValue(MediaStore.Images.Media.SIZE, cache)
                 val path = c.getStringValue(MediaStore.Images.Media.DATA, cache)
                 val bucket = bucketMap[bucketId]
                 if (bucket != null) {
                     if (bucket.topItems.size < 4) {
                         bucket.topItems.add(path)
                     }
+                    bucket.size += size
                     bucket.itemCount++
                 } else {
-                    bucketMap[bucketId] = DMediaBucket(bucketId, bucketName, 1, mutableListOf(path))
+                    bucketMap[bucketId] = DMediaBucket(bucketId, bucketName, 1, size, mutableListOf(path))
                 }
             }
         }

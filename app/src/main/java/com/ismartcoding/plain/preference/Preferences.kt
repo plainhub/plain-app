@@ -389,9 +389,9 @@ object AudioPlayModePreference : BasePreference<Int>() {
     }
 }
 
-object ImageGridCellsIndexPreference : BasePreference<Int>() {
-    override val default = 6
-    override val key = intPreferencesKey("image_grid_cells_index")
+object ImageGridCellsPerRowPreference : BasePreference<Int>() {
+    override val default = 3
+    override val key = intPreferencesKey("image_grid_cells_per_row")
 }
 
 abstract class BaseSortByPreference(
