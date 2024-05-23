@@ -1,9 +1,11 @@
-package com.ismartcoding.plain.ui.base.videoplayer
+package com.ismartcoding.plain.ui.components.mediaviewer.video
 
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Handler
 import android.os.Looper
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.widget.FrameLayout
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -18,6 +20,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 
 
@@ -25,11 +28,10 @@ import androidx.media3.ui.PlayerView
 @Composable
 internal fun VideoPlayerSurface(
     modifier: Modifier = Modifier,
-    defaultPlayerView: PlayerView,
+    playerView: PlayerView,
     player: ExoPlayer,
+    videoState: VideoState,
     usePlayerController: Boolean,
-    enablePip: Boolean,
-    surfaceResizeMode: ResizeMode,
     onPipEntered: () -> Unit = {},
     autoDispose: Boolean = true,
 ) {
@@ -42,9 +44,11 @@ internal fun VideoPlayerSurface(
         AndroidView(
             modifier = modifier,
             factory = {
-                defaultPlayerView.apply {
+                playerView.apply {
+                    this.player = player
                     useController = usePlayerController
-                    resizeMode = surfaceResizeMode.toPlayerViewResizeMode()
+                    resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+                    layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
                     setBackgroundColor(Color.BLACK)
                 }
             },
@@ -53,12 +57,14 @@ internal fun VideoPlayerSurface(
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_PAUSE -> {
-                    player.pause()
-                    if (enablePip && player.playWhenReady) {
+                    if (!videoState.enablePip) {
+                        player.pause()
+                    }
+                    if (videoState.enablePip && player.playWhenReady) {
                         isPendingPipMode = true
 
                         Handler(Looper.getMainLooper()).post {
-                            enterPIPMode(context, defaultPlayerView)
+                            videoState.enterPipMode(context)
                             onPipEntered()
 
                             Handler(Looper.getMainLooper()).postDelayed({
@@ -69,9 +75,12 @@ internal fun VideoPlayerSurface(
                 }
 
                 Lifecycle.Event.ON_RESUME -> {
-                    player.play()
-                    if (enablePip && player.playWhenReady) {
-                        defaultPlayerView.useController = usePlayerController
+                    videoState.enablePip = context.isActivityStatePipMode()
+                    if (!videoState.enablePip) {
+                        player.play()
+                    }
+                    if (videoState.enablePip && player.playWhenReady) {
+                        playerView.useController = usePlayerController
                     }
                 }
 

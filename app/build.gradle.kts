@@ -44,7 +44,7 @@ android {
         ndk {
             //noinspection ChromeOsAbiSupport
             abiFilters += abiFilterList.ifEmpty {
-                listOf("arm64-v8a", "x86_64")
+                listOf("arm64-v8a")
             }
         }
     }

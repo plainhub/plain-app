@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.base.videoplayer
+package com.ismartcoding.plain.ui.components.mediaviewer.video
 
 import androidx.media3.common.Player
 

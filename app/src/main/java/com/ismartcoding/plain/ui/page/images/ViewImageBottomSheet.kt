@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.getMimeType
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
@@ -159,7 +160,7 @@ fun ViewImageBottomSheet(
             item {
                 VerticalSpace(dp = 16.dp)
                 PCard {
-                    PListItem(title = stringResource(id = R.string.file_size), value = FormatHelper.formatBytes(m.size))
+                    PListItem(title = stringResource(id = R.string.file_size), value = m.size.formatBytes())
                     PListItem(title = stringResource(id = R.string.type), value = m.path.getMimeType())
                     PListItem(title = stringResource(id = R.string.dimensions), value = "${viewSize.width}×${viewSize.height}")
                     PListItem(title = stringResource(id = R.string.created_at), value = m.createdAt.formatDateTime())

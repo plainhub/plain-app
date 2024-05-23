@@ -25,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.lib.extensions.formatBytes
+import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DVideo
@@ -163,7 +165,7 @@ fun VideoGridItem(
                     modifier =
                     Modifier
                         .padding(horizontal = 4.dp, vertical = 2.dp),
-                    text = if (setOf(FileSortBy.SIZE_ASC, FileSortBy.SIZE_DESC).contains(sort)) FormatHelper.formatBytes(m.size) else FormatHelper.formatDuration(m.duration),
+                    text = if (setOf(FileSortBy.SIZE_ASC, FileSortBy.SIZE_DESC).contains(sort)) m.size.formatBytes() else m.duration.formatDuration(),
                     color = Color.White,
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
                 )

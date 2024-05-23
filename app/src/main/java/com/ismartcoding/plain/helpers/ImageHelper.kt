@@ -152,7 +152,7 @@ object ImageHelper {
 
         try {
             val exif = ExifInterface(path)
-            val contentCreated = exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL) ?: return null
+            val takenAt = exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL) ?: return null
             val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
             val rotation = when (orientation) {
                 ExifInterface.ORIENTATION_ROTATE_90 -> 90
@@ -190,7 +190,7 @@ object ImageHelper {
                 exposureTimeToString(exposureTime),
                 focalLength,
                 isoSpeed,
-                convertExifDateTimeToInstant(contentCreated),
+                convertExifDateTimeToInstant(takenAt),
                 flash,
                 fNumber,
                 exposureProgram,

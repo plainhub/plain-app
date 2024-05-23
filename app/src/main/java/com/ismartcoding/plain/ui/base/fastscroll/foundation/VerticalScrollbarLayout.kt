@@ -3,17 +3,21 @@ package com.ismartcoding.plain.ui.base.fastscroll.foundation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.ui.base.fastscroll.ScrollbarLayoutSide
+import com.ismartcoding.plain.R
 
 @Composable
 internal fun VerticalScrollbarLayout(
@@ -23,7 +27,6 @@ internal fun VerticalScrollbarLayout(
     settings: ScrollbarLayoutSettings,
     draggableModifier: Modifier,
     indicator: (@Composable () -> Unit)?,
-    modifier: Modifier = Modifier,
 ) {
     val state = rememberScrollbarLayoutState(
         thumbIsInAction = thumbIsInAction,
@@ -32,27 +35,28 @@ internal fun VerticalScrollbarLayout(
     )
 
     Layout(
-        modifier = modifier,
         content = {
             Box(
                 modifier = Modifier
-                    .height(48.dp)
-                    .padding(
-                        start = if (settings.side == ScrollbarLayoutSide.Start) settings.scrollbarPadding else 0.dp,
-                        end = if (settings.side == ScrollbarLayoutSide.End) settings.scrollbarPadding else 0.dp,
-                    )
                     .alpha(state.hideAlpha.value)
-                    .clip(
-                        RoundedCornerShape(
+                    .size(40.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(
                             topStartPercent = 100,
-                            bottomStartPercent = 100,
-                            topEndPercent = 0,
-                            bottomEndPercent = 0
+                            bottomStartPercent = 100
                         )
                     )
-                    .width(settings.thumbThickness)
-                    .background(state.thumbColor.value)
-            )
+                    .padding(vertical = 2.dp).run { if (state.activeDraggableModifier.value) then(draggableModifier) else this },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_scroll_arrow),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
+
             when (indicator) {
                 null -> Box(Modifier)
                 else -> Box(
@@ -65,7 +69,7 @@ internal fun VerticalScrollbarLayout(
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .width(settings.scrollbarPadding * 2 + settings.thumbThickness)
+                    .width(16.dp)
                     .run { if (state.activeDraggableModifier.value) then(draggableModifier) else this }
             )
         },
@@ -79,31 +83,19 @@ internal fun VerticalScrollbarLayout(
 
                 val offset = (constraints.maxHeight.toFloat() * thumbOffsetNormalized).toInt()
 
-                val hideDisplacementPx = when (settings.side) {
-                    ScrollbarLayoutSide.Start -> -state.hideDisplacement.value.roundToPx()
-                    ScrollbarLayoutSide.End -> +state.hideDisplacement.value.roundToPx()
-                }
+                val hideDisplacementPx = state.hideDisplacement.value.roundToPx()
 
                 placeableThumb.placeRelative(
-                    x = when (settings.side) {
-                        ScrollbarLayoutSide.Start -> 0
-                        ScrollbarLayoutSide.End -> constraints.maxWidth - placeableThumb.width
-                    } + hideDisplacementPx,
+                    x = constraints.maxWidth - placeableThumb.width + hideDisplacementPx,
                     y = offset
                 )
 
                 placeableIndicator.placeRelative(
-                    x = when (settings.side) {
-                        ScrollbarLayoutSide.Start -> 0 + placeableThumb.width
-                        ScrollbarLayoutSide.End -> constraints.maxWidth - placeableThumb.width - placeableIndicator.width
-                    } + hideDisplacementPx,
+                    x = constraints.maxWidth - placeableThumb.width - placeableIndicator.width + hideDisplacementPx,
                     y = offset + placeableThumb.height / 2 - placeableIndicator.height / 2
                 )
                 placeableScrollbarArea.placeRelative(
-                    x = when (settings.side) {
-                        ScrollbarLayoutSide.Start -> 0
-                        ScrollbarLayoutSide.End -> constraints.maxWidth - placeableScrollbarArea.width
-                    },
+                    x = constraints.maxWidth - placeableScrollbarArea.width,
                     y = 0
                 )
 

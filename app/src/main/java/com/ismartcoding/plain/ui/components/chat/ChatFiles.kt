@@ -22,6 +22,8 @@ import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.ismartcoding.lib.extensions.dp2px
+import com.ismartcoding.lib.extensions.formatBytes
+import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.getFinalPath
@@ -113,7 +115,7 @@ fun ChatFiles(
                             Modifier
                                 .fillMaxWidth()
                                 .padding(end = 8.dp),
-                            text = FormatHelper.formatBytes(item.size) + if (item.duration > 0) " / ${FormatHelper.formatDuration(item.duration)}" else "",
+                            text = item.size.formatBytes() + if (item.duration > 0) " / ${item.duration.formatDuration()}" else "",
                             color = MaterialTheme.colorScheme.secondary,
                             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal),
                         )

@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.bumptech.glide.Glide
+import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.plain.MainApp
@@ -119,7 +120,7 @@ fun AboutPage(
                     PCard {
                         PListItem(
                             title = stringResource(R.string.logs),
-                            desc = FormatHelper.formatBytes(fileSize),
+                            desc = fileSize.formatBytes(),
                             separatedActions = fileSize > 0L,
                             action = {
                                 if (fileSize > 0L) {
@@ -178,7 +179,7 @@ fun AboutPage(
                     PCard {
                         PListItem(
                             title = stringResource(R.string.local_cache),
-                            desc = FormatHelper.formatBytes(cacheSize),
+                            desc = cacheSize.formatBytes(),
                             action = {
                                 PMiniOutlineButton(text = stringResource(R.string.clear_cache)) {
                                     scope.launch {

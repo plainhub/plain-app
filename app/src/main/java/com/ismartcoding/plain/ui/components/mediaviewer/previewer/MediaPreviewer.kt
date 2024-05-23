@@ -1,12 +1,9 @@
 package com.ismartcoding.plain.ui.components.mediaviewer.previewer
 
-import androidx.annotation.IntRange
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
-import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -16,101 +13,46 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.mapSaver
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
-import com.ismartcoding.plain.ui.components.mediaviewer.MediaGallery
-import com.ismartcoding.plain.ui.components.mediaviewer.MediaGalleryState
+import com.ismartcoding.plain.enums.ImageType
+import com.ismartcoding.plain.helpers.ImageHelper
+import com.ismartcoding.plain.ui.components.mediaviewer.GestureScope
+import com.ismartcoding.plain.ui.components.mediaviewer.MediaViewer
 import com.ismartcoding.plain.ui.components.mediaviewer.ViewImageBottomSheet
+import com.ismartcoding.plain.ui.components.mediaviewer.rememberDecoderImagePainter
+import com.ismartcoding.plain.ui.components.mediaviewer.rememberViewerState
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.preview.PreviewItem
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import java.io.File
 
 
 val DEFAULT_SOFT_ANIMATION_SPEC = tween<Float>(320)
 
-@OptIn(ExperimentalFoundationApi::class)
-class MediaPreviewerState(
-    scope: CoroutineScope = MainScope(),
-    galleryState: MediaGalleryState,
-) : PreviewerVerticalDragState(scope, galleryState = galleryState) {
-
-
-    companion object {
-        fun getSaver(galleryState: MediaGalleryState): Saver<MediaPreviewerState, *> {
-            return mapSaver(
-                save = {
-                    mapOf<String, Any>(
-                        it.galleryState.pagerState::currentPage.name to it.galleryState.pagerState.currentPage,
-                        it::animateContainerVisibleState.name to it.animateContainerVisibleState.currentState,
-                        it::uiAlpha.name to it.uiAlpha.value,
-                        it::visible.name to it.visible,
-                    )
-                },
-                restore = {
-                    val previewerState = MediaPreviewerState(galleryState = galleryState)
-                    previewerState.animateContainerVisibleState =
-                        MutableTransitionState(it[MediaPreviewerState::animateContainerVisibleState.name] as Boolean)
-                    previewerState.uiAlpha = Animatable(it[MediaPreviewerState::uiAlpha.name] as Float)
-                    previewerState.visible = it[MediaPreviewerState::visible.name] as Boolean
-                    previewerState
-                }
-            )
-        }
-    }
-}
-
-/**
- * 记录预览组件状态
- */
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun rememberPreviewerState(
-    scope: CoroutineScope = rememberCoroutineScope(),
-    verticalDragType: VerticalDragType = VerticalDragType.UpAndDown,
-    @IntRange(from = 0) initialPage: Int = 0,
-    pageCount: () -> Int = { MediaPreviewData.items.size },
-    getKey: (Int) -> Any = { MediaPreviewData.items[it].id },
-): MediaPreviewerState {
-    val pagerState = rememberPagerState(initialPage, pageCount = pageCount)
-    val galleryState = remember { MediaGalleryState(pagerState) }
-    val mediaPreviewerState = rememberSaveable(saver = MediaPreviewerState.getSaver(galleryState)) {
-        MediaPreviewerState(galleryState = galleryState)
-    }
-    mediaPreviewerState.scope = scope
-    mediaPreviewerState.getKey = getKey
-    mediaPreviewerState.verticalDragType = verticalDragType
-    return mediaPreviewerState
-}
-
-/**
- * 默认的弹出预览时的动画效果
- */
 val DEFAULT_PREVIEWER_ENTER_TRANSITION =
     scaleIn(tween(180)) + fadeIn(tween(240))
 
-/**
- * 默认的关闭预览时的动画效果
- */
 val DEFAULT_PREVIEWER_EXIT_TRANSITION =
     scaleOut(tween(320)) + fadeOut(tween(240))
 
@@ -143,9 +85,8 @@ class PreviewerPlaceholder(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MediaPreviewer(
-    modifier: Modifier = Modifier,
     state: MediaPreviewerState,
-    getItem: @Composable (Int) -> PreviewItem = { index ->
+    getItem: (Int) -> PreviewItem = { index ->
         MediaPreviewData.items[index]
     },
     castViewModel: CastViewModel = viewModel(),
@@ -162,6 +103,8 @@ fun MediaPreviewer(
     ) {
         state.onAnimateContainerStateChanged()
     }
+
+    // Previewer -> ViewerContainer -> Viewer -> NormalImage/HugeImage/Video
     AnimatedVisibility(
         modifier = Modifier.fillMaxSize(),
         visibleState = state.animateContainerVisibleState,
@@ -175,53 +118,80 @@ fun MediaPreviewer(
                     state.verticalDrag(this)
                 }
         ) {
-            MediaGallery(
-                modifier = modifier.fillMaxSize(),
-                state = state.galleryState,
-                getItem = getItem,
-                detectGesture = {
-                    onTap = {
-                        state.showActions = !state.showActions
+            val scope = rememberCoroutineScope()
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .alpha(state.uiAlpha.value)
+                    .background(Color.Black)
+            )
+            HorizontalPager(
+                state = state.pagerState,
+                modifier = Modifier
+                    .fillMaxSize(),
+                pageSpacing = 16.dp,
+            ) { page ->
+                val viewerState = rememberViewerState()
+                val viewerContainerState = rememberViewerContainerState(
+                    viewerState = viewerState,
+                )
+                LaunchedEffect(key1 = state.pagerState.currentPage) {
+                    if (state.pagerState.currentPage == page) {
+                        state.viewerContainerState = viewerContainerState
                     }
-                },
-                galleryLayer = {
-                    this.viewerContainer = { page, viewerState, viewer ->
-                        val viewerContainerState = rememberViewerContainerState(
-                            viewerState = viewerState,
-                        )
-                        LaunchedEffect(key1 = state.galleryState.pagerState.currentPage) {
-                            if (state.galleryState.pagerState.currentPage == page) {
-                                state.viewerContainerState = viewerContainerState
-                                state.currentViewerState = viewerState
-                            }
-                        }
-                        MediaViewerContainer(
-                            modifier = Modifier.alpha(state.viewerAlpha.value),
-                            containerState = viewerContainerState,
-                            placeholder = PreviewerPlaceholder(),
-                            viewer = viewer,
-                        )
-                    }
-                    this.background = {
+                }
+                MediaViewerContainer(
+                    modifier = Modifier.alpha(state.viewerAlpha.value),
+                    containerState = viewerContainerState,
+                    placeholder = PreviewerPlaceholder(),
+                    viewer = {
                         Box(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .alpha(state.uiAlpha.value)
-                                .background(Color.Black)
-                        )
-                    }
-                    this.foreground = { page ->
-                        val m = getItem(page)
-                        if (!m.path.isVideoFast()) {
-                            MediaPreviewActions(context = context, castViewModel = castViewModel, m = m, getViewerState = { state.currentViewerState }, state)
+                                .fillMaxSize(),
+
+                        ) {
+                            key(page) {
+                                val item = remember(page) {
+                                    getItem(page)
+                                }
+                                MediaViewer(
+                                    modifier = Modifier.fillMaxSize(),
+                                    pagerState = state.pagerState,
+                                    videoState = state.videoState,
+                                    page = page,
+                                    model = getModel(item),
+                                    state = viewerState,
+                                    boundClip = false,
+                                    gesture = GestureScope(
+                                        onTap = {
+                                            state.showActions = !state.showActions
+                                        },
+                                        onDoubleTap = {
+                                            scope.launch {
+                                                viewerState.toggleScale(it)
+                                            }
+                                            false
+                                        },
+                                        onLongPress = {}
+                                    ),
+                                )
+                            }
                         }
-                    }
-                },
-            )
+                    },
+                )
+            }
+            val m = remember(state.pagerState.currentPage) {
+                getItem(state.pagerState.currentPage)
+            }
+            if (m.path.isVideoFast()) {
+                VideoPreviewActions(context = context, castViewModel = castViewModel, m = m, state)
+            } else {
+                ImagePreviewActions(context = context, castViewModel = castViewModel, m = m, state)
+            }
         }
     }
     if (state.showMediaInfo) {
-        val m = getItem(state.galleryState.pagerState.currentPage)
+        val m = getItem(state.pagerState.currentPage)
         ViewImageBottomSheet(m,
             tagsViewModel, tagsMap, tagsState,
             onDismiss = {
@@ -234,4 +204,34 @@ fun MediaPreviewer(
     }
 
     state.ticket.Next()
+}
+
+@Composable
+fun getModel(item: PreviewItem): Any? {
+    val model: Any?
+    if (item.path.isVideoFast() || item.path.isUrl()) {
+        model = item
+    } else if (item.size <= 2000 * 1000) {
+        // If the image size is less than 2MB, load the image directly
+        model = item
+    } else {
+        val imageType = remember { ImageHelper.getImageType(item.path) }
+        if (imageType.isApplicableAnimated() || imageType == ImageType.SVG) {
+            model = item
+        } else {
+            val rotation = remember {
+                if (item.rotation == -1) {
+                    item.rotation = ImageHelper.getRotation(item.path)
+                }
+                item.rotation
+            }
+            val inputStream = remember(item.path) { File(item.path).inputStream() }
+            val decoder = rememberDecoderImagePainter(inputStream = inputStream, rotation = rotation)
+            if (decoder != null) {
+                item.intrinsicSize = IntSize(decoder.decoderWidth, decoder.decoderHeight)
+            }
+            model = decoder
+        }
+    }
+    return model
 }

@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -74,7 +75,7 @@ fun PackageListItem(
                 )
                 VerticalSpace(dp = 8.dp)
                 Text(
-                    text = stringResource(id = LocaleHelper.getStringIdentifier("app_type_" + item.type)) + " " + FormatHelper.formatBytes(item.size),
+                    text = stringResource(id = LocaleHelper.getStringIdentifier("app_type_" + item.type)) + " " + item.size.formatBytes(),
                     style = MaterialTheme.typography.listItemDescription(),
                 )
                 VerticalSpace(dp = 8.dp)

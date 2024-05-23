@@ -1,8 +1,7 @@
-package com.ismartcoding.plain.ui.components.mediaviewer
+package com.ismartcoding.plain.ui.components.mediaviewer.video
 
 import androidx.annotation.OptIn
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -17,22 +16,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.media3.common.ForwardingPlayer
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.PlayerView
 import com.ismartcoding.lib.extensions.pathToUri
+import com.ismartcoding.plain.ui.components.mediaviewer.RawGesture
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
-import com.ismartcoding.plain.ui.base.videoplayer.VideoPlayer
-import com.ismartcoding.plain.ui.base.videoplayer.VideoPlayerMediaItem
-import com.ismartcoding.plain.ui.base.videoplayer.rememberVideoPlayer
-import com.ismartcoding.plain.ui.base.videoplayer.toUri
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import kotlinx.coroutines.launch
 import java.util.UUID
+
 
 @kotlin.OptIn(ExperimentalFoundationApi::class)
 @OptIn(UnstableApi::class)
@@ -40,6 +36,7 @@ import java.util.UUID
 fun MediaVideo(
     modifier: Modifier = Modifier,
     pagerState: PagerState,
+    videoState: VideoState,
     page: Int,
     model: PreviewItem,
     gesture: RawGesture = RawGesture(),
@@ -47,32 +44,26 @@ fun MediaVideo(
 ) {
     val scope = rememberCoroutineScope()
     val viewerAlpha = remember { Animatable(0F) }
-    val view = LocalView.current
     val context = LocalContext.current
 
-    var mediaSession = remember<MediaSession?> { null }
     val defaultPlayerView = remember {
         PlayerView(context)
     }
+
+    var mediaSession = remember<MediaSession?> { null }
     val player = rememberVideoPlayer(context, playerInstance = {
-        addAnalyticsListener(object : AnalyticsListener {
-            override fun onPlayWhenReadyChanged(
-                eventTime: AnalyticsListener.EventTime,
-                playWhenReady: Boolean,
-                reason: Int,
-            ) {
+        addListener(
+            object : Player.Listener {
+                override fun onEvents(player: Player, events: Player.Events) {
+                    videoState.totalTime = player.duration.coerceAtLeast(0L)
+                    videoState.isPlaying = player.isPlaying
+                    if (!videoState.isSeeking) {
+                        videoState.updateTime()
+                    }
+                    defaultPlayerView.keepScreenOn = player.isPlaying
+                }
             }
-
-            override fun onIsPlayingChanged(eventTime: AnalyticsListener.EventTime, isPlaying: Boolean) {
-                defaultPlayerView.keepScreenOn = isPlaying
-            }
-
-            override fun onVolumeChanged(
-                eventTime: AnalyticsListener.EventTime,
-                volume: Float,
-            ) {
-            }
-        })
+        )
     })
 
     fun goMounted() {
@@ -88,6 +79,7 @@ fun MediaVideo(
         if (pagerState.currentPage != page) {
             return@LaunchedEffect
         }
+        videoState.initData(player)
         mediaSession?.release()
         mediaSession = MediaSession.Builder(context, ForwardingPlayer(player))
             .setId("VideoPlayerMediaSession_${UUID.randomUUID().toString().lowercase().split("-").first()}")
@@ -115,12 +107,11 @@ fun MediaVideo(
         modifier = modifier
             .fillMaxSize()
             .graphicsLayer {
-                // 图片位移时会超出容器大小，需要在这个地方指定是否裁切
                 clip = true
                 alpha = viewerAlpha.value
             }
             .pointerInput(Unit) {
-                detectTapGestures(onLongPress = gesture.onLongPress)
+                detectTapGestures(onLongPress = gesture.onLongPress, onTap = gesture.onTap)
             },
         contentAlignment = Alignment.Center,
     ) {
@@ -129,6 +120,7 @@ fun MediaVideo(
                 .align(Alignment.Center),
             player = player,
             playerView = defaultPlayerView,
+            videoState = videoState,
         )
     }
 }

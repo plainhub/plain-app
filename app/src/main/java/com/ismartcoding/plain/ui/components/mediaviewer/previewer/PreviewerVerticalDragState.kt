@@ -1,18 +1,15 @@
 package com.ismartcoding.plain.ui.components.mediaviewer.previewer
 
-import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputScope
-import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.ui.components.mediaviewer.MediaGalleryState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
@@ -43,8 +40,8 @@ open class PreviewerVerticalDragState(
     scope: CoroutineScope = MainScope(),
     verticalDragType: VerticalDragType = VerticalDragType.None,
     scaleToCloseMinValue: Float = DEFAULT_SCALE_TO_CLOSE_MIN_VALUE,
-    galleryState: MediaGalleryState,
-) : PreviewerTransformState(scope, galleryState) {
+    pagerState: PagerState,
+) : PreviewerTransformState(scope, pagerState) {
 
 
     /**
@@ -78,7 +75,7 @@ open class PreviewerVerticalDragState(
         // 刷新transform的pos
         transformState?.notifyEnterChanged()
         // 关闭loading
-        viewerContainerState?.allowLoading = false
+        viewerContainerState?.showLoading = false
         // 等待下一帧，确保transform的pos刷新成功
         ticket.awaitNextTicket()
         // 将container的pos复制给transform
@@ -92,7 +89,7 @@ open class PreviewerVerticalDragState(
         // 执行转换关闭
         closeTransform()
         // 解除loading限制
-        viewerContainerState?.allowLoading = true
+        viewerContainerState?.showLoading = true
     }
 
     /**
@@ -114,7 +111,7 @@ open class PreviewerVerticalDragState(
                     var transformItemState: TransformItemState? = null
                     // 查询当前transformItem
                     getKey?.apply {
-                        findTransformItem(invoke(galleryState.pagerState.currentPage))?.apply {
+                        findTransformItem(invoke(pagerState.currentPage))?.apply {
                             transformItemState = this
                         }
                     }
@@ -152,7 +149,7 @@ open class PreviewerVerticalDragState(
 
                         scope.launch {
                             if (getKey != null && canTransformOut) {
-                                val key = getKey!!.invoke(galleryState.pagerState.currentPage)
+                                val key = getKey!!.invoke(pagerState.currentPage)
                                 val transformItem = findTransformItem(key)
                                 // 如果item在画面内，就执行变换关闭，否则缩小关闭
                                 if (transformItem != null) {

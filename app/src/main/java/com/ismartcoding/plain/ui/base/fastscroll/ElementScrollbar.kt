@@ -15,7 +15,6 @@ import com.ismartcoding.plain.ui.base.fastscroll.foundation.VerticalScrollbarLay
 
 @Composable
 internal fun <IndicatorValue> ElementScrollbar(
-    orientation: Orientation,
     stateController: StateController<IndicatorValue>,
     modifier: Modifier,
     settings: ScrollbarSettings,
@@ -37,10 +36,7 @@ internal fun <IndicatorValue> ElementScrollbar(
     }
 
     BoxWithConstraints(modifier) {
-        val maxLengthPixels = when (orientation) {
-            Orientation.Vertical -> constraints.maxHeight
-            Orientation.Horizontal -> constraints.maxWidth
-        }.toFloat()
+        val maxLengthPixels = constraints.maxHeight.toFloat()
 
         VerticalScrollbarLayout(
             thumbOffsetNormalized = stateController.thumbOffsetNormalized.value,
@@ -57,16 +53,13 @@ internal fun <IndicatorValue> ElementScrollbar(
                         maxLengthPixels = maxLengthPixels
                     )
                 },
-                orientation = orientation,
+                orientation = Orientation.Vertical,
                 enabled = settings.selectionMode != ScrollbarSelectionMode.Disabled,
                 startDragImmediately = true,
                 onDragStarted = { offsetPixel ->
                     view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                     stateController.onDragStarted(
-                        offsetPixels = when (orientation) {
-                            Orientation.Horizontal -> offsetPixel.x
-                            Orientation.Vertical -> offsetPixel.y
-                        },
+                        offsetPixels = offsetPixel.y,
                         maxLengthPixels = maxLengthPixels
                     )
                 },

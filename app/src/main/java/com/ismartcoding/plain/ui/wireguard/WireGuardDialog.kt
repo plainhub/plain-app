@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.wireguard
 import android.os.Bundle
 import android.view.View
 import com.ismartcoding.lib.channel.receiveEvent
+import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.UIDataCache
@@ -70,9 +71,9 @@ class WireGuardDialog(var wireGuard: WireGuard) : BaseBottomSheetDialog<DialogWi
                     LocaleHelper.getStringF(
                         R.string.transfer_text,
                         "rx_bytes",
-                        FormatHelper.formatBytes(peer.rxBytes),
+                        peer.rxBytes.formatBytes(),
                         "tx_bytes",
-                        FormatHelper.formatBytes(peer.txBytes),
+                        peer.txBytes.formatBytes(),
                     ),
                 )
             }

@@ -15,7 +15,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.getMimeType
+import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.DImage
@@ -37,6 +39,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.ImageMetaRows
 import com.ismartcoding.plain.ui.components.FileRenameDialog
 import com.ismartcoding.plain.ui.components.TagSelector
+import com.ismartcoding.plain.ui.components.VideoMetaRows
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.preview.PreviewItem
@@ -121,8 +124,9 @@ fun ViewImageBottomSheet(
             item {
                 VerticalSpace(dp = 16.dp)
                 PCard {
-                    PListItem(title = stringResource(id = R.string.file_size), value = FormatHelper.formatBytes(m.size))
-                    PListItem(title = stringResource(id = R.string.type), value = m.path.getMimeType())
+                    PListItem(title = stringResource(id = R.string.file_size), value = m.size.formatBytes())
+                    val mimeType = m.path.getMimeType()
+                    PListItem(title = stringResource(id = R.string.type), value = mimeType)
                     val intrinsicSize = m.intrinsicSize
                     if (intrinsicSize.width > 0 && intrinsicSize.height > 0) {
                         PListItem(title = stringResource(id = R.string.dimensions), value = "${intrinsicSize.width}×${intrinsicSize.height}")
@@ -131,6 +135,16 @@ fun ViewImageBottomSheet(
                         PListItem(title = stringResource(id = R.string.created_at), value = m.data.createdAt.formatDateTime())
                         PListItem(title = stringResource(id = R.string.updated_at), value = m.data.updatedAt.formatDateTime())
                         ImageMetaRows(path = m.path)
+                    } else if (m.data is DVideo) {
+                        PListItem(title = stringResource(id = R.string.created_at), value = m.data.createdAt.formatDateTime())
+                        PListItem(title = stringResource(id = R.string.updated_at), value = m.data.updatedAt.formatDateTime())
+                        VideoMetaRows(path = m.path)
+                    } else if (m.path.isUrl()) {
+
+                    } else if (mimeType.startsWith("image/")) {
+                        ImageMetaRows(path = m.path)
+                    } else if (mimeType.startsWith("video/")) {
+                        VideoMetaRows(path = m.path)
                     }
                 }
             }

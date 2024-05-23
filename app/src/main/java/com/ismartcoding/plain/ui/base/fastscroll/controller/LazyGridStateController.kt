@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.base.fastscroll.controller
 
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.lazy.grid.LazyGridItemInfo
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.Composable
@@ -13,9 +12,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.ui.base.fastscroll.ScrollbarSelectionMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import com.ismartcoding.plain.ui.base.fastscroll.ScrollbarSelectionMode
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -25,14 +25,12 @@ internal fun rememberLazyGridStateController(
     thumbMinLength: Float,
     alwaysShowScrollBar: Boolean,
     selectionMode: ScrollbarSelectionMode,
-    orientation: Orientation
 ): LazyGridStateController {
     val coroutineScope = rememberCoroutineScope()
 
     val thumbMinLengthUpdated = rememberUpdatedState(thumbMinLength)
     val alwaysShowScrollBarUpdated = rememberUpdatedState(alwaysShowScrollBar)
     val selectionModeUpdated = rememberUpdatedState(selectionMode)
-    val orientationUpdated = rememberUpdatedState(orientation)
     val reverseLayout = remember { derivedStateOf { state.layoutInfo.reverseLayout } }
 
     val isSelected = remember { mutableStateOf(false) }
@@ -52,10 +50,7 @@ internal fun rememberLazyGridStateController(
         derivedStateOf {
             var count = 0
             for (item in state.layoutInfo.visibleItemsInfo) {
-                val index = when (orientation) {
-                    Orientation.Vertical -> item.column
-                    Orientation.Horizontal -> item.row
-                }
+                val index = item.column
                 if (index == -1)
                     break
                 if (count == index) {
@@ -78,17 +73,11 @@ internal fun rememberLazyGridStateController(
     }
 
     fun LazyGridItemInfo.fractionHiddenTop(firstItemOffset: Int): Float {
-        return when (orientationUpdated.value) {
-            Orientation.Vertical -> if (size.height == 0) 0f else firstItemOffset / size.width.toFloat()
-            Orientation.Horizontal -> if (size.width == 0) 0f else firstItemOffset / size.width.toFloat()
-        }
+        return if (size.height == 0) 0f else firstItemOffset / size.width.toFloat()
     }
 
     fun LazyGridItemInfo.fractionVisibleBottom(viewportEndOffset: Int): Float {
-        return when (orientationUpdated.value) {
-            Orientation.Vertical -> if (size.height == 0) 0f else (viewportEndOffset - offset.y).toFloat() / size.height.toFloat()
-            Orientation.Horizontal -> if (size.width == 0) 0f else (viewportEndOffset - offset.x).toFloat() / size.width.toFloat()
-        }
+        return if (size.height == 0) 0f else (viewportEndOffset - offset.y).toFloat() / size.height.toFloat()
     }
 
 
@@ -167,7 +156,6 @@ internal fun rememberLazyGridStateController(
             realFirstVisibleItem = realFirstVisibleItem,
             thumbMinLength = thumbMinLengthUpdated,
             reverseLayout = reverseLayout,
-            orientation = orientationUpdated,
             nElementsMainAxis = nElementsMainAxis,
             state = state,
             coroutineScope = coroutineScope
@@ -186,7 +174,6 @@ internal class LazyGridStateController(
     private val thumbSizeNormalizedReal: State<Float>,
     private val thumbMinLength: State<Float>,
     private val reverseLayout: State<Boolean>,
-    private val orientation: State<Orientation>,
     private val nElementsMainAxis: State<Int>,
     private val state: LazyGridState,
     private val coroutineScope: CoroutineScope,
@@ -253,10 +240,7 @@ internal class LazyGridStateController(
             val offset = realFirstVisibleItem.value
                 ?.size
                 ?.let {
-                    val size = when (orientation.value) {
-                        Orientation.Vertical -> it.height
-                        Orientation.Horizontal -> it.width
-                    }
+                    val size = it.height
                     size.toFloat() * remainder
                 }
                 ?.toInt() ?: 0

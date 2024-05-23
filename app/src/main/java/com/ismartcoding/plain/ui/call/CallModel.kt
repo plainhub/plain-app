@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.call
 
 import android.provider.CallLog
+import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DCall
@@ -16,13 +17,13 @@ data class CallModel(override val data: DCall) : IDataModel, ListItemModel() {
                 LocaleHelper.getString(R.string.call_missed)
             }
             CallLog.Calls.INCOMING_TYPE -> {
-                LocaleHelper.getString(R.string.call_incoming) + " " + FormatHelper.formatDuration(data.duration.toLong())
+                LocaleHelper.getString(R.string.call_incoming) + " " + data.duration.toLong().formatDuration()
             }
             CallLog.Calls.OUTGOING_TYPE -> {
                 if (data.duration == 0) {
                     LocaleHelper.getString(R.string.call_not_connected)
                 } else {
-                    LocaleHelper.getString(R.string.call_outgoing) + " " + FormatHelper.formatDuration(data.duration.toLong())
+                    LocaleHelper.getString(R.string.call_outgoing) + " " + data.duration.toLong().formatDuration()
                 }
             }
             else -> ""

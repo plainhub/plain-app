@@ -11,6 +11,7 @@ import android.widget.SeekBar
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.receiveEvent
+import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.lib.isSPlus
@@ -41,7 +42,7 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        receiveEvent<PermissionsResultEvent> { event ->
+        receiveEvent<PermissionsResultEvent> {
             if (isSPlus()) {
                 if (alarmManager.canScheduleExactAlarms()) {
                     alarmManager.setExact(
@@ -68,7 +69,7 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
             if (leftTime > 0) {
                 binding.seekBar.isVisible = false
                 binding.shouldFinishLastAudio.isVisible = false
-                binding.minutes.text = FormatHelper.formatDuration(leftTime / 1000)
+                binding.minutes.text = (leftTime / 1000).formatDuration()
                 binding.start.text = getString(R.string.stop)
                 binding.start.setSafeClick {
                     lifecycleScope.launch {
@@ -210,7 +211,7 @@ class SleepTimerDialog() : BaseBottomSheetDialog<DialogSleepTimerBinding>() {
         override fun onTick(millisUntilFinished: Long) {
             dialog.get()?.let {
                 if (it.isActive) {
-                    it.binding.minutes.text = FormatHelper.formatDuration(millisUntilFinished / 1000)
+                    it.binding.minutes.text = (millisUntilFinished / 1000).formatDuration()
                 }
             }
         }

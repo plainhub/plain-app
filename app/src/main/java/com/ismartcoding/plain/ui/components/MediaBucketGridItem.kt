@@ -23,6 +23,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.helpers.BitmapHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
@@ -114,7 +115,7 @@ fun MediaBucketGridItem(
                 modifier =
                 Modifier
                     .padding(horizontal = 4.dp),
-                text = pluralStringResource(R.plurals.items, m.itemCount, m.itemCount) + " • " + FormatHelper.formatBytes(m.size),
+                text = pluralStringResource(R.plurals.items, m.itemCount, m.itemCount) + " • " + m.size.formatBytes(),
                 style = MaterialTheme.typography.listItemSubtitle(),
             )
         }

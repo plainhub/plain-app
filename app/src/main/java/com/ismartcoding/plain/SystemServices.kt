@@ -83,5 +83,9 @@ val alarmManager: AlarmManager by lazy {
     MainApp.instance.getSystemServiceCompat(AlarmManager::class.java)
 }
 
+val audioManager: android.media.AudioManager by lazy {
+    MainApp.instance.getSystemServiceCompat(android.media.AudioManager::class.java)
+}
+
 
 

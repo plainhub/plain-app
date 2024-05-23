@@ -2,6 +2,9 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Ваш VPN в настоящее время включен на вашем устройстве, что может потенциально привести к проблемам с веб-подключением при доступе с ПК. Для устранения этой проблемы мы рекомендуем настроить параметры вашего VPN для разрешения локального сетевого трафика или отключить ваш VPN.</string>
     <string name="warning">Предупреждение</string>
+    <string name="description">Описание</string>
+    <string name="duration">Длительность</string>
+    <string name="bitrate">Битрейт</string>
     <string name="flash_fired">Сработал</string>
     <string name="flash_return_light_not_detected">Не обнаружено возвращающего света вспышки</string>
     <string name="flash_return_light_detected">Обнаружен возвращающий свет вспышки</string>

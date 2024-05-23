@@ -22,6 +22,8 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.lib.extensions.formatBytes
+import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
@@ -93,11 +95,9 @@ fun ChatImages(
                                 .padding(horizontal = 4.dp, vertical = 2.dp),
                             text =
                             if (item.duration > 0) {
-                                FormatHelper.formatDuration(
-                                    item.duration,
-                                )
+                                item.duration.formatDuration()
                             } else {
-                                FormatHelper.formatBytes(item.size)
+                                item.size.formatBytes()
                             },
                             color = Color.White,
                             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),

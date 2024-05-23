@@ -17,7 +17,7 @@ data class ScrollbarSettings(
     val thumbThickness: Dp = 12.dp,
     val thumbShape: Shape = CircleShape,
     val thumbMinLength: Float = 0.1f,
-    val selectionMode: ScrollbarSelectionMode = ScrollbarSelectionMode.Thumb,
+    val selectionMode: ScrollbarSelectionMode = ScrollbarSelectionMode.Full,
     val selectionActionable: ScrollbarSelectionActionable = ScrollbarSelectionActionable.Always,
     val hideDelayMillis: Int = 3000,
     val hideDisplacement: Dp = 15.dp,

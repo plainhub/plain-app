@@ -5,7 +5,6 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.telephony.PhoneNumberUtils
 import com.ismartcoding.lib.Constants
-import com.ismartcoding.lib.helpers.ValidateHelper
 import java.io.File
 import java.net.URL
 import java.net.URLDecoder
@@ -13,7 +12,11 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.text.Normalizer
 import java.text.SimpleDateFormat
-import java.util.*
+import java.text.StringCharacterIterator
+import java.util.Base64
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import kotlin.math.ceil
 
 fun String.getFilenameFromPath() = substring(lastIndexOf("/") + 1)
@@ -290,6 +293,7 @@ private val typesMap =
         put("h", "text/plain")
         put("hdf", "application/x-hdf")
         put("hdml", "text/x-hdml")
+        put("heif", "image/heif")
         put("hhc", "application/x-oleobject")
         put("hhk", "application/octet-stream")
         put("hhp", "application/octet-stream")

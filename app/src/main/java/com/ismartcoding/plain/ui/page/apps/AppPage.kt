@@ -40,6 +40,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.ismartcoding.lib.apk.ApkParsers
+import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.helpers.ShareHelper
@@ -261,7 +262,7 @@ fun AppPage(
                     PCard {
                         PListItem(
                             title = stringResource(R.string.app_size),
-                            value = FormatHelper.formatBytes(item?.size ?: 0),
+                            value = (item?.size ?: 0).formatBytes(),
                         )
                         PListItem(
                             title = "SDK",

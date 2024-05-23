@@ -56,7 +56,6 @@ fun FeedEntryListItem(
     onClick: () -> Unit,
     onLongClick: () -> Unit,
 ) {
-    val context = LocalContext.current
     Row {
         if (viewModel.selectMode.value) {
             HorizontalSpace(dp = 16.dp)

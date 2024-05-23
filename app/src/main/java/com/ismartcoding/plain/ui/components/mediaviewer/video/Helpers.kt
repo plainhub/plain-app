@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.base.videoplayer
+package com.ismartcoding.plain.ui.components.mediaviewer.video
 
 import android.app.Activity
 import android.content.Context
@@ -8,6 +8,10 @@ import com.ismartcoding.plain.ui.MainActivity
 
 internal fun Context.findActivity(): Activity {
     return MainActivity.instance.get()!!
+}
+
+internal fun Context.isActivityStatePipMode(): Boolean {
+    return findActivity().isInPictureInPictureMode
 }
 
 internal fun Activity.setFullScreen(fullscreen: Boolean) {

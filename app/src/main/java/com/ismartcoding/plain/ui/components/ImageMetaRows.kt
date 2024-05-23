@@ -40,8 +40,8 @@ fun ImageMetaRows(path: String) {
         if (mt.isScreenshot) {
             return
         }
-        if (mt.contentCreated != null) {
-            PListItem(title = stringResource(id = R.string.taken_at), value = mt.contentCreated.formatDateTime())
+        if (mt.takenAt != null) {
+            PListItem(title = stringResource(id = R.string.taken_at), value = mt.takenAt.formatDateTime())
         }
         if (mt.resolutionX > 0 && mt.resolutionY > 0) {
             PListItem(title = stringResource(id = R.string.resolution), value = "${mt.resolutionX} x ${mt.resolutionY}")

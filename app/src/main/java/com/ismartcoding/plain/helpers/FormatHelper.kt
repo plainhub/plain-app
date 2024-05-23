@@ -73,33 +73,4 @@ object FormatHelper {
         format.roundingMode = RoundingMode.HALF_UP
         return format.format(value)
     }
-
-    fun formatDuration(
-        totalSeconds: Long,
-        alwaysShowHour: Boolean = false,
-    ): String {
-        val seconds = totalSeconds % 60
-        val minutes = totalSeconds / 60 % 60
-        val hours = totalSeconds / 3600
-        return if (hours > 0 || alwaysShowHour) {
-            String.format("%02d:%02d:%02d", hours, minutes, seconds)
-        } else {
-            String.format("%02d:%02d", minutes, seconds)
-        }
-    }
-
-    fun formatBytes(bytes: Long): String {
-        if (bytes in 0..999) {
-            return "$bytes B"
-        }
-
-        var newBytes = bytes
-        val ci = StringCharacterIterator("kMGTPE")
-        while (newBytes <= -999950 || newBytes >= 999950) {
-            newBytes /= 1000
-            ci.next()
-        }
-
-        return String.format("%.1f %cB", newBytes / 1000.0, ci.current())
-    }
 }

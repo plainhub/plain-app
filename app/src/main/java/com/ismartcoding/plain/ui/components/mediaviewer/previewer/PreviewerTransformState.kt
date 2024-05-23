@@ -4,10 +4,10 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.ismartcoding.plain.ui.components.mediaviewer.MediaGalleryState
 import com.ismartcoding.plain.ui.components.mediaviewer.MediaViewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.Ticket
 import kotlinx.coroutines.CoroutineScope
@@ -23,8 +23,7 @@ import kotlin.coroutines.suspendCoroutine
 @OptIn(ExperimentalFoundationApi::class)
 open class PreviewerTransformState(
     var scope: CoroutineScope = MainScope(),
-    val galleryState: MediaGalleryState,
-    var currentViewerState: MediaViewerState? = null,
+    val pagerState: PagerState,
 ) {
     // 锁对象
     private var mutex = Mutex()
@@ -137,7 +136,7 @@ open class PreviewerTransformState(
 
     // imageViewer状态对象
     val mediaViewerState: MediaViewerState?
-        get() = viewerContainerState?.mediaViewerState
+        get() = viewerContainerState?.viewerState
 
     /**
      * 根据页面获取当前页码所属的key
@@ -184,11 +183,11 @@ open class PreviewerTransformState(
                 // 开启container
                 animateContainerVisibleState.targetState = true
                 // 跳转到index
-                galleryState.pagerState.scrollToPage(index)
+                pagerState.scrollToPage(index)
                 // 等待下一帧之后viewerContainerState才会刷新出来
                 ticket.awaitNextTicket()
                 // 允许显示loading
-                viewerContainerState?.allowLoading = true
+                viewerContainerState?.showLoading = true
                 // 开启viewer
                 viewerContainerState?.viewerContainerAlpha?.snapTo(1F)
                 // 如果输入itemState，则用itemState做为背景
@@ -249,11 +248,11 @@ open class PreviewerTransformState(
         // 设置新的container状态立刻设置为true
         animateContainerVisibleState = MutableTransitionState(true)
         // 跳转到index页
-        galleryState.pagerState.scrollToPage(index)
+        pagerState.scrollToPage(index)
         // 等待下一帧
         ticket.awaitNextTicket()
         // 关闭loading
-        viewerContainerState?.allowLoading = false
+        viewerContainerState?.showLoading = false
         // 关闭viewer。打开transform
         transformSnapToViewer(false)
         // 开启viewer
@@ -264,7 +263,7 @@ open class PreviewerTransformState(
                 // 开启动画
                 transformState?.enterTransform(itemState, DEFAULT_SOFT_ANIMATION_SPEC)
                 // 开启loading
-                viewerContainerState?.allowLoading = true
+                viewerContainerState?.showLoading = true
             },
             scope.async {
                 // UI慢慢显示
@@ -285,9 +284,9 @@ open class PreviewerTransformState(
         // 关闭可能正在进行的open操作
         viewerContainerState?.cancelOpenTransform()
         // 关闭loading的显示
-        viewerContainerState?.allowLoading = false
+        viewerContainerState?.showLoading = false
         // 查询item是否存在
-        val itemState = findTransformItemByIndex(galleryState.pagerState.currentPage)
+        val itemState = findTransformItemByIndex(pagerState.currentPage)
         // 如果存在，就transform退出，否则就普通退出
         if (itemState != null && canNowTransformOut) {
             // 如果viewer在显示的状态，退出时将viewer的pose复制给content
@@ -328,7 +327,7 @@ open class PreviewerTransformState(
             animateContainerVisibleState.targetState = false
         }
 
-        viewerContainerState?.allowLoading = true
+        viewerContainerState?.showLoading = true
         showActions = true
 
         stateCloseEnd()

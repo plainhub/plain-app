@@ -13,7 +13,7 @@ data class DImageMeta(
     val exposureTime: String,
     val focalLength : String,
     val isoSpeed: Int,
-    val contentCreated: Instant?,
+    val takenAt: Instant?,
     val flash: Int,
     val fNumber: Double,
     val exposureProgram: Int,

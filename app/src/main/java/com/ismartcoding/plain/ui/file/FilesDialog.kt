@@ -14,6 +14,7 @@ import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.brv.utils.linear
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
+import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.isAudioFast
 import com.ismartcoding.lib.extensions.isImageFast
@@ -364,7 +365,7 @@ class FilesDialog(val fileType: FilesType = FilesType.INTERNAL_STORAGE) : BaseDi
                             } else {
                                 startIconId = R.drawable.ic_file
                             }
-                            subtitle = FormatHelper.formatBytes(f.size) + ", " + f.updatedAt.formatDateTime()
+                            subtitle = f.size.formatBytes() + ", " + f.updatedAt.formatDateTime()
                         }
                     }
                 },

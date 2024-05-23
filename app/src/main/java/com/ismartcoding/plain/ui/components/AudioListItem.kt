@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.data.DAudio
 import com.ismartcoding.plain.db.DNote
@@ -85,7 +86,7 @@ fun AudioListItem(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
-                        text = listOf(m.artist, FormatHelper.formatDuration(m.duration)).filter { it.isNotEmpty() }.joinToString(" • "),
+                        text = listOf(m.artist, m.duration.formatDuration()).filter { it.isNotEmpty() }.joinToString(" • "),
                         style = MaterialTheme.typography.listItemSubtitle(),
                     )
                     tags.forEach { tag ->

@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.R
@@ -64,7 +65,7 @@ fun UpdateDialog(viewModel: UpdateViewModel) {
                     Text(text = "Release $newVersion")
                     VerticalSpace(dp = 16.dp)
                     Text(
-                        text = "$newVersionPublishDate ${FormatHelper.formatBytes(newVersionSize)}",
+                        text = "$newVersionPublishDate ${newVersionSize.formatBytes()}",
                         color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.bodyMedium,
                     )

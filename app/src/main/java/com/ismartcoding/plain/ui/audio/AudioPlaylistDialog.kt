@@ -14,6 +14,7 @@ import com.ismartcoding.lib.brv.utils.removeModel
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.preference.AudioPlayingPreference
@@ -161,7 +162,7 @@ class AudioPlaylistDialog : BaseBottomSheetDialog<DialogPlaylistBinding>() {
                     .map { audio ->
                         AudioModel(audio).apply {
                             title = audio.title
-                            subtitle = audio.artist + " " + FormatHelper.formatDuration(audio.duration)
+                            subtitle = audio.artist + " " + audio.duration.formatDuration()
                             isPlaying = isAudioPlaying && currentPath == audio.path
                             swipeEnable = true
                             rightSwipeText = getString(R.string.remove)

@@ -12,6 +12,7 @@ import com.ismartcoding.lib.brv.utils.models
 import com.ismartcoding.lib.brv.utils.setup
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.extensions.dp2px
+import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.lib.isQPlus
@@ -205,7 +206,7 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
             items.map { a ->
                 AudioModel(a).apply {
                     title = a.title
-                    subtitle = a.artist + " " + FormatHelper.formatDuration(a.duration)
+                    subtitle = a.artist + " " + a.duration.formatDuration()
                     this.toggleMode = toggleMode
                     isChecked = checkedItems.any { it.data.id == data.id }
                     isPlaying = isAudioPlaying && currentPath == a.path

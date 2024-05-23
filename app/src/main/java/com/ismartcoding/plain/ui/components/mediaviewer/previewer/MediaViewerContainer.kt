@@ -26,7 +26,7 @@ internal class ViewerContainerState(
     // 转换图层的状态
     var transformState: TransformContentState = TransformContentState(),
     // viewer的状态
-    var mediaViewerState: MediaViewerState = MediaViewerState(),
+    var viewerState: MediaViewerState = MediaViewerState(),
 ) {
 
     // 转换图层transformContent透明度
@@ -35,8 +35,7 @@ internal class ViewerContainerState(
     // viewer容器的透明度
     internal var viewerContainerAlpha = Animatable(1F)
 
-    // 是否允许界面显示loading
-    internal var allowLoading by mutableStateOf(true)
+    internal var showLoading by mutableStateOf(true)
 
     // 打开图片后到加载成功过程的协程任务
     internal var openTransformJob: Deferred<Unit>? = null
@@ -68,7 +67,7 @@ internal class ViewerContainerState(
      * 等待viewer挂载成功
      */
     private suspend fun awaitViewerLoading() {
-        mediaViewerState.mountedFlow.apply {
+        viewerState.mountedFlow.apply {
             withContext(Dispatchers.Default) {
                 takeWhile { !it }.collect()
             }
@@ -113,10 +112,10 @@ internal class ViewerContainerState(
             // 更新itemState，确保itemState一致
             this@apply.itemState = itemState
             // 确保viewer的容器大小与transform的容器大小一致
-            containerSize = mediaViewerState.containerSize
-            val scale = mediaViewerState.scale
-            val offsetX = mediaViewerState.offsetX
-            val offsetY = mediaViewerState.offsetY
+            containerSize = viewerState.containerSize
+            val scale = viewerState.scale
+            val offsetX = viewerState.offsetX
+            val offsetY = viewerState.offsetY
             // 计算transform的实际大小
             val rw = fitSize.width * scale.value
             val rh = fitSize.height * scale.value
@@ -215,7 +214,7 @@ internal fun rememberViewerContainerState(
         ViewerContainerState()
     }
     viewerContainerState.scope = scope
-    viewerContainerState.mediaViewerState = viewerState
+    viewerContainerState.viewerState = viewerState
     viewerContainerState.transformState = transformContentState
     return viewerContainerState
 }
@@ -265,15 +264,17 @@ internal fun MediaViewerContainer(
                 viewer()
             }
             // 判断viewer是否加载成功
-            val viewerMounted by mediaViewerState.mountedFlow.collectAsState(
+            val viewerMounted by viewerState.mountedFlow.collectAsState(
                 initial = false
             )
-            if (allowLoading) AnimatedVisibility(
-                visible = !viewerMounted,
-                enter = placeholder.enterTransition,
-                exit = placeholder.exitTransition,
-            ) {
-                placeholder.content()
+            if (showLoading) {
+                AnimatedVisibility(
+                    visible = !viewerMounted,
+                    enter = placeholder.enterTransition,
+                    exit = placeholder.exitTransition,
+                ) {
+                    placeholder.content()
+                }
             }
         }
     }

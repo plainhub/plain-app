@@ -2,6 +2,9 @@
     <string name="app_name">簡樸</string>
     <string name="vpn_web_conflict_warning">您的手機啟用了VPN，這可能會導致從電腦訪問網頁時出現連接問題。我們建議您調整VPN設置允許區域網路流量或關閉VPN。</string>
     <string name="warning">警告</string>
+    <string name="description">描述</string>
+    <string name="duration">時長</string>
+    <string name="bitrate">比特率</string>
     <string name="flash_fired">已觸發</string>
     <string name="flash_return_light_not_detected">未偵測到閃光燈返回光</string>
     <string name="flash_return_light_detected">偵測到閃光燈返回光</string>

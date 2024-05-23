@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DImage
@@ -162,7 +163,7 @@ fun ImageGridItem(
                     modifier =
                     Modifier
                         .padding(horizontal = 4.dp, vertical = 2.dp),
-                    text = FormatHelper.formatBytes(m.size),
+                    text = m.size.formatBytes(),
                     color = Color.White,
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
                 )

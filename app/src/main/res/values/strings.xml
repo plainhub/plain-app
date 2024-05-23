@@ -2,7 +2,18 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Your VPN is currently enabled on your device, which could potentially lead to web connection issues when accessed from PC. To resolve this, we recommend adjusting your VPN settings to allow LAN traffic or disabling your VPN.</string>
     <string name="warning">Warning</string>
+    <string name="title">Title</string>
+    <string name="pause">Pause</string>
+    <string name="play">Play</string>
+    <string name="change_playback_speed">Change playback speed</string>
+    <string name="toggle_audio">Toggle audio</string>
+    <string name="picture_in_picture">Picture in picture</string>
+    <string name="fullscreen">Fullscreen</string>
+    <string name="video_save_to">Video saved to {{path}}</string>
+    <string name="video_save_to_failed">Failed to save video</string>
     <string name="description">Description</string>
+    <string name="duration">Duration</string>
+    <string name="bitrate">Bitrate</string>
     <string name="flash_fired">Fired</string>
     <string name="flash_return_light_not_detected">Strobe return light not detected</string>
     <string name="flash_return_light_detected">Strobe return light detected</string>
@@ -457,7 +468,7 @@
     <string name="system_permission_granted">System permission granted</string>
     <string name="system_permission_not_granted">System permission not granted</string>
     <string name="open_permission_settings">Open permission settings</string>
-    <string name="api_service_is_running">API service is running</string>
+    <string name="api_service_is_running">Web service is running</string>
     <string name="screen_mirror_service_is_running">Screen mirror service is running</string>
     <string name="cast">Cast</string>
     <string name="images">Images</string>

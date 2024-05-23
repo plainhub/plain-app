@@ -1,9 +1,6 @@
 package com.ismartcoding.plain.ui.components.mediaviewer
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FloatExponentialDecaySpec
-import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.generateDecayAnimationSpec
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.awaitEachGesture
@@ -13,7 +10,6 @@ import androidx.compose.foundation.gestures.calculateCentroidSize
 import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateRotation
 import androidx.compose.foundation.gestures.calculateZoom
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
@@ -22,23 +18,17 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.listSaver
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.input.pointer.util.VelocityTracker
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import com.ismartcoding.lib.extensions.isUrl
@@ -46,14 +36,14 @@ import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.ui.components.mediaviewer.hugeimage.ImageDecoder
 import com.ismartcoding.plain.ui.components.mediaviewer.hugeimage.MediaHugeImage
+import com.ismartcoding.plain.ui.components.mediaviewer.video.MediaVideo
+import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoState
 import com.ismartcoding.plain.ui.preview.PreviewItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.abs
@@ -80,197 +70,9 @@ const val MAX_SCALE_RATE = 3.2F
 // 最小手指手势间距
 const val MIN_GESTURE_FINGER_DISTANCE = 200
 
-/**
- * viewer状态对象，用于记录compose组件状态
- */
-class MediaViewerState(
-    // X轴偏移量
-    offsetX: Float = DEFAULT_OFFSET_X,
-    // Y轴偏移量
-    offsetY: Float = DEFAULT_OFFSET_Y,
-    // 缩放率
-    scale: Float = DEFAULT_SCALE,
-    // 旋转角度
-    rotation: Float = DEFAULT_ROTATION,
-) : CoroutineScope by MainScope() {
-
-    // 默认动画窗格
-    private var defaultAnimateSpec: AnimationSpec<Float> = SpringSpec()
-
-    // x偏移
-    val offsetX = Animatable(offsetX)
-
-    // y偏移
-    val offsetY = Animatable(offsetY)
-
-    // 放大倍率
-    val scale = Animatable(scale)
-
-    // 旋转
-    val rotation = Animatable(rotation)
-
-    // 是否允许手势输入
-    var allowGestureInput by mutableStateOf(true)
-
-    // 默认显示大小
-    var defaultSize by mutableStateOf(IntSize(0, 0))
-        internal set
-
-    // 容器大小
-    internal var containerSize by mutableStateOf(IntSize(0, 0))
-
-    // 最大缩放
-    internal var maxScale by mutableFloatStateOf(1F)
-
-    // 标识是否来自saver，旋转屏幕后会变成true
-    internal var fromSaver = false
-
-    // 恢复的时间戳
-    internal var resetTimeStamp by mutableLongStateOf(0L)
-
-    // 挂载状态
-    internal val mountedFlow = MutableStateFlow(false)
-
-    /**
-     * 判断是否有动画正在运行
-     * @return Boolean
-     */
-    internal fun isRunning(): Boolean {
-        return scale.isRunning
-                || offsetX.isRunning
-                || offsetY.isRunning
-                || rotation.isRunning
-    }
-
-    /**
-     * 立即设置回初始值
-     */
-    suspend fun resetImmediately() {
-        rotation.snapTo(DEFAULT_ROTATION)
-        offsetX.snapTo(DEFAULT_OFFSET_X)
-        offsetY.snapTo(DEFAULT_OFFSET_Y)
-        scale.snapTo(DEFAULT_SCALE)
-    }
-
-    /**
-     * 设置回初始值
-     */
-    suspend fun reset(animationSpec: AnimationSpec<Float> = defaultAnimateSpec) {
-        coroutineScope {
-            launch {
-                rotation.animateTo(DEFAULT_ROTATION, animationSpec)
-                resetTimeStamp = System.currentTimeMillis()
-            }
-            launch {
-                offsetX.animateTo(DEFAULT_OFFSET_X, animationSpec)
-                resetTimeStamp = System.currentTimeMillis()
-            }
-            launch {
-                offsetY.animateTo(DEFAULT_OFFSET_Y, animationSpec)
-                resetTimeStamp = System.currentTimeMillis()
-            }
-            launch {
-                scale.animateTo(DEFAULT_SCALE, animationSpec)
-                resetTimeStamp = System.currentTimeMillis()
-            }
-        }
-    }
-
-    /**
-     * 放大到最大
-     */
-    private suspend fun scaleToMax(
-        offset: Offset,
-        animationSpec: AnimationSpec<Float>? = null
-    ) {
-        val currentAnimateSpec = animationSpec ?: defaultAnimateSpec
-        // 计算x和y偏移量和范围，并确保不会在放大过程中超出范围
-        var bcx = (containerSize.width / 2 - offset.x) * maxScale
-        val boundX = getBound(defaultSize.width.toFloat() * maxScale, containerSize.width.toFloat())
-        bcx = limitToBound(bcx, boundX)
-        var bcy = (containerSize.height / 2 - offset.y) * maxScale
-        val boundY =
-            getBound(defaultSize.height.toFloat() * maxScale, containerSize.height.toFloat())
-        bcy = limitToBound(bcy, boundY)
-        // 启动
-        coroutineScope {
-            launch {
-                scale.animateTo(maxScale, currentAnimateSpec)
-            }
-            launch {
-                offsetX.animateTo(bcx, currentAnimateSpec)
-            }
-            launch {
-                offsetY.animateTo(bcy, currentAnimateSpec)
-            }
-        }
-    }
-
-    /**
-     * 放大或缩小
-     */
-    suspend fun toggleScale(
-        offset: Offset,
-        animationSpec: AnimationSpec<Float> = defaultAnimateSpec
-    ) {
-        // 如果不等于1，就调回1
-        if (scale.value != 1F) {
-            reset(animationSpec)
-        } else {
-            scaleToMax(offset, animationSpec)
-        }
-    }
-
-    /**
-     * 修正offsetX,offsetY的位置
-     */
-    suspend fun fixToBound() {
-        val boundX =
-            getBound(defaultSize.width.toFloat() * scale.value, containerSize.width.toFloat())
-        val boundY =
-            getBound(defaultSize.height.toFloat() * scale.value, containerSize.height.toFloat())
-        val limitX = limitToBound(offsetX.value, boundX)
-        val limitY = limitToBound(offsetY.value, boundY)
-        offsetX.snapTo(limitX)
-        offsetY.snapTo(limitY)
-    }
-
-    companion object {
-        val SAVER: Saver<MediaViewerState, *> = listSaver(save = {
-            listOf(it.offsetX.value, it.offsetY.value, it.scale.value, it.rotation.value)
-        }, restore = {
-            val state = MediaViewerState(
-                offsetX = it[0],
-                offsetY = it[1],
-                scale = it[2],
-                rotation = it[3],
-            )
-            state.fromSaver = true
-            state
-        })
-    }
-}
-
-@Composable
-fun rememberViewerState(
-    // X轴偏移量
-    offsetX: Float = DEFAULT_OFFSET_X,
-    // Y轴偏移量
-    offsetY: Float = DEFAULT_OFFSET_Y,
-    // 缩放率
-    scale: Float = DEFAULT_SCALE,
-    // 旋转
-    rotation: Float = DEFAULT_ROTATION,
-): MediaViewerState = rememberSaveable(saver = MediaViewerState.SAVER) {
-    MediaViewerState(offsetX, offsetY, scale, rotation)
-}
-
-class ViewerGestureScope(
-    // 点击事件
+class GestureScope(
     var onTap: (Offset) -> Unit = {},
-    // 双击事件
-    var onDoubleTap: (Offset) -> Unit = {},
-    // 长按事件
+    var onDoubleTap: (Offset) -> Boolean = { false },
     var onLongPress: (Offset) -> Unit = {},
 )
 
@@ -279,14 +81,13 @@ class ViewerGestureScope(
 fun MediaViewer(
     modifier: Modifier = Modifier,
     pagerState: PagerState,
+    videoState: VideoState,
     page: Int,
     model: Any?,
     state: MediaViewerState = rememberViewerState(),
-    detectGesture: ViewerGestureScope.() -> Unit = {},
+    gesture: GestureScope,
     boundClip: Boolean = true,
 ) {
-    val viewerGestureScope = remember { ViewerGestureScope() }
-    detectGesture.invoke(viewerGestureScope)
     val scope = rememberCoroutineScope()
     // 触摸时中心位置
     var centroid by remember { mutableStateOf(Offset.Zero) }
@@ -334,11 +135,11 @@ fun MediaViewer(
     LaunchedEffect(key1 = state.resetTimeStamp) {
         asyncDesParams()
     }
-    val gesture = remember {
+    val rawGesture = remember {
         RawGesture(
-            onTap = viewerGestureScope.onTap,
-            onDoubleTap = viewerGestureScope.onDoubleTap,
-            onLongPress = viewerGestureScope.onLongPress,
+            onTap = gesture.onTap,
+            onDoubleTap = { gesture.onDoubleTap(it) },
+            onLongPress = gesture.onLongPress,
             gestureStart = {
                 if (state.allowGestureInput) {
                     eventChangeCount = 0
@@ -533,9 +334,6 @@ fun MediaViewer(
         }
     }
     Box(modifier = modifier) {
-        /**
-         * 将挂载信息通知到state
-         */
         val onMounted: () -> Unit = {
             scope.launch {
                 state.mountedFlow.emit(true)
@@ -548,9 +346,10 @@ fun MediaViewer(
                 if (model.path.isVideoFast() && !model.path.isUrl()) {
                     MediaVideo(
                         pagerState = pagerState,
+                        videoState = videoState,
                         page = page,
                         model = model,
-                        gesture = gesture,
+                        gesture = rawGesture,
                         onMounted = onMounted,
                     )
                 } else {
@@ -560,7 +359,7 @@ fun MediaViewer(
                         offsetX = state.offsetX.value,
                         offsetY = state.offsetY.value,
                         rotation = state.rotation.value,
-                        gesture = gesture,
+                        gesture = rawGesture,
                         onSizeChange = sizeChange,
                         onMounted = onMounted,
                         boundClip = boundClip,
@@ -575,7 +374,7 @@ fun MediaViewer(
                     offsetX = state.offsetX.value,
                     offsetY = state.offsetY.value,
                     rotation = state.rotation.value,
-                    gesture = gesture,
+                    gesture = rawGesture,
                     onSizeChange = sizeChange,
                     onMounted = onMounted,
                     boundClip = boundClip,

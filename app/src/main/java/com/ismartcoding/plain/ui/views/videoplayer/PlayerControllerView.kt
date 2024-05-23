@@ -7,6 +7,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.SeekBar
+import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.plain.helpers.FormatHelper
@@ -79,7 +80,7 @@ open class PlayerControllerView
                                 gestureSeekPosition = 0
                             }
 
-                            binding.currentTime.text = FormatHelper.formatDuration(gestureSeekPosition / 1000)
+                            binding.currentTime.text = (gestureSeekPosition / 1000).formatDuration()
                             setSeekbarProgress(gestureSeekPosition, it.getDuration())
                         }
                     }
@@ -149,7 +150,7 @@ open class PlayerControllerView
                             }
                             mMediaPlayer?.let { mp ->
                                 newPosition = mp.getDuration() * progress / seekBar.max
-                                binding.currentTime.text = FormatHelper.formatDuration(newPosition / 1000)
+                                binding.currentTime.text = (newPosition / 1000).formatDuration()
                                 binding.centerPlayPause.run {
                                     if (mp.isInPlaybackState()) {
                                         visibility = View.GONE
@@ -241,12 +242,12 @@ open class PlayerControllerView
 
         override fun updateCurrentPosition(position: Long) {
             super.updateCurrentPosition(position)
-            binding.currentTime.text = FormatHelper.formatDuration(position / 1000)
+            binding.currentTime.text = (position / 1000).formatDuration()
         }
 
         override fun updateDuration(duration: Long) {
             super.updateDuration(duration)
-            binding.totalTime.text = FormatHelper.formatDuration(duration / 1000)
+            binding.totalTime.text = (duration / 1000).formatDuration()
         }
 
         override fun onTouchEvent(event: MotionEvent): Boolean {

@@ -46,7 +46,6 @@ import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PMiniButton
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.components.CastDialog
-import com.ismartcoding.plain.ui.components.mediaviewer.MediaViewerState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.preview.PreviewItem
@@ -56,7 +55,10 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 @Composable
-fun MediaPreviewActions(context: Context, castViewModel: CastViewModel, m: PreviewItem, getViewerState: () -> MediaViewerState?, state: MediaPreviewerState) {
+fun ImagePreviewActions(
+    context: Context, castViewModel: CastViewModel,
+    m: PreviewItem, state: MediaPreviewerState
+) {
     val scope = rememberCoroutineScope()
 
     CastDialog(castViewModel)
@@ -64,7 +66,7 @@ fun MediaPreviewActions(context: Context, castViewModel: CastViewModel, m: Previ
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 48.dp)
+            .padding(horizontal = 16.dp, vertical = 32.dp)
             .alpha(state.uiAlpha.value)
     ) {
         if (!state.showActions) {
@@ -137,7 +139,7 @@ fun MediaPreviewActions(context: Context, castViewModel: CastViewModel, m: Previ
                 contentDescription = stringResource(R.string.rotate),
             ) {
                 scope.launch {
-                    getViewerState()?.let {
+                    state.viewerContainerState?.viewerState?.let {
                         it.rotation.animateTo(it.rotation.value + 90, SpringSpec())
                     }
                 }

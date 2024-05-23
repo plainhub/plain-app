@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.helpers.ShareHelper
@@ -91,7 +92,7 @@ fun OtherFilePage(
                         VerticalSpace(dp = 16.dp)
                         SelectionContainer {
                             Text(
-                                text = stringResource(R.string.file_size) + ": " + FormatHelper.formatBytes(file.length()),
+                                text = stringResource(R.string.file_size) + ": " + file.length().formatBytes(),
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
                                     .padding(horizontal = 32.dp),

@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
+import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.isPdfFile
 import com.ismartcoding.lib.extensions.isTextFile
@@ -46,7 +47,6 @@ fun DocItem(
     viewModel: DocsViewModel,
     m: DFile,
 ) {
-    val context = LocalContext.current
     Row {
         if (viewModel.selectMode.value) {
             HorizontalSpace(dp = 16.dp)
@@ -107,7 +107,7 @@ fun DocItem(
                     )
                     VerticalSpace(dp = 8.dp)
                     Text(
-                        text = FormatHelper.formatBytes(m.size) + ", " + m.updatedAt.formatDateTime(),
+                        text = m.size.formatBytes() + ", " + m.updatedAt.formatDateTime(),
                         style = MaterialTheme.typography.listItemSubtitle(),
                     )
                 }

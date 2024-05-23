@@ -91,7 +91,7 @@
         android:usesCleartextTraffic="true">
         <activity
             android:name=".ui.MainActivity"
-            android:configChanges="uiMode|orientation|screenSize|smallestScreenSize|screenLayout"
+            android:configChanges="uiMode|orientation|screenSize|smallestScreenSize|screenLayout|locale|layoutDirection"
             android:exported="true"
             android:launchMode="singleInstance"
             android:supportsPictureInPicture="true"

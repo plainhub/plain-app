@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.SeekBar
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.receiveEvent
+import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
@@ -76,13 +77,13 @@ class AudioPlayerDialog() : BaseBottomSheetDialog<DialogAudioPlayerBinding>() {
         lifecycleScope.launch {
             binding.seekBar.removeCallbacks(seekBarUpdateRunnable)
             val process = AudioPlayer.playerProgress / 1000
-            binding.process.text = FormatHelper.formatDuration(process)
+            binding.process.text = process.formatDuration()
             val path = withIO { AudioPlayingPreference.getValueAsync(requireContext()) }
             if (path.isNotEmpty()) {
                 val audio = withIO { DPlaylistAudio.fromPath(requireContext(), path) }
                 binding.seekBar.max = audio.duration.toInt()
                 binding.seekBar.progress = process.toInt()
-                binding.duration.text = FormatHelper.formatDuration(audio.duration)
+                binding.duration.text = audio.duration.formatDuration()
                 binding.title.text = audio.title
                 binding.title.isSelected = true // need for marquee
                 binding.artist.text = audio.artist
@@ -135,14 +136,14 @@ class AudioPlayerDialog() : BaseBottomSheetDialog<DialogAudioPlayerBinding>() {
                         s.removeCallbacks(seekBarUpdateRunnable)
                     }
 
-                    binding.process.text = FormatHelper.formatDuration(s.progress.toLong())
+                    binding.process.text = s.progress.toLong().formatDuration()
                 }
 
                 override fun onStartTrackingTouch(s: SeekBar) = Unit
 
                 override fun onStopTrackingTouch(s: SeekBar) {
                     s.removeCallbacks(seekBarUpdateRunnable)
-                    binding.process.text = FormatHelper.formatDuration(s.progress.toLong())
+                    binding.process.text = s.progress.toLong().formatDuration()
                     AudioPlayer.seekTo(s.progress.toLong())
                     s.postDelayed(seekBarUpdateRunnable, seekBarUpdateDelayMillis)
                 }

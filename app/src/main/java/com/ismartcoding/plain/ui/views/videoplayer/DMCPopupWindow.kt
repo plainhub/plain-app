@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.WindowManager
 import android.widget.PopupWindow
 import android.widget.SeekBar
+import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.ViewVideoPlayerDmcBinding
@@ -76,7 +77,7 @@ class DMCPopupWindow(context: Context) : PopupWindow(context) {
                     }
                     if (isSuccess) {
                         newPosition = duration * progress / seekBar.max
-                        viewBinding.tvCurrentTime.text = FormatHelper.formatDuration(newPosition)
+                        viewBinding.tvCurrentTime.text = newPosition.formatDuration()
                     }
                 }
 
@@ -152,9 +153,9 @@ class DMCPopupWindow(context: Context) : PopupWindow(context) {
             if (duration > 0) {
                 viewBinding.seekbar.progress = (currentPosition * viewBinding.seekbar.max / duration).toInt()
             }
-            viewBinding.tvCurrentTime.text = FormatHelper.formatDuration(currentPosition)
+            viewBinding.tvCurrentTime.text = currentPosition.formatDuration()
         }
-        viewBinding.tvTotalTime.text = FormatHelper.formatDuration(duration)
+        viewBinding.tvTotalTime.text = duration.formatDuration()
     }
 
     interface ControlCallback {
