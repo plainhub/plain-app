@@ -311,13 +311,11 @@ fun FeedEntryPage(
                         VerticalSpace(dp = 16.dp)
                     }
                     item {
-
                         MarkdownText(
                             text = viewModel.content.value.ifEmpty { m.description },
                             modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
                             previewerState = previewerState,
                         )
-
                     }
                     if (viewModel.content.value.isEmpty() && topRefreshLayoutState.refreshContentState.value == RefreshContentState.Finished) {
                         item {

@@ -4,6 +4,10 @@ import android.text.method.LinkMovementMethod
 import android.widget.TextView
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.graphics.toArgb
@@ -28,6 +32,7 @@ fun MarkdownText(
 ) {
     val defaultColor = MaterialTheme.colorScheme.onSurface
     val linkTextColor = MaterialTheme.colorScheme.primary
+    var mText by remember { mutableStateOf("") }
 
     AndroidView(
         modifier = modifier,
@@ -43,20 +48,23 @@ fun MarkdownText(
             }
         },
         update = { textView ->
-            with(textView) {
-                applyTextColor(style.color.takeOrElse { defaultColor }.toArgb())
-                applyFontSize(style)
-                applyLineHeight(style)
-                applyLineSpacing(style)
-                applyTextDecoration(style)
+            if (text != mText) {
+                mText = text
+                with(textView) {
+                    applyTextColor(style.color.takeOrElse { defaultColor }.toArgb())
+                    applyFontSize(style)
+                    applyLineHeight(style)
+                    applyLineSpacing(style)
+                    applyTextDecoration(style)
 
-                with(style) {
-                    applyTextAlign(textAlign)
-                    fontStyle?.let { applyFontStyle(it) }
-                    fontWeight?.let { applyFontWeight(it) }
+                    with(style) {
+                        applyTextAlign(textAlign)
+                        fontStyle?.let { applyFontStyle(it) }
+                        fontWeight?.let { applyFontWeight(it) }
+                    }
                 }
+                textView.markdown(text, previewerState)
             }
-            textView.markdown(text, previewerState)
         }
     )
 }
