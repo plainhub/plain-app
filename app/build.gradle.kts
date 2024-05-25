@@ -153,6 +153,7 @@ dependencies {
     implementation(platform(libs.compose.bom))
 
     // https://github.com/google/accompanist/releases
+    implementation(libs.compose.lifecycle.runtime)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.runtime)
     implementation(libs.androidx.ui)

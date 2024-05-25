@@ -7,11 +7,8 @@ import androidx.core.app.NotificationCompat
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.extensions.toDNotification
 import com.ismartcoding.plain.features.CancelNotificationsEvent

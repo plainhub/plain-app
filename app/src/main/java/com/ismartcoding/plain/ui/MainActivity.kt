@@ -89,6 +89,7 @@ import com.ismartcoding.plain.preference.ApiPermissionsPreference
 import com.ismartcoding.plain.preference.KeepScreenOnPreference
 import com.ismartcoding.plain.preference.SettingsProvider
 import com.ismartcoding.plain.preference.SystemScreenTimeoutPreference
+import com.ismartcoding.plain.preference.WebPreference
 import com.ismartcoding.plain.receivers.NetworkStateReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.NotificationListenerMonitorService
@@ -239,7 +240,8 @@ class MainActivity : AppCompatActivity() {
                         showTermsAndPrivacyDialog(this@MainActivity)
                     }
                 } else {
-                    if (TempData.webEnabled) {
+                    val webEnabled = WebPreference.getAsync(this@MainActivity)
+                    if (webEnabled) {
                         viewModel.enableHttpServer(this@MainActivity, true)
                     }
                     PackageHelper.cacheAppLabels()

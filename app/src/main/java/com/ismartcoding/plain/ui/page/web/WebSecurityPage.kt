@@ -41,6 +41,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.preference.AuthTwoFactorPreference
+import com.ismartcoding.plain.preference.KeyStorePasswordPreference
 import com.ismartcoding.plain.preference.LocalAuthTwoFactor
 import com.ismartcoding.plain.preference.LocalPassword
 import com.ismartcoding.plain.preference.LocalPasswordType
@@ -48,6 +49,7 @@ import com.ismartcoding.plain.preference.PasswordPreference
 import com.ismartcoding.plain.preference.PasswordTypePreference
 import com.ismartcoding.plain.preference.UrlTokenPreference
 import com.ismartcoding.plain.preference.WebSettingsProvider
+import com.ismartcoding.plain.preference.rememberPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.ClipboardCard
 import com.ismartcoding.plain.ui.base.PBlockButton
@@ -74,6 +76,7 @@ fun WebSecurityPage(navController: NavHostController) {
         val password = LocalPassword.current
         val authTwoFactor = LocalAuthTwoFactor.current
         var urlToken by remember { mutableStateOf(TempData.urlToken) }
+        val keyStorePassword by rememberPreference(key = KeyStorePasswordPreference.key, defaultValue = KeyStorePasswordPreference.default)
 
         val editPassword = remember { mutableStateOf("") }
         LaunchedEffect(password) {
@@ -166,7 +169,7 @@ fun WebSecurityPage(navController: NavHostController) {
                             stringResource(
                                 id = R.string.https_certificate_signature,
                             ),
-                            HttpServerManager.getSSLSignature(context).joinToString(" ") {
+                            HttpServerManager.getSSLSignature(context, keyStorePassword).joinToString(" ") {
                                 "%02x".format(it).uppercase()
                             },
                         )

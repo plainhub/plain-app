@@ -68,7 +68,7 @@ class HttpServerService : LifecycleService() {
         try {
             HttpServerManager.portsInUse.clear()
             HttpServerManager.httpServerError = ""
-            HttpServerManager.createHttpServer(MainApp.instance).start(wait = false)
+            HttpServerManager.createHttpServerAsync(MainApp.instance).start(wait = false)
         } catch (ex: Exception) {
             ex.printStackTrace()
             LogCat.e(ex.toString())

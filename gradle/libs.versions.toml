@@ -72,6 +72,8 @@ bcpkix-jdk15on = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bc
 bcprov-jdk15on = { module = "org.bouncycastle:bcprov-jdk15on", version.ref = "bcprovJdk15onVersion" }
 exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoplayerVersion" }
 
+
+
 # Coil
 coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
 coil-video = { module = "io.coil-kt.coil3:coil-video", version.ref = "coil" }
@@ -110,6 +112,7 @@ androidx-material3 = { module = "androidx.compose.material3:material3", version.
 androidx-preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtxVersion" }
 androidx-paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "pagingRuntimeKtxVersion" }
 androidx-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
+compose-lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleViewmodelKtxVersion" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
 androidx-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2Version" }

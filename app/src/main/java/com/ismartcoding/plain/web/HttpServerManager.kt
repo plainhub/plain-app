@@ -24,6 +24,7 @@ import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.HttpServerStateChangedEvent
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
+import com.ismartcoding.plain.preference.KeyStorePasswordPreference
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.web.websocket.WebSocketSession
 import io.ktor.client.plugins.websocket.ws
@@ -143,10 +144,10 @@ object HttpServerManager {
         }
     }
 
-    private fun getSSLKeyStore(context: Context): KeyStore {
+    private fun getSSLKeyStore(context: Context, password: String): KeyStore {
         val file = File(context.filesDir, "keystore2.jks")
         if (!file.exists()) {
-            val keyStore = JksHelper.genJksFile(SSL_KEY_ALIAS, TempData.keyStorePassword, Constants.SSL_NAME)
+            val keyStore = JksHelper.genJksFile(SSL_KEY_ALIAS, password, Constants.SSL_NAME)
             val out = FileOutputStream(file)
             keyStore.store(out, null)
             out.close()
@@ -159,8 +160,9 @@ object HttpServerManager {
         }
     }
 
-    fun createHttpServer(context: Context): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
-        val password = TempData.keyStorePassword.toCharArray()
+    suspend fun createHttpServerAsync(context: Context): EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration> {
+        val password = KeyStorePasswordPreference.getAsync(context)
+        val passwordArray = password.toCharArray()
         val httpPort = TempData.httpPort
         val httpsPort = TempData.httpsPort
         val environment = applicationEnvironment {
@@ -175,10 +177,10 @@ object HttpServerManager {
             }
             enableHttp2 = false
             sslConnector(
-                keyStore = getSSLKeyStore(context),
+                keyStore = getSSLKeyStore(context, password),
                 keyAlias = SSL_KEY_ALIAS,
-                keyStorePassword = { password },
-                privateKeyPassword = { password },
+                keyStorePassword = { passwordArray },
+                privateKeyPassword = { passwordArray },
             ) {
                 port = httpsPort
             }
@@ -188,15 +190,15 @@ object HttpServerManager {
         }, HttpModule.module)
     }
 
-    fun getSSLSignature(context: Context): ByteArray {
-        val keystore = getSSLKeyStore(context)
+    fun getSSLSignature(context: Context, password: String): ByteArray {
+        val keystore = getSSLKeyStore(context, password)
         val cert = keystore.getCertificate(SSL_KEY_ALIAS) as X509Certificate
         return cert.signature
     }
 
     fun clientTsInterval() {
         val duration = 5000L
-        Timer().scheduleAtFixedRate(
+        Timer().schedule(
             timerTask {
                 val now = System.currentTimeMillis()
                 val updates =

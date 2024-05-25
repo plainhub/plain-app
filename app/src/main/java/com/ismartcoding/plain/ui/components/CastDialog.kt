@@ -91,7 +91,8 @@ fun CastDialog(viewModel: CastViewModel) {
                             viewModel.selectDevice(m)
                             viewModel.enterCastMode()
                             scope.launch(Dispatchers.IO) {
-                                if (!TempData.webEnabled) {
+                                val webEnabled = WebPreference.getAsync(context)
+                                if (!webEnabled) {
                                     WebPreference.putAsync(context, true)
                                     sendEvent(StartHttpServerEvent())
                                 }

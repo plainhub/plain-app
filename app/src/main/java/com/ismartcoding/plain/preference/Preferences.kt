@@ -341,10 +341,10 @@ object KeyStorePasswordPreference : BasePreference<String>() {
         context: Context,
         preferences: Preferences,
     ) {
-        TempData.keyStorePassword = get(preferences)
-        if (TempData.keyStorePassword.isEmpty()) {
-            TempData.keyStorePassword = StringHelper.shortUUID()
-            putAsync(context, TempData.keyStorePassword)
+        var password = get(preferences)
+        if (password.isEmpty()) {
+            password = StringHelper.shortUUID()
+            putAsync(context, password)
         }
     }
 }
