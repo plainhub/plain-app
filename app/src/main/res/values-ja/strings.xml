@@ -2,6 +2,15 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">お使いのデバイスでは現在VPNが有効になっており、PCからアクセスした際にWeb接続の問題が発生する可能性があります。これを解決するために、LANトラフィックを許可するようにVPNの設定を調整するか、VPNを無効にすることをお勧めします。</string>
     <string name="warning">警告</string>
+    <string name="title">タイトル</string>
+    <string name="pause">一時停止</string>
+    <string name="play">再生</string>
+    <string name="change_playback_speed">再生速度を変更</string>
+    <string name="toggle_audio">オーディオの切り替え</string>
+    <string name="picture_in_picture">ピクチャーインピクチャー</string>
+    <string name="fullscreen">フルスクリーン</string>
+    <string name="video_save_to">{{path}} にビデオが保存されました</string>
+    <string name="video_save_to_failed">ビデオの保存に失敗しました</string>
     <string name="description">説明</string>
     <string name="duration">期間</string>
     <string name="bitrate">ビットレート</string>

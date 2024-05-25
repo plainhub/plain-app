@@ -2,6 +2,15 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">আপনার ডিভাইসে সক্রিয় ভিপিএন আছে, যা একটি পিসি থেকে অ্যাক্সেস করার সময় ওয়েব সংযোগের সমস্যা উত্পন্ন করতে পারে। এটি সমাধান করতে, আমরা আপনাকে আপনার ভিপিএন সেটিংস পরিবর্তন করে এলএএন ট্র্যাফিক অনুমতি দেওয়া বা আপনার ভিপিএন নিষ্ক্রিয় করতে প্রস্তাবনা দিচ্ছি।</string>
     <string name="warning">সতর্কবার্তা</string>
+    <string name="title">শিরোনাম</string>
+    <string name="pause">বিরতি</string>
+    <string name="play">চলার সুযোগ</string>
+    <string name="change_playback_speed">প্লেব্যাক গতি পরিবর্তন করুন</string>
+    <string name="toggle_audio">অডিও টগল করুন</string>
+    <string name="picture_in_picture">চিত্র অনুমুক্ত</string>
+    <string name="fullscreen">পূর্ণ পর্দা</string>
+    <string name="video_save_to">{{পাথ}} এ ভিডিও সংরক্ষিত হয়েছে</string>
+    <string name="video_save_to_failed">ভিডিও সংরক্ষণ করা ব্যর্থ হয়েছে</string>
     <string name="description">বিবরণ</string>
     <string name="duration">সময়কাল</string>
     <string name="bitrate">বিটরেট</string>

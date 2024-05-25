@@ -2,6 +2,15 @@
     <string name="app_name">簡樸</string>
     <string name="vpn_web_conflict_warning">您的手機啟用了VPN，這可能會導致從電腦訪問網頁時出現連接問題。我們建議您調整VPN設置允許區域網路流量或關閉VPN。</string>
     <string name="warning">警告</string>
+    <string name="title">標題</string>
+    <string name="pause">暫停</string>
+    <string name="play">播放</string>
+    <string name="change_playback_speed">更改播放速度</string>
+    <string name="toggle_audio">切換音頻</string>
+    <string name="picture_in_picture">畫中畫</string>
+    <string name="fullscreen">全螢幕</string>
+    <string name="video_save_to">影片已儲存在{{path}}</string>
+    <string name="video_save_to_failed">無法儲存影片</string>
     <string name="description">描述</string>
     <string name="duration">時長</string>
     <string name="bitrate">比特率</string>

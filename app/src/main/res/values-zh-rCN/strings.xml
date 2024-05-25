@@ -2,6 +2,15 @@
     <string name="app_name">简朴</string>
     <string name="vpn_web_conflict_warning">您的手机启用了VPN，这可能会导致从电脑访问网页时出现连接问题。我们建议您调整VPN设置允许局域网流量或关闭VPN。</string>
     <string name="warning">警告</string>
+    <string name="title">标题</string>
+    <string name="pause">暂停</string>
+    <string name="play">播放</string>
+    <string name="change_playback_speed">更改播放速度</string>
+    <string name="toggle_audio">切换音频</string>
+    <string name="picture_in_picture">画中画</string>
+    <string name="fullscreen">全屏</string>
+    <string name="video_save_to">视频已保存到{{path}}</string>
+    <string name="video_save_to_failed">保存视频失败</string>
     <string name="description">描述</string>
     <string name="duration">时长</string>
     <string name="bitrate">比特率</string>
