@@ -36,7 +36,6 @@ import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.capitalize
 import com.ismartcoding.lib.extensions.dp2px
-import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.getSystemScreenTimeout
 import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.extensions.parcelableArrayList
@@ -49,7 +48,6 @@ import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageText

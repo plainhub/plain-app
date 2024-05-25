@@ -8,6 +8,7 @@ import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.OpenWith
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -21,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.getMimeType
+import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.db.DTag
@@ -111,6 +113,15 @@ fun ViewVideoBottomSheet(
                             viewModel.showRenameDialog.value = true
                         }
                     )
+                    if (!m.path.isUrl()) {
+                        PIconTextActionButton(
+                            icon = Icons.Outlined.OpenWith,
+                            text = LocaleHelper.getString(R.string.open_with),
+                            click = {
+                                ShareHelper.openPathWith(context, m.path)
+                            }
+                        )
+                    }
                     PIconTextActionButton(
                         icon = Icons.Outlined.DeleteForever,
                         text = LocaleHelper.getString(R.string.delete),

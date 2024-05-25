@@ -24,9 +24,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.getNavigationBarHeight
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
@@ -43,6 +45,7 @@ fun ChatInput(
     onValueChange: (String) -> Unit = {},
 ) {
     var hasFocus by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     Column(modifier = Modifier.fillMaxWidth()) {
         OutlinedTextField(
             value = value,
@@ -100,7 +103,7 @@ fun ChatInput(
                 }
             }
         } else {
-            VerticalSpace(dp = 16.dp)
+            VerticalSpace(dp = context.getNavigationBarHeight().dp)
         }
     }
 }

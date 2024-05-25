@@ -233,7 +233,7 @@ fun FeedEntryPage(
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)
             .imePadding(),
-        content = {
+        content = { paddingValues ->
             val m = viewModel.item.value ?: return@PScaffold
             PullToRefresh(
                 refreshLayoutState = topRefreshLayoutState,
@@ -259,7 +259,8 @@ fun FeedEntryPage(
                 },
             ) {
                 LazyColumn(
-                    Modifier.fillMaxSize(),
+                    Modifier
+                        .fillMaxSize(),
                     state = scrollState,
                 ) {
                     item {
@@ -362,7 +363,7 @@ fun FeedEntryPage(
                     }
 
                     item {
-                        BottomSpace()
+                        BottomSpace(paddingValues)
                     }
                 }
             }

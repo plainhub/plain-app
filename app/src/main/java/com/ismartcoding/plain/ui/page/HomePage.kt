@@ -174,7 +174,7 @@ fun HomePage(
                 }
             }
         },
-    ) {
+    ) { paddingValues ->
         LazyColumn {
             item {
                 TopSpace()
@@ -240,7 +240,7 @@ fun HomePage(
                 HomeFeatures(navController, itemWidth)
             }
             item {
-                BottomSpace()
+                BottomSpace(paddingValues)
             }
         }
     }

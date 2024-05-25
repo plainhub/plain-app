@@ -273,6 +273,14 @@ fun Context.isGestureInteractionMode(): Boolean {
     return resources.getInteger(resourceId) == 2
 }
 
+fun Context.getNavigationBarHeight(): Int {
+    return if (isGestureInteractionMode()) {
+        return 16
+    } else {
+        return 48
+    }
+}
+
 val Context.actionBarSize
     get() =
         theme.obtainStyledAttributes(intArrayOf(android.R.attr.actionBarSize))
