@@ -8,6 +8,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.saveable
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.FeedEntryFilterType
 import com.ismartcoding.plain.db.DFeedEntry
@@ -15,6 +16,7 @@ import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.file.DFile
+import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,11 +37,12 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
     var noMore = mutableStateOf(false)
     var filterType by savedStateHandle.saveable { mutableStateOf(FeedEntryFilterType.DEFAULT) }
     var total = mutableIntStateOf(0)
-    var totalToday = mutableIntStateOf(0)
+    private var totalToday = mutableIntStateOf(0)
     var tag = mutableStateOf<DTag?>(null)
     var feedId = mutableStateOf<String>("")
     val dataType = DataType.FEED_ENTRY
     var selectedItem = mutableStateOf<DFeedEntry?>(null)
+    var tabs = mutableStateOf(listOf<VTabData>())
 
     override val showSearchBar = mutableStateOf(false)
     override val searchActive = mutableStateOf(false)
@@ -65,6 +68,11 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
         total.value = FeedEntryHelper.count(getTotalAllQuery())
         totalToday.value = FeedEntryHelper.count(getTotalTodayQuery())
         noMore.value = _itemsFlow.value.size < limit.value
+        tabs.value = listOf(
+            VTabData(LocaleHelper.getString(R.string.all), "all", total.value),
+            VTabData(LocaleHelper.getString(R.string.today), "today", totalToday.value),
+            * tagsViewModel.itemsFlow.value.map { VTabData(it.name, it.id, it.count) }.toTypedArray()
+        )
         showLoading.value = false
     }
 

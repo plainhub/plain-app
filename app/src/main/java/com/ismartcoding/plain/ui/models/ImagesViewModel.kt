@@ -9,12 +9,14 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,6 +44,7 @@ class ImagesViewModel(private val savedStateHandle: SavedStateHandle) :
     val sortBy = mutableStateOf(FileSortBy.DATE_DESC)
     val showRenameDialog = mutableStateOf(false)
     val showSortDialog = mutableStateOf(false)
+    var tabs = mutableStateOf(listOf<VTabData>())
 
     override val showSearchBar = mutableStateOf(false)
     override val searchActive = mutableStateOf(false)
@@ -62,6 +65,10 @@ class ImagesViewModel(private val savedStateHandle: SavedStateHandle) :
         tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
         total.value = ImageMediaStoreHelper.count(context, getTotalQuery())
         noMore.value = _itemsFlow.value.size < limit.value
+        tabs.value = listOf(
+            VTabData(LocaleHelper.getString(R.string.all), "all", total.value),
+            * tagsViewModel.itemsFlow.value.map { VTabData(it.name, it.id, it.count) }.toTypedArray()
+        )
         showLoading.value = false
     }
 

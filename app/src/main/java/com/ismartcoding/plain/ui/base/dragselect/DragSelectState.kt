@@ -23,7 +23,23 @@ public fun rememberDragSelectState(
     return remember(lazyGridState) {
         DragSelectState(
             initialSelection = initialSelection,
-            gridState = lazyGridState,
+            gridState = { lazyGridState },
+            dragState = dragState,
+        )
+    }
+}
+
+@Composable
+public fun rememberDragSelectState(
+    lazyGridState: () -> LazyGridState?,
+    initialSelection: List<String> = emptyList(),
+): DragSelectState {
+    val dragState = rememberSaveable(saver = DragState.Saver) { DragState() }
+
+    return remember(lazyGridState) {
+        DragSelectState(
+            initialSelection = initialSelection,
+            gridState = { lazyGridState() },
             dragState = dragState,
         )
     }
@@ -33,7 +49,7 @@ public fun rememberDragSelectState(
 @Stable
 class DragSelectState(
     initialSelection: List<String>,
-    val gridState: LazyGridState,
+    val gridState: () -> LazyGridState?,
     var dragState: DragState,
 ) {
     var selectedIds: List<String> by mutableStateOf(initialSelection)

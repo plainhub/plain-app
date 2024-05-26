@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.features.file
 
+import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.data.IData
 import kotlinx.datetime.Instant
 
@@ -17,6 +18,7 @@ data class DFile(
     override var id: String
         get() = path
         set(value) {
-            path = value
         }
+
+    val extension: String by lazy { path.getFilenameExtension() }
 }

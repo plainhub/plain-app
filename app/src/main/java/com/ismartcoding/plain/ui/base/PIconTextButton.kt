@@ -77,7 +77,7 @@ fun PIconTextActionButton(
             text = text,
             style = MaterialTheme.typography.labelMedium,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp),
         )
     }
 }

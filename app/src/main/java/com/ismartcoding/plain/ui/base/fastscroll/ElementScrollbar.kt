@@ -24,9 +24,6 @@ internal fun <IndicatorValue> ElementScrollbar(
     val layoutSettings = remember(settings) {
         ScrollbarLayoutSettings(
             scrollbarPadding = settings.scrollbarPadding,
-            thumbShape = settings.thumbShape,
-            thumbThickness = settings.thumbThickness,
-            side = settings.side,
             selectionActionable = settings.selectionActionable,
             hideEasingAnimation = settings.hideEasingAnimation,
             hideDisplacement = settings.hideDisplacement,

@@ -9,17 +9,18 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +34,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -88,6 +90,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
+import com.ismartcoding.plain.ui.base.tabs.PScrollableTabRow
 import com.ismartcoding.plain.ui.components.CastDialog
 import com.ismartcoding.plain.ui.components.FileSortDialog
 import com.ismartcoding.plain.ui.components.ImageGridItem
@@ -98,8 +101,8 @@ import com.ismartcoding.plain.ui.extensions.navigateMediaFolders
 import com.ismartcoding.plain.ui.extensions.navigateTags
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.CastViewModel
-import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
+import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSearchMode
@@ -121,9 +124,8 @@ fun ImagesPage(
     val view = LocalView.current
     val window = (view.context as Activity).window
     val itemsState by viewModel.itemsFlow.collectAsState()
-    val bucketsState by bucketViewModel.itemsFlow.collectAsState()
     val configuration = LocalConfiguration.current
-
+    val bucketsState by bucketViewModel.itemsFlow.collectAsState()
     val bucketsMap = remember(bucketsState) {
         derivedStateOf {
             bucketsState.associateBy { it.id }
@@ -134,20 +136,25 @@ fun ImagesPage(
     val tagsState by tagsViewModel.itemsFlow.collectAsState()
     val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
     val scope = rememberCoroutineScope()
-    val filtersScrollState = rememberScrollState()
     var hasPermission by remember {
         mutableStateOf(AppFeatureType.FILES.hasPermission(context))
     }
 
-    val gridState = rememberLazyGridState()
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { gridState.firstVisibleItemIndex > 0 })
+    val scrollStateMap = remember {
+        mutableStateMapOf<Int, LazyGridState>()
+    }
+    val pagerState = rememberPagerState(pageCount = { viewModel.tabs.value.size })
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
+        (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0
+    })
+    var isFirstTime by remember { mutableStateOf(true) }
 
     var cellsPerRow by remember { mutableIntStateOf(ImageGridCellsPerRowPreference.default) }
     val density = LocalDensity.current
     val imageWidthPx = remember(cellsPerRow) {
         density.run { ((configuration.screenWidthDp.dp - ((cellsPerRow - 1) * 2).dp) / cellsPerRow).toPx().toInt() }
     }
-    val dragSelectState = rememberDragSelectState(lazyGridState = gridState)
+    val dragSelectState = rememberDragSelectState({ scrollStateMap[pagerState.currentPage] })
     var showCellsPerRowDialog by remember { mutableStateOf(false) }
 
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
@@ -207,6 +214,29 @@ fun ImagesPage(
             insetsController.show(WindowInsetsCompat.Type.navigationBars())
             events.forEach { it.cancel() }
             events.clear()
+        }
+    }
+
+    LaunchedEffect(pagerState.currentPage) {
+        if (isFirstTime) {
+            isFirstTime = false
+            return@LaunchedEffect
+        }
+        val tab = viewModel.tabs.value.getOrNull(pagerState.currentPage) ?: return@LaunchedEffect
+        if (tab.value == "all") {
+            viewModel.trash.value = false
+            viewModel.tag.value = null
+        } else {
+            val tag = tagsState.find { it.id == tab.value }
+            viewModel.trash.value = false
+            viewModel.tag.value = tag
+        }
+        scope.launch {
+            scrollBehavior.reset()
+            scrollStateMap[pagerState.currentPage]?.scrollToItem(0)
+        }
+        scope.launch(Dispatchers.IO) {
+            viewModel.loadAsync(context, tagsViewModel)
         }
     }
 
@@ -277,7 +307,7 @@ fun ImagesPage(
             PTopAppBar(
                 modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = {
                     scope.launch {
-                        gridState.scrollToItem(0)
+                        scrollStateMap[pagerState.currentPage]?.scrollToItem(0)
                     }
                 }),
                 navController = navController,
@@ -367,131 +397,108 @@ fun ImagesPage(
         }
 
         if (!dragSelectState.selectMode) {
-            Row(
+            PScrollableTabRow(
+                selectedTabIndex = pagerState.currentPage,
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .horizontalScroll(filtersScrollState),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    .fillMaxWidth()
             ) {
-                PFilterChip(
-                    selected = !viewModel.trash.value && viewModel.tag.value == null,
-                    onClick = {
-                        viewModel.trash.value = false
-                        viewModel.tag.value = null
-                        scope.launch {
-                            scrollBehavior.reset()
-                            gridState.scrollToItem(0)
-                        }
-                        scope.launch(Dispatchers.IO) {
-                            viewModel.loadAsync(context, tagsViewModel)
-                        }
-                    },
-                    label = { Text(stringResource(id = R.string.all) + " (${viewModel.total.value})") }
-                )
-//                PFilterChip(
-//                    selected = viewModel.trash.value,
-//                    onClick = {
-//                        viewModel.trash.value = true
-//                        viewModel.tag.value = null
-//                scope.launch {
-//                    scrollBehavior.reset()
-//                    gridState.scrollToItem(0)
-//                }
-//                        scope.launch(Dispatchers.IO) {
-//                            viewModel.loadAsync(context, tagsViewModel)
-//                        }
-//                    },
-//                    label = { Text(stringResource(id = R.string.trash) + " (${viewModel.totalTrash.value})") }
-//                )
-                tagsState.forEach { tag ->
+                viewModel.tabs.value.forEachIndexed { index, s ->
                     PFilterChip(
-                        selected = viewModel.tag.value?.id == tag.id,
+                        modifier = Modifier.padding(start = if (index == 0) 0.dp else 8.dp),
+                        selected = pagerState.currentPage == index,
                         onClick = {
-                            viewModel.trash.value = false
-                            viewModel.tag.value = tag
                             scope.launch {
-                                scrollBehavior.reset()
-                                gridState.scrollToItem(0)
-                            }
-                            scope.launch(Dispatchers.IO) {
-                                viewModel.loadAsync(context, tagsViewModel)
+                                pagerState.scrollToPage(index)
                             }
                         },
-                        label = { Text(if (viewModel.bucketId.value.isNotEmpty() || viewModel.queryText.value.isNotEmpty()) tag.name else "${tag.name} (${tag.count})") }
+                        label = {
+                            if (index == 0) {
+                                Text(text = s.title + " (" + s.count + ")")
+                            } else {
+                                Text(if (viewModel.bucketId.value.isNotEmpty() || viewModel.queryText.value.isNotEmpty()) s.title else "${s.title} (${s.count})")
+                            }
+                        }
                     )
                 }
             }
         }
-
-        PullToRefresh(
-            refreshLayoutState = topRefreshLayoutState,
-        ) {
-            AnimatedVisibility(
-                visible = true,
-                enter = fadeIn(),
-                exit = fadeOut()
+        if (pagerState.pageCount == 0) {
+            NoDataColumn(loading = viewModel.showLoading.value, search = viewModel.showSearchBar.value)
+            return@PScaffold
+        }
+        HorizontalPager(state = pagerState) { index ->
+            PullToRefresh(
+                refreshLayoutState = topRefreshLayoutState,
             ) {
-                if (itemsState.isNotEmpty()) {
-                    LazyVerticalGridScrollbar(
-                        state = gridState,
-                    ) {
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(cellsPerRow),
-                            state = gridState,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .gridDragSelect(
-                                    items = itemsState,
-                                    state = dragSelectState,
-                                ),
-                            horizontalArrangement = Arrangement.spacedBy(2.dp),
-                            verticalArrangement = Arrangement.spacedBy(2.dp),
+                AnimatedVisibility(
+                    visible = true,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    if (itemsState.isNotEmpty()) {
+                        val scrollState = rememberLazyGridState()
+                        scrollStateMap[index] = scrollState
+                        LazyVerticalGridScrollbar(
+                            state = scrollState,
                         ) {
-                            items(itemsState,
-                                key = {
-                                    it.id
-                                },
-                                contentType = {
-                                    "image"
-                                },
-                                span = {
-                                    GridItemSpan(1)
-                                }) { m ->
-                                ImageGridItem(
-                                    modifier = Modifier
-                                        .animateItemPlacement(),
-                                    viewModel,
-                                    castViewModel,
-                                    m,
-                                    showSize = cellsPerRow < 6,
-                                    previewerState,
-                                    dragSelectState,
-                                    imageWidthPx,
-                                )
-                            }
-                            item(
-                                span = { GridItemSpan(maxLineSpan) },
-                                key = "loadMore"
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(cellsPerRow),
+                                state = scrollState,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .gridDragSelect(
+                                        items = itemsState,
+                                        state = dragSelectState,
+                                    ),
+                                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                                verticalArrangement = Arrangement.spacedBy(2.dp),
                             ) {
-                                if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
-                                    LaunchedEffect(Unit) {
-                                        scope.launch(Dispatchers.IO) {
-                                            withIO { viewModel.moreAsync(context, tagsViewModel) }
+                                items(itemsState,
+                                    key = {
+                                        it.id
+                                    },
+                                    contentType = {
+                                        "image"
+                                    },
+                                    span = {
+                                        GridItemSpan(1)
+                                    }) { m ->
+                                    ImageGridItem(
+                                        modifier = Modifier
+                                            .animateItemPlacement(),
+                                        viewModel,
+                                        castViewModel,
+                                        m,
+                                        showSize = cellsPerRow < 6,
+                                        previewerState,
+                                        dragSelectState,
+                                        imageWidthPx,
+                                    )
+                                }
+                                item(
+                                    span = { GridItemSpan(maxLineSpan) },
+                                    key = "loadMore"
+                                ) {
+                                    if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
+                                        LaunchedEffect(Unit) {
+                                            scope.launch(Dispatchers.IO) {
+                                                withIO { viewModel.moreAsync(context, tagsViewModel) }
+                                            }
                                         }
                                     }
+                                    LoadMoreRefreshContent(viewModel.noMore.value)
                                 }
-                                LoadMoreRefreshContent(viewModel.noMore.value)
-                            }
-                            item(
-                                span = { GridItemSpan(maxLineSpan) },
-                                key = "bottomSpace"
-                            ) {
-                                BottomSpace()
+                                item(
+                                    span = { GridItemSpan(maxLineSpan) },
+                                    key = "bottomSpace"
+                                ) {
+                                    BottomSpace()
+                                }
                             }
                         }
+                    } else {
+                        NoDataColumn(loading = viewModel.showLoading.value, search = viewModel.showSearchBar.value)
                     }
-                } else {
-                    NoDataColumn(loading = viewModel.showLoading.value, search = viewModel.showSearchBar.value)
                 }
             }
         }

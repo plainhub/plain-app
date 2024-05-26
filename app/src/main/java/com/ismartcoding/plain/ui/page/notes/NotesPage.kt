@@ -9,18 +9,15 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.animateTo
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,11 +30,14 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
@@ -50,7 +50,6 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.DragAnchors
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
@@ -61,9 +60,7 @@ import com.ismartcoding.plain.ui.base.PDropdownMenuItemTags
 import com.ismartcoding.plain.ui.base.PFilterChip
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
-import com.ismartcoding.plain.ui.base.PSwipeBox
 import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.ui.base.SwipeActionButton
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
@@ -71,6 +68,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
+import com.ismartcoding.plain.ui.base.tabs.PScrollableTabRow
 import com.ismartcoding.plain.ui.components.ListSearchBar
 import com.ismartcoding.plain.ui.components.NoteListItem
 import com.ismartcoding.plain.ui.extensions.navigateTags
@@ -102,9 +100,14 @@ fun NotesPage(
     val tagsState by tagsViewModel.itemsFlow.collectAsState()
     val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
     val scope = rememberCoroutineScope()
-    val filtersScrollState = rememberScrollState()
-    val scrollState = rememberLazyListState()
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { scrollState.firstVisibleItemIndex > 0 })
+    val scrollStateMap = remember {
+        mutableStateMapOf<Int, LazyListState>()
+    }
+    val pagerState = rememberPagerState(pageCount = { viewModel.tabs.value.size })
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
+        (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0
+    })
+    var isFirstTime by remember { mutableStateOf(true) }
 
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
@@ -129,6 +132,36 @@ fun NotesPage(
             insetsController.hide(WindowInsetsCompat.Type.navigationBars())
         } else {
             insetsController.show(WindowInsetsCompat.Type.navigationBars())
+        }
+    }
+
+    LaunchedEffect(pagerState.currentPage) {
+        if (isFirstTime) {
+            isFirstTime = false
+            return@LaunchedEffect
+        }
+        when (val index = pagerState.currentPage) {
+            0 -> {
+                viewModel.trash.value = false
+                viewModel.tag.value = null
+            }
+
+            1 -> {
+                viewModel.trash.value = true
+                viewModel.tag.value = null
+            }
+
+            else -> {
+                viewModel.trash.value = false
+                viewModel.tag.value = tagsState.getOrNull(index - 2)
+            }
+        }
+        scope.launch {
+            scrollBehavior.reset()
+            scrollStateMap[pagerState.currentPage]?.scrollToItem(0)
+        }
+        scope.launch(Dispatchers.IO) {
+            viewModel.loadAsync(tagsViewModel)
         }
     }
 
@@ -186,7 +219,7 @@ fun NotesPage(
             PTopAppBar(
                 modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = {
                     scope.launch {
-                        scrollState.scrollToItem(0)
+                        scrollStateMap[pagerState.currentPage]?.scrollToItem(0)
                     }
                 }),
                 navController = navController,
@@ -256,134 +289,59 @@ fun NotesPage(
         },
     ) {
         if (!viewModel.selectMode.value) {
-            Row(
+            PScrollableTabRow(
+                selectedTabIndex = pagerState.currentPage,
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .horizontalScroll(filtersScrollState),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    .fillMaxWidth()
             ) {
-                PFilterChip(
-                    selected = !viewModel.trash.value && viewModel.tag.value == null,
-                    onClick = {
-                        viewModel.trash.value = false
-                        viewModel.tag.value = null
-                        scope.launch {
-                            scrollBehavior.reset()
-                            scrollState.scrollToItem(0)
-                        }
-                        scope.launch(Dispatchers.IO) {
-                            viewModel.loadAsync(tagsViewModel)
-                        }
-                    },
-                    label = { Text(stringResource(id = R.string.all) + " (${viewModel.total.value})") }
-                )
-                PFilterChip(
-                    selected = viewModel.trash.value,
-                    onClick = {
-                        viewModel.trash.value = true
-                        viewModel.tag.value = null
-                        scope.launch {
-                            scrollBehavior.reset()
-                            scrollState.scrollToItem(0)
-                        }
-                        scope.launch(Dispatchers.IO) {
-                            viewModel.loadAsync(tagsViewModel)
-                        }
-                    },
-                    label = { Text(stringResource(id = R.string.trash) + " (${viewModel.totalTrash.value})") }
-                )
-                tagsState.forEach { tag ->
+                viewModel.tabs.value.forEachIndexed { index, s ->
                     PFilterChip(
-                        selected = viewModel.tag.value?.id == tag.id,
+                        modifier = Modifier.padding(start = if (index == 0) 0.dp else 8.dp),
+                        selected = pagerState.currentPage == index,
                         onClick = {
-                            viewModel.trash.value = false
-                            viewModel.tag.value = tag
                             scope.launch {
-                                scrollBehavior.reset()
-                                scrollState.scrollToItem(0)
-                            }
-                            scope.launch(Dispatchers.IO) {
-                                viewModel.loadAsync(tagsViewModel)
+                                pagerState.scrollToPage(index)
                             }
                         },
-                        label = { Text(if (viewModel.queryText.value.isNotEmpty()) tag.name else "${tag.name} (${tag.count})") }
+                        label = {
+                            if (index < 2) {
+                                Text(text = s.title + " (" + s.count + ")")
+                            } else {
+                                Text(if (viewModel.queryText.value.isNotEmpty()) s.title else "${s.title} (${s.count})")
+                            }
+                        }
                     )
                 }
             }
         }
 
-        PullToRefresh(
-            refreshLayoutState = topRefreshLayoutState,
-        ) {
-            AnimatedVisibility(
-                visible = true,
-                enter = fadeIn(),
-                exit = fadeOut()
+        HorizontalPager(state = pagerState) { index ->
+            PullToRefresh(
+                refreshLayoutState = topRefreshLayoutState,
             ) {
-                if (itemsState.isNotEmpty()) {
-                    LazyColumnScrollbar(
-                        state = scrollState,
-                    ) {
-                        LazyColumn(
-                            Modifier
-                                .fillMaxSize()
-                                .nestedScroll(scrollBehavior.nestedScrollConnection),
+                AnimatedVisibility(
+                    visible = true,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    if (itemsState.isNotEmpty()) {
+                        val scrollState = rememberLazyListState()
+                        scrollStateMap[index] = scrollState
+                        LazyColumnScrollbar(
                             state = scrollState,
                         ) {
-                            item {
-                                TopSpace()
-                            }
-                            items(itemsState, key = {
-                                it.id
-                            }) { m ->
-                                PSwipeBox(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .wrapContentHeight(),
-                                    enabled = !viewModel.selectMode.value,
-                                    startContent = if (viewModel.trash.value) {
-                                        { state ->
-                                            HorizontalSpace(dp = 32.dp)
-                                            SwipeActionButton(
-                                                text = stringResource(R.string.restore),
-                                                color = colorResource(id = R.color.blue),
-                                                onClick = {
-                                                    scope.launch {
-                                                        state.animateTo(DragAnchors.Center)
-                                                    }
-                                                    val ids = setOf(m.id)
-                                                    viewModel.untrash(ids)
-                                                })
-                                        }
-                                    } else null,
-                                    endContent = { state ->
-                                        if (viewModel.trash.value) {
-                                            SwipeActionButton(
-                                                text = stringResource(R.string.delete),
-                                                color = colorResource(id = R.color.red),
-                                                onClick = {
-                                                    scope.launch {
-                                                        state.animateTo(DragAnchors.Center)
-                                                    }
-                                                    val ids = setOf(m.id)
-                                                    viewModel.delete(ids)
-                                                })
-                                        } else {
-                                            SwipeActionButton(
-                                                text = stringResource(R.string.move_to_trash),
-                                                color = colorResource(id = R.color.red),
-                                                onClick = {
-                                                    scope.launch {
-                                                        state.animateTo(DragAnchors.Center)
-                                                    }
-                                                    val ids = setOf(m.id)
-                                                    viewModel.trash(ids)
-                                                })
-                                        }
-
-                                        HorizontalSpace(dp = 32.dp)
-                                    }
-                                ) {
+                            LazyColumn(
+                                Modifier
+                                    .fillMaxSize()
+                                    .nestedScroll(scrollBehavior.nestedScrollConnection),
+                                state = scrollState,
+                            ) {
+                                item {
+                                    TopSpace()
+                                }
+                                items(itemsState, key = {
+                                    it.id
+                                }) { m ->
                                     val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
                                     NoteListItem(
                                         viewModel,
@@ -404,24 +362,24 @@ fun NotesPage(
                                             viewModel.selectedItem.value = m
                                         }
                                     )
+                                    VerticalSpace(dp = 8.dp)
                                 }
-                                VerticalSpace(dp = 8.dp)
-                            }
-                            item {
-                                if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
-                                    LaunchedEffect(Unit) {
-                                        scope.launch(Dispatchers.IO) {
-                                            withIO { viewModel.moreAsync(tagsViewModel) }
+                                item {
+                                    if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
+                                        LaunchedEffect(Unit) {
+                                            scope.launch(Dispatchers.IO) {
+                                                withIO { viewModel.moreAsync(tagsViewModel) }
+                                            }
                                         }
                                     }
+                                    LoadMoreRefreshContent(viewModel.noMore.value)
+                                    BottomSpace()
                                 }
-                                LoadMoreRefreshContent(viewModel.noMore.value)
-                                BottomSpace()
                             }
                         }
+                    } else {
+                        NoDataColumn(loading = viewModel.showLoading.value, search = viewModel.showSearchBar.value)
                     }
-                } else {
-                    NoDataColumn(loading = viewModel.showLoading.value, search = viewModel.showSearchBar.value)
                 }
             }
         }

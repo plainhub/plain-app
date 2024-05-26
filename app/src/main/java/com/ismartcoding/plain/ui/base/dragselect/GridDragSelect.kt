@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.base.dragselect
 
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.runtime.LaunchedEffect
@@ -32,7 +31,7 @@ fun Modifier.gridDragSelect(
             if (state.autoScrollSpeed.value == 0f) return@LaunchedEffect
 
             while (isActive) {
-                state.gridState.scrollBy(state.autoScrollSpeed.value)
+                state.gridState()?.scrollBy(state.autoScrollSpeed.value)
                 delay(10)
             }
         }
@@ -48,7 +47,7 @@ fun Modifier.gridDragSelect(
     pointerInput(Unit) {
         detectDragGestures(
             onDragStart = { offset ->
-                state.gridState.itemIndexAtPosition(offset)?.let { startIndex ->
+                state.gridState()?.itemIndexAtPosition(offset)?.let { startIndex ->
                     val item = items.getOrNull(startIndex)
                     if (item != null) {
                         haptics?.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -60,6 +59,7 @@ fun Modifier.gridDragSelect(
             onDragEnd = state::stopDrag,
             onDrag = { change, _ ->
                 state.whenDragging { dragState ->
+                    val gridState = gridState() ?: return@whenDragging
                     autoScrollSpeed.value = gridState.calculateScrollSpeed(change, scrollThreshold)
 
                     val itemPosition = gridState.getItemPosition(change.position)

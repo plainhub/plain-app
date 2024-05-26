@@ -12,10 +12,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.FileType
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.FileMediaStoreHelper
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -39,6 +41,8 @@ class DocsViewModel(private val savedStateHandle: SavedStateHandle) :
     val selectedItem = mutableStateOf<DFile?>(null)
     val showRenameDialog = mutableStateOf(false)
     val showSortDialog = mutableStateOf(false)
+    val fileType = mutableStateOf("")
+    var tabs = mutableStateOf(listOf<VTabData>())
 
     override val showSearchBar = mutableStateOf(false)
     override val searchActive = mutableStateOf(false)
@@ -61,9 +65,14 @@ class DocsViewModel(private val savedStateHandle: SavedStateHandle) :
         val query = getQuery()
         offset.value = 0
         val items = FileMediaStoreHelper.getAllByFileType(context, MediaStore.VOLUME_EXTERNAL_PRIMARY, FileType.DOCUMENT, sortBy.value)
-        _itemsFlow.value = items.filter { query.isEmpty() || it.name.contains(query) }.take(limit.value).toMutableStateList()
+            .filter { query.isEmpty() || it.name.contains(query) }
+        _itemsFlow.value = items.take(limit.value).toMutableStateList()
         total.value = items.size
         noMore.value = _itemsFlow.value.size < limit.value
+        val extensions = items
+            .groupBy { it.extension }.map { VTabData(it.key.uppercase(), it.key, it.value.size) }
+            .sortedBy { it.title }
+        tabs.value = listOf(VTabData(getString(R.string.all), "", total.value), *extensions.toTypedArray())
         showLoading.value = false
     }
 

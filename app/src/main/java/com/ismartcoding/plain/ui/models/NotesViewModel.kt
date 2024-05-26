@@ -7,11 +7,13 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.TagHelper
+import com.ismartcoding.plain.features.locale.LocaleHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,10 +30,11 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
     var noMore = mutableStateOf(false)
     var trash = mutableStateOf(false)
     var total = mutableIntStateOf(0)
-    var totalTrash = mutableIntStateOf(0)
+    private var totalTrash = mutableIntStateOf(0)
     var tag = mutableStateOf<DTag?>(null)
     val dataType = DataType.NOTE
     var selectedItem = mutableStateOf<DNote?>(null)
+    var tabs = mutableStateOf(listOf<VTabData>())
 
     override val showSearchBar = mutableStateOf(false)
     override val searchActive = mutableStateOf(false)
@@ -61,6 +64,11 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
         total.value = NoteHelper.count(getTotalQuery())
         totalTrash.value = NoteHelper.count(getTrashQuery())
         noMore.value = _itemsFlow.value.size < limit.value
+        tabs.value = listOf(
+            VTabData(LocaleHelper.getString(R.string.all), "all", total.value),
+            VTabData(LocaleHelper.getString(R.string.trash), "trash", totalTrash.value),
+            * tagsViewModel.itemsFlow.value.map { VTabData(it.name, it.id, it.count) }.toTypedArray()
+        )
         showLoading.value = false
     }
 

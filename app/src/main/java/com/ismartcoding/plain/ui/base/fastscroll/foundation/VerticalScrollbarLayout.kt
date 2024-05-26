@@ -3,6 +3,8 @@ package com.ismartcoding.plain.ui.base.fastscroll.foundation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -47,7 +49,8 @@ internal fun VerticalScrollbarLayout(
                             bottomStartPercent = 100
                         )
                     )
-                    .padding(vertical = 2.dp).run { if (state.activeDraggableModifier.value) then(draggableModifier) else this },
+                    .padding(vertical = 2.dp)
+                    .run { if (state.activeDraggableModifier.value) then(draggableModifier) else this },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -86,7 +89,7 @@ internal fun VerticalScrollbarLayout(
                 val hideDisplacementPx = state.hideDisplacement.value.roundToPx()
 
                 placeableThumb.placeRelative(
-                    x = constraints.maxWidth - placeableThumb.width + hideDisplacementPx,
+                    x = constraints.maxWidth - placeableThumb.width + hideDisplacementPx + 8.dp.roundToPx(),
                     y = offset
                 )
 
