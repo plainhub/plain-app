@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.extensions
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
 import android.view.GestureDetector
@@ -17,7 +16,6 @@ import com.ismartcoding.lib.markdown.AppImageSchemeHandler
 import com.ismartcoding.lib.markdown.FontTagHandler
 import com.ismartcoding.lib.markdown.NetworkSchemeHandler
 import com.ismartcoding.lib.markdown.image.ImagesPlugin
-import com.ismartcoding.plain.ui.base.coil.newImageLoader
 import com.ismartcoding.plain.ui.base.markdowntext.CoilImagesPlugin
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.helpers.WebHelper
@@ -101,7 +99,7 @@ fun TextView.setDoubleCLick(click: () -> Unit) {
 fun TextView.markdown(content: String, previewerState: MediaPreviewerState) {
     this.movementMethod = LinkMovementMethod.getInstance()
     val markdown = Markwon.builder(context)
-        .usePlugin(CoilImagesPlugin.create(context, context.imageLoader))
+        .usePlugin(CoilImagesPlugin(context))
         .usePlugin(
             ImagesPlugin.create { plugin ->
                 plugin.addSchemeHandler(AppImageSchemeHandler(context))
@@ -143,7 +141,7 @@ fun TextView.markdown(content: String, previewerState: MediaPreviewerState) {
                             ImageProps.DESTINATION.require(props),
                         ) { _, link ->
                             coMain {
-                                val links = extractImageLinksFromHtml(convertMarkdownToHtml(content)).map { PreviewItem(it, Uri.EMPTY, it.getFinalPath(context)) }
+                                val links = extractImageLinksFromHtml(convertMarkdownToHtml(content)).map { PreviewItem(it, it.getFinalPath(context)) }
                                 MediaPreviewData.items = links
                                 previewerState.open(index = links.indexOfFirst { it.id == link })
                             }

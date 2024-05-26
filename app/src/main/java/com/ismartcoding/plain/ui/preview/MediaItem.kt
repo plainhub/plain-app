@@ -1,9 +1,6 @@
 package com.ismartcoding.plain.ui.preview
 
-import android.content.Context
-import android.net.Uri
 import androidx.compose.ui.unit.IntSize
-import com.ismartcoding.lib.extensions.getFileName
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.plain.data.DImage
@@ -15,7 +12,6 @@ import com.ismartcoding.plain.helpers.VideoHelper
 
 data class PreviewItem(
     val id: String,
-    val uri: Uri,
     var path: String = "",
     var size: Long = 0L,
     val mediaId: String = "",
@@ -67,18 +63,18 @@ data class PreviewItem(
             } else {
                 val w = meta.width
                 val h = meta.height
-                if (rotation == 90 || rotation == 270) {
-                    intrinsicSize = IntSize(h, w)
+                intrinsicSize = if (rotation == 90 || rotation == 270) {
+                    IntSize(h, w)
                 } else {
-                    intrinsicSize = IntSize(w, h)
+                    IntSize(w, h)
                 }
             }
         }
     }
 
-    fun itemType(context: Context): Int {
+    fun itemType(): Int {
         return when {
-            uri.getFileName(context).isVideoFast() -> ItemType.VIDEO
+            path.isVideoFast() -> ItemType.VIDEO
             else -> ItemType.IMAGE
         }
     }

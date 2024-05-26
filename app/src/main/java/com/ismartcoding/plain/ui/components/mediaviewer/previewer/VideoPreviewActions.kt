@@ -58,6 +58,7 @@ import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.video.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.DownloadHelper
@@ -171,28 +172,30 @@ fun VideoPreviewActions(
                 ) {
                     castViewModel.showCastDialog.value = true
                 }
-                HorizontalSpace(dp = 20.dp)
-                ActionIconButton(
-                    icon = Icons.Rounded.SaveAlt,
-                    contentDescription = stringResource(R.string.save),
-                ) {
-                    scope.launch {
-                        if (m.path.isUrl()) {
-                            DialogHelper.showLoading()
-                            val dir = PathHelper.getPlainPublicDir(Environment.DIRECTORY_MOVIES)
-                            val r = withIO { DownloadHelper.downloadAsync(m.path, dir.absolutePath) }
-                            DialogHelper.hideLoading()
-                            if (r.success) {
-                                DialogHelper.showMessage(LocaleHelper.getStringF(R.string.video_save_to, "path", r.path))
+                if (m.data !is DVideo) {
+                    HorizontalSpace(dp = 20.dp)
+                    ActionIconButton(
+                        icon = Icons.Rounded.SaveAlt,
+                        contentDescription = stringResource(R.string.save),
+                    ) {
+                        scope.launch {
+                            if (m.path.isUrl()) {
+                                DialogHelper.showLoading()
+                                val dir = PathHelper.getPlainPublicDir(Environment.DIRECTORY_MOVIES)
+                                val r = withIO { DownloadHelper.downloadAsync(m.path, dir.absolutePath) }
+                                DialogHelper.hideLoading()
+                                if (r.success) {
+                                    DialogHelper.showMessage(LocaleHelper.getStringF(R.string.video_save_to, "path", r.path))
+                                } else {
+                                    DialogHelper.showMessage(r.message)
+                                }
                             } else {
-                                DialogHelper.showMessage(r.message)
-                            }
-                        } else {
-                            val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_MOVIES) }
-                            if (r.isNotEmpty()) {
-                                DialogHelper.showMessage(LocaleHelper.getStringF(R.string.video_save_to, "path", r))
-                            } else {
-                                DialogHelper.showMessage(LocaleHelper.getString(R.string.video_save_to_failed))
+                                val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_MOVIES) }
+                                if (r.isNotEmpty()) {
+                                    DialogHelper.showMessage(LocaleHelper.getStringF(R.string.video_save_to, "path", r))
+                                } else {
+                                    DialogHelper.showMessage(LocaleHelper.getString(R.string.video_save_to_failed))
+                                }
                             }
                         }
                     }

@@ -36,6 +36,8 @@ import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.DImage
+import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.features.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.DownloadHelper
@@ -144,40 +146,42 @@ fun ImagePreviewActions(
                     }
                 }
             }
-            HorizontalSpace(dp = 20.dp)
-            ActionIconButton(
-                icon = Icons.Rounded.SaveAlt,
-                contentDescription = stringResource(R.string.save),
-            ) {
-                scope.launch {
-                    if (m.path.isUrl()) {
-                        DialogHelper.showLoading()
-                        val cachedPath = context.imageLoader
-                            .diskCache?.openSnapshot(m.path)?.data
-                        if (cachedPath != null) {
-                            val r = withIO { FileHelper.copyFileToPublicDir(cachedPath.toString(), Environment.DIRECTORY_PICTURES, newName = m.path.getFilenameFromPath()) }
+            if (m.data !is DImage) {
+                HorizontalSpace(dp = 20.dp)
+                ActionIconButton(
+                    icon = Icons.Rounded.SaveAlt,
+                    contentDescription = stringResource(R.string.save),
+                ) {
+                    scope.launch {
+                        if (m.path.isUrl()) {
+                            DialogHelper.showLoading()
+                            val cachedPath = context.imageLoader
+                                .diskCache?.openSnapshot(m.path)?.data
+                            if (cachedPath != null) {
+                                val r = withIO { FileHelper.copyFileToPublicDir(cachedPath.toString(), Environment.DIRECTORY_PICTURES, newName = m.path.getFilenameFromPath()) }
+                                DialogHelper.hideLoading()
+                                if (r.isNotEmpty()) {
+                                    DialogHelper.showMessage(LocaleHelper.getStringF(R.string.image_save_to, "path", r))
+                                } else {
+                                    DialogHelper.showMessage(LocaleHelper.getString(R.string.image_save_to_failed))
+                                }
+                                return@launch
+                            }
+                            val dir = PathHelper.getPlainPublicDir(Environment.DIRECTORY_PICTURES)
+                            val r = withIO { DownloadHelper.downloadAsync(m.path, dir.absolutePath) }
                             DialogHelper.hideLoading()
+                            if (r.success) {
+                                DialogHelper.showMessage(LocaleHelper.getStringF(R.string.image_save_to, "path", r.path))
+                            } else {
+                                DialogHelper.showMessage(r.message)
+                            }
+                        } else {
+                            val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_PICTURES) }
                             if (r.isNotEmpty()) {
                                 DialogHelper.showMessage(LocaleHelper.getStringF(R.string.image_save_to, "path", r))
                             } else {
                                 DialogHelper.showMessage(LocaleHelper.getString(R.string.image_save_to_failed))
                             }
-                            return@launch
-                        }
-                        val dir = PathHelper.getPlainPublicDir(Environment.DIRECTORY_PICTURES)
-                        val r = withIO { DownloadHelper.downloadAsync(m.path, dir.absolutePath) }
-                        DialogHelper.hideLoading()
-                        if (r.success) {
-                            DialogHelper.showMessage(LocaleHelper.getStringF(R.string.image_save_to, "path", r.path))
-                        } else {
-                            DialogHelper.showMessage(r.message)
-                        }
-                    } else {
-                        val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_PICTURES) }
-                        if (r.isNotEmpty()) {
-                            DialogHelper.showMessage(LocaleHelper.getStringF(R.string.image_save_to, "path", r))
-                        } else {
-                            DialogHelper.showMessage(LocaleHelper.getString(R.string.image_save_to_failed))
                         }
                     }
                 }

@@ -6,7 +6,6 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.ui.preview.viewholders.*
 
 class PreviewAdapter(var key: String) : PagingDataAdapter<PreviewItem, RecyclerView.ViewHolder>(diff) {
@@ -38,7 +37,7 @@ class PreviewAdapter(var key: String) : PagingDataAdapter<PreviewItem, RecyclerV
         }
     }
 
-    override fun getItemViewType(position: Int) = getItem(position)?.itemType(MainApp.instance) ?: ItemType.UNKNOWN
+    override fun getItemViewType(position: Int) = getItem(position)?.itemType() ?: ItemType.UNKNOWN
 }
 
 private val diff =

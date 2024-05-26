@@ -15,7 +15,6 @@ import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.plain.databinding.ItemImageviewerSubsamplingBinding
 import com.ismartcoding.plain.helpers.FileHelper
@@ -40,7 +39,7 @@ class SubsamplingViewHolder(
         val holder = this
         binding.download.setSafeClick {
             coMain {
-                val r = withIO { if (item.path.isNotEmpty()) FileHelper.copyFileToDownloads(item.path) else FileHelper.copyFileToDownloads(binding.download.context, item.uri) }
+                val r = withIO { FileHelper.copyFileToDownloads(item.path) }
                 if (r.isNotEmpty()) {
                     DialogHelper.showMessage("Downloaded to $r")
                 } else {
@@ -60,7 +59,7 @@ class SubsamplingViewHolder(
             initTag(item, holder)
             orientation = SubsamplingScaleImageView.ORIENTATION_USE_EXIF
             coMain {
-                val path = item.uri.toString()
+                val path = item.path
                 if (path.startsWith("http://", true) || path.startsWith("https://", true)) {
                     showLoadingJob?.cancel()
                     showLoadingJob = coIO {
@@ -96,12 +95,12 @@ class SubsamplingViewHolder(
                     setImage(ImageSource.uri(path.getFinalPath(context)))
                 } else {
                     if (isSPlus()) {
-                        setImage(ImageSource.uri(item.uri.toString()))
+                        setImage(ImageSource.uri(item.path))
                     } else { // could be slow on poor performance devices
                         coIO {
                             delay(200)
                             coMain {
-                                setImage(ImageSource.uri(item.uri.toString()))
+                                setImage(ImageSource.uri(item.path))
                             }
                         }
                     }

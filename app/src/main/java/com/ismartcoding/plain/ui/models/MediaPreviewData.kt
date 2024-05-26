@@ -16,7 +16,6 @@ import com.ismartcoding.plain.ui.preview.PreviewItem
 
 object MediaPreviewData {
     var items = listOf<PreviewItem>()
-    var index = 0
 
     fun setDataAsync(
         context: Context,
@@ -33,7 +32,7 @@ object MediaPreviewData {
             }
         }
         items = newItems.map { f ->
-            PreviewItem(f.id, Uri.EMPTY, f.uri.getFinalPath(context), f.size, data = f)
+            PreviewItem(f.id, f.uri.getFinalPath(context), f.size, data = f)
         }
         items.find { it.id == m.id }?.let {
             it.initAsync(m)
@@ -47,7 +46,7 @@ object MediaPreviewData {
         m: DImage
     ) {
         MediaPreviewData.items = items.map { f ->
-            PreviewItem(f.id, Uri.EMPTY, f.path, f.size, mediaId = f.id, data = f)
+            PreviewItem(f.id, f.path, f.size, mediaId = f.id, data = f)
         }
         MediaPreviewData.items.find { it.id == m.id }?.let {
             it.initAsync(m)
@@ -61,7 +60,7 @@ object MediaPreviewData {
         m: DVideo
     ) {
         MediaPreviewData.items = items.map { f ->
-            PreviewItem(f.id, Uri.EMPTY, f.path, f.size, mediaId = f.id, data = f)
+            PreviewItem(f.id, f.path, f.size, mediaId = f.id, data = f)
         }
         MediaPreviewData.items.find { it.id == m.id }?.let {
             it.initAsync(m)

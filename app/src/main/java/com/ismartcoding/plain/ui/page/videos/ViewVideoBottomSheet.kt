@@ -106,13 +106,6 @@ fun ViewVideoBottomSheet(
                             onDismiss()
                         }
                     )
-                    PIconTextActionButton(
-                        icon = Icons.Outlined.Edit,
-                        text = LocaleHelper.getString(R.string.rename),
-                        click = {
-                            viewModel.showRenameDialog.value = true
-                        }
-                    )
                     if (!m.path.isUrl()) {
                         PIconTextActionButton(
                             icon = Icons.Outlined.OpenWith,
@@ -122,6 +115,13 @@ fun ViewVideoBottomSheet(
                             }
                         )
                     }
+                    PIconTextActionButton(
+                        icon = Icons.Outlined.Edit,
+                        text = LocaleHelper.getString(R.string.rename),
+                        click = {
+                            viewModel.showRenameDialog.value = true
+                        }
+                    )
                     PIconTextActionButton(
                         icon = Icons.Outlined.DeleteForever,
                         text = LocaleHelper.getString(R.string.delete),

@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.getFileName
-import com.ismartcoding.lib.helpers.CoroutinesHelper
+import com.ismartcoding.lib.extensions.getFilenameWithoutExtensionFromPath
+import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.media.VideoModel
@@ -33,16 +33,16 @@ class VideoViewHolder(
         _item = item
         binding.videoView.initTag(item, this)
         binding.imageView.visibility = View.GONE
-        Glide.with(binding.imageView).load(item.uri)
+        Glide.with(binding.imageView).load(item.path)
             .placeholder(binding.imageView.drawable)
             .into(binding.imageView)
-        binding.videoView.binding.title.text = _item.uri.getFileName(MainApp.instance)
+        binding.videoView.binding.title.text = _item.path.getFilenameWithoutExtensionFromPath()
         binding.videoView.binding.ivCast.setSafeClick {
-            sendEvent(ViewerShowCastListEvent(item.uri.path ?: ""))
+            sendEvent(ViewerShowCastListEvent(item.path))
         }
         binding.videoView.binding.download.setSafeClick {
             coMain {
-                val r = withIO { if (item.path.isNotEmpty()) FileHelper.copyFileToDownloads(item.path) else FileHelper.copyFileToDownloads(binding.videoView.context, item.uri) }
+                val r = withIO { FileHelper.copyFileToDownloads(item.path) }
                 if (r.isNotEmpty()) {
                     DialogHelper.showMessage("Downloaded to $r")
                 } else {
@@ -63,7 +63,7 @@ class VideoViewHolder(
     fun resume() {
         // surrounded with coMain to fix the bug that it only shows loading in some case.
         coMain {
-            player.setMediaSource(MainApp.instance, VideoModel(_item.uri))
+            player.setMediaSource(MainApp.instance, VideoModel(_item.path.pathToUri()))
             binding.videoView.bindMediaPlayer(player)
             binding.videoView.play()
         }

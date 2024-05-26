@@ -150,7 +150,7 @@ class FilesDialog(val fileType: FilesType = FilesType.INTERNAL_STORAGE) : BaseDi
                         items =
                         items.filter { !it.data.isDir && (it.data.path.isVideoFast() || it.data.path.isImageFast()) }.map { s ->
                             val path = s.data.path
-                            PreviewItem(path, path.pathToUri(), path)
+                            PreviewItem(path, path)
                         },
                         initKey = m.data.path,
                     )
