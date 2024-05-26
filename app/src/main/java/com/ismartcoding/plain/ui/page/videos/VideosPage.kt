@@ -9,9 +9,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,7 +21,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -299,7 +296,6 @@ fun VideosPage(
     CastDialog(castViewModel)
 
     PScaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             if (viewModel.showSearchBar.value) {
                 ListSearchBar(
@@ -453,6 +449,7 @@ fun VideosPage(
                                 state = scrollState,
                                 modifier = Modifier
                                     .fillMaxSize()
+                                    .nestedScroll(scrollBehavior.nestedScrollConnection)
                                     .gridDragSelect(
                                         items = itemsState,
                                         state = dragSelectState,

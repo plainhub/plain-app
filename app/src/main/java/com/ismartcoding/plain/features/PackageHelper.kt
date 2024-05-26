@@ -90,7 +90,14 @@ object PackageHelper {
             }.sorted(sortBy).drop(offset).take(limit)
         }
 
-        return apps.map { getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES)) }.filter {
+        return apps.map {
+            try {
+                getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES))
+            } catch (ex: Exception) {
+                LogCat.d(ex.toString())
+                getPackage(it.appInfo, PackageInfo())
+            }
+        }.filter {
             text.isEmpty()
                     || it.id.contains(text, true)
                     || it.name.contains(text, true)

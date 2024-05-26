@@ -295,7 +295,6 @@ fun ImagesPage(
     CastDialog(castViewModel)
 
     PScaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             if (viewModel.showSearchBar.value) {
                 ListSearchBar(
@@ -446,6 +445,7 @@ fun ImagesPage(
                                 state = scrollState,
                                 modifier = Modifier
                                     .fillMaxSize()
+                                    .nestedScroll(scrollBehavior.nestedScrollConnection)
                                     .gridDragSelect(
                                         items = itemsState,
                                         state = dragSelectState,
