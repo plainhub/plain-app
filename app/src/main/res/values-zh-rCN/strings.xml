@@ -168,7 +168,6 @@
     <string name="launch">启动</string>
     <string name="uninstall">卸载</string>
     <string name="view_in_settings">在设置中查看</string>
-    <string name="paths_directories">路径和目录</string>
     <string name="source_directory">源目录</string>
     <string name="data_directory">数据目录</string>
     <string name="more_info">更多信息</string>

@@ -242,10 +242,6 @@ fun AppPage(
                 }
                 item {
                     VerticalSpace(dp = 16.dp)
-                    Subtitle(
-                        text = stringResource(R.string.paths_directories),
-                    )
-
                     PCard {
                         PListItem(
                             title = stringResource(R.string.source_directory),

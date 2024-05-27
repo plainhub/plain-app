@@ -6,7 +6,8 @@ import android.net.Uri
 // https://developer.android.com/training/data-storage/shared/photopicker
 object FilePickHelper {
     fun getPickFileIntent(multiple: Boolean): Intent {
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, multiple)
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)

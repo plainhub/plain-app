@@ -168,7 +168,6 @@
     <string name="launch">চালাও</string>
     <string name="uninstall">আনইনস্টল</string>
     <string name="view_in_settings">সেটিংসে দেখুন</string>
-    <string name="paths_directories">পাথ এবং ডিরেক্টরিস</string>
     <string name="source_directory">উৎস ডিরেক্টরি</string>
     <string name="data_directory">ডেটা ডিরেক্টরি</string>
     <string name="more_info">আরও তথ্য</string>

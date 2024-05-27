@@ -168,7 +168,6 @@
     <string name="launch">Launch</string>
     <string name="uninstall">Uninstall</string>
     <string name="view_in_settings">View in settings</string>
-    <string name="paths_directories">Paths &amp; Directories</string>
     <string name="source_directory">Source directory</string>
     <string name="data_directory">Data directory</string>
     <string name="more_info">More info</string>

@@ -55,12 +55,14 @@ fun MediaVideo(
         addListener(
             object : Player.Listener {
                 override fun onEvents(player: Player, events: Player.Events) {
-                    videoState.totalTime = player.duration.coerceAtLeast(0L)
-                    videoState.isPlaying = player.isPlaying
-                    if (!videoState.isSeeking) {
-                        videoState.updateTime()
+                    scope.launch {
+                        videoState.totalTime = player.duration.coerceAtLeast(0L)
+                        videoState.isPlaying = player.isPlaying
+                        if (!videoState.isSeeking) {
+                            videoState.updateTime()
+                        }
+                        defaultPlayerView.keepScreenOn = player.isPlaying
                     }
-                    defaultPlayerView.keepScreenOn = player.isPlaying
                 }
             }
         )

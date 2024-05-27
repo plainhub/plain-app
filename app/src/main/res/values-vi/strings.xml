@@ -168,7 +168,6 @@
     <string name="launch">Khởi chạy</string>
     <string name="uninstall">Gỡ cài đặt</string>
     <string name="view_in_settings">Xem trong cài đặt</string>
-    <string name="paths_directories">Đường dẫn &amp; Thư mục</string>
     <string name="source_directory">Thư mục nguồn</string>
     <string name="data_directory">Thư mục dữ liệu</string>
     <string name="more_info">Thông tin thêm</string>

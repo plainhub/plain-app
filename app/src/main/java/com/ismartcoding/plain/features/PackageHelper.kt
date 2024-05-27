@@ -44,42 +44,53 @@ object PackageHelper {
     }
 
     fun search(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DPackage> {
-        var type = ""
-        var text = ""
-        var ids = setOf<String>()
-        if (query.isNotEmpty()) {
-            val queryGroups = SearchHelper.parse(query)
-            var t = queryGroups.find { it.name == "type" }
-            if (t != null) {
-                type = t.value
-            }
-            t = queryGroups.find { it.name == "text" }
-            if (t != null) {
-                text = t.value
-            }
-            t = queryGroups.find { it.name == "ids" }
-            if (t != null) {
-                ids = t.value.split(",").toSet()
-            }
-        }
-
-        val apps = mutableListOf<DPackageStub>()
-        val appInfos = packageManager.getInstalledApplications(0)
-        appInfos.forEach { appInfo ->
-            if (ids.isNotEmpty() && !ids.contains(appInfo.packageName)) {
-                return@forEach
-            }
-
-            if (type.isNotEmpty()) {
-                val appType = getAppType(appInfo)
-                if (appType != type) {
-                    return@forEach
+        try {
+            var type = ""
+            var text = ""
+            var ids = setOf<String>()
+            if (query.isNotEmpty()) {
+                val queryGroups = SearchHelper.parse(query)
+                var t = queryGroups.find { it.name == "type" }
+                if (t != null) {
+                    type = t.value
+                }
+                t = queryGroups.find { it.name == "text" }
+                if (t != null) {
+                    text = t.value
+                }
+                t = queryGroups.find { it.name == "ids" }
+                if (t != null) {
+                    ids = t.value.split(",").toSet()
                 }
             }
-            apps.add(DPackageStub(appInfo, appInfo.packageName, getLabel(appInfo)))
-        }
 
-        if (query.isEmpty() || text.isEmpty()) {
+            val apps = mutableListOf<DPackageStub>()
+            val appInfos = packageManager.getInstalledApplications(0)
+            appInfos.forEach { appInfo ->
+                if (ids.isNotEmpty() && !ids.contains(appInfo.packageName)) {
+                    return@forEach
+                }
+
+                if (type.isNotEmpty()) {
+                    val appType = getAppType(appInfo)
+                    if (appType != type) {
+                        return@forEach
+                    }
+                }
+                apps.add(DPackageStub(appInfo, appInfo.packageName, getLabel(appInfo)))
+            }
+
+            if (query.isEmpty() || text.isEmpty()) {
+                return apps.map {
+                    try {
+                        getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES))
+                    } catch (ex: Exception) {
+                        LogCat.d(ex.toString())
+                        getPackage(it.appInfo, PackageInfo())
+                    }
+                }.sorted(sortBy).drop(offset).take(limit)
+            }
+
             return apps.map {
                 try {
                     getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES))
@@ -87,25 +98,19 @@ object PackageHelper {
                     LogCat.d(ex.toString())
                     getPackage(it.appInfo, PackageInfo())
                 }
-            }.sorted(sortBy).drop(offset).take(limit)
+            }.filter {
+                text.isEmpty()
+                        || it.id.contains(text, true)
+                        || it.name.contains(text, true)
+                        || it.certs.any { c ->
+                    c.issuer.contains(text, true)
+                            || c.subject.contains(text, true)
+                }
+            }.sorted(sortBy).drop(offset).take(limit).toList()
+        } catch (ex: Exception) {
+            LogCat.d(ex.toString())
+            return emptyList()
         }
-
-        return apps.map {
-            try {
-                getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES))
-            } catch (ex: Exception) {
-                LogCat.d(ex.toString())
-                getPackage(it.appInfo, PackageInfo())
-            }
-        }.filter {
-            text.isEmpty()
-                    || it.id.contains(text, true)
-                    || it.name.contains(text, true)
-                    || it.certs.any { c ->
-                c.issuer.contains(text, true)
-                        || c.subject.contains(text, true)
-            }
-        }.sorted(sortBy).drop(offset).take(limit).toList()
     }
 
     private fun getAppType(appInfo: ApplicationInfo): String {

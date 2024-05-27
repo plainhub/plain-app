@@ -90,13 +90,18 @@ fun VideoPreviewActions(
     context: Context, castViewModel: CastViewModel, m: PreviewItem,
     state: MediaPreviewerState
 ) {
+    val videoState = state.videoState
+    if (!state.showActions || videoState.enablePip || videoState.isFullscreenMode) {
+        return
+    }
     val scope = rememberCoroutineScope()
     CastDialog(castViewModel)
-    val videoState = state.videoState
 
     LaunchedEffect(Unit) {
         while (true) {
-            state.videoState.updateTime()
+            scope.launch {
+                state.videoState.updateTime()
+            }
             delay(1.seconds)
         }
     }
@@ -107,9 +112,6 @@ fun VideoPreviewActions(
             .padding(horizontal = 16.dp, vertical = 32.dp)
             .alpha(state.uiAlpha.value)
     ) {
-        if (!state.showActions || videoState.enablePip || videoState.isFullscreenMode) {
-            return
-        }
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)

@@ -168,7 +168,6 @@
     <string name="launch">Запустить</string>
     <string name="uninstall">Удалить</string>
     <string name="view_in_settings">Посмотреть в настройках</string>
-    <string name="paths_directories">Пути и каталоги</string>
     <string name="source_directory">Исходный каталог</string>
     <string name="data_directory">Каталог данных</string>
     <string name="more_info">Дополнительная информация</string>

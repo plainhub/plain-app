@@ -168,7 +168,6 @@
     <string name="launch">Starten</string>
     <string name="uninstall">Deinstallieren</string>
     <string name="view_in_settings">In den Einstellungen anzeigen</string>
-    <string name="paths_directories">Pfade und Verzeichnisse</string>
     <string name="source_directory">Quellverzeichnis</string>
     <string name="data_directory">Datenverzeichnis</string>
     <string name="more_info">Mehr Infos</string>

@@ -168,7 +168,6 @@
     <string name="launch">起動</string>
     <string name="uninstall">アンインストール</string>
     <string name="view_in_settings">設定で表示</string>
-    <string name="paths_directories">パスとディレクトリ</string>
     <string name="source_directory">ソースディレクトリ</string>
     <string name="data_directory">データディレクトリ</string>
     <string name="more_info">詳細</string>

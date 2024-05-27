@@ -168,7 +168,6 @@
     <string name="launch">Lancer</string>
     <string name="uninstall">Désinstaller</string>
     <string name="view_in_settings">Voir dans les paramètres</string>
-    <string name="paths_directories">Chemins et Répertoires</string>
     <string name="source_directory">Répertoire source</string>
     <string name="data_directory">Répertoire de données</string>
     <string name="more_info">Plus d\'informations</string>

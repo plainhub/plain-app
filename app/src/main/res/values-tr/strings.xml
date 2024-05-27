@@ -168,7 +168,6 @@
     <string name="launch">Başlat</string>
     <string name="uninstall">Kaldır</string>
     <string name="view_in_settings">Ayarlarda görüntüle</string>
-    <string name="paths_directories">Yollar ve Dizinler</string>
     <string name="source_directory">Kaynak dizin</string>
     <string name="data_directory">Veri dizini</string>
     <string name="more_info">Daha fazla bilgi</string>

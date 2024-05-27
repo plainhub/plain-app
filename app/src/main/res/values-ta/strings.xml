@@ -168,7 +168,6 @@
     <string name="launch">தொடங்கு</string>
     <string name="uninstall">அணுகுதல்</string>
     <string name="view_in_settings">அமைப்புகளில் காண்க</string>
-    <string name="paths_directories">பாதைகளும் கோப்புறைகளும்</string>
     <string name="source_directory">மூல கோப்புறை</string>
     <string name="data_directory">தரவு கோப்புறை</string>
     <string name="more_info">மேலும் தகவல்</string>

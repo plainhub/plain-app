@@ -168,7 +168,6 @@
     <string name="launch">啟動</string>
     <string name="uninstall">解除安裝</string>
     <string name="view_in_settings">在設定中檢視</string>
-    <string name="paths_directories">路徑與目錄</string>
     <string name="source_directory">來源目錄</string>
     <string name="data_directory">資料目錄</string>
     <string name="more_info">更多資訊</string>

@@ -168,7 +168,6 @@
     <string name="launch">Iniciar</string>
     <string name="uninstall">Desinstalar</string>
     <string name="view_in_settings">Ver en ajustes</string>
-    <string name="paths_directories">Rutas y Directorios</string>
     <string name="source_directory">Directorio de origen</string>
     <string name="data_directory">Directorio de datos</string>
     <string name="more_info">Más información</string>
