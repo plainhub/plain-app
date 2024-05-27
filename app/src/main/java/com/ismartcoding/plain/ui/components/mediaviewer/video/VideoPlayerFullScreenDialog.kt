@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.components.mediaviewer.video
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.widget.ImageButton
 import androidx.compose.foundation.background
@@ -18,9 +19,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.compose.ui.window.SecureFlagPolicy
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.media3.ui.R
+import com.ismartcoding.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.lib.logcat.LogCat
 
 @SuppressLint("UnsafeOptInUsageError")
@@ -37,6 +41,10 @@ internal fun VideoPlayerFullScreenDialog(
         }
     }
 
+    val view = LocalView.current
+    val window = (view.context as Activity).window
+    val insetsController = WindowCompat.getInsetsController(window, view)
+
     val onDismissRequest = {
         PlayerView.switchTargetView(player, fullScreenPlayerView, currentPlayerView)
         currentPlayerView.findViewById<ImageButton>(R.id.exo_fullscreen)
@@ -44,6 +52,11 @@ internal fun VideoPlayerFullScreenDialog(
         val currentActivity = context.findActivity()
         currentActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
         currentActivity.setFullScreen(false)
+        if (context.isGestureInteractionMode()) {
+            insetsController.show(WindowInsetsCompat.Type.systemBars())
+        } else {
+            insetsController.show(WindowInsetsCompat.Type.statusBars())
+        }
         videoState.isFullscreenMode = false
     }
 
@@ -62,8 +75,6 @@ internal fun VideoPlayerFullScreenDialog(
 
             val currentActivity = context.findActivity()
             currentActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            currentActivity.setFullScreen(true)
-
             (view.parent as DialogWindowProvider).window.setFullScreen(true)
             fullScreenPlayerView.setFullscreenButtonClickListener {
                 if (!it) {
