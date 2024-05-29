@@ -22,4 +22,5 @@ data class App(
     val usbDiskPaths: List<String>,
     val internalStoragePath: String,
     val downloadsDir: String,
+    val developerMode: Boolean,
 )

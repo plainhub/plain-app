@@ -6,6 +6,7 @@ import kotlinx.datetime.Instant
 import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
+@kotlinx.serialization.Serializable
 data class DVideo(
     override var id: String,
     val title: String,
@@ -18,7 +19,7 @@ data class DVideo(
     val bucketId: String,
     val createdAt: Instant,
     val updatedAt: Instant,
-) : IData, IMedia, Serializable {
+) : IData, IMedia {
 
     fun getRotatedSize(): IntSize {
         if (rotation == 90 || rotation == 270) {

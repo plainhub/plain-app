@@ -94,7 +94,7 @@ class SelectItemDialog(val search: suspend (String) -> List<Any>, val onSelect: 
                     is DeviceFragment -> {
                         type = ApplyToType.DEVICE
                         value = m.mac
-                        binding.bindDevice(requireContext(), m)
+                        binding.bindDevice(m)
                     }
 
                     is AllItemsOption -> {

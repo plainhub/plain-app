@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.web
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -97,12 +98,12 @@ fun WebSecurityPage(navController: NavHostController) {
                     item {
                         PCard {
                             PListItem(
-                                title = stringResource(R.string.require_password),
-                                onClick = {
+                                modifier = Modifier.clickable {
                                     scope.launch(Dispatchers.IO) {
                                         PasswordTypePreference.putAsync(context, if (passwordType == PasswordType.NONE.value) PasswordType.FIXED.value else PasswordType.NONE.value)
                                     }
                                 },
+                                title = stringResource(R.string.require_password),
                             ) {
                                 PSwitch(
                                     activated = passwordType != PasswordType.NONE.value,
@@ -143,12 +144,12 @@ fun WebSecurityPage(navController: NavHostController) {
                         VerticalSpace(dp = 16.dp)
                         PCard {
                             PListItem(
-                                title = stringResource(R.string.require_confirmation),
-                                onClick = {
+                                modifier = Modifier.clickable {
                                     scope.launch(Dispatchers.IO) {
                                         AuthTwoFactorPreference.putAsync(context, !authTwoFactor)
                                     }
-                                }
+                                },
+                                title = stringResource(R.string.require_confirmation),
                             ) {
                                 PSwitch(
                                     activated = authTwoFactor,

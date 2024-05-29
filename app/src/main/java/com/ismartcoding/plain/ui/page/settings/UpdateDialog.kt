@@ -32,10 +32,13 @@ import com.ismartcoding.plain.preference.LocalNewVersionPublishDate
 import com.ismartcoding.plain.preference.LocalNewVersionSize
 import com.ismartcoding.plain.preference.SkipVersionPreference
 import com.ismartcoding.plain.data.toVersion
+import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,7 +68,7 @@ fun UpdateDialog(viewModel: UpdateViewModel) {
                     Text(text = "Release $newVersion")
                     VerticalSpace(dp = 16.dp)
                     Text(
-                        text = "$newVersionPublishDate ${newVersionSize.formatBytes()}",
+                        text = "${Instant.parse(newVersionPublishDate).formatDateTime()} ${newVersionSize.formatBytes()}",
                         color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.bodyMedium,
                     )

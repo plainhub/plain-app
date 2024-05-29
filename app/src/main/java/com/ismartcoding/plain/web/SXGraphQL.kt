@@ -84,11 +84,13 @@ import com.ismartcoding.plain.helpers.DeviceInfoHelper
 import com.ismartcoding.plain.helpers.ExchangeHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.TempHelper
+import com.ismartcoding.plain.preference.DeveloperModePreference
 import com.ismartcoding.plain.preference.ScreenMirrorQualityPreference
 import com.ismartcoding.plain.receivers.BatteryReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.MainActivity
+import com.ismartcoding.plain.web.loaders.FeedsLoader
 import com.ismartcoding.plain.web.loaders.FileInfoLoader
 import com.ismartcoding.plain.web.loaders.TagsLoader
 import com.ismartcoding.plain.web.models.AIChat
@@ -583,6 +585,12 @@ class SXGraphQL(val schema: Schema) {
                                 TagsLoader.load(ids, DataType.FEED_ENTRY)
                             }
                         }
+                        dataProperty("feed") {
+                            prepare { item -> item.feedId }
+                            loader { ids ->
+                                FeedsLoader.load(ids)
+                            }
+                        }
                     }
                 }
                 query("feedEntryCount") {
@@ -668,6 +676,7 @@ class SXGraphQL(val schema: Schema) {
                             usbDiskPaths = FileSystemHelper.getUsbDiskPaths(),
                             internalStoragePath = FileSystemHelper.getInternalStoragePath(),
                             downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath,
+                            developerMode = DeveloperModePreference.getAsync(context),
                         )
                     }
                 }

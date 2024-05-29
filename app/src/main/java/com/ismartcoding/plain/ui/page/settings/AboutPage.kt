@@ -1,14 +1,19 @@
 package com.ismartcoding.plain.ui.page.settings
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -26,14 +31,15 @@ import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.AppLogHelper
-import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.helpers.UrlHelper
+import com.ismartcoding.plain.preference.DeveloperModePreference
 import com.ismartcoding.plain.preference.SkipVersionPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -42,11 +48,10 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.ticker
 import kotlinx.coroutines.launch
 import java.io.File
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun AboutPage(
     navController: NavHostController,
@@ -56,10 +61,12 @@ fun AboutPage(
     var cacheSize by remember { mutableLongStateOf(0L) }
     val scope = rememberCoroutineScope()
     var fileSize by remember { mutableLongStateOf(AppLogHelper.getFileSize(context)) }
+    var developerMode by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.IO) {
             cacheSize = AppHelper.getCacheSize(context)
+            developerMode = DeveloperModePreference.getAsync(context)
         }
     }
 
@@ -110,6 +117,12 @@ fun AboutPage(
                             )
                         }
                         PListItem(
+                            modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = {
+                                developerMode = true
+                                scope.launch(Dispatchers.IO) {
+                                    DeveloperModePreference.putAsync(context, true)
+                                }
+                            }),
                             title = stringResource(R.string.android_version),
                             value = MainApp.getAndroidVersion(),
                         )
@@ -119,6 +132,12 @@ fun AboutPage(
                     VerticalSpace(dp = 16.dp)
                     PCard {
                         PListItem(
+                            modifier = Modifier.clickable {
+                                navController.navigateTextFile(
+                                    DiskLogFormatStrategy.getLogFolder(context) + "/latest.log",
+                                    getString(R.string.logs), "", TextFileType.APP_LOG
+                                )
+                            },
                             title = stringResource(R.string.logs),
                             desc = fileSize.formatBytes(),
                             separatedActions = fileSize > 0L,
@@ -138,45 +157,7 @@ fun AboutPage(
                                     )
                                 }
                             },
-                            onClick = {
-                                navController.navigateTextFile(
-                                    DiskLogFormatStrategy.getLogFolder(context) + "/latest.log",
-                                    getString(R.string.logs), "", TextFileType.APP_LOG
-                                )
-                            },
                         )
-                        PListItem(
-                            title = stringResource(R.string.donation),
-                            showMore = true,
-                            onClick = {
-                                WebHelper.open(context, "https://ko-fi.com/ismartcoding")
-                            },
-                        )
-                    }
-                }
-                item {
-                    VerticalSpace(dp = 16.dp)
-                    PCard {
-                        PListItem(
-                            title = stringResource(R.string.terms_of_use),
-                            showMore = true,
-                            onClick = {
-                                WebHelper.open(context, UrlHelper.getTermsUrl())
-                            },
-                        )
-                        PListItem(
-                            title = stringResource(R.string.privacy_policy),
-                            showMore = true,
-                            onClick = {
-                                WebHelper.open(context, UrlHelper.getPolicyUrl())
-                            },
-                        )
-                    }
-                }
-
-                item {
-                    VerticalSpace(dp = 16.dp)
-                    PCard {
                         PListItem(
                             title = stringResource(R.string.local_cache),
                             desc = cacheSize.formatBytes(),
@@ -195,7 +176,49 @@ fun AboutPage(
                                 }
                             },
                         )
+                        if (developerMode) {
+                            PListItem(
+                                title = stringResource(R.string.developer_mode),
+                            ) {
+                                PSwitch(
+                                    activated = developerMode,
+                                ) {
+                                    developerMode = it
+                                    scope.launch(Dispatchers.IO) {
+                                        DeveloperModePreference.putAsync(context, it)
+                                    }
+                                }
+                            }
+                        }
                     }
+                }
+                item {
+                    VerticalSpace(dp = 16.dp)
+                    PCard {
+                        PListItem(
+                            modifier = Modifier.clickable {
+                                WebHelper.open(context, UrlHelper.getTermsUrl())
+                            },
+                            title = stringResource(R.string.terms_of_use),
+                            showMore = true,
+                        )
+                        PListItem(
+                            modifier = Modifier.clickable {
+                                WebHelper.open(context, UrlHelper.getPolicyUrl())
+                            },
+                            title = stringResource(R.string.privacy_policy),
+                            showMore = true,
+                        )
+                        PListItem(
+                            modifier = Modifier.clickable {
+                                WebHelper.open(context, "https://ko-fi.com/ismartcoding")
+                            },
+                            title = stringResource(R.string.donation),
+                            showMore = true,
+                        )
+                    }
+                }
+                item {
                     BottomSpace()
                 }
             }

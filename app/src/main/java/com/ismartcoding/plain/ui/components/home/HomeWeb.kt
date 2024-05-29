@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.components.home
 
 import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,11 +36,11 @@ fun HomeWeb(
     val fullText = (stringResource(id = R.string.web_console_desc) + " " + learnMore)
     PCard {
         PListItem(
+            modifier = Modifier.clickable {
+                navController.navigate(RouteName.WEB_SETTINGS)
+            },
             title = stringResource(R.string.web_console),
             showMore = true,
-            onClick = {
-                navController.navigate(RouteName.WEB_SETTINGS)
-            }
         )
         VerticalSpace(dp = 8.dp)
         PClickableText(

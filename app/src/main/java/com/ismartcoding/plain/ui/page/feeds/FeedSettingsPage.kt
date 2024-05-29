@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.feeds
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -87,10 +89,10 @@ fun FeedSettingsPage(
             item {
                 PCard {
                     PListItem(
-                        title = stringResource(id = R.string.auto_refresh_feeds),
-                        onClick = {
+                        modifier = Modifier.clickable {
                             viewModel.setAutoRefresh(context, !viewModel.autoRefresh.value)
-                        }
+                        },
+                        title = stringResource(id = R.string.auto_refresh_feeds),
                     ) {
                         PSwitch(
                             activated = viewModel.autoRefresh.value,
@@ -101,18 +103,18 @@ fun FeedSettingsPage(
 
                     if (viewModel.autoRefresh.value) {
                         PListItem(
+                            modifier = Modifier.clickable {
+                                viewModel.showIntervalDialog.value = true
+                            },
                             title = stringResource(id = R.string.auto_refresh_interval),
                             value = FormatHelper.formatSeconds(viewModel.autoRefreshInterval.value),
                             showMore = true,
-                            onClick = {
-                                viewModel.showIntervalDialog.value = true
-                            }
                         )
                         PListItem(
-                            title = stringResource(id = R.string.auto_refresh_only_over_wifi),
-                            onClick = {
+                            modifier = Modifier.clickable {
                                 viewModel.setAutoRefreshOnlyWifi(context, !viewModel.autoRefreshOnlyWifi.value)
-                            }
+                            },
+                            title = stringResource(id = R.string.auto_refresh_only_over_wifi),
                         ) {
                             PSwitch(
                                 activated = viewModel.autoRefreshOnlyWifi.value,

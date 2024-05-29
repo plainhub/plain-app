@@ -12,12 +12,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text2.input.textAsFlow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Redo
 import androidx.compose.material.icons.automirrored.outlined.Undo
@@ -37,6 +37,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -140,7 +141,7 @@ fun NotePage(
                     }
                 }
             }
-            mdEditorViewModel.textFieldState.textAsFlow().debounce(200)
+            snapshotFlow { mdEditorViewModel.textFieldState.text } .debounce(200)
                 .collectLatest { t ->
                     val isNew = id.isEmpty()
                     val text = t.toString()
@@ -269,11 +270,20 @@ fun NotePage(
                 MdEditorBottomAppBar(mdEditorViewModel)
             }
         },
-        content = {
+        content = { paddingValues ->
             if (viewModel.editMode) {
-                MdEditor(viewModel = mdEditorViewModel, editorScrollState, focusRequester = focusRequester)
+                MdEditor(
+                    modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding()),
+                    viewModel = mdEditorViewModel,
+                    scrollState = editorScrollState,
+                    focusRequester = focusRequester
+                )
             } else {
-                LazyColumn(state = mdListState, modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)) {
+                LazyColumn(
+                    modifier = Modifier
+                        .nestedScroll(scrollBehavior.nestedScrollConnection),
+                    state = mdListState
+                ) {
                     item {
                         val tags = tagsState.filter { tagIds.contains(it.id) }
                         if (tags.isNotEmpty()) {
@@ -305,6 +315,7 @@ fun NotePage(
                         )
                     }
                     item {
+                        VerticalSpace(dp = paddingValues.calculateBottomPadding())
                         BottomSpace()
                     }
                 }

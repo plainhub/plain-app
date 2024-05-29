@@ -82,6 +82,7 @@ import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.RadioDialog
 import com.ismartcoding.plain.ui.base.RadioDialogOption
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.base.dragselect.gridDragSelect
 import com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState
@@ -144,8 +145,9 @@ fun VideosPage(
         mutableStateMapOf<Int, LazyGridState>()
     }
     val pagerState = rememberPagerState(pageCount = { viewModel.tabs.value.size })
+    val dragSelectState = rememberDragSelectState({ scrollStateMap[pagerState.currentPage] })
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
-        (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0
+        (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0 && !dragSelectState.selectMode
     })
     var isFirstTime by remember { mutableStateOf(true) }
 
@@ -155,7 +157,6 @@ fun VideosPage(
         density.run { ((configuration.screenWidthDp.dp - ((cellsPerRow - 1) * 2).dp) / cellsPerRow).toPx().toInt() }
     }
 
-    val dragSelectState = rememberDragSelectState({ scrollStateMap[pagerState.currentPage] })
     var showCellsPerRowDialog by remember { mutableStateOf(false) }
 
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
@@ -196,6 +197,7 @@ fun VideosPage(
     val insetsController = WindowCompat.getInsetsController(window, view)
     LaunchedEffect(dragSelectState.selectMode, (previewerState.visible && !context.isGestureInteractionMode())) {
         if (dragSelectState.selectMode || (previewerState.visible && !context.isGestureInteractionMode())) {
+            scrollBehavior.reset()
             insetsController.hide(WindowInsetsCompat.Type.navigationBars())
         } else {
             insetsController.show(WindowInsetsCompat.Type.navigationBars())
@@ -390,7 +392,7 @@ fun VideosPage(
                 FilesSelectModeBottomActions(viewModel, tagsViewModel, tagsState, dragSelectState)
             }
         },
-    ) {
+    ) { paddingValues ->
         if (!hasPermission) {
             NeedPermissionColumn(AppFeatureType.FILES.getPermission()!!)
             return@PScaffold
@@ -497,7 +499,7 @@ fun VideosPage(
                                     span = { GridItemSpan(maxLineSpan) },
                                     key = "bottomSpace"
                                 ) {
-                                    BottomSpace()
+                                    VerticalSpace(dp = paddingValues.calculateBottomPadding())
                                 }
                             }
                         }

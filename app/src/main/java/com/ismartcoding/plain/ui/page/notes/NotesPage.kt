@@ -105,7 +105,7 @@ fun NotesPage(
     }
     val pagerState = rememberPagerState(pageCount = { viewModel.tabs.value.size })
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
-        (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0
+        (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0 && !viewModel.selectMode.value
     })
     var isFirstTime by remember { mutableStateOf(true) }
 
@@ -129,6 +129,7 @@ fun NotesPage(
     val insetsController = WindowCompat.getInsetsController(window, view)
     LaunchedEffect(viewModel.selectMode.value) {
         if (viewModel.selectMode.value) {
+            scrollBehavior.reset()
             insetsController.hide(WindowInsetsCompat.Type.navigationBars())
         } else {
             insetsController.show(WindowInsetsCompat.Type.navigationBars())
@@ -287,7 +288,7 @@ fun NotesPage(
                 }
             }
         },
-    ) {
+    ) { paddingValues ->
         if (!viewModel.selectMode.value) {
             PScrollableTabRow(
                 selectedTabIndex = pagerState.currentPage,
@@ -373,7 +374,9 @@ fun NotesPage(
                                         }
                                     }
                                     LoadMoreRefreshContent(viewModel.noMore.value)
-                                    BottomSpace()
+                                }
+                                item {
+                                    VerticalSpace(dp = paddingValues.calculateBottomPadding())
                                 }
                             }
                         }

@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.page.feeds
 
 import android.content.ClipData
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -9,6 +10,7 @@ import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -87,9 +89,9 @@ fun ViewFeedEntryBottomSheet(
                 )
                 VerticalSpace(dp = 24.dp)
                 PCard {
-                    PListItem(title = m.url, separatedActions = true, onClick = {
+                    PListItem(modifier = Modifier.clickable {
                         WebHelper.open(context, m.url)
-                    }, action = {
+                    }, title = m.url, separatedActions = true, action = {
                         PIconButton(icon = Icons.Outlined.ContentCopy, contentDescription = stringResource(id = R.string.copy_link), onClick = {
                             val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), m.url)
                             clipboardManager.setPrimaryClip(clip)

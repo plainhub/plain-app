@@ -265,7 +265,7 @@ fun FeedsPage(
                 }
             }
         },
-    ) {
+    ) { paddingValues ->
         PullToRefresh(
             refreshLayoutState = topRefreshLayoutState,
         ) {
@@ -301,6 +301,9 @@ fun FeedsPage(
                                 },
                             )
                             VerticalSpace(dp = 8.dp)
+                        }
+                        item {
+                            VerticalSpace(dp = paddingValues.calculateBottomPadding())
                         }
                     }
                 } else {

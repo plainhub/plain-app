@@ -56,7 +56,7 @@ class DevicesDialog : BaseDialog<DialogDevicesBinding>() {
             onBind {
                 val binding = getBinding<ViewListItemBinding>()
                 val m = getModel<DeviceFragment>()
-                binding.bindDevice(requireContext(), m)
+                binding.bindDevice(m)
                 binding.enableSwipeMenu(true)
                 binding.setRightSwipeButton(getString(R.string.delete)) {
                     DialogHelper.confirmToAction(R.string.confirm_to_delete) {

@@ -86,6 +86,7 @@ import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
@@ -407,8 +408,8 @@ fun ChatPage(
                     LazyColumn(
                         modifier =
                         Modifier
-                            .fillMaxSize()
-                            .padding(bottom = paddingValues.calculateBottomPadding()),
+                            .padding(bottom = paddingValues.calculateBottomPadding())
+                            .fillMaxSize(),
                         state = scrollState,
                         reverseLayout = true,
                         verticalArrangement = Arrangement.Top,

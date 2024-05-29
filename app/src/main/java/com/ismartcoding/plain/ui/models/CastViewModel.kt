@@ -5,14 +5,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.lib.extensions.isUrl
-import com.ismartcoding.lib.helpers.CoroutinesHelper
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.upnp.UPnPController
 import com.ismartcoding.lib.upnp.UPnPDevice
 import com.ismartcoding.lib.upnp.UPnPDiscovery
-import com.ismartcoding.plain.data.IMedia
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.UrlHelper
 import io.ktor.client.HttpClient
@@ -56,7 +53,7 @@ class CastViewModel : ViewModel() {
             CastPlayer.currentUri = path
             UPnPController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(path))
             if (CastPlayer.sid.isNotEmpty()) {
-                UPnPController.unsubscribeEvent(device, CastPlayer.sid, UrlHelper.getCastCallbackUrl())
+                UPnPController.unsubscribeEvent(device, CastPlayer.sid)
                 CastPlayer.sid = ""
             }
         }

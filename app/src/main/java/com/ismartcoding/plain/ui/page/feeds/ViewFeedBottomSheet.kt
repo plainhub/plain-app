@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.page.feeds
 
 import android.content.ClipData
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Checklist
@@ -12,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -93,9 +95,9 @@ fun ViewFeedBottomSheet(
         VerticalSpace(dp = 24.dp)
         Subtitle(text = m.name)
         PCard {
-            PListItem(title = m.url, separatedActions = true, onClick = {
+            PListItem(modifier = Modifier.clickable {
                 WebHelper.open(context, m.url)
-            }, action = {
+            }, title = m.url, separatedActions = true, action = {
                 PIconButton(icon = Icons.Outlined.ContentCopy, contentDescription = stringResource(id = R.string.copy_link), onClick = {
                     val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), m.url)
                     clipboardManager.setPrimaryClip(clip)
@@ -105,11 +107,11 @@ fun ViewFeedBottomSheet(
         }
         VerticalSpace(dp = 16.dp)
         PCard {
-            PListItem(title = stringResource(id = R.string.auto_fetch_full_content), onClick = {
+            PListItem(modifier = Modifier.clickable {
                 viewModel.editFetchContent.value = !viewModel.editFetchContent.value
                 m.fetchContent = viewModel.editFetchContent.value
                 viewModel.updateFetchContent(m.id, viewModel.editFetchContent.value)
-            }, action = {
+            }, title = stringResource(id = R.string.auto_fetch_full_content), action = {
                 PSwitch(
                     activated = viewModel.editFetchContent.value,
                 ) {

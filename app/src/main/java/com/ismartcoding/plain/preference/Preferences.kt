@@ -259,6 +259,11 @@ object WebPreference : BasePreference<Boolean>() {
     }
 }
 
+object DeveloperModePreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("developer_mode")
+}
+
 object HttpsPreference : BasePreference<Boolean>() {
     override val default = false
     override val key = booleanPreferencesKey("https")

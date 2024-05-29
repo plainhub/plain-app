@@ -43,21 +43,12 @@ fun PListItem(
     icon: Any? = null,
     separatedActions: Boolean = false,
     showMore: Boolean = false,
-    onClick: () -> Unit = { },
-    onLongClick: (() -> Unit)? = null,
     action: (@Composable () -> Unit)? = null,
 ) {
     val tonalPalettes = LocalTonalPalettes.current
-    val context = LocalContext.current
-
     Surface(
         modifier =
         modifier
-            .combinedClickable(
-                enabled = enable,
-                onClick = onClick,
-                onLongClick = onLongClick,
-            )
             .alpha(if (enable) 1f else 0.5f),
         color = Color.Unspecified,
     ) {

@@ -21,9 +21,6 @@ data class FeedEntry(
 
 fun DFeedEntry.toModel(): FeedEntry {
     return FeedEntry(
-        ID(
-            id,
-        ),
-        title, url, FileHelper.getFileId(image), description, author, content, feedId, rawId, publishedAt, createdAt, updatedAt,
+        ID(id), title, url, FileHelper.getFileId(image), description, author, content, feedId, rawId, publishedAt, createdAt, updatedAt,
     )
 }

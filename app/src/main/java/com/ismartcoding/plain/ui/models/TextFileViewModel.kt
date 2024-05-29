@@ -13,6 +13,7 @@ import com.ismartcoding.plain.preference.EditorWrapContentPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.io.File
 
 class TextFileViewModel : ViewModel() {
@@ -24,6 +25,7 @@ class TextFileViewModel : ViewModel() {
     val file = mutableStateOf<DFile?>(null)
     val webView = mutableStateOf<WebView?>(null)
     val content = mutableStateOf("")
+    val oldContent = mutableStateOf<String?>(null)
 
     suspend fun loadConfigAsync(context: Context) {
         wrapContent.value = EditorWrapContentPreference.getAsync(context)
@@ -60,11 +62,19 @@ class TextFileViewModel : ViewModel() {
 
     fun enterEditMode() {
         readOnly.value = false
+        oldContent.value = content.value
         webView.value?.evaluateJavascript("editor.setReadOnly(false)") {}
     }
 
     fun exitEditMode() {
         readOnly.value = true
+        if (oldContent.value != null) {
+            content.value = oldContent.value!!
+            oldContent.value = null
+            val json = JSONObject()
+            json.put("content", content.value)
+            webView.value?.evaluateJavascript("updateContent($json)") {}
+        }
         webView.value?.evaluateJavascript("editor.setReadOnly(true)") {}
     }
 }

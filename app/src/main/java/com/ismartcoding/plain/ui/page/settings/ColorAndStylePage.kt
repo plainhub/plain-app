@@ -170,13 +170,12 @@ fun ColorAndStylePage(navController: NavHostController) {
                         text = stringResource(R.string.appearance),
                     )
                     PListItem(
+                        modifier = PlainTheme.getCardModifier().clickable {
+                            navController.navigate(RouteName.DARK_THEME)
+                        },
                         title = stringResource(R.string.dark_theme),
                         desc = DarkTheme.entries.find { it.value == darkTheme }?.getText(context) ?: "",
                         separatedActions = true,
-                        modifier = PlainTheme.getCardModifier(),
-                        onClick = {
-                            navController.navigate(RouteName.DARK_THEME)
-                        },
                     ) {
                         PSwitch(
                             activated = DarkTheme.isDarkTheme(darkTheme),

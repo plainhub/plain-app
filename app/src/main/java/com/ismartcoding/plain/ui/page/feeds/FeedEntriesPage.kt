@@ -128,7 +128,7 @@ fun FeedEntriesPage(
     }
     val pagerState = rememberPagerState(pageCount = { viewModel.tabs.value.size })
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
-        (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0
+        (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0 && !viewModel.selectMode.value
     })
     var isFirstTime by remember { mutableStateOf(true) }
 
@@ -217,6 +217,7 @@ fun FeedEntriesPage(
 
     LaunchedEffect(viewModel.selectMode.value) {
         if (viewModel.selectMode.value) {
+            scrollBehavior.reset()
             insetsController.hide(WindowInsetsCompat.Type.navigationBars())
         } else {
             insetsController.show(WindowInsetsCompat.Type.navigationBars())
@@ -346,7 +347,7 @@ fun FeedEntriesPage(
             }
         },
 
-        ) {
+        ) { paddingValues ->
         if (!viewModel.selectMode.value) {
             PScrollableTabRow(
                 selectedTabIndex = pagerState.currentPage,
@@ -454,7 +455,7 @@ fun FeedEntriesPage(
                                         }
                                     }
                                     LoadMoreRefreshContent(viewModel.noMore.value)
-                                    BottomSpace()
+                                    VerticalSpace(dp = paddingValues.calculateBottomPadding())
                                 }
                             }
                         }

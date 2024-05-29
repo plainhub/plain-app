@@ -74,7 +74,7 @@ class CastDialog(val items: List<IMedia>, private val singlePath: String = "") :
 //                            }
                         } else {
                             if (CastPlayer.sid.isNotEmpty()) {
-                                withIO { UPnPController.unsubscribeEvent(m, CastPlayer.sid, UrlHelper.getCastCallbackUrl()) }
+                                withIO { UPnPController.unsubscribeEvent(m, CastPlayer.sid) }
                                 CastPlayer.sid = ""
                             }
                         }

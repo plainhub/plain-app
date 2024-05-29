@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -283,10 +284,7 @@ fun WebSettingsPage(
                         VerticalSpace(dp = 16.dp)
                         PCard {
                             PListItem(
-                                icon = m.icon,
-                                title = permission.getText(),
-                                showMore = true,
-                                onClick = {
+                                modifier = Modifier.clickable {
                                     val intent =
                                         Intent(
                                             if (context.isTV()) Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS else Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
@@ -299,29 +297,33 @@ fun WebSettingsPage(
                                         DialogHelper.showMessage(R.string.not_supported_error)
                                     }
                                 },
+                                icon = m.icon,
+                                title = permission.getText(),
+                                showMore = true,
                             )
                         }
                     } else {
                         PListItem(
-                            modifier = PlainTheme.getCardModifier(index = index, size = permissionList.size - 1),
+                            modifier = PlainTheme
+                                .getCardModifier(index = index, size = permissionList.size - 1)
+                                .clickable {
+                                    scope.launch {
+                                        val enable = withIO { !permission.isEnabledAsync(context) }
+                                        withIO { ApiPermissionsPreference.putAsync(context, permission, enable) }
+                                        if (enable) {
+                                            val ps = m.permissions.filter { !it.can(context) }
+                                            if (ps.isNotEmpty()) {
+                                                sendEvent(RequestPermissionsEvent(*ps.toTypedArray()))
+                                            }
+                                        }
+                                    }
+                                },
                             icon = m.icon,
                             title = permission.getText(),
                             desc =
                             stringResource(
                                 if (m.granted) R.string.system_permission_granted else R.string.system_permission_not_granted,
                             ),
-                            onClick = {
-                                scope.launch {
-                                    val enable = withIO { !permission.isEnabledAsync(context) }
-                                    withIO { ApiPermissionsPreference.putAsync(context, permission, enable) }
-                                    if (enable) {
-                                        val ps = m.permissions.filter { !it.can(context) }
-                                        if (ps.isNotEmpty()) {
-                                            sendEvent(RequestPermissionsEvent(*ps.toTypedArray()))
-                                        }
-                                    }
-                                }
-                            },
                         ) {
                             PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
                                 scope.launch {
@@ -343,9 +345,9 @@ fun WebSettingsPage(
                         text = stringResource(id = R.string.performance),
                     )
                     PCard {
-                        PListItem(title = stringResource(id = R.string.keep_awake), onClick = {
+                        PListItem(modifier = Modifier.clickable {
                             viewModel.enableKeepAwake(context, !keepAwake)
-                        }) {
+                        }, title = stringResource(id = R.string.keep_awake)) {
                             PSwitch(activated = keepAwake) { enable ->
                                 viewModel.enableKeepAwake(context, enable)
                             }
@@ -354,9 +356,8 @@ fun WebSettingsPage(
                     Tips(stringResource(id = R.string.keep_awake_tips))
                     VerticalSpace(dp = 16.dp)
                     PCard {
-                        PListItem(title = stringResource(id = if (shouldIgnoreOptimize) R.string.disable_battery_optimization else R.string.battery_optimization_disabled),
-                            showMore = true,
-                            onClick = {
+                        PListItem(
+                            modifier = Modifier.clickable {
                                 if (shouldIgnoreOptimize) {
                                     viewModel.requestIgnoreBatteryOptimization()
                                 } else {
@@ -364,7 +365,10 @@ fun WebSettingsPage(
                                     intent.action = Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
                                     context.startActivity(intent)
                                 }
-                            })
+                            },
+                            title = stringResource(id = if (shouldIgnoreOptimize) R.string.disable_battery_optimization else R.string.battery_optimization_disabled),
+                            showMore = true
+                        )
                     }
                 }
                 item {

@@ -114,6 +114,7 @@ fun TextFilePage(
                             scope.launch {
                                 DialogHelper.showLoading()
                                 withIO { File(path).writeText(viewModel.content.value) }
+                                viewModel.oldContent.value = viewModel.content.value
                                 context.scanFileByConnection(path)
                                 DialogHelper.hideLoading()
                                 DialogHelper.showMessage(R.string.saved)

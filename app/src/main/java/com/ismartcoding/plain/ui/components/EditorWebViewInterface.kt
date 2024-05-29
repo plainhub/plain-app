@@ -4,8 +4,8 @@ import android.webkit.JavascriptInterface
 
 class EditorWebViewInterface(val ready: () -> Unit, val update: (String) -> Unit) {
     @JavascriptInterface
-    fun updateContent(code: String) {
-        update(code)
+    fun updateContent(content: String) {
+        update(content)
     }
 
     @JavascriptInterface

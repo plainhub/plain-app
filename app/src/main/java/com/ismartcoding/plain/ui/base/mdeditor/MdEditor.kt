@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.debounce
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalFoundationApi::class, FlowPreview::class)
 @Composable
 fun MdEditor(
+    modifier: Modifier,
     viewModel: MdEditorViewModel,
     scrollState: ScrollState,
     focusRequester: FocusRequester,
@@ -57,7 +58,7 @@ fun MdEditor(
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceContainerLowest)
     ) {

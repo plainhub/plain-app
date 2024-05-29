@@ -107,7 +107,7 @@ fun DocsPage(
     }
     val pagerState = rememberPagerState(pageCount = { viewModel.tabs.value.size })
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
-        (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0
+        (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0 && !viewModel.selectMode.value
     })
     var isFirstTime by remember { mutableStateOf(true) }
 
@@ -158,6 +158,7 @@ fun DocsPage(
     val insetsController = WindowCompat.getInsetsController(window, view)
     LaunchedEffect(viewModel.selectMode.value) {
         if (viewModel.selectMode.value) {
+            scrollBehavior.reset()
             insetsController.hide(WindowInsetsCompat.Type.navigationBars())
         } else {
             insetsController.show(WindowInsetsCompat.Type.navigationBars())
@@ -279,7 +280,7 @@ fun DocsPage(
                 FilesSelectModeBottomActions(viewModel)
             }
         },
-    ) {
+    ) { paddingValues ->
         if (!hasPermission) {
             NeedPermissionColumn(AppFeatureType.FILES.getPermission()!!)
             return@PScaffold
@@ -347,6 +348,9 @@ fun DocsPage(
                                         }
                                     }
                                     LoadMoreRefreshContent(viewModel.noMore.value)
+                                }
+                                item {
+                                    VerticalSpace(dp = paddingValues.calculateBottomPadding())
                                 }
                             }
                         }

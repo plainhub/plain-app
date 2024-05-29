@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.features.device
 
-import android.content.Context
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.ViewListItemBinding
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
@@ -20,7 +19,6 @@ fun DeviceFragment.getName(): String {
 }
 
 fun ViewListItemBinding.bindDevice(
-    context: Context,
     item: DeviceFragment,
 ) {
     clearTextRows()

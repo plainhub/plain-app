@@ -275,9 +275,9 @@ fun Context.isGestureInteractionMode(): Boolean {
 
 fun Context.getNavigationBarHeight(): Int {
     return if (isGestureInteractionMode()) {
-        return 16
+        16
     } else {
-        return 48
+        48
     }
 }
 

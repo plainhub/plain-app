@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Backup
@@ -13,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -76,43 +78,43 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                 item {
                     PCard {
                         PListItem(
+                            modifier = Modifier.clickable {
+                                navController.navigate(RouteName.COLOR_AND_STYLE)
+                            },
                             title = stringResource(R.string.color_and_style),
                             desc = stringResource(R.string.color_and_style_desc),
                             icon = Icons.Outlined.Palette,
                             showMore = true,
-                            onClick = {
-                                navController.navigate(RouteName.COLOR_AND_STYLE)
-                            },
                         )
                         PListItem(
+                            modifier = Modifier.clickable {
+                                navController.navigate(RouteName.LANGUAGE)
+                            },
                             title = stringResource(R.string.language),
                             desc = stringResource(R.string.language_desc),
                             icon = Icons.Outlined.Language,
                             showMore = true,
-                            onClick = {
-                                navController.navigate(RouteName.LANGUAGE)
-                            },
                         )
                     }
                     VerticalSpace(16.dp)
                     PCard {
                         PListItem(
+                            modifier = Modifier.clickable {
+                                navController.navigate(RouteName.BACKUP_RESTORE)
+                            },
                             title = stringResource(R.string.backup_restore),
                             desc = stringResource(R.string.backup_desc),
                             icon = Icons.Outlined.Backup,
                             showMore = true,
-                            onClick = {
-                                navController.navigate(RouteName.BACKUP_RESTORE)
-                            },
                         )
                         PListItem(
+                            modifier = Modifier.clickable {
+                                navController.navigate(RouteName.ABOUT)
+                            },
                             title = stringResource(R.string.about),
                             desc = stringResource(R.string.about_desc),
                             icon = Icons.Outlined.TipsAndUpdates,
                             showMore = true,
-                            onClick = {
-                                navController.navigate(RouteName.ABOUT)
-                            },
                         )
                     }
                 }

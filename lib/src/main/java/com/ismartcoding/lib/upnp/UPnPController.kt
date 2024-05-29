@@ -166,7 +166,6 @@ object UPnPController {
     suspend fun unsubscribeEvent(
         device: UPnPDevice,
         sid: String,
-        url: String,
     ): String {
         val service = device.getAVTransportService() ?: return ""
         try {

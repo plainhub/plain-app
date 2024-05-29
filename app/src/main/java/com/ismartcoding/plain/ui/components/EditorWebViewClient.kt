@@ -21,6 +21,4 @@ class EditorWebViewClient(
             view.evaluateJavascript("loadEditor(${json})") {}
         }
     }
-
-
 }

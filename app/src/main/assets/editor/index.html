@@ -28,6 +28,11 @@
 <script src="./ace/ace.js" type="text/javascript"></script>
 <script>
 let editor
+
+function updateContent(data) {
+    editor.setValue(data.content, -1)
+}
+
 function loadEditor(data) {
     editor = ace.edit('editor')
     editor.renderer.setAnimatedScroll(true)
