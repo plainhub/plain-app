@@ -106,11 +106,16 @@ class PNotificationListenerService : NotificationListenerService() {
             }
 
             events.add(receiveEventHandler<CancelNotificationsEvent> { event ->
-                event.ids.forEach {
-                    try {
-                        cancelNotification(it)
-                    } catch (ex: Exception) {
-                        LogCat.e(ex.toString())
+                if (event.ids.size == TempData.notifications.size) {
+                    cancelAllNotifications()
+                    TempData.notifications.clear()
+                } else {
+                    event.ids.forEach { id ->
+                        try {
+                            cancelNotification(id)
+                        } catch (ex: Exception) {
+                            LogCat.e(ex.toString())
+                        }
                     }
                 }
             })

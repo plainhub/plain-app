@@ -86,6 +86,7 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:largeHeap="true"
         android:localeConfig="@xml/locales_config"
         android:theme="@style/Theme.Splash"
         android:usesCleartextTraffic="true">
