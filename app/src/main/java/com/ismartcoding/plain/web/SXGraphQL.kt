@@ -557,6 +557,11 @@ class SXGraphQL(val schema: Schema) {
                         }
                     }
                 }
+                query("tagRelations") {
+                    resolver { type: DataType, keys: List<String> ->
+                        TagHelper.getTagRelationsByKeys(keys.toSet(), type).map { it.toModel() }
+                    }
+                }
                 query("notifications") {
                     resolver { ->
                         val context = MainApp.instance

@@ -50,6 +50,7 @@ import com.ismartcoding.plain.preference.LocalWeb
 import com.ismartcoding.plain.preference.WebSettingsProvider
 import com.ismartcoding.plain.features.IgnoreBatteryOptimizationResultEvent
 import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.features.PermissionItem
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.features.RequestPermissionsEvent
@@ -57,6 +58,7 @@ import com.ismartcoding.plain.features.WindowFocusChangedEvent
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.powerManager
+import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.AlertType
@@ -112,9 +114,12 @@ fun WebSettingsPage(
 
         LaunchedEffect(Unit) {
             events.add(
-                receiveEventHandler<PermissionsResultEvent> {
+                receiveEventHandler<PermissionsResultEvent> { event ->
                     permissionList = Permissions.getWebList(context)
                     systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.can(context)
+                    if (event.map[Permission.NOTIFICATION_LISTENER.toSysPermission()] == true) {
+                        PNotificationListenerService.toggle(context, true)
+                    }
                 }
             )
 
@@ -122,12 +127,6 @@ fun WebSettingsPage(
                 receiveEventHandler<WindowFocusChangedEvent> {
                     shouldIgnoreOptimize = !powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)
                     isVPNConnected = NetworkHelper.isVPNConnected(context)
-                }
-            )
-
-            events.add(
-                receiveEventHandler<PermissionsResultEvent> {
-                    permissionList = Permissions.getWebList(context)
                 }
             )
 
@@ -139,6 +138,26 @@ fun WebSettingsPage(
                     shouldIgnoreOptimize = !powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)
                 }
             })
+        }
+
+        fun togglePermission(m: PermissionItem, enable: Boolean) {
+            scope.launch {
+                withIO { ApiPermissionsPreference.putAsync(context, m.permission, enable) }
+                if (enable) {
+                    val ps = m.permissions.filter { !it.can(context) }
+                    if (ps.isNotEmpty()) {
+                        sendEvent(RequestPermissionsEvent(*ps.toTypedArray()))
+                    } else {
+                        if (m.permission == Permission.NOTIFICATION_LISTENER) {
+                            PNotificationListenerService.toggle(context, true)
+                        }
+                    }
+                } else {
+                    if (m.permission == Permission.NOTIFICATION_LISTENER) {
+                        PNotificationListenerService.toggle(context, false)
+                    }
+                }
+            }
         }
 
         DisposableEffect(Unit) {
@@ -307,16 +326,7 @@ fun WebSettingsPage(
                             modifier = PlainTheme
                                 .getCardModifier(index = index, size = permissionList.size - 1)
                                 .clickable {
-                                    scope.launch {
-                                        val enable = withIO { !permission.isEnabledAsync(context) }
-                                        withIO { ApiPermissionsPreference.putAsync(context, permission, enable) }
-                                        if (enable) {
-                                            val ps = m.permissions.filter { !it.can(context) }
-                                            if (ps.isNotEmpty()) {
-                                                sendEvent(RequestPermissionsEvent(*ps.toTypedArray()))
-                                            }
-                                        }
-                                    }
+                                    togglePermission(m, !enabledPermissions.contains(permission.name))
                                 },
                             icon = m.icon,
                             title = permission.getText(),
@@ -326,15 +336,7 @@ fun WebSettingsPage(
                             ),
                         ) {
                             PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
-                                scope.launch {
-                                    withIO { ApiPermissionsPreference.putAsync(context, permission, enable) }
-                                    if (enable) {
-                                        val ps = m.permissions.filter { !it.can(context) }
-                                        if (ps.isNotEmpty()) {
-                                            sendEvent(RequestPermissionsEvent(*ps.toTypedArray()))
-                                        }
-                                    }
-                                }
+                                togglePermission(m, enable)
                             }
                         }
                     }

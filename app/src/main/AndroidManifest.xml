@@ -151,10 +151,6 @@
             android:foregroundServiceType="mediaProjection" />
 
         <service
-            android:name=".services.NotificationListenerMonitorService"
-            android:exported="false" />
-
-        <service
             android:name=".services.PNotificationListenerService"
             android:exported="true"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">

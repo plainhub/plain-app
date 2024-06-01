@@ -90,7 +90,7 @@ import com.ismartcoding.plain.preference.SystemScreenTimeoutPreference
 import com.ismartcoding.plain.preference.WebPreference
 import com.ismartcoding.plain.receivers.NetworkStateReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
-import com.ismartcoding.plain.services.NotificationListenerMonitorService
+import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
 import com.ismartcoding.plain.ui.extensions.navigate
@@ -242,14 +242,18 @@ class MainActivity : AppCompatActivity() {
                     if (webEnabled) {
                         viewModel.enableHttpServer(this@MainActivity, true)
                     }
-                    PackageHelper.cacheAppLabels()
-                    startService(Intent(this@MainActivity, NotificationListenerMonitorService::class.java))
+                    doWhenReadyAsync()
                 }
             } catch (ex: Exception) {
                 LogCat.e(ex.toString())
             }
         }
 
+    }
+
+    private suspend fun doWhenReadyAsync() {
+        PackageHelper.cacheAppLabels()
+        PNotificationListenerService.toggle(this@MainActivity, Permission.NOTIFICATION_LISTENER.isEnabledAsync(this@MainActivity))
     }
 
     override fun onDestroy() {
@@ -421,8 +425,7 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("同意并继续") { _, _ ->
                 coIO {
                     AgreeTermsPreference.putAsync(context, true)
-                    PackageHelper.cacheAppLabels()
-                    startService(Intent(this@MainActivity, NotificationListenerMonitorService::class.java))
+                    doWhenReadyAsync()
                 }
             }
             .setNegativeButton("不同意") { _, _ ->

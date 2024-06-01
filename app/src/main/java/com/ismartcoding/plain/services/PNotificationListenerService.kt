@@ -1,6 +1,9 @@
 package com.ismartcoding.plain.services
 
 import android.app.Notification
+import android.content.ComponentName
+import android.content.Context
+import android.content.pm.PackageManager
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import androidx.core.app.NotificationCompat
@@ -10,9 +13,11 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.activityManager
 import com.ismartcoding.plain.extensions.toDNotification
 import com.ismartcoding.plain.features.CancelNotificationsEvent
 import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
@@ -129,6 +134,39 @@ class PNotificationListenerService : NotificationListenerService() {
         isConnected = false
         LogCat.d("PNotificationListenerService: onListenerDisconnected")
         events.clear()
+    }
+
+    companion object {
+        fun toggle(context: Context, enable: Boolean) {
+            if (enable) {
+                val collectorComponent = ComponentName(context, PNotificationListenerService::class.java)
+                LogCat.d("ensureCollectorRunning collectorComponent: $collectorComponent")
+                var collectorRunning = false
+                val runningServices = activityManager.getRunningServices(Int.MAX_VALUE)
+                if (runningServices == null) {
+                    LogCat.d("ensureCollectorRunning() runningServices is NULL")
+                    return
+                }
+                for (service in runningServices) {
+                    if (service.service == collectorComponent) {
+                        if (service.pid == android.os.Process.myPid()) {
+                            collectorRunning = true
+                        }
+                    }
+                }
+                if (collectorRunning) {
+                    LogCat.d("ensureCollectorRunning: collector is running")
+                    return
+                }
+                LogCat.d("ensureCollectorRunning: collector not running, reviving...")
+                val thisComponent = ComponentName(context, PNotificationListenerService::class.java)
+                packageManager.setComponentEnabledSetting(thisComponent, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
+                packageManager.setComponentEnabledSetting(thisComponent, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
+            } else {
+                val thisComponent = ComponentName(context, PNotificationListenerService::class.java)
+                packageManager.setComponentEnabledSetting(thisComponent, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP)
+            }
+        }
     }
 }
 

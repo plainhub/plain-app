@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatBytes
+import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.getMimeType
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
@@ -101,8 +102,8 @@ fun ViewDocBottomSheet(
         FileRenameDialog(path = m.path, onDismiss = {
             viewModel.showRenameDialog.value = false
         }, onDone = {
-            scope.launch(Dispatchers.IO) { viewModel.loadAsync(context) }
-            onDismiss()
+            m.path = it
+            m.name = it.getFilenameFromPath()
         })
     }
 

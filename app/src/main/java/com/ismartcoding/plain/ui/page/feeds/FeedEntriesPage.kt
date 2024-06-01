@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -30,11 +30,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -139,14 +139,17 @@ fun FeedEntriesPage(
             }
         }
 
+    val once = rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        tagsViewModel.dataType.value = viewModel.dataType
-        viewModel.feedId.value = feedId
-        scope.launch(Dispatchers.IO) {
-            feedsViewModel.loadAsync()
-            viewModel.loadAsync(tagsViewModel)
+        if (!once.value) {
+            once.value = true
+            tagsViewModel.dataType.value = viewModel.dataType
+            viewModel.feedId.value = feedId
+            scope.launch(Dispatchers.IO) {
+                feedsViewModel.loadAsync()
+                viewModel.loadAsync(tagsViewModel)
+            }
         }
-
         events.add(
             receiveEventHandler<FeedStatusEvent> { event ->
                 if (event.status == FeedWorkerStatus.COMPLETED) {
@@ -422,11 +425,12 @@ fun FeedEntriesPage(
                                 item(key = "top") {
                                     TopSpace()
                                 }
-                                items(itemsState, key = { it.id }) { m ->
+                                itemsIndexed(itemsState, key = { _, it -> it.id }) { index, m ->
                                     val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
                                     FeedEntryListItem(
                                         viewModel,
                                         tagsViewModel,
+                                        index,
                                         m,
                                         feedsMap.value[m.feedId],
                                         tagsState.filter { tagIds.contains(it.id) },

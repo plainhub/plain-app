@@ -38,6 +38,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -171,16 +172,20 @@ fun ImagesPage(
             }
         }
 
+    val once = rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        viewModel.bucketId.value = bucketId
-        tagsViewModel.dataType.value = viewModel.dataType
-        bucketViewModel.dataType.value = viewModel.dataType
-        if (hasPermission) {
-            scope.launch(Dispatchers.IO) {
-                cellsPerRow = ImageGridCellsPerRowPreference.getAsync(context)
-                viewModel.sortBy.value = ImageSortByPreference.getValueAsync(context)
-                viewModel.loadAsync(context, tagsViewModel)
-                bucketViewModel.loadAsync(context)
+        if (!once.value) {
+            once.value = true
+            viewModel.bucketId.value = bucketId
+            tagsViewModel.dataType.value = viewModel.dataType
+            bucketViewModel.dataType.value = viewModel.dataType
+            if (hasPermission) {
+                scope.launch(Dispatchers.IO) {
+                    cellsPerRow = ImageGridCellsPerRowPreference.getAsync(context)
+                    viewModel.sortBy.value = ImageSortByPreference.getValueAsync(context)
+                    viewModel.loadAsync(context, tagsViewModel)
+                    bucketViewModel.loadAsync(context)
+                }
             }
         }
         events.add(

@@ -31,14 +31,14 @@ class TagsViewModel() : ViewModel() {
     var dataType = mutableStateOf(DataType.DEFAULT)
 
     fun loadAsync(keys: Set<String> = emptySet()) {
-        if (keys.isNotEmpty()) {
-            _tagsMapFlow.value = TagHelper.getTagRelationsByKeysMap(keys, dataType.value).toMutableMap()
-        }
         val tagCountMap = TagHelper.count(dataType.value).associate { it.id to it.count }
         _itemsFlow.value = TagHelper.getAll(dataType.value).map { tag ->
             tag.count = tagCountMap[tag.id] ?: 0
             tag
         }.toMutableStateList()
+        if (keys.isNotEmpty()) {
+            _tagsMapFlow.value = TagHelper.getTagRelationsByKeysMap(keys, dataType.value).toMutableMap()
+        }
         showLoading.value = false
     }
 

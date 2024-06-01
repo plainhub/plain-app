@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -92,9 +93,13 @@ fun AppsPage(
             }
         }
 
+    val once = rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        scope.launch(Dispatchers.IO) {
-            viewModel.loadAsync()
+        if (!once.value) {
+            once.value = true
+            scope.launch(Dispatchers.IO) {
+                viewModel.loadAsync()
+            }
         }
     }
 

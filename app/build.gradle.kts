@@ -171,13 +171,13 @@ dependencies {
     releaseImplementation(libs.firebase.crashlytics.ktx)
 
     // Media3
-    implementation(libs.androidx.media3.exoplayer)
-    implementation(libs.androidx.media3.datasource)
-    implementation(libs.androidx.media3.ui)
-    implementation(libs.androidx.media3.session)
-    implementation(libs.androidx.media3.cast)
-    implementation(libs.androidx.media3.dash)
-    implementation(libs.androidx.media3.hls)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.datasource)
+    implementation(libs.media3.ui)
+    implementation(libs.media3.session)
+    implementation(libs.media3.cast)
+    implementation(libs.media3.dash)
+    implementation(libs.media3.hls)
 
     implementation(libs.apollo.runtime)
     implementation(libs.apollo.normalized.cache)
@@ -185,17 +185,16 @@ dependencies {
     implementation(libs.apollo.adapters)
 
     implementation(libs.androidx.viewpager2)
-    implementation(libs.androidx.paging.runtime.ktx)
     implementation(libs.androidx.preference.ktx)
 
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.snake.yaml)
 
     // CameraX
-    implementation(libs.androidx.camera.core)
-    implementation(libs.androidx.camera.camera2)
-    implementation(libs.androidx.camera.lifecycle)
-    implementation(libs.androidx.camera.view)
+    implementation(libs.camera.core)
+    implementation(libs.camera.camera2)
+    implementation(libs.camera.lifecycle)
+    implementation(libs.camera.view)
 
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
@@ -221,15 +220,16 @@ dependencies {
 
     implementation(libs.openai.client)
 
-    // https://coil-kt.github.io/coil/changelog/
-    api(libs.coil)
-    api(libs.coil.video)
-    api(libs.coil.svg)
-    api(libs.coil.gif)
-    api(libs.coil.compose)
-    api(libs.coil.network.ktor)
+    // coil: https://coil-kt.github.io/coil/changelog/
+    implementation(libs.coil)
+    implementation(libs.coil.video)
+    implementation(libs.coil.svg)
+    implementation(libs.coil.gif)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.ktor)
 
     implementation(libs.core)
+    implementation(libs.paging.runtime)
 
     implementation(libs.androidx.work.runtime.ktx)
 

@@ -34,6 +34,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -119,10 +120,14 @@ fun NotesPage(
             }
         }
 
+    val once = rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        tagsViewModel.dataType.value = viewModel.dataType
-        scope.launch(Dispatchers.IO) {
-            viewModel.loadAsync(tagsViewModel)
+        if (!once.value) {
+            once.value = true
+            tagsViewModel.dataType.value = viewModel.dataType
+            scope.launch(Dispatchers.IO) {
+                viewModel.loadAsync(tagsViewModel)
+            }
         }
     }
 

@@ -19,6 +19,10 @@ data class DNote(
     var deletedAt: Instant? = null
 
     var content: String = ""
+
+    fun getSummary(): String {
+        return content.replace("\n", "").replaceFirst("^\\s*".toRegex(), "")
+    }
 }
 
 @Dao

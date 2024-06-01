@@ -830,3 +830,11 @@ fun String.pathToAceMode(): String {
         else -> "text" // Default to plain text if no specific mapping found
     }
 }
+
+fun String.getSummary(): String {
+    // Define regex to match Markdown image syntax and HTML img tags
+    val regex = Regex("!\\[.*?\\]\\(.*?\\)|!\\[.*?\\]\\[.*?\\]|<img.*?>", RegexOption.IGNORE_CASE)
+
+    // Replace matched patterns with an empty string, replace newlines with an empty string, and trim leading whitespace
+    return replace(regex, "🖼").replace("\n", "").replaceFirst("^\\s*".toRegex(), "")
+}

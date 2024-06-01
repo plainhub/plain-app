@@ -122,18 +122,21 @@ fun VideoPreviewActions(
             VideoButtons1(context, videoState)
             VideoButtons2(videoState, scope)
             if (castViewModel.castMode.value) {
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(MaterialTheme.colorScheme.darkMask())
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
-                ) {
-                    PMiniButton(text = stringResource(id = R.string.cast)) {
-                        castViewModel.cast(m.path)
-                    }
-                    HorizontalSpace(dp = 20.dp)
-                    PMiniOutlineButton(text = stringResource(id = R.string.exit_cast_mode), color = Color.LightGray) {
-                        castViewModel.exitCastMode()
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .clip(RoundedCornerShape(50))
+                            .background(MaterialTheme.colorScheme.darkMask())
+                            .padding(horizontal = 20.dp, vertical = 8.dp),
+                    ) {
+                        PMiniButton(text = stringResource(id = R.string.cast)) {
+                            castViewModel.cast(m.path)
+                        }
+                        HorizontalSpace(dp = 20.dp)
+                        PMiniOutlineButton(text = stringResource(id = R.string.exit_cast_mode), color = Color.LightGray) {
+                            castViewModel.exitCastMode()
+                        }
                     }
                 }
                 return

@@ -37,11 +37,14 @@ fun FileRenameDialog(path: String, onDismiss: () -> Unit, onDone: (String) -> Un
         onConfirm = {
             scope.launch {
                 withIO {
-                    FileHelper.rename(path, name.value)
+                    val newFile = FileHelper.rename(path, name.value)
                     MainApp.instance.scanFileByConnection(path)
+                    if (newFile != null) {
+                        MainApp.instance.scanFileByConnection(newFile.absolutePath)
+                        onDone(newFile.absolutePath)
+                    }
                 }
                 onDismiss()
-                onDone(name.value)
             }
         },
     )

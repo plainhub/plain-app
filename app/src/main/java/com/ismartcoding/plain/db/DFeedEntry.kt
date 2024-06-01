@@ -2,6 +2,7 @@ package com.ismartcoding.plain.db
 
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
+import com.ismartcoding.lib.extensions.getSummary
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.data.IDData
 import com.ismartcoding.plain.data.IData
@@ -38,10 +39,8 @@ data class DFeedEntry(
 //
 //    @ColumnInfo(name = "deleted_at")
 //    var deletedAt: Instant? = null
-
     fun getSummary(): String {
-        val regex = Regex("!\\[.*?\\]\\(.*?\\)|!\\[.*?\\]\\[.*?\\]")
-        return description.replace(regex, "").replaceFirst("^\\s*".toRegex(), "")
+        return description.getSummary()
     }
 }
 

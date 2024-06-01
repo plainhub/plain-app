@@ -33,6 +33,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -138,11 +139,15 @@ fun DocsPage(
         }
     }
 
+    val once = rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        if (hasPermission) {
-            scope.launch(Dispatchers.IO) {
-                viewModel.sortBy.value = DocSortByPreference.getValueAsync(context)
-                viewModel.loadAsync(context)
+        if (!once.value) {
+            once.value = true
+            if (hasPermission) {
+                scope.launch(Dispatchers.IO) {
+                    viewModel.sortBy.value = DocSortByPreference.getValueAsync(context)
+                    viewModel.loadAsync(context)
+                }
             }
         }
         events.add(

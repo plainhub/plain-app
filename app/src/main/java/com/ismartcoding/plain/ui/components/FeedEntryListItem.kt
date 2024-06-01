@@ -23,9 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
@@ -40,7 +38,6 @@ import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import com.ismartcoding.plain.ui.theme.listItemDescription
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTag
 import com.ismartcoding.plain.ui.theme.listItemTitle
@@ -50,6 +47,7 @@ import com.ismartcoding.plain.ui.theme.listItemTitle
 fun FeedEntryListItem(
     viewModel: FeedEntriesViewModel,
     tagsViewModel: TagsViewModel,
+    index: Int,
     m: DFeedEntry,
     feed: DFeed?,
     tags: List<DTag>,
@@ -92,13 +90,6 @@ fun FeedEntryListItem(
                             text = m.title,
                             style = MaterialTheme.typography.listItemTitle()
                         )
-                        VerticalSpace(dp = 8.dp)
-                        Text(
-                            text = m.getSummary(),
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.listItemDescription(),
-                        )
                     }
                     if (m.image.isNotEmpty()) {
                         HorizontalSpace(dp = 12.dp)
@@ -118,7 +109,7 @@ fun FeedEntryListItem(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
-                        text = arrayOf(feed?.name ?: "", m.author, m.publishedAt.timeAgo()).filter {
+                        text = arrayOf((index + 1).toString(), feed?.name ?: "", m.author, m.publishedAt.timeAgo()).filter {
                             it.isNotEmpty()
                         }.joinToString(" · "),
                         style = MaterialTheme.typography.listItemSubtitle(),

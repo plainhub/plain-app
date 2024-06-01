@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -147,9 +148,13 @@ fun ChatPage(
     val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
     val previewerState = rememberPreviewerState()
 
+    val once = rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        inputValue = ChatInputTextPreference.getAsync(context)
-        viewModel.fetch(context)
+        if (!once.value) {
+            once.value = true
+            inputValue = ChatInputTextPreference.getAsync(context)
+            viewModel.fetch(context)
+        }
         events.add(
             receiveEventHandler<DeleteChatItemViewEvent> { event ->
                 viewModel.remove(event.id)

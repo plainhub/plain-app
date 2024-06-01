@@ -20,8 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.lib.extensions.getSummary
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
@@ -71,7 +71,7 @@ fun NoteListItem(
                     .padding(16.dp)
             ) {
                 Text(
-                    text = m.title,
+                    text = m.title.getSummary(),
                     style = MaterialTheme.typography.listItemDescription(),
                 )
                 VerticalSpace(dp = 8.dp)
