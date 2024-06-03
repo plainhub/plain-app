@@ -166,11 +166,11 @@ abstract class BaseContentHelper {
         }
     }
 
-    fun getIds(
+   suspend fun getIds(
         context: Context,
         query: String,
     ): Set<String> {
-        val cursor = getSearchCursor(context, query)
+        val cursor = getSearchCursor(context, QueryHelper.prepareQuery(query))
         val ids = mutableSetOf<String>()
         if (cursor?.moveToFirst() == true) {
             val cache = mutableMapOf<String, Int>()
