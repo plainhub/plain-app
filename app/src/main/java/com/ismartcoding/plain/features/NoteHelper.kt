@@ -95,7 +95,7 @@ object NoteHelper {
     fun addOrUpdateAsync(
         id: String,
         updateItem: DNote.() -> Unit,
-    ): String {
+    ): DNote {
         var item = if (id.isNotEmpty()) noteDao.getById(id) else null
         var isInsert = false
         if (item == null) {
@@ -113,7 +113,7 @@ object NoteHelper {
             noteDao.update(item)
         }
 
-        return item.id
+        return item
     }
 
     fun trashAsync(ids: Set<String>) {

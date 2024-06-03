@@ -40,8 +40,8 @@ import com.ismartcoding.plain.ui.components.chat.ChatFiles
 import com.ismartcoding.plain.ui.components.chat.ChatImages
 import com.ismartcoding.plain.ui.components.chat.ChatName
 import com.ismartcoding.plain.ui.components.chat.ChatText
-import com.ismartcoding.plain.ui.extensions.navigateChatEditText
-import com.ismartcoding.plain.ui.extensions.navigateChatText
+import com.ismartcoding.plain.ui.nav.navigateChatEditText
+import com.ismartcoding.plain.ui.nav.navigateChatText
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.VChat

@@ -63,8 +63,9 @@ import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.home.HomeFeatures
 import com.ismartcoding.plain.ui.components.home.HomeWeb
-import com.ismartcoding.plain.ui.extensions.navigate
+import com.ismartcoding.plain.ui.nav.navigate
 import com.ismartcoding.plain.ui.models.MainViewModel
+import com.ismartcoding.plain.ui.nav.RouteName
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

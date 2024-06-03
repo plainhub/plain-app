@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -57,6 +56,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.DataType
@@ -77,6 +77,7 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPrevie
 import com.ismartcoding.plain.ui.extensions.setSelection
 import com.ismartcoding.plain.ui.models.MdEditorViewModel
 import com.ismartcoding.plain.ui.models.NoteViewModel
+import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.page.tags.SelectTagsDialog
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -95,6 +96,7 @@ fun NotePage(
     initId: String,
     tagId: String,
     viewModel: NoteViewModel = viewModel(),
+    notesViewModel: NotesViewModel = viewModel(),
     tagsViewModel: TagsViewModel = viewModel(),
     mdEditorViewModel: MdEditorViewModel = viewModel()
 ) {
@@ -127,18 +129,11 @@ fun NotePage(
         scope.launch(Dispatchers.IO) {
             if (id.isNotEmpty()) {
                 val item = NoteHelper.getById(id)
-                tagsViewModel.loadAsync(setOf(id))
                 viewModel.item.value = item
                 viewModel.content = item?.content ?: ""
                 mdEditorViewModel.textFieldState.edit {
                     append(viewModel.content)
                     setSelection(0)
-                }
-                if (tagsMapState[id]?.isNotEmpty() == true) {
-                    delay(200)
-                    scope.launch {
-                        mdListState.scrollToItem(0)
-                    }
                 }
             }
             snapshotFlow { mdEditorViewModel.textFieldState.text } .debounce(200)
@@ -149,18 +144,21 @@ fun NotePage(
                         return@collectLatest
                     }
                     scope.launch(Dispatchers.IO) {
-                        id =
+                        val newItem =
                             NoteHelper.addOrUpdateAsync(id) {
                                 title = text.cut(100).replace("\n", "")
                                 content = text
                                 viewModel.content = text
                             }
+                        id = newItem.id
                         if (isNew) {
                             if (tagId.isNotEmpty()) {
                                 // create note from tag items page.
                                 TagHelper.addTagRelations(arrayListOf(TagRelationStub(id).toTagRelation(tagId, DataType.NOTE)))
                             }
+                            tagsViewModel.loadAsync(setOf(id))
                         }
+                        notesViewModel.updateItem(newItem)
                     }
                 }
 

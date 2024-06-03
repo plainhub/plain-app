@@ -43,11 +43,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.FeedEntryFilterType
 import com.ismartcoding.plain.features.FeedStatusEvent
@@ -55,7 +53,6 @@ import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
-import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
@@ -79,8 +76,9 @@ import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.tabs.PScrollableTabRow
 import com.ismartcoding.plain.ui.components.FeedEntryListItem
 import com.ismartcoding.plain.ui.components.ListSearchBar
-import com.ismartcoding.plain.ui.extensions.navigate
-import com.ismartcoding.plain.ui.extensions.navigateTags
+import com.ismartcoding.plain.ui.nav.navigate
+import com.ismartcoding.plain.ui.nav.navigateDetail
+import com.ismartcoding.plain.ui.nav.navigateTags
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
@@ -94,12 +92,13 @@ import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.ui.models.toggleSelectMode
-import com.ismartcoding.plain.ui.page.RouteName
+import com.ismartcoding.plain.ui.nav.RouteName
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlin.math.abs
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -149,6 +148,11 @@ fun FeedEntriesPage(
                 feedsViewModel.loadAsync()
                 viewModel.loadAsync(tagsViewModel)
             }
+        } else {
+            // refresh tabs in case tag name changed in tags page
+            scope.launch(Dispatchers.IO) {
+                viewModel.refreshTabsAsync(tagsViewModel)
+            }
         }
         events.add(
             receiveEventHandler<FeedStatusEvent> { event ->
@@ -168,7 +172,7 @@ fun FeedEntriesPage(
                             else -> {}
                         }
                     } else {
-                        DialogHelper.showErrorDialog(FeedFetchWorker.errorMap.values.toList().joinToString("\n"))
+                        DialogHelper.showErrorDialog(FeedFetchWorker.errorMap.values.joinToString("\n"))
                     }
                 }
             }
@@ -254,6 +258,9 @@ fun FeedEntriesPage(
     val onSearch: (String) -> Unit = {
         viewModel.searchActive.value = false
         viewModel.showLoading.value = true
+        scope.launch {
+            scrollStateMap[pagerState.currentPage]?.scrollToItem(0)
+        }
         scope.launch(Dispatchers.IO) {
             viewModel.loadAsync(tagsViewModel)
         }
@@ -425,11 +432,10 @@ fun FeedEntriesPage(
                                 item(key = "top") {
                                     TopSpace()
                                 }
-                                itemsIndexed(itemsState, key = { _, it -> it.id }) { index, m ->
+                                itemsIndexed(itemsState, key = { _, m -> m.id }) { index, m ->
                                     val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
                                     FeedEntryListItem(
                                         viewModel,
-                                        tagsViewModel,
                                         index,
                                         m,
                                         feedsMap.value[m.feedId],
@@ -438,7 +444,7 @@ fun FeedEntriesPage(
                                             if (viewModel.selectMode.value) {
                                                 viewModel.select(m.id)
                                             } else {
-                                                navController.navigate("${RouteName.FEED_ENTRIES.name}/${m.id}")
+                                                navController.navigateDetail(RouteName.FEED_ENTRIES, m.id)
                                             }
                                         },
                                         onLongClick = {
@@ -446,6 +452,17 @@ fun FeedEntriesPage(
                                                 return@FeedEntryListItem
                                             }
                                             viewModel.selectedItem.value = m
+                                        },
+                                        onClickTag = { tag ->
+                                            if (viewModel.selectMode.value) {
+                                                return@FeedEntryListItem
+                                            }
+                                            val idx = viewModel.tabs.value.indexOfFirst { it.value == tag.id }
+                                            if (idx != -1) {
+                                                scope.launch {
+                                                    pagerState.scrollToPage(idx)
+                                                }
+                                            }
                                         }
                                     )
                                     VerticalSpace(dp = 8.dp)

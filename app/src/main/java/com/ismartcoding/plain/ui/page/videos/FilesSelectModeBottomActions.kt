@@ -93,7 +93,7 @@ fun FilesSelectModeBottomActions(
                 text = LocaleHelper.getString(R.string.delete),
                 click = {
                     DialogHelper.confirmToDelete {
-                        viewModel.delete(context, dragSelectState.selectedIds.toSet())
+                        viewModel.delete(context, tagsViewModel, dragSelectState.selectedIds.toSet())
                         dragSelectState.exitSelectMode()
                     }
                 }

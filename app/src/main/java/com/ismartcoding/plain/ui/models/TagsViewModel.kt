@@ -37,7 +37,7 @@ class TagsViewModel() : ViewModel() {
             tag
         }.toMutableStateList()
         if (keys.isNotEmpty()) {
-            _tagsMapFlow.value = TagHelper.getTagRelationsByKeysMap(keys, dataType.value).toMutableMap()
+            _tagsMapFlow.value += TagHelper.getTagRelationsByKeysMap(keys, dataType.value).toMutableMap()
         }
         showLoading.value = false
     }

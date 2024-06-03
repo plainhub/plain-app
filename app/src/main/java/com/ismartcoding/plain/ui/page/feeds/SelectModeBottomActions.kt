@@ -67,7 +67,7 @@ fun SelectModeBottomActions(
                 icon = Icons.Outlined.DeleteForever,
                 text = LocaleHelper.getString(R.string.delete),
                 onClick = {
-                    viewModel.delete(viewModel.selectedIds.toSet())
+                    viewModel.delete(tagsViewModel, viewModel.selectedIds.toSet())
                     viewModel.exitSelectMode()
                 }
             ),

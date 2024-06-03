@@ -1,10 +1,9 @@
-package com.ismartcoding.plain.ui.extensions
+package com.ismartcoding.plain.ui.nav
 
 import android.net.Uri
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.TextFileType
-import com.ismartcoding.plain.ui.page.RouteName
 
 fun NavHostController.navigate(route: RouteName) {
     navigate(route.name) {
@@ -56,17 +55,17 @@ fun NavHostController.navigateTags(dateType: DataType) {
 }
 
 fun NavHostController.navigateImages(bucketId: String = "") {
-    currentBackStackEntry?.savedStateHandle?.set("bucketId", bucketId)
-    navigate(RouteName.IMAGES)
+    navigate("${RouteName.IMAGES.name}?bucketId=${bucketId}")
 }
 
 fun NavHostController.navigateVideos(bucketId: String = "") {
-    currentBackStackEntry?.savedStateHandle?.set("bucketId", bucketId)
-    navigate(RouteName.VIDEOS)
+    navigate("${RouteName.VIDEOS.name}?bucketId=${bucketId}")
 }
-
 
 fun NavHostController.navigateMediaFolders(dateType: DataType) {
     navigate("${RouteName.MEDIA_FOLDERS.name}?dataType=${dateType.value}")
 }
 
+fun NavHostController.navigateDetail(routeName: RouteName, id: String) {
+    navigate("${routeName.name}/${id}")
+}

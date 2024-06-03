@@ -46,13 +46,13 @@ import com.ismartcoding.plain.ui.theme.listItemTitle
 @Composable
 fun FeedEntryListItem(
     viewModel: FeedEntriesViewModel,
-    tagsViewModel: TagsViewModel,
     index: Int,
     m: DFeedEntry,
     feed: DFeed?,
     tags: List<DTag>,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
+    onClickTag: (DTag) -> Unit
 ) {
     Row {
         if (viewModel.selectMode.value) {
@@ -122,14 +122,7 @@ fun FeedEntryListItem(
                                 .align(Alignment.Bottom),
                             style = MaterialTheme.typography.listItemTag(),
                             onClick = {
-                                if (viewModel.selectMode.value) {
-                                    return@ClickableText
-                                }
-                                viewModel.filterType = FeedEntryFilterType.DEFAULT
-                                viewModel.tag.value = tag
-                                coIO {
-                                    viewModel.loadAsync(tagsViewModel)
-                                }
+                                onClickTag(tag)
                             }
                         )
                     }

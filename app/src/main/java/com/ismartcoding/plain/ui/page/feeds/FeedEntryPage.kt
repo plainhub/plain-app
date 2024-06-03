@@ -72,13 +72,13 @@ import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.markdowntext.MarkdownText
-import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
-import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
-import com.ismartcoding.plain.ui.extensions.navigateText
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
+import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
+import com.ismartcoding.plain.ui.nav.navigateText
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.FeedEntryViewModel
@@ -137,7 +137,6 @@ fun FeedEntryPage(
         tagsViewModel.dataType.value = DataType.FEED_ENTRY
         scope.launch(Dispatchers.IO) {
             viewModel.item.value = FeedEntryHelper.getAsync(id)
-            tagsViewModel.loadAsync(setOf(id))
             val m = viewModel.item.value ?: return@launch
             viewModel.content.value = m.content
             viewModel.feed.value = FeedHelper.getById(m.feedId)

@@ -137,7 +137,7 @@ fun ViewImageBottomSheet(
                         text = LocaleHelper.getString(R.string.delete),
                         click = {
                             DialogHelper.confirmToDelete {
-                                viewModel.delete(context, setOf(m.id))
+                                viewModel.delete(context, tagsViewModel, setOf(m.id))
                                 onDismiss()
                             }
                         }
@@ -153,6 +153,11 @@ fun ViewImageBottomSheet(
                         tagsViewModel = tagsViewModel,
                         tagsMap = tagsMap,
                         tagsState = tagsState,
+                        onChanged = {
+                            scope.launch(Dispatchers.IO) {
+                                viewModel.refreshTabsAsync(context, tagsViewModel)
+                            }
+                        }
                     )
                 }
             }

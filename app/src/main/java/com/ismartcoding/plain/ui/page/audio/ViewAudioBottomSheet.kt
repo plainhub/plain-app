@@ -111,6 +111,7 @@ fun ViewAudioBottomSheet(
                 tagsViewModel = tagsViewModel,
                 tagsMap = tagsMap,
                 tagsState = tagsState,
+                onChanged = {}
             )
             VerticalSpace(dp = 24.dp)
         }

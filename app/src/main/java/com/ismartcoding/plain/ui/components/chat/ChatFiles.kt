@@ -41,14 +41,13 @@ import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.helpers.AppHelper
-import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformImageView
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
-import com.ismartcoding.plain.ui.extensions.navigateOtherFile
-import com.ismartcoding.plain.ui.extensions.navigatePdf
-import com.ismartcoding.plain.ui.extensions.navigateTextFile
+import com.ismartcoding.plain.ui.nav.navigateOtherFile
+import com.ismartcoding.plain.ui.nav.navigatePdf
+import com.ismartcoding.plain.ui.nav.navigateTextFile
 import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.VChat
 import java.io.File

@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.view.WindowCompat
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -55,8 +54,6 @@ import com.ismartcoding.plain.ui.page.chat.ChatEditTextPage
 import com.ismartcoding.plain.ui.page.chat.ChatPage
 import com.ismartcoding.plain.ui.page.chat.ChatTextPage
 import com.ismartcoding.plain.ui.page.docs.DocsPage
-import com.ismartcoding.plain.ui.page.feeds.FeedEntriesPage
-import com.ismartcoding.plain.ui.page.feeds.FeedEntryPage
 import com.ismartcoding.plain.ui.page.feeds.FeedSettingsPage
 import com.ismartcoding.plain.ui.page.feeds.FeedsPage
 import com.ismartcoding.plain.ui.page.images.ImagesPage
@@ -80,12 +77,16 @@ import com.ismartcoding.plain.ui.page.web.WebDevPage
 import com.ismartcoding.plain.ui.page.web.WebLearnMorePage
 import com.ismartcoding.plain.ui.page.web.WebSecurityPage
 import com.ismartcoding.plain.ui.page.web.WebSettingsPage
+import com.ismartcoding.plain.ui.nav.RouteName
+import com.ismartcoding.plain.ui.nav.feedEntriesGraph
+import com.ismartcoding.plain.ui.nav.notesGraph
+import com.ismartcoding.plain.ui.nav.routeDetail
 import com.ismartcoding.plain.ui.theme.AppTheme
 import kotlinx.coroutines.Job
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalCoilApi::class)
 @Composable
-fun Main(navControllerState: MutableState<NavHostController?>, onLaunched: () -> Unit, viewModel: MainViewModel) {
+fun Main(navControllerState: MutableState<NavHostController?>, onLaunched: () -> Unit, mainViewModel: MainViewModel) {
     val context = LocalContext.current
     val navController = rememberNavController()
     navControllerState.value = navController
@@ -129,14 +130,14 @@ fun Main(navControllerState: MutableState<NavHostController?>, onLaunched: () ->
             startDestination = RouteName.HOME.name,
         ) {
             mapOf<RouteName, @Composable () -> Unit>(
-                RouteName.HOME to { HomePage(navController, viewModel) },
+                RouteName.HOME to { HomePage(navController, mainViewModel) },
                 RouteName.SETTINGS to { SettingsPage(navController) },
                 RouteName.COLOR_AND_STYLE to { ColorAndStylePage(navController) },
                 RouteName.DARK_THEME to { DarkThemePage(navController) },
                 RouteName.LANGUAGE to { LanguagePage(navController) },
                 RouteName.BACKUP_RESTORE to { BackupRestorePage(navController) },
                 RouteName.ABOUT to { AboutPage(navController) },
-                RouteName.WEB_SETTINGS to { WebSettingsPage(navController, viewModel) },
+                RouteName.WEB_SETTINGS to { WebSettingsPage(navController, mainViewModel) },
                 RouteName.SESSIONS to { SessionsPage(navController) },
                 RouteName.WEB_DEV to { WebDevPage(navController) },
                 RouteName.WEB_SECURITY to { WebSecurityPage(navController) },
@@ -147,7 +148,6 @@ fun Main(navControllerState: MutableState<NavHostController?>, onLaunched: () ->
                 RouteName.SCAN to { ScanPage(navController) },
                 RouteName.APPS to { AppsPage(navController) },
                 RouteName.DOCS to { DocsPage(navController) },
-                RouteName.NOTES to { NotesPage(navController) },
                 RouteName.FEEDS to { FeedsPage(navController) },
                 RouteName.FEED_SETTINGS to { FeedSettingsPage(navController) },
                 RouteName.WEB_LEARN_MORE to { WebLearnMorePage(navController) },
@@ -158,59 +158,37 @@ fun Main(navControllerState: MutableState<NavHostController?>, onLaunched: () ->
                 }
             }
 
-            routeDetail(RouteName.APPS) {
-                AppPage(navController, it)
+            routeDetail(RouteName.APPS) { _, id ->
+                AppPage(navController, id)
             }
 
+            feedEntriesGraph(navController)
+            notesGraph(navController)
+
             composable(
-                "${RouteName.FEED_ENTRIES.name}?feedId={feedId}",
-                arguments = listOf(navArgument("feedId") {
+                "${RouteName.IMAGES.name}?bucketId={bucketId}",
+                arguments = listOf(navArgument("bucketId") {
                     nullable = true
                     defaultValue = ""
                     type = NavType.StringType
                 }),
             ) {
-                val feedId = it.arguments?.getString("feedId") ?: ""
-                FeedEntriesPage(navController, feedId)
-            }
-
-            routeDetail(RouteName.FEED_ENTRIES) {
-                FeedEntryPage(navController, it)
-            }
-
-            composable(
-                RouteName.IMAGES.name,
-            ) {
-                val bucketId = navController.previousBackStackEntry?.savedStateHandle?.get("bucketId") ?: ""
+                val bucketId = it.arguments?.getString("bucketId") ?: ""
                 ImagesPage(navController, bucketId)
             }
 
             composable(
-                RouteName.VIDEOS.name,
-            ) {
-                val bucketId = navController.previousBackStackEntry?.savedStateHandle?.get("bucketId") ?: ""
-                VideosPage(navController, bucketId)
-            }
-
-            composable(
-                "${RouteName.NOTES.name}/create?tagId={tagId}",
-                arguments = listOf(navArgument("tagId") {
+                "${RouteName.VIDEOS.name}?bucketId={bucketId}",
+                arguments = listOf(navArgument("bucketId") {
                     nullable = true
                     defaultValue = ""
                     type = NavType.StringType
                 }),
             ) {
-                val tagId = it.arguments?.getString("tagId") ?: ""
-                NotePage(navController, "", tagId)
+                val bucketId = it.arguments?.getString("bucketId") ?: ""
+                VideosPage(navController, bucketId)
             }
 
-            composable(
-                "${RouteName.NOTES.name}/{id}",
-                arguments = listOf(navArgument("id") { type = NavType.StringType }),
-            ) {
-                val id = it.arguments?.getString("id") ?: ""
-                NotePage(navController, id, "")
-            }
 
             composable(RouteName.TEXT.name) {
                 val title = navController.previousBackStackEntry?.savedStateHandle?.get("title") ?: ""
@@ -250,11 +228,8 @@ fun Main(navControllerState: MutableState<NavHostController?>, onLaunched: () ->
                 MediaFoldersPage(navController, DataType.fromInt(dataType))
             }
 
-            composable(
-                "${RouteName.CHAT_EDIT_TEXT.name}/{id}",
-                arguments = listOf(navArgument("id") { type = NavType.StringType }),
-            ) {
-                val id = it.arguments?.getString("id") ?: ""
+
+            routeDetail(RouteName.CHAT_EDIT_TEXT) { _, id ->
                 val content = navController.previousBackStackEntry?.savedStateHandle?.get("content") ?: ""
                 ChatEditTextPage(navController, id, content)
             }
@@ -324,16 +299,6 @@ fun Main(navControllerState: MutableState<NavHostController?>, onLaunched: () ->
                 }
             }
         }
-    }
-}
-
-fun NavGraphBuilder.routeDetail(routeName: RouteName, action: @Composable (String) -> Unit) {
-    composable(
-        "${routeName.name}/{id}",
-        arguments = listOf(navArgument("id") { type = NavType.StringType }),
-    ) {
-        val id = it.arguments?.getString("id") ?: ""
-        action(id)
     }
 }
 

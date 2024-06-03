@@ -9,6 +9,7 @@ import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.RestoreFromTrash
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
@@ -29,6 +30,8 @@ import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.enterSelectMode
 import com.ismartcoding.plain.ui.models.select
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -42,6 +45,7 @@ fun ViewNoteBottomSheet(
     val onDismiss = {
         viewModel.selectedItem.value = null
     }
+    val scope = rememberCoroutineScope()
 
     PModalBottomSheet(
         onDismissRequest = {
@@ -67,7 +71,7 @@ fun ViewNoteBottomSheet(
                             icon = Icons.Outlined.RestoreFromTrash,
                             text = LocaleHelper.getString(R.string.restore),
                             click = {
-                                viewModel.untrash(setOf(m.id))
+                                viewModel.untrash(tagsViewModel, setOf(m.id))
                                 onDismiss()
                             }
                         )
@@ -75,7 +79,7 @@ fun ViewNoteBottomSheet(
                             icon = Icons.Outlined.DeleteForever,
                             text = LocaleHelper.getString(R.string.delete),
                             click = {
-                                viewModel.delete(setOf(m.id))
+                                viewModel.delete(tagsViewModel, setOf(m.id))
                                 onDismiss()
                             }
                         )
@@ -90,7 +94,7 @@ fun ViewNoteBottomSheet(
                             icon = Icons.Outlined.DeleteOutline,
                             text = LocaleHelper.getString(R.string.move_to_trash),
                             click = {
-                                viewModel.trash(setOf(m.id))
+                                viewModel.trash(tagsViewModel, setOf(m.id))
                                 onDismiss()
                             }
                         )
@@ -106,6 +110,11 @@ fun ViewNoteBottomSheet(
                         tagsViewModel = tagsViewModel,
                         tagsMap = tagsMap,
                         tagsState = tagsState,
+                        onChanged = {
+                            scope.launch(Dispatchers.IO) {
+                                viewModel.refreshTabsAsync(tagsViewModel)
+                            }
+                        }
                     )
                 }
             }

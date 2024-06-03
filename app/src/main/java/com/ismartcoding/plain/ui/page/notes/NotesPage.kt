@@ -45,12 +45,13 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.ismartcoding.lib.helpers.CoroutinesHelper
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
-import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
@@ -72,7 +73,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.tabs.PScrollableTabRow
 import com.ismartcoding.plain.ui.components.ListSearchBar
 import com.ismartcoding.plain.ui.components.NoteListItem
-import com.ismartcoding.plain.ui.extensions.navigateTags
+import com.ismartcoding.plain.ui.nav.navigateTags
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -84,7 +85,7 @@ import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.ui.models.toggleSelectMode
-import com.ismartcoding.plain.ui.page.RouteName
+import com.ismartcoding.plain.ui.nav.RouteName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -127,6 +128,11 @@ fun NotesPage(
             tagsViewModel.dataType.value = viewModel.dataType
             scope.launch(Dispatchers.IO) {
                 viewModel.loadAsync(tagsViewModel)
+            }
+        } else {
+            // refresh tabs in case tag name changed in tags page
+            scope.launch(Dispatchers.IO) {
+                viewModel.refreshTabsAsync(tagsViewModel)
             }
         }
     }
@@ -197,6 +203,9 @@ fun NotesPage(
     val onSearch: (String) -> Unit = {
         viewModel.searchActive.value = false
         viewModel.showLoading.value = true
+        scope.launch {
+            scrollStateMap[pagerState.currentPage]?.scrollToItem(0)
+        }
         scope.launch(Dispatchers.IO) {
             viewModel.loadAsync(tagsViewModel)
         }
@@ -351,7 +360,6 @@ fun NotesPage(
                                     val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
                                     NoteListItem(
                                         viewModel,
-                                        tagsViewModel,
                                         m,
                                         tagsState.filter { tagIds.contains(it.id) },
                                         onClick = {
@@ -366,6 +374,17 @@ fun NotesPage(
                                                 return@NoteListItem
                                             }
                                             viewModel.selectedItem.value = m
+                                        },
+                                        onClickTag = { tag ->
+                                            if (viewModel.selectMode.value) {
+                                                return@NoteListItem
+                                            }
+                                            val idx = viewModel.tabs.value.indexOfFirst { it.value == tag.id }
+                                            if (idx != -1) {
+                                                scope.launch {
+                                                    pagerState.scrollToPage(idx)
+                                                }
+                                            }
                                         }
                                     )
                                     VerticalSpace(dp = 8.dp)

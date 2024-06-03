@@ -974,12 +974,12 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("saveNote") {
                     resolver { id: ID, input: NoteInput ->
-                        val newId =
+                        val item =
                             NoteHelper.addOrUpdateAsync(id.value) {
                                 title = input.title
                                 content = input.content
                             }
-                        NoteHelper.getById(newId)?.toModel()
+                        NoteHelper.getById(item.id)?.toModel()
                     }
                 }
                 mutation("trashNotes") {

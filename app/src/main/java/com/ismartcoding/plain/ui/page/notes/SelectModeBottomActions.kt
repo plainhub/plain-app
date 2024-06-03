@@ -62,7 +62,7 @@ fun SelectModeBottomActions(
                     icon = Icons.Outlined.RestoreFromTrash,
                     text = LocaleHelper.getString(R.string.restore),
                     click = {
-                        viewModel.untrash(viewModel.selectedIds.toSet())
+                        viewModel.untrash(tagsViewModel, viewModel.selectedIds.toSet())
                         viewModel.exitSelectMode()
                     }
                 )
@@ -70,7 +70,7 @@ fun SelectModeBottomActions(
                     icon = Icons.Outlined.DeleteForever,
                     text = LocaleHelper.getString(R.string.delete),
                     click = {
-                        viewModel.delete(viewModel.selectedIds.toSet())
+                        viewModel.delete(tagsViewModel, viewModel.selectedIds.toSet())
                         viewModel.exitSelectMode()
                     }
                 )
@@ -95,7 +95,7 @@ fun SelectModeBottomActions(
                     icon = Icons.Outlined.DeleteOutline,
                     text = LocaleHelper.getString(R.string.move_to_trash),
                     click = {
-                        viewModel.trash(viewModel.selectedIds.toSet())
+                        viewModel.trash(tagsViewModel, viewModel.selectedIds.toSet())
                         viewModel.exitSelectMode()
                     }
                 )

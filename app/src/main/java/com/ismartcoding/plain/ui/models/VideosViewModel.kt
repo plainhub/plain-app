@@ -62,6 +62,12 @@ class VideosViewModel(private val savedStateHandle: SavedStateHandle) :
     fun loadAsync(context: Context, tagsViewModel: TagsViewModel) {
         offset.value = 0
         _itemsFlow.value = VideoMediaStoreHelper.search(context, getQuery(), limit.value, offset.value, sortBy.value).toMutableStateList()
+        refreshTabsAsync(context, tagsViewModel)
+        showLoading.value = false
+    }
+
+    // for updating tags, delete items
+    fun refreshTabsAsync(context: Context, tagsViewModel: TagsViewModel) {
         tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
         total.value = VideoMediaStoreHelper.count(context, getTotalQuery())
         noMore.value = _itemsFlow.value.size < limit.value
@@ -69,14 +75,14 @@ class VideosViewModel(private val savedStateHandle: SavedStateHandle) :
             VTabData(LocaleHelper.getString(R.string.all), "all", total.value),
             * tagsViewModel.itemsFlow.value.map { VTabData(it.name, it.id, it.count) }.toTypedArray()
         )
-        showLoading.value = false
     }
 
-    fun delete(context: Context, ids: Set<String>) {
+    fun delete(context: Context, tagsViewModel: TagsViewModel, ids: Set<String>) {
         viewModelScope.launch(Dispatchers.IO) {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             VideoMediaStoreHelper.deleteRecordsAndFilesByIds(context, ids)
+            refreshTabsAsync(context, tagsViewModel)
             DialogHelper.hideLoading()
             _itemsFlow.update {
                 it.toMutableStateList().apply {

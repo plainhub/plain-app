@@ -10,6 +10,7 @@ import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -36,6 +37,8 @@ import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.enterSelectMode
 import com.ismartcoding.plain.ui.models.select
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -47,6 +50,7 @@ fun ViewFeedEntryBottomSheet(
 ) {
     val m = viewModel.selectedItem.value ?: return
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val onDismiss = {
         viewModel.selectedItem.value = null
     }
@@ -74,7 +78,7 @@ fun ViewFeedEntryBottomSheet(
                         icon = Icons.Outlined.DeleteForever,
                         text = LocaleHelper.getString(R.string.delete),
                         click = {
-                            viewModel.delete(setOf(m.id))
+                            viewModel.delete(tagsViewModel, setOf(m.id))
                             onDismiss()
                         }
                     )
@@ -86,6 +90,11 @@ fun ViewFeedEntryBottomSheet(
                     tagsViewModel = tagsViewModel,
                     tagsMap = tagsMap,
                     tagsState = tagsState,
+                    onChanged = {
+                        scope.launch(Dispatchers.IO) {
+                            viewModel.refreshTabsAsync(tagsViewModel)
+                        }
+                    }
                 )
                 VerticalSpace(dp = 24.dp)
                 PCard {

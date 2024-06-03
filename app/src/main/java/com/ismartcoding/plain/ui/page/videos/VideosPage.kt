@@ -65,7 +65,6 @@ import com.ismartcoding.plain.preference.VideoGridCellsPerRowPreference
 import com.ismartcoding.plain.preference.VideoSortByPreference
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
-import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
@@ -99,8 +98,8 @@ import com.ismartcoding.plain.ui.components.ListSearchBar
 import com.ismartcoding.plain.ui.components.VideoGridItem
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
-import com.ismartcoding.plain.ui.extensions.navigateMediaFolders
-import com.ismartcoding.plain.ui.extensions.navigateTags
+import com.ismartcoding.plain.ui.nav.navigateMediaFolders
+import com.ismartcoding.plain.ui.nav.navigateTags
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
@@ -187,6 +186,11 @@ fun VideosPage(
                     viewModel.loadAsync(context, tagsViewModel)
                     bucketViewModel.loadAsync(context)
                 }
+            }
+        } else {
+            // refresh tabs in case tag name changed in tags page
+            scope.launch(Dispatchers.IO) {
+                viewModel.refreshTabsAsync(context, tagsViewModel)
             }
         }
         events.add(
@@ -527,7 +531,7 @@ fun VideosPage(
         },
         deleteAction = { item ->
             scope.launch(Dispatchers.IO) {
-                viewModel.delete(context, setOf(item.mediaId))
+                viewModel.delete(context, tagsViewModel, setOf(item.mediaId))
                 previewerState.closeTransform()
             }
         },

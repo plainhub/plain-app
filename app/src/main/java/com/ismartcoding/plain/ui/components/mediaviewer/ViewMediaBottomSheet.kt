@@ -54,6 +54,7 @@ fun ViewImageBottomSheet(
     onDismiss: () -> Unit = {},
     onRenamed: () -> Unit = {},
     deleteAction: () -> Unit = {},
+    onTagsChanged: () -> Unit = {},
 ) {
     var showRenameDialog by remember {
         mutableStateOf(false)
@@ -105,6 +106,9 @@ fun ViewImageBottomSheet(
                         tagsViewModel = tagsViewModel!!,
                         tagsMap = tagsMap!!,
                         tagsState = tagsState,
+                        onChanged = {
+                            onTagsChanged()
+                        }
                     )
                     VerticalSpace(dp = 24.dp)
                 }

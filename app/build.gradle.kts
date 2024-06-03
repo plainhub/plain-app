@@ -154,18 +154,17 @@ dependencies {
 
     // https://github.com/google/accompanist/releases
     implementation(libs.compose.lifecycle.runtime)
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.runtime)
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.foundation)
-    implementation(libs.androidx.foundation.layout)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.compose.activity)
+    implementation(libs.compose.runtime)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.foundation.layout)
+    implementation(libs.compose.viewmodel)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.material.icons.extended)
     implementation(libs.accompanist.drawablepainter)
-//    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha12")
-
     // https://developer.android.com/jetpack/androidx/releases/navigation
-    implementation(libs.androidx.navigation.compose)
+    implementation(libs.compose.navigation)
 
     releaseImplementation(platform(libs.firebase.bom))
     releaseImplementation(libs.firebase.crashlytics.ktx)
@@ -228,7 +227,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.ktor)
 
-    implementation(libs.core)
+    implementation(libs.zxing.core)
     implementation(libs.paging.runtime)
 
     implementation(libs.androidx.work.runtime.ktx)

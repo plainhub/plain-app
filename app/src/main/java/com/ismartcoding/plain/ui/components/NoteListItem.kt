@@ -40,11 +40,11 @@ import com.ismartcoding.plain.ui.theme.listItemTag
 @Composable
 fun NoteListItem(
     viewModel: NotesViewModel,
-    tagsViewModel: TagsViewModel,
     m: DNote,
     tags: List<DTag>,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
+    onClickTag: (DTag) -> Unit
 ) {
     Row {
         if (viewModel.selectMode.value) {
@@ -91,14 +91,7 @@ fun NoteListItem(
                                 .align(Alignment.Bottom),
                             style = MaterialTheme.typography.listItemTag(),
                             onClick = {
-                                if (viewModel.selectMode.value) {
-                                    return@ClickableText
-                                }
-                                viewModel.trash.value = false
-                                viewModel.tag.value = tag
-                                coIO {
-                                    viewModel.loadAsync(tagsViewModel)
-                                }
+                                onClickTag(tag)
                             }
                         )
                     }

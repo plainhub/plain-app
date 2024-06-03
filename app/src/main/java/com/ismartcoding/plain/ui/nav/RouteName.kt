@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.page
+package com.ismartcoding.plain.ui.nav
 
 enum class RouteName {
     HOME,

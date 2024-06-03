@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ui.page.apps
 
 
 import android.annotation.SuppressLint
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -49,7 +48,6 @@ import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.data.DPackageDetail
 import com.ismartcoding.plain.features.PackageHelper
-import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.GroupButton
@@ -61,10 +59,9 @@ import com.ismartcoding.plain.ui.base.PIconTextActionButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.rememberLifecycleEvent
-import com.ismartcoding.plain.ui.extensions.navigateText
+import com.ismartcoding.plain.ui.nav.navigateText
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

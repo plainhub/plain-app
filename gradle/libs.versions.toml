@@ -89,8 +89,6 @@ accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-dra
 
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreenVersion" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferencesVersion" }
-androidx-foundation-layout = { module = "androidx.compose.foundation:foundation-layout", version.ref = "compose" }
-androidx-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
 
 # camera
 camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraCoreVersion" }
@@ -108,30 +106,45 @@ media3-dash = { module = "androidx.media3:media3-exoplayer-dash", version.ref = 
 media3-hls = { module = "androidx.media3:media3-exoplayer-hls", version.ref = "media3" }
 
 paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "pagingVersion" }
+zxing-core = { module = "com.google.zxing:core", version.ref = "coreVersion" }
 
-androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationComposeVersion" }
-androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtendedVersion" }
-androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
+
 androidx-preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtxVersion" }
-androidx-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
-compose-lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleViewmodelKtxVersion" }
-androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
-androidx-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2Version" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtxVersion" }
+
+# compose
+compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
+compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
+compose-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "navigationComposeVersion" }
+compose-lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleViewmodelKtxVersion" }
+compose-activity = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+compose-foundation-layout = { module = "androidx.compose.foundation:foundation-layout", version.ref = "compose" }
+compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
+compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtendedVersion" }
+compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
+compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose" }
+
+# firebase
+firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx", version.ref = "firebaseCrashlyticsKtxVersion" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
+
+gson = { module = "com.google.code.gson:gson", version.ref = "gsonVersion" }
+guava = { module = "com.google.guava:guava", version.ref = "guavaVersion" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoupVersion" }
+
+# graphql
+kgraphql-ktor = { module = "com.apurebase:kgraphql-ktor", version.ref = "kgraphql" }
+kgraphql = { module = "com.apurebase:kgraphql", version.ref = "kgraphql" }
+
+# apollo
 apollo-adapters = { module = "com.apollographql.apollo3:apollo-adapters", version.ref = "apollo" }
 apollo-normalized-cache-sqlite = { module = "com.apollographql.apollo3:apollo-normalized-cache-sqlite", version.ref = "apollo" }
 apollo-normalized-cache = { module = "com.apollographql.apollo3:apollo-normalized-cache", version.ref = "apollo" }
 apollo-runtime = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo" }
-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
-core = { module = "com.google.zxing:core", version.ref = "coreVersion" }
-firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx", version.ref = "firebaseCrashlyticsKtxVersion" }
-firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
-gson = { module = "com.google.code.gson:gson", version.ref = "gsonVersion" }
-guava = { module = "com.google.guava:guava", version.ref = "guavaVersion" }
-jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoupVersion" }
-kgraphql-ktor = { module = "com.apurebase:kgraphql-ktor", version.ref = "kgraphql" }
-kgraphql = { module = "com.apurebase:kgraphql", version.ref = "kgraphql" }
+
+# kotlin
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePluginVersion" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetimeVersion" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJsonVersion" }
@@ -169,14 +182,19 @@ markwon-tables = { module = "io.noties.markwon:ext-tables", version.ref = "markw
 markwon-linkify = { module = "io.noties.markwon:linkify", version.ref = "markwon" }
 markwon-tasklist = { module = "io.noties.markwon:ext-tasklist", version.ref = "markwon" }
 
+# material
 material = { module = "com.google.android.material:material", version.ref = "materialVersion" }
+
+# room
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttpVersion" }
 openai-client = { module = "com.aallam.openai:openai-client", version.ref = "openaiClientVersion" }
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroidVersion" }
 pdfium-android = { module = "com.github.barteksc:pdfium-android", version.ref = "pdfiumAndroidVersion" }
 refresh-layout-kernel = { module = "io.github.scwang90:refresh-layout-kernel", version.ref = "refreshLayoutKernelVersion" }
-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+
 snake-yaml = { module = "com.github.bmoliveira:snake-yaml", version.ref = "snakeYamlVersion" }
 subsampling-scale-image-view-androidx = { module = "com.davemorrissey.labs:subsampling-scale-image-view-androidx", version.ref = "subsamplingScaleImageViewAndroidxVersion" }
 zt-zip = { module = "org.zeroturnaround:zt-zip", version.ref = "ztZipVersion" }

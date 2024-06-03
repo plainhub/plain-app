@@ -22,10 +22,10 @@ import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.ui.audio.AudiosDialog
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconTextButton
-import com.ismartcoding.plain.ui.extensions.navigate
-import com.ismartcoding.plain.ui.extensions.navigateImages
+import com.ismartcoding.plain.ui.nav.navigate
+import com.ismartcoding.plain.ui.nav.navigateImages
 import com.ismartcoding.plain.ui.file.FilesDialog
-import com.ismartcoding.plain.ui.page.RouteName
+import com.ismartcoding.plain.ui.nav.RouteName
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

@@ -25,6 +25,7 @@ fun TagSelector(
     tagsViewModel: TagsViewModel,
     tagsMap: Map<String, List<DTagRelation>>,
     tagsState: List<DTag>,
+    onChanged: () -> Unit
 ) {
     val tagIds = remember {
         mutableStateListOf<String>()
@@ -51,6 +52,7 @@ fun TagSelector(
                     } else {
                         tagIds.add(tag.id)
                     }
+                    onChanged()
                 },
                 text = tag.name
             )

@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
@@ -27,12 +26,11 @@ import com.ismartcoding.lib.extensions.isTextFile
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.AppHelper
-import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.extensions.navigateOtherFile
-import com.ismartcoding.plain.ui.extensions.navigatePdf
-import com.ismartcoding.plain.ui.extensions.navigateTextFile
+import com.ismartcoding.plain.ui.nav.navigateOtherFile
+import com.ismartcoding.plain.ui.nav.navigatePdf
+import com.ismartcoding.plain.ui.nav.navigateTextFile
 import com.ismartcoding.plain.ui.models.DocsViewModel
 import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.theme.PlainTheme

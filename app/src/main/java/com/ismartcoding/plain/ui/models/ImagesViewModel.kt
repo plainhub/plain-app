@@ -62,21 +62,26 @@ class ImagesViewModel(private val savedStateHandle: SavedStateHandle) :
     fun loadAsync(context: Context, tagsViewModel: TagsViewModel) {
         offset.value = 0
         _itemsFlow.value = ImageMediaStoreHelper.search(context, getQuery(), limit.value, offset.value, sortBy.value).toMutableStateList()
+        refreshTabsAsync(context, tagsViewModel)
+        noMore.value = _itemsFlow.value.size < limit.value
+        showLoading.value = false
+    }
+
+    fun refreshTabsAsync(context: Context, tagsViewModel: TagsViewModel) {
         tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
         total.value = ImageMediaStoreHelper.count(context, getTotalQuery())
-        noMore.value = _itemsFlow.value.size < limit.value
         tabs.value = listOf(
             VTabData(LocaleHelper.getString(R.string.all), "all", total.value),
             * tagsViewModel.itemsFlow.value.map { VTabData(it.name, it.id, it.count) }.toTypedArray()
         )
-        showLoading.value = false
     }
 
-    fun delete(context: Context, ids: Set<String>) {
+    fun delete(context: Context, tagsViewModel: TagsViewModel, ids: Set<String>) {
         viewModelScope.launch(Dispatchers.IO) {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
             ImageMediaStoreHelper.deleteRecordsAndFilesByIds(context, ids)
+            refreshTabsAsync(context, tagsViewModel)
             DialogHelper.hideLoading()
             _itemsFlow.update {
                 it.toMutableStateList().apply {
