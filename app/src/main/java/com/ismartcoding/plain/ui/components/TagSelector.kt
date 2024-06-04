@@ -33,7 +33,7 @@ fun TagSelector(
     LaunchedEffect(Unit) {
         tagIds.addAll(tagsMap[data.id]?.map { it.tagId } ?: emptyList())
     }
-    TagNameDialog(tagsViewModel)
+    TagNameDialog(tagsViewModel, onChanged)
     FlowRow(
         modifier =
         Modifier

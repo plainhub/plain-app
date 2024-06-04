@@ -7,7 +7,7 @@ import com.ismartcoding.plain.ui.base.TextFieldDialog
 import com.ismartcoding.plain.ui.models.TagsViewModel
 
 @Composable
-fun TagNameDialog(viewModel: TagsViewModel) {
+fun TagNameDialog(viewModel: TagsViewModel, onChanged: () -> Unit = {}) {
     val tag = viewModel.editItem.value
     if (viewModel.tagNameDialogVisible.value) {
         TextFieldDialog(
@@ -27,6 +27,7 @@ fun TagNameDialog(viewModel: TagsViewModel) {
                 } else {
                     viewModel.addTag(viewModel.editTagName.value)
                 }
+                onChanged()
             },
         )
     }
