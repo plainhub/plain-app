@@ -20,8 +20,8 @@ class Ticket {
     private fun clearTicket() {
         ticketMap.forEach {
             it.value.resume(Unit)
-            ticketMap.remove(it.key)
         }
+        ticketMap.clear()
     }
 
     @Composable

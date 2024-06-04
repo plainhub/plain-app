@@ -31,12 +31,10 @@ class ImagesViewModel(private val savedStateHandle: SavedStateHandle) :
     private val _itemsFlow = MutableStateFlow(mutableStateListOf<DImage>())
     val itemsFlow: StateFlow<List<DImage>> get() = _itemsFlow
     val showLoading = mutableStateOf(true)
-    val offset = mutableIntStateOf(0)
-    val limit = mutableIntStateOf(1000)
+    private var offset = 0
+    private val limit = 1000
     val noMore = mutableStateOf(false)
     var trash = mutableStateOf(false)
-    var total = mutableIntStateOf(0)
-    var totalTrash = mutableIntStateOf(0)
     var tag = mutableStateOf<DTag?>(null)
     val bucketId = mutableStateOf<String>("")
     val dataType = DataType.IMAGE
@@ -51,27 +49,27 @@ class ImagesViewModel(private val savedStateHandle: SavedStateHandle) :
     override val queryText = mutableStateOf("")
 
     fun moreAsync(context: Context, tagsViewModel: TagsViewModel) {
-        offset.value += limit.value
-        val items = ImageMediaStoreHelper.search(context, getQuery(), limit.value, offset.value, sortBy.value)
+        offset += limit
+        val items = ImageMediaStoreHelper.search(context, getQuery(), limit, offset, sortBy.value)
         _itemsFlow.value.addAll(items)
         tagsViewModel.loadMoreAsync(items.map { it.id }.toSet())
         showLoading.value = false
-        noMore.value = items.size < limit.value
+        noMore.value = items.size < limit
     }
 
     fun loadAsync(context: Context, tagsViewModel: TagsViewModel) {
-        offset.value = 0
-        _itemsFlow.value = ImageMediaStoreHelper.search(context, getQuery(), limit.value, offset.value, sortBy.value).toMutableStateList()
+        offset = 0
+        _itemsFlow.value = ImageMediaStoreHelper.search(context, getQuery(), limit, offset, sortBy.value).toMutableStateList()
         refreshTabsAsync(context, tagsViewModel)
-        noMore.value = _itemsFlow.value.size < limit.value
+        noMore.value = _itemsFlow.value.size < limit
         showLoading.value = false
     }
 
     fun refreshTabsAsync(context: Context, tagsViewModel: TagsViewModel) {
         tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
-        total.value = ImageMediaStoreHelper.count(context, getTotalQuery())
+        val total = ImageMediaStoreHelper.count(context, getTotalQuery())
         tabs.value = listOf(
-            VTabData(LocaleHelper.getString(R.string.all), "all", total.value),
+            VTabData(LocaleHelper.getString(R.string.all), "all", total),
             * tagsViewModel.itemsFlow.value.map { VTabData(it.name, it.id, it.count) }.toTypedArray()
         )
     }

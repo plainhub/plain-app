@@ -124,7 +124,6 @@ compose-foundation-layout = { module = "androidx.compose.foundation:foundation-l
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
 compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtendedVersion" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
-compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose" }
 
 # firebase
 firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx", version.ref = "firebaseCrashlyticsKtxVersion" }

@@ -55,6 +55,7 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.enums.AppFeatureType
@@ -110,6 +111,7 @@ import com.ismartcoding.plain.ui.models.exitSearchMode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlin.system.measureTimeMillis
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -180,10 +182,14 @@ fun ImagesPage(
             bucketViewModel.dataType.value = viewModel.dataType
             if (hasPermission) {
                 scope.launch(Dispatchers.IO) {
-                    cellsPerRow = ImageGridCellsPerRowPreference.getAsync(context)
-                    viewModel.sortBy.value = ImageSortByPreference.getValueAsync(context)
-                    viewModel.loadAsync(context, tagsViewModel)
-                    bucketViewModel.loadAsync(context)
+                    val ts =  measureTimeMillis {
+
+                        cellsPerRow = ImageGridCellsPerRowPreference.getAsync(context)
+                        viewModel.sortBy.value = ImageSortByPreference.getValueAsync(context)
+                        viewModel.loadAsync(context, tagsViewModel)
+                        bucketViewModel.loadAsync(context)
+                    }
+                    LogCat.d("performance: $ts")
                 }
             }
         } else {
@@ -530,6 +536,11 @@ fun ImagesPage(
                 previewerState.closeTransform()
             }
         },
+        onTagsChanged = {
+            scope.launch(Dispatchers.IO) {
+                viewModel.refreshTabsAsync(context, tagsViewModel)
+            }
+        }
     )
 }
 

@@ -37,7 +37,7 @@ import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.ui.components.mediaviewer.GestureScope
 import com.ismartcoding.plain.ui.components.mediaviewer.MediaViewer
-import com.ismartcoding.plain.ui.components.mediaviewer.ViewImageBottomSheet
+import com.ismartcoding.plain.ui.components.mediaviewer.ViewMediaBottomSheet
 import com.ismartcoding.plain.ui.components.mediaviewer.rememberDecoderImagePainter
 import com.ismartcoding.plain.ui.components.mediaviewer.rememberViewerState
 import com.ismartcoding.plain.ui.models.CastViewModel
@@ -95,6 +95,7 @@ fun MediaPreviewer(
     tagsState: List<DTag> = emptyList(),
     onRenamed: () -> Unit = {},
     deleteAction: (PreviewItem) -> Unit = {},
+    onTagsChanged: () -> Unit = {},
 ) {
     val context = LocalContext.current
     LaunchedEffect(
@@ -149,7 +150,7 @@ fun MediaPreviewer(
                             modifier = Modifier
                                 .fillMaxSize(),
 
-                        ) {
+                            ) {
                             key(page) {
                                 val item = remember(page) {
                                     getItem(page)
@@ -192,7 +193,8 @@ fun MediaPreviewer(
     }
     if (state.showMediaInfo) {
         val m = getItem(state.pagerState.currentPage)
-        ViewImageBottomSheet(m,
+        ViewMediaBottomSheet(
+            m,
             tagsViewModel, tagsMap, tagsState,
             onDismiss = {
                 state.showMediaInfo = false
@@ -200,7 +202,9 @@ fun MediaPreviewer(
             onRenamed = onRenamed,
             deleteAction = {
                 deleteAction(m)
-            })
+            },
+            onTagsChanged = onTagsChanged
+        )
     }
 
     state.ticket.Next()

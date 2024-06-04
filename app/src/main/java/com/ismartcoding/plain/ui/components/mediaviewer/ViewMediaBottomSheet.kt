@@ -26,7 +26,6 @@ import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
@@ -46,7 +45,7 @@ import com.ismartcoding.plain.ui.preview.PreviewItem
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun ViewImageBottomSheet(
+fun ViewMediaBottomSheet(
     m: PreviewItem,
     tagsViewModel: TagsViewModel? = null,
     tagsMap: Map<String, List<DTagRelation>>? = null,

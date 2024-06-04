@@ -535,6 +535,11 @@ fun VideosPage(
                 previewerState.closeTransform()
             }
         },
+        onTagsChanged = {
+            scope.launch(Dispatchers.IO) {
+                viewModel.loadAsync(context, tagsViewModel)
+            }
+        },
     )
 }
 

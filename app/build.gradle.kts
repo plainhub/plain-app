@@ -159,7 +159,6 @@ dependencies {
     implementation(libs.compose.ui)
     implementation(libs.compose.foundation)
     implementation(libs.compose.foundation.layout)
-    implementation(libs.compose.viewmodel)
     implementation(libs.compose.material3)
     implementation(libs.compose.material.icons.extended)
     implementation(libs.accompanist.drawablepainter)

@@ -105,7 +105,9 @@ suspend fun DFeedEntry.fetchContentAsync(): ApiResult {
                             ex.printStackTrace()
                         }
                     }
-                    content = MDConverter().convert(mobilizedHtml)
+                    if (content.length > description.length) {
+                        content = MDConverter().convert(mobilizedHtml)
+                    }
                     updatedAt = Clock.System.now()
                     FeedEntryHelper.updateAsync(this)
                 }
