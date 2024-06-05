@@ -22,11 +22,9 @@ import com.ismartcoding.lib.extensions.isPdfFile
 import com.ismartcoding.lib.extensions.isTextFile
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.extensions.newPath
-import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.lib.extensions.px
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.ActionSourceType
@@ -38,14 +36,14 @@ import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.PermissionsResultEvent
-import com.ismartcoding.plain.features.audio.AudioPlayer
+import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.features.media.FileMediaStoreHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.BaseDialog
-import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.PdfViewerDialog
 import com.ismartcoding.plain.ui.TextEditorDialog
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
@@ -328,7 +326,7 @@ class FilesDialog(val fileType: FilesType = FilesType.INTERNAL_STORAGE) : BaseDi
             val items =
                 withIO {
                     if (viewModel.type == FilesType.RECENTS) {
-                        FileSystemHelper.getRecents(context)
+                        FileMediaStoreHelper.getRecentFilesAsync(context, "")
                     } else if (viewModel.searchQ.isNotEmpty()) {
                         FileSystemHelper.search(viewModel.searchQ, p, ShowHiddenFilesPreference.getAsync(context))
                     } else {

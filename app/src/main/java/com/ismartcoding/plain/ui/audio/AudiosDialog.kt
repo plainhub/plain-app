@@ -14,7 +14,6 @@ import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
@@ -27,12 +26,11 @@ import com.ismartcoding.plain.preference.AudioSortByPreference
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.AudioActionEvent
 import com.ismartcoding.plain.features.ClearAudioPlaylistEvent
-import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.PermissionsResultEvent
 import com.ismartcoding.plain.enums.AudioAction
-import com.ismartcoding.plain.features.audio.AudioMediaStoreHelper
-import com.ismartcoding.plain.features.audio.AudioPlayer
+import com.ismartcoding.plain.features.media.AudioMediaStoreHelper
+import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.ui.BaseListDrawerDialog
 import com.ismartcoding.plain.ui.CastDialog
 import com.ismartcoding.plain.ui.extensions.checkPermission
@@ -195,8 +193,8 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
         val query = viewModel.getQuery()
         val context = requireContext()
         val sortBy = AudioSortByPreference.getValueAsync(context)
-        val items = withIO { AudioMediaStoreHelper.search(context, query, viewModel.limit, viewModel.offset, sortBy) }
-        viewModel.total = withIO { AudioMediaStoreHelper.count(context, query) }
+        val items = withIO { AudioMediaStoreHelper.searchAsync(context, query, viewModel.limit, viewModel.offset, sortBy) }
+        viewModel.total = withIO { AudioMediaStoreHelper.countAsync(context, query) }
         val bindingAdapter = binding.list.rv.bindingAdapter
         val toggleMode = bindingAdapter.toggleMode
         val checkedItems = bindingAdapter.getCheckedModels<AudioModel>()
@@ -220,7 +218,7 @@ class AudiosDialog(private val bucket: DMediaBucket? = null) : BaseListDrawerDia
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private suspend fun updateFolders() {
-        val items = withIO { AudioMediaStoreHelper.getBuckets(requireContext()) }
+        val items = withIO { AudioMediaStoreHelper.getBucketsAsync(requireContext()) }
         viewModel.total = items.size
         binding.list.page.addData(items, hasMore = { false })
     }

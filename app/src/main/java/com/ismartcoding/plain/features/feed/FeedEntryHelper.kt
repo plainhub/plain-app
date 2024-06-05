@@ -6,6 +6,7 @@ import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.FeedEntryDao
+import com.ismartcoding.plain.helpers.QueryHelper
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -16,7 +17,7 @@ object FeedEntryHelper {
         AppDatabase.instance.feedEntryDao()
     }
 
-    fun count(query: String): Int {
+    suspend fun count(query: String): Int {
         var sql = "SELECT COUNT(id) FROM feed_entries"
         val where = ContentWhere()
         if (query.isNotEmpty()) {
@@ -27,7 +28,7 @@ object FeedEntryHelper {
         return feedEntryDao.count(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
     }
 
-    fun getIdsAsync(query: String): Set<String> {
+    suspend fun getIdsAsync(query: String): Set<String> {
         var sql = "SELECT id FROM feed_entries"
         val where = ContentWhere()
         if (query.isNotEmpty()) {
@@ -38,7 +39,7 @@ object FeedEntryHelper {
         return feedEntryDao.getIds(SimpleSQLiteQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
     }
 
-    fun search(
+    suspend fun search(
         query: String,
         limit: Int,
         offset: Int,
@@ -88,12 +89,11 @@ object FeedEntryHelper {
         feedEntryDao.deleteAll()
     }
 
-    private fun parseQuery(
+    private suspend fun parseQuery(
         where: ContentWhere,
         query: String,
     ) {
-        val queryGroups = SearchHelper.parse(query)
-        queryGroups.forEach {
+        QueryHelper.parseAsync(query).forEach {
             if (it.name == "text") {
                 where.addLikes(listOf("title", "description", "content"), listOf(it.value, it.value, it.value))
             } else if (it.name == "feed_id") {
@@ -106,10 +106,7 @@ object FeedEntryHelper {
                     .atStartOfDayIn(timeZone)
                 where.add("published_at>=?", startOfDay.toString())
             } else if (it.name == "ids") {
-                val ids = it.value.split(",")
-                if (ids.isNotEmpty()) {
-                    where.addIn("id", ids)
-                }
+                where.addIn("id", it.value.split(","))
             } else if (it.name == "created_at") {
                 where.add("created_at ${it.op} ?", it.value)
             }

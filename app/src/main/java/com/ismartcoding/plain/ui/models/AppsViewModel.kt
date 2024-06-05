@@ -33,17 +33,17 @@ class AppsViewModel(private val savedStateHandle: SavedStateHandle) : ISearchabl
     override val searchActive = mutableStateOf(false)
     override val queryText = mutableStateOf("")
 
-    fun moreAsync() {
+    suspend fun moreAsync() {
         offset.value += limit.value
-        val items = PackageHelper.search(getQuery(), limit.value, offset.value, sortBy.value).map { VPackage.from(it) }
+        val items = PackageHelper.searchAsync(getQuery(), limit.value, offset.value, sortBy.value).map { VPackage.from(it) }
         _itemsFlow.value.addAll(items)
         showLoading.value = false
         noMore.value = items.size < limit.value
     }
 
-    fun loadAsync() {
+    suspend fun loadAsync() {
         offset.value = 0
-        _itemsFlow.value = PackageHelper.search(getQuery(), limit.value, 0, sortBy.value).map { VPackage.from(it) }.toMutableStateList()
+        _itemsFlow.value = PackageHelper.searchAsync(getQuery(), limit.value, 0, sortBy.value).map { VPackage.from(it) }.toMutableStateList()
         total.value = PackageHelper.count(queryText.value)
         totalSystem.value = PackageHelper.count("${queryText.value} type:system")
         noMore.value = _itemsFlow.value.size < limit.value

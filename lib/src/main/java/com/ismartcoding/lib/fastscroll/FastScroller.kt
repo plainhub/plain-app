@@ -24,6 +24,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.ismartcoding.lib.R
@@ -486,7 +487,7 @@ class FastScroller : LinearLayout {
 
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                if (event.x < handleView.x - scrollbar.compatPaddingStart) return false
+                if (event.x < handleView.x - scrollbar.getPaddingStart()) return false
 
                 requestDisallowInterceptTouchEvent(true)
                 setHandleSelected(view == scrollbar)

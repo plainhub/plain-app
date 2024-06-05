@@ -9,8 +9,8 @@ import androidx.lifecycle.ViewModel
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.enums.DataType
-import com.ismartcoding.plain.features.ImageMediaStoreHelper
-import com.ismartcoding.plain.features.video.VideoMediaStoreHelper
+import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
+import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -25,10 +25,10 @@ class MediaFoldersViewModel(private val savedStateHandle: SavedStateHandle) : Vi
     fun loadAsync(context: Context) {
         _itemsFlow.value = (when (dataType.value) {
             DataType.IMAGE -> {
-                ImageMediaStoreHelper.getBuckets(context)
+                ImageMediaStoreHelper.getBucketsAsync(context)
             }
             DataType.VIDEO -> {
-                VideoMediaStoreHelper.getBuckets(context)
+                VideoMediaStoreHelper.getBucketsAsync(context)
             }
             else -> {
                 emptyList()

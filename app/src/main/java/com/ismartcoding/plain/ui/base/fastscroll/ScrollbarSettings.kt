@@ -14,7 +14,7 @@ data class ScrollbarSettings(
     val thumbMinLength: Float = 0.1f,
     val selectionMode: ScrollbarSelectionMode = ScrollbarSelectionMode.Full,
     val selectionActionable: ScrollbarSelectionActionable = ScrollbarSelectionActionable.Always,
-    val hideDelayMillis: Int = 2000,
+    val hideDelayMillis: Int = 1000,
     val hideDisplacement: Dp = 0.dp,
     val hideEasingAnimation: Easing = FastOutSlowInEasing,
     val durationAnimationMillis: Int = 500,

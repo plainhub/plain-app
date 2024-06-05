@@ -2,10 +2,10 @@ package com.ismartcoding.plain.features
 
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.ismartcoding.lib.content.ContentWhere
-import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.NoteDao
+import com.ismartcoding.plain.helpers.QueryHelper
 import kotlinx.datetime.Clock
 
 object NoteHelper {
@@ -13,7 +13,7 @@ object NoteHelper {
         AppDatabase.instance.noteDao()
     }
 
-    fun count(query: String): Int {
+    suspend fun count(query: String): Int {
         var sql = "SELECT COUNT(id) FROM notes"
         val where = ContentWhere()
         if (query.isNotEmpty()) {
@@ -24,7 +24,7 @@ object NoteHelper {
         return noteDao.count(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
     }
 
-    fun getIdsAsync(query: String): Set<String> {
+    suspend fun getIdsAsync(query: String): Set<String> {
         var sql = "SELECT id FROM notes"
         val where = ContentWhere()
         if (query.isNotEmpty()) {
@@ -35,7 +35,7 @@ object NoteHelper {
         return noteDao.getIds(SimpleSQLiteQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
     }
 
-    fun search(
+    suspend fun search(
         query: String,
         limit: Int,
         offset: Int,
@@ -52,7 +52,7 @@ object NoteHelper {
         return noteDao.search(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
     }
 
-    fun deleteAsync(query: String) {
+    suspend fun deleteAsync(query: String) {
         var sql = "DELETE FROM notes"
         val where = ContentWhere()
         if (query.isNotEmpty()) {
@@ -117,30 +117,27 @@ object NoteHelper {
     }
 
     fun trashAsync(ids: Set<String>) {
-        noteDao.trash(ids, Clock.System.now())
+        val now = Clock.System.now()
+        noteDao.trash(ids, now, now)
     }
 
     fun untrashAsync(ids: Set<String>) {
-        noteDao.trash(ids, null)
+        noteDao.trash(ids, null, Clock.System.now())
     }
 
     fun deleteAsync(ids: Set<String>) {
         noteDao.delete(ids)
     }
 
-    private fun parseQuery(
+    private suspend fun parseQuery(
         where: ContentWhere,
         query: String,
     ) {
-        val queryGroups = SearchHelper.parse(query)
-        queryGroups.forEach {
+        QueryHelper.parseAsync(query).forEach {
             if (it.name == "text") {
                 where.addLike("content", it.value)
             } else if (it.name == "ids") {
-                val ids = it.value.split(",")
-                if (ids.isNotEmpty()) {
-                    where.addIn("id", ids)
-                }
+                where.addIn("id", it.value.split(","))
             } else if (it.name == "trash") {
                 if (it.value == "true") {
                     where.add("deleted_at IS NOT NULL")

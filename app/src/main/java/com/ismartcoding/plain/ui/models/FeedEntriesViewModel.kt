@@ -51,7 +51,7 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
     override var selectMode = mutableStateOf(false)
     override val selectedIds = mutableStateListOf<String>()
 
-    fun moreAsync(tagsViewModel: TagsViewModel) {
+    suspend fun moreAsync(tagsViewModel: TagsViewModel) {
         offset.value += limit.value
         val items = FeedEntryHelper.search(getQuery(), limit.value, offset.value)
         _itemsFlow.value.addAll(items)
@@ -60,7 +60,7 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
         noMore.value = items.size < limit.value
     }
 
-    fun loadAsync(tagsViewModel: TagsViewModel) {
+    suspend fun loadAsync(tagsViewModel: TagsViewModel) {
         offset.value = 0
         val query = getQuery()
         _itemsFlow.value = FeedEntryHelper.search(query, limit.value, offset.value).toMutableStateList()
@@ -74,7 +74,7 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
     }
 
     // for updating tags, delete items
-    fun refreshTabsAsync(tagsViewModel: TagsViewModel) {
+    suspend fun refreshTabsAsync(tagsViewModel: TagsViewModel) {
         tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
         total.value = FeedEntryHelper.count(getTotalAllQuery())
         totalToday.value = FeedEntryHelper.count(getTotalTodayQuery())

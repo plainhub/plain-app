@@ -182,14 +182,10 @@ fun ImagesPage(
             bucketViewModel.dataType.value = viewModel.dataType
             if (hasPermission) {
                 scope.launch(Dispatchers.IO) {
-                    val ts =  measureTimeMillis {
-
-                        cellsPerRow = ImageGridCellsPerRowPreference.getAsync(context)
-                        viewModel.sortBy.value = ImageSortByPreference.getValueAsync(context)
-                        viewModel.loadAsync(context, tagsViewModel)
-                        bucketViewModel.loadAsync(context)
-                    }
-                    LogCat.d("performance: $ts")
+                    cellsPerRow = ImageGridCellsPerRowPreference.getAsync(context)
+                    viewModel.sortBy.value = ImageSortByPreference.getValueAsync(context)
+                    viewModel.loadAsync(context, tagsViewModel)
+                    bucketViewModel.loadAsync(context)
                 }
             }
         } else {

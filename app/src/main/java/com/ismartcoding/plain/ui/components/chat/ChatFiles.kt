@@ -39,7 +39,7 @@ import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.features.Permissions
-import com.ismartcoding.plain.features.audio.AudioPlayer
+import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState

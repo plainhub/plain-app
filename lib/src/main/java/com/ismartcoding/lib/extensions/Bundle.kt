@@ -4,7 +4,6 @@ import android.content.ContentResolver
 import android.os.Bundle
 import android.os.Parcelable
 import android.text.SpannableString
-import android.util.Log
 import com.ismartcoding.lib.data.SortBy
 import com.ismartcoding.lib.data.enums.SortDirection
 import com.ismartcoding.lib.isTPlus

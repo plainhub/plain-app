@@ -1,18 +1,19 @@
 package com.ismartcoding.plain.ui.extensions
 
+import android.util.TypedValue
 import android.view.View
-import android.widget.*
+import android.widget.CompoundButton
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import com.google.android.material.button.MaterialButton
 import com.ismartcoding.lib.extensions.delayOnLifecycle
 import com.ismartcoding.lib.extensions.px
 import com.ismartcoding.lib.extensions.setSelectableItemBackground
-import com.ismartcoding.lib.extensions.setTextSizePx
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.ViewListItemBinding
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
-import com.ismartcoding.plain.ui.views.ChipItem
 
 fun ViewListItemBinding.setKeyText(text: String): ViewListItemBinding {
     textKey.text = text
@@ -93,7 +94,7 @@ fun ViewListItemBinding.addTextRow(text: String): ViewListItemBinding {
     layoutParams.topMargin = context.px(R.dimen.size_mini)
     textView.layoutParams = layoutParams
     textView.setTextIsSelectable(true)
-    textView.setTextSizePx(context.px(R.dimen.text_size_lg))
+    textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, context.px(R.dimen.text_size_lg).toFloat())
     rows.addView(textView)
     return this
 }
@@ -194,52 +195,4 @@ fun ViewListItemBinding.showMore(): ViewListItemBinding {
     val p16 = container.context.px(R.dimen.size_normal)
     container.setPadding(p16, p8, container.context.px(R.dimen.size_mini), p8)
     return this
-}
-
-fun ViewListItemBinding.setChips(
-    items: List<ChipItem>,
-    value: String,
-    onChanged: ((String) -> Unit)? = null,
-) {
-    chipGroup.run {
-        visibility = View.VISIBLE
-        initView(items, value, false) {
-            onChanged?.invoke(it)
-        }
-    }
-}
-
-fun ViewListItemBinding.setSpinners(
-    items: List<String>,
-    value: String,
-    onChanged: ((String) -> Unit)? = null,
-) {
-    spinner.run {
-        visibility = View.VISIBLE
-        val adapter =
-            ArrayAdapter<String>(
-                this.context,
-                R.layout.simple_spinner_item,
-                items,
-            )
-        spinner.adapter = adapter
-        spinner.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>,
-                    view: View?,
-                    position: Int,
-                    id: Long,
-                ) {
-                    val newValue = items[position]
-                    if (value != newValue) {
-                        onChanged?.invoke(newValue)
-                    }
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-                }
-            }
-        spinner.setSelection(items.indexOf(value))
-    }
 }

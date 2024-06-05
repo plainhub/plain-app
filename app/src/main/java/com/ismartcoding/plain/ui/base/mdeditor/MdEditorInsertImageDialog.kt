@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.base.mdeditor
 
 import android.os.Environment
-import android.provider.OpenableColumns
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -20,7 +19,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.getFilenameFromPath
-import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.newPath
+import com.ismartcoding.lib.extensions.queryOpenableFileName
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
@@ -62,29 +60,25 @@ fun MdEditorInsertImageDialog(
                     return@receiveEventHandler
                 }
                 val uri = event.uris.first()
-                context.contentResolver.query(uri, null, null, null, null)
-                    ?.use { cursor ->
-                        cursor.moveToFirst()
-                        val cache = mutableMapOf<String, Int>()
-                        val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
-                        cursor.close()
-                        try {
-                            val dir = Environment.DIRECTORY_PICTURES
-                            val dst = context.getExternalFilesDir(dir)!!.path + "/$fileName"
-                            val dstFile = File(dst)
-                            val path =
-                                if (dstFile.exists()) {
-                                    dstFile.newPath()
-                                } else {
-                                    dst
-                                }
-                            FileHelper.copyFile(context, uri, path)
-                            imageUrl = "app://$dir/${path.getFilenameFromPath()}"
-                        } catch (ex: Exception) {
-                            // the picked file could be deleted
-                            ex.printStackTrace()
-                        }
+                try {
+                    val fileName = context.contentResolver.queryOpenableFileName(uri)
+                    if (fileName.isNotEmpty()) {
+                        val dir = Environment.DIRECTORY_PICTURES
+                        val dst = context.getExternalFilesDir(dir)!!.path + "/$fileName"
+                        val dstFile = File(dst)
+                        val path =
+                            if (dstFile.exists()) {
+                                dstFile.newPath()
+                            } else {
+                                dst
+                            }
+                        FileHelper.copyFile(context, uri, path)
+                        imageUrl = "app://$dir/${path.getFilenameFromPath()}"
                     }
+                } catch (ex: Exception) {
+                    // the picked file could be deleted
+                    ex.printStackTrace()
+                }
             }
         )
     }
@@ -127,7 +121,8 @@ fun MdEditorInsertImageDialog(
             }
         },
         title = {
-            Text(text = stringResource(id = R.string.insert_image),
+            Text(
+                text = stringResource(id = R.string.insert_image),
                 style = MaterialTheme.typography.titleLarge
             )
         },

@@ -75,7 +75,7 @@ import com.ismartcoding.plain.features.RequestPermissionsEvent
 import com.ismartcoding.plain.features.RestartAppEvent
 import com.ismartcoding.plain.features.StartScreenMirrorEvent
 import com.ismartcoding.plain.features.WindowFocusChangedEvent
-import com.ismartcoding.plain.features.audio.AudioPlayer
+import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.bluetooth.BluetoothPermission
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getStringF
@@ -449,7 +449,7 @@ class MainActivity : AppCompatActivity() {
         if (intent.action == Intent.ACTION_VIEW) {
             val uri = intent.data
             if (uri != null) {
-                val mimeType = this@MainActivity.contentResolver.getType(uri)
+                val mimeType = contentResolver.getType(uri)
                 if (mimeType != null) {
                     if (mimeType.startsWith("audio/") ||
                         setOf("application/ogg", "application/x-ogg", "application/itunes").contains(mimeType)

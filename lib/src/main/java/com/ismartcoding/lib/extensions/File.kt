@@ -72,7 +72,7 @@ fun File.getBitmapAsync(
 
     var bitmap: Bitmap? = null
     if (isQPlus() && this.path.isVideoFast()) {
-        val contentUri = if (mediaId.isNotEmpty()) context.getMediaContentUri(path, mediaId) else context.getMediaContentUri(path)
+        val contentUri = if (mediaId.isNotEmpty()) path.pathToMediaStoreUri(mediaId) else context.contentResolver.getMediaContentUri(path)
         if (contentUri != null) {
             try {
                 bitmap = context.contentResolver.loadThumbnail(contentUri, Size(width, height), null)

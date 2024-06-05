@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.page.feeds
 
 import android.app.Activity
-import android.provider.OpenableColumns
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -38,7 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.getStringValue
+import com.ismartcoding.lib.extensions.queryOpenableFileName
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.contentResolver
@@ -138,16 +137,11 @@ fun FeedsPage(
                     OutputStreamWriter(contentResolver.openOutputStream(event.uri)!!, Charsets.UTF_8).use { writer ->
                         withIO { FeedHelper.exportAsync(writer) }
                     }
-                    contentResolver.query(event.uri, null, null, null, null)?.use { cursor ->
-                        if (cursor.moveToFirst()) {
-                            val cache = mutableMapOf<String, Int>()
-                            val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
-                            DialogHelper.showConfirmDialog(
-                                "",
-                                LocaleHelper.getStringF(R.string.exported_to, "name", fileName),
-                            )
-                        }
-                    }
+                    val fileName = contentResolver.queryOpenableFileName(event.uri)
+                    DialogHelper.showConfirmDialog(
+                        "",
+                        LocaleHelper.getStringF(R.string.exported_to, "name", fileName),
+                    )
                 }
             })
     }

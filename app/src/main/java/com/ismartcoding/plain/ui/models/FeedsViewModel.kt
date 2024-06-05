@@ -7,7 +7,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.extensions.isUrl
-import com.ismartcoding.lib.helpers.ValidateHelper
 import com.ismartcoding.lib.rss.model.RssChannel
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.DataType

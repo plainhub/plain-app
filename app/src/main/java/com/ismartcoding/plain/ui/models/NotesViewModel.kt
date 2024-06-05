@@ -44,7 +44,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
     override var selectMode = mutableStateOf(false)
     override val selectedIds = mutableStateListOf<String>()
 
-    fun moreAsync(tagsViewModel: TagsViewModel) {
+    suspend fun moreAsync(tagsViewModel: TagsViewModel) {
         offset.value += limit.value
         val items = NoteHelper.search(getQuery(), limit.value, offset.value)
         _itemsFlow.update {
@@ -57,7 +57,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
         noMore.value = items.size < limit.value
     }
 
-    fun loadAsync(tagsViewModel: TagsViewModel) {
+    suspend fun loadAsync(tagsViewModel: TagsViewModel) {
         offset.value = 0
         val query = getQuery()
         _itemsFlow.value = NoteHelper.search(query, limit.value, offset.value).toMutableStateList()
@@ -66,7 +66,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
         showLoading.value = false
     }
 
-    fun refreshTabsAsync(tagsViewModel: TagsViewModel) {
+    suspend fun refreshTabsAsync(tagsViewModel: TagsViewModel) {
         tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
         total.value = NoteHelper.count(getTotalQuery())
         totalTrash.value = NoteHelper.count(getTrashQuery())
@@ -100,7 +100,7 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
             if (index != -1) {
                 mutableList.removeAt(index)
                 mutableList.add(index, item)
-            }  else {
+            } else {
                 mutableList.add(0, item)
             }
             mutableList

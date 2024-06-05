@@ -17,8 +17,7 @@ import com.ismartcoding.plain.preference.AudioPlayingPreference
 import com.ismartcoding.plain.databinding.DialogAudioPlayerBinding
 import com.ismartcoding.plain.features.AudioActionEvent
 import com.ismartcoding.plain.features.ClearAudioPlaylistEvent
-import com.ismartcoding.plain.features.audio.AudioPlayer
-import com.ismartcoding.plain.helpers.FormatHelper
+import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.ui.BaseBottomSheetDialog
 import com.ismartcoding.plain.ui.extensions.setSafeClick
 import kotlinx.coroutines.launch

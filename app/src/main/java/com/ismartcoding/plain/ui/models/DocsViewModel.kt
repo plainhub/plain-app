@@ -15,7 +15,7 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.FileType
 import com.ismartcoding.plain.features.file.DFile
-import com.ismartcoding.plain.features.file.FileMediaStoreHelper
+import com.ismartcoding.plain.features.media.FileMediaStoreHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +54,7 @@ class DocsViewModel(private val savedStateHandle: SavedStateHandle) :
     fun moreAsync(context: Context) {
         val query = getQuery()
         offset.value += limit.value
-        val items = FileMediaStoreHelper.getAllByFileType(context, MediaStore.VOLUME_EXTERNAL_PRIMARY, FileType.DOCUMENT, sortBy.value)
+        val items = FileMediaStoreHelper.getAllByFileTypeAsync(context, MediaStore.VOLUME_EXTERNAL_PRIMARY, FileType.DOCUMENT, sortBy.value)
             .filter { query.isEmpty() || it.name.contains(query) }.drop(offset.value).take(limit.value)
         _itemsFlow.value.addAll(items)
         showLoading.value = false
@@ -64,7 +64,7 @@ class DocsViewModel(private val savedStateHandle: SavedStateHandle) :
     fun loadAsync(context: Context) {
         val query = getQuery()
         offset.value = 0
-        val items = FileMediaStoreHelper.getAllByFileType(context, MediaStore.VOLUME_EXTERNAL_PRIMARY, FileType.DOCUMENT, sortBy.value)
+        val items = FileMediaStoreHelper.getAllByFileTypeAsync(context, MediaStore.VOLUME_EXTERNAL_PRIMARY, FileType.DOCUMENT, sortBy.value)
             .filter { query.isEmpty() || it.name.contains(query) }
         _itemsFlow.value = items.take(limit.value).toMutableStateList()
         total.value = items.size

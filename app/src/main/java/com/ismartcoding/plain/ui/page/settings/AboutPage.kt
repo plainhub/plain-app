@@ -83,10 +83,12 @@ fun AboutPage(
                 }
                 item {
                     PCard {
-                        PListItem(
-                            title = stringResource(R.string.client_id),
-                            value = TempData.clientId,
-                        )
+                        if (developerMode) {
+                            PListItem(
+                                title = stringResource(R.string.client_id),
+                                value = TempData.clientId,
+                            )
+                        }
                         if (AppFeatureType.CHECK_UPDATES.has()) {
                             PListItem(
                                 title = stringResource(R.string.app_version),

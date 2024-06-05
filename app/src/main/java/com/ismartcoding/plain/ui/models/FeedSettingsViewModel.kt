@@ -61,7 +61,7 @@ class FeedSettingsViewModel : ViewModel() {
         }
     }
 
-    fun clearByFeedIdAsync(feedId: String) {
+    suspend fun clearByFeedIdAsync(feedId: String) {
         val ids = FeedEntryHelper.getIdsAsync("feed_id:$feedId")
         TagHelper.deleteTagRelationByKeys(ids, DataType.FEED_ENTRY)
         FeedEntryHelper.deleteAsync(ids)
@@ -72,7 +72,7 @@ class FeedSettingsViewModel : ViewModel() {
         FeedEntryHelper.deleteAllAsync()
     }
 
-    fun clearByTimeAsync(ts: Long) {
+    suspend fun clearByTimeAsync(ts: Long) {
         val time = Clock.System.now().epochSeconds - ts
         val ids = FeedEntryHelper.getIdsAsync("created_at:<${Instant.fromEpochSeconds(time)}")
         TagHelper.deleteTagRelationByKeys(ids, DataType.FEED_ENTRY)

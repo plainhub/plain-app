@@ -1,8 +1,18 @@
 package com.ismartcoding.lib.extensions
 
 import android.content.ContentResolver
+import android.database.Cursor
+import android.net.Uri
+import android.os.Bundle
+import android.provider.MediaStore
+import android.provider.OpenableColumns
 import android.provider.Settings
 import androidx.annotation.CheckResult
+import com.ismartcoding.lib.content.ContentWhere
+import com.ismartcoding.lib.data.OpenableFile
+import com.ismartcoding.lib.data.SortBy
+import com.ismartcoding.lib.isQPlus
+import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.logcat.LogCat
 
 fun ContentResolver.getSystemScreenTimeout(): Int {
@@ -22,5 +32,172 @@ fun ContentResolver.setSystemScreenTimeout(timeout: Int): Boolean {
     } catch (e: SecurityException) {
         LogCat.e("Error writing screen timeout", e)
         false
+    }
+}
+
+fun ContentResolver.count(uri: Uri, where: ContentWhere): Int {
+    return if (isQPlus()) {
+        countWithBundle(uri, where)
+    } else {
+        try {
+            countWithSql(uri, where)
+        } catch (ex: Exception) {
+            // Fatal Exception: java.lang.IllegalArgumentException: Non-token detected in 'count(*) AS count'
+            countWithBundle(uri, where)
+        }
+    }
+}
+
+fun ContentResolver.countWithSql(uri: Uri, where: ContentWhere): Int {
+    var result = 0
+    query(
+        uri,
+        arrayOf("count(*) AS count"),
+        where.toSelection(),
+        where.args.toTypedArray(),
+        null,
+    )?.use {
+        it.moveToFirst()
+        if (it.count > 0) {
+            result = it.getInt(0)
+        }
+    }
+
+    return result
+}
+
+fun ContentResolver.countWithBundle(uri: Uri, where: ContentWhere): Int {
+    var result = 0
+    query(
+        uri,
+        null,
+        Bundle().apply {
+            where(where.toSelection(), where.args)
+        },
+        null,
+    )?.use {
+        it.moveToFirst()
+        result = it.count
+    }
+
+    return result
+}
+
+fun ContentResolver.getPagingCursor(
+    uri: Uri,
+    projection: Array<String>,
+    where: ContentWhere,
+    limit: Int,
+    offset: Int,
+    sortBy: SortBy,
+): Cursor? {
+    return if (isRPlus()) {
+        // From Android 11, LIMIT and OFFSET should be retrieved using Bundle
+        getPagingCursorWithBundle(uri, projection, where, limit, offset, sortBy)
+    } else {
+        try {
+            getPagingCursorWithSql(uri, projection, where, limit, offset, sortBy)
+        } catch (ex: Exception) {
+            LogCat.e(ex.toString())
+            // Huawei OS android 10 may throw error `Invalid token LIMIT`
+            getPagingCursorWithBundle(uri, projection, where, limit, offset, sortBy)
+        }
+    }
+}
+
+fun ContentResolver.getPagingCursorWithBundle(
+    uri: Uri,
+    projection: Array<String>,
+    where: ContentWhere,
+    limit: Int,
+    offset: Int,
+    sortBy: SortBy,
+): Cursor? {
+    return try {
+        val sourceUri =
+            uri.buildUpon()
+                .appendQueryParameter("limit", limit.toString())
+                .appendQueryParameter("offset", offset.toString())
+                .build()
+        query(
+            sourceUri,
+            projection,
+            Bundle().apply {
+                paging(offset, limit)
+                sort(sortBy)
+                where(where.toSelection(), where.args)
+            },
+            null,
+        )
+    } catch (ex: Exception) {
+        LogCat.e(ex.toString())
+        null
+    }
+}
+
+fun ContentResolver.getPagingCursorWithSql(
+    uri: Uri,
+    projection: Array<String>,
+    where: ContentWhere,
+    limit: Int,
+    offset: Int,
+    sortBy: SortBy?,
+): Cursor? {
+    return query(
+        uri,
+        projection,
+        where.toSelection(),
+        where.args.toTypedArray(),
+        if (sortBy != null) "${sortBy.field} ${sortBy.direction} LIMIT $offset, $limit" else "LIMIT $offset, $limit",
+    )
+}
+
+fun ContentResolver.getSearchCursor(
+    uri: Uri,
+    projection: Array<String>,
+    where: ContentWhere,
+): Cursor? {
+    return query(
+        uri,
+        projection,
+        where.toSelection(),
+        where.args.toTypedArray(),
+        null,
+    )
+}
+
+fun ContentResolver.queryCursor(
+    uri: Uri,
+    projection: Array<String>? = null,
+    selection: String? = null,
+    selectionArgs: Array<String>? = null,
+    sortOrder: String? = null,
+): Cursor? {
+    return query(uri, projection, selection, selectionArgs, sortOrder)
+}
+
+fun ContentResolver.getMediaContentUri(path: String): Uri? {
+    val baseUri = path.pathToMediaStoreBaseUri()
+    val projection = arrayOf(MediaStore.Images.Media._ID)
+    val selection = MediaStore.Images.Media.DATA + "= ?"
+    val selectionArgs = arrayOf(path)
+    return query(baseUri, projection, selection, selectionArgs, null)?.find { cursor, cache ->
+        val id = cursor.getStringValue(MediaStore.Images.Media._ID, cache)
+        Uri.withAppendedPath(baseUri, id)
+    }
+}
+
+fun ContentResolver.queryOpenableFileName(uri: Uri): String {
+    return queryCursor(uri)?.find { cursor, cache ->
+        cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
+    } ?: ""
+}
+
+fun ContentResolver.queryOpenableFile(uri: Uri): OpenableFile? {
+    return queryCursor(uri)?.find { cursor, cache ->
+        OpenableFile(
+            cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache),
+            cursor.getLongValue(OpenableColumns.SIZE, cache)
+        )
     }
 }

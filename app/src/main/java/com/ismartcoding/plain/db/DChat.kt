@@ -1,17 +1,21 @@
 package com.ismartcoding.plain.db
 
-import androidx.room.*
-import com.ismartcoding.lib.helpers.JsonHelper
+import androidx.room.ColumnInfo
+import androidx.room.Dao
+import androidx.room.Entity
+import androidx.room.Insert
+import androidx.room.PrimaryKey
+import androidx.room.Query
+import androidx.room.Update
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
-import kotlinx.datetime.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import org.json.JSONObject
 
 fun DMessageContent.toJSONString(): String {

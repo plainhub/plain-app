@@ -8,9 +8,11 @@ import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.text.TextUtils
 import androidx.core.os.bundleOf
+import com.ismartcoding.lib.extensions.forEach
 import com.ismartcoding.lib.extensions.getDirectChildrenCount
 import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
+import com.ismartcoding.lib.extensions.getTimeValue
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.sorted
@@ -264,54 +266,7 @@ object FileSystemHelper {
         return convertFile(file, false)
     }
 
-    fun getRecents(context: Context): List<DFile> {
-        val items = arrayListOf<DFile>()
-        val limit = 100
-        val uri =
-            MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY).buildUpon()
-                .appendQueryParameter("limit", limit.toString())
-                .appendQueryParameter("offset", "0")
-                .build()
-        val projection =
-            arrayOf(
-                MediaStore.Files.FileColumns.DATA,
-                MediaStore.Files.FileColumns.DISPLAY_NAME,
-                MediaStore.Files.FileColumns.DATE_ADDED,
-                MediaStore.Files.FileColumns.DATE_MODIFIED,
-                MediaStore.Files.FileColumns.SIZE,
-            )
 
-        val queryArgs =
-            bundleOf(
-                ContentResolver.QUERY_ARG_LIMIT to limit,
-                ContentResolver.QUERY_ARG_SORT_COLUMNS to arrayOf(MediaStore.Files.FileColumns.DATE_MODIFIED),
-                ContentResolver.QUERY_ARG_SORT_DIRECTION to ContentResolver.QUERY_SORT_DIRECTION_DESCENDING,
-            )
-        context.contentResolver?.query(uri, projection, queryArgs, null)?.use { cursor ->
-            if (cursor.moveToFirst()) {
-                val cache = mutableMapOf<String, Int>()
-                do {
-                    val path = cursor.getStringValue(MediaStore.Files.FileColumns.DATA, cache)
-                    if (File(path).isDirectory) {
-                        continue
-                    }
-
-                    val name = cursor.getStringValue(MediaStore.Files.FileColumns.DISPLAY_NAME, cache)
-                    val size = cursor.getLongValue(MediaStore.Files.FileColumns.SIZE, cache)
-                    val createdAt = Instant.fromEpochMilliseconds(
-                        cursor.getLongValue(MediaStore.Files.FileColumns.DATE_ADDED, cache) * 1000L,
-                    )
-                    val updatedAt =
-                        Instant.fromEpochMilliseconds(
-                            cursor.getLongValue(MediaStore.Files.FileColumns.DATE_MODIFIED, cache) * 1000L,
-                        )
-                    items.add(DFile(name, path, "", createdAt, updatedAt, size, false, 0))
-                } while (cursor.moveToNext())
-            }
-        }
-
-        return items.take(50)
-    }
 
     fun getAllVolumeNames(context: Context): List<String> {
         val volumeNames = mutableListOf(MediaStore.VOLUME_EXTERNAL_PRIMARY)

@@ -13,7 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
@@ -23,7 +22,7 @@ import com.ismartcoding.plain.preference.AudioSleepTimerMinutesPreference
 import com.ismartcoding.plain.databinding.DialogSleepTimerBinding
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionsResultEvent
-import com.ismartcoding.plain.features.audio.AudioPlayer
+import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.enums.AudioServiceAction
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.services.AudioPlayerService

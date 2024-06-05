@@ -10,7 +10,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.pinyin.Pinyin
 import com.ismartcoding.plain.data.DCertificate
@@ -19,6 +18,7 @@ import com.ismartcoding.plain.data.DPackageDetail
 import com.ismartcoding.plain.data.DPackageStub
 import com.ismartcoding.plain.extensions.isSystemApp
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.packageManager
 import kotlinx.datetime.Instant
 import java.io.File
@@ -43,13 +43,13 @@ object PackageHelper {
         return getPackageStatuses(listOf(packageName))[packageName] == false
     }
 
-    fun search(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DPackage> {
+    suspend fun searchAsync(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DPackage> {
         try {
             var type = ""
             var text = ""
             var ids = setOf<String>()
             if (query.isNotEmpty()) {
-                val queryGroups = SearchHelper.parse(query)
+                val queryGroups = QueryHelper.parseAsync(query)
                 var t = queryGroups.find { it.name == "type" }
                 if (t != null) {
                     type = t.value
@@ -173,22 +173,27 @@ object PackageHelper {
     }
 
     fun getPackageDetail(packageName: String): DPackageDetail {
-        val flags = PackageManager.GET_SIGNING_CERTIFICATES
-        val packageInfo = packageManager.getPackageInfo(packageName, flags)
-        val appInfo = packageManager.getApplicationInfo(packageName, 0)
-        return DPackageDetail(
-            appInfo,
-            packageInfo,
-            appInfo.packageName,
-            getLabel(appInfo),
-            getAppType(appInfo),
-            packageInfo.versionName ?: "",
-            appInfo.sourceDir,
-            File(appInfo.publicSourceDir).length(),
-            getCerts(packageInfo),
-            Instant.fromEpochMilliseconds(packageInfo.firstInstallTime),
-            Instant.fromEpochMilliseconds(packageInfo.lastUpdateTime),
-        )
+        try {
+            val flags = PackageManager.GET_SIGNING_CERTIFICATES
+            val packageInfo = packageManager.getPackageInfo(packageName, flags)
+            val appInfo = packageManager.getApplicationInfo(packageName, 0)
+            return DPackageDetail(
+                appInfo,
+                packageInfo,
+                appInfo.packageName,
+                getLabel(appInfo),
+                getAppType(appInfo),
+                packageInfo.versionName ?: "",
+                appInfo.sourceDir,
+                File(appInfo.publicSourceDir).length(),
+                getCerts(packageInfo),
+                Instant.fromEpochMilliseconds(packageInfo.firstInstallTime),
+                Instant.fromEpochMilliseconds(packageInfo.lastUpdateTime),
+            )
+        } catch (ex: Exception) {
+            LogCat.d(ex.toString())
+            return DPackageDetail(ApplicationInfo(), PackageInfo(), packageName, "", "", "", "", 0, emptyList(), Instant.DISTANT_PAST, Instant.DISTANT_PAST)
+        }
     }
 
     fun cacheAppLabels() {
@@ -206,22 +211,19 @@ object PackageHelper {
         }
     }
 
-    fun count(query: String): Int {
+    suspend fun count(query: String): Int {
         if (query.isEmpty()) {
             return packageManager.getInstalledApplications(0).count()
         } else {
-            val queryGroups = SearchHelper.parse(query)
-            if (queryGroups.size == 1) {
-                val t = queryGroups.find { it.name == "type" }
-                if (t != null) {
-                    val type = t.value
-                    return packageManager.getInstalledApplications(0).count { appInfo ->
-                        getAppType(appInfo) == type
-                    }
+            val t = QueryHelper.parseAsync(query).find { it.name == "type" }
+            if (t != null) {
+                val type = t.value
+                return packageManager.getInstalledApplications(0).count { appInfo ->
+                    getAppType(appInfo) == type
                 }
             }
         }
-        return search(query, Int.MAX_VALUE, 0, FileSortBy.SIZE_ASC).count()
+        return searchAsync(query, Int.MAX_VALUE, 0, FileSortBy.SIZE_ASC).count()
     }
 
     private fun getLabel(packageInfo: ApplicationInfo): String {

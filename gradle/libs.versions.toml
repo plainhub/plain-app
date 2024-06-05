@@ -5,10 +5,10 @@ androidsvgAarVersion="1.4"
 appcompatVersion="1.6.1"
 bcprovJdk15onVersion="1.70"
 coil="3.0.0-alpha06"
-coreKtxVersion="1.13.0"
+coreKtxVersion="1.13.1"
 exoplayerVersion="2.19.1"
 firebaseCrashlyticsGradleVersion="2.9.9"
-fragmentKtxVersion="1.6.2"
+fragmentKtxVersion="1.7.0"
 glideVersion="4.16.0"
 googleServicesVersion="4.4.1"
 gradle= "8.3.2"
@@ -17,10 +17,10 @@ cameraCoreVersion = "1.4.0-alpha04"
 apollo = "3.2.1"
 compose = "1.6.7"
 activityComposeVersion = "1.9.0"
-composeBom = "2024.04.01"
+composeBom = "2024.05.00"
 coreSplashscreenVersion = "1.0.1"
 coreVersion = "3.5.3"
-datastorePreferencesVersion = "1.0.0"
+datastorePreferencesVersion = "1.1.1"
 firebaseCrashlyticsKtxVersion = "18.6.3"
 firebaseBomVersion = "32.8.0"
 gsonVersion="2.10.1"
@@ -28,11 +28,9 @@ guavaVersion="33.0.0-jre"
 jsoupVersion="1.15.3"
 kgraphql = "0.19.0"
 kotlinGradlePluginVersion="1.9.23"
-kotlinxDatetimeVersion="0.4.0"
+kotlinxDatetimeVersion="0.5.0"
 kotlinxSerializationJsonVersion="1.6.3"
-kotlinxCoroutinesGuavaVersion="1.8.0"
-kotlinxCoroutinesAndroidVersion="1.8.0"
-kotlinxCoroutinesCoreVersion="1.8.0"
+kotlinxCoroutinesVersion ="1.8.1"
 ktor = "3.0.0-beta-1"
 leakcanaryAndroidVersion = "2.12"
 lifecycleExtensionsVersion="2.2.0"
@@ -147,9 +145,9 @@ apollo-runtime = { module = "com.apollographql.apollo3:apollo-runtime", version.
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePluginVersion" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetimeVersion" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJsonVersion" }
-kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "kotlinxCoroutinesGuavaVersion" }
-kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroidVersion" }
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCoreVersion" }
+kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "kotlinxCoroutinesVersion" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesVersion" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesVersion" }
 ksp = { module = "com.github.bumptech.glide:ksp", version.ref = "glideVersion" }
 
 # ktor client

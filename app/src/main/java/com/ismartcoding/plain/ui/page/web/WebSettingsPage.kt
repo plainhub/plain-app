@@ -143,18 +143,13 @@ fun WebSettingsPage(
         fun togglePermission(m: PermissionItem, enable: Boolean) {
             scope.launch {
                 withIO { ApiPermissionsPreference.putAsync(context, m.permission, enable) }
+                if (m.permission == Permission.NOTIFICATION_LISTENER) {
+                    PNotificationListenerService.toggle(context, enable)
+                }
                 if (enable) {
                     val ps = m.permissions.filter { !it.can(context) }
                     if (ps.isNotEmpty()) {
                         sendEvent(RequestPermissionsEvent(*ps.toTypedArray()))
-                    } else {
-                        if (m.permission == Permission.NOTIFICATION_LISTENER) {
-                            PNotificationListenerService.toggle(context, true)
-                        }
-                    }
-                } else {
-                    if (m.permission == Permission.NOTIFICATION_LISTENER) {
-                        PNotificationListenerService.toggle(context, false)
                     }
                 }
             }

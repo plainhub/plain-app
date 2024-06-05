@@ -84,7 +84,7 @@ object TagHelper {
         return tagRelationDao.getKeysByTagId(tagId)
     }
 
-    fun getKeysByTagIds(tagIds: Set<String>): List<String> {
+    suspend fun getKeysByTagIdsAsync(tagIds: Set<String>): List<String> {
         val items = tagRelationDao.getAllByTagIds(tagIds)
         return items.groupBy { it.key }.filter { it.value.size == tagIds.size }.map { it.key }
     }

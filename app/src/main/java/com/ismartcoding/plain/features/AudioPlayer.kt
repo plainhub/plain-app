@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.features.audio
+package com.ismartcoding.plain.features
 
 import android.content.ComponentName
 import android.content.Context
@@ -18,7 +18,6 @@ import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.preference.AudioPlayingPreference
 import com.ismartcoding.plain.preference.AudioPlaylistPreference
-import com.ismartcoding.plain.features.AudioActionEvent
 import com.ismartcoding.plain.services.AudioPlayerService
 
 object AudioPlayer {

@@ -1,15 +1,14 @@
 package com.ismartcoding.plain.db
 
 import androidx.room.TypeConverter
-import com.ismartcoding.lib.extensions.toJSON
-import com.ismartcoding.lib.extensions.toStringList
+import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
+import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import kotlinx.datetime.*
-import org.json.JSONArray
 
 class StringListConverter {
     @TypeConverter
     fun toJSON(list: ArrayList<String>): String {
-        return list.toJSON().toString()
+        return jsonEncode(list)
     }
 
     @TypeConverter
@@ -17,7 +16,8 @@ class StringListConverter {
         if (value.isEmpty()) {
             return arrayListOf()
         }
-        return ArrayList(JSONArray(value).toStringList())
+
+        return jsonDecode<ArrayList<String>>(value)
     }
 }
 

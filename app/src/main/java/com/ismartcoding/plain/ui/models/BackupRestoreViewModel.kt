@@ -2,13 +2,11 @@ package com.ismartcoding.plain.ui.models
 
 import android.content.Context
 import android.net.Uri
-import android.provider.OpenableColumns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.getStringValue
+import com.ismartcoding.lib.extensions.queryOpenableFileName
 import com.ismartcoding.lib.helpers.CoroutinesHelper
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.contentResolver
@@ -47,16 +45,9 @@ class BackupRestoreViewModel : ViewModel() {
                         val item = files[i]
                         appendFile(out, item.dir, item.file)
                     }
-                    contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-                        if (cursor.moveToFirst()) {
-                            val cache = mutableMapOf<String, Int>()
-                            val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
-                            DialogHelper.hideLoading()
-                            coMain {
-                                DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(R.string.exported_to, "name", fileName))
-                            }
-                        }
-                    }
+                    val fileName = contentResolver.queryOpenableFileName(uri)
+                    DialogHelper.hideLoading()
+                    DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(R.string.exported_to, "name", fileName))
                 } finally {
                     IOUtils.closeQuietly(out)
                 }
@@ -70,48 +61,41 @@ class BackupRestoreViewModel : ViewModel() {
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             DialogHelper.showLoading()
-            contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val cache = mutableMapOf<String, Int>()
-                    val fileName = cursor.getStringValue(OpenableColumns.DISPLAY_NAME, cache)
-                    if (!fileName.endsWith(".zip")) {
-                        DialogHelper.showMessage(R.string.invalid_file)
-                        DialogHelper.hideLoading()
-                        return@launch
-                    }
-                    contentResolver.openInputStream(uri)?.use { stream ->
-                        val destFile = File(context.cacheDir, "restore")
-                        ZipUtil.unpack(stream, destFile)
+            val fileName = contentResolver.queryOpenableFileName(uri)
+            if (!fileName.endsWith(".zip")) {
+                DialogHelper.showMessage(R.string.invalid_file)
+                DialogHelper.hideLoading()
+                return@launch
+            }
+            contentResolver.openInputStream(uri)?.use { stream ->
+                val destFile = File(context.cacheDir, "restore")
+                ZipUtil.unpack(stream, destFile)
 
-                        // restore database
-                        File(destFile.path + "/databases").let {
-                            if (it.exists()) {
-                                it.copyRecursively(File(context.dataDir.path + "/databases"), true)
-                            }
-                        }
-
-                        // restore local storage
-                        File(destFile.path + "/files").let {
-                            if (it.exists()) {
-                                it.copyRecursively(context.filesDir, true)
-                            }
-                        }
-
-                        // restore external files
-                        File(destFile.path + "/external/files").let {
-                            if (it.exists()) {
-                                it.copyRecursively(context.getExternalFilesDir(null)!!, true)
-                            }
-                        }
-                        destFile.delete()
-                    }
-                    DialogHelper.hideLoading()
-                    coMain {
-                        DialogHelper.showConfirmDialog("", getString(R.string.app_restored)) {
-                            sendEvent(RestartAppEvent())
-                        }
+                // restore database
+                File(destFile.path + "/databases").let {
+                    if (it.exists()) {
+                        it.copyRecursively(File(context.dataDir.path + "/databases"), true)
                     }
                 }
+
+                // restore local storage
+                File(destFile.path + "/files").let {
+                    if (it.exists()) {
+                        it.copyRecursively(context.filesDir, true)
+                    }
+                }
+
+                // restore external files
+                File(destFile.path + "/external/files").let {
+                    if (it.exists()) {
+                        it.copyRecursively(context.getExternalFilesDir(null)!!, true)
+                    }
+                }
+                destFile.delete()
+            }
+            DialogHelper.hideLoading()
+            DialogHelper.showConfirmDialog("", getString(R.string.app_restored)) {
+                sendEvent(RestartAppEvent())
             }
         }
     }

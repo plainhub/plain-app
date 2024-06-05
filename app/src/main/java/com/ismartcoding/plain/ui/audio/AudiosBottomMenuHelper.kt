@@ -14,7 +14,7 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.preference.AudioPlaylistPreference
 import com.ismartcoding.plain.databinding.DialogListDrawerBinding
 import com.ismartcoding.plain.features.ActionEvent
-import com.ismartcoding.plain.features.audio.AudioMediaStoreHelper
+import com.ismartcoding.plain.features.media.AudioMediaStoreHelper
 import com.ismartcoding.plain.data.DAudio
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.ui.CastDialog
@@ -69,7 +69,7 @@ object AudiosBottomMenuHelper {
                                     ids,
                                     DataType.AUDIO,
                                 )
-                                AudioMediaStoreHelper.deleteRecordsAndFilesByIds(
+                                AudioMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(
                                     context,
                                     ids,
                                 )

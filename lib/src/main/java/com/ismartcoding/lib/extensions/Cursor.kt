@@ -51,3 +51,34 @@ fun Cursor.getTimeSecondsValue(
     key: String,
     cache: MutableMap<String, Int>,
 ): Instant = Instant.fromEpochSeconds(getLongValue(key, cache))
+
+fun Cursor.forEach(callback: (cursor: Cursor, cache: MutableMap<String, Int>) -> Unit) {
+    // the use function closes the cursor when the block is done
+    use { cursor ->
+        if (cursor.moveToFirst()) {
+            val cache = mutableMapOf<String, Int>()
+            do {
+                callback(cursor, cache)
+            } while (cursor.moveToNext())
+        }
+    }
+}
+
+fun <T> Cursor.map(callback: (cursor: Cursor, cache: MutableMap<String, Int>) -> T): List<T> {
+    val result = mutableListOf<T>()
+    forEach { cursor, cache ->
+        result.add(callback(cursor, cache))
+    }
+    return result
+}
+
+fun <T> Cursor.find(callback: (cursor: Cursor, cache: MutableMap<String, Int>) -> T): T? {
+    // the use function closes the cursor when the block is done
+    use { cursor ->
+        if (cursor.moveToFirst()) {
+            return callback(cursor, mutableMapOf())
+        }
+    }
+
+    return null
+}

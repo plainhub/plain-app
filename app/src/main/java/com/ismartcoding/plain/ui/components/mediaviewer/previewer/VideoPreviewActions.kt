@@ -60,7 +60,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.features.video.VideoMediaStoreHelper
+import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.DownloadHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.PathHelper

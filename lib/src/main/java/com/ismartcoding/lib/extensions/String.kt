@@ -5,6 +5,7 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.telephony.PhoneNumberUtils
 import com.ismartcoding.lib.Constants
+import com.ismartcoding.lib.isQPlus
 import java.io.File
 import java.net.URL
 import java.net.URLDecoder
@@ -12,7 +13,6 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.text.Normalizer
 import java.text.SimpleDateFormat
-import java.text.StringCharacterIterator
 import java.util.Base64
 import java.util.Date
 import java.util.Locale
@@ -837,4 +837,25 @@ fun String.getSummary(): String {
 
     // Replace matched patterns with an empty string, replace newlines with an empty string, and trim leading whitespace
     return replace(regex, "🖼").replace("\n", "").replaceFirst("^\\s*".toRegex(), "")
+}
+
+fun String.pathToMediaStoreBaseUri(): Uri {
+    return when {
+        isImageFast() -> if (isQPlus()) MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        isVideoFast() -> if (isQPlus()) MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+        isAudioFast() -> if (isQPlus()) MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+        else -> MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+    }
+}
+
+fun String.pathToMediaStoreUri(id: String): Uri {
+    return Uri.withAppendedPath(pathToMediaStoreBaseUri(), id)
+}
+
+fun String.isEmail(): Boolean {
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(this).matches()
+}
+
+fun String.isPhone(): Boolean {
+    return android.util.Patterns.PHONE.matcher(this).matches()
 }

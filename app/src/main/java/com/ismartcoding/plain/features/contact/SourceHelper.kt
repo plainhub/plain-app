@@ -3,6 +3,7 @@ package com.ismartcoding.plain.features.contact
 import android.content.Context
 import android.net.Uri
 import android.provider.ContactsContract
+import com.ismartcoding.lib.extensions.forEach
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.queryCursor
 import com.ismartcoding.plain.MainApp
@@ -28,13 +29,13 @@ object SourceHelper {
         uri: Uri,
         sources: MutableList<DContactSource>,
     ) {
-        context.queryCursor(
+        context.contentResolver.queryCursor(
             uri,
             arrayOf(
                 ContactsContract.RawContacts.ACCOUNT_NAME,
                 ContactsContract.RawContacts.ACCOUNT_TYPE,
             ),
-        ) { cursor, cache ->
+        )?.forEach { cursor, cache ->
             val name = cursor.getStringValue(ContactsContract.RawContacts.ACCOUNT_NAME, cache)
             val type = cursor.getStringValue(ContactsContract.RawContacts.ACCOUNT_TYPE, cache)
             if (!sources.any { it.name == name && it.type == type }) {

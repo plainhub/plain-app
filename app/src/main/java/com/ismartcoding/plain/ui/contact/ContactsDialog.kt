@@ -17,8 +17,8 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionsResultEvent
-import com.ismartcoding.plain.features.call.CallMediaStoreHelper
-import com.ismartcoding.plain.features.contact.ContactMediaStoreHelper
+import com.ismartcoding.plain.features.media.CallMediaStoreHelper
+import com.ismartcoding.plain.features.media.ContactMediaStoreHelper
 import com.ismartcoding.plain.data.DContact
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.TagHelper
@@ -76,7 +76,7 @@ class ContactsDialog : BaseListDrawerDialog() {
                                 DialogHelper.showLoading()
                                 withIO {
                                     TagHelper.deleteTagRelationByKeys(ids, DataType.CONTACT)
-                                    ContactMediaStoreHelper.deleteByIds(requireContext(), ids)
+                                    ContactMediaStoreHelper.deleteByIdsAsync(requireContext(), ids)
                                 }
                                 DialogHelper.hideLoading()
                                 binding.list.rv.bindingAdapter.checkedAll(false)
@@ -108,7 +108,7 @@ class ContactsDialog : BaseListDrawerDialog() {
                 }
             }
         }
-        receiveEvent<PermissionsResultEvent> { event ->
+        receiveEvent<PermissionsResultEvent> {
             checkPermission()
         }
         receiveEvent<ActionEvent> { event ->
@@ -128,14 +128,14 @@ class ContactsDialog : BaseListDrawerDialog() {
             val query = viewModel.getQuery()
             val items =
                 withIO {
-                    ContactMediaStoreHelper.search(
+                    ContactMediaStoreHelper.searchAsync(
                         requireContext(),
                         query,
                         viewModel.limit,
                         viewModel.offset,
                     ).sortedBy { Pinyin.toPinyin(it.fullName()) }
                 }
-            viewModel.total = withIO { ContactMediaStoreHelper.count(requireContext(), query) }
+            viewModel.total = withIO { ContactMediaStoreHelper.countAsync(requireContext(), query) }
 
             val bindingAdapter = binding.list.rv.bindingAdapter
             val toggleMode = bindingAdapter.toggleMode

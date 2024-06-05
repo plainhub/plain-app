@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DTag
-import com.ismartcoding.plain.features.ImageMediaStoreHelper
+import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.ActionButtons

@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.models
 
 import android.content.Context
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
@@ -13,7 +12,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.enums.DataType
-import com.ismartcoding.plain.features.ImageMediaStoreHelper
+import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -48,26 +47,26 @@ class ImagesViewModel(private val savedStateHandle: SavedStateHandle) :
     override val searchActive = mutableStateOf(false)
     override val queryText = mutableStateOf("")
 
-    fun moreAsync(context: Context, tagsViewModel: TagsViewModel) {
+    suspend fun moreAsync(context: Context, tagsViewModel: TagsViewModel) {
         offset += limit
-        val items = ImageMediaStoreHelper.search(context, getQuery(), limit, offset, sortBy.value)
+        val items = ImageMediaStoreHelper.searchAsync(context, getQuery(), limit, offset, sortBy.value)
         _itemsFlow.value.addAll(items)
         tagsViewModel.loadMoreAsync(items.map { it.id }.toSet())
         showLoading.value = false
         noMore.value = items.size < limit
     }
 
-    fun loadAsync(context: Context, tagsViewModel: TagsViewModel) {
+    suspend fun loadAsync(context: Context, tagsViewModel: TagsViewModel) {
         offset = 0
-        _itemsFlow.value = ImageMediaStoreHelper.search(context, getQuery(), limit, offset, sortBy.value).toMutableStateList()
+        _itemsFlow.value = ImageMediaStoreHelper.searchAsync(context, getQuery(), limit, offset, sortBy.value).toMutableStateList()
         refreshTabsAsync(context, tagsViewModel)
         noMore.value = _itemsFlow.value.size < limit
         showLoading.value = false
     }
 
-    fun refreshTabsAsync(context: Context, tagsViewModel: TagsViewModel) {
+    suspend fun refreshTabsAsync(context: Context, tagsViewModel: TagsViewModel) {
         tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
-        val total = ImageMediaStoreHelper.count(context, getTotalQuery())
+        val total = ImageMediaStoreHelper.countAsync(context, getTotalQuery())
         tabs.value = listOf(
             VTabData(LocaleHelper.getString(R.string.all), "all", total),
             * tagsViewModel.itemsFlow.value.map { VTabData(it.name, it.id, it.count) }.toTypedArray()
@@ -78,7 +77,7 @@ class ImagesViewModel(private val savedStateHandle: SavedStateHandle) :
         viewModelScope.launch(Dispatchers.IO) {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
-            ImageMediaStoreHelper.deleteRecordsAndFilesByIds(context, ids)
+            ImageMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids)
             refreshTabsAsync(context, tagsViewModel)
             DialogHelper.hideLoading()
             _itemsFlow.update {

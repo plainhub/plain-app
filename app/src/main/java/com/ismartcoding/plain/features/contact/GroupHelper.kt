@@ -3,10 +3,12 @@ package com.ismartcoding.plain.features.contact
 import android.content.ContentProviderOperation
 import android.content.ContentUris
 import android.provider.ContactsContract
+import com.ismartcoding.lib.extensions.forEach
 import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.queryCursor
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.contentResolver
 import com.ismartcoding.plain.data.DGroup
 import java.util.ArrayList
 
@@ -24,13 +26,13 @@ object GroupHelper {
 
         val selection = "${ContactsContract.Groups.AUTO_ADD} = ? AND ${ContactsContract.Groups.FAVORITES} = ?"
         val selectionArgs = arrayOf("0", "0")
-        context.queryCursor(uri, projection, selection, selectionArgs) { cursor, cache ->
+        context.contentResolver.queryCursor(uri, projection, selection, selectionArgs)?.forEach { cursor, cache ->
             val id = cursor.getLongValue(ContactsContract.Groups._ID, cache)
             val title = cursor.getStringValue(ContactsContract.Groups.TITLE, cache)
 
             val systemId = cursor.getStringValue(ContactsContract.Groups.SYSTEM_ID, cache)
             if (groups.map { it.name }.contains(title) && systemId.isNotEmpty()) {
-                return@queryCursor
+                return@forEach
             }
 
             groups.add(DGroup(id, title))
@@ -43,7 +45,6 @@ object GroupHelper {
         accountName: String,
         accountType: String,
     ): DGroup {
-        val context = MainApp.instance
         val operations = ArrayList<ContentProviderOperation>()
         ContentProviderOperation.newInsert(ContactsContract.Groups.CONTENT_URI).apply {
             withValue(ContactsContract.Groups.TITLE, name)
@@ -53,7 +54,7 @@ object GroupHelper {
             operations.add(build())
         }
 
-        val results = context.contentResolver.applyBatch(ContactsContract.AUTHORITY, operations)
+        val results = contentResolver.applyBatch(ContactsContract.AUTHORITY, operations)
         val rawId = ContentUris.parseId(results[0].uri!!)
         return DGroup(rawId, name)
     }

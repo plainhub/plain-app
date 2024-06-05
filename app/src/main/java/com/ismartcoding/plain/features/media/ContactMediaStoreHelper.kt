@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.features.contact
+package com.ismartcoding.plain.features.media
 
 import android.content.ContentProviderOperation
 import android.content.ContentUris
@@ -8,19 +8,23 @@ import android.provider.ContactsContract
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.data.SortBy
 import com.ismartcoding.lib.data.enums.SortDirection
-import com.ismartcoding.lib.extensions.*
-import com.ismartcoding.lib.helpers.SearchHelper
+import com.ismartcoding.lib.extensions.getIntValue
+import com.ismartcoding.lib.extensions.getPagingCursor
+import com.ismartcoding.lib.extensions.getStringValue
+import com.ismartcoding.lib.extensions.getTimeValue
+import com.ismartcoding.lib.extensions.map
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.DContact
 import com.ismartcoding.plain.data.DGroup
-import com.ismartcoding.plain.features.BaseContentHelper
+import com.ismartcoding.plain.features.contact.ContentHelper
+import com.ismartcoding.plain.features.contact.DOrganization
+import com.ismartcoding.plain.features.contact.SourceHelper
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.web.models.ContactInput
-import java.util.*
 
 object ContactMediaStoreHelper : BaseContentHelper() {
     override val uriExternal: Uri = ContactsContract.Data.CONTENT_URI
-    override val idKey: String = ContactsContract.Data.RAW_CONTACT_ID
 
     override fun getProjection(): Array<String> {
         return arrayOf(
@@ -41,18 +45,20 @@ object ContactMediaStoreHelper : BaseContentHelper() {
         )
     }
 
-    override fun getWhere(query: String): ContentWhere {
+    override suspend fun buildWhereAsync(query: String): ContentWhere {
         val where = ContentWhere()
         where.add("${ContactsContract.Data.MIMETYPE} = ?", ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
         if (query.isNotEmpty()) {
-            val queryGroups = SearchHelper.parse(query)
-            queryGroups.forEach {
-                if (it.name == "text") {
-                    where.add("${ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME} LIKE ?", "%${it.value}%")
-                } else if (it.name == "ids") {
-                    val ids = it.value.split(",")
-                    if (ids.isNotEmpty()) {
-                        where.addIn(ContactsContract.Data.RAW_CONTACT_ID, ids)
+            QueryHelper.parseAsync(query).forEach {
+                when (it.name) {
+                    "text" -> {
+                        where.add("${ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME} LIKE ?", "%${it.value}%")
+                    }
+                    "ids" -> {
+                        where.addIn(ContactsContract.Data.RAW_CONTACT_ID, it.value.split(","))
+                    }
+                    "id" -> {
+                        where.addEqual(ContactsContract.Data.RAW_CONTACT_ID, it.value)
                     }
                 }
             }
@@ -61,7 +67,7 @@ object ContactMediaStoreHelper : BaseContentHelper() {
         return where
     }
 
-    override fun deleteByIds(
+    override fun deleteByIdsAsync(
         context: Context,
         ids: Set<String>,
     ) {
@@ -72,14 +78,14 @@ object ContactMediaStoreHelper : BaseContentHelper() {
         }
     }
 
-    fun get(
+    suspend fun getByIdAsync(
         context: Context,
         id: String,
     ): DContact? {
-        return search(context, "ids=$id", 1, 0).firstOrNull()
+        return searchAsync(context, "id=$id", 1, 0).firstOrNull()
     }
 
-    fun update(
+    fun updateAsync(
         id: String,
         contact: ContactInput,
     ) {
@@ -158,7 +164,7 @@ object ContactMediaStoreHelper : BaseContentHelper() {
         context.contentResolver.applyBatch(ContactsContract.AUTHORITY, operations)
     }
 
-    fun create(contact: ContactInput): String {
+    fun createAsync(contact: ContactInput): String {
         val context = MainApp.instance
         val operations = ArrayList<ContentProviderOperation>()
         ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI).apply {
@@ -230,75 +236,61 @@ object ContactMediaStoreHelper : BaseContentHelper() {
         return ContentUris.parseId(results[0].uri!!).toString()
     }
 
-    fun search(
+    suspend fun searchAsync(
         context: Context,
         query: String,
         limit: Int,
         offset: Int,
     ): List<DContact> {
         val contentMap = ContentHelper.getMap(context)
-        val cursor =
-            getSearchCursorWithSortOrder(
-                context,
-                query,
-                limit,
-                offset,
-                SortBy(ContactsContract.Data.DISPLAY_NAME_PRIMARY, SortDirection.ASC),
+        return context.contentResolver.getPagingCursor(
+            uriExternal, getProjection(), buildWhereAsync(query), limit, offset,
+            SortBy(ContactsContract.Data.DISPLAY_NAME_PRIMARY, SortDirection.ASC)
+        )?.map { cursor, cache ->
+            val accountName = cursor.getStringValue(ContactsContract.RawContacts.ACCOUNT_NAME, cache)
+            val rawId = cursor.getStringValue(ContactsContract.Data.RAW_CONTACT_ID, cache)
+            val prefix = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.PREFIX, cache)
+            val givenName = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, cache)
+            val middleName = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME, cache)
+            val familyName = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME, cache)
+            val suffix = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.SUFFIX, cache)
+            val photoUri = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.PHOTO_URI, cache)
+            val starred = cursor.getIntValue(ContactsContract.CommonDataKinds.StructuredName.STARRED, cache)
+            val contactId = cursor.getStringValue(ContactsContract.Data.CONTACT_ID, cache)
+            val thumbnailUri = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.PHOTO_THUMBNAIL_URI, cache)
+            val ringtone = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.CUSTOM_RINGTONE, cache)
+            val updatedAt = cursor.getTimeValue(ContactsContract.Data.CONTACT_LAST_UPDATED_TIMESTAMP, cache)
+
+            val nicknames = contentMap[rawId]?.nicknames ?: arrayListOf()
+            val notes = contentMap[rawId]?.notes ?: arrayListOf()
+            val groups = ArrayList<DGroup>()
+            val organizations = contentMap[rawId]?.organizations ?: arrayListOf()
+            val websites = contentMap[rawId]?.websites ?: arrayListOf()
+            val events = contentMap[rawId]?.events ?: arrayListOf()
+            val emails = contentMap[rawId]?.emails ?: arrayListOf()
+            val addresses = contentMap[rawId]?.addresses ?: arrayListOf()
+            val ims = contentMap[rawId]?.ims ?: arrayListOf()
+            val phoneNumbers = contentMap[rawId]?.phoneNumbers ?: arrayListOf()
+            DContact(
+                rawId, prefix, givenName, middleName,
+                familyName, suffix,
+                if (nicknames.isNotEmpty()) nicknames[0] else "",
+                photoUri,
+                phoneNumbers,
+                emails,
+                addresses,
+                events,
+                accountName,
+                starred,
+                contactId, thumbnailUri,
+                if (notes.isNotEmpty()) notes[0] else "",
+                groups,
+                if (organizations.isNotEmpty()) organizations[0] else DOrganization("", ""),
+                websites,
+                ims,
+                ringtone,
+                updatedAt,
             )
-        val items = mutableListOf<DContact>()
-        if (cursor?.moveToFirst() == true) {
-            val cache = mutableMapOf<String, Int>()
-            do {
-                val accountName = cursor.getStringValue(ContactsContract.RawContacts.ACCOUNT_NAME, cache)
-                val rawId = cursor.getStringValue(ContactsContract.Data.RAW_CONTACT_ID, cache)
-                val prefix = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.PREFIX, cache)
-                val givenName = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, cache)
-                val middleName = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME, cache)
-                val familyName = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME, cache)
-                val suffix = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.SUFFIX, cache)
-                val photoUri = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.PHOTO_URI, cache)
-                val starred = cursor.getIntValue(ContactsContract.CommonDataKinds.StructuredName.STARRED, cache)
-                val contactId = cursor.getStringValue(ContactsContract.Data.CONTACT_ID, cache)
-                val thumbnailUri = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.PHOTO_THUMBNAIL_URI, cache)
-                val ringtone = cursor.getStringValue(ContactsContract.CommonDataKinds.StructuredName.CUSTOM_RINGTONE, cache)
-                val updatedAt = cursor.getTimeValue(ContactsContract.Data.CONTACT_LAST_UPDATED_TIMESTAMP, cache)
-
-                val nicknames = contentMap[rawId]?.nicknames ?: arrayListOf()
-                val notes = contentMap[rawId]?.notes ?: arrayListOf()
-                val groups = ArrayList<DGroup>()
-                val organizations = contentMap[rawId]?.organizations ?: arrayListOf()
-                val websites = contentMap[rawId]?.websites ?: arrayListOf()
-                val events = contentMap[rawId]?.events ?: arrayListOf()
-                val emails = contentMap[rawId]?.emails ?: arrayListOf()
-                val addresses = contentMap[rawId]?.addresses ?: arrayListOf()
-                val ims = contentMap[rawId]?.ims ?: arrayListOf()
-                val phoneNumbers = contentMap[rawId]?.phoneNumbers ?: arrayListOf()
-                val contact =
-                    DContact(
-                        rawId, prefix, givenName, middleName,
-                        familyName, suffix,
-                        if (nicknames.isNotEmpty()) nicknames[0] else "",
-                        photoUri,
-                        phoneNumbers,
-                        emails,
-                        addresses,
-                        events,
-                        accountName,
-                        starred,
-                        contactId, thumbnailUri,
-                        if (notes.isNotEmpty()) notes[0] else "",
-                        groups,
-                        if (organizations.isNotEmpty()) organizations[0] else DOrganization("", ""),
-                        websites,
-                        ims,
-                        ringtone,
-                        updatedAt,
-                    )
-
-                items.add(contact)
-            } while (cursor.moveToNext())
-        }
-
-        return items
+        } ?: emptyList()
     }
 }

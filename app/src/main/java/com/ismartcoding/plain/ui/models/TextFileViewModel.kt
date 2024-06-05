@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.extensions.toJsValue
 import com.ismartcoding.plain.features.file.DFile
-import com.ismartcoding.plain.features.file.FileMediaStoreHelper
+import com.ismartcoding.plain.features.media.FileMediaStoreHelper
 import com.ismartcoding.plain.preference.EditorWrapContentPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +34,7 @@ class TextFileViewModel : ViewModel() {
     fun loadFileAsync(context: Context, path: String, mediaId: String) {
         try {
             if (mediaId.isNotEmpty()) {
-                file.value = FileMediaStoreHelper.getById(context, mediaId)
+                file.value = FileMediaStoreHelper.getByIdAsync(context, mediaId)
             }
             content.value = File(path).readText()
         } catch (e: Exception) {

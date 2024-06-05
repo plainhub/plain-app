@@ -45,10 +45,11 @@ interface NoteDao {
     @Query("SELECT * FROM notes WHERE id=:id")
     fun getById(id: String): DNote?
 
-    @Query("UPDATE notes SET deleted_at=:time WHERE id in (:ids)")
+    @Query("UPDATE notes SET deleted_at=:deletedAt, updated_at=:updatedAt WHERE id in (:ids)")
     fun trash(
         ids: Set<String>,
-        time: Instant?,
+        deletedAt: Instant?,
+        updatedAt: Instant,
     )
 
     @Insert

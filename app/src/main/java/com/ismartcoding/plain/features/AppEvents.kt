@@ -28,7 +28,6 @@ import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
-import com.ismartcoding.plain.features.audio.AudioPlayer
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.preference.ChatGPTApiKeyPreference
@@ -219,7 +218,7 @@ object AppEvents {
 
                     val messages = mutableListOf<ChatMessage>()
                     messages.addAll(
-                        AIChatHelper.getChats(parentId).map {
+                        AIChatHelper.getChatsAsync(parentId).map {
                             ChatMessage(
                                 role = if (it.isMe) ChatRole.User else ChatRole.Assistant,
                                 content = it.content,

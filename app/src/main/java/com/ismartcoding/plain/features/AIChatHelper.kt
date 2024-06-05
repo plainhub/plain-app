@@ -3,17 +3,17 @@ package com.ismartcoding.plain.features
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.ismartcoding.lib.content.ContentSort
 import com.ismartcoding.lib.content.ContentWhere
-import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.db.AIChatDao
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DAIChat
+import com.ismartcoding.plain.helpers.QueryHelper
 
 object AIChatHelper {
     private val chatDao: AIChatDao by lazy {
         AppDatabase.instance.aiChatDao()
     }
 
-    fun getChats(id: String): List<DAIChat> {
+    suspend fun getChatsAsync(id: String): List<DAIChat> {
         return chatDao.getChats(id)
     }
 
@@ -30,30 +30,30 @@ object AIChatHelper {
         return listOf(item)
     }
 
-    fun count(query: String): Int {
+    suspend fun countAsync(query: String): Int {
         var sql = "SELECT COUNT(id) FROM aichats"
         val where = ContentWhere()
         val sort = ContentSort("updated_at", "DESC")
         if (query.isNotEmpty()) {
-            parseQuery(where, query, sort)
+            parseQueryAsync(where, query, sort)
             sql += " WHERE ${where.toSelection()}"
         }
 
         return chatDao.count(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
     }
 
-    fun getIdsAsync(query: String): Set<String> {
+    suspend fun getIdsAsync(query: String): Set<String> {
         var sql = "SELECT id FROM aichats"
         val where = ContentWhere()
         if (query.isNotEmpty()) {
-            parseQuery(where, query)
+            parseQueryAsync(where, query)
             sql += " WHERE ${where.toSelection()}"
         }
 
         return chatDao.getIds(SimpleSQLiteQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
     }
 
-    fun search(
+    suspend fun searchAsync(
         query: String,
         limit: Int,
         offset: Int,
@@ -62,7 +62,7 @@ object AIChatHelper {
         val where = ContentWhere()
         val sort = ContentSort("updated_at", "DESC")
         if (query.isNotEmpty()) {
-            parseQuery(where, query, sort)
+            parseQueryAsync(where, query, sort)
             sql += " WHERE ${where.toSelection()}"
         }
 
@@ -83,38 +83,41 @@ object AIChatHelper {
         var sql = "DELETE FROM aichats"
         val where = ContentWhere()
         if (query.isNotEmpty()) {
-            parseQuery(where, query)
+            parseQueryAsync(where, query)
             sql += " WHERE ${where.toSelection()}"
         }
 
         chatDao.delete(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
     }
 
-    private fun parseQuery(
+    private suspend fun parseQueryAsync(
         where: ContentWhere,
         query: String,
         sort: ContentSort? = null,
     ) {
-        val queryGroups = SearchHelper.parse(query)
-        queryGroups.forEach {
-            if (it.name == "text") {
-                where.addLikes(listOf("content"), listOf(it.value, it.value))
-            } else if (it.name == "parent_id") {
-                where.add("parent_id=?", it.value)
-            } else if (it.name == "ids") {
-                val ids = it.value.split(",")
-                if (ids.isNotEmpty()) {
-                    where.addIn("id", ids)
+        QueryHelper.parseAsync(query).forEach {
+            when (it.name) {
+                "text" -> {
+                    where.addLikes(listOf("content"), listOf(it.value, it.value))
                 }
-            } else if (it.name == "parent_ids") {
-                val ids = it.value.split(",")
-                if (ids.isNotEmpty()) {
-                    where.addIn("parent_id", ids)
+
+                "parent_id" -> {
+                    where.add("parent_id=?", it.value)
                 }
-            } else if (it.name == "sort") {
-                val split = it.value.split("-")
-                sort?.name = split[0]
-                sort?.direction = split[1]
+
+                "ids" -> {
+                    where.addIn("id", it.value.split(","))
+                }
+
+                "parent_ids" -> {
+                    where.addIn("parent_id", it.value.split(","))
+                }
+
+                "sort" -> {
+                    val split = it.value.split("-")
+                    sort?.name = split[0]
+                    sort?.direction = split[1]
+                }
             }
         }
     }

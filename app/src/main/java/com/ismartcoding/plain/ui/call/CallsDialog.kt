@@ -17,7 +17,7 @@ import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.ActionEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionsResultEvent
-import com.ismartcoding.plain.features.call.CallMediaStoreHelper
+import com.ismartcoding.plain.features.media.CallMediaStoreHelper
 import com.ismartcoding.plain.data.DCall
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.TagHelper
@@ -71,7 +71,7 @@ class CallsDialog : BaseListDrawerDialog() {
                                 DialogHelper.showLoading()
                                 withIO {
                                     TagHelper.deleteTagRelationByKeys(ids, DataType.CALL)
-                                    CallMediaStoreHelper.deleteByIds(requireContext(), ids)
+                                    CallMediaStoreHelper.deleteByIdsAsync(requireContext(), ids)
                                 }
                                 DialogHelper.hideLoading()
                                 binding.list.rv.bindingAdapter.checkedAll(false)
@@ -120,8 +120,8 @@ class CallsDialog : BaseListDrawerDialog() {
     override fun updateList() {
         lifecycleScope.launch {
             val query = viewModel.getQuery()
-            val items = withIO { CallMediaStoreHelper.search(requireContext(), query, viewModel.limit, viewModel.offset) }
-            viewModel.total = withIO { CallMediaStoreHelper.count(requireContext(), query) }
+            val items = withIO { CallMediaStoreHelper.searchAsync(requireContext(), query, viewModel.limit, viewModel.offset) }
+            viewModel.total = withIO { CallMediaStoreHelper.countAsync(requireContext(), query) }
 
             val bindingAdapter = binding.list.rv.bindingAdapter
             val toggleMode = bindingAdapter.toggleMode

@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DTag
-import com.ismartcoding.plain.features.ImageMediaStoreHelper
+import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
@@ -28,7 +28,6 @@ import com.ismartcoding.plain.ui.base.PIconTextActionButton
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.VideosViewModel
 import com.ismartcoding.plain.ui.page.tags.BatchSelectTagsDialog

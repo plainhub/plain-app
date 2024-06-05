@@ -16,7 +16,7 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.features.video.VideoMediaStoreHelper
+import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,26 +50,26 @@ class VideosViewModel(private val savedStateHandle: SavedStateHandle) :
     override val searchActive = mutableStateOf(false)
     override val queryText = mutableStateOf("")
 
-    fun moreAsync(context: Context, tagsViewModel: TagsViewModel) {
+    suspend fun moreAsync(context: Context, tagsViewModel: TagsViewModel) {
         offset.value += limit.value
-        val items = VideoMediaStoreHelper.search(context, getQuery(), limit.value, offset.value, sortBy.value)
+        val items = VideoMediaStoreHelper.searchAsync(context, getQuery(), limit.value, offset.value, sortBy.value)
         _itemsFlow.value.addAll(items)
         tagsViewModel.loadMoreAsync(items.map { it.id }.toSet())
         showLoading.value = false
         noMore.value = items.size < limit.value
     }
 
-    fun loadAsync(context: Context, tagsViewModel: TagsViewModel) {
+    suspend fun loadAsync(context: Context, tagsViewModel: TagsViewModel) {
         offset.value = 0
-        _itemsFlow.value = VideoMediaStoreHelper.search(context, getQuery(), limit.value, offset.value, sortBy.value).toMutableStateList()
+        _itemsFlow.value = VideoMediaStoreHelper.searchAsync(context, getQuery(), limit.value, offset.value, sortBy.value).toMutableStateList()
         refreshTabsAsync(context, tagsViewModel)
         showLoading.value = false
     }
 
     // for updating tags, delete items
-    fun refreshTabsAsync(context: Context, tagsViewModel: TagsViewModel) {
+    suspend fun refreshTabsAsync(context: Context, tagsViewModel: TagsViewModel) {
         tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
-        total.value = VideoMediaStoreHelper.count(context, getTotalQuery())
+        total.value = VideoMediaStoreHelper.countAsync(context, getTotalQuery())
         noMore.value = _itemsFlow.value.size < limit.value
         tabs.value = listOf(
             VTabData(LocaleHelper.getString(R.string.all), "all", total.value),
@@ -81,7 +81,7 @@ class VideosViewModel(private val savedStateHandle: SavedStateHandle) :
         viewModelScope.launch(Dispatchers.IO) {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
-            VideoMediaStoreHelper.deleteRecordsAndFilesByIds(context, ids)
+            VideoMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids)
             refreshTabsAsync(context, tagsViewModel)
             DialogHelper.hideLoading()
             _itemsFlow.update {
