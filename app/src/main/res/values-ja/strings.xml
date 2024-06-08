@@ -2,6 +2,7 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">お使いのデバイスでは現在VPNが有効になっており、PCからアクセスした際にWeb接続の問題が発生する可能性があります。これを解決するために、LANトラフィックを許可するようにVPNの設定を調整するか、VPNを無効にすることをお勧めします。</string>
     <string name="warning">警告</string>
+    <string name="device_name">デバイス名</string>
     <string name="developer_mode">開発者モード</string>
     <string name="title">タイトル</string>
     <string name="pause">一時停止</string>
@@ -247,7 +248,7 @@
     <string name="language">言語</string>
     <string name="language_desc">英語、中国語、その他</string>
     <string name="about">アプリについて</string>
-    <string name="about_desc">クライアントID、バージョン、ログ、寄付</string>
+    <string name="about_desc">クライアント名、バージョン、ログ、寄付</string>
     <string name="require_confirmation">確認が必要</string>
     <string name="web_console">PC上のWeb</string>
     <string name="backup_restore">バックアップ＆復元</string>

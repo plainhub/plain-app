@@ -2,6 +2,7 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Ваш VPN в настоящее время включен на вашем устройстве, что может потенциально привести к проблемам с веб-подключением при доступе с ПК. Для устранения этой проблемы мы рекомендуем настроить параметры вашего VPN для разрешения локального сетевого трафика или отключить ваш VPN.</string>
     <string name="warning">Предупреждение</string>
+    <string name="device_name">Имя устройства</string>
     <string name="developer_mode">Режим разработчика</string>
     <string name="title">Заголовок</string>
     <string name="pause">Пауза</string>
@@ -247,7 +248,7 @@
     <string name="language">Язык</string>
     <string name="language_desc">Английский, китайский и другие</string>
     <string name="about">О приложении</string>
-    <string name="about_desc">Идентификатор клиента, версия, логи, пожертвования</string>
+    <string name="about_desc">Имя клиента, версия, журналы, пожертвование</string>
     <string name="require_confirmation">Требовать подтверждение</string>
     <string name="web_console">Веб на ПК</string>
     <string name="backup_restore">Резервное копирование и восстановление</string>

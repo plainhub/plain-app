@@ -85,6 +85,7 @@ import com.ismartcoding.plain.helpers.ExchangeHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.preference.DeveloperModePreference
+import com.ismartcoding.plain.preference.DeviceNamePreference
 import com.ismartcoding.plain.preference.ScreenMirrorQualityPreference
 import com.ismartcoding.plain.receivers.BatteryReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
@@ -668,7 +669,7 @@ class SXGraphQL(val schema: Schema) {
                             httpPort = TempData.httpPort,
                             httpsPort = TempData.httpsPort,
                             externalFilesDir = context.getExternalFilesDir(null)?.path ?: "",
-                            if (TempData.demoMode) "Demo phone" else PhoneHelper.getDeviceName(context),
+                            deviceName = DeviceNamePreference.getAsync(context).ifEmpty { PhoneHelper.getDeviceName(context) },
                             PhoneHelper.getBatteryPercentage(context),
                             BuildConfig.VERSION_CODE,
                             android.os.Build.VERSION.SDK_INT,

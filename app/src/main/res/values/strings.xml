@@ -2,6 +2,7 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Your VPN is currently enabled on your device, which could potentially lead to web connection issues when accessed from PC. To resolve this, we recommend adjusting your VPN settings to allow LAN traffic or disabling your VPN.</string>
     <string name="warning">Warning</string>
+    <string name="device_name">Device name</string>
     <string name="developer_mode">Developer mode</string>
     <string name="title">Title</string>
     <string name="pause">Pause</string>
@@ -247,7 +248,7 @@
     <string name="language">Language</string>
     <string name="language_desc">English, Chinese and more</string>
     <string name="about">About</string>
-    <string name="about_desc">Client ID, version, logs, donation</string>
+    <string name="about_desc">Client name, version, logs, donation</string>
     <string name="require_confirmation">Require confirmation</string>
     <string name="web_console">Web on PC</string>
     <string name="backup_restore">Backup &amp; restore</string>

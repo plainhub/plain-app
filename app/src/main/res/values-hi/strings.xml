@@ -2,6 +2,7 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">आपके डिवाइस पर वर्तमान में आपका VPN सक्रिय है, जिससे PC से एक्सेस करते समay वेब कनेक्शन समस्याएँ उत्पन्न हो सकती हैं। इसे हल करने के लिए, हम सुझाव देते हैं कि आप अपने VPN सेटिंग्स को LAN ट्रैफ़िक की अनुमति देने या अपने VPN को अक्षम करने के लिए समायोजित करें।</string>
     <string name="warning">चेतावनी</string>
+    <string name="device_name">उपकरण का नाम</string>
     <string name="developer_mode">डेवलपर मोड</string>
     <string name="title">शीर्षक</string>
     <string name="pause">रोक</string>
@@ -247,7 +248,7 @@
     <string name="language">भाषा</string>
     <string name="language_desc">अंग्रेजी, चीनी और अधिक</string>
     <string name="about">हमारे बारे में</string>
-    <string name="about_desc">क्लाइंट आईडी, संस्करण, लॉग, डोनेशन</string>
+    <string name="about_desc">क्लाइंट नाम, संस्करण, लॉग, दान</string>
     <string name="require_confirmation">पुष्टिकरण की आवश्यकता है</string>
     <string name="web_console">पीसी पर वेब</string>
     <string name="backup_restore">बैकअप और पुनर्स्थापित करें</string>

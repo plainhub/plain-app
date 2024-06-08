@@ -2,6 +2,7 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Votre VPN est actuellement activé sur votre appareil, ce qui pourrait potentiellement entraîner des problèmes de connexion Web lorsqu\'il est accédé depuis un PC. Pour résoudre cela, nous vous recommandons d\'ajuster les paramètres de votre VPN pour autoriser le trafic LAN ou de désactiver votre VPN.</string>
     <string name="warning">Avertissement</string>
+    <string name="device_name">Nom de l\'appareil</string>
     <string name="developer_mode">Mode développeur</string>
     <string name="title">Titre</string>
     <string name="pause">Pause</string>
@@ -247,7 +248,7 @@
     <string name="language">Langue</string>
     <string name="language_desc">Anglais, chinois et plus</string>
     <string name="about">À propos</string>
-    <string name="about_desc">ID client, version, journaux, donation</string>
+    <string name="about_desc">Nom du client, version, journaux, don</string>
     <string name="require_confirmation">Nécessite une confirmation</string>
     <string name="web_console">Web sur PC</string>
     <string name="backup_restore">Sauvegarde et restauration</string>

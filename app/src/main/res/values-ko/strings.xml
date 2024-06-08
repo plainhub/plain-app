@@ -2,6 +2,7 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">현재 기기에서 VPN이 활성화되어 있어 PC에서 액세스할 때 웹 연결 문제가 발생할 수 있습니다. 이를 해결하기 위해 LAN 트래픽을 허용하거나 VPN을 비활성화하는 것을 권장합니다.</string>
     <string name="warning">경고</string>
+    <string name="device_name">기기 이름</string>
     <string name="developer_mode">개발자 모드</string>
     <string name="title">제목</string>
     <string name="pause">일시 정지</string>
@@ -247,7 +248,7 @@
     <string name="language">언어</string>
     <string name="language_desc">영어, 중국어 등</string>
     <string name="about">정보</string>
-    <string name="about_desc">클라이언트 ID, 버전, 로그, 기부</string>
+    <string name="about_desc">클라이언트 이름, 버전, 로그, 기부</string>
     <string name="require_confirmation">확인 필요</string>
     <string name="web_console">웹(PC)에서</string>
     <string name="backup_restore">백업 및 복원</string>

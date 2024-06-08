@@ -2,6 +2,7 @@
     <string name="app_name">簡樸</string>
     <string name="vpn_web_conflict_warning">您的手機啟用了VPN，這可能會導致從電腦訪問網頁時出現連接問題。我們建議您調整VPN設置允許區域網路流量或關閉VPN。</string>
     <string name="warning">警告</string>
+    <string name="device_name">設備名稱</string>
     <string name="developer_mode">開發者模式</string>
     <string name="title">標題</string>
     <string name="pause">暫停</string>
@@ -251,7 +252,7 @@
     <string name="ip_address_asc">IP地址(0到9)</string>
     <string name="last_active_desc">活躍時間</string>
     <string name="about">關於</string>
-    <string name="about_desc">客戶端ID、版本、日誌、捐贈</string>
+    <string name="about_desc">客戶端名稱、版本、日誌、捐贈</string>
     <string name="require_confirmation">需要二次確認</string>
     <string name="web_console">電腦瀏覽器訪問</string>
     <string name="backup_restore">備份與恢復</string>

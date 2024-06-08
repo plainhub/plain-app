@@ -2,6 +2,7 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">আপনার ডিভাইসে সক্রিয় ভিপিএন আছে, যা একটি পিসি থেকে অ্যাক্সেস করার সময় ওয়েব সংযোগের সমস্যা উত্পন্ন করতে পারে। এটি সমাধান করতে, আমরা আপনাকে আপনার ভিপিএন সেটিংস পরিবর্তন করে এলএএন ট্র্যাফিক অনুমতি দেওয়া বা আপনার ভিপিএন নিষ্ক্রিয় করতে প্রস্তাবনা দিচ্ছি।</string>
     <string name="warning">সতর্কবার্তা</string>
+    <string name="device_name">ডিভাইসের নাম</string>
     <string name="developer_mode">ডেভেলপার মোড</string>
     <string name="title">শিরোনাম</string>
     <string name="pause">বিরতি</string>
@@ -247,7 +248,7 @@
     <string name="language">ভাষা</string>
     <string name="language_desc">ইংরেজি, চীনা এবং আরো</string>
     <string name="about">সম্পর্কে</string>
-    <string name="about_desc">ক্লায়েন্ট আইডি, সংস্করণ, লগ, দান</string>
+    <string name="about_desc">ক্লায়েন্টের নাম, সংস্করণ, লগ, অনুদান</string>
     <string name="require_confirmation">নিশ্চিত প্রয়োজন</string>
     <string name="web_console">ওয়েব কনসোল পিসি উপর</string>
     <string name="backup_restore">ব্যাকআপ এবং পুনরুদ্ধার</string>
