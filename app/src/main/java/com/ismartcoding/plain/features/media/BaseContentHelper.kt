@@ -26,7 +26,7 @@ abstract class BaseContentHelper {
         }?.toSet() ?: emptySet()
     }
 
-    open fun deleteByIdsAsync(context: Context, ids: Set<String>) {
+    fun deleteByIdsAsync(context: Context, ids: Set<String>) {
         ids.chunked(500).forEach { chunk ->
             val selection = "${BaseColumns._ID} IN (${StringHelper.getQuestionMarks(chunk.size)})"
             val selectionArgs = chunk.map { it }.toTypedArray()

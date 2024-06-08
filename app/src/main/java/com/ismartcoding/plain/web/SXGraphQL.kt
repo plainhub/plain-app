@@ -576,6 +576,11 @@ class SXGraphQL(val schema: Schema) {
                         items.map { it.toModel() }
                     }
                 }
+                query("feedsCount") {
+                    resolver { ->
+                        FeedHelper.getFeedCounts().map { it.toModel() }
+                    }
+                }
                 query("feedEntries") {
                     configure {
                         executor = Executor.DataLoaderPrepared

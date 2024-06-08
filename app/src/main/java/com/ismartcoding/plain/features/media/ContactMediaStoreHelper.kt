@@ -4,12 +4,15 @@ import android.content.ContentProviderOperation
 import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
+import android.provider.BaseColumns
 import android.provider.ContactsContract
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.data.SortBy
 import com.ismartcoding.lib.data.enums.SortDirection
+import com.ismartcoding.lib.extensions.count
 import com.ismartcoding.lib.extensions.getIntValue
 import com.ismartcoding.lib.extensions.getPagingCursor
+import com.ismartcoding.lib.extensions.getSearchCursor
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.getTimeValue
 import com.ismartcoding.lib.extensions.map
@@ -23,10 +26,10 @@ import com.ismartcoding.plain.features.contact.SourceHelper
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.web.models.ContactInput
 
-object ContactMediaStoreHelper : BaseContentHelper() {
-    override val uriExternal: Uri = ContactsContract.Data.CONTENT_URI
+object ContactMediaStoreHelper {
+    private val uriExternal: Uri = ContactsContract.Data.CONTENT_URI
 
-    override fun getProjection(): Array<String> {
+    private fun getProjection(): Array<String> {
         return arrayOf(
             ContactsContract.Data.CONTACT_ID,
             ContactsContract.Data.RAW_CONTACT_ID,
@@ -45,7 +48,7 @@ object ContactMediaStoreHelper : BaseContentHelper() {
         )
     }
 
-    override suspend fun buildWhereAsync(query: String): ContentWhere {
+    private suspend fun buildWhereAsync(query: String): ContentWhere {
         val where = ContentWhere()
         where.add("${ContactsContract.Data.MIMETYPE} = ?", ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
         if (query.isNotEmpty()) {
@@ -54,9 +57,11 @@ object ContactMediaStoreHelper : BaseContentHelper() {
                     "text" -> {
                         where.add("${ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME} LIKE ?", "%${it.value}%")
                     }
+
                     "ids" -> {
                         where.addIn(ContactsContract.Data.RAW_CONTACT_ID, it.value.split(","))
                     }
+
                     "id" -> {
                         where.addEqual(ContactsContract.Data.RAW_CONTACT_ID, it.value)
                     }
@@ -67,7 +72,11 @@ object ContactMediaStoreHelper : BaseContentHelper() {
         return where
     }
 
-    override fun deleteByIdsAsync(
+    suspend fun countAsync(context: Context, query: String): Int {
+        return context.contentResolver.count(uriExternal, buildWhereAsync(query))
+    }
+
+    fun deleteByIdsAsync(
         context: Context,
         ids: Set<String>,
     ) {
@@ -83,6 +92,13 @@ object ContactMediaStoreHelper : BaseContentHelper() {
         id: String,
     ): DContact? {
         return searchAsync(context, "id=$id", 1, 0).firstOrNull()
+    }
+
+    suspend fun getIdsAsync(context: Context, query: String): Set<String> {
+        val where = buildWhereAsync(query)
+        return context.contentResolver.getSearchCursor(uriExternal, arrayOf(ContactsContract.Data.RAW_CONTACT_ID), where)?.map { cursor, cache ->
+            cursor.getStringValue(ContactsContract.Data.RAW_CONTACT_ID, cache)
+        }?.toSet() ?: emptySet()
     }
 
     fun updateAsync(

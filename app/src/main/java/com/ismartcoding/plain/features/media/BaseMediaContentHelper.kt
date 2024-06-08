@@ -95,7 +95,9 @@ abstract class BaseMediaContentHelper {
         context: Context,
         query: String,
     ): Set<String> {
-        return getSearchCursorAsync(context, query)?.map { cursor, cache ->
+        return context.contentResolver.getSearchCursor(
+            uriExternal, arrayOf(BaseColumns._ID), buildWhere(query)
+        )?.map { cursor, cache ->
             cursor.getStringValue(BaseColumns._ID, cache)
         }?.toSet() ?: emptySet()
     }
