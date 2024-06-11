@@ -146,7 +146,7 @@ fun NotePage(
                     scope.launch(Dispatchers.IO) {
                         val newItem =
                             NoteHelper.addOrUpdateAsync(id) {
-                                title = text.cut(100).replace("\n", "")
+                                title = text.cut(250).replace("\n", "")
                                 content = text
                                 viewModel.content = text
                             }

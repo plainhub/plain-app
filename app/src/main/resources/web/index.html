@@ -1,28 +1,51 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.ico" />
-    <link rel="manifest" href="/manifest.json" crossOrigin="use-credentials">
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes" />
     <title>PlainApp</title>
-  <script type="module" crossorigin src="/assets/index-9c78c93b.js"></script>
-  <link rel="stylesheet" href="/assets/index-5d7ef901.css">
-</head>
+    <script type="module" crossorigin src="/assets/index-BxNI00MG.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CXJ7ZBVr.css">
+  </head>
 
-<body>
+  <body>
     <div id="browser-issue">Your browser is not supported or up-to-date. Please try updating it.</div>
     <div id="app"></div>
-    
-</body>
-<script type="text/javascript">
+  </body>
+  <script type="text/javascript">
     if ('customElements' in window) {
-        document.getElementById('browser-issue').style.display = 'none';
+      document.getElementById('browser-issue').style.display = 'none'
     } else {
-        if (navigator.language === 'zh-CN') {
-            document.getElementById('browser-issue').innerHTML = '您的浏览器不支持或者版本过低，请尝试更新。';
-        }
+      if (navigator.language === 'zh-CN') {
+        document.getElementById('browser-issue').innerHTML = '您的浏览器不支持或者版本过低，请尝试更新。'
+      }
     }
-</script>
+    
+    function isTouchDevice() {
+      return 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      function handleTouchStart() {
+        document.body.classList.add('no-hover')
+        window.removeEventListener('touchstart', handleTouchStart)
+        window.addEventListener('mousemove', handleMouseMove)
+      }
+
+      function handleMouseMove() {
+        document.body.classList.remove('no-hover')
+        window.removeEventListener('mousemove', handleMouseMove)
+        window.addEventListener('touchstart', handleTouchStart)
+      }
+
+      if (isTouchDevice()) {
+        document.body.classList.add('no-hover')
+        window.addEventListener('mousemove', handleMouseMove)
+      } else {
+        window.addEventListener('touchstart', handleTouchStart)
+      }
+    })
+  </script>
 </html>

@@ -23,6 +23,9 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
 import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 
 object FileHelper {
     fun fileFromAsset(
@@ -90,26 +93,9 @@ object FileHelper {
         pathTo: String,
     ) {
         context.contentResolver.openInputStream(pathFrom).use { input ->
-            var bis: BufferedInputStream? = null
-            var bos: BufferedOutputStream? = null
-
-            try {
-                bis = BufferedInputStream(input)
-                bos = BufferedOutputStream(FileOutputStream(pathTo, false))
-                val buf = ByteArray(1024)
-                bis.read(buf)
-                do {
-                    bos.write(buf)
-                } while (bis.read(buf) != -1)
-            } catch (e: IOException) {
-                e.printStackTrace()
-            } finally {
-                try {
-                    bis?.close()
-                    bos?.close()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
+            if (input != null) {
+                val targetPath = Paths.get(pathTo)
+                Files.copy(input, targetPath, StandardCopyOption.REPLACE_EXISTING)
             }
         }
     }

@@ -12,6 +12,7 @@ import com.apurebase.kgraphql.schema.dsl.SchemaConfigurationDSL
 import com.apurebase.kgraphql.schema.execution.Execution
 import com.apurebase.kgraphql.schema.execution.Executor
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isAudioFast
 import com.ismartcoding.lib.extensions.isImageFast
@@ -460,8 +461,8 @@ class SXGraphQL(val schema: Schema) {
                     }
                 }
                 query("packages") {
-                    resolver { offset: Int, limit: Int, query: String ->
-                        PackageHelper.searchAsync(query, limit, offset, FileSortBy.NAME_ASC).map { it.toModel() }
+                    resolver { offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
+                        PackageHelper.searchAsync(query, limit, offset, sortBy).map { it.toModel() }
                     }
                 }
                 query("packageStatuses") {
@@ -986,6 +987,21 @@ class SXGraphQL(val schema: Schema) {
                                 content = input.content
                             }
                         NoteHelper.getById(item.id)?.toModel()
+                    }
+                }
+                mutation("saveFeedEntriesToNotes") {
+                    resolver { query: String ->
+                        val entries = FeedEntryHelper.search(query, Int.MAX_VALUE, 0)
+                        val ids = mutableListOf<String>()
+                        entries.forEach { m ->
+                            val c = "# ${m.title}\n\n" + m.content.ifEmpty { m.description }
+                            NoteHelper.saveToNotesAsync(m.id) {
+                                title = c.cut(250).replace("\n", "")
+                                content = c
+                            }
+                            ids.add(m.id)
+                        }
+                        NoteHelper.search("ids:${ids.joinToString(",")}", Int.MAX_VALUE, 0).map { it.toModel() }
                     }
                 }
                 mutation("trashNotes") {

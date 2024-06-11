@@ -47,8 +47,11 @@ object NoteHelper {
             sql += " WHERE ${where.toSelection()}"
         }
 
-        sql += " ORDER BY updated_at DESC LIMIT $limit OFFSET $offset"
-
+        sql += if (limit == Int.MAX_VALUE) {
+            " ORDER BY updated_at DESC"
+        } else {
+            " ORDER BY updated_at DESC LIMIT $limit OFFSET $offset"
+        }
         return noteDao.search(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
     }
 

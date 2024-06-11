@@ -51,7 +51,11 @@ object FeedEntryHelper {
             sql += " WHERE ${where.toSelection()}"
         }
 
-        sql += " ORDER BY published_at DESC LIMIT $limit OFFSET $offset"
+        sql += if (limit == Int.MAX_VALUE) {
+            " ORDER BY published_at DESC"
+        } else {
+            " ORDER BY published_at DESC LIMIT $limit OFFSET $offset"
+        }
 
         return feedEntryDao.search(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
     }

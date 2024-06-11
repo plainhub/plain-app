@@ -110,7 +110,6 @@ infix fun Color.alwaysLight(isAlways: Boolean): Color {
             colorScheme.error -> colorScheme.onError
             colorScheme.surface -> colorScheme.onSurface
             colorScheme.surfaceVariant -> colorScheme.onSurfaceVariant
-            colorScheme.error -> colorScheme.onError
             colorScheme.primaryContainer -> colorScheme.onPrimaryContainer
             colorScheme.secondaryContainer -> colorScheme.onSecondaryContainer
             colorScheme.tertiaryContainer -> colorScheme.onTertiaryContainer
@@ -124,7 +123,6 @@ infix fun Color.alwaysLight(isAlways: Boolean): Color {
             colorScheme.onError -> colorScheme.error
             colorScheme.onSurface -> colorScheme.surface
             colorScheme.onSurfaceVariant -> colorScheme.surfaceVariant
-            colorScheme.onError -> colorScheme.error
             colorScheme.onPrimaryContainer -> colorScheme.primaryContainer
             colorScheme.onSecondaryContainer -> colorScheme.secondaryContainer
             colorScheme.onTertiaryContainer -> colorScheme.tertiaryContainer
@@ -152,7 +150,6 @@ infix fun Color.alwaysDark(isAlways: Boolean): Color {
             colorScheme.error -> colorScheme.onError
             colorScheme.surface -> colorScheme.onSurface
             colorScheme.surfaceVariant -> colorScheme.onSurfaceVariant
-            colorScheme.error -> colorScheme.onError
             colorScheme.primaryContainer -> colorScheme.onPrimaryContainer
             colorScheme.secondaryContainer -> colorScheme.onSecondaryContainer
             colorScheme.tertiaryContainer -> colorScheme.onTertiaryContainer
@@ -166,7 +163,6 @@ infix fun Color.alwaysDark(isAlways: Boolean): Color {
             colorScheme.onError -> colorScheme.error
             colorScheme.onSurface -> colorScheme.surface
             colorScheme.onSurfaceVariant -> colorScheme.surfaceVariant
-            colorScheme.onError -> colorScheme.error
             colorScheme.onPrimaryContainer -> colorScheme.primaryContainer
             colorScheme.onSecondaryContainer -> colorScheme.secondaryContainer
             colorScheme.onTertiaryContainer -> colorScheme.tertiaryContainer

@@ -6,6 +6,7 @@ import android.provider.MediaStore
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.extensions.getLongValue
 import com.ismartcoding.lib.extensions.getStringValue
+import com.ismartcoding.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.lib.extensions.map
 import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.lib.isQPlus
@@ -25,8 +26,11 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
             MediaStore.Audio.Media.ARTIST,
             MediaStore.Audio.Media.SIZE,
             MediaStore.Audio.Media.DURATION,
+            MediaStore.Audio.Media.DATE_ADDED,
+            MediaStore.Audio.Media.DATE_MODIFIED,
             MediaStore.Audio.Media.DATA,
             MediaStore.Audio.Media.BUCKET_ID,
+            MediaStore.Audio.Media.ALBUM_ID,
         )
     }
 
@@ -71,9 +75,12 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
             val artist = cursor.getStringValue(MediaStore.Audio.Media.ARTIST, cache).replace(MediaStore.UNKNOWN_STRING, "")
             val size = cursor.getLongValue(MediaStore.Audio.Media.SIZE, cache)
             val duration = cursor.getLongValue(MediaStore.Audio.Media.DURATION, cache) / 1000
+            val createdAt = cursor.getTimeSecondsValue(MediaStore.Audio.Media.DATE_ADDED, cache)
+            val updatedAt = cursor.getTimeSecondsValue(MediaStore.Audio.Media.DATE_MODIFIED, cache)
             val path = cursor.getStringValue(MediaStore.Audio.Media.DATA, cache)
             val bucketId = cursor.getStringValue(MediaStore.Audio.Media.BUCKET_ID, cache)
-            DAudio(id, title, artist, path, duration, size, bucketId)
+            val albumId = cursor.getStringValue(MediaStore.Audio.Media.ALBUM_ID, cache)
+            DAudio(id, title, artist, path, duration, size, bucketId,albumId, createdAt, updatedAt)
         } ?: emptyList()
     }
 

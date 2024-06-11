@@ -9,7 +9,7 @@ import java.util.TimeZone
 
 
 object DateParser {
-    private var ADDITIONAL_MASKS: Array<String> = arrayOf("yyyy-MM-dd HH:mm:ss")
+    private var ADDITIONAL_MASKS: Array<String> = arrayOf("yyyy-MM-dd HH:mm:ss Z", "yyyy-MM-dd HH:mm:ss")
 
     // order is like this because the SimpleDateFormat.parse does not fail with exception if it can
     // parse a valid date out of a substring of the full string given the mask so we have to check

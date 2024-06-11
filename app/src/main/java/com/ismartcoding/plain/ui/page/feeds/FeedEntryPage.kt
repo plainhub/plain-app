@@ -207,7 +207,7 @@ fun FeedEntryPage(
                             scope.launch(Dispatchers.IO) {
                                 val c = "# ${m.title}\n\n" + m.content.ifEmpty { m.description }
                                 NoteHelper.saveToNotesAsync(m.id) {
-                                    title = c.cut(100).replace("\n", "")
+                                    title = c.cut(250).replace("\n", "")
                                     content = c
                                 }
                                 DialogHelper.showMessage(R.string.saved)

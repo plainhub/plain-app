@@ -9,6 +9,7 @@ import com.ismartcoding.lib.data.SortBy
 import com.ismartcoding.lib.data.enums.SortDirection
 import com.ismartcoding.lib.extensions.getIntValue
 import com.ismartcoding.lib.extensions.getPagingCursor
+import com.ismartcoding.lib.extensions.getPagingCursorWithSql
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.getTimeValue
 import com.ismartcoding.lib.extensions.map
@@ -60,7 +61,7 @@ object SmsMediaStoreHelper : BaseContentHelper() {
         limit: Int,
         offset: Int,
     ): List<DMessage> {
-        return context.contentResolver.getPagingCursor(
+        return context.contentResolver.getPagingCursorWithSql(
             uriExternal, getProjection(), buildWhereAsync(query),
             limit, offset, SortBy(Telephony.Sms.DATE, SortDirection.DESC)
         )?.map { cursor, cache ->
