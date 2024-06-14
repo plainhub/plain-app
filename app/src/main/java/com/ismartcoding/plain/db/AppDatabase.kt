@@ -1,10 +1,12 @@
 package com.ismartcoding.plain.db
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import androidx.room.migration.AutoMigrationSpec
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
@@ -15,7 +17,10 @@ import com.ismartcoding.plain.MainApp
         DNote::class, DFeed::class, DFeedEntry::class, DBook::class, DBookChapter::class, DAIChat::class,
     ],
     version = 1,
-    exportSchema = false,
+//    autoMigrations = [
+//        AutoMigration (from = 1, to = 2, spec = AppDatabase.AutoMigration1To2::class)
+//    ],
+    exportSchema = true,
 )
 @TypeConverters(DateConverter::class, StringListConverter::class, ChatItemContentConverter::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -40,6 +45,10 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun bookDao(): BookDao
 
     abstract fun aiChatDao(): AIChatDao
+
+    class AutoMigration1To2 : AutoMigrationSpec {
+
+    }
 
     companion object {
         @Volatile

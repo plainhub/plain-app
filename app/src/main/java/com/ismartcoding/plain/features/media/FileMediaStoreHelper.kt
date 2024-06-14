@@ -111,8 +111,8 @@ object FileMediaStoreHelper : BaseContentHelper() {
             }
 
             val path = cursor.getStringValue(MediaStore.Files.FileColumns.DATA, cache)
-            val createdAt = cursor.getTimeValue(MediaStore.Files.FileColumns.DATE_ADDED, cache)
-            val updatedAt = cursor.getTimeValue(MediaStore.Files.FileColumns.DATE_MODIFIED, cache)
+            val createdAt = cursor.getTimeSecondsValue(MediaStore.Files.FileColumns.DATE_ADDED, cache)
+            val updatedAt = cursor.getTimeSecondsValue(MediaStore.Files.FileColumns.DATE_MODIFIED, cache)
             val mimetype = fullMimetype.substringBefore("/")
             when (fileType) {
                 FileType.IMAGE -> {
@@ -173,8 +173,9 @@ object FileMediaStoreHelper : BaseContentHelper() {
         val title = cursor.getStringValue(MediaStore.Files.FileColumns.DISPLAY_NAME, cache)
         val size = cursor.getLongValue(MediaStore.Files.FileColumns.SIZE, cache)
         val path = cursor.getStringValue(MediaStore.Files.FileColumns.DATA, cache)
-        val createdAt = cursor.getTimeValue(MediaStore.Files.FileColumns.DATE_ADDED, cache)
-        val updatedAt = cursor.getTimeValue(MediaStore.Files.FileColumns.DATE_MODIFIED, cache)
+        val createdAt = cursor.getTimeSecondsValue(MediaStore.Files.FileColumns.DATE_ADDED, cache)
+        val updatedAt = cursor.getTimeSecondsValue(MediaStore.Files.FileColumns.DATE_MODIFIED, cache)
+
         val mediaType = cursor.getIntValue(MediaStore.Files.FileColumns.MEDIA_TYPE, cache)
         return DFile(
             title,

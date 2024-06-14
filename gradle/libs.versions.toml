@@ -183,8 +183,10 @@ markwon-tasklist = { module = "io.noties.markwon:ext-tasklist", version.ref = "m
 material = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 
 # room
+room-gradle = { module = "androidx.room:room-gradle-plugin", version.ref = "room" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
 
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttpVersion" }
 openai-client = { module = "com.aallam.openai:openai-client", version.ref = "openaiClientVersion" }

@@ -357,6 +357,10 @@ object KeyStorePasswordPreference : BasePreference<String>() {
             putAsync(context, password)
         }
     }
+
+    suspend fun resetAsync(context: Context) {
+        putAsync(context, StringHelper.shortUUID())
+    }
 }
 
 object DeviceSortByPreference : BasePreference<Int>() {

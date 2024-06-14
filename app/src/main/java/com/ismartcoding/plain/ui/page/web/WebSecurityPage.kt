@@ -2,9 +2,7 @@ package com.ismartcoding.plain.ui.page.web
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
@@ -37,10 +35,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.PasswordType
+import com.ismartcoding.plain.features.RestartAppEvent
+import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.preference.AuthTwoFactorPreference
 import com.ismartcoding.plain.preference.KeyStorePasswordPreference
 import com.ismartcoding.plain.preference.LocalAuthTwoFactor
@@ -50,7 +52,6 @@ import com.ismartcoding.plain.preference.PasswordPreference
 import com.ismartcoding.plain.preference.PasswordTypePreference
 import com.ismartcoding.plain.preference.UrlTokenPreference
 import com.ismartcoding.plain.preference.WebSettingsProvider
-import com.ismartcoding.plain.preference.rememberPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.ClipboardCard
 import com.ismartcoding.plain.ui.base.PBlockButton
@@ -63,9 +64,11 @@ import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,12 +80,19 @@ fun WebSecurityPage(navController: NavHostController) {
         val password = LocalPassword.current
         val authTwoFactor = LocalAuthTwoFactor.current
         var urlToken by remember { mutableStateOf(TempData.urlToken) }
-        val keyStorePassword by rememberPreference(key = KeyStorePasswordPreference.key, defaultValue = KeyStorePasswordPreference.default)
+        var keyStorePassword by remember { mutableStateOf("") }
+        var sslSignature by remember { mutableStateOf("") }
 
         val editPassword = remember { mutableStateOf("") }
         LaunchedEffect(password) {
             if (editPassword.value != password) {
                 editPassword.value = password
+            }
+            scope.launch(Dispatchers.IO) {
+                keyStorePassword = KeyStorePasswordPreference.getAsync(context)
+                sslSignature = HttpServerManager.getSSLSignature(context, keyStorePassword).joinToString(" ") {
+                    "%02x".format(it).uppercase()
+                }
             }
         }
 
@@ -170,15 +180,31 @@ fun WebSecurityPage(navController: NavHostController) {
                             stringResource(
                                 id = R.string.https_certificate_signature,
                             ),
-                            HttpServerManager.getSSLSignature(context, keyStorePassword).joinToString(" ") {
-                                "%02x".format(it).uppercase()
+                            sslSignature,
+                        )
+                        VerticalSpace(dp = 16.dp)
+                        PBlockButton(
+                            text = stringResource(id = R.string.reset_ssl_certificate),
+                            type = ButtonType.DANGER,
+                            onClick = {
+                                scope.launch(Dispatchers.IO) {
+                                    DialogHelper.showLoading()
+                                    KeyStorePasswordPreference.resetAsync(context)
+                                    keyStorePassword = KeyStorePasswordPreference.getAsync(context)
+                                    val file = File(context.filesDir, Constants.KEY_STORE_FILE_NAME)
+                                    HttpServerManager.generateSSLKeyStore(file, keyStorePassword)
+                                    DialogHelper.hideLoading()
+                                    DialogHelper.showConfirmDialog("", LocaleHelper.getString(R.string.ssl_certificate_reset)) {
+                                        sendEvent(RestartAppEvent())
+                                    }
+                                }
                             },
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        VerticalSpace(dp = 24.dp)
                         Subtitle(text = stringResource(id = R.string.url_token))
                         ClipboardCard(label = stringResource(id = R.string.url_token), urlToken)
                         Tips(text = stringResource(id = R.string.url_token_tips))
-                        Spacer(modifier = Modifier.height(16.dp))
+                        VerticalSpace(dp = 16.dp)
                         PBlockButton(
                             text = stringResource(id = R.string.reset_token),
                             type = ButtonType.DANGER,
@@ -186,6 +212,7 @@ fun WebSecurityPage(navController: NavHostController) {
                                 scope.launch(Dispatchers.IO) {
                                     UrlTokenPreference.resetAsync(context)
                                     urlToken = TempData.urlToken
+                                    DialogHelper.showMessage(R.string.the_token_is_reset)
                                 }
                             },
                         )

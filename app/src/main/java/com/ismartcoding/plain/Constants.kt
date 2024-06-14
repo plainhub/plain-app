@@ -18,4 +18,5 @@ object Constants {
     const val ONE_DAY_MS = ONE_DAY * 1000L
     const val BROADCAST_ACTION_SERVICE = "${BuildConfig.APPLICATION_ID}.action.service"
     const val BROADCAST_ACTION_ACTIVITY = "${BuildConfig.APPLICATION_ID}.action.activity"
+    const val KEY_STORE_FILE_NAME = "keystore2.jks"
 }

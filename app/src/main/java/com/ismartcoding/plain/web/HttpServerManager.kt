@@ -62,6 +62,7 @@ object HttpServerManager {
     val portsInUse = mutableSetOf<Int>()
     val httpsPorts = setOf(8043, 8143, 8243, 8343, 8443, 8543, 8643, 8743, 8843, 8943)
     val httpPorts = setOf(8080, 8180, 8280, 8380, 8480, 8580, 8680, 8780, 8880, 8980)
+
     val notificationId: Int by lazy {
         NotificationHelper.generateId()
     }
@@ -144,13 +145,17 @@ object HttpServerManager {
         }
     }
 
+    fun generateSSLKeyStore(file: File, password: String) {
+        val keyStore = JksHelper.genJksFile(SSL_KEY_ALIAS, password, Constants.SSL_NAME)
+        FileOutputStream(file).use {
+            keyStore.store(it, null)
+        }
+    }
+
     private fun getSSLKeyStore(context: Context, password: String): KeyStore {
-        val file = File(context.filesDir, "keystore2.jks")
+        val file = File(context.filesDir, Constants.KEY_STORE_FILE_NAME)
         if (!file.exists()) {
-            val keyStore = JksHelper.genJksFile(SSL_KEY_ALIAS, password, Constants.SSL_NAME)
-            val out = FileOutputStream(file)
-            keyStore.store(out, null)
-            out.close()
+            generateSSLKeyStore(file, password)
         }
 
         return KeyStore.getInstance(KeyStore.getDefaultType()).apply {

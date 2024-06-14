@@ -9,10 +9,15 @@ plugins {
     id("com.google.firebase.crashlytics")
     id("com.apollographql.apollo3") version "3.2.1"
     id("kotlin-parcelize")
+    id("androidx.room")
     id("com.google.devtools.ksp")
     kotlin("android")
     kotlin("kapt")
     kotlin("plugin.serialization") version "1.9.23"
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 val keystoreProperties = Properties()

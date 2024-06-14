@@ -7,6 +7,7 @@ buildscript {
     dependencies {
         classpath(libs.gradle)
         classpath(libs.kotlin.gradle.plugin)
+        classpath(libs.room.gradle)
         classpath(libs.google.services)
         classpath(libs.firebase.crashlytics.gradle)
     }

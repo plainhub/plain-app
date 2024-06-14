@@ -2,6 +2,9 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">Su VPN está actualmente habilitado en su dispositivo, lo que podría provocar problemas de conexión web cuando se accede desde su PC. Para resolver esto, le recomendamos ajustar la configuración de su VPN para permitir el tráfico de LAN o desactivar su VPN.</string>
     <string name="warning">Advertencia</string>
+    <string name="ssl_certificate_reset">Certificado SSL restablecido</string>
+    <string name="the_token_is_reset">El token se ha restablecido</string>
+    <string name="reset_ssl_certificate">Restablecer certificado SSL</string>
     <string name="device_name">Nombre del dispositivo</string>
     <string name="developer_mode">Modo desarrollador</string>
     <string name="title">Título</string>

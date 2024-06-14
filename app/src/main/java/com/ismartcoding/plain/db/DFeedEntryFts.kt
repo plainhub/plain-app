@@ -12,9 +12,10 @@ import kotlinx.serialization.Serializable
 
 // https://validator.w3.org/feed/docs/rss2.html
 // https://validator.w3.org/feed/docs/atom.html
-@Entity(tableName = "feed_entries")
+@Entity(tableName = "feed_entries_fts")
 @Serializable
-data class DFeedEntry(
+@Fts4
+data class DFeedEntryFts(
     @PrimaryKey override var id: String = StringHelper.shortUUID(),
 ) : IData, DEntityBase() {
     var title: String = ""
@@ -43,51 +44,51 @@ data class DFeedEntry(
 }
 
 @Dao
-interface FeedEntryDao {
-    @Query("SELECT * FROM feed_entries")
-    fun getAll(): List<DFeedEntry>
+interface FeedEntryFtsDao {
+    @Query("SELECT * FROM feed_entries_fts")
+    fun getAll(): List<DFeedEntryFts>
 
     @RawQuery
     fun getIds(query: SupportSQLiteQuery): List<IDData>
 
     @RawQuery
-    fun search(query: SupportSQLiteQuery): List<DFeedEntry>
+    fun search(query: SupportSQLiteQuery): List<DFeedEntryFts>
 
     @RawQuery
     fun count(query: SupportSQLiteQuery): Int
 
-    @Query("SELECT * FROM feed_entries WHERE id=:id")
-    fun getById(id: String): DFeedEntry?
+    @Query("SELECT * FROM feed_entries_fts WHERE id=:id")
+    fun getById(id: String): DFeedEntryFts?
 
     @Insert
-    fun insert(vararg item: DFeedEntry)
+    fun insert(vararg item: DFeedEntryFts)
 
     @Update
-    fun update(vararg item: DFeedEntry)
+    fun update(vararg item: DFeedEntryFts)
 
-    @Query("DELETE FROM feed_entries")
+    @Query("DELETE FROM feed_entries_fts")
     fun deleteAll()
 
-    @Query("DELETE FROM feed_entries WHERE id in (:ids)")
+    @Query("DELETE FROM feed_entries_fts WHERE id in (:ids)")
     fun delete(ids: Set<String>)
 
-    @Query("DELETE FROM feed_entries WHERE feed_id in (:ids)")
+    @Query("DELETE FROM feed_entries_fts WHERE feed_id in (:ids)")
     fun deleteByFeedIds(ids: Set<String>)
 
-    @Query("SELECT * from feed_entries WHERE url=:url AND feed_id=:feedId")
+    @Query("SELECT * from feed_entries_fts WHERE url=:url AND feed_id=:feedId")
     fun getByUrl(
         url: String,
         feedId: String,
-    ): DFeedEntry?
+    ): DFeedEntryFts?
 
-    @Query("SELECT id from feed_entries WHERE feed_id in (:ids)")
+    @Query("SELECT id from feed_entries_fts WHERE feed_id in (:ids)")
     fun getIds(ids: Set<String>): List<String>
 
     @Insert
-    fun insertList(entries: List<DFeedEntry>): List<Long>
+    fun insertList(entries: List<DFeedEntryFts>): List<Long>
 
     @Transaction
-    fun insertListIfNotExist(entries: List<DFeedEntry>): List<DFeedEntry> {
+    fun insertListIfNotExist(entries: List<DFeedEntryFts>): List<DFeedEntryFts> {
         return entries.mapNotNull {
             if (getByUrl(
                     url = it.url,

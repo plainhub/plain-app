@@ -2,6 +2,9 @@
     <string name="app_name">PlainApp</string>
     <string name="vpn_web_conflict_warning">VPN\'iniz şu anda cihazınızda etkinleştirilmiştir, bu da PC\'den erişildiğinde potansiyel olarak web bağlantısı sorunlarına yol açabilir. Bu sorunu çözmek için VPN ayarlarınızı lan trafiğine izin verecek şekilde ayarlamanızı veya VPN\'inizi devre dışı bırakmanızı öneririz.</string>
     <string name="warning">Uyarı</string>
+    <string name="ssl_certificate_reset">SSL sertifikası sıfırlandı</string>
+    <string name="the_token_is_reset">Belirteç sıfırlandı</string>
+    <string name="reset_ssl_certificate">SSL sertifikasını sıfırla</string>
     <string name="device_name">Cihaz adı</string>
     <string name="developer_mode">Geliştirici modu</string>
     <string name="title">Başlık</string>
