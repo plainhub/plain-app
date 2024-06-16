@@ -368,7 +368,16 @@ object HttpModule {
                 }
                 try {
                     val context = MainApp.instance
-                    val path = UrlHelper.decrypt(id).getFinalPath(context)
+                    val decryptedId = UrlHelper.decrypt(id).getFinalPath(context)
+                    var path: String
+                    var mediaId = ""
+                    if (decryptedId.startsWith("{")) {
+                        val json = JSONObject(decryptedId)
+                        path = json.optString("path")
+                        mediaId = json.optString("mediaId")
+                    } else {
+                        path = decryptedId
+                    }
                     if (path.startsWith("content://")) {
                         val bytes = withIO { context.contentResolver.openInputStream(Uri.parse(path))?.buffered()?.use { it.readBytes() } }
                         if (bytes != null) {
@@ -413,7 +422,7 @@ object HttpModule {
                         val centerCrop = q["cc"]?.toBooleanStrictOrNull() ?: true
                         // get video/image thumbnail
                         if (w != null && h != null) {
-                            val bytes = withIO { file.toThumbBytesAsync(MainApp.instance, w, h, centerCrop) }
+                            val bytes = withIO { file.toThumbBytesAsync(MainApp.instance, w, h, centerCrop, mediaId) }
                             if (bytes != null) {
                                 call.respondBytes(bytes)
                             }

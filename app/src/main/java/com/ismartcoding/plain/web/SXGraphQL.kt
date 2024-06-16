@@ -24,6 +24,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
+import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.PhoneHelper
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.logcat.LogCat
@@ -118,6 +119,7 @@ import com.ismartcoding.plain.web.models.StorageStats
 import com.ismartcoding.plain.web.models.Tag
 import com.ismartcoding.plain.web.models.TempValue
 import com.ismartcoding.plain.web.models.Video
+import com.ismartcoding.plain.web.models.toExportModel
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
@@ -1068,6 +1070,18 @@ class SXGraphQL(val schema: Schema) {
                         val writer = StringWriter()
                         FeedHelper.exportAsync(writer)
                         writer.toString()
+                    }
+                }
+                mutation("exportNotes") {
+                    resolver { query: String ->
+                        val items = NoteHelper.search(query, Int.MAX_VALUE, 0)
+                        val keys = items.map { it.id }
+                        val allTags = TagHelper.getAll(DataType.NOTE)
+                        val map = TagHelper.getTagRelationsByKeys(keys.toSet(), DataType.NOTE).groupBy { it.key }
+                        jsonEncode(items.map {
+                            val tagIds = map[it.id]?.map { t ->  t.tagId } ?: emptyList()
+                            it.toExportModel(if (tagIds.isNotEmpty()) allTags.filter { tagIds.contains(it.id) }.map { t -> t.toModel() } else emptyList())
+                        })
                     }
                 }
                 mutation("addToTags") {

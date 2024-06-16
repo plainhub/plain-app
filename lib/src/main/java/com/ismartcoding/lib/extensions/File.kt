@@ -131,8 +131,9 @@ fun File.toThumbBytesAsync(
     width: Int,
     height: Int,
     centerCrop: Boolean,
+    mediaId: String
 ): ByteArray? {
-    val bitmap = getBitmapAsync(context, width, height, centerCrop) ?: return null
+    val bitmap = getBitmapAsync(context, width, height, centerCrop, mediaId) ?: return null
     val stream = ByteArrayOutputStream()
     bitmap.compress(80, stream)
     return stream.toByteArray()
