@@ -401,6 +401,10 @@ object HttpModule {
                             call.respond(HttpStatusCode.NotFound)
                             return@get
                         }
+                        if (file.isDirectory) {
+                            call.respond(HttpStatusCode.BadRequest)
+                            return@get
+                        }
 
                         val fileName = (q["name"] ?: file.name).urlEncode().replace("+", "%20")
                         if (q["dl"] == "1") {

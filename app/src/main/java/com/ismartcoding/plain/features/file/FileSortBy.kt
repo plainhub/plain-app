@@ -59,4 +59,27 @@ enum class FileSortBy {
             }
         }
     }
+
+    fun toFileSortBy(): SortBy {
+        return when (this) {
+            NAME_ASC -> {
+                SortBy(MediaStore.MediaColumns.DISPLAY_NAME, SortDirection.ASC)
+            }
+            NAME_DESC -> {
+                SortBy(MediaStore.MediaColumns.DISPLAY_NAME, SortDirection.DESC)
+            }
+            DATE_ASC -> {
+                SortBy(MediaStore.MediaColumns.DATE_MODIFIED, SortDirection.ASC)
+            }
+            DATE_DESC -> {
+                SortBy(MediaStore.MediaColumns.DATE_MODIFIED, SortDirection.DESC)
+            }
+            SIZE_ASC -> {
+                SortBy(MediaStore.MediaColumns.SIZE, SortDirection.ASC)
+            }
+            SIZE_DESC -> {
+                SortBy(MediaStore.MediaColumns.SIZE, SortDirection.DESC)
+            }
+        }
+    }
 }

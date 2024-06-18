@@ -1,18 +1,12 @@
 package com.ismartcoding.plain.features.file
 
-import android.content.ContentResolver
 import android.content.Context
 import android.os.Environment
 import android.os.StatFs
 import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.text.TextUtils
-import androidx.core.os.bundleOf
-import com.ismartcoding.lib.extensions.forEach
 import com.ismartcoding.lib.extensions.getDirectChildrenCount
-import com.ismartcoding.lib.extensions.getLongValue
-import com.ismartcoding.lib.extensions.getStringValue
-import com.ismartcoding.lib.extensions.getTimeValue
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.sorted

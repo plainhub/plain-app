@@ -21,12 +21,11 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 
 fun File.getDirectChildrenCount(countHiddenItems: Boolean): Int {
-    return listFiles()?.filter {
-        if (countHiddenItems) {
-            true
-        } else {
-            !it.name.startsWith('.')
-        }
+    if (countHiddenItems) {
+        return list()?.size ?: 0
+    }
+    return list()?.filter {
+        !it.startsWith('.')
     }?.size ?: 0
 }
 

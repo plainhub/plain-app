@@ -42,6 +42,13 @@ data class ContentWhere(private val selections: MutableList<String> = mutableLis
         add("$field LIKE '%' || ? || '%'", value)
     }
 
+    fun addNotStartsWith(
+        field: String,
+        value: String,
+    ) {
+        add("$field NOT LIKE ? || '%'", value)
+    }
+
     fun addLikes(
         fields: List<String>,
         values: List<String>,

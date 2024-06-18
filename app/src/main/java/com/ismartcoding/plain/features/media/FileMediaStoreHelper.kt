@@ -6,11 +6,14 @@ import android.net.Uri
 import android.provider.MediaStore
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.extensions.*
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.enums.FileType
 import com.ismartcoding.plain.extensions.sorted
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.helpers.QueryHelper
+import java.io.File
 import java.util.Locale
 
 object FileMediaStoreHelper : BaseContentHelper() {
@@ -55,12 +58,29 @@ object FileMediaStoreHelper : BaseContentHelper() {
     override suspend fun buildWhereAsync(query: String): ContentWhere {
         val where = ContentWhere()
         if (query.isNotEmpty()) {
+            var showHidden = false
             QueryHelper.parseAsync(query).forEach {
-                if (it.name == "text") {
-                    where.add("${MediaStore.Files.FileColumns.DISPLAY_NAME} LIKE ?", "%${it.value}%")
-                } else if (it.name == "ids") {
-                    where.addIn(MediaStore.Files.FileColumns._ID, it.value.split(","))
+                when (it.name) {
+                    "text" -> {
+                        where.add("${MediaStore.Files.FileColumns.DISPLAY_NAME} LIKE ?", "%${it.value}%")
+                    }
+                    "parent" -> {
+                        where.add("${MediaStore.Files.FileColumns.PARENT} = ?", getIdByPathAsync(MainApp.instance, it.value) ?: "-1")
+                    }
+                    "type" -> {
+                        where.add("${MediaStore.Files.FileColumns.MIME_TYPE} = ?", it.value)
+                    }
+                    "show_hidden" -> {
+                        showHidden = it.value.toBoolean()
+                    }
+                    "ids" -> {
+                        where.addIn(MediaStore.Files.FileColumns._ID, it.value.split(","))
+                    }
                 }
+            }
+
+            if (!showHidden) {
+                where.addNotStartsWith(MediaStore.Files.FileColumns.DISPLAY_NAME, ".")
             }
         }
         return where
@@ -73,18 +93,46 @@ object FileMediaStoreHelper : BaseContentHelper() {
         offset: Int,
         sortBy: FileSortBy,
     ): List<DFile> {
-        return context.contentResolver.getPagingCursor(
+        val items = context.contentResolver.getPagingCursor(
             uriExternal, getProjection(), buildWhereAsync(query),
-            limit, offset, sortBy.toSortBy()
+            limit, offset, sortBy.toFileSortBy()
         )?.map { cursor, cache ->
             cursorToFile(cursor, cache)
         } ?: emptyList()
+        val folderIds = items.filter { it.isDir }.map { it.mediaId }
+        val counts = getChildrenCountAsync(context, folderIds)
+        return items.map {
+            it.copy(children = counts[it.mediaId] ?: 0)
+        }
     }
 
     fun getByIdAsync(context: Context, id: String): DFile? {
         return context.contentResolver
             .queryCursor(uriExternal, getProjection(), "${MediaStore.Files.FileColumns._ID} = ?", arrayOf(id))?.find { cursor, cache ->
                 cursorToFile(cursor, cache)
+            }
+    }
+
+    private fun getChildrenCountAsync(context: Context, folderIds: List<String>): Map<String, Int> {
+        val counts = mutableMapOf<String, Int>()
+        if (folderIds.isEmpty()) {
+            return counts
+        }
+        val where = ContentWhere()
+        where.addIn(MediaStore.Files.FileColumns.PARENT, folderIds)
+        context.contentResolver
+            .queryCursor(uriExternal, arrayOf(MediaStore.Files.FileColumns.PARENT), where.toSelection(), where.args.toTypedArray())?.forEach { cursor, cache ->
+                val parentId = cursor.getStringValue(MediaStore.Files.FileColumns.PARENT, cache)
+                counts[parentId] = counts.getOrDefault(parentId, 0) + 1
+            }
+
+        return counts
+    }
+
+    fun getIdByPathAsync(context: Context, path: String): String? {
+        return context.contentResolver
+            .queryCursor(uriExternal, arrayOf(MediaStore.Files.FileColumns._ID), "${MediaStore.Files.FileColumns.DATA} = ?", arrayOf(path))?.find { cursor, cache ->
+                cursor.getStringValue(MediaStore.Files.FileColumns._ID, cache)
             }
     }
 
@@ -162,7 +210,7 @@ object FileMediaStoreHelper : BaseContentHelper() {
     suspend fun getRecentFilesAsync(context: Context, query: String): List<DFile> {
         return context.contentResolver.getPagingCursor(
             uriExternal, getProjection(), buildWhereAsync(query),
-            100, 0, FileSortBy.DATE_DESC.toSortBy()
+            100, 0, FileSortBy.DATE_DESC.toFileSortBy()
         )?.map { cursor, cache ->
             cursorToFile(cursor, cache)
         }?.filter { !it.isDir }?.take(50) ?: emptyList()
@@ -175,7 +223,7 @@ object FileMediaStoreHelper : BaseContentHelper() {
         val path = cursor.getStringValue(MediaStore.Files.FileColumns.DATA, cache)
         val createdAt = cursor.getTimeSecondsValue(MediaStore.Files.FileColumns.DATE_ADDED, cache)
         val updatedAt = cursor.getTimeSecondsValue(MediaStore.Files.FileColumns.DATE_MODIFIED, cache)
-
+        val mimeType = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MIME_TYPE))
         val mediaType = cursor.getIntValue(MediaStore.Files.FileColumns.MEDIA_TYPE, cache)
         return DFile(
             title,
@@ -184,7 +232,7 @@ object FileMediaStoreHelper : BaseContentHelper() {
             createdAt,
             updatedAt,
             size,
-            mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_NONE,
+            mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_NONE && mimeType == null && size == 0L,
             0,
             id
         )

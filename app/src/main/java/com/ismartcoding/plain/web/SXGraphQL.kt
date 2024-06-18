@@ -85,6 +85,7 @@ import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.DeviceInfoHelper
 import com.ismartcoding.plain.helpers.ExchangeHelper
 import com.ismartcoding.plain.helpers.FileHelper
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.preference.DeveloperModePreference
 import com.ismartcoding.plain.preference.DeviceNamePreference
@@ -510,12 +511,27 @@ class SXGraphQL(val schema: Schema) {
                         FileMediaStoreHelper.getRecentFilesAsync(context, "").map { it.toModel() }
                     }
                 }
-                query("files") {
+                query("files2") {
                     resolver { dir: String, showHidden: Boolean, sortBy: FileSortBy ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
                         val files = FileSystemHelper.getFilesList(dir, showHidden, sortBy).map { it.toModel() }
                         Files(dir, files)
+                    }
+                }
+                query("files") {
+                    resolver { offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
+                        val context = MainApp.instance
+                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
+                        val filterFields = QueryHelper.parseAsync(query)
+                        val appFolder = context.getExternalFilesDir(null)?.path ?: ""
+                        val parent = filterFields.find { it.name == "parent" }
+                        if (parent?.value?.startsWith(appFolder) == true) {
+                            val showHidden = filterFields.find { it.name == "show_hidden" }?.value?.toBoolean() ?: false
+                            FileSystemHelper.getFilesList(parent.value, showHidden, sortBy).map { it.toModel() }
+                        } else {
+                            FileMediaStoreHelper.searchAsync(MainApp.instance, query, limit, offset, sortBy).map { it.toModel() }
+                        }
                     }
                 }
                 query("fileInfo") {
@@ -1079,7 +1095,7 @@ class SXGraphQL(val schema: Schema) {
                         val allTags = TagHelper.getAll(DataType.NOTE)
                         val map = TagHelper.getTagRelationsByKeys(keys.toSet(), DataType.NOTE).groupBy { it.key }
                         jsonEncode(items.map {
-                            val tagIds = map[it.id]?.map { t ->  t.tagId } ?: emptyList()
+                            val tagIds = map[it.id]?.map { t -> t.tagId } ?: emptyList()
                             it.toExportModel(if (tagIds.isNotEmpty()) allTags.filter { tagIds.contains(it.id) }.map { t -> t.toModel() } else emptyList())
                         })
                     }
