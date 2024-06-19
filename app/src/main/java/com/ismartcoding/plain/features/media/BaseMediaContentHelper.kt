@@ -1,10 +1,14 @@
 package com.ismartcoding.plain.features.media
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
+import android.os.Environment
 import android.provider.BaseColumns
 import android.provider.MediaStore
+import androidx.annotation.RequiresApi
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.data.SortBy
 import com.ismartcoding.lib.extensions.count
@@ -102,6 +106,17 @@ abstract class BaseMediaContentHelper {
         }?.toSet() ?: emptySet()
     }
 
+    suspend fun getTrashedIdsAsync(
+        context: Context,
+        query: String,
+    ): Set<String> {
+        return context.contentResolver.getSearchCursor(
+            uriExternal, arrayOf(BaseColumns._ID), buildWhere(query).apply { trash = true }
+        )?.map { cursor, cache ->
+            cursor.getStringValue(BaseColumns._ID, cache)
+        }?.toSet() ?: emptySet()
+    }
+
     protected suspend fun getSearchCursorAsync(
         context: Context,
         query: String,
@@ -114,12 +129,14 @@ abstract class BaseMediaContentHelper {
     fun deleteRecordsAndFilesByIdsAsync(
         context: Context,
         ids: Set<String>,
+        trash: Boolean? = null,
     ): Set<String> {
         val paths = mutableSetOf<String>()
         val projection = arrayOf(BaseColumns._ID, MediaStore.MediaColumns.DATA)
         ids.chunked(500).forEach { chunk ->
             val where = ContentWhere()
             where.addIn(BaseColumns._ID, chunk)
+            where.trash = trash
             context.contentResolver.getSearchCursor(uriExternal, projection, where)?.forEach { cursor, cache ->
                 val id = cursor.getStringValue(BaseColumns._ID, cache)
                 val path = cursor.getStringValue(MediaStore.MediaColumns.DATA, cache)
@@ -141,6 +158,52 @@ abstract class BaseMediaContentHelper {
         }
 
         return paths
+    }
+
+    fun getPathsByIdsAsync(
+        context: Context,
+        ids: Set<String>,
+    ): Set<String> {
+        val paths = mutableSetOf<String>()
+        val projection = arrayOf(BaseColumns._ID, MediaStore.MediaColumns.DATA)
+        ids.chunked(500).forEach { chunk ->
+            val where = ContentWhere()
+            where.addIn(BaseColumns._ID, chunk)
+            context.contentResolver.getSearchCursor(uriExternal, projection, where)?.forEach { cursor, cache ->
+                val path = cursor.getStringValue(MediaStore.MediaColumns.DATA, cache)
+                paths.add(path)
+            }
+        }
+
+        return paths
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    fun trashByIdsAsync(
+        context: Context,
+        ids: Set<String>,
+    ) {
+        val contentValues = ContentValues().apply {
+//            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Trash")
+            put(MediaStore.MediaColumns.IS_TRASHED, 1)
+        }
+        ids.forEach { id ->
+            context.contentResolver.update(getItemUri(id), contentValues, null, null)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    fun restoreByIdsAsync(
+        context: Context,
+        ids: Set<String>,
+    ) {
+        val contentValues = ContentValues().apply {
+//            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Trash")
+            put(MediaStore.MediaColumns.IS_TRASHED, 0)
+        }
+        ids.forEach { id ->
+            context.contentResolver.update(getItemUri(id), contentValues, null, null)
+        }
     }
 
     fun getBucketsAsync(context: Context): List<DMediaBucket> {

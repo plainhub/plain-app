@@ -57,6 +57,10 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
                 "artist" -> {
                     where.addEqual(MediaStore.Audio.Media.ARTIST, it.value)
                 }
+
+                "trash" -> {
+                    where.trash = it.value.toBooleanStrictOrNull()
+                }
             }
         }
         return where
@@ -80,7 +84,7 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
             val path = cursor.getStringValue(MediaStore.Audio.Media.DATA, cache)
             val bucketId = cursor.getStringValue(MediaStore.Audio.Media.BUCKET_ID, cache)
             val albumId = cursor.getStringValue(MediaStore.Audio.Media.ALBUM_ID, cache)
-            DAudio(id, title, artist, path, duration, size, bucketId,albumId, createdAt, updatedAt)
+            DAudio(id, title, artist, path, duration, size, bucketId, albumId, createdAt, updatedAt)
         } ?: emptyList()
     }
 

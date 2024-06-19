@@ -8,9 +8,9 @@ import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import com.google.android.material.button.MaterialButton
-import com.ismartcoding.lib.extensions.delayOnLifecycle
+import com.ismartcoding.plain.extensions.delayOnLifecycle
 import com.ismartcoding.lib.extensions.px
-import com.ismartcoding.lib.extensions.setSelectableItemBackground
+import com.ismartcoding.plain.extensions.setSelectableItemBackground
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.ViewListItemBinding
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString

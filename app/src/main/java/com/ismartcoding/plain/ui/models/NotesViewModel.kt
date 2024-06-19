@@ -7,7 +7,6 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.db.DNote
@@ -107,13 +106,13 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
         }
     }
 
-    fun untrash(tagsViewModel: TagsViewModel, ids: Set<String>) {
+    fun restore(tagsViewModel: TagsViewModel, ids: Set<String>) {
         viewModelScope.launch(Dispatchers.IO) {
             TagHelper.deleteTagRelationByKeys(
                 ids,
                 dataType,
             )
-            NoteHelper.untrashAsync(ids)
+            NoteHelper.restoreAsync(ids)
             refreshTabsAsync(tagsViewModel)
             _itemsFlow.update {
                 val mutableList = it.toMutableStateList()

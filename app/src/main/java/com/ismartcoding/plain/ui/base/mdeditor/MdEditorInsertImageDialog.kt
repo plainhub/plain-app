@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.getFilenameFromPath
-import com.ismartcoding.lib.extensions.newPath
+import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.lib.extensions.queryOpenableFileName
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.PickFileTag

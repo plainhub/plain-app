@@ -62,7 +62,7 @@ fun SelectModeBottomActions(
                     icon = Icons.Outlined.RestoreFromTrash,
                     text = LocaleHelper.getString(R.string.restore),
                     click = {
-                        viewModel.untrash(tagsViewModel, viewModel.selectedIds.toSet())
+                        viewModel.restore(tagsViewModel, viewModel.selectedIds.toSet())
                         viewModel.exitSelectMode()
                     }
                 )

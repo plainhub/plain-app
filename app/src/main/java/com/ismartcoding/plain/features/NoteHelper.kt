@@ -16,10 +16,8 @@ object NoteHelper {
     suspend fun count(query: String): Int {
         var sql = "SELECT COUNT(id) FROM notes"
         val where = ContentWhere()
-        if (query.isNotEmpty()) {
-            parseQuery(where, query)
-            sql += " WHERE ${where.toSelection()}"
-        }
+        parseQuery(where, query)
+        sql += " WHERE ${where.toSelection()}"
 
         return noteDao.count(SimpleSQLiteQuery(sql, where.args.toTypedArray()))
     }
@@ -35,6 +33,18 @@ object NoteHelper {
         return noteDao.getIds(SimpleSQLiteQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
     }
 
+    suspend fun getTrashedIdsAsync(query: String): Set<String> {
+        var sql = "SELECT id FROM notes"
+        val where = ContentWhere()
+        where.trash = true
+        if (query.isNotEmpty()) {
+            parseQuery(where, query)
+            sql += " WHERE ${where.toSelection()}"
+        }
+
+        return noteDao.getIds(SimpleSQLiteQuery(sql, where.args.toTypedArray())).map { it.id }.toSet()
+    }
+
     suspend fun search(
         query: String,
         limit: Int,
@@ -42,10 +52,8 @@ object NoteHelper {
     ): List<DNote> {
         var sql = "SELECT * FROM notes"
         val where = ContentWhere()
-        if (query.isNotEmpty()) {
-            parseQuery(where, query)
-            sql += " WHERE ${where.toSelection()}"
-        }
+        parseQuery(where, query)
+        sql += " WHERE ${where.toSelection()}"
 
         sql += if (limit == Int.MAX_VALUE) {
             " ORDER BY updated_at DESC"
@@ -124,7 +132,7 @@ object NoteHelper {
         noteDao.trash(ids, now, now)
     }
 
-    fun untrashAsync(ids: Set<String>) {
+    fun restoreAsync(ids: Set<String>) {
         noteDao.trash(ids, null, Clock.System.now())
     }
 
@@ -137,17 +145,24 @@ object NoteHelper {
         query: String,
     ) {
         QueryHelper.parseAsync(query).forEach {
-            if (it.name == "text") {
-                where.addLike("content", it.value)
-            } else if (it.name == "ids") {
-                where.addIn("id", it.value.split(","))
-            } else if (it.name == "trash") {
-                if (it.value == "true") {
-                    where.add("deleted_at IS NOT NULL")
-                } else {
-                    where.add("deleted_at IS NULL")
+            when (it.name) {
+                "text" -> {
+                    where.addLike("content", it.value)
+                }
+
+                "ids" -> {
+                    where.addIn("id", it.value.split(","))
+                }
+
+                "trash" -> {
+                    where.trash = it.value.toBooleanStrictOrNull()
                 }
             }
+        }
+        if (where.trash == true) {
+            where.add("deleted_at IS NOT NULL")
+        } else {
+            where.add("deleted_at IS NULL")
         }
     }
 }

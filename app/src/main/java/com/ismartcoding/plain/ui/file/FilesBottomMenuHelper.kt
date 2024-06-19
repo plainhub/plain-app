@@ -5,7 +5,7 @@ import android.view.MenuItem
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.brv.utils.bindingAdapter
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.newPath
+import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.helpers.ShareHelper

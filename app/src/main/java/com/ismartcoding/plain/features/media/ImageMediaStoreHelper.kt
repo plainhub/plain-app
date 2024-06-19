@@ -41,7 +41,9 @@ object ImageMediaStoreHelper : BaseMediaContentHelper() {
             if (it.name == "text") {
                 where.add("${MediaStore.Images.Media.TITLE} LIKE ?", "%${it.value}%")
             } else if (it.name == "bucket_id") {
-                where.add("${MediaStore.Images.Media.BUCKET_ID} = ?", it.value)
+                where.addEqual(MediaStore.Images.Media.BUCKET_ID, it.value)
+            } else if (it.name == "trash") {
+                where.trash = it.value.toBooleanStrictOrNull()
             }
         }
         return where

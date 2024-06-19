@@ -3,6 +3,7 @@ package com.ismartcoding.lib.extensions
 import android.content.ContentResolver
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.OpenableColumns
@@ -73,6 +74,11 @@ fun ContentResolver.countWithBundle(uri: Uri, where: ContentWhere): Int {
         null,
         Bundle().apply {
             where(where.toSelection(), where.args)
+            if (where.trash == true) {
+                if (isRPlus()) {
+                    putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_ONLY)
+                }
+            }
         },
         null,
     )?.use {
@@ -126,6 +132,11 @@ fun ContentResolver.getPagingCursorWithBundle(
                 paging(offset, limit)
                 sort(sortBy)
                 where(where.toSelection(), where.args)
+                if (where.trash == true) {
+                    if (isRPlus()) {
+                        putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_ONLY)
+                    }
+                }
             },
             null,
         )
@@ -152,7 +163,7 @@ fun ContentResolver.getPagingCursorWithSql(
     )
 }
 
-fun ContentResolver.getSearchCursor(
+fun ContentResolver.getSearchCursorWithSql(
     uri: Uri,
     projection: Array<String>,
     where: ContentWhere,
@@ -164,6 +175,48 @@ fun ContentResolver.getSearchCursor(
         where.args.toTypedArray(),
         null,
     )
+}
+
+fun ContentResolver.getSearchCursorWithBundle(
+    uri: Uri,
+    projection: Array<String>,
+    where: ContentWhere,
+): Cursor? {
+    return try {
+        query(
+            uri,
+            projection,
+            Bundle().apply {
+                where(where.toSelection(), where.args)
+                if (where.trash == true) {
+                    if (isRPlus()) {
+                        putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_ONLY)
+                    }
+                }
+            },
+            null,
+        )
+    } catch (ex: Exception) {
+        LogCat.e(ex.toString())
+        null
+    }
+}
+
+fun ContentResolver.getSearchCursor(
+    uri: Uri,
+    projection: Array<String>,
+    where: ContentWhere,
+): Cursor? {
+    return if (isRPlus()) {
+        getSearchCursorWithBundle(uri, projection, where)
+    } else {
+        try {
+            getSearchCursorWithSql(uri, projection, where)
+        } catch (ex: Exception) {
+            LogCat.e(ex.toString())
+            getSearchCursorWithBundle(uri, projection, where)
+        }
+    }
 }
 
 fun ContentResolver.queryCursor(

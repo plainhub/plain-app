@@ -8,21 +8,18 @@ import android.util.Base64
 import com.ismartcoding.lib.extensions.getFileName
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.hasPermission
-import com.ismartcoding.lib.extensions.newFile
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.extensions.newFile
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
-import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
@@ -150,6 +147,8 @@ object FileHelper {
         return ""
     }
 
+
+
     private fun createPublicFile(fileName: String, dirName: String): File {
         val dir = PathHelper.getPlainPublicDir(dirName)
         if (!dir.exists()) {
@@ -161,4 +160,6 @@ object FileHelper {
         }
         return file
     }
+
+
 }

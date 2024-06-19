@@ -57,7 +57,7 @@ import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.QrCodeBitmapHelper
+import com.ismartcoding.plain.helpers.QrCodeBitmapHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager

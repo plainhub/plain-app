@@ -6,7 +6,7 @@ import android.view.View
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.getFilenameFromPath
-import com.ismartcoding.lib.extensions.newPath
+import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.lib.extensions.queryOpenableFileName
 import com.ismartcoding.plain.databinding.DialogEditorInsertImageBinding
 import com.ismartcoding.plain.enums.PickFileTag

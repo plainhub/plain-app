@@ -11,9 +11,9 @@ import com.ismartcoding.lib.extensions.compress
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isUrl
-import com.ismartcoding.lib.extensions.newFile
+import com.ismartcoding.plain.extensions.newFile
 import com.ismartcoding.lib.extensions.scanFileByConnection
-import com.ismartcoding.lib.extensions.toThumbBytesAsync
+import com.ismartcoding.plain.extensions.toThumbBytesAsync
 import com.ismartcoding.lib.extensions.urlEncode
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO

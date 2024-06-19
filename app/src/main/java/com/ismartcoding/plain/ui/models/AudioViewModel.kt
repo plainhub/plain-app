@@ -65,7 +65,7 @@ class AudioViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
     fun trash(ids: Set<String>) {
     }
 
-    fun untrash(ids: Set<String>) {
+    fun restore(ids: Set<String>) {
 
     }
 

@@ -1,6 +1,6 @@
 package com.ismartcoding.lib.content
 
-data class ContentWhere(private val selections: MutableList<String> = mutableListOf(), val args: MutableList<String> = mutableListOf()) {
+data class ContentWhere(private val selections: MutableList<String> = mutableListOf(), val args: MutableList<String> = mutableListOf(), var trash: Boolean? = null) {
     fun addIn(
         field: String,
         values: List<String>,
@@ -33,6 +33,13 @@ data class ContentWhere(private val selections: MutableList<String> = mutableLis
         value: String,
     ) {
         add("$field = ?", value)
+    }
+
+    fun addNotEqual(
+        field: String,
+        value: String,
+    ) {
+        add("$field != ?", value)
     }
 
     fun addLike(

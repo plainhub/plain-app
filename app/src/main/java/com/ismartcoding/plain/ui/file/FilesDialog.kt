@@ -21,7 +21,7 @@ import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isPdfFile
 import com.ismartcoding.lib.extensions.isTextFile
 import com.ismartcoding.lib.extensions.isVideoFast
-import com.ismartcoding.lib.extensions.newPath
+import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.lib.extensions.px
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
@@ -326,7 +326,7 @@ class FilesDialog(val fileType: FilesType = FilesType.INTERNAL_STORAGE) : BaseDi
             val items =
                 withIO {
                     if (viewModel.type == FilesType.RECENTS) {
-                        FileMediaStoreHelper.getRecentFilesAsync(context, "")
+                        FileMediaStoreHelper.getRecentFilesAsync(context)
                     } else if (viewModel.searchQ.isNotEmpty()) {
                         FileSystemHelper.search(viewModel.searchQ, p, ShowHiddenFilesPreference.getAsync(context))
                     } else {

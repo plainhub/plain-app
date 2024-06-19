@@ -207,13 +207,15 @@ object FileMediaStoreHelper : BaseContentHelper() {
         return items.sorted(sortBy)
     }
 
-    suspend fun getRecentFilesAsync(context: Context, query: String): List<DFile> {
+    suspend fun getRecentFilesAsync(context: Context): List<DFile> {
+        val where = ContentWhere()
+        where.addNotEqual(MediaStore.Files.FileColumns.MIME_TYPE,  "vnd.android.document/directory")
         return context.contentResolver.getPagingCursor(
-            uriExternal, getProjection(), buildWhereAsync(query),
+            uriExternal, getProjection(), where,
             100, 0, FileSortBy.DATE_DESC.toFileSortBy()
         )?.map { cursor, cache ->
             cursorToFile(cursor, cache)
-        }?.filter { !it.isDir }?.take(50) ?: emptyList()
+        } ?: emptyList()
     }
 
     private fun cursorToFile(cursor: Cursor, cache: MutableMap<String, Int>): DFile {

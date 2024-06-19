@@ -71,7 +71,7 @@ fun ViewNoteBottomSheet(
                             icon = Icons.Outlined.RestoreFromTrash,
                             text = LocaleHelper.getString(R.string.restore),
                             click = {
-                                viewModel.untrash(tagsViewModel, setOf(m.id))
+                                viewModel.restore(tagsViewModel, setOf(m.id))
                                 onDismiss()
                             }
                         )

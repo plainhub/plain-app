@@ -62,7 +62,7 @@ fun ViewAudioBottomSheet(
                     icon = Icons.Outlined.RestoreFromTrash,
                     text = LocaleHelper.getString(R.string.restore),
                     onClick = {
-                        viewModel.untrash(setOf(m.id))
+                        viewModel.restore(setOf(m.id))
                         onDismiss()
                     }
                 ),

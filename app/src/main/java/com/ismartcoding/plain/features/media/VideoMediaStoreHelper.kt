@@ -44,7 +44,9 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
             if (it.name == "text") {
                 where.add("${MediaStore.Video.Media.TITLE} LIKE ?", "%${it.value}%")
             } else if (it.name == "bucket_id") {
-                where.add("${MediaStore.Video.Media.BUCKET_ID} = ?", it.value)
+                where.addEqual(MediaStore.Video.Media.BUCKET_ID, it.value)
+            } else if (it.name == "trash") {
+                where.trash = it.value.toBooleanStrictOrNull()
             }
         }
         return where

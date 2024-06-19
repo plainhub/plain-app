@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.web
 
+import android.os.Build
 import android.os.Environment
 import com.apurebase.kgraphql.GraphQLError
 import com.apurebase.kgraphql.GraphqlRequest
@@ -17,7 +18,7 @@ import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isAudioFast
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
-import com.ismartcoding.lib.extensions.newPath
+import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.extensions.toAppUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
@@ -27,6 +28,7 @@ import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.PhoneHelper
 import com.ismartcoding.lib.isQPlus
+import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
@@ -79,6 +81,8 @@ import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.media.SmsMediaStoreHelper
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.data.TagRelationStub
+import com.ismartcoding.plain.enums.AppFeatureType
+import com.ismartcoding.plain.extensions.sorted
 import com.ismartcoding.plain.features.media.FileMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.AppHelper
@@ -508,27 +512,29 @@ class SXGraphQL(val schema: Schema) {
                     resolver { ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-                        FileMediaStoreHelper.getRecentFilesAsync(context, "").map { it.toModel() }
-                    }
-                }
-                query("files2") {
-                    resolver { dir: String, showHidden: Boolean, sortBy: FileSortBy ->
-                        val context = MainApp.instance
-                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-                        val files = FileSystemHelper.getFilesList(dir, showHidden, sortBy).map { it.toModel() }
-                        Files(dir, files)
+                        if (isQPlus()) {
+                            FileMediaStoreHelper.getRecentFilesAsync(context).map { it.toModel() }
+                        } else {
+                            FileSystemHelper.getRecentFiles().map { it.toModel() }
+                        }
                     }
                 }
                 query("files") {
-                    resolver { offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
+                    resolver { root: String, offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-                        val filterFields = QueryHelper.parseAsync(query)
                         val appFolder = context.getExternalFilesDir(null)?.path ?: ""
-                        val parent = filterFields.find { it.name == "parent" }
-                        if (parent?.value?.startsWith(appFolder) == true) {
+                        val internalPath = FileSystemHelper.getInternalStoragePath()
+                        if (!isQPlus() || root.startsWith(appFolder) || !root.startsWith(internalPath)) {
+                            val filterFields = QueryHelper.parseAsync(query)
                             val showHidden = filterFields.find { it.name == "show_hidden" }?.value?.toBoolean() ?: false
-                            FileSystemHelper.getFilesList(parent.value, showHidden, sortBy).map { it.toModel() }
+                            val text = filterFields.find { it.name == "text" }?.value ?: ""
+                            val parent = filterFields.find { it.name == "parent" }?.value ?: ""
+                            if (text.isNotEmpty()) {
+                                FileSystemHelper.search(text, parent.ifEmpty { root }, showHidden).sorted(sortBy).drop(offset).take(limit).map { it.toModel() }
+                            } else {
+                                FileSystemHelper.getFilesList(parent.ifEmpty { root }, showHidden, sortBy).drop(offset).take(limit).map { it.toModel() }
+                            }
                         } else {
                             FileMediaStoreHelper.searchAsync(MainApp.instance, query, limit, offset, sortBy).map { it.toModel() }
                         }
@@ -696,7 +702,7 @@ class SXGraphQL(val schema: Schema) {
                             deviceName = DeviceNamePreference.getAsync(context).ifEmpty { PhoneHelper.getDeviceName(context) },
                             PhoneHelper.getBatteryPercentage(context),
                             BuildConfig.VERSION_CODE,
-                            android.os.Build.VERSION.SDK_INT,
+                            Build.VERSION.SDK_INT,
                             BuildConfig.CHANNEL,
                             Permission.entries.filter { apiPermissions.contains(it.name) && it.can(MainApp.instance) },
                             AudioPlaylistPreference.getValueAsync(context).map { it.toModel() },
@@ -1027,22 +1033,22 @@ class SXGraphQL(val schema: Schema) {
                         val ids = NoteHelper.getIdsAsync(query)
                         TagHelper.deleteTagRelationByKeys(ids, DataType.NOTE)
                         NoteHelper.trashAsync(ids)
-                        ids.size
+                        query
                     }
                 }
-                mutation("untrashNotes") {
+                mutation("restoreNotes") {
                     resolver { query: String ->
-                        val ids = NoteHelper.getIdsAsync(query)
-                        NoteHelper.untrashAsync(ids)
-                        ids.size
+                        val ids = NoteHelper.getTrashedIdsAsync(query)
+                        NoteHelper.restoreAsync(ids)
+                        query
                     }
                 }
                 mutation("deleteNotes") {
                     resolver { query: String ->
-                        val ids = NoteHelper.getIdsAsync(query)
+                        val ids = NoteHelper.getTrashedIdsAsync(query)
                         TagHelper.deleteTagRelationByKeys(ids, DataType.NOTE)
                         NoteHelper.deleteAsync(ids)
-                        ids.size
+                        query
                     }
                 }
                 mutation("deleteFeedEntries") {
@@ -1050,7 +1056,7 @@ class SXGraphQL(val schema: Schema) {
                         val ids = FeedEntryHelper.getIdsAsync(query)
                         TagHelper.deleteTagRelationByKeys(ids, DataType.FEED_ENTRY)
                         FeedEntryHelper.deleteAsync(ids)
-                        ids.size
+                        query
                     }
                 }
                 mutation("addPlaylistAudios") {
@@ -1223,31 +1229,94 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("deleteMediaItems") {
                     resolver { type: DataType, query: String ->
+                        var ids: Set<String>
+                        val context = MainApp.instance
+                        val hasTrashFeature = AppFeatureType.MEDIA_TRASH.has()
+                        when (type) {
+                            DataType.AUDIO -> {
+                                ids = if (hasTrashFeature) AudioMediaStoreHelper.getTrashedIdsAsync(context, query) else AudioMediaStoreHelper.getIdsAsync(context, query)
+                                AudioMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids, true)
+                            }
+
+                            DataType.VIDEO -> {
+                                ids = if (hasTrashFeature) VideoMediaStoreHelper.getTrashedIdsAsync(context, query) else VideoMediaStoreHelper.getIdsAsync(context, query)
+                                VideoMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids, true)
+                            }
+
+                            DataType.IMAGE -> {
+                                ids = if (hasTrashFeature) ImageMediaStoreHelper.getTrashedIdsAsync(context, query) else ImageMediaStoreHelper.getIdsAsync(context, query)
+                                ImageMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids, true)
+                            }
+
+                            else -> {
+                            }
+                        }
+                        true
+                    }
+                }
+                mutation("trashMediaItems") {
+                    resolver { type: DataType, query: String ->
+                        if (!isRPlus()) {
+                            return@resolver query
+                        }
+
                         var ids = setOf<String>()
                         val context = MainApp.instance
                         when (type) {
                             DataType.AUDIO -> {
                                 ids = AudioMediaStoreHelper.getIdsAsync(context, query)
-                                val paths = AudioMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids)
+                                val paths = AudioMediaStoreHelper.getPathsByIdsAsync(context, ids)
+                                AudioMediaStoreHelper.trashByIdsAsync(context, ids)
                                 AudioPlaylistPreference.deleteAsync(context, paths)
                             }
 
                             DataType.VIDEO -> {
                                 ids = VideoMediaStoreHelper.getIdsAsync(context, query)
-                                val paths = VideoMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids)
+                                val paths = VideoMediaStoreHelper.getPathsByIdsAsync(context, ids)
+                                VideoMediaStoreHelper.trashByIdsAsync(context, ids)
                                 VideoPlaylistPreference.deleteAsync(context, paths)
                             }
 
                             DataType.IMAGE -> {
                                 ids = ImageMediaStoreHelper.getIdsAsync(context, query)
-                                ImageMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids)
+                                ImageMediaStoreHelper.trashByIdsAsync(context, ids)
                             }
 
                             else -> {
                             }
                         }
                         TagHelper.deleteTagRelationByKeys(ids, type)
-                        true
+                        query
+                    }
+                }
+                mutation("restoreMediaItems") {
+                    resolver { type: DataType, query: String ->
+                        if (!isRPlus()) {
+                            return@resolver query
+                        }
+
+                        var ids: Set<String>
+                        val context = MainApp.instance
+                        when (type) {
+                            DataType.AUDIO -> {
+                                ids = AudioMediaStoreHelper.getTrashedIdsAsync(context, query)
+                                AudioMediaStoreHelper.restoreByIdsAsync(context, ids)
+                            }
+
+                            DataType.VIDEO -> {
+                                ids = VideoMediaStoreHelper.getTrashedIdsAsync(context, query)
+                                VideoMediaStoreHelper.restoreByIdsAsync(context, ids)
+                            }
+
+                            DataType.IMAGE -> {
+                                ids = ImageMediaStoreHelper.getTrashedIdsAsync(context, query)
+                                ImageMediaStoreHelper.restoreByIdsAsync(context, ids)
+                            }
+
+                            else -> {
+                            }
+                        }
+                        query
                     }
                 }
                 mutation("moveFile") {

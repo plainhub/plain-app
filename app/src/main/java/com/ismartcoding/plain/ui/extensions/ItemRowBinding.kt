@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.extensions
 
 import android.widget.CompoundButton
-import com.ismartcoding.lib.extensions.setSelectableItemBackground
+import com.ismartcoding.plain.extensions.setSelectableItemBackground
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.databinding.ItemRowBinding
 

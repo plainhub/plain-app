@@ -13,7 +13,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -27,7 +26,6 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.GroupButton
 import com.ismartcoding.plain.ui.base.GroupButtons
 import com.ismartcoding.plain.ui.models.AudioViewModel
-import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.getSelectedItems
@@ -55,7 +53,7 @@ fun SelectModeBottomActions(
                     icon = Icons.Outlined.RestoreFromTrash,
                     text = LocaleHelper.getString(R.string.restore),
                     onClick = {
-                        viewModel.untrash(viewModel.selectedIds.toSet())
+                        viewModel.restore(viewModel.selectedIds.toSet())
                         viewModel.exitSelectMode()
                     }
                 ),

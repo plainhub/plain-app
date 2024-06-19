@@ -6,7 +6,7 @@ import android.os.StatFs
 import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.text.TextUtils
-import com.ismartcoding.lib.extensions.getDirectChildrenCount
+import com.ismartcoding.plain.extensions.getDirectChildrenCount
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.sorted
@@ -17,6 +17,7 @@ import kotlinx.datetime.Instant
 import java.io.File
 import java.util.Collections
 import java.util.Locale
+import java.util.PriorityQueue
 import java.util.regex.Pattern
 
 object FileSystemHelper {
@@ -121,8 +122,7 @@ object FileSystemHelper {
         var rootDirs: Array<File>? = null
         for (storageVolume in storageVolumes) {
             if (storageVolume.isRemovable) {
-                var path = ""
-                path =
+                val path =
                     if (isRPlus()) {
                         storageVolume.directory.toString()
                     } else {
@@ -261,7 +261,6 @@ object FileSystemHelper {
     }
 
 
-
     fun getAllVolumeNames(context: Context): List<String> {
         val volumeNames = mutableListOf(MediaStore.VOLUME_EXTERNAL_PRIMARY)
         context.getExternalFilesDirs(null)
@@ -274,7 +273,37 @@ object FileSystemHelper {
         return volumeNames
     }
 
+    fun getRecentFiles(): List<File> {
+        val externalStorageDir = Environment.getExternalStorageDirectory()
 
+        val recentFilesQueue = PriorityQueue<File>(100) { f1, f2 ->
+            f1.lastModified().compareTo(f2.lastModified())
+        }
+
+        gatherRecentFiles(externalStorageDir, recentFilesQueue)
+
+        return recentFilesQueue.sortedByDescending { it.lastModified() }
+    }
+
+    private fun gatherRecentFiles(directory: File, recentFilesQueue: PriorityQueue<File>) {
+        val files = directory.listFiles()
+        if (files != null) {
+            for (file in files) {
+                if (file.isDirectory) {
+                    gatherRecentFiles(file, recentFilesQueue)
+                } else {
+                    if (recentFilesQueue.size < 100) {
+                        recentFilesQueue.add(file)
+                    } else {
+                        if (file.lastModified() > (recentFilesQueue.peek()?.lastModified() ?: Long.MIN_VALUE)) {
+                            recentFilesQueue.poll()
+                            recentFilesQueue.add(file)
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 
