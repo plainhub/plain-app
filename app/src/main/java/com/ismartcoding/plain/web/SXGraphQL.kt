@@ -103,6 +103,7 @@ import com.ismartcoding.plain.web.loaders.FileInfoLoader
 import com.ismartcoding.plain.web.loaders.TagsLoader
 import com.ismartcoding.plain.web.models.AIChat
 import com.ismartcoding.plain.web.models.AIChatConfig
+import com.ismartcoding.plain.web.models.ActionResult
 import com.ismartcoding.plain.web.models.App
 import com.ismartcoding.plain.web.models.Audio
 import com.ismartcoding.plain.web.models.Call
@@ -1229,7 +1230,7 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("deleteMediaItems") {
                     resolver { type: DataType, query: String ->
-                        var ids: Set<String>
+                        val ids: Set<String>
                         val context = MainApp.instance
                         val hasTrashFeature = AppFeatureType.MEDIA_TRASH.has()
                         when (type) {
@@ -1251,13 +1252,13 @@ class SXGraphQL(val schema: Schema) {
                             else -> {
                             }
                         }
-                        true
+                        ActionResult(type, query)
                     }
                 }
                 mutation("trashMediaItems") {
                     resolver { type: DataType, query: String ->
                         if (!isRPlus()) {
-                            return@resolver query
+                            return@resolver ActionResult(type, query)
                         }
 
                         var ids = setOf<String>()
@@ -1286,16 +1287,16 @@ class SXGraphQL(val schema: Schema) {
                             }
                         }
                         TagHelper.deleteTagRelationByKeys(ids, type)
-                        query
+                        ActionResult(type, query)
                     }
                 }
                 mutation("restoreMediaItems") {
                     resolver { type: DataType, query: String ->
                         if (!isRPlus()) {
-                            return@resolver query
+                            return@resolver ActionResult(type, query)
                         }
 
-                        var ids: Set<String>
+                        val ids: Set<String>
                         val context = MainApp.instance
                         when (type) {
                             DataType.AUDIO -> {
@@ -1316,7 +1317,7 @@ class SXGraphQL(val schema: Schema) {
                             else -> {
                             }
                         }
-                        query
+                        ActionResult(type, query)
                     }
                 }
                 mutation("moveFile") {

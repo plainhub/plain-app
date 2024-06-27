@@ -234,11 +234,17 @@ object ImageHelper {
             return null
         }
 
-        val formatter = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss")
-        val localDateTime = LocalDateTime.parse(dateTime, formatter)
-        val javaInstant = ZonedDateTime.of(localDateTime, ZoneOffset.UTC).toInstant()
+        try {
+            val formatter = DateTimeFormatter.ofPattern("yyyy:MM:dd HH:mm:ss")
+            val localDateTime = LocalDateTime.parse(dateTime, formatter)
+            val javaInstant = ZonedDateTime.of(localDateTime, ZoneOffset.UTC).toInstant()
 
-        return Instant.fromEpochMilliseconds(javaInstant.toEpochMilli())
+            return Instant.fromEpochMilliseconds(javaInstant.toEpochMilli())
+        } catch (ex: Exception) {
+            LogCat.e(ex.toString())
+        }
+
+        return null
     }
 
     fun getExposureProgramText(exposureProgram: Int): String {
@@ -283,7 +289,7 @@ object ImageHelper {
             ExifInterface.FLAG_FLASH_RETURN_LIGHT_DETECTED -> getString(R.string.flash_return_light_detected)
             ExifInterface.FLAG_FLASH_MODE_COMPULSORY_FIRING -> getString(R.string.flash_mode_compulsory_firing)
             ExifInterface.FLAG_FLASH_MODE_COMPULSORY_SUPPRESSION -> getString(R.string.flash_mode_compulsory_suppression)
-            ExifInterface.FLAG_FLASH_MODE_AUTO ->  getString(R.string.flash_mode_auto)
+            ExifInterface.FLAG_FLASH_MODE_AUTO -> getString(R.string.flash_mode_auto)
             ExifInterface.FLAG_FLASH_NO_FLASH_FUNCTION -> getString(R.string.flash_no_flash_function)
             ExifInterface.FLAG_FLASH_RED_EYE_SUPPORTED -> getString(R.string.flash_red_eye_supported)
             else -> ""
