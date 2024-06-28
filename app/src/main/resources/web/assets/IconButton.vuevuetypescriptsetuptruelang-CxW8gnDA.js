@@ -1,1 +1,0 @@
-import{d as s,o,c as n,r as a,a as c}from"./index-B-S542RM.js";const l=["disabled"],r=c("md-ripple",null,null,-1),d={key:0,indeterminate:""},m=s({__name:"IconButton",props:{loading:{type:Boolean}},setup(e){return(t,i)=>(o(),n("button",{class:"btn-icon",disabled:e.loading},[r,e.loading?(o(),n("md-circular-progress",d)):a(t.$slots,"icon",{key:1})],8,l))}});export{m as _};
