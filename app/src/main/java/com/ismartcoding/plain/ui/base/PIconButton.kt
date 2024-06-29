@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun PIconButton(
     icon: Any,
+    modifier: Modifier = Modifier,
     iconSize: Dp = 24.dp,
     tint: Color = LocalContentColor.current,
     contentDescription: String? = null,
@@ -35,6 +36,7 @@ fun PIconButton(
 ) {
     val view = LocalView.current
     IconButton(
+        modifier = modifier,
         enabled = enabled,
         colors = IconButtonDefaults.iconButtonColors().copy(
             contentColor = tint,

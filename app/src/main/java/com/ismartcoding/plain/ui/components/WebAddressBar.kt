@@ -3,14 +3,16 @@ package com.ismartcoding.plain.ui.components
 import android.content.ClipData
 import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -18,7 +20,9 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.MoreVert
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material.icons.rounded.QrCode
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,7 +35,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -43,11 +48,13 @@ import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.clipboardManager
-import com.ismartcoding.plain.preference.HttpPortPreference
-import com.ismartcoding.plain.preference.HttpsPortPreference
 import com.ismartcoding.plain.features.WindowFocusChangedEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.AppHelper
+import com.ismartcoding.plain.helpers.QrCodeGenerateHelper
+import com.ismartcoding.plain.preference.HttpPortPreference
+import com.ismartcoding.plain.preference.HttpsPortPreference
+import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PIconButton
@@ -67,6 +74,7 @@ fun WebAddressBar(
 ) {
     val port = if (isHttps) TempData.httpsPort else TempData.httpPort
     var portDialogVisible by remember { mutableStateOf(false) }
+    var qrCodeDialogVisible by remember { mutableStateOf(false) }
     var ip4 = remember { NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" } }
     var ip4s = remember { NetworkHelper.getDeviceIP4s().filter { it != ip4 } }
     val showContextMenu = remember { mutableStateOf(false) }
@@ -119,17 +127,28 @@ fun WebAddressBar(
                 },
             )
         }
+        Spacer(modifier = Modifier.weight(1f))
         PIconButton(
             icon = Icons.Rounded.Edit,
-            iconSize = 20.dp,
+            modifier = Modifier.size(32.dp),
+            iconSize = 16.dp,
             contentDescription = stringResource(id = R.string.edit),
             tint = MaterialTheme.colorScheme.onSurface,
             onClick = {
                 portDialogVisible = true
             },
         )
+        PIconButton(
+            icon = Icons.Rounded.QrCode,
+            modifier = Modifier.size(32.dp),
+            iconSize = 16.dp,
+            contentDescription = stringResource(id = R.string.qrcode),
+            tint = MaterialTheme.colorScheme.onSurface,
+            onClick = {
+                qrCodeDialogVisible = true
+            },
+        )
         if (ip4s.isNotEmpty()) {
-            Spacer(modifier = Modifier.weight(1f))
             Box(
                 modifier =
                 Modifier
@@ -137,7 +156,8 @@ fun WebAddressBar(
             ) {
                 PIconButton(
                     icon = Icons.Rounded.MoreVert,
-                    iconSize = 20.dp,
+                    modifier = Modifier.size(32.dp),
+                    iconSize = 16.dp,
                     contentDescription = stringResource(id = R.string.more),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     onClick = {
@@ -160,6 +180,7 @@ fun WebAddressBar(
                 }
             }
         }
+        HorizontalSpace(dp = 4.dp)
     }
 
     if (portDialogVisible) {
@@ -192,5 +213,29 @@ fun WebAddressBar(
         ) {
             portDialogVisible = false
         }
+    }
+
+    if (qrCodeDialogVisible) {
+        AlertDialog(onDismissRequest = {
+            qrCodeDialogVisible = false
+        }, confirmButton = {
+            Button(
+                onClick = {
+                    qrCodeDialogVisible = false
+                }
+            ) {
+                Text(stringResource(id = R.string.close))
+            }
+        }, title = {
+
+        }, text = {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                Image(
+                    bitmap = QrCodeGenerateHelper.generate(defaultUrl.value, 240, 240).asImageBitmap(),
+                    contentDescription = stringResource(id = R.string.qrcode),
+                    modifier = Modifier.size(240.dp).clip(RoundedCornerShape(16.dp))
+                )
+            }
+        })
     }
 }
