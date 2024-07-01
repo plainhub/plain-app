@@ -234,7 +234,7 @@ object FileMediaStoreHelper : BaseContentHelper() {
             createdAt,
             updatedAt,
             size,
-            mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_NONE && mimeType == null && size == 0L,
+            mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_NONE && (mimeType == null || mimeType == "vnd.android.document/directory"),
             0,
             id
         )
