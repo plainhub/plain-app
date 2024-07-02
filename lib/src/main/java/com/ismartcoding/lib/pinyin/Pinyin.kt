@@ -1,7 +1,7 @@
 package com.ismartcoding.lib.pinyin
 
+import com.ismartcoding.lib.ahocorasick.trie.Trie
 import com.ismartcoding.lib.pinyin.Utils.dictsToTrie
-import org.ahocorasick.trie.Trie
 import java.util.*
 import kotlin.experimental.and
 import kotlin.experimental.or

@@ -1,6 +1,6 @@
 package com.ismartcoding.lib.pinyin
 
-import org.ahocorasick.trie.Emit
+import com.ismartcoding.lib.ahocorasick.trie.Emit
 
 /**
  * 分词选择算法应实现的接口

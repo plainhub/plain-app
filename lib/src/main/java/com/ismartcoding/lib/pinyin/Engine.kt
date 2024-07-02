@@ -1,9 +1,9 @@
 package com.ismartcoding.lib.pinyin
 
+import com.ismartcoding.lib.ahocorasick.trie.Emit
+import com.ismartcoding.lib.ahocorasick.trie.Trie
 import com.ismartcoding.lib.pinyin.Pinyin.toPinyin
 import com.ismartcoding.lib.pinyin.Utils.dictsToTrie
-import org.ahocorasick.trie.Emit
-import org.ahocorasick.trie.Trie
 import java.util.*
 
 /**

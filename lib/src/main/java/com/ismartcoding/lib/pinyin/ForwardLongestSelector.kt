@@ -1,7 +1,7 @@
 package com.ismartcoding.lib.pinyin
 
+import com.ismartcoding.lib.ahocorasick.trie.Emit
 import com.ismartcoding.lib.pinyin.Engine.EmitComparator
-import org.ahocorasick.trie.Emit
 import java.util.*
 
 /**

@@ -1,6 +1,6 @@
 package com.ismartcoding.lib.pinyin
 
-import org.ahocorasick.trie.Trie
+import com.ismartcoding.lib.ahocorasick.trie.Trie
 import java.util.*
 
 internal object Utils {
