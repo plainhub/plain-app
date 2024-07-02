@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.helpers
 
-import com.caverock.androidsvg.SVG
+import com.ismartcoding.lib.androidsvg.SVG
 import java.io.File
 import androidx.compose.ui.unit.IntSize
 import com.ismartcoding.lib.logcat.LogCat

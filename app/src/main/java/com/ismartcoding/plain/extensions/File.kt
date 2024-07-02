@@ -14,7 +14,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
 import com.bumptech.glide.load.resource.bitmap.Downsampler
 import com.bumptech.glide.request.RequestOptions
-import com.caverock.androidsvg.SVG
+import com.ismartcoding.lib.androidsvg.SVG
 import com.ismartcoding.lib.extensions.compress
 import com.ismartcoding.lib.extensions.getMediaContentUri
 import com.ismartcoding.lib.extensions.isAudioFast

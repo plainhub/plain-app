@@ -92,7 +92,6 @@ dependencies {
     api(libs.markwon.tables)
     api(libs.markwon.latex)
     api(libs.markwon.linkify)
-    api(libs.androidsvg.aar)
     api(libs.okhttp)
     implementation(libs.android.gif.drawable)
 

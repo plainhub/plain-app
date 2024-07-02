@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import coil3.compose.AsyncImage
-import com.caverock.androidsvg.SVG
+import com.ismartcoding.lib.androidsvg.SVG
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.preference.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.svg.parseDynamicColor

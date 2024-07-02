@@ -7,8 +7,8 @@ import android.graphics.drawable.PictureDrawable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.caverock.androidsvg.SVG;
-import com.caverock.androidsvg.SVGParseException;
+import com.ismartcoding.lib.androidsvg.SVG;
+import com.ismartcoding.lib.androidsvg.SVGParseException;
 import com.ismartcoding.lib.markdown.image.MediaDecoder;
 
 import java.io.InputStream;

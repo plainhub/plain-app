@@ -1,6 +1,5 @@
 [versions]
-androidGifDrawableVersion="1.2.23"
-androidsvgAarVersion="1.4"
+androidGifDrawableVersion="1.2.28"
 appcompatVersion="1.7.0"
 bcprovJdk15onVersion="1.70"
 coil="3.0.0-alpha06"
@@ -57,7 +56,6 @@ pagingVersion = "3.3.0"
 
 [libraries]
 android-gif-drawable = { module = "pl.droidsonroids.gif:android-gif-drawable", version.ref = "androidGifDrawableVersion" }
-androidsvg-aar = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvgAarVersion" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtxVersion" }
