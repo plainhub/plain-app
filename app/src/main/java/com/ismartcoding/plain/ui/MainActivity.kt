@@ -252,7 +252,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private suspend fun doWhenReadyAsync() {
-        PackageHelper.cacheAppLabels()
+        // PackageHelper.cacheAppLabels()
         PNotificationListenerService.toggle(this@MainActivity, Permission.NOTIFICATION_LISTENER.isEnabledAsync(this@MainActivity))
     }
 
