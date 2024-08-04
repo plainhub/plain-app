@@ -129,7 +129,7 @@ object FileMediaStoreHelper : BaseContentHelper() {
         return counts
     }
 
-    fun getIdByPathAsync(context: Context, path: String): String? {
+    private fun getIdByPathAsync(context: Context, path: String): String? {
         return context.contentResolver
             .queryCursor(uriExternal, arrayOf(MediaStore.Files.FileColumns._ID), "${MediaStore.Files.FileColumns.DATA} = ?", arrayOf(path))?.find { cursor, cache ->
                 cursor.getStringValue(MediaStore.Files.FileColumns._ID, cache)

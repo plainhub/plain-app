@@ -524,9 +524,9 @@ class SXGraphQL(val schema: Schema) {
                     resolver { root: String, offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-                        val appFolder = context.getExternalFilesDir(null)?.path ?: ""
-                        val internalPath = FileSystemHelper.getInternalStoragePath()
-                        if (!isQPlus() || root.startsWith(appFolder) || !root.startsWith(internalPath)) {
+//                        val appFolder = context.getExternalFilesDir(null)?.path ?: ""
+//                        val internalPath = FileSystemHelper.getInternalStoragePath()
+                     //   if (!isQPlus() || root.startsWith(appFolder) || !root.startsWith(internalPath)) {
                             val filterFields = QueryHelper.parseAsync(query)
                             val showHidden = filterFields.find { it.name == "show_hidden" }?.value?.toBoolean() ?: false
                             val text = filterFields.find { it.name == "text" }?.value ?: ""
@@ -536,9 +536,9 @@ class SXGraphQL(val schema: Schema) {
                             } else {
                                 FileSystemHelper.getFilesList(parent.ifEmpty { root }, showHidden, sortBy).drop(offset).take(limit).map { it.toModel() }
                             }
-                        } else {
-                            FileMediaStoreHelper.searchAsync(MainApp.instance, query, limit, offset, sortBy).map { it.toModel() }
-                        }
+//                        } else {
+//                            FileMediaStoreHelper.searchAsync(MainApp.instance, query, limit, offset, sortBy).map { it.toModel() }
+//                        }
                     }
                 }
                 query("fileInfo") {
