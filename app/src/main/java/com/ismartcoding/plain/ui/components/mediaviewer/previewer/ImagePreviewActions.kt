@@ -12,12 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.RotateRight
-import androidx.compose.material.icons.outlined.MoreHoriz
-import androidx.compose.material.icons.rounded.Cast
-import androidx.compose.material.icons.rounded.SaveAlt
-import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -27,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.imageLoader
@@ -37,6 +31,7 @@ import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DImage
+import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.DownloadHelper
@@ -49,7 +44,7 @@ import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.components.CastDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.CastViewModel
-import com.ismartcoding.plain.ui.preview.PreviewItem
+import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
 import com.ismartcoding.plain.ui.theme.darkMask
 import com.ismartcoding.plain.ui.theme.lightMask
 import kotlinx.coroutines.launch
@@ -81,11 +76,11 @@ fun ImagePreviewActions(
                     .background(MaterialTheme.colorScheme.darkMask())
                     .padding(horizontal = 20.dp, vertical = 8.dp),
             ) {
-                PMiniButton(text = stringResource(id = R.string.cast)) {
+                PMiniButton(label = stringResource(id = R.string.cast)) {
                     castViewModel.cast(m.path)
                 }
                 HorizontalSpace(dp = 20.dp)
-                PMiniOutlineButton(text = stringResource(id = R.string.exit_cast_mode), color = Color.LightGray) {
+                PMiniOutlineButton(label = stringResource(id = R.string.exit_cast_mode), color = Color.LightGray) {
                     castViewModel.exitCastMode()
                 }
             }
@@ -99,7 +94,7 @@ fun ImagePreviewActions(
                 .padding(horizontal = 20.dp, vertical = 8.dp),
         ) {
             ActionIconButton(
-                icon = Icons.Rounded.Share,
+                icon = R.drawable.share_2,
                 contentDescription = stringResource(R.string.share),
             ) {
                 if (m.mediaId.isNotEmpty()) {
@@ -129,14 +124,14 @@ fun ImagePreviewActions(
             }
             HorizontalSpace(dp = 20.dp)
             ActionIconButton(
-                icon = Icons.Rounded.Cast,
+                icon = R.drawable.cast,
                 contentDescription = stringResource(R.string.cast),
             ) {
                 castViewModel.showCastDialog.value = true
             }
             HorizontalSpace(dp = 20.dp)
             ActionIconButton(
-                icon = Icons.AutoMirrored.Rounded.RotateRight,
+                icon = R.drawable.rotate_cw_square,
                 contentDescription = stringResource(R.string.rotate),
             ) {
                 scope.launch {
@@ -145,10 +140,10 @@ fun ImagePreviewActions(
                     }
                 }
             }
-            if (m.data !is DImage) {
+            if (m.data !is DImage && m.data !is DFile) {
                 HorizontalSpace(dp = 20.dp)
                 ActionIconButton(
-                    icon = Icons.Rounded.SaveAlt,
+                    icon = R.drawable.save,
                     contentDescription = stringResource(R.string.save),
                 ) {
                     scope.launch {
@@ -187,7 +182,7 @@ fun ImagePreviewActions(
             }
             HorizontalSpace(dp = 20.dp)
             ActionIconButton(
-                icon = Icons.Outlined.MoreHoriz,
+                icon = R.drawable.ellipsis,
                 contentDescription = stringResource(R.string.more_info),
             ) {
                 state.showMediaInfo = true
@@ -197,7 +192,7 @@ fun ImagePreviewActions(
 }
 
 @Composable
-fun ActionIconButton(icon: ImageVector, contentDescription: String, click: () -> Unit) {
+fun ActionIconButton(icon: Int, contentDescription: String, click: () -> Unit) {
     Box(
         modifier = Modifier
             .size(32.dp)
@@ -210,7 +205,7 @@ fun ActionIconButton(icon: ImageVector, contentDescription: String, click: () ->
     ) {
         Icon(
             modifier = Modifier.size(18.dp),
-            imageVector = icon,
+            painter = painterResource(icon),
             contentDescription = contentDescription,
             tint = Color.White,
         )

@@ -13,18 +13,18 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun PMiniButton(
-    text: String,
+    label: String,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
+    click: () -> Unit,
 ) {
     Button(
-        onClick,
+        click,
         modifier =
         modifier
             .height(32.dp),
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
         shape = RoundedCornerShape(8.dp),
     ) {
-        Text(text, style = MaterialTheme.typography.labelSmall)
+        Text(label, style = MaterialTheme.typography.labelSmall)
     }
 }

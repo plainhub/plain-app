@@ -1,13 +1,8 @@
 package com.ismartcoding.plain.ui.extensions
 
-import android.annotation.SuppressLint
 import android.text.method.LinkMovementMethod
 import android.text.util.Linkify
-import android.view.GestureDetector
-import android.view.MotionEvent
 import android.widget.TextView
-import androidx.core.view.GestureDetectorCompat
-import coil3.imageLoader
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
@@ -20,7 +15,7 @@ import com.ismartcoding.plain.ui.base.markdowntext.CoilImagesPlugin
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.MediaPreviewData
-import com.ismartcoding.plain.ui.preview.PreviewItem
+import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
 import io.noties.markwon.AbstractMarkwonPlugin
 import io.noties.markwon.Markwon
 import io.noties.markwon.MarkwonConfiguration
@@ -41,60 +36,6 @@ import org.commonmark.node.SoftLineBreak
 import org.commonmark.parser.Parser
 import org.commonmark.renderer.html.HtmlRenderer
 import org.jsoup.Jsoup
-
-@SuppressLint("ClickableViewAccessibility")
-fun TextView.setSelectableTextClickable(click: () -> Unit) {
-    val detector = GestureDetectorCompat(context, GestureDetector.SimpleOnGestureListener())
-    detector.setOnDoubleTapListener(
-        object : GestureDetector.OnDoubleTapListener {
-            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                click()
-                return false
-            }
-
-            override fun onDoubleTap(e: MotionEvent): Boolean {
-                return false
-            }
-
-            override fun onDoubleTapEvent(e: MotionEvent): Boolean {
-                return false
-            }
-        },
-    )
-
-    setOnTouchListener { _, event ->
-        detector.onTouchEvent(event)
-        false
-    }
-}
-
-@SuppressLint("ClickableViewAccessibility")
-fun TextView.setDoubleCLick(click: () -> Unit) {
-    val detector = GestureDetectorCompat(context, GestureDetector.SimpleOnGestureListener())
-    detector.setOnDoubleTapListener(
-        object : GestureDetector.OnDoubleTapListener {
-            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
-                return false
-            }
-
-            override fun onDoubleTap(e: MotionEvent): Boolean {
-                setTextIsSelectable(false) // deselect text
-                click()
-                setTextIsSelectable(true)
-                return false
-            }
-
-            override fun onDoubleTapEvent(e: MotionEvent): Boolean {
-                return false
-            }
-        },
-    )
-
-    setOnTouchListener { _, event ->
-        detector.onTouchEvent(event)
-        false
-    }
-}
 
 fun TextView.markdown(content: String, previewerState: MediaPreviewerState) {
     this.movementMethod = LinkMovementMethod.getInstance()

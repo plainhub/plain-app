@@ -3,11 +3,11 @@ plugins {
     id("com.google.devtools.ksp")
     kotlin("android")
     kotlin("kapt")
-    kotlin("plugin.serialization") version "1.9.23"
+    kotlin("plugin.serialization") version libs.versions.kotlin
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 28
@@ -16,7 +16,7 @@ android {
 
     buildTypes {
         debug {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         release {
@@ -58,26 +58,19 @@ dependencies {
 
     api(libs.kotlinx.coroutines.core)
     api(libs.kotlinx.coroutines.android)
-    api(libs.kotlinx.coroutines.guava)
     api(libs.kotlinx.serialization.json)
     api(libs.kotlinx.datetime)
-    api(libs.material)
     api(libs.androidx.lifecycle.runtime.ktx)
     api(libs.androidx.lifecycle.extensions)
 
-    api(libs.androidx.fragment.ktx)
     api(libs.androidx.appcompat)
     api(libs.androidx.core.ktx)
     api(libs.androidx.transition)
-//    api("com.squareup.picasso:picasso:2.71828")
 
-    api(libs.guava)
-    api(libs.exoplayer)
+//    api(libs.exoplayer)
     // https://developer.android.com/topic/performance/graphics/load-bitmap
     api(libs.glide)
     ksp(libs.ksp)
-    // https://github.com/davemorrissey/subsampling-scale-image-view
-    api(libs.subsampling.scale.image.view.androidx)
 
     implementation(libs.bcprov.jdk15on)
     implementation(libs.bcpkix.jdk15on)
@@ -96,6 +89,4 @@ dependencies {
     implementation(libs.android.gif.drawable)
 
     api(libs.jsoup)
-
-    api(libs.refresh.layout.kernel)
 }

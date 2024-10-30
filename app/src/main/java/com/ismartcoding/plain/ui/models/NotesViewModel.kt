@@ -7,13 +7,11 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.R
-import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
+import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.TagHelper
-import com.ismartcoding.plain.features.locale.LocaleHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,11 +28,11 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
     var noMore = mutableStateOf(false)
     var trash = mutableStateOf(false)
     var total = mutableIntStateOf(0)
-    private var totalTrash = mutableIntStateOf(0)
+    var totalTrash = mutableIntStateOf(0)
     var tag = mutableStateOf<DTag?>(null)
     val dataType = DataType.NOTE
     var selectedItem = mutableStateOf<DNote?>(null)
-    var tabs = mutableStateOf(listOf<VTabData>())
+    val showTagsDialog = mutableStateOf(false)
 
     override val showSearchBar = mutableStateOf(false)
     override val searchActive = mutableStateOf(false)
@@ -43,52 +41,38 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
     override var selectMode = mutableStateOf(false)
     override val selectedIds = mutableStateListOf<String>()
 
-    suspend fun moreAsync(tagsViewModel: TagsViewModel) {
-        offset.value += limit.value
-        val items = NoteHelper.search(getQuery(), limit.value, offset.value)
+    suspend fun moreAsync(tagsVM: TagsViewModel) {
+        offset.value += limit.intValue
+        val items = NoteHelper.search(getQuery(), limit.intValue, offset.intValue)
         _itemsFlow.update {
             val mutableList = it.toMutableStateList()
             mutableList.addAll(items)
             mutableList
         }
-        tagsViewModel.loadMoreAsync(items.map { it.id }.toSet())
+        tagsVM.loadMoreAsync(items.map { it.id }.toSet())
         showLoading.value = false
-        noMore.value = items.size < limit.value
+        noMore.value = items.size < limit.intValue
     }
 
-    suspend fun loadAsync(tagsViewModel: TagsViewModel) {
-        offset.value = 0
+    suspend fun loadAsync(tagsVM: TagsViewModel) {
+        offset.intValue = 0
         val query = getQuery()
-        _itemsFlow.value = NoteHelper.search(query, limit.value, offset.value).toMutableStateList()
-        refreshTabsAsync(tagsViewModel)
-        noMore.value = _itemsFlow.value.size < limit.value
+        _itemsFlow.value = NoteHelper.search(query, limit.intValue, offset.intValue).toMutableStateList()
+        tagsVM.loadAsync(_itemsFlow.value.map { it.id }.toSet())
+        total.intValue = NoteHelper.count(getTotalQuery())
+        totalTrash.intValue = NoteHelper.count(getTrashQuery())
+        noMore.value = _itemsFlow.value.size < limit.intValue
         showLoading.value = false
     }
 
-    suspend fun refreshTabsAsync(tagsViewModel: TagsViewModel) {
-        tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
-        total.value = NoteHelper.count(getTotalQuery())
-        totalTrash.value = NoteHelper.count(getTrashQuery())
-        tabs.value = listOf(
-            VTabData(LocaleHelper.getString(R.string.all), "all", total.value),
-            VTabData(LocaleHelper.getString(R.string.trash), "trash", totalTrash.value),
-            * tagsViewModel.itemsFlow.value.map { VTabData(it.name, it.id, it.count) }.toTypedArray()
-        )
-    }
-
-    fun trash(tagsViewModel: TagsViewModel, ids: Set<String>) {
+    fun trash(tagsVM: TagsViewModel, ids: Set<String>) {
         viewModelScope.launch(Dispatchers.IO) {
             TagHelper.deleteTagRelationByKeys(
                 ids,
                 dataType,
             )
             NoteHelper.trashAsync(ids)
-            refreshTabsAsync(tagsViewModel)
-            _itemsFlow.update {
-                val mutableList = it.toMutableStateList()
-                mutableList.removeIf { m -> ids.contains(m.id) }
-                mutableList
-            }
+            loadAsync(tagsVM)
         }
     }
 
@@ -106,35 +90,25 @@ class NotesViewModel(private val savedStateHandle: SavedStateHandle) : ISearchab
         }
     }
 
-    fun restore(tagsViewModel: TagsViewModel, ids: Set<String>) {
+    fun restore(tagsVM: TagsViewModel, ids: Set<String>) {
         viewModelScope.launch(Dispatchers.IO) {
             TagHelper.deleteTagRelationByKeys(
                 ids,
                 dataType,
             )
             NoteHelper.restoreAsync(ids)
-            refreshTabsAsync(tagsViewModel)
-            _itemsFlow.update {
-                val mutableList = it.toMutableStateList()
-                mutableList.removeIf { m -> ids.contains(m.id) }
-                mutableList
-            }
+            loadAsync(tagsVM)
         }
     }
 
-    fun delete(tagsViewModel: TagsViewModel, ids: Set<String>) {
+    fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
         viewModelScope.launch(Dispatchers.IO) {
             TagHelper.deleteTagRelationByKeys(
                 ids,
                 dataType,
             )
             NoteHelper.deleteAsync(ids)
-            refreshTabsAsync(tagsViewModel)
-            _itemsFlow.update {
-                val mutableList = it.toMutableStateList()
-                mutableList.removeIf { m -> ids.contains(m.id) }
-                mutableList
-            }
+            loadAsync(tagsVM)
         }
     }
 

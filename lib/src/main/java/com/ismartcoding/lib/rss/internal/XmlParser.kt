@@ -32,7 +32,7 @@ internal class XmlParser(
                 if (eventType == XmlPullParser.START_TAG) {
                     if (xmlPullParser.contains(RssKeyword.Rss)) {
                         rssChannel = extractRSSContent(xmlPullParser)
-                    } else if (xmlPullParser.contains(AtomKeyword.Atom)) {
+                    } else if (xmlPullParser.contains(AtomKeyword.Feed.Atom)) {
                         rssChannel = extractAtomContent(xmlPullParser)
                     }
                 }

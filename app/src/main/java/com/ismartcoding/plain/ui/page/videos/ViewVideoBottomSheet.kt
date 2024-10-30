@@ -3,13 +3,6 @@ package com.ismartcoding.plain.ui.page.videos
 import android.content.ClipData
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Checklist
-import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.DeleteForever
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.OpenWith
-import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,9 +25,13 @@ import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.IconTextDeleteButton
+import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
+import com.ismartcoding.plain.ui.base.IconTextRenameButton
+import com.ismartcoding.plain.ui.base.IconTextSelectButton
+import com.ismartcoding.plain.ui.base.IconTextShareButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconButton
-import com.ismartcoding.plain.ui.base.PIconTextActionButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.Subtitle
@@ -52,16 +49,16 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ViewVideoBottomSheet(
-    viewModel: VideosViewModel,
-    tagsViewModel: TagsViewModel,
+    videosVM: VideosViewModel,
+    tagsVM: TagsViewModel,
     tagsMap: Map<String, List<DTagRelation>>,
     tagsState: List<DTag>,
     dragSelectState: DragSelectState,
 ) {
-    val m = viewModel.selectedItem.value ?: return
+    val m = videosVM.selectedItem.value ?: return
     val context = LocalContext.current
     val onDismiss = {
-        viewModel.selectedItem.value = null
+        videosVM.selectedItem.value = null
     }
     val viewSize by remember {
         mutableStateOf(m.getRotatedSize())
@@ -69,11 +66,11 @@ fun ViewVideoBottomSheet(
 
     val scope = rememberCoroutineScope()
 
-    if (viewModel.showRenameDialog.value) {
+    if (videosVM.showRenameDialog.value) {
         FileRenameDialog(path = m.path, onDismiss = {
-            viewModel.showRenameDialog.value = false
+            videosVM.showRenameDialog.value = false
         }, onDone = {
-            scope.launch(Dispatchers.IO) { viewModel.loadAsync(context, tagsViewModel) }
+            scope.launch(Dispatchers.IO) { videosVM.loadAsync(context, tagsVM) }
             onDismiss()
         })
     }
@@ -85,76 +82,56 @@ fun ViewVideoBottomSheet(
     ) {
         LazyColumn {
             item {
+                VerticalSpace(32.dp)
+            }
+            item {
                 ActionButtons {
-                    if (!viewModel.showSearchBar.value) {
-                        PIconTextActionButton(
-                            icon = Icons.Outlined.Checklist,
-                            text = LocaleHelper.getString(R.string.select),
-                            click = {
-                                dragSelectState.enterSelectMode()
-                                dragSelectState.select(m.id)
-                                onDismiss()
-                            }
-                        )
-                    }
-                    PIconTextActionButton(
-                        icon = Icons.Outlined.Share,
-                        text = LocaleHelper.getString(R.string.share),
-                        click = {
-                            ShareHelper.shareUris(context, listOf(VideoMediaStoreHelper.getItemUri(m.id)))
+                    if (!videosVM.showSearchBar.value) {
+                        IconTextSelectButton {
+                            dragSelectState.enterSelectMode()
+                            dragSelectState.select(m.id)
                             onDismiss()
                         }
-                    )
-                    if (!m.path.isUrl()) {
-                        PIconTextActionButton(
-                            icon = Icons.Outlined.OpenWith,
-                            text = LocaleHelper.getString(R.string.open_with),
-                            click = {
-                                ShareHelper.openPathWith(context, m.path)
-                            }
-                        )
                     }
-                    PIconTextActionButton(
-                        icon = Icons.Outlined.Edit,
-                        text = LocaleHelper.getString(R.string.rename),
-                        click = {
-                            viewModel.showRenameDialog.value = true
+                    IconTextShareButton {
+                        ShareHelper.shareUris(context, listOf(VideoMediaStoreHelper.getItemUri(m.id)))
+                        onDismiss()
+                    }
+                    if (!m.path.isUrl()) {
+                        IconTextOpenWithButton {
+                            ShareHelper.openPathWith(context, m.path)
                         }
-                    )
-                    PIconTextActionButton(
-                        icon = Icons.Outlined.DeleteForever,
-                        text = LocaleHelper.getString(R.string.delete),
-                        click = {
-                            DialogHelper.confirmToDelete {
-                                viewModel.delete(context, tagsViewModel, setOf(m.id))
-                                onDismiss()
-                            }
+                    }
+                    IconTextRenameButton {
+                        videosVM.showRenameDialog.value = true
+                    }
+                    IconTextDeleteButton {
+                        DialogHelper.confirmToDelete {
+                            videosVM.delete(context, tagsVM, setOf(m.id))
+                            onDismiss()
                         }
-                    )
+                    }
                 }
             }
-            if (!viewModel.trash.value) {
+            if (!videosVM.trash.value) {
                 item {
                     VerticalSpace(dp = 16.dp)
                     Subtitle(text = stringResource(id = R.string.tags))
                     TagSelector(
                         data = m,
-                        tagsViewModel = tagsViewModel,
+                        tagsVM = tagsVM,
                         tagsMap = tagsMap,
                         tagsState = tagsState,
                         onChanged = {
-                            scope.launch(Dispatchers.IO) {
-                                viewModel.refreshTabsAsync(context, tagsViewModel)
-                            }
                         }
                     )
                 }
             }
             item {
-                VerticalSpace(dp = 24.dp)
+                VerticalSpace(dp = 16.dp)
                 PCard {
                     PListItem(title = m.path, action = {
-                        PIconButton(icon = Icons.Outlined.ContentCopy, contentDescription = stringResource(id = R.string.copy_path), onClick = {
+                        PIconButton(icon = R.drawable.copy, contentDescription = stringResource(id = R.string.copy_path), click = {
                             val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.file_path), m.path)
                             clipboardManager.setPrimaryClip(clip)
                             DialogHelper.showTextCopiedMessage(m.path)

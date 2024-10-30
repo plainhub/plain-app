@@ -1,3 +1,5 @@
 package com.ismartcoding.plain.ui.models
 
-class DrawerMenuItemClickedEvent(val model: MenuItemModel)
+import com.ismartcoding.lib.channel.ChannelEvent
+
+class DrawerMenuItemClickedEvent(val model: MenuItemModel) : ChannelEvent()

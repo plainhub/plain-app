@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
@@ -58,10 +60,10 @@ public class ColorPickerController {
   internal var pureSelectedColor: MutableState<Color> = mutableStateOf(Color.Transparent)
 
   /** Alpha value to be applied with the selected color. */
-  internal var alpha: MutableState<Float> = mutableStateOf(1.0f)
+  internal var alpha: MutableState<Float> = mutableFloatStateOf(1.0f)
 
   /** Brightness value to be applied with the selected color. */
-  internal var brightness: MutableState<Float> = mutableStateOf(1.0f)
+  internal var brightness: MutableState<Float> = mutableFloatStateOf(1.0f)
 
   /** Radius to draw default wheel. */
   internal var wheelRadius: Dp = 12.dp
@@ -92,7 +94,7 @@ public class ColorPickerController {
   /** Indicates if the brightness slider has been attached. */
   internal var isAttachedBrightnessSlider: Boolean = false
 
-  internal var reviseTick = mutableStateOf(0)
+  internal var reviseTick = mutableIntStateOf(0)
 
   internal var colorChangedTick = MutableStateFlow<ColorEnvelope?>(null)
 
@@ -115,7 +117,7 @@ public class ColorPickerController {
     paletteBitmap = resized.asImageBitmap()
     copiedBitmap.recycle()
     selectCenter(fromUser = false)
-    reviseTick.value++
+    reviseTick.intValue++
   }
 
   /** Set a [PaletteContentScale] to the palette bitmap. */
@@ -131,25 +133,25 @@ public class ColorPickerController {
   /** Set a radius to draw default wheel. */
   public fun setWheelRadius(radius: Dp) {
     wheelRadius = radius
-    reviseTick.value++
+    reviseTick.intValue++
   }
 
   /** Set a paint to draw default wheel. */
   public fun setWheelPaint(paint: Paint) {
     wheelPaint = paint
-    reviseTick.value++
+    reviseTick.intValue++
   }
 
   /** Set a color for the wheel. */
   public fun setWheelColor(color: Color) {
     wheelPaint.color = color
-    reviseTick.value++
+    reviseTick.intValue++
   }
 
   /** Set an alpha for the wheel. */
   public fun setWheelAlpha(alpha: Float) {
     wheelPaint.alpha = alpha
-    reviseTick.value++
+    reviseTick.intValue++
   }
 
   /** Enable or unable color selection. */

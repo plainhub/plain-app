@@ -22,7 +22,7 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 @Composable
 fun TagSelector(
     data: IData,
-    tagsViewModel: TagsViewModel,
+    tagsVM: TagsViewModel,
     tagsMap: Map<String, List<DTagRelation>>,
     tagsState: List<DTag>,
     onChanged: () -> Unit
@@ -33,7 +33,7 @@ fun TagSelector(
     LaunchedEffect(Unit) {
         tagIds.addAll(tagsMap[data.id]?.map { it.tagId } ?: emptyList())
     }
-    TagNameDialog(tagsViewModel, onChanged)
+    TagNameDialog(tagsVM, onChanged)
     FlowRow(
         modifier =
         Modifier
@@ -46,7 +46,7 @@ fun TagSelector(
             PSelectionChip(
                 selected = tagIds.contains(tag.id),
                 onClick = {
-                    tagsViewModel.toggleTag(data, tag.id)
+                    tagsVM.toggleTag(data, tag.id)
                     if (tagIds.contains(tag.id)) {
                         tagIds.remove(tag.id)
                     } else {
@@ -58,7 +58,7 @@ fun TagSelector(
             )
         }
         NewTagButton(click = {
-            tagsViewModel.showAddDialog()
+            tagsVM.showAddDialog()
         })
     }
 }

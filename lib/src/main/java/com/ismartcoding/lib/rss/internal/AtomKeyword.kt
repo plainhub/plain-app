@@ -1,7 +1,7 @@
 package com.ismartcoding.lib.rss.internal
 
 internal class AtomKeyword {
-    companion object {
+     object Feed {
         val Atom = "feed"
         val Title = "title"
         val Icon = "icon"

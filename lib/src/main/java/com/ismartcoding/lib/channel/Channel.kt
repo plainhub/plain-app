@@ -12,13 +12,13 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 object Channel {
-    var sharedFlow = MutableSharedFlow<ChannelEvent<Any>>()
+    var sharedFlow = MutableSharedFlow<ChannelEvent>()
     internal val internalScope = ChannelScope()
 }
 
-fun sendEvent(event: Any) =
+fun sendEvent(event: ChannelEvent) =
     internalScope.launch {
-        sharedFlow.emit(ChannelEvent(event))
+        sharedFlow.emit(event)
     }
 
 inline fun <reified T> LifecycleOwner.receiveEvent(
@@ -27,16 +27,16 @@ inline fun <reified T> LifecycleOwner.receiveEvent(
 ): Job {
     return ChannelScope(this, lifeEvent).launch {
         sharedFlow.collect {
-            if (it.event is T) {
-                block(it.event)
+            if (it is T) {
+                block(it)
             }
         }
     }
 }
 
 inline fun <reified T> LifecycleOwner.receiveEvent(): Flow<T> {
-    return sharedFlow.filter { it.event is T }
-        .map { it.event as T }
+    return sharedFlow.filter { it is T }
+        .map { it as T }
 }
 
 inline fun <reified T> LifecycleOwner.receiveEventLive(
@@ -45,8 +45,8 @@ inline fun <reified T> LifecycleOwner.receiveEventLive(
 ): Job {
     return lifecycleScope.launch {
         sharedFlow.flowWithLifecycle(lifecycle, lifeEvent.targetState).collect {
-            if (it.event is T) {
-                block(it.event)
+            if (it is T) {
+                block(it)
             }
         }
     }
@@ -55,8 +55,8 @@ inline fun <reified T> LifecycleOwner.receiveEventLive(
 inline fun <reified T> receiveEventHandler(noinline block: suspend CoroutineScope.(event: T) -> Unit): Job {
     return ChannelScope().launch {
         sharedFlow.collect {
-            if (it.event is T) {
-                block(it.event)
+            if (it is T) {
+                block(it)
             }
         }
     }

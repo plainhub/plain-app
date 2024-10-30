@@ -24,7 +24,7 @@ internal fun CoroutineScope.extractAtomContent(
         when {
             eventType == XmlPullParser.START_TAG -> when {
                 // Entering conditions
-                xmlPullParser.contains(AtomKeyword.Atom) -> {
+                xmlPullParser.contains(AtomKeyword.Feed.Atom) -> {
                     insideChannel = true
                 }
 
@@ -34,7 +34,7 @@ internal fun CoroutineScope.extractAtomContent(
                 //endregion
 
                 //region Channel tags
-                xmlPullParser.contains(AtomKeyword.Icon) -> {
+                xmlPullParser.contains(AtomKeyword.Feed.Icon) -> {
                     if (insideChannel) {
                         channelFactory.channelImageBuilder.url(xmlPullParser.nextTrimmedText())
                     }
@@ -85,7 +85,7 @@ internal fun CoroutineScope.extractAtomContent(
                     }
                 }
 
-                xmlPullParser.contains(AtomKeyword.Updated) -> {
+                xmlPullParser.contains(AtomKeyword.Feed.Updated) -> {
                     when {
                         insideItem -> {
                             channelFactory.articleBuilder.pubDateIfNull(xmlPullParser.nextTrimmedText())
@@ -103,7 +103,7 @@ internal fun CoroutineScope.extractAtomContent(
                     }
                 }
 
-                xmlPullParser.contains(AtomKeyword.Subtitle) -> {
+                xmlPullParser.contains(AtomKeyword.Feed.Subtitle) -> {
                     if (insideChannel) {
                         channelFactory.channelBuilder.description(xmlPullParser.nextTrimmedText())
                     }
@@ -117,14 +117,14 @@ internal fun CoroutineScope.extractAtomContent(
                     }
                 }
                 //region Mixed tags
-                xmlPullParser.contains(AtomKeyword.Title) -> {
+                xmlPullParser.contains(AtomKeyword.Feed.Title) -> {
                     when {
                         insideItem -> channelFactory.articleBuilder.title(xmlPullParser.nextTrimmedText())
                         insideChannel -> channelFactory.channelBuilder.title(xmlPullParser.nextTrimmedText())
                     }
                 }
 
-                xmlPullParser.contains(AtomKeyword.Link) -> {
+                xmlPullParser.contains(AtomKeyword.Feed.Link) -> {
                     if (insideChannel) {
                         val href = xmlPullParser.attributeValue(
                             AtomKeyword.Link.Href
@@ -149,7 +149,7 @@ internal fun CoroutineScope.extractAtomContent(
                 channelFactory.buildArticle()
             }
 
-            eventType == XmlPullParser.END_TAG && xmlPullParser.contains(AtomKeyword.Atom) -> {
+            eventType == XmlPullParser.END_TAG && xmlPullParser.contains(AtomKeyword.Feed.Atom) -> {
                 // The channel is correctly parsed
                 insideChannel = false
             }

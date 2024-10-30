@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.page.settings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RadioButton
@@ -46,8 +47,8 @@ fun DarkThemePage(navController: NavHostController) {
                 title = stringResource(R.string.dark_theme),
             )
         },
-        content = {
-            LazyColumn {
+        content = { paddingValues ->
+            LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 item {
                     TopSpace()
                 }

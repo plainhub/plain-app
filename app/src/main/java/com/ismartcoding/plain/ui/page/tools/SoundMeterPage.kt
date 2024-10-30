@@ -9,8 +9,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,7 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.channel.receiveEventHandler
+import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.R
@@ -48,7 +46,6 @@ import com.ismartcoding.plain.features.RequestPermissionsEvent
 import com.ismartcoding.plain.helpers.SoundMeterHelper
 import com.ismartcoding.plain.ui.base.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
@@ -67,7 +64,6 @@ fun SoundMeterPage(navController: NavHostController) {
     var avg by remember { mutableFloatStateOf(0f) }
     var max by remember { mutableFloatStateOf(0f) }
     var isRunning by remember { mutableStateOf(false) }
-    val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
     var decibel by remember { mutableFloatStateOf(0f) }
     val decibelValueStrings = stringArrayResource(R.array.decibel_values)
     val decibelValueString by remember(decibel) {
@@ -79,19 +75,15 @@ fun SoundMeterPage(navController: NavHostController) {
             ""
         }
     }
+    val sharedFlow = Channel.sharedFlow
 
-    LaunchedEffect(Unit) {
-        events.add(
-            receiveEventHandler<PermissionsResultEvent> {
-                isRunning = Permission.RECORD_AUDIO.can(context)
-            },
-        )
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            events.forEach { it.cancel() }
-            events.clear()
+    LaunchedEffect(sharedFlow) {
+        sharedFlow.collect { event ->
+            when (event) {
+                is PermissionsResultEvent -> {
+                    isRunning = Permission.RECORD_AUDIO.can(context)
+                }
+            }
         }
     }
 
@@ -154,6 +146,7 @@ fun SoundMeterPage(navController: NavHostController) {
             if (audioRecord?.state == AudioRecord.STATE_INITIALIZED) {
                 audioRecord?.stop()
                 audioRecord?.release()
+                audioRecord = null
             }
         }
     }
@@ -165,7 +158,7 @@ fun SoundMeterPage(navController: NavHostController) {
                 title = stringResource(id = R.string.sound_meter),
                 actions = {
                     PIconButton(
-                        icon = Icons.Outlined.Info,
+                        icon = R.drawable.info,
                         contentDescription = stringResource(R.string.decibel_values),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
@@ -174,14 +167,14 @@ fun SoundMeterPage(navController: NavHostController) {
                 },
             )
         },
-        content = {
-            LazyColumn {
+        content = { paddingValues ->
+            LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 item {
                     Column(
                         modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(top = 56.dp),
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 56.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Row(verticalAlignment = Alignment.Bottom) {
@@ -203,9 +196,9 @@ fun SoundMeterPage(navController: NavHostController) {
                 item {
                     Row(
                         modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 40.dp, vertical = 24.dp),
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 40.dp, vertical = 24.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Column(
@@ -234,10 +227,10 @@ fun SoundMeterPage(navController: NavHostController) {
                         text = decibelValueString,
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(96.dp)
-                            .padding(16.dp),
+                            Modifier
+                                .fillMaxWidth()
+                                .height(96.dp)
+                                .padding(16.dp),
                         textAlign = TextAlign.Center,
                     )
                     if (isRunning) {
@@ -271,17 +264,19 @@ fun SoundMeterPage(navController: NavHostController) {
     )
 
     if (decibelValuesDialogVisible) {
-        AlertDialog(onDismissRequest = {
-            decibelValuesDialogVisible = false
-        }, confirmButton = {
-            Button(
-                onClick = {
-                    decibelValuesDialogVisible = false
+        AlertDialog(
+            containerColor = MaterialTheme.colorScheme.surface,
+            onDismissRequest = {
+                decibelValuesDialogVisible = false
+            }, confirmButton = {
+                Button(
+                    onClick = {
+                        decibelValuesDialogVisible = false
+                    }
+                ) {
+                    Text(stringResource(id = R.string.close))
                 }
-            ) {
-                Text(stringResource(id = R.string.close))
-            }
-        },
+            },
             title = {
                 Text(
                     text = stringResource(id = R.string.decibel_values),

@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
@@ -12,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -19,10 +19,6 @@ object PlainTheme {
     val PAGE_HORIZONTAL_MARGIN = 16.dp
     val PAGE_TOP_MARGIN = 8.dp
     val CARD_RADIUS = 12.dp
-    val APP_BAR_HEIGHT = 64.dp
-    const val ANIMATION_DURATION = 300
-
-    val cellsList = IntRange(2, 10).map { GridCells.Fixed(it) }.reversed()
 
     @Composable
     fun getCardModifier(index: Int = 0, size: Int = 1, selected: Boolean = false): Modifier {
@@ -60,13 +56,19 @@ fun Typography.buttonTextLarge() = bodyMedium.copy(fontSize = 16.sp)
 fun Typography.tipsText() = bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
 
 @Composable
-fun Typography.listItemTitle() = titleMedium.copy(color = MaterialTheme.colorScheme.onSurface)
+fun Typography.listItemTitle() = titleMedium.copy(
+    fontWeight = FontWeight.SemiBold,
+    color = MaterialTheme.colorScheme.onSurface
+)
+
+@Composable
+fun Typography.listItemValue() = bodyMedium.copy(fontSize = 15.sp, color = MaterialTheme.colorScheme.onSurface)
 
 @Composable
 fun Typography.listItemDescription() = titleSmall.copy(color = MaterialTheme.colorScheme.onSurface)
 
 @Composable
-fun Typography.listItemSubtitle() = labelLarge.copy(color = MaterialTheme.colorScheme.secondary)
+fun Typography.listItemSubtitle() = labelLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
 
 @Composable
 fun Typography.listItemTag() = labelLarge.copy(color = MaterialTheme.colorScheme.primary)

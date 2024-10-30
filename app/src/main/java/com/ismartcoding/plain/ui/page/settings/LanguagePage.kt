@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.page.settings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,8 +42,8 @@ fun LanguagePage(navController: NavHostController) {
         topBar = {
             PTopAppBar(navController = navController, title = stringResource(R.string.language))
         },
-        content = {
-            LazyColumn {
+        content = { paddingValues ->
+            LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 item {
                     TopSpace()
                 }

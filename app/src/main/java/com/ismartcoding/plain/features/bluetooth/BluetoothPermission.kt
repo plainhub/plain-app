@@ -7,8 +7,8 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.R
@@ -82,7 +82,7 @@ object BluetoothPermission {
 
         events.add(
             receiveEventHandler<RequestBluetoothLocationGPSPermissionEvent> {
-                MaterialAlertDialogBuilder(activity)
+                AlertDialog.Builder(activity)
                     .setTitle(getString(R.string.bluetooth_scan_gps_enable_title))
                     .setMessage(getString(R.string.bluetooth_scan_gps_enable_description))
                     .setPositiveButton(getString(R.string.bluetooth_scan_gps_enable_confirm)) { _, _ ->

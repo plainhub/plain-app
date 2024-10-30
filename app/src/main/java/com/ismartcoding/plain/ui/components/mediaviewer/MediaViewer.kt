@@ -38,7 +38,6 @@ import com.ismartcoding.plain.ui.components.mediaviewer.hugeimage.ImageDecoder
 import com.ismartcoding.plain.ui.components.mediaviewer.hugeimage.MediaHugeImage
 import com.ismartcoding.plain.ui.components.mediaviewer.video.MediaVideo
 import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoState
-import com.ismartcoding.plain.ui.preview.PreviewItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope

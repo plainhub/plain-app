@@ -1,18 +1,10 @@
 package com.ismartcoding.plain.features.bluetooth
 
 import android.bluetooth.BluetoothProfile
-import android.content.Context
-import android.util.Base64
-import com.apollographql.apollo3.api.*
-import com.apollographql.apollo3.api.json.buildJsonString
-import com.apollographql.apollo3.api.json.jsonReader
-import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.logcat.LogCat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
-import okio.Buffer
-import okio.ByteString.Companion.toByteString
-import java.util.*
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 class SmartBTDevice(val device: BTDevice) {
@@ -95,36 +87,6 @@ class SmartBTDevice(val device: BTDevice) {
         }
 
         return BluetoothResult(api.charUUID, responseStr, BluetoothActionResult.SUCCESS)
-    }
-
-    suspend fun <D : Operation.Data> graphqlAsync(
-        context: Context,
-        query: Operation<D>,
-        token: String,
-    ): ApolloResponse<D>? {
-        val requestData = BleRequestData.create(context)
-        val body =
-            buildJsonString {
-                query.composeJsonRequest(this, CustomScalarAdapters.Empty)
-            }
-        requestData.body = Base64.encodeToString(CryptoHelper.aesEncrypt(token, body), Base64.NO_WRAP)
-        val r = requestAsync(BTDevice.graphqlService, requestData)
-        if (r.isSuccess()) {
-            try {
-                val bytes = CryptoHelper.aesDecrypt(token, Base64.decode(r.value as String, Base64.DEFAULT))
-                if (bytes != null) {
-                    val adapter =
-                        CustomScalarAdapters.Builder()
-                            .add(com.ismartcoding.plain.type.Time.type, com.apollographql.apollo3.adapter.DateAdapter).build()
-                    val jsonReader = Buffer().write(bytes.toByteString()).jsonReader()
-                    return query.parseJsonResponse(jsonReader, adapter)
-                }
-            } catch (ex: Exception) {
-                LogCat.e(ex.toString())
-            }
-        }
-
-        return null
     }
 
     private suspend fun readCharacteristicAsync(

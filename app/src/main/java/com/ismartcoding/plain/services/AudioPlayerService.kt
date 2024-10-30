@@ -52,24 +52,17 @@ class AudioPlayerService : MediaLibraryService() {
                     withIO { AudioPlayingPreference.putAsync(context, mediaItem.mediaId) }
                     AudioPlayer.setChangedNotify(AudioAction.MEDIA_ITEM_TRANSITION)
                 }
-            } else if (events.contains(Player.EVENT_IS_PLAYING_CHANGED)) {
-                LogCat.d("onEvents: EVENT_IS_PLAYING_CHANGED")
-                AudioPlayer.setChangedNotify(AudioAction.PLAYBACK_STATE_CHANGED)
-            } else if (events.contains(Player.EVENT_PLAYBACK_STATE_CHANGED)) {
-                LogCat.d("onEvents: EVENT_PLAYBACK_STATE_CHANGED")
-                AudioPlayer.setChangedNotify(AudioAction.PLAYBACK_STATE_CHANGED)
             }
+        }
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            LogCat.d("onIsPlayingChanged: $isPlaying")
         }
 
         override fun onPlaybackStateChanged(playbackState: Int) {
             if (playbackState == Player.STATE_ENDED) {
-                if (AudioPlayer.pendingQuit) {
-                    AudioPlayer.pendingQuit = false
-                    AudioPlayer.pause()
-                    return
-                }
                 if (TempData.audioPlayMode == MediaPlayMode.REPEAT_ONE) {
-                    AudioPlayer.repeatCurrent()
+                    AudioPlayer.seekTo(0)
                 } else {
                     AudioPlayer.skipToNext()
                 }
@@ -142,9 +135,6 @@ class AudioPlayerService : MediaLibraryService() {
                 AudioPlayer.pause()
             }
 
-            AudioServiceAction.PENDING_QUIT.name -> {
-                AudioPlayer.pendingQuit = true
-            }
         }
         return START_NOT_STICKY
     }
@@ -153,7 +143,7 @@ class AudioPlayerService : MediaLibraryService() {
         return session
     }
 
-    override fun onTaskRemoved(rootIntent: Intent) {
+    override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
         stopSelf()
     }

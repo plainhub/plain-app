@@ -24,6 +24,7 @@ fun RadioDialog(
 ) {
     AlertDialog(
         modifier = modifier.fillMaxWidth(),
+        containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = onDismissRequest,
         title = {
             Text(

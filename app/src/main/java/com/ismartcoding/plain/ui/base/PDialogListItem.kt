@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.ui.theme.palette.LocalTonalPalettes
 import com.ismartcoding.plain.ui.theme.palette.onDark
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -40,8 +39,6 @@ fun PDialogListItem(
     showMore: Boolean = false,
     action: (@Composable () -> Unit)? = null,
 ) {
-    val tonalPalettes = LocalTonalPalettes.current
-
     Row(
         modifier =
         modifier
@@ -101,7 +98,7 @@ fun PDialogListItem(
                 Modifier
                     .height(32.dp)
                     .padding(start = 16.dp),
-                color = tonalPalettes neutralVariant 80 onDark (tonalPalettes neutralVariant 30),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
@@ -124,7 +121,7 @@ fun PDialogListItem(
 
         if (showMore) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_chevron_right),
+                painter = painterResource(id = R.drawable.chevron_right),
                 modifier =
                 Modifier
                     .size(24.dp),

@@ -27,11 +27,11 @@ fun Modifier.gridDragSelect(
 ): Modifier = composed {
     val scrollThreshold: Float = autoScrollThreshold ?: GridDragSelectDefaults.autoScrollThreshold
     if (enableAutoScroll) {
-        LaunchedEffect(state.autoScrollSpeed.value) {
-            if (state.autoScrollSpeed.value == 0f) return@LaunchedEffect
+        LaunchedEffect(state.autoScrollSpeed.floatValue) {
+            if (state.autoScrollSpeed.floatValue == 0f) return@LaunchedEffect
 
             while (isActive) {
-                state.gridState()?.scrollBy(state.autoScrollSpeed.value)
+                state.gridState()?.scrollBy(state.autoScrollSpeed.floatValue)
                 delay(10)
             }
         }

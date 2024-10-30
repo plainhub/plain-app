@@ -53,26 +53,26 @@ class DocsViewModel(private val savedStateHandle: SavedStateHandle) :
 
     fun moreAsync(context: Context) {
         val query = getQuery()
-        offset.value += limit.value
+        offset.value += limit.intValue
         val items = FileMediaStoreHelper.getAllByFileTypeAsync(context, MediaStore.VOLUME_EXTERNAL_PRIMARY, FileType.DOCUMENT, sortBy.value)
-            .filter { query.isEmpty() || it.name.contains(query) }.drop(offset.value).take(limit.value)
+            .filter { query.isEmpty() || it.name.contains(query) }.drop(offset.intValue).take(limit.intValue)
         _itemsFlow.value.addAll(items)
         showLoading.value = false
-        noMore.value = items.size < limit.value
+        noMore.value = items.size < limit.intValue
     }
 
     fun loadAsync(context: Context) {
         val query = getQuery()
-        offset.value = 0
+        offset.intValue = 0
         val items = FileMediaStoreHelper.getAllByFileTypeAsync(context, MediaStore.VOLUME_EXTERNAL_PRIMARY, FileType.DOCUMENT, sortBy.value)
             .filter { query.isEmpty() || it.name.contains(query) }
-        _itemsFlow.value = items.take(limit.value).toMutableStateList()
-        total.value = items.size
-        noMore.value = _itemsFlow.value.size < limit.value
+        _itemsFlow.value = items.take(limit.intValue).toMutableStateList()
+        total.intValue = items.size
+        noMore.value = _itemsFlow.value.size < limit.intValue
         val extensions = items
             .groupBy { it.extension }.map { VTabData(it.key.uppercase(), it.key, it.value.size) }
             .sortedBy { it.title }
-        tabs.value = listOf(VTabData(getString(R.string.all), "", total.value), *extensions.toTypedArray())
+        tabs.value = listOf(VTabData(getString(R.string.all), "", total.intValue), *extensions.toTypedArray())
         showLoading.value = false
     }
 

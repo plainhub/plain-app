@@ -35,14 +35,15 @@ import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
-import com.ismartcoding.plain.ui.components.chat.ChatDate
-import com.ismartcoding.plain.ui.components.chat.ChatFiles
-import com.ismartcoding.plain.ui.components.chat.ChatImages
-import com.ismartcoding.plain.ui.components.chat.ChatName
-import com.ismartcoding.plain.ui.components.chat.ChatText
+import com.ismartcoding.plain.ui.page.chat.components.ChatDate
+import com.ismartcoding.plain.ui.page.chat.components.ChatFiles
+import com.ismartcoding.plain.ui.page.chat.components.ChatImages
+import com.ismartcoding.plain.ui.page.chat.components.ChatName
+import com.ismartcoding.plain.ui.page.chat.components.ChatText
 import com.ismartcoding.plain.ui.nav.navigateChatEditText
 import com.ismartcoding.plain.ui.nav.navigateChatText
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.models.enterSelectMode
@@ -53,7 +54,8 @@ import com.ismartcoding.plain.ui.theme.PlainTheme
 @Composable
 fun ChatListItem(
     navController: NavHostController,
-    viewModel: ChatViewModel,
+    chatVM: ChatViewModel,
+    audioPlaylistVM: AudioPlaylistViewModel,
     items: List<VChat>,
     m: VChat,
     index: Int,
@@ -67,10 +69,10 @@ fun ChatListItem(
     Column {
         ChatDate(items, m, index)
         Row {
-            if (viewModel.selectMode.value) {
+            if (chatVM.selectMode.value) {
                 HorizontalSpace(dp = 16.dp)
-                Checkbox(checked = viewModel.selectedIds.contains(m.id), onCheckedChange = {
-                    viewModel.select(m.id)
+                Checkbox(checked = chatVM.selectedIds.contains(m.id), onCheckedChange = {
+                    chatVM.select(m.id)
                 })
             }
             Box(modifier = Modifier.weight(1f)) {
@@ -79,17 +81,17 @@ fun ChatListItem(
                     Modifier
                         .combinedClickable(
                             onClick = {
-                                if (viewModel.selectMode.value) {
-                                    viewModel.select(m.id)
+                                if (chatVM.selectMode.value) {
+                                    chatVM.select(m.id)
                                 } else {
                                     focusManager.clearFocus()
                                 }
                             },
                             onLongClick = {
-                                if (viewModel.selectMode.value) {
+                                if (chatVM.selectMode.value) {
                                     return@combinedClickable
                                 }
-                                viewModel.selectedItem.value = m
+                                chatVM.selectedItem.value = m
                                 showContextMenu.value = true
                             },
                             onDoubleClick = {
@@ -104,7 +106,7 @@ fun ChatListItem(
                     Surface(
                         modifier =
                         PlainTheme
-                            .getCardModifier(selected = viewModel.selectedItem.value?.id == m.id || viewModel.selectedIds.contains(m.id)),
+                            .getCardModifier(selected = chatVM.selectedItem.value?.id == m.id || chatVM.selectedIds.contains(m.id)),
                         color = Color.Unspecified,
                     ) {
                         when (m.type) {
@@ -113,7 +115,7 @@ fun ChatListItem(
                             }
 
                             DMessageType.FILES.value -> {
-                                ChatFiles(context, items, navController, m, previewerState)
+                                ChatFiles(context, items, navController, m, audioPlaylistVM, previewerState)
                             }
 
                             DMessageType.TEXT.value -> {
@@ -121,7 +123,7 @@ fun ChatListItem(
                                     val content = (m.value as DMessageText).text
                                     navController.navigateChatText(content)
                                 }, onLongClick = {
-                                    viewModel.selectedItem.value = m
+                                    chatVM.selectedItem.value = m
                                     showContextMenu.value = true
                                 })
                             }
@@ -137,18 +139,18 @@ fun ChatListItem(
                         .wrapContentSize(Alignment.Center),
                 ) {
                     PDropdownMenu(
-                        expanded = showContextMenu.value && viewModel.selectedItem.value == m,
+                        expanded = showContextMenu.value && chatVM.selectedItem.value == m,
                         onDismissRequest = {
-                            viewModel.selectedItem.value = null
+                            chatVM.selectedItem.value = null
                             showContextMenu.value = false
                         },
                     ) {
                         PDropdownMenuItem(
                             text = { Text(stringResource(id = R.string.select)) },
                             onClick = {
-                                viewModel.enterSelectMode()
-                                viewModel.select(m.id)
-                                viewModel.selectedItem.value = null
+                                chatVM.enterSelectMode()
+                                chatVM.select(m.id)
+                                chatVM.selectedItem.value = null
                                 showContextMenu.value = false
                             },
                         )
@@ -156,7 +158,7 @@ fun ChatListItem(
                             PDropdownMenuItem(
                                 text = { Text(stringResource(id = R.string.copy_text)) },
                                 onClick = {
-                                    viewModel.selectedItem.value = null
+                                    chatVM.selectedItem.value = null
                                     showContextMenu.value = false
                                     val text = (m.value as DMessageText).text
                                     val clip =
@@ -171,7 +173,7 @@ fun ChatListItem(
                             PDropdownMenuItem(
                                 text = { Text(stringResource(id = R.string.edit_text)) },
                                 onClick = {
-                                    viewModel.selectedItem.value = null
+                                    chatVM.selectedItem.value = null
                                     showContextMenu.value = false
                                     val content = (m.value as DMessageText).text
                                     navController.navigateChatEditText(m.id, content)
@@ -181,9 +183,9 @@ fun ChatListItem(
                         PDropdownMenuItem(
                             text = { Text(stringResource(id = R.string.delete)) },
                             onClick = {
-                                viewModel.selectedItem.value = null
+                                chatVM.selectedItem.value = null
                                 showContextMenu.value = false
-                                viewModel.delete(context, setOf(m.id))
+                                chatVM.delete(context, setOf(m.id))
                             },
                         )
                     }

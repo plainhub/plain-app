@@ -4,7 +4,6 @@
 -keep class com.ismartcoding.plain.** { *; }
 -keep class io.ktor.server.** { *; }
 -keep class io.netty.** { *; }
--keep class com.rometools.rome.** { *; }
 
 -keepclassmembers class **.R$* {
     public static <fields>;
@@ -21,25 +20,15 @@
 
 # Please add these rules to your existing keep rules in order to suppress warnings.
 # This is generated automatically by the Android Gradle plugin.
--dontwarn com.aayushatharva.brotli4j.encoder.BrotliEncoderChannel
--dontwarn io.ktor.client.plugins.HttpRequestRetry$Configuration
--dontwarn io.ktor.client.plugins.HttpRequestRetry$Plugin
--dontwarn io.ktor.client.plugins.HttpRequestRetry$ShouldRetryContext
--dontwarn io.ktor.client.plugins.HttpRequestRetry
--dontwarn io.ktor.client.plugins.HttpTimeout$HttpTimeoutCapabilityConfiguration
--dontwarn io.ktor.client.plugins.HttpTimeout$Plugin
--dontwarn io.ktor.client.plugins.HttpTimeout
--dontwarn io.ktor.client.plugins.logging.Logging$Companion
--dontwarn io.ktor.client.plugins.logging.Logging$Config
--dontwarn io.ktor.client.plugins.logging.Logging
--dontwarn io.ktor.util.KtorDsl
 -dontwarn com.aayushatharva.brotli4j.Brotli4jLoader
 -dontwarn com.aayushatharva.brotli4j.decoder.DecoderJNI$Status
 -dontwarn com.aayushatharva.brotli4j.decoder.DecoderJNI$Wrapper
+-dontwarn com.aayushatharva.brotli4j.encoder.BrotliEncoderChannel
 -dontwarn com.aayushatharva.brotli4j.encoder.Encoder$Mode
 -dontwarn com.aayushatharva.brotli4j.encoder.Encoder$Parameters
--dontwarn com.aayushatharva.brotli4j.encoder.Encoders
 -dontwarn com.github.luben.zstd.Zstd
+-dontwarn com.github.luben.zstd.ZstdInputStreamNoFinalizer
+-dontwarn com.github.luben.zstd.util.Native
 -dontwarn com.google.protobuf.ExtensionRegistry
 -dontwarn com.google.protobuf.ExtensionRegistryLite
 -dontwarn com.google.protobuf.MessageLite$Builder
@@ -64,6 +53,9 @@
 -dontwarn com.oracle.svm.core.annotate.RecomputeFieldValue$Kind
 -dontwarn com.oracle.svm.core.annotate.RecomputeFieldValue
 -dontwarn com.oracle.svm.core.annotate.TargetClass
+-dontwarn com.sun.nio.file.SensitivityWatchEventModifier
+-dontwarn io.ktor.server.routing.Routing$Plugin
+-dontwarn io.ktor.utils.io.core.Input
 -dontwarn io.netty.internal.tcnative.AsyncSSLPrivateKeyMethod
 -dontwarn io.netty.internal.tcnative.AsyncTask
 -dontwarn io.netty.internal.tcnative.Buffer
@@ -110,12 +102,11 @@
 -dontwarn org.jboss.marshalling.MarshallerFactory
 -dontwarn org.jboss.marshalling.MarshallingConfiguration
 -dontwarn org.jboss.marshalling.Unmarshaller
--dontwarn pl.droidsonroids.gif.GifDrawable
+-dontwarn org.osgi.annotation.bundle.Export
 -dontwarn reactor.blockhound.BlockHound$Builder
 -dontwarn reactor.blockhound.integration.BlockHoundIntegration
 -dontwarn sun.security.x509.AlgorithmId
 -dontwarn sun.security.x509.CertificateAlgorithmId
--dontwarn sun.security.x509.CertificateIssuerName
 -dontwarn sun.security.x509.CertificateSerialNumber
 -dontwarn sun.security.x509.CertificateSubjectName
 -dontwarn sun.security.x509.CertificateValidity
@@ -124,4 +115,3 @@
 -dontwarn sun.security.x509.X500Name
 -dontwarn sun.security.x509.X509CertImpl
 -dontwarn sun.security.x509.X509CertInfo
--dontwarn org.slf4j.impl.StaticLoggerBinder

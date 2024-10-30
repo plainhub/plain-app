@@ -35,7 +35,7 @@ class DateConverter {
         if (date == null) {
             return null
         }
-        return date.toInstant()
+        return Instant.parse(date)
     }
 }
 

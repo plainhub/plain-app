@@ -1,7 +1,5 @@
 # PlainApp
 
-<a href="README_zh_CN.md">中文</a>
-
 PlainApp is an open-source application that allows you to manage your phone through a web browser. Access files, videos, music, contacts, sms, calls, and more from your desktop using a secure, easy to use web interface!
 
 [<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt='Get it on Google Play' height="80">](https://play.google.com/store/apps/details?id=com.ismartcoding.plain)
@@ -26,7 +24,6 @@ PlainApp is an open-source application that allows you to manage your phone thro
 - SMS, Calls: Read your SMS and calls on webpage.
 - Apps: View your apps and download apk from phone.
 - Screen mirror: Mirror your phone on webpage.
-- Tools: Sound meter.
 - Notifications: You can manage push notifications on the webpage.
 - Device info: You can view your device info on the webpage.
 - PWA support: You can add webpage to your home screen and experience the convenience of using the webpage like a desktop app.
@@ -63,34 +60,17 @@ Your donation is highly appreciated. Thank you!
 
 ## Screenshots
 
-| ![sound meter](screenshots/1.jpeg)   | ![files](screenshots/2.jpeg)            | ![web](screenshots/3.jpeg)                   | ![notes](screenshots/4.jpeg)                     |
-|--------------------------------------|-----------------------------------------|----------------------------------------------|--------------------------------------------------|
-| ![audio](screenshots/5.jpeg)         | ![images](screenshots/6.jpeg)           | ![videos](screenshots/7.jpeg)                | ![rss](screenshots/8.jpeg)                       |
-| ![home](screenshots/web-home.png)    | ![images](screenshots/web-images.png)   | ![videos](screenshots/web-videos.png)        | ![notes](screenshots/web-notes.png)              |
-| ![files](screenshots/web-files.png)  |  ![encryption](screenshots/web-calls.png)  | ![messages](screenshots/web-messages.png)    | ![contacts](screenshots/web-contacts.png)        |
-| ![audio](screenshots/web-audios.png) | ![rss](screenshots/web-rss.png)         | ![encryption](screenshots/web-encryption.png) | ![encryption](screenshots/web-screen-mirror.png) |
-| ![audio](screenshots/web-image.png)  | ![rss](screenshots/web-video.png)       |                                              |                                                  |
+| ![files](screenshots/2.jpeg)               | ![web](screenshots/3.jpeg)                       | ![notes](screenshots/4.jpeg)                  |                                                  |
+|--------------------------------------------|--------------------------------------------------|-----------------------------------------------|--------------------------------------------------|
+| ![audio](screenshots/5.jpeg)               | ![images](screenshots/6.jpeg)                    | ![videos](screenshots/7.jpeg)                 | ![rss](screenshots/8.jpeg)                       |
+| ![home](screenshots/web-home.png)          | ![images](screenshots/web-images.png)            | ![videos](screenshots/web-videos.png)         | ![notes](screenshots/web-notes.png)              |
+| ![files](screenshots/web-files.png)        | ![encryption](screenshots/web-calls.png)         | ![messages](screenshots/web-messages.png)     | ![contacts](screenshots/web-contacts.png)        |
+| ![audio](screenshots/web-audios.png)       | ![rss](screenshots/web-rss.png)                  | ![encryption](screenshots/web-encryption.png) | ![encryption](screenshots/web-screen-mirror.png) |
+| ![audio](screenshots/web-image.png)        | ![rss](screenshots/web-video.png)                |                                               |                                                  |
 
 ## Compatibility
 
 PlainApp requires Android 9.0 or higher.
-
-## Roadmap
-
-- ❌ Not Started
-- 🟡 In Progress
-- ✅ Completed
-
-| Feature                                                   | WEB | APP |
-|-----------------------------------------------------------|:---:|:---:|
-| Material You Theme                                        | ✅  | 🟡  |
-| Share Files via Web Link                                  |  ❌  |  ❌  |
-| Messaging between Phones with PlainApp (Bluetooth, Wi-Fi) |  ❌  |  ❌  |
-| Translation Dictionary                                    |  ❌  |  ❌  |
-| Books                                                     |  ❌  |  ❌  |
-| To do list                                                |  ❌  |  ❌  |
-
-The ultimate goal is to turn smartphones into personal data and knowledge managers, allowing individuals to more easily exchange knowledge and data with each other through PlainApp.
 
 ## FAQ
 
@@ -101,15 +81,6 @@ The ultimate goal is to turn smartphones into personal data and knowledge manage
 It's worth mentioning that this is an open-source application.
 If you have doubts, you can either build your own version or choose not to use it.
 If you encounter any issues, feel free to open an issue on GitHub. I am always happy to help. Please do not give a one-star rating arbitrarily.
-
-## Download GraphQL schema from PlainBox
-
-```bash
-./gradlew downloadApolloSchema \
-  --endpoint="http://<box-ip>:8080/graphql" \
-  --schema="app/src/main/graphql/com/ismartcoding/plain/schema.graphqls" \
-  --header="Authorization: Bearer <token>"
-```
 
 ## Build
 

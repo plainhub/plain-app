@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ContentPaste
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,6 +28,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
@@ -100,8 +99,8 @@ fun WebSecurityPage(navController: NavHostController) {
             topBar = {
                 PTopAppBar(navController = navController, title = stringResource(R.string.security))
             },
-            content = {
-                LazyColumn {
+            content = { paddingValues ->
+                LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                     item {
                         TopSpace()
                     }
@@ -177,9 +176,9 @@ fun WebSecurityPage(navController: NavHostController) {
                         Subtitle(text = stringResource(id = R.string.https_certificate_signature))
                         ClipboardCard(
                             label =
-                            stringResource(
-                                id = R.string.https_certificate_signature,
-                            ),
+                                stringResource(
+                                    id = R.string.https_certificate_signature,
+                                ),
                             sslSignature,
                         )
                         VerticalSpace(dp = 16.dp)
@@ -236,15 +235,15 @@ fun PasswordTextField(
         val focusRequester = remember { FocusRequester() }
         TextField(
             modifier =
-            Modifier
-                .focusRequester(focusRequester)
-                .fillMaxWidth(),
+                Modifier
+                    .focusRequester(focusRequester)
+                    .fillMaxWidth(),
             colors =
-            TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor = Color.Transparent,
-            ),
+                TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                ),
             maxLines = 1,
             value = value,
             onValueChange = {
@@ -275,7 +274,7 @@ fun PasswordTextField(
                         onValueChange(clipboardManager.getText()?.text ?: "")
                     }) {
                         Icon(
-                            imageVector = Icons.Rounded.ContentPaste,
+                            painter = painterResource(R.drawable.content_paste),
                             contentDescription = stringResource(R.string.paste),
                             tint = MaterialTheme.colorScheme.primary,
                         )
@@ -283,9 +282,9 @@ fun PasswordTextField(
                 }
             },
             keyboardOptions =
-            KeyboardOptions(
-                imeAction = ImeAction.Done,
-            ),
+                KeyboardOptions(
+                    imeAction = ImeAction.Done,
+                ),
         )
     }
 }

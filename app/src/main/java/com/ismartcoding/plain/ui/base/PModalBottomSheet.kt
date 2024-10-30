@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.base
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -21,12 +22,12 @@ fun PModalBottomSheet(
     content: @Composable ColumnScope.() -> Unit = {},
 ) {
     ModalBottomSheet(
-        modifier = modifier,
+        modifier = modifier.statusBarsPadding(),
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 0.dp,
         onDismissRequest = onDismissRequest,
-        windowInsets = WindowInsets(0, 0, 0, 0),
+        dragHandle = null,
         content = content
     )
 }

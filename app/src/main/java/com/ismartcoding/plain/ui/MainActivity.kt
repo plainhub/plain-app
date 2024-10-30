@@ -31,7 +31,6 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ismartcoding.lib.channel.receiveEvent
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.capitalize
@@ -53,11 +52,14 @@ import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.enums.AppChannelType
+import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.enums.Language
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
+import com.ismartcoding.plain.features.AudioActionEvent
+import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.ExportFileEvent
@@ -65,7 +67,6 @@ import com.ismartcoding.plain.features.ExportFileResultEvent
 import com.ismartcoding.plain.features.HttpServerStateChangedEvent
 import com.ismartcoding.plain.features.IgnoreBatteryOptimizationEvent
 import com.ismartcoding.plain.features.IgnoreBatteryOptimizationResultEvent
-import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.PermissionsResultEvent
@@ -75,7 +76,6 @@ import com.ismartcoding.plain.features.RequestPermissionsEvent
 import com.ismartcoding.plain.features.RestartAppEvent
 import com.ismartcoding.plain.features.StartScreenMirrorEvent
 import com.ismartcoding.plain.features.WindowFocusChangedEvent
-import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.bluetooth.BluetoothPermission
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getStringF
@@ -92,15 +92,14 @@ import com.ismartcoding.plain.receivers.NetworkStateReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.services.ScreenMirrorService
-import com.ismartcoding.plain.ui.audio.AudioPlayerDialog
-import com.ismartcoding.plain.ui.nav.navigate
-import com.ismartcoding.plain.ui.nav.navigatePdf
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
 import com.ismartcoding.plain.ui.helpers.WebHelper
+import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
+import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.ui.nav.navigatePdf
 import com.ismartcoding.plain.ui.page.Main
-import com.ismartcoding.plain.ui.nav.RouteName
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.EventType
@@ -117,7 +116,8 @@ class MainActivity : AppCompatActivity() {
     private var pickFileTag = PickFileTag.SEND_MESSAGE
     private var exportFileType = ExportFileType.OPML
     private var requestToConnectDialog: AlertDialog? = null
-    private val viewModel: MainViewModel by viewModels()
+    private val mainVM: MainViewModel by viewModels()
+    private val audioPlaylistVM: AudioPlaylistViewModel by viewModels()
     private val navControllerState = mutableStateOf<NavHostController?>(null)
 
     private val screenCapture =
@@ -226,7 +226,7 @@ class MainActivity : AppCompatActivity() {
             SettingsProvider {
                 Main(navControllerState, onLaunched = {
                     handleIntent(intent)
-                }, viewModel)
+                }, mainVM, audioPlaylistVM)
             }
         }
 
@@ -240,7 +240,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     val webEnabled = WebPreference.getAsync(this@MainActivity)
                     if (webEnabled) {
-                        viewModel.enableHttpServer(this@MainActivity, true)
+                        mainVM.enableHttpServer(this@MainActivity, true)
                     }
                     doWhenReadyAsync()
                 }
@@ -266,9 +266,21 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("CheckResult")
     private fun initEvents() {
+        receiveEvent<AudioActionEvent> {
+            when (it.action) {
+                AudioAction.MEDIA_ITEM_TRANSITION -> {
+                    coIO {
+                        audioPlaylistVM.loadAsync(this@MainActivity)
+                    }
+                }
+
+                else -> {
+                }
+            }
+        }
         receiveEvent<HttpServerStateChangedEvent> {
-            viewModel.httpServerError = HttpServerManager.httpServerError
-            viewModel.httpServerState = it.state
+            mainVM.httpServerError = HttpServerManager.httpServerError
+            mainVM.httpServerState = it.state
             if (it.state == HttpServerState.ON && !Permission.WRITE_EXTERNAL_STORAGE.can(this@MainActivity)) {
                 DialogHelper.showConfirmDialog(
                     LocaleHelper.getString(R.string.confirm),
@@ -362,7 +374,7 @@ class MainActivity : AppCompatActivity() {
 
             val r = event.request
             requestToConnectDialog =
-                MaterialAlertDialogBuilder(instance.get()!!)
+                AlertDialog.Builder(instance.get()!!)
                     .setTitle(getStringF(R.string.request_to_connect, "ip", clientIp))
                     .setMessage(
                         getStringF(
@@ -419,7 +431,7 @@ class MainActivity : AppCompatActivity() {
                 WebHelper.open(context, UrlHelper.getPolicyUrl())
             }
         }, startIndexPrivacyPolicy, startIndexPrivacyPolicy + 6, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        val dialog = MaterialAlertDialogBuilder(context)
+        val dialog = AlertDialog.Builder(context)
             .setTitle("温馨提示")
             .setCancelable(false)
             .setPositiveButton("同意并继续") { _, _ ->
@@ -454,12 +466,11 @@ class MainActivity : AppCompatActivity() {
                     if (mimeType.startsWith("audio/") ||
                         setOf("application/ogg", "application/x-ogg", "application/itunes").contains(mimeType)
                     ) {
-                        AudioPlayerDialog().show()
                         Permissions.checkNotification(this@MainActivity, R.string.audio_notification_prompt) {
                             AudioPlayer.play(this@MainActivity, DPlaylistAudio.fromPath(this@MainActivity, uri.toString()))
                         }
                     } else if (mimeType.startsWith("text/")) {
-                        TextEditorDialog(uri).show()
+//                        TextEditorDialog(uri).show()
                     } else if (mimeType.startsWith("image/") || mimeType.startsWith("video/")) {
 //                        val link = uri.toString()
 //                        PreviewDialog().show(
@@ -490,15 +501,16 @@ class MainActivity : AppCompatActivity() {
                             ),
                         ),
                     )
-                    navControllerState.value?.navigate(RouteName.CHAT)
+                    navControllerState.value?.navigate(Routing.Chat)
                 }
                 return
             }
 
             val uri = intent.parcelable(Intent.EXTRA_STREAM) as? Uri ?: return
-            DialogHelper.showConfirmDialog("", LocaleHelper.getString(R.string.confirm_to_send_file_to_file_assistant),
+            DialogHelper.showConfirmDialog(
+                "", LocaleHelper.getString(R.string.confirm_to_send_file_to_file_assistant),
                 confirmButton = LocaleHelper.getString(R.string.ok) to {
-                    navControllerState.value?.navigate(RouteName.CHAT)
+                    navControllerState.value?.navigate(Routing.Chat)
                     coIO {
                         delay(1000)
                         sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, setOf(uri)))
@@ -506,11 +518,12 @@ class MainActivity : AppCompatActivity() {
                 },
                 dismissButton = LocaleHelper.getString(R.string.cancel) to {})
         } else if (intent.action == Intent.ACTION_SEND_MULTIPLE) {
-            DialogHelper.showConfirmDialog("", LocaleHelper.getString(R.string.confirm_to_send_files_to_file_assistant),
+            DialogHelper.showConfirmDialog(
+                "", LocaleHelper.getString(R.string.confirm_to_send_files_to_file_assistant),
                 confirmButton = LocaleHelper.getString(R.string.ok) to {
                     val uris = intent.parcelableArrayList<Uri>(Intent.EXTRA_STREAM)
                     if (uris != null) {
-                        navControllerState.value?.navigate(RouteName.CHAT)
+                        navControllerState.value?.navigate(Routing.Chat)
                         coIO {
                             delay(1000)
                             sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris.toSet()))

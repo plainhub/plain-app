@@ -3,8 +3,6 @@ package com.ismartcoding.plain.ui.page.feeds
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -15,6 +13,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -23,30 +22,32 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 
 @Composable
-fun EditFeedDialog(viewModel: FeedsViewModel) {
-    if (viewModel.showEditDialog.value) {
+fun EditFeedDialog(feedsVM: FeedsViewModel) {
+    if (feedsVM.showEditDialog.value) {
         val focusManager = LocalFocusManager.current
         AlertDialog(
+            containerColor = MaterialTheme.colorScheme.surface,
             onDismissRequest = {
-                viewModel.showEditDialog.value = false
+                feedsVM.showEditDialog.value = false
             },
             icon = {
                 Icon(
-                    imageVector = Icons.Outlined.Edit,
+                    painter = painterResource(R.drawable.square_pen),
                     contentDescription = stringResource(id = R.string.edit),
                 )
             },
             title = {
-                Text(text = stringResource(id = R.string.edit), maxLines = 1, overflow = TextOverflow.Ellipsis,
+                Text(
+                    text = stringResource(id = R.string.edit), maxLines = 1, overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleLarge
                 )
             },
             text = {
                 Column {
                     OutlinedTextField(
-                        value = viewModel.editName.value,
+                        value = feedsVM.editName.value,
                         onValueChange = {
-                            viewModel.editName.value = it
+                            feedsVM.editName.value = it
                         },
                         singleLine = true,
                         label = {
@@ -55,11 +56,11 @@ fun EditFeedDialog(viewModel: FeedsViewModel) {
                     )
                     VerticalSpace(dp = 8.dp)
                     OutlinedTextField(
-                        value = viewModel.editUrl.value,
+                        value = feedsVM.editUrl.value,
                         onValueChange = {
-                            viewModel.editUrl.value = it
-                            if (viewModel.editUrlError.value.isNotEmpty()) {
-                                viewModel.editUrlError.value = ""
+                            feedsVM.editUrl.value = it
+                            if (feedsVM.editUrlError.value.isNotEmpty()) {
+                                feedsVM.editUrlError.value = ""
                             }
                         },
                         singleLine = true,
@@ -67,11 +68,11 @@ fun EditFeedDialog(viewModel: FeedsViewModel) {
                             Text(text = stringResource(id = R.string.url))
                         }
                     )
-                    if (viewModel.editUrlError.value.isNotEmpty()) {
+                    if (feedsVM.editUrlError.value.isNotEmpty()) {
                         SelectionContainer {
                             Text(
                                 modifier = Modifier.padding(horizontal = 16.dp),
-                                text = viewModel.editUrlError.value,
+                                text = feedsVM.editUrlError.value,
                                 color = MaterialTheme.colorScheme.error,
                             )
                         }
@@ -80,10 +81,10 @@ fun EditFeedDialog(viewModel: FeedsViewModel) {
             },
             confirmButton = {
                 Button(
-                    enabled = viewModel.editUrl.value.isNotBlank() && viewModel.editName.value.isNotBlank(),
+                    enabled = feedsVM.editUrl.value.isNotBlank() && feedsVM.editName.value.isNotBlank(),
                     onClick = {
                         focusManager.clearFocus()
-                        viewModel.edit()
+                        feedsVM.edit()
                     },
                 ) {
                     Text(stringResource(id = R.string.save))
@@ -91,7 +92,7 @@ fun EditFeedDialog(viewModel: FeedsViewModel) {
             },
             dismissButton = {
                 TextButton(onClick = {
-                    viewModel.showEditDialog.value = false
+                    feedsVM.showEditDialog.value = false
                 }) {
                     Text(text = stringResource(id = R.string.cancel))
                 }

@@ -12,6 +12,7 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.features.TagHelper
+import com.ismartcoding.plain.ui.helpers.LoadingHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,7 +20,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
-class TagsViewModel() : ViewModel() {
+class TagsViewModel : ViewModel() {
     private val _itemsFlow = MutableStateFlow(mutableStateListOf<DTag>())
     val itemsFlow: StateFlow<List<DTag>> get() = _itemsFlow
     private val _tagsMapFlow = MutableStateFlow(mutableMapOf<String, List<DTagRelation>>())
@@ -31,6 +32,7 @@ class TagsViewModel() : ViewModel() {
     var dataType = mutableStateOf(DataType.DEFAULT)
 
     fun loadAsync(keys: Set<String> = emptySet()) {
+        val startTime = System.currentTimeMillis()
         val tagCountMap = TagHelper.count(dataType.value).associate { it.id to it.count }
         _itemsFlow.value = TagHelper.getAll(dataType.value).map { tag ->
             tag.count = tagCountMap[tag.id] ?: 0
@@ -39,7 +41,11 @@ class TagsViewModel() : ViewModel() {
         if (keys.isNotEmpty()) {
             _tagsMapFlow.value += TagHelper.getTagRelationsByKeysMap(keys, dataType.value).toMutableMap()
         }
-        showLoading.value = false
+        LoadingHelper.ensureMinimumLoadingTime(
+            viewModel = this,
+            startTime = startTime,
+            updateLoadingState = { isLoading -> showLoading.value = isLoading }
+        )
     }
 
     fun loadMoreAsync(keys: Set<String>) {

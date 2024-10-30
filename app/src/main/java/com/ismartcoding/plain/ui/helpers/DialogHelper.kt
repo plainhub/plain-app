@@ -1,20 +1,16 @@
 package com.ismartcoding.plain.ui.helpers
 
 import android.widget.Toast
-import com.apollographql.apollo3.api.ApolloResponse
-import com.apollographql.apollo3.api.Operation
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.ApiResult
-import com.ismartcoding.plain.api.GraphqlApiResult
 import com.ismartcoding.plain.features.ConfirmDialogEvent
 import com.ismartcoding.plain.features.LoadingDialogEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
-import com.ismartcoding.plain.ui.MainActivity
+import com.ismartcoding.plain.ui.base.ToastManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
@@ -25,9 +21,12 @@ object DialogHelper {
         message: String,
         duration: Int = Toast.LENGTH_SHORT,
     ) {
-        coMain {
-            Toast.makeText(MainActivity.instance.get()!!, message, duration).show()
-        }
+        val durationMs = if (duration == Toast.LENGTH_SHORT) 2000L else 3500L
+        ToastManager.showInfoToast(message, durationMs)
+    }
+
+    fun showSuccess(resId: Int) {
+        ToastManager.showSuccessToast(getString(resId), 2000L)
     }
 
     fun showMessage(resId: Int) {
@@ -35,19 +34,11 @@ object DialogHelper {
     }
 
     fun showMessage(r: ApiResult) {
-        showMessage(r.errorMessage())
+        ToastManager.showErrorToast(r.errorMessage())
     }
 
     fun showMessage(ex: Throwable) {
-        showMessage(ex.toString())
-    }
-
-    fun <D : Operation.Data> showMessage(response: ApolloResponse<D>) {
-        showMessage(response.errors?.joinToString(", ") { it.message } ?: "")
-    }
-
-    fun <D : Operation.Data> showMessage(result: GraphqlApiResult<D>) {
-        showMessage(result.getErrorMessage())
+        ToastManager.showErrorToast(ex.toString())
     }
 
     fun showLoading(message: String = "") {

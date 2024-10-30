@@ -43,7 +43,7 @@ import com.ismartcoding.plain.ui.components.mediaviewer.rememberViewerState
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import com.ismartcoding.plain.ui.preview.PreviewItem
+import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -89,8 +89,8 @@ fun MediaPreviewer(
     getItem: (Int) -> PreviewItem = { index ->
         MediaPreviewData.items[index]
     },
-    castViewModel: CastViewModel = viewModel(),
-    tagsViewModel: TagsViewModel? = null,
+    castVM: CastViewModel = viewModel(),
+    tagsVM: TagsViewModel? = null,
     tagsMap: Map<String, List<DTagRelation>>? = null,
     tagsState: List<DTag> = emptyList(),
     onRenamed: () -> Unit = {},
@@ -185,9 +185,9 @@ fun MediaPreviewer(
                 getItem(state.pagerState.currentPage)
             }
             if (m.path.isVideoFast()) {
-                VideoPreviewActions(context = context, castViewModel = castViewModel, m = m, state)
+                VideoPreviewActions(context = context, castViewModel = castVM, m = m, state)
             } else {
-                ImagePreviewActions(context = context, castViewModel = castViewModel, m = m, state)
+                ImagePreviewActions(context = context, castViewModel = castVM, m = m, state)
             }
         }
     }
@@ -195,7 +195,7 @@ fun MediaPreviewer(
         val m = getItem(state.pagerState.currentPage)
         ViewMediaBottomSheet(
             m,
-            tagsViewModel, tagsMap, tagsState,
+            tagsVM, tagsMap, tagsState,
             onDismiss = {
                 state.showMediaInfo = false
             },

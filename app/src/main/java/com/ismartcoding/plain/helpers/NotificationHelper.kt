@@ -76,7 +76,7 @@ object NotificationHelper {
 
         return NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID).apply {
 //            setLargeIcon(BitmapFactory.decodeResource(context.resources, R.drawable.ic_notification))
-            setSmallIcon(R.drawable.ic_notification)
+            setSmallIcon(R.drawable.notification)
             setContentTitle(title)
             setContentText(description)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

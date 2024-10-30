@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.page.feeds
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -46,14 +47,14 @@ import kotlinx.coroutines.launch
 @Composable
 fun FeedSettingsPage(
     navController: NavHostController,
-    viewModel: FeedSettingsViewModel = viewModel()
+    feedSettingsVM: FeedSettingsViewModel = viewModel()
 ) {
     val context = LocalContext.current
     LaunchedEffect(Unit) {
-        viewModel.loadSettings(context)
+        feedSettingsVM.loadSettings(context)
     }
 
-    if (viewModel.showIntervalDialog.value) {
+    if (feedSettingsVM.showIntervalDialog.value) {
         val options = remember {
             setOf(900, 1800, 3600, 7200, 21600, 43200, 86400).map { FeedAutoRefreshInterval(it) }
         }
@@ -63,26 +64,26 @@ fun FeedSettingsPage(
             options = options.map {
                 RadioDialogOption(
                     text = it.getText(),
-                    selected = it.value == viewModel.autoRefreshInterval.value,
+                    selected = it.value == feedSettingsVM.autoRefreshInterval.intValue,
                 ) {
-                    viewModel.setAutoRefreshInterval(context, it.value)
+                    feedSettingsVM.setAutoRefreshInterval(context, it.value)
                 }
             },
         ) {
-            viewModel.showIntervalDialog.value = false
+            feedSettingsVM.showIntervalDialog.value = false
         }
     }
 
-    if (viewModel.showClearFeedsDialog.value) {
-        ClearFeedsDialog(viewModel)
+    if (feedSettingsVM.showClearFeedsDialog.value) {
+        ClearFeedsDialog(feedSettingsVM)
     }
 
     PScaffold(
         topBar = {
             PTopAppBar(navController = navController, title = stringResource(id = R.string.settings))
         },
-    ) {
-        LazyColumn {
+    ) { paddingValues ->
+        LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
             item {
                 TopSpace()
             }
@@ -90,36 +91,36 @@ fun FeedSettingsPage(
                 PCard {
                     PListItem(
                         modifier = Modifier.clickable {
-                            viewModel.setAutoRefresh(context, !viewModel.autoRefresh.value)
+                            feedSettingsVM.setAutoRefresh(context, !feedSettingsVM.autoRefresh.value)
                         },
                         title = stringResource(id = R.string.auto_refresh_feeds),
                     ) {
                         PSwitch(
-                            activated = viewModel.autoRefresh.value,
+                            activated = feedSettingsVM.autoRefresh.value,
                         ) {
-                            viewModel.setAutoRefresh(context, it)
+                            feedSettingsVM.setAutoRefresh(context, it)
                         }
                     }
 
-                    if (viewModel.autoRefresh.value) {
+                    if (feedSettingsVM.autoRefresh.value) {
                         PListItem(
                             modifier = Modifier.clickable {
-                                viewModel.showIntervalDialog.value = true
+                                feedSettingsVM.showIntervalDialog.value = true
                             },
                             title = stringResource(id = R.string.auto_refresh_interval),
-                            value = FormatHelper.formatSeconds(viewModel.autoRefreshInterval.value),
+                            value = FormatHelper.formatSeconds(feedSettingsVM.autoRefreshInterval.intValue),
                             showMore = true,
                         )
                         PListItem(
                             modifier = Modifier.clickable {
-                                viewModel.setAutoRefreshOnlyWifi(context, !viewModel.autoRefreshOnlyWifi.value)
+                                feedSettingsVM.setAutoRefreshOnlyWifi(context, !feedSettingsVM.autoRefreshOnlyWifi.value)
                             },
                             title = stringResource(id = R.string.auto_refresh_only_over_wifi),
                         ) {
                             PSwitch(
-                                activated = viewModel.autoRefreshOnlyWifi.value,
+                                activated = feedSettingsVM.autoRefreshOnlyWifi.value,
                             ) {
-                                viewModel.setAutoRefreshOnlyWifi(context, it)
+                                feedSettingsVM.setAutoRefreshOnlyWifi(context, it)
                             }
                         }
                     }
@@ -128,7 +129,7 @@ fun FeedSettingsPage(
             item {
                 VerticalSpace(dp = 48.dp)
                 PBlockButton(text = stringResource(id = R.string.clear_feed_items), type = ButtonType.DANGER, onClick = {
-                    viewModel.showClearFeedsDialog.value = true
+                    feedSettingsVM.showClearFeedsDialog.value = true
                 })
             }
             item {
@@ -141,12 +142,13 @@ fun FeedSettingsPage(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ClearFeedsDialog(
-    viewModel: FeedSettingsViewModel,
+    feedSettingsVM: FeedSettingsViewModel,
 ) {
     val scope = rememberCoroutineScope()
     AlertDialog(
+        containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = {
-            viewModel.showClearFeedsDialog.value = false
+            feedSettingsVM.showClearFeedsDialog.value = false
         },
         confirmButton = {
             Button(
@@ -154,14 +156,14 @@ fun ClearFeedsDialog(
                     scope.launch {
                         DialogHelper.showLoading()
                         withIO {
-                            if (viewModel.clearFeedItemsTs.value == 0L) {
-                                viewModel.clearAllAsync()
+                            if (feedSettingsVM.clearFeedItemsTs.longValue == 0L) {
+                                feedSettingsVM.clearAllAsync()
                             } else {
-                                viewModel.clearByTimeAsync(viewModel.clearFeedItemsTs.value)
+                                feedSettingsVM.clearByTimeAsync(feedSettingsVM.clearFeedItemsTs.longValue)
                             }
                         }
                         DialogHelper.hideLoading()
-                        viewModel.showClearFeedsDialog.value = false
+                        feedSettingsVM.showClearFeedsDialog.value = false
                         DialogHelper.showMessage(R.string.feed_items_cleared)
                     }
                 }
@@ -171,7 +173,7 @@ fun ClearFeedsDialog(
         },
         dismissButton = {
             TextButton(onClick = {
-                viewModel.showClearFeedsDialog.value = false
+                feedSettingsVM.showClearFeedsDialog.value = false
             }) {
                 Text(stringResource(id = R.string.cancel))
             }
@@ -184,14 +186,14 @@ fun ClearFeedsDialog(
         },
         text = {
             Column {
-                PDialogRadioRow(selected = viewModel.clearFeedItemsTs.value == 0L, onClick = {
-                    viewModel.clearFeedItemsTs.value = 0
+                PDialogRadioRow(selected = feedSettingsVM.clearFeedItemsTs.longValue == 0L, onClick = {
+                    feedSettingsVM.clearFeedItemsTs.longValue = 0
                 }, text = stringResource(id = R.string.all))
-                PDialogRadioRow(selected = viewModel.clearFeedItemsTs.value == Constants.ONE_DAY * 7, onClick = {
-                    viewModel.clearFeedItemsTs.value = Constants.ONE_DAY * 7
+                PDialogRadioRow(selected = feedSettingsVM.clearFeedItemsTs.longValue == Constants.ONE_DAY * 7, onClick = {
+                    feedSettingsVM.clearFeedItemsTs.longValue = Constants.ONE_DAY * 7
                 }, text = stringResource(id = R.string.older_than_7days_feed_items))
-                PDialogRadioRow(selected = viewModel.clearFeedItemsTs.value == Constants.ONE_DAY * 30, onClick = {
-                    viewModel.clearFeedItemsTs.value = Constants.ONE_DAY * 30
+                PDialogRadioRow(selected = feedSettingsVM.clearFeedItemsTs.longValue == Constants.ONE_DAY * 30, onClick = {
+                    feedSettingsVM.clearFeedItemsTs.value = Constants.ONE_DAY * 30
                 }, text = stringResource(id = R.string.older_than_30days_feed_items))
             }
         })

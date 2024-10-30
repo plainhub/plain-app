@@ -11,42 +11,43 @@ import androidx.compose.ui.graphics.Color
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.preference.LocalAmoledDarkTheme
 import com.ismartcoding.plain.preference.LocalDarkTheme
+import com.ismartcoding.plain.ui.theme.PlainColors
 
 @Composable
 fun dynamicLightColorScheme(): ColorScheme {
     val palettes = LocalTonalPalettes.current
     return lightColorScheme(
-        primary = palettes primary 40,
-        onPrimary = palettes primary 100,
-        primaryContainer = palettes primary 90,
-        onPrimaryContainer = palettes primary 10,
+        primary = PlainColors.Light.blue,
+        onPrimary = Color(0xFFFFFFFF),
+        primaryContainer = Color(0xFFD2E4FF),
+        onPrimaryContainer = Color(0xFF001E3C),
         inversePrimary = palettes primary 80,
-        secondary = palettes secondary 40,
-        onSecondary = palettes secondary 100,
-        secondaryContainer = palettes secondary 90,
-        onSecondaryContainer = palettes secondary 10,
+        secondary = Color(0xFF42A5F5),
+        onSecondary = Color(0xFFFFFFFF),
+        secondaryContainer = Color(0xFFE3F2FD),
+        onSecondaryContainer = Color(0xFF0D47A1),
         tertiary = palettes tertiary 40,
         onTertiary = palettes tertiary 100,
         tertiaryContainer = palettes tertiary 90,
         onTertiaryContainer = palettes tertiary 10,
-        background = palettes primary 98,
-        onBackground = palettes primary 10,
-        surface = palettes neutral 98,
-        onSurface = palettes neutral 10,
-        surfaceVariant = palettes neutralVariant 90,
-        onSurfaceVariant = palettes neutralVariant 30,
-        surfaceTint = palettes primary 40,
-        inverseSurface = palettes neutral 20,
-        inverseOnSurface = palettes neutral 95,
-        outline = palettes neutralVariant 50,
-        outlineVariant = palettes neutralVariant 80,
-        surfaceBright = palettes neutral 98,
-        surfaceDim = palettes neutral 87,
-        surfaceContainerLowest = palettes neutral 100,
-        surfaceContainerLow = palettes neutral 96,
-        surfaceContainer = palettes neutral 94,
-        surfaceContainerHigh = palettes neutral 92,
-        surfaceContainerHighest = palettes neutral 90,
+        background = Color(0xFFFFFFFF),
+        onBackground = Color(0xFF202124),
+        surface = Color(0xFFFFFFFF),
+        onSurface = Color(0xFF202124),
+        surfaceVariant = Color(0xFFFFFFFF),
+        onSurfaceVariant = Color(0xFF5F6368),
+        surfaceTint = Color(0xFF2196F3).copy(alpha = 0.1f),
+        inverseSurface = Color(0xFF202124),
+        inverseOnSurface = Color(0xFFF8F9FA),
+        outline = Color(0xFFDADCE0),
+        outlineVariant = Color(0xFFEEEEEE),
+        surfaceBright = Color(0xFFFFFFFF),
+        surfaceDim = Color(0xFFF1F3F4),
+        surfaceContainerLowest = Color(0xFFEFF6FF),
+        surfaceContainerLow = Color(0xFFECF2FF),
+        surfaceContainer = Color(0xFFE3EFFF),
+        surfaceContainerHigh = Color(0xFFDCECFF),
+        surfaceContainerHighest = Color(0xFFD1E8FF),
     )
 }
 
@@ -54,44 +55,48 @@ fun dynamicLightColorScheme(): ColorScheme {
 fun dynamicDarkColorScheme(): ColorScheme {
     val palettes = LocalTonalPalettes.current
     val amoledDarkTheme = LocalAmoledDarkTheme.current
+    
+    // Use true black (#000000) for background and surfaces when amoledDarkTheme is enabled
+    val backgroundColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF121212)
+    val surfaceColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF121212)
+    val surfaceVariantColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF202124)
+    val surfaceDimColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF101010)
+    val surfaceContainerLowestColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF0A0A0A)
+    val surfaceContainerLowColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF121212)
 
     return darkColorScheme(
-        primary = palettes primary 80,
-        onPrimary = palettes primary 20,
-        primaryContainer = palettes primary 30,
-        onPrimaryContainer = palettes primary 90,
+        primary = PlainColors.Dark.blue,
+        onPrimary = Color(0xFFE8EAED),
+        primaryContainer = Color(0xFF004D8F),
+        onPrimaryContainer = Color(0xFFD6E3FF),
         inversePrimary = palettes primary 40,
-        secondary = palettes secondary 80,
-        onSecondary = palettes secondary 20,
-        secondaryContainer = palettes secondary 30,
-        onSecondaryContainer = palettes secondary 90,
+        secondary = Color(0xFF82B1FF),
+        onSecondary = Color(0xFF002171),
+        secondaryContainer = Color(0xFF1A237E),
+        onSecondaryContainer = Color(0xFFE6EEFF),
         tertiary = palettes tertiary 80,
         onTertiary = palettes tertiary 20,
         tertiaryContainer = palettes tertiary 30,
         onTertiaryContainer = palettes tertiary 90,
-        background = palettes neutral if (amoledDarkTheme) 0 else 10,
-        onBackground = palettes neutral 90,
-        surface = palettes neutral 10,
-        onSurface = palettes neutral 90,
-        surfaceVariant = palettes neutralVariant 30,
-        onSurfaceVariant = palettes neutralVariant 80,
-        surfaceTint = palettes primary 80,
-        inverseSurface = palettes neutral 90,
-        inverseOnSurface = palettes neutral 20,
-        outline = palettes neutralVariant 60,
-        outlineVariant = palettes neutralVariant 30,
-        surfaceBright = palettes neutral 24,
-        surfaceDim = palettes neutral 6,
-        surfaceContainerLowest = palettes neutral 4,
-        surfaceContainerLow = palettes neutral 10,
-        surfaceContainer = palettes neutral 12,
-        surfaceContainerHigh = palettes neutral 17,
-        surfaceContainerHighest = palettes neutral 22,
+        background = backgroundColor,
+        onBackground = Color(0xFFE8EAED),
+        surface = surfaceColor,
+        onSurface = Color(0xFFE8EAED),
+        surfaceVariant = surfaceVariantColor,
+        onSurfaceVariant = Color(0xFFBDC1C6),
+        surfaceTint = Color(0xFF64B5F6).copy(alpha = 0.2f),
+        inverseSurface = Color(0xFFF8F9FA),
+        inverseOnSurface = Color(0xFF202124),
+        outline = Color(0xFF5F6368),
+        outlineVariant = Color(0xFF3C4043),
+        surfaceBright = Color(0xFF3C4043),
+        surfaceDim = surfaceDimColor,
+        surfaceContainerLowest = surfaceContainerLowestColor,
+        surfaceContainerLow = surfaceContainerLowColor,
+        surfaceContainerHigh = Color(0xFF202124),
+        surfaceContainerHighest = Color(0xFF292A2D),
     )
 }
-
-@Composable
-infix fun Color.onLight(lightColor: Color): Color = if (!DarkTheme.isDarkTheme(LocalDarkTheme.current)) lightColor else this
 
 @Composable
 infix fun Color.onDark(darkColor: Color): Color = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) darkColor else this
@@ -102,46 +107,6 @@ infix fun Color.onDark(darkColor: Color): Color = if (DarkTheme.isDarkTheme(Loca
 infix fun Color.alwaysLight(isAlways: Boolean): Color {
     val colorScheme = MaterialTheme.colorScheme
     return if (isAlways && DarkTheme.isDarkTheme(LocalDarkTheme.current)) {
-        when (this) {
-            colorScheme.primary -> colorScheme.onPrimary
-            colorScheme.secondary -> colorScheme.onSecondary
-            colorScheme.tertiary -> colorScheme.onTertiary
-            colorScheme.background -> colorScheme.onBackground
-            colorScheme.error -> colorScheme.onError
-            colorScheme.surface -> colorScheme.onSurface
-            colorScheme.surfaceVariant -> colorScheme.onSurfaceVariant
-            colorScheme.primaryContainer -> colorScheme.onPrimaryContainer
-            colorScheme.secondaryContainer -> colorScheme.onSecondaryContainer
-            colorScheme.tertiaryContainer -> colorScheme.onTertiaryContainer
-            colorScheme.errorContainer -> colorScheme.onErrorContainer
-            colorScheme.inverseSurface -> colorScheme.inverseOnSurface
-
-            colorScheme.onPrimary -> colorScheme.primary
-            colorScheme.onSecondary -> colorScheme.secondary
-            colorScheme.onTertiary -> colorScheme.tertiary
-            colorScheme.onBackground -> colorScheme.background
-            colorScheme.onError -> colorScheme.error
-            colorScheme.onSurface -> colorScheme.surface
-            colorScheme.onSurfaceVariant -> colorScheme.surfaceVariant
-            colorScheme.onPrimaryContainer -> colorScheme.primaryContainer
-            colorScheme.onSecondaryContainer -> colorScheme.secondaryContainer
-            colorScheme.onTertiaryContainer -> colorScheme.tertiaryContainer
-            colorScheme.onErrorContainer -> colorScheme.errorContainer
-            colorScheme.inverseOnSurface -> colorScheme.inverseSurface
-
-            else -> Color.Unspecified
-        }
-    } else {
-        this
-    }
-}
-
-@Stable
-@Composable
-@ReadOnlyComposable
-infix fun Color.alwaysDark(isAlways: Boolean): Color {
-    val colorScheme = MaterialTheme.colorScheme
-    return if (isAlways && !DarkTheme.isDarkTheme(LocalDarkTheme.current)) {
         when (this) {
             colorScheme.primary -> colorScheme.onPrimary
             colorScheme.secondary -> colorScheme.onSecondary

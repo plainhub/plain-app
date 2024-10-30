@@ -1,10 +1,7 @@
 package com.ismartcoding.plain.data
 
-import android.os.Parcelable
 import androidx.compose.ui.unit.IntSize
 import kotlinx.datetime.Instant
-import kotlinx.parcelize.Parcelize
-import java.io.Serializable
 
 @kotlinx.serialization.Serializable
 data class DVideo(
@@ -19,7 +16,7 @@ data class DVideo(
     val bucketId: String,
     val createdAt: Instant,
     val updatedAt: Instant,
-) : IData, IMedia {
+) : IMedia, IData {
 
     fun getRotatedSize(): IntSize {
         if (rotation == 90 || rotation == 270) {

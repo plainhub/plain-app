@@ -24,7 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -38,7 +38,7 @@ fun PBanner(
     title: String,
     desc: String? = null,
     backgroundColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    icon: ImageVector? = null,
+    icon: Int? = null,
     action: (@Composable () -> Unit)? = null,
     onClick: () -> Unit = {},
 ) {
@@ -63,7 +63,7 @@ fun PBanner(
             icon?.let { icon ->
                 Crossfade(targetState = icon, label = "") {
                     Icon(
-                        imageVector = it,
+                        painter = painterResource(it),
                         contentDescription = null,
                         modifier = Modifier.padding(end = 16.dp),
                         tint = MaterialTheme.colorScheme.onSurface alwaysLight true,

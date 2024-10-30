@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 fun PullToRefresh(
     refreshLayoutState: RefreshLayoutState,
     modifier: Modifier = Modifier,
+    userEnable: Boolean = true,
     refreshContent: @Composable RefreshLayoutState.() -> Unit = remember {
         { PullToRefreshContent() }
     },
@@ -17,6 +18,7 @@ fun PullToRefresh(
         refreshContent = refreshContent,
         refreshLayoutState = refreshLayoutState,
         modifier = modifier,
+        userEnable = userEnable,
         content = content,
     )
 }

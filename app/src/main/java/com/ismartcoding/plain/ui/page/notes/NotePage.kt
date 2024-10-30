@@ -17,11 +17,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Redo
-import androidx.compose.material.icons.automirrored.outlined.Undo
-import androidx.compose.material.icons.automirrored.outlined.WrapText
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -45,7 +40,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
@@ -56,7 +50,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.DataType
@@ -95,10 +88,10 @@ fun NotePage(
     navController: NavHostController,
     initId: String,
     tagId: String,
-    viewModel: NoteViewModel = viewModel(),
-    notesViewModel: NotesViewModel = viewModel(),
-    tagsViewModel: TagsViewModel = viewModel(),
-    mdEditorViewModel: MdEditorViewModel = viewModel()
+    notesVM: NotesViewModel,
+    tagsVM: TagsViewModel,
+    noteVM: NoteViewModel = viewModel(),
+    mdEditorVM: MdEditorViewModel = viewModel()
 ) {
     val scope = rememberCoroutineScope()
     val view = LocalView.current
@@ -112,35 +105,35 @@ fun NotePage(
         mutableStateOf(initId)
     }
     val previewerState = rememberPreviewerState()
-    val tagsState by tagsViewModel.itemsFlow.collectAsState()
-    val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
+    val tagsState by tagsVM.itemsFlow.collectAsState()
+    val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
     val mdListState = rememberLazyListState()
     val editorScrollState = rememberScrollState()
     var shouldRequestFocus by remember {
         mutableStateOf(true)
     }
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { !viewModel.editMode })
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = { !noteVM.editMode })
 
     val tagIds = tagsMapState[id]?.map { it.tagId } ?: emptyList()
     LaunchedEffect(Unit) {
-        tagsViewModel.dataType.value = DataType.NOTE
-        viewModel.editMode = id.isEmpty()
-        mdEditorViewModel.load(context)
+        tagsVM.dataType.value = DataType.NOTE
+        noteVM.editMode = id.isEmpty()
+        mdEditorVM.load(context)
         scope.launch(Dispatchers.IO) {
             if (id.isNotEmpty()) {
                 val item = NoteHelper.getById(id)
-                viewModel.item.value = item
-                viewModel.content = item?.content ?: ""
-                mdEditorViewModel.textFieldState.edit {
-                    append(viewModel.content)
+                noteVM.item.value = item
+                noteVM.content = item?.content ?: ""
+                mdEditorVM.textFieldState.edit {
+                    append(noteVM.content)
                     setSelection(0)
                 }
             }
-            snapshotFlow { mdEditorViewModel.textFieldState.text } .debounce(200)
+            snapshotFlow { mdEditorVM.textFieldState.text }.debounce(200)
                 .collectLatest { t ->
                     val isNew = id.isEmpty()
                     val text = t.toString()
-                    if (viewModel.content == text) {
+                    if (noteVM.content == text) {
                         return@collectLatest
                     }
                     scope.launch(Dispatchers.IO) {
@@ -148,7 +141,7 @@ fun NotePage(
                             NoteHelper.addOrUpdateAsync(id) {
                                 title = text.cut(250).replace("\n", "")
                                 content = text
-                                viewModel.content = text
+                                noteVM.content = text
                             }
                         id = newItem.id
                         if (isNew) {
@@ -156,9 +149,9 @@ fun NotePage(
                                 // create note from tag items page.
                                 TagHelper.addTagRelations(arrayListOf(TagRelationStub(id).toTagRelation(tagId, DataType.NOTE)))
                             }
-                            tagsViewModel.loadAsync(setOf(id))
+                            tagsVM.loadAsync(setOf(id))
                         }
-                        notesViewModel.updateItem(newItem)
+                        notesVM.updateItem(newItem)
                     }
                 }
 
@@ -177,8 +170,8 @@ fun NotePage(
         }
     }
 
-    LaunchedEffect(viewModel.editMode) {
-        if (viewModel.editMode) {
+    LaunchedEffect(noteVM.editMode) {
+        if (noteVM.editMode) {
             keyboardController?.show()
             if (shouldRequestFocus) {
                 scope.launch(Dispatchers.IO) {
@@ -196,18 +189,18 @@ fun NotePage(
     }
 
     SideEffect {
-        if (viewModel.editMode) {
+        if (noteVM.editMode) {
             insetsController.hide(WindowInsetsCompat.Type.navigationBars())
         } else {
             insetsController.show(WindowInsetsCompat.Type.navigationBars())
         }
     }
 
-    if (viewModel.showSelectTagsDialog.value) {
-        val m = viewModel.item.value
+    if (noteVM.showSelectTagsDialog.value) {
+        val m = noteVM.item.value
         if (m != null) {
-            SelectTagsDialog(tagsViewModel, tagsState, tagsMapState, data = m) {
-                viewModel.showSelectTagsDialog.value = false
+            SelectTagsDialog(tagsVM, tagsState, tagsMapState, data = m) {
+                noteVM.showSelectTagsDialog.value = false
             }
         }
     }
@@ -218,42 +211,42 @@ fun NotePage(
                 title = "",
                 scrollBehavior = scrollBehavior,
                 actions = {
-                    if (viewModel.editMode) {
+                    if (noteVM.editMode) {
                         PIconButton(
-                            icon = Icons.AutoMirrored.Outlined.Undo,
+                            icon = R.drawable.undo,
                             contentDescription = stringResource(id = R.string.undo),
-                            enabled = mdEditorViewModel.textFieldState.undoState.canUndo,
+                            enabled = mdEditorVM.textFieldState.undoState.canUndo,
                             tint = MaterialTheme.colorScheme.onSurface
                         ) {
-                            mdEditorViewModel.textFieldState.undoState.undo()
+                            mdEditorVM.textFieldState.undoState.undo()
                         }
                         PIconButton(
-                            icon = Icons.AutoMirrored.Outlined.Redo,
+                            icon = R.drawable.redo,
                             contentDescription = stringResource(id = R.string.redo),
-                            enabled = mdEditorViewModel.textFieldState.undoState.canRedo,
+                            enabled = mdEditorVM.textFieldState.undoState.canRedo,
                             tint = MaterialTheme.colorScheme.onSurface
                         ) {
-                            mdEditorViewModel.textFieldState.undoState.redo()
+                            mdEditorVM.textFieldState.undoState.redo()
                         }
 
                         PIconButton(
-                            icon = Icons.AutoMirrored.Outlined.WrapText,
+                            icon = R.drawable.wrap_text,
                             contentDescription = stringResource(R.string.wrap_content),
                             tint = MaterialTheme.colorScheme.onSurface,
                         ) {
-                            mdEditorViewModel.toggleWrapContent(context)
+                            mdEditorVM.toggleWrapContent(context)
                         }
                     } else if (id.isNotEmpty()) {
                         ActionButtonTags {
-                            viewModel.showSelectTagsDialog.value = true
+                            noteVM.showSelectTagsDialog.value = true
                         }
                     }
                     PIconButton(
-                        icon = if (viewModel.editMode) painterResource(id = R.drawable.ic_markdown) else Icons.Outlined.Edit,
-                        contentDescription = stringResource(if (viewModel.editMode) R.string.view else R.string.edit),
+                        icon = if (noteVM.editMode) R.drawable.markdown else R.drawable.square_pen,
+                        contentDescription = stringResource(if (noteVM.editMode) R.string.view else R.string.edit),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
-                        viewModel.editMode = !viewModel.editMode
+                        noteVM.editMode = !noteVM.editMode
                     }
                 },
             )
@@ -262,23 +255,24 @@ fun NotePage(
             .imePadding(),
         bottomBar = {
             AnimatedVisibility(
-                visible = viewModel.editMode,
+                visible = noteVM.editMode,
                 enter = slideInVertically { it },
                 exit = slideOutVertically { it }) {
-                MdEditorBottomAppBar(mdEditorViewModel)
+                MdEditorBottomAppBar(mdEditorVM)
             }
         },
         content = { paddingValues ->
-            if (viewModel.editMode) {
+            if (noteVM.editMode) {
                 MdEditor(
-                    modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding()),
-                    viewModel = mdEditorViewModel,
+                    modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding(), top = paddingValues.calculateTopPadding()),
+                    mdEditorVM = mdEditorVM,
                     scrollState = editorScrollState,
                     focusRequester = focusRequester
                 )
             } else {
                 LazyColumn(
                     modifier = Modifier
+                        .padding(top = paddingValues.calculateTopPadding())
                         .nestedScroll(scrollBehavior.nestedScrollConnection),
                     state = mdListState
                 ) {
@@ -307,7 +301,7 @@ fun NotePage(
                     }
                     item {
                         MarkdownText(
-                            text = viewModel.content,
+                            text = noteVM.content,
                             modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
                             previewerState = previewerState,
                         )

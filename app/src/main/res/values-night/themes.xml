@@ -1,6 +1,0 @@
-<resources>
-    <style name="Theme.Plain" parent="Theme.PlainBase">
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-    </style>
-</resources>

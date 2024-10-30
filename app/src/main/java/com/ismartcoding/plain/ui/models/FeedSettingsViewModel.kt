@@ -30,7 +30,7 @@ class FeedSettingsViewModel : ViewModel() {
     fun loadSettings(context: Context) {
         viewModelScope.launch {
             autoRefresh.value = FeedAutoRefreshPreference.getAsync(context)
-            autoRefreshInterval.value = FeedAutoRefreshIntervalPreference.getAsync(context)
+            autoRefreshInterval.intValue = FeedAutoRefreshIntervalPreference.getAsync(context)
             autoRefreshOnlyWifi.value = FeedAutoRefreshOnlyWifiPreference.getAsync(context)
         }
     }

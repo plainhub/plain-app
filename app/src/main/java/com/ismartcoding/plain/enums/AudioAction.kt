@@ -8,5 +8,4 @@ enum class AudioAction {
 
 enum class AudioServiceAction {
     QUIT,
-    PENDING_QUIT,
 }

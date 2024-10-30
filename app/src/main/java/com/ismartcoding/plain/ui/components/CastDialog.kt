@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.features.StartHttpServerEvent
 import com.ismartcoding.plain.preference.WebPreference
 import com.ismartcoding.plain.ui.base.PDialogListItem
@@ -37,17 +36,17 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun CastDialog(viewModel: CastViewModel) {
-    if (!viewModel.showCastDialog.value) {
+fun CastDialog(castVM: CastViewModel) {
+    if (!castVM.showCastDialog.value) {
         return
     }
-    val itemsState by viewModel.itemsFlow.collectAsState()
+    val itemsState by castVM.itemsFlow.collectAsState()
     var loadingTextId by remember {
         mutableIntStateOf(R.string.searching_devices)
     }
     val scope = rememberCoroutineScope()
     val onDismiss = {
-        viewModel.showCastDialog.value = false
+        castVM.showCastDialog.value = false
     }
     val context = LocalContext.current
     var job by remember { mutableStateOf<Job?>(null) }
@@ -57,7 +56,7 @@ fun CastDialog(viewModel: CastViewModel) {
                 job?.cancel()
                 if (itemsState.isEmpty()) {
                     job = coIO {
-                        viewModel.searchAsync(context)
+                        castVM.searchAsync(context)
                     }
                 }
                 delay(5000)
@@ -75,6 +74,7 @@ fun CastDialog(viewModel: CastViewModel) {
     }
 
     AlertDialog(
+        containerColor = MaterialTheme.colorScheme.surface,
         modifier = Modifier.fillMaxWidth(),
         onDismissRequest = onDismiss,
         title = {
@@ -88,8 +88,8 @@ fun CastDialog(viewModel: CastViewModel) {
                 LazyColumn(modifier = Modifier.defaultMinSize(minHeight = 100.dp)) {
                     items(itemsState) { m ->
                         PDialogListItem(modifier = Modifier.clickable {
-                            viewModel.selectDevice(m)
-                            viewModel.enterCastMode()
+                            castVM.selectDevice(m)
+                            castVM.enterCastMode()
                             scope.launch(Dispatchers.IO) {
                                 val webEnabled = WebPreference.getAsync(context)
                                 if (!webEnabled) {

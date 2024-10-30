@@ -15,6 +15,7 @@ buildscript {
 
 plugins {
     alias(libs.plugins.devtools.ksp) apply false
+    alias(libs.plugins.compose.compiler) apply false
 }
 
 allprojects {

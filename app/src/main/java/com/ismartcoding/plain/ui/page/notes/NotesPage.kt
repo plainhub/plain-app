@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.page.notes
 
-import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -9,6 +8,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,15 +18,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,35 +31,28 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.helpers.CoroutinesHelper
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
+import com.ismartcoding.plain.ui.base.ActionButtonTags
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PDraggableElement
-import com.ismartcoding.plain.ui.base.PDropdownMenuItemSelect
-import com.ismartcoding.plain.ui.base.PDropdownMenuItemTags
 import com.ismartcoding.plain.ui.base.PFilterChip
-import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PScrollableTabRow
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.PTopRightButton
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
@@ -70,13 +60,12 @@ import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
-import com.ismartcoding.plain.ui.base.tabs.PScrollableTabRow
 import com.ismartcoding.plain.ui.components.ListSearchBar
 import com.ismartcoding.plain.ui.components.NoteListItem
-import com.ismartcoding.plain.ui.nav.navigateTags
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.models.VTabData
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSearchMode
 import com.ismartcoding.plain.ui.models.exitSelectMode
@@ -84,8 +73,8 @@ import com.ismartcoding.plain.ui.models.isAllSelected
 import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
-import com.ismartcoding.plain.ui.models.toggleSelectMode
-import com.ismartcoding.plain.ui.nav.RouteName
+import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -93,57 +82,49 @@ import kotlinx.coroutines.launch
 @Composable
 fun NotesPage(
     navController: NavHostController,
-    viewModel: NotesViewModel = viewModel(),
-    tagsViewModel: TagsViewModel = viewModel(),
+    notesVM: NotesViewModel,
+    tagsVM: TagsViewModel,
 ) {
-    val view = LocalView.current
-    val window = (view.context as Activity).window
-    val itemsState by viewModel.itemsFlow.collectAsState()
-    val tagsState by tagsViewModel.itemsFlow.collectAsState()
-    val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
+    val itemsState by notesVM.itemsFlow.collectAsState()
+    val tagsState by tagsVM.itemsFlow.collectAsState()
+    val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
     val scope = rememberCoroutineScope()
     val scrollStateMap = remember {
         mutableStateMapOf<Int, LazyListState>()
     }
-    val pagerState = rememberPagerState(pageCount = { viewModel.tabs.value.size })
+    val pagerState = rememberPagerState(pageCount = { tagsState.size + 2 })
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
-        (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0 && !viewModel.selectMode.value
+        (scrollStateMap[pagerState.currentPage]?.firstVisibleItemIndex ?: 0) > 0 && !notesVM.selectMode.value
     })
     var isFirstTime by remember { mutableStateOf(true) }
+    val tabs = remember(tagsState, notesVM.total.intValue, notesVM.totalTrash.intValue) {
+        listOf(
+            VTabData(LocaleHelper.getString(R.string.all), "all", notesVM.total.intValue),
+            VTabData(LocaleHelper.getString(R.string.trash), "trash", notesVM.totalTrash.intValue),
+            *tagsState.map { VTabData(it.name, it.id, it.count) }.toTypedArray()
+        )
+    }
 
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
             scope.launch {
                 withIO {
-                    viewModel.loadAsync(tagsViewModel)
+                    notesVM.loadAsync(tagsVM)
                 }
                 setRefreshState(RefreshContentState.Finished)
             }
         }
 
-    val once = rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        if (!once.value) {
-            once.value = true
-            tagsViewModel.dataType.value = viewModel.dataType
-            scope.launch(Dispatchers.IO) {
-                viewModel.loadAsync(tagsViewModel)
-            }
-        } else {
-            // refresh tabs in case tag name changed in tags page
-            scope.launch(Dispatchers.IO) {
-                viewModel.refreshTabsAsync(tagsViewModel)
-            }
+        tagsVM.dataType.value = notesVM.dataType
+        scope.launch(Dispatchers.IO) {
+            notesVM.loadAsync(tagsVM)
         }
     }
 
-    val insetsController = WindowCompat.getInsetsController(window, view)
-    LaunchedEffect(viewModel.selectMode.value) {
-        if (viewModel.selectMode.value) {
+    LaunchedEffect(notesVM.selectMode.value) {
+        if (notesVM.selectMode.value) {
             scrollBehavior.reset()
-            insetsController.hide(WindowInsetsCompat.Type.navigationBars())
-        } else {
-            insetsController.show(WindowInsetsCompat.Type.navigationBars())
         }
     }
 
@@ -154,18 +135,18 @@ fun NotesPage(
         }
         when (val index = pagerState.currentPage) {
             0 -> {
-                viewModel.trash.value = false
-                viewModel.tag.value = null
+                notesVM.trash.value = false
+                notesVM.tag.value = null
             }
 
             1 -> {
-                viewModel.trash.value = true
-                viewModel.tag.value = null
+                notesVM.trash.value = true
+                notesVM.tag.value = null
             }
 
             else -> {
-                viewModel.trash.value = false
-                viewModel.tag.value = tagsState.getOrNull(index - 2)
+                notesVM.trash.value = false
+                notesVM.tag.value = tagsState.getOrNull(index - 2)
             }
         }
         scope.launch {
@@ -173,50 +154,50 @@ fun NotesPage(
             scrollStateMap[pagerState.currentPage]?.scrollToItem(0)
         }
         scope.launch(Dispatchers.IO) {
-            viewModel.loadAsync(tagsViewModel)
+            notesVM.loadAsync(tagsVM)
         }
     }
 
-    DisposableEffect(Unit) {
-        onDispose {
-            insetsController.show(WindowInsetsCompat.Type.navigationBars())
-        }
-    }
-
-    val pageTitle = if (viewModel.selectMode.value) {
-        LocaleHelper.getStringF(R.string.x_selected, "count", viewModel.selectedIds.size)
-    } else if (viewModel.tag.value != null) {
-        stringResource(id = R.string.notes) + " - " + viewModel.tag.value!!.name
-    } else if (viewModel.trash.value) {
+    val pageTitle = if (notesVM.selectMode.value) {
+        LocaleHelper.getStringF(R.string.x_selected, "count", notesVM.selectedIds.size)
+    } else if (notesVM.tag.value != null) {
+        stringResource(id = R.string.notes) + " - " + notesVM.tag.value!!.name
+    } else if (notesVM.trash.value) {
         stringResource(id = R.string.notes) + " - " + stringResource(id = R.string.trash)
     } else {
         stringResource(id = R.string.notes)
     }
 
     ViewNoteBottomSheet(
-        viewModel,
-        tagsViewModel,
+        notesVM,
+        tagsVM,
         tagsMapState,
         tagsState,
     )
 
+    if (notesVM.showTagsDialog.value) {
+        TagsBottomSheet(tagsVM) {
+            notesVM.showTagsDialog.value = false
+        }
+    }
+
     val onSearch: (String) -> Unit = {
-        viewModel.searchActive.value = false
-        viewModel.showLoading.value = true
+        notesVM.searchActive.value = false
+        notesVM.showLoading.value = true
         scope.launch {
             scrollStateMap[pagerState.currentPage]?.scrollToItem(0)
         }
         scope.launch(Dispatchers.IO) {
-            viewModel.loadAsync(tagsViewModel)
+            notesVM.loadAsync(tagsVM)
         }
     }
 
-    BackHandler(enabled = viewModel.selectMode.value || viewModel.showSearchBar.value) {
-        if (viewModel.selectMode.value) {
-            viewModel.exitSelectMode()
-        } else if (viewModel.showSearchBar.value) {
-            if (!viewModel.searchActive.value || viewModel.queryText.value.isEmpty()) {
-                viewModel.exitSearchMode()
+    BackHandler(enabled = notesVM.selectMode.value || notesVM.showSearchBar.value) {
+        if (notesVM.selectMode.value) {
+            notesVM.exitSelectMode()
+        } else if (notesVM.showSearchBar.value) {
+            if (!notesVM.searchActive.value || notesVM.queryText.value.isEmpty()) {
+                notesVM.exitSearchMode()
                 onSearch("")
             }
         }
@@ -224,9 +205,9 @@ fun NotesPage(
 
     PScaffold(
         topBar = {
-            if (viewModel.showSearchBar.value) {
+            if (notesVM.showSearchBar.value) {
                 ListSearchBar(
-                    viewModel = viewModel,
+                    viewModel = notesVM,
                     onSearch = onSearch
                 )
                 return@PScaffold
@@ -239,9 +220,9 @@ fun NotesPage(
                 }),
                 navController = navController,
                 navigationIcon = {
-                    if (viewModel.selectMode.value) {
+                    if (notesVM.selectMode.value) {
                         NavigationCloseIcon {
-                            viewModel.exitSelectMode()
+                            notesVM.exitSelectMode()
                         }
                     } else {
                         NavigationBackIcon {
@@ -252,27 +233,20 @@ fun NotesPage(
                 title = pageTitle,
                 scrollBehavior = scrollBehavior,
                 actions = {
-                    if (viewModel.selectMode.value) {
-                        PMiniOutlineButton(
-                            text = stringResource(if (viewModel.isAllSelected()) R.string.unselect_all else R.string.select_all),
-                            onClick = {
-                                viewModel.toggleSelectAll()
+                    if (notesVM.selectMode.value) {
+                        PTopRightButton(
+                            label = stringResource(if (notesVM.isAllSelected()) R.string.unselect_all else R.string.select_all),
+                            click = {
+                                notesVM.toggleSelectAll()
                             },
                         )
                         HorizontalSpace(dp = 8.dp)
                     } else {
                         ActionButtonSearch {
-                            viewModel.enterSearchMode()
+                            notesVM.enterSearchMode()
                         }
-                        ActionButtonMoreWithMenu { dismiss ->
-                            PDropdownMenuItemSelect(onClick = {
-                                dismiss()
-                                viewModel.toggleSelectMode()
-                            })
-                            PDropdownMenuItemTags(onClick = {
-                                dismiss()
-                                navController.navigateTags(viewModel.dataType)
-                            })
+                        ActionButtonTags {
+                            notesVM.showTagsDialog.value = true
                         }
                     }
                 },
@@ -280,22 +254,22 @@ fun NotesPage(
         },
         bottomBar = {
             AnimatedVisibility(
-                visible = viewModel.showBottomActions(),
+                visible = notesVM.showBottomActions(),
                 enter = slideInVertically { it },
                 exit = slideOutVertically { it }) {
-                SelectModeBottomActions(viewModel, tagsViewModel, tagsState)
+                NotesSelectModeBottomActions(notesVM, tagsVM, tagsState)
             }
         },
-        floatingActionButton = if (viewModel.selectMode.value) null else {
+        floatingActionButton = if (notesVM.selectMode.value) null else {
             {
                 PDraggableElement {
                     FloatingActionButton(
                         onClick = {
-                            navController.navigate("${RouteName.NOTES.name}/create?tagId=${viewModel.tag.value?.id ?: ""}")
+                            navController.navigate(Routing.NotesCreate(notesVM.tag.value?.id ?: ""))
                         },
                     ) {
                         Icon(
-                            Icons.Outlined.Add,
+                            painter = painterResource(R.drawable.plus),
                             stringResource(R.string.add),
                         )
                     }
@@ -303,109 +277,112 @@ fun NotesPage(
             }
         },
     ) { paddingValues ->
-        if (!viewModel.selectMode.value) {
-            PScrollableTabRow(
-                selectedTabIndex = pagerState.currentPage,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                viewModel.tabs.value.forEachIndexed { index, s ->
-                    PFilterChip(
-                        modifier = Modifier.padding(start = if (index == 0) 0.dp else 8.dp),
-                        selected = pagerState.currentPage == index,
-                        onClick = {
-                            scope.launch {
-                                pagerState.scrollToPage(index)
+        Column(Modifier.padding(top = paddingValues.calculateTopPadding())) {
+
+            if (!notesVM.selectMode.value) {
+                PScrollableTabRow(
+                    selectedTabIndex = pagerState.currentPage,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    tabs.forEachIndexed { index, s ->
+                        PFilterChip(
+                            modifier = Modifier.padding(start = if (index == 0) 0.dp else 8.dp),
+                            selected = pagerState.currentPage == index,
+                            onClick = {
+                                scope.launch {
+                                    pagerState.scrollToPage(index)
+                                }
+                            },
+                            label = {
+                                if (index < 2) {
+                                    Text(text = s.title + " (" + s.count + ")")
+                                } else {
+                                    Text(if (notesVM.queryText.value.isNotEmpty()) s.title else "${s.title} (${s.count})")
+                                }
                             }
-                        },
-                        label = {
-                            if (index < 2) {
-                                Text(text = s.title + " (" + s.count + ")")
-                            } else {
-                                Text(if (viewModel.queryText.value.isNotEmpty()) s.title else "${s.title} (${s.count})")
-                            }
-                        }
-                    )
+                        )
+                    }
                 }
             }
-        }
 
-        HorizontalPager(state = pagerState) { index ->
-            PullToRefresh(
-                refreshLayoutState = topRefreshLayoutState,
-            ) {
-                AnimatedVisibility(
-                    visible = true,
-                    enter = fadeIn(),
-                    exit = fadeOut()
+            HorizontalPager(state = pagerState) { index ->
+                PullToRefresh(
+                    refreshLayoutState = topRefreshLayoutState,
                 ) {
-                    if (itemsState.isNotEmpty()) {
-                        val scrollState = rememberLazyListState()
-                        scrollStateMap[index] = scrollState
-                        LazyColumnScrollbar(
-                            state = scrollState,
-                        ) {
-                            LazyColumn(
-                                Modifier
-                                    .fillMaxSize()
-                                    .nestedScroll(scrollBehavior.nestedScrollConnection),
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        if (itemsState.isNotEmpty()) {
+                            val scrollState = rememberLazyListState()
+                            scrollStateMap[index] = scrollState
+                            LazyColumnScrollbar(
                                 state = scrollState,
                             ) {
-                                item {
-                                    TopSpace()
-                                }
-                                items(itemsState, key = {
-                                    it.id
-                                }) { m ->
-                                    val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
-                                    NoteListItem(
-                                        viewModel,
-                                        m,
-                                        tagsState.filter { tagIds.contains(it.id) },
-                                        onClick = {
-                                            if (viewModel.selectMode.value) {
-                                                viewModel.select(m.id)
-                                            } else {
-                                                navController.navigate("${RouteName.NOTES.name}/${m.id}")
+                                LazyColumn(
+                                    Modifier
+                                        .fillMaxSize()
+                                        .nestedScroll(scrollBehavior.nestedScrollConnection),
+                                    state = scrollState,
+                                ) {
+                                    item {
+                                        TopSpace()
+                                    }
+                                    items(itemsState, key = {
+                                        it.id
+                                    }) { m ->
+                                        val tagIds = tagsMapState[m.id]?.map { it.tagId } ?: emptyList()
+                                        NoteListItem(
+                                            notesVM,
+                                            m,
+                                            tagsState.filter { tagIds.contains(it.id) },
+                                            onClick = {
+                                                if (notesVM.selectMode.value) {
+                                                    notesVM.select(m.id)
+                                                } else {
+                                                    navController.navigate(Routing.NoteDetail(m.id))
+                                                }
+                                            },
+                                            onLongClick = {
+                                                if (notesVM.selectMode.value) {
+                                                    return@NoteListItem
+                                                }
+                                                notesVM.selectedItem.value = m
+                                            },
+                                            onClickTag = { tag ->
+                                                if (notesVM.selectMode.value) {
+                                                    return@NoteListItem
+                                                }
+                                                val idx = tabs.indexOfFirst { it.value == tag.id }
+                                                if (idx != -1) {
+                                                    scope.launch {
+                                                        pagerState.scrollToPage(idx)
+                                                    }
+                                                }
                                             }
-                                        },
-                                        onLongClick = {
-                                            if (viewModel.selectMode.value) {
-                                                return@NoteListItem
-                                            }
-                                            viewModel.selectedItem.value = m
-                                        },
-                                        onClickTag = { tag ->
-                                            if (viewModel.selectMode.value) {
-                                                return@NoteListItem
-                                            }
-                                            val idx = viewModel.tabs.value.indexOfFirst { it.value == tag.id }
-                                            if (idx != -1) {
-                                                scope.launch {
-                                                    pagerState.scrollToPage(idx)
+                                        )
+                                        VerticalSpace(dp = 8.dp)
+                                    }
+                                    item {
+                                        if (itemsState.isNotEmpty() && !notesVM.noMore.value) {
+                                            LaunchedEffect(Unit) {
+                                                scope.launch(Dispatchers.IO) {
+                                                    withIO { notesVM.moreAsync(tagsVM) }
                                                 }
                                             }
                                         }
-                                    )
-                                    VerticalSpace(dp = 8.dp)
-                                }
-                                item {
-                                    if (itemsState.isNotEmpty() && !viewModel.noMore.value) {
-                                        LaunchedEffect(Unit) {
-                                            scope.launch(Dispatchers.IO) {
-                                                withIO { viewModel.moreAsync(tagsViewModel) }
-                                            }
-                                        }
+                                        LoadMoreRefreshContent(notesVM.noMore.value)
                                     }
-                                    LoadMoreRefreshContent(viewModel.noMore.value)
-                                }
-                                item {
-                                    VerticalSpace(dp = paddingValues.calculateBottomPadding())
+                                    item {
+                                        VerticalSpace(dp = paddingValues.calculateBottomPadding())
+                                    }
                                 }
                             }
+                        } else {
+                            NoDataColumn(loading = notesVM.showLoading.value, search = notesVM.showSearchBar.value)
                         }
-                    } else {
-                        NoDataColumn(loading = viewModel.showLoading.value, search = viewModel.showSearchBar.value)
                     }
                 }
             }

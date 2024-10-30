@@ -35,7 +35,6 @@ import coil3.compose.AsyncImage
 import coil3.imageLoader
 import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
-import com.ismartcoding.plain.ui.preview.PreviewItem
 import kotlinx.coroutines.launch
 
 class RawGesture(

@@ -46,6 +46,7 @@ fun ColorPickerDialog(
     val colorPickerController = rememberColorPickerController()
     var customColorValue by remember { mutableStateOf(initValue) }
     AlertDialog(
+        containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = onDismiss,
         confirmButton = {
             Button(

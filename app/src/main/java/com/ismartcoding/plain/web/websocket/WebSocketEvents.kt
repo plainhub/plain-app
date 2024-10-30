@@ -1,9 +1,11 @@
 package com.ismartcoding.plain.web.websocket
 
+import com.ismartcoding.lib.channel.ChannelEvent
+
 class WebSocketEvent(
     val type: EventType,
     val data: Any, // String or ByteArray
-) // Event will be sent to web client
+): ChannelEvent() // Event will be sent to web client
 
 enum class EventType(val value: Int) {
     MESSAGE_CREATED(1),

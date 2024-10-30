@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -14,10 +12,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.ui.theme.red
+import com.ismartcoding.plain.ui.theme.yellow
 
 enum class AlertType {
     WARNING,
@@ -39,9 +40,9 @@ fun PAlert(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = Icons.Rounded.Error,
+                painter = painterResource(R.drawable.circle_alert),
                 contentDescription = "",
-                tint = colorResource(id = if (type == AlertType.WARNING) R.color.yellow else R.color.red),
+                tint = if (type == AlertType.WARNING) MaterialTheme.colorScheme.yellow else MaterialTheme.colorScheme.red,
             )
             HorizontalSpace(dp = 8.dp)
             Text(

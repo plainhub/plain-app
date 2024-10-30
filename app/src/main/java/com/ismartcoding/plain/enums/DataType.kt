@@ -11,12 +11,11 @@ enum class DataType(val value: Int) {
     FEED_ENTRY(7),
     CALL(8),
     BOOK(9),
-    AI_CHAT(10),
     PACKAGE(21),
     FILE(22),
     ; // starts from 21, not used for tag
 
     companion object {
-        fun fromInt(value: Int) = values().first { it.value == value }
+        fun fromInt(value: Int) = entries.first { it.value == value }
     }
 }

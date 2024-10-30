@@ -37,12 +37,12 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
     var noMore = mutableStateOf(false)
     var filterType by savedStateHandle.saveable { mutableStateOf(FeedEntryFilterType.DEFAULT) }
     var total = mutableIntStateOf(0)
-    private var totalToday = mutableIntStateOf(0)
+    var totalToday = mutableIntStateOf(0)
     var tag = mutableStateOf<DTag?>(null)
     var feedId = mutableStateOf<String>("")
     val dataType = DataType.FEED_ENTRY
     var selectedItem = mutableStateOf<DFeedEntry?>(null)
-    var tabs = mutableStateOf(listOf<VTabData>())
+    val showTagsDialog = mutableStateOf(false)
 
     override val showSearchBar = mutableStateOf(false)
     override val searchActive = mutableStateOf(false)
@@ -52,20 +52,22 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
     override val selectedIds = mutableStateListOf<String>()
 
     suspend fun moreAsync(tagsViewModel: TagsViewModel) {
-        offset.value += limit.value
-        val items = FeedEntryHelper.search(getQuery(), limit.value, offset.value)
+        offset.value += limit.intValue
+        val items = FeedEntryHelper.search(getQuery(), limit.intValue, offset.intValue)
         _itemsFlow.value.addAll(items)
         tagsViewModel.loadMoreAsync(items.map { it.id }.toSet())
         showLoading.value = false
-        noMore.value = items.size < limit.value
+        noMore.value = items.size < limit.intValue
     }
 
     suspend fun loadAsync(tagsViewModel: TagsViewModel) {
-        offset.value = 0
+        offset.intValue = 0
         val query = getQuery()
-        _itemsFlow.value = FeedEntryHelper.search(query, limit.value, offset.value).toMutableStateList()
-        refreshTabsAsync(tagsViewModel)
-        noMore.value = _itemsFlow.value.size < limit.value
+        _itemsFlow.value = FeedEntryHelper.search(query, limit.intValue, offset.intValue).toMutableStateList()
+        tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
+        total.intValue = FeedEntryHelper.count(getTotalAllQuery())
+        totalToday.intValue = FeedEntryHelper.count(getTotalTodayQuery())
+        noMore.value = _itemsFlow.value.size < limit.intValue
         showLoading.value = false
     }
 
@@ -73,31 +75,14 @@ class FeedEntriesViewModel(private val savedStateHandle: SavedStateHandle) :
         FeedFetchWorker.oneTimeRequest(feedId.value)
     }
 
-    // for updating tags, delete items
-    suspend fun refreshTabsAsync(tagsViewModel: TagsViewModel) {
-        tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
-        total.value = FeedEntryHelper.count(getTotalAllQuery())
-        totalToday.value = FeedEntryHelper.count(getTotalTodayQuery())
-        tabs.value = listOf(
-            VTabData(LocaleHelper.getString(R.string.all), "all", total.value),
-            VTabData(LocaleHelper.getString(R.string.today), "today", totalToday.value),
-            * tagsViewModel.itemsFlow.value.map { VTabData(it.name, it.id, it.count) }.toTypedArray()
-        )
-    }
-
-    fun delete(tagsViewModel: TagsViewModel, ids: Set<String>) {
+    fun delete(tagsVM: TagsViewModel, ids: Set<String>) {
         viewModelScope.launch(Dispatchers.IO) {
             TagHelper.deleteTagRelationByKeys(
                 ids,
                 dataType,
             )
             FeedEntryHelper.deleteAsync(ids)
-            refreshTabsAsync(tagsViewModel)
-            _itemsFlow.update {
-                val mutableList = it.toMutableStateList()
-                mutableList.removeIf { m -> ids.contains(m.id) }
-                mutableList
-            }
+            loadAsync(tagsVM)
         }
     }
 

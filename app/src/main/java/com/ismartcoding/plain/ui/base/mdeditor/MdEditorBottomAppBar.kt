@@ -10,9 +10,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.LooksOne
-import androidx.compose.material.icons.outlined.LooksTwo
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,28 +35,28 @@ import com.ismartcoding.plain.ui.theme.palette.checkColorHex
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun MdEditorBottomAppBar(
-    viewModel: MdEditorViewModel,
+    mdEditorVM: MdEditorViewModel,
 ) {
     val scrollState = rememberScrollState()
     val scrollState2 = rememberScrollState()
     val context = LocalContext.current
 
-    if (viewModel.showSettings) {
-        MdEditorSettingsDialog(viewModel = viewModel)
+    if (mdEditorVM.showSettings) {
+        MdEditorSettingsDialog(mdEditorVM = mdEditorVM)
     }
-    if (viewModel.showInsertImage) {
-        MdEditorInsertImageDialog(viewModel = viewModel)
+    if (mdEditorVM.showInsertImage) {
+        MdEditorInsertImageDialog(mdEditorVM = mdEditorVM)
     }
-    if (viewModel.showColorPicker) {
+    if (mdEditorVM.showColorPicker) {
         ColorPickerDialog(
             stringResource(id = R.string.pick_color),
             initValue = "FFFFFFFF",
             onDismiss = {
-                viewModel.showColorPicker = false
+                mdEditorVM.showColorPicker = false
             }, onConfirm = {
                 val hex = it.checkColorHex()
                 if (hex != null) {
-                    viewModel.insertColor("#$hex")
+                    mdEditorVM.insertColor("#$hex")
                 } else {
                     DialogHelper.showMessage(LocaleHelper.getString(R.string.invalid_value))
                 }
@@ -72,7 +69,7 @@ fun MdEditorBottomAppBar(
             .background(MaterialTheme.colorScheme.bottomAppBarContainer()),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (viewModel.level == 0) {
+        if (mdEditorVM.level == 0) {
             Row(
                 modifier =
                 Modifier
@@ -81,7 +78,7 @@ fun MdEditorBottomAppBar(
             ) {
                 MdEditorViewModel.mdAccessoryItems.forEach { button ->
                     TextButton(onClick = {
-                        viewModel.textFieldState.edit { inlineWrap(button.before, button.after) }
+                        mdEditorVM.textFieldState.edit { inlineWrap(button.before, button.after) }
                     }) {
                         Text(button.text, style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold, fontSize = 20.sp))
                     }
@@ -99,8 +96,8 @@ fun MdEditorBottomAppBar(
                         icon = button.icon,
                         contentDescription = "",
                         tint = MaterialTheme.colorScheme.primary,
-                        onClick = {
-                            button.click(viewModel)
+                        click = {
+                            button.click(mdEditorVM)
                         },
                     )
                 }
@@ -113,11 +110,11 @@ fun MdEditorBottomAppBar(
             contentAlignment = Alignment.CenterEnd
         ) {
             PIconButton(
-                icon = if (viewModel.level == 0) Icons.Outlined.LooksOne else Icons.Outlined.LooksTwo,
+                icon = if (mdEditorVM.level == 0) R.drawable.looks_one else R.drawable.looks_two,
                 contentDescription = "",
                 tint = MaterialTheme.colorScheme.onPrimary,
-                onClick = {
-                    viewModel.toggleLevel(context)
+                click = {
+                    mdEditorVM.toggleLevel(context)
                 },
             )
         }

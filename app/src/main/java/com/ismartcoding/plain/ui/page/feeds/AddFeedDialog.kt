@@ -1,8 +1,6 @@
 package com.ismartcoding.plain.ui.page.feeds
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.RssFeed
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -12,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -24,16 +23,17 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FeedsViewModel
 
 @Composable
-fun AddFeedDialog(viewModel: FeedsViewModel) {
-    if (viewModel.showAddDialog.value) {
+fun AddFeedDialog(feedsVM: FeedsViewModel) {
+    if (feedsVM.showAddDialog.value) {
         val focusManager = LocalFocusManager.current
         AlertDialog(
+            containerColor = MaterialTheme.colorScheme.surface,
             onDismissRequest = {
-                viewModel.showAddDialog.value = false
+                feedsVM.showAddDialog.value = false
             },
             icon = {
                 Icon(
-                    imageVector = Icons.Outlined.RssFeed,
+                    painter = painterResource(R.drawable.rss),
                     contentDescription = stringResource(id = R.string.subscriptions),
                 )
             },
@@ -43,29 +43,29 @@ fun AddFeedDialog(viewModel: FeedsViewModel) {
                 )
             },
             text = {
-                if (viewModel.rssChannel.value == null) {
+                if (feedsVM.rssChannel.value == null) {
                     ClipboardTextField(
-                        value = viewModel.editUrl.value,
+                        value = feedsVM.editUrl.value,
                         onValueChange = {
-                            viewModel.editUrl.value = it
-                            if (viewModel.editUrlError.value.isNotEmpty()) {
-                                viewModel.editUrlError.value = ""
+                            feedsVM.editUrl.value = it
+                            if (feedsVM.editUrlError.value.isNotEmpty()) {
+                                feedsVM.editUrlError.value = ""
                             }
                         },
                         placeholder = stringResource(id = R.string.rss_url),
-                        errorText = if (viewModel.editUrl.value.isNotEmpty()) viewModel.editUrlError.value else "",
+                        errorText = if (feedsVM.editUrl.value.isNotEmpty()) feedsVM.editUrlError.value else "",
                         focusManager = focusManager,
                         requestFocus = true,
                         onConfirm = {
-                            viewModel.fetchChannel()
+                            feedsVM.fetchChannel()
                         },
                     )
                 } else {
                     Column {
                         OutlinedTextField(
-                            value = viewModel.editName.value,
+                            value = feedsVM.editName.value,
                             onValueChange = {
-                                viewModel.editName.value = it
+                                feedsVM.editName.value = it
                             },
                             singleLine = true,
                             label = {
@@ -77,9 +77,9 @@ fun AddFeedDialog(viewModel: FeedsViewModel) {
                             title = stringResource(id = R.string.auto_fetch_full_content),
                         ) {
                             PSwitch(
-                                activated = viewModel.editFetchContent.value,
+                                activated = feedsVM.editFetchContent.value,
                             ) {
-                                viewModel.editFetchContent.value = it
+                                feedsVM.editFetchContent.value = it
                             }
                         }
                         PDialogTips(text = stringResource(id = R.string.auto_fetch_full_content_tips))
@@ -87,15 +87,15 @@ fun AddFeedDialog(viewModel: FeedsViewModel) {
                 }
             },
             confirmButton = {
-                val buttonText = if (viewModel.rssChannel.value == null) R.string.search else R.string.add
+                val buttonText = if (feedsVM.rssChannel.value == null) R.string.search else R.string.add
                 Button(
-                    enabled = viewModel.editUrl.value.isNotBlank(),
+                    enabled = feedsVM.editUrl.value.isNotBlank(),
                     onClick = {
                         focusManager.clearFocus()
-                        if (viewModel.rssChannel.value == null) {
-                            viewModel.fetchChannel()
+                        if (feedsVM.rssChannel.value == null) {
+                            feedsVM.fetchChannel()
                         } else {
-                            viewModel.add()
+                            feedsVM.add()
                         }
                     },
                 ) {
@@ -104,7 +104,7 @@ fun AddFeedDialog(viewModel: FeedsViewModel) {
             },
             dismissButton = {
                 TextButton(onClick = {
-                    viewModel.showAddDialog.value = false
+                    feedsVM.showAddDialog.value = false
                 }) {
                     Text(text = stringResource(id = R.string.cancel))
                 }

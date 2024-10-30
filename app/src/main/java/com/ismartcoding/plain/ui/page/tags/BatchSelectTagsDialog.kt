@@ -28,16 +28,17 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun BatchSelectTagsDialog(
-    tagsViewModel: TagsViewModel,
+    tagsVM: TagsViewModel,
     tagsState: List<DTag>,
     items: List<IData>,
     removeFromTags: Boolean = false,
     onDismiss: () -> Unit,
 ) {
-    TagNameDialog(tagsViewModel)
+    TagNameDialog(tagsVM)
     val tagIds = remember { mutableStateListOf<String>() }
 
     AlertDialog(
+        containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = {
             onDismiss()
         },
@@ -68,7 +69,7 @@ fun BatchSelectTagsDialog(
                     )
                 }
                 NewTagButton(click = {
-                    tagsViewModel.showAddDialog()
+                    tagsVM.showAddDialog()
                 })
             }
         }, confirmButton = {
@@ -76,9 +77,9 @@ fun BatchSelectTagsDialog(
                 enabled = tagIds.isNotEmpty(),
                 onClick = {
                     if (removeFromTags) {
-                        tagsViewModel.removeFromTags(items.map { it.id }.toSet(), tagIds.toSet())
+                        tagsVM.removeFromTags(items.map { it.id }.toSet(), tagIds.toSet())
                     } else {
-                        tagsViewModel.addToTags(items, tagIds.toSet())
+                        tagsVM.addToTags(items, tagIds.toSet())
                     }
                     onDismiss()
                 },

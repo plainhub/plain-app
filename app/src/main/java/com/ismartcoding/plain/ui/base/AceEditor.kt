@@ -19,14 +19,14 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AceEditor(
-    viewModel: TextFileViewModel,
+    textFileVM: TextFileViewModel,
     scope: CoroutineScope,
     data: EditorData,
 ) {
     DisposableEffect(Unit) {
         onDispose {
-            viewModel.webView.value?.destroy()
-            viewModel.webView.value = null
+            textFileVM.webView.value?.destroy()
+            textFileVM.webView.value = null
         }
     }
 
@@ -48,10 +48,10 @@ fun AceEditor(
             addJavascriptInterface(
                 EditorWebViewInterface(
                     ready = {
-                        viewModel.isEditorReady.value = true
+                        textFileVM.isEditorReady.value = true
                     },
                     update = { c ->
-                        viewModel.content.value = c
+                        textFileVM.content.value = c
                     }), "AndroidApp"
             )
             settings.domStorageEnabled = true
@@ -60,7 +60,7 @@ fun AceEditor(
                 Language.initLocaleAsync(context)
             }
         }
-        viewModel.webView.value = webView
+        textFileVM.webView.value = webView
         webView
     })
 }

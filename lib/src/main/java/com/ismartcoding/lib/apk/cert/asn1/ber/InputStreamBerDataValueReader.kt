@@ -279,7 +279,7 @@ class InputStreamBerDataValueReader(`in`: InputStream?) : BerDataValueReader {
                     throw BerDataValueFormatException("Indefinite-length contents too long")
                 }
                 val encoded = dataValue.encoded
-                if (encoded!!.remaining() == 2 && encoded[0].toInt() == 0 && encoded[1].toInt() == 0) {
+                if (encoded.remaining() == 2 && encoded[0].toInt() == 0 && encoded[1].toInt() == 0) {
                     // 0x00 0x00 encountered
                     return `in`.readByteCount - readByteCountBefore - 2
                 }

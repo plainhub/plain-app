@@ -33,23 +33,23 @@ import com.ismartcoding.plain.ui.theme.listItemTitle
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun FeedListItem(
-    viewModel: FeedsViewModel,
+    feedsVM: FeedsViewModel,
     m: DFeed,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
 ) {
     Row {
-        if (viewModel.selectMode.value) {
+        if (feedsVM.selectMode.value) {
             HorizontalSpace(dp = 16.dp)
-            Checkbox(checked = viewModel.selectedIds.contains(m.id), onCheckedChange = {
-                viewModel.select(m.id)
+            Checkbox(checked = feedsVM.selectedIds.contains(m.id), onCheckedChange = {
+                feedsVM.select(m.id)
             })
         }
 
         Surface(
             modifier =
             PlainTheme
-                .getCardModifier(selected = viewModel.selectedItem.value?.id == m.id || viewModel.selectedIds.contains(m.id))
+                .getCardModifier(selected = feedsVM.selectedItem.value?.id == m.id || feedsVM.selectedIds.contains(m.id))
                 .combinedClickable(
                     onClick = onClick,
                     onLongClick = onLongClick,

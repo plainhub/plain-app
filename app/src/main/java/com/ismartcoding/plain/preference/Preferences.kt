@@ -20,11 +20,19 @@ import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.enums.MediaPlayMode
-import com.ismartcoding.plain.features.device.DeviceSortBy
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.data.DScreenMirrorQuality
+import com.ismartcoding.plain.ui.models.BreadcrumbItem
 import java.util.Locale
+import org.json.JSONArray
+import org.json.JSONObject
+
+data class FilePathData(
+    val rootPath: String,
+    val fullPath: String,
+    val selectedPath: String
+)
 
 object PasswordPreference : BasePreference<String>() {
     override val default = ""
@@ -287,26 +295,6 @@ object AgreeTermsPreference : BasePreference<Boolean>() {
     override val key = booleanPreferencesKey("agree_terms")
 }
 
-object ExchangeRatePreference : BasePreference<String>() {
-    override val default = ""
-    override val key = stringPreferencesKey("exchange")
-
-    fun getConfig(preferences: Preferences): ExchangeConfig {
-        val str = get(preferences)
-        if (str.isEmpty()) {
-            return ExchangeConfig()
-        }
-        return jsonDecode(str)
-    }
-
-    suspend fun putAsync(
-        context: Context,
-        value: ExchangeConfig,
-    ) {
-        putAsync(context, jsonEncode(value))
-    }
-}
-
 object ScreenMirrorQualityPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("screen_mirror_quality")
@@ -360,23 +348,6 @@ object KeyStorePasswordPreference : BasePreference<String>() {
 
     suspend fun resetAsync(context: Context) {
         putAsync(context, StringHelper.shortUUID())
-    }
-}
-
-object DeviceSortByPreference : BasePreference<Int>() {
-    override val default = DeviceSortBy.LAST_ACTIVE.ordinal
-    override val key = intPreferencesKey("device_sort_by")
-
-    suspend fun putAsync(
-        context: Context,
-        value: DeviceSortBy,
-    ) {
-        putAsync(context, value.ordinal)
-    }
-
-    suspend fun getValueAsync(context: Context): DeviceSortBy {
-        val value = getAsync(context)
-        return DeviceSortBy.entries.find { it.ordinal == value } ?: DeviceSortBy.LAST_ACTIVE
     }
 }
 
@@ -500,6 +471,41 @@ object AudioSleepTimerFinishLastPreference : BasePreference<Boolean>() {
     override val key = booleanPreferencesKey("audio_sleep_timer_finish_last")
 }
 
+object LastFilePathPreference : BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("last_file_path")
+
+    suspend fun getValueAsync(context: Context): FilePathData {
+        val str = getAsync(context)
+        if (str.isEmpty()) {
+            return FilePathData("", "", "")
+        }
+        return try {
+            val json = JSONObject(str)
+            FilePathData(
+                rootPath = json.getString("root_path"),
+                fullPath = json.getString("full_path"),
+                selectedPath = json.getString("selected_path")
+            )
+        } catch (e: Exception) {
+            // If JSON parsing fails, return empty data
+            FilePathData("", "", "")
+        }
+    }
+
+    suspend fun putAsync(
+        context: Context,
+        data: FilePathData
+    ) {
+        val json = JSONObject().apply {
+            put("root_path", data.rootPath)
+            put("full_path", data.fullPath)
+            put("selected_path", data.selectedPath)
+        }
+        putAsync(context, json.toString())
+    }
+}
+
 object ScanHistoryPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("scan_history")
@@ -542,13 +548,12 @@ object AudioPlaylistPreference : BasePreference<String>() {
     suspend fun deleteAsync(
         context: Context,
         paths: Set<String>,
-    ) {
-        putAsync(
-            context,
-            getValueAsync(context).toMutableList().apply {
-                removeIf { paths.contains(it.path) }
-            },
-        )
+    ): List<DPlaylistAudio> {
+        val items = getValueAsync(context).toMutableList().apply {
+            removeIf { paths.contains(it.path) }
+        }
+        putAsync(context, items)
+        return items
     }
 
     suspend fun addAsync(

@@ -120,13 +120,8 @@ fun ContentResolver.getPagingCursorWithBundle(
     sortBy: SortBy,
 ): Cursor? {
     return try {
-        val sourceUri =
-            uri.buildUpon()
-                .appendQueryParameter("limit", limit.toString())
-                .appendQueryParameter("offset", offset.toString())
-                .build()
         query(
-            sourceUri,
+            uri,
             projection,
             Bundle().apply {
                 paging(offset, limit)

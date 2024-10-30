@@ -13,18 +13,6 @@ import com.ismartcoding.plain.ui.theme.palette.colorspace.zcam.Zcam
 import com.ismartcoding.plain.ui.theme.palette.colorspace.zcam.Zcam.Companion.toZcam
 
 @Composable
-fun rgb(
-    r: Double,
-    g: Double,
-    b: Double,
-): Rgb = Rgb(
-    r = r,
-    g = g,
-    b = b,
-    colorSpace = LocalRgbColorSpace.current,
-)
-
-@Composable
 fun zcamLch(
     L: Double,
     C: Double,

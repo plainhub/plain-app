@@ -7,15 +7,9 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.BrokenImage
-import androidx.compose.material.icons.outlined.Image
-import androidx.compose.material.icons.outlined.VideoFile
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -29,7 +23,6 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -41,14 +34,13 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntSize
-import coil3.compose.AsyncImage
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import com.ismartcoding.lib.extensions.isImageFast
-import com.ismartcoding.plain.ui.components.mediaviewer.rememberCoilImagePainter
+import com.ismartcoding.plain.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
@@ -72,7 +64,7 @@ fun TransformImageView(
     path: String,
     key: String,
     uri: Uri? = null,
-    itemState: TransformItemState = rememberTransformItemState(),
+    itemState: TransformItemState,
     previewerState: MediaPreviewerState,
     widthPx: Int,
 ) {
@@ -94,10 +86,10 @@ fun TransformImageView(
                 filterQuality = FilterQuality.None
             )
 
-            if (painter.state is AsyncImagePainter.State.Error) {
+            if (painter.state.value is AsyncImagePainter.State.Error) {
                 Image(
                     modifier = imageModifier,
-                    imageVector = if (path.isImageFast()) Icons.Outlined.Image else Icons.Outlined.VideoFile,
+                    painter = painterResource(if (path.isImageFast()) R.drawable.image else R.drawable.file_video),
                     contentDescription = path,
                     contentScale = ContentScale.Crop,
                 )

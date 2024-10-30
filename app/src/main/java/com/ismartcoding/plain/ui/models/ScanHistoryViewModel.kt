@@ -29,8 +29,8 @@ class ScanHistoryViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             _itemsFlow.update {
                 val mutableList = it.toMutableList()
-                ScanHistoryPreference.putAsync(context, mutableList)
                 mutableList.remove(value)
+                ScanHistoryPreference.putAsync(context, mutableList)
                 mutableList
             }
         }

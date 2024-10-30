@@ -23,7 +23,7 @@ typealias TonalPalette = MutableMap<TonalValue, Color>
 val tonalTokens = listOf(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 99, 100)
 
 val LocalTonalPalettes = compositionLocalOf {
-    TonalPalettes(238.36, 15.0)
+    TonalPalettes(180.0, 15.0)
 }
 
 @Composable

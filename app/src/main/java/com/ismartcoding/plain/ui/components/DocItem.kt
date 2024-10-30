@@ -42,24 +42,24 @@ import java.io.File
 @Composable
 fun DocItem(
     navController: NavHostController,
-    viewModel: DocsViewModel,
+    docsVM: DocsViewModel,
     m: DFile,
 ) {
     Row {
-        if (viewModel.selectMode.value) {
+        if (docsVM.selectMode.value) {
             HorizontalSpace(dp = 16.dp)
-            Checkbox(checked = viewModel.selectedIds.contains(m.id), onCheckedChange = {
-                viewModel.select(m.id)
+            Checkbox(checked = docsVM.selectedIds.contains(m.id), onCheckedChange = {
+                docsVM.select(m.id)
             })
         }
         Surface(
             modifier =
             PlainTheme
-                .getCardModifier(selected = viewModel.selectedItem.value?.id == m.id || viewModel.selectedIds.contains(m.id))
+                .getCardModifier(selected = docsVM.selectedItem.value?.id == m.id || docsVM.selectedIds.contains(m.id))
                 .combinedClickable(
                     onClick = {
-                        if (viewModel.selectMode.value) {
-                            viewModel.select(m.id)
+                        if (docsVM.selectMode.value) {
+                            docsVM.select(m.id)
                         } else {
                             if (m.path.isTextFile()) {
                                 navController.navigateTextFile(m.path, mediaId = m.mediaId)
@@ -71,10 +71,10 @@ fun DocItem(
                         }
                     },
                     onLongClick = {
-                        if (viewModel.selectMode.value) {
+                        if (docsVM.selectMode.value) {
                             return@combinedClickable
                         }
-                        viewModel.selectedItem.value = m
+                        docsVM.selectedItem.value = m
                     },
                 )
                 .weight(1f),

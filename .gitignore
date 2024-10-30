@@ -81,3 +81,5 @@ lint/tmp/
 
 .DS_Store
 output-metadata.json
+.kotlin
+.vscode

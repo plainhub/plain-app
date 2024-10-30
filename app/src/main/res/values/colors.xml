@@ -2,27 +2,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <color name="canvas">#F4F4F4</color>
     <color name="primary">#000000</color>
-    <color name="blur">#95FFFFFF</color>
-    <color name="secondary">#6c757d</color>
-    <color name="divider">#12000000</color>
-    <color name="purple_light">#512da8</color>
-    <color name="bg_selected">#20512da8</color>
-    <color name="white">#FFFFFF</color>
-    <color name="bg_input">#FFFFFF</color>
-    <color name="foreground">#FFFFFF</color>
-    <color name="switch_track_color">#66512da8</color>
-    <color name="switch_track_inactive_color">#668D8D8D</color>
-    <color name="color_on_primary">#FFFFFF</color>
-    <color name="color_placeholder">#EEEEEF</color>
-    <color name="color_loading_background">#282828</color>
-    <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">#000000</color>
     <color name="launcher_background">#FFFFFF</color>
     <color name="splash_icon">#000000</color>
-    <color name="color_duration_text">#FFFFFF</color>
-    <color name="color_duration_back">#50000000</color>
-    <color name="fast_scroll_handle">#512da8</color>
-    <color name="control_highlight">#40000000</color>
-
 
     <color name="syntax_number">#ffff6600</color>
     <color name="syntax_keyword">#ff2f6f9f</color>
@@ -31,11 +12,4 @@
     <color name="syntax_string">#ffd44950</color>
     <color name="syntax_variable">#ff009688</color>
     <color name="syntax_comment">#ff999999</color>
-
-    <color name="blue">#3F51B5</color>
-    <color name="red">#E53935</color>
-    <color name="yellow">#FFD54F</color>
-    <color name="purple">#9C27B0</color>
-    <color name="green">#4CAF50</color>
-
 </resources>

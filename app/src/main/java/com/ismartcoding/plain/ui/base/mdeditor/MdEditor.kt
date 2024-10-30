@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text2.BasicTextField2
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -42,7 +42,7 @@ import kotlinx.coroutines.flow.debounce
 @Composable
 fun MdEditor(
     modifier: Modifier,
-    viewModel: MdEditorViewModel,
+    mdEditorVM: MdEditorViewModel,
     scrollState: ScrollState,
     focusRequester: FocusRequester,
 ) {
@@ -62,8 +62,8 @@ fun MdEditor(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceContainerLowest)
     ) {
-        val lineNumberWidth = if (viewModel.showLineNumbers) measureTextWidth(" ${lineCount + 1} ", MaterialTheme.typography.bodyLarge) else 0.dp
-        if (viewModel.showLineNumbers) {
+        val lineNumberWidth = if (mdEditorVM.showLineNumbers) measureTextWidth(" ${lineCount + 1} ", MaterialTheme.typography.bodyLarge) else 0.dp
+        if (mdEditorVM.showLineNumbers) {
             Column(
                 modifier = Modifier
                     .width(lineNumberWidth)
@@ -72,7 +72,7 @@ fun MdEditor(
                     .verticalScroll(lineNumberState, enabled = false),
             ) {
                 Text(
-                    text = viewModel.linesText,
+                    text = mdEditorVM.linesText,
                     style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                     modifier = Modifier
                         .fillMaxHeight(),
@@ -81,22 +81,22 @@ fun MdEditor(
             }
         }
         Box(
-            modifier = if (viewModel.wrapContent) {
+            modifier = if (mdEditorVM.wrapContent) {
                 Modifier
-                    .padding(start = if (viewModel.showLineNumbers) lineNumberWidth + 8.dp else PlainTheme.PAGE_HORIZONTAL_MARGIN, end = PlainTheme.PAGE_HORIZONTAL_MARGIN)
+                    .padding(start = if (mdEditorVM.showLineNumbers) lineNumberWidth + 8.dp else PlainTheme.PAGE_HORIZONTAL_MARGIN, end = PlainTheme.PAGE_HORIZONTAL_MARGIN)
                     .fillMaxSize()
             } else {
                 Modifier
-                    .padding(if (viewModel.showLineNumbers) lineNumberWidth + 8.dp else PlainTheme.PAGE_HORIZONTAL_MARGIN, end = PlainTheme.PAGE_HORIZONTAL_MARGIN)
+                    .padding(if (mdEditorVM.showLineNumbers) lineNumberWidth + 8.dp else PlainTheme.PAGE_HORIZONTAL_MARGIN, end = PlainTheme.PAGE_HORIZONTAL_MARGIN)
                     .fillMaxSize()
                     .horizontalScroll(rememberScrollState())
             }
         ) {
-            BasicTextField2(
+            BasicTextField(
                 modifier = Modifier
                     .fillMaxSize()
                     .focusRequester(focusRequester),
-                state = viewModel.textFieldState,
+                state = mdEditorVM.textFieldState,
                 scrollState = scrollState,
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                 cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
@@ -105,10 +105,10 @@ fun MdEditor(
                     if (r != null) {
                         if (lineCount != r.lineCount) {
                             lineCount = r.lineCount
-                            viewModel.linesText = MdEditorLineHelper.getLinesText(
+                            mdEditorVM.linesText = MdEditorLineHelper.getLinesText(
                                 lineCount,
                                 r,
-                                viewModel.textFieldState.text.toString(),
+                                mdEditorVM.textFieldState.text.toString(),
                             )
                         }
                     }

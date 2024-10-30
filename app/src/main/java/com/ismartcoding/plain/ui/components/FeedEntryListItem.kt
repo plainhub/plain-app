@@ -26,16 +26,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.DTag
-import com.ismartcoding.plain.enums.FeedEntryFilterType
 import com.ismartcoding.plain.extensions.timeAgo
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FeedEntriesViewModel
-import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
@@ -45,7 +42,7 @@ import com.ismartcoding.plain.ui.theme.listItemTitle
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun FeedEntryListItem(
-    viewModel: FeedEntriesViewModel,
+    feedEntriesVM: FeedEntriesViewModel,
     index: Int,
     m: DFeedEntry,
     feed: DFeed?,
@@ -55,17 +52,17 @@ fun FeedEntryListItem(
     onClickTag: (DTag) -> Unit
 ) {
     Row {
-        if (viewModel.selectMode.value) {
+        if (feedEntriesVM.selectMode.value) {
             HorizontalSpace(dp = 16.dp)
-            Checkbox(checked = viewModel.selectedIds.contains(m.id), onCheckedChange = {
-                viewModel.select(m.id)
+            Checkbox(checked = feedEntriesVM.selectedIds.contains(m.id), onCheckedChange = {
+                feedEntriesVM.select(m.id)
             })
         }
 
         Surface(
             modifier =
             PlainTheme
-                .getCardModifier(selected = viewModel.selectedItem.value?.id == m.id || viewModel.selectedIds.contains(m.id))
+                .getCardModifier(selected = feedEntriesVM.selectedItem.value?.id == m.id || feedEntriesVM.selectedIds.contains(m.id))
                 .combinedClickable(
                     onClick = onClick,
                     onLongClick = onLongClick,

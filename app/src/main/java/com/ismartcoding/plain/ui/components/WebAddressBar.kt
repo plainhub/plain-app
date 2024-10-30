@@ -17,16 +17,11 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Edit
-import androidx.compose.material.icons.rounded.MoreVert
-import androidx.compose.material.icons.rounded.QrCode
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,8 +37,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.ismartcoding.lib.channel.receiveEventHandler
+import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
@@ -63,7 +57,6 @@ import com.ismartcoding.plain.ui.base.RadioDialogOption
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -80,24 +73,19 @@ fun WebAddressBar(
     val showContextMenu = remember { mutableStateOf(false) }
     val defaultUrl = remember { mutableStateOf("${if (isHttps) "https" else "http"}://$ip4:${port}") }
     val scope = rememberCoroutineScope()
-    val events by remember { mutableStateOf<MutableList<Job>>(arrayListOf()) }
+    val sharedFlow = Channel.sharedFlow
 
-    LaunchedEffect(Unit) {
-        events.add(
-            receiveEventHandler<WindowFocusChangedEvent> {
-                if (it.hasFocus) {
-                    ip4 = NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }
-                    ip4s = NetworkHelper.getDeviceIP4s().filter { it != ip4 }
-                    defaultUrl.value = "${if (isHttps) "https" else "http"}://$ip4:${port}"
+    LaunchedEffect(sharedFlow) {
+        sharedFlow.collect { event ->
+            when (event) {
+                is WindowFocusChangedEvent -> {
+                    if (event.hasFocus) {
+                        ip4 = NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }
+                        ip4s = NetworkHelper.getDeviceIP4s().filter { it != ip4 }
+                        defaultUrl.value = "${if (isHttps) "https" else "http"}://$ip4:${port}"
+                    }
                 }
             }
-        )
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            events.forEach { it.cancel() }
-            events.clear()
         }
     }
 
@@ -116,10 +104,10 @@ fun WebAddressBar(
                 text = AnnotatedString(defaultUrl.value),
                 modifier = Modifier.padding(start = 16.dp),
                 style =
-                TextStyle(
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontSize = 18.sp,
-                ),
+                    TextStyle(
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 18.sp,
+                    ),
                 onClick = {
                     val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), defaultUrl.value)
                     clipboardManager.setPrimaryClip(clip)
@@ -129,38 +117,38 @@ fun WebAddressBar(
         }
         Spacer(modifier = Modifier.weight(1f))
         PIconButton(
-            icon = Icons.Rounded.Edit,
+            icon = R.drawable.pen,
             modifier = Modifier.size(32.dp),
             iconSize = 16.dp,
             contentDescription = stringResource(id = R.string.edit),
             tint = MaterialTheme.colorScheme.onSurface,
-            onClick = {
+            click = {
                 portDialogVisible = true
             },
         )
         PIconButton(
-            icon = Icons.Rounded.QrCode,
+            icon = R.drawable.qr_code,
             modifier = Modifier.size(32.dp),
             iconSize = 16.dp,
             contentDescription = stringResource(id = R.string.qrcode),
             tint = MaterialTheme.colorScheme.onSurface,
-            onClick = {
+            click = {
                 qrCodeDialogVisible = true
             },
         )
         if (ip4s.isNotEmpty()) {
             Box(
                 modifier =
-                Modifier
-                    .wrapContentSize(Alignment.TopEnd),
+                    Modifier
+                        .wrapContentSize(Alignment.TopEnd),
             ) {
                 PIconButton(
-                    icon = Icons.Rounded.MoreVert,
+                    icon = R.drawable.ellipsis_vertical,
                     modifier = Modifier.size(32.dp),
                     iconSize = 16.dp,
                     contentDescription = stringResource(id = R.string.more),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    onClick = {
+                    click = {
                         showContextMenu.value = true
                     },
                 )
@@ -187,55 +175,59 @@ fun WebAddressBar(
         RadioDialog(
             title = stringResource(R.string.change_port),
             options =
-            (if (isHttps) HttpServerManager.httpsPorts else HttpServerManager.httpPorts).map {
-                RadioDialogOption(
-                    text = it.toString(),
-                    selected = it == port,
-                ) {
-                    scope.launch(Dispatchers.IO) {
-                        if (isHttps) {
-                            HttpsPortPreference.putAsync(context, it)
-                        } else {
-                            HttpPortPreference.putAsync(context, it)
+                (if (isHttps) HttpServerManager.httpsPorts else HttpServerManager.httpPorts).map {
+                    RadioDialogOption(
+                        text = it.toString(),
+                        selected = it == port,
+                    ) {
+                        scope.launch(Dispatchers.IO) {
+                            if (isHttps) {
+                                HttpsPortPreference.putAsync(context, it)
+                            } else {
+                                HttpPortPreference.putAsync(context, it)
+                            }
                         }
+                        androidx.appcompat.app.AlertDialog.Builder(context)
+                            .setTitle(R.string.restart_app_title)
+                            .setMessage(R.string.restart_app_message)
+                            .setPositiveButton(R.string.relaunch_app) { _, _ ->
+                                AppHelper.relaunch(context)
+                            }
+                            .setCancelable(false)
+                            .create()
+                            .show()
                     }
-                    MaterialAlertDialogBuilder(context)
-                        .setTitle(R.string.restart_app_title)
-                        .setMessage(R.string.restart_app_message)
-                        .setPositiveButton(R.string.relaunch_app) { _, _ ->
-                            AppHelper.relaunch(context)
-                        }
-                        .setCancelable(false)
-                        .create()
-                        .show()
-                }
-            },
+                },
         ) {
             portDialogVisible = false
         }
     }
 
     if (qrCodeDialogVisible) {
-        AlertDialog(onDismissRequest = {
-            qrCodeDialogVisible = false
-        }, confirmButton = {
-            Button(
-                onClick = {
-                    qrCodeDialogVisible = false
+        AlertDialog(
+            containerColor = MaterialTheme.colorScheme.surface,
+            onDismissRequest = {
+                qrCodeDialogVisible = false
+            }, confirmButton = {
+                Button(
+                    onClick = {
+                        qrCodeDialogVisible = false
+                    }
+                ) {
+                    Text(stringResource(id = R.string.close))
                 }
-            ) {
-                Text(stringResource(id = R.string.close))
-            }
-        }, title = {
+            }, title = {
 
-        }, text = {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                Image(
-                    bitmap = QrCodeGenerateHelper.generate(defaultUrl.value, 240, 240).asImageBitmap(),
-                    contentDescription = stringResource(id = R.string.qrcode),
-                    modifier = Modifier.size(240.dp).clip(RoundedCornerShape(16.dp))
-                )
-            }
-        })
+            }, text = {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    Image(
+                        bitmap = QrCodeGenerateHelper.generate(defaultUrl.value, 240, 240).asImageBitmap(),
+                        contentDescription = stringResource(id = R.string.qrcode),
+                        modifier = Modifier
+                            .size(240.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                    )
+                }
+            })
     }
 }

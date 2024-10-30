@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,13 +15,13 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun PMiniOutlineButton(
-    text: String,
+    label: String,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.primary,
-    onClick: () -> Unit,
+    click: () -> Unit,
 ) {
     Button(
-        onClick,
+        click,
         modifier =
         modifier
             .height(32.dp),
@@ -34,6 +33,6 @@ fun PMiniOutlineButton(
         ),
         border = BorderStroke(1.dp, color),
     ) {
-        Text(text, style = MaterialTheme.typography.labelSmall)
+        Text(label, style = MaterialTheme.typography.labelSmall)
     }
 }

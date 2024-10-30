@@ -41,6 +41,7 @@ fun TextFieldDialog(
     val focusManager = LocalFocusManager.current
     AlertDialog(
         modifier = modifier.fillMaxWidth(),
+        containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = onDismissRequest,
         icon = {
             icon?.let {

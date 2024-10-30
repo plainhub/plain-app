@@ -53,7 +53,7 @@ class RefreshLayoutState(
      * 获取刷新布局拖动的阈值,单位px
      * Get threshold of the refresh content
      */
-    fun getRefreshContentThreshold(): Float = refreshContentThresholdState.value
+    fun getRefreshContentThreshold(): Float = refreshContentThresholdState.floatValue
 
     /**
      * 刷新布局内容区域的Offset的值,单位px
@@ -113,7 +113,7 @@ class RefreshLayoutState(
     internal fun offsetHoming() {
         coroutineScope.launch {
             //检查是否进入了刷新状态
-            if (abs(refreshContentOffsetState.value) >= refreshContentThresholdState.value) {
+            if (abs(refreshContentOffsetState.value) >= refreshContentThresholdState.floatValue) {
                 refreshContentState.value = RefreshContentState.Refreshing
                 if (canCallRefreshListener)
                     onRefreshListener()
@@ -131,9 +131,9 @@ class RefreshLayoutState(
     private suspend fun animateToThreshold() {
         val composePosition = composePositionState.value
         if (composePosition == ComposePosition.Start || composePosition == ComposePosition.Top)
-            refreshContentOffsetState.animateTo(refreshContentThresholdState.value)
+            refreshContentOffsetState.animateTo(refreshContentThresholdState.floatValue)
         else
-            refreshContentOffsetState.animateTo(-refreshContentThresholdState.value)
+            refreshContentOffsetState.animateTo(-refreshContentThresholdState.floatValue)
     }
 
     //增加偏移量

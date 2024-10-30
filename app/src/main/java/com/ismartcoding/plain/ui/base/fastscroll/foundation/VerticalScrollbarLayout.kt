@@ -3,8 +3,6 @@ package com.ismartcoding.plain.ui.base.fastscroll.foundation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -15,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -54,7 +51,7 @@ internal fun VerticalScrollbarLayout(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_scroll_arrow),
+                    painter = painterResource(id = R.drawable.scroll_arrow),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimary
                 )

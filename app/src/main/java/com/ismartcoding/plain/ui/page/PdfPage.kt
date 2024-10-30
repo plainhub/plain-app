@@ -2,8 +2,7 @@ package com.ismartcoding.plain.ui.page
 
 import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Share
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -35,7 +34,7 @@ fun PdfPage(
                 title = uri.getFileName(context),
                 actions = {
                     PIconButton(
-                        icon = Icons.Outlined.Share,
+                        icon = R.drawable.share_2,
                         contentDescription = stringResource(R.string.share),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
@@ -48,8 +47,12 @@ fun PdfPage(
                 },
             )
         },
-        content = {
-            PdfView(uri = uri, modifier = Modifier.fillMaxSize())
+        content = { paddingValues ->
+            PdfView(
+                uri = uri, modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = paddingValues.calculateTopPadding())
+            )
         },
     )
 }

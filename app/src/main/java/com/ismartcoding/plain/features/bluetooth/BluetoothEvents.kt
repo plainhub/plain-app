@@ -1,24 +1,25 @@
 package com.ismartcoding.plain.features.bluetooth
 
+import com.ismartcoding.lib.channel.ChannelEvent
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import kotlinx.coroutines.withTimeoutOrNull
 
-class RequestEnableBluetoothEvent
+class RequestEnableBluetoothEvent: ChannelEvent()
 
-class RequestScanConnectBluetoothEvent
+class RequestScanConnectBluetoothEvent: ChannelEvent()
 
-class RequestBluetoothLocationPermissionEvent
+class RequestBluetoothLocationPermissionEvent: ChannelEvent()
 
-class RequestBluetoothLocationGPSPermissionEvent
+class RequestBluetoothLocationGPSPermissionEvent: ChannelEvent()
 
-class BluetoothPermissionResultEvent
+class BluetoothPermissionResultEvent: ChannelEvent()
 
-class BluetoothFindOneEvent(val mac: String)
+class BluetoothFindOneEvent(val mac: String): ChannelEvent()
 
-class ScanBTDeviceTimeoutEvent
+class ScanBTDeviceTimeoutEvent: ChannelEvent()
 
-class BTDeviceFoundEvent(val device: BTDevice)
+class BTDeviceFoundEvent(val device: BTDevice): ChannelEvent()
 
 object BluetoothEvents {
     fun register() {

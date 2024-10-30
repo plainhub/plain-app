@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.ui.theme.secondaryTextColor
 
 @Composable
 fun LoadMoreRefreshContent(isLoadFinish: Boolean = false) {
@@ -26,7 +27,7 @@ fun LoadMoreRefreshContent(isLoadFinish: Boolean = false) {
             Text(
                 text = stringResource(id = R.string.loading),
                 fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.secondary,
+                color = MaterialTheme.colorScheme.secondaryTextColor,
             )
         }
     }

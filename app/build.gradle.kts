@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.config.KotlinCompilerVersion
 import java.io.FileInputStream
 import java.util.Properties
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
@@ -7,13 +6,13 @@ plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
     id("com.google.firebase.crashlytics")
-    id("com.apollographql.apollo3") version "3.2.1"
     id("kotlin-parcelize")
     id("androidx.room")
     id("com.google.devtools.ksp")
     kotlin("android")
     kotlin("kapt")
-    kotlin("plugin.serialization") version "1.9.23"
+    kotlin("plugin.serialization") version libs.versions.kotlin
+    alias(libs.plugins.compose.compiler)
 }
 
 room {
@@ -28,11 +27,10 @@ rootProject.file("keystore.properties").let {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
     defaultConfig {
         applicationId = "com.ismartcoding.plain"
         minSdk = 28
-        targetSdk = 34
 
         val abiFilterList = if (hasProperty("abiFilters")) property("abiFilters").toString().split(';') else listOf()
         val singleAbiNum =
@@ -42,9 +40,9 @@ android {
                 else -> 0
             }
 
-        val vCode = 331
+        val vCode = 334
         versionCode = vCode - singleAbiNum
-        versionName = "1.3.6"
+        versionName = "2.0.0"
 
         ndk {
             //noinspection ChromeOsAbiSupport
@@ -128,10 +126,6 @@ android {
         compose = true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.12"
-    }
-
     packaging {
         jniLibs {
             // useLegacyPackaging = true
@@ -142,11 +136,6 @@ android {
         }
     }
     namespace = "com.ismartcoding.plain"
-
-    apollo {
-        packageName.set("com.ismartcoding.plain")
-        mapScalar("Time", "java.util.Date")
-    }
 
     kotlinOptions {
         jvmTarget = "17"
@@ -165,7 +154,6 @@ dependencies {
     implementation(libs.compose.foundation)
     implementation(libs.compose.foundation.layout)
     implementation(libs.compose.material3)
-    implementation(libs.compose.material.icons.extended)
     implementation(libs.accompanist.drawablepainter)
     // https://developer.android.com/jetpack/androidx/releases/navigation
     implementation(libs.compose.navigation)
@@ -182,16 +170,7 @@ dependencies {
     implementation(libs.media3.dash)
     implementation(libs.media3.hls)
 
-    implementation(libs.apollo.runtime)
-    implementation(libs.apollo.normalized.cache)
-    implementation(libs.apollo.normalized.cache.sqlite)
-    implementation(libs.apollo.adapters)
-
-    implementation(libs.androidx.viewpager2)
-    implementation(libs.androidx.preference.ktx)
-
     implementation(libs.androidx.core.splashscreen)
-    implementation(libs.snake.yaml)
 
     // CameraX
     implementation(libs.camera.core)
@@ -218,10 +197,8 @@ dependencies {
 
     // https://developer.android.com/jetpack/androidx/releases/room
     implementation(libs.room.runtime)
-    annotationProcessor(libs.room.compiler)
+//    annotationProcessor(libs.room.compiler)
     ksp(libs.room.compiler)
-
-    implementation(libs.openai.client)
 
     // coil: https://coil-kt.github.io/coil/changelog/
     implementation(libs.coil)
@@ -232,16 +209,14 @@ dependencies {
     implementation(libs.coil.network.ktor)
 
     implementation(libs.zxing.core)
-    implementation(libs.paging.runtime)
 
     implementation(libs.androidx.work.runtime.ktx)
 
     // https://developer.android.com/jetpack/androidx/releases/datastore
     implementation(libs.androidx.datastore.preferences)
 
-//    implementation("org.eclipse.jgit:org.eclipse.jgit:6.1.0.202203080745-r") // TODO: git support
     implementation(libs.zt.zip)
     implementation(project(":lib"))
     debugImplementation(libs.leakcanary.android)
-    implementation(kotlin("stdlib", KotlinCompilerVersion.VERSION))
+    implementation(kotlin("stdlib", libs.versions.kotlin.get()))
 }

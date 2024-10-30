@@ -26,11 +26,11 @@ class QSTileService : TileService() {
         if (state == Tile.STATE_INACTIVE) {
             qsTile?.state = Tile.STATE_INACTIVE
             qsTile?.label = getString(R.string.app_name)
-            qsTile?.icon = Icon.createWithResource(applicationContext, R.drawable.ic_app_icon)
+            qsTile?.icon = Icon.createWithResource(applicationContext, R.drawable.app_icon)
         } else if (state == Tile.STATE_ACTIVE) {
             qsTile?.state = Tile.STATE_ACTIVE
             qsTile?.label = getString(R.string.app_name)
-            qsTile?.icon = Icon.createWithResource(applicationContext, R.drawable.ic_app_icon)
+            qsTile?.icon = Icon.createWithResource(applicationContext, R.drawable.app_icon)
         }
 
         qsTile?.updateTile()

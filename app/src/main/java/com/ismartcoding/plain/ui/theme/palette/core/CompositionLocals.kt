@@ -1,7 +1,5 @@
 package com.ismartcoding.plain.ui.theme.palette.core
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.ismartcoding.plain.ui.theme.palette.colorspace.cielab.CieLab
 import com.ismartcoding.plain.ui.theme.palette.colorspace.ciexyz.CieXyz
@@ -23,26 +21,6 @@ val LocalRgbColorSpace = staticCompositionLocalOf {
 
 val LocalZcamViewingConditions = staticCompositionLocalOf {
     createZcamViewingConditions()
-}
-
-@Composable
-fun ProvideZcamViewingConditions(
-    whitePoint: CieXyz = Illuminant.D65,
-    luminance: Double = 203.0, // BT.2408-4, HDR white luminance
-    surroundFactor: Double = 0.69, // average surround
-    content: @Composable () -> Unit,
-) {
-    CompositionLocalProvider(
-        LocalWhitePoint provides whitePoint,
-        LocalLuminance provides luminance,
-        LocalZcamViewingConditions provides createZcamViewingConditions(
-            whitePoint = whitePoint,
-            luminance = luminance,
-            surroundFactor = surroundFactor,
-        )
-    ) {
-        content()
-    }
 }
 
 fun createZcamViewingConditions(

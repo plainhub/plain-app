@@ -2,27 +2,9 @@ package com.ismartcoding.plain.ui.models
 
 import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.text2.input.TextFieldState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Help
-import androidx.compose.material.icons.outlined.CheckBox
-import androidx.compose.material.icons.outlined.CheckBoxOutlineBlank
-import androidx.compose.material.icons.outlined.Code
-import androidx.compose.material.icons.outlined.FormatBold
-import androidx.compose.material.icons.outlined.FormatColorFill
-import androidx.compose.material.icons.outlined.FormatItalic
-import androidx.compose.material.icons.outlined.FormatStrikethrough
-import androidx.compose.material.icons.outlined.FormatUnderlined
-import androidx.compose.material.icons.outlined.Image
-import androidx.compose.material.icons.outlined.Link
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Subscript
-import androidx.compose.material.icons.outlined.TableView
-import androidx.compose.material.icons.outlined.VerticalAlignBottom
-import androidx.compose.material.icons.outlined.VerticalAlignTop
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -39,9 +21,10 @@ import com.ismartcoding.plain.ui.extensions.setSelection
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.ismartcoding.plain.R
 
 data class MdAccessoryItem(val text: String, val before: String, val after: String = "")
-data class MdAccessoryItem2(val icon: ImageVector, val click: (MdEditorViewModel) -> Unit = {})
+data class MdAccessoryItem2(val icon: Int, val click: (MdEditorViewModel) -> Unit = {})
 
 @OptIn(ExperimentalFoundationApi::class, SavedStateHandleSaveableApi::class)
 class MdEditorViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
@@ -113,26 +96,26 @@ class MdEditorViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
 
         val mdAccessoryItems2 =
             listOf(
-                MdAccessoryItem2(Icons.Outlined.FormatBold, click = {
+                MdAccessoryItem2(R.drawable.bold, click = {
                     it.textFieldState.edit { inlineWrap("**", "**") }
                 }),
-                MdAccessoryItem2(Icons.Outlined.FormatItalic, click = {
+                MdAccessoryItem2(R.drawable.italic, click = {
                     it.textFieldState.edit { inlineWrap("*", "*") }
                 }),
-                MdAccessoryItem2(Icons.Outlined.FormatUnderlined, click = {
+                MdAccessoryItem2(R.drawable.underline, click = {
                     it.textFieldState.edit { inlineWrap("<u>", "</u>") }
                 }),
-                MdAccessoryItem2(Icons.Outlined.FormatStrikethrough, click = {
+                MdAccessoryItem2(R.drawable.strikethrough, click = {
                     it.textFieldState.edit { inlineWrap("~~", "~~") }
                 }),
-                MdAccessoryItem2(Icons.Outlined.Code, click = {
+                MdAccessoryItem2(R.drawable.code, click = {
                     it.textFieldState.edit { inlineWrap("```\n", "\n```") }
                 }),
-                MdAccessoryItem2(Icons.Outlined.Subscript, click = {
+                MdAccessoryItem2(R.drawable.superscript, click = {
                     it.textFieldState.edit { inlineWrap("\$\$\n", "\n\$\$") }
                 }),
                 MdAccessoryItem2(
-                    Icons.Outlined.TableView,
+                    R.drawable.table,
                     click = {
                         it.textFieldState.edit {
                             add(
@@ -147,32 +130,31 @@ class MdEditorViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
                         }
                     },
                 ),
-                MdAccessoryItem2(Icons.Outlined.CheckBox, click = {
+                MdAccessoryItem2(R.drawable.square_check, click = {
                     it.textFieldState.edit { inlineWrap("\n- [x] ") }
                 }),
-                MdAccessoryItem2(Icons.Outlined.CheckBoxOutlineBlank, click = {
+                MdAccessoryItem2(R.drawable.square, click = {
                     it.textFieldState.edit { inlineWrap("\n- [ ] ") }
                 }),
-                MdAccessoryItem2(Icons.Outlined.Link, click = {
+                MdAccessoryItem2(R.drawable.link, click = {
                     it.textFieldState.edit { inlineWrap("[Link](", ")") }
                 }),
-                MdAccessoryItem2(Icons.Outlined.Image, click = {
+                MdAccessoryItem2(R.drawable.image, click = {
                     it.showInsertImage = true
                 }),
-                MdAccessoryItem2(Icons.Outlined.FormatColorFill, click = {
+                MdAccessoryItem2(R.drawable.paint_bucket, click = {
                     it.showColorPicker = true
                 }),
-                MdAccessoryItem2(Icons.Outlined.VerticalAlignTop, click = {
+                MdAccessoryItem2(R.drawable.arrow_up_to_line, click = {
                     it.textFieldState.edit { setSelection(0) }
                 }),
-                MdAccessoryItem2(Icons.Outlined.VerticalAlignBottom, click = {
+                MdAccessoryItem2(R.drawable.arrow_down_to_line, click = {
                     it.textFieldState.edit { setSelection(length) }
                 }),
-//                MdAccessoryItem2(Icons.Outlined.FindReplace),
-                MdAccessoryItem2(Icons.AutoMirrored.Outlined.Help, click = {
+                MdAccessoryItem2(R.drawable.circle_help, click = {
                     WebHelper.open(MainActivity.instance.get()!!, "https://www.markdownguide.org/basic-syntax")
                 }),
-                MdAccessoryItem2(Icons.Outlined.Settings, click = {
+                MdAccessoryItem2(R.drawable.settings, click = {
                     it.showSettings = true
                 }),
             )

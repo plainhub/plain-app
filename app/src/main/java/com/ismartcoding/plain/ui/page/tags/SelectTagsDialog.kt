@@ -29,7 +29,7 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SelectTagsDialog(
-    tagsViewModel: TagsViewModel,
+    tagsVM: TagsViewModel,
     tagsState: List<DTag>,
     tagsMap: Map<String, List<DTagRelation>>,
     data: IData,
@@ -39,13 +39,14 @@ fun SelectTagsDialog(
         mutableStateListOf<String>()
     }
 
-    TagNameDialog(tagsViewModel)
+    TagNameDialog(tagsVM)
 
     LaunchedEffect(Unit) {
         tagIds.addAll(tagsMap[data.id]?.map { it.tagId } ?: emptyList())
     }
 
     AlertDialog(
+        containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = {
             onDismiss()
         },
@@ -66,7 +67,7 @@ fun SelectTagsDialog(
                     PSelectionChip(
                         selected = tagIds.contains(tag.id),
                         onClick = {
-                            tagsViewModel.toggleTag(data, tag.id)
+                            tagsVM.toggleTag(data, tag.id)
                             if (tagIds.contains(tag.id)) {
                                 tagIds.remove(tag.id)
                             } else {
@@ -77,7 +78,7 @@ fun SelectTagsDialog(
                     )
                 }
                 NewTagButton(click = {
-                    tagsViewModel.showAddDialog()
+                    tagsVM.showAddDialog()
                 })
             }
         }, confirmButton = {

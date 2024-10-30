@@ -6,10 +6,6 @@ import com.ismartcoding.plain.enums.MediaPlayMode
 object TempData {
     var webEnabled = false
     var webHttps = false
-    var demoMode = false
-    var selectedBoxId = ""
-    var endictShowWord = true
-    var endictShowTranslation = true
     var clientId = ""
     var httpPort: Int = 8080
     var httpsPort: Int = 8443

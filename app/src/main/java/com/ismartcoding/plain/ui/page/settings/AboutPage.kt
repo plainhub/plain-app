@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.page.settings
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -57,8 +58,7 @@ import java.io.File
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun AboutPage(
-    navController: NavHostController,
-    updateViewModel: UpdateViewModel = viewModel()
+    navController: NavHostController, updateViewModel: UpdateViewModel = viewModel()
 ) {
     val context = LocalContext.current
     var cacheSize by remember { mutableLongStateOf(0L) }
@@ -92,8 +92,8 @@ fun AboutPage(
         topBar = {
             PTopAppBar(navController = navController, title = stringResource(R.string.about))
         },
-        content = {
-            LazyColumn {
+        content = { paddingValues ->
+            LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 item {
                     TopSpace()
                 }
@@ -101,11 +101,8 @@ fun AboutPage(
                     PCard {
                         PListItem(
                             modifier = Modifier.clickable {
-                                showDeviceRenameDialog = true
-                            },
-                            title = stringResource(R.string.device_name),
-                            value = deviceName.ifEmpty { PhoneHelper.getDeviceName(context) },
-                            showMore = true
+                            showDeviceRenameDialog = true
+                        }, title = stringResource(R.string.device_name), value = deviceName.ifEmpty { PhoneHelper.getDeviceName(context) }, showMore = true
                         )
                         if (developerMode) {
                             PListItem(
@@ -118,7 +115,7 @@ fun AboutPage(
                                 title = stringResource(R.string.app_version),
                                 desc = MainApp.getAppVersion(),
                                 action = {
-                                    PMiniOutlineButton(text = stringResource(R.string.check_update)) {
+                                    PMiniOutlineButton(label = stringResource(R.string.check_update)) {
                                         scope.launch {
                                             DialogHelper.showMessage(getString(R.string.checking_updates))
                                             val r = withIO {
@@ -160,8 +157,7 @@ fun AboutPage(
                         PListItem(
                             modifier = Modifier.clickable {
                                 navController.navigateTextFile(
-                                    DiskLogFormatStrategy.getLogFolder(context) + "/latest.log",
-                                    getString(R.string.logs), "", TextFileType.APP_LOG
+                                    DiskLogFormatStrategy.getLogFolder(context) + "/latest.log", getString(R.string.logs), "", TextFileType.APP_LOG
                                 )
                             },
                             title = stringResource(R.string.logs),
@@ -170,8 +166,8 @@ fun AboutPage(
                             action = {
                                 if (fileSize > 0L) {
                                     PMiniOutlineButton(
-                                        text = stringResource(R.string.clear_logs),
-                                        onClick = {
+                                        label = stringResource(R.string.clear_logs),
+                                        click = {
                                             DialogHelper.confirmToAction(R.string.confirm_to_clear_logs) {
                                                 val dir = File(DiskLogFormatStrategy.getLogFolder(context))
                                                 if (dir.exists()) {
@@ -188,7 +184,7 @@ fun AboutPage(
                             title = stringResource(R.string.local_cache),
                             desc = cacheSize.formatBytes(),
                             action = {
-                                PMiniOutlineButton(text = stringResource(R.string.clear_cache)) {
+                                PMiniOutlineButton(label = stringResource(R.string.clear_cache)) {
                                     scope.launch {
                                         DialogHelper.showLoading()
                                         withIO {

@@ -27,7 +27,7 @@ import com.ismartcoding.plain.ui.models.WebConsoleViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WebLearnMorePage(navController: NavHostController, viewModel: WebConsoleViewModel = viewModel()) {
+fun WebLearnMorePage(navController: NavHostController, webVM: WebConsoleViewModel = viewModel()) {
 
     WebSettingsProvider {
         val webEnabled = LocalWeb.current
@@ -36,8 +36,8 @@ fun WebLearnMorePage(navController: NavHostController, viewModel: WebConsoleView
             topBar = {
                 PTopAppBar(navController = navController, title = stringResource(R.string.web_console))
             },
-            content = {
-                LazyColumn {
+            content = { paddingValues ->
+                LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                     item {
                         TopSpace()
                         Subtitle(text = stringResource(id = R.string.instruction_for_use))
@@ -75,7 +75,7 @@ fun WebLearnMorePage(navController: NavHostController, viewModel: WebConsoleView
                         if (webEnabled) {
                             VerticalSpace(dp = 16.dp)
                             PBlockButton(text = stringResource(id = R.string.http_server_diagnostics)) {
-                                viewModel.dig(context)
+                                webVM.dig(context)
                             }
                         }
                         BottomSpace()

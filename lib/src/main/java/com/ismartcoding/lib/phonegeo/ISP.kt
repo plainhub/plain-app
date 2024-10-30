@@ -12,7 +12,7 @@ enum class ISP(val carrier: String, val code: Int) {
 
     companion object {
         fun of(ispMark: Int): ISP {
-            return values().firstOrNull { it.code == ispMark } ?: UNKNOWN
+            return entries.firstOrNull { it.code == ispMark } ?: UNKNOWN
         }
     }
 }

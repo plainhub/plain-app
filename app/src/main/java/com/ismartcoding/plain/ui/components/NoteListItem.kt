@@ -22,14 +22,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.getSummary
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.extensions.timeAgo
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.NotesViewModel
-import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.listItemDescription
@@ -39,7 +37,7 @@ import com.ismartcoding.plain.ui.theme.listItemTag
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun NoteListItem(
-    viewModel: NotesViewModel,
+    notesVM: NotesViewModel,
     m: DNote,
     tags: List<DTag>,
     onClick: () -> Unit,
@@ -47,17 +45,17 @@ fun NoteListItem(
     onClickTag: (DTag) -> Unit
 ) {
     Row {
-        if (viewModel.selectMode.value) {
+        if (notesVM.selectMode.value) {
             HorizontalSpace(dp = 16.dp)
-            Checkbox(checked = viewModel.selectedIds.contains(m.id), onCheckedChange = {
-                viewModel.select(m.id)
+            Checkbox(checked = notesVM.selectedIds.contains(m.id), onCheckedChange = {
+                notesVM.select(m.id)
             })
         }
 
         Surface(
             modifier =
             PlainTheme
-                .getCardModifier(selected = viewModel.selectedItem.value?.id == m.id || viewModel.selectedIds.contains(m.id))
+                .getCardModifier(selected = notesVM.selectedItem.value?.id == m.id || notesVM.selectedIds.contains(m.id))
                 .combinedClickable(
                     onClick = onClick,
                     onLongClick = onLongClick,

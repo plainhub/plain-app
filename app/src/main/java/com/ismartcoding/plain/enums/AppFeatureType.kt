@@ -10,8 +10,6 @@ import com.ismartcoding.plain.features.Permissions
 
 enum class AppFeatureType {
     SOCIAL,
-    EDUCATION,
-    HARDWARE,
     APPS,
     FILES,
     CALLS,
@@ -19,23 +17,16 @@ enum class AppFeatureType {
     SMS,
     NOTIFICATIONS,
     CHECK_UPDATES,
-    MEDIA_TRASH,
-    EXCHANGE_RATE;
+    MEDIA_TRASH;
 
     fun has(): Boolean {
         when (this) {
-            SOCIAL, NOTIFICATIONS -> {
-                return BuildConfig.CHANNEL != AppChannelType.GOOGLE.name && !TempData.demoMode
-            }
-            MEDIA_TRASH -> {
-                return isRPlus() // Android 11+
-            }
-            APPS -> {
+            APPS, SOCIAL, NOTIFICATIONS -> {
                 return BuildConfig.CHANNEL != AppChannelType.GOOGLE.name
             }
 
-            EXCHANGE_RATE, EDUCATION, HARDWARE -> {
-                return BuildConfig.DEBUG && !TempData.demoMode
+            MEDIA_TRASH -> {
+                return isRPlus() // Android 11+
             }
 
             CHECK_UPDATES -> {
@@ -60,15 +51,19 @@ enum class AppFeatureType {
             FILES -> {
                 DFeaturePermission(setOf(Permission.WRITE_EXTERNAL_STORAGE), Permission.WRITE_EXTERNAL_STORAGE)
             }
+
             CONTACTS -> {
                 DFeaturePermission(setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS), Permission.READ_CONTACTS)
             }
+
             SMS -> {
                 DFeaturePermission(setOf(Permission.READ_SMS), Permission.READ_SMS)
             }
+
             CALLS -> {
                 DFeaturePermission(setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG), Permission.READ_CALL_LOG)
             }
+
             else -> {
                 null
             }

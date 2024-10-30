@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ui.base
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,16 +20,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.ui.theme.palette.LocalTonalPalettes
 import com.ismartcoding.plain.ui.theme.palette.onDark
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -40,51 +36,34 @@ fun PListItem(
     title: String,
     desc: String? = null,
     value: String? = null,
-    icon: Any? = null,
+    icon: Int? = null,
     separatedActions: Boolean = false,
     showMore: Boolean = false,
     action: (@Composable () -> Unit)? = null,
 ) {
-    val tonalPalettes = LocalTonalPalettes.current
     Surface(
         modifier =
-        modifier
-            .alpha(if (enable) 1f else 0.5f),
+            modifier
+                .alpha(if (enable) 1f else 0.5f),
         color = Color.Unspecified,
     ) {
         Row(
             modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(16.dp, 8.dp, 8.dp, 8.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp, 8.dp, 8.dp, 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (icon != null) {
-                if (icon is ImageVector) {
-                    Icon(
-                        modifier = Modifier.padding(end = 16.dp),
-                        imageVector = icon,
-                        contentDescription = title,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                } else if (icon is Painter) {
-                    Image(
-                        modifier =
+                Image(
+                    modifier =
                         Modifier
                             .padding(end = 16.dp)
                             .size(24.dp),
-                        painter = icon,
-                        contentDescription = title,
-                    )
-                } else if (icon is String) {
-                    AsyncImage(
-                        model = icon,
-                        contentDescription = title,
-                        modifier = Modifier
-                            .size(24.dp),
-                    )
-                    HorizontalSpace(dp = 16.dp)
-                }
+                    painter = painterResource(icon),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                    contentDescription = title,
+                )
             }
             Column(
                 modifier = Modifier
@@ -108,10 +87,10 @@ fun PListItem(
             if (separatedActions) {
                 VerticalDivider(
                     modifier =
-                    Modifier
-                        .height(32.dp)
-                        .padding(start = 16.dp),
-                    color = tonalPalettes neutralVariant 80 onDark (tonalPalettes neutralVariant 30),
+                        Modifier
+                            .height(24.dp)
+                            .padding(start = 16.dp),
+                    color = MaterialTheme.colorScheme.onSurface.copy(0.2f),
                 )
             }
 
@@ -137,10 +116,10 @@ fun PListItem(
 
             if (showMore) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_chevron_right),
+                    painter = painterResource(id = R.drawable.chevron_right),
                     modifier =
-                    Modifier
-                        .size(24.dp),
+                        Modifier
+                            .size(24.dp),
                     contentDescription = title,
                     tint = MaterialTheme.colorScheme.onSurface,
                 )

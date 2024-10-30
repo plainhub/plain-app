@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.ui.models
 
 import android.content.Context
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.BuildConfig
@@ -30,7 +30,7 @@ class WebConsoleViewModel : ViewModel() {
             val r = withIO { HttpServerManager.checkServerAsync() }
             DialogHelper.hideLoading()
             if (!r.websocket || !r.http) {
-                MaterialAlertDialogBuilder(context)
+                AlertDialog.Builder(context)
                     .setTitle(context.getString(R.string.error))
                     .setMessage(errorMessage)
                     .setPositiveButton(R.string.ok) { _, _ ->

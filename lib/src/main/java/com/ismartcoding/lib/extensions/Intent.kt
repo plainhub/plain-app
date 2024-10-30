@@ -19,5 +19,4 @@ inline fun <reified T : Parcelable> Intent.parcelableArrayList(key: String): Arr
         else ->
             @Suppress("DEPRECATION")
             getParcelableArrayListExtra<T>(key)
-                as? ArrayList<T>
     }

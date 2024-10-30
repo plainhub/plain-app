@@ -12,7 +12,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -37,17 +37,18 @@ internal fun VideoPlayerSurface(
 
     var isPendingPipMode by remember { mutableStateOf(false) }
 
+    AndroidView(
+        modifier = modifier,
+        factory = {
+            playerView.apply {
+                this.player = player
+                useController = usePlayerController
+                resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+            }
+        },
+    )
     DisposableEffect(
-        AndroidView(
-            modifier = modifier,
-            factory = {
-                playerView.apply {
-                    this.player = player
-                    useController = usePlayerController
-                    resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
-                }
-            },
-        ),
+        Unit,
     ) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {

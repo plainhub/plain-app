@@ -1,10 +1,8 @@
 package com.ismartcoding.plain.ui.base
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -26,11 +24,7 @@ fun PScaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = containerColor,
         topBar = topBar,
-        content = { paddingValues ->
-            Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
-                content(paddingValues)
-            }
-        },
+        content = content,
         bottomBar = { bottomBar?.invoke() },
         floatingActionButton = { floatingActionButton?.invoke() },
     )

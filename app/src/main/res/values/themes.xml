@@ -1,120 +1,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.PlainActivity" parent="Theme.Material3.DayNight.NoActionBar">
-<!--        <item name="windowActionModeOverlay">true</item>-->
-<!--        <item name="windowActionBar">false</item>-->
-<!--        <item name="windowNoTitle">true</item>-->
-<!--        <item name="android:windowActionModeOverlay">true</item>-->
-<!--        <item name="android:windowContentOverlay">@color/canvas</item>-->
-<!--        <item name="android:windowBackground">@color/canvas</item>-->
+    <style name="Theme.PlainActivity" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
-    </style>
-
-    <style name="Theme.FullScreen" parent="@android:style/Theme.Dialog">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:windowFrame">@null</item>
-        <item name="android:backgroundDimEnabled">false</item>
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
-    </style>
-
-    <style name="Theme.PlainBase" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorSecondary">@color/secondary</item>
-        <item name="android:windowBackground">@color/canvas</item>
-        <item name="android:statusBarColor">@color/canvas</item>
-        <item name="android:textColor">@color/primary</item>
-        <item name="android:fontFamily">@font/noto_regular</item>
-        <item name="android:textSize">@dimen/text_size_normal</item>
-        <item name="android:includeFontPadding">false</item>
-        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
-        <item name="android:windowSoftInputMode">stateAlwaysHidden|adjustResize|adjustPan</item>
-        <item name="bottomSheetDialogTheme">@style/PlainBottomSheetDialogTheme</item>
-        <item name="materialAlertDialogTheme">@style/PlainMaterialAlertDialog</item>
-        <item name="popupMenuBackground">@drawable/popup_menu_background</item>
-        <item name="actionModeCloseDrawable">@drawable/ic_close</item>
-    </style>
-
-    <style name="Theme.Plain" parent="Theme.PlainBase">
-        <item name="android:windowLightStatusBar">true</item>
-    </style>
-
-    <style name="Theme.Plain.TransparentBar" parent="Theme.Plain">
-        <item name="android:windowIsTranslucent">true</item>
     </style>
 
     <style name="Theme.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/canvas</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_foreground</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_foreground</item>
         <item name="windowSplashScreenAnimationDuration">200</item>
         <item name="postSplashScreenTheme">@style/Theme.PlainActivity</item>
     </style>
 
-    <style name="PlainBottomSheetDialogTheme" parent="@style/ThemeOverlay.Material3.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/PlainBottomSheetStyle</item>
-        <item name="android:windowSoftInputMode">adjustPan</item>
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:navigationBarColor">@color/canvas</item>
-    </style>
-
-    <!-- https://material.io/components/sheets-bottom/android#anatomy-and-key-properties -->
-    <style name="PlainBottomSheetStyle" parent="Widget.Material3.BottomSheet">
-        <item name="backgroundTint">@color/canvas</item>
-        <item name="shapeAppearance">@style/PlainBottomSheetShapeAppearance</item>
-<!--        <item name="behavior_peekHeight">420dp</item>-->
-    </style>
-
-    <style name="PlainBottomSheetShapeAppearance">
-        <item name="cornerSizeTopLeft">@dimen/background_radius</item>
-        <item name="cornerSizeTopRight">@dimen/background_radius</item>
-        <item name="cornerFamily">rounded</item>
-    </style>
-
-    <style name="PlainMaterialAlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorSecondary">@color/primary</item>
-        <item name="android:background">@color/canvas</item>
-        <item name="materialAlertDialogTitleTextStyle">@style/PlainMaterialAlertDialogTitleTextStyle</item>
-        <item name="materialAlertDialogBodyTextStyle">@style/PlainMaterialAlertDialogBodyTextStyle</item>
-        <item name="buttonBarPositiveButtonStyle">@style/PlainButtonStyle</item>
-        <item name="buttonBarNeutralButtonStyle">@style/PlainButtonStyle</item>
-        <item name="buttonBarNegativeButtonStyle">@style/PlainButtonStyle</item>
-    </style>
-
-    <style name="PlainMaterialAlertDialogTitleTextStyle" parent="MaterialAlertDialog.Material3.Title.Text">
-        <item name="android:textSize">@dimen/text_size_lg</item>
-        <item name="android:fontFamily">@font/noto_medium</item>
-    </style>
-
-    <style name="PlainMaterialAlertDialogBodyTextStyle" parent="MaterialAlertDialog.Material3.Body.Text">
-        <item name="android:textSize">@dimen/text_size_lg</item>
-        <item name="android:textColor">@color/primary</item>
-        <item name="android:textIsSelectable">true</item>
-        <item name="android:paddingTop">@dimen/size_sm</item>
-        <item name="android:paddingBottom">@dimen/size_sm</item>
-    </style>
-
-    <style name="PlainButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
-        <item name="android:fontFamily">@font/noto_medium</item>
-        <item name="android:textSize">@dimen/text_size_lg</item>
-    </style>
-
-    <style name="Theme.ActionBar" parent="ThemeOverlay.Material3.ActionBar">
-        <item name="android:editTextColor">@color/primary</item>
-        <item name="android:textColor">@color/primary</item>
-        <item name="android:titleTextColor">@color/primary</item>
-        <item name="android:textColorHint">@color/secondary</item>
-        <item name="android:tint">@color/primary</item>
-        <item name="actionMenuTextColor">@color/primary</item>
-        <item name="subtitleTextColor">@color/secondary</item>
-    </style>
-
-    <style name="Theme.BottomAppBar" parent="ThemeOverlay.Material3.BottomAppBar">
-        <item name="android:textColor">@color/primary</item>
-        <item name="android:textColorHint">@color/secondary</item>
-        <item name="android:tint">@color/primary</item>
-        <item name="actionMenuTextColor">@color/primary</item>
-    </style>
 </resources>

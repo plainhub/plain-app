@@ -9,15 +9,6 @@ import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.List
-import androidx.compose.material.icons.outlined.Call
-import androidx.compose.material.icons.outlined.Contacts
-import androidx.compose.material.icons.outlined.Folder
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.Numbers
-import androidx.compose.material.icons.outlined.Sms
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import com.ismartcoding.lib.channel.receiveEventHandler
@@ -31,10 +22,10 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
-import com.ismartcoding.plain.preference.ApiPermissionsPreference
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.packageManager
+import com.ismartcoding.plain.preference.ApiPermissionsPreference
 import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -243,10 +234,10 @@ enum class Permission {
     }
 }
 
-data class PermissionItem(val icon: ImageVector?, val permission: Permission, val permissions: Set<Permission>, var granted: Boolean = false) {
+data class PermissionItem(val icon: Int?, val permission: Permission, val permissions: Set<Permission>, var granted: Boolean = false) {
 
     companion object {
-        fun create(context: Context, icon: ImageVector?, permission: Permission, permissions: Set<Permission> = setOf(permission)): PermissionItem {
+        fun create(context: Context, icon: Int?, permission: Permission, permissions: Set<Permission> = setOf(permission)): PermissionItem {
             return PermissionItem(icon, permission, permissions).apply {
                 granted = permissions.all { it.can(context) }
             }
@@ -283,27 +274,27 @@ object Permissions {
         val list = mutableListOf<PermissionItem>()
         list.add(
             PermissionItem.create(
-                context, Icons.Outlined.Folder, Permission.WRITE_EXTERNAL_STORAGE
+                context, R.drawable.folder, Permission.WRITE_EXTERNAL_STORAGE
             )
         )
         if (AppFeatureType.NOTIFICATIONS.has()) {
             list.add(
-                PermissionItem.create(context, Icons.Outlined.Notifications, Permission.NOTIFICATION_LISTENER)
+                PermissionItem.create(context, R.drawable.bell, Permission.NOTIFICATION_LISTENER)
             )
         }
         list.add(
-            PermissionItem.create(context, Icons.Outlined.Contacts, Permission.WRITE_CONTACTS, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))
+            PermissionItem.create(context, R.drawable.book_user, Permission.WRITE_CONTACTS, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))
         )
 
         if (AppFeatureType.SOCIAL.has()) {
-            list.add(PermissionItem.create(context, Icons.Outlined.Sms, Permission.READ_SMS))
-            list.add(PermissionItem.create(context, Icons.AutoMirrored.Outlined.List, Permission.WRITE_CALL_LOG, setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG)))
+            list.add(PermissionItem.create(context, R.drawable.message_square_text, Permission.READ_SMS))
+            list.add(PermissionItem.create(context, R.drawable.logs, Permission.WRITE_CALL_LOG, setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG)))
         }
         list.add(
-            PermissionItem.create(context, Icons.Outlined.Call, Permission.CALL_PHONE)
+            PermissionItem.create(context, R.drawable.phone, Permission.CALL_PHONE)
         )
         list.add(
-            PermissionItem.create(context, Icons.Outlined.Numbers, Permission.READ_PHONE_NUMBERS, setOf(Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS))
+            PermissionItem.create(context, R.drawable.file_digit, Permission.READ_PHONE_NUMBERS, setOf(Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS))
         )
         list.add(PermissionItem(null, Permission.NONE, setOf(Permission.NONE)))
         return list

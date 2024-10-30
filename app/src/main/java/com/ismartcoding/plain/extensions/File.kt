@@ -41,7 +41,7 @@ fun File.newName(): String {
     val split = nameWithoutExtension.split(' ').toMutableList()
     val last = split.last()
     if ("""^\(\d+\)$""".toRegex().matches(last)) {
-        split.removeLast()
+        split.remove(last)
     }
     val name = split.joinToString(" ")
     while (true) {

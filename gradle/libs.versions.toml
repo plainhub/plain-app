@@ -2,69 +2,54 @@
 androidGifDrawableVersion="1.2.28"
 appcompatVersion="1.7.0"
 bcprovJdk15onVersion="1.70"
-coil="3.0.0-alpha06"
-coreKtxVersion="1.13.1"
-exoplayerVersion="2.19.1"
+coil="3.1.0"
+coreKtxVersion="1.15.0"
 firebaseCrashlyticsGradleVersion="3.0.1"
-fragmentKtxVersion="1.8.0"
 glideVersion="4.16.0"
 googleServicesVersion="4.4.2"
-gradle= "8.3.2"
-accompanistDrawablepainterVersion = "0.34.0"
-cameraCoreVersion = "1.4.0-beta02"
-apollo = "3.2.1"
-compose = "1.6.8"
-activityComposeVersion = "1.9.0"
-composeBom = "2024.06.00"
+gradle= "8.8.0"
+accompanistDrawablepainterVersion = "0.37.3"
+cameraCoreVersion = "1.4.1"
+compose = "1.8.1"
+activityComposeVersion = "1.10.0"
+composeBom = "2025.04.01"
 coreSplashscreenVersion = "1.0.1"
 coreVersion = "3.5.3"
-datastorePreferencesVersion = "1.1.1"
-firebaseCrashlyticsKtxVersion = "19.0.1"
-firebaseBomVersion = "33.1.0"
+datastorePreferencesVersion = "1.1.3"
+firebaseCrashlyticsKtxVersion = "19.4.2"
+firebaseBomVersion = "33.12.0"
 gsonVersion="2.10.1"
-guavaVersion="33.0.0-jre"
 jsoupVersion="1.15.3"
 kgraphql = "0.19.0"
-kotlinGradlePluginVersion="1.9.23"
-kotlinxDatetimeVersion="0.5.0"
-kotlinxSerializationJsonVersion="1.6.3"
-kotlinxCoroutinesVersion ="1.8.1"
-ktor = "3.0.0-beta-1"
+kotlin ="2.1.10"
+kotlinxDatetimeVersion="0.6.1"
+kotlinxSerializationJsonVersion="1.7.3"
+kotlinxCoroutinesVersion ="1.10.1"
+ktor = "3.0.3"
 leakcanaryAndroidVersion = "2.12"
 lifecycleExtensionsVersion="2.2.0"
-lifecycleViewmodelKtxVersion="2.8.3"
+lifecycleViewmodelKtxVersion="2.8.7"
 markwon="4.6.2"
-materialVersion="1.12.0"
-media3 = "1.3.1"
-navigationComposeVersion = "2.7.7"
-materialIconsExtendedVersion = "1.7.0-beta03"
-material3Version = "1.2.1"
+media3 = "1.4.1"
+navigationComposeVersion = "2.8.6"
+material3Version = "1.3.2"
 okhttpVersion="4.12.0"
-openaiClientVersion = "3.6.2"
 pdfiumAndroidVersion="1.9.0"
-preferenceKtxVersion = "1.2.1"
-refreshLayoutKernelVersion="2.0.5"
 room = "2.6.1"
-snakeYamlVersion = "v1.18-android"
-subsamplingScaleImageViewAndroidxVersion="3.10.0"
 transitionVersion="1.5.0"
-viewpager2Version = "1.1.0"
 workRuntimeKtxVersion = "2.9.0"
 ztZipVersion = "1.16"
-devtoolsKspVersion = "1.9.23-1.0.20"
-pagingVersion = "3.3.0"
+devtoolsKspVersion = "2.1.10-1.0.29"
 
 [libraries]
 android-gif-drawable = { module = "pl.droidsonroids.gif:android-gif-drawable", version.ref = "androidGifDrawableVersion" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
-androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtxVersion" }
 androidx-lifecycle-extensions = { module = "androidx.lifecycle:lifecycle-extensions", version.ref = "lifecycleExtensionsVersion" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleViewmodelKtxVersion" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtxVersion" }
 bcpkix-jdk15on = { module = "org.bouncycastle:bcpkix-jdk15on", version.ref = "bcprovJdk15onVersion" }
 bcprov-jdk15on = { module = "org.bouncycastle:bcprov-jdk15on", version.ref = "bcprovJdk15onVersion" }
-exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoplayerVersion" }
 
 # Coil
 coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
@@ -72,7 +57,7 @@ coil-video = { module = "io.coil-kt.coil3:coil-video", version.ref = "coil" }
 coil-gif = { module = "io.coil-kt.coil3:coil-gif", version.ref = "coil" }
 coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
-coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coil" }
+coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 
 androidx-transition = { module = "androidx.transition:transition", version.ref = "transitionVersion" }
 firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsGradleVersion" }
@@ -99,12 +84,9 @@ media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
 media3-dash = { module = "androidx.media3:media3-exoplayer-dash", version.ref = "media3" }
 media3-hls = { module = "androidx.media3:media3-exoplayer-hls", version.ref = "media3" }
 
-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "pagingVersion" }
 zxing-core = { module = "com.google.zxing:core", version.ref = "coreVersion" }
 
 
-androidx-preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtxVersion" }
-androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2Version" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtxVersion" }
 
 # compose
@@ -116,32 +98,24 @@ compose-activity = { module = "androidx.activity:activity-compose", version.ref 
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 compose-foundation-layout = { module = "androidx.compose.foundation:foundation-layout", version.ref = "compose" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtendedVersion" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
+
 
 # firebase
 firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx", version.ref = "firebaseCrashlyticsKtxVersion" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
 
 gson = { module = "com.google.code.gson:gson", version.ref = "gsonVersion" }
-guava = { module = "com.google.guava:guava", version.ref = "guavaVersion" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoupVersion" }
 
 # graphql
 kgraphql-ktor = { module = "com.apurebase:kgraphql-ktor", version.ref = "kgraphql" }
 kgraphql = { module = "com.apurebase:kgraphql", version.ref = "kgraphql" }
 
-# apollo
-apollo-adapters = { module = "com.apollographql.apollo3:apollo-adapters", version.ref = "apollo" }
-apollo-normalized-cache-sqlite = { module = "com.apollographql.apollo3:apollo-normalized-cache-sqlite", version.ref = "apollo" }
-apollo-normalized-cache = { module = "com.apollographql.apollo3:apollo-normalized-cache", version.ref = "apollo" }
-apollo-runtime = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo" }
-
 # kotlin
-kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinGradlePluginVersion" }
+kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetimeVersion" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJsonVersion" }
-kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "kotlinxCoroutinesVersion" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesVersion" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesVersion" }
 ksp = { module = "com.github.bumptech.glide:ksp", version.ref = "glideVersion" }
@@ -175,24 +149,17 @@ markwon-tables = { module = "io.noties.markwon:ext-tables", version.ref = "markw
 markwon-linkify = { module = "io.noties.markwon:linkify", version.ref = "markwon" }
 markwon-tasklist = { module = "io.noties.markwon:ext-tasklist", version.ref = "markwon" }
 
-# material
-material = { module = "com.google.android.material:material", version.ref = "materialVersion" }
-
 # room
 room-gradle = { module = "androidx.room:room-gradle-plugin", version.ref = "room" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
-room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
 
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttpVersion" }
-openai-client = { module = "com.aallam.openai:openai-client", version.ref = "openaiClientVersion" }
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroidVersion" }
 pdfium-android = { module = "com.github.barteksc:pdfium-android", version.ref = "pdfiumAndroidVersion" }
-refresh-layout-kernel = { module = "io.github.scwang90:refresh-layout-kernel", version.ref = "refreshLayoutKernelVersion" }
 
-snake-yaml = { module = "com.github.bmoliveira:snake-yaml", version.ref = "snakeYamlVersion" }
-subsampling-scale-image-view-androidx = { module = "com.davemorrissey.labs:subsampling-scale-image-view-androidx", version.ref = "subsamplingScaleImageViewAndroidxVersion" }
 zt-zip = { module = "org.zeroturnaround:zt-zip", version.ref = "ztZipVersion" }
 
 [plugins]
 devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "devtoolsKspVersion" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

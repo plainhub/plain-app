@@ -20,12 +20,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Label
-import androidx.compose.material.icons.outlined.Link
-import androidx.compose.material.icons.outlined.OpenInBrowser
-import androidx.compose.material.icons.outlined.SaveAs
-import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -44,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -87,6 +82,7 @@ import com.ismartcoding.plain.ui.page.tags.SelectTagsDialog
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.buttonTextLarge
 import com.ismartcoding.plain.ui.theme.largeBlockButton
+import com.ismartcoding.plain.ui.theme.secondaryTextColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
@@ -98,13 +94,13 @@ import kotlin.math.abs
 fun FeedEntryPage(
     navController: NavHostController,
     id: String,
-    viewModel: FeedEntryViewModel = viewModel(),
-    tagsViewModel: TagsViewModel = viewModel(),
+    tagsVM: TagsViewModel,
+    feedEntryVM: FeedEntryViewModel = viewModel(),
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val tagsState by tagsViewModel.itemsFlow.collectAsState()
-    val tagsMapState by tagsViewModel.tagsMapFlow.collectAsState()
+    val tagsState by tagsVM.itemsFlow.collectAsState()
+    val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
     val tagIds = tagsMapState[id]?.map { it.tagId } ?: emptyList()
     val scrollState = rememberLazyListState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {
@@ -114,12 +110,12 @@ fun FeedEntryPage(
     val topRefreshLayoutState =
         rememberRefreshLayoutState {
             scope.launch {
-                viewModel.item.value?.let { m ->
+                feedEntryVM.item.value?.let { m ->
                     val r = withIO {
                         m.fetchContentAsync()
                     }
                     if (r.isOk()) {
-                        viewModel.content.value = m.content
+                        feedEntryVM.content.value = m.content
                         setRefreshState(RefreshContentState.Finished)
                     } else {
                         setRefreshState(RefreshContentState.Failed)
@@ -134,20 +130,20 @@ fun FeedEntryPage(
         }
 
     LaunchedEffect(Unit) {
-        tagsViewModel.dataType.value = DataType.FEED_ENTRY
+        tagsVM.dataType.value = DataType.FEED_ENTRY
         scope.launch(Dispatchers.IO) {
-            viewModel.item.value = FeedEntryHelper.getAsync(id)
-            val m = viewModel.item.value ?: return@launch
-            viewModel.content.value = m.content
-            viewModel.feed.value = FeedHelper.getById(m.feedId)
+            feedEntryVM.item.value = FeedEntryHelper.getAsync(id)
+            val m = feedEntryVM.item.value ?: return@launch
+            feedEntryVM.content.value = m.content
+            feedEntryVM.feed.value = FeedHelper.getById(m.feedId)
         }
     }
 
-    if (viewModel.showSelectTagsDialog.value) {
-        val m = viewModel.item.value
+    if (feedEntryVM.showSelectTagsDialog.value) {
+        val m = feedEntryVM.item.value
         if (m != null) {
-            SelectTagsDialog(tagsViewModel, tagsState, tagsMapState, data = m) {
-                viewModel.showSelectTagsDialog.value = false
+            SelectTagsDialog(tagsVM, tagsState, tagsMapState, data = m) {
+                feedEntryVM.showSelectTagsDialog.value = false
             }
         }
     }
@@ -171,39 +167,37 @@ fun FeedEntryPage(
                 scrollBehavior = scrollBehavior,
                 actions = {
                     PIconButton(
-                        icon = Icons.AutoMirrored.Outlined.Label,
+                        icon = R.drawable.label,
                         contentDescription = stringResource(R.string.select_tags),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
-                        viewModel.showSelectTagsDialog.value = true
+                        feedEntryVM.showSelectTagsDialog.value = true
                     }
                     PIconButton(
-                        icon = Icons.Outlined.Share,
+                        icon = R.drawable.chrome,
+                        contentDescription = stringResource(R.string.open_in_web),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                    ) {
+                        val m = feedEntryVM.item.value ?: return@PIconButton
+                        WebHelper.open(context, m.url)
+                    }
+                    PIconButton(
+                        icon = R.drawable.share_2,
                         contentDescription = stringResource(R.string.share),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
-                        val m = viewModel.item.value ?: return@PIconButton
+                        val m = feedEntryVM.item.value ?: return@PIconButton
                         ShareHelper.shareText(context, m.title.let { it + "\n" } + m.url)
                     }
                     ActionButtonMoreWithMenu { dismiss ->
-                        PDropdownMenuItem(text = { Text(stringResource(R.string.open_in_web)) }, leadingIcon = {
-                            Icon(
-                                Icons.Outlined.OpenInBrowser,
-                                contentDescription = stringResource(id = R.string.open_in_web)
-                            )
-                        }, onClick = {
-                            dismiss()
-                            val m = viewModel.item.value ?: return@PDropdownMenuItem
-                            WebHelper.open(context, m.url)
-                        })
                         PDropdownMenuItem(text = { Text(stringResource(R.string.save_to_notes)) }, leadingIcon = {
                             Icon(
-                                Icons.Outlined.SaveAs,
+                                painter = painterResource(R.drawable.save),
                                 contentDescription = stringResource(id = R.string.save_to_notes)
                             )
                         }, onClick = {
                             dismiss()
-                            val m = viewModel.item.value ?: return@PDropdownMenuItem
+                            val m = feedEntryVM.item.value ?: return@PDropdownMenuItem
                             scope.launch(Dispatchers.IO) {
                                 val c = "# ${m.title}\n\n" + m.content.ifEmpty { m.description }
                                 NoteHelper.saveToNotesAsync(m.id) {
@@ -215,12 +209,12 @@ fun FeedEntryPage(
                         })
                         PDropdownMenuItem(text = { Text(stringResource(R.string.copy_link)) }, leadingIcon = {
                             Icon(
-                                Icons.Outlined.Link,
+                                painter = painterResource(R.drawable.link),
                                 contentDescription = stringResource(id = R.string.copy_link)
                             )
                         }, onClick = {
                             dismiss()
-                            val m = viewModel.item.value ?: return@PDropdownMenuItem
+                            val m = feedEntryVM.item.value ?: return@PDropdownMenuItem
                             val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), m.url)
                             clipboardManager.setPrimaryClip(clip)
                             DialogHelper.showTextCopiedMessage(m.url)
@@ -232,8 +226,9 @@ fun FeedEntryPage(
         modifier = Modifier
             .imePadding(),
         content = { paddingValues ->
-            val m = viewModel.item.value ?: return@PScaffold
+            val m = feedEntryVM.item.value ?: return@PScaffold
             PullToRefresh(
+                modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
                 refreshLayoutState = topRefreshLayoutState,
                 refreshContent = remember {
                     {
@@ -245,7 +240,7 @@ fun FeedEntryPage(
                                     RefreshContentState.Refreshing -> stringResource(id = R.string.fetching_content)
                                     RefreshContentState.Dragging -> {
                                         if (abs(getRefreshContentOffset()) < getRefreshContentThreshold()) {
-                                            stringResource(id = R.string.pull_down_to_fecth_content)
+                                            stringResource(id = R.string.pull_down_to_fetch_content)
                                         } else {
                                             stringResource(id = R.string.release_to_fetch)
                                         }
@@ -292,10 +287,10 @@ fun FeedEntryPage(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Text(
-                                text = arrayOf(viewModel.feed.value?.name ?: "", m.author, m.publishedAt.timeAgo()).filter {
+                                text = arrayOf(feedEntryVM.feed.value?.name ?: "", m.author, m.publishedAt.timeAgo()).filter {
                                     it.isNotEmpty()
                                 }.joinToString(" · "),
-                                style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp, color = MaterialTheme.colorScheme.secondary),
+                                style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp, color = MaterialTheme.colorScheme.secondaryTextColor),
                             )
                             tags.forEach { tag ->
                                 Text(
@@ -311,19 +306,19 @@ fun FeedEntryPage(
                     }
                     item {
                         MarkdownText(
-                            text = viewModel.content.value.ifEmpty { m.description },
+                            text = feedEntryVM.content.value.ifEmpty { m.description },
                             modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN),
                             previewerState = previewerState,
                         )
                     }
-                    if (viewModel.content.value.isEmpty() && topRefreshLayoutState.refreshContentState.value == RefreshContentState.Finished) {
+                    if (feedEntryVM.content.value.isEmpty() && topRefreshLayoutState.refreshContentState.value == RefreshContentState.Finished) {
                         item {
                             VerticalSpace(dp = 32.dp)
-                            if (viewModel.fetchingContent.value) {
+                            if (feedEntryVM.fetchingContent.value) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                                     CircularProgressIndicator(
                                         modifier = Modifier.size(32.dp),
-                                        color = MaterialTheme.colorScheme.secondary,
+                                        color = MaterialTheme.colorScheme.primary,
                                         strokeWidth = 3.dp
                                     )
                                 }
@@ -331,14 +326,14 @@ fun FeedEntryPage(
                                 OutlinedButton(
                                     onClick = {
                                         scope.launch {
-                                            viewModel.item.value?.let { m ->
-                                                viewModel.fetchingContent.value = true
+                                            feedEntryVM.item.value?.let { m ->
+                                                feedEntryVM.fetchingContent.value = true
                                                 val r = withIO {
                                                     m.fetchContentAsync()
                                                 }
-                                                viewModel.fetchingContent.value = false
+                                                feedEntryVM.fetchingContent.value = false
                                                 if (r.isOk()) {
-                                                    viewModel.content.value = m.content
+                                                    feedEntryVM.content.value = m.content
                                                 } else {
                                                     DialogHelper.showErrorDialog(r.errorMessage())
                                                 }
@@ -347,7 +342,7 @@ fun FeedEntryPage(
                                     },
                                     modifier = Modifier
                                         .largeBlockButton(),
-                                    enabled = !viewModel.fetchingContent.value,
+                                    enabled = !feedEntryVM.fetchingContent.value,
                                 ) {
                                     Text(
                                         text = stringResource(id = R.string.load_full_content),
@@ -360,7 +355,7 @@ fun FeedEntryPage(
                     }
 
                     item {
-                        BottomSpace(paddingValues)
+                        BottomSpace()
                     }
                 }
             }

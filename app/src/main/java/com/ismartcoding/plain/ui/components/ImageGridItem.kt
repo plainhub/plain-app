@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.PlayCircleOutline
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatBytes
@@ -39,13 +38,14 @@ import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.MediaPreviewData
 import com.ismartcoding.plain.ui.theme.darkMask
 import com.ismartcoding.plain.ui.theme.lightMask
+import com.ismartcoding.plain.R
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ImageGridItem(
     modifier: Modifier = Modifier,
-    viewModel: ImagesViewModel,
-    castViewModel: CastViewModel,
+    imagesVM: ImagesViewModel,
+    castVM: CastViewModel,
     m: DImage,
     showSize: Boolean,
     previewerState: MediaPreviewerState,
@@ -54,19 +54,19 @@ fun ImageGridItem(
 ) {
     val isSelected by remember { derivedStateOf { dragSelectState.isSelected(m.id) } }
     val inSelectionMode = dragSelectState.selectMode
-    val selected = isSelected || viewModel.selectedItem.value?.id == m.id
+    val selected = isSelected || imagesVM.selectedItem.value?.id == m.id
     val itemState = rememberTransformItemState()
     Box(
         modifier = modifier
             .combinedClickable(
                 onClick = {
-                    if (castViewModel.castMode.value) {
-                        castViewModel.cast(m.path)
+                    if (castVM.castMode.value) {
+                        castVM.cast(m.path)
                     } else if (inSelectionMode) {
                         dragSelectState.addSelected(m.id)
                     } else {
                         coMain {
-                            withIO { MediaPreviewData.setDataAsync(itemState, viewModel.itemsFlow.value, m) }
+                            withIO { MediaPreviewData.setDataAsync(itemState, imagesVM.itemsFlow.value, m) }
                             previewerState.openTransform(
                                 index = MediaPreviewData.items.indexOfFirst { it.id == m.id },
                                 itemState = itemState,
@@ -78,7 +78,7 @@ fun ImageGridItem(
                     if (inSelectionMode) {
                         return@combinedClickable
                     }
-                    viewModel.selectedItem.value = m
+                    imagesVM.selectedItem.value = m
                 },
             )
             .then(
@@ -122,7 +122,7 @@ fun ImageGridItem(
                     .background(MaterialTheme.colorScheme.lightMask())
                     .aspectRatio(1f)
             )
-        } else if (castViewModel.castMode.value) {
+        } else if (castVM.castMode.value) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -134,7 +134,7 @@ fun ImageGridItem(
                     Modifier
                         .align(Alignment.Center)
                         .size(48.dp),
-                    imageVector = Icons.Outlined.PlayCircleOutline,
+                    painter = painterResource(R.drawable.cast),
                     contentDescription = null,
                     tint = Color.LightGray
                 )

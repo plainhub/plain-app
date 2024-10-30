@@ -3,10 +3,6 @@ package com.ismartcoding.plain.ui.components.mediaviewer
 import android.content.ClipData
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.DeleteForever
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,26 +24,26 @@ import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.IconTextDeleteButton
+import com.ismartcoding.plain.ui.base.IconTextRenameButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconButton
-import com.ismartcoding.plain.ui.base.PIconTextActionButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.components.ImageMetaRows
 import com.ismartcoding.plain.ui.components.FileRenameDialog
+import com.ismartcoding.plain.ui.components.ImageMetaRows
 import com.ismartcoding.plain.ui.components.TagSelector
 import com.ismartcoding.plain.ui.components.VideoMetaRows
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.TagsViewModel
-import com.ismartcoding.plain.ui.preview.PreviewItem
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ViewMediaBottomSheet(
     m: PreviewItem,
-    tagsViewModel: TagsViewModel? = null,
+    tagsVM: TagsViewModel? = null,
     tagsMap: Map<String, List<DTagRelation>>? = null,
     tagsState: List<DTag> = emptyList(),
     onDismiss: () -> Unit = {},
@@ -75,26 +71,21 @@ fun ViewMediaBottomSheet(
         },
     ) {
         LazyColumn {
+            item {
+                VerticalSpace(32.dp)
+            }
             if (m.data is DImage || m.data is DVideo) {
                 item {
                     ActionButtons {
-                        PIconTextActionButton(
-                            icon = Icons.Outlined.Edit,
-                            text = LocaleHelper.getString(R.string.rename),
-                            click = {
-                                showRenameDialog = true
+                        IconTextRenameButton {
+                            showRenameDialog = true
+                        }
+                        IconTextDeleteButton {
+                            DialogHelper.confirmToDelete {
+                                deleteAction()
+                                onDismiss()
                             }
-                        )
-                        PIconTextActionButton(
-                            icon = Icons.Outlined.DeleteForever,
-                            text = LocaleHelper.getString(R.string.delete),
-                            click = {
-                                DialogHelper.confirmToDelete {
-                                    deleteAction()
-                                    onDismiss()
-                                }
-                            }
-                        )
+                        }
                     }
                 }
                 item {
@@ -102,21 +93,21 @@ fun ViewMediaBottomSheet(
                     Subtitle(text = stringResource(id = R.string.tags))
                     TagSelector(
                         data = m.data,
-                        tagsViewModel = tagsViewModel!!,
+                        tagsVM = tagsVM!!,
                         tagsMap = tagsMap!!,
                         tagsState = tagsState,
                         onChanged = {
                             onTagsChanged()
                         }
                     )
-                    VerticalSpace(dp = 24.dp)
+                    VerticalSpace(dp = 16.dp)
                 }
             }
 
             item {
                 PCard {
                     PListItem(title = m.path, action = {
-                        PIconButton(icon = Icons.Outlined.ContentCopy, contentDescription = stringResource(id = R.string.copy_path), onClick = {
+                        PIconButton(icon = R.drawable.copy, contentDescription = stringResource(id = R.string.copy_path), click = {
                             val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.file_path), m.path)
                             clipboardManager.setPrimaryClip(clip)
                             DialogHelper.showTextCopiedMessage(m.path)

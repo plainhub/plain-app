@@ -39,12 +39,13 @@ fun ChatTextPage(
                 title = ""
             )
         },
-        content = {
+        content = { paddingValues ->
             Column(
                 modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = paddingValues.calculateTopPadding())
+                        .verticalScroll(rememberScrollState()),
             ) {
                 SelectionContainer(
                     modifier = Modifier
@@ -54,11 +55,11 @@ fun ChatTextPage(
                     ClickableText(
                         text = text,
                         style =
-                        MaterialTheme.typography.bodyLarge.copy(
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 20.sp,
-                            lineHeight = 36.sp,
-                        ),
+                            MaterialTheme.typography.bodyLarge.copy(
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontSize = 20.sp,
+                                lineHeight = 36.sp,
+                            ),
                         onClick = { position -> text.urlAt(context, position) },
                     )
                 }

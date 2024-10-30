@@ -11,12 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Launch
-import androidx.compose.material.icons.outlined.DeleteOutline
-import androidx.compose.material.icons.outlined.Outbox
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
@@ -50,12 +44,12 @@ import com.ismartcoding.plain.data.DPackageDetail
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.GroupButton
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PIconTextActionButton
+import com.ismartcoding.plain.ui.base.PIconTextButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -77,7 +71,6 @@ fun AppPage(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var item by remember { mutableStateOf<DPackageDetail?>(null) }
-    var groupButtons by remember { mutableStateOf(listOf<GroupButton>()) }
     val lifecycleEvent = rememberLifecycleEvent()
     LaunchedEffect(lifecycleEvent) {
         if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
@@ -90,55 +83,6 @@ fun AppPage(
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.IO) {
             item = PackageHelper.getPackageDetail(id)
-            val buttons = mutableListOf<GroupButton>()
-            if (PackageHelper.canLaunch(item!!.id)) {
-                buttons.add(
-                    GroupButton(Icons.AutoMirrored.Outlined.Launch, LocaleHelper.getString(R.string.launch)) {
-                        try {
-                            PackageHelper.launch(context, item?.id ?: "")
-                        } catch (ex: Exception) {
-                            DialogHelper.showMessage(ex)
-                        }
-                    }
-                )
-            }
-            buttons.add(
-                GroupButton(
-                    Icons.Outlined.DeleteOutline, LocaleHelper.getString(R.string.uninstall)
-                ) {
-                    try {
-                        PackageHelper.uninstall(context, item?.id ?: "")
-                    } catch (ex: Exception) {
-                        DialogHelper.showMessage(ex)
-                    }
-                }
-            )
-            buttons.add(
-                GroupButton(Icons.Outlined.Settings, LocaleHelper.getString(R.string.settings)) {
-                    try {
-                        PackageHelper.viewInSettings(context, item?.id ?: "")
-                    } catch (ex: Exception) {
-                        DialogHelper.showMessage(ex)
-                    }
-                }
-            )
-            buttons.add(
-                GroupButton(Icons.Outlined.Outbox, "Manifest") {
-                    coMain {
-                        try {
-                            DialogHelper.showLoading()
-                            val content = withIO { ApkParsers.getManifestXml(item?.path ?: "") }
-                            DialogHelper.hideLoading()
-                            navController.navigateText("Manifest", content, "xml")
-                        } catch (ex: Exception) {
-                            ex.printStackTrace()
-                            DialogHelper.hideLoading()
-                            DialogHelper.showErrorDialog(ex.toString())
-                        }
-                    }
-                }
-            )
-            groupButtons = buttons
         }
     }
 
@@ -149,7 +93,7 @@ fun AppPage(
                 title = item?.name ?: "",
                 actions = {
                     PIconButton(
-                        icon = Icons.Outlined.Share,
+                        icon = R.drawable.share_2,
                         contentDescription = stringResource(R.string.share),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
@@ -158,12 +102,12 @@ fun AppPage(
                 },
             )
         },
-        content = {
+        content = { paddingValues ->
             if (item == null) {
                 NoDataColumn(loading = true)
                 return@PScaffold
             }
-            LazyColumn {
+            LazyColumn(Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 item {
                     Column(
                         modifier = Modifier
@@ -174,8 +118,7 @@ fun AppPage(
                         if (item != null) {
                             val icon = packageManager.getApplicationIcon(item!!.appInfo)
                             Image(
-                                modifier =
-                                Modifier
+                                modifier = Modifier
                                     .padding(bottom = 16.dp)
                                     .size(56.dp),
                                 painter = rememberDrawablePainter(drawable = icon),
@@ -185,8 +128,7 @@ fun AppPage(
                                 Text(
                                     text = item?.id ?: "",
                                     textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .padding(horizontal = 32.dp),
+                                    modifier = Modifier.padding(horizontal = 32.dp),
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.onSurface,
                                 )
@@ -195,19 +137,16 @@ fun AppPage(
                             SelectionContainer {
                                 Text(
                                     text = LocaleHelper.getStringF(
-                                        R.string.version_name_with_code,
-                                        "version_name", item?.version ?: "", "version_code", PackageInfoCompat.getLongVersionCode(item!!.packageInfo)
+                                        R.string.version_name_with_code, "version_name", item?.version ?: "", "version_code", PackageInfoCompat.getLongVersionCode(item!!.packageInfo)
                                     ),
                                     textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .padding(horizontal = 32.dp),
+                                    modifier = Modifier.padding(horizontal = 32.dp),
                                     style = MaterialTheme.typography.titleSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                             Row(
-                                Modifier
-                                    .padding(start = 32.dp, end = 32.dp, top = 8.dp),
+                                Modifier.padding(start = 32.dp, end = 32.dp, top = 8.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 SuggestionChip(onClick = {}, label = {
@@ -221,17 +160,56 @@ fun AppPage(
                                 }
                             }
                             VerticalSpace(dp = 16.dp)
+
                             Row(
-                                modifier = Modifier
-                                    .align(Alignment.CenterHorizontally),
+                                modifier = Modifier.align(Alignment.CenterHorizontally),
                                 horizontalArrangement = Arrangement.spacedBy(32.dp),
                             ) {
-                                groupButtons.forEach { button ->
+                                if (item != null && PackageHelper.canLaunch(item!!.id)) {
                                     PIconTextActionButton(
-                                        icon = button.icon,
-                                        text = button.text,
-                                        click = button.onClick,
-                                    )
+                                        icon = R.drawable.square_arrow_out_up_right, text = stringResource(R.string.launch),
+                                        click = {
+                                            try {
+                                                PackageHelper.launch(context, item?.id ?: "")
+                                            } catch (ex: Exception) {
+                                                DialogHelper.showMessage(ex)
+                                            }
+                                        })
+
+                                    PIconTextActionButton(
+                                        icon = R.drawable.delete_forever, text = stringResource(R.string.uninstall), click = {
+                                            try {
+                                                PackageHelper.uninstall(context, item?.id ?: "")
+                                            } catch (ex: Exception) {
+                                                DialogHelper.showMessage(ex)
+                                            }
+
+                                        })
+                                    PIconTextActionButton(
+                                        icon = R.drawable.settings, text = stringResource(R.string.settings), click = {
+                                            try {
+                                                PackageHelper.viewInSettings(context, item?.id ?: "")
+                                            } catch (ex: Exception) {
+                                                DialogHelper.showMessage(ex)
+                                            }
+
+                                        })
+                                    PIconTextActionButton(
+                                        icon = R.drawable.code, text = "Manifest", click = {
+                                            coMain {
+                                                try {
+                                                    DialogHelper.showLoading()
+                                                    val content = withIO { ApkParsers.getManifestXml(item?.path ?: "") }
+                                                    DialogHelper.hideLoading()
+                                                    navController.navigateText("Manifest", content, "xml")
+                                                } catch (ex: Exception) {
+                                                    ex.printStackTrace()
+                                                    DialogHelper.hideLoading()
+                                                    DialogHelper.showErrorDialog(ex.toString())
+                                                }
+                                            }
+
+                                        })
                                 }
                             }
                         }

@@ -13,7 +13,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.preference.EditorShowLineNumbersPreference
-import com.ismartcoding.plain.preference.EditorSyntaxHighlightPreference
 import com.ismartcoding.plain.preference.EditorWrapContentPreference
 import com.ismartcoding.plain.ui.base.PDialogListItem
 import com.ismartcoding.plain.ui.base.PSwitch
@@ -24,18 +23,19 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun MdEditorSettingsDialog(
-    viewModel: MdEditorViewModel,
+    mdEditorVM: MdEditorViewModel,
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     AlertDialog(
+        containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = {
-            viewModel.showSettings = false
+            mdEditorVM.showSettings = false
         },
         confirmButton = {
             Button(
                 onClick = {
-                    viewModel.showSettings = false
+                    mdEditorVM.showSettings = false
                 }
             ) {
                 Text(stringResource(id = R.string.close))
@@ -52,9 +52,9 @@ fun MdEditorSettingsDialog(
                     title = stringResource(id = R.string.show_line_numbers),
                 ) {
                     PSwitch(
-                        activated = viewModel.showLineNumbers,
+                        activated = mdEditorVM.showLineNumbers,
                     ) {
-                        viewModel.showLineNumbers = it
+                        mdEditorVM.showLineNumbers = it
                         scope.launch(Dispatchers.IO) {
                             EditorShowLineNumbersPreference.putAsync(context, it)
                         }
@@ -64,9 +64,9 @@ fun MdEditorSettingsDialog(
                     title = stringResource(id = R.string.wrap_content),
                 ) {
                     PSwitch(
-                        activated = viewModel.wrapContent,
+                        activated = mdEditorVM.wrapContent,
                     ) {
-                        viewModel.wrapContent = it
+                        mdEditorVM.wrapContent = it
                         scope.launch(Dispatchers.IO) {
                             EditorWrapContentPreference.putAsync(context, it)
                         }

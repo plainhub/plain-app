@@ -1,10 +1,13 @@
 package com.ismartcoding.plain.ui.page
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -28,7 +31,7 @@ fun TextPage(
     title: String,
     content: String,
     language: String,
-    viewModel: TextFileViewModel = viewModel(),
+    textFileVM: TextFileViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -37,41 +40,43 @@ fun TextPage(
 
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.IO) {
-            viewModel.loadConfigAsync(context)
-            viewModel.isDataLoading.value = false
+            textFileVM.loadConfigAsync(context)
+            textFileVM.isDataLoading.value = false
         }
     }
 
-    if (viewModel.showMoreActions.value) {
-        ViewTextContentBottomSheet(viewModel, content)
+    if (textFileVM.showMoreActions.value) {
+        ViewTextContentBottomSheet(textFileVM, content)
     }
 
     PScaffold(
         topBar = {
             PTopAppBar(navController = navController, title = title, actions = {
                 ActionButtonMore {
-                    viewModel.showMoreActions.value = true
+                    textFileVM.showMoreActions.value = true
                 }
             })
         },
-        content = {
-            if (viewModel.isDataLoading.value) {
-                NoDataColumn(loading = true)
-                return@PScaffold
-            }
-            if (!viewModel.isEditorReady.value) {
-                NoDataColumn(loading = true)
-            }
-            AceEditor(
-                viewModel, scope, EditorData(
-                    language,
-                    viewModel.wrapContent.value,
-                    isDarkTheme = isDarkTheme,
-                    readOnly = viewModel.readOnly.value,
-                    gotoEnd = false,
-                    content = content
+        content = { paddingValues ->
+            Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
+                if (textFileVM.isDataLoading.value) {
+                    NoDataColumn(loading = true)
+                    return@PScaffold
+                }
+                if (!textFileVM.isEditorReady.value) {
+                    NoDataColumn(loading = true)
+                }
+                AceEditor(
+                    textFileVM, scope, EditorData(
+                        language,
+                        textFileVM.wrapContent.value,
+                        isDarkTheme = isDarkTheme,
+                        readOnly = textFileVM.readOnly.value,
+                        gotoEnd = false,
+                        content = content
+                    )
                 )
-            )
+            }
         },
     )
 }

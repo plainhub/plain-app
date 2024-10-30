@@ -2,8 +2,6 @@ package com.ismartcoding.plain.ui.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
@@ -68,7 +66,7 @@ fun <T : IData> ListSearchBar(
             placeholder = { Text(stringResource(id = R.string.search)) },
             leadingIcon = {
                 PIconButton(
-                    icon = Icons.AutoMirrored.Rounded.ArrowBack,
+                    icon = R.drawable.arrow_left,
                     contentDescription = stringResource(R.string.back),
                     tint = MaterialTheme.colorScheme.onSurface,
                 ) {

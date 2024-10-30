@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -52,7 +50,7 @@ fun OtherFilePage(
                 title = file.name,
                 actions = {
                     PIconButton(
-                        icon = Icons.Outlined.Share,
+                        icon = R.drawable.share_2,
                         contentDescription = stringResource(R.string.share),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
@@ -61,8 +59,8 @@ fun OtherFilePage(
                 },
             )
         },
-        content = {
-            LazyColumn {
+        content = { paddingValues ->
+            LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 item {
                     Column(
                         modifier = Modifier
@@ -72,10 +70,10 @@ fun OtherFilePage(
                     ) {
                         Image(
                             modifier =
-                            Modifier
-                                .padding(bottom = 32.dp)
-                                .size(56.dp),
-                            painter = painterResource(id = R.drawable.ic_unknown_file),
+                                Modifier
+                                    .padding(bottom = 32.dp)
+                                    .size(56.dp),
+                            painter = painterResource(id = R.drawable.file_question),
                             contentDescription = "",
                         )
                         SelectionContainer {

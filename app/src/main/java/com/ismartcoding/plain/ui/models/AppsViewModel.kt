@@ -34,23 +34,23 @@ class AppsViewModel(private val savedStateHandle: SavedStateHandle) : ISearchabl
     override val queryText = mutableStateOf("")
 
     suspend fun moreAsync() {
-        offset.value += limit.value
-        val items = PackageHelper.searchAsync(getQuery(), limit.value, offset.value, sortBy.value).map { VPackage.from(it) }
+        offset.value += limit.intValue
+        val items = PackageHelper.searchAsync(getQuery(), limit.intValue, offset.intValue, sortBy.value).map { VPackage.from(it) }
         _itemsFlow.value.addAll(items)
         showLoading.value = false
-        noMore.value = items.size < limit.value
+        noMore.value = items.size < limit.intValue
     }
 
     suspend fun loadAsync() {
-        offset.value = 0
-        _itemsFlow.value = PackageHelper.searchAsync(getQuery(), limit.value, 0, sortBy.value).map { VPackage.from(it) }.toMutableStateList()
-        total.value = PackageHelper.count(queryText.value)
-        totalSystem.value = PackageHelper.count("${queryText.value} type:system")
-        noMore.value = _itemsFlow.value.size < limit.value
+        offset.intValue = 0
+        _itemsFlow.value = PackageHelper.searchAsync(getQuery(), limit.intValue, 0, sortBy.value).map { VPackage.from(it) }.toMutableStateList()
+        total.intValue = PackageHelper.count(queryText.value)
+        totalSystem.intValue = PackageHelper.count("${queryText.value} type:system")
+        noMore.value = _itemsFlow.value.size < limit.intValue
         tabs.value = listOf(
-            VTabData(getString(R.string.all), "", total.value),
-            VTabData(getString(R.string.app_type_system), "system", totalSystem.value),
-            VTabData(getString(R.string.app_type_user), "user", total.value - totalSystem.value)
+            VTabData(getString(R.string.all), "", total.intValue),
+            VTabData(getString(R.string.app_type_system), "system", totalSystem.intValue),
+            VTabData(getString(R.string.app_type_user), "user", total.intValue - totalSystem.intValue)
         )
         showLoading.value = false
     }

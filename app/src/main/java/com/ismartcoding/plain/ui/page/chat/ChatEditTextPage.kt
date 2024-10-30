@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -57,7 +55,7 @@ fun ChatEditTextPage(
                 title = stringResource(id = R.string.edit_text),
                 actions = {
                     PIconButton(
-                        icon = Icons.Outlined.Save,
+                        icon = R.drawable.save,
                         contentDescription = stringResource(R.string.save),
                         tint = MaterialTheme.colorScheme.onSurface,
                     ) {
@@ -89,20 +87,20 @@ fun ChatEditTextPage(
                     }
                 })
         },
-        content = {
+        content = { paddingValues ->
             OutlinedTextField(
                 value = inputValue,
                 onValueChange = { inputValue = it },
                 modifier =
-                Modifier
-                    .padding(horizontal = 16.dp)
-                    .imePadding()
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(8.dp),
-                    )
-                    .fillMaxWidth(),
+                    Modifier
+                        .padding(start = 16.dp, end = 16.dp, top = paddingValues.calculateTopPadding())
+                        .imePadding()
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(8.dp),
+                        )
+                        .fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default,
                 shape = RoundedCornerShape(8.dp),
             )

@@ -228,7 +228,7 @@ class NumberParser
             // If that's the case, we need to apply the exponent in two steps.
             if (exponent < -38) {
                // Long.MAX_VALUE is 19 digits, so taking 20 off the exponent should be enough. 
-               f *= 1e-20;
+               f *= 1e-20F;
                exponent += 20;
             }
             // Do exponents < 0

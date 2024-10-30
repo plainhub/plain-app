@@ -18,7 +18,6 @@ import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isAudioFast
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
-import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.extensions.toAppUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
@@ -33,41 +32,32 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.api.BoxProxyApi
-import com.ismartcoding.plain.api.HttpApiTimeout
-import com.ismartcoding.plain.data.UIDataCache
-import com.ismartcoding.plain.enums.DataType
-import com.ismartcoding.plain.preference.ApiPermissionsPreference
-import com.ismartcoding.plain.preference.AudioPlayModePreference
-import com.ismartcoding.plain.preference.AudioPlayingPreference
-import com.ismartcoding.plain.preference.AudioPlaylistPreference
-import com.ismartcoding.plain.preference.AudioSortByPreference
-import com.ismartcoding.plain.preference.AuthDevTokenPreference
-import com.ismartcoding.plain.preference.ChatGPTApiKeyPreference
-import com.ismartcoding.plain.preference.VideoPlaylistPreference
+import com.ismartcoding.plain.data.DPlaylistAudio
+import com.ismartcoding.plain.data.DScreenMirrorQuality
+import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageType
-import com.ismartcoding.plain.features.AIChatCreatedEvent
+import com.ismartcoding.plain.enums.AppFeatureType
+import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.enums.MediaPlayMode
+import com.ismartcoding.plain.extensions.newPath
+import com.ismartcoding.plain.extensions.sorted
+import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.CancelNotificationsEvent
+import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.features.ClearAudioPlaylistEvent
 import com.ismartcoding.plain.features.DeleteChatItemViewEvent
+import com.ismartcoding.plain.features.NoteHelper
+import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.StartScreenMirrorEvent
-import com.ismartcoding.plain.features.AIChatHelper
-import com.ismartcoding.plain.features.media.AudioMediaStoreHelper
-import com.ismartcoding.plain.features.AudioPlayer
-import com.ismartcoding.plain.data.DPlaylistAudio
-import com.ismartcoding.plain.data.DScreenMirrorQuality
-import com.ismartcoding.plain.enums.MediaPlayMode
-import com.ismartcoding.plain.features.media.CallMediaStoreHelper
+import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.call.SimHelper
-import com.ismartcoding.plain.features.ChatHelper
-import com.ismartcoding.plain.features.media.ContactMediaStoreHelper
 import com.ismartcoding.plain.features.contact.GroupHelper
 import com.ismartcoding.plain.features.contact.SourceHelper
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
@@ -75,25 +65,28 @@ import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.features.feed.fetchContentAsync
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.FileSystemHelper
-import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
-import com.ismartcoding.plain.features.NoteHelper
-import com.ismartcoding.plain.features.PackageHelper
-import com.ismartcoding.plain.features.media.SmsMediaStoreHelper
-import com.ismartcoding.plain.features.TagHelper
-import com.ismartcoding.plain.data.TagRelationStub
-import com.ismartcoding.plain.enums.AppFeatureType
-import com.ismartcoding.plain.extensions.sorted
+import com.ismartcoding.plain.features.media.AudioMediaStoreHelper
+import com.ismartcoding.plain.features.media.CallMediaStoreHelper
+import com.ismartcoding.plain.features.media.ContactMediaStoreHelper
 import com.ismartcoding.plain.features.media.FileMediaStoreHelper
+import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
+import com.ismartcoding.plain.features.media.SmsMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.DeviceInfoHelper
-import com.ismartcoding.plain.helpers.ExchangeHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.helpers.TempHelper
+import com.ismartcoding.plain.preference.ApiPermissionsPreference
+import com.ismartcoding.plain.preference.AudioPlayModePreference
+import com.ismartcoding.plain.preference.AudioPlayingPreference
+import com.ismartcoding.plain.preference.AudioPlaylistPreference
+import com.ismartcoding.plain.preference.AudioSortByPreference
+import com.ismartcoding.plain.preference.AuthDevTokenPreference
 import com.ismartcoding.plain.preference.DeveloperModePreference
 import com.ismartcoding.plain.preference.DeviceNamePreference
 import com.ismartcoding.plain.preference.ScreenMirrorQualityPreference
+import com.ismartcoding.plain.preference.VideoPlaylistPreference
 import com.ismartcoding.plain.receivers.BatteryReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.ScreenMirrorService
@@ -101,8 +94,6 @@ import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.web.loaders.FeedsLoader
 import com.ismartcoding.plain.web.loaders.FileInfoLoader
 import com.ismartcoding.plain.web.loaders.TagsLoader
-import com.ismartcoding.plain.web.models.AIChat
-import com.ismartcoding.plain.web.models.AIChatConfig
 import com.ismartcoding.plain.web.models.ActionResult
 import com.ismartcoding.plain.web.models.App
 import com.ismartcoding.plain.web.models.Audio
@@ -113,7 +104,6 @@ import com.ismartcoding.plain.web.models.ContactGroup
 import com.ismartcoding.plain.web.models.ContactInput
 import com.ismartcoding.plain.web.models.FeedEntry
 import com.ismartcoding.plain.web.models.FileInfo
-import com.ismartcoding.plain.web.models.Files
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.Image
 import com.ismartcoding.plain.web.models.MediaFileInfo
@@ -136,20 +126,18 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.application.BaseApplicationPlugin
 import io.ktor.server.application.call
-import io.ktor.server.application.pluginOrNull
 import io.ktor.server.request.header
 import io.ktor.server.request.receive
 import io.ktor.server.request.receiveText
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondBytes
 import io.ktor.server.response.respondText
-import io.ktor.server.routing.Routing
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
 import io.ktor.util.AttributeKey
 import kotlinx.coroutines.coroutineScope
 import kotlinx.datetime.Instant
-import kotlinx.datetime.toInstant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.buildJsonArray
@@ -166,38 +154,6 @@ class SXGraphQL(val schema: Schema) {
     class Configuration : SchemaConfigurationDSL() {
         fun init() {
             schemaBlock = {
-                query("aiChats") {
-                    configure {
-                        executor = Executor.DataLoaderPrepared
-                    }
-                    resolver { offset: Int, limit: Int, query: String ->
-                        val items = AIChatHelper.searchAsync(query, limit, offset)
-                        items.map { it.toModel() }
-                    }
-                    type<AIChat> {
-                        dataProperty("tags") {
-                            prepare { item -> item.id.value }
-                            loader { ids ->
-                                TagsLoader.load(ids, DataType.AI_CHAT)
-                            }
-                        }
-                    }
-                }
-                query("aiChatCount") {
-                    resolver { query: String ->
-                        AIChatHelper.countAsync(query)
-                    }
-                }
-                query("aiChatConfig") {
-                    resolver { ->
-                        AIChatConfig(ChatGPTApiKeyPreference.getAsync(MainApp.instance))
-                    }
-                }
-                query("aiChat") {
-                    resolver { id: ID ->
-                        AIChatHelper.getAsync(id.value)?.toModel()
-                    }
-                }
                 query("chatItems") {
                     resolver { ->
                         val dao = AppDatabase.instance.chatDao()
@@ -569,12 +525,6 @@ class SXGraphQL(val schema: Schema) {
                         FileInfo(path, updatedAt, size = file.length(), tags, data)
                     }
                 }
-                query("boxes") {
-                    resolver { ->
-                        val items = AppDatabase.instance.boxDao().getAll()
-                        items.map { it.toModel() }
-                    }
-                }
                 query("tags") {
                     resolver { type: DataType ->
                         val tagCountMap = TagHelper.count(type).associate { it.id to it.count }
@@ -669,14 +619,6 @@ class SXGraphQL(val schema: Schema) {
                         data?.toModel()
                     }
                 }
-                query("latestExchangeRates") {
-                    resolver { live: Boolean ->
-                        if (live || UIDataCache.current().latestExchangeRates == null) {
-                            ExchangeHelper.getRates()
-                        }
-                        UIDataCache.current().latestExchangeRates?.toModel()
-                    }
-                }
                 query("deviceInfo") {
                     resolver { ->
                         val context = MainApp.instance
@@ -742,13 +684,6 @@ class SXGraphQL(val schema: Schema) {
                         true
                     }
                 }
-                mutation("updateAIChatConfig") {
-                    resolver { chatGPTApiKey: String ->
-                        val context = MainApp.instance
-                        ChatGPTApiKeyPreference.putAsync(context, chatGPTApiKey)
-                        AIChatConfig(chatGPTApiKey)
-                    }
-                }
                 mutation("createChatItem") {
                     resolver { content: String ->
                         val item =
@@ -769,29 +704,11 @@ class SXGraphQL(val schema: Schema) {
                         true
                     }
                 }
-                mutation("createAIChat") {
-                    resolver { id: ID, message: String, isMe: Boolean ->
-                        if (ChatGPTApiKeyPreference.getAsync(MainApp.instance).isEmpty()) {
-                            throw Exception("no_api_key")
-                        }
-                        val items = AIChatHelper.createChatItemsAsync(id.value, isMe, message)
-                        if (isMe) {
-                            sendEvent(AIChatCreatedEvent(items[0]))
-                        }
-                        items.map { it.toModel() }
-                    }
-                }
                 mutation("relaunchApp") {
                     resolver { ->
                         coIO {
                             AppHelper.relaunch(MainApp.instance)
                         }
-                        true
-                    }
-                }
-                mutation("deleteAIChats") {
-                    resolver { query: String ->
-                        AIChatHelper.deleteAsync(query)
                         true
                     }
                 }
@@ -1144,10 +1061,6 @@ class SXGraphQL(val schema: Schema) {
                                 items = CallMediaStoreHelper.getIdsAsync(context, query).map { TagRelationStub(it) }
                             }
 
-                            DataType.AI_CHAT -> {
-                                items = AIChatHelper.getIdsAsync(query).map { TagRelationStub(it) }
-                            }
-
                             else -> {}
                         }
 
@@ -1215,10 +1128,6 @@ class SXGraphQL(val schema: Schema) {
 
                             DataType.CALL -> {
                                 ids = CallMediaStoreHelper.getIdsAsync(context, query)
-                            }
-
-                            DataType.AI_CHAT -> {
-                                ids = AIChatHelper.getIdsAsync(query)
                             }
 
                             else -> {}
@@ -1358,7 +1267,7 @@ class SXGraphQL(val schema: Schema) {
                 enum<Permission>()
                 enum<FileSortBy>()
                 stringScalar<Instant> {
-                    deserialize = { value: String -> value.toInstant() }
+                    deserialize = { value: String -> Instant.parse(value) }
                     serialize = Instant::toString
                 }
 
@@ -1378,11 +1287,7 @@ class SXGraphQL(val schema: Schema) {
         private suspend fun executeGraphqlQL(
             schema: Schema,
             query: String,
-            useBoxApi: Boolean,
         ): String {
-            if (useBoxApi) {
-                return BoxProxyApi.executeAsync(query, HttpApiTimeout.MEDIUM_SECONDS)
-            }
             val request = Json.decodeFromString(GraphqlRequest.serializer(), query)
             return schema.execute(request.query, request.variables.toString(), context {})
         }
@@ -1398,7 +1303,7 @@ class SXGraphQL(val schema: Schema) {
                     config.schemaBlock?.invoke(this)
                 }
 
-            val routing: Routing.() -> Unit = {
+            pipeline.routing {
                 route("/graphql") {
                     post {
                         if (!TempData.webEnabled) {
@@ -1406,7 +1311,6 @@ class SXGraphQL(val schema: Schema) {
                             return@post
                         }
                         val clientId = call.request.header("c-id") ?: ""
-                        val useBoxApi = call.request.header("x-box-api") == "true"
                         if (clientId.isNotEmpty()) {
                             val token = HttpServerManager.tokenCache[clientId]
                             if (token == null) {
@@ -1426,7 +1330,7 @@ class SXGraphQL(val schema: Schema) {
 
                             LogCat.d("[Request] $requestStr")
                             HttpServerManager.clientRequestTs[clientId] = System.currentTimeMillis() // record the api request time
-                            val r = executeGraphqlQL(schema, requestStr, useBoxApi)
+                            val r = executeGraphqlQL(schema, requestStr)
                             call.respondBytes(CryptoHelper.aesEncrypt(token, r))
                         } else {
                             val authStr = call.request.header("authorization")?.split(" ")
@@ -1442,14 +1346,12 @@ class SXGraphQL(val schema: Schema) {
                             val requestStr = call.receiveText()
                             LogCat.d("[Request] $requestStr")
                             HttpServerManager.clientRequestTs[clientId] = System.currentTimeMillis() // record the api request time
-                            val r = executeGraphqlQL(schema, requestStr, useBoxApi)
+                            val r = executeGraphqlQL(schema, requestStr)
                             call.respondText(r, contentType = ContentType.Application.Json)
                         }
                     }
                 }
             }
-
-            pipeline.pluginOrNull(Routing)?.apply(routing)
 
             pipeline.intercept(ApplicationCallPipeline.Monitoring) {
                 try {

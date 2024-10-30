@@ -38,7 +38,7 @@ fun RefreshLayout(
         refreshLayoutState.composePositionState.value = composePosition
         refreshLayoutState.coroutineScope = coroutineScope
         if (refreshContentThreshold != null)
-            refreshLayoutState.refreshContentThresholdState.value =
+            refreshLayoutState.refreshContentThresholdState.floatValue =
                 with(density) { refreshContentThreshold.toPx() }
         composePosition.isHorizontal()
     }
@@ -72,8 +72,8 @@ fun RefreshLayout(
                 maxHeight = if (orientationIsHorizontal) contentPlaceable.height else Constraints.Infinity,
             )
         )
-        if (refreshContentThreshold == null && refreshLayoutState.refreshContentThresholdState.value == 0f) {
-            refreshLayoutState.refreshContentThresholdState.value =
+        if (refreshContentThreshold == null && refreshLayoutState.refreshContentThresholdState.floatValue == 0f) {
+            refreshLayoutState.refreshContentThresholdState.floatValue =
                 if (orientationIsHorizontal) {
                     refreshContentPlaceable.width.toFloat()
                 } else {

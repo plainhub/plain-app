@@ -3,11 +3,6 @@ package com.ismartcoding.plain.ui.base
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.ContentPaste
-import androidx.compose.material.icons.rounded.Visibility
-import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,6 +23,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -64,24 +60,24 @@ fun PTextField(
 
     TextField(
         modifier =
-        Modifier
-            .focusRequester(focusRequester)
-            .fillMaxWidth(),
+            Modifier
+                .focusRequester(focusRequester)
+                .fillMaxWidth(),
         colors =
-        TextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent,
-        ),
+            TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+            ),
         maxLines = if (singleLine) 1 else Int.MAX_VALUE,
         enabled = !readOnly,
         value = value,
         label =
-        if (label.isEmpty()) {
-            null
-        } else {
-            { Text(label) }
-        },
+            if (label.isEmpty()) {
+                null
+            } else {
+                { Text(label) }
+            },
         onValueChange = {
             if (!readOnly) onValueChange(it)
         },
@@ -105,16 +101,18 @@ fun PTextField(
                     }
                 }) {
                     Icon(
-                        imageVector =
-                        if (isPassword) {
-                            if (showPassword) {
-                                Icons.Rounded.Visibility
-                            } else {
-                                Icons.Rounded.VisibilityOff
-                            }
-                        } else {
-                            Icons.Rounded.Close
-                        },
+                        painter =
+                            painterResource(
+                                if (isPassword) {
+                                    if (showPassword) {
+                                        R.drawable.eye
+                                    } else {
+                                        R.drawable.eye_off
+                                    }
+                                } else {
+                                    R.drawable.x
+                                }
+                            ),
                         contentDescription = if (isPassword) stringResource(R.string.password) else stringResource(R.string.clear),
                         tint = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                     )
@@ -124,7 +122,7 @@ fun PTextField(
                     onValueChange(clipboardManager.getText()?.text ?: "")
                 }) {
                     Icon(
-                        imageVector = Icons.Rounded.ContentPaste,
+                        painter = painterResource(R.drawable.content_paste),
                         contentDescription = stringResource(R.string.paste),
                         tint = MaterialTheme.colorScheme.primary,
                     )

@@ -8,6 +8,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.MediaMetadata.MEDIA_TYPE_MUSIC
 import androidx.media3.common.util.UnstableApi
+import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.extensions.getFilenameWithoutExtensionFromPath
 import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.plain.R
@@ -39,6 +40,10 @@ data class DPlaylistAudio(
                     .build()
             )
             .build()
+    }
+
+    fun getSubtitle(): String {
+        return listOf(artist, duration.formatDuration()).filter { it.isNotEmpty() }.joinToString(" · ")
     }
 
     companion object {

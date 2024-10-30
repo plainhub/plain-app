@@ -19,10 +19,23 @@ import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.preference.AudioPlayingPreference
 import com.ismartcoding.plain.preference.AudioPlaylistPreference
 import com.ismartcoding.plain.services.AudioPlayerService
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 object AudioPlayer {
+    private val _isPlayingFlow = MutableStateFlow(false)
+    val isPlayingFlow: StateFlow<Boolean> = _isPlayingFlow.asStateFlow()
+
     fun isPlaying(): Boolean {
         return player?.isPlaying == true
+    }
+
+    private val playerListener = object : Player.Listener {
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            LogCat.d("Player.isPlaying changed to: $isPlaying")
+            _isPlayingFlow.value = isPlaying
+        }
     }
 
     private var player: Player? = null
@@ -35,18 +48,23 @@ object AudioPlayer {
             }
         }
 
-    var pendingQuit: Boolean = false
-
-    fun ensurePlayer(context: Context, callback: () -> Unit = {}) {
+    fun ensurePlayer(context: Context, callback: suspend () -> Unit = {}) {
         if (player != null) {
-            callback()
+            coMain {
+                callback()
+            }
             return
         }
         val sessionToken = SessionToken(context, ComponentName(context, AudioPlayerService::class.java))
         val mediaControllerFuture = MediaController.Builder(context, sessionToken).buildAsync()
         mediaControllerFuture.addListener({
-            player = mediaControllerFuture.get()
-            callback()
+            player = mediaControllerFuture.get().also {
+                it.addListener(playerListener)
+                _isPlayingFlow.value = it.isPlaying
+            }
+            coMain {
+                callback()
+            }
         }, MoreExecutors.directExecutor())
     }
 
@@ -114,14 +132,16 @@ object AudioPlayer {
     }
 
     fun seekTo(progress: Long) {
-        playerProgress = progress * 1000
-        if (player?.isPlaying == true) {
-            player?.pause()
-            player?.seekTo(playerProgress)
-            player?.prepare()
-            player?.play()
-        } else {
-            play()
+        coMain {
+            playerProgress = progress * 1000
+            if (player?.isPlaying == true) {
+                player?.pause()
+                player?.seekTo(playerProgress)
+                player?.prepare()
+                player?.play()
+            } else {
+                play()
+            }
         }
     }
 
@@ -182,35 +202,31 @@ object AudioPlayer {
     }
 
     fun pause() {
-        playerProgress = player?.currentPosition ?: 0
-        if (player?.isPlaying == true) {
+        coMain {
             player?.pause()
         }
     }
 
     fun clear() {
-        if (player?.isPlaying == true) {
-            player?.pause()
+        coMain {
+            if (player?.isPlaying == true) {
+                player?.pause()
+            }
+            player?.clearMediaItems()
         }
-        player?.clearMediaItems()
     }
 
     fun release() {
+        player?.removeListener(playerListener)
         player = null
+        _isPlayingFlow.value = false
     }
 
     private fun doPlay(
         audio: DPlaylistAudio,
     ) {
-        pendingQuit = false
         player?.setMediaItem(audio.toMediaItem())
         player?.prepare()
-        player?.seekTo(playerProgress)
-        player?.play()
-    }
-
-    fun repeatCurrent() {
-        playerProgress = 0
         player?.seekTo(playerProgress)
         player?.play()
     }

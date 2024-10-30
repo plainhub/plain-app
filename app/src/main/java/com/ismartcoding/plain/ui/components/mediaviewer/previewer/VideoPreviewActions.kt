@@ -10,29 +10,17 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.VolumeMute
-import androidx.compose.material.icons.automirrored.outlined.VolumeUp
-import androidx.compose.material.icons.outlined.MoreHoriz
-import androidx.compose.material.icons.outlined.Speed
-import androidx.compose.material.icons.rounded.Cast
-import androidx.compose.material.icons.rounded.Fullscreen
-import androidx.compose.material.icons.rounded.Pause
-import androidx.compose.material.icons.rounded.PlayArrow
-import androidx.compose.material.icons.rounded.SaveAlt
-import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -59,6 +47,7 @@ import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DVideo
+import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.DownloadHelper
@@ -68,11 +57,12 @@ import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PMiniButton
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
+import com.ismartcoding.plain.ui.base.PlayerSlider
 import com.ismartcoding.plain.ui.components.CastDialog
 import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.CastViewModel
-import com.ismartcoding.plain.ui.preview.PreviewItem
+import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
 import com.ismartcoding.plain.ui.theme.darkMask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -130,11 +120,11 @@ fun VideoPreviewActions(
                             .background(MaterialTheme.colorScheme.darkMask())
                             .padding(horizontal = 20.dp, vertical = 8.dp),
                     ) {
-                        PMiniButton(text = stringResource(id = R.string.cast)) {
+                        PMiniButton(label = stringResource(id = R.string.cast)) {
                             castViewModel.cast(m.path)
                         }
                         HorizontalSpace(dp = 20.dp)
-                        PMiniOutlineButton(text = stringResource(id = R.string.exit_cast_mode), color = Color.LightGray) {
+                        PMiniOutlineButton(label = stringResource(id = R.string.exit_cast_mode), color = Color.LightGray) {
                             castViewModel.exitCastMode()
                         }
                     }
@@ -149,7 +139,7 @@ fun VideoPreviewActions(
                     .padding(horizontal = 20.dp, vertical = 8.dp),
             ) {
                 ActionIconButton(
-                    icon = Icons.Rounded.Share,
+                    icon = R.drawable.share_2,
                     contentDescription = stringResource(R.string.share),
                 ) {
                     if (m.mediaId.isNotEmpty()) {
@@ -172,15 +162,15 @@ fun VideoPreviewActions(
                 }
                 HorizontalSpace(dp = 20.dp)
                 ActionIconButton(
-                    icon = Icons.Rounded.Cast,
+                    icon = R.drawable.cast,
                     contentDescription = stringResource(R.string.cast),
                 ) {
                     castViewModel.showCastDialog.value = true
                 }
-                if (m.data !is DVideo) {
+                if (m.data !is DVideo && m.data !is DFile) {
                     HorizontalSpace(dp = 20.dp)
                     ActionIconButton(
-                        icon = Icons.Rounded.SaveAlt,
+                        icon = R.drawable.save,
                         contentDescription = stringResource(R.string.save),
                     ) {
                         scope.launch {
@@ -207,7 +197,7 @@ fun VideoPreviewActions(
                 }
                 HorizontalSpace(dp = 20.dp)
                 ActionIconButton(
-                    icon = Icons.Outlined.MoreHoriz,
+                    icon = R.drawable.ellipsis,
                     contentDescription = stringResource(R.string.more_info),
                 ) {
                     state.showMediaInfo = true
@@ -266,7 +256,7 @@ fun VideoButtons1(context: Context, videoState: VideoState) {
             }
         ) {
             Icon(
-                imageVector = Icons.Outlined.Speed,
+                painter = painterResource(R.drawable.gauge),
                 tint = Color.White,
                 contentDescription = stringResource(R.string.change_playback_speed)
             )
@@ -278,7 +268,7 @@ fun VideoButtons1(context: Context, videoState: VideoState) {
         }
     ) {
         Icon(
-            imageVector = if (videoState.isMuted) Icons.AutoMirrored.Outlined.VolumeMute else Icons.AutoMirrored.Outlined.VolumeUp,
+            painter = painterResource(if (videoState.isMuted) R.drawable.volume_x else R.drawable.volume_2),
             tint = Color.White,
             contentDescription = stringResource(R.string.toggle_audio)
         )
@@ -290,7 +280,7 @@ fun VideoButtons1(context: Context, videoState: VideoState) {
             },
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_pip),
+                painter = painterResource(id = R.drawable.pip),
                 tint = Color.White,
                 contentDescription = stringResource(R.string.picture_in_picture),
             )
@@ -315,14 +305,14 @@ fun VideoButtons2(videoState: VideoState, scope: CoroutineScope) {
             if (videoState.isPlaying) {
                 Image(
                     modifier = Modifier.size(32.dp),
-                    imageVector = Icons.Rounded.Pause,
+                    painter = painterResource(R.drawable.pause),
                     colorFilter = ColorFilter.tint(Color.White),
                     contentDescription = stringResource(R.string.pause),
                 )
             } else {
                 Image(
                     modifier = Modifier.size(32.dp),
-                    imageVector = Icons.Rounded.PlayArrow,
+                    painter = painterResource(R.drawable.play_arrow),
                     colorFilter = ColorFilter.tint(Color.White),
                     contentDescription = stringResource(R.string.play),
                 )
@@ -336,34 +326,20 @@ fun VideoButtons2(videoState: VideoState, scope: CoroutineScope) {
             color = Color.White,
             textAlign = TextAlign.Center
         )
-        Box(Modifier.weight(1f)) {
-            Slider(
-                modifier = Modifier.fillMaxWidth(),
-                value = videoState.bufferedPercentage.toFloat(),
-                enabled = false,
-                onValueChange = {},
-                valueRange = 0f..100f,
-                colors =
-                SliderDefaults.colors(
-                    disabledThumbColor = Color.Transparent,
-                    disabledInactiveTrackColor = Color.DarkGray.copy(alpha = 0.4f),
-                    disabledActiveTrackColor = Color.Gray
-                )
-            )
-            Slider(
-                modifier = Modifier.fillMaxWidth(),
-                value = videoState.currentTime.toFloat(),
-                onValueChange = {
-                    videoState.seekTo(it.toLong())
-                },
-                valueRange = 0f..videoState.totalTime.toFloat(),
-                colors =
-                SliderDefaults.colors(
-                    thumbColor = Color.White,
-                    activeTrackColor = Color.White,
-                    activeTickColor = Color.White,
-                    inactiveTrackColor = Color.Transparent
-                )
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 4.dp)
+        ) {
+            PlayerSlider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(20.dp),
+                progress = videoState.currentTime.toFloat() / videoState.totalTime.toFloat(),
+                bufferedProgress = videoState.bufferedPercentage / 100f,
+                onProgressChange = { progress ->
+                    videoState.seekTo((progress * videoState.totalTime).toLong())
+                }
             )
         }
         Text(
@@ -380,12 +356,12 @@ fun VideoButtons2(videoState: VideoState, scope: CoroutineScope) {
                 videoState.isFullscreenMode = !videoState.isFullscreenMode
             }
         ) {
-            Image(
-                modifier = Modifier.size(32.dp),
-                imageVector = Icons.Rounded.Fullscreen,
-                colorFilter = ColorFilter.tint(Color.White),
+            Icon(
+                painter = painterResource(R.drawable.maximize),
+                tint = Color.White,
                 contentDescription = stringResource(R.string.fullscreen)
             )
         }
     }
 }
+

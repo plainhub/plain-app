@@ -25,7 +25,7 @@ import androidx.media3.ui.PlayerView
 import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.plain.ui.components.mediaviewer.RawGesture
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
-import com.ismartcoding.plain.ui.preview.PreviewItem
+import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
 import kotlinx.coroutines.launch
 import java.util.UUID
 
