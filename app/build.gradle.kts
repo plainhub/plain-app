@@ -121,8 +121,6 @@ android {
 
     buildFeatures {
         buildConfig = true
-        viewBinding = true
-        dataBinding = true
         compose = true
     }
 
@@ -143,6 +141,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":lib"))
 
     implementation(platform(libs.compose.bom))
 
@@ -216,7 +215,6 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
 
     implementation(libs.zt.zip)
-    implementation(project(":lib"))
     debugImplementation(libs.leakcanary.android)
     implementation(kotlin("stdlib", libs.versions.kotlin.get()))
 }

@@ -39,3 +39,4 @@ jobs:
           draft: true
           prerelease: false
           artifacts: ./app/build/outputs/apk/github/release/PlainApp-${{ env.version_name }}.apk,./app/build/outputs/apk/china/release/PlainApp-${{ env.version_name }}-china.apk
+
