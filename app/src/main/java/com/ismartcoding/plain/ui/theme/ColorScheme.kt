@@ -67,18 +67,18 @@ val ColorScheme.yellow: Color
     @Composable
     @ReadOnlyComposable
     get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) {
-        Color(0xFFFFEB3B)
+        Color(0xFFFFB300)
     } else {
-        Color(0xFFFFEB3B)
+        Color(0xFFFFCC00)
     }
 
 val ColorScheme.orange: Color
     @Composable
     @ReadOnlyComposable
     get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) {
-        Color(0xFFFF9800)
+        Color(0xFFFFB74D)
     } else {
-        Color(0xFFFF9800)
+        Color(0xFFF57C00)
     }
 
 val ColorScheme.navBarBackground: Color

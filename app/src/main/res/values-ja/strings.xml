@@ -165,7 +165,7 @@
     <string name="privacy_policy">プライバシーポリシー</string>
     <string name="terms_of_use">利用規約</string>
     <string name="grant_permission">許可を付与</string>
-    <string name="system_alert_window_warning">「他のアプリの上に表示」の許可を付与することが不可欠です。この許可がないと、アプリがバックグラウンドで実行されている場合に、アンインストール確認ダイアログなど、アプリによってトリガーされた重要なシステムダイアログが見逃される可能性があります。</string>
+    <string name="system_alert_window_warning">アプリがバックグラウンドで動作中に、アンインストール確認などの重要なシステムポップアップを見逃さないように、「他のアプリの上に表示」を許可してください。</string>
     <string name="version_name_with_code">バージョン {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">最適化されたバッテリー使用が現在有効です。中断のないパフォーマンスを確保するために、このアプリケーションのために特にバッテリーオプティマイゼーションを無効にすることを検討してください。</string>
     <string name="apps">アプリ</string>

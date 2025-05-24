@@ -165,7 +165,7 @@
     <string name="privacy_policy">隱私政策</string>
     <string name="terms_of_use">使用條款</string>
     <string name="grant_permission">授權</string>
-    <string name="system_alert_window_warning">授予\'在其他應用程式上顯示\'權限是至關重要的。如果沒有此權限，在應用程式在背景運行時，您可能會錯過由應用程式觸發的關鍵系統對話方塊，例如卸載確認對話方塊。</string>
+    <string name="system_alert_window_warning">請允許「顯示在其他應用程式上層」，避免應用程式在背景執行時錯過重要的系統彈窗，例如解除安裝確認。</string>
     <string name="version_name_with_code">版本 {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">優化電池使用目前已啟用。為確保不中斷效能，請考慮為此應用停用電池優化。</string>
     <string name="apps">應用</string>

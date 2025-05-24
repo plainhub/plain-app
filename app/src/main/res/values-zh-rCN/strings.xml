@@ -165,7 +165,7 @@
     <string name="privacy_policy">隐私政策</string>
     <string name="terms_of_use">用户协议</string>
     <string name="grant_permission">授予权限</string>
-    <string name="system_alert_window_warning">授予‘在其他应用程序上显示’权限是至关重要的。如果没有此权限，在应用程序在后台运行时，您可能会错过由应用程序触发的关键系统对话框，例如卸载确认对话框。</string>
+    <string name="system_alert_window_warning">请允许“显示在其他应用上层”，以免应用在后台运行时错过卸载确认等重要系统弹窗。</string>
     <string name="version_name_with_code">版本 {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">优化电池使用目前已激活。为确保流畅的使用性能，请考虑为此应用禁用电池优化。</string>
     <string name="apps">应用</string>

@@ -165,7 +165,7 @@
     <string name="privacy_policy">Gizlilik politikası</string>
     <string name="terms_of_use">Kullanım şartları</string>
     <string name="grant_permission">İzin ver</string>
-    <string name="system_alert_window_warning">\'Diğer uygulamaların üzerinde görüntüleme\' iznini vermek çok önemlidir. Bu izin olmadan, uygulama arka planda çalışıyorsa, uygulama tarafından tetiklenen kaldırma onayı iletişim kutuları gibi önemli sistem iletişim kutularını kaçırabilirsiniz.</string>
+    <string name="system_alert_window_warning">Uygulama arka planda çalışırken kaldırma onayı gibi önemli sistem uyarılarını kaçırmamak için “Diğer uygulamaların üzerinde göster” iznini verin.</string>
     <string name="version_name_with_code">Sürüm {{ version_name }} ({{ version_code }})</string>
     <string name="optimized_batter_usage_warning">Optimize edilmiş pil kullanımı şu anda etkin. Kesintisiz performans sağlamak için, lütfen özellikle bu uygulama için pil optimizasyonunu devre dışı bırakmayı düşünün.</string>
     <string name="apps">Uygulamalar</string>

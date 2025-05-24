@@ -165,7 +165,7 @@
     <string name="privacy_policy">Chính sách bảo mật</string>
     <string name="terms_of_use">Điều khoản sử dụng</string>
     <string name="grant_permission">Cấp quyền</string>
-    <string name="system_alert_window_warning">Cấp quyền \'Hiển thị trên các ứng dụng khác\' là cần thiết. Nếu không có quyền này, nếu ứng dụng đang chạy ở nền, bạn có thể bỏ lỡ các hộp thoại quan trọng của hệ thống được kích hoạt bởi ứng dụng, như hộp thoại xác nhận gỡ cài đặt.</string>
+    <string name="system_alert_window_warning">Vui lòng cho phép “Hiển thị trên các ứng dụng khác” để không bỏ lỡ các thông báo hệ thống quan trọng như xác nhận gỡ cài đặt khi ứng dụng chạy nền.</string>
     <string name="version_name_with_code">Phiên bản {{ version_name }} ({{ version_code }})</string>
     <string name="optimized_batter_usage_warning">Tối ưu hóa pin đang hoạt động. Để đảm bảo hiệu suất không gián đoạn, vui lòng xem xét tắt tối ưu hóa pin đặc biệt cho ứng dụng này.</string>
     <string name="apps">Ứng dụng</string>

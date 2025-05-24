@@ -165,7 +165,7 @@
     <string name="privacy_policy">Datenschutzrichtlinie</string>
     <string name="terms_of_use">Nutzungsbedingungen</string>
     <string name="grant_permission">Berechtigung erteilen</string>
-    <string name="system_alert_window_warning">Die Gewährung der \'Über anderen Apps anzeigen\'-Berechtigung ist unerlässlich. Ohne diese Berechtigung könnten bei laufender App im Hintergrund wichtige Systemdialoge, wie etwa Deinstallationsbestätigungsdialoge, übersehen werden.</string>
+    <string name="system_alert_window_warning">Bitte erlauben Sie „Über anderen Apps anzeigen“, damit Sie wichtige System-Popups wie Deinstallationsbestätigungen im Hintergrund nicht verpassen.</string>
     <string name="version_name_with_code">Version {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">Optimierte Batterienutzung ist derzeit aktiv. Um eine unterbrechungsfreie Leistung zu gewährleisten, erwägen Sie bitte, die Batterieoptimierung speziell für diese App zu deaktivieren.</string>
     <string name="apps">Apps</string>

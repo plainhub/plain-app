@@ -11,9 +11,7 @@ import com.ismartcoding.lib.extensions.compress
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isUrl
-import com.ismartcoding.plain.extensions.newFile
 import com.ismartcoding.lib.extensions.scanFileByConnection
-import com.ismartcoding.plain.extensions.toThumbBytesAsync
 import com.ismartcoding.lib.extensions.urlEncode
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
@@ -33,6 +31,8 @@ import com.ismartcoding.plain.data.UploadInfo
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.enums.PasswordType
+import com.ismartcoding.plain.extensions.newFile
+import com.ismartcoding.plain.extensions.toThumbBytesAsync
 import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -48,7 +48,6 @@ import com.ismartcoding.plain.preference.PasswordPreference
 import com.ismartcoding.plain.preference.PasswordTypePreference
 import com.ismartcoding.plain.web.websocket.WebSocketSession
 import io.ktor.client.request.get
-import io.ktor.client.statement.readBytes
 import io.ktor.client.statement.readRawBytes
 import io.ktor.http.CacheControl
 import io.ktor.http.ContentType
@@ -111,7 +110,6 @@ import java.io.IOException
 import java.util.Date
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
-import kotlin.collections.set
 
 object HttpModule {
     @SuppressLint("SuspiciousIndentation")

@@ -165,7 +165,7 @@
     <string name="privacy_policy">गोपनीयता नीति</string>
     <string name="terms_of_use">उपयोग की शर्तें</string>
     <string name="grant_permission">अनुमति प्रदान करें</string>
-    <string name="system_alert_window_warning">‘अन्य एप्लिकेशन्स पर प्रदर्शन’ अनुमति देना अत्यंत आवश्यक है। इस अनुमति के बिना, यदि ऐप बैकग्राउंड में चल रहा है, तो आप एप्लिकेशन द्वारा उत्पन्न होने वाले महत्वपूर्ण सिस्टम डायलॉग, जैसे कि अनइंस्टॉल की पुष्टि करने वाले डायलॉग, को छू सकते हैं।</string>
+    <string name="system_alert_window_warning">कृपया "अन्य ऐप्स के ऊपर दिखाएं" की अनुमति दें ताकि ऐप के पृष्ठभूमि में चलते समय आप अनइंस्टॉल पुष्टि जैसे ज़रूरी सिस्टम पॉप-अप न मिस करें।</string>
     <string name="version_name_with_code">संस्करण {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">अद्यतित बैटरी उपयोग सतर्कता वर्तमान में सक्रिय है। अविघातित प्रदर्शन सुनिश्चित करने के लिए, कृपया इस एप्लिकेशन के लिए विशेष रूप से बैटरी अनुकूलन को अक्षम करने का विचार करें।</string>
     <string name="apps">ऐप्स</string>

@@ -165,7 +165,7 @@
     <string name="privacy_policy">Privacybeleid</string>
     <string name="terms_of_use">Gebruiksvoorwaarden</string>
     <string name="grant_permission">Toestemming verlenen</string>
-    <string name="system_alert_window_warning">Het verlenen van de \'Weergeven over andere apps\'-toestemming is essentieel. Zonder deze toestemming kunnen bij een app die op de achtergrond draait, cruciale systeemdialogen, zoals bevestigingsdialogen voor verwijdering, worden gemist.</string>
+    <string name="system_alert_window_warning">Sta “Weergeven boven andere apps” toe zodat je geen belangrijke systeemmeldingen mist, zoals bevestigingen voor verwijderen, wanneer de app op de achtergrond draait.</string>
     <string name="version_name_with_code">Versie {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">Geoptimaliseerd batterijgebruik is momenteel actief. Om ononderbroken prestaties te garanderen, overweeg batterijoptimalisatie specifiek voor deze app uit te schakelen.</string>
     <string name="apps">Apps</string>

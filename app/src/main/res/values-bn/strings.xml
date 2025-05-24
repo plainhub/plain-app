@@ -165,7 +165,7 @@
     <string name="privacy_policy">গোপনীয়তা নীতি</string>
     <string name="terms_of_use">ব্যবহারের শর্তাবলী</string>
     <string name="grant_permission">অনুমতি দান করুন</string>
-    <string name="system_alert_window_warning">‘অন্য অ্যাপস উপর প্রদর্শন’ অনুমতি দেওয়া গুরুত্বপূর্ণ। এই অনুমতি না থাকলে, যদি অ্যাপটি ব্যাকগ্রাউন্ডে চলছে, আপনি অ্যাপ দ্বারা সৃষ্টিকৃত মৌলিক সিস্টেম ডায়ালগ, যেমন অনইনস্টলেশন নিশ্চিতকরণ ডায়ালগ, অনুমতি দেওয়া না থাকলে আপনি এটি হারতে পারেন।</string>
+    <string name="system_alert_window_warning">অ্যাপটি পেছনে চলাকালীন গুরুত্বপূর্ণ সিস্টেম পপ-আপ যেমন আনইনস্টল নিশ্চিতকরণ মিস না করতে “অন্যান্য অ্যাপের উপরে প্রদর্শন” অনুমতি দিন।</string>
     <string name="version_name_with_code">সংস্করণ {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">অপটিমাইজড ব্যাটারি ব্যবহার সক্রিয় আছে। অবিরত কাজের জন্য, এই অ্যাপ এর জন্য ব্যাটারি অপটিমাইজেশন অক্ষম করতে বিবেচনা করুন।</string>
     <string name="apps">অ্যাপস</string>

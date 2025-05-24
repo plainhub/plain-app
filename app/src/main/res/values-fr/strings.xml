@@ -165,7 +165,7 @@
     <string name="privacy_policy">Politique de confidentialité</string>
     <string name="terms_of_use">Conditions d\'utilisation</string>
     <string name="grant_permission">Accorder l\'autorisation</string>
-    <string name="system_alert_window_warning">Accorder l\'autorisation \'Affichage par-dessus d\'autres applications\' est essentiel. Sans cette autorisation, si l\'application est en cours d\'exécution en arrière-plan, vous pourriez manquer des dialogues système cruciaux déclenchés par l\'application, tels que les dialogues de confirmation de désinstallation.</string>
+    <string name="system_alert_window_warning">Veuillez autoriser “Afficher par-dessus les autres applications” pour ne pas manquer les pop-ups système importants comme la confirmation de désinstallation lorsque l\'application s\'exécute en arrière-plan.</string>
     <string name="version_name_with_code">Version {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">L\'optimisation de l\'utilisation de la batterie est actuellement active. Pour garantir des performances ininterrompues, veuillez envisager de désactiver l\'optimisation de la batterie spécifiquement pour cette application.</string>
     <string name="apps">Applications</string>

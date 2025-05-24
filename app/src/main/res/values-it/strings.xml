@@ -165,7 +165,7 @@
     <string name="privacy_policy">Informativa sulla privacy</string>
     <string name="terms_of_use">Termini di utilizzo</string>
     <string name="grant_permission">Concedi il permesso</string>
-    <string name="system_alert_window_warning">Concedere il permesso \'Mostra sopra le altre app\' è essenziale. Senza questo permesso, se l\'app è in esecuzione in background, potresti perdere dialoghi di sistema cruciali generati dall\'app, come i dialoghi di conferma della disinstallazione.</string>
+    <string name="system_alert_window_warning">Consenti “Mostra sopra le altre app” per non perdere importanti popup di sistema come la conferma di disinstallazione quando l\'app è in background.</string>
     <string name="version_name_with_code">Versione {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">L\'ottimizzazione dell\'uso della batteria è attualmente attiva. Per garantire prestazioni ininterrotte, considera di disabilitare l\'ottimizzazione della batteria specificamente per questa app.</string>
     <string name="apps">App</string>

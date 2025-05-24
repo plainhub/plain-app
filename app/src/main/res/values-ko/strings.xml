@@ -165,7 +165,7 @@
     <string name="privacy_policy">개인 정보 보호 정책</string>
     <string name="terms_of_use">이용 약관</string>
     <string name="grant_permission">권한 부여</string>
-    <string name="system_alert_window_warning">\'다른 앱 위에 표시\' 권한을 부여하는 것이 중요합니다. 이 권한이 없으면 앱이 백그라운드에서 실행 중인 경우 앱에 의해 생성된 중요한 시스템 대화 상자, 예를 들면 언인스톨 확인 대화 상자 등을 놓칠 수 있습니다.</string>
+    <string name="system_alert_window_warning">앱이 백그라운드에서 실행 중일 때 삭제 확인과 같은 중요한 시스템 팝업을 놓치지 않으려면 "다른 앱 위에 표시" 권한을 허용하세요.</string>
     <string name="version_name_with_code">버전 {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">최적화된 배터리 사용이 현재 활성화되어 있습니다. 중단없는 성능을 보장하기 위해 이 앱에 대한 배터리 최적화를 비활성화하는 것을 고려해보십시오.</string>
     <string name="apps">앱</string>

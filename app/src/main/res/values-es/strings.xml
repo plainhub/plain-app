@@ -165,7 +165,7 @@
     <string name="privacy_policy">Política de privacidad</string>
     <string name="terms_of_use">Términos de uso</string>
     <string name="grant_permission">Conceder permiso</string>
-    <string name="system_alert_window_warning">Conceder el permiso de \'Mostrar sobre otras aplicaciones\' es esencial. Sin este permiso, si la aplicación se está ejecutando en segundo plano, podrías perder diálogos cruciales del sistema provocados por la aplicación, como los diálogos de confirmación de desinstalación.</string>
+    <string name="system_alert_window_warning">Permite “Mostrar sobre otras apps” para no perderte ventanas emergentes importantes del sistema como la confirmación de desinstalación cuando la app se ejecuta en segundo plano.</string>
     <string name="version_name_with_code">Versión {{version_name}} ({{version_code}})</string>
     <string name="optimized_batter_usage_warning">La optimización de la batería está actualmente activa. Para garantizar un rendimiento ininterrumpido, considere desactivar la optimización de la batería específicamente para esta aplicación.</string>
     <string name="apps">Aplicaciones</string>

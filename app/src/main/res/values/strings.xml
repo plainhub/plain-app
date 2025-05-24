@@ -165,7 +165,7 @@
     <string name="privacy_policy">Privacy policy</string>
     <string name="terms_of_use">Terms of use</string>
     <string name="grant_permission">Grant permission</string>
-    <string name="system_alert_window_warning">Granting the \'Display over other apps\' permission is essential. Without this permission, if the app is running in the background, you may miss crucial system dialogs triggered by the app, such as uninstallation confirmation dialogs.</string>
+    <string name="system_alert_window_warning">Please allow “Display over other apps” so you don’t miss important system pop-ups like uninstall confirmations when the app runs in the background.</string>
     <string name="version_name_with_code">Version {{ version_name }} ({{ version_code }})</string>
     <string name="optimized_batter_usage_warning">Optimized battery usage is currently active. To ensure uninterrupted performance, please consider disabling battery optimization specifically for this app.</string>
     <string name="apps">Apps</string>
