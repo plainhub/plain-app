@@ -49,7 +49,7 @@ fun ViewDocBottomSheet(
     if (docsVM.showRenameDialog.value) {
         FileRenameDialog(path = m.path, onDismiss = {
             docsVM.showRenameDialog.value = false
-        }, onDone = {
+        }, onDoneAsync = {
             m.path = it
             m.name = it.getFilenameFromPath()
         })

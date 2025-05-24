@@ -79,8 +79,8 @@ fun ViewImageBottomSheet(
     if (imagesVM.showRenameDialog.value) {
         FileRenameDialog(path = m.path, onDismiss = {
             imagesVM.showRenameDialog.value = false
-        }, onDone = {
-            scope.launch(Dispatchers.IO) { imagesVM.loadAsync(context, tagsVM) }
+        }, onDoneAsync = {
+            imagesVM.loadAsync(context, tagsVM)
             onDismiss()
         })
     }
@@ -132,7 +132,8 @@ fun ViewImageBottomSheet(
                         tagsVM = tagsVM,
                         tagsMap = tagsMap,
                         tagsState = tagsState,
-                        onChanged = {
+                        onChangedAsync = {
+                            imagesVM.loadAsync(context, tagsVM)
                         }
                     )
                 }

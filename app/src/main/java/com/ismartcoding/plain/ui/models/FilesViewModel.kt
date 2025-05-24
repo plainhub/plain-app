@@ -60,7 +60,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
             }
         }
 
-    val breadcrumbs = mutableStateListOf(BreadcrumbItem(FileSystemHelper.getInternalStorageName(MainApp.instance), root))
+    val breadcrumbs = mutableStateListOf(BreadcrumbItem(FileSystemHelper.getInternalStorageName(), root))
     val selectedBreadcrumbIndex = mutableIntStateOf(0)
     var cutFiles = mutableListOf<DFile>()
     var copyFiles = mutableListOf<DFile>()
@@ -139,7 +139,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
 
     private fun rebuildBreadcrumbs(targetPath: String) {
         breadcrumbs.clear()
-        breadcrumbs.add(BreadcrumbItem(FileSystemHelper.getInternalStorageName(MainApp.instance), root))
+        breadcrumbs.add(BreadcrumbItem(FileSystemHelper.getInternalStorageName(), root))
         
         if (targetPath != root) {
             val relativePath = targetPath.removePrefix(root).trim('/')

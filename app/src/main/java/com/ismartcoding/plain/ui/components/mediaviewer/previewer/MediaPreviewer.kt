@@ -199,11 +199,11 @@ fun MediaPreviewer(
             onDismiss = {
                 state.showMediaInfo = false
             },
-            onRenamed = onRenamed,
+            onRenamedAsync = onRenamed,
             deleteAction = {
                 deleteAction(m)
             },
-            onTagsChanged = onTagsChanged
+            onTagsChangedAsync = onTagsChanged
         )
     }
 

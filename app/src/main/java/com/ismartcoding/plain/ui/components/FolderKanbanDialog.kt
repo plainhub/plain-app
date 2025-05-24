@@ -44,7 +44,7 @@ fun FolderKanbanDialog(filesVM: FilesViewModel, onDismiss: () -> Unit = {}) {
             menuItems.add(
                 MenuItemModel(FileSystemHelper.getInternalStoragePath()).apply {
                     isChecked = filesVM.type == FilesType.INTERNAL_STORAGE
-                    title = FileSystemHelper.getInternalStorageName(context)
+                    title = FileSystemHelper.getInternalStorageName()
                     iconId = R.drawable.hard_drive
                 }
             )

@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -17,6 +18,8 @@ import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.ui.base.PSelectionChip
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -25,20 +28,21 @@ fun TagSelector(
     tagsVM: TagsViewModel,
     tagsMap: Map<String, List<DTagRelation>>,
     tagsState: List<DTag>,
-    onChanged: () -> Unit
+    onChangedAsync: suspend () -> Unit
 ) {
     val tagIds = remember {
         mutableStateListOf<String>()
     }
+    val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         tagIds.addAll(tagsMap[data.id]?.map { it.tagId } ?: emptyList())
     }
-    TagNameDialog(tagsVM, onChanged)
+    TagNameDialog(tagsVM, onChangedAsync)
     FlowRow(
         modifier =
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
@@ -46,13 +50,15 @@ fun TagSelector(
             PSelectionChip(
                 selected = tagIds.contains(tag.id),
                 onClick = {
-                    tagsVM.toggleTag(data, tag.id)
-                    if (tagIds.contains(tag.id)) {
-                        tagIds.remove(tag.id)
-                    } else {
-                        tagIds.add(tag.id)
+                    scope.launch(Dispatchers.IO) {
+                        tagsVM.toggleTagAsync(data, tag.id)
+                        if (tagIds.contains(tag.id)) {
+                            tagIds.remove(tag.id)
+                        } else {
+                            tagIds.add(tag.id)
+                        }
+                        onChangedAsync()
                     }
-                    onChanged()
                 },
                 text = tag.name
             )

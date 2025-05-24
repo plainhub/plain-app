@@ -88,7 +88,8 @@ fun ViewNoteBottomSheet(
                         tagsVM = tagsVM,
                         tagsMap = tagsMap,
                         tagsState = tagsState,
-                        onChanged = {
+                        onChangedAsync = {
+                            notesVM.loadAsync(tagsVM)
                         }
                     )
                 }

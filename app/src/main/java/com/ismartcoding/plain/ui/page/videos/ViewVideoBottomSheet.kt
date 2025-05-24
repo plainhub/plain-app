@@ -69,8 +69,8 @@ fun ViewVideoBottomSheet(
     if (videosVM.showRenameDialog.value) {
         FileRenameDialog(path = m.path, onDismiss = {
             videosVM.showRenameDialog.value = false
-        }, onDone = {
-            scope.launch(Dispatchers.IO) { videosVM.loadAsync(context, tagsVM) }
+        }, onDoneAsync = {
+            videosVM.loadAsync(context, tagsVM)
             onDismiss()
         })
     }
@@ -122,7 +122,8 @@ fun ViewVideoBottomSheet(
                         tagsVM = tagsVM,
                         tagsMap = tagsMap,
                         tagsState = tagsState,
-                        onChanged = {
+                        onChangedAsync = {
+                            videosVM.loadAsync(context, tagsVM)
                         }
                     )
                 }

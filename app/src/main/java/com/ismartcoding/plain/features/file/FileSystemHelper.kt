@@ -77,8 +77,8 @@ object FileSystemHelper {
                 ) ?: Environment.getExternalStorageDirectory()?.absolutePath?.trimEnd('/') ?: ""
     }
 
-    fun getInternalStorageName(context: Context): String {
-        return storageManager.primaryStorageVolume.getDescription(context) ?: getString(R.string.internal_storage)
+    fun getInternalStorageName(): String {
+        return getString(R.string.internal_storage)
     }
 
     fun getExternalFilesDirPath(context: Context): String {

@@ -63,8 +63,8 @@ fun ViewAudioBottomSheet(
     if (audioVM.showRenameDialog.value) {
         FileRenameDialog(path = m.path, onDismiss = {
             audioVM.showRenameDialog.value = false
-        }, onDone = {
-            scope.launch(Dispatchers.IO) { audioVM.loadAsync(context, tagsVM) }
+        }, onDoneAsync = {
+            audioVM.loadAsync(context, tagsVM)
             onDismiss()
         })
     }
@@ -116,7 +116,8 @@ fun ViewAudioBottomSheet(
                         tagsVM = tagsVM,
                         tagsMap = tagsMapState,
                         tagsState = tagsState,
-                        onChanged = {
+                        onChangedAsync = {
+                            audioVM.loadAsync(context, tagsVM)
                         }
                     )
                 }

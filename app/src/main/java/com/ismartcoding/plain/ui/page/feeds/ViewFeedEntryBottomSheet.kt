@@ -80,7 +80,8 @@ fun ViewFeedEntryBottomSheet(
                     tagsVM = tagsVM,
                     tagsMap = tagsMap,
                     tagsState = tagsState,
-                    onChanged = {
+                    onChangedAsync = {
+                        feedEntriesVM.loadAsync(tagsVM)
                     }
                 )
                 VerticalSpace(dp = 16.dp)

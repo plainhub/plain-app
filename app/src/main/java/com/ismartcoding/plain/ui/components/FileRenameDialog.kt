@@ -11,11 +11,10 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.ui.base.TextFieldDialog
-import com.ismartcoding.plain.ui.models.TagsViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun FileRenameDialog(path: String, onDismiss: () -> Unit, onDone: (String) -> Unit) {
+fun FileRenameDialog(path: String, onDismiss: () -> Unit, onDoneAsync: suspend (String) -> Unit) {
     val scope = rememberCoroutineScope()
     val oldName = remember {
         mutableStateOf(path.substringAfterLast("/"))
@@ -41,7 +40,7 @@ fun FileRenameDialog(path: String, onDismiss: () -> Unit, onDone: (String) -> Un
                     MainApp.instance.scanFileByConnection(path)
                     if (newFile != null) {
                         MainApp.instance.scanFileByConnection(newFile.absolutePath)
-                        onDone(newFile.absolutePath)
+                        onDoneAsync(newFile.absolutePath)
                     }
                 }
                 onDismiss()

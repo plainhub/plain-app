@@ -51,13 +51,11 @@ fun FileInfoBottomSheet(
     if (filesVM.showRenameDialog.value) {
         FileRenameDialog(path = file.path, onDismiss = {
             filesVM.showRenameDialog.value = false
-        }, onDone = {
+        }, onDoneAsync = {
             file.name = it.getFilenameFromPath()
             file.path = it
             filesVM.selectedFile.value = null
-            scope.launch(Dispatchers.IO) {
-                filesVM.loadAsync(context)
-            }
+            filesVM.loadAsync(context)
         })
     }
 

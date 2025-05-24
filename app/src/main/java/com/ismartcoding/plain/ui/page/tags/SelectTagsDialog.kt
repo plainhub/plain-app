@@ -13,8 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
@@ -25,6 +27,8 @@ import com.ismartcoding.plain.ui.base.PSelectionChip
 import com.ismartcoding.plain.ui.components.NewTagButton
 import com.ismartcoding.plain.ui.components.TagNameDialog
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -38,6 +42,7 @@ fun SelectTagsDialog(
     val tagIds = remember {
         mutableStateListOf<String>()
     }
+    val scope = rememberCoroutineScope()
 
     TagNameDialog(tagsVM)
 
@@ -67,11 +72,13 @@ fun SelectTagsDialog(
                     PSelectionChip(
                         selected = tagIds.contains(tag.id),
                         onClick = {
-                            tagsVM.toggleTag(data, tag.id)
-                            if (tagIds.contains(tag.id)) {
-                                tagIds.remove(tag.id)
-                            } else {
-                                tagIds.add(tag.id)
+                            scope.launch(Dispatchers.IO) {
+                                tagsVM.toggleTagAsync(data, tag.id)
+                                if (tagIds.contains(tag.id)) {
+                                    tagIds.remove(tag.id)
+                                } else {
+                                    tagIds.add(tag.id)
+                                }
                             }
                         },
                         text = tag.name

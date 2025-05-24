@@ -54,33 +54,29 @@ class TagsViewModel : ViewModel() {
         }
     }
 
-    fun addTag(name: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val id = TagHelper.addOrUpdate("") {
+    suspend fun addTagAsync(name: String) {
+        val id = TagHelper.addOrUpdate("") {
+            this.name = name
+            type = dataType.value.value
+        }
+        _itemsFlow.update {
+            val mutableList = it.toMutableStateList()
+            mutableList.add(DTag(id).apply {
                 this.name = name
                 type = dataType.value.value
-            }
-            _itemsFlow.update {
-                val mutableList = it.toMutableStateList()
-                mutableList.add(DTag(id).apply {
-                    this.name = name
-                    type = dataType.value.value
-                })
-                mutableList
-            }
+            })
+            mutableList
         }
         tagNameDialogVisible.value = false
     }
 
-    fun editTag(name: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val id = TagHelper.addOrUpdate(editItem.value!!.id) {
-                this.name = name
-            }
-            _itemsFlow.update {
-                it.toMutableStateList().apply {
-                    find { i -> i.id == id }?.name = name
-                }
+    suspend fun editTagAsync(name: String) {
+        val id = TagHelper.addOrUpdate(editItem.value!!.id) {
+            this.name = name
+        }
+        _itemsFlow.update {
+            it.toMutableStateList().apply {
+                find { i -> i.id == id }?.name = name
             }
         }
         tagNameDialogVisible.value = false
@@ -135,28 +131,26 @@ class TagsViewModel : ViewModel() {
         }
     }
 
-    fun toggleTag(
+    suspend fun toggleTagAsync(
         data: IData, tagId: String
     ) {
         val tagIds = _tagsMapFlow.value[data.id]?.map { it.tagId } ?: emptyList()
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                if (tagIds.contains(tagId)) {
-                    TagHelper.deleteTagRelationByKeysTagId(setOf(data.id), tagId)
-                    _tagsMapFlow.value[data.id] = _tagsMapFlow.value[data.id]?.filter { it.tagId != tagId } ?: emptyList()
-                } else {
-                    val relation = TagRelationStub.create(data).toTagRelation(tagId, dataType.value)
-                    TagHelper.addTagRelations(
-                        listOf(relation)
-                    )
-                    _tagsMapFlow.value[data.id] = _tagsMapFlow.value[data.id]?.toMutableList()?.apply {
-                        add(relation)
-                    } ?: listOf(relation)
-                }
-                loadAsync()
-            } catch (ex: Exception) {
-                LogCat.e(ex.toString())
+        try {
+            if (tagIds.contains(tagId)) {
+                TagHelper.deleteTagRelationByKeysTagId(setOf(data.id), tagId)
+                _tagsMapFlow.value[data.id] = _tagsMapFlow.value[data.id]?.filter { it.tagId != tagId } ?: emptyList()
+            } else {
+                val relation = TagRelationStub.create(data).toTagRelation(tagId, dataType.value)
+                TagHelper.addTagRelations(
+                    listOf(relation)
+                )
+                _tagsMapFlow.value[data.id] = _tagsMapFlow.value[data.id]?.toMutableList()?.apply {
+                    add(relation)
+                } ?: listOf(relation)
             }
+            loadAsync()
+        } catch (ex: Exception) {
+            LogCat.e(ex.toString())
         }
     }
 

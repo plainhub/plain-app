@@ -47,9 +47,9 @@ fun ViewMediaBottomSheet(
     tagsMap: Map<String, List<DTagRelation>>? = null,
     tagsState: List<DTag> = emptyList(),
     onDismiss: () -> Unit = {},
-    onRenamed: () -> Unit = {},
+    onRenamedAsync: suspend () -> Unit = {},
     deleteAction: () -> Unit = {},
-    onTagsChanged: () -> Unit = {},
+    onTagsChangedAsync: suspend () -> Unit = {},
 ) {
     var showRenameDialog by remember {
         mutableStateOf(false)
@@ -58,9 +58,9 @@ fun ViewMediaBottomSheet(
     if (showRenameDialog) {
         FileRenameDialog(path = m.path, onDismiss = {
             showRenameDialog = false
-        }, onDone = {
+        }, onDoneAsync = {
             m.path = m.path.substring(0, m.path.lastIndexOf("/") + 1) + it
-            onRenamed()
+            onRenamedAsync()
             onDismiss()
         })
     }
@@ -96,8 +96,8 @@ fun ViewMediaBottomSheet(
                         tagsVM = tagsVM!!,
                         tagsMap = tagsMap!!,
                         tagsState = tagsState,
-                        onChanged = {
-                            onTagsChanged()
+                        onChangedAsync = {
+                            onTagsChangedAsync()
                         }
                     )
                     VerticalSpace(dp = 16.dp)
