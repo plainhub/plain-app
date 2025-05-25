@@ -22,9 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.ui.theme.blue
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
-import com.ismartcoding.plain.ui.theme.cardContainer
 
 @Composable
 fun PIconTextButton(
@@ -146,6 +144,18 @@ fun IconTextOpenWithButton(
         click = click
     )
 }
+
+@Composable
+fun IconTextScanQrCodeButton(
+    click: () -> Unit,
+) {
+    PIconTextActionButton(
+        R.drawable.scan_qr_code,
+        text = stringResource(R.string.scan_qrcode),
+        click = click
+    )
+}
+
 
 @Composable
 fun IconTextRenameButton(

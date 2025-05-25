@@ -35,6 +35,9 @@ object AudioPlayer {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             LogCat.d("Player.isPlaying changed to: $isPlaying")
             _isPlayingFlow.value = isPlaying
+            if (!isPlaying && player != null) {
+                TempData.audioPlayPosition = player?.currentPosition ?: 0
+            }
         }
     }
 
@@ -44,7 +47,7 @@ object AudioPlayer {
             return if (player?.isPlaying == true) {
                 player?.currentPosition ?: 0
             } else {
-                field
+                TempData.audioPlayPosition
             }
         }
 
@@ -73,7 +76,7 @@ object AudioPlayer {
         playlistAudio: DPlaylistAudio
     ) {
         coMain {
-            playerProgress = 0
+            TempData.audioPlayPosition = 0
             withIO { AudioPlaylistPreference.addAsync(context, listOf(playlistAudio)) }
             ensurePlayer(context) {
                 doPlay(playlistAudio)
@@ -86,7 +89,7 @@ object AudioPlayer {
         playlistAudio: DPlaylistAudio
     ) {
         coMain {
-            playerProgress = 0
+            TempData.audioPlayPosition = 0
             ensurePlayer(context) {
                 doPlay(playlistAudio)
             }
@@ -97,7 +100,7 @@ object AudioPlayer {
         coMain {
             val current = player?.currentMediaItem
             if (current != null) {
-                player?.seekTo(playerProgress)
+                player?.seekTo(TempData.audioPlayPosition)
                 player?.play()
                 return@coMain
             }
@@ -133,10 +136,11 @@ object AudioPlayer {
 
     fun seekTo(progress: Long) {
         coMain {
-            playerProgress = progress * 1000
+            val seekPosition = progress * 1000
+            TempData.audioPlayPosition = seekPosition
             if (player?.isPlaying == true) {
                 player?.pause()
-                player?.seekTo(playerProgress)
+                player?.seekTo(seekPosition)
                 player?.prepare()
                 player?.play()
             } else {
@@ -192,7 +196,7 @@ object AudioPlayer {
             }
 
             LogCat.d("skipTo: ${audio.path}")
-            playerProgress = 0
+            TempData.audioPlayPosition = 0
             coMain {
                 ensurePlayer(context) {
                     doPlay(audio)
@@ -203,6 +207,7 @@ object AudioPlayer {
 
     fun pause() {
         coMain {
+            TempData.audioPlayPosition = player?.currentPosition ?: 0
             player?.pause()
         }
     }
@@ -213,6 +218,7 @@ object AudioPlayer {
                 player?.pause()
             }
             player?.clearMediaItems()
+            TempData.audioPlayPosition = 0
         }
     }
 
@@ -220,6 +226,7 @@ object AudioPlayer {
         player?.removeListener(playerListener)
         player = null
         _isPlayingFlow.value = false
+        TempData.audioPlayPosition = 0
     }
 
     private fun doPlay(
@@ -227,7 +234,7 @@ object AudioPlayer {
     ) {
         player?.setMediaItem(audio.toMediaItem())
         player?.prepare()
-        player?.seekTo(playerProgress)
+        player?.seekTo(TempData.audioPlayPosition)
         player?.play()
     }
 

@@ -494,7 +494,6 @@
     <string name="internal_storage">Armazenamento interno</string>
     <string name="enter_this_address_tips">Digite o endereço acima no navegador do seu computador, garantindo que seu telefone e computador estejam na mesma rede local.</string>
     <string name="last_visit_at">Última visita em</string>
-    <string name="web_console_desc">Gerencie fotos, vídeos, arquivos, notificações e outros dados no seu telefone via computador sem a necessidade de um cabo de dados.</string>
     <string name="app_restored">Dados do APP foram restaurados, você precisa sair forçadamente deste app e iniciá-lo novamente como novo.</string>
     <string name="welcome_text">Bem-vindo! Você pode facilmente enviar texto, imagens e vídeos para esta página e visualizá-los no seu computador.\nSe encontrar algum problema, não hesite em enviar um e-mail para ismartcoding@gmail.com para assistência ou junte-se à nossa discussão no Discord em: https://discord.gg/RQWcS6DEEe.</string>
     <string name="donation">Doação</string>
@@ -561,4 +560,7 @@
     <string name="empty_playlist">Sua lista de reprodução está vazia</string>
     <string name="drag_number_to_reorder">Arraste o número para reordenar</string>
     <string name="remove_from_playlist">Remover da lista</string>
+    <string name="no_internet_connection">Nenhuma conexão de internet. Verifique sua conexão.</string>
+    <string name="access_phone_web">Acesse seu telefone a partir de um navegador de computador.</string>
+    <string name="scan_qrcode_to_access_web">Digitalize o código QR para acessar o endereço da web</string>
 </resources>

@@ -107,13 +107,13 @@ object AppHelper {
     }
 
     fun clearCacheAsync(context: Context) {
-        val cacheDir = context.cacheDir
-        val files = cacheDir.listFiles()
-        files?.forEach {
+        context.cacheDir.listFiles()?.forEach {
             it.deleteRecursively()
         }
-        val imageCache = context.filesDir.resolve("image_cache")
-        imageCache.listFiles()?.forEach {
+        context.filesDir.resolve("image_cache").listFiles()?.forEach {
+            it.deleteRecursively()
+        }
+        context.filesDir.resolve("upload_tmp").listFiles()?.forEach {
             it.deleteRecursively()
         }
     }

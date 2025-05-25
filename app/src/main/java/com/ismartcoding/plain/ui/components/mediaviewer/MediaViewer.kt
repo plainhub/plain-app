@@ -348,8 +348,14 @@ fun MediaViewer(
                         videoState = videoState,
                         page = page,
                         model = model,
+                        scale = state.scale.value,
+                        offsetX = state.offsetX.value,
+                        offsetY = state.offsetY.value,
+                        rotation = state.rotation.value,
                         gesture = rawGesture,
                         onMounted = onMounted,
+                        onSizeChange = sizeChange,
+                        boundClip = boundClip,
                     )
                 } else {
                     MediaNormalImage(

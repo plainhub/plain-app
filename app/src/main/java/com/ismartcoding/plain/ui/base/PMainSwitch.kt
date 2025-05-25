@@ -28,13 +28,13 @@ fun PMainSwitch(
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(12.dp))
             .clickable(true, onClick = {
                 if (enable) {
                     onClick(!activated)
                 }
             })
-            .background(MaterialTheme.colorScheme.primaryContainer),
+            .background(MaterialTheme.colorScheme.surfaceContainerHighest),
     ) {
         Row(
             modifier =

@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -219,13 +220,20 @@ fun WebAddressBar(
             }, title = {
 
             }, text = {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.scan_qrcode_to_access_web),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
                     Image(
-                        bitmap = QrCodeGenerateHelper.generate(defaultUrl.value, 240, 240).asImageBitmap(),
+                        bitmap = QrCodeGenerateHelper.generate(defaultUrl.value, 300, 300).asImageBitmap(),
                         contentDescription = stringResource(id = R.string.qrcode),
                         modifier = Modifier
-                            .size(240.dp)
-                            .clip(RoundedCornerShape(16.dp))
+                            .size(300.dp)
                     )
                 }
             })

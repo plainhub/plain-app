@@ -14,19 +14,17 @@ import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.data.DPlaylistAudio
+import com.ismartcoding.plain.data.DScreenMirrorQuality
+import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.Language
+import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.data.DPlaylistAudio
-import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.data.DVideo
-import com.ismartcoding.plain.data.DScreenMirrorQuality
-import com.ismartcoding.plain.ui.models.BreadcrumbItem
-import java.util.Locale
-import org.json.JSONArray
 import org.json.JSONObject
+import java.util.Locale
 
 data class FilePathData(
     val rootPath: String,
@@ -414,11 +412,6 @@ object PackageSortByPreference : BaseSortByPreference("pkg", FileSortBy.NAME_ASC
 object ShowHiddenFilesPreference : BasePreference<Boolean>() {
     override val default = false
     override val key = booleanPreferencesKey("show_hidden_files")
-}
-
-object ChatGPTApiKeyPreference : BasePreference<String>() {
-    override val default = ""
-    override val key = stringPreferencesKey("chat_gpt_api_key")
 }
 
 object NoteEditModePreference : BasePreference<Boolean>() {

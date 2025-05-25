@@ -15,4 +15,5 @@ object TempData {
     var audioPlayMode = MediaPlayMode.REPEAT
 
     var audioSleepTimerFutureTime = 0L
+    var audioPlayPosition = 0L // audio play position in milliseconds
 }

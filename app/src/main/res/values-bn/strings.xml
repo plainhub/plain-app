@@ -494,7 +494,6 @@
     <string name="internal_storage">অভ্যন্তরীণ স্টোরেজ</string>
     <string name="enter_this_address_tips">আপনার কম্পিউটারের ব্রাউজারে উপরের ঠিকানা লিখুন, নিশ্চিত করুন যে আপনার ফোন এবং কম্পিউটারটি একই স্থানীয় নেটওয়ার্কে আছে।</string>
     <string name="last_visit_at">শেষ দেখা</string>
-    <string name="web_console_desc">ডেটা কেবলের প্রয়োজন ছাড়াই কম্পিউটারের মাধ্যমে ফোনের ছবি, ভিডিও, ফাইল, বিজ্ঞপ্তি এবং অন্যান্য তথ্য পরিচালনা করুন।</string>
     <string name="app_restored">এপ্লিকেশন ডেটা পুনরুদ্ধার করা হয়েছে, আপনাকে অ্যাপটি বন্ধ করে নিতে এবং এপ্লিকেশনটি আবার একটি নতুন অবস্থায় শুরু করতে বাধ্য করা হবে।</string>
     <string name="welcome_text">স্বাগতম! আপনি সহজেই এই পৃষ্ঠাতে টেক্সট, চিত্র, এবং ভিডিও প্রেরণ করতে পারেন এবং তাদের আপনার কম্পিউটারে দেখতে পারেন।\nযদি আপনি যে কোনও সমস্যার সম্মুখীন হন, তবে সাহায্যের জন্য অনুগ্রহ করে ismartcoding@gmail.com ঠিকানায় একটি ইমেল পাঠাতে বা আমাদের Discord আলোচনায় যোগদান করতে স্বাগতম: https://discord.gg/RQWcS6DEEe।</string>
     <string name="donation">দান</string>
@@ -561,4 +560,7 @@
     <string name="empty_playlist">আপনার প্লেলিস্ট খালি</string>
     <string name="drag_number_to_reorder">প্লেলিস্ট পুনরায় সাজাতে নম্বরটি টানুন</string>
     <string name="remove_from_playlist">প্লেলিস্ট থেকে সরান</string>
+    <string name="no_internet_connection">নেটওয়ার্ক সংযোগ বন্ধ রয়েছে। দয়া করে আবার চেষ্টা করুন।</string>
+    <string name="access_phone_web">একটি কম্পিউটার ব্রাউজার থেকে আপনার ফোন অ্যাক্সেস করুন।</string>
+    <string name="scan_qrcode_to_access_web">ওয়েব ঠিকানা অ্যাক্সেস করতে QR কোড স্ক্যান করুন</string>
 </resources>

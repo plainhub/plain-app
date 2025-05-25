@@ -494,7 +494,6 @@
     <string name="internal_storage">உள் சேமிப்பு</string>
     <string name="enter_this_address_tips">உங்கள் கணினியின் உலாவியில் மேலே குறிப்பிட்ட முகவரியை உள்ளிடுக, உங்கள் போன் மற்றும் கணினியை ஒரே உள்ளாக்க வலிமையானதாக உறுதிப்படுத்துங்கள்.</string>
     <string name="last_visit_at">கடைசி பரிந்துரை</string>
-    <string name="web_console_desc">டேட்டா கேபிள் தேவையற்று கணினியில் உங்கள் மொபைலில் புகைப்படங்கள், வீடியோகள், கோப்புகள், அறிவிப்புகள் மற்றும் பிற தரவுகளை மேலாண்மை செய்யுங்கள்.</string>
     <string name="app_restored">ஆப்லிகேஷன் தரவு மீட்கப்பட்டுள்ளது, இதை புரிந்திருக்க உங்கள் ஆப்லிகேஷனை புதுப்பிக்கவும்.</string>
     <string name="welcome_text">வரவேற்கிறோம்! நீங்கள் எளிதாக உங்கள் கணினியில் உருவாக்கப்பட்ட உரை, புகைப்படங்கள் மற்றும் காணொளிகளை அனுப்ப முடியும்.\nஏனெனில் உங்களிடம் ஏதும் பிரச்சினை ஏற்பட்டால், தயவுசெய்து உதவி பெற இஸ்மார்ட் கோடிங்குமின்றி மின்னஞ்சல் அனுப்பவும் அல்லது எங்கள் டிஸ்கார்ட் உரையில் இணைந்துகொள்கின்றது: https://discord.gg/RQWcS6DEEe.</string>
     <string name="donation">தானம்</string>
@@ -561,4 +560,7 @@
     <string name="empty_playlist">உங்கள் பாடல் பட்டியல் காலியாக உள்ளது</string>
     <string name="drag_number_to_reorder">வரிசையை மாற்ற எண்ணை இழுக்கவும்</string>
     <string name="remove_from_playlist">பாடல் பட்டியலிலிருந்து நீக்கு</string>
+    <string name="no_internet_connection">இணைய இணைப்பு இல்லை. உங்கள் இணைப்பைச் சரிபார்க்கவும்.</string>
+    <string name="access_phone_web">கணினி உலாவியில் இருந்து உங்கள் கைபேசியை அணுகவும்.</string>
+    <string name="scan_qrcode_to_access_web">இணைய முகவரிக்கு அணுக கீரோ குறியை சீக்கிரம் செய்யவும்</string>
 </resources>

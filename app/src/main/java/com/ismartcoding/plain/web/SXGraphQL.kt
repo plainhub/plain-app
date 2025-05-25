@@ -132,6 +132,7 @@ import io.ktor.server.request.receiveText
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondBytes
 import io.ktor.server.response.respondText
+import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
@@ -144,15 +145,18 @@ import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import java.io.File
+import java.io.FileInputStream
 import java.io.StringReader
 import java.io.StringWriter
 import kotlin.collections.set
 import kotlin.io.path.Path
 import kotlin.io.path.moveTo
+import java.nio.channels.FileChannel
 
 class SXGraphQL(val schema: Schema) {
     class Configuration : SchemaConfigurationDSL() {
         fun init() {
+            val uploadTmpDir = File(MainApp.instance.filesDir, "upload_tmp")
             schemaBlock = {
                 query("chatItems") {
                     resolver { ->
@@ -482,16 +486,16 @@ class SXGraphQL(val schema: Schema) {
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
 //                        val appFolder = context.getExternalFilesDir(null)?.path ?: ""
 //                        val internalPath = FileSystemHelper.getInternalStoragePath()
-                     //   if (!isQPlus() || root.startsWith(appFolder) || !root.startsWith(internalPath)) {
-                            val filterFields = QueryHelper.parseAsync(query)
-                            val showHidden = filterFields.find { it.name == "show_hidden" }?.value?.toBoolean() ?: false
-                            val text = filterFields.find { it.name == "text" }?.value ?: ""
-                            val parent = filterFields.find { it.name == "parent" }?.value ?: ""
-                            if (text.isNotEmpty()) {
-                                FileSystemHelper.search(text, parent.ifEmpty { root }, showHidden).sorted(sortBy).drop(offset).take(limit).map { it.toModel() }
-                            } else {
-                                FileSystemHelper.getFilesList(parent.ifEmpty { root }, showHidden, sortBy).drop(offset).take(limit).map { it.toModel() }
-                            }
+                        //   if (!isQPlus() || root.startsWith(appFolder) || !root.startsWith(internalPath)) {
+                        val filterFields = QueryHelper.parseAsync(query)
+                        val showHidden = filterFields.find { it.name == "show_hidden" }?.value?.toBoolean() ?: false
+                        val text = filterFields.find { it.name == "text" }?.value ?: ""
+                        val parent = filterFields.find { it.name == "parent" }?.value ?: ""
+                        if (text.isNotEmpty()) {
+                            FileSystemHelper.search(text, parent.ifEmpty { root }, showHidden).sorted(sortBy).drop(offset).take(limit).map { it.toModel() }
+                        } else {
+                            FileSystemHelper.getFilesList(parent.ifEmpty { root }, showHidden, sortBy).drop(offset).take(limit).map { it.toModel() }
+                        }
 //                        } else {
 //                            FileMediaStoreHelper.searchAsync(MainApp.instance, query, limit, offset, sortBy).map { it.toModel() }
 //                        }
@@ -1262,6 +1266,60 @@ class SXGraphQL(val schema: Schema) {
                         feedEntry?.toModel()
                     }
                 }
+                query("uploadedChunks") {
+                    resolver { fileId: String ->
+                        val chunkDir = File(uploadTmpDir, fileId)
+                        if (!chunkDir.exists()) return@resolver emptyList<Int>()
+
+                        chunkDir.listFiles()
+                            ?.mapNotNull { it.name.removePrefix("chunk_").toIntOrNull() }
+                            ?.sorted()
+                            ?: emptyList()
+                    }
+                }
+                mutation("mergeChunks") {
+                    resolver { fileId: String, totalChunks: Int, path: String, replace: Boolean ->
+                        val chunkDir = File(uploadTmpDir, fileId)
+                        if (!chunkDir.exists()) {
+                            throw GraphQLError("No chunks found for $fileId")
+                        }
+
+                        val outputFile = if (replace) {
+                            File(path)
+                        } else {
+                            val originalFile = File(path)
+                            if (originalFile.exists()) {
+                                File(originalFile.newPath())
+                            } else {
+                                originalFile
+                            }
+                        }
+                        outputFile.parentFile?.mkdirs()
+
+                        outputFile.outputStream().use { outputStream ->
+                            val outputChannel = outputStream.channel
+                            for (i in 0 until totalChunks) {
+                                val chunkFile = File(chunkDir, "chunk_$i")
+                                if (!chunkFile.exists()) {
+                                    throw GraphQLError("Missing chunk $i")
+                                }
+
+                                chunkFile.inputStream().channel.use { inputChannel ->
+                                    var position = 0L
+                                    val size = inputChannel.size()
+                                    while (position < size) {
+                                        val transferred = inputChannel.transferTo(position, size - position, outputChannel)
+                                        if (transferred <= 0) break
+                                        position += transferred
+                                    }
+                                }
+                            }
+                        }
+                        chunkDir.deleteRecursively()
+                        MainApp.instance.scanFileByConnection(outputFile, null)
+                        outputFile.absolutePath
+                    }
+                }
                 enum<MediaPlayMode>()
                 enum<DataType>()
                 enum<Permission>()
@@ -1307,14 +1365,14 @@ class SXGraphQL(val schema: Schema) {
                 route("/graphql") {
                     post {
                         if (!TempData.webEnabled) {
-                            call.response.status(HttpStatusCode.Forbidden)
+                            call.respond(HttpStatusCode.Forbidden)
                             return@post
                         }
                         val clientId = call.request.header("c-id") ?: ""
                         if (clientId.isNotEmpty()) {
                             val token = HttpServerManager.tokenCache[clientId]
                             if (token == null) {
-                                call.response.status(HttpStatusCode.Unauthorized)
+                                call.respond(HttpStatusCode.Unauthorized)
                                 return@post
                             }
 
@@ -1324,7 +1382,7 @@ class SXGraphQL(val schema: Schema) {
                                 requestStr = decryptedBytes.decodeToString()
                             }
                             if (requestStr.isEmpty()) {
-                                call.response.status(HttpStatusCode.Unauthorized)
+                                call.respond(HttpStatusCode.Unauthorized)
                                 return@post
                             }
 
@@ -1366,7 +1424,7 @@ class SXGraphQL(val schema: Schema) {
                             if (token != null) {
                                 call.respondBytes(CryptoHelper.aesEncrypt(token, e.serialize()))
                             } else {
-                                call.response.status(HttpStatusCode.Unauthorized)
+                                call.respond(HttpStatusCode.Unauthorized)
                             }
                         } else {
                             context.respond(HttpStatusCode.OK, e.serialize())

@@ -39,6 +39,7 @@ import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.components.NetworkErrorBanner
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.page.root.components.HomeFeatures
 import com.ismartcoding.plain.ui.page.root.components.HomeWeb
@@ -59,7 +60,6 @@ fun TabContentHome(
     val webEnabled = LocalWeb.current
     val context = LocalContext.current
     var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.can(context)) }
-    var isVPNConnected by remember { mutableStateOf(NetworkHelper.isVPNConnected(context)) }
     val sharedFlow = Channel.sharedFlow
 
     LaunchedEffect(sharedFlow) {
@@ -70,7 +70,8 @@ fun TabContentHome(
                 }
 
                 is WindowFocusChangedEvent -> {
-                    isVPNConnected = NetworkHelper.isVPNConnected(context)
+                    mainVM.isVPNConnected = NetworkHelper.isVPNConnected(context)
+                    mainVM.isNetworkConnected = NetworkHelper.isNetworkConnected(context)
                 }
             }
         }
@@ -81,6 +82,11 @@ fun TabContentHome(
         .padding(top = paddingValues.calculateTopPadding())) {
         item {
             TopSpace()
+        }
+        item {
+            NetworkErrorBanner(
+                isVisible = !mainVM.isNetworkConnected && webEnabled
+            )
         }
         item {
             if (webEnabled) {
@@ -121,7 +127,7 @@ fun TabContentHome(
                         )
                     }
                 } else {
-                    if (isVPNConnected) {
+                    if (mainVM.isVPNConnected) {
                         PAlert(title = stringResource(id = R.string.attention), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
                     }
                     if (!systemAlertWindow) {

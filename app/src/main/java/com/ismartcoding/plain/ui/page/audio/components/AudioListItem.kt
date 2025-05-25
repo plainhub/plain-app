@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,11 +28,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DAudio
 import com.ismartcoding.plain.db.DTag
@@ -63,7 +60,7 @@ fun AudioListItem(
     audioPlaylistVM: AudioPlaylistViewModel,
     tagsVM: TagsViewModel,
     tags: List<DTag>,
-     pagerState: PagerState,
+    pagerState: PagerState,
     dragSelectState: DragSelectState,
     isCurrentlyPlaying: Boolean = false,
     isInPlaylist: Boolean = false,
@@ -120,11 +117,11 @@ fun AudioListItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp, 8.dp, 8.dp, 8.dp),
+                .padding(12.dp, 8.dp, 8.dp, 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(40.dp),
                 contentAlignment = Alignment.Center
             ) {
                 if (dragSelectState.selectMode) {
@@ -135,10 +132,9 @@ fun AudioListItem(
                         }
                     )
                 } else if (!isCurrentlyPlaying) {
-                    Icon(
-                        painter = painterResource(R.drawable.music2),
-                        contentDescription = item.title,
-                        tint = MaterialTheme.colorScheme.primary
+                    AudioCoverOrIcon(
+                        path = item.path,
+                        modifier = Modifier.size(40.dp),
                     )
                 } else {
                     PulsatingWave(
@@ -149,7 +145,7 @@ fun AudioListItem(
                 }
             }
 
-            HorizontalSpace(dp = 16.dp)
+            HorizontalSpace(dp = 12.dp)
             Column(
                 modifier = Modifier
                     .weight(1f)

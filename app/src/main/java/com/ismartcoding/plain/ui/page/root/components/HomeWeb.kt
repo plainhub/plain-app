@@ -31,7 +31,9 @@ fun HomeWeb(
             modifier = Modifier.clickable {
                 navController.navigate(Routing.WebSettings)
             },
+            icon = R.drawable.laptop,
             title = stringResource(R.string.web_console),
+            desc = stringResource(R.string.access_phone_web),
             showMore = true,
         )
         VerticalSpace(dp = 8.dp)

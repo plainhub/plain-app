@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ui.page.web
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -54,7 +52,6 @@ fun SessionsPage(
     sessionsVM: SessionsViewModel = viewModel(),
 ) {
     val itemsState by sessionsVM.itemsFlow.collectAsState()
-    val scope = rememberCoroutineScope()
 
     val refreshState =
         rememberRefreshLayoutState {
@@ -102,15 +99,15 @@ fun SessionsPage(
                                     contentDescription = stringResource(R.string.delete),
                                     tint = MaterialTheme.colorScheme.red,
                                     modifier = Modifier
-                                        .padding(start = 8.dp)
-                                        .clickable {
-                                            DialogHelper.confirmToDelete {
-                                                sessionsVM.delete(m.clientId)
-                                            }
+                                        .padding(start = 8.dp),
+                                    click = {
+                                        DialogHelper.confirmToDelete {
+                                            sessionsVM.delete(m.clientId)
                                         }
+                                    }
                                 )
                             }
-                            
+
                             PCard {
                                 PListItem(title = stringResource(id = R.string.client_id), value = m.clientId)
                                 PListItem(title = stringResource(id = R.string.ip_address), value = m.clientIP)

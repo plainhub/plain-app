@@ -494,7 +494,6 @@
     <string name="internal_storage">내부 저장소</string>
     <string name="enter_this_address_tips">컴퓨터 브라우저에서 위의 주소를 입력하고 휴대전화와 컴퓨터가 동일한 로컬 네트워크에 있는지 확인하십시오.</string>
     <string name="last_visit_at">마지막 방문 날짜</string>
-    <string name="web_console_desc">데이터 케이블이 필요 없이 컴퓨터를 통해 휴대폰의 사진, 비디오, 파일, 알림 등을 관리합니다.</string>
     <string name="app_restored">앱 데이터가 복원되었습니다. 앱을 강제 종료하고 새로 시작해야 합니다.</string>
     <string name="welcome_text">환영합니다! 이 페이지로 텍스트, 이미지 및 비디오를 쉽게 보내고 컴퓨터에서 볼 수 있습니다.\n문제가 발생하면 도움이 필요하면 ismartcoding@gmail.com으로 이메일을 보내거나 https://discord.gg/RQWcS6DEEe에서 디스코드 토론에 참여하세요.</string>
     <string name="donation">기부</string>
@@ -561,4 +560,7 @@
     <string name="empty_playlist">재생 목록이 비어 있습니다</string>
     <string name="drag_number_to_reorder">번호를 드래그하여 순서 변경</string>
     <string name="remove_from_playlist">재생 목록에서 제거</string>
+    <string name="no_internet_connection">인터넷 연결이 없습니다. 네트워크를 확인하세요.</string>
+    <string name="access_phone_web">컴퓨터 브라우저에서 휴대전화를 액세스하세요.</string>
+    <string name="scan_qrcode_to_access_web">웹 주소에 액세스하려면 QR 코드를 스캔하세요</string>
 </resources>

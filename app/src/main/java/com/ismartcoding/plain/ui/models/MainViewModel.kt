@@ -30,6 +30,8 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     var httpServerState by savedStateHandle.saveable {
         mutableStateOf(HttpServerState.OFF)
     }
+    var isNetworkConnected by savedStateHandle.saveable { mutableStateOf(true) }
+    var isVPNConnected by savedStateHandle.saveable { mutableStateOf(false) }
 
     fun enableHttpServer(
         context: Context,

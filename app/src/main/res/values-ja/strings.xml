@@ -494,7 +494,6 @@
     <string name="internal_storage">内部ストレージ</string>
     <string name="enter_this_address_tips">上記のアドレスをコンピューターのブラウザに入力して、電話とコンピューターが同じローカルネットワークにあることを確認してください。</string>
     <string name="last_visit_at">前回の訪問時刻</string>
-    <string name="web_console_desc">データケーブルが不要で、コンピュータを介して携帯電話の写真、ビデオ、ファイル、通知などのデータを管理します。</string>
     <string name="app_restored">アプリのデータが復元されました。新しい状態でアプリを再起動する必要があります。</string>
     <string name="welcome_text">ようこそ！このページにテキスト、画像、動画を簡単に送信し、コンピュータで表示することができます。\n問題が発生した場合は、お手伝いが必要な場合はismartcoding@gmail.comにメールを送信するか、次のDiscordのディスカッションに参加してください：https://discord.gg/RQWcS6DEEe。</string>
     <string name="donation">寄付</string>
@@ -561,4 +560,7 @@
     <string name="empty_playlist">プレイリストが空です</string>
     <string name="drag_number_to_reorder">番号をドラッグして順番を変更</string>
     <string name="remove_from_playlist">プレイリストから削除</string>
+    <string name="no_internet_connection">インターネット接続がありません。ネットワークを確認してください。</string>
+    <string name="access_phone_web">コンピュータのブラウザから携帯電話にアクセスします。</string>
+    <string name="scan_qrcode_to_access_web">WebアドレスにアクセスするためにQRコードをスキャンします</string>
 </resources>

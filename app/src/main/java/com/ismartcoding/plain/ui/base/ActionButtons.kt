@@ -6,23 +6,18 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.FlowRowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
@@ -31,14 +26,15 @@ import com.ismartcoding.plain.R
 
 @Composable
 fun ActionButtons(
-    content: @Composable RowScope.() -> Unit
+    content: @Composable FlowRowScope.() -> Unit
 ) {
-    Row(
+    FlowRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .horizontalScroll(rememberScrollState()),
+            .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        maxItemsInEachRow = 5,
         content = content
     )
 }
@@ -99,7 +95,7 @@ fun ActionButtonRefresh(
         ),
         label = "refresh_rotation"
     )
-    
+
     PIconButton(
         icon = R.drawable.refresh_ccw,
         contentDescription = stringResource(R.string.refresh),

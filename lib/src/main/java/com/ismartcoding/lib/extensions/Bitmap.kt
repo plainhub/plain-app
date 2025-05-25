@@ -3,6 +3,7 @@ package com.ismartcoding.lib.extensions
 import android.graphics.Bitmap
 import com.ismartcoding.lib.isRPlus
 import java.io.ByteArrayOutputStream
+import androidx.core.graphics.scale
 
 fun Bitmap.scaleDown(maxSize: Int): Bitmap {
     val source = this
@@ -18,7 +19,7 @@ fun Bitmap.scaleDown(maxSize: Int): Bitmap {
         width = source.width.toFloat() / source.height.toFloat() * maxSize.toFloat()
         height = maxSize.toFloat()
     }
-    return Bitmap.createScaledBitmap(source, width.toInt(), height.toInt(), true)
+    return source.scale(width.toInt(), height.toInt())
 }
 
 @Suppress("DEPRECATION")

@@ -494,7 +494,6 @@
     <string name="internal_storage">内部存储</string>
     <string name="enter_this_address_tips">在电脑浏览器中输入以上地址，需确保手机和电脑在同一局域网中。</string>
     <string name="last_visit_at">最后访问时间</string>
-    <string name="web_console_desc">无需数据线即可通过电脑管理手机照片、视频、文件、通知等数据。</string>
     <string name="app_restored">应用数据已经恢复，您需要重启应用。</string>
     <string name="welcome_text">欢迎使用！您可以轻松地将文本、图片和视频发送到本页面，并在您的电脑上查看。\n如果您遇到问题，请发送邮件至ismartcoding@gmail.com寻求帮助，或者加入QQ群讨论: 812409393。</string>
     <string name="donation">捐赠</string>
@@ -561,4 +560,7 @@
     <string name="empty_playlist">您的播放列表为空</string>
     <string name="drag_number_to_reorder">拖动编号重新排序</string>
     <string name="remove_from_playlist">从播放列表中移除</string>
+    <string name="no_internet_connection">没有互联网连接。请检查您的连接。</string>
+    <string name="access_phone_web">从电脑浏览器访问您的手机。</string>
+    <string name="scan_qrcode_to_access_web">扫描二维码访问网页</string>
 </resources>

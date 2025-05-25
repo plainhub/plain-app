@@ -60,7 +60,6 @@ fun MdEditor(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
     ) {
         val lineNumberWidth = if (mdEditorVM.showLineNumbers) measureTextWidth(" ${lineCount + 1} ", MaterialTheme.typography.bodyLarge) else 0.dp
         if (mdEditorVM.showLineNumbers) {
@@ -68,7 +67,6 @@ fun MdEditor(
                 modifier = Modifier
                     .width(lineNumberWidth)
                     .fillMaxHeight()
-                    .background(MaterialTheme.colorScheme.background)
                     .verticalScroll(lineNumberState, enabled = false),
             ) {
                 Text(

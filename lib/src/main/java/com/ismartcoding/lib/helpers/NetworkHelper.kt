@@ -71,4 +71,17 @@ object NetworkHelper {
             false
         }
     }
+
+    fun isNetworkConnected(context: Context): Boolean {
+        val cm = context.getSystemService(ConnectivityManager::class.java)
+        val network = cm.activeNetwork
+        val caps = cm.getNetworkCapabilities(network)
+        return caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true &&
+                caps.run {
+                    hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                            hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                            hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) ||
+                            hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+                }
+    }
 }

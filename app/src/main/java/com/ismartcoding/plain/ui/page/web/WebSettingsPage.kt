@@ -105,7 +105,7 @@ fun WebSettingsPage(
         val sharedFlow = Channel.sharedFlow
 
         val learnMore = stringResource(id = R.string.learn_more)
-        val fullText = (stringResource(id = R.string.web_console_desc) + " " + learnMore)
+        val fullText = (stringResource(id = R.string.access_phone_web) + " " + learnMore)
 
         LaunchedEffect(sharedFlow) {
             sharedFlow.collect { event ->

@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.page.scan
 
 import android.annotation.SuppressLint
-import android.content.ClipData
 import android.content.Context
 import android.graphics.ImageFormat
 import androidx.camera.core.CameraSelector
@@ -14,7 +13,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -56,7 +54,6 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.features.Permission
@@ -68,14 +65,10 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.QrCodeBitmapHelper
 import com.ismartcoding.plain.helpers.QrCodeScanHelper
 import com.ismartcoding.plain.preference.ScanHistoryPreference
-import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PIconButton
-import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.ui.page.scan.components.ScanResult
-import com.ismartcoding.plain.ui.base.TopSpace
+import com.ismartcoding.plain.ui.components.QrScanResultBottomSheet
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.theme.darkMask
@@ -160,7 +153,7 @@ fun ScanPage(navController: NavHostController) {
     }
 
     if (showScanResultSheet) {
-        ScanResultBottomSheet(context, scanResult) {
+        QrScanResultBottomSheet(context, scanResult) {
             showScanResultSheet = false
             cameraDetecting = true
         }
@@ -326,31 +319,3 @@ private fun addScanResult(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
-@Composable
-fun ScanResultBottomSheet(
-    context: Context,
-    value: String,
-    onDismiss: () -> Unit,
-) {
-    PModalBottomSheet(
-        onDismissRequest = {
-            onDismiss()
-        },
-    ) {
-        PBottomSheetTopAppBar(title = stringResource(id = R.string.scan_result)) {
-            PIconButton(
-                icon = R.drawable.copy,
-                contentDescription = stringResource(android.R.string.copy),
-                tint = MaterialTheme.colorScheme.onSurface,
-            ) {
-                val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.scan_result), value)
-                clipboardManager.setPrimaryClip(clip)
-                DialogHelper.showMessage(value)
-            }
-        }
-        TopSpace()
-        ScanResult(context, text = value)
-        BottomSpace()
-    }
-}

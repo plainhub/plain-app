@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -22,6 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -41,6 +43,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
@@ -53,6 +56,7 @@ import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.WaveSlider
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.page.audio.components.AudioPlayerCover
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -126,41 +130,21 @@ fun AudioPlayerPage(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(320.dp)
-                    .padding(horizontal = 32.dp, vertical = 24.dp),
+                    .padding(horizontal = 40.dp, vertical = 32.dp)
+                    .height(280.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(24.dp)),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.music2),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                            modifier = Modifier.size(120.dp)
-                        )
-                    }
-                }
+                AudioPlayerCover(
+                    path = currentPlayingPath.value,
+                )
             }
 
-            // Song Info - Simplified and elegant with scrolling text
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Title with horizontal scroll for long text
                 val titleScrollState = rememberScrollState()
                 val isScrollingTitle = remember { mutableStateOf(false) }
 
@@ -180,13 +164,13 @@ fun AudioPlayerPage(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
+                        .heightIn(min = 48.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = title,
                         style = MaterialTheme.typography.headlineSmall.copy(
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         ),
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
@@ -217,7 +201,7 @@ fun AudioPlayerPage(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 2.dp),
+                        .heightIn(min = 36.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(

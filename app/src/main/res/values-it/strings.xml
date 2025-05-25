@@ -494,7 +494,6 @@
     <string name="internal_storage">Memoria interna</string>
     <string name="enter_this_address_tips">Inserisci l\'indirizzo sopra nel browser del tuo computer, assicurandoti che il telefono e il computer siano sulla stessa rete locale.</string>
     <string name="last_visit_at">Ultima visita il</string>
-    <string name="web_console_desc">Gestisci foto, video, file, notifiche e altri dati sul tuo telefono tramite computer senza la necessità di un cavo dati.</string>
     <string name="app_restored">I dati dell\'app sono stati ripristinati, devi chiudere forzatamente questa app e riavviare l\'app come nuova.</string>
     <string name="welcome_text">Benvenuto! Puoi facilmente inviare testi, immagini e video su questa pagina e visualizzarli sul tuo computer.\nSe incontri problemi, non esitare a inviare una e-mail a ismartcoding@gmail.com per assistenza o unirti alla nostra discussione su Discord su: https://discord.gg/RQWcS6DEEe.</string>
     <string name="donation">Donazione</string>
@@ -561,4 +560,7 @@
     <string name="empty_playlist">La tua playlist è vuota</string>
     <string name="drag_number_to_reorder">Trascina il numero per riordinare</string>
     <string name="remove_from_playlist">Rimuovi dalla playlist</string>
+    <string name="no_internet_connection">Nessuna connessione internet. Controlla la tua connessione.</string>
+    <string name="access_phone_web">Accedi al tuo telefono da un browser del computer.</string>
+    <string name="scan_qrcode_to_access_web">Scansiona il codice QR per accedere all\'indirizzo web</string>
 </resources>

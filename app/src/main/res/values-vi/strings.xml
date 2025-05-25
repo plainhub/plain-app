@@ -494,7 +494,6 @@
     <string name="internal_storage">Bộ nhớ trong</string>
     <string name="enter_this_address_tips">Nhập địa chỉ trên vào trình duyệt của máy tính của bạn, đảm bảo rằng điện thoại và máy tính của bạn đang kết nối với cùng một mạng cục bộ.</string>
     <string name="last_visit_at">Lần ghé thăm cuối cùng tại</string>
-    <string name="web_console_desc">Quản lý ảnh, video, tập tin, thông báo và dữ liệu khác trên điện thoại của bạn thông qua máy tính mà không cần cáp dữ liệu.</string>
     <string name="app_restored">Dữ liệu ứng dụng được khôi phục, bạn cần tắt ứng dụng này và khởi động lại ứng dụng như mới.</string>
     <string name="welcome_text">Chào mừng! Bạn có thể dễ dàng gửi văn bản, hình ảnh và video đến trang này và xem chúng trên máy tính của mình. Nếu bạn gặp bất kỳ vấn đề nào, vui lòng gửi email đến ismartcoding@gmail.com để được hỗ trợ hoặc tham gia trò chuyện Discord của chúng tôi tại: https://discord.gg/RQWcS6DEEe.</string>
     <string name="donation">Quyên góp</string>
@@ -561,4 +560,7 @@
     <string name="empty_playlist">Danh sách phát của bạn trống</string>
     <string name="drag_number_to_reorder">Kéo số để sắp xếp lại</string>
     <string name="remove_from_playlist">Xóa khỏi danh sách phát</string>
+    <string name="no_internet_connection">Không có kết nối internet. Vui lòng kiểm tra kết nối của bạn.</string>
+    <string name="access_phone_web">Truy cập điện thoại của bạn từ trình duyệt máy tính.</string>
+    <string name="scan_qrcode_to_access_web">Quét mã QR để truy cập địa chỉ web</string>
 </resources>

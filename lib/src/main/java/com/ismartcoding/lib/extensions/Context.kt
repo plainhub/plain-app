@@ -5,20 +5,16 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.content.pm.ShortcutManager
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.media.MediaScannerConnection
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.net.Uri
 import android.telecom.TelecomManager
-import android.util.DisplayMetrics
 import android.view.WindowManager
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
-import com.ismartcoding.lib.isRPlus
 import java.io.File
-import kotlin.math.roundToInt
 
 fun Context.px(
     @DimenRes dimen: Int,
@@ -29,38 +25,6 @@ fun Context.dp(
 ): Float = resources.getDimensionPixelSize(dimen) / resources.displayMetrics.density
 
 fun Context.dp2px(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
-
-fun dp2px(dp: Int): Int {
-    val density: Float = Resources.getSystem().displayMetrics.density
-    return (dp * density).roundToInt()
-}
-
-fun Context.getWindowHeight(): Int {
-    if (isRPlus()) {
-        return getSystemService(WindowManager::class.java).currentWindowMetrics.bounds.height()
-    }
-
-    val outMetrics = DisplayMetrics()
-    val windowManager = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-    @Suppress("DEPRECATION")
-    windowManager.defaultDisplay.getMetrics(outMetrics)
-    return outMetrics.heightPixels
-}
-
-fun Context.getWindowWidth(): Int {
-    if (isRPlus()) {
-        return getSystemService(WindowManager::class.java).currentWindowMetrics.bounds.width()
-    }
-
-    val outMetrics = DisplayMetrics()
-    @Suppress("DEPRECATION")
-    windowManager.defaultDisplay.getMetrics(outMetrics)
-    return outMetrics.widthPixels
-}
-
-fun Context.getDrawableId(name: String): Int {
-    return resources.getIdentifier(name, "drawable", packageName)
-}
 
 fun Context.hasPermission(vararg permission: String): Boolean {
     return permission.toSet().all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }

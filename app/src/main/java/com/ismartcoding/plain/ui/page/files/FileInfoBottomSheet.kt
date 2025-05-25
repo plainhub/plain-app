@@ -77,6 +77,7 @@ fun FileInfoBottomSheet(
                             onDismiss()
                         }
                     }
+
                     IconTextShareButton {
                         ShareHelper.sharePaths(context, setOf(file.path))
                         onDismiss()

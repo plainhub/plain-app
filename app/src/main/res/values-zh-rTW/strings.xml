@@ -494,7 +494,6 @@
     <string name="internal_storage">內部儲存</string>
     <string name="enter_this_address_tips">在電腦瀏覽器中輸入上述地址，請確保您的手機和電腦位於同一局域網中。</string>
     <string name="last_visit_at">最後訪問時間</string>
-    <string name="web_console_desc">無需資料線即可透過電腦管理手機照片、影片、檔案、通知等資料。</string>
     <string name="app_restored">應用數據已經恢復，您需要重啟應用。</string>
     <string name="welcome_text">歡迎使用！您可以輕鬆地將文本、圖片和影片發送到本頁面，並在您的電腦上查看。\n如果您遇到問題，請發送郵件至ismartcoding@gmail.com尋求幫助，或者加入Discord討論: https://discord.gg/RQWcS6DEEe。</string>
     <string name="donation">捐贈</string>
@@ -561,4 +560,7 @@
     <string name="empty_playlist">您的播放清單為空</string>
     <string name="drag_number_to_reorder">拖曳編號以重新排序</string>
     <string name="remove_from_playlist">從播放清單中移除</string>
+    <string name="no_internet_connection">無網路連線。請檢查您的網路。</string>
+    <string name="access_phone_web">從電腦瀏覽器訪問您的手機。</string>
+    <string name="scan_qrcode_to_access_web">掃描二維碼訪問網頁</string>
 </resources>

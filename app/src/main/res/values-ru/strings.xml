@@ -494,7 +494,6 @@
     <string name="internal_storage">Внутреннее хранилище</string>
     <string name="enter_this_address_tips">Введите вышеуказанный адрес в браузер вашего компьютера, убедившись, что ваш телефон и компьютер находятся в одной локальной сети.</string>
     <string name="last_visit_at">Последнее посещение в</string>
-    <string name="web_console_desc">Управляйте фотографиями, видео, файлами, уведомлениями и другими данными на своем телефоне через компьютер без необходимости использования кабеля для передачи данных.</string>
     <string name="app_restored">Данные приложения восстановлены, вам нужно выйти из приложения и снова запустить его, как новое.</string>
     <string name="welcome_text">Добро пожаловать! Вы можете легко отправлять текст, изображения и видео на эту страницу и просматривать их на своем компьютере.\nЕсли у вас возникнут проблемы, не стесняйтесь отправить электронное письмо на адрес ismartcoding@gmail.com для получения помощи или присоединиться к нашей дискуссии в Discord по адресу: https://discord.gg/RQWcS6DEEe.</string>
     <string name="donation">Пожертвование</string>
@@ -561,4 +560,7 @@
     <string name="empty_playlist">Ваш плейлист пуст</string>
     <string name="drag_number_to_reorder">Перетащите номер для изменения порядка</string>
     <string name="remove_from_playlist">Удалить из плейлиста</string>
+    <string name="no_internet_connection">Нет подключения к интернету. Пожалуйста, проверьте вашу сеть.</string>
+    <string name="access_phone_web">Получите доступ к телефону через браузер на компьютере.</string>
+    <string name="scan_qrcode_to_access_web">Сканируйте QR-код, чтобы получить доступ к веб-адресу</string>
 </resources>

@@ -494,7 +494,6 @@
     <string name="internal_storage">Interner Speicher</string>
     <string name="enter_this_address_tips">Geben Sie die obige Adresse in den Browser Ihres Computers ein und stellen Sie sicher, dass Ihr Telefon und Ihr Computer im selben lokalen Netzwerk sind.</string>
     <string name="last_visit_at">Zuletzt besucht um</string>
-    <string name="web_console_desc">Verwalten Sie Fotos, Videos, Dateien, Benachrichtigungen und andere Daten auf Ihrem Telefon über den Computer, ohne dass ein Datenkabel erforderlich ist.</string>
     <string name="app_restored">APP-Daten wurden wiederhergestellt. Sie müssen die App zwangsweise beenden und die App erneut als neu starten.</string>
     <string name="welcome_text">Willkommen! Sie können ganz einfach Text, Bilder und Videos auf dieser Seite senden und sie auf Ihrem Computer anzeigen.\nWenn Sie auf Probleme stoßen, senden Sie bitte eine E-Mail an ismartcoding@gmail.com, um Unterstützung zu erhalten, oder nehmen Sie an unserer Discord-Diskussion teil unter: https://discord.gg/RQWcS6DEEe.</string>
     <string name="donation">Spende</string>
@@ -561,4 +560,7 @@
     <string name="empty_playlist">Ihre Playlist ist leer</string>
     <string name="drag_number_to_reorder">Ziehen Sie die Nummer, um die Playlist neu zu ordnen</string>
     <string name="remove_from_playlist">Aus Playlist entfernen</string>
+    <string name="no_internet_connection">Keine Internetverbindung. Bitte überprüfen Sie Ihre Verbindung.</string>
+    <string name="access_phone_web">Greifen Sie über einen Computerbrowser auf Ihr Telefon zu.</string>
+    <string name="scan_qrcode_to_access_web">Scannen Sie den QR-Code, um auf die Webadresse zuzugreifen</string>
 </resources>

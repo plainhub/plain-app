@@ -3,9 +3,6 @@ package com.ismartcoding.plain.web
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Build
-import com.google.common.io.ByteStreams
-import com.google.common.io.FileWriteMode
-import com.google.common.io.Files
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.compress
 import com.ismartcoding.lib.extensions.getFinalPath
@@ -27,6 +24,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.data.DownloadFileItem
 import com.ismartcoding.plain.data.DownloadFileItemWrap
+import com.ismartcoding.plain.data.UploadChunkInfo
 import com.ismartcoding.plain.data.UploadInfo
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.ImageType
@@ -152,7 +150,7 @@ object HttpModule {
                 },
             )
         }
-        
+
         intercept(ApplicationCallPipeline.Plugins) {
             if (!TempData.webEnabled) {
                 call.respond(HttpStatusCode.NotFound)
@@ -422,7 +420,7 @@ object HttpModule {
 
                         val w = q["w"]?.toIntOrNull()
                         val h = q["h"]?.toIntOrNull()
-                        val centerCrop = q["cc"]?.toBooleanStrictOrNull() ?: true
+                        val centerCrop = q["cc"]?.toBooleanStrictOrNull() != false
                         // get video/image thumbnail
                         if (w != null && h != null) {
                             val bytes = withIO { file.toThumbBytesAsync(MainApp.instance, w, h, centerCrop, mediaId) }
@@ -472,13 +470,13 @@ object HttpModule {
             post("/upload") {
                 val clientId = call.request.header("c-id") ?: ""
                 if (clientId.isEmpty()) {
-                    call.respond(HttpStatusCode.BadRequest)
+                    call.respond(HttpStatusCode.BadRequest, "c-id header is missing")
                     return@post
                 }
 
                 val token = HttpServerManager.tokenCache[clientId]
                 if (token == null) {
-                    call.response.status(HttpStatusCode.Unauthorized)
+                    call.respond(HttpStatusCode.Unauthorized)
                     return@post
                 }
                 try {
@@ -495,7 +493,7 @@ object HttpModule {
                                             requestStr = decryptedBytes.decodeToString()
                                         }
                                         if (requestStr.isEmpty()) {
-                                            call.response.status(HttpStatusCode.Unauthorized)
+                                            call.respond(HttpStatusCode.Unauthorized)
                                             return@forEachPart
                                         }
 
@@ -510,7 +508,7 @@ object HttpModule {
                                         }
                                         File(info.dir).mkdirs()
                                         var destFile = File("${info.dir}/$fileName")
-                                        if (info.index == 0 && destFile.exists()) {
+                                        if (destFile.exists()) {
                                             if (info.replace) {
                                                 destFile.delete()
                                             } else {
@@ -519,54 +517,12 @@ object HttpModule {
                                             }
                                         }
 
-                                        // use append file way
-                                        val noSplitFiles = false
-                                        if (noSplitFiles) {
-                                            part.provider().let { input ->
-                                                val outputStream = FileOutputStream(destFile)
-                                                input.copyTo(outputStream)
-                                                outputStream.close()
-                                            }
-                                            if (info.total - 1 == info.index) {
-                                                MainApp.instance.scanFileByConnection(destFile, null)
-                                            }
-                                        } else {
-                                            if (info.total > 1) {
-                                                destFile = File("${info.dir}/$fileName.part${String.format("%03d", info.index)}")
-//                                                if (destFile.exists() && destFile.length() == info.size) {
-//                                                    // skip if the part file is already uploaded
-//                                                } else {
-                                                part.provider().let { input ->
-                                                    val outputStream = FileOutputStream(destFile)
-                                                    input.copyTo(outputStream)
-                                                    outputStream.close()
-                                                }
-                                                //  }
-                                            } else {
-                                                part.provider().let { input ->
-                                                    val outputStream = FileOutputStream(destFile)
-                                                    input.copyTo(outputStream)
-                                                    outputStream.close()
-                                                }
-                                            }
-
-                                            if (info.total - 1 == info.index) {
-                                                if (info.total > 1) {
-                                                    // merge part files into original file
-                                                    destFile = File("${info.dir}/$fileName")
-                                                    val partFiles = File(info.dir).listFiles()?.filter { it.name.startsWith("$fileName.part") }?.sortedBy { it.name } ?: arrayListOf()
-                                                    Files.asByteSink(destFile, FileWriteMode.APPEND).openStream().use { fos ->
-                                                        partFiles.forEach { partFile ->
-                                                            Files.asByteSource(partFile).openStream().use { input ->
-                                                                ByteStreams.copy(input, fos)
-                                                            }
-                                                            partFile.delete()
-                                                        }
-                                                    }
-                                                }
-                                                MainApp.instance.scanFileByConnection(destFile, null)
-                                            }
+                                        part.provider().let { input ->
+                                            val outputStream = FileOutputStream(destFile)
+                                            input.copyTo(outputStream)
+                                            outputStream.close()
                                         }
+                                        MainApp.instance.scanFileByConnection(destFile, null)
                                     }
 
                                     else -> {}
@@ -579,6 +535,81 @@ object HttpModule {
                         part.dispose()
                     }
                     call.respond(HttpStatusCode.Created, fileName)
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                    call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
+                }
+            }
+
+            post("/upload_chunk") {
+                val clientId = call.request.header("c-id") ?: ""
+                if (clientId.isEmpty()) {
+                    call.respond(HttpStatusCode.BadRequest, "c-id header is missing")
+                    return@post
+                }
+
+                val token = HttpServerManager.tokenCache[clientId]
+                if (token == null) {
+                    call.respond(HttpStatusCode.Unauthorized)
+                    return@post
+                }
+
+                try {
+                    lateinit var chunkInfo: UploadChunkInfo
+                    var chunkSaved = false
+
+                    call.receiveMultipart(formFieldLimit = Long.MAX_VALUE).forEachPart { part ->
+                        when (part) {
+                            is PartData.FileItem -> {
+                                when (part.name) {
+                                    "info" -> {
+                                        var requestStr = ""
+                                        val decryptedBytes = CryptoHelper.aesDecrypt(token, part.provider().toByteArray())
+                                        if (decryptedBytes != null) {
+                                            requestStr = decryptedBytes.decodeToString()
+                                        }
+                                        if (requestStr.isEmpty()) {
+                                            call.respond(HttpStatusCode.Unauthorized)
+                                            return@forEachPart
+                                        }
+
+                                        chunkInfo = jsonDecode<UploadChunkInfo>(requestStr)
+                                    }
+
+                                    "file" -> {
+                                        if (chunkInfo.fileId.isEmpty() || chunkInfo.index < 0) {
+                                            call.respond(HttpStatusCode.BadRequest, "fileId or index is missing or invalid")
+                                            return@forEachPart
+                                        }
+
+                                        // Create directory in cache dir using file_id as directory name
+                                        val chunkDir = File(MainApp.instance.filesDir, "upload_tmp/${chunkInfo.fileId}")
+                                        chunkDir.mkdirs()
+
+                                        // Save chunk file with name chunk_$index
+                                        val chunkFile = File(chunkDir, "chunk_${chunkInfo.index}")
+                                        part.provider().let { input ->
+                                            val outputStream = FileOutputStream(chunkFile)
+                                            input.copyTo(outputStream)
+                                            outputStream.close()
+                                        }
+                                        chunkSaved = true
+                                    }
+
+                                    else -> {}
+                                }
+                            }
+
+                            else -> {}
+                        }
+                        part.dispose()
+                    }
+
+                    if (chunkSaved) {
+                        call.respond(HttpStatusCode.Created, "chunk_${chunkInfo.index}")
+                    } else {
+                        call.respond(HttpStatusCode.BadRequest, "chunk upload failed")
+                    }
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                     call.respond(HttpStatusCode.BadRequest, ex.message ?: "")

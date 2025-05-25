@@ -283,15 +283,15 @@ object Permissions {
             )
         }
         list.add(
-            PermissionItem.create(context, R.drawable.book_user, Permission.WRITE_CONTACTS, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))
+            PermissionItem.create(context, R.drawable.contact_round, Permission.WRITE_CONTACTS, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))
         )
 
         if (AppFeatureType.SOCIAL.has()) {
             list.add(PermissionItem.create(context, R.drawable.message_square_text, Permission.READ_SMS))
-            list.add(PermissionItem.create(context, R.drawable.logs, Permission.WRITE_CALL_LOG, setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG)))
+            list.add(PermissionItem.create(context, R.drawable.call_log, Permission.WRITE_CALL_LOG, setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG)))
         }
         list.add(
-            PermissionItem.create(context, R.drawable.phone, Permission.CALL_PHONE)
+            PermissionItem.create(context, R.drawable.phone_call, Permission.CALL_PHONE)
         )
         list.add(
             PermissionItem.create(context, R.drawable.file_digit, Permission.READ_PHONE_NUMBERS, setOf(Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS))

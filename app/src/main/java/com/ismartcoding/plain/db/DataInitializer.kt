@@ -20,7 +20,6 @@ class DataInitializer(val context: Context, val db: SupportSQLiteDatabase) {
     private val tags =
         arrayOf(
             TagItem(R.string.favorites, DataType.AUDIO),
-            TagItem(R.string.children_songs, DataType.AUDIO),
             TagItem(R.string.light_music, DataType.AUDIO),
             TagItem(R.string.movie, DataType.VIDEO),
             TagItem(R.string.family, DataType.IMAGE),
@@ -28,7 +27,6 @@ class DataInitializer(val context: Context, val db: SupportSQLiteDatabase) {
             TagItem(R.string.todo, DataType.SMS),
             TagItem(R.string.family, DataType.CONTACT),
             TagItem(R.string.important, DataType.CONTACT),
-            TagItem(R.string.inspirations, DataType.NOTE),
             TagItem(R.string.personal, DataType.NOTE),
             TagItem(R.string.work, DataType.NOTE),
         )

@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.page.images
 
 import android.content.ClipData
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,8 +23,9 @@ import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.extensions.formatDateTime
-import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
+import com.ismartcoding.plain.helpers.QrCodeScanHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.helpers.SvgHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
@@ -31,6 +33,9 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
 import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
 import com.ismartcoding.plain.ui.base.IconTextRenameButton
+import com.ismartcoding.plain.ui.base.IconTextScanQrCodeButton
+import com.ismartcoding.plain.ui.base.IconTextSelectButton
+import com.ismartcoding.plain.ui.base.IconTextShareButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PListItem
@@ -38,16 +43,15 @@ import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
-import com.ismartcoding.plain.ui.components.ImageMetaRows
 import com.ismartcoding.plain.ui.components.FileRenameDialog
+import com.ismartcoding.plain.ui.components.ImageMetaRows
+import com.ismartcoding.plain.ui.components.QrScanResultBottomSheet
 import com.ismartcoding.plain.ui.components.TagSelector
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import com.ismartcoding.plain.ui.base.IconTextSelectButton
-import com.ismartcoding.plain.ui.base.IconTextShareButton
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -66,12 +70,24 @@ fun ViewImageBottomSheet(
     var viewSize by remember {
         mutableStateOf(m.getRotatedSize())
     }
+    var showQrScanResult by remember { mutableStateOf(false) }
+    var qrScanResult by remember { mutableStateOf("") }
 
     val scope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.IO) {
             if (m.path.endsWith(".svg", true)) {
                 viewSize = SvgHelper.getSize(m.path)
+            }
+            try {
+                val bitmap = BitmapFactory.decodeFile(m.path)
+                if (bitmap != null) {
+                    val result = QrCodeScanHelper.tryDecode(bitmap)
+                    if (result != null) {
+                        qrScanResult = result.text
+                    }
+                }
+            } catch (e: Exception) {
             }
         }
     }
@@ -101,6 +117,11 @@ fun ViewImageBottomSheet(
                             dragSelectState.enterSelectMode()
                             dragSelectState.select(m.id)
                             onDismiss()
+                        }
+                    }
+                    if (qrScanResult.isNotEmpty()) {
+                        IconTextScanQrCodeButton {
+                            showQrScanResult = true
                         }
                     }
                     IconTextShareButton {
@@ -166,4 +187,11 @@ fun ViewImageBottomSheet(
             }
         }
     }
+
+    if (showQrScanResult) {
+        QrScanResultBottomSheet(context, qrScanResult) {
+            showQrScanResult = false
+        }
+    }
 }
+
