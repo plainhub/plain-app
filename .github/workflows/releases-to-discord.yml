@@ -3,21 +3,51 @@ name: Release to Discord
 on:
   release:
     types: [published]
+  workflow_dispatch: {}
 
 jobs:
-  github-releases-to-discord:
+  notify-discord:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Github Releases To Discord
-        uses: SethCohen/github-releases-to-discord@v1.13.1
+      - name: Determine Release Info
+        id: release-info
+        run: |
+          if [ "${{ github.event.release.tag_name != '' }}" = "true" ]; then
+            echo "Using release event payload"
+            echo "RELEASE_NAME=${{ github.event.release.name }}" >> $GITHUB_ENV
+            echo "RELEASE_URL=${{ github.event.release.html_url }}" >> $GITHUB_ENV
+            echo "RELEASE_TIMESTAMP=${{ github.event.release.published_at }}" >> $GITHUB_ENV
+            CLEAN_BODY=$(echo "${{ github.event.release.body }}" | tr -d '\r')
+            echo "RELEASE_BODY<<EOF" >> $GITHUB_ENV
+            echo "$CLEAN_BODY" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          else
+            echo "Fetching latest release from GitHub API"
+            response=$(curl -s https://api.github.com/repos/${{ github.repository }}/releases/latest)
+            name=$(echo "$response" | jq -r '.name')
+            body=$(echo "$response" | jq -r '.body // "No changelog provided."' | tr -d '\r')
+            url=$(echo "$response" | jq -r '.html_url')
+            timestamp=$(echo "$response" | jq -r '.published_at')
+      
+            echo "RELEASE_NAME=$name" >> $GITHUB_ENV
+            echo "RELEASE_URL=$url" >> $GITHUB_ENV
+            echo "RELEASE_TIMESTAMP=$timestamp" >> $GITHUB_ENV
+            echo "RELEASE_BODY<<EOF" >> $GITHUB_ENV
+            echo "$body" >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+          fi
+
+      - name: Send to Discord
+        uses: tsickert/discord-webhook@v7.0.0
         with:
-          webhook_url: ${{ secrets.RELEASE_WEBHOOK_URL }}
-          color: "2105893"
+          webhook-url: ${{ secrets.RELEASE_WEBHOOK_URL }}
           username: "Release"
-          avatar_url: "https://cdn.discordapp.com/avatars/1184778180515606560/52b7876fc8cefa73f593c7f8b95811f3.webp?size=160"
+          avatar-url: "https://cdn.discordapp.com/avatars/1184778180515606560/52b7876fc8cefa73f593c7f8b95811f3.webp?size=160"
           content: "||@everyone||"
-          footer_title: "Changelog"
-          footer_icon_url: "https://cdn.discordapp.com/avatars/1184778180515606560/52b7876fc8cefa73f593c7f8b95811f3.webp?size=160"
-          footer_timestamp: true
+          embed-title: "📦 New Release: ${{ env.RELEASE_NAME }}"
+          embed-url: "${{ env.RELEASE_URL }}"
+          embed-description: "${{ env.RELEASE_BODY }}"
+          embed-color: 2105893
+          embed-footer-text: "Changelog"
+          embed-footer-icon-url: "https://cdn.discordapp.com/avatars/1184778180515606560/52b7876fc8cefa73f593c7f8b95811f3.webp?size=160"
+          embed-timestamp: "${{ env.RELEASE_TIMESTAMP }}"
