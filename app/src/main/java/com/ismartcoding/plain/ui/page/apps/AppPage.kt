@@ -61,6 +61,34 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
+/**
+ * Check if a file can be shared through the app's FileProvider
+ */
+private fun isFileShareable(file: File): Boolean {
+    if (!file.exists() || !file.canRead()) {
+        return false
+    }
+    
+    val path = file.absolutePath
+    // Files in /apex/ directory are modular system components and cannot be shared via FileProvider
+    if (path.startsWith("/apex/")) {
+        return false
+    }
+    
+    // Files in other system directories may also be inaccessible
+    if (path.startsWith("/system/") || path.startsWith("/vendor/") || path.startsWith("/product/")) {
+        // Try to access the file to see if it's readable
+        try {
+            file.inputStream().use { it.read() }
+            return true
+        } catch (e: Exception) {
+            return false
+        }
+    }
+    
+    return true
+}
+
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,6 +99,7 @@ fun AppPage(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var item by remember { mutableStateOf<DPackageDetail?>(null) }
+    var isShareable by remember { mutableStateOf(true) }
     val lifecycleEvent = rememberLifecycleEvent()
     LaunchedEffect(lifecycleEvent) {
         if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
@@ -83,6 +112,10 @@ fun AppPage(
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.IO) {
             item = PackageHelper.getPackageDetail(id)
+            // Check if the APK file can be shared
+            item?.let { packageDetail ->
+                isShareable = isFileShareable(File(packageDetail.path))
+            }
         }
     }
 
@@ -92,12 +125,14 @@ fun AppPage(
                 navController = navController,
                 title = item?.name ?: "",
                 actions = {
-                    PIconButton(
-                        icon = R.drawable.share_2,
-                        contentDescription = stringResource(R.string.share),
-                        tint = MaterialTheme.colorScheme.onSurface,
-                    ) {
-                        ShareHelper.shareFile(context, File(item?.path ?: ""))
+                    if (isShareable) {
+                        PIconButton(
+                            icon = R.drawable.share_2,
+                            contentDescription = stringResource(R.string.share),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                        ) {
+                            ShareHelper.shareFile(context, File(item?.path ?: ""))
+                        }
                     }
                 },
             )

@@ -564,4 +564,13 @@
     <string name="no_internet_connection">Нет подключения к интернету. Пожалуйста, проверьте вашу сеть.</string>
     <string name="access_phone_web">Получите доступ к телефону через браузер на компьютере.</string>
     <string name="scan_qrcode_to_access_web">Сканируйте QR-код, чтобы получить доступ к веб-адресу</string>
+    <string name="cannot_share_system_component">Невозможно поделиться системным компонентом. Этот файл является защищенным системным модулем.</string>
+    <string name="cannot_share_system_file">Невозможно поделиться системным файлом. Этот файл не доступен.</string>
+    <string name="cannot_share_file_not_accessible">Невозможно поделиться файлом. Этот файл не доступен через приложение.</string>
+    <string name="cannot_share_any_files">Невозможно поделиться файлами. Все выбранные файлы не доступны.</string>
+    <string name="some_files_cannot_be_shared">Некоторые файлы не могут быть поделены</string>
+    <string name="cannot_open_system_component">Невозможно открыть системный компонент. Этот файл является защищенным системным модулем.</string>
+    <string name="cannot_open_system_file">Невозможно открыть системный файл. Этот файл не доступен.</string>
+    <string name="cannot_open_file_not_accessible">Невозможно открыть файл. Этот файл не доступен через приложение.</string>
+    <string name="unknown_error">Произошла неизвестная ошибка.</string>
 </resources>

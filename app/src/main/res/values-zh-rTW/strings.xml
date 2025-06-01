@@ -564,4 +564,13 @@
     <string name="no_internet_connection">無網路連線。請檢查您的網路。</string>
     <string name="access_phone_web">從電腦瀏覽器訪問您的手機。</string>
     <string name="scan_qrcode_to_access_web">掃描二維碼訪問網頁</string>
+    <string name="cannot_share_system_component">無法共享系統組件。此文件是受保護的系統模組。</string>
+    <string name="cannot_share_system_file">無法共享系統文件。此文件不可訪問。</string>
+    <string name="cannot_share_file_not_accessible">無法共享文件。此文件不可通過應用程序訪問。</string>
+    <string name="cannot_share_any_files">無法共享任何文件。所有選定的文件都不可訪問。</string>
+    <string name="some_files_cannot_be_shared">某些文件無法共享</string>
+    <string name="cannot_open_system_component">無法打開系統組件。此文件是受保護的系統模組。</string>
+    <string name="cannot_open_system_file">無法打開系統文件。此文件不可訪問。</string>
+    <string name="cannot_open_file_not_accessible">無法打開文件。此文件不可通過應用程序訪問。</string>
+    <string name="unknown_error">發生未知錯誤。</string>
 </resources>

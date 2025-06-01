@@ -564,4 +564,13 @@
     <string name="no_internet_connection">No internet connection. Please check your network.</string>
     <string name="access_phone_web">Access your phone from a computer browser.</string>
     <string name="scan_qrcode_to_access_web">Scan QR code to access web address</string>
+    <string name="cannot_share_system_component">Cannot share system component. This file is a protected system module.</string>
+    <string name="cannot_share_system_file">Cannot share system file. This file is not accessible.</string>
+    <string name="cannot_share_file_not_accessible">Cannot share file. File is not accessible through the app.</string>
+    <string name="cannot_share_any_files">Cannot share any files. All selected files are not accessible.</string>
+    <string name="some_files_cannot_be_shared">Some files cannot be shared</string>
+    <string name="cannot_open_system_component">Cannot open system component. This file is a protected system module.</string>
+    <string name="cannot_open_system_file">Cannot open system file. This file is not accessible.</string>
+    <string name="cannot_open_file_not_accessible">Cannot open file. File is not accessible through the app.</string>
+    <string name="unknown_error">Unknown error occurred.</string>
 </resources>

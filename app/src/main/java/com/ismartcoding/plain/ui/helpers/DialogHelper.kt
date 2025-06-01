@@ -25,6 +25,14 @@ object DialogHelper {
         ToastManager.showInfoToast(message, durationMs)
     }
 
+    fun showErrorMessage(
+        message: String,
+        duration: Int = Toast.LENGTH_SHORT,
+    ) {
+        val durationMs = if (duration == Toast.LENGTH_SHORT) 2000L else 3500L
+        ToastManager.showErrorToast(message, durationMs)
+    }
+
     fun showSuccess(resId: Int) {
         ToastManager.showSuccessToast(getString(resId), 2000L)
     }

@@ -564,4 +564,13 @@
     <string name="no_internet_connection">인터넷 연결이 없습니다. 네트워크를 확인하세요.</string>
     <string name="access_phone_web">컴퓨터 브라우저에서 휴대전화를 액세스하세요.</string>
     <string name="scan_qrcode_to_access_web">웹 주소에 액세스하려면 QR 코드를 스캔하세요</string>
+    <string name="cannot_share_system_component">시스템 구성 요소를 공유할 수 없습니다. 이 파일은 보호된 시스템 모듈입니다.</string>
+    <string name="cannot_share_system_file">시스템 파일을 공유할 수 없습니다. 이 파일은 액세스할 수 없습니다.</string>
+    <string name="cannot_share_file_not_accessible">파일을 공유할 수 없습니다. 이 파일은 앱에서 액세스할 수 없습니다.</string>
+    <string name="cannot_share_any_files">파일을 공유할 수 없습니다. 선택한 모든 파일은 액세스할 수 없습니다.</string>
+    <string name="some_files_cannot_be_shared">일부 파일을 공유할 수 없습니다</string>
+    <string name="cannot_open_system_component">시스템 구성 요소를 열 수 없습니다. 이 파일은 보호된 시스템 모듈입니다.</string>
+    <string name="cannot_open_system_file">시스템 파일을 열 수 없습니다. 이 파일은 액세스할 수 없습니다.</string>
+    <string name="cannot_open_file_not_accessible">파일을 열 수 없습니다. 이 파일은 앱에서 액세스할 수 없습니다.</string>
+    <string name="unknown_error">알 수 없는 오류가 발생했습니다.</string>
 </resources>

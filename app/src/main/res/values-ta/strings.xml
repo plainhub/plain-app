@@ -564,4 +564,13 @@
     <string name="no_internet_connection">இணைய இணைப்பு இல்லை. உங்கள் இணைப்பைச் சரிபார்க்கவும்.</string>
     <string name="access_phone_web">கணினி உலாவியில் இருந்து உங்கள் கைபேசியை அணுகவும்.</string>
     <string name="scan_qrcode_to_access_web">இணைய முகவரிக்கு அணுக கீரோ குறியை சீக்கிரம் செய்யவும்</string>
+    <string name="cannot_share_system_component">கணினி கூட்டமைப்பு பகுதியை பகிர முடியாது. இந்த கோப்பு ஒரு பாதுகாப்பான கணினி மொழிப்பாடு ஆகும்.</string>
+    <string name="cannot_share_system_file">கணினி கோப்பை பகிர முடியாது. இந்த கோப்பு அணுகக்கூடியதல்ல.</string>
+    <string name="cannot_share_file_not_accessible">கோப்பை பகிர முடியாது. இந்த கோப்பு பயன்பாட்டில் அணுகக்கூடியதல்ல.</string>
+    <string name="cannot_share_any_files">எந்த கோப்பும் பகிர முடியாது. தேர்ந்தெடுக்கப்பட்ட அனைத்து கோப்புகளும் அணுகக்கூடியதல்ல.</string>
+    <string name="some_files_cannot_be_shared">சில கோப்புகள் பகிர முடியாது</string>
+    <string name="cannot_open_system_component">கணினி கூட்டமைப்பு பகுதியை திறக்க முடியாது. இந்த கோப்பு ஒரு பாதுகாப்பான கணினி மொழிப்பாடு ஆகும்.</string>
+    <string name="cannot_open_system_file">கணினி கோப்பை திறக்க முடியாது. இந்த கோப்பு அணுகக்கூடியதல்ல.</string>
+    <string name="cannot_open_file_not_accessible">கோப்பை திறக்க முடியாது. இந்த கோப்பு பயன்பாட்டில் அணுகக்கூடியதல்ல.</string>
+    <string name="unknown_error">அறியாத பிழை ஏற்பட்டது.</string>
 </resources>

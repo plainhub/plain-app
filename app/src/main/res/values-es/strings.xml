@@ -564,4 +564,13 @@
     <string name="no_internet_connection">No hay conexión a internet. Por favor, verifica tu conexión.</string>
     <string name="access_phone_web">Accede a tu teléfono desde el navegador de una computadora.</string>
     <string name="scan_qrcode_to_access_web">Escanea el código QR para acceder a la dirección web</string>
+    <string name="cannot_share_system_component">No se puede compartir el componente del sistema. Este archivo es un módulo del sistema protegido.</string>
+    <string name="cannot_share_system_file">No se puede compartir el archivo del sistema. Este archivo no es accesible.</string>
+    <string name="cannot_share_file_not_accessible">No se puede compartir el archivo. Este archivo no es accesible a través de la aplicación.</string>
+    <string name="cannot_share_any_files">No se puede compartir ningún archivo. Todos los archivos seleccionados no son accesibles.</string>
+    <string name="some_files_cannot_be_shared">Algunos archivos no se pueden compartir</string>
+    <string name="cannot_open_system_component">No se puede abrir el componente del sistema. Este archivo es un módulo del sistema protegido.</string>
+    <string name="cannot_open_system_file">No se puede abrir el archivo del sistema. Este archivo no es accesible.</string>
+    <string name="cannot_open_file_not_accessible">No se puede abrir el archivo. Este archivo no es accesible a través de la aplicación.</string>
+    <string name="unknown_error">Se produjo un error desconocido.</string>
 </resources>

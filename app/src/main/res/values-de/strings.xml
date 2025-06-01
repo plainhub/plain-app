@@ -564,4 +564,13 @@
     <string name="no_internet_connection">Keine Internetverbindung. Bitte überprüfen Sie Ihre Verbindung.</string>
     <string name="access_phone_web">Greifen Sie über einen Computerbrowser auf Ihr Telefon zu.</string>
     <string name="scan_qrcode_to_access_web">Scannen Sie den QR-Code, um auf die Webadresse zuzugreifen</string>
+    <string name="cannot_share_system_component">Systemkomponente kann nicht geteilt werden. Diese Datei ist ein geschütztes Systemmodul.</string>
+    <string name="cannot_share_system_file">Systemdatei kann nicht geteilt werden. Diese Datei ist nicht zugänglich.</string>
+    <string name="cannot_share_file_not_accessible">Datei kann nicht geteilt werden. Diese Datei ist nicht über die App zugänglich.</string>
+    <string name="cannot_share_any_files">Keine Dateien können geteilt werden. Alle ausgewählten Dateien sind nicht zugänglich.</string>
+    <string name="some_files_cannot_be_shared">Einige Dateien können nicht geteilt werden</string>
+    <string name="cannot_open_system_component">Systemkomponente kann nicht geöffnet werden. Diese Datei ist ein geschütztes Systemmodul.</string>
+    <string name="cannot_open_system_file">Systemdatei kann nicht geöffnet werden. Diese Datei ist nicht zugänglich.</string>
+    <string name="cannot_open_file_not_accessible">Datei kann nicht geöffnet werden. Diese Datei ist nicht über die App zugänglich.</string>
+    <string name="unknown_error">Ein unbekannter Fehler ist aufgetreten.</string>
 </resources>

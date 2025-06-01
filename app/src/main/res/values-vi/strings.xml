@@ -564,4 +564,13 @@
     <string name="no_internet_connection">Không có kết nối internet. Vui lòng kiểm tra kết nối của bạn.</string>
     <string name="access_phone_web">Truy cập điện thoại của bạn từ trình duyệt máy tính.</string>
     <string name="scan_qrcode_to_access_web">Quét mã QR để truy cập địa chỉ web</string>
+    <string name="cannot_share_system_component">Không thể chia sẻ thành phần hệ thống. Tệp này là một mô-đun hệ thống được bảo vệ.</string>
+    <string name="cannot_share_system_file">Không thể chia sẻ tệp hệ thống. Tệp này không thể truy cập được.</string>
+    <string name="cannot_share_file_not_accessible">Không thể chia sẻ tệp. Tệp này không thể truy cập được thông qua ứng dụng.</string>
+    <string name="cannot_share_any_files">Không thể chia sẻ bất kỳ tệp nào. Tất cả các tệp đã chọn không thể truy cập được.</string>
+    <string name="some_files_cannot_be_shared">Một số tệp không thể được chia sẻ</string>
+    <string name="cannot_open_system_component">Không thể mở thành phần hệ thống. Tệp này là một mô-đun hệ thống được bảo vệ.</string>
+    <string name="cannot_open_system_file">Không thể mở tệp hệ thống. Tệp này không thể truy cập được.</string>
+    <string name="cannot_open_file_not_accessible">Không thể mở tệp. Tệp này không thể truy cập được thông qua ứng dụng.</string>
+    <string name="unknown_error">Đã xảy ra lỗi không xác định.</string>
 </resources>

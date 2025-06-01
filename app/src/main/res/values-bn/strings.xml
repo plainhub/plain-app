@@ -564,4 +564,13 @@
     <string name="no_internet_connection">নেটওয়ার্ক সংযোগ বন্ধ রয়েছে। দয়া করে আবার চেষ্টা করুন।</string>
     <string name="access_phone_web">একটি কম্পিউটার ব্রাউজার থেকে আপনার ফোন অ্যাক্সেস করুন।</string>
     <string name="scan_qrcode_to_access_web">ওয়েব ঠিকানা অ্যাক্সেস করতে QR কোড স্ক্যান করুন</string>
+    <string name="cannot_share_system_component">সিস্টেম কম্পোনেন্ট শেয়ার করা যাবে না। এই ফাইলটি একটি সুরক্ষিত সিস্টেম মডিউল।</string>
+    <string name="cannot_share_system_file">সিস্টেম ফাইল শেয়ার করা যাবে না। এই ফাইলটি অ্যাক্সেস করা যাবে না।</string>
+    <string name="cannot_share_file_not_accessible">ফাইল শেয়ার করা যাবে না। এই ফাইলটি অ্যাপ দ্বারা অ্যাক্সেস করা যাবে না।</string>
+    <string name="cannot_share_any_files">কোনও ফাইল শেয়ার করা যাবে না। সকল চয়নকৃত ফাইলগুলি অ্যাক্সেস করা যাবে না।</string>
+    <string name="some_files_cannot_be_shared">কিছু ফাইলগুলি শেয়ার করা যাবে না</string>
+    <string name="cannot_open_system_component">সিস্টেম কম্পোনেন্ট খুলতে ব্যর্থ। এই ফাইলটি একটি সুরক্ষিত সিস্টেম মডিউল।</string>
+    <string name="cannot_open_system_file">সিস্টেম ফাইল খুলতে ব্যর্থ। এই ফাইলটি অ্যাক্সেস করা যাবে না।</string>
+    <string name="cannot_open_file_not_accessible">ফাইল খুলতে ব্যর্থ। এই ফাইলটি অ্যাপ দ্বারা অ্যাক্সেস করা যাবে না।</string>
+    <string name="unknown_error">অজানা ত্রুটি ঘটেছে।</string>
 </resources>

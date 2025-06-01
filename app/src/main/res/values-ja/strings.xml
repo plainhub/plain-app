@@ -564,4 +564,13 @@
     <string name="no_internet_connection">インターネット接続がありません。ネットワークを確認してください。</string>
     <string name="access_phone_web">コンピュータのブラウザから携帯電話にアクセスします。</string>
     <string name="scan_qrcode_to_access_web">WebアドレスにアクセスするためにQRコードをスキャンします</string>
+    <string name="cannot_share_system_component">システムコンポーネントを共有できません。このファイルは保護されたシステムモジュールです。</string>
+    <string name="cannot_share_system_file">システムファイルを共有できません。このファイルはアクセスできません。</string>
+    <string name="cannot_share_file_not_accessible">ファイルを共有できません。このファイルはアプリからアクセスできません。</string>
+    <string name="cannot_share_any_files">ファイルを共有できません。選択したファイルはアクセスできません。</string>
+    <string name="some_files_cannot_be_shared">一部のファイルを共有できません</string>
+    <string name="cannot_open_system_component">システムコンポーネントを開けません。このファイルは保護されたシステムモジュールです。</string>
+    <string name="cannot_open_system_file">システムファイルを開けません。このファイルはアクセスできません。</string>
+    <string name="cannot_open_file_not_accessible">ファイルを開けません。このファイルはアプリからアクセスできません。</string>
+    <string name="unknown_error">不明なエラーが発生しました。</string>
 </resources>

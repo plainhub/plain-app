@@ -564,4 +564,13 @@
     <string name="no_internet_connection">इंटरनेट कनेक्शन नहीं है। कृपया अपना नेटवर्क जांचें।</string>
     <string name="access_phone_web">कंप्यूटर ब्राउज़र से अपने फ़ोन तक पहुँचें।</string>
     <string name="scan_qrcode_to_access_web">वेब पता तक पहुँचने के लिए QR कोड स्कैन करें</string>
+    <string name="cannot_share_system_component">सिस्टम घटक साझा करना संभव नहीं है। यह फ़ाइल एक सुरक्षित सिस्टम मॉड्यूल है।</string>
+    <string name="cannot_share_system_file">सिस्टम फ़ाइल साझा करना संभव नहीं है। यह फ़ाइल पहुँच योग्य नहीं है।</string>
+    <string name="cannot_share_file_not_accessible">फ़ाइल साझा करना संभव नहीं है। यह फ़ाइल ऐप द्वारा पहुँच योग्य नहीं है।</string>
+    <string name="cannot_share_any_files">कोई फ़ाइल साझा करना संभव नहीं है। सभी चुने हुए फ़ाइलें पहुँच योग्य नहीं हैं।</string>
+    <string name="some_files_cannot_be_shared">कुछ फ़ाइलें साझा करना संभव नहीं है</string>
+    <string name="cannot_open_system_component">सिस्टम घटक खोलना संभव नहीं है। यह फ़ाइल एक सुरक्षित सिस्टम मॉड्यूल है।</string>
+    <string name="cannot_open_system_file">सिस्टम फ़ाइल खोलना संभव नहीं है। यह फ़ाइल पहुँच योग्य नहीं है।</string>
+    <string name="cannot_open_file_not_accessible">फ़ाइल खोलना संभव नहीं है। यह फ़ाइल ऐप द्वारा पहुँच योग्य नहीं है।</string>
+    <string name="unknown_error">अजगर हो गया है।</string>
 </resources>

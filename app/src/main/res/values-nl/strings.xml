@@ -564,4 +564,13 @@
     <string name="no_internet_connection">Geen internetverbinding. Controleer uw verbinding.</string>
     <string name="access_phone_web">Toegang tot je telefoon via een computerbrowser.</string>
     <string name="scan_qrcode_to_access_web">Scan QR code to access web address</string>
+    <string name="cannot_share_system_component">Kan systeemcomponent niet delen. Dit bestand is een beveiligd systeemmodule.</string>
+    <string name="cannot_share_system_file">Kan systeembestand niet delen. Dit bestand is niet toegankelijk.</string>
+    <string name="cannot_share_file_not_accessible">Kan bestand niet delen. Dit bestand is niet toegankelijk via de app.</string>
+    <string name="cannot_share_any_files">Kan geen bestanden delen. Alle geselecteerde bestanden zijn niet toegankelijk.</string>
+    <string name="some_files_cannot_be_shared">Sommige bestanden kunnen niet worden gedeeld</string>
+    <string name="cannot_open_system_component">Kan systeemcomponent niet openen. Dit bestand is een beveiligd systeemmodule.</string>
+    <string name="cannot_open_system_file">Kan systeembestand niet openen. Dit bestand is niet toegankelijk.</string>
+    <string name="cannot_open_file_not_accessible">Kan bestand niet openen. Dit bestand is niet toegankelijk via de app.</string>
+    <string name="unknown_error">Er is een onbekende fout opgetreden.</string>
 </resources>

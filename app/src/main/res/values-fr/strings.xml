@@ -563,4 +563,14 @@
     <string name="remove_from_playlist">Supprimer de la liste</string>
     <string name="no_internet_connection">Aucune connexion internet. Veuillez vérifier votre connexion.</string>
     <string name="access_phone_web">Accédez à votre téléphone depuis un navigateur sur un ordinateur.</string>
+    <string name="scan_qrcode_to_access_web">Scannez le code QR ci-dessus pour accéder à votre téléphone depuis un navigateur sur un ordinateur.</string>
+    <string name="cannot_share_system_component">Impossible de partager le composant du système. Ce fichier est un module du système protégé.</string>
+    <string name="cannot_share_system_file">Impossible de partager le fichier du système. Ce fichier n\'est pas accessible.</string>
+    <string name="cannot_share_file_not_accessible">Impossible de partager le fichier. Ce fichier n\'est pas accessible via l\'application.</string>
+    <string name="cannot_share_any_files">Impossible de partager aucun fichier. Tous les fichiers sélectionnés ne sont pas accessibles.</string>
+    <string name="some_files_cannot_be_shared">Certains fichiers ne peuvent pas être partagés</string>
+    <string name="cannot_open_system_component">Impossible d\'ouvrir le composant du système. Ce fichier est un module du système protégé.</string>
+    <string name="cannot_open_system_file">Impossible d\'ouvrir le fichier du système. Ce fichier n\'est pas accessible.</string>
+    <string name="cannot_open_file_not_accessible">Impossible d\'ouvrir le fichier. Ce fichier n\'est pas accessible via l\'application.</string>
+    <string name="unknown_error">Une erreur inconnue est survenue.</string>
 </resources>
