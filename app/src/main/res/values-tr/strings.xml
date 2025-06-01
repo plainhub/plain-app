@@ -1,5 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
+    <string name="app_data">Uygulama verileri</string>
     <string name="vpn_web_conflict_warning">Cihazınızda VPN şu anda etkin durumda, bu da PC\'den erişildiğinde web bağlantı sorunlarına yol açabilir. Bunu çözmek için VPN ayarlarınızı LAN trafiğine izin verecek şekilde ayarlamanızı veya VPN\'inizi devre dışı bırakmanızı öneririz.</string>
     <string name="warning">Uyarı</string>
     <string name="ssl_certificate_reset">SSL sertifikası sıfırlandı</string>

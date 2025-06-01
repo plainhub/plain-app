@@ -1,5 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
+    <string name="app_data">應用程式資料</string>
     <string name="vpn_web_conflict_warning">您的手機啟用了VPN，這可能會導致從電腦訪問網頁時出現連接問題。我們建議您調整VPN設置允許區域網路流量或關閉VPN。</string>
     <string name="warning">警告</string>
     <string name="ssl_certificate_reset">SSL證書已重置</string>

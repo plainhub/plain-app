@@ -1,5 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
+    <string name="app_data">Данные приложения</string>
     <string name="vpn_web_conflict_warning">Ваш VPN в настоящее время включен на вашем устройстве, что может потенциально привести к проблемам с веб-подключением при доступе с ПК. Для устранения этой проблемы мы рекомендуем настроить параметры вашего VPN для разрешения локального сетевого трафика или отключить ваш VPN.</string>
     <string name="warning">Предупреждение</string>
     <string name="ssl_certificate_reset">Сертификат SSL сброшен</string>

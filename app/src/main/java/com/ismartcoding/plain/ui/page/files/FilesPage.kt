@@ -143,16 +143,15 @@ fun FilesPage(
     }
 
     LaunchedEffect(fileType) {
-        if (fileType == FilesType.APP) {
-            filesVM.root = FileSystemHelper.getExternalFilesDirPath(context)
-            filesVM.breadcrumbs.clear()
-            filesVM.breadcrumbs.add(BreadcrumbItem(LocaleHelper.getString(R.string.send_to_pc), filesVM.root))
-            filesVM.initPath(filesVM.root)
-            filesVM.type = FilesType.APP
-        }
-
         scope.launch(Dispatchers.IO) {
             filesVM.loadLastPathAsync(context)
+            if (fileType == FilesType.APP) {
+                filesVM.root = FileSystemHelper.getExternalFilesDirPath(context)
+                filesVM.breadcrumbs.clear()
+                filesVM.breadcrumbs.add(BreadcrumbItem(LocaleHelper.getString(R.string.app_data), filesVM.root))
+                filesVM.initPath(filesVM.root)
+                filesVM.type = FilesType.APP
+            }
             filesVM.loadAsync(context)
             audioPlaylistVM.loadAsync(context)
         }

@@ -1,5 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
+    <string name="app_data">Dữ liệu ứng dụng</string>
     <string name="vpn_web_conflict_warning">VPN hiện đang được kích hoạt trên thiết bị của bạn, điều này có thể dẫn đến vấn đề kết nối web khi truy cập từ PC. Để giải quyết vấn đề này, chúng tôi khuyên bạn nên điều chỉnh cài đặt VPN của mình để cho phép lưu lượng LAN hoặc tắt VPN của bạn.</string>
     <string name="warning">Cảnh báo</string>
     <string name="ssl_certificate_reset">Chứng chỉ SSL đã được đặt lại</string>

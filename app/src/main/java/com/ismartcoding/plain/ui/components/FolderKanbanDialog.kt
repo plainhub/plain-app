@@ -27,7 +27,7 @@ fun FolderKanbanDialog(filesVM: FilesViewModel, onDismiss: () -> Unit = {}) {
     val recentsText = stringResource(R.string.recents)
     val sdcardText = stringResource(R.string.sdcard)
     val usbStorageText = stringResource(R.string.usb_storage)
-    val fileTransferAssistantText = stringResource(R.string.send_to_pc)
+    val fileTransferAssistantText = stringResource(R.string.app_data)
     
     LaunchedEffect(Unit) {
         val items = withIO {

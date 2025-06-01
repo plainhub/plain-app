@@ -1,5 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
+    <string name="app_data">App-Daten</string>
     <string name="vpn_web_conflict_warning">Ihr VPN ist derzeit auf Ihrem Gerät aktiviert, was potenziell zu Webverbindungsproblemen führen kann, wenn es von Ihrem PC aus zugegriffen wird. Um dies zu lösen, empfehlen wir Ihnen, Ihre VPN-Einstellungen anzupassen, um LAN-Verkehr zuzulassen oder Ihr VPN zu deaktivieren.</string>
     <string name="warning">Warnung</string>
     <string name="ssl_certificate_reset">SSL-Zertifikat zurückgesetzt</string>
