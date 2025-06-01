@@ -37,56 +37,79 @@ fun ContentResolver.setSystemScreenTimeout(timeout: Int): Boolean {
 }
 
 fun ContentResolver.count(uri: Uri, where: ContentWhere): Int {
-    return if (isQPlus()) {
-        countWithBundle(uri, where)
-    } else {
-        try {
-            countWithSql(uri, where)
-        } catch (ex: Exception) {
-            // Fatal Exception: java.lang.IllegalArgumentException: Non-token detected in 'count(*) AS count'
+    return try {
+        if (isQPlus()) {
             countWithBundle(uri, where)
+        } else {
+            try {
+                countWithSql(uri, where)
+            } catch (ex: Exception) {
+                // Fatal Exception: java.lang.IllegalArgumentException: Non-token detected in 'count(*) AS count'
+                countWithBundle(uri, where)
+            }
         }
+    } catch (ex: SecurityException) {
+        // Permission Denial: reading MediaProvider without proper permissions
+        LogCat.e("Permission denied when querying MediaStore: ${ex.message}")
+        0
+    } catch (ex: Exception) {
+        LogCat.e("Error querying MediaStore: ${ex.message}")
+        0
     }
 }
 
 fun ContentResolver.countWithSql(uri: Uri, where: ContentWhere): Int {
-    var result = 0
-    query(
-        uri,
-        arrayOf("count(*) AS count"),
-        where.toSelection(),
-        where.args.toTypedArray(),
-        null,
-    )?.use {
-        it.moveToFirst()
-        if (it.count > 0) {
-            result = it.getInt(0)
+    return try {
+        var result = 0
+        query(
+            uri,
+            arrayOf("count(*) AS count"),
+            where.toSelection(),
+            where.args.toTypedArray(),
+            null,
+        )?.use {
+            it.moveToFirst()
+            if (it.count > 0) {
+                result = it.getInt(0)
+            }
         }
+        result
+    } catch (ex: SecurityException) {
+        LogCat.e("Permission denied when querying MediaStore with SQL: ${ex.message}")
+        0
+    } catch (ex: Exception) {
+        LogCat.e("Error querying MediaStore with SQL: ${ex.message}")
+        0
     }
-
-    return result
 }
 
 fun ContentResolver.countWithBundle(uri: Uri, where: ContentWhere): Int {
-    var result = 0
-    query(
-        uri,
-        null,
-        Bundle().apply {
-            where(where.toSelection(), where.args)
-            if (where.trash == true) {
-                if (isRPlus()) {
-                    putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_ONLY)
+    return try {
+        var result = 0
+        query(
+            uri,
+            null,
+            Bundle().apply {
+                where(where.toSelection(), where.args)
+                if (where.trash == true) {
+                    if (isRPlus()) {
+                        putInt(MediaStore.QUERY_ARG_MATCH_TRASHED, MediaStore.MATCH_ONLY)
+                    }
                 }
-            }
-        },
-        null,
-    )?.use {
-        it.moveToFirst()
-        result = it.count
+            },
+            null,
+        )?.use {
+            it.moveToFirst()
+            result = it.count
+        }
+        result
+    } catch (ex: SecurityException) {
+        LogCat.e("Permission denied when querying MediaStore with bundle: ${ex.message}")
+        0
+    } catch (ex: Exception) {
+        LogCat.e("Error querying MediaStore with bundle: ${ex.message}")
+        0
     }
-
-    return result
 }
 
 fun ContentResolver.getPagingCursor(
