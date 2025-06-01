@@ -505,6 +505,11 @@
     <string name="restart_app_message">Presque terminé ! Appuyez simplement sur "Relancer l'application" pour que les changements prennent effet.</string>
     <string name="keep_screen_on">Garder l\'écran allumé</string>
     <string name="cast_mode">Mode de diffusion</string>
+    <string name="casting">Diffusion</string>
+    <string name="cast_playlist">Liste de diffusion</string>
+    <string name="cast_playlist_empty">La liste de diffusion est vide</string>
+    <string name="add_to_cast_queue">Ajouter à la liste de diffusion</string>
+    <string name="remove_from_cast_queue">Supprimer de la liste de diffusion</string>
     <string name="my_phone">Mon téléphone</string>
     <string name="back">Retour</string>
     <string name="primary_color_hint">Comme #666666 ou 666666</string>

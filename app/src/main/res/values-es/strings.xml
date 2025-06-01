@@ -505,6 +505,11 @@
     <string name="restart_app_message">¡Casi listo! Solo toque "Volver a lanzar APP" para que surtan efecto los cambios.</string>
     <string name="keep_screen_on">Mantener pantalla encendida</string>
     <string name="cast_mode">Modo de transmisión</string>
+    <string name="casting">Transmitiendo</string>
+    <string name="cast_playlist">Lista de reproducción de transmisión</string>
+    <string name="cast_playlist_empty">La lista de reproducción de transmisión está vacía</string>
+    <string name="add_to_cast_queue">Agregar a la lista de reproducción de transmisión</string>
+    <string name="remove_from_cast_queue">Eliminar de la lista de reproducción de transmisión</string>
     <string name="my_phone">Mi teléfono</string>
     <string name="back">Atrás</string>
     <string name="primary_color_hint">Como #666666 o 666666</string>

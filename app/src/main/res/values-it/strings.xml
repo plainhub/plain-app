@@ -505,6 +505,11 @@
     <string name="restart_app_message">Quasi fatto! Tocca semplicemente "Rilancia APP" per rendere effettive le modifiche.</string>
     <string name="keep_screen_on">Mantieni schermo attivo</string>
     <string name="cast_mode">Modalità Cast</string>
+    <string name="casting">Casting</string>
+    <string name="cast_playlist">Playlist Cast</string>
+    <string name="cast_playlist_empty">La playlist Cast è vuota</string>
+    <string name="add_to_cast_queue">Aggiungi alla coda Cast</string>
+    <string name="remove_from_cast_queue">Rimuovi dalla coda Cast</string>
     <string name="my_phone">Il mio telefono</string>
     <string name="back">Indietro</string>
     <string name="primary_color_hint">Come #666666 o 666666</string>

@@ -505,6 +505,11 @@
     <string name="restart_app_message">Bijna klaar! Tik gewoon op "APP opnieuw starten" om het effect te zien.</string>
     <string name="keep_screen_on">Scherm aan houden</string>
     <string name="cast_mode">Cast-modus</string>
+    <string name="casting">Casten</string>
+    <string name="cast_playlist">Cast-afspeellijst</string>
+    <string name="cast_playlist_empty">De cast-afspeellijst is leeg</string>
+    <string name="add_to_cast_queue">Toevoegen aan cast-wachtrij</string>
+    <string name="remove_from_cast_queue">Verwijderen uit cast-wachtrij</string>
     <string name="my_phone">Mijn telefoon</string>
     <string name="back">Terug</string>
     <string name="primary_color_hint">Zoals #666666 of 666666</string>

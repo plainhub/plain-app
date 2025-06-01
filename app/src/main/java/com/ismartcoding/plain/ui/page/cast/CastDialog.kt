@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.components
+package com.ismartcoding.plain.ui.page.cast
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.defaultMinSize
@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.StartHttpServerEvent
 import com.ismartcoding.plain.preference.WebPreference
 import com.ismartcoding.plain.ui.base.PDialogListItem
@@ -90,6 +91,7 @@ fun CastDialog(castVM: CastViewModel) {
                         PDialogListItem(modifier = Modifier.clickable {
                             castVM.selectDevice(m)
                             castVM.enterCastMode()
+                            AudioPlayer.pause()
                             scope.launch(Dispatchers.IO) {
                                 val webEnabled = WebPreference.getAsync(context)
                                 if (!webEnabled) {

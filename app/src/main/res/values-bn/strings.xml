@@ -505,6 +505,11 @@
     <string name="restart_app_message">প্রায় সম্পন্ন! কেবল "এপিপি পুনরারম্ভ করুন" ট্যাপ করুন যাতে প্রভাব ফেলতে পারে।</string>
     <string name="keep_screen_on">পর্দায় রাখুন</string>
     <string name="cast_mode">কাস্ট মোড</string>
+    <string name="casting">কাস্টিং</string>
+    <string name="cast_playlist">কাস্ট প্লেলিস্ট</string>
+    <string name="cast_playlist_empty">কাস্ট প্লেলিস্ট খালি</string>
+    <string name="add_to_cast_queue">কাস্ট কিউ এ যোগ করুন</string>
+    <string name="remove_from_cast_queue">কাস্ট কিউ থেকে সরান</string>
     <string name="my_phone">আমার ফোন</string>
     <string name="back">পেছনে</string>
     <string name="primary_color_hint">যেমন # 666666 বা 666666</string>

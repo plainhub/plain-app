@@ -505,6 +505,11 @@
     <string name="restart_app_message">Almost done! Just tap "Relaunch APP" to take effect.</string>
     <string name="keep_screen_on">Keep screen on</string>
     <string name="cast_mode">Cast mode</string>
+    <string name="casting">Casting</string>
+    <string name="cast_playlist">Cast Playlist</string>
+    <string name="cast_playlist_empty">Cast playlist is empty</string>
+    <string name="add_to_cast_queue">Add to cast queue</string>
+    <string name="remove_from_cast_queue">Remove from cast queue</string>
     <string name="my_phone">My phone</string>
     <string name="back">Back</string>
     <string name="primary_color_hint">Like #666666 or 666666</string>

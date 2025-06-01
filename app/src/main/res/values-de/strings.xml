@@ -505,6 +505,11 @@
     <string name="restart_app_message">Fast geschafft! Tippen Sie einfach auf "APP neu starten", um die Änderungen zu übernehmen.</string>
     <string name="keep_screen_on">Bildschirm eingeschaltet lassen</string>
     <string name="cast_mode">Gussmodus</string>
+    <string name="casting">Übertragen</string>
+    <string name="cast_playlist">Übertragungsliste</string>
+    <string name="cast_playlist_empty">Übertragungsliste ist leer</string>
+    <string name="add_to_cast_queue">Zur Übertragungsliste hinzufügen</string>
+    <string name="remove_from_cast_queue">Von Übertragungsliste entfernen</string>
     <string name="my_phone">Mein Handy</string>
     <string name="back">Zurück</string>
     <string name="primary_color_hint">Wie #666666 oder 666666</string>

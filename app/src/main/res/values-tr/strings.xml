@@ -505,6 +505,11 @@
     <string name="restart_app_message">Neredeyse bitti! Etkili olması için "Uygulamayı Yeniden Başlat" düğmesine dokunun.</string>
     <string name="keep_screen_on">Ekranı açık tut</string>
     <string name="cast_mode">Yayın modu</string>
+    <string name="casting">Yayınla</string>
+    <string name="cast_playlist">Yayın listesi</string>
+    <string name="cast_playlist_empty">Yayın listesi boş</string>
+    <string name="add_to_cast_queue">Yayın kuyruğuna ekle</string>
+    <string name="remove_from_cast_queue">Yayın kuyruğundan kaldır</string>
     <string name="my_phone">Telefonum</string>
     <string name="back">Geri</string>
     <string name="primary_color_hint">#666666 veya 666666 gibi</string>

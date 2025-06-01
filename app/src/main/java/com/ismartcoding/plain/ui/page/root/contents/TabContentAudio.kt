@@ -49,7 +49,8 @@ import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
-import com.ismartcoding.plain.ui.components.CastDialog
+import com.ismartcoding.plain.ui.page.cast.AudioCastPlayerBar
+import com.ismartcoding.plain.ui.page.cast.CastDialog
 import com.ismartcoding.plain.ui.components.FileSortDialog
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
@@ -283,6 +284,7 @@ fun TabContentAudio(
                                             audioVM = audioVM,
                                             audioPlaylistVM,
                                             tagsVM = tagsVM,
+                                            castVM = castVM,
                                             tags = tags,
                                             pagerState = pagerState,
                                             dragSelectState = dragSelectState,
@@ -320,6 +322,14 @@ fun TabContentAudio(
 
         AudioPlayerBar(
             audioPlaylistVM,
+            castVM,
+            modifier = Modifier
+                .align(Alignment.BottomCenter),
+            dragSelectState = audioState.dragSelectState
+        )
+        
+        AudioCastPlayerBar(
+            castVM = castVM,
             modifier = Modifier
                 .align(Alignment.BottomCenter),
             dragSelectState = audioState.dragSelectState

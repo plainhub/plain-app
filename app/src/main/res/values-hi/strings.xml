@@ -505,6 +505,11 @@
     <string name="restart_app_message">लगभग हो गया! केवल प्रभावी बनाने के लिए "ऐप फिर से चालना" टैप करें।</string>
     <string name="keep_screen_on">स्क्रीन चालित रखें</string>
     <string name="cast_mode">कास्ट मोड</string>
+    <string name="casting">कास्टिंग</string>
+    <string name="cast_playlist">कास्ट प्लेलिस्ट</string>
+    <string name="cast_playlist_empty">कास्ट प्लेलिस्ट खाली है</string>
+    <string name="add_to_cast_queue">कास्ट किउ में जोड़ें</string>
+    <string name="remove_from_cast_queue">कास्ट किउ से हटाएं</string>
     <string name="my_phone">मेरा फोन</string>
     <string name="back">वापस</string>
     <string name="primary_color_hint">#666666 या 666666 की तरह</string>

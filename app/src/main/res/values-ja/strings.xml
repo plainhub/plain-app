@@ -505,6 +505,11 @@
     <string name="restart_app_message">ほとんど完了！効果を確認するには、「アプリを再起動」をタップしてください。</string>
     <string name="keep_screen_on">画面を常にオンにする</string>
     <string name="cast_mode">キャストモード</string>
+    <string name="casting">キャスト</string>
+    <string name="cast_playlist">キャストプレイリスト</string>
+    <string name="cast_playlist_empty">キャストプレイリストが空です</string>
+    <string name="add_to_cast_queue">キャストキューに追加</string>
+    <string name="remove_from_cast_queue">キャストキューから削除</string>
     <string name="my_phone">マイフォン</string>
     <string name="back">戻る</string>
     <string name="primary_color_hint">#666666のように入力してください</string>

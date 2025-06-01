@@ -1,7 +1,7 @@
 package com.ismartcoding.lib.upnp
 
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
-import com.ismartcoding.lib.helpers.XmlHelper.xmlDecode
+import com.ismartcoding.lib.helpers.XmlHelper
 import kotlinx.serialization.Serializable
 import java.net.URL
 
@@ -23,7 +23,7 @@ class UPnPDevice(
 
     fun update(xml: String) {
         descriptionXML = xml
-        description = xmlDecode(xml)
+        description = XmlHelper.decodeXml(xml)
     }
 
     fun getAVTransportService(): DeviceService? {

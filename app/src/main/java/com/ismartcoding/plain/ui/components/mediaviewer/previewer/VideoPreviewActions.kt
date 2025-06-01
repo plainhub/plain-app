@@ -58,7 +58,7 @@ import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PMiniButton
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PlayerSlider
-import com.ismartcoding.plain.ui.components.CastDialog
+import com.ismartcoding.plain.ui.page.cast.CastDialog
 import com.ismartcoding.plain.ui.components.mediaviewer.video.VideoState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.CastViewModel

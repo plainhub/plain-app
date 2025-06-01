@@ -505,6 +505,11 @@
     <string name="restart_app_message">差一点了！只需点击“重启应用”即可生效。</string>
     <string name="keep_screen_on">保持屏幕常亮</string>
     <string name="cast_mode">投屏模式</string>
+    <string name="casting">投屏中</string>
+    <string name="cast_playlist">投屏播放列表</string>
+    <string name="cast_playlist_empty">投屏播放列表为空</string>
+    <string name="add_to_cast_queue">添加到投屏队列</string>
+    <string name="remove_from_cast_queue">从投屏队列移除</string>
     <string name="my_phone">我的手机</string>
     <string name="back">后退</string>
     <string name="primary_color_hint">例如 #666666 或 666666</string>

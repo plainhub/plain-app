@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
@@ -42,8 +45,12 @@ import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.components.PulsatingWave
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
+import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.features.media.CastPlayer
+import androidx.compose.runtime.collectAsState
 import com.ismartcoding.plain.ui.theme.PlainTheme
+import com.ismartcoding.plain.ui.theme.blue
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTag
 import com.ismartcoding.plain.ui.theme.listItemTitle
@@ -59,6 +66,7 @@ fun AudioListItem(
     audioVM: AudioViewModel,
     audioPlaylistVM: AudioPlaylistViewModel,
     tagsVM: TagsViewModel,
+    castVM: CastViewModel,
     tags: List<DTag>,
     pagerState: PagerState,
     dragSelectState: DragSelectState,
@@ -69,6 +77,12 @@ fun AudioListItem(
     val scope = rememberCoroutineScope()
 
     var animatingButton by remember { mutableStateOf(false) }
+    
+    val castItems by CastPlayer.items.collectAsState()
+    val currentUri by CastPlayer.currentUri.collectAsState()
+    val castPlaying by CastPlayer.isPlaying.collectAsState()
+    val isCurrentlyPlayingByCast = currentUri == item.path && castPlaying
+    val isCurrentItemLoading = castVM.isLoading.value && currentUri == item.path
 
     val rotation by animateFloatAsState(
         targetValue = if (animatingButton) 90f else 0f,
@@ -97,6 +111,8 @@ fun AudioListItem(
                 onClick = {
                     if (dragSelectState.selectMode) {
                         dragSelectState.select(item.id)
+                    } else if (castVM.castMode.value) {
+                        castVM.cast(item)
                     } else {
                         Permissions.checkNotification(context, R.string.audio_notification_prompt) {
                             scope.launch(Dispatchers.IO) {
@@ -131,6 +147,32 @@ fun AudioListItem(
                             dragSelectState.select(item.id)
                         }
                     )
+                } else if (castVM.castMode.value) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isCurrentItemLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = MaterialTheme.colorScheme.primary,
+                                strokeWidth = 2.dp
+                            )
+                        } else if (isCurrentlyPlayingByCast) {
+                            PulsatingWave(
+                                isPlaying = true,
+                                modifier = Modifier.align(Alignment.Center)
+                            )
+                        } else {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                painter = painterResource(R.drawable.cast),
+                                contentDescription = stringResource(R.string.cast),
+                                tint = MaterialTheme.colorScheme.blue
+                            )
+                        }
+                    }
                 } else if (!isCurrentlyPlaying) {
                     AudioCoverOrIcon(
                         path = item.path,
@@ -190,32 +232,60 @@ fun AudioListItem(
             }
 
             if (!dragSelectState.selectMode) {
-                PIconButton(
-                    icon = iconResource,
-                    tint = iconColor,
-                    contentDescription = if (isInPlaylist)
-                        stringResource(R.string.remove_from_playlist)
-                    else
-                        stringResource(R.string.add_to_playlist),
-                    modifier = Modifier.rotate(rotation),
-                    click = {
-                        if (isInPlaylist) {
+                if (castVM.castMode.value) {
+                    val isInCastQueue = remember(item.path, castItems) {
+                        castItems.any { it.path == item.path }
+                    }
+                    
+                    PIconButton(
+                        icon = if (isInCastQueue) R.drawable.playlist_remove else R.drawable.playlist_add,
+                        tint = if (isInCastQueue) MaterialTheme.colorScheme.red else MaterialTheme.colorScheme.primary,
+                        contentDescription = if (isInCastQueue)
+                            stringResource(R.string.remove_from_cast_queue)
+                        else
+                            stringResource(R.string.add_to_cast_queue),
+                        modifier = Modifier.rotate(rotation),
+                        click = {
                             scope.launch(Dispatchers.IO) {
                                 animatingButton = true
-                                audioPlaylistVM.removeAsync(context, item.path)
-                                delay(400)
-                                animatingButton = false
-                            }
-                        } else {
-                            scope.launch(Dispatchers.IO) {
-                                animatingButton = true
-                                audioPlaylistVM.addAsync(context, listOf(item))
+                                if (isInCastQueue) {
+                                    CastPlayer.removeItem(item)
+                                } else {
+                                    CastPlayer.addItem(item)
+                                }
                                 delay(400)
                                 animatingButton = false
                             }
                         }
-                    }
-                )
+                    )
+                } else {
+                    PIconButton(
+                        icon = iconResource,
+                        tint = iconColor,
+                        contentDescription = if (isInPlaylist)
+                            stringResource(R.string.remove_from_playlist)
+                        else
+                            stringResource(R.string.add_to_playlist),
+                        modifier = Modifier.rotate(rotation),
+                        click = {
+                            if (isInPlaylist) {
+                                scope.launch(Dispatchers.IO) {
+                                    animatingButton = true
+                                    audioPlaylistVM.removeAsync(context, item.path)
+                                    delay(400)
+                                    animatingButton = false
+                                }
+                            } else {
+                                scope.launch(Dispatchers.IO) {
+                                    animatingButton = true
+                                    audioPlaylistVM.addAsync(context, listOf(item))
+                                    delay(400)
+                                    animatingButton = false
+                                }
+                            }
+                        }
+                    )
+                }
             }
         }
     }

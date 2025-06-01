@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.page.audio.components
+package com.ismartcoding.plain.ui.page.cast
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -38,79 +37,57 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.ismartcoding.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.features.AudioPlayer
+import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
-import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
-import com.ismartcoding.plain.ui.page.audio.AudioPlayerPage
-import com.ismartcoding.plain.ui.page.audio.AudioPlaylistPage
-import com.ismartcoding.plain.ui.page.audio.SleepTimerPage
 import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 @Composable
-fun AudioPlayerBar(audioPlaylistVM: AudioPlaylistViewModel, castVM: CastViewModel, modifier: Modifier = Modifier, dragSelectState: DragSelectState) {
+fun AudioCastPlayerBar(
+    castVM: CastViewModel,
+    modifier: Modifier = Modifier,
+    dragSelectState: DragSelectState
+) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
     var title by remember { mutableStateOf("") }
     var artist by remember { mutableStateOf("") }
-    var progress by remember { mutableFloatStateOf(0f) }
-    var duration by remember { mutableFloatStateOf(1f) }
-    val isPlaying by AudioPlayer.isPlayingFlow.collectAsState()
-    var showPlayer by remember { mutableStateOf(false) }
-    var showSleepTimer by remember { mutableStateOf(false) }
-    var showPlaylist by remember { mutableStateOf(false) }
-    val currentPlayingPath = audioPlaylistVM.selectedPath
+    var showCastPlaylist by remember { mutableStateOf(false) }
+    val isPlaying by CastPlayer.isPlaying.collectAsState()
+    val progress by CastPlayer.progress.collectAsState()
+    val duration by CastPlayer.duration.collectAsState()
+    val supportsCallback by CastPlayer.supportsCallback.collectAsState()
 
-    LaunchedEffect(currentPlayingPath.value) {
+    val currentUri by CastPlayer.currentUri.collectAsState()
+
+    LaunchedEffect(currentUri) {
         scope.launch {
-            val path = currentPlayingPath.value
-            if (path.isNotEmpty()) {
-                val audio = withIO { DPlaylistAudio.fromPath(context, path) }
+            if (currentUri.isNotEmpty()) {
+                val audio = withIO { DPlaylistAudio.fromPath(context, currentUri) }
                 title = audio.title
                 artist = audio.artist
-                duration = audio.duration.toFloat()
-                progress = AudioPlayer.playerProgress / 1000f
-            }
-            if (showPlayer) {
-                showPlayer = path.isNotEmpty()
-            }
-        }
-    }
-
-    var progressUpdateJob: Job? = null
-
-    LaunchedEffect(isPlaying) {
-        progressUpdateJob?.cancel()
-
-        if (isPlaying) {
-            progressUpdateJob = scope.launch {
-                while (isActive) {
-                    progress = AudioPlayer.playerProgress / 1000f
-                    delay(1000)
-                }
+            } else {
+                title = ""
+                artist = ""
             }
         }
     }
 
     AnimatedVisibility(
-        visible = currentPlayingPath.value.isNotEmpty() && !dragSelectState.selectMode && !castVM.castMode.value,
+        visible = castVM.castMode.value && CastPlayer.currentDevice != null && !dragSelectState.selectMode,
         enter = slideInVertically { it },
         exit = slideOutVertically { it },
         modifier = modifier
@@ -135,7 +112,13 @@ fun AudioPlayerBar(audioPlaylistVM: AudioPlaylistViewModel, castVM: CastViewMode
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 LinearProgressIndicator(
-                    progress = { if (duration == 0f) 0f else progress / duration },
+                    progress = { 
+                        if (supportsCallback && duration > 0f) {
+                            progress / duration
+                        } else {
+                            0f
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(4.dp),
@@ -153,18 +136,20 @@ fun AudioPlayerBar(audioPlaylistVM: AudioPlaylistViewModel, castVM: CastViewMode
                         modifier = Modifier
                             .clip(RoundedCornerShape(12.dp))
                             .weight(1f)
-                            .clickable { showPlayer = true }
+                            .clickable {
+                                showCastPlaylist = true
+                            }
                             .padding(horizontal = 12.dp, vertical = 8.dp)
                     ) {
                         Text(
-                            text = title,
+                            text = if (title.isNotEmpty()) title else stringResource(R.string.casting),
                             style = MaterialTheme.typography.listItemTitle(),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         VerticalSpace(4.dp)
                         Text(
-                            text = artist,
+                            text = if (artist.isNotEmpty()) artist else (CastPlayer.currentDevice?.description?.device?.friendlyName ?: ""),
                             style = MaterialTheme.typography.listItemSubtitle(),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -173,47 +158,48 @@ fun AudioPlayerBar(audioPlaylistVM: AudioPlaylistViewModel, castVM: CastViewMode
 
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    IconButton(
-                        onClick = {
-                            if (isPlaying) {
-                                AudioPlayer.pause()
-                            } else {
-                                AudioPlayer.play()
-                            }
-                        },
-                        modifier = Modifier
-                            .size(48.dp)
-                            .shadow(2.dp, CircleShape)
-                            .clip(CircleShape)
-                            .background(
-                                if (isPlaying)
-                                    MaterialTheme.colorScheme.primaryContainer
+                    if (currentUri.isNotEmpty()) {
+
+                        IconButton(
+                            onClick = {
+                                if (isPlaying) {
+                                    castVM.pauseCast()
+                                } else {
+                                    castVM.playCast()
+                                }
+                            },
+                            modifier = Modifier
+                                .size(48.dp)
+                                .shadow(2.dp, CircleShape)
+                                .clip(CircleShape)
+                                .background(
+                                    if (isPlaying)
+                                        MaterialTheme.colorScheme.primaryContainer
+                                    else
+                                        MaterialTheme.colorScheme.primary
+                                )
+                        ) {
+                            Icon(
+                                painter = painterResource(id = if (isPlaying) R.drawable.pause else R.drawable.play_arrow),
+                                contentDescription = if (isPlaying) stringResource(R.string.pause) else stringResource(R.string.play),
+                                tint = if (isPlaying)
+                                    MaterialTheme.colorScheme.onPrimaryContainer
                                 else
-                                    MaterialTheme.colorScheme.primary
+                                    MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.size(24.dp)
                             )
-                    ) {
-                        Icon(
-                            painter = painterResource(id = if (isPlaying) R.drawable.pause else R.drawable.play_arrow),
-                            contentDescription = if (isPlaying) stringResource(R.string.pause) else stringResource(R.string.play),
-                            tint = if (isPlaying)
-                                MaterialTheme.colorScheme.onPrimaryContainer
-                            else
-                                MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(24.dp)
-                        )
+                        }
+                        HorizontalSpace(8.dp)
                     }
-
-                    HorizontalSpace(8.dp)
-
                     IconButton(
-                        onClick = { showPlaylist = true },
+                        onClick = { showCastPlaylist = true },
                         modifier = Modifier
                             .size(42.dp)
                             .clip(CircleShape)
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.list_music),
-                            contentDescription = "Queue",
+                            contentDescription = stringResource(R.string.playlist),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -222,23 +208,10 @@ fun AudioPlayerBar(audioPlaylistVM: AudioPlaylistViewModel, castVM: CastViewMode
         }
     }
 
-    if (showPlayer) {
-        AudioPlayerPage(
-            audioPlaylistVM,
-            onDismissRequest = { showPlayer = false }
-        )
-    }
-
-    if (showSleepTimer) {
-        SleepTimerPage(
-            onDismissRequest = { showSleepTimer = false }
-        )
-    }
-
-    if (showPlaylist) {
-        AudioPlaylistPage(
-            audioPlaylistVM,
-            onDismissRequest = { showPlaylist = false }
+    if (showCastPlaylist) {
+        AudioCastPlaylistPage(
+            castVM = castVM,
+            onDismissRequest = { showCastPlaylist = false }
         )
     }
 } 

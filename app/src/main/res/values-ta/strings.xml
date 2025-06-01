@@ -505,6 +505,11 @@
     <string name="restart_app_message">விரைவில் முடிந்தது! பிராப்தியை அடைய விட்டு "பராமரிக்க APP" ஐ தட்டவும்.</string>
     <string name="keep_screen_on">திரையை நிரப்பிடு</string>
     <string name="cast_mode">பரிசு முறை</string>
+    <string name="casting">பரிசு</string>
+    <string name="cast_playlist">பரிசு பட்டியல்</string>
+    <string name="cast_playlist_empty">பரிசு பட்டியல் இல்லை</string>
+    <string name="add_to_cast_queue">பரிசு கட்டத்திற்கு சேர்</string>
+    <string name="remove_from_cast_queue">பரிசு கட்டத்திலிருந்து நீக்கு</string>
     <string name="my_phone">என் போன்</string>
     <string name="back">பின்</string>
     <string name="primary_color_hint">#666666 அல்லது 666666 போன்ற உருவாக்கத்தைப் போன்ற</string>

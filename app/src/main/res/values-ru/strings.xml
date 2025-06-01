@@ -505,6 +505,11 @@
     <string name="restart_app_message">Почти готово! Просто нажмите "Перезапустить приложение", чтобы изменения вступили в силу.</string>
     <string name="keep_screen_on">Не выключать экран</string>
     <string name="cast_mode">Режим передачи</string>
+    <string name="casting">Передача</string>
+    <string name="cast_playlist">Плейлист передачи</string>
+    <string name="cast_playlist_empty">Плейлист передачи пуст</string>
+    <string name="add_to_cast_queue">Добавить в очередь передачи</string>
+    <string name="remove_from_cast_queue">Удалить из очереди передачи</string>
     <string name="my_phone">Мой телефон</string>
     <string name="back">Назад</string>
     <string name="primary_color_hint">Как #666666 или 666666</string>

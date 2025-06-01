@@ -445,21 +445,50 @@ object HttpModule {
                     // the TV could send the callback twice in short time, the second one should be ignore if it has AVTransportURIMetaData field.
                     if (xml.contains("TransportState val=\"STOPPED\"") && !xml.contains("AVTransportURIMetaData")) {
                         withIO {
-                            if (CastPlayer.items?.isNotEmpty() == true) {
+                            CastPlayer.isPlaying.value = false
+                            val castItems = CastPlayer.items.value
+                            if (castItems.isNotEmpty()) {
                                 CastPlayer.currentDevice?.let { device ->
-                                    val currentUri = CastPlayer.currentUri
-                                    var index = CastPlayer.items!!.indexOfFirst { it.path == currentUri }
+                                    val currentUri = CastPlayer.currentUri.value
+                                    var index = castItems.indexOfFirst { it.path == currentUri }
                                     index++
-                                    if (index > CastPlayer.items!!.size - 1) {
+                                    if (index > castItems.size - 1) {
                                         index = 0
                                     }
-                                    val current = CastPlayer.items!![index]
+                                    val current = castItems[index]
                                     if (current.path != currentUri) {
                                         LogCat.d(current.path)
                                         UPnPController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(current.path))
-                                        CastPlayer.currentUri = current.path
+                                        CastPlayer.setCurrentUri(current.path)
+                                        CastPlayer.isPlaying.value = true
                                     }
                                 }
+                            }
+                        }
+                    } else if (xml.contains("TransportState val=\"PLAYING\"")) {
+                        withIO {
+                            CastPlayer.isPlaying.value = true
+                        }
+                    } else if (xml.contains("TransportState val=\"PAUSED_PLAYBACK\"")) {
+                        withIO {
+                            CastPlayer.isPlaying.value = false
+                        }
+                    }
+                    
+                    // 尝试解析播放位置信息
+                    if (xml.contains("RelTime val=") && xml.contains("TrackDuration val=")) {
+                        withIO {
+                            try {
+                                val relTimeMatch = Regex("RelTime val=\"([^\"]+)\"").find(xml)
+                                val durationMatch = Regex("TrackDuration val=\"([^\"]+)\"").find(xml)
+                                
+                                if (relTimeMatch != null && durationMatch != null) {
+                                    val relTime = relTimeMatch.groupValues[1]
+                                    val trackDuration = durationMatch.groupValues[1]
+                                    CastPlayer.updatePositionInfo(relTime, trackDuration)
+                                }
+                            } catch (e: Exception) {
+                                // 解析失败，忽略
                             }
                         }
                     }

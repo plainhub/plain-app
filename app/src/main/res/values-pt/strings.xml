@@ -505,6 +505,11 @@
     <string name="restart_app_message">Quase lá! Apenas toque em "Reiniciar APP" para que as alterações tenham efeito.</string>
     <string name="keep_screen_on">Manter a tela ligada</string>
     <string name="cast_mode">Modo de transmissão</string>
+    <string name="casting">Transmitindo</string>
+    <string name="cast_playlist">Lista de reprodução de transmissão</string>
+    <string name="cast_playlist_empty">A lista de reprodução de transmissão está vazia</string>
+    <string name="add_to_cast_queue">Adicionar à fila de transmissão</string>
+    <string name="remove_from_cast_queue">Remover da fila de transmissão</string>
     <string name="my_phone">Meu telefone</string>
     <string name="back">Voltar</string>
     <string name="primary_color_hint">Como #666666 ou 666666</string>

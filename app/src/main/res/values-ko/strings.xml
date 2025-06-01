@@ -505,6 +505,11 @@
     <string name="restart_app_message">거의 완료되었습니다! 효과를 적용하려면 "앱 다시 시작"을 탭하세요.</string>
     <string name="keep_screen_on">화면 켜짐 유지</string>
     <string name="cast_mode">캐스트 모드</string>
+    <string name="casting">캐스트</string>
+    <string name="cast_playlist">캐스트 재생 목록</string>
+    <string name="cast_playlist_empty">캐스트 재생 목록이 비어 있습니다</string>
+    <string name="add_to_cast_queue">캐스트 큐에 추가</string>
+    <string name="remove_from_cast_queue">캐스트 큐에서 제거</string>
     <string name="my_phone">내 폰</string>
     <string name="back">뒤로</string>
     <string name="primary_color_hint">예: #666666 또는 666666</string>
