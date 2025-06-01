@@ -38,7 +38,7 @@ fun WebSettingsProvider(content: @Composable () -> Unit) {
         )
     val settings =
         remember {
-            context.dataStore.data.map {
+            context.dataStore.dataFlow.map {
                 WebSettings(
                     passwordType = PasswordTypePreference.get(it),
                     password = PasswordPreference.get(it),

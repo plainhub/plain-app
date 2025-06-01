@@ -27,6 +27,7 @@ import com.ismartcoding.plain.preference.PasswordPreference
 import com.ismartcoding.plain.preference.UrlTokenPreference
 import com.ismartcoding.plain.preference.WebPreference
 import com.ismartcoding.plain.preference.dataStore
+import com.ismartcoding.plain.preference.getPreferencesAsync
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
@@ -50,7 +51,7 @@ class MainApp : Application() {
         }
 
         coIO {
-            val preferences = dataStore.data.first()
+            val preferences = dataStore.getPreferencesAsync()
             TempData.webEnabled = WebPreference.get(preferences)
             TempData.webHttps = HttpsPreference.get(preferences)
             TempData.httpPort = HttpPortPreference.get(preferences)

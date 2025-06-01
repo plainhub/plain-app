@@ -66,7 +66,7 @@ fun SettingsProvider(content: @Composable () -> Unit) {
         )
     val settings =
         remember {
-            context.dataStore.data.map {
+            context.dataStore.dataFlow.map {
                 Settings(
                     themeIndex = ThemeIndexPreference.get(it),
                     customPrimaryColor = CustomPrimaryColorPreference.get(it),
