@@ -174,13 +174,9 @@ fun NotePage(
         if (noteVM.editMode) {
             keyboardController?.show()
             if (shouldRequestFocus) {
-                scope.launch(Dispatchers.IO) {
-                    delay(500)
-                    coMain {
-                        focusRequester.requestFocus()
-                        shouldRequestFocus = false
-                    }
-                }
+                delay(500)
+                focusRequester.requestFocus()
+                shouldRequestFocus = false
             }
         } else {
             keyboardController?.hide()
