@@ -7,8 +7,13 @@ import com.ismartcoding.lib.logcat.LogCat
 
 object SvgHelper {
     fun getSize(path:String): IntSize {
+        val file = File(path)
+        if (!file.exists()) {
+            return IntSize(150, 150)
+        }
+        
         try {
-            val svg = SVG.getFromInputStream(File(path).inputStream())
+            val svg = SVG.getFromInputStream(file.inputStream())
             var width = svg.documentWidth.toInt()
             var height = svg.documentHeight.toInt()
             if (width <= 0) {

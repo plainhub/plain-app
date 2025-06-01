@@ -46,6 +46,7 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
 import kotlinx.coroutines.launch
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 
 val DEFAULT_SOFT_ANIMATION_SPEC = tween<Float>(320)
@@ -74,6 +75,9 @@ val DEFAULT_PREVIEWER_PLACEHOLDER_CONTENT = @Composable {
         CircularProgressIndicator(color = Color.White.copy(0.2F))
     }
 }
+
+// 文件存在性缓存，避免重复检查
+private val fileExistsCache = ConcurrentHashMap<String, Boolean>()
 
 // 加载时的占位内容
 class PreviewerPlaceholder(
@@ -229,12 +233,40 @@ fun getModel(item: PreviewItem): Any? {
                 }
                 item.rotation
             }
-            val inputStream = remember(item.path) { File(item.path).inputStream() }
-            val decoder = rememberDecoderImagePainter(inputStream = inputStream, rotation = rotation)
-            if (decoder != null) {
-                item.intrinsicSize = IntSize(decoder.decoderWidth, decoder.decoderHeight)
+            
+            // 使用缓存检查文件是否存在，避免重复文件系统调用
+            val fileExists = remember(item.path) {
+                fileExistsCache.getOrPut(item.path) {
+                    File(item.path).exists()
+                }
             }
-            model = decoder
+            
+            if (!fileExists) {
+                // If file doesn't exist, return the item itself to handle gracefully
+                model = item
+            } else {
+                val inputStream = remember(item.path) { 
+                    try {
+                        File(item.path).inputStream()
+                    } catch (e: Exception) {
+                        // If there's any error opening the file, return null to handle gracefully
+                        // 如果文件访问失败，从缓存中移除该条目
+                        fileExistsCache.remove(item.path)
+                        null
+                    }
+                }
+                
+                val decoder = if (inputStream != null) {
+                    rememberDecoderImagePainter(inputStream = inputStream, rotation = rotation)
+                } else {
+                    null
+                }
+                
+                if (decoder != null) {
+                    item.intrinsicSize = IntSize(decoder.decoderWidth, decoder.decoderHeight)
+                }
+                model = decoder ?: item
+            }
         }
     }
     return model

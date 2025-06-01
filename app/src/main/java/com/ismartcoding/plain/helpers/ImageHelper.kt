@@ -51,57 +51,67 @@ object ImageHelper {
             return ImageType.JPG
         }
 
-        File(path).inputStream().use {
-            val totalBytes = it.available()
-            val bytes = ByteArray(256)
-            it.read(bytes)
+        val file = File(path)
+        if (!file.exists()) {
+            return ImageType.UNKNOWN
+        }
 
-            if (bytes[0].toInt() == -1 && bytes[1].toInt() == -40) {
-                // jpg
-                return ImageType.JPG
-            }
+        try {
+            file.inputStream().use {
+                val totalBytes = it.available()
+                val bytes = ByteArray(256)
+                it.read(bytes)
 
-            if (bytes[0].toInt() == -119 && bytes[1].toInt() == 80) {
-                // png
-                return ImageType.PNG
-            }
-
-            val info = bytes.decodeToString()
-            if (info.substring(0, 4) == WEBP_HEADER_RIFF && info.substring(8, 12) == WEBP_HEADER_WEBP) {
-                // webp
-                if (info.substring(12, 16) == WEBP_HEADER_VPX8 &&
-                    totalBytes > 17 &&
-                    (bytes[16] and 0b00000010) > 0
-                ) {
-                    // 动态 webp
-                    return ImageType.WEBP_ANIMATE
+                if (bytes[0].toInt() == -1 && bytes[1].toInt() == -40) {
+                    // jpg
+                    return ImageType.JPG
                 }
-                return ImageType.WEBP
-            }
 
-            val gifInfo = info.substring(0, 6)
-            if (gifInfo == GIF_HEADER_89A || gifInfo == GIF_HEADER_87A) {
-                // gif
-                return ImageType.GIF
-            }
-
-            if (info.substring(4, 8) == HEIF_HEADER_FTYP) {
-                // heif
-                val heifAnimateInfo = info.substring(8, 12)
-                if (heifAnimateInfo == HEIF_HEADER_MSF1 ||
-                    heifAnimateInfo == HEIF_HEADER_HEVC ||
-                    heifAnimateInfo == HEIF_HEADER_HEVX
-                ) {
-                    // 动态 heif
-                    return ImageType.HEIF_ANIMATED
+                if (bytes[0].toInt() == -119 && bytes[1].toInt() == 80) {
+                    // png
+                    return ImageType.PNG
                 }
-                return ImageType.HEIF
-            }
 
-            if (info.contains(SVG_TAG)) {
-                // svg
-                return ImageType.SVG
+                val info = bytes.decodeToString()
+                if (info.substring(0, 4) == WEBP_HEADER_RIFF && info.substring(8, 12) == WEBP_HEADER_WEBP) {
+                    // webp
+                    if (info.substring(12, 16) == WEBP_HEADER_VPX8 &&
+                        totalBytes > 17 &&
+                        (bytes[16] and 0b00000010) > 0
+                    ) {
+                        // 动态 webp
+                        return ImageType.WEBP_ANIMATE
+                    }
+                    return ImageType.WEBP
+                }
+
+                val gifInfo = info.substring(0, 6)
+                if (gifInfo == GIF_HEADER_89A || gifInfo == GIF_HEADER_87A) {
+                    // gif
+                    return ImageType.GIF
+                }
+
+                if (info.substring(4, 8) == HEIF_HEADER_FTYP) {
+                    // heif
+                    val heifAnimateInfo = info.substring(8, 12)
+                    if (heifAnimateInfo == HEIF_HEADER_MSF1 ||
+                        heifAnimateInfo == HEIF_HEADER_HEVC ||
+                        heifAnimateInfo == HEIF_HEADER_HEVX
+                    ) {
+                        // 动态 heif
+                        return ImageType.HEIF_ANIMATED
+                    }
+                    return ImageType.HEIF
+                }
+
+                if (info.contains(SVG_TAG)) {
+                    // svg
+                    return ImageType.SVG
+                }
             }
+        } catch (e: Exception) {
+            LogCat.e(e.toString())
+            return ImageType.UNKNOWN
         }
 
         return ImageType.UNKNOWN
@@ -111,6 +121,12 @@ object ImageHelper {
         if (path.endsWith(".svg", true)) {
             return 0
         }
+        
+        val file = File(path)
+        if (!file.exists()) {
+            return 0
+        }
+        
         try {
             val exif = ExifInterface(path)
             val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
@@ -120,21 +136,30 @@ object ImageHelper {
                 ExifInterface.ORIENTATION_ROTATE_270 -> 270
                 else -> 0
             }
-        } catch (e: IOException) {
-            e.printStackTrace()
+        } catch (e: Exception) {
             LogCat.e(e.toString())
         }
         return 0
     }
 
     fun getIntrinsicSize(path: String, rotation: Int): IntSize {
+        val file = File(path)
+        if (!file.exists()) {
+            return IntSize.Zero
+        }
+        
         val size = if (path.endsWith(".svg", true)) {
             SvgHelper.getSize(path)
         } else {
-            val options = BitmapFactory.Options()
-            options.inJustDecodeBounds = true
-            BitmapFactory.decodeFile(path, options)
-            IntSize(options.outWidth, options.outHeight)
+            try {
+                val options = BitmapFactory.Options()
+                options.inJustDecodeBounds = true
+                BitmapFactory.decodeFile(path, options)
+                IntSize(options.outWidth, options.outHeight)
+            } catch (e: Exception) {
+                LogCat.e(e.toString())
+                IntSize.Zero
+            }
         }
 
         if (rotation == 90 || rotation == 270) {

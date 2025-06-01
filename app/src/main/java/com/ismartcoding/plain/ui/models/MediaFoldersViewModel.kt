@@ -18,6 +18,9 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
 
 @OptIn(androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi::class)
 class MediaFoldersViewModel : ViewModel() {
@@ -63,8 +66,9 @@ class MediaFoldersViewModel : ViewModel() {
             sizeValue += bucket.size
 
             // Add the first item from each folder's topItems if available
-            if (bucket.topItems.isNotEmpty()) {
-                subItems.add(bucket.topItems.first())
+            val validTopItems = bucket.topItems.filter { File(it).exists() }
+            if (validTopItems.isNotEmpty()) {
+                subItems.add(validTopItems.first())
             }
 
             // Stop if we've collected 4 items
@@ -77,11 +81,12 @@ class MediaFoldersViewModel : ViewModel() {
         // take additional items from the first folder that has multiple items
         if (subItems.size < 4 && _itemsFlow.value.isNotEmpty()) {
             for (bucket in _itemsFlow.value) {
-                if (bucket.topItems.size > 1) {
+                val validTopItems = bucket.topItems.filter { File(it).exists() }
+                if (validTopItems.size > 1) {
                     // Start from the second item (index 1) since we've already added the first one
-                    for (i in 1 until bucket.topItems.size) {
+                    for (i in 1 until validTopItems.size) {
                         if (subItems.size < 4) {
-                            subItems.add(bucket.topItems[i])
+                            subItems.add(validTopItems[i])
                         } else {
                             break
                         }
@@ -101,5 +106,16 @@ class MediaFoldersViewModel : ViewModel() {
             startTime = startTime,
             updateLoadingState = { isLoading -> showLoading.value = isLoading }
         )
+    }
+
+    /**
+     * 异步预验证文件存在性，可以在后台线程中调用
+     * 这样可以提前过滤掉不存在的文件，减少UI线程的负担
+     */
+    suspend fun preValidateFilesAsync() = withContext(Dispatchers.IO) {
+        _itemsFlow.value.forEach { bucket ->
+            // 过滤掉不存在的文件
+            bucket.topItems.removeAll { !File(it).exists() }
+        }
     }
 }
