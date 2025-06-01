@@ -506,7 +506,6 @@ object HttpModule {
                                             call.respond(HttpStatusCode.BadRequest)
                                             return@forEachPart
                                         }
-                                        File(info.dir).mkdirs()
                                         var destFile = File("${info.dir}/$fileName")
                                         if (destFile.exists()) {
                                             if (info.replace) {
@@ -516,6 +515,8 @@ object HttpModule {
                                                 fileName = destFile.name
                                             }
                                         }
+                                        LogCat.d("Upload: ${info.dir}, ${destFile.absolutePath}")
+                                        destFile.parentFile?.mkdirs()
 
                                         part.provider().let { input ->
                                             val outputStream = FileOutputStream(destFile)
