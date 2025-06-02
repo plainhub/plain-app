@@ -198,6 +198,9 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="qrcode">QRCode</string>
     <string name="scanner">Scanner</string>
+    <string name="link_preview_image">Link preview image</string>
+    <string name="loading_link_preview">Loading link preview…</string>
+    <string name="link_preview_error">Failed to load link preview</string>
     <string name="bluetooth_scan_gps_enable_title">Enable GPS</string>
     <string name="bluetooth_scan_gps_enable_description">Enable GPS in your settings for scanning nearby devices.</string>
     <string name="bluetooth_scan_gps_enable_confirm">Settings</string>

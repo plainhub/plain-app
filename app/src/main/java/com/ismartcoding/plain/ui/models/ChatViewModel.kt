@@ -82,9 +82,13 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     }
 
     fun update(item: DChat) {
-        val index = _itemsFlow.value.indexOfFirst { it.id == item.id }
-        if (index >= 0) {
-            _itemsFlow.value[index] = _itemsFlow.value[index].copy(value = item.content.value)
+        _itemsFlow.update { currentList ->
+            val mutableList = currentList.toMutableStateList()
+            val index = mutableList.indexOfFirst { it.id == item.id }
+            if (index >= 0) {
+                mutableList[index] = VChat.from(item)
+            }
+            mutableList
         }
     }
 

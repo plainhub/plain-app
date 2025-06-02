@@ -35,6 +35,10 @@ fun DMessageContent.toJSONString(): String {
             DMessageType.FILES.value -> {
                 valueJSON = jsonEncode(value as DMessageFiles)
             }
+
+            DMessageType.LINK_PREVIEW.value -> {
+                valueJSON = jsonEncode(value as DMessageText)
+            }
         }
         obj.put("value", JSONObject(valueJSON))
     }
@@ -47,10 +51,11 @@ enum class DMessageType(val value: String) {
     TEXT("text"),
     IMAGES("images"),
     FILES("files"),
+    LINK_PREVIEW("link_preview"),
 }
 
 @Serializable
-class DMessageText(val text: String)
+class DMessageText(val text: String, val linkPreviews: List<DLinkPreview> = emptyList())
 
 @Serializable
 class DMessageFile(
@@ -67,6 +72,22 @@ class DMessageImages(val items: List<DMessageFile>)
 
 @Serializable
 class DMessageFiles(val items: List<DMessageFile>)
+
+@Serializable
+class DLinkPreview(
+    val url: String,
+    val title: String? = null,
+    val description: String? = null,
+    val imageUrl: String? = null,
+    val imageLocalPath: String? = null,
+    val imageWidth: Int = 0,
+    val imageHeight: Int = 0,
+    val siteName: String? = null,
+    val domain: String? = null,
+    val isLoading: Boolean = false,
+    val hasError: Boolean = false,
+    val createdAt: Instant = Clock.System.now()
+)
 
 @Entity(tableName = "chats")
 data class DChat(
@@ -103,6 +124,10 @@ data class DChat(
 
                 DMessageType.FILES.value -> {
                     message.value = jsonDecode<DMessageFiles>(valueJson)
+                }
+
+                DMessageType.LINK_PREVIEW.value -> {
+                    message.value = jsonDecode<DMessageText>(valueJson)
                 }
             }
 

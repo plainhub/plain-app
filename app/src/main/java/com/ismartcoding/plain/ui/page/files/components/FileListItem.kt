@@ -317,7 +317,7 @@ fun FileListItem(
                                     .background(MaterialTheme.colorScheme.surfaceVariant)
                             ) {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.square_arrow_out_up_right),
+                                    painter = painterResource(id = R.drawable.music2),
                                     contentDescription = "Full player",
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.size(20.dp)

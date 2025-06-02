@@ -34,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavHostController
@@ -70,6 +71,7 @@ import com.ismartcoding.plain.ui.nav.navigateOtherFile
 import com.ismartcoding.plain.ui.nav.navigatePdf
 import com.ismartcoding.plain.ui.nav.navigateTextFile
 import com.ismartcoding.plain.ui.page.audio.AudioPlayerPage
+import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import kotlinx.coroutines.Job
@@ -100,7 +102,7 @@ fun ChatFiles(
         }
     }
 
-    Column {
+    Column(Modifier.padding(horizontal = 16.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.cardBackgroundNormal)) {
         fileItems.forEachIndexed { index, item ->
             val itemState = rememberTransformItemState()
             val path = item.uri.getFinalPath(context)
@@ -265,7 +267,7 @@ fun ChatFiles(
                                     ) {
                                         Icon(
                                             painter = painterResource(id = R.drawable.pause),
-                                            contentDescription = "Pause",
+                                            contentDescription = stringResource(R.string.pause),
                                             tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                             modifier = Modifier.size(24.dp)
                                         )
@@ -283,7 +285,7 @@ fun ChatFiles(
                                     ) {
                                         Icon(
                                             painter = painterResource(id = R.drawable.play_arrow),
-                                            contentDescription = "Play",
+                                            contentDescription = stringResource(R.string.play),
                                             tint = MaterialTheme.colorScheme.onPrimary,
                                             modifier = Modifier.size(24.dp)
                                         )
@@ -297,7 +299,7 @@ fun ChatFiles(
                                         .clip(CircleShape)
                                 ) {
                                     Icon(
-                                        painter = painterResource(id = R.drawable.square_arrow_out_up_right),
+                                        painter = painterResource(id = R.drawable.music2),
                                         contentDescription = "Full player",
                                         tint = MaterialTheme.colorScheme.primary
                                     )

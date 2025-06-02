@@ -76,12 +76,10 @@ fun PListItem(
                 )
                 desc?.let {
                     VerticalSpace(dp = 8.dp)
-                    SelectionContainer {
-                        Text(
-                            text = it,
-                            style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
-                        )
-                    }
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
+                    )
                 }
             }
             if (separatedActions) {

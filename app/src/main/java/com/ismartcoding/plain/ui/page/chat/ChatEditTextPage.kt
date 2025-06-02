@@ -29,12 +29,16 @@ import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.web.HttpServerEvents
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.EventType
 import com.ismartcoding.plain.web.websocket.WebSocketEvent
+import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.ui.models.ChatViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,6 +47,7 @@ fun ChatEditTextPage(
     navController: NavHostController,
     id: String,
     content: String,
+    chatVM: ChatViewModel,
 ) {
     val scope = rememberCoroutineScope()
     var inputValue by remember { mutableStateOf(content) }
@@ -61,12 +66,20 @@ fun ChatEditTextPage(
                     ) {
                         if (inputValue.isNotEmpty()) {
                             scope.launch {
-                                val update = ChatItemDataUpdate(id, DMessageContent(DMessageType.TEXT.value, DMessageText(inputValue)))
+                                val originalChat = withIO { AppDatabase.instance.chatDao().getById(id) }
+                                val originalMessageText = originalChat?.content?.value as? DMessageText
+                                val originalLinkPreviews = originalMessageText?.linkPreviews ?: emptyList()
+                                
+                                val updatedMessageText = DMessageText(inputValue, originalLinkPreviews)
+                                val update = ChatItemDataUpdate(id, DMessageContent(DMessageType.TEXT.value, updatedMessageText))
+                                
                                 withIO {
                                     AppDatabase.instance.chatDao().updateData(update)
                                 }
+                                
                                 val c = withIO { AppDatabase.instance.chatDao().getById(id) }
                                 if (c != null) {
+                                    chatVM.update(c)
                                     sendEvent(
                                         WebSocketEvent(
                                             EventType.MESSAGE_UPDATED,

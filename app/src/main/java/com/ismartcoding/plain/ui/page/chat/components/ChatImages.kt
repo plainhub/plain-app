@@ -51,7 +51,7 @@ fun ChatImages(
         modifier =
         Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp),
         maxItemsInEachRow = 3,
         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),

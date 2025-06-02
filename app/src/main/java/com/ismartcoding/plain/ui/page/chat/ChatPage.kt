@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -34,7 +35,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
@@ -52,7 +52,6 @@ import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
-import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
@@ -79,7 +78,7 @@ import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
-import com.ismartcoding.plain.ui.components.ChatListItem
+import com.ismartcoding.plain.ui.page.chat.components.ChatListItem
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -107,7 +106,7 @@ import java.io.File
 fun ChatPage(
     navController: NavHostController,
     audioPlaylistVM: AudioPlaylistViewModel,
-    chatVM: ChatViewModel = viewModel(),
+    chatVM: ChatViewModel,
 ) {
     val context = LocalContext.current
     val itemsState = chatVM.itemsFlow.collectAsState()
@@ -117,7 +116,7 @@ fun ChatPage(
     val density = LocalDensity.current
 
     val imageWidthDp = remember {
-        (configuration.screenWidthDp.dp - 74.dp) / 3
+        (configuration.screenWidthDp.dp - 44.dp) / 3
     }
     val imageWidthPx = remember(imageWidthDp) {
         derivedStateOf {
@@ -373,7 +372,7 @@ fun ChatPage(
                             return@ChatInput
                         }
                         scope.launch {
-                            val item = withIO { ChatHelper.sendAsync(DMessageContent(DMessageType.TEXT.value, DMessageText(inputValue))) }
+                            val (item, urls) = withIO { ChatHelper.sendTextMessageWithLinkPreview(context, inputValue) }
                             chatVM.addAll(arrayListOf(item))
                             sendEvent(
                                 WebSocketEvent(
@@ -390,6 +389,15 @@ fun ChatPage(
                             inputValue = ""
                             withIO { ChatInputTextPreference.putAsync(context, inputValue) }
                             scrollState.scrollToItem(0)
+                            
+                            // 异步获取链接预览
+                            if (urls.isNotEmpty()) {
+                                launch {
+                                    ChatHelper.fetchAndUpdateLinkPreviews(context, item.id, urls)
+                                    // 刷新UI显示更新后的预览
+                                    chatVM.fetch(context)
+                                }
+                            }
                         }
                     },
                 )

@@ -81,7 +81,7 @@ fun ChatInput(
                     sendEvent(PickFileEvent(PickFileTag.SEND_MESSAGE, PickFileType.IMAGE_VIDEO, multiple = true))
                 }
                 PIconButton(
-                    icon = R.drawable.files,
+                    icon = R.drawable.folder,
                     contentDescription = stringResource(R.string.files),
                     tint = MaterialTheme.colorScheme.primary,
                 ) {

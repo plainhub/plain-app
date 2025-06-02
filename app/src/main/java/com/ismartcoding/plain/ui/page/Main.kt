@@ -49,6 +49,7 @@ import com.ismartcoding.plain.ui.base.PToast
 import com.ismartcoding.plain.ui.base.ToastEvent
 import com.ismartcoding.plain.ui.base.coil.newImageLoader
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -95,6 +96,7 @@ fun Main(
     notesVM: NotesViewModel = viewModel(key = "notesVM"),
     feedTagsVM: TagsViewModel = viewModel(key = "feedTagsVM"),
     noteTagsVM: TagsViewModel = viewModel(key = "noteTagsVM"),
+    chatVM: ChatViewModel = viewModel(key = "chatVM"),
 ) {
     val context = LocalContext.current
     val navController = rememberNavController()
@@ -174,7 +176,7 @@ fun Main(
                 composable<Routing.WebDev> { WebDevPage(navController) }
                 composable<Routing.WebSecurity> { WebSecurityPage(navController) }
                 composable<Routing.SoundMeter> { SoundMeterPage(navController) }
-                composable<Routing.Chat> { ChatPage(navController, audioPlaylistVM = audioPlaylistVM) }
+                composable<Routing.Chat> { ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = chatVM) }
                 composable<Routing.ScanHistory> { ScanHistoryPage(navController) }
                 composable<Routing.Scan> { ScanPage(navController) }
                 composable<Routing.Apps> { AppsPage(navController) }
@@ -233,7 +235,7 @@ fun Main(
                 composable<Routing.ChatEditText> { backStackEntry ->
                     val content = navController.previousBackStackEntry?.savedStateHandle?.get("content") ?: ""
                     val r = backStackEntry.toRoute<Routing.ChatEditText>()
-                    ChatEditTextPage(navController, r.id, content)
+                    ChatEditTextPage(navController, r.id, content, chatVM)
                 }
 
                 composable<Routing.OtherFile> {
