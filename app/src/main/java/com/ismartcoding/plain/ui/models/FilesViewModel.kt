@@ -12,10 +12,12 @@ import com.ismartcoding.lib.extensions.getParentPath
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.FileSystemHelper
+import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.FileMediaStoreHelper
 import com.ismartcoding.plain.preference.FilePathData
 import com.ismartcoding.plain.preference.LastFilePathPreference
@@ -60,7 +62,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
             }
         }
 
-    val breadcrumbs = mutableStateListOf(BreadcrumbItem(FileSystemHelper.getInternalStorageName(), root))
+    val breadcrumbs = mutableStateListOf<BreadcrumbItem>()
     val selectedBreadcrumbIndex = mutableIntStateOf(0)
     var cutFiles = mutableListOf<DFile>()
     var copyFiles = mutableListOf<DFile>()
@@ -70,6 +72,11 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
     var total: Int = 0
 
     private val navigationHistory = Stack<String>()
+
+    init {
+        // Initialize with default breadcrumb - will be updated when loadLastPathAsync is called
+        breadcrumbs.add(BreadcrumbItem(getRootDisplayName(), root))
+    }
 
     val selectedFile = mutableStateOf<DFile?>(null)
     val showRenameDialog = mutableStateOf(false)
@@ -125,6 +132,8 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
         val data = LastFilePathPreference.getValueAsync(context)
         if (data.selectedPath.isNotEmpty() && File(data.selectedPath).exists()) {
             root = data.rootPath
+            // Infer the file system type from the root path
+            type = inferFileTypeFromRoot(context, data.rootPath)
             // Restore complete breadcrumbs from fullPath
             rebuildBreadcrumbs(data.fullPath)
             _path = data.selectedPath
@@ -134,12 +143,31 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
                 selectedBreadcrumbIndex.value = breadcrumbs.size - 1
             }
             navigationHistory.clear()
+        } else {
+            // No saved path, but still infer the type based on current root
+            type = inferFileTypeFromRoot(context, root)
+            updateRootBreadcrumb()
+        }
+    }
+
+    private fun inferFileTypeFromRoot(context: Context, rootPath: String): FilesType {
+        val internalStoragePath = FileSystemHelper.getInternalStoragePath()
+        val appDataPath = FileSystemHelper.getExternalFilesDirPath(context)
+        val sdCardPath = FileSystemHelper.getSDCardPath(context)
+        val usbPaths = FileSystemHelper.getUsbDiskPaths()
+
+        return when {
+            rootPath == appDataPath -> FilesType.APP
+            rootPath == sdCardPath -> FilesType.SDCARD
+            usbPaths.contains(rootPath) -> FilesType.USB_STORAGE
+            rootPath == internalStoragePath -> FilesType.INTERNAL_STORAGE
+            else -> FilesType.INTERNAL_STORAGE // default fallback
         }
     }
 
     private fun rebuildBreadcrumbs(targetPath: String) {
         breadcrumbs.clear()
-        breadcrumbs.add(BreadcrumbItem(FileSystemHelper.getInternalStorageName(), root))
+        breadcrumbs.add(BreadcrumbItem(getRootDisplayName(), root))
         
         if (targetPath != root) {
             val relativePath = targetPath.removePrefix(root).trim('/')
@@ -153,6 +181,22 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
         }
         
         selectedBreadcrumbIndex.value = breadcrumbs.size - 1
+    }
+
+    fun getRootDisplayName(): String {
+        return when (type) {
+            FilesType.INTERNAL_STORAGE -> FileSystemHelper.getInternalStorageName()
+            FilesType.APP -> LocaleHelper.getString(R.string.app_data)
+            FilesType.SDCARD -> LocaleHelper.getString(R.string.sdcard)
+            FilesType.USB_STORAGE -> LocaleHelper.getString(R.string.usb_storage)
+            FilesType.RECENTS -> LocaleHelper.getString(R.string.recents)
+        }
+    }
+
+    fun updateRootBreadcrumb() {
+        if (breadcrumbs.isNotEmpty()) {
+            breadcrumbs[0] = BreadcrumbItem(getRootDisplayName(), root)
+        }
     }
 
     // Check if we can navigate back

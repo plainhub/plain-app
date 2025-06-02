@@ -85,7 +85,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun FilesPage(
     navController: NavHostController,
-    fileType: FilesType = FilesType.INTERNAL_STORAGE,
+    fileType: FilesType? = null,
     audioPlaylistVM: AudioPlaylistViewModel,
     filesVM: FilesViewModel = viewModel(),
 ) {
@@ -145,12 +145,16 @@ fun FilesPage(
     LaunchedEffect(fileType) {
         scope.launch(Dispatchers.IO) {
             filesVM.loadLastPathAsync(context)
-            if (fileType == FilesType.APP) {
-                filesVM.root = FileSystemHelper.getExternalFilesDirPath(context)
-                filesVM.breadcrumbs.clear()
-                filesVM.breadcrumbs.add(BreadcrumbItem(LocaleHelper.getString(R.string.app_data), filesVM.root))
-                filesVM.initPath(filesVM.root)
-                filesVM.type = FilesType.APP
+            // Only override the inferred type if explicitly passed
+            fileType?.let { type ->
+                if (type == FilesType.APP) {
+                    filesVM.root = FileSystemHelper.getExternalFilesDirPath(context)
+                    filesVM.type = FilesType.APP
+                    filesVM.breadcrumbs.clear()
+                    filesVM.breadcrumbs.add(BreadcrumbItem(filesVM.getRootDisplayName(), filesVM.root))
+                    filesVM.initPath(filesVM.root)
+                }
+                // Add other specific file type handling here if needed
             }
             filesVM.loadAsync(context)
             audioPlaylistVM.loadAsync(context)
@@ -170,9 +174,6 @@ fun FilesPage(
                     val m = event.model
                     filesVM.offset = 0
                     filesVM.root = m.data as String
-                    filesVM.breadcrumbs.clear()
-                    filesVM.breadcrumbs.add(BreadcrumbItem(m.title, filesVM.root))
-                    filesVM.initPath(filesVM.root)
                     filesVM.type = when (m.iconId) {
                         R.drawable.sd_card -> FilesType.SDCARD
                         R.drawable.usb -> FilesType.USB_STORAGE
@@ -180,6 +181,9 @@ fun FilesPage(
                         R.drawable.history -> FilesType.RECENTS
                         else -> FilesType.INTERNAL_STORAGE
                     }
+                    filesVM.breadcrumbs.clear()
+                    filesVM.breadcrumbs.add(BreadcrumbItem(filesVM.getRootDisplayName(), filesVM.root))
+                    filesVM.initPath(filesVM.root)
 
                     scope.launch(Dispatchers.IO) {
                         filesVM.loadAsync(context)

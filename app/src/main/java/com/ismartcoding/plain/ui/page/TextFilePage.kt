@@ -1,15 +1,24 @@
 package com.ismartcoding.plain.ui.page
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -35,6 +44,7 @@ import com.ismartcoding.plain.ui.components.EditorData
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.TextFileViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -52,6 +62,15 @@ fun TextFilePage(
     val scope = rememberCoroutineScope()
     val darkTheme = LocalDarkTheme.current
     val isDarkTheme = DarkTheme.isDarkTheme(darkTheme)
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+    
+    var isSaving by remember { mutableStateOf(false) }
+    val rotation by animateFloatAsState(
+        targetValue = if (isSaving) 360f else 0f,
+        animationSpec = tween(durationMillis = 600),
+        label = "save_rotation"
+    )
 
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.IO) {
@@ -107,7 +126,8 @@ fun TextFilePage(
                         PIconButton(
                             icon = R.drawable.save,
                             contentDescription = stringResource(R.string.save),
-                            tint = MaterialTheme.colorScheme.onSurface,
+                            tint = if (isSaving) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.rotate(rotation),
                         ) {
                             scope.launch {
                                 // Prevent saving external files (content URIs)
@@ -116,12 +136,22 @@ fun TextFilePage(
                                     return@launch
                                 }
                                 
+                                // Close keyboard and clear focus
+                                keyboardController?.hide()
+                                focusManager.clearFocus()
+                                
+                                // Start saving animation
+                                isSaving = true
+                                
                                 DialogHelper.showLoading()
                                 withIO { File(path).writeText(textFileVM.content.value) }
                                 textFileVM.oldContent.value = textFileVM.content.value
                                 context.scanFileByConnection(path)
                                 DialogHelper.hideLoading()
-                                DialogHelper.showMessage(R.string.saved)
+                                
+                                // Wait for animation to complete
+                                delay(600)
+                                isSaving = false
                             }
                         }
                     }
