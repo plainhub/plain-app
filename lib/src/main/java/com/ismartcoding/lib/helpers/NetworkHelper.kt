@@ -45,7 +45,7 @@ object NetworkHelper {
                     while (enumIpAddr.hasMoreElements()) {
                         val inetAddress = enumIpAddr.nextElement()
                         if (!inetAddress.isLoopbackAddress && inetAddress is Inet4Address) {
-                            val ip = inetAddress.getHostAddress() ?: ""
+                            val ip = inetAddress.hostAddress ?: ""
                             if (ip.isNotEmpty()) {
                                 ips.add(ip)
                             }

@@ -89,7 +89,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun WebSettingsPage(
     navController: NavHostController,
-    mainViewModel: MainViewModel,
+    mainVM: MainViewModel,
     webVM: WebConsoleViewModel = viewModel(),
 ) {
     WebSettingsProvider {
@@ -191,8 +191,8 @@ fun WebSettingsPage(
                 item {
                     TopSpace()
                     if (webEnabled) {
-                        if (mainViewModel.httpServerError.isNotEmpty()) {
-                            PAlert(title = stringResource(id = R.string.error), description = mainViewModel.httpServerError, AlertType.ERROR) {
+                        if (mainVM.httpServerError.isNotEmpty()) {
+                            PAlert(title = stringResource(id = R.string.error), description = mainVM.httpServerError, AlertType.ERROR) {
                                 if (HttpServerManager.portsInUse.isNotEmpty()) {
                                     PMiniOutlineButton(
                                         label = stringResource(R.string.change_port),
@@ -259,18 +259,18 @@ fun WebSettingsPage(
                 item {
                     VerticalSpace(dp = 8.dp)
                     PMainSwitch(
-                        title = stringResource(id = mainViewModel.httpServerState.getTextId()),
+                        title = stringResource(id = mainVM.httpServerState.getTextId()),
                         activated = webEnabled,
-                        enable = !mainViewModel.httpServerState.isProcessing()
+                        enable = !mainVM.httpServerState.isProcessing()
                     ) {
-                        mainViewModel.enableHttpServer(context, it)
+                        mainVM.enableHttpServer(context, it)
                     }
                 }
                 if (webEnabled) {
                     item {
                         VerticalSpace(dp = 16.dp)
                         PCard {
-                            WebAddress(context)
+                            WebAddress(context, mainVM)
                             VerticalSpace(dp = 16.dp)
                         }
                     }

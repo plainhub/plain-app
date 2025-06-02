@@ -19,6 +19,7 @@ import com.ismartcoding.plain.preference.HttpsPreference
 import com.ismartcoding.plain.ui.base.PageIndicator
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.models.MainViewModel
 import kotlinx.coroutines.launch
 
 // https://developer.android.com/jetpack/compose/layouts/pager
@@ -26,6 +27,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun WebAddress(
     context: Context,
+    mainVM: MainViewModel
 ) {
     val initialPage = if (TempData.webHttps) 1 else 0
     val pagerState = rememberPagerState(initialPage = initialPage, pageCount = {
@@ -51,7 +53,7 @@ fun WebAddress(
     ) { page ->
         Column {
             val isHttps = page != 0
-            WebAddressBar(context, isHttps)
+            WebAddressBar(context, mainVM, isHttps)
             Tips(text = stringResource(id = R.string.enter_this_address_tips), modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp))
             VerticalSpace(dp = 8.dp)
         }
