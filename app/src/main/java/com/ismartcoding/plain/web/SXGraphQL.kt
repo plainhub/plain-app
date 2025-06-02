@@ -990,6 +990,42 @@ class SXGraphQL(val schema: Schema) {
                         true
                     }
                 }
+                mutation("reorderPlaylistAudios") {
+                    resolver { paths: List<String> ->
+                        val context = MainApp.instance
+
+                        // Get current playlist
+                        val currentPlaylist = AudioPlaylistPreference.getValueAsync(context)
+                        if (currentPlaylist.isEmpty() || paths.isEmpty()) {
+                            return@resolver true
+                        }
+
+                        // Create a map of paths to audio items
+                        val audioMap = currentPlaylist.associateBy { it.path }
+
+                        // Reorder the playlist based on the provided paths
+                        val reorderedPlaylist = mutableListOf<DPlaylistAudio>()
+
+                        // First add audio items in the new order
+                        paths.forEach { path ->
+                            audioMap[path]?.let { audio ->
+                                reorderedPlaylist.add(audio)
+                            }
+                        }
+
+                        // Add other audio items that are not in the reorder list (keep their original positions)
+                        currentPlaylist.forEach { audio ->
+                            if (!paths.contains(audio.path)) {
+                                reorderedPlaylist.add(audio)
+                            }
+                        }
+
+                        // Save the reordered playlist
+                        AudioPlaylistPreference.putAsync(context, reorderedPlaylist)
+
+                        true
+                    }
+                }
                 mutation("createFeed") {
                     resolver { url: String, fetchContent: Boolean ->
                         val syndFeed = withIO { FeedHelper.fetchAsync(url) }
