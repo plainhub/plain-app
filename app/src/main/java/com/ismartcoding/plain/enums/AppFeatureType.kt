@@ -3,7 +3,6 @@ package com.ismartcoding.plain.enums
 import android.content.Context
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.plain.BuildConfig
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DFeaturePermission
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
@@ -20,20 +19,20 @@ enum class AppFeatureType {
     MEDIA_TRASH;
 
     fun has(): Boolean {
-        when (this) {
+        return when (this) {
             APPS, SOCIAL, NOTIFICATIONS -> {
-                return BuildConfig.CHANNEL != AppChannelType.GOOGLE.name
+                BuildConfig.CHANNEL != AppChannelType.GOOGLE.name
             }
 
             MEDIA_TRASH -> {
-                return isRPlus() // Android 11+
+                isRPlus() // Android 11+
             }
 
             CHECK_UPDATES -> {
-                return BuildConfig.CHANNEL == AppChannelType.GITHUB.name
+                BuildConfig.CHANNEL == AppChannelType.GITHUB.name
             }
 
-            else -> return true
+            else -> true
         }
     }
 

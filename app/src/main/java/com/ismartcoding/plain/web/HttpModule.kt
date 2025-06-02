@@ -410,6 +410,8 @@ object HttpModule {
                             call.response.header("Content-Disposition", "inline;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
                         }
 
+                        call.response.header("Access-Control-Expose-Headers", "Content-Disposition") 
+
                         if (path.isImageFast()) {
                             val imageType = ImageHelper.getImageType(path)
                             if (imageType.isApplicableAnimated() || imageType == ImageType.SVG) {
