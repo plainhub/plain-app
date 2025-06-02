@@ -47,7 +47,6 @@ import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
@@ -99,6 +98,7 @@ import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.nav.navigatePdf
+import com.ismartcoding.plain.ui.nav.navigateTextFile
 import com.ismartcoding.plain.ui.page.Main
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.web.models.toModel
@@ -463,23 +463,15 @@ class MainActivity : AppCompatActivity() {
             if (uri != null) {
                 val mimeType = contentResolver.getType(uri)
                 if (mimeType != null) {
-                    if (mimeType.startsWith("audio/") ||
-                        setOf("application/ogg", "application/x-ogg", "application/itunes").contains(mimeType)
-                    ) {
-                        Permissions.checkNotification(this@MainActivity, R.string.audio_notification_prompt) {
-                            AudioPlayer.play(this@MainActivity, DPlaylistAudio.fromPath(this@MainActivity, uri.toString()))
-                        }
-                    } else if (mimeType.startsWith("text/")) {
-//                        TextEditorDialog(uri).show()
-                    } else if (mimeType.startsWith("image/") || mimeType.startsWith("video/")) {
-//                        val link = uri.toString()
-//                        PreviewDialog().show(
-//                            items = arrayListOf(PreviewItem(link, uri)),
-//                            initKey = link,
-//                        )
+                    if (mimeType.startsWith("text/")) {
+                        navControllerState.value?.navigateTextFile(uri.toString())
                     } else if (mimeType == "application/pdf") {
                         navControllerState.value?.navigatePdf(uri)
+                    } else {
+                        DialogHelper.showMessage(LocaleHelper.getString(R.string.not_supported_error))
                     }
+                } else {
+                    DialogHelper.showMessage(LocaleHelper.getString(R.string.not_supported_error))
                 }
             }
         } else if (intent.action == Intent.ACTION_SEND) {

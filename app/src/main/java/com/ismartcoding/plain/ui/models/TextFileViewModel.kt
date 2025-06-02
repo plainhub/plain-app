@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.models
 
 import android.content.Context
+import android.net.Uri
 import android.webkit.WebView
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -26,6 +27,7 @@ class TextFileViewModel : ViewModel() {
     val webView = mutableStateOf<WebView?>(null)
     val content = mutableStateOf("")
     val oldContent = mutableStateOf<String?>(null)
+    val isExternalFile = mutableStateOf(false)
 
     suspend fun loadConfigAsync(context: Context) {
         wrapContent.value = EditorWrapContentPreference.getAsync(context)
@@ -36,7 +38,21 @@ class TextFileViewModel : ViewModel() {
             if (mediaId.isNotEmpty()) {
                 file.value = FileMediaStoreHelper.getByIdAsync(context, mediaId)
             }
-            content.value = File(path).readText()
+            
+            // Set external file flag
+            isExternalFile.value = path.startsWith("content://")
+            
+            // Handle content:// URIs and regular file paths
+            content.value = if (path.startsWith("content://")) {
+                // For content:// URIs, use ContentResolver
+                val uri = Uri.parse(path)
+                context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                    inputStream.bufferedReader().readText()
+                } ?: ""
+            } else {
+                // For regular file paths, use File.readText()
+                File(path).readText()
+            }
         } catch (e: Exception) {
             DialogHelper.showErrorDialog(e.toString())
             LogCat.e(e.toString())

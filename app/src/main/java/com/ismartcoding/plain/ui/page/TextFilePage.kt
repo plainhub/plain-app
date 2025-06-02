@@ -94,7 +94,7 @@ fun TextFilePage(
                         return@PTopAppBar
                     }
                     if (textFileVM.readOnly.value) {
-                        if (type != TextFileType.APP_LOG.name) {
+                        if (type != TextFileType.APP_LOG.name && !textFileVM.isExternalFile.value) {
                             PIconButton(
                                 icon = R.drawable.square_pen,
                                 contentDescription = stringResource(R.string.edit),
@@ -110,6 +110,12 @@ fun TextFilePage(
                             tint = MaterialTheme.colorScheme.onSurface,
                         ) {
                             scope.launch {
+                                // Prevent saving external files (content URIs)
+                                if (textFileVM.isExternalFile.value) {
+                                    DialogHelper.showMessage(R.string.not_supported_error)
+                                    return@launch
+                                }
+                                
                                 DialogHelper.showLoading()
                                 withIO { File(path).writeText(textFileVM.content.value) }
                                 textFileVM.oldContent.value = textFileVM.content.value

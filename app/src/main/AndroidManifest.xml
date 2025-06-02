@@ -96,6 +96,7 @@
         android:name=".MainApp"
         android:allowBackup="true"
         android:enableOnBackInvokedCallback="true"
+        android:banner="@mipmap/ic_launcher"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
@@ -122,13 +123,23 @@
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
 
-            <!--            <intent-filter>-->
-            <!--                <action android:name="android.intent.action.VIEW" />-->
-            <!--                <category android:name="android.intent.category.DEFAULT" />-->
-            <!--                <data android:scheme="content" />-->
-            <!--                <data android:scheme="file" />-->
-            <!--                <data android:mimeType="*/*" />-->
-            <!--            </intent-filter>-->
+            <!-- Support for text files -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="text/*" />
+            </intent-filter>
+            
+            <!-- Support for PDF files -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:scheme="file" />
+                <data android:mimeType="application/pdf" />
+            </intent-filter>
 
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
