@@ -52,6 +52,7 @@ import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
+import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
@@ -85,6 +86,7 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.enums.FilesType
+import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
 import com.ismartcoding.plain.ui.models.showBottomActions
@@ -372,7 +374,8 @@ fun ChatPage(
                             return@ChatInput
                         }
                         scope.launch {
-                            val (item, urls) = withIO { ChatHelper.sendTextMessageWithLinkPreview(context, inputValue) }
+                            val item = withIO { ChatHelper.sendAsync(DMessageContent(DMessageType.TEXT.value, DMessageText(inputValue))) }
+                            val urls = LinkPreviewHelper.extractUrls(inputValue)
                             chatVM.addAll(arrayListOf(item))
                             sendEvent(
                                 WebSocketEvent(
@@ -390,11 +393,9 @@ fun ChatPage(
                             withIO { ChatInputTextPreference.putAsync(context, inputValue) }
                             scrollState.scrollToItem(0)
                             
-                            // 异步获取链接预览
                             if (urls.isNotEmpty()) {
-                                launch {
-                                    ChatHelper.fetchAndUpdateLinkPreviews(context, item.id, urls)
-                                    // 刷新UI显示更新后的预览
+                                launch(Dispatchers.IO) {
+                                    ChatHelper.fetchAndUpdateLinkPreviewsAsync(context, item, urls)
                                     chatVM.fetch(context)
                                 }
                             }

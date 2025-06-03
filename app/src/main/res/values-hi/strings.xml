@@ -198,6 +198,9 @@
     <string name="bluetooth">ब्लूटूथ</string>
     <string name="qrcode">क्यूआरकोड</string>
     <string name="scanner">स्कैनर</string>
+    <string name="link_preview_image">लिंक पूर्वावलोकन छवि</string>
+    <string name="loading_link_preview">लिंक पूर्वावलोकन लोड हो रहा है…</string>
+    <string name="link_preview_error">लिंक पूर्वावलोकन लोड करने में विफल</string>
     <string name="bluetooth_scan_gps_enable_title">जीपीएस सक्षम करें</string>
     <string name="bluetooth_scan_gps_enable_description">आसपास के उपकरणों को स्कैन करने के लिए अपनी सेटिंग्स में जीपीएस सक्षम करें।</string>
     <string name="bluetooth_scan_gps_enable_confirm">सेटिंग्स</string>

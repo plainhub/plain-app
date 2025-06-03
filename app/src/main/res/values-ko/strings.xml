@@ -198,6 +198,9 @@
     <string name="bluetooth">블루투스</string>
     <string name="qrcode">QR코드</string>
     <string name="scanner">스캐너</string>
+    <string name="link_preview_image">링크 미리보기 이미지</string>
+    <string name="loading_link_preview">링크 미리보기 로딩 중…</string>
+    <string name="link_preview_error">링크 미리보기 로딩 실패</string>
     <string name="bluetooth_scan_gps_enable_title">GPS 활성화</string>
     <string name="bluetooth_scan_gps_enable_description">근처 기기를 스캔하려면 설정에서 GPS를 활성화하십시오.</string>
     <string name="bluetooth_scan_gps_enable_confirm">설정</string>

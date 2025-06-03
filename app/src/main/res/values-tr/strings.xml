@@ -198,6 +198,9 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="qrcode">QR Kodu</string>
     <string name="scanner">Tarayıcı</string>
+    <string name="link_preview_image">Bağlantı önizleme görüntüsü</string>
+    <string name="loading_link_preview">Bağlantı önizleme yükleniyor…</string>
+    <string name="link_preview_error">Bağlantı önizleme yüklenemedi</string>
     <string name="bluetooth_scan_gps_enable_title">GPS\'i etkinleştir</string>
     <string name="bluetooth_scan_gps_enable_description">Yakındaki cihazları taramak için ayarlarınızda GPS\'i etkinleştirin.</string>
     <string name="bluetooth_scan_gps_enable_confirm">Ayarlar</string>

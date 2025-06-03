@@ -198,6 +198,9 @@
     <string name="bluetooth">புளூடூது</string>
     <string name="qrcode">QR குறியீடு</string>
     <string name="scanner">ஸ்கேனர்</string>
+    <string name="link_preview_image">இணைப்பு முன்னோட்ட படம்</string>
+    <string name="loading_link_preview">இணைப்பு முன்னோட்டத்தை ஏற்றவும்…</string>
+    <string name="link_preview_error">இணைப்பு முன்னோட்டத்தை ஏற்ற முடியவில்லை</string>
     <string name="bluetooth_scan_gps_enable_title">GPS ஐ இயக்குக</string>
     <string name="bluetooth_scan_gps_enable_description">அருகிலுள்ள சாதனங்களை ஸ்கேன் செய்யும் குறிப்பின் உடன் உங்கள் அமைப்புகளில் GPS ஐ இயக்கவும்.</string>
     <string name="bluetooth_scan_gps_enable_confirm">அமைப்புகள்</string>

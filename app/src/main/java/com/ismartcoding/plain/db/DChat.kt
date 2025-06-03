@@ -35,10 +35,6 @@ fun DMessageContent.toJSONString(): String {
             DMessageType.FILES.value -> {
                 valueJSON = jsonEncode(value as DMessageFiles)
             }
-
-            DMessageType.LINK_PREVIEW.value -> {
-                valueJSON = jsonEncode(value as DMessageText)
-            }
         }
         obj.put("value", JSONObject(valueJSON))
     }
@@ -51,7 +47,6 @@ enum class DMessageType(val value: String) {
     TEXT("text"),
     IMAGES("images"),
     FILES("files"),
-    LINK_PREVIEW("link_preview"),
 }
 
 @Serializable
@@ -124,10 +119,6 @@ data class DChat(
 
                 DMessageType.FILES.value -> {
                     message.value = jsonDecode<DMessageFiles>(valueJson)
-                }
-
-                DMessageType.LINK_PREVIEW.value -> {
-                    message.value = jsonDecode<DMessageText>(valueJson)
                 }
             }
 

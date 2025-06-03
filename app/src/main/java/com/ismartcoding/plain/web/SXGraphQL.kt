@@ -51,6 +51,7 @@ import com.ismartcoding.plain.features.CancelNotificationsEvent
 import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.features.ClearAudioPlaylistEvent
 import com.ismartcoding.plain.features.DeleteChatItemViewEvent
+import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.Permission
@@ -137,7 +138,9 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.util.AttributeKey
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.addJsonObject
@@ -690,10 +693,18 @@ class SXGraphQL(val schema: Schema) {
                 }
                 mutation("createChatItem") {
                     resolver { content: String ->
-                        val item =
+                        var item =
                             ChatHelper.sendAsync(
                                 DChat.parseContent(content),
                             )
+                        val urls = LinkPreviewHelper.extractUrls(content)
+                        if (urls.isNotEmpty()) {
+                            val context = MainApp.instance
+                            val links = ChatHelper.fetchAndUpdateLinkPreviewsAsync(context, item, urls)
+                            if (links.isNotEmpty()) {
+                                item = AppDatabase.instance.chatDao().getById(item.id) ?: item
+                            }
+                        }
                         sendEvent(HttpServerEvents.MessageCreatedEvent(arrayListOf(item)))
                         arrayListOf(item).map { it.toModel() }
                     }

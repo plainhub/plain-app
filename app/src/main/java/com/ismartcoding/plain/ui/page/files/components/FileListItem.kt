@@ -37,9 +37,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.formatDuration
+import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.isAudioFast
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
@@ -55,6 +57,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformImageView
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
+import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.page.audio.AudioPlayerPage
 import kotlinx.coroutines.Job
@@ -165,15 +168,15 @@ fun FileListItem(
                             widthPx = context.dp2px(48)
                         )
                     } else {
-                        val iconRes = when {
-                            file.isDir -> R.drawable.folder
-                            file.path.isAudioFast() -> R.drawable.music2
-                            else -> R.drawable.file
-                        }
-                        Icon(
-                            painter = painterResource(id = iconRes),
-                            contentDescription = null,
-                            tint = if (isCurrentlyPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary
+                        AsyncImage(
+                            model = if (file.isDir) {
+                                AppHelper.getFileIconPath("folder")
+                            } else {
+                                AppHelper.getFileIconPath(file.path.getFilenameExtension())
+                            },
+                            modifier = Modifier.size(48.dp),
+                            alignment = Alignment.Center,
+                            contentDescription = file.path,
                         )
                     }
                 }

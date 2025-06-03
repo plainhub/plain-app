@@ -198,6 +198,9 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="qrcode">Mã QR</string>
     <string name="scanner">Máy quét</string>
+    <string name="link_preview_image">Ảnh xem trước liên kết</string>
+    <string name="loading_link_preview">Đang tải xem trước liên kết…</string>
+    <string name="link_preview_error">Không thể tải xem trước liên kết</string>
     <string name="bluetooth_scan_gps_enable_title">Bật GPS</string>
     <string name="bluetooth_scan_gps_enable_description">Bật GPS trong cài đặt của bạn để quét các thiết bị gần đây.</string>
     <string name="bluetooth_scan_gps_enable_confirm">Cài đặt</string>

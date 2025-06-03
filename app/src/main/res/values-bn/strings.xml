@@ -198,6 +198,9 @@
     <string name="bluetooth">ব্লুটুথ</string>
     <string name="qrcode">কিউআরকোড</string>
     <string name="scanner">স্ক্যানার</string>
+    <string name="link_preview_image">লিঙ্ক প্রিভিউ ছবি</string>
+    <string name="loading_link_preview">লিঙ্ক প্রিভিউ লোড হচ্ছে…</string>
+    <string name="link_preview_error">লিঙ্ক প্রিভিউ লোড করতে ব্যর্থ হয়েছে</string>
     <string name="bluetooth_scan_gps_enable_title">জিপিএস চালু করুন</string>
     <string name="bluetooth_scan_gps_enable_description">আপনার সেটিংসে জিপিএস চালু করুন যেন আশেপাশের ডিভাইসগুলি স্ক্যান করা যায়।</string>
     <string name="bluetooth_scan_gps_enable_confirm">সেটিংস</string>

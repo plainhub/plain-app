@@ -28,6 +28,13 @@ data class ChatItem(
                 ChatItemContent.MessageFiles((_content.value as DMessageFiles).items.map { FileHelper.getFileId(it.uri) })
             }
 
+            is DMessageText -> {
+                val messageText = _content.value as DMessageText
+                val imageIds = messageText.linkPreviews
+                    .map { if (it.imageLocalPath.isNullOrEmpty()) "" else FileHelper.getFileId(it.imageLocalPath) }
+                ChatItemContent.MessageText(imageIds)
+            }
+
             else -> {
                 null
             }
@@ -43,6 +50,9 @@ sealed class ChatItemContent() {
 
     @Serializable
     data class MessageFiles(val ids: List<String>) : ChatItemContent()
+
+    @Serializable
+    data class MessageText(val ids: List<String>) : ChatItemContent()
 }
 
 fun DChat.toModel(): ChatItem {

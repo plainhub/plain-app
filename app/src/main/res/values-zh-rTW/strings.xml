@@ -198,6 +198,9 @@
     <string name="bluetooth">藍牙</string>
     <string name="qrcode">二維碼</string>
     <string name="scanner">掃碼</string>
+    <string name="link_preview_image">鏈接預覽圖片</string>
+    <string name="loading_link_preview">加載鏈接預覽中…</string>
+    <string name="link_preview_error">加載鏈接預覽失敗</string>
     <string name="bluetooth_scan_gps_enable_title">啟用GPS</string>
     <string name="bluetooth_scan_gps_enable_description">啟用GPS以便搜索附近的盒子。</string>
     <string name="bluetooth_scan_gps_enable_confirm">設置</string>

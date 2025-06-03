@@ -198,6 +198,9 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="qrcode">QRコード</string>
     <string name="scanner">スキャナー</string>
+    <string name="link_preview_image">リンクプレビュー画像</string>
+    <string name="loading_link_preview">リンクプレビューを読み込んでいます…</string>
+    <string name="link_preview_error">リンクプレビューの読み込みに失敗しました</string>
     <string name="bluetooth_scan_gps_enable_title">GPSを有効にする</string>
     <string name="bluetooth_scan_gps_enable_description">近くのデバイスをスキャンするために、設定でGPSを有効にしてください。</string>
     <string name="bluetooth_scan_gps_enable_confirm">設定</string>
