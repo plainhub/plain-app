@@ -31,6 +31,7 @@ android {
     defaultConfig {
         applicationId = "com.ismartcoding.plain"
         minSdk = 28
+        targetSdk = 35
 
         val abiFilterList = if (hasProperty("abiFilters")) property("abiFilters").toString().split(';') else listOf()
         val singleAbiNum =
@@ -40,9 +41,9 @@ android {
                 else -> 0
             }
 
-        val vCode = 346
+        val vCode = 349
         versionCode = vCode - singleAbiNum
-        versionName = "2.0.4"
+        versionName = "2.0.5"
 
         ndk {
             //noinspection ChromeOsAbiSupport
