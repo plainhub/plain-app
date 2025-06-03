@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.base
 
 import android.view.HapticFeedbackConstants
 import android.view.SoundEffectConstants
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,6 +34,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.ui.theme.badgeBorderColor
+import com.ismartcoding.plain.ui.theme.red
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,14 +68,19 @@ fun PIconButton(
         if (showBadge) {
             BadgedBox(
                 badge = {
-                    Badge(
+                    Box(
                         modifier = Modifier
-                            .size(8.dp)
-                            .offset(x = (1).dp, y = (-4).dp)
-                            .clip(CircleShape),
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = MaterialTheme.colorScheme.onError,
-                    )
+                            .size(12.dp)
+                            .offset(x = 4.dp, y = (-6).dp)
+                            .background(MaterialTheme.colorScheme.badgeBorderColor, shape = CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(MaterialTheme.colorScheme.red, shape = CircleShape)
+                        )
+                    }
                 }
             ) {
                 PIcon(

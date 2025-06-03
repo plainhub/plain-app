@@ -160,7 +160,7 @@ fun ChatFiles(
                         modifier =
                             Modifier
                                 .fillMaxWidth()
-                                .padding(top = if (index == 0) 16.dp else 6.dp, bottom = if (isAudio) 8.dp else 16.dp, start = 16.dp, end = 16.dp),
+                                .padding(top = if (index == 0) 16.dp else 6.dp, bottom = 16.dp, start = 16.dp, end = 16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(modifier = Modifier.weight(1f)) {

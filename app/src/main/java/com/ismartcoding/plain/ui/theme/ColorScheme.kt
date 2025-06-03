@@ -57,6 +57,14 @@ val ColorScheme.red: Color
         PlainColors.Light.red
     }
 
+val ColorScheme.badgeBorderColor: Color
+    @Composable
+    @ReadOnlyComposable
+    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) {
+        MaterialTheme.colorScheme.background
+    } else {
+        Color.White
+    }
 
 val ColorScheme.blue: Color
     @Composable
