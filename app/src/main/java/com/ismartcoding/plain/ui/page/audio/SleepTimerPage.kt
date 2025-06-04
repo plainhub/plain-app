@@ -55,9 +55,8 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.alarmManager
 import com.ismartcoding.plain.enums.AudioServiceAction
 import com.ismartcoding.plain.enums.ButtonType
-import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.PermissionsResultEvent
+import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.services.AudioPlayerService
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PModalBottomSheet

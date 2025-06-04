@@ -25,8 +25,8 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.mediaProjectionManager
-import com.ismartcoding.plain.web.websocket.EventType
-import com.ismartcoding.plain.web.websocket.WebSocketEvent
+import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.WebSocketEvent
 import java.io.ByteArrayOutputStream
 
 

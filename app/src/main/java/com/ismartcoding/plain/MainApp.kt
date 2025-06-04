@@ -10,8 +10,8 @@ import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.features.AcquireWakeLockEvent
-import com.ismartcoding.plain.features.AppEvents
+import com.ismartcoding.plain.events.AcquireWakeLockEvent
+import com.ismartcoding.plain.events.AppEvents
 import com.ismartcoding.plain.features.bluetooth.BluetoothEvents
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.preference.AudioPlayModePreference
@@ -32,7 +32,6 @@ import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import dalvik.system.ZipPathValidator
-import kotlinx.coroutines.flow.first
 
 class MainApp : Application() {
     override fun onCreate() {

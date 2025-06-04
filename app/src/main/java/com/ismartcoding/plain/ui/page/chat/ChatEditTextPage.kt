@@ -33,11 +33,9 @@ import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.web.HttpServerEvents
 import com.ismartcoding.plain.web.models.toModel
-import com.ismartcoding.plain.web.websocket.EventType
-import com.ismartcoding.plain.web.websocket.WebSocketEvent
-import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.features.LinkPreviewHelper
 import androidx.compose.ui.platform.LocalContext
@@ -69,7 +67,7 @@ fun ChatEditTextPage(
                     ) {
                         if (inputValue.isNotEmpty()) {
                             scope.launch {
-                                val originalChat = withIO { AppDatabase.instance.chatDao().getById(id) }
+                                val originalChat = withIO { AppDatabase.instance.chatDao().getById(id) } ?: return@launch
                                 val originalMessageText = originalChat?.content?.value as? DMessageText
                                 val originalLinkPreviews = originalMessageText?.linkPreviews ?: emptyList()
 
@@ -94,40 +92,32 @@ fun ChatEditTextPage(
                                     originalLinkPreviews.filter { it.url in newUrls }
                                 } else {
                                     originalLinkPreviews
+                                }.toMutableList()
+
+                                // If links changed, fetch new link previews for added URLs
+                                if (linksChanged) {
+                                    val addedUrls = newUrls - originalUrls.toSet()
+                                    if (addedUrls.isNotEmpty()) {
+                                        val linkPreviews = withIO { ChatHelper.fetchLinkPreviewsAsync(context, addedUrls) }
+                                        updatedLinkPreviews.addAll(linkPreviews.filter { !it.hasError })
+                                    }
                                 }
 
                                 val updatedMessageText = DMessageText(inputValue, updatedLinkPreviews)
-                                val update = ChatItemDataUpdate(id, DMessageContent(DMessageType.TEXT.value, updatedMessageText))
-
-                                withIO {
-                                    AppDatabase.instance.chatDao().updateData(update)
-                                }
-
-                                val c = withIO { AppDatabase.instance.chatDao().getById(id) }
-                                if (c != null) {
-                                    chatVM.update(c)
-                                    sendEvent(
-                                        WebSocketEvent(
-                                            EventType.MESSAGE_UPDATED,
-                                            JsonHelper.jsonEncode(
-                                                listOf(
-                                                    c.toModel().apply {
-                                                        data = this.getContentData()
-                                                    },
-                                                ),
-                                            ),
+                                val content = DMessageContent(DMessageType.TEXT.value, updatedMessageText)
+                                withIO { AppDatabase.instance.chatDao().updateData(ChatItemDataUpdate(id, content)) }
+                                originalChat.content = content
+                                chatVM.update(originalChat)
+                                val m = originalChat.toModel()
+                                m.data = m.getContentData()
+                                sendEvent(
+                                    WebSocketEvent(
+                                        EventType.MESSAGE_UPDATED,
+                                        JsonHelper.jsonEncode(
+                                            listOf(m)
                                         ),
-                                    )
-
-                                    // If links changed, fetch new link previews for added URLs
-                                    if (linksChanged) {
-                                        val addedUrls = newUrls - originalUrls.toSet()
-                                        if (addedUrls.isNotEmpty()) {
-                                            withIO { ChatHelper.fetchAndUpdateLinkPreviewsAsync(context, c, addedUrls) }
-                                            chatVM.fetch(context)
-                                        }
-                                    }
-                                }
+                                    ),
+                                )
                                 focusManager.clearFocus()
                                 navController.popBackStack()
                             }

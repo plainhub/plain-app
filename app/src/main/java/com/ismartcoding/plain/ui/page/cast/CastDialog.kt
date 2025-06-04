@@ -27,7 +27,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.AudioPlayer
-import com.ismartcoding.plain.features.StartHttpServerEvent
+import com.ismartcoding.plain.events.StartHttpServerEvent
 import com.ismartcoding.plain.preference.WebPreference
 import com.ismartcoding.plain.ui.base.PDialogListItem
 import com.ismartcoding.plain.ui.models.CastViewModel

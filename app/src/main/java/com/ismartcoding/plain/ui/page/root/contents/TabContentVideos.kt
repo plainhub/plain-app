@@ -37,7 +37,7 @@ import com.ismartcoding.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
-import com.ismartcoding.plain.features.PermissionsResultEvent
+import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.preference.VideoGridCellsPerRowPreference
 import com.ismartcoding.plain.preference.VideoSortByPreference

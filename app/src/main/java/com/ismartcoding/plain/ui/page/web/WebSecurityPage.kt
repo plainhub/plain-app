@@ -40,7 +40,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.PasswordType
-import com.ismartcoding.plain.features.RestartAppEvent
+import com.ismartcoding.plain.events.RestartAppEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.preference.AuthTwoFactorPreference
 import com.ismartcoding.plain.preference.KeyStorePasswordPreference

@@ -47,16 +47,17 @@ import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.extensions.sorted
 import com.ismartcoding.plain.features.AudioPlayer
-import com.ismartcoding.plain.features.CancelNotificationsEvent
+import com.ismartcoding.plain.events.CancelNotificationsEvent
 import com.ismartcoding.plain.features.ChatHelper
-import com.ismartcoding.plain.features.ClearAudioPlaylistEvent
-import com.ismartcoding.plain.features.DeleteChatItemViewEvent
+import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
+import com.ismartcoding.plain.events.DeleteChatItemViewEvent
+import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
-import com.ismartcoding.plain.features.StartScreenMirrorEvent
+import com.ismartcoding.plain.events.StartScreenMirrorEvent
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.call.SimHelper
 import com.ismartcoding.plain.features.contact.GroupHelper
@@ -118,8 +119,9 @@ import com.ismartcoding.plain.web.models.TempValue
 import com.ismartcoding.plain.web.models.Video
 import com.ismartcoding.plain.web.models.toExportModel
 import com.ismartcoding.plain.web.models.toModel
-import com.ismartcoding.plain.web.websocket.EventType
-import com.ismartcoding.plain.web.websocket.WebSocketEvent
+import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -133,14 +135,11 @@ import io.ktor.server.request.receiveText
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondBytes
 import io.ktor.server.response.respondText
-import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.util.AttributeKey
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.addJsonObject
@@ -148,13 +147,11 @@ import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import java.io.File
-import java.io.FileInputStream
 import java.io.StringReader
 import java.io.StringWriter
 import kotlin.collections.set
 import kotlin.io.path.Path
 import kotlin.io.path.moveTo
-import java.nio.channels.FileChannel
 
 class SXGraphQL(val schema: Schema) {
     class Configuration : SchemaConfigurationDSL() {
@@ -697,15 +694,10 @@ class SXGraphQL(val schema: Schema) {
                             ChatHelper.sendAsync(
                                 DChat.parseContent(content),
                             )
-                        val urls = LinkPreviewHelper.extractUrls(content)
-                        if (urls.isNotEmpty()) {
-                            val context = MainApp.instance
-                            val links = ChatHelper.fetchAndUpdateLinkPreviewsAsync(context, item, urls)
-                            if (links.isNotEmpty()) {
-                                item = AppDatabase.instance.chatDao().getById(item.id) ?: item
-                            }
+                        if (item.content.type == DMessageType.TEXT.value) {
+                            sendEvent(FetchLinkPreviewsEvent(item))
                         }
-                        sendEvent(HttpServerEvents.MessageCreatedEvent(arrayListOf(item)))
+                        sendEvent(HttpApiEvents.MessageCreatedEvent(arrayListOf(item)))
                         arrayListOf(item).map { it.toModel() }
                     }
                 }

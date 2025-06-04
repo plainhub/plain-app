@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.web.websocket
 
 import com.ismartcoding.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.web.HttpServerManager
 import io.ktor.websocket.send
 

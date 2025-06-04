@@ -9,9 +9,9 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.preference.KeepAwakePreference
-import com.ismartcoding.plain.features.AcquireWakeLockEvent
-import com.ismartcoding.plain.features.IgnoreBatteryOptimizationEvent
-import com.ismartcoding.plain.features.ReleaseWakeLockEvent
+import com.ismartcoding.plain.events.AcquireWakeLockEvent
+import com.ismartcoding.plain.events.IgnoreBatteryOptimizationEvent
+import com.ismartcoding.plain.events.ReleaseWakeLockEvent
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.receivers.PlugInControlReceiver

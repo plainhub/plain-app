@@ -8,8 +8,8 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.features.AcquireWakeLockEvent
-import com.ismartcoding.plain.features.ReleaseWakeLockEvent
+import com.ismartcoding.plain.events.AcquireWakeLockEvent
+import com.ismartcoding.plain.events.ReleaseWakeLockEvent
 import com.ismartcoding.plain.preference.KeepAwakePreference
 
 class PlugInControlReceiver : BroadcastReceiver() {

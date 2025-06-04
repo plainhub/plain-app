@@ -26,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -54,13 +53,18 @@ import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
+import com.ismartcoding.plain.events.DeleteChatItemViewEvent
+import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
+import com.ismartcoding.plain.events.HttpApiEvents
+import com.ismartcoding.plain.events.PickFileResultEvent
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.extensions.getDuration
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.features.ChatHelper
-import com.ismartcoding.plain.features.DeleteChatItemViewEvent
-import com.ismartcoding.plain.features.PickFileResultEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.ImageHelper
@@ -79,24 +83,19 @@ import com.ismartcoding.plain.ui.base.fastscroll.LazyColumnScrollbar
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
-import com.ismartcoding.plain.ui.page.chat.components.ChatListItem
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
-import com.ismartcoding.plain.enums.FilesType
-import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
 import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.ChatInput
-import com.ismartcoding.plain.web.HttpServerEvents
+import com.ismartcoding.plain.ui.page.chat.components.ChatListItem
 import com.ismartcoding.plain.web.models.toModel
-import com.ismartcoding.plain.web.websocket.EventType
-import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -151,7 +150,7 @@ fun ChatPage(
                     chatVM.remove(event.id)
                 }
 
-                is HttpServerEvents.MessageCreatedEvent -> {
+                is HttpApiEvents.MessageCreatedEvent -> {
                     chatVM.addAll(event.items)
                     scope.launch {
                         scrollState.scrollToItem(0)
@@ -240,14 +239,14 @@ fun ChatPage(
                         val item = withIO { ChatHelper.sendAsync(content) }
                         DialogHelper.hideLoading()
                         chatVM.addAll(arrayListOf(item))
+                        val m = item.toModel()
+                        m.data = m.getContentData()
                         sendEvent(
                             WebSocketEvent(
                                 EventType.MESSAGE_CREATED,
                                 JsonHelper.jsonEncode(
                                     arrayListOf(
-                                        item.toModel().apply {
-                                            data = this.getContentData()
-                                        },
+                                        m,
                                     ),
                                 ),
                             ),
@@ -375,16 +374,15 @@ fun ChatPage(
                         }
                         scope.launch {
                             val item = withIO { ChatHelper.sendAsync(DMessageContent(DMessageType.TEXT.value, DMessageText(inputValue))) }
-                            val urls = LinkPreviewHelper.extractUrls(inputValue)
                             chatVM.addAll(arrayListOf(item))
+                            val m = item.toModel()
+                            m.data = m.getContentData()
                             sendEvent(
                                 WebSocketEvent(
                                     EventType.MESSAGE_CREATED,
                                     JsonHelper.jsonEncode(
                                         arrayListOf(
-                                            item.toModel().apply {
-                                                data = this.getContentData()
-                                            },
+                                            m,
                                         ),
                                     ),
                                 ),
@@ -392,13 +390,7 @@ fun ChatPage(
                             inputValue = ""
                             withIO { ChatInputTextPreference.putAsync(context, inputValue) }
                             scrollState.scrollToItem(0)
-                            
-                            if (urls.isNotEmpty()) {
-                                launch(Dispatchers.IO) {
-                                    ChatHelper.fetchAndUpdateLinkPreviewsAsync(context, item, urls)
-                                    chatVM.fetch(context)
-                                }
-                            }
+                            sendEvent(FetchLinkPreviewsEvent(item))
                         }
                     },
                 )

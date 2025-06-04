@@ -15,12 +15,12 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.activityManager
 import com.ismartcoding.plain.extensions.toDNotification
-import com.ismartcoding.plain.features.CancelNotificationsEvent
+import com.ismartcoding.plain.events.CancelNotificationsEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.web.models.toModel
-import com.ismartcoding.plain.web.websocket.EventType
-import com.ismartcoding.plain.web.websocket.WebSocketEvent
+import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.WebSocketEvent
 import kotlinx.coroutines.Job
 
 class PNotificationListenerService : NotificationListenerService() {

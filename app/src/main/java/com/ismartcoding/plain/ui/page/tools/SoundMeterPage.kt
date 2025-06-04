@@ -41,8 +41,8 @@ import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.PermissionsResultEvent
-import com.ismartcoding.plain.features.RequestPermissionsEvent
+import com.ismartcoding.plain.events.PermissionsResultEvent
+import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.helpers.SoundMeterHelper
 import com.ismartcoding.plain.ui.base.*
 import kotlinx.coroutines.Dispatchers

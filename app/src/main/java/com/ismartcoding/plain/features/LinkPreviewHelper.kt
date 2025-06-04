@@ -41,6 +41,7 @@ object LinkPreviewHelper {
         }
         return urls.take(5)
     }
+
     private fun resolveUrl(baseUrl: String, url: String): String {
         return try {
             if (url.startsWith("http://") || url.startsWith("https://")) {
@@ -80,6 +81,7 @@ object LinkPreviewHelper {
             return false
         }
     }
+
     suspend fun fetchLinkPreview(context: Context, url: String): DLinkPreview {
         return withIO {
             try {
@@ -146,7 +148,7 @@ object LinkPreviewHelper {
                             "<link[^>]+rel=[\"']shortcut icon[\"'][^>]+href=[\"']([^\"']+)[\"']",
                             "<link[^>]+rel=[\"']apple-touch-icon[^\"']*[\"'][^>]+href=[\"']([^\"']+)[\"']"
                         )
-                        
+
                         for (pattern in faviconPatterns) {
                             val faviconMatch = Regex(pattern, RegexOption.IGNORE_CASE).find(htmlContent)
                             if (faviconMatch != null) {
@@ -154,7 +156,7 @@ object LinkPreviewHelper {
                                 break
                             }
                         }
-                        
+
                         if (imageUrl.isNullOrEmpty()) {
                             val baseUrl = URL(url)
                             val defaultFaviconUrl = "${baseUrl.protocol}://${baseUrl.host}/favicon.ico"
@@ -174,7 +176,7 @@ object LinkPreviewHelper {
                     imageLocalPath = imageResult.first
                     imageWidth = imageResult.second
                     imageHeight = imageResult.third
-                    
+
                     if (imageLocalPath == null && imageUrl.endsWith("/favicon.ico")) {
                         imageUrl = null
                     }
@@ -214,8 +216,9 @@ object LinkPreviewHelper {
 
                 val contentType = response.headers["Content-Type"]?.lowercase() ?: ""
                 val isFaviconFile = imageUrl.contains("favicon") || imageUrl.endsWith(".ico")
-                if (!contentType.startsWith("image/") && 
-                    !(isFaviconFile && (contentType.contains("icon") || contentType.contains("octet-stream")))) {
+                if (!contentType.startsWith("image/") &&
+                    !(isFaviconFile && (contentType.contains("icon") || contentType.contains("octet-stream")))
+                ) {
                     client.close()
                     return@withContext Triple(null, 0, 0)
                 }
@@ -231,9 +234,9 @@ object LinkPreviewHelper {
                 val imageWidth = options.outWidth
                 val imageHeight = options.outHeight
 
-                val isFavicon = imageUrl.contains("favicon") || imageUrl.contains("icon") || 
-                    (imageWidth < 200 && imageHeight < 200 && imageWidth > 16 && imageHeight > 16)
-                
+                val isFavicon = imageUrl.contains("favicon") || imageUrl.contains("icon") ||
+                        (imageWidth < 200 && imageHeight < 200 && imageWidth > 16 && imageHeight > 16)
+
                 if (imageWidth < 100 || imageHeight < 100) {
                     if (!isFavicon) {
                         client.close()
@@ -250,7 +253,7 @@ object LinkPreviewHelper {
                     else -> imageUrl.getFilenameExtension().ifEmpty { "jpg" }
                 }
 
-                val fileName = "main-${CryptoHelper.sha1(imageUrl.toByteArray())}.${extension}"
+                val fileName = "preview_${System.currentTimeMillis()}_${URL(originalUrl).host.hashCode().toString().replace("-", "")}.${extension}"
                 val dir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
                 val previewDir = File(dir, "link_previews")
                 if (!previewDir.exists()) {
@@ -258,12 +261,12 @@ object LinkPreviewHelper {
                 }
 
                 val file = File(previewDir, fileName)
-                
+
                 if (file.exists()) {
                     client.close()
                     return@withContext Triple("app://${Environment.DIRECTORY_PICTURES}/link_previews/${fileName}", imageWidth, imageHeight)
                 }
-                
+
                 file.writeBytes(imageBytes)
 
                 client.close()

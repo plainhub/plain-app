@@ -1,7 +1,8 @@
-package com.ismartcoding.plain.web.websocket
+package com.ismartcoding.plain.events
 
 import com.ismartcoding.lib.channel.ChannelEvent
 
+// The events sent to the web client via WebSocket
 class WebSocketEvent(
     val type: EventType,
     val data: Any, // String or ByteArray

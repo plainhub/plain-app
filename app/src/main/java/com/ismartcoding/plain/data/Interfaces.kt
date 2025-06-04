@@ -8,10 +8,3 @@ interface ISelectOption {
     fun getText(): String
 }
 
-interface IFormItem {
-    fun beforeSubmit()
-
-    fun blurAndHideSoftInput()
-
-    val hasError: Boolean
-}

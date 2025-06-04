@@ -57,24 +57,24 @@ import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.enums.Language
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
-import com.ismartcoding.plain.features.AudioActionEvent
+import com.ismartcoding.plain.events.AudioActionEvent
 import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.ChatHelper
-import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
-import com.ismartcoding.plain.features.ExportFileEvent
-import com.ismartcoding.plain.features.ExportFileResultEvent
-import com.ismartcoding.plain.features.HttpServerStateChangedEvent
-import com.ismartcoding.plain.features.IgnoreBatteryOptimizationEvent
-import com.ismartcoding.plain.features.IgnoreBatteryOptimizationResultEvent
+import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.events.ExportFileEvent
+import com.ismartcoding.plain.events.ExportFileResultEvent
+import com.ismartcoding.plain.events.HttpServerStateChangedEvent
+import com.ismartcoding.plain.events.IgnoreBatteryOptimizationEvent
+import com.ismartcoding.plain.events.IgnoreBatteryOptimizationResultEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
-import com.ismartcoding.plain.features.PermissionsResultEvent
-import com.ismartcoding.plain.features.PickFileEvent
-import com.ismartcoding.plain.features.PickFileResultEvent
-import com.ismartcoding.plain.features.RequestPermissionsEvent
-import com.ismartcoding.plain.features.RestartAppEvent
-import com.ismartcoding.plain.features.StartScreenMirrorEvent
-import com.ismartcoding.plain.features.WindowFocusChangedEvent
+import com.ismartcoding.plain.events.PermissionsResultEvent
+import com.ismartcoding.plain.events.PickFileEvent
+import com.ismartcoding.plain.events.PickFileResultEvent
+import com.ismartcoding.plain.events.RequestPermissionsEvent
+import com.ismartcoding.plain.events.RestartAppEvent
+import com.ismartcoding.plain.events.StartScreenMirrorEvent
+import com.ismartcoding.plain.events.WindowFocusChangedEvent
 import com.ismartcoding.plain.features.bluetooth.BluetoothPermission
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getStringF
@@ -102,8 +102,8 @@ import com.ismartcoding.plain.ui.nav.navigateTextFile
 import com.ismartcoding.plain.ui.page.Main
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.web.models.toModel
-import com.ismartcoding.plain.web.websocket.EventType
-import com.ismartcoding.plain.web.websocket.WebSocketEvent
+import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.WebSocketEvent
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.close
 import kotlinx.coroutines.Dispatchers
@@ -481,14 +481,14 @@ class MainActivity : AppCompatActivity() {
                     val item = withIO {
                         ChatHelper.sendAsync(DMessageContent(DMessageType.TEXT.value, DMessageText(sharedText)))
                     }
+                    val m = item.toModel()
+                    m.data = m.getContentData()
                     sendEvent(
                         WebSocketEvent(
                             EventType.MESSAGE_CREATED,
                             JsonHelper.jsonEncode(
                                 arrayListOf(
-                                    item.toModel().apply {
-                                        data = this.getContentData()
-                                    },
+                                    m
                                 ),
                             ),
                         ),

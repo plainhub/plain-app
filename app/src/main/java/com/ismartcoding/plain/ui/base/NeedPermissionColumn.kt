@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.sp
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DFeaturePermission
-import com.ismartcoding.plain.features.RequestPermissionsEvent
+import com.ismartcoding.plain.events.RequestPermissionsEvent
 
 @Composable
 fun NeedPermissionColumn(

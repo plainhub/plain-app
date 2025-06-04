@@ -20,8 +20,8 @@ import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.preference.PasswordPreference
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.SessionClientTsUpdate
-import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
-import com.ismartcoding.plain.features.HttpServerStateChangedEvent
+import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.preference.KeyStorePasswordPreference

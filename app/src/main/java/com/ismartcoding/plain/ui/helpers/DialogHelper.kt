@@ -7,8 +7,8 @@ import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.api.ApiResult
-import com.ismartcoding.plain.features.ConfirmDialogEvent
-import com.ismartcoding.plain.features.LoadingDialogEvent
+import com.ismartcoding.plain.events.ConfirmDialogEvent
+import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.base.ToastManager
 import kotlinx.coroutines.Job

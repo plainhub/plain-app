@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.features
+package com.ismartcoding.plain.events
 
 import android.content.Intent
 import android.media.MediaPlayer
@@ -12,6 +12,7 @@ import com.ismartcoding.lib.helpers.SslHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.enums.ActionSourceType
 import com.ismartcoding.plain.enums.ActionType
 import com.ismartcoding.plain.enums.AudioAction
@@ -19,80 +20,84 @@ import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
+import com.ismartcoding.plain.features.AudioPlayer
+import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.web.AuthRequest
-import com.ismartcoding.plain.web.websocket.WebSocketEvent
 import com.ismartcoding.plain.web.websocket.WebSocketHelper
 import io.ktor.server.websocket.DefaultWebSocketServerSession
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class StartHttpServerEvent: ChannelEvent()
+// The events raised by the app
+class StartHttpServerEvent : ChannelEvent()
 
-class HttpServerStateChangedEvent(val state: HttpServerState): ChannelEvent()
+class HttpServerStateChangedEvent(val state: HttpServerState) : ChannelEvent()
 
-class StartScreenMirrorEvent: ChannelEvent()
+class StartScreenMirrorEvent : ChannelEvent()
 
-class RestartAppEvent: ChannelEvent()
+class RestartAppEvent : ChannelEvent()
+
+class FetchLinkPreviewsEvent(val chat: DChat) : ChannelEvent()
 
 class ConfirmDialogEvent(
     val title: String,
     val message: String,
     val confirmButton: Pair<String, () -> Unit>,
     val dismissButton: Pair<String, () -> Unit>?
-): ChannelEvent()
+) : ChannelEvent()
 
 class LoadingDialogEvent(
     val show: Boolean,
     val message: String = ""
-): ChannelEvent()
+) : ChannelEvent()
 
-class WindowFocusChangedEvent(val hasFocus: Boolean): ChannelEvent()
+class WindowFocusChangedEvent(val hasFocus: Boolean) : ChannelEvent()
 
-class DeleteChatItemViewEvent(val id: String): ChannelEvent()
+class DeleteChatItemViewEvent(val id: String) : ChannelEvent()
 
 class ConfirmToAcceptLoginEvent(
     val session: DefaultWebSocketServerSession,
     val clientId: String,
     val request: AuthRequest,
-): ChannelEvent()
+) : ChannelEvent()
 
-class RequestPermissionsEvent(vararg val permissions: Permission): ChannelEvent()
-class PermissionsResultEvent(val map: Map<String, Boolean>): ChannelEvent() {
+class RequestPermissionsEvent(vararg val permissions: Permission) : ChannelEvent()
+class PermissionsResultEvent(val map: Map<String, Boolean>) : ChannelEvent() {
     fun has(permission: Permission): Boolean {
         return map.containsKey(permission.toSysPermission())
     }
 }
 
-class PickFileEvent(val tag: PickFileTag, val type: PickFileType, val multiple: Boolean): ChannelEvent()
+class PickFileEvent(val tag: PickFileTag, val type: PickFileType, val multiple: Boolean) : ChannelEvent()
 
-class PickFileResultEvent(val tag: PickFileTag, val type: PickFileType, val uris: Set<Uri>): ChannelEvent()
+class PickFileResultEvent(val tag: PickFileTag, val type: PickFileType, val uris: Set<Uri>) : ChannelEvent()
 
-class ExportFileEvent(val type: ExportFileType, val fileName: String): ChannelEvent()
+class ExportFileEvent(val type: ExportFileType, val fileName: String) : ChannelEvent()
 
-class ExportFileResultEvent(val type: ExportFileType, val uri: Uri): ChannelEvent()
+class ExportFileResultEvent(val type: ExportFileType, val uri: Uri) : ChannelEvent()
 
-class ActionEvent(val source: ActionSourceType, val action: ActionType, val ids: Set<String>, val extra: Any? = null): ChannelEvent()
+class ActionEvent(val source: ActionSourceType, val action: ActionType, val ids: Set<String>, val extra: Any? = null) : ChannelEvent()
 
-class AudioActionEvent(val action: AudioAction): ChannelEvent()
+class AudioActionEvent(val action: AudioAction) : ChannelEvent()
 
-class IgnoreBatteryOptimizationEvent: ChannelEvent()
-class AcquireWakeLockEvent: ChannelEvent()
-class ReleaseWakeLockEvent: ChannelEvent()
+class IgnoreBatteryOptimizationEvent : ChannelEvent()
+class AcquireWakeLockEvent : ChannelEvent()
+class ReleaseWakeLockEvent : ChannelEvent()
 
-class IgnoreBatteryOptimizationResultEvent: ChannelEvent()
+class IgnoreBatteryOptimizationResultEvent : ChannelEvent()
 
-class CancelNotificationsEvent(val ids: Set<String>): ChannelEvent()
+class CancelNotificationsEvent(val ids: Set<String>) : ChannelEvent()
 
-class ClearAudioPlaylistEvent: ChannelEvent()
+class ClearAudioPlaylistEvent : ChannelEvent()
 
-class FeedStatusEvent(val feedId: String, val status: FeedWorkerStatus): ChannelEvent()
+class FeedStatusEvent(val feedId: String, val status: FeedWorkerStatus) : ChannelEvent()
 
-data class PlayAudioEvent(val uri: Uri): ChannelEvent()
+data class PlayAudioEvent(val uri: Uri) : ChannelEvent()
 
-data class PlayAudioResultEvent(val uri: Uri): ChannelEvent()
+data class PlayAudioResultEvent(val uri: Uri) : ChannelEvent()
 
 object AppEvents {
     private lateinit var mediaPlayer: MediaPlayer

@@ -20,7 +20,7 @@ import com.ismartcoding.plain.data.toVersion
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.extensions.getText
-import com.ismartcoding.plain.features.AppEvents
+import com.ismartcoding.plain.events.AppEvents
 import com.ismartcoding.plain.preference.DarkThemePreference
 import com.ismartcoding.plain.preference.LocalDarkTheme
 import com.ismartcoding.plain.preference.LocalNewVersion

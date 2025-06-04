@@ -1,6 +1,5 @@
 package com.ismartcoding.lib.helpers
 
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 object JsonHelper {

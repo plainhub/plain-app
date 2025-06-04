@@ -38,12 +38,25 @@ import androidx.navigation.toRoute
 import coil3.annotation.ExperimentalCoilApi
 import coil3.compose.setSingletonImageLoaderFactory
 import com.ismartcoding.lib.channel.Channel
+import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.isQPlus
+import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.db.ChatItemDataUpdate
+import com.ismartcoding.plain.db.DMessageContent
+import com.ismartcoding.plain.db.DMessageText
+import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.features.ConfirmDialogEvent
-import com.ismartcoding.plain.features.LoadingDialogEvent
+import com.ismartcoding.plain.enums.FilesType
+import com.ismartcoding.plain.events.ConfirmDialogEvent
+import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
+import com.ismartcoding.plain.events.LoadingDialogEvent
+import com.ismartcoding.plain.events.WebSocketEvent
+import com.ismartcoding.plain.features.ChatHelper
+import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.preference.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.PToast
 import com.ismartcoding.plain.ui.base.ToastEvent
@@ -82,9 +95,9 @@ import com.ismartcoding.plain.ui.page.web.WebLearnMorePage
 import com.ismartcoding.plain.ui.page.web.WebSecurityPage
 import com.ismartcoding.plain.ui.page.web.WebSettingsPage
 import com.ismartcoding.plain.ui.theme.AppTheme
+import com.ismartcoding.plain.web.models.toModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import com.ismartcoding.plain.enums.FilesType
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalCoilApi::class)
 @Composable
@@ -138,6 +151,41 @@ fun Main(
                         delay(event.duration)
                         toastState = null
                     }
+                }
+
+                is FetchLinkPreviewsEvent -> {
+                    coIO {
+                        val data = event.chat.content.value as DMessageText
+                        val urls = LinkPreviewHelper.extractUrls(data.text)
+                        if (urls.isNotEmpty()) {
+                            val links = ChatHelper.fetchLinkPreviewsAsync(context, urls).filter { !it.hasError }
+                            if (links.isNotEmpty()) {
+                                val updatedMessageText = DMessageText(data.text, links)
+                                event.chat.content = DMessageContent(DMessageType.TEXT.value, updatedMessageText)
+                                AppDatabase.instance.chatDao().updateData(
+                                    ChatItemDataUpdate(
+                                        event.chat.id,
+                                        event.chat.content
+                                    )
+                                )
+                                chatVM.update(event.chat)
+                                val m = event.chat.toModel()
+                                m.data = m.getContentData()
+                                sendEvent(
+                                    WebSocketEvent(
+                                        EventType.MESSAGE_UPDATED,
+                                        JsonHelper.jsonEncode(
+                                            listOf(m)
+                                        ),
+                                    ),
+                                )
+                            }
+                        }
+                    }
+                }
+
+                else -> {
+                    // Handle other events if necessary
                 }
             }
         }

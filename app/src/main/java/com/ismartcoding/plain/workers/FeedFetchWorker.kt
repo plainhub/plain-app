@@ -10,10 +10,10 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.preference.FeedAutoRefreshIntervalPreference
 import com.ismartcoding.plain.preference.FeedAutoRefreshOnlyWifiPreference
 import com.ismartcoding.plain.db.DFeed
-import com.ismartcoding.plain.features.FeedStatusEvent
+import com.ismartcoding.plain.events.FeedStatusEvent
 import com.ismartcoding.plain.features.feed.*
-import com.ismartcoding.plain.web.websocket.EventType
-import com.ismartcoding.plain.web.websocket.WebSocketEvent
+import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.WebSocketEvent
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.supervisorScope

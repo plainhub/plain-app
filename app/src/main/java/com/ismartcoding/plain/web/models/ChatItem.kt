@@ -42,8 +42,8 @@ data class ChatItem(
     }
 }
 
-@Polymorphic
 @Serializable
+@Polymorphic
 sealed class ChatItemContent() {
     @Serializable
     data class MessageImages(val ids: List<String>) : ChatItemContent()

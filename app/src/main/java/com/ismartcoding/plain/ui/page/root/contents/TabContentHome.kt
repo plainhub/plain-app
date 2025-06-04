@@ -26,9 +26,9 @@ import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.PermissionsResultEvent
-import com.ismartcoding.plain.features.RequestPermissionsEvent
-import com.ismartcoding.plain.features.WindowFocusChangedEvent
+import com.ismartcoding.plain.events.PermissionsResultEvent
+import com.ismartcoding.plain.events.RequestPermissionsEvent
+import com.ismartcoding.plain.events.WindowFocusChangedEvent
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.preference.HttpPortPreference
 import com.ismartcoding.plain.preference.HttpsPortPreference

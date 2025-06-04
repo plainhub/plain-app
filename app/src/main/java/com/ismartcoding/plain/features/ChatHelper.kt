@@ -2,9 +2,14 @@ package com.ismartcoding.plain.features
 
 import android.content.Context
 import com.ismartcoding.lib.extensions.getFinalPath
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.db.*
+import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.db.DChat
+import com.ismartcoding.plain.db.DLinkPreview
+import com.ismartcoding.plain.db.DMessageContent
+import com.ismartcoding.plain.db.DMessageFiles
+import com.ismartcoding.plain.db.DMessageImages
+import com.ismartcoding.plain.db.DMessageText
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -19,23 +24,15 @@ object ChatHelper {
         return item
     }
 
-    suspend fun fetchAndUpdateLinkPreviewsAsync(context: Context, chat: DChat, urls: List<String>): List<DLinkPreview> {
+    suspend fun fetchLinkPreviewsAsync(context: Context, urls: List<String>): List<DLinkPreview> {
         if (urls.isEmpty()) return emptyList()
 
         try {
-            val linkPreviews = coroutineScope {
+            return coroutineScope {
                 urls.map { url ->
                     async { LinkPreviewHelper.fetchLinkPreview(context, url) }
                 }.awaitAll()
             }
-
-            val messageText = chat.content.value as DMessageText
-            val updatedMessageText = DMessageText(messageText.text, linkPreviews.filter { !it.hasError })
-            val updatedContent = DMessageContent(DMessageType.TEXT.value, updatedMessageText)
-            AppDatabase.instance.chatDao().updateData(
-                ChatItemDataUpdate(chat.id, updatedContent)
-            )
-            return linkPreviews
         } catch (e: Exception) {
             LogCat.e(e.toString())
         }

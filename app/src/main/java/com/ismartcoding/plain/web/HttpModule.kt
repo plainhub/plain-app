@@ -31,7 +31,7 @@ import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.extensions.newFile
 import com.ismartcoding.plain.extensions.toThumbBytesAsync
-import com.ismartcoding.plain.features.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.media.AudioMediaStoreHelper

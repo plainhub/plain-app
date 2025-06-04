@@ -3,6 +3,7 @@ package com.ismartcoding.plain.db
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
@@ -79,8 +80,7 @@ class DLinkPreview(
     val imageHeight: Int = 0,
     val siteName: String? = null,
     val domain: String? = null,
-    val isLoading: Boolean = false,
-    val hasError: Boolean = false,
+    @Transient val hasError: Boolean = false,
     val createdAt: Instant = Clock.System.now()
 )
 

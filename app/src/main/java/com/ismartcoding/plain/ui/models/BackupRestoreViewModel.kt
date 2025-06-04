@@ -10,7 +10,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.contentResolver
-import com.ismartcoding.plain.features.RestartAppEvent
+import com.ismartcoding.plain.events.RestartAppEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.helpers.DialogHelper

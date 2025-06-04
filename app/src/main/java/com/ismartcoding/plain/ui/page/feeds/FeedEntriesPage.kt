@@ -42,7 +42,7 @@ import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.FeedEntryFilterType
-import com.ismartcoding.plain.features.FeedStatusEvent
+import com.ismartcoding.plain.events.FeedStatusEvent
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
@@ -82,7 +82,6 @@ import com.ismartcoding.plain.ui.models.isAllSelected
 import com.ismartcoding.plain.ui.models.select
 import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
-import com.ismartcoding.plain.ui.models.toggleSelectMode
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import com.ismartcoding.plain.workers.FeedFetchWorker
