@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
     <string name="app_data">アプリデータ</string>
-    <string name="vpn_web_conflict_warning">お使いのデバイスでは現在VPNが有効になっており、PCからアクセスした際にWeb接続の問題が発生する可能性があります。これを解決するために、LANトラフィックを許可するようにVPNの設定を調整するか、VPNを無効にすることをお勧めします。</string>
+    <string name="vpn_web_conflict_warning">VPNが有効になっています。VPN IPまたはWi-Fi IPを使用して電話にアクセスできます。Wi-Fi IPが機能しない場合は、VPN設定で「LANトラフィックを許可」を有効にするか、VPNを無効にしてください。</string>
     <string name="warning">警告</string>
     <string name="ssl_certificate_reset">SSL証明書がリセットされました</string>
     <string name="the_token_is_reset">トークンがリセットされました</string>

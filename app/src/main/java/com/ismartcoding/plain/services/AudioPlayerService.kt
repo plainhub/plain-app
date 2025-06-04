@@ -92,6 +92,10 @@ class AudioPlayerService : MediaLibraryService() {
 
     override fun onCreate() {
         super.onCreate()
+        if (::session.isInitialized) {
+            LogCat.w("AudioPlayerService already created, skipping initialization.")
+            return
+        }
         player = createPlayer()
         player.addListener(listener)
         val forwardingPlayer = object : ForwardingPlayer(player) {

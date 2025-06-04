@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">简朴</string>
     <string name="app_data">应用数据</string>
-    <string name="vpn_web_conflict_warning">您的手机启用了VPN，这可能会导致从电脑访问网页时出现连接问题。我们建议您调整VPN设置允许局域网流量或关闭VPN。</string>
+    <string name="vpn_web_conflict_warning">VPN 已开启。您可以通过 VPN IP 或 Wi-Fi IP 访问手机。如果 Wi-Fi IP 无法连接，请在 VPN 设置中启用“允许局域网流量”或关闭 VPN。</string>
     <string name="warning">警告</string>
     <string name="ssl_certificate_reset">SSL证书已重置</string>
     <string name="the_token_is_reset">令牌已重置</string>

@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
     <string name="app_data">앱 데이터</string>
-    <string name="vpn_web_conflict_warning">현재 기기에서 VPN이 활성화되어 있어 PC에서 액세스할 때 웹 연결 문제가 발생할 수 있습니다. 이를 해결하기 위해 LAN 트래픽을 허용하거나 VPN을 비활성화하는 것을 권장합니다.</string>
+    <string name="vpn_web_conflict_warning">VPN이 활성화되어 있습니다. VPN IP 또는 Wi-Fi IP를 사용하여 휴대폰에 액세스할 수 있습니다. Wi-Fi IP가 작동하지 않으면 VPN 설정에서 “LAN 트래픽 허용”을 활성화하거나 VPN을 비활성화하세요.</string>
     <string name="warning">경고</string>
     <string name="ssl_certificate_reset">SSL 인증서가 재설정되었습니다</string>
     <string name="the_token_is_reset">토큰이 재설정되었습니다</string>

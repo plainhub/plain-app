@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
     <string name="app_data">অ্যাপ ডেটা</string>
-    <string name="vpn_web_conflict_warning">আপনার ডিভাইসে সক্রিয় ভিপিএন আছে, যা একটি পিসি থেকে অ্যাক্সেস করার সময় ওয়েব সংযোগের সমস্যা উত্পন্ন করতে পারে। এটি সমাধান করতে, আমরা আপনাকে আপনার ভিপিএন সেটিংস পরিবর্তন করে এলএএন ট্র্যাফিক অনুমতি দেওয়া বা আপনার ভিপিএন নিষ্ক্রিয় করতে প্রস্তাবনা দিচ্ছি।</string>
+    <string name="vpn_web_conflict_warning">VPN চালু আছে। আপনি ভিপিএন আইপি বা ওয়াইফাই আইপি ব্যবহার করে ফোনটি অ্যাক্সেস করতে পারেন। যদি ওয়াইফাই আইপি কাজ করে না, তাহলে ভিপিএন সেটিংসে “লান ট্রাফিক অনুমতি দিন” বা ভিপিএন বন্ধ করুন।</string>
     <string name="warning">সতর্কবার্তা</string>
     <string name="ssl_certificate_reset">এসএসএল সার্টিফিকেট পুনরায় সেট করুন</string>
     <string name="the_token_is_reset">টোকেন পুনরায় সেট করা হয়েছে</string>

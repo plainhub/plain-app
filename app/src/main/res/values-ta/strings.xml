@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
     <string name="app_data">பயன்பாட்டின் தரவு</string>
-    <string name="vpn_web_conflict_warning">உங்கள் உலாவியில் தற்போது VPN செல்லுபடி உள்ளது, இது பிரச்சனைகளைக் கொண்டுவரலாம் பாராட்டும் நேரத்தில். இதை தீர்மானிக்க, உங்கள் VPN அமைப்புகளை LAN பரிமாறத்தை அனுமதிக்க அல்லது உங்கள் VPN முடக்குதலை கொண்டுவிடுவதை பரிந்துரைக்கிறோம்.</string>
+    <string name="vpn_web_conflict_warning">VPN செல்லுபடி உள்ளது. உங்கள் கணினியிலிருந்து செல்லுபடி உள்ளது. உங்கள் VPN அமைப்புகளை LAN பரிமாறத்தை அனுமதிக்க அல்லது உங்கள் VPN முடக்குதலை கொண்டுவிடுவதை பரிந்துரைக்கிறோம்.</string>
     <string name="warning">எச்சரிக்கை</string>
     <string name="ssl_certificate_reset">SSL சான்றியம் மீளமைக்கப்பட்டது</string>
     <string name="the_token_is_reset">டோக்கன் மீளமைக்கப்பட்டது</string>

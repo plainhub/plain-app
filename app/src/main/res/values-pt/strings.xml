@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
     <string name="app_data">Dados da aplicação</string>
-    <string name="vpn_web_conflict_warning">O seu VPN está atualmente ativado no seu dispositivo, o que pode potencialmente levar a problemas de conexão web quando acessado a partir do PC. Para resolver isso, recomendamos ajustar as configurações do seu VPN para permitir o tráfego de LAN ou desativar o seu VPN.</string>
+    <string name="vpn_web_conflict_warning">VPN está ativada. Você pode acessar o telefone usando a IP VPN ou Wi-Fi IP. Se o Wi-Fi IP não funcionar, ative “Permitir tráfego de LAN” nas configurações de VPN ou desative a VPN.</string>
     <string name="warning">Aviso</string>
     <string name="ssl_certificate_reset">Certificado SSL redefinido</string>
     <string name="the_token_is_reset">O token foi redefinido</string>

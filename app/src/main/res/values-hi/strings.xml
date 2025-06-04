@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">PlainApp</string>
     <string name="app_data">ऐप डेटा</string>
-    <string name="vpn_web_conflict_warning">आपके डिवाइस पर वर्तमान में आपका VPN सक्रिय है, जिससे PC से एक्सेस करते समay वेब कनेक्शन समस्याएँ उत्पन्न हो सकती हैं। इसे हल करने के लिए, हम सुझाव देते हैं कि आप अपने VPN सेटिंग्स को LAN ट्रैफ़िक की अनुमति देने या अपने VPN को अक्षम करने के लिए समायोजित करें।</string>
+    <string name="vpn_web_conflict_warning">VPN सक्रिय है। आप फोन को VPN IP या Wi-Fi IP का उपयोग करके एक्सेस कर सकते हैं। यदि Wi-Fi IP काम नहीं करता है, तो VPN सेटिंग्स में “LAN ट्रैफ़िक अनुमति दें” सक्षम करें या VPN बंद करें।</string>
     <string name="warning">चेतावनी</string>
     <string name="ssl_certificate_reset">SSL प्रमाणपत्र रीसेट किया गया है</string>
     <string name="the_token_is_reset">टोकन रीसेट किया गया है</string>
