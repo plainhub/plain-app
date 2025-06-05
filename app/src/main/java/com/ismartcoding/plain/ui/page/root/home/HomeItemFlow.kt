@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.page.root.components
+package com.ismartcoding.plain.ui.page.root.home
 
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow

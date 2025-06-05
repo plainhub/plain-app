@@ -581,4 +581,5 @@
     <string name="cannot_open_system_file">Kan systeembestand niet openen. Dit bestand is niet toegankelijk.</string>
     <string name="cannot_open_file_not_accessible">Kan bestand niet openen. Dit bestand is niet toegankelijk via de app.</string>
     <string name="unknown_error">Er is een onbekende fout opgetreden.</string>
+    <string name="customize_home_features">Home-functies aanpassen</string>
 </resources>

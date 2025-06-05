@@ -581,4 +581,5 @@
     <string name="cannot_open_system_file">Cannot open system file. This file is not accessible.</string>
     <string name="cannot_open_file_not_accessible">Cannot open file. File is not accessible through the app.</string>
     <string name="unknown_error">Unknown error occurred.</string>
+    <string name="customize_home_features">Customize Home Features</string>
 </resources>

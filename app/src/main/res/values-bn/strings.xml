@@ -581,4 +581,5 @@
     <string name="cannot_open_system_file">সিস্টেম ফাইল খুলতে ব্যর্থ। এই ফাইলটি অ্যাক্সেস করা যাবে না।</string>
     <string name="cannot_open_file_not_accessible">ফাইল খুলতে ব্যর্থ। এই ফাইলটি অ্যাপ দ্বারা অ্যাক্সেস করা যাবে না।</string>
     <string name="unknown_error">অজানা ত্রুটি ঘটেছে।</string>
+    <string name="customize_home_features">হোম ফিচার কাস্টমাইজ করুন</string>
 </resources>

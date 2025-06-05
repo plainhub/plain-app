@@ -581,4 +581,5 @@
     <string name="cannot_open_system_file">无法打开系统文件。此文件不可访问。</string>
     <string name="cannot_open_file_not_accessible">无法打开文件。此文件不可通过应用程序访问。</string>
     <string name="unknown_error">发生未知错误。</string>
+    <string name="customize_home_features">自定义首页功能</string>
 </resources>

@@ -122,9 +122,9 @@ fun FilesSelectModeBottomActions(
                                 File(it).deleteRecursively()
                             }
                             MainApp.instance.scanFileByConnection(paths.toTypedArray())
+                            filesVM.loadAsync(context)
                         }
                         DialogHelper.hideLoading()
-                        sendEvent(ActionEvent(ActionSourceType.FILE, ActionType.DELETED, paths))
                         filesVM.exitSelectMode()
                     }
                 }
@@ -142,6 +142,7 @@ fun FilesSelectModeBottomActions(
                         }
                         withIO {
                             ZipHelper.zip(selectedFiles.map { it.path }, destPath)
+                            filesVM.loadAsync(context)
                         }
                         DialogHelper.hideLoading()
                         filesVM.exitSelectMode()
@@ -162,6 +163,7 @@ fun FilesSelectModeBottomActions(
                         withIO {
                             ZipUtil.unpack(File(file.path), File(destPath))
                             MainApp.instance.scanFileByConnection(destPath)
+                            filesVM.loadAsync(context)
                         }
                         DialogHelper.hideLoading()
                         filesVM.exitSelectMode()

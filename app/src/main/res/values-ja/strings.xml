@@ -581,4 +581,5 @@
     <string name="cannot_open_system_file">システムファイルを開けません。このファイルはアクセスできません。</string>
     <string name="cannot_open_file_not_accessible">ファイルを開けません。このファイルはアプリからアクセスできません。</string>
     <string name="unknown_error">不明なエラーが発生しました。</string>
+    <string name="customize_home_features">ホーム機能をカスタマイズ</string>
 </resources>

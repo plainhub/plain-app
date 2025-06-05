@@ -288,8 +288,10 @@ object Permissions {
             PermissionItem.create(context, R.drawable.contact_round, Permission.WRITE_CONTACTS, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))
         )
 
-        if (AppFeatureType.SOCIAL.has()) {
+        if (AppFeatureType.SMS.has()) {
             list.add(PermissionItem.create(context, R.drawable.message_square_text, Permission.READ_SMS))
+        }
+        if (AppFeatureType.CALLS.has()) {
             list.add(PermissionItem.create(context, R.drawable.call_log, Permission.WRITE_CALL_LOG, setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG)))
         }
         list.add(

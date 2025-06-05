@@ -581,4 +581,5 @@
     <string name="cannot_open_system_file">கணினி கோப்பை திறக்க முடியாது. இந்த கோப்பு அணுகக்கூடியதல்ல.</string>
     <string name="cannot_open_file_not_accessible">கோப்பை திறக்க முடியாது. இந்த கோப்பு பயன்பாட்டில் அணுகக்கூடியதல்ல.</string>
     <string name="unknown_error">அறியாத பிழை ஏற்பட்டது.</string>
+    <string name="customize_home_features">முகப்பு செயல்பாடுகளை மாற்று</string>
 </resources>

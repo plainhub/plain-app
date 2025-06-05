@@ -41,8 +41,8 @@ import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.NetworkErrorBanner
 import com.ismartcoding.plain.ui.models.MainViewModel
-import com.ismartcoding.plain.ui.page.root.components.HomeFeatures
-import com.ismartcoding.plain.ui.page.root.components.HomeWeb
+import com.ismartcoding.plain.ui.page.root.home.HomeFeatures
+import com.ismartcoding.plain.ui.page.root.home.HomeWeb
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

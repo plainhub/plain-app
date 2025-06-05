@@ -581,4 +581,5 @@
     <string name="cannot_open_system_file">Không thể mở tệp hệ thống. Tệp này không thể truy cập được.</string>
     <string name="cannot_open_file_not_accessible">Không thể mở tệp. Tệp này không thể truy cập được thông qua ứng dụng.</string>
     <string name="unknown_error">Đã xảy ra lỗi không xác định.</string>
+    <string name="customize_home_features">Tùy chỉnh các tính năng trang chủ</string>
 </resources>

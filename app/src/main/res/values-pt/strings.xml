@@ -581,4 +581,5 @@
     <string name="cannot_open_system_file">Não é possível abrir o arquivo do sistema. Este arquivo não é acessível.</string>
     <string name="cannot_open_file_not_accessible">Não é possível abrir o arquivo. Este arquivo não é acessível através do aplicativo.</string>
     <string name="unknown_error">Ocorreu um erro desconhecido.</string>
+    <string name="customize_home_features">Personalizar as funcionalidades da home</string>
 </resources>

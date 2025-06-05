@@ -17,6 +17,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.data.DVideo
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.Language
 import com.ismartcoding.plain.enums.MediaPlayMode
@@ -620,4 +621,11 @@ object VideoPlaylistPreference : BasePreference<String>() {
         items.addAll(videos)
         putAsync(context, items)
     }
+}
+
+object HomeFeaturesPreference : BasePreference<Set<String>>() {
+    override val default = setOf(
+        AppFeatureType.CHAT, AppFeatureType.FILES, AppFeatureType.DOCS, AppFeatureType.APPS, AppFeatureType.NOTES, AppFeatureType.FEEDS
+    ).map { it.name }.toSet()
+    override val key = stringSetPreferencesKey("home_features")
 }

@@ -8,19 +8,23 @@ import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 
 enum class AppFeatureType {
-    SOCIAL,
+    CHAT,
+    DOCS,
+    NOTES,
+    FEEDS,
     APPS,
     FILES,
     CALLS,
     CONTACTS,
     SMS,
+    SOUND_METER,
     NOTIFICATIONS,
     CHECK_UPDATES,
     MEDIA_TRASH;
 
     fun has(): Boolean {
         return when (this) {
-            APPS, SOCIAL, NOTIFICATIONS -> {
+            APPS, SMS, CALLS, NOTIFICATIONS -> {
                 BuildConfig.CHANNEL != AppChannelType.GOOGLE.name
             }
 

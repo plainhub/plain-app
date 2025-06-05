@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.page.root.components
+package com.ismartcoding.plain.ui.page.root.home
 
 import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi

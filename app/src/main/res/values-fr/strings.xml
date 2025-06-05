@@ -581,4 +581,5 @@
     <string name="cannot_open_system_file">Impossible d\'ouvrir le fichier du système. Ce fichier n\'est pas accessible.</string>
     <string name="cannot_open_file_not_accessible">Impossible d\'ouvrir le fichier. Ce fichier n\'est pas accessible via l\'application.</string>
     <string name="unknown_error">Une erreur inconnue est survenue.</string>
+    <string name="customize_home_features">Personnaliser les fonctionnalités de l\'accueil</string>
 </resources>
