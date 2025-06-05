@@ -69,7 +69,7 @@ fun String.cut(length: Int): String {
         return this
     }
 
-    return this.substring(0, length)
+    return this.substring(0, length) + "..."
 }
 
 // remove diacritics, for example č -> c

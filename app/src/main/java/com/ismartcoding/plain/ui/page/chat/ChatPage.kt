@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.getFilenameWithoutExtension
 import com.ismartcoding.lib.extensions.isAudioFast
@@ -46,6 +47,7 @@ import com.ismartcoding.lib.extensions.queryOpenableFile
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.helpers.StringHelper
+import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
@@ -100,6 +102,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
+import kotlinx.datetime.Clock
 
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
@@ -373,24 +376,70 @@ fun ChatPage(
                             return@ChatInput
                         }
                         scope.launch {
-                            val item = withIO { ChatHelper.sendAsync(DMessageContent(DMessageType.TEXT.value, DMessageText(inputValue))) }
-                            chatVM.addAll(arrayListOf(item))
-                            val m = item.toModel()
-                            m.data = m.getContentData()
-                            sendEvent(
-                                WebSocketEvent(
-                                    EventType.MESSAGE_CREATED,
-                                    JsonHelper.jsonEncode(
-                                        arrayListOf(
-                                            m,
+                            // Check if the message exceeds 1024 characters
+                            if (inputValue.length > Constants.MAX_MESSAGE_LENGTH) {
+                                // Create a temporary text file with the message content
+                                val timestamp = Clock.System.now().toEpochMilliseconds()
+                                val fileName = "message-$timestamp.txt"
+                                val dir = context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+                                if (!dir!!.exists()) {
+                                    dir.mkdirs()
+                                }
+                                val file = File(dir, fileName)
+                                file.writeText(inputValue)
+
+                                val summary = inputValue.cut(Constants.TEXT_FILE_SUMMARY_LENGTH)
+
+                                // Create a message file item
+                                val messageFile = DMessageFile(
+                                    uri = file.absolutePath,
+                                    size = file.length(),
+                                    summary = summary
+                                )
+                                
+                                // Send the file as a message
+                                val content = DMessageContent(
+                                    DMessageType.FILES.value,
+                                    DMessageFiles(listOf(messageFile))
+                                )
+                                
+                                val item = withIO { ChatHelper.sendAsync(content) }
+                                chatVM.addAll(arrayListOf(item))
+                                val m = item.toModel()
+                                m.data = m.getContentData()
+                                sendEvent(
+                                    WebSocketEvent(
+                                        EventType.MESSAGE_CREATED,
+                                        JsonHelper.jsonEncode(
+                                            arrayListOf(
+                                                m,
+                                            ),
                                         ),
                                     ),
-                                ),
-                            )
+                                )
+                            } else {
+                                // Send as normal text message
+                                val item = withIO { ChatHelper.sendAsync(DMessageContent(DMessageType.TEXT.value, DMessageText(inputValue))) }
+                                chatVM.addAll(arrayListOf(item))
+                                val m = item.toModel()
+                                m.data = m.getContentData()
+                                sendEvent(
+                                    WebSocketEvent(
+                                        EventType.MESSAGE_CREATED,
+                                        JsonHelper.jsonEncode(
+                                            arrayListOf(
+                                                m,
+                                            ),
+                                        ),
+                                    ),
+                                )
+                                sendEvent(FetchLinkPreviewsEvent(item))
+                            }
+                            
+                            // Reset input and scroll regardless of message type
                             inputValue = ""
                             withIO { ChatInputTextPreference.putAsync(context, inputValue) }
                             scrollState.scrollToItem(0)
-                            sendEvent(FetchLinkPreviewsEvent(item))
                         }
                     },
                 )

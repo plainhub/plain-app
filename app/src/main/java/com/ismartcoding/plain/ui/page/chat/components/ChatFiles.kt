@@ -181,6 +181,18 @@ fun ChatFiles(
                                 text = item.size.formatBytes() + if (item.duration > 0) " / ${item.duration.formatDuration()}" else "",
                                 style = MaterialTheme.typography.listItemSubtitle(),
                             )
+                            // Display summary for text files if available
+                            if (path.isTextFile() && item.summary.isNotEmpty()) {
+                                Text(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 4.dp, end = 8.dp),
+                                    text = item.summary,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 2
+                                )
+                            }
                         }
                         if (path.isImageFast() || path.isVideoFast()) {
                             TransformImageView(

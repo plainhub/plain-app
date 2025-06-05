@@ -3,7 +3,6 @@ package com.ismartcoding.plain.db
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
@@ -61,6 +60,7 @@ class DMessageFile(
     val duration: Long = 0,
     val width: Int = 0,
     val height: Int = 0,
+    val summary: String = "",
 ) : IData
 
 @Serializable

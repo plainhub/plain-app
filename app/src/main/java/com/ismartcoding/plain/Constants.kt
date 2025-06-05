@@ -19,4 +19,6 @@ object Constants {
     const val BROADCAST_ACTION_SERVICE = "${BuildConfig.APPLICATION_ID}.action.service"
     const val BROADCAST_ACTION_ACTIVITY = "${BuildConfig.APPLICATION_ID}.action.activity"
     const val KEY_STORE_FILE_NAME = "keystore2.jks"
+    const val MAX_MESSAGE_LENGTH = 2048 // Maximum length of a message in the chat
+    const val TEXT_FILE_SUMMARY_LENGTH = 250
 }
