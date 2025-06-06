@@ -21,7 +21,7 @@ fun ChatName(m: VChat) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = m.name,
+            text = m.name.uppercase(),
             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(end = 4.dp),
         )
