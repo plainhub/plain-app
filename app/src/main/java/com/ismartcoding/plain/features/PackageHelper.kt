@@ -29,18 +29,22 @@ object PackageHelper {
     private val appTypeCache: MutableMap<String, String> = HashMap()
     private val appCertsCache: MutableMap<String, List<DCertificate>> = HashMap()
 
-    fun getPackageStatuses(ids: List<String>): Map<String, Boolean> {
-        val packages = packageManager.getInstalledPackages(0).map { it.packageName }
-        val map = mutableMapOf<String, Boolean>()
+    fun getPackageInfoMap(ids: List<String>): Map<String, PackageInfo?> {
+        val packages = packageManager.getInstalledPackages(0).associateBy { it.packageName }
+        val map = mutableMapOf<String, PackageInfo?>()
         ids.forEach { id ->
-            map[id] = packages.contains(id)
+            map[id] = packages[id]
         }
 
         return map
     }
 
+    fun isInstalled(packageName: String): Boolean {
+        return getPackageInfoMap(listOf(packageName))[packageName] != null
+    }
+
     fun isUninstalled(packageName: String): Boolean {
-        return getPackageStatuses(listOf(packageName))[packageName] == false
+        return !isInstalled(packageName)
     }
 
     suspend fun searchAsync(query: String, limit: Int, offset: Int, sortBy: FileSortBy): List<DPackage> {
@@ -215,11 +219,14 @@ object PackageHelper {
         if (query.isEmpty()) {
             return packageManager.getInstalledApplications(0).count()
         } else {
-            val t = QueryHelper.parseAsync(query).find { it.name == "type" }
-            if (t != null) {
-                val type = t.value
-                return packageManager.getInstalledApplications(0).count { appInfo ->
-                    getAppType(appInfo) == type
+            val parsed = QueryHelper.parseAsync(query)
+            if (parsed.size == 1) {
+                val t = parsed.find { it.name == "type" }
+                if (t != null) {
+                    val type = t.value
+                    return packageManager.getInstalledApplications(0).count { appInfo ->
+                        getAppType(appInfo) == type
+                    }
                 }
             }
         }
@@ -305,6 +312,36 @@ object PackageHelper {
             data = Uri.parse("package:$packageName")
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         })
+    }
+
+    fun install(context: Context, file: File) {
+        try {
+            if (!file.name.lowercase().endsWith(".apk")) {
+                LogCat.e("Invalid file extension: ${file.name}")
+                throw IllegalArgumentException("Invalid file extension: ${file.name}")
+            }
+
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                context,
+                com.ismartcoding.plain.Constants.AUTHORITY,
+                file
+            )
+
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "application/vnd.android.package-archive")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                putExtra(Intent.EXTRA_RETURN_RESULT, true)
+                putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true)
+                putExtra(Intent.EXTRA_INSTALLER_PACKAGE_NAME, context.applicationInfo.packageName)
+            }
+
+            context.startActivity(intent)
+            LogCat.d("APK installation intent started for ${file.name}")
+        } catch (e: Exception) {
+            LogCat.e("Failed to install APK: ${e.message}", e)
+            throw e
+        }
     }
 
     private fun List<DPackage>.sorted(sortBy: FileSortBy): List<DPackage> {

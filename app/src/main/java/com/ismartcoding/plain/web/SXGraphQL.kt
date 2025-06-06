@@ -12,6 +12,7 @@ import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
 import com.apurebase.kgraphql.schema.dsl.SchemaConfigurationDSL
 import com.apurebase.kgraphql.schema.execution.Execution
 import com.apurebase.kgraphql.schema.execution.Executor
+import com.ismartcoding.lib.apk.ApkParsers
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.extensions.getFinalPath
@@ -44,20 +45,22 @@ import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.MediaPlayMode
+import com.ismartcoding.plain.events.CancelNotificationsEvent
+import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
+import com.ismartcoding.plain.events.DeleteChatItemViewEvent
+import com.ismartcoding.plain.events.EventType
+import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
+import com.ismartcoding.plain.events.HttpApiEvents
+import com.ismartcoding.plain.events.StartScreenMirrorEvent
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.extensions.sorted
 import com.ismartcoding.plain.features.AudioPlayer
-import com.ismartcoding.plain.events.CancelNotificationsEvent
 import com.ismartcoding.plain.features.ChatHelper
-import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
-import com.ismartcoding.plain.events.DeleteChatItemViewEvent
-import com.ismartcoding.plain.events.HttpApiEvents
-import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
-import com.ismartcoding.plain.events.StartScreenMirrorEvent
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.call.SimHelper
 import com.ismartcoding.plain.features.contact.GroupHelper
@@ -79,6 +82,7 @@ import com.ismartcoding.plain.helpers.DeviceInfoHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.helpers.TempHelper
+import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.preference.ApiPermissionsPreference
 import com.ismartcoding.plain.preference.AudioPlayModePreference
 import com.ismartcoding.plain.preference.AudioPlayingPreference
@@ -112,6 +116,7 @@ import com.ismartcoding.plain.web.models.MediaFileInfo
 import com.ismartcoding.plain.web.models.Message
 import com.ismartcoding.plain.web.models.Note
 import com.ismartcoding.plain.web.models.NoteInput
+import com.ismartcoding.plain.web.models.PackageInstallPending
 import com.ismartcoding.plain.web.models.PackageStatus
 import com.ismartcoding.plain.web.models.StorageStats
 import com.ismartcoding.plain.web.models.Tag
@@ -119,9 +124,6 @@ import com.ismartcoding.plain.web.models.TempValue
 import com.ismartcoding.plain.web.models.Video
 import com.ismartcoding.plain.web.models.toExportModel
 import com.ismartcoding.plain.web.models.toModel
-import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
-import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -149,7 +151,6 @@ import kotlinx.serialization.json.put
 import java.io.File
 import java.io.StringReader
 import java.io.StringWriter
-import kotlin.collections.set
 import kotlin.io.path.Path
 import kotlin.io.path.moveTo
 
@@ -435,7 +436,11 @@ class SXGraphQL(val schema: Schema) {
                 }
                 query("packageStatuses") {
                     resolver { ids: List<ID> ->
-                        PackageHelper.getPackageStatuses(ids.map { it.value }).map { PackageStatus(ID(it.key), it.value) }
+                        PackageHelper.getPackageInfoMap(ids.map { it.value }).map {
+                            val pkg = it.value
+                            val updatedAt = if (pkg != null) Instant.fromEpochMilliseconds(pkg.lastUpdateTime) else null
+                            PackageStatus(ID(it.key), pkg != null, updatedAt)
+                        }
                     }
                 }
                 query("packageCount") {
@@ -682,6 +687,38 @@ class SXGraphQL(val schema: Schema) {
                         true
                     }
                 }
+                mutation("installPackage") {
+                    resolver { path: String ->
+                        val file = File(path)
+                        if (!file.exists()) {
+                            throw GraphQLError("File does not exist")
+                        }
+
+                        try {
+                            val context = MainActivity.instance.get()!!
+                            if (file.name.endsWith(".apk", ignoreCase = true)) {
+                                LogCat.d("Installing APK file: ${file.name}")
+                                val apkMeta = ApkParsers.getMetaInfo(file)
+                                    ?: throw GraphQLError("Failed to parse APK package ID")
+
+                                PackageHelper.install(context, file)
+                                val packageName = apkMeta.packageName ?: ""
+                                try {
+                                    val pkg = packageManager.getPackageInfo(packageName, 0)
+                                    PackageInstallPending(packageName, Instant.fromEpochMilliseconds(pkg.lastUpdateTime), isNew = false)
+                                } catch (e: Exception) {
+                                    PackageInstallPending(packageName, null, isNew = true)
+                                }
+                            } else {
+                                throw GraphQLError("Unsupported file format. Only APK files are supported.")
+                            }
+                        } catch (e: Exception) {
+                            LogCat.e("Installation failed: ${e.message}", e)
+                            throw GraphQLError("Installation failed: ${e.message}")
+                        }
+                    }
+                }
+
                 mutation("cancelNotifications") {
                     resolver { ids: List<ID> ->
                         sendEvent(CancelNotificationsEvent(ids.map { it.value }.toSet()))

@@ -25,4 +25,4 @@ fun DPackage.toModel(): Package {
     )
 }
 
-data class PackageStatus(val id: ID, val exist: Boolean)
+data class PackageStatus(val id: ID, val exist: Boolean, val updatedAt: Instant?)
