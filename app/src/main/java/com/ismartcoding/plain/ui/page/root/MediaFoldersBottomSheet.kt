@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.ui.page
+package com.ismartcoding.plain.ui.page.root
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn

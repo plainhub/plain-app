@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.IData
@@ -77,10 +78,11 @@ fun <T : IData> MediaTopBar(
                 ActionButtonSearch {
                     mediaVM.enterSearchMode()
                 }
-                ActionButtonFolders {
-                    mediaVM.showFoldersDialog.value = true
+                if (isQPlus()) {
+                    ActionButtonFolders {
+                        mediaVM.showFoldersDialog.value = true
+                    }
                 }
-
                 ActionButtonCast {
                     castVM.showCastDialog.value = true
                 }

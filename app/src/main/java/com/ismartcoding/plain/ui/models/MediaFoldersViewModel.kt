@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.enums.DataType
@@ -48,7 +49,11 @@ class MediaFoldersViewModel : ViewModel() {
             }
 
             DataType.AUDIO -> {
-                AudioMediaStoreHelper.getBucketsAsync(context)
+                if (isQPlus()) {
+                    AudioMediaStoreHelper.getBucketsAsync(context)
+                } else {
+                    emptyList()
+                }
             }
 
             else -> {

@@ -22,8 +22,8 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
     override val mediaType: MediaType = MediaType.VIDEO
 
     override fun getProjection(): Array<String> {
-        return arrayOf(
-            MediaStore.Video.Media._ID,
+        val projection = mutableListOf(
+           MediaStore.Video.Media._ID,
             MediaStore.Video.Media.TITLE,
             MediaStore.Video.Media.DATA,
             MediaStore.Video.Media.SIZE,
@@ -32,9 +32,13 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
             MediaStore.Video.Media.DATE_MODIFIED,
             MediaStore.Video.Media.WIDTH,
             MediaStore.Video.Media.HEIGHT,
-            MediaStore.Video.Media.ORIENTATION,
             MediaStore.Video.Media.BUCKET_ID,
         )
+        if (isQPlus()) {
+            projection.add(MediaStore.Video.Media.ORIENTATION)
+        }
+
+        return projection.toTypedArray()
     }
 
     override fun buildBaseWhere(filterFields: List<FilterField>): ContentWhere {
@@ -68,7 +72,7 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
             val updatedAt = cursor.getTimeSecondsValue(MediaStore.Video.Media.DATE_MODIFIED, cache)
             val width = cursor.getIntValue(MediaStore.Video.Media.WIDTH, cache)
             val height = cursor.getIntValue(MediaStore.Video.Media.HEIGHT, cache)
-            val rotation = cursor.getIntValue(MediaStore.Video.Media.ORIENTATION, cache)
+            val rotation = if (isQPlus()) cursor.getIntValue(MediaStore.Video.Media.ORIENTATION, cache) else 0
             val path = cursor.getStringValue(MediaStore.Video.Media.DATA, cache)
             val bucketId = cursor.getStringValue(MediaStore.Video.Media.BUCKET_ID, cache)
             DVideo(id, title, path, duration, size, width, height, rotation, bucketId, createdAt, updatedAt)

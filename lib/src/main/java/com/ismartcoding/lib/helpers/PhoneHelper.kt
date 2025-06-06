@@ -14,7 +14,7 @@ object PhoneHelper {
     fun getDeviceName(context: Context): String {
         var name = ""
         try {
-            name = Settings.Secure.getString(context.contentResolver, "bluetooth_name")
+            name = Settings.Secure.getString(context.contentResolver, "bluetooth_name") ?: ""
         } catch (e: Exception) {
             LogCat.e(e.toString())
         }

@@ -63,7 +63,7 @@ import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.VTabData
-import com.ismartcoding.plain.ui.page.MediaFoldersBottomSheet
+import com.ismartcoding.plain.ui.page.root.MediaFoldersBottomSheet
 import com.ismartcoding.plain.ui.page.images.ImagesPageState
 import com.ismartcoding.plain.ui.page.images.ViewImageBottomSheet
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet

@@ -20,7 +20,7 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
     override val mediaType: MediaType = MediaType.AUDIO
 
     override fun getProjection(): Array<String> {
-        return arrayOf(
+        val projection = mutableListOf(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.TITLE,
             MediaStore.Audio.Media.ARTIST,
@@ -29,9 +29,16 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
             MediaStore.Audio.Media.DATE_ADDED,
             MediaStore.Audio.Media.DATE_MODIFIED,
             MediaStore.Audio.Media.DATA,
-            MediaStore.Audio.Media.BUCKET_ID,
             MediaStore.Audio.Media.ALBUM_ID,
         )
+
+        if (isQPlus()) {
+            projection.add(
+                MediaStore.Audio.Media.BUCKET_ID,
+            )
+        }
+
+        return projection.toTypedArray()
     }
 
     override fun buildBaseWhere(filterFields: List<FilterField>): ContentWhere {
@@ -82,7 +89,9 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
             val createdAt = cursor.getTimeSecondsValue(MediaStore.Audio.Media.DATE_ADDED, cache)
             val updatedAt = cursor.getTimeSecondsValue(MediaStore.Audio.Media.DATE_MODIFIED, cache)
             val path = cursor.getStringValue(MediaStore.Audio.Media.DATA, cache)
-            val bucketId = cursor.getStringValue(MediaStore.Audio.Media.BUCKET_ID, cache)
+            val bucketId = if (isQPlus()) {
+                cursor.getStringValue(MediaStore.Audio.Media.BUCKET_ID, cache)
+            } else ""
             val albumId = cursor.getStringValue(MediaStore.Audio.Media.ALBUM_ID, cache)
             DAudio(id, title, artist, path, duration, size, bucketId, albumId, createdAt, updatedAt)
         } ?: emptyList()

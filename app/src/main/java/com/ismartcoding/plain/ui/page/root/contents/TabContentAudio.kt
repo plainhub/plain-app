@@ -59,7 +59,7 @@ import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.VTabData
-import com.ismartcoding.plain.ui.page.MediaFoldersBottomSheet
+import com.ismartcoding.plain.ui.page.root.MediaFoldersBottomSheet
 import com.ismartcoding.plain.ui.page.audio.AudioPageState
 import com.ismartcoding.plain.ui.page.audio.components.AudioListItem
 import com.ismartcoding.plain.ui.page.audio.components.AudioPlayerBar
