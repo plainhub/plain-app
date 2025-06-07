@@ -37,10 +37,8 @@ fun NavHostController.navigatePdf(uri: Uri) {
     }
 }
 
-
 fun NavHostController.navigateOtherFile(path: String) {
-    currentBackStackEntry?.savedStateHandle?.set("path", path)
-    navigate(Routing.OtherFile) {
+    navigate(Routing.OtherFile(path)) {
         launchSingleTop = true
     }
 }

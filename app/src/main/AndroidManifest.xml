@@ -52,6 +52,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <!--    <uses-permission android:name="android.permission.RECORD_AUDIO" />-->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <uses-feature
         android:name="android.hardware.microphone"
@@ -152,7 +153,7 @@
         <service
             android:name=".services.HttpServerService"
             android:exported="false"
-            android:foregroundServiceType="specialUse"
+            android:foregroundServiceType="specialUse|dataSync"
             android:stopWithTask="true">
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"

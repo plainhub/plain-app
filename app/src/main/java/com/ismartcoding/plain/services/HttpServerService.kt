@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.services
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.ServiceInfo
 import androidx.core.app.ServiceCompat
 import androidx.lifecycle.Lifecycle
@@ -31,18 +32,7 @@ class HttpServerService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
         NotificationHelper.ensureDefaultChannel()
-        val notification =
-            NotificationHelper.createServiceNotification(
-                this,
-                "${BuildConfig.APPLICATION_ID}.action.stop_http_server",
-                getString(R.string.api_service_is_running),
-                HttpServerManager.getNotificationContent()
-            )
-        ServiceCompat.startForeground(
-            this, HttpServerManager.notificationId,
-            notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-        )
-
+        
         lifecycle.addObserver(object : LifecycleEventObserver {
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                 when (event) {
@@ -60,6 +50,51 @@ class HttpServerService : LifecycleService() {
                 }
             }
         })
+    }
+    
+    @SuppressLint("InlinedApi")
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        super.onStartCommand(intent, flags, startId)
+        
+        try {
+            NotificationHelper.ensureDefaultChannel()
+            
+            val notification = NotificationHelper.createServiceNotification(
+                this,
+                "${BuildConfig.APPLICATION_ID}.action.stop_http_server",
+                getString(R.string.api_service_is_running),
+                HttpServerManager.getNotificationContent()
+            )
+            
+            try {
+                ServiceCompat.startForeground(
+                    this, 
+                    HttpServerManager.notificationId,
+                    notification, 
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                )
+            } catch (e: Exception) {
+                LogCat.e("Error starting foreground service with specialUse: ${e.message}")
+                try {
+                    ServiceCompat.startForeground(
+                        this, 
+                        HttpServerManager.notificationId,
+                        notification, 
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                    )
+                } catch (e2: Exception) {
+                    LogCat.e("Error starting foreground service with dataSync: ${e2.message}")
+                    startForeground(HttpServerManager.notificationId, notification)
+                }
+            }
+        } catch (e: Exception) {
+            LogCat.e("Failed to start foreground service: ${e.message}")
+            e.printStackTrace()
+            stopSelf()
+            return START_NOT_STICKY
+        }
+        
+        return START_STICKY
     }
 
     private suspend fun startHttpServerAsync() {

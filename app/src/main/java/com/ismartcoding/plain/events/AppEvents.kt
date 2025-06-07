@@ -30,6 +30,7 @@ import com.ismartcoding.plain.web.websocket.WebSocketHelper
 import io.ktor.server.websocket.DefaultWebSocketServerSession
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import androidx.core.content.ContextCompat
 
 // The events raised by the app
 class StartHttpServerEvent : ChannelEvent()
@@ -173,7 +174,10 @@ object AppEvents {
                 while (retry > 0) {
                     try {
                         val context = MainApp.instance
-                        context.startService(Intent(context, HttpServerService::class.java))
+                        androidx.core.content.ContextCompat.startForegroundService(
+                            context, 
+                            Intent(context, HttpServerService::class.java)
+                        )
                         break
                     } catch (ex: Exception) {
                         LogCat.e(ex.toString())

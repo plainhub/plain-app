@@ -132,7 +132,6 @@ fun Main(
     LaunchedEffect(Unit) {
         onLaunched()
     }
-
     LaunchedEffect(sharedFlow) {
         sharedFlow.collect { event ->
             when (event) {
@@ -286,13 +285,13 @@ fun Main(
                     ChatEditTextPage(navController, r.id, content, chatVM)
                 }
 
-                composable<Routing.OtherFile> {
-                    val path = navController.previousBackStackEntry?.savedStateHandle?.get("path") ?: ""
-                    OtherFilePage(navController, path)
+                composable<Routing.OtherFile> { backStackEntry ->
+                    val r = backStackEntry.toRoute<Routing.OtherFile>()
+                    OtherFilePage(navController, r.path)
                 }
 
                 composable<Routing.PdfViewer> {
-                    val uri = navController.previousBackStackEntry?.savedStateHandle?.get("uri") as? Uri
+                    val uri = navController.previousBackStackEntry?.savedStateHandle?.get<Uri>("uri")
                     if (uri != null) {
                         PdfPage(navController, uri)
                     }
