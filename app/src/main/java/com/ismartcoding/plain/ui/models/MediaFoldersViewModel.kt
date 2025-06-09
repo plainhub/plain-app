@@ -70,15 +70,12 @@ class MediaFoldersViewModel : ViewModel() {
             totalValue += bucket.itemCount
             sizeValue += bucket.size
 
-            // Add the first item from each folder's topItems if available
-            val validTopItems = bucket.topItems.filter { File(it).exists() }
-            if (validTopItems.isNotEmpty()) {
-                subItems.add(validTopItems.first())
-            }
-
-            // Stop if we've collected 4 items
-            if (subItems.size >= 4) {
-                break
+            if (subItems.size < 4) {
+                // Add the first item from each folder's topItems if available
+                val validTopItems = bucket.topItems.filter { File(it).exists() }
+                if (validTopItems.isNotEmpty()) {
+                    subItems.add(validTopItems.first())
+                }
             }
         }
 
