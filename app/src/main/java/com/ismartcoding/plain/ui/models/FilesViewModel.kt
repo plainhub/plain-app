@@ -22,6 +22,7 @@ import com.ismartcoding.plain.features.media.FileMediaStoreHelper
 import com.ismartcoding.plain.preference.FilePathData
 import com.ismartcoding.plain.preference.LastFilePathPreference
 import com.ismartcoding.plain.preference.ShowHiddenFilesPreference
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -255,6 +256,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
 
     fun deleteFiles(paths: Set<String>) {
         viewModelScope.launch {
+            DialogHelper.showLoading()
             withIO {
                 paths.forEach {
                     File(it).deleteRecursively()
@@ -262,6 +264,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
 
                 MainApp.instance.scanFileByConnection(paths.toTypedArray())
             }
+            DialogHelper.hideLoading()
 
             _itemsFlow.update {
                 it.toMutableStateList().apply {

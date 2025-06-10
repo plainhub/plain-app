@@ -1,1 +1,0 @@
-import{e as t,c,o as n,R as a,cc as l,Y as r}from"./index-CextXMl7.js";const i=["disabled"],m=t({__name:"VIconButton",props:{loading:{type:Boolean}},setup(e){return(o,_)=>{const s=r;return n(),c("button",{class:"btn-icon",disabled:e.loading},[e.loading?(n(),a(s,{key:0,indeterminate:"",class:"sm"})):l(o.$slots,"icon",{key:1})],8,i)}}});export{m as _};
