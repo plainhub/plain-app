@@ -364,6 +364,15 @@
     <string name="feature_WRITE_CONTACTS">संपर्क प्रबंधित करें</string>
     <string name="feature_NOTIFICATION_LISTENER">सूचना सुनने वाला</string>
     <string name="feature_READ_PHONE_NUMBERS">फ़ोन नंबर पढ़ें</string>
+    <string name="notification_filter_settings">सूचना फ़िल्टर सेटिंग्स</string>
+    <string name="notification_filter_settings_desc">आपके कंप्यूटर को सूचना कैसे भेजा जाए उसे चुनें</string>
+    <string name="filter_mode">फ़िल्टर मोड</string>
+    <string name="notification_filter_mode_desc">अनुमति दें या दें नहीं दें चुनें</string>
+    <string name="allowlist_mode">अनुमति दें</string>
+    <string name="blacklist_mode">अनुमति दें नहीं</string>
+    <string name="allowed_apps">अनुमति दें दिए गए एप्प्स</string>
+    <string name="blocked_apps">अनुमति दें नहीं दिए गए एप्प्स</string>
+    <string name="add_app">एप्प जोड़ें</string>
     <string name="system_permission_granted">सिस्टम अनुमति प्रदान की गई है</string>
     <string name="system_permission_not_granted">सिस्टम अनुमति प्रदान नहीं की गई है</string>
     <string name="open_permission_settings">अनुमति सेटिंग्स खोलें</string>

@@ -364,6 +364,15 @@
     <string name="feature_WRITE_CONTACTS">連絡先の管理</string>
     <string name="feature_NOTIFICATION_LISTENER">通知の管理</string>
     <string name="feature_READ_PHONE_NUMBERS">電話番号の読み取り</string>
+    <string name="notification_filter_settings">通知フィルター設定</string>
+    <string name="notification_filter_settings_desc">PCに通知を送信する方法を選択してください</string>
+    <string name="filter_mode">フィルターモード</string>
+    <string name="notification_filter_mode_desc">許可リスト（選択したアプリのみ）またはブロックリスト（選択したアプリのみを除外）モードを選択してください</string>
+    <string name="allowlist_mode">許可リスト</string>
+    <string name="blacklist_mode">ブロックリスト</string>
+    <string name="allowed_apps">許可アプリ</string>
+    <string name="blocked_apps">ブロックアプリ</string>
+    <string name="add_app">アプリを追加</string>
     <string name="system_permission_granted">システムの許可が与えられました</string>
     <string name="system_permission_not_granted">システムの許可が与えられていません</string>
     <string name="open_permission_settings">許可設定を開く</string>

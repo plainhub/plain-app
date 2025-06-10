@@ -363,6 +363,15 @@
     <string name="feature_CALL_PHONE">拨打电话</string>
     <string name="feature_WRITE_CONTACTS">管理联系人</string>
     <string name="feature_NOTIFICATION_LISTENER">管理通知</string>
+    <string name="notification_filter_settings">通知过滤设置</string>
+    <string name="notification_filter_settings_desc">选择哪些应用可以向PC发送通知</string>
+    <string name="filter_mode">过滤模式</string>
+    <string name="notification_filter_mode_desc">选择白名单（仅选中的应用）或黑名单（排除选中的应用）模式</string>
+    <string name="allowlist_mode">白名单</string>
+    <string name="blacklist_mode">黑名单</string>
+    <string name="allowed_apps">允许的应用</string>
+    <string name="blocked_apps">阻止的应用</string>
+    <string name="add_app">添加应用</string>
     <string name="feature_READ_PHONE_NUMBERS">读取话号码</string>
     <string name="system_permission_granted">已获取系统权限</string>
     <string name="system_permission_not_granted">未获取系统权限</string>

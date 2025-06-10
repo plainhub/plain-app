@@ -364,6 +364,15 @@
     <string name="feature_WRITE_CONTACTS">যোগাযোগ পরিচালনা</string>
     <string name="feature_NOTIFICATION_LISTENER">বিজ্ঞপ্তি পরিচালক</string>
     <string name="feature_READ_PHONE_NUMBERS">ফোন নম্বর পড়ুন</string>
+    <string name="notification_filter_settings">বিজ্ঞপ্তি ফিল্টার সেটিংস</string>
+    <string name="notification_filter_settings_desc">কিভাবে পিসি এ বিজ্ঞপ্তি প্রেরণ করবে তা নির্বাচন করুন</string>
+    <string name="filter_mode">ফিল্টার মোড</string>
+    <string name="notification_filter_mode_desc">অনুমতি দেওয়া হয়েছে বা দেওয়া হয়নি তা নির্বাচন করুন</string>
+    <string name="allowlist_mode">অনুমতি দেওয়া হয়েছে</string>
+    <string name="blacklist_mode">অনুমতি দেওয়া হয়নি</string>
+    <string name="allowed_apps">অনুমতি দেওয়া হয়েছে অ্যাপস</string>
+    <string name="blocked_apps">অনুমতি দেওয়া হয়নি অ্যাপস</string>
+    <string name="add_app">অ্যাপ যোগ করুন</string>
     <string name="system_permission_granted">সিস্টেম অনুমতি দেওয়া হয়েছে</string>
     <string name="system_permission_not_granted">সিস্টেম অনুমতি দেওয়া হয়নি</string>
     <string name="open_permission_settings">অনুমতি সেটিংস খুলুন</string>

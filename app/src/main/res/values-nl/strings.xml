@@ -364,6 +364,15 @@
     <string name="feature_WRITE_CONTACTS">Contacten beheren</string>
     <string name="feature_NOTIFICATION_LISTENER">Meldingen beheren</string>
     <string name="feature_READ_PHONE_NUMBERS">Telefoonnummers lezen</string>
+    <string name="notification_filter_settings">Notificatiefilterinstellingen</string>
+    <string name="notification_filter_settings_desc">Kies hoe notificaties naar uw PC moeten worden verzonden</string>
+    <string name="filter_mode">Filtermodus</string>
+    <string name="notification_filter_mode_desc">Kies tussen toegestane lijst (alleen geselecteerde apps) of geblokkeerde lijst (uitsluit geselecteerde apps) modus</string>
+    <string name="allowlist_mode">Toegestane lijst</string>
+    <string name="blacklist_mode">Geblokkeerde lijst</string>
+    <string name="allowed_apps">Toegestane apps</string>
+    <string name="blocked_apps">Geblokkeerde apps</string>
+    <string name="add_app">App toevoegen</string>
     <string name="system_permission_granted">Systeemtoestemming verleend</string>
     <string name="system_permission_not_granted">Systeemtoestemming niet verleend</string>
     <string name="open_permission_settings">Toestemmingsinstellingen openen</string>

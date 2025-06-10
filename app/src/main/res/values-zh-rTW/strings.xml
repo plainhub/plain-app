@@ -364,6 +364,15 @@
     <string name="feature_WRITE_CONTACTS">管理聯絡人</string>
     <string name="feature_NOTIFICATION_LISTENER">管理通知</string>
     <string name="feature_READ_PHONE_NUMBERS">讀取電話號碼</string>
+    <string name="notification_filter_settings">通知過濾設置</string>
+    <string name="notification_filter_settings_desc">選擇通知如何發送到您的PC</string>
+    <string name="filter_mode">過濾模式</string>
+    <string name="notification_filter_mode_desc">選擇允許列表（僅選定的應用程序）或阻止列表（排除選定的應用程序）模式</string>
+    <string name="allowlist_mode">允許列表</string>
+    <string name="blacklist_mode">阻止列表</string>
+    <string name="allowed_apps">允許的應用程序</string>
+    <string name="blocked_apps">阻止的應用程序</string>
+    <string name="add_app">添加應用程序</string>
     <string name="system_permission_granted">已獲取系統權限</string>
     <string name="system_permission_not_granted">未獲取系統權限</string>
     <string name="open_permission_settings">系統權限設置</string>

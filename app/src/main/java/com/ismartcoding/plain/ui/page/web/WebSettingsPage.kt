@@ -38,6 +38,7 @@ import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationResultEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.PermissionItem
@@ -117,10 +118,12 @@ fun WebSettingsPage(
                             PNotificationListenerService.toggle(context, true)
                         }
                     }
+
                     is WindowFocusChangedEvent -> {
                         shouldIgnoreOptimize = !powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)
                         isVPNConnected = NetworkHelper.isVPNConnected(context)
                     }
+
                     is IgnoreBatteryOptimizationResultEvent -> {
                         if (shouldIgnoreOptimize) {
                             coIO {
@@ -283,48 +286,86 @@ fun WebSettingsPage(
                 }
                 itemsIndexed(permissionList) { index, m ->
                     val permission = m.permission
-                    if (permission == Permission.NONE) {
+                    PListItem(
+                        modifier = PlainTheme
+                            .getCardModifier(index = index, size = permissionList.size)
+                            .clickable {
+                                togglePermission(m, !enabledPermissions.contains(permission.name))
+                            },
+                        icon = m.icon,
+                        title = permission.getText(),
+                        desc =
+                            stringResource(
+                                if (m.granted) R.string.system_permission_granted else R.string.system_permission_not_granted,
+                            ),
+                    ) {
+                        PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
+                            togglePermission(m, enable)
+                        }
+                    }
+                }
+                if (AppFeatureType.NOTIFICATIONS.has()) {
+                    item {
                         VerticalSpace(dp = 16.dp)
                         PCard {
+                            val m = PermissionItem.create(context, R.drawable.bell, Permission.NOTIFICATION_LISTENER)
+                            val permission = m.permission
                             PListItem(
                                 modifier = Modifier.clickable {
-                                    val intent =
-                                        Intent(
-                                            if (context.isTV()) Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS else Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                        )
-                                    intent.addCategory(Intent.CATEGORY_DEFAULT)
-                                    intent.data = Uri.fromParts("package", context.packageName, null)
-                                    if (intent.resolveActivity(packageManager) != null) {
-                                        context.startActivity(intent)
-                                    } else {
-                                        DialogHelper.showMessage(R.string.not_supported_error)
-                                    }
+                                    togglePermission(m, !enabledPermissions.contains(permission.name))
                                 },
                                 icon = m.icon,
                                 title = permission.getText(),
-                                showMore = true,
-                            )
-                        }
-                    } else {
-                        PListItem(
-                            modifier = PlainTheme
-                                .getCardModifier(index = index, size = permissionList.size - 1)
-                                .clickable {
-                                    togglePermission(m, !enabledPermissions.contains(permission.name))
-                                },
-                            icon = m.icon,
-                            title = permission.getText(),
-                            desc =
-                                stringResource(
-                                    if (m.granted) R.string.system_permission_granted else R.string.system_permission_not_granted,
-                                ),
-                        ) {
-                            PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
-                                togglePermission(m, enable)
+                                desc =
+                                    stringResource(
+                                        if (m.granted) R.string.system_permission_granted else R.string.system_permission_not_granted,
+                                    ),
+                            ) {
+                                PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
+                                    togglePermission(m, enable)
+                                }
+                            }
+                            if (enabledPermissions.contains(permission.name)) {
+                                PListItem(
+                                    modifier = Modifier.clickable {
+                                        navController.navigate(Routing.NotificationSettings)
+                                    },
+                                    icon = R.drawable.settings,
+                                    title = stringResource(R.string.notification_filter_settings),
+                                    desc = stringResource(R.string.notification_filter_settings_desc),
+                                    showMore = true,
+                                )
                             }
                         }
                     }
                 }
+
+                item {
+                    VerticalSpace(dp = 16.dp)
+                    val m = PermissionItem(null, Permission.NONE, setOf(Permission.NONE))
+                    val permission = m.permission
+                    PCard {
+                        PListItem(
+                            modifier = Modifier.clickable {
+                                val intent =
+                                    Intent(
+                                        if (context.isTV()) Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS else Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                    )
+                                intent.addCategory(Intent.CATEGORY_DEFAULT)
+                                intent.data = Uri.fromParts("package", context.packageName, null)
+                                if (intent.resolveActivity(packageManager) != null) {
+                                    context.startActivity(intent)
+                                } else {
+                                    DialogHelper.showMessage(R.string.not_supported_error)
+                                }
+                            },
+                            icon = m.icon,
+                            title = permission.getText(),
+                            showMore = true,
+                        )
+                    }
+                }
+
                 item {
                     VerticalSpace(dp = 16.dp)
                     Subtitle(

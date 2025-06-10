@@ -364,6 +364,15 @@
     <string name="feature_WRITE_CONTACTS">Управление контактами</string>
     <string name="feature_NOTIFICATION_LISTENER">Управление уведомлениями</string>
     <string name="feature_READ_PHONE_NUMBERS">Чтение телефонных номеров</string>
+    <string name="notification_filter_settings">Настройки фильтра уведомлений</string>
+    <string name="notification_filter_settings_desc">Выберите, как уведомления должны быть отправлены на ваш компьютер</string>
+    <string name="filter_mode">Режим фильтра</string>
+    <string name="notification_filter_mode_desc">Выберите режим списка разрешенных (только выбранные приложения) или списка запрещенных (исключая выбранные приложения)</string>
+    <string name="allowlist_mode">Список разрешенных</string>
+    <string name="blacklist_mode">Список запрещенных</string>
+    <string name="allowed_apps">Разрешенные приложения</string>
+    <string name="blocked_apps">Заблокированные приложения</string>
+    <string name="add_app">Добавить приложение</string>
     <string name="system_permission_granted">Разрешение системы предоставлено</string>
     <string name="system_permission_not_granted">Разрешение системы не предоставлено</string>
     <string name="open_permission_settings">Открыть настройки разрешений</string>

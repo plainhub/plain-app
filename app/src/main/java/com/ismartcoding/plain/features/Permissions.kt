@@ -279,11 +279,6 @@ object Permissions {
                 context, R.drawable.folder, Permission.WRITE_EXTERNAL_STORAGE
             )
         )
-        if (AppFeatureType.NOTIFICATIONS.has()) {
-            list.add(
-                PermissionItem.create(context, R.drawable.bell, Permission.NOTIFICATION_LISTENER)
-            )
-        }
         list.add(
             PermissionItem.create(context, R.drawable.contact_round, Permission.WRITE_CONTACTS, setOf(Permission.READ_CONTACTS, Permission.WRITE_CONTACTS))
         )
@@ -300,7 +295,6 @@ object Permissions {
         list.add(
             PermissionItem.create(context, R.drawable.file_digit, Permission.READ_PHONE_NUMBERS, setOf(Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS))
         )
-        list.add(PermissionItem(null, Permission.NONE, setOf(Permission.NONE)))
         return list
     }
 

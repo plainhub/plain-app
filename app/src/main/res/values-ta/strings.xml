@@ -364,6 +364,15 @@
     <string name="feature_WRITE_CONTACTS">தொடர்புகளை நிர்வகிக்கவும்</string>
     <string name="feature_NOTIFICATION_LISTENER">அறிவிப்புகளை நிர்வகிக்கவும்</string>
     <string name="feature_READ_PHONE_NUMBERS">போன் எண்களை படிக்கவும்</string>
+    <string name="notification_filter_settings">அறிவிப்பு வடிகட்டி அமைப்புகள்</string>
+    <string name="notification_filter_settings_desc">உங்கள் கணக்கு அனுமதிகளை எவ்வாறு பயன்படுத்தலாம் என்பதை தேர்ந்தெடுக்கவும்</string>
+    <string name="filter_mode">வடிகட்டி முறை</string>
+    <string name="notification_filter_mode_desc">அனுமதிக்கப்பட்ட பட்டியல் (தேர்ந்தெடுக்கப்பட்ட பயன்பாடுகள் மட்டும்) அல்லது தடுக்கப்பட்ட பட்டியல் (தேர்ந்தெடுக்கப்பட்ட பயன்பாடுகள் தவிர) முறையை தேர்ந்தெடுக்கவும்</string>
+    <string name="allowlist_mode">அனுமதிக்கப்பட்ட பட்டியல்</string>
+    <string name="blacklist_mode">தடுக்கப்பட்ட பட்டியல்</string>
+    <string name="allowed_apps">அனுமதிக்கப்பட்ட பயன்பாடுகள்</string>
+    <string name="blocked_apps">தடுக்கப்பட்ட பயன்பாடுகள்</string>
+    <string name="add_app">பயன்பாட்டை சேர்</string>
     <string name="system_permission_granted">கணக்கு அனுமதி வழங்கப்பட்டது</string>
     <string name="system_permission_not_granted">கணக்கு அனுமதி அனுப்பப்படவில்லை</string>
     <string name="open_permission_settings">அனுமதி அமைப்புகளை திற</string>

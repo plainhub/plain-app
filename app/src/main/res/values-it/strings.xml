@@ -364,6 +364,15 @@
     <string name="feature_WRITE_CONTACTS">Gestisci i contatti</string>
     <string name="feature_NOTIFICATION_LISTENER">Gestisci le notifiche</string>
     <string name="feature_READ_PHONE_NUMBERS">Leggi i numeri di telefono</string>
+    <string name="notification_filter_settings">Impostazioni filtro notifiche</string>
+    <string name="notification_filter_settings_desc">Scegli come le notifiche devono essere inviate al tuo PC</string>
+    <string name="filter_mode">Modalità filtro</string>
+    <string name="notification_filter_mode_desc">Scegli tra lista consentiti (solo app selezionate) o lista bloccate (esclude app selezionate) modalità</string>
+    <string name="allowlist_mode">Lista consentiti</string>
+    <string name="blacklist_mode">Lista bloccata</string>
+    <string name="allowed_apps">App consentite</string>
+    <string name="blocked_apps">App bloccate</string>
+    <string name="add_app">Aggiungi app</string>
     <string name="system_permission_granted">Permesso di sistema concessa</string>
     <string name="system_permission_not_granted">Permesso di sistema non concessa</string>
     <string name="open_permission_settings">Apri impostazioni permessi</string>

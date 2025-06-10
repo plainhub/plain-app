@@ -364,6 +364,15 @@
     <string name="feature_WRITE_CONTACTS">연락처 관리</string>
     <string name="feature_NOTIFICATION_LISTENER">알림 관리</string>
     <string name="feature_READ_PHONE_NUMBERS">전화 번호 읽기</string>
+    <string name="notification_filter_settings">알림 필터 설정</string>
+    <string name="notification_filter_settings_desc">PC에 알림을 보내는 방법을 선택하세요</string>
+    <string name="filter_mode">필터 모드</string>
+    <string name="notification_filter_mode_desc">허용 목록(선택된 앱만) 또는 차단 목록(선택된 앱 제외) 모드를 선택하세요</string>
+    <string name="allowlist_mode">허용 목록</string>
+    <string name="blacklist_mode">차단 목록</string>
+    <string name="allowed_apps">허용된 앱</string>
+    <string name="blocked_apps">차단된 앱</string>
+    <string name="add_app">앱 추가</string>
     <string name="system_permission_granted">시스템 권한 부여됨</string>
     <string name="system_permission_not_granted">시스템 권한 부여되지 않음</string>
     <string name="open_permission_settings">권한 설정 열기</string>

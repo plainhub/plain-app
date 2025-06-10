@@ -18,6 +18,7 @@ import com.ismartcoding.plain.extensions.toDNotification
 import com.ismartcoding.plain.events.CancelNotificationsEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.packageManager
+import com.ismartcoding.plain.preference.NotificationFilterPreference
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
@@ -65,14 +66,17 @@ class PNotificationListenerService : NotificationListenerService() {
             coIO {
                 val enable = Permission.NOTIFICATION_LISTENER.isEnabledAsync(applicationContext)
                 if (enable) {
-                    sendEvent(
-                        WebSocketEvent(
-                            if (old == null) EventType.NOTIFICATION_CREATED else EventType.NOTIFICATION_UPDATED,
-                            JsonHelper.jsonEncode(
-                                n.toModel()
-                            ),
+                    val isAllowed = NotificationFilterPreference.isAllowedAsync(applicationContext, statusBarNotification.packageName)
+                    if (isAllowed) {
+                        sendEvent(
+                            WebSocketEvent(
+                                if (old == null) EventType.NOTIFICATION_CREATED else EventType.NOTIFICATION_UPDATED,
+                                JsonHelper.jsonEncode(
+                                    n.toModel()
+                                ),
+                            )
                         )
-                    )
+                    }
                 }
             }
         }

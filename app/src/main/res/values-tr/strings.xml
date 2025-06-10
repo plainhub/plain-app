@@ -364,6 +364,15 @@
     <string name="feature_WRITE_CONTACTS">Kişileri yönet</string>
     <string name="feature_NOTIFICATION_LISTENER">Bildirimleri yönet</string>
     <string name="feature_READ_PHONE_NUMBERS">Telefon numaralarını oku</string>
+    <string name="notification_filter_settings">Bildirim filtre ayarları</string>
+    <string name="notification_filter_settings_desc">Bildirimlerin PC\'ye nasıl gönderileceğini seçin</string>
+    <string name="filter_mode">Filtre modu</string>
+    <string name="notification_filter_mode_desc">İzin verilen liste (seçilen uygulamalar yalnızca) veya engellenen liste (seçilen uygulamalar hariç) modunu seçin</string>
+    <string name="allowlist_mode">İzin verilen liste</string>
+    <string name="blacklist_mode">Engellenen liste</string>
+    <string name="allowed_apps">İzin verilen uygulamalar</string>
+    <string name="blocked_apps">Engellenen uygulamalar</string>
+    <string name="add_app">Uygulama ekle</string>
     <string name="system_permission_granted">Sistem izni verildi</string>
     <string name="system_permission_not_granted">Sistem izni verilmedi</string>
     <string name="open_permission_settings">İzin ayarlarını aç</string>

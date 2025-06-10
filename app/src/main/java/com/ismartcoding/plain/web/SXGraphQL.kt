@@ -80,6 +80,7 @@ import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.DeviceInfoHelper
 import com.ismartcoding.plain.helpers.FileHelper
+import com.ismartcoding.plain.helpers.NotificationsHelper
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.packageManager
@@ -552,7 +553,7 @@ class SXGraphQL(val schema: Schema) {
                     resolver { ->
                         val context = MainApp.instance
                         Permission.NOTIFICATION_LISTENER.checkAsync(context)
-                        TempData.notifications.sortedByDescending { it.time }.map { it.toModel() }
+                        NotificationsHelper.filterNotificationsAsync(context).sortedByDescending { it.time }.map { it.toModel() }
                     }
                 }
                 query("feeds") {

@@ -364,6 +364,15 @@
     <string name="feature_WRITE_CONTACTS">Quản lý danh bạ</string>
     <string name="feature_NOTIFICATION_LISTENER">Quản lý thông báo</string>
     <string name="feature_READ_PHONE_NUMBERS">Đọc số điện thoại</string>
+    <string name="notification_filter_settings">Cài đặt lọc thông báo</string>
+    <string name="notification_filter_settings_desc">Chọn cách thông báo được gửi đến PC của bạn</string>
+    <string name="filter_mode">Chế độ lọc</string>
+    <string name="notification_filter_mode_desc">Chọn chế độ danh sách cho phép (chỉ các ứng dụng được chọn) hoặc danh sách chặn (loại trừ các ứng dụng được chọn)</string>
+    <string name="allowlist_mode">Danh sách cho phép</string>
+    <string name="blacklist_mode">Danh sách chặn</string>
+    <string name="allowed_apps">Các ứng dụng được phép</string>
+    <string name="blocked_apps">Các ứng dụng bị chặn</string>
+    <string name="add_app">Thêm ứng dụng</string>
     <string name="system_permission_granted">Đã cấp quyền hệ thống</string>
     <string name="system_permission_not_granted">Không cấp quyền hệ thống</string>
     <string name="open_permission_settings">Mở cài đặt quyền</string>

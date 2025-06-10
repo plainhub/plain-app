@@ -25,6 +25,9 @@ class Routing {
     object WebSettings
 
     @Serializable
+    object NotificationSettings
+
+    @Serializable
     object WebSecurity
 
     @Serializable

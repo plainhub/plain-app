@@ -17,6 +17,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.data.DVideo
+import com.ismartcoding.plain.data.NotificationFilterData
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.Language
@@ -24,6 +25,7 @@ import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.file.FileSortBy
+import kotlinx.serialization.Serializable
 import org.json.JSONObject
 import java.util.Locale
 
@@ -628,4 +630,63 @@ object HomeFeaturesPreference : BasePreference<Set<String>>() {
         AppFeatureType.CHAT, AppFeatureType.FILES, AppFeatureType.DOCS, AppFeatureType.APPS, AppFeatureType.NOTES, AppFeatureType.FEEDS
     ).map { it.name }.toSet()
     override val key = stringSetPreferencesKey("home_features")
+}
+
+object NotificationFilterPreference : BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("notification_filter")
+
+    suspend fun getValueAsync(context: Context): NotificationFilterData {
+        val str = getAsync(context)
+        if (str.isEmpty()) {
+            return NotificationFilterData()
+        }
+        return try {
+            jsonDecode(str)
+        } catch (e: Exception) {
+            NotificationFilterData()
+        }
+    }
+
+    suspend fun putAsync(
+        context: Context,
+        data: NotificationFilterData
+    ) {
+        putAsync(context, jsonEncode(data))
+    }
+
+    suspend fun toggleAppAsync(
+        context: Context,
+        packageName: String,
+    ) {
+        val data = getValueAsync(context)
+        val newApps = data.apps.toMutableSet()
+        if (newApps.contains(packageName)) {
+            newApps.remove(packageName)
+        } else {
+            newApps.add(packageName)
+        }
+        putAsync(context, data.copy(apps = newApps))
+    }
+
+    suspend fun setModeAsync(
+        context: Context,
+        mode: String
+    ) {
+        val data = getValueAsync(context)
+        putAsync(context, data.copy(mode = mode))
+    }
+
+    suspend fun isAllowedAsync(context: Context, packageName: String): Boolean {
+        val data = getValueAsync(context)
+        return when (data.mode) {
+            "allowlist" -> {
+                data.apps.contains(packageName)
+            }
+            "blacklist" -> {
+                !data.apps.contains(packageName)
+            }
+            else -> true
+        }
+    }
 }

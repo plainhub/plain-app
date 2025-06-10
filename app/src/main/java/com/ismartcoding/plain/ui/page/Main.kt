@@ -89,6 +89,7 @@ import com.ismartcoding.plain.ui.page.settings.DarkThemePage
 import com.ismartcoding.plain.ui.page.settings.LanguagePage
 import com.ismartcoding.plain.ui.page.settings.SettingsPage
 import com.ismartcoding.plain.ui.page.tools.SoundMeterPage
+import com.ismartcoding.plain.ui.page.web.NotificationSettingsPage
 import com.ismartcoding.plain.ui.page.web.SessionsPage
 import com.ismartcoding.plain.ui.page.web.WebDevPage
 import com.ismartcoding.plain.ui.page.web.WebLearnMorePage
@@ -219,6 +220,7 @@ fun Main(
                 composable<Routing.BackupRestore> { BackupRestorePage(navController) }
                 composable<Routing.About> { AboutPage(navController) }
                 composable<Routing.WebSettings> { WebSettingsPage(navController, mainVM) }
+                composable<Routing.NotificationSettings> { NotificationSettingsPage(navController) }
                 composable<Routing.Sessions> { SessionsPage(navController) }
                 composable<Routing.WebDev> { WebDevPage(navController) }
                 composable<Routing.WebSecurity> { WebSecurityPage(navController) }

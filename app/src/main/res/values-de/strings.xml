@@ -364,6 +364,15 @@
     <string name="feature_WRITE_CONTACTS">Kontakte verwalten</string>
     <string name="feature_NOTIFICATION_LISTENER">Benachrichtigungen verwalten</string>
     <string name="feature_READ_PHONE_NUMBERS">Telefonnummern lesen</string>
+    <string name="notification_filter_settings">Benachrichtigungsfilter-Einstellungen</string>
+    <string name="notification_filter_settings_desc">Wähle aus, wie Benachrichtigungen an dein PC gesendet werden sollen</string>
+    <string name="filter_mode">Filtermodus</string>
+    <string name="notification_filter_mode_desc">Wähle zwischen Zulassungsliste (nur ausgewählte Apps) oder Sperrliste (ausschließlich ausgewählte Apps) Modus</string>
+    <string name="allowlist_mode">Zulassungsliste</string>
+    <string name="blacklist_mode">Sperrliste</string>
+    <string name="allowed_apps">Erlaubte Apps</string>
+    <string name="blocked_apps">Blockierte Apps</string>
+    <string name="add_app">App hinzufügen</string>
     <string name="system_permission_granted">Systemberechtigung erteilt</string>
     <string name="system_permission_not_granted">Systemberechtigung nicht erteilt</string>
     <string name="open_permission_settings">Berechtigungseinstellungen öffnen</string>
