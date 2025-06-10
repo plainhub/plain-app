@@ -23,7 +23,7 @@ class AudioViewModel : BaseMediaViewModel<DAudio>() {
         viewModelScope.launch(Dispatchers.IO) {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
-            AudioMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids)
+            AudioMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids, trash.value)
             val pathes = itemsFlow.value.filter { ids.contains(it.id) }.map { it.path }.toSet()
             AudioPlaylistPreference.deleteAsync(context, pathes)
             loadAsync(context, tagsVM)

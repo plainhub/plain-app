@@ -99,11 +99,15 @@ fun TabContentVideos(
         density.run { ((configuration.screenWidthDp.dp - ((cellsPerRow.value - 1) * 2).dp) / cellsPerRow.value).toPx().toInt() }
     }
     val sharedFlow = Channel.sharedFlow
-    val tabs = remember(tagsState, videosVM.total.intValue) {
-        listOf(
-            VTabData(LocaleHelper.getString(R.string.all), "all", videosVM.total.intValue),
-            *tagsState.map { VTabData(it.name, it.id, it.count) }.toTypedArray()
+    val tabs = remember(tagsState, videosVM.total.intValue, videosVM.totalTrash.intValue) {
+        val baseTabs = mutableListOf(
+            VTabData(LocaleHelper.getString(R.string.all), "all", videosVM.total.intValue)
         )
+        if (AppFeatureType.MEDIA_TRASH.has()) {
+            baseTabs.add(VTabData(LocaleHelper.getString(R.string.trash), "trash", videosVM.totalTrash.intValue))
+        }
+        baseTabs.addAll(tagsState.map { VTabData(it.name, it.id, it.count) })
+        baseTabs
     }
 
     val topRefreshLayoutState =
@@ -154,13 +158,20 @@ fun TabContentVideos(
             return@LaunchedEffect
         }
         val tab = tabs.getOrNull(pagerState.currentPage) ?: return@LaunchedEffect
-        if (tab.value == "all") {
-            videosVM.trash.value = false
-            videosVM.tag.value = null
-        } else {
-            val tag = tagsState.find { it.id == tab.value }
-            videosVM.trash.value = false
-            videosVM.tag.value = tag
+        when (tab.value) {
+            "all" -> {
+                videosVM.trash.value = false
+                videosVM.tag.value = null
+            }
+            "trash" -> {
+                videosVM.trash.value = true
+                videosVM.tag.value = null
+            }
+            else -> {
+                val tag = tagsState.find { it.id == tab.value }
+                videosVM.trash.value = false
+                videosVM.tag.value = tag
+            }
         }
         scope.launch {
             scrollBehavior.reset()

@@ -19,11 +19,12 @@ fun VideoFilesSelectModeBottomActions(
     dragSelectState: DragSelectState,
 ) {
     MediaFilesSelectModeBottomActions(
-        viewModel = videosVM,
+        vm = videosVM,
         tagsVM = tagsVM,
         tagsState = tagsState,
         dragSelectState = dragSelectState,
         getItemUri = { VideoMediaStoreHelper.getItemUri(it) },
-        getCollectableItems = { videosVM.itemsFlow.collectAsStateValue() }
+        getCollectableItems = { videosVM.itemsFlow.collectAsStateValue() },
+        isInTrashMode = videosVM.trash.value
     )
 }

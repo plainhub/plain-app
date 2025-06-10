@@ -16,6 +16,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.AudioMediaStoreHelper
@@ -25,8 +26,10 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
 import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
 import com.ismartcoding.plain.ui.base.IconTextRenameButton
+import com.ismartcoding.plain.ui.base.IconTextRestoreButton
 import com.ismartcoding.plain.ui.base.IconTextSelectButton
 import com.ismartcoding.plain.ui.base.IconTextShareButton
+import com.ismartcoding.plain.ui.base.IconTextTrashButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PListItem
@@ -97,10 +100,30 @@ fun ViewAudioBottomSheet(
                     IconTextRenameButton {
                         audioVM.showRenameDialog.value = true
                     }
-                    IconTextDeleteButton {
-                        DialogHelper.confirmToDelete {
-                            audioVM.delete(context, tagsVM, setOf(m.id))
-                            onDismiss()
+                    if (AppFeatureType.MEDIA_TRASH.has()) {
+                        if (audioVM.trash.value) {
+                            IconTextRestoreButton {
+                                audioVM.restore(context, tagsVM, setOf(m.id))
+                                onDismiss()
+                            }
+                            IconTextDeleteButton {
+                                DialogHelper.confirmToDelete {
+                                    audioVM.delete(context, tagsVM, setOf(m.id))
+                                    onDismiss()
+                                }
+                            }
+                        } else {
+                            IconTextTrashButton {
+                                audioVM.trash(context, tagsVM, setOf(m.id))
+                                onDismiss()
+                            }
+                        }
+                    } else {
+                        IconTextDeleteButton {
+                            DialogHelper.confirmToDelete {
+                                audioVM.delete(context, tagsVM, setOf(m.id))
+                                onDismiss()
+                            }
                         }
                     }
                 }

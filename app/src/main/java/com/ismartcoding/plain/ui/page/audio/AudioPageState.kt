@@ -14,6 +14,7 @@ import com.ismartcoding.plain.data.DAudio
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.base.dragselect.rememberListDragSelectState
 import com.ismartcoding.plain.ui.models.AudioViewModel
@@ -42,7 +43,9 @@ data class AudioPageState(
             tagsVM.dataType.value = audioVM.dataType
             mediaFoldersVM.dataType.value = audioVM.dataType
             val tagsState by tagsVM.itemsFlow.collectAsState()
-            val pagerState = rememberPagerState(pageCount = { tagsState.size + 1 })
+            val pagerState = rememberPagerState(pageCount = { 
+                tagsState.size + if (AppFeatureType.MEDIA_TRASH.has()) 2 else 1 
+            })
             val itemsState by audioVM.itemsFlow.collectAsState()
             val scrollState = rememberLazyListState()
             

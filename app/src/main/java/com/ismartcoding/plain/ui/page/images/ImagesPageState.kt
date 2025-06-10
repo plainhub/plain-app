@@ -15,6 +15,7 @@ import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.preference.ImageGridCellsPerRowPreference
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState
@@ -47,7 +48,9 @@ data class ImagesPageState(
             tagsVM.dataType.value = imagesVM.dataType
             imageFoldersVM.dataType.value = imagesVM.dataType
             val tagsState by tagsVM.itemsFlow.collectAsState()
-            val pagerState = rememberPagerState(pageCount = { tagsState.size + 2 })
+            val pagerState = rememberPagerState(pageCount = { 
+                tagsState.size + if (AppFeatureType.MEDIA_TRASH.has()) 2 else 1 
+            })
             val itemsState by imagesVM.itemsFlow.collectAsState()
             val dragSelectState = rememberDragSelectState({ imagesVM.scrollStateMap[pagerState.currentPage] })
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {

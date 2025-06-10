@@ -99,21 +99,47 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
         _itemsFlow.value = searchAsync(context, getQuery()).toMutableStateList()
         tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
         total.intValue = countAsync(context, getTotalQuery())
+        totalTrash.intValue = countAsync(context, getTrashQuery())
         noMore.value = _itemsFlow.value.size < limit.intValue
         showLoading.value = false
     }
 
-    fun trash(ids: Set<String>) {
+    fun trash(context: Context, tagsVM: TagsViewModel, ids: Set<String>) {
         viewModelScope.launch(Dispatchers.IO) {
             DialogHelper.showLoading()
+            TagHelper.deleteTagRelationByKeys(ids, dataType)
+            when (dataType) {
+                DataType.AUDIO -> AudioMediaStoreHelper.trashByIdsAsync(context, ids)
+                DataType.IMAGE -> ImageMediaStoreHelper.trashByIdsAsync(context, ids)
+                DataType.VIDEO -> VideoMediaStoreHelper.trashByIdsAsync(context, ids)
+                else -> {}
+            }
+            loadAsync(context, tagsVM)
             DialogHelper.hideLoading()
+            _itemsFlow.update {
+                it.toMutableStateList().apply {
+                    removeIf { i -> ids.contains(i.id) }
+                }
+            }
         }
     }
 
-    fun restore(ids: Set<String>) {
+    fun restore(context: Context, tagsVM: TagsViewModel, ids: Set<String>) {
         viewModelScope.launch(Dispatchers.IO) {
             DialogHelper.showLoading()
+            when (dataType) {
+                DataType.AUDIO -> AudioMediaStoreHelper.restoreByIdsAsync(context, ids)
+                DataType.IMAGE -> ImageMediaStoreHelper.restoreByIdsAsync(context, ids)
+                DataType.VIDEO -> VideoMediaStoreHelper.restoreByIdsAsync(context, ids)
+                else -> {}
+            }
+            loadAsync(context, tagsVM)
             DialogHelper.hideLoading()
+            _itemsFlow.update {
+                it.toMutableStateList().apply {
+                    removeIf { i -> ids.contains(i.id) }
+                }
+            }
         }
     }
 

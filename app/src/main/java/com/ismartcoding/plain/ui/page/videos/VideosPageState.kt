@@ -15,6 +15,7 @@ import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.preference.VideoGridCellsPerRowPreference
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState
@@ -48,7 +49,9 @@ data class VideosPageState(
             mediaFoldersVM.dataType.value = videosVM.dataType
             tagsVM.dataType.value = videosVM.dataType
             val tagsState by tagsVM.itemsFlow.collectAsState()
-            val pagerState = rememberPagerState(pageCount = { tagsState.size + 1 })
+            val pagerState = rememberPagerState(pageCount = { 
+                tagsState.size + if (AppFeatureType.MEDIA_TRASH.has()) 2 else 1 
+            })
             val itemsState by videosVM.itemsFlow.collectAsState()
             val dragSelectState = rememberDragSelectState({ videosVM.scrollStateMap[pagerState.currentPage] })
             val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(canScroll = {

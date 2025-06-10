@@ -24,7 +24,7 @@ class VideosViewModel : BaseMediaViewModel<DVideo>() {
         viewModelScope.launch(Dispatchers.IO) {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
-            VideoMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids)
+            VideoMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids, trash.value)
             loadAsync(context, tagsVM)
             DialogHelper.hideLoading()
         }

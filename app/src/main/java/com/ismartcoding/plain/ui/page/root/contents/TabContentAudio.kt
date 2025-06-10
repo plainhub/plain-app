@@ -90,11 +90,15 @@ fun TabContentAudio(
     val dragSelectState = audioState.dragSelectState
     val itemsState = audioState.itemsState
     val scrollState = audioState.scrollState
-    val tabs = remember(tagsState, audioVM.total.intValue) {
-        listOf(
-            VTabData(LocaleHelper.getString(R.string.all), "all", audioVM.total.intValue),
-            *tagsState.map { VTabData(it.name, it.id, it.count) }.toTypedArray()
+    val tabs = remember(tagsState, audioVM.total.intValue, audioVM.totalTrash.intValue) {
+        val baseTabs = mutableListOf(
+            VTabData(LocaleHelper.getString(R.string.all), "all", audioVM.total.intValue)
         )
+        if (AppFeatureType.MEDIA_TRASH.has()) {
+            baseTabs.add(VTabData(LocaleHelper.getString(R.string.trash), "trash", audioVM.totalTrash.intValue))
+        }
+        baseTabs.addAll(tagsState.map { VTabData(it.name, it.id, it.count) })
+        baseTabs
     }
 
     val isAudioPlaying by AudioPlayer.isPlayingFlow.collectAsState()
@@ -145,13 +149,20 @@ fun TabContentAudio(
 
     LaunchedEffect(pagerState.currentPage) {
         val tab = tabs.getOrNull(pagerState.currentPage) ?: return@LaunchedEffect
-        if (tab.value == "all") {
-            audioVM.trash.value = false
-            audioVM.tag.value = null
-        } else {
-            val tag = tagsState.find { it.id == tab.value }
-            audioVM.trash.value = false
-            audioVM.tag.value = tag
+        when (tab.value) {
+            "all" -> {
+                audioVM.trash.value = false
+                audioVM.tag.value = null
+            }
+            "trash" -> {
+                audioVM.trash.value = true
+                audioVM.tag.value = null
+            }
+            else -> {
+                val tag = tagsState.find { it.id == tab.value }
+                audioVM.trash.value = false
+                audioVM.tag.value = tag
+            }
         }
         scope.launch {
             scrollBehavior.reset()

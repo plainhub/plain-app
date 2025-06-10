@@ -155,6 +155,16 @@ fun IconTextSmallButtonRestore(
     )
 }
 
+@Composable
+fun IconTextSmallButtonTrash(
+    click: () -> Unit,
+) {
+    PIconTextSmallButton(
+        R.drawable.trash_2,
+        text = stringResource(R.string.trash),
+        click = click
+    )
+}
 
 @Composable
 fun IconTrashButton(

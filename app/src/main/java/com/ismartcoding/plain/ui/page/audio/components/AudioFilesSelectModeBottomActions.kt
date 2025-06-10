@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DTag
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.media.AudioMediaStoreHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
@@ -20,7 +21,9 @@ import com.ismartcoding.plain.ui.base.IconTextSmallButtonDelete
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonLabel
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonLabelOff
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonPlaylistAdd
+import com.ismartcoding.plain.ui.base.IconTextSmallButtonRestore
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonShare
+import com.ismartcoding.plain.ui.base.IconTextSmallButtonTrash
 import com.ismartcoding.plain.ui.base.PBottomAppBar
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -77,10 +80,30 @@ fun AudioFilesSelectModeBottomActions(
             IconTextSmallButtonShare {
                 ShareHelper.shareUris(context, dragSelectState.selectedIds.map { AudioMediaStoreHelper.getItemUri(it) })
             }
-            IconTextSmallButtonDelete {
-                DialogHelper.confirmToDelete {
-                    audioVM.delete(context, tagsVM, dragSelectState.selectedIds.toSet())
-                    dragSelectState.exitSelectMode()
+            if (AppFeatureType.MEDIA_TRASH.has()) {
+                if (audioVM.trash.value) {
+                    IconTextSmallButtonRestore {
+                        audioVM.restore(context, tagsVM, dragSelectState.selectedIds.toSet())
+                        dragSelectState.exitSelectMode()
+                    }
+                    IconTextSmallButtonDelete {
+                        DialogHelper.confirmToDelete {
+                            audioVM.delete(context, tagsVM, dragSelectState.selectedIds.toSet())
+                            dragSelectState.exitSelectMode()
+                        }
+                    }
+                } else {
+                    IconTextSmallButtonTrash {
+                        audioVM.trash(context, tagsVM, dragSelectState.selectedIds.toSet())
+                        dragSelectState.exitSelectMode()
+                    }
+                }
+            } else {
+                IconTextSmallButtonDelete {
+                    DialogHelper.confirmToDelete {
+                        audioVM.delete(context, tagsVM, dragSelectState.selectedIds.toSet())
+                        dragSelectState.exitSelectMode()
+                    }
                 }
             }
         }

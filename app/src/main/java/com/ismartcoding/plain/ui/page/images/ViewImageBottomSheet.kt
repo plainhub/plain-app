@@ -22,6 +22,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
@@ -33,9 +34,11 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
 import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
 import com.ismartcoding.plain.ui.base.IconTextRenameButton
+import com.ismartcoding.plain.ui.base.IconTextRestoreButton
 import com.ismartcoding.plain.ui.base.IconTextScanQrCodeButton
 import com.ismartcoding.plain.ui.base.IconTextSelectButton
 import com.ismartcoding.plain.ui.base.IconTextShareButton
+import com.ismartcoding.plain.ui.base.IconTextTrashButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PListItem
@@ -136,10 +139,30 @@ fun ViewImageBottomSheet(
                     IconTextRenameButton {
                         imagesVM.showRenameDialog.value = true
                     }
-                    IconTextDeleteButton {
-                        DialogHelper.confirmToDelete {
-                            imagesVM.delete(context, tagsVM, setOf(m.id))
-                            onDismiss()
+                    if (AppFeatureType.MEDIA_TRASH.has()) {
+                        if (imagesVM.trash.value) {
+                            IconTextRestoreButton {
+                                imagesVM.restore(context, tagsVM, setOf(m.id))
+                                onDismiss()
+                            }
+                            IconTextDeleteButton {
+                                DialogHelper.confirmToDelete {
+                                    imagesVM.delete(context, tagsVM, setOf(m.id))
+                                    onDismiss()
+                                }
+                            }
+                        } else {
+                            IconTextTrashButton {
+                                imagesVM.trash(context, tagsVM, setOf(m.id))
+                                onDismiss()
+                            }
+                        }
+                    } else {
+                        IconTextDeleteButton {
+                            DialogHelper.confirmToDelete {
+                                imagesVM.delete(context, tagsVM, setOf(m.id))
+                                onDismiss()
+                            }
                         }
                     }
                 }

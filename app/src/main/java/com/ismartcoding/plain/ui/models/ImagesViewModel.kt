@@ -22,7 +22,7 @@ class ImagesViewModel : BaseMediaViewModel<DImage>() {
         viewModelScope.launch(Dispatchers.IO) {
             DialogHelper.showLoading()
             TagHelper.deleteTagRelationByKeys(ids, dataType)
-            ImageMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids)
+            ImageMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids, trash.value)
             loadAsync(context, tagsVM)
             DialogHelper.hideLoading()
         }
