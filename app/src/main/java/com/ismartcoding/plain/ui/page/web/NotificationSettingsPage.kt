@@ -59,39 +59,39 @@ import kotlinx.coroutines.launch
 @Composable
 fun NotificationSettingsPage(
     navController: NavHostController,
-    viewModel: NotificationSettingsViewModel = viewModel()
+    vm: NotificationSettingsViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val selectedAppsState by viewModel.selectedAppsFlow.collectAsState()
+    val selectedAppsState by vm.selectedAppsFlow.collectAsState()
 
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.IO) {
-            viewModel.loadDataAsync(context)
+            vm.loadDataAsync(context)
         }
     }
 
     fun toggleMode() {
         scope.launch(Dispatchers.IO) {
-            viewModel.toggleModeAsync(context)
+            vm.toggleModeAsync(context)
         }
     }
 
     fun removeApp(packageName: String) {
         scope.launch(Dispatchers.IO) {
-            viewModel.removeAppAsync(context, packageName)
+            vm.removeAppAsync(context, packageName)
         }
     }
 
     fun addApps(packageNames: List<String>) {
         scope.launch(Dispatchers.IO) {
-            viewModel.addAppsAsync(context, packageNames)
+            vm.addAppsAsync(context, packageNames)
         }
     }
 
     fun clearAll() {
         scope.launch(Dispatchers.IO) {
-            viewModel.clearAllAsync(context)
+            vm.clearAllAsync(context)
         }
     }
 
@@ -143,8 +143,8 @@ fun NotificationSettingsPage(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             FilterChip(
-                                selected = viewModel.filterData.value.mode == "allowlist",
-                                onClick = { if (viewModel.filterData.value.mode != "allowlist") toggleMode() },
+                                selected = vm.filterData.value.mode == "allowlist",
+                                onClick = { if (vm.filterData.value.mode != "allowlist") toggleMode() },
                                 label = { Text(stringResource(R.string.allowlist_mode)) },
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = MaterialTheme.colorScheme.primary,
@@ -154,8 +154,8 @@ fun NotificationSettingsPage(
                                 )
                             )
                             FilterChip(
-                                selected = viewModel.filterData.value.mode == "blacklist",
-                                onClick = { if (viewModel.filterData.value.mode != "blacklist") toggleMode() },
+                                selected = vm.filterData.value.mode == "blacklist",
+                                onClick = { if (vm.filterData.value.mode != "blacklist") toggleMode() },
                                 label = { Text(stringResource(R.string.blacklist_mode)) },
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = MaterialTheme.colorScheme.primary,
@@ -173,7 +173,7 @@ fun NotificationSettingsPage(
             item {
                 Subtitle(
                     text = stringResource(
-                        if (viewModel.filterData.value.mode == "allowlist")
+                        if (vm.filterData.value.mode == "allowlist")
                             R.string.allowed_apps
                         else
                             R.string.blocked_apps
@@ -181,7 +181,7 @@ fun NotificationSettingsPage(
                 )
             }
 
-            if (!viewModel.isLoading.value) {
+            if (!vm.isLoading.value) {
                 items(selectedAppsState, key = { it.id }) { app ->
                     Row(
                         modifier = PlainTheme
@@ -220,7 +220,7 @@ fun NotificationSettingsPage(
                         TextButton(
                             onClick = { removeApp(app.id) }
                         ) {
-                            Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.red)
+                            Text(stringResource(R.string.remove), color = MaterialTheme.colorScheme.red)
                         }
                     }
                     VerticalSpace(dp = 8.dp)
@@ -229,7 +229,7 @@ fun NotificationSettingsPage(
                 item {
                     Button(
                         onClick = { 
-                            viewModel.showAppSelectorDialog()
+                            vm.showAppSelectorDialog()
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -253,13 +253,13 @@ fun NotificationSettingsPage(
         }
     }
 
-    if (viewModel.showAppSelector.value) {
+    if (vm.showAppSelector.value) {
         AppSelectorBottomSheet(
-            vm = viewModel,
-            onDismiss = { viewModel.showAppSelector.value = false },
+            vm = vm,
+            onDismiss = { vm.showAppSelector.value = false },
             onAppsSelected = { packageNames ->
                 addApps(packageNames)
-                viewModel.showAppSelector.value = false
+                vm.showAppSelector.value = false
             }
         )
     }

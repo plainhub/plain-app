@@ -62,9 +62,9 @@ fun AppSelectorBottomSheet(
         if (searchQuery.isBlank()) {
             allAppsState
         } else {
-            allAppsState.filter { 
-                it.name.contains(searchQuery, ignoreCase = true) || 
-                it.id.contains(searchQuery, ignoreCase = true)
+            allAppsState.filter {
+                it.name.contains(searchQuery, ignoreCase = true) ||
+                        it.id.contains(searchQuery, ignoreCase = true)
             }
         }
     }
@@ -94,13 +94,13 @@ fun AppSelectorBottomSheet(
                 actions = {
                     PTopRightButton(
                         stringResource(R.string.add) +
-                            if (vm.selectedAppIds.isNotEmpty()) " (${vm.selectedAppIds.size})" else "", click = {
-                        if (vm.selectedAppIds.isNotEmpty()) {
-                            onAppsSelected(vm.selectedAppIds.toList())
-                            vm.clearSelectedApps()
-                            onDismiss()
-                        }
-                    }, enabled = vm.selectedAppIds.isNotEmpty()
+                                if (vm.selectedAppIds.isNotEmpty()) " (${vm.selectedAppIds.size})" else "", click = {
+                            if (vm.selectedAppIds.isNotEmpty()) {
+                                onAppsSelected(vm.selectedAppIds.toList())
+                                vm.clearSelectedApps()
+                                onDismiss()
+                            }
+                        }, enabled = vm.selectedAppIds.isNotEmpty()
                     )
                 }
             )
@@ -132,7 +132,7 @@ fun AppSelectorBottomSheet(
                         .fillMaxWidth()
                         .weight(1f)
                 ) {
-                    items(filteredApps, key = { it.id }) { app ->
+                    items(filteredApps.filter { !vm.filterData.value.apps.contains(it.id) }, key = { it.id }) { app ->
                         AppSelectorItem(
                             app = app,
                             isSelected = vm.selectedAppIds.contains(app.id),
@@ -154,10 +154,10 @@ private fun AppSelectorItem(
     isSelected: Boolean,
     onToggleSelection: () -> Unit
 ) {
-    val appIcon = remember(app.id) { 
-        packageManager.getApplicationIcon(app.appInfo) 
+    val appIcon = remember(app.id) {
+        packageManager.getApplicationIcon(app.appInfo)
     }
-    
+
     Row(
         modifier = Modifier
             .fillMaxWidth()

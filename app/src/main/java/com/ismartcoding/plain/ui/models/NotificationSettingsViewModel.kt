@@ -96,8 +96,6 @@ class NotificationSettingsViewModel : ViewModel() {
         }
         filterData.value = NotificationFilterPreference.getValueAsync(context)
         loadSelectedApps(context)
-        // Remove added apps from all apps list
-        _allAppsFlow.value.removeAll { packageNames.contains(it.id) }
         refreshNotifications()
     }
 

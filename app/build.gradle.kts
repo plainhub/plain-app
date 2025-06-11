@@ -41,9 +41,9 @@ android {
                 else -> 0
             }
 
-        val vCode = 364
+        val vCode = 367
         versionCode = vCode - singleAbiNum
-        versionName = "2.0.10"
+        versionName = "2.0.11"
 
         ndk {
             //noinspection ChromeOsAbiSupport
