@@ -36,10 +36,10 @@ sdk.dir=/Users/$USER/Library/Android/sdk
 EOF
 
 ./gradlew assembleGithubRelease || err_and_exit "assembleGithubRelease failed"
-./gradlew assembleChinaRelease || err_and_exit "assembleChinaRelease failed"
+#./gradlew assembleChinaRelease || err_and_exit "assembleChinaRelease failed"
 
 BUILD_FILE="PlainApp-$(getVersionName).apk"
 mv ./app/build/outputs/apk/github/release/app-github-release.apk ./app/build/outputs/apk/github/release/$BUILD_FILE
 
-BUILD_FILE="PlainApp-$(getVersionName)-china.apk"
-mv ./app/build/outputs/apk/china/release/app-china-release.apk ./app/build/outputs/apk/china/release/$BUILD_FILE
+#BUILD_FILE="PlainApp-$(getVersionName)-china.apk"
+#mv ./app/build/outputs/apk/china/release/app-china-release.apk ./app/build/outputs/apk/china/release/$BUILD_FILE
