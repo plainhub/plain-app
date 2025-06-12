@@ -36,4 +36,16 @@
         <item quantity="one">%,d सेकंड</item>
         <item quantity="other">%,d सेकंड</item>
     </plurals>
+    <plurals name="n_pomodoros">
+        <item quantity="one">%,d पोमोडोरो</item>
+        <item quantity="other">%,d पोमोडोरो</item>
+    </plurals>
+    <plurals name="today_stats_pomodoros">
+        <item quantity="one">आज: %,d पोमोडोरो</item>
+        <item quantity="other">आज: %,d पोमोडोरो</item>
+    </plurals>
+    <plurals name="total_stats_pomodoros">
+        <item quantity="one">कुल: %,d पोमोडोरो</item>
+        <item quantity="other">कुल: %,d पोमोडोरो</item>
+    </plurals>
 </resources>

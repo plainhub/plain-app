@@ -4,11 +4,11 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.PowerManager
+import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.ChannelEvent
-import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.SslHelper
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
@@ -22,15 +22,23 @@ import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.features.bluetooth.BluetoothFindOneEvent
+import com.ismartcoding.plain.features.bluetooth.BluetoothPermissionResultEvent
+import com.ismartcoding.plain.features.bluetooth.BluetoothUtil
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.services.HttpServerService
+import com.ismartcoding.plain.preference.PomodoroSettingsPreference
+import com.ismartcoding.plain.ui.MainActivity
+import com.ismartcoding.plain.ui.page.pomodoro.PomodoroHelper
+import com.ismartcoding.plain.ui.page.pomodoro.PomodoroHelper.playNotificationSound
+import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import com.ismartcoding.plain.web.AuthRequest
 import com.ismartcoding.plain.web.websocket.WebSocketHelper
 import io.ktor.server.websocket.DefaultWebSocketServerSession
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import androidx.core.content.ContextCompat
+import kotlinx.coroutines.withTimeoutOrNull
 
 // The events raised by the app
 class StartHttpServerEvent : ChannelEvent()
@@ -96,93 +104,144 @@ class ClearAudioPlaylistEvent : ChannelEvent()
 
 class FeedStatusEvent(val feedId: String, val status: FeedWorkerStatus) : ChannelEvent()
 
-data class PlayAudioEvent(val uri: Uri) : ChannelEvent()
-
 data class PlayAudioResultEvent(val uri: Uri) : ChannelEvent()
+
+class SleepTimerEvent(val durationMs: Long) : ChannelEvent()
+
+class CancelSleepTimerEvent : ChannelEvent()
+
+class PomodoroTimerEvent(val timeLeft: Int, val state: PomodoroState) : ChannelEvent()
+
+class CancelPomodoroTimerEvent : ChannelEvent()
 
 object AppEvents {
     private lateinit var mediaPlayer: MediaPlayer
     private var mediaPlayingUri: Uri? = null
+    private var sleepTimerJob: Job? = null
+    private var pomodoroTimerJob: Job? = null
     val wakeLock: PowerManager.WakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "${BuildConfig.APPLICATION_ID}:http_server")
+
 
     fun register() {
         mediaPlayer = MediaPlayer()
-        receiveEventHandler<PlayAudioEvent> { event ->
-            launch {
-                try {
-                    SslHelper.disableSSLCertificateChecking()
-                    if (mediaPlayer.isPlaying) {
-                        mediaPlayer.stop()
-                        mediaPlayingUri?.let {
-                            if (it.toString() != event.uri.toString()) {
-                                sendEvent(PlayAudioResultEvent(it))
+        val sharedFlow = Channel.sharedFlow
+        coMain {
+            sharedFlow.collect { event ->
+                when (event) {
+                    is BluetoothPermissionResultEvent -> {
+                        BluetoothUtil.canContinue = true
+                    }
+
+                    is BluetoothFindOneEvent -> {
+                        if (BluetoothUtil.isScanning) {
+                            return@collect
+                        }
+                        coIO {
+                            withTimeoutOrNull(3000) {
+                                BluetoothUtil.currentBTDevice = BluetoothUtil.findOneAsync(event.mac)
+                            }
+                        }
+
+                        BluetoothUtil.stopScan()
+                    }
+
+                    is SleepTimerEvent -> {
+                        sleepTimerJob?.cancel()
+                        sleepTimerJob = coIO {
+                            delay(event.durationMs)
+                            AudioPlayer.pause()
+                        }
+                    }
+
+                    is CancelSleepTimerEvent -> {
+                        sleepTimerJob?.cancel()
+                        sleepTimerJob = null
+                    }
+
+                    is PomodoroTimerEvent -> {
+                        pomodoroTimerJob?.cancel()
+                        pomodoroTimerJob = coIO {
+                            delay(event.timeLeft * 1000L)
+                            MainActivity.instance.get()?.pomodoroVM?.let { vm ->
+                                when (vm.currentState.value) {
+                                    PomodoroState.WORK -> vm.handleWorkSessionCompleteAsync(isSkip = false)
+                                    PomodoroState.SHORT_BREAK, PomodoroState.LONG_BREAK -> vm.handleBreakSessionComplete()
+                                }
+                                vm.resetSessionState()
+                            }
+                            val context = MainApp.instance
+                            val settings = PomodoroSettingsPreference.getValueAsync(context)
+                            if (settings.showNotification) {
+                                PomodoroHelper.showNotificationAsync(context, event.state)
+                            }
+                            if (settings.playSoundOnComplete) {
+                                try {
+                                    PomodoroHelper.playNotificationSound()
+                                } catch (e: Exception) {
+                                    LogCat.e("Failed to play Pomodoro sound: ${e.message}")
+                                }
                             }
                         }
                     }
-                    mediaPlayingUri = event.uri
-                    mediaPlayer.reset()
-                    mediaPlayer.setDataSource(MainApp.instance, event.uri)
-                    mediaPlayer.setOnCompletionListener {
-                        mediaPlayer.stop()
-                        sendEvent(PlayAudioResultEvent(event.uri))
+
+                    is CancelPomodoroTimerEvent -> {
+                        pomodoroTimerJob?.cancel()
+                        pomodoroTimerJob = null
                     }
-                    mediaPlayer.prepare()
-                    mediaPlayer.start()
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                    sendEvent(PlayAudioResultEvent(event.uri))
-                }
-            }
-        }
 
-        receiveEventHandler<WebSocketEvent> { event ->
-            coIO {
-                WebSocketHelper.sendEventAsync(event)
-            }
-        }
+                    is WebSocketEvent -> {
+                        coIO {
+                            WebSocketHelper.sendEventAsync(event)
+                        }
+                    }
 
-        receiveEventHandler<AcquireWakeLockEvent> {
-            coIO {
-                LogCat.d("AcquireWakeLockEvent")
-                if (!wakeLock.isHeld) {
-                    wakeLock.acquire()
-                }
-            }
-        }
+                    is AcquireWakeLockEvent -> {
+                        coIO {
+                            LogCat.d("AcquireWakeLockEvent")
+                            if (!wakeLock.isHeld) {
+                                wakeLock.acquire()
+                            }
+                        }
+                    }
 
-        receiveEventHandler<ReleaseWakeLockEvent> {
-            coIO {
-                LogCat.d("ReleaseWakeLockEvent")
-                if (wakeLock.isHeld) {
-                    wakeLock.release()
-                }
-            }
-        }
+                    is ReleaseWakeLockEvent -> {
+                        coIO {
+                            LogCat.d("ReleaseWakeLockEvent")
+                            if (wakeLock.isHeld) {
+                                wakeLock.release()
+                            }
+                        }
+                    }
 
-        receiveEventHandler<PermissionsResultEvent> { event ->
-            if (event.map.containsKey(Permission.POST_NOTIFICATIONS.toSysPermission())) {
-                if (AudioPlayer.isPlaying()) {
-                    AudioPlayer.pause()
-                    AudioPlayer.play()
-                }
-            }
-        }
+                    is PermissionsResultEvent -> {
+                        coMain {
+                            if (event.map.containsKey(Permission.POST_NOTIFICATIONS.toSysPermission())) {
+                                if (AudioPlayer.isPlaying()) {
+                                    AudioPlayer.pause()
+                                    AudioPlayer.play()
+                                }
+                            }
+                        }
+                    }
 
-        receiveEventHandler<StartHttpServerEvent> {
-            coIO {
-                var retry = 3
-                while (retry > 0) {
-                    try {
+                    is StartHttpServerEvent -> {
+                        var retry = 3
                         val context = MainApp.instance
-                        androidx.core.content.ContextCompat.startForegroundService(
-                            context, 
-                            Intent(context, HttpServerService::class.java)
-                        )
-                        break
-                    } catch (ex: Exception) {
-                        LogCat.e(ex.toString())
-                        delay(500)
-                        retry--
+                        coIO {
+                            while (retry > 0) {
+                                try {
+                                    androidx.core.content.ContextCompat.startForegroundService(
+                                        context,
+                                        Intent(context, HttpServerService::class.java)
+                                    )
+                                    break
+                                } catch (ex: Exception) {
+                                    LogCat.e(ex.toString())
+                                    delay(500)
+                                    retry--
+                                }
+                            }
+                        }
                     }
                 }
             }

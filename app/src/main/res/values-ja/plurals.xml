@@ -36,4 +36,16 @@
         <item quantity="one">%,d 秒</item>
         <item quantity="other">%,d 秒</item>
     </plurals>
+    <plurals name="n_pomodoros">
+        <item quantity="one">%,d ポモドーロ</item>
+        <item quantity="other">%,d ポモドーロ</item>
+    </plurals>
+    <plurals name="today_stats_pomodoros">
+        <item quantity="one">今日: %,d ポモドーロ</item>
+        <item quantity="other">今日: %,d ポモドーロ</item>
+    </plurals>
+    <plurals name="total_stats_pomodoros">
+        <item quantity="one">合計: %,d ポモドーロ</item>
+        <item quantity="other">合計: %,d ポモドーロ</item>
+    </plurals>
 </resources>

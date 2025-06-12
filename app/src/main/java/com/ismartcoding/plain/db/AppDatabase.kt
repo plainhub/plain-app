@@ -22,8 +22,9 @@ class AiChatsDeletionSpec : AutoMigrationSpec
     entities = [
         DChat::class, DSession::class, DTag::class, DTagRelation::class,
         DNote::class, DFeed::class, DFeedEntry::class, DBook::class, DBookChapter::class,
+        DPomodoroItem::class,
     ],
-    version = 4,
+    version = 5,
     autoMigrations = [
         AutoMigration(from = 1, to = 2, spec = AppDatabase.AutoMigration1To2::class),
         AutoMigration(
@@ -34,6 +35,9 @@ class AiChatsDeletionSpec : AutoMigrationSpec
             from = 3,
             to = 4,
             spec = AiChatsDeletionSpec::class
+        ), AutoMigration(
+            from = 4,
+            to = 5
         )
     ],
     exportSchema = true,
@@ -55,6 +59,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun feedEntryDao(): FeedEntryDao
 
     abstract fun bookDao(): BookDao
+
+    abstract fun pomodoroItemDao(): PomodoroItemDao
 
     class AutoMigration1To2 : AutoMigrationSpec {
 

@@ -18,6 +18,7 @@ import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.data.NotificationFilterData
+import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.Language
@@ -25,7 +26,6 @@ import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.file.FileSortBy
-import kotlinx.serialization.Serializable
 import org.json.JSONObject
 import java.util.Locale
 
@@ -688,5 +688,29 @@ object NotificationFilterPreference : BasePreference<String>() {
             }
             else -> true
         }
+    }
+}
+
+object PomodoroSettingsPreference : BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("pomodoro_settings")
+
+    suspend fun getValueAsync(context: Context): DPomodoroSettings {
+        val str = getAsync(context)
+        if (str.isEmpty()) {
+            return DPomodoroSettings()
+        }
+        return try {
+            jsonDecode(str)
+        } catch (e: Exception) {
+            DPomodoroSettings()
+        }
+    }
+
+    suspend fun putAsync(
+        context: Context,
+        value: DPomodoroSettings,
+    ) {
+        putAsync(context, jsonEncode(value))
     }
 }

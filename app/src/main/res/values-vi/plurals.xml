@@ -36,4 +36,16 @@
         <item quantity="one">%,d giây</item>
         <item quantity="other">%,d giây</item>
     </plurals>
+    <plurals name="n_pomodoros">
+        <item quantity="one">%,d pomodoro</item>
+        <item quantity="other">%,d pomodoro</item>
+    </plurals>
+    <plurals name="today_stats_pomodoros">
+        <item quantity="one">Hôm nay: %,d pomodoro</item>
+        <item quantity="other">Hôm nay: %,d pomodoro</item>
+    </plurals>
+    <plurals name="total_stats_pomodoros">
+        <item quantity="one">Tổng: %,d pomodoro</item>
+        <item quantity="other">Tổng: %,d pomodoro</item>
+    </plurals>
 </resources>

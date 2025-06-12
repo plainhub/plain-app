@@ -1,14 +1,11 @@
 package com.ismartcoding.plain.ui.page.audio
 
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
 import android.os.SystemClock
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,7 +21,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -47,37 +43,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.lib.channel.Channel
+import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.alarmManager
-import com.ismartcoding.plain.enums.AudioServiceAction
 import com.ismartcoding.plain.enums.ButtonType
-import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.events.PermissionsResultEvent
-import com.ismartcoding.plain.services.AudioPlayerService
+import com.ismartcoding.plain.events.SleepTimerEvent
+import com.ismartcoding.plain.events.CancelSleepTimerEvent
+import com.ismartcoding.plain.ui.base.CircularTimer
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
+import com.ismartcoding.plain.ui.base.VerticalSpace
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
-
-// Helper functions for timer intent creation
-private fun makeTimerIntent(context: Context): Intent {
-    val intent = Intent(context, AudioPlayerService::class.java)
-    return intent.setAction(AudioServiceAction.QUIT.name)
-}
-
-private fun makeTimerPendingIntent(context: Context, flag: Int): PendingIntent {
-    return PendingIntent.getService(
-        context,
-        0,
-        makeTimerIntent(context),
-        flag or PendingIntent.FLAG_IMMUTABLE
-    )
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,11 +69,11 @@ fun SleepTimerPage(
         skipPartiallyExpanded = true
     )
     val context = LocalContext.current
-    val sharedFlow = Channel.sharedFlow
 
     var timerActive by remember { mutableStateOf(false) }
     var remainingTimeMs by remember { mutableLongStateOf(0L) }
     var selectedTimeMinutes by remember { mutableIntStateOf(15) }
+    var timerJob by remember { mutableStateOf<Job?>(null) }
     
     LaunchedEffect(Unit) {
         val futureTime = TempData.audioSleepTimerFutureTime
@@ -108,40 +88,18 @@ fun SleepTimerPage(
         sheetState.expand()
     }
 
-    LaunchedEffect(sharedFlow) {
-        sharedFlow.collect { event ->
-            when (event) {
-                is PermissionsResultEvent -> {
-                    if (isSPlus()) {
-                        if (alarmManager.canScheduleExactAlarms()) {
-                            alarmManager.setExact(
-                                AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                TempData.audioSleepTimerFutureTime,
-                                makeTimerPendingIntent(context, PendingIntent.FLAG_CANCEL_CURRENT)
-                            )
-                        } else {
-                            alarmManager.setWindow(
-                                AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                TempData.audioSleepTimerFutureTime,
-                                1000,
-                                makeTimerPendingIntent(context, PendingIntent.FLAG_CANCEL_CURRENT)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     LaunchedEffect(timerActive) {
         if (timerActive && remainingTimeMs > 0) {
-            while (true) {
-                delay(1000)
-                remainingTimeMs = maxOf(0, TempData.audioSleepTimerFutureTime - SystemClock.elapsedRealtime())
+            timerJob?.cancel()
+            timerJob = scope.launch {
+                while (true) {
+                    delay(1000)
+                    remainingTimeMs = maxOf(0, TempData.audioSleepTimerFutureTime - SystemClock.elapsedRealtime())
 
-                if (remainingTimeMs <= 0 || TempData.audioSleepTimerFutureTime <= 0) {
-                    timerActive = false
-                    break
+                    if (remainingTimeMs <= 0) {
+                        timerActive = false
+                        break
+                    }
                 }
             }
         }
@@ -189,19 +147,18 @@ fun SleepTimerPage(
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
-                                .size(240.dp)
-                                .padding(8.dp)
+                                .size(250.dp)
                         ) {
                             val hours = TimeUnit.MILLISECONDS.toHours(remainingTimeMs)
                             val minutes = TimeUnit.MILLISECONDS.toMinutes(remainingTimeMs) % 60
                             val seconds = TimeUnit.MILLISECONDS.toSeconds(remainingTimeMs) % 60
 
-                            CircularProgressIndicator(
-                                progress = { (remainingTimeMs / (selectedTimeMinutes * 60f * 1000f)).coerceIn(0f, 1f) },
-                                modifier = Modifier.size(240.dp),
-                                color = MaterialTheme.colorScheme.primary,
-                                strokeWidth = 10.dp,
-                                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                            val totalDurationMs = selectedTimeMinutes * 60f * 1000f
+                            val elapsedTimeMs = totalDurationMs - remainingTimeMs
+                            val progress = (elapsedTimeMs / totalDurationMs).coerceIn(0f, 1f)
+                            
+                            CircularTimer(
+                                progress = progress,
                             )
 
                             Column(
@@ -210,17 +167,18 @@ fun SleepTimerPage(
                                 Text(
                                     text = String.format("%02d:%02d:%02d", hours, minutes, seconds),
                                     style = MaterialTheme.typography.displayMedium.copy(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 42.sp
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 48.sp
                                     ),
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
+                                VerticalSpace(dp = 8.dp)
 
                                 Text(
                                     text = stringResource(R.string.remaining),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(top = 4.dp)
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                                    fontWeight = FontWeight.Medium
                                 )
                             }
                         }
@@ -232,20 +190,12 @@ fun SleepTimerPage(
                             onClick = {
                                 scope.launch {
                                     withIO {
-                                        val previous = PendingIntent.getService(
-                                            context,
-                                            0,
-                                            makeTimerIntent(context),
-                                            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
-                                        )
-                                        if (previous != null) {
-                                            alarmManager.cancel(previous)
-                                            previous.cancel()
-                                        }
                                         TempData.audioSleepTimerFutureTime = 0
                                     }
+                                    timerJob?.cancel()
                                     timerActive = false
                                     remainingTimeMs = 0
+                                    sendEvent(CancelSleepTimerEvent())
                                 }
                             },
                             type = ButtonType.DANGER
@@ -300,26 +250,9 @@ fun SleepTimerPage(
                                         val durationMs = selectedTimeMinutes * 60 * 1000L
                                         TempData.audioSleepTimerFutureTime = SystemClock.elapsedRealtime() + durationMs
                                         remainingTimeMs = durationMs
-
-                                        if (isSPlus()) {
-                                            if (alarmManager.canScheduleExactAlarms()) {
-                                                alarmManager.setExact(
-                                                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                                    TempData.audioSleepTimerFutureTime,
-                                                    makeTimerPendingIntent(context, PendingIntent.FLAG_CANCEL_CURRENT)
-                                                )
-                                            } else {
-                                                Permission.SCHEDULE_EXACT_ALARM.grant(context)
-                                            }
-                                        } else {
-                                            alarmManager.setExact(
-                                                AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                                TempData.audioSleepTimerFutureTime,
-                                                makeTimerPendingIntent(context, PendingIntent.FLAG_CANCEL_CURRENT)
-                                            )
-                                        }
                                     }
                                     timerActive = true
+                                    sendEvent(SleepTimerEvent(selectedTimeMinutes * 60 * 1000L))
                                 }
                             }
                         )

@@ -36,4 +36,16 @@
         <item quantity="one">%,d Sekunde</item>
         <item quantity="other">%,d Sekunden</item>
     </plurals>
+    <plurals name="n_pomodoros">
+        <item quantity="one">%,d Pomodoro</item>
+        <item quantity="other">%,d Pomodoros</item>
+    </plurals>
+    <plurals name="today_stats_pomodoros">
+        <item quantity="one">Heute: %,d Pomodoro</item>
+        <item quantity="other">Heute: %,d Pomodoros</item>
+    </plurals>
+    <plurals name="total_stats_pomodoros">
+        <item quantity="one">Gesamt: %,d Pomodoro</item>
+        <item quantity="other">Gesamt: %,d Pomodoros</item>
+    </plurals>
 </resources>

@@ -90,7 +90,20 @@ fun RootPage(
         mediaFoldersVM = audioFoldersVM,
     )
 
-    BackHandler {
+    BackHandler(enabled = when (pagerState.currentPage) {
+        RootTabType.IMAGES.value -> imagesState.previewerState.visible || 
+                                   imagesState.dragSelectState.selectMode || 
+                                   imageCastVM.castMode.value || 
+                                   imagesVM.showSearchBar.value
+        RootTabType.VIDEOS.value -> videosState.previewerState.visible || 
+                                   videosState.dragSelectState.selectMode || 
+                                   videoCastVM.castMode.value || 
+                                   videosVM.showSearchBar.value
+        RootTabType.AUDIO.value -> audioState.dragSelectState.selectMode || 
+                                  audioCastVM.castMode.value || 
+                                  audioVM.showSearchBar.value
+        else -> false
+    }) {
         if (pagerState.currentPage == RootTabType.IMAGES.value) {
             if (imagesState.previewerState.visible) {
                 scope.launch {
@@ -108,8 +121,6 @@ fun RootPage(
                         imagesVM.loadAsync(context, imageTagsVM)
                     }
                 }
-            } else {
-                activity?.moveTaskToBack(true)
             }
         } else if (pagerState.currentPage == RootTabType.VIDEOS.value) {
             if (videosState.previewerState.visible) {
@@ -128,8 +139,6 @@ fun RootPage(
                         videosVM.loadAsync(context, videoTagsVM)
                     }
                 }
-            } else {
-                activity?.moveTaskToBack(true)
             }
         } else if (pagerState.currentPage == RootTabType.AUDIO.value) {
             if (audioState.dragSelectState.selectMode) {
@@ -144,11 +153,7 @@ fun RootPage(
                         audioVM.loadAsync(context, audioTagsVM)
                     }
                 }
-            } else {
-                activity?.moveTaskToBack(true)
             }
-        } else {
-            activity?.moveTaskToBack(true)
         }
     }
 

@@ -18,6 +18,7 @@ enum class AppFeatureType {
     CONTACTS,
     SMS,
     SOUND_METER,
+    POMODORO_TIMER,
     NOTIFICATIONS,
     CHECK_UPDATES,
     MEDIA_TRASH;

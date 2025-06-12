@@ -44,6 +44,9 @@ data class FeatureItem(
                     FeatureItem(AppFeatureType.SOUND_METER, R.string.sound_meter, R.drawable.audio_lines) {
                         navController.navigate(Routing.SoundMeter)
                     },
+                    FeatureItem(AppFeatureType.POMODORO_TIMER, R.string.pomodoro_timer, R.drawable.timer) {
+                        navController.navigate(Routing.PomodoroTimer)
+                    },
                 )
             )
 

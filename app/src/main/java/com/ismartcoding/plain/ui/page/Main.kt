@@ -20,6 +20,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,11 +49,14 @@ import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.FilesType
+import com.ismartcoding.plain.events.AudioActionEvent
 import com.ismartcoding.plain.events.ConfirmDialogEvent
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
+import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.features.ChatHelper
@@ -65,6 +69,7 @@ import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.NotesViewModel
+import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.apps.AppPage
@@ -80,6 +85,7 @@ import com.ismartcoding.plain.ui.page.feeds.FeedsPage
 import com.ismartcoding.plain.ui.page.files.FilesPage
 import com.ismartcoding.plain.ui.page.notes.NotePage
 import com.ismartcoding.plain.ui.page.notes.NotesPage
+import com.ismartcoding.plain.ui.page.pomodoro.PomodoroPage
 import com.ismartcoding.plain.ui.page.root.RootPage
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.page.scan.ScanPage
@@ -97,8 +103,10 @@ import com.ismartcoding.plain.ui.page.web.WebSecurityPage
 import com.ismartcoding.plain.ui.page.web.WebSettingsPage
 import com.ismartcoding.plain.ui.theme.AppTheme
 import com.ismartcoding.plain.web.models.toModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalCoilApi::class)
 @Composable
@@ -107,12 +115,14 @@ fun Main(
     onLaunched: () -> Unit,
     mainVM: MainViewModel,
     audioPlaylistVM: AudioPlaylistViewModel,
+    pomodoroVM: PomodoroViewModel,
     notesVM: NotesViewModel = viewModel(key = "notesVM"),
     feedTagsVM: TagsViewModel = viewModel(key = "feedTagsVM"),
     noteTagsVM: TagsViewModel = viewModel(key = "noteTagsVM"),
     chatVM: ChatViewModel = viewModel(key = "chatVM"),
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val navController = rememberNavController()
     navControllerState.value = navController
     val useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current)
@@ -132,10 +142,20 @@ fun Main(
 
     LaunchedEffect(Unit) {
         onLaunched()
+        scope.launch(Dispatchers.IO) {
+            pomodoroVM.loadAsync(context)
+        }
     }
     LaunchedEffect(sharedFlow) {
         sharedFlow.collect { event ->
             when (event) {
+                is AudioActionEvent -> {
+                    if (event.action == AudioAction.MEDIA_ITEM_TRANSITION) {
+                        scope.launch(Dispatchers.IO) {
+                            audioPlaylistVM.loadAsync(context)
+                        }
+                    }
+                }
                 is ConfirmDialogEvent -> {
                     confirmDialogEvent = event
                 }
@@ -154,7 +174,7 @@ fun Main(
                 }
 
                 is FetchLinkPreviewsEvent -> {
-                    coIO {
+                    scope.launch(Dispatchers.IO) {
                         val data = event.chat.content.value as DMessageText
                         val urls = LinkPreviewHelper.extractUrls(data.text)
                         if (urls.isNotEmpty()) {
@@ -182,6 +202,23 @@ fun Main(
                             }
                         }
                     }
+                }
+
+                is HttpApiEvents.PomodoroStartEvent -> {
+                    pomodoroVM.startSession()
+                }
+
+                is HttpApiEvents.PomodoroPauseEvent -> {
+                    pomodoroVM.pauseSession()
+                }
+
+                is HttpApiEvents.PomodoroStopEvent -> {
+                    pomodoroVM.resetTimer()
+                }
+
+                is HttpApiEvents.PomodoroProgressUpdateEvent -> {
+                    pomodoroVM.timeLeft.intValue = event.timeLeft
+                    pomodoroVM.startSession()
                 }
 
                 else -> {
@@ -225,6 +262,9 @@ fun Main(
                 composable<Routing.WebDev> { WebDevPage(navController) }
                 composable<Routing.WebSecurity> { WebSecurityPage(navController) }
                 composable<Routing.SoundMeter> { SoundMeterPage(navController) }
+                composable<Routing.PomodoroTimer> {
+                    PomodoroPage(navController, pomodoroVM)
+                }
                 composable<Routing.Chat> { ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = chatVM) }
                 composable<Routing.ScanHistory> { ScanHistoryPage(navController) }
                 composable<Routing.Scan> { ScanPage(navController) }

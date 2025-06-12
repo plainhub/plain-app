@@ -54,4 +54,22 @@
         <item quantity="many">%,d секунд</item>
         <item quantity="other">%,d секунд</item>
     </plurals>
+    <plurals name="n_pomodoros">
+        <item quantity="one">%,d помидор</item>
+        <item quantity="few">%,d помидора</item>
+        <item quantity="many">%,d помидоров</item>
+        <item quantity="other">%,d помидоров</item>
+    </plurals>
+    <plurals name="today_stats_pomodoros">
+        <item quantity="one">Сегодня: %,d помидор</item>
+        <item quantity="few">Сегодня: %,d помидора</item>
+        <item quantity="many">Сегодня: %,d помидоров</item>
+        <item quantity="other">Сегодня: %,d помидоров</item>
+    </plurals>
+    <plurals name="total_stats_pomodoros">
+        <item quantity="one">Всего: %,d помидор</item>
+        <item quantity="few">Всего: %,d помидора</item>
+        <item quantity="many">Всего: %,d помидоров</item>
+        <item quantity="other">Всего: %,d помидоров</item>
+    </plurals>
 </resources>

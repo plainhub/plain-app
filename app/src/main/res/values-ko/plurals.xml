@@ -36,4 +36,16 @@
         <item quantity="one">%d초</item>
         <item quantity="other">%d초</item>
     </plurals>
+    <plurals name="n_pomodoros">
+        <item quantity="one">%,d 포모도로</item>
+        <item quantity="other">%,d 포모도로</item>
+    </plurals>
+    <plurals name="today_stats_pomodoros">
+        <item quantity="one">오늘: %,d 포모도로</item>
+        <item quantity="other">오늘: %,d 포모도로</item>
+    </plurals>
+    <plurals name="total_stats_pomodoros">
+        <item quantity="one">총: %,d 포모도로</item>
+        <item quantity="other">총: %,d 포모도로</item>
+    </plurals>
 </resources>

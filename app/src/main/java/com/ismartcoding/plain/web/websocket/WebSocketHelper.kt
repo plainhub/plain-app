@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.web.websocket
 
 import com.ismartcoding.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.events.WebSocketData
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.web.HttpServerManager
 import io.ktor.websocket.send
@@ -11,13 +12,13 @@ object WebSocketHelper {
 //                LogCat.d("sendEventAsync: ${event.data}")
 //            }
         HttpServerManager.wsSessions.toList().forEach {
-            if (event.data is String) {
+            if (event.data is WebSocketData.Text) {
                 val token = HttpServerManager.tokenCache[it.clientId]
                 if (token != null) {
-                    it.session.send(addIntPrefixToByteArray(event.type.value, CryptoHelper.aesEncrypt(token, event.data)))
+                    it.session.send(addIntPrefixToByteArray(event.type.value, CryptoHelper.aesEncrypt(token, event.data.value)))
                 }
-            } else {
-                it.session.send(addIntPrefixToByteArray(event.type.value, event.data as ByteArray))
+            } else if (event.data is WebSocketData.Binary) {
+                it.session.send(addIntPrefixToByteArray(event.type.value, event.data.value as ByteArray))
             }
         }
     }

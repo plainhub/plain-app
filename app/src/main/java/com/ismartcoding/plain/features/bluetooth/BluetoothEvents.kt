@@ -21,21 +21,3 @@ class ScanBTDeviceTimeoutEvent: ChannelEvent()
 
 class BTDeviceFoundEvent(val device: BTDevice): ChannelEvent()
 
-object BluetoothEvents {
-    fun register() {
-        receiveEventHandler<BluetoothPermissionResultEvent> {
-            BluetoothUtil.canContinue = true
-        }
-        receiveEventHandler<BluetoothFindOneEvent> { event ->
-            if (BluetoothUtil.isScanning) {
-                return@receiveEventHandler
-            }
-            withIO {
-                withTimeoutOrNull(3000) {
-                    BluetoothUtil.currentBTDevice = BluetoothUtil.findOneAsync(event.mac)
-                }
-                BluetoothUtil.stopScan()
-            }
-        }
-    }
-}

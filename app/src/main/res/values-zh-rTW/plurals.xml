@@ -36,4 +36,16 @@
         <item quantity="one">%,d 秒</item>
         <item quantity="other">%,d 秒</item>
     </plurals>
+    <plurals name="n_pomodoros">
+        <item quantity="one">%,d 番茄</item>
+        <item quantity="other">%,d 番茄</item>
+    </plurals>
+    <plurals name="today_stats_pomodoros">
+        <item quantity="one">今天: %,d 番茄</item>
+        <item quantity="other">今天: %,d 番茄</item>
+    </plurals>
+    <plurals name="total_stats_pomodoros">
+        <item quantity="one">總共: %,d 番茄</item>
+        <item quantity="other">總共: %,d 番茄</item>
+    </plurals>
 </resources>

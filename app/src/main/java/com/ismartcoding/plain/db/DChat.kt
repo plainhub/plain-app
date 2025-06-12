@@ -80,7 +80,7 @@ class DLinkPreview(
     val imageHeight: Int = 0,
     val siteName: String? = null,
     val domain: String? = null,
-    @Transient val hasError: Boolean = false,
+    @kotlinx.serialization.Transient val hasError: Boolean = false,
     val createdAt: Instant = Clock.System.now()
 )
 

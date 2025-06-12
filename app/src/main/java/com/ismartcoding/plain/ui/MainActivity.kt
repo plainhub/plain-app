@@ -31,7 +31,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.channel.receiveEvent
+import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.capitalize
 import com.ismartcoding.lib.extensions.dp2px
@@ -51,30 +51,30 @@ import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.enums.AppChannelType
-import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.enums.Language
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
-import com.ismartcoding.plain.events.AudioActionEvent
-import com.ismartcoding.plain.features.AudioPlayer
-import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.ExportFileEvent
 import com.ismartcoding.plain.events.ExportFileResultEvent
 import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationEvent
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationResultEvent
-import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.PickFileEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.events.RestartAppEvent
 import com.ismartcoding.plain.events.StartScreenMirrorEvent
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
+import com.ismartcoding.plain.features.AudioPlayer
+import com.ismartcoding.plain.features.ChatHelper
+import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.bluetooth.BluetoothPermission
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getStringF
@@ -96,14 +96,13 @@ import com.ismartcoding.plain.ui.helpers.FilePickHelper
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
+import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.nav.navigatePdf
 import com.ismartcoding.plain.ui.nav.navigateTextFile
 import com.ismartcoding.plain.ui.page.Main
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.web.models.toModel
-import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.WebSocketEvent
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.close
 import kotlinx.coroutines.Dispatchers
@@ -118,6 +117,7 @@ class MainActivity : AppCompatActivity() {
     private var requestToConnectDialog: AlertDialog? = null
     private val mainVM: MainViewModel by viewModels()
     private val audioPlaylistVM: AudioPlaylistViewModel by viewModels()
+    val pomodoroVM: PomodoroViewModel by viewModels()
     private val navControllerState = mutableStateOf<NavHostController?>(null)
 
     private val screenCapture =
@@ -226,7 +226,7 @@ class MainActivity : AppCompatActivity() {
             SettingsProvider {
                 Main(navControllerState, onLaunched = {
                     handleIntent(intent)
-                }, mainVM, audioPlaylistVM)
+                }, mainVM, audioPlaylistVM, pomodoroVM)
             }
         }
 
@@ -258,7 +258,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        BluetoothPermission.release()
         Permissions.release()
         unregisterReceiver(plugInReceiver)
         unregisterReceiver(networkStateReceiver)
@@ -266,140 +265,132 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("CheckResult")
     private fun initEvents() {
-        receiveEvent<AudioActionEvent> {
-            when (it.action) {
-                AudioAction.MEDIA_ITEM_TRANSITION -> {
-                    coIO {
-                        audioPlaylistVM.loadAsync(this@MainActivity)
-                    }
-                }
-
-                else -> {
-                }
-            }
-        }
-        receiveEvent<HttpServerStateChangedEvent> {
-            mainVM.httpServerError = HttpServerManager.httpServerError
-            mainVM.httpServerState = it.state
-            if (it.state == HttpServerState.ON && !Permission.WRITE_EXTERNAL_STORAGE.can(this@MainActivity)) {
-                DialogHelper.showConfirmDialog(
-                    LocaleHelper.getString(R.string.confirm),
-                    LocaleHelper.getString(R.string.storage_permission_confirm)
-                ) {
-                    coIO {
-                        ApiPermissionsPreference.putAsync(this@MainActivity, Permission.WRITE_EXTERNAL_STORAGE, true)
-                        sendEvent(RequestPermissionsEvent(Permission.WRITE_EXTERNAL_STORAGE))
-                    }
-                }
-            }
-        }
-
-        receiveEvent<PermissionsResultEvent> { event ->
-            if (event.map.containsKey(Permission.WRITE_SETTINGS.toSysPermission()) && Permission.WRITE_SETTINGS.can(this@MainActivity)) {
-                val enable = !KeepScreenOnPreference.getAsync(this@MainActivity)
-                ScreenHelper.saveOn(this@MainActivity, enable)
-                if (enable) {
-                    ScreenHelper.saveTimeout(this@MainActivity, contentResolver.getSystemScreenTimeout())
-                    contentResolver.setSystemScreenTimeout(Int.MAX_VALUE)
-                } else {
-                    val systemScreenTimeout = SystemScreenTimeoutPreference.getAsync(this@MainActivity)
-                    contentResolver.setSystemScreenTimeout(
-                        if (systemScreenTimeout > 0) systemScreenTimeout else 5000 * 60,
-                    ) // default 5 minutes
-                }
-            }
-        }
-
-        receiveEvent<StartScreenMirrorEvent> {
-            screenCapture.launch(mediaProjectionManager.createScreenCaptureIntent())
-        }
-
-        receiveEvent<IgnoreBatteryOptimizationEvent> {
-            val intent = Intent()
-            intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-            intent.data = Uri.parse("package:$packageName")
-            ignoreBatteryOptimizationActivityLauncher.launch(intent)
-        }
-
-        receiveEvent<RestartAppEvent> {
-            val intent = Intent(this@MainActivity, MainActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-            Runtime.getRuntime().exit(0)
-        }
-
-        receiveEvent<PickFileEvent> {
-            pickFileType = it.type
-            pickFileTag = it.tag
-            var type: ActivityResultContracts.PickVisualMedia.VisualMediaType? = null
-            when (it.type) {
-                PickFileType.IMAGE_VIDEO -> {
-                    type = ActivityResultContracts.PickVisualMedia.ImageAndVideo
-                }
-
-                PickFileType.IMAGE -> {
-                    type = ActivityResultContracts.PickVisualMedia.ImageOnly
-                }
-
-                else -> {}
-            }
-            if (type != null) {
-                if (it.multiple) {
-                    pickMultipleMedia.launch(PickVisualMediaRequest(type))
-                } else {
-                    pickMedia.launch(PickVisualMediaRequest(type))
-                }
-            } else {
-                doPickFile(it)
-            }
-        }
-
-        receiveEvent<ExportFileEvent> { event ->
-            exportFileType = event.type
-            exportFileActivityLauncher.launch(
-                Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                    type = "text/*"
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                    putExtra(Intent.EXTRA_TITLE, event.fileName)
-                },
-            )
-        }
-
-        receiveEvent<ConfirmToAcceptLoginEvent> { event ->
-            val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
-            if (requestToConnectDialog?.isShowing == true) {
-                requestToConnectDialog?.dismiss()
-                requestToConnectDialog = null
-            }
-
-            val r = event.request
-            requestToConnectDialog =
-                AlertDialog.Builder(instance.get()!!)
-                    .setTitle(getStringF(R.string.request_to_connect, "ip", clientIp))
-                    .setMessage(
-                        getStringF(
-                            R.string.client_ua, "os_name", r.osName.capitalize(), "os_version", r.osVersion, "browser_name", r.browserName.capitalize(), "browser_version", r.browserVersion,
-                        ),
-                    )
-                    .setPositiveButton(getString(R.string.accept)) { _, _ ->
-                        launch(Dispatchers.IO) {
-                            HttpServerManager.respondTokenAsync(event, clientIp)
+        val sharedFlow = Channel.sharedFlow
+        coMain {
+            sharedFlow.collect { event ->
+                when (event) {
+                    is HttpServerStateChangedEvent -> {
+                        mainVM.httpServerError = HttpServerManager.httpServerError
+                        mainVM.httpServerState = event.state
+                        if (event.state == HttpServerState.ON && !Permission.WRITE_EXTERNAL_STORAGE.can(this@MainActivity)) {
+                            DialogHelper.showConfirmDialog(
+                                LocaleHelper.getString(R.string.confirm),
+                                LocaleHelper.getString(R.string.storage_permission_confirm)
+                            ) {
+                                coIO {
+                                    ApiPermissionsPreference.putAsync(this@MainActivity, Permission.WRITE_EXTERNAL_STORAGE, true)
+                                    sendEvent(RequestPermissionsEvent(Permission.WRITE_EXTERNAL_STORAGE))
+                                }
+                            }
                         }
                     }
-                    .setNegativeButton(getString(R.string.reject)) { _, _ ->
-                        launch(Dispatchers.IO) {
-                            event.session.close(
-                                CloseReason(
-                                    CloseReason.Codes.TRY_AGAIN_LATER, "rejected",
-                                ),
-                            )
+                    is PermissionsResultEvent -> {
+                        if (event.map.containsKey(Permission.WRITE_SETTINGS.toSysPermission()) && Permission.WRITE_SETTINGS.can(this@MainActivity)) {
+                            val enable = !KeepScreenOnPreference.getAsync(this@MainActivity)
+                            ScreenHelper.saveOn(this@MainActivity, enable)
+                            if (enable) {
+                                ScreenHelper.saveTimeout(this@MainActivity, contentResolver.getSystemScreenTimeout())
+                                contentResolver.setSystemScreenTimeout(Int.MAX_VALUE)
+                            } else {
+                                val systemScreenTimeout = SystemScreenTimeoutPreference.getAsync(this@MainActivity)
+                                contentResolver.setSystemScreenTimeout(
+                                    if (systemScreenTimeout > 0) systemScreenTimeout else 5000 * 60,
+                                ) // default 5 minutes
+                            }
                         }
-                    }.create()
-            if (Permission.SYSTEM_ALERT_WINDOW.can(this@MainActivity)) {
-                requestToConnectDialog?.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+                    }
+                    is StartScreenMirrorEvent -> {
+                        screenCapture.launch(mediaProjectionManager.createScreenCaptureIntent())
+                    }
+                    is IgnoreBatteryOptimizationEvent -> {
+                        val intent = Intent()
+                        intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                        intent.data = Uri.parse("package:$packageName")
+                        ignoreBatteryOptimizationActivityLauncher.launch(intent)
+                    }
+
+                    is RestartAppEvent -> {
+                        val intent = Intent(this@MainActivity, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                        startActivity(intent)
+                        Runtime.getRuntime().exit(0)
+                    }
+
+                    is PickFileEvent -> {
+                        pickFileType = event.type
+                        pickFileTag = event.tag
+                        var type: ActivityResultContracts.PickVisualMedia.VisualMediaType? = null
+                        when (event.type) {
+                            PickFileType.IMAGE_VIDEO -> {
+                                type = ActivityResultContracts.PickVisualMedia.ImageAndVideo
+                            }
+
+                            PickFileType.IMAGE -> {
+                                type = ActivityResultContracts.PickVisualMedia.ImageOnly
+                            }
+
+                            else -> {}
+                        }
+                        if (type != null) {
+                            if (event.multiple) {
+                                pickMultipleMedia.launch(PickVisualMediaRequest(type))
+                            } else {
+                                pickMedia.launch(PickVisualMediaRequest(type))
+                            }
+                        } else {
+                            doPickFile(event)
+                        }
+                    }
+
+                    is ExportFileEvent -> {
+                        exportFileType = event.type
+                        exportFileActivityLauncher.launch(
+                            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                                type = "text/*"
+                                addCategory(Intent.CATEGORY_OPENABLE)
+                                putExtra(Intent.EXTRA_TITLE, event.fileName)
+                            },
+                        )
+                    }
+
+                    is ConfirmToAcceptLoginEvent -> {
+                        val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
+                        if (requestToConnectDialog?.isShowing == true) {
+                            requestToConnectDialog?.dismiss()
+                            requestToConnectDialog = null
+                        }
+
+                        val r = event.request
+                        requestToConnectDialog =
+                            AlertDialog.Builder(instance.get()!!)
+                                .setTitle(getStringF(R.string.request_to_connect, "ip", clientIp))
+                                .setMessage(
+                                    getStringF(
+                                        R.string.client_ua, "os_name", r.osName.capitalize(), "os_version", r.osVersion, "browser_name", r.browserName.capitalize(), "browser_version", r.browserVersion,
+                                    ),
+                                )
+                                .setPositiveButton(getString(R.string.accept)) { _, _ ->
+                                    launch(Dispatchers.IO) {
+                                        HttpServerManager.respondTokenAsync(event, clientIp)
+                                    }
+                                }
+                                .setNegativeButton(getString(R.string.reject)) { _, _ ->
+                                    launch(Dispatchers.IO) {
+                                        event.session.close(
+                                            CloseReason(
+                                                CloseReason.Codes.TRY_AGAIN_LATER, "rejected",
+                                            ),
+                                        )
+                                    }
+                                }.create()
+                        if (Permission.SYSTEM_ALERT_WINDOW.can(this@MainActivity)) {
+                            requestToConnectDialog?.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+                        }
+                        requestToConnectDialog?.window?.setDimAmount(0.8f)
+                        requestToConnectDialog?.show()
+                    }
+                }
             }
-            requestToConnectDialog?.window?.setDimAmount(0.8f)
-            requestToConnectDialog?.show()
         }
     }
 

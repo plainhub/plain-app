@@ -2,6 +2,7 @@ package com.ismartcoding.plain
 
 import com.ismartcoding.plain.data.DNotification
 import com.ismartcoding.plain.enums.MediaPlayMode
+import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 
 object TempData {
     var webEnabled = false

@@ -36,4 +36,16 @@
         <item quantity="one">%d saniye</item>
         <item quantity="other">%d saniye</item>
     </plurals>
+    <plurals name="n_pomodoros">
+        <item quantity="one">%,d pomodoro</item>
+        <item quantity="other">%,d pomodoro</item>
+    </plurals>
+    <plurals name="today_stats_pomodoros">
+        <item quantity="one">Bugün: %,d pomodoro</item>
+        <item quantity="other">Bugün: %,d pomodoro</item>
+    </plurals>
+    <plurals name="total_stats_pomodoros">
+        <item quantity="one">Toplam: %,d pomodoro</item>
+        <item quantity="other">Toplam: %,d pomodoro</item>
+    </plurals>
 </resources>

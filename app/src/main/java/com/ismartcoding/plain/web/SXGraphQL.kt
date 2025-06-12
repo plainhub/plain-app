@@ -92,12 +92,14 @@ import com.ismartcoding.plain.preference.AudioSortByPreference
 import com.ismartcoding.plain.preference.AuthDevTokenPreference
 import com.ismartcoding.plain.preference.DeveloperModePreference
 import com.ismartcoding.plain.preference.DeviceNamePreference
+import com.ismartcoding.plain.preference.PomodoroSettingsPreference
 import com.ismartcoding.plain.preference.ScreenMirrorQualityPreference
 import com.ismartcoding.plain.preference.VideoPlaylistPreference
 import com.ismartcoding.plain.receivers.BatteryReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.MainActivity
+import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import com.ismartcoding.plain.web.loaders.FeedsLoader
 import com.ismartcoding.plain.web.loaders.FileInfoLoader
 import com.ismartcoding.plain.web.loaders.TagsLoader
@@ -119,6 +121,7 @@ import com.ismartcoding.plain.web.models.Note
 import com.ismartcoding.plain.web.models.NoteInput
 import com.ismartcoding.plain.web.models.PackageInstallPending
 import com.ismartcoding.plain.web.models.PackageStatus
+import com.ismartcoding.plain.web.models.PomodoroToday
 import com.ismartcoding.plain.web.models.StorageStats
 import com.ismartcoding.plain.web.models.Tag
 import com.ismartcoding.plain.web.models.TempValue
@@ -143,7 +146,10 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.util.AttributeKey
 import kotlinx.coroutines.coroutineScope
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.buildJsonArray
@@ -473,6 +479,28 @@ class SXGraphQL(val schema: Schema) {
                 query("screenMirrorQuality") {
                     resolver { ->
                         ScreenMirrorQualityPreference.getValueAsync(MainApp.instance).toModel()
+                    }
+                }
+                query("pomodoroSettings") {
+                    resolver { ->
+                        PomodoroSettingsPreference.getValueAsync(MainApp.instance).toModel()
+                    }
+                }
+                query("pomodoroToday") {
+                    resolver { ->
+                        val dao = AppDatabase.instance.pomodoroItemDao()
+                        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
+                        val vm = MainActivity.instance.get()!!.pomodoroVM
+                        PomodoroToday(
+                            date = today,
+                            completedCount = vm.completedCount.intValue,
+                            currentRound = vm.currentRound.intValue,
+                            timeLeft = vm.timeLeft.intValue,
+                            totalTime = vm.settings.value.getTotalSeconds(vm.currentState.value),
+                            isRunning = vm.isRunning.value,
+                            isPause = vm.isPaused.value,
+                            state = vm.currentState.value
+                        )
                     }
                 }
                 query("recentFiles") {
@@ -847,6 +875,30 @@ class SXGraphQL(val schema: Schema) {
                         val qualityData = DScreenMirrorQuality(quality, resolution)
                         ScreenMirrorQualityPreference.putAsync(MainApp.instance, qualityData)
                         ScreenMirrorService.qualityData = qualityData
+                        true
+                    }
+                }
+                mutation("startPomodoro") {
+                    resolver { ->
+                        sendEvent(HttpApiEvents.PomodoroStartEvent())
+                        true
+                    }
+                }
+                mutation("pausePomodoro") {
+                    resolver { ->
+                        sendEvent(HttpApiEvents.PomodoroPauseEvent())
+                        true
+                    }
+                }
+                mutation("stopPomodoro") {
+                    resolver { ->
+                        sendEvent(HttpApiEvents.PomodoroStopEvent())
+                        true
+                    }
+                }
+                mutation("updatePomodoroProgress") {
+                    resolver { timeLeft: Int ->
+                        sendEvent(HttpApiEvents.PomodoroProgressUpdateEvent(timeLeft))
                         true
                     }
                 }
@@ -1401,6 +1453,7 @@ class SXGraphQL(val schema: Schema) {
                 enum<DataType>()
                 enum<Permission>()
                 enum<FileSortBy>()
+                enum<PomodoroState>()
                 stringScalar<Instant> {
                     deserialize = { value: String -> Instant.parse(value) }
                     serialize = Instant::toString

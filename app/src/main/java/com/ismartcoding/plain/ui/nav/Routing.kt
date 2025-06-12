@@ -49,6 +49,9 @@ class Routing {
     object SoundMeter
 
     @Serializable
+    object PomodoroTimer
+
+    @Serializable
     object Chat
 
     @Serializable

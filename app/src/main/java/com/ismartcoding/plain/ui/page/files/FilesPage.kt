@@ -104,7 +104,7 @@ fun FilesPage(
         }
     }
 
-    BackHandler(enabled = true) {
+    BackHandler(enabled = previewerState.visible || filesVM.selectMode.value || filesVM.showSearchBar.value || filesVM.showPasteBar.value || filesVM.canNavigateBack()) {
         when {
             previewerState.visible -> {
                 scope.launch {
@@ -134,10 +134,6 @@ fun FilesPage(
                 scope.launch(Dispatchers.IO) {
                     filesVM.loadAsync(context)
                 }
-            }
-
-            else -> {
-                navController.popBackStack()
             }
         }
     }

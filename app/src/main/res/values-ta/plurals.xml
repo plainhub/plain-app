@@ -36,4 +36,16 @@
         <item quantity="one">%d விநாடி</item>
         <item quantity="other">%d விநாடிகள்</item>
     </plurals>
+    <plurals name="n_pomodoros">
+        <item quantity="one">%,d போமோடோரோ</item>
+        <item quantity="other">%,d போமோடோரோ</item>
+    </plurals>
+    <plurals name="today_stats_pomodoros">
+        <item quantity="one">இன்று: %,d போமோடோரோ</item>
+        <item quantity="other">இன்று: %,d போமோடோரோ</item>
+    </plurals>
+    <plurals name="total_stats_pomodoros">
+        <item quantity="one">மொத்தம்: %,d போமோடோரோ</item>
+        <item quantity="other">மொத்தம்: %,d போமோடோரோ</item>
+    </plurals>
 </resources>

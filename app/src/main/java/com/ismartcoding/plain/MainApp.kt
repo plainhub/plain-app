@@ -12,7 +12,6 @@ import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.events.AcquireWakeLockEvent
 import com.ismartcoding.plain.events.AppEvents
-import com.ismartcoding.plain.features.bluetooth.BluetoothEvents
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.preference.AudioPlayModePreference
 import com.ismartcoding.plain.preference.CheckUpdateTimePreference
@@ -41,7 +40,6 @@ class MainApp : Application() {
 
         LogCat.addLogAdapter(DiskLogAdapter(DiskLogFormatStrategy.getInstance(this)))
 
-        BluetoothEvents.register()
         AppEvents.register()
 
         // https://stackoverflow.com/questions/77683434/the-getnextentry-method-of-zipinputstream-throws-a-zipexception-invalid-zip-ent
