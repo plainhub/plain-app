@@ -407,7 +407,7 @@
     <string name="system_permission_not_granted">Systemberechtigung nicht erteilt</string>
     <string name="open_permission_settings">Berechtigungseinstellungen öffnen</string>
     <string name="api_service_is_running">API-Dienst läuft</string>
-    <string name="screen_mirror_service_is_running">Bildschirmspiegelungsdienst läuft</string>
+    <string name="screen_mirror_service_is_running">Der Bildschirmspiegelungsdienst läuft</string>
     <string name="cast">Übertragen</string>
     <string name="images">Bilder</string>
     <string name="audios">Audio</string>
