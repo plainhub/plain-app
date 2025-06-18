@@ -155,6 +155,9 @@
     <string name="http_server_state_stopping">正在停止服務…</string>
     <string name="http_server_state_error">啟動失敗</string>
     <string name="change_port">更改端口</string>
+    <string name="custom_sound">自訂音效</string>
+    <string name="select_sound">選擇音效</string>
+    <string name="change">更改</string>
     <string name="start_service">啟動服務</string>
     <string name="stop_service">停止服務</string>
     <string name="run">運行</string>
@@ -346,6 +349,8 @@
     <string name="grant_permission_button">授予權限</string>
     <string name="sleep_timer_permission_message">睡眠計時器需要排程精確鬧鐘的權限，才能在背景中正確運作，即使應用程式未開啟也能運行。</string>
     <string name="permissions">訪問權限</string>
+    <string name="show_notification">顯示通知</string>
+    <string name="play_sound_on_complete">完成時播放聲音</string>
     <string name="date">日期</string>
     <string name="sort_by_random">隨機排序</string>
     <string name="edit">編輯</string>

@@ -11,6 +11,8 @@ data class DPomodoroSettings(
     val pomodorosBeforeLongBreak: Int = 4,
     val showNotification: Boolean = true,
     val playSoundOnComplete: Boolean = true,
+    val soundPath: String = "",
+    val originalSoundName: String = "",
 ) {
     fun getTotalSeconds(state: PomodoroState): Int {
         return when (state) {

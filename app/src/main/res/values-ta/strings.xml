@@ -155,6 +155,9 @@
     <string name="http_server_state_stopping">சேவை நிறுத்தப்படுகிறது...</string>
     <string name="http_server_state_error">தொடங்க முடியவில்லை</string>
     <string name="change_port">போர்ட் மாற்றம்</string>
+    <string name="custom_sound">பிரத்தியேக ஒலி</string>
+    <string name="select_sound">ஒலியைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="change">மாற்று</string>
     <string name="start_service">சேவை தொடங்கு</string>
     <string name="stop_service">சேவை நிறுத்து</string>
     <string name="run">இயக்கு</string>
@@ -346,6 +349,8 @@
     <string name="grant_permission_button">அனுமதி வழங்கவும்</string>
     <string name="sleep_timer_permission_message">பின்தோன்றும் நிலையில் நேரத்துக்கேற்ப செயல்பட, உறக்க நேரமிடிக்கு துல்லிய அலாரங்களை திட்டமிட அனுமதி தேவை.</string>
     <string name="permissions">அனுமதிகள்</string>
+    <string name="show_notification">அறிவிப்புகளை காட்டு</string>
+    <string name="play_sound_on_complete">முடிவுக்கு ஒலியை பதிவிறக்கு</string>
     <string name="date">தேதி</string>
     <string name="sort_by_random">புதியாக வரிசைப்படுத்து</string>
     <string name="edit">திருத்து</string>

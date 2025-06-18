@@ -5,13 +5,13 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPomodoroItem
-import com.ismartcoding.plain.events.CancelPomodoroTimerEvent
-import com.ismartcoding.plain.events.PomodoroTimerEvent
 import com.ismartcoding.plain.preference.PomodoroSettingsPreference
+import com.ismartcoding.plain.ui.page.pomodoro.PomodoroHelper
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -56,7 +56,6 @@ class PomodoroViewModel : ViewModel() {
     fun startSession() {
         isRunning.value = true
         isPaused.value = false
-        sendEvent(PomodoroTimerEvent(timeLeft.intValue, currentState.value))
         startCountdownTimer()
     }
 
@@ -68,6 +67,24 @@ class PomodoroViewModel : ViewModel() {
                 if (isRunning.value && !isPaused.value && timeLeft.intValue > 0) {
                     timeLeft.intValue--
                 }
+            }
+
+            // When timer reaches zero, send completion event
+            if (isRunning.value && !isPaused.value && timeLeft.intValue <= 0) {
+                val context = MainApp.instance
+                if (settings.value.showNotification) {
+                    PomodoroHelper.showNotificationAsync(context, currentState.value)
+                }
+                try {
+                    PomodoroHelper.playCompletionSound(context, settings.value)
+                } catch (e: Exception) {
+                    LogCat.e("Failed to play Pomodoro sound: ${e.message}")
+                }
+                when (currentState.value) {
+                    PomodoroState.WORK -> handleWorkSessionCompleteAsync(isSkip = false)
+                    PomodoroState.SHORT_BREAK, PomodoroState.LONG_BREAK -> handleBreakSessionComplete()
+                }
+                resetSessionState()
             }
         }
     }
@@ -87,7 +104,6 @@ class PomodoroViewModel : ViewModel() {
     private fun stopTimer() {
         timerJob?.cancel()
         timerJob = null
-        sendEvent(CancelPomodoroTimerEvent())
     }
 
     private fun resetToInitialState() {
@@ -176,6 +192,5 @@ class PomodoroViewModel : ViewModel() {
         super.onCleared()
         timerJob?.cancel()
         eventHandler?.cancel()
-        sendEvent(CancelPomodoroTimerEvent())
     }
 }

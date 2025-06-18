@@ -155,6 +155,9 @@
     <string name="http_server_state_stopping">서비스 중지 중...</string>
     <string name="http_server_state_error">시작 실패</string>
     <string name="change_port">포트 변경</string>
+    <string name="custom_sound">커스텀 사운드</string>
+    <string name="select_sound">사운드 선택</string>
+    <string name="change">변경</string>
     <string name="start_service">서비스 시작</string>
     <string name="stop_service">서비스 중지</string>
     <string name="run">실행</string>
@@ -346,6 +349,8 @@
     <string name="grant_permission_button">권한 부여</string>
     <string name="sleep_timer_permission_message">수면 타이머가 백그라운드에서 정상적으로 작동하려면 정확한 알람 예약 권한이 필요합니다.</string>
     <string name="permissions">권한</string>
+    <string name="show_notification">알림 표시</string>
+    <string name="play_sound_on_complete">완료 시 소리 재생</string>
     <string name="date">날짜</string>
     <string name="sort_by_random">랜덤 정렬</string>
     <string name="edit">편집</string>

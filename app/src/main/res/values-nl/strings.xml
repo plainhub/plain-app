@@ -155,6 +155,9 @@
     <string name="http_server_state_stopping">Service wordt gestopt...</string>
     <string name="http_server_state_error">Starten mislukt</string>
     <string name="change_port">Poort wijzigen</string>
+    <string name="custom_sound">Aangepast geluid</string>
+    <string name="select_sound">Geluid selecteren</string>
+    <string name="change">Wijzigen</string>
     <string name="start_service">Start service</string>
     <string name="stop_service">Stop service</string>
     <string name="run">Uitvoeren</string>
@@ -346,6 +349,8 @@
     <string name="grant_permission_button">Toestemming Geven</string>
     <string name="sleep_timer_permission_message">De slaaptimer heeft toestemming nodig om exacte alarmen in te stellen om correct te werken op de achtergrond. Dit zorgt ervoor dat de timer werkt, zelfs wanneer de app niet actief is.</string>
     <string name="permissions">Toestemmingen</string>
+    <string name="show_notification">Melding tonen</string>
+    <string name="play_sound_on_complete">Geluid afspelen bij voltooiing</string>
     <string name="date">Datum</string>
     <string name="sort_by_random">Willekeurig sorteren</string>
     <string name="edit">Bewerken</string>

@@ -155,6 +155,9 @@
     <string name="http_server_state_stopping">Hizmet durduruluyor…</string>
     <string name="http_server_state_error">Başlatma başarısız oldu</string>
     <string name="change_port">Portu değiştir</string>
+    <string name="custom_sound">Özel ses</string>
+    <string name="select_sound">Ses seç</string>
+    <string name="change">Değiştir</string>
     <string name="start_service">Hizmeti başlat</string>
     <string name="stop_service">Hizmeti durdur</string>
     <string name="run">Çalıştır</string>
@@ -346,6 +349,8 @@
     <string name="grant_permission_button">İzin ver</string>
     <string name="sleep_timer_permission_message">Uyku zamanlayıcısının arka planda düzgün çalışabilmesi için tam zamanlı alarmları planlamak adına izne ihtiyacı vardır.</string>
     <string name="permissions">İzinler</string>
+    <string name="show_notification">Bildirim göster</string>
+    <string name="play_sound_on_complete">Tamamlandığında ses çal</string>
     <string name="date">Tarih</string>
     <string name="sort_by_random">Rastgele sırala</string>
     <string name="edit">Düzenle</string>

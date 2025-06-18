@@ -151,7 +151,7 @@ fun PomodoroPage(
 
                                         val totalDuration = pomodoroVM.getTotalSeconds()
                                         val newTimeLeft = (totalDuration * (1 - normalizedAngle)).toInt().coerceIn(0, totalDuration)
-                                        pomodoroVM.timeLeft.value = newTimeLeft
+                                        pomodoroVM.timeLeft.intValue = newTimeLeft
                                         pomodoroVM.adjustJob.value?.cancel() // Cancel any previous adjustment
                                         pomodoroVM.adjustJob.value = coIO {
                                             delay(500) // Debounce to prevent too frequent updates
@@ -189,7 +189,7 @@ fun PomodoroPage(
                         } else {
                             0f
                         }
-                        
+
                         CircularTimer(progress = progress)
 
                         Column(
@@ -204,16 +204,7 @@ fun PomodoroPage(
                                 color = MaterialTheme.colorScheme.onSurface
                             )
 
-                            VerticalSpace(dp = 8.dp)
-
-                            Text(
-                                text = pomodoroVM.currentState.value.getText(),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                                fontWeight = FontWeight.Medium
-                            )
-
-                            VerticalSpace(dp = 4.dp)
+                            VerticalSpace(dp = 16.dp)
 
                             Text(
                                 text = stringResource(R.string.drag_to_adjust_progress),
@@ -339,69 +330,61 @@ fun PomodoroPage(
                             )
                         }
                     }
-                    VerticalSpace(dp = 24.dp)
+                    VerticalSpace(dp = 16.dp)
                 }
                 item {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                        ),
-                        shape = RoundedCornerShape(16.dp)
+                    Column(
+                        modifier = Modifier
+                            .padding(24.dp)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(24.dp)
-                                .fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Text(
+                            text = stringResource(R.string.today_completed),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center
+                        )
+
+                        VerticalSpace(dp = 16.dp)
+
+                        // Pomodoro tomato icons
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(
-                                text = stringResource(R.string.today_completed),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.Medium,
-                                textAlign = TextAlign.Center
-                            )
+                            val completedCount = pomodoroVM.completedCount.intValue
+                            val displayCount = if (completedCount <= 4) 4 else completedCount
 
-                            VerticalSpace(dp = 16.dp)
-
-                            // Pomodoro tomato icons
-                            Row(
-                                horizontalArrangement = Arrangement.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                val completedCount = pomodoroVM.completedCount.intValue
-                                val displayCount = if (completedCount <= 4) 4 else completedCount
-
-                                repeat(displayCount) { index ->
-                                    Text(
-                                        text = "🍅",
-                                        fontSize = 24.sp,
-                                        color = if (index < completedCount) {
-                                            Color.Unspecified // Full color for completed
-                                        } else {
-                                            Color.Gray.copy(alpha = 0.3f) // Faded for incomplete
-                                        },
-                                        modifier = Modifier.padding(horizontal = 4.dp)
-                                    )
-                                }
+                            repeat(displayCount) { index ->
+                                Text(
+                                    text = "🍅",
+                                    fontSize = 24.sp,
+                                    color = if (index < completedCount) {
+                                        Color.Unspecified // Full color for completed
+                                    } else {
+                                        Color.Gray.copy(alpha = 0.3f) // Faded for incomplete
+                                    },
+                                    modifier = Modifier.padding(horizontal = 4.dp)
+                                )
                             }
-
-                            VerticalSpace(dp = 16.dp)
-
-                            Text(
-                                text = pluralStringResource(
-                                    R.plurals.n_pomodoros,
-                                    pomodoroVM.completedCount.intValue,
-                                    pomodoroVM.completedCount.intValue
-                                ),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                                fontWeight = FontWeight.Medium,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            )
                         }
+
+                        VerticalSpace(dp = 16.dp)
+
+                        Text(
+                            text = pluralStringResource(
+                                R.plurals.n_pomodoros,
+                                pomodoroVM.completedCount.intValue,
+                                pomodoroVM.completedCount.intValue
+                            ),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                     BottomSpace()
                 }

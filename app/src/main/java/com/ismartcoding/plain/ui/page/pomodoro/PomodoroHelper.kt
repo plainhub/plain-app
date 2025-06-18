@@ -6,16 +6,20 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.media.AudioFormat
-import android.media.AudioManager
 import android.media.AudioTrack
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.ismartcoding.lib.extensions.getFinalPath
+import com.ismartcoding.lib.extensions.isAudioFast
 import com.ismartcoding.lib.helpers.CoroutinesHelper
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.DPlaylistAudio
+import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
@@ -28,6 +32,7 @@ import kotlin.math.PI
 import kotlin.math.exp
 import kotlin.math.ln
 import kotlin.math.sin
+import java.io.File
 
 object PomodoroHelper {
     @SuppressLint("MissingPermission")
@@ -92,6 +97,48 @@ object PomodoroHelper {
             }
         } catch (e: Exception) {
             LogCat.e("Failed to show Pomodoro notification: ${e.message}")
+        }
+    }
+
+    suspend fun playCompletionSound(context: Context, settings: DPomodoroSettings) {
+        // First check if sound should be played at all
+        if (!settings.playSoundOnComplete) {
+            return
+        }
+        
+        if (settings.soundPath.isNotEmpty()) {
+            try {
+                val actualPath = settings.soundPath.getFinalPath(context)
+                val file = File(actualPath)
+                
+                if (file.exists() && actualPath.isAudioFast()) {
+                    playCustomSong(context, actualPath)
+                    return
+                } else if (settings.soundPath.startsWith("content://")) {
+                    playCustomSong(context, settings.soundPath)
+                    return
+                }
+            } catch (e: Exception) {
+                LogCat.e("Failed to play custom song, falling back to default sound: ${e.message}")
+                // Fall through to play default sound
+            }
+        }
+        
+        // Play default notification sound in IO thread
+        coIO {
+            playNotificationSound()
+        }
+    }
+
+    private suspend fun playCustomSong(context: Context, songPath: String) {
+        try {
+            val audio = DPlaylistAudio.fromPath(context, songPath)
+            coIO {
+                AudioPlayer.justPlay(context, audio)
+            }
+        } catch (e: Exception) {
+            LogCat.e("Failed to play custom song: ${e.message}")
+            // Don't throw exception, let caller handle fallback
         }
     }
 

@@ -155,6 +155,9 @@
     <string name="http_server_state_stopping">সেবা বন্ধ করা হচ্ছে...</string>
     <string name="http_server_state_error">চালু করা ব্যর্থ হয়েছে</string>
     <string name="change_port">পোর্ট পরিবর্তন</string>
+    <string name="custom_sound">কাস্টম সাউন্ড</string>
+    <string name="select_sound">সাউন্ড নির্বাচন করুন</string>
+    <string name="change">পরিবর্তন</string>
     <string name="start_service">সেবা চালুন</string>
     <string name="stop_service">সেবা বন্ধ করুন</string>
     <string name="run">চালান</string>
@@ -346,6 +349,8 @@
     <string name="grant_permission_button">অনুমতি প্রদান করুন</string>
     <string name="sleep_timer_permission_message">স্লিপ টাইমার সঠিক ব্যবহারের জন্য নির্দিষ্ট অ্যালার্ম সক্রিয় করতে অনুমতি প্রয়োজন। এটি আপনাকে সম্পূর্ণ ব্যবহার করতে নির্দিষ্ট অ্যালার্ম প্রাপ্ত করতে সাহায্য করে।</string>
     <string name="permissions">অনুমতিসমূহ</string>
+    <string name="show_notification">বিজ্ঞপ্তি দেখান</string>
+    <string name="play_sound_on_complete">সম্পন্ন হলে শব্দ বাজান</string>
     <string name="date">তারিখ</string>
     <string name="sort_by_random">যেখানে যেখানে আসে তা অনুসারে বাছাই করুন</string>
     <string name="edit">সম্পাদন করুন</string>

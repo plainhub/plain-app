@@ -155,6 +155,9 @@
     <string name="http_server_state_stopping">Parando serviço...</string>
     <string name="http_server_state_error">Falha ao iniciar</string>
     <string name="change_port">Alterar porta</string>
+    <string name="custom_sound">Som personalizado</string>
+    <string name="select_sound">Selecionar som</string>
+    <string name="change">Alterar</string>
     <string name="start_service">Iniciar serviço</string>
     <string name="stop_service">Parar serviço</string>
     <string name="run">Executar</string>
@@ -346,6 +349,8 @@
     <string name="grant_permission_button">Conceder permissão</string>
     <string name="sleep_timer_permission_message">O temporizador de sono precisa de permissão para agendar alarmes exatos e funcionar corretamente em segundo plano, mesmo quando o app não estiver ativo.</string>
     <string name="permissions">Permissões</string>
+    <string name="show_notification">Mostrar notificação</string>
+    <string name="play_sound_on_complete">Reproduzir som ao concluir</string>
     <string name="date">Data</string>
     <string name="sort_by_random">Ordenar aleatoriamente</string>
     <string name="edit">Editar</string>

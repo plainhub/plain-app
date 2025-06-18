@@ -155,6 +155,9 @@
     <string name="http_server_state_stopping">Arresto del servizio...</string>
     <string name="http_server_state_error">Avvio non riuscito</string>
     <string name="change_port">Cambia porta</string>
+    <string name="custom_sound">Suono personalizzato</string>
+    <string name="select_sound">Seleziona suono</string>
+    <string name="change">Cambia</string>
     <string name="start_service">Avvia servizio</string>
     <string name="stop_service">Arresta servizio</string>
     <string name="run">Esegui</string>
@@ -346,6 +349,8 @@
     <string name="grant_permission_button">Concedi Permesso</string>
     <string name="sleep_timer_permission_message">Il timer del sonno necessita del permesso di programmare allarmi precisi per funzionare correttamente in background. Questo garantisce che il timer funzioni anche quando l\'app non è attiva.</string>
     <string name="permissions">Permessi</string>
+    <string name="show_notification">Mostra notifica</string>
+    <string name="play_sound_on_complete">Riproduci suono al completamento</string>
     <string name="date">Data</string>
     <string name="sort_by_random">Ordina per caso</string>
     <string name="edit">Modifica</string>

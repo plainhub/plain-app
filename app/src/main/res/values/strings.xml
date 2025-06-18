@@ -348,6 +348,9 @@
     <string name="permissions">Permissions</string>
     <string name="show_notification">Show notification</string>
     <string name="play_sound_on_complete">Play sound on complete</string>
+    <string name="custom_sound">Custom sound</string>
+    <string name="select_sound">Select sound</string>
+    <string name="change">Change</string>
     <string name="date">Date</string>
     <string name="sort_by_random">Sort by random</string>
     <string name="edit">Edit</string>

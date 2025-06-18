@@ -13,4 +13,5 @@ enum class PickFileTag {
     FEED,
     BOOK,
     RESTORE,
+    POMODORO,
 }

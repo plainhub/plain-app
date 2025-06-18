@@ -205,6 +205,7 @@ fun Main(
                 }
 
                 is HttpApiEvents.PomodoroStartEvent -> {
+                    pomodoroVM.timeLeft.intValue = event.timeLeft
                     pomodoroVM.startSession()
                 }
 
@@ -214,11 +215,6 @@ fun Main(
 
                 is HttpApiEvents.PomodoroStopEvent -> {
                     pomodoroVM.resetTimer()
-                }
-
-                is HttpApiEvents.PomodoroProgressUpdateEvent -> {
-                    pomodoroVM.timeLeft.intValue = event.timeLeft
-                    pomodoroVM.startSession()
                 }
 
                 else -> {

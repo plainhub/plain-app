@@ -879,8 +879,8 @@ class SXGraphQL(val schema: Schema) {
                     }
                 }
                 mutation("startPomodoro") {
-                    resolver { ->
-                        sendEvent(HttpApiEvents.PomodoroStartEvent())
+                    resolver { timeLeft: Int ->
+                        sendEvent(HttpApiEvents.PomodoroStartEvent(timeLeft))
                         true
                     }
                 }
@@ -893,12 +893,6 @@ class SXGraphQL(val schema: Schema) {
                 mutation("stopPomodoro") {
                     resolver { ->
                         sendEvent(HttpApiEvents.PomodoroStopEvent())
-                        true
-                    }
-                }
-                mutation("updatePomodoroProgress") {
-                    resolver { timeLeft: Int ->
-                        sendEvent(HttpApiEvents.PomodoroProgressUpdateEvent(timeLeft))
                         true
                     }
                 }
@@ -1040,7 +1034,7 @@ class SXGraphQL(val schema: Schema) {
                             }
                             ids.add(m.id)
                         }
-                        NoteHelper.search("ids:${ids.joinToString(",")}", Int.MAX_VALUE, 0).map { it.toModel() }
+                        ids
                     }
                 }
                 mutation("trashNotes") {

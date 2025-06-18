@@ -346,6 +346,11 @@
     <string name="grant_permission_button">許可を与える</string>
     <string name="sleep_timer_permission_message">スリープタイマーを正確にスケジュールするには許可が必要です。アプリが非アクティブな状態でも正常に動作させるためです。</string>
     <string name="permissions">権限</string>
+    <string name="show_notification">通知を表示</string>
+    <string name="play_sound_on_complete">完了時に音を再生</string>
+    <string name="custom_sound">カスタムサウンド</string>
+    <string name="select_sound">サウンドを選択</string>
+    <string name="change">変更</string>
     <string name="date">日付</string>
     <string name="sort_by_random">ランダムに並べ替え</string>
     <string name="edit">編集</string>

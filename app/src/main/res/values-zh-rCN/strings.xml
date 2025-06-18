@@ -331,7 +331,7 @@
     <string name="back_to_work">回去继续工作吧！</string>
     <string name="pomodoro_stats">番茄统计</string>
     <string name="work_time">工作时间</string>
-    <string name="round_counter">第 %1$d 轮/ 共 %2$d 轮</string>
+    <string name="round_counter">第 %1$d 轮 / 共 %2$d 轮</string>
     <string name="drag_to_adjust_progress">拖动以调整进度</string>
     <string name="today_completed">今日完成</string>
     <string name="permission_required">需要权限</string>
@@ -346,6 +346,11 @@
     <string name="grant_permission_button">授予权限</string>
     <string name="sleep_timer_permission_message">睡眠定时器需要调度精确闹钟的权限，以确保在后台也能正常工作，即使应用未激活。</string>
     <string name="permissions">访问权限</string>
+    <string name="show_notification">显示通知</string>
+    <string name="play_sound_on_complete">完成时播放声音</string>
+    <string name="custom_sound">自定义音效</string>
+    <string name="select_sound">选择音效</string>
+    <string name="change">更换</string>
     <string name="date">日期</string>
     <string name="sort_by_random">随机排序</string>
     <string name="edit">编辑</string>

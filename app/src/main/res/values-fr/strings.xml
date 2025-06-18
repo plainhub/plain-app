@@ -346,6 +346,11 @@
     <string name="grant_permission_button">Accorder la Permission</string>
     <string name="sleep_timer_permission_message">Le minuteur de sommeil a besoin de la permission de programmer des alarmes précises pour fonctionner correctement en arrière-plan. Cela garantit que le minuteur fonctionne même lorsque l\'application n\'est pas active.</string>
     <string name="permissions">Autorisations</string>
+    <string name="show_notification">Afficher la notification</string>
+    <string name="play_sound_on_complete">Lire le son lorsque la tâche est terminée</string>
+    <string name="custom_sound">Son personnalisé</string>
+    <string name="select_sound">Sélectionner un son</string>
+    <string name="change">Modifier</string>
     <string name="date">Date</string>
     <string name="sort_by_random">Trier au hasard</string>
     <string name="edit">Modifier</string>

@@ -57,8 +57,6 @@ class HttpServerService : LifecycleService() {
         super.onStartCommand(intent, flags, startId)
         
         try {
-            NotificationHelper.ensureDefaultChannel()
-            
             val notification = NotificationHelper.createServiceNotification(
                 this,
                 "${BuildConfig.APPLICATION_ID}.action.stop_http_server",

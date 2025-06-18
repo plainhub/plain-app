@@ -346,6 +346,11 @@
     <string name="grant_permission_button">Предоставить разрешение</string>
     <string name="sleep_timer_permission_message">Таймер сна требует разрешения на установку точных будильников для корректной работы в фоновом режиме, даже когда приложение не активно.</string>
     <string name="permissions">Разрешения</string>
+    <string name="show_notification">Показать уведомление</string>
+    <string name="play_sound_on_complete">Воспроизвести звук при завершении</string>
+    <string name="custom_sound">Пользовательский звук</string>
+    <string name="select_sound">Выбрать звук</string>
+    <string name="change">Изменить</string>
     <string name="date">Дата</string>
     <string name="sort_by_random">Сортировать случайно</string>
     <string name="edit">Редактировать</string>

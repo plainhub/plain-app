@@ -11,11 +11,9 @@ class HttpApiEvents {
     class MessageUpdatedEvent(val id: String) : ChannelEvent()
     
     // Pomodoro events
-    class PomodoroStartEvent : ChannelEvent()
+    class PomodoroStartEvent(val timeLeft: Int) : ChannelEvent()
     
     class PomodoroPauseEvent : ChannelEvent()
     
     class PomodoroStopEvent : ChannelEvent()
-    
-    class PomodoroProgressUpdateEvent(val timeLeft: Int) : ChannelEvent()
 }

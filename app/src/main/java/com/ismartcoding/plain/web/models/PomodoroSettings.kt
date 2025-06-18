@@ -8,7 +8,9 @@ data class PomodoroSettings(
     val longBreakDuration: Int,
     val pomodorosBeforeLongBreak: Int,
     val showNotification: Boolean,
-    val playSoundOnComplete: Boolean
+    val playSoundOnComplete: Boolean,
+    val soundPath: String,
+    val originalSoundName: String
 )
 
 fun DPomodoroSettings.toModel(): PomodoroSettings {
@@ -18,6 +20,8 @@ fun DPomodoroSettings.toModel(): PomodoroSettings {
         longBreakDuration = longBreakDuration,
         pomodorosBeforeLongBreak = pomodorosBeforeLongBreak,
         showNotification = showNotification,
-        playSoundOnComplete = playSoundOnComplete
+        playSoundOnComplete = playSoundOnComplete,
+        soundPath = soundPath,
+        originalSoundName = originalSoundName
     )
 }

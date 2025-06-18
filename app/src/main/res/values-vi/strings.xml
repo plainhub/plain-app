@@ -155,6 +155,9 @@
     <string name="http_server_state_stopping">Đang dừng dịch vụ…</string>
     <string name="http_server_state_error">Khởi động không thành công</string>
     <string name="change_port">Thay đổi cổng</string>
+    <string name="custom_sound">Âm thanh tùy chỉnh</string>
+    <string name="select_sound">Chọn âm thanh</string>
+    <string name="change">Thay đổi</string>
     <string name="start_service">Bắt đầu dịch vụ</string>
     <string name="stop_service">Dừng dịch vụ</string>
     <string name="run">Chạy</string>
@@ -346,6 +349,8 @@
     <string name="grant_permission_button">Cấp quyền</string>
     <string name="sleep_timer_permission_message">Bộ hẹn giờ ngủ cần quyền lập lịch báo thức chính xác để hoạt động đúng trong nền, ngay cả khi ứng dụng không hoạt động.</string>
     <string name="permissions">Quyền</string>
+    <string name="show_notification">Hiển thị thông báo</string>
+    <string name="play_sound_on_complete">Phát âm thanh khi hoàn thành</string>
     <string name="date">Ngày</string>
     <string name="sort_by_random">Sắp xếp ngẫu nhiên</string>
     <string name="edit">Chỉnh sửa</string>

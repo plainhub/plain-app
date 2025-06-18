@@ -346,6 +346,11 @@
     <string name="grant_permission_button">Berechtigung erteilen</string>
     <string name="sleep_timer_permission_message">Der Schlaf-Timer benötigt die Berechtigung, genaue Alarme zu planen, um im Hintergrund ordnungsgemäß zu funktionieren. Dadurch funktioniert der Timer auch, wenn die App nicht aktiv ist.</string>
     <string name="permissions">Berechtigungen</string>
+    <string name="show_notification">Benachrichtigung anzeigen</string>
+    <string name="play_sound_on_complete">Sound abspielen, wenn abgeschlossen</string>
+    <string name="custom_sound">Benutzerdefinierter Ton</string>
+    <string name="select_sound">Ton auswählen</string>
+    <string name="change">Ändern</string>
     <string name="date">Datum</string>
     <string name="sort_by_random">Zufällig sortieren</string>
     <string name="edit">Bearbeiten</string>

@@ -155,6 +155,9 @@
     <string name="http_server_state_stopping">सेवा बंद हो रही है...</string>
     <string name="http_server_state_error">प्रारंभ विफल हुआ</string>
     <string name="change_port">पोर्ट बदलें</string>
+    <string name="custom_sound">कस्टम ध्वनि</string>
+    <string name="select_sound">ध्वनि चुनें</string>
+    <string name="change">बदलें</string>
     <string name="start_service">सेवा शुरू करें</string>
     <string name="stop_service">सेवा बंद करें</string>
     <string name="run">चलाएं</string>
@@ -346,6 +349,8 @@
     <string name="grant_permission_button">अनुमति दें</string>
     <string name="sleep_timer_permission_message">स्लीप टाइमर को पृष्ठभूमि में सही ढंग से काम करने के लिए सटीक अलार्म शेड्यूल करने की अनुमति की आवश्यकता होती है। यह सुनिश्चित करता है कि ऐप सक्रिय न होने पर भी टाइमर काम करे।</string>
     <string name="permissions">अनुमतियाँ</string>
+    <string name="show_notification">सूचना दिखाएं</string>
+    <string name="play_sound_on_complete">पूर्ण होने पर ध्वनि बजाएं</string>
     <string name="date">तारीख</string>
     <string name="sort_by_random">यादृच्छिक आधार पर क्रमबद्ध करें</string>
     <string name="edit">संपादित करें</string>

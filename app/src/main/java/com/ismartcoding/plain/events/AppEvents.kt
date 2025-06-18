@@ -6,7 +6,6 @@ import android.net.Uri
 import android.os.PowerManager
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.ChannelEvent
-import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.logcat.LogCat
@@ -28,11 +27,6 @@ import com.ismartcoding.plain.features.bluetooth.BluetoothUtil
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.services.HttpServerService
-import com.ismartcoding.plain.preference.PomodoroSettingsPreference
-import com.ismartcoding.plain.ui.MainActivity
-import com.ismartcoding.plain.ui.page.pomodoro.PomodoroHelper
-import com.ismartcoding.plain.ui.page.pomodoro.PomodoroHelper.playNotificationSound
-import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import com.ismartcoding.plain.web.AuthRequest
 import com.ismartcoding.plain.web.websocket.WebSocketHelper
 import io.ktor.server.websocket.DefaultWebSocketServerSession
@@ -110,15 +104,11 @@ class SleepTimerEvent(val durationMs: Long) : ChannelEvent()
 
 class CancelSleepTimerEvent : ChannelEvent()
 
-class PomodoroTimerEvent(val timeLeft: Int, val state: PomodoroState) : ChannelEvent()
-
-class CancelPomodoroTimerEvent : ChannelEvent()
-
 object AppEvents {
     private lateinit var mediaPlayer: MediaPlayer
     private var mediaPlayingUri: Uri? = null
     private var sleepTimerJob: Job? = null
-    private var pomodoroTimerJob: Job? = null
+
     val wakeLock: PowerManager.WakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "${BuildConfig.APPLICATION_ID}:http_server")
 
 
@@ -156,37 +146,6 @@ object AppEvents {
                     is CancelSleepTimerEvent -> {
                         sleepTimerJob?.cancel()
                         sleepTimerJob = null
-                    }
-
-                    is PomodoroTimerEvent -> {
-                        pomodoroTimerJob?.cancel()
-                        pomodoroTimerJob = coIO {
-                            delay(event.timeLeft * 1000L)
-                            MainActivity.instance.get()?.pomodoroVM?.let { vm ->
-                                when (vm.currentState.value) {
-                                    PomodoroState.WORK -> vm.handleWorkSessionCompleteAsync(isSkip = false)
-                                    PomodoroState.SHORT_BREAK, PomodoroState.LONG_BREAK -> vm.handleBreakSessionComplete()
-                                }
-                                vm.resetSessionState()
-                            }
-                            val context = MainApp.instance
-                            val settings = PomodoroSettingsPreference.getValueAsync(context)
-                            if (settings.showNotification) {
-                                PomodoroHelper.showNotificationAsync(context, event.state)
-                            }
-                            if (settings.playSoundOnComplete) {
-                                try {
-                                    PomodoroHelper.playNotificationSound()
-                                } catch (e: Exception) {
-                                    LogCat.e("Failed to play Pomodoro sound: ${e.message}")
-                                }
-                            }
-                        }
-                    }
-
-                    is CancelPomodoroTimerEvent -> {
-                        pomodoroTimerJob?.cancel()
-                        pomodoroTimerJob = null
                     }
 
                     is WebSocketEvent -> {
