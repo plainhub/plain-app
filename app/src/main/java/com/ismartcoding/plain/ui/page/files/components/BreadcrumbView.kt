@@ -48,7 +48,7 @@ fun BreadcrumbView(
 
             if (index < breadcrumbs.size - 1) {
                 Text(
-                    text = " > ",
+                    text = " / ",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

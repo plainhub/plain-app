@@ -148,7 +148,7 @@ object HttpServerManager {
     fun generateSSLKeyStore(file: File, password: String) {
         val keyStore = JksHelper.genJksFile(SSL_KEY_ALIAS, password, Constants.SSL_NAME)
         FileOutputStream(file).use {
-            keyStore.store(it, null)
+            keyStore.store(it, password.toCharArray())
         }
     }
 
@@ -159,8 +159,22 @@ object HttpServerManager {
         }
 
         return KeyStore.getInstance(KeyStore.getDefaultType()).apply {
-            file.inputStream().use {
-                load(it, null)
+            try {
+                file.inputStream().use {
+                    load(it, password.toCharArray())
+                }
+            } catch (ex: Exception) {
+                LogCat.e("Failed to load keystore: ${ex.message}, regenerating...")
+                ex.printStackTrace()
+                // Delete corrupted file and regenerate
+                if (file.exists()) {
+                    file.delete()
+                }
+                generateSSLKeyStore(file, password)
+                // Reload the newly generated keystore
+                file.inputStream().use {
+                    load(it, password.toCharArray())
+                }
             }
         }
     }

@@ -23,4 +23,5 @@ data class App(
     val internalStoragePath: String,
     val downloadsDir: String,
     val developerMode: Boolean,
+    val favoriteFolders: List<FavoriteFolder>
 )

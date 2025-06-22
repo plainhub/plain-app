@@ -27,12 +27,15 @@ import com.ismartcoding.plain.features.bluetooth.BluetoothUtil
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.services.HttpServerService
+import com.ismartcoding.plain.ui.models.FolderOption
 import com.ismartcoding.plain.web.AuthRequest
 import com.ismartcoding.plain.web.websocket.WebSocketHelper
 import io.ktor.server.websocket.DefaultWebSocketServerSession
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
+
+class FolderKanbanSelectEvent(val data: FolderOption) : ChannelEvent()
 
 // The events raised by the app
 class StartHttpServerEvent : ChannelEvent()

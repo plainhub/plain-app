@@ -66,7 +66,7 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPrevie
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.BreadcrumbItem
-import com.ismartcoding.plain.ui.models.DrawerMenuItemClickedEvent
+import com.ismartcoding.plain.events.FolderKanbanSelectEvent
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode
 import com.ismartcoding.plain.ui.models.exitSearchMode
@@ -144,11 +144,8 @@ fun FilesPage(
             // Only override the inferred type if explicitly passed
             fileType?.let { type ->
                 if (type == FilesType.APP) {
-                    filesVM.root = FileSystemHelper.getExternalFilesDirPath(context)
-                    filesVM.type = FilesType.APP
-                    filesVM.breadcrumbs.clear()
-                    filesVM.breadcrumbs.add(BreadcrumbItem(filesVM.getRootDisplayName(), filesVM.root))
-                    filesVM.initPath(filesVM.root)
+                    val rootPath = FileSystemHelper.getExternalFilesDirPath(context)
+                    filesVM.initSelectedPath(rootPath, type, rootPath, rootPath)
                 }
                 // Add other specific file type handling here if needed
             }
@@ -166,20 +163,10 @@ fun FilesPage(
                     }
                 }
 
-                is DrawerMenuItemClickedEvent -> {
-                    val m = event.model
+                is FolderKanbanSelectEvent -> {
+                    val m = event.data
                     filesVM.offset = 0
-                    filesVM.root = m.data as String
-                    filesVM.type = when (m.iconId) {
-                        R.drawable.sd_card -> FilesType.SDCARD
-                        R.drawable.usb -> FilesType.USB_STORAGE
-                        R.drawable.app_icon -> FilesType.APP
-                        R.drawable.history -> FilesType.RECENTS
-                        else -> FilesType.INTERNAL_STORAGE
-                    }
-                    filesVM.breadcrumbs.clear()
-                    filesVM.breadcrumbs.add(BreadcrumbItem(filesVM.getRootDisplayName(), filesVM.root))
-                    filesVM.initPath(filesVM.root)
+                    filesVM.initSelectedPath(m.rootPath, m.type, m.fullPath, m.fullPath)
 
                     scope.launch(Dispatchers.IO) {
                         filesVM.loadAsync(context)
@@ -220,7 +207,7 @@ fun FilesPage(
             onConfirm = { name ->
                 scope.launch {
                     DialogHelper.showLoading()
-                    withIO { FileSystemHelper.createDirectory(filesVM.path + "/" + name) }
+                    withIO { FileSystemHelper.createDirectory(filesVM.selectedPath + "/" + name) }
                     DialogHelper.hideLoading()
                     withIO { filesVM.loadAsync(context) }
                     filesVM.showCreateFolderDialog.value = false
@@ -240,7 +227,7 @@ fun FilesPage(
             onConfirm = { name ->
                 scope.launch {
                     DialogHelper.showLoading()
-                    withIO { FileSystemHelper.createFile(filesVM.path + "/" + name) }
+                    withIO { FileSystemHelper.createFile(filesVM.selectedPath + "/" + name) }
                     DialogHelper.hideLoading()
                     withIO { filesVM.loadAsync(context) }
                     filesVM.showCreateFileDialog.value = false
@@ -275,7 +262,7 @@ fun FilesPage(
                     )
 
                     filesVM.type == FilesType.RECENTS -> stringResource(R.string.recents)
-                    filesVM.path != filesVM.root -> filesVM.path.getFilenameFromPath()
+                    filesVM.selectedPath != filesVM.rootPath -> filesVM.selectedPath.getFilenameFromPath()
                     else -> stringResource(R.string.files)
                 },
                 subtitle = if (!filesVM.selectMode.value) {

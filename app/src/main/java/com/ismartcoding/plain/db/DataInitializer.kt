@@ -19,7 +19,6 @@ class DataInitializer(val context: Context, val db: SupportSQLiteDatabase) {
 
     private val tags =
         arrayOf(
-            TagItem(R.string.favorites, DataType.AUDIO),
             TagItem(R.string.light_music, DataType.AUDIO),
             TagItem(R.string.movie, DataType.VIDEO),
             TagItem(R.string.family, DataType.IMAGE),

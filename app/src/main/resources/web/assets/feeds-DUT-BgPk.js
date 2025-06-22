@@ -1,0 +1,1 @@
+import{C as a,B as d,D as o}from"./index-BAdglffH.js";const l=e=>({viewAll:()=>{d(e,"/feeds")},viewFeed:s=>{const u=a([{name:"feed_id",op:"",value:s.id}]);d(e,`/feeds?q=${o(u)}`)},viewToday:()=>{const s=a([{name:"today",op:"",value:"true"}]);d(e,`/feeds?q=${o(s)}`)}});export{l as u};

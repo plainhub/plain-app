@@ -33,6 +33,7 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.data.DFavoriteFolder
 import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.data.TagRelationStub
@@ -92,6 +93,7 @@ import com.ismartcoding.plain.preference.AudioSortByPreference
 import com.ismartcoding.plain.preference.AuthDevTokenPreference
 import com.ismartcoding.plain.preference.DeveloperModePreference
 import com.ismartcoding.plain.preference.DeviceNamePreference
+import com.ismartcoding.plain.preference.FavoriteFoldersPreference
 import com.ismartcoding.plain.preference.PomodoroSettingsPreference
 import com.ismartcoding.plain.preference.ScreenMirrorQualityPreference
 import com.ismartcoding.plain.preference.VideoPlaylistPreference
@@ -694,6 +696,7 @@ class SXGraphQL(val schema: Schema) {
                             internalStoragePath = FileSystemHelper.getInternalStoragePath(),
                             downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath,
                             developerMode = DeveloperModePreference.getAsync(context),
+                            favoriteFolders = FavoriteFoldersPreference.getValueAsync(context).map { it.toModel() }
                         )
                     }
                 }
@@ -1441,6 +1444,21 @@ class SXGraphQL(val schema: Schema) {
                         chunkDir.deleteRecursively()
                         MainApp.instance.scanFileByConnection(outputFile, null)
                         outputFile.absolutePath
+                    }
+                }
+                mutation("addFavoriteFolder") {
+                    resolver { rootPath: String, fullPath: String ->
+                        val context = MainApp.instance
+                        val folder = DFavoriteFolder(rootPath, fullPath)
+                        val updatedFolders = FavoriteFoldersPreference.addAsync(context, folder)
+                        updatedFolders.map { it.toModel() }
+                    }
+                }
+                mutation("removeFavoriteFolder") {
+                    resolver { fullPath: String ->
+                        val context = MainApp.instance
+                        val updatedFolders = FavoriteFoldersPreference.removeAsync(context, fullPath)
+                        updatedFolders.map { it.toModel() }
                     }
                 }
                 enum<MediaPlayMode>()

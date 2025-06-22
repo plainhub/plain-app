@@ -13,13 +13,13 @@ import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.FilePathData
 import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.FileMediaStoreHelper
-import com.ismartcoding.plain.preference.FilePathData
 import com.ismartcoding.plain.preference.LastFilePathPreference
 import com.ismartcoding.plain.preference.ShowHiddenFilesPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -35,13 +35,13 @@ import java.util.Stack
 data class BreadcrumbItem(var name: String, var path: String)
 
 class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>, ViewModel() {
-    var root = FileSystemHelper.getInternalStoragePath()
-    private var _path = root
-    var path: String
-        get() = _path
+    var rootPath = FileSystemHelper.getInternalStoragePath()
+    private var _selectedPath = rootPath
+    var selectedPath: String
+        get() = _selectedPath
         set(value) {
-            val isChanged = _path != value
-            _path = value
+            val isChanged = _selectedPath != value
+            _selectedPath = value
             if (isChanged) {
                 viewModelScope.launch(Dispatchers.IO) {
                     // Save complete breadcrumbs path to preserve user's navigation state
@@ -54,7 +54,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
                     LastFilePathPreference.putAsync(
                         MainApp.instance,
                         FilePathData(
-                            rootPath = root, 
+                            rootPath = rootPath,
                             fullPath = fullPath, 
                             selectedPath = value
                         )
@@ -76,7 +76,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
 
     init {
         // Initialize with default breadcrumb - will be updated when loadLastPathAsync is called
-        breadcrumbs.add(BreadcrumbItem(getRootDisplayName(), root))
+        breadcrumbs.add(BreadcrumbItem(getRootDisplayName(), rootPath))
     }
 
     val selectedFile = mutableStateOf<DFile?>(null)
@@ -106,10 +106,10 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
     }
 
     fun navigateToDirectory(context: Context, newPath: String) {
-        if (path != newPath) {
+        if (selectedPath != newPath) {
             // Add current path to history before changing
-            navigationHistory.push(path)
-            path = newPath
+            navigationHistory.push(selectedPath)
+            selectedPath = newPath
             getAndUpdateSelectedIndex()
             viewModelScope.launch(Dispatchers.IO) {
                 isLoading.value = true
@@ -121,7 +121,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
 
     fun navigateBack(): Boolean {
         return if (navigationHistory.isNotEmpty()) {
-            path = navigationHistory.pop()
+            selectedPath = navigationHistory.pop()
             getAndUpdateSelectedIndex()
             true
         } else {
@@ -132,21 +132,11 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
     suspend fun loadLastPathAsync(context: Context) {
         val data = LastFilePathPreference.getValueAsync(context)
         if (data.selectedPath.isNotEmpty() && File(data.selectedPath).exists()) {
-            root = data.rootPath
-            // Infer the file system type from the root path
             type = inferFileTypeFromRoot(context, data.rootPath)
-            // Restore complete breadcrumbs from fullPath
-            rebuildBreadcrumbs(data.fullPath)
-            _path = data.selectedPath
-            // Set correct breadcrumb selection
-            selectedBreadcrumbIndex.value = breadcrumbs.indexOfFirst { it.path == data.selectedPath }
-            if (selectedBreadcrumbIndex.value == -1) {
-                selectedBreadcrumbIndex.value = breadcrumbs.size - 1
-            }
-            navigationHistory.clear()
+            initSelectedPath(data.rootPath, type, data.fullPath, data.selectedPath)
         } else {
             // No saved path, but still infer the type based on current root
-            type = inferFileTypeFromRoot(context, root)
+            type = inferFileTypeFromRoot(context, rootPath)
             updateRootBreadcrumb()
         }
     }
@@ -168,12 +158,12 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
 
     private fun rebuildBreadcrumbs(targetPath: String) {
         breadcrumbs.clear()
-        breadcrumbs.add(BreadcrumbItem(getRootDisplayName(), root))
+        breadcrumbs.add(BreadcrumbItem(getRootDisplayName(), rootPath))
         
-        if (targetPath != root) {
-            val relativePath = targetPath.removePrefix(root).trim('/')
+        if (targetPath != rootPath) {
+            val relativePath = targetPath.removePrefix(rootPath).trim('/')
             if (relativePath.isNotEmpty()) {
-                var currentPath = root
+                var currentPath = rootPath
                 relativePath.split("/").forEach { segment ->
                     currentPath += "/$segment"
                     breadcrumbs.add(BreadcrumbItem(segment, currentPath))
@@ -196,7 +186,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
 
     fun updateRootBreadcrumb() {
         if (breadcrumbs.isNotEmpty()) {
-            breadcrumbs[0] = BreadcrumbItem(getRootDisplayName(), root)
+            breadcrumbs[0] = BreadcrumbItem(getRootDisplayName(), rootPath)
         }
     }
 
@@ -206,23 +196,31 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
     }
 
     // Initialize path without adding to history
-    fun initPath(newPath: String) {
-        path = newPath
-        // Clear navigation history when initializing
+    fun initSelectedPath(rootPath: String, type: FilesType, fullPath: String,  selectedPath: String) {
+        this.rootPath = rootPath
+        // Infer the file system type from the root path
+        this.type = type
+        // Restore complete breadcrumbs from fullPath
+        rebuildBreadcrumbs(fullPath)
+        this.selectedPath = selectedPath
+        // Set correct breadcrumb selection
+        selectedBreadcrumbIndex.value = breadcrumbs.indexOfFirst { it.path == selectedPath }
+        if (selectedBreadcrumbIndex.value == -1) {
+            selectedBreadcrumbIndex.value = breadcrumbs.size - 1
+        }
         navigationHistory.clear()
-        getAndUpdateSelectedIndex()
     }
 
     private fun getAndUpdateSelectedIndex(): Int {
-        var index = breadcrumbs.indexOfFirst { it.path == path }
+        var index = breadcrumbs.indexOfFirst { it.path == selectedPath }
         if (index == -1) {
-            val parent = path.getParentPath()
+            val parent = selectedPath.getParentPath()
             breadcrumbs.reversed().forEach { b ->
                 if (b.path != parent && !("$parent/").startsWith(b.path + "/")) {
                     breadcrumbs.remove(b)
                 }
             }
-            breadcrumbs.add(BreadcrumbItem(path.getFilenameFromPath(), path))
+            breadcrumbs.add(BreadcrumbItem(selectedPath.getFilenameFromPath(), selectedPath))
             index = breadcrumbs.size - 1
         }
 
@@ -239,12 +237,12 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
         val showHiddenFiles = ShowHiddenFilesPreference.getAsync(context)
         val query = getQuery()
         val files = if (showSearchBar.value && query.isNotEmpty()) {
-            FileSystemHelper.search(query, path, showHiddenFiles)
+            FileSystemHelper.search(query, selectedPath, showHiddenFiles)
         } else if (type == FilesType.RECENTS) {
             FileMediaStoreHelper.getRecentFilesAsync(context)
         } else {
             FileSystemHelper.getFilesList(
-                path,
+                selectedPath,
                 showHiddenFiles,
                 sortBy.value
             )

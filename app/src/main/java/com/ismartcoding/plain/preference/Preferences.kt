@@ -19,6 +19,8 @@ import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.data.NotificationFilterData
 import com.ismartcoding.plain.data.DPomodoroSettings
+import com.ismartcoding.plain.data.DFavoriteFolder
+import com.ismartcoding.plain.data.FilePathData
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.Language
@@ -26,14 +28,8 @@ import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.file.FileSortBy
-import org.json.JSONObject
 import java.util.Locale
 
-data class FilePathData(
-    val rootPath: String,
-    val fullPath: String,
-    val selectedPath: String
-)
 
 object PasswordPreference : BasePreference<String>() {
     override val default = ""
@@ -477,12 +473,7 @@ object LastFilePathPreference : BasePreference<String>() {
             return FilePathData("", "", "")
         }
         return try {
-            val json = JSONObject(str)
-            FilePathData(
-                rootPath = json.getString("root_path"),
-                fullPath = json.getString("full_path"),
-                selectedPath = json.getString("selected_path")
-            )
+            jsonDecode(str)
         } catch (e: Exception) {
             // If JSON parsing fails, return empty data
             FilePathData("", "", "")
@@ -493,12 +484,59 @@ object LastFilePathPreference : BasePreference<String>() {
         context: Context,
         data: FilePathData
     ) {
-        val json = JSONObject().apply {
-            put("root_path", data.rootPath)
-            put("full_path", data.fullPath)
-            put("selected_path", data.selectedPath)
+        putAsync(context, jsonEncode(data))
+    }
+}
+
+object FavoriteFoldersPreference : BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("favorite_folders")
+
+    suspend fun getValueAsync(context: Context): List<DFavoriteFolder> {
+        val str = getAsync(context)
+        if (str.isEmpty()) {
+            return listOf()
         }
-        putAsync(context, json.toString())
+        return try {
+            jsonDecode(str)
+        } catch (e: Exception) {
+            listOf()
+        }
+    }
+
+    suspend fun putAsync(
+        context: Context,
+        value: List<DFavoriteFolder>
+    ) {
+        putAsync(context, jsonEncode(value))
+    }
+
+    suspend fun addAsync(
+        context: Context,
+        folder: DFavoriteFolder
+    ): List<DFavoriteFolder> {
+        val items = getValueAsync(context).toMutableList()
+        items.removeIf { it.fullPath == folder.fullPath }
+        items.add(folder)
+        putAsync(context, items)
+        return items
+    }
+
+    suspend fun removeAsync(
+        context: Context,
+        fullPath: String
+    ): List<DFavoriteFolder> {
+        val items = getValueAsync(context).toMutableList()
+        items.removeIf { it.fullPath == fullPath }
+        putAsync(context, items)
+        return items
+    }
+
+    suspend fun isFavoriteAsync(
+        context: Context,
+        fullPath: String
+    ): Boolean {
+        return getValueAsync(context).any { it.fullPath == fullPath }
     }
 }
 

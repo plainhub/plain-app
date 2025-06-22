@@ -68,7 +68,7 @@ fun FilePasteBar(
                         DialogHelper.showLoading()
                         withContext(Dispatchers.IO) {
                             filesVM.cutFiles.forEach {
-                                val dstFile = File(filesVM.path + "/" + it.id.getFilenameFromPath())
+                                val dstFile = File(filesVM.selectedPath + "/" + it.id.getFilenameFromPath())
                                 if (!dstFile.exists()) {
                                     Path(it.id).moveTo(dstFile.toPath(), true)
                                 } else {
@@ -84,7 +84,7 @@ fun FilePasteBar(
                         DialogHelper.showLoading()
                         withContext(Dispatchers.IO) {
                             filesVM.copyFiles.forEach {
-                                val dstFile = File(filesVM.path + "/" + it.id.getFilenameFromPath())
+                                val dstFile = File(filesVM.selectedPath + "/" + it.id.getFilenameFromPath())
                                 if (!dstFile.exists()) {
                                     File(it.id).copyRecursively(dstFile, true)
                                 } else {

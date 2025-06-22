@@ -191,3 +191,16 @@ fun ActionButtonCast(onClick: () -> Unit) {
         click = onClick,
     )
 }
+
+@Composable
+fun IconTextFavoriteButton(
+    isFavorite: Boolean = false,
+    onClick: () -> Unit
+) {
+    val icon = if (isFavorite) R.drawable.check else R.drawable.plus
+    PIconTextActionButton(
+        icon = icon,
+        text = stringResource(R.string.favorites),
+        click = onClick
+    )
+}

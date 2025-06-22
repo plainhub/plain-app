@@ -435,7 +435,7 @@
     <string name="clear_list">清空列表</string>
     <string name="add_to_playlist">添加到播放列表</string>
     <string name="play_selected">播放已選項</string>
-    <string name="favorites">我喜歡</string>
+    <string name="favorites">收藏</string>
     <string name="play_all">播放全部</string>
     <string name="_default">默認</string>
     <string name="add_to_tags">添加到標簽</string>

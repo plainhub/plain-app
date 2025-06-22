@@ -5,7 +5,12 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -14,12 +19,15 @@ import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.getMimeType
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
+import com.ismartcoding.plain.data.DFavoriteFolder
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.ShareHelper
+import com.ismartcoding.plain.preference.FavoriteFoldersPreference
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
+import com.ismartcoding.plain.ui.base.IconTextFavoriteButton
 import com.ismartcoding.plain.ui.base.IconTextRenameButton
 import com.ismartcoding.plain.ui.base.IconTextSelectButton
 import com.ismartcoding.plain.ui.base.IconTextShareButton
@@ -44,8 +52,16 @@ fun FileInfoBottomSheet(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val file = filesVM.selectedFile.value ?: return
+    var isFavorite by remember { mutableStateOf(false) }
+    
     val onDismiss = {
         filesVM.selectedFile.value = null
+    }
+
+    LaunchedEffect(file.path) {
+        if (file.isDir) {
+            isFavorite = FavoriteFoldersPreference.isFavoriteAsync(context, file.path)
+        }
     }
 
     if (filesVM.showRenameDialog.value) {
@@ -75,6 +91,28 @@ fun FileInfoBottomSheet(
                             filesVM.enterSelectMode()
                             filesVM.select(file.path)
                             onDismiss()
+                        }
+                    }
+
+                    if (file.isDir) {
+                        IconTextFavoriteButton(
+                            isFavorite = isFavorite
+                        ) {
+                            scope.launch(Dispatchers.IO) {
+                                if (isFavorite) {
+                                    FavoriteFoldersPreference.removeAsync(context, file.path)
+                                    isFavorite = false
+                                } else {
+                                    FavoriteFoldersPreference.addAsync(
+                                        context,
+                                        DFavoriteFolder(
+                                            rootPath = filesVM.rootPath,
+                                            fullPath = file.path
+                                        )
+                                    )
+                                    isFavorite = true
+                                }
+                            }
                         }
                     }
 
