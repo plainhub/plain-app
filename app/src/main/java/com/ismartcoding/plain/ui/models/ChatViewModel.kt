@@ -8,32 +8,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.toAppUrl
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageType
-import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
+import com.ismartcoding.plain.features.ChatHelper
+import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
 import org.json.JSONArray
-
-data class VChat(override var id: String, val name: String, val createdAt: Instant, val type: String, var value: Any? = null) : IData {
-    companion object {
-        fun from(data: DChat): VChat {
-            return VChat(data.id, data.name, data.createdAt, data.content.type, data.content.value)
-        }
-    }
-}
 
 class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     private val _itemsFlow = MutableStateFlow(mutableStateListOf<VChat>())
@@ -42,10 +34,10 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     override var selectMode = mutableStateOf(false)
     override val selectedIds = mutableStateListOf<String>()
 
-    fun fetch(context: Context) {
+    fun fetch(context: Context, toId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val dao = AppDatabase.instance.chatDao()
-            val list = dao.getAll()
+            val list = dao.getByChatId(toId)
             if (!TempData.chatItemsMigrated) {
                 TempData.chatItemsMigrated = true
                 list.filter { setOf(DMessageType.IMAGES.value, DMessageType.FILES.value).contains(it.content.type) }.forEach {
@@ -69,7 +61,10 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
                     }
                 }
             }
-            _itemsFlow.value = list.sortedByDescending { it.createdAt }.map { VChat.from(it) }.toMutableStateList()
+
+            _itemsFlow.value = list.sortedByDescending { it.createdAt }.map {
+                VChat.from(it)
+            }.toMutableStateList()
         }
     }
 

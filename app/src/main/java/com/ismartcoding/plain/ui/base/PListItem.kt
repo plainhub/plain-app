@@ -25,7 +25,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.ui.theme.palette.onDark
+import com.ismartcoding.plain.ui.theme.listItemSubtitle
+import com.ismartcoding.plain.ui.theme.listItemTitle
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -34,7 +35,7 @@ fun PListItem(
     modifier: Modifier = Modifier,
     enable: Boolean = true,
     title: String,
-    desc: String? = null,
+    subtitle: String? = null,
     value: String? = null,
     icon: Int? = null,
     separatedActions: Boolean = false,
@@ -72,13 +73,13 @@ fun PListItem(
             ) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.listItemTitle(),
                 )
-                desc?.let {
+                subtitle?.let {
                     VerticalSpace(dp = 8.dp)
                     Text(
                         text = it,
-                        style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
+                        style = MaterialTheme.typography.listItemSubtitle(),
                     )
                 }
             }

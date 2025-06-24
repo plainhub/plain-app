@@ -201,6 +201,18 @@
     <string name="bluetooth">藍牙</string>
     <string name="qrcode">二維碼</string>
     <string name="scanner">掃碼</string>
+    <string name="nearby">附近</string>
+    <string name="nearby_devices">附近裝置</string>
+    <string name="searching_nearby_devices">搜尋附近裝置中...</string>
+    <string name="no_nearby_devices_found">未發現附近裝置</string>
+    <string name="make_discoverable">設為可被發現</string>
+    <string name="make_discoverable_desc">允許其他裝置在網路中發現此裝置</string>
+    <string name="discover_nearby_devices">發現附近裝置</string>
+    <string name="stop_discovering">停止發現</string>
+    <string name="tap_discover_to_start">點擊「發現附近裝置」開始搜尋</string>
+    <string name="make_sure_devices_same_network">確保其他裝置在同一網路中且可被發現</string>
+    <string name="last_seen">最後上線</string>
+    <string name="device_discovered">發現裝置</string>
     <string name="link_preview_image">鏈接預覽圖片</string>
     <string name="loading_link_preview">加載鏈接預覽中…</string>
     <string name="link_preview_error">加載鏈接預覽失敗</string>
@@ -599,7 +611,6 @@
     <string name="pdf_open_error">無法開啟 PDF 檔案。</string>
     <string name="audio_play_error">無法播放音訊檔案。</string>
     <string name="copy">複製</string>
-    <string name="send_to_pc">傳送到電腦</string>
     <string name="home">首頁</string>
     <string name="clear_all">全部清除</string>
     <string name="clear_all_confirm">確定要清除播放清單嗎？此操作無法還原。</string>
@@ -626,4 +637,5 @@
     <string name="cannot_open_file_not_accessible">無法打開文件。此文件不可通過應用程序訪問。</string>
     <string name="unknown_error">發生未知錯誤。</string>
     <string name="customize_home_features">自定義首頁功能</string>
+    <string name="file_picker_not_available">此設備上沒有可用的檔案選擇器應用程式。請安裝檔案管理器應用程式。</string>
 </resources>

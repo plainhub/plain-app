@@ -49,13 +49,13 @@ import com.ismartcoding.plain.events.WindowFocusChangedEvent
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.powerManager
-import com.ismartcoding.plain.preference.ApiPermissionsPreference
-import com.ismartcoding.plain.preference.HttpPortPreference
-import com.ismartcoding.plain.preference.HttpsPortPreference
-import com.ismartcoding.plain.preference.LocalApiPermissions
-import com.ismartcoding.plain.preference.LocalKeepAwake
-import com.ismartcoding.plain.preference.LocalWeb
-import com.ismartcoding.plain.preference.WebSettingsProvider
+import com.ismartcoding.plain.preferences.ApiPermissionsPreference
+import com.ismartcoding.plain.preferences.HttpPortPreference
+import com.ismartcoding.plain.preferences.HttpsPortPreference
+import com.ismartcoding.plain.preferences.LocalApiPermissions
+import com.ismartcoding.plain.preferences.LocalKeepAwake
+import com.ismartcoding.plain.preferences.LocalWeb
+import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.AlertType
@@ -294,7 +294,7 @@ fun WebSettingsPage(
                             },
                         icon = m.icon,
                         title = permission.getText(),
-                        desc =
+                        subtitle =
                             stringResource(
                                 if (m.granted) R.string.system_permission_granted else R.string.system_permission_not_granted,
                             ),
@@ -316,7 +316,7 @@ fun WebSettingsPage(
                                 },
                                 icon = m.icon,
                                 title = permission.getText(),
-                                desc =
+                                subtitle =
                                     stringResource(
                                         if (m.granted) R.string.system_permission_granted else R.string.system_permission_not_granted,
                                     ),
@@ -332,7 +332,7 @@ fun WebSettingsPage(
                                     },
                                     icon = R.drawable.settings,
                                     title = stringResource(R.string.notification_filter_settings),
-                                    desc = stringResource(R.string.notification_filter_settings_desc),
+                                    subtitle = stringResource(R.string.notification_filter_settings_desc),
                                     showMore = true,
                                 )
                             }

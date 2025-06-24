@@ -14,8 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -43,7 +41,7 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.PomodoroActionData
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.features.Permissions
-import com.ismartcoding.plain.preference.PomodoroSettingsPreference
+import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.CircularTimer
 import com.ismartcoding.plain.ui.base.PIconButton

@@ -198,6 +198,18 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="qrcode">Código QR</string>
     <string name="scanner">Escáner</string>
+    <string name="nearby">Cerca</string>
+    <string name="nearby_devices">Dispositivos cercanos</string>
+    <string name="searching_nearby_devices">Buscando dispositivos cercanos...</string>
+    <string name="no_nearby_devices_found">No se encontraron dispositivos cercanos</string>
+    <string name="make_discoverable">Hacer visible</string>
+    <string name="make_discoverable_desc">Permitir que otros dispositivos detecten este dispositivo en la red</string>
+    <string name="discover_nearby_devices">Descubrir dispositivos cercanos</string>
+    <string name="stop_discovering">Detener búsqueda</string>
+    <string name="tap_discover_to_start">Toca \"Descubrir dispositivos cercanos\" para comenzar a buscar</string>
+    <string name="make_sure_devices_same_network">Asegúrate de que otros dispositivos estén en la misma red y sean detectables</string>
+    <string name="last_seen">Última conexión</string>
+    <string name="device_discovered">Dispositivo descubierto</string>
     <string name="link_preview_image">Vista previa de enlace</string>
     <string name="loading_link_preview">Cargando vista previa de enlace…</string>
     <string name="link_preview_error">Error al cargar vista previa de enlace</string>
@@ -599,7 +611,6 @@
     <string name="pdf_open_error">No se pudo abrir el archivo PDF.</string>
     <string name="audio_play_error">No se pudo reproducir el archivo de audio.</string>
     <string name="copy">Copiar</string>
-    <string name="send_to_pc">Enviar al PC</string>
     <string name="home">Inicio</string>
     <string name="clear_all">Borrar todo</string>
     <string name="clear_all_confirm">¿Está seguro de que desea borrar la lista de reproducción? Esta acción no se puede deshacer.</string>
@@ -626,4 +637,5 @@
     <string name="cannot_open_file_not_accessible">No se puede abrir el archivo. Este archivo no es accesible a través de la aplicación.</string>
     <string name="unknown_error">Se produjo un error desconocido.</string>
     <string name="customize_home_features">Personalizar características de inicio</string>
+    <string name="file_picker_not_available">No hay una aplicación de selección de archivos disponible en este dispositivo. Por favor instale una aplicación de administrador de archivos.</string>
 </resources>

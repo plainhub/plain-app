@@ -2,7 +2,7 @@ package com.ismartcoding.plain.api
 
 import android.util.Base64
 import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.PhoneHelper
+import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
@@ -102,11 +102,11 @@ object HttpClientManager {
                                 Base64.encodeToString(PhoneHelper.getDeviceName(MainApp.instance).toByteArray(), Base64.NO_WRAP),
                             )
                             .addHeader("c-version", MainApp.getAppVersion())
-                            .post(CryptoHelper.aesEncrypt(token, requestBodyStr).toRequestBody(requestBody.contentType()))
+                            .post(CryptoHelper.chaCha20Encrypt(token, requestBodyStr).toRequestBody(requestBody.contentType()))
                             .build(),
                     )
                 val responseBody = response.body!!
-                val decryptedBytes = CryptoHelper.aesDecrypt(token, responseBody.bytes())
+                val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, responseBody.bytes())
                 if (decryptedBytes != null) {
                     val json = decryptedBytes.decodeToString()
                     LogCat.d("[Response] $json")

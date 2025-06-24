@@ -2,6 +2,7 @@ package com.ismartcoding.plain
 
 import android.app.ActivityManager
 import android.app.AlarmManager
+import android.app.UiModeManager
 import android.app.usage.StorageStatsManager
 import android.content.ClipboardManager
 import android.content.ContentResolver
@@ -86,6 +87,11 @@ val alarmManager: AlarmManager by lazy {
 val audioManager: android.media.AudioManager by lazy {
     MainApp.instance.getSystemServiceCompat(android.media.AudioManager::class.java)
 }
+
+val uiModeManager: UiModeManager by lazy {
+    MainApp.instance.getSystemServiceCompat(UiModeManager::class.java)
+}
+
 
 
 

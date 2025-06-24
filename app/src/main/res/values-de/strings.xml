@@ -198,6 +198,18 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="qrcode">QR-Code</string>
     <string name="scanner">Scanner</string>
+    <string name="nearby">In der Nähe</string>
+    <string name="nearby_devices">Geräte in der Nähe</string>
+    <string name="searching_nearby_devices">Suche nach Geräten in der Nähe...</string>
+    <string name="no_nearby_devices_found">Keine Geräte in der Nähe gefunden</string>
+    <string name="make_discoverable">Auffindbar machen</string>
+    <string name="make_discoverable_desc">Anderen Geräten erlauben, dieses Gerät im Netzwerk zu entdecken</string>
+    <string name="discover_nearby_devices">Geräte in der Nähe entdecken</string>
+    <string name="stop_discovering">Suche stoppen</string>
+    <string name="tap_discover_to_start">Tippe auf \"Geräte in der Nähe entdecken\", um die Suche zu starten</string>
+    <string name="make_sure_devices_same_network">Stelle sicher, dass andere Geräte im selben Netzwerk sind und auffindbar sind</string>
+    <string name="last_seen">Zuletzt gesehen</string>
+    <string name="device_discovered">Gerät entdeckt</string>
     <string name="link_preview_image">Link-Vorschau-Bild</string>
     <string name="loading_link_preview">Link-Vorschau wird geladen…</string>
     <string name="link_preview_error">Link-Vorschau konnte nicht geladen werden</string>
@@ -599,7 +611,6 @@
     <string name="pdf_open_error">PDF-Datei konnte nicht geöffnet werden.</string>
     <string name="audio_play_error">Audiodatei konnte nicht abgespielt werden.</string>
     <string name="copy">Kopieren</string>
-    <string name="send_to_pc">An PC senden</string>
     <string name="home">Startseite</string>
     <string name="clear_all">Alles löschen</string>
     <string name="clear_all_confirm">Sind Sie sicher, dass Sie die Playlist löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.</string>
@@ -626,4 +637,5 @@
     <string name="cannot_open_file_not_accessible">Datei kann nicht geöffnet werden. Diese Datei ist nicht über die App zugänglich.</string>
     <string name="unknown_error">Ein unbekannter Fehler ist aufgetreten.</string>
     <string name="customize_home_features">Startseitenfunktionen anpassen</string>
+    <string name="file_picker_not_available">Es ist keine Dateiauswahl-App auf diesem Gerät verfügbar. Bitte installieren Sie eine Dateimanager-App.</string>
 </resources>

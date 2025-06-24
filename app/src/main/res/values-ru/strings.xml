@@ -198,6 +198,18 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="qrcode">QR-код</string>
     <string name="scanner">Сканер</string>
+    <string name="nearby">Рядом</string>
+    <string name="nearby_devices">Устройства рядом</string>
+    <string name="searching_nearby_devices">Поиск устройств рядом...</string>
+    <string name="no_nearby_devices_found">Устройства рядом не найдены</string>
+    <string name="make_discoverable">Сделать обнаруживаемым</string>
+    <string name="make_discoverable_desc">Разрешить другим устройствам обнаруживать это устройство в сети</string>
+    <string name="discover_nearby_devices">Обнаружить устройства рядом</string>
+    <string name="stop_discovering">Остановить поиск</string>
+    <string name="tap_discover_to_start">Нажмите \"Обнаружить устройства рядом\" для начала поиска</string>
+    <string name="make_sure_devices_same_network">Убедитесь, что другие устройства находятся в той же сети и обнаруживаемы</string>
+    <string name="last_seen">Последний раз в сети</string>
+    <string name="device_discovered">Устройство обнаружено</string>
     <string name="link_preview_image">Изображение предварительного просмотра ссылки</string>
     <string name="loading_link_preview">Загрузка предварительного просмотра ссылки…</string>
     <string name="link_preview_error">Не удалось загрузить предварительный просмотр ссылки</string>
@@ -599,7 +611,6 @@
     <string name="pdf_open_error">Не удалось открыть PDF-файл.</string>
     <string name="audio_play_error">Не удалось воспроизвести аудиофайл.</string>
     <string name="copy">Копировать</string>
-    <string name="send_to_pc">Отправить на ПК</string>
     <string name="home">Главная</string>
     <string name="clear_all">Очистить всё</string>
     <string name="clear_all_confirm">Вы уверены, что хотите очистить плейлист? Это действие невозможно отменить.</string>
@@ -626,4 +637,5 @@
     <string name="cannot_open_file_not_accessible">Невозможно открыть файл. Этот файл не доступен через приложение.</string>
     <string name="unknown_error">Произошла неизвестная ошибка.</string>
     <string name="customize_home_features">Настроить функции дома</string>
+    <string name="file_picker_not_available">На этом устройстве нет приложения для выбора файлов. Пожалуйста, установите приложение файлового менеджера.</string>
 </resources>

@@ -16,6 +16,15 @@ object FilePickHelper {
         return intent
     }
 
+    fun getFallbackPickFileIntent(multiple: Boolean): Intent {
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, multiple)
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        intent.type = "*/*"
+
+        return intent
+    }
+
     fun getUris(intent: Intent): Set<Uri> {
         val uris = mutableSetOf<Uri>()
         if (intent.clipData != null) {

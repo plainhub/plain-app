@@ -218,4 +218,7 @@ dependencies {
     implementation(libs.zt.zip)
     debugImplementation(libs.leakcanary.android)
     implementation(kotlin("stdlib", libs.versions.kotlin.get()))
+    
+    // Google Tink for cryptography (Ed25519 support on all Android versions)
+    implementation(libs.tink.android)
 }

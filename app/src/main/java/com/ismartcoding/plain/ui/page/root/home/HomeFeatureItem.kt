@@ -16,9 +16,6 @@ data class FeatureItem(
 
         fun getList(navController: NavHostController): List<FeatureItem> {
             val list = mutableListOf(
-                FeatureItem(AppFeatureType.CHAT, R.string.send_to_pc, R.drawable.bot) {
-                    navController.navigate(Routing.Chat)
-                },
                 FeatureItem(AppFeatureType.FILES, R.string.files, R.drawable.folder) {
                     navController.navigateFiles()
                 },

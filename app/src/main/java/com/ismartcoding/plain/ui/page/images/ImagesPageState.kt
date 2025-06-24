@@ -16,7 +16,7 @@ import com.ismartcoding.plain.data.DMediaBucket
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.enums.AppFeatureType
-import com.ismartcoding.plain.preference.ImageGridCellsPerRowPreference
+import com.ismartcoding.plain.preferences.ImageGridCellsPerRowPreference
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.base.dragselect.rememberDragSelectState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState

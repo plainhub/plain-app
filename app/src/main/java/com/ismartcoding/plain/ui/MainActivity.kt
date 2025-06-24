@@ -2,7 +2,7 @@ package com.ismartcoding.plain.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
@@ -11,13 +11,7 @@ import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.provider.Settings
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.method.LinkMovementMethod
-import android.text.style.ClickableSpan
-import android.view.View
 import android.view.WindowManager
-import android.widget.TextView
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.PickVisualMediaRequest
@@ -34,7 +28,6 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.capitalize
-import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.extensions.getSystemScreenTimeout
 import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.extensions.parcelableArrayList
@@ -45,12 +38,10 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
-import com.ismartcoding.plain.enums.AppChannelType
 import com.ismartcoding.plain.enums.ExportFileType
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.enums.Language
@@ -63,6 +54,9 @@ import com.ismartcoding.plain.events.ExportFileResultEvent
 import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationEvent
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationResultEvent
+import com.ismartcoding.plain.events.PairingCancelledEvent
+import com.ismartcoding.plain.events.PairingRequestReceivedEvent
+import com.ismartcoding.plain.events.PairingResponseEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.PickFileEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
@@ -79,21 +73,18 @@ import com.ismartcoding.plain.features.bluetooth.BluetoothPermission
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getStringF
 import com.ismartcoding.plain.helpers.ScreenHelper
-import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.mediaProjectionManager
-import com.ismartcoding.plain.preference.AgreeTermsPreference
-import com.ismartcoding.plain.preference.ApiPermissionsPreference
-import com.ismartcoding.plain.preference.KeepScreenOnPreference
-import com.ismartcoding.plain.preference.SettingsProvider
-import com.ismartcoding.plain.preference.SystemScreenTimeoutPreference
-import com.ismartcoding.plain.preference.WebPreference
+import com.ismartcoding.plain.preferences.ApiPermissionsPreference
+import com.ismartcoding.plain.preferences.KeepScreenOnPreference
+import com.ismartcoding.plain.preferences.SettingsProvider
+import com.ismartcoding.plain.preferences.SystemScreenTimeoutPreference
+import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.receivers.NetworkStateReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
-import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
@@ -115,6 +106,7 @@ class MainActivity : AppCompatActivity() {
     private var pickFileTag = PickFileTag.SEND_MESSAGE
     private var exportFileType = ExportFileType.OPML
     private var requestToConnectDialog: AlertDialog? = null
+    private var pairingRequestDialog: AlertDialog? = null
     private val mainVM: MainViewModel by viewModels()
     private val audioPlaylistVM: AudioPlaylistViewModel by viewModels()
     val pomodoroVM: PomodoroViewModel by viewModels()
@@ -233,22 +225,15 @@ class MainActivity : AppCompatActivity() {
         AudioPlayer.ensurePlayer(this@MainActivity)
         coIO {
             try {
-                if (BuildConfig.CHANNEL == AppChannelType.CHINA.name && !AgreeTermsPreference.getAsync(this@MainActivity)) {
-                    coMain {
-                        showTermsAndPrivacyDialog(this@MainActivity)
-                    }
-                } else {
-                    val webEnabled = WebPreference.getAsync(this@MainActivity)
-                    if (webEnabled) {
-                        mainVM.enableHttpServer(this@MainActivity, true)
-                    }
-                    doWhenReadyAsync()
+                val webEnabled = WebPreference.getAsync(this@MainActivity)
+                if (webEnabled) {
+                    mainVM.enableHttpServer(this@MainActivity, true)
                 }
+                doWhenReadyAsync()
             } catch (ex: Exception) {
                 LogCat.e(ex.toString())
             }
         }
-
     }
 
     private suspend fun doWhenReadyAsync() {
@@ -265,9 +250,13 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("CheckResult")
     private fun initEvents() {
-        val sharedFlow = Channel.sharedFlow
-        coMain {
-            sharedFlow.collect { event ->
+        lifecycleScope.launch {
+            Channel.sharedFlow.collect { event ->
+                // Check if activity is still valid before processing events
+                if (isDestroyed || isFinishing) {
+                    return@collect
+                }
+
                 when (event) {
                     is HttpServerStateChangedEvent -> {
                         mainVM.httpServerError = HttpServerManager.httpServerError
@@ -284,6 +273,7 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                     }
+
                     is PermissionsResultEvent -> {
                         if (event.map.containsKey(Permission.WRITE_SETTINGS.toSysPermission()) && Permission.WRITE_SETTINGS.can(this@MainActivity)) {
                             val enable = !KeepScreenOnPreference.getAsync(this@MainActivity)
@@ -299,14 +289,24 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
                     }
+
                     is StartScreenMirrorEvent -> {
-                        screenCapture.launch(mediaProjectionManager.createScreenCaptureIntent())
+                        try {
+                            screenCapture.launch(mediaProjectionManager.createScreenCaptureIntent())
+                        } catch (e: IllegalStateException) {
+                            LogCat.e("Error launching screen capture: ${e.message}")
+                        }
                     }
+
                     is IgnoreBatteryOptimizationEvent -> {
-                        val intent = Intent()
-                        intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-                        intent.data = Uri.parse("package:$packageName")
-                        ignoreBatteryOptimizationActivityLauncher.launch(intent)
+                        try {
+                            val intent = Intent()
+                            intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+                            intent.data = Uri.parse("package:$packageName")
+                            ignoreBatteryOptimizationActivityLauncher.launch(intent)
+                        } catch (e: IllegalStateException) {
+                            LogCat.e("Error launching battery optimization: ${e.message}")
+                        }
                     }
 
                     is RestartAppEvent -> {
@@ -317,77 +317,152 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     is PickFileEvent -> {
-                        pickFileType = event.type
-                        pickFileTag = event.tag
-                        var type: ActivityResultContracts.PickVisualMedia.VisualMediaType? = null
-                        when (event.type) {
-                            PickFileType.IMAGE_VIDEO -> {
-                                type = ActivityResultContracts.PickVisualMedia.ImageAndVideo
-                            }
+                        try {
+                            pickFileType = event.type
+                            pickFileTag = event.tag
+                            var type: ActivityResultContracts.PickVisualMedia.VisualMediaType? = null
+                            when (event.type) {
+                                PickFileType.IMAGE_VIDEO -> {
+                                    type = ActivityResultContracts.PickVisualMedia.ImageAndVideo
+                                }
 
-                            PickFileType.IMAGE -> {
-                                type = ActivityResultContracts.PickVisualMedia.ImageOnly
-                            }
+                                PickFileType.IMAGE -> {
+                                    type = ActivityResultContracts.PickVisualMedia.ImageOnly
+                                }
 
-                            else -> {}
-                        }
-                        if (type != null) {
-                            if (event.multiple) {
-                                pickMultipleMedia.launch(PickVisualMediaRequest(type))
+                                else -> {}
+                            }
+                            if (type != null) {
+                                try {
+                                    if (event.multiple) {
+                                        pickMultipleMedia.launch(PickVisualMediaRequest(type))
+                                    } else {
+                                        pickMedia.launch(PickVisualMediaRequest(type))
+                                    }
+                                } catch (e: ActivityNotFoundException) {
+                                    LogCat.e("Photo picker not available, falling back to file picker")
+                                    doPickFile(event)
+                                }
                             } else {
-                                pickMedia.launch(PickVisualMediaRequest(type))
+                                doPickFile(event)
                             }
-                        } else {
-                            doPickFile(event)
+                        } catch (e: IllegalStateException) {
+                            LogCat.e("Error launching pick file: ${e.message}")
                         }
                     }
 
                     is ExportFileEvent -> {
-                        exportFileType = event.type
-                        exportFileActivityLauncher.launch(
-                            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                                type = "text/*"
-                                addCategory(Intent.CATEGORY_OPENABLE)
-                                putExtra(Intent.EXTRA_TITLE, event.fileName)
-                            },
-                        )
+                        try {
+                            exportFileType = event.type
+                            exportFileActivityLauncher.launch(
+                                Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                                    type = "text/*"
+                                    addCategory(Intent.CATEGORY_OPENABLE)
+                                    putExtra(Intent.EXTRA_TITLE, event.fileName)
+                                },
+                            )
+                        } catch (e: ActivityNotFoundException) {
+                            LogCat.e("No document creation app available")
+                            DialogHelper.showMessage(getString(R.string.file_picker_not_available))
+                        } catch (e: IllegalStateException) {
+                            LogCat.e("Error launching export file: ${e.message}")
+                        }
                     }
 
                     is ConfirmToAcceptLoginEvent -> {
-                        val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
-                        if (requestToConnectDialog?.isShowing == true) {
-                            requestToConnectDialog?.dismiss()
+                        try {
+                            val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
+                            if (requestToConnectDialog?.isShowing == true) {
+                                requestToConnectDialog?.dismiss()
+                                requestToConnectDialog = null
+                            }
+
+                            val r = event.request
+                            requestToConnectDialog =
+                                AlertDialog.Builder(instance.get()!!)
+                                    .setTitle(getStringF(R.string.request_to_connect, "ip", clientIp))
+                                    .setMessage(
+                                        getStringF(
+                                            R.string.client_ua,
+                                            "os_name",
+                                            r.osName.capitalize(),
+                                            "os_version",
+                                            r.osVersion,
+                                            "browser_name",
+                                            r.browserName.capitalize(),
+                                            "browser_version",
+                                            r.browserVersion,
+                                        ),
+                                    )
+                                    .setPositiveButton(getString(R.string.accept)) { _, _ ->
+                                        launch(Dispatchers.IO) {
+                                            HttpServerManager.respondTokenAsync(event, clientIp)
+                                        }
+                                    }
+                                    .setNegativeButton(getString(R.string.reject)) { _, _ ->
+                                        launch(Dispatchers.IO) {
+                                            event.session.close(
+                                                CloseReason(
+                                                    CloseReason.Codes.TRY_AGAIN_LATER, "rejected",
+                                                ),
+                                            )
+                                        }
+                                    }.create()
+
+                            if (Permission.SYSTEM_ALERT_WINDOW.can(this@MainActivity)) {
+                                requestToConnectDialog?.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+                            }
+                            requestToConnectDialog?.window?.setDimAmount(0.8f)
+                            requestToConnectDialog?.show()
+                        } catch (e: Exception) {
+                            LogCat.e("Error showing connect dialog: ${e.message}")
                             requestToConnectDialog = null
                         }
+                    }
 
-                        val r = event.request
-                        requestToConnectDialog =
-                            AlertDialog.Builder(instance.get()!!)
-                                .setTitle(getStringF(R.string.request_to_connect, "ip", clientIp))
-                                .setMessage(
-                                    getStringF(
-                                        R.string.client_ua, "os_name", r.osName.capitalize(), "os_version", r.osVersion, "browser_name", r.browserName.capitalize(), "browser_version", r.browserVersion,
-                                    ),
-                                )
-                                .setPositiveButton(getString(R.string.accept)) { _, _ ->
-                                    launch(Dispatchers.IO) {
-                                        HttpServerManager.respondTokenAsync(event, clientIp)
+                    is PairingRequestReceivedEvent -> {
+                        try {
+                            if (pairingRequestDialog?.isShowing == true) {
+                                pairingRequestDialog?.dismiss()
+                                pairingRequestDialog = null
+                            }
+
+                            val request = event.request
+                            pairingRequestDialog =
+                                AlertDialog.Builder(instance.get()!!)
+                                    .setTitle(getString(R.string.pairing_request))
+                                    .setMessage(getString(R.string.pairing_request_message, request.fromName))
+                                    .setPositiveButton(getString(R.string.allow)) { _, _ ->
+                                        sendEvent(PairingResponseEvent(request, event.fromIp, true))
                                     }
-                                }
-                                .setNegativeButton(getString(R.string.reject)) { _, _ ->
-                                    launch(Dispatchers.IO) {
-                                        event.session.close(
-                                            CloseReason(
-                                                CloseReason.Codes.TRY_AGAIN_LATER, "rejected",
-                                            ),
-                                        )
+                                    .setNegativeButton(getString(R.string.deny)) { _, _ ->
+                                        sendEvent(PairingResponseEvent(request, event.fromIp, false))
                                     }
-                                }.create()
-                        if (Permission.SYSTEM_ALERT_WINDOW.can(this@MainActivity)) {
-                            requestToConnectDialog?.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+                                    .setCancelable(false)
+                                    .create()
+
+                            if (Permission.SYSTEM_ALERT_WINDOW.can(this@MainActivity)) {
+                                pairingRequestDialog?.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+                            }
+                            pairingRequestDialog?.window?.setDimAmount(0.8f)
+                            pairingRequestDialog?.show()
+                        } catch (e: Exception) {
+                            LogCat.e("Error showing pairing dialog: ${e.message}")
+                            pairingRequestDialog = null
                         }
-                        requestToConnectDialog?.window?.setDimAmount(0.8f)
-                        requestToConnectDialog?.show()
+                    }
+                    
+                    is PairingCancelledEvent -> {
+                        try {
+                            if (pairingRequestDialog?.isShowing == true) {
+                                pairingRequestDialog?.dismiss()
+                                pairingRequestDialog = null
+                                LogCat.d("Pairing request dialog closed due to cancellation from remote device")
+                            }
+                        } catch (e: Exception) {
+                            LogCat.e("Error closing pairing dialog: ${e.message}")
+                            pairingRequestDialog = null
+                        }
                     }
                 }
             }
@@ -402,45 +477,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun doPickFile(event: PickFileEvent) {
-        pickFileActivityLauncher.launch(FilePickHelper.getPickFileIntent(event.multiple))
-    }
-
-    private fun showTermsAndPrivacyDialog(context: Context) {
-        val message = "请您认真阅读《用户协议》和《隐私政策》的全部条款，接受后可开始使用我们的服务。"
-
-        val startIndexUserAgreement = message.indexOf("《用户协议》")
-        val startIndexPrivacyPolicy = message.indexOf("《隐私政策》")
-
-        val spannableString = SpannableString(message)
-        spannableString.setSpan(object : ClickableSpan() {
-            override fun onClick(widget: View) {
-                WebHelper.open(context, UrlHelper.getTermsUrl())
+        try {
+            pickFileActivityLauncher.launch(FilePickHelper.getPickFileIntent(event.multiple))
+        } catch (e: ActivityNotFoundException) {
+            LogCat.w("ACTION_OPEN_DOCUMENT not supported, trying fallback")
+            try {
+                pickFileActivityLauncher.launch(FilePickHelper.getFallbackPickFileIntent(event.multiple))
+            } catch (e2: ActivityNotFoundException) {
+                LogCat.e("No file picker available on this device")
+                DialogHelper.showErrorMessage(getString(R.string.file_picker_not_available))
+            } catch (e2: IllegalStateException) {
+                LogCat.e("Error launching fallback pick file activity: ${e2.message}")
             }
-        }, startIndexUserAgreement, startIndexUserAgreement + 6, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        spannableString.setSpan(object : ClickableSpan() {
-            override fun onClick(widget: View) {
-                WebHelper.open(context, UrlHelper.getPolicyUrl())
-            }
-        }, startIndexPrivacyPolicy, startIndexPrivacyPolicy + 6, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        val dialog = AlertDialog.Builder(context)
-            .setTitle("温馨提示")
-            .setCancelable(false)
-            .setPositiveButton("同意并继续") { _, _ ->
-                coIO {
-                    AgreeTermsPreference.putAsync(context, true)
-                    doWhenReadyAsync()
-                }
-            }
-            .setNegativeButton("不同意") { _, _ ->
-                this@MainActivity.finish()
-            }
-            .create()
-
-        dialog.setView(TextView(context).apply {
-            text = spannableString
-            movementMethod = LinkMovementMethod.getInstance()
-        }, context.dp2px(24), context.dp2px(28), context.dp2px(24), context.dp2px(28))
-        dialog.show()
+        } catch (e: IllegalStateException) {
+            LogCat.e("Error launching pick file activity: ${e.message}")
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -459,10 +510,10 @@ class MainActivity : AppCompatActivity() {
                     } else if (mimeType == "application/pdf") {
                         navControllerState.value?.navigatePdf(uri)
                     } else {
-                        DialogHelper.showMessage(LocaleHelper.getString(R.string.not_supported_error))
+                        DialogHelper.showErrorMessage(LocaleHelper.getString(R.string.not_supported_error))
                     }
                 } else {
-                    DialogHelper.showMessage(LocaleHelper.getString(R.string.not_supported_error))
+                    DialogHelper.showErrorMessage(LocaleHelper.getString(R.string.not_supported_error))
                 }
             }
         } else if (intent.action == Intent.ACTION_SEND) {

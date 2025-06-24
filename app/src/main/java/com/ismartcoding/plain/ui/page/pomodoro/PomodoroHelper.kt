@@ -23,7 +23,7 @@ import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
-import com.ismartcoding.plain.preference.PomodoroSettingsPreference
+import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.ui.MainActivity
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone

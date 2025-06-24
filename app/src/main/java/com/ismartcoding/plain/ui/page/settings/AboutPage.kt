@@ -23,7 +23,6 @@ import androidx.navigation.NavHostController
 import com.bumptech.glide.Glide
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.PhoneHelper
 import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
@@ -34,9 +33,8 @@ import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.AppLogHelper
 import com.ismartcoding.plain.helpers.UrlHelper
-import com.ismartcoding.plain.preference.DeveloperModePreference
-import com.ismartcoding.plain.preference.DeviceNamePreference
-import com.ismartcoding.plain.preference.SkipVersionPreference
+import com.ismartcoding.plain.preferences.DeveloperModePreference
+import com.ismartcoding.plain.preferences.SkipVersionPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
@@ -46,7 +44,6 @@ import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.components.DeviceRenameDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.UpdateViewModel
@@ -65,28 +62,15 @@ fun AboutPage(
     val scope = rememberCoroutineScope()
     var fileSize by remember { mutableLongStateOf(AppLogHelper.getFileSize(context)) }
     var developerMode by remember { mutableStateOf(false) }
-    var showDeviceRenameDialog by remember { mutableStateOf(false) }
-    var deviceName by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.IO) {
             cacheSize = AppHelper.getCacheSize(context)
             developerMode = DeveloperModePreference.getAsync(context)
-            deviceName = DeviceNamePreference.getAsync(context).ifEmpty { PhoneHelper.getDeviceName(context) }
         }
     }
 
     UpdateDialog(updateViewModel)
-
-    if (showDeviceRenameDialog) {
-        DeviceRenameDialog(deviceName, onDismiss = {
-            showDeviceRenameDialog = false
-        }, onDone = {
-            deviceName = it.ifEmpty {
-                PhoneHelper.getDeviceName(context)
-            }
-        })
-    }
 
     PScaffold(
         topBar = {
@@ -99,11 +83,6 @@ fun AboutPage(
                 }
                 item {
                     PCard {
-                        PListItem(
-                            modifier = Modifier.clickable {
-                            showDeviceRenameDialog = true
-                        }, title = stringResource(R.string.device_name), value = deviceName.ifEmpty { PhoneHelper.getDeviceName(context) }, showMore = true
-                        )
                         if (developerMode) {
                             PListItem(
                                 title = stringResource(R.string.client_id),
@@ -113,7 +92,7 @@ fun AboutPage(
                         if (AppFeatureType.CHECK_UPDATES.has()) {
                             PListItem(
                                 title = stringResource(R.string.app_version),
-                                desc = MainApp.getAppVersion(),
+                                subtitle = MainApp.getAppVersion(),
                                 action = {
                                     PMiniOutlineButton(label = stringResource(R.string.check_update)) {
                                         scope.launch {
@@ -161,7 +140,7 @@ fun AboutPage(
                                 )
                             },
                             title = stringResource(R.string.logs),
-                            desc = fileSize.formatBytes(),
+                            subtitle = fileSize.formatBytes(),
                             separatedActions = fileSize > 0L,
                             action = {
                                 if (fileSize > 0L) {
@@ -182,7 +161,7 @@ fun AboutPage(
                         )
                         PListItem(
                             title = stringResource(R.string.local_cache),
-                            desc = cacheSize.formatBytes(),
+                            subtitle = cacheSize.formatBytes(),
                             action = {
                                 PMiniOutlineButton(label = stringResource(R.string.clear_cache)) {
                                     scope.launch {

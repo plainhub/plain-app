@@ -201,6 +201,18 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="qrcode">QR Kodu</string>
     <string name="scanner">Tarayıcı</string>
+    <string name="nearby">Yakınlarda</string>
+    <string name="nearby_devices">Yakınlardaki cihazlar</string>
+    <string name="searching_nearby_devices">Yakınlardaki cihazlar aranıyor...</string>
+    <string name="no_nearby_devices_found">Yakınlarda cihaz bulunamadı</string>
+    <string name="make_discoverable">Keşfedilebilir yap</string>
+    <string name="make_discoverable_desc">Diğer cihazların bu cihazı ağda keşfetmesine izin ver</string>
+    <string name="discover_nearby_devices">Yakınlardaki cihazları keşfet</string>
+    <string name="stop_discovering">Aramayı durdur</string>
+    <string name="tap_discover_to_start">Aramaya başlamak için \"Yakınlardaki cihazları keşfet\"e dokunun</string>
+    <string name="make_sure_devices_same_network">Diğer cihazların aynı ağda ve keşfedilebilir olduğundan emin olun</string>
+    <string name="last_seen">Son görülme</string>
+    <string name="device_discovered">Cihaz keşfedildi</string>
     <string name="link_preview_image">Bağlantı önizleme görüntüsü</string>
     <string name="loading_link_preview">Bağlantı önizleme yükleniyor…</string>
     <string name="link_preview_error">Bağlantı önizleme yüklenemedi</string>
@@ -599,7 +611,6 @@
     <string name="pdf_open_error">PDF dosyası açılamadı.</string>
     <string name="audio_play_error">Ses dosyası çalınamadı.</string>
     <string name="copy">Kopyala</string>
-    <string name="send_to_pc">Bilgisayara gönder</string>
     <string name="home">Ana Sayfa</string>
     <string name="clear_all">Tümünü temizle</string>
     <string name="clear_all_confirm">Çalma listesini temizlemek istediğinizden emin misiniz? Bu işlem geri alınamaz.</string>
@@ -626,4 +637,5 @@
     <string name="cannot_open_file_not_accessible">Dosyayı açamazsınız. Bu dosya uygulama aracılığıyla erişilemez.</string>
     <string name="unknown_error">Bilinmeyen bir hata oluştu.</string>
     <string name="customize_home_features">Ana sayfa özelliklerini özelleştir</string>
+    <string name="file_picker_not_available">Bu cihazda dosya seçici uygulaması mevcut değil. Lütfen bir dosya yöneticisi uygulaması yükleyin.</string>
 </resources>

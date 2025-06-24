@@ -17,7 +17,7 @@ import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.events.StartHttpServerEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.AppHelper
-import com.ismartcoding.plain.preference.WebPreference
+import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.delay

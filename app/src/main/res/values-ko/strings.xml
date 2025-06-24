@@ -201,6 +201,18 @@
     <string name="bluetooth">블루투스</string>
     <string name="qrcode">QR코드</string>
     <string name="scanner">스캐너</string>
+    <string name="nearby">근처</string>
+    <string name="nearby_devices">근처 기기</string>
+    <string name="searching_nearby_devices">근처 기기 검색 중...</string>
+    <string name="no_nearby_devices_found">근처 기기를 찾을 수 없음</string>
+    <string name="make_discoverable">검색 가능하게 설정</string>
+    <string name="make_discoverable_desc">다른 기기가 네트워크에서 이 기기를 검색할 수 있도록 허용</string>
+    <string name="discover_nearby_devices">근처 기기 검색</string>
+    <string name="stop_discovering">검색 중지</string>
+    <string name="tap_discover_to_start">\"근처 기기 검색\"을 눌러 검색 시작</string>
+    <string name="make_sure_devices_same_network">다른 기기가 같은 네트워크에 있고 검색 가능한지 확인하세요</string>
+    <string name="last_seen">마지막 확인</string>
+    <string name="device_discovered">기기 발견됨</string>
     <string name="link_preview_image">링크 미리보기 이미지</string>
     <string name="loading_link_preview">링크 미리보기 로딩 중…</string>
     <string name="link_preview_error">링크 미리보기 로딩 실패</string>
@@ -599,7 +611,6 @@
     <string name="pdf_open_error">PDF 파일을 열 수 없습니다.</string>
     <string name="audio_play_error">오디오 파일을 재생할 수 없습니다.</string>
     <string name="copy">복사</string>
-    <string name="send_to_pc">PC로 보내기</string>
     <string name="home">홈</string>
     <string name="clear_all">모두 지우기</string>
     <string name="clear_all_confirm">재생 목록을 지우시겠습니까? 이 작업은 취소할 수 없습니다.</string>
@@ -626,4 +637,5 @@
     <string name="cannot_open_file_not_accessible">파일을 열 수 없습니다. 이 파일은 앱에서 액세스할 수 없습니다.</string>
     <string name="unknown_error">알 수 없는 오류가 발생했습니다.</string>
     <string name="customize_home_features">홈 기능 사용자 정의</string>
+    <string name="file_picker_not_available">이 기기에 파일 선택 앱이 없습니다. 파일 관리자 앱을 설치해 주세요.</string>
 </resources>

@@ -20,9 +20,9 @@ import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonType
-import com.ismartcoding.plain.preference.AuthDevTokenPreference
-import com.ismartcoding.plain.preference.LocalAuthDevToken
-import com.ismartcoding.plain.preference.WebSettingsProvider
+import com.ismartcoding.plain.preferences.AuthDevTokenPreference
+import com.ismartcoding.plain.preferences.LocalAuthDevToken
+import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.ClipboardCard
 import com.ismartcoding.plain.ui.base.PBlockButton

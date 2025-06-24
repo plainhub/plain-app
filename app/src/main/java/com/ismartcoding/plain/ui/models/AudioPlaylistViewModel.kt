@@ -8,8 +8,8 @@ import com.ismartcoding.plain.data.DAudio
 import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
-import com.ismartcoding.plain.preference.AudioPlayingPreference
-import com.ismartcoding.plain.preference.AudioPlaylistPreference
+import com.ismartcoding.plain.preferences.AudioPlayingPreference
+import com.ismartcoding.plain.preferences.AudioPlaylistPreference
 
 class AudioPlaylistViewModel : ViewModel() {
     val playlistItems = mutableStateOf<List<DPlaylistAudio>>(listOf())

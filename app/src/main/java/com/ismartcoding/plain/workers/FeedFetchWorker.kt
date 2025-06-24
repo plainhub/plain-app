@@ -7,8 +7,8 @@ import com.ismartcoding.lib.extensions.isWifiConnected
 import com.ismartcoding.lib.helpers.CoroutinesHelper.pmap
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
-import com.ismartcoding.plain.preference.FeedAutoRefreshIntervalPreference
-import com.ismartcoding.plain.preference.FeedAutoRefreshOnlyWifiPreference
+import com.ismartcoding.plain.preferences.FeedAutoRefreshIntervalPreference
+import com.ismartcoding.plain.preferences.FeedAutoRefreshOnlyWifiPreference
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.events.FeedStatusEvent
 import com.ismartcoding.plain.features.feed.*

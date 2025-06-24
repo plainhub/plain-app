@@ -10,7 +10,7 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPomodoroItem
-import com.ismartcoding.plain.preference.PomodoroSettingsPreference
+import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroHelper
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import kotlinx.coroutines.Dispatchers

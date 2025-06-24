@@ -7,7 +7,7 @@ import android.os.SystemClock
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
-import com.ismartcoding.lib.helpers.PhoneHelper
+import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.activityManager

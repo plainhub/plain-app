@@ -3,7 +3,7 @@ package com.ismartcoding.plain.ui.models
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.preference.ScanHistoryPreference
+import com.ismartcoding.plain.preferences.ScanHistoryPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

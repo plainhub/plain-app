@@ -33,6 +33,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PDropdownMenu
@@ -58,6 +59,7 @@ fun ChatListItem(
     audioPlaylistVM: AudioPlaylistViewModel,
     items: List<VChat>,
     m: VChat,
+    peer: DPeer?,
     index: Int,
     imageWidthDp: Dp,
     imageWidthPx: Int,
@@ -107,7 +109,7 @@ fun ChatListItem(
                                 },
                             ),
                 ) {
-                    ChatName(m)
+                    ChatName(m, peer)
                     when (m.type) {
                         DMessageType.IMAGES.value -> {
                             ChatImages(context, items, m, imageWidthDp, imageWidthPx, previewerState)

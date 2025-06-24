@@ -8,7 +8,6 @@ import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 
 enum class AppFeatureType {
-    CHAT,
     DOCS,
     NOTES,
     FEEDS,

@@ -61,7 +61,7 @@ import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.features.LinkPreviewHelper
-import com.ismartcoding.plain.preference.LocalDarkTheme
+import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.PToast
 import com.ismartcoding.plain.ui.base.ToastEvent
 import com.ismartcoding.plain.ui.base.coil.newImageLoader
@@ -83,6 +83,7 @@ import com.ismartcoding.plain.ui.page.feeds.FeedEntryPage
 import com.ismartcoding.plain.ui.page.feeds.FeedSettingsPage
 import com.ismartcoding.plain.ui.page.feeds.FeedsPage
 import com.ismartcoding.plain.ui.page.files.FilesPage
+import com.ismartcoding.plain.ui.page.chat.NearbyPage
 import com.ismartcoding.plain.ui.page.notes.NotePage
 import com.ismartcoding.plain.ui.page.notes.NotesPage
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroPage
@@ -261,7 +262,10 @@ fun Main(
                 composable<Routing.PomodoroTimer> {
                     PomodoroPage(navController, pomodoroVM)
                 }
-                composable<Routing.Chat> { ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = chatVM) }
+                composable<Routing.Chat> { backStackEntry ->
+                    val r = backStackEntry.toRoute<Routing.Chat>()
+                    ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = chatVM, r.id)
+                }
                 composable<Routing.ScanHistory> { ScanHistoryPage(navController) }
                 composable<Routing.Scan> { ScanPage(navController) }
                 composable<Routing.Apps> { AppsPage(navController) }
@@ -338,6 +342,10 @@ fun Main(
                 composable<Routing.Files> { backStackEntry ->
                     val r = backStackEntry.toRoute<Routing.Files>()
                     FilesPage(navController, FilesType.entries[r.fileType], audioPlaylistVM)
+                }
+                
+                composable<Routing.Nearby> { 
+                    NearbyPage(navController)
                 }
             }
 

@@ -201,6 +201,18 @@
     <string name="bluetooth">ब्लूटूथ</string>
     <string name="qrcode">क्यूआरकोड</string>
     <string name="scanner">स्कैनर</string>
+    <string name="nearby">पास में</string>
+    <string name="nearby_devices">पास के डिवाइस</string>
+    <string name="searching_nearby_devices">पास के डिवाइस खोज रहे हैं...</string>
+    <string name="no_nearby_devices_found">पास में कोई डिवाइस नहीं मिला</string>
+    <string name="make_discoverable">खोजे जाने योग्य बनाएं</string>
+    <string name="make_discoverable_desc">अन्य डिवाइसों को नेटवर्क पर इस डिवाइस को खोजने की अनुमति दें</string>
+    <string name="discover_nearby_devices">पास के डिवाइस खोजें</string>
+    <string name="stop_discovering">खोजना बंद करें</string>
+    <string name="tap_discover_to_start">खोजना शुरू करने के लिए \"पास के डिवाइस खोजें\" टैप करें</string>
+    <string name="make_sure_devices_same_network">सुनिश्चित करें कि अन्य डिवाइस समान नेटवर्क पर हैं और खोजे जा सकते हैं</string>
+    <string name="last_seen">अंतिम बार देखा गया</string>
+    <string name="device_discovered">डिवाइस खोजा गया</string>
     <string name="link_preview_image">लिंक पूर्वावलोकन छवि</string>
     <string name="loading_link_preview">लिंक पूर्वावलोकन लोड हो रहा है…</string>
     <string name="link_preview_error">लिंक पूर्वावलोकन लोड करने में विफल</string>
@@ -599,7 +611,6 @@
     <string name="pdf_open_error">PDF फ़ाइल खोलने में विफल।</string>
     <string name="audio_play_error">ऑडियो फ़ाइल चलाने में विफल।</string>
     <string name="copy">कॉपी करें</string>
-    <string name="send_to_pc">पीसी पर भेजें</string>
     <string name="home">होम</string>
     <string name="clear_all">सब साफ करें</string>
     <string name="clear_all_confirm">क्या आप वाकई प्लेलिस्ट को साफ़ करना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।</string>
@@ -624,6 +635,7 @@
     <string name="cannot_open_system_component">सिस्टम घटक खोलना संभव नहीं है। यह फ़ाइल एक सुरक्षित सिस्टम मॉड्यूल है।</string>
     <string name="cannot_open_system_file">सिस्टम फ़ाइल खोलना संभव नहीं है। यह फ़ाइल पहुँच योग्य नहीं है।</string>
     <string name="cannot_open_file_not_accessible">फ़ाइल खोलना संभव नहीं है। यह फ़ाइल ऐप द्वारा पहुँच योग्य नहीं है।</string>
-    <string name="unknown_error">अजगर हो गया है।</string>
+    <string name="unknown_error">अज्ञात त्रुटि हुई।</string>
     <string name="customize_home_features">होम फीचर्स कॉस्टमाइज करें</string>
+    <string name="file_picker_not_available">इस डिवाइस पर कोई फ़ाइल चयनकर्ता ऐप उपलब्ध नहीं है। कृपया एक फ़ाइल मैनेजर ऐप इंस्टॉल करें।</string>
 </resources>

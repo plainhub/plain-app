@@ -13,7 +13,7 @@ import kotlinx.datetime.Clock
 class DataInitializer(val context: Context, val db: SupportSQLiteDatabase) {
     private data class TagItem(val nameKey: Int, val type: DataType)
 
-    private data class MessageItem(val content: String, val isMe: Boolean)
+    private data class MessageItem(val content: String, val fromId: String, val toId: String)
 
     private val now = Clock.System.now().toString()
 
@@ -66,14 +66,16 @@ class DataInitializer(val context: Context, val db: SupportSQLiteDatabase) {
 
     fun insertWelcome() {
         setOf<MessageItem>(
-            MessageItem("""{"type":"text","value":{"text":"${context.resources.getString(R.string.welcome_text)}"}}""", false),
+            MessageItem("""{"type":"text","value":{"text":"${context.resources.getString(R.string.welcome_text)}"}}""", "local", "me"),
         ).forEach {
             db.insert(
                 "chats",
                 SQLiteDatabase.CONFLICT_NONE,
                 ContentValues().apply {
                     put("id", StringHelper.shortUUID())
-                    put("is_me", it.isMe)
+                    put("from_id", it.fromId)
+                    put("to_id", it.toId)
+                    put("group_id", "") // Empty string for local chat (not a group chat)
                     put("content", it.content)
                     put("created_at", now)
                     put("updated_at", now)

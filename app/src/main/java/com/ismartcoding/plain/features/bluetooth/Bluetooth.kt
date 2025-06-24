@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features.bluetooth
 
 import android.content.Context
-import com.ismartcoding.lib.helpers.PhoneHelper
+import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import org.json.JSONObject

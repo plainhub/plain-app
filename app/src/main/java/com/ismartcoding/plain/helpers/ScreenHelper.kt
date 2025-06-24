@@ -5,8 +5,8 @@ import android.content.Context
 import com.ismartcoding.lib.extensions.getSystemScreenTimeout
 import com.ismartcoding.lib.extensions.setSystemScreenTimeout
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.plain.preference.KeepScreenOnPreference
-import com.ismartcoding.plain.preference.SystemScreenTimeoutPreference
+import com.ismartcoding.plain.preferences.KeepScreenOnPreference
+import com.ismartcoding.plain.preferences.SystemScreenTimeoutPreference
 import com.ismartcoding.plain.features.Permission
 
 object ScreenHelper {

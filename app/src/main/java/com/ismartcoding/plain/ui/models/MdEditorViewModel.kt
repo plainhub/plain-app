@@ -10,10 +10,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
-import com.ismartcoding.plain.preference.EditorAccessoryLevelPreference
-import com.ismartcoding.plain.preference.EditorShowLineNumbersPreference
-import com.ismartcoding.plain.preference.EditorSyntaxHighlightPreference
-import com.ismartcoding.plain.preference.EditorWrapContentPreference
+import com.ismartcoding.plain.preferences.EditorAccessoryLevelPreference
+import com.ismartcoding.plain.preferences.EditorShowLineNumbersPreference
+import com.ismartcoding.plain.preferences.EditorSyntaxHighlightPreference
+import com.ismartcoding.plain.preferences.EditorWrapContentPreference
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.extensions.add
 import com.ismartcoding.plain.ui.extensions.inlineWrap

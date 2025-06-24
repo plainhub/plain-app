@@ -20,8 +20,8 @@ import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.FileMediaStoreHelper
-import com.ismartcoding.plain.preference.LastFilePathPreference
-import com.ismartcoding.plain.preference.ShowHiddenFilesPreference
+import com.ismartcoding.plain.preferences.LastFilePathPreference
+import com.ismartcoding.plain.preferences.ShowHiddenFilesPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
-import java.util.Stack
 
 data class BreadcrumbItem(var name: String, var path: String)
 
@@ -72,7 +71,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
     var limit: Int = 1000
     var total: Int = 0
 
-    private val navigationHistory = Stack<String>()
+    private val navigationHistory = mutableStateListOf<String>()
 
     init {
         // Initialize with default breadcrumb - will be updated when loadLastPathAsync is called
@@ -108,7 +107,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
     fun navigateToDirectory(context: Context, newPath: String) {
         if (selectedPath != newPath) {
             // Add current path to history before changing
-            navigationHistory.push(selectedPath)
+            navigationHistory.add(selectedPath)
             selectedPath = newPath
             getAndUpdateSelectedIndex()
             viewModelScope.launch(Dispatchers.IO) {
@@ -121,7 +120,7 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
 
     fun navigateBack(): Boolean {
         return if (navigationHistory.isNotEmpty()) {
-            selectedPath = navigationHistory.pop()
+            selectedPath = navigationHistory.removeLastOrNull() ?: selectedPath
             getAndUpdateSelectedIndex()
             true
         } else {

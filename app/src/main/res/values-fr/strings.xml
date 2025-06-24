@@ -198,6 +198,18 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="qrcode">QRCode</string>
     <string name="scanner">Scanner</string>
+    <string name="nearby">À proximité</string>
+    <string name="nearby_devices">Appareils à proximité</string>
+    <string name="searching_nearby_devices">Recherche d\'appareils à proximité...</string>
+    <string name="no_nearby_devices_found">Aucun appareil à proximité trouvé</string>
+    <string name="make_discoverable">Rendre détectable</string>
+    <string name="make_discoverable_desc">Permettre aux autres appareils de détecter cet appareil sur le réseau</string>
+    <string name="discover_nearby_devices">Découvrir les appareils à proximité</string>
+    <string name="stop_discovering">Arrêter la recherche</string>
+    <string name="tap_discover_to_start">Appuyez sur \"Découvrir les appareils à proximité\" pour commencer la recherche</string>
+    <string name="make_sure_devices_same_network">Assurez-vous que les autres appareils sont sur le même réseau et détectables</string>
+    <string name="last_seen">Dernière connexion</string>
+    <string name="device_discovered">Appareil découvert</string>
     <string name="link_preview_image">Image de prévisualisation du lien</string>
     <string name="loading_link_preview">Chargement de la prévisualisation du lien…</string>
     <string name="link_preview_error">Échec du chargement de la prévisualisation du lien</string>
@@ -599,7 +611,6 @@
     <string name="pdf_open_error">Échec de l\'ouverture du fichier PDF.</string>
     <string name="audio_play_error">Échec de la lecture du fichier audio.</string>
     <string name="copy">Copier</string>
-    <string name="send_to_pc">Envoyer au PC</string>
     <string name="home">Accueil</string>
     <string name="clear_all">Tout effacer</string>
     <string name="clear_all_confirm">Êtes-vous sûr de vouloir effacer la liste de lecture ? Cette action est irréversible.</string>
@@ -626,4 +637,5 @@
     <string name="cannot_open_file_not_accessible">Impossible d\'ouvrir le fichier. Ce fichier n\'est pas accessible via l\'application.</string>
     <string name="unknown_error">Une erreur inconnue est survenue.</string>
     <string name="customize_home_features">Personnaliser les fonctionnalités de l\'accueil</string>
+    <string name="file_picker_not_available">Aucune application de sélection de fichiers n\'est disponible sur cet appareil. Veuillez installer une application de gestionnaire de fichiers.</string>
 </resources>

@@ -173,14 +173,10 @@ fun NotePage(
     LaunchedEffect(noteVM.editMode) {
         if (noteVM.editMode) {
             keyboardController?.show()
-            if (shouldRequestFocus) {
-                delay(500)
-                focusRequester.requestFocus()
-                shouldRequestFocus = false
-            }
         } else {
             keyboardController?.hide()
             focusManager.clearFocus()
+            shouldRequestFocus = true // Reset for next time entering edit mode
         }
     }
 
@@ -263,7 +259,9 @@ fun NotePage(
                     modifier = Modifier.padding(bottom = paddingValues.calculateBottomPadding(), top = paddingValues.calculateTopPadding()),
                     mdEditorVM = mdEditorVM,
                     scrollState = editorScrollState,
-                    focusRequester = focusRequester
+                    focusRequester = focusRequester,
+                    shouldRequestFocus = shouldRequestFocus,
+                    onFocusRequested = { shouldRequestFocus = false }
                 )
             } else {
                 LazyColumn(

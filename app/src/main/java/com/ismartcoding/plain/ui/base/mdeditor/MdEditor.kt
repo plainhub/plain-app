@@ -45,6 +45,8 @@ fun MdEditor(
     mdEditorVM: MdEditorViewModel,
     scrollState: ScrollState,
     focusRequester: FocusRequester,
+    shouldRequestFocus: Boolean = false,
+    onFocusRequested: () -> Unit = {},
 ) {
     val lineNumberState = rememberScrollState()
     var lineCount by remember { mutableIntStateOf(0) }
@@ -55,6 +57,13 @@ fun MdEditor(
             .collectLatest { value ->
                 lineNumberState.scrollTo(value)
             }
+    }
+
+    LaunchedEffect(shouldRequestFocus) {
+        if (shouldRequestFocus) {
+            focusRequester.requestFocus()
+            onFocusRequested()
+        }
     }
 
     Box(

@@ -40,8 +40,8 @@ import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.preference.FileSortByPreference
-import com.ismartcoding.plain.preference.ShowHiddenFilesPreference
+import com.ismartcoding.plain.preferences.FileSortByPreference
+import com.ismartcoding.plain.preferences.ShowHiddenFilesPreference
 import com.ismartcoding.plain.ui.base.ActionButtonFolderKanban
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
@@ -65,7 +65,6 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
-import com.ismartcoding.plain.ui.models.BreadcrumbItem
 import com.ismartcoding.plain.events.FolderKanbanSelectEvent
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.enterSearchMode

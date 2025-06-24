@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.BuildConfig
-import com.ismartcoding.plain.preference.WebPreference
+import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.web.HttpServerManager
 

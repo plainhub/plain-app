@@ -85,4 +85,7 @@ dependencies {
     implementation(libs.android.gif.drawable)
 
     api(libs.jsoup)
+    
+    // Google Tink for cryptography (Ed25519 support on all Android versions)
+    api(libs.tink.android)
 }

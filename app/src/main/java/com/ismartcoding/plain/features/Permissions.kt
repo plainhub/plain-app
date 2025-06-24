@@ -27,7 +27,7 @@ import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.packageManager
-import com.ismartcoding.plain.preference.ApiPermissionsPreference
+import com.ismartcoding.plain.preferences.ApiPermissionsPreference
 import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.helpers.DialogHelper

@@ -15,9 +15,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.preference.HomeFeaturesPreference
-import com.ismartcoding.plain.preference.dataFlow
-import com.ismartcoding.plain.preference.dataStore
+import com.ismartcoding.plain.preferences.HomeFeaturesPreference
+import com.ismartcoding.plain.preferences.dataFlow
+import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconTextButton
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue

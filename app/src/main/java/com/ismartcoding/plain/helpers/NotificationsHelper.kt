@@ -3,7 +3,7 @@ package com.ismartcoding.plain.helpers
 import android.content.Context
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DNotification
-import com.ismartcoding.plain.preference.NotificationFilterPreference
+import com.ismartcoding.plain.preferences.NotificationFilterPreference
 
 object NotificationsHelper {
     suspend fun filterNotificationsAsync(context: Context): List<DNotification> {

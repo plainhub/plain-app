@@ -39,8 +39,8 @@ import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.QrCodeGenerateHelper
-import com.ismartcoding.plain.preference.HttpPortPreference
-import com.ismartcoding.plain.preference.HttpsPortPreference
+import com.ismartcoding.plain.preferences.HttpPortPreference
+import com.ismartcoding.plain.preferences.HttpsPortPreference
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.RadioDialog

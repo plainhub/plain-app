@@ -201,6 +201,18 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="qrcode">QRCode</string>
     <string name="scanner">Scanner</string>
+    <string name="nearby">Próximo</string>
+    <string name="nearby_devices">Dispositivos próximos</string>
+    <string name="searching_nearby_devices">Procurando dispositivos próximos...</string>
+    <string name="no_nearby_devices_found">Nenhum dispositivo próximo encontrado</string>
+    <string name="make_discoverable">Tornar detectável</string>
+    <string name="make_discoverable_desc">Permitir que outros dispositivos detectem este dispositivo na rede</string>
+    <string name="discover_nearby_devices">Descobrir dispositivos próximos</string>
+    <string name="stop_discovering">Parar busca</string>
+    <string name="tap_discover_to_start">Toque em \"Descobrir dispositivos próximos\" para começar a procurar</string>
+    <string name="make_sure_devices_same_network">Certifique-se de que outros dispositivos estão na mesma rede e são detectáveis</string>
+    <string name="last_seen">Última conexão</string>
+    <string name="device_discovered">Dispositivo descoberto</string>
     <string name="link_preview_image">Imagem de pré-visualização de link</string>
     <string name="loading_link_preview">Carregando pré-visualização de link…</string>
     <string name="link_preview_error">Erro ao carregar pré-visualização de link</string>
@@ -599,7 +611,6 @@
     <string name="pdf_open_error">Não foi possível abrir o arquivo PDF.</string>
     <string name="audio_play_error">Não foi possível reproduzir o arquivo de áudio.</string>
     <string name="copy">Copiar</string>
-    <string name="send_to_pc">Enviar para o PC</string>
     <string name="home">Início</string>
     <string name="clear_all">Limpar tudo</string>
     <string name="clear_all_confirm">Tem certeza de que deseja limpar a lista de reprodução? Essa ação não pode ser desfeita.</string>
@@ -626,4 +637,5 @@
     <string name="cannot_open_file_not_accessible">Não é possível abrir o arquivo. Este arquivo não é acessível através do aplicativo.</string>
     <string name="unknown_error">Ocorreu um erro desconhecido.</string>
     <string name="customize_home_features">Personalizar as funcionalidades da home</string>
+    <string name="file_picker_not_available">Nenhum aplicativo de seleção de arquivos disponível neste dispositivo. Por favor, instale um aplicativo gerenciador de arquivos.</string>
 </resources>

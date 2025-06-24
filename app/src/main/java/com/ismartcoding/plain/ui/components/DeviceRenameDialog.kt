@@ -8,7 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.preference.DeviceNamePreference
+import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.ui.base.TextFieldDialog
 import kotlinx.coroutines.launch
 

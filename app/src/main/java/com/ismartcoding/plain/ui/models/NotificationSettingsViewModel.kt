@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.data.DPackage
 import com.ismartcoding.plain.data.NotificationFilterData
@@ -13,11 +12,9 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.preference.NotificationFilterPreference
-import kotlinx.coroutines.Dispatchers
+import com.ismartcoding.plain.preferences.NotificationFilterPreference
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 
 class NotificationSettingsViewModel : ViewModel() {
     private val _selectedAppsFlow = MutableStateFlow(mutableStateListOf<DPackage>())

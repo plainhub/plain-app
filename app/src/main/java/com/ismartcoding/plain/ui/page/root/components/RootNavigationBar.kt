@@ -54,6 +54,21 @@ fun RootNavigationBar(
         }
 
         IconButton(
+            onClick = { onTabSelected(RootTabType.CHAT.value) },
+            modifier = Modifier.size(48.dp)
+        ) {
+            Icon(
+                painterResource(R.drawable.message_circle),
+                contentDescription = stringResource(R.string.chat),
+                modifier = Modifier.size(24.dp),
+                tint = if (selectedTab == RootTabType.CHAT.value)
+                    MaterialTheme.colorScheme.primary
+                else
+                    unselectedColor
+            )
+        }
+
+        IconButton(
             onClick = { onTabSelected(RootTabType.AUDIO.value) },
             modifier = Modifier.size(48.dp)
         ) {
@@ -99,5 +114,6 @@ fun RootNavigationBar(
                     unselectedColor
             )
         }
+
     }
 }

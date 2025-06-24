@@ -201,6 +201,18 @@
     <string name="bluetooth">புளூடூது</string>
     <string name="qrcode">QR குறியீடு</string>
     <string name="scanner">ஸ்கேனர்</string>
+    <string name="nearby">அருகில்</string>
+    <string name="nearby_devices">அருகிலுள்ள சாதனங்கள்</string>
+    <string name="searching_nearby_devices">அருகிலுள்ள சாதனங்களைத் தேடுகிறது...</string>
+    <string name="no_nearby_devices_found">அருகிலுள்ள சாதனங்கள் எதுவும் கிடைக்கவில்லை</string>
+    <string name="make_discoverable">கண்டுபிடிக்கக்கூடியதாக்கு</string>
+    <string name="make_discoverable_desc">மற்ற சாதனங்கள் நெட்வொர்க்கில் இந்த சாதனத்தைக் கண்டுபிடிக்க அனுமதிக்கவும்</string>
+    <string name="discover_nearby_devices">அருகிலுள்ள சாதனங்களைக் கண்டுபிடி</string>
+    <string name="stop_discovering">கண்டுபிடிப்பதை நிறுத்து</string>
+    <string name="tap_discover_to_start">தேடலைத் தொடங்க \"அருகிலுள்ள சாதனங்களைக் கண்டுபிடி\" என்பதைத் தட்டவும்</string>
+    <string name="make_sure_devices_same_network">மற்ற சாதனங்கள் அதே நெட்வொர்க்கில் உள்ளன மற்றும் கண்டுபிடிக்கக்கூடியவை என்பதை உறுதிசெய்யவும்</string>
+    <string name="last_seen">கடைசியாகப் பார்த்தது</string>
+    <string name="device_discovered">சாதனம் கண்டுபிடிக்கப்பட்டது</string>
     <string name="link_preview_image">இணைப்பு முன்னோட்ட படம்</string>
     <string name="loading_link_preview">இணைப்பு முன்னோட்டத்தை ஏற்றவும்…</string>
     <string name="link_preview_error">இணைப்பு முன்னோட்டத்தை ஏற்ற முடியவில்லை</string>
@@ -599,7 +611,6 @@
     <string name="pdf_open_error">PDF கோப்பைத் திறக்க முடியவில்லை.</string>
     <string name="audio_play_error">ஆடியோ கோப்பை இயக்க முடியவில்லை.</string>
     <string name="copy">நகலெடு</string>
-    <string name="send_to_pc">கணினிக்கு அனுப்பு</string>
     <string name="home">முகப்பு</string>
     <string name="clear_all">அனைத்தையும் நீக்கு</string>
     <string name="clear_all_confirm">பாடல் பட்டியலை நீக்க விரும்புகிறீர்களா? இது rückgängig செய்ய முடியாது.</string>
@@ -626,4 +637,5 @@
     <string name="cannot_open_file_not_accessible">கோப்பை திறக்க முடியாது. இந்த கோப்பு பயன்பாட்டில் அணுகக்கூடியதல்ல.</string>
     <string name="unknown_error">அறியாத பிழை ஏற்பட்டது.</string>
     <string name="customize_home_features">முகப்பு செயல்பாடுகளை மாற்று</string>
+    <string name="file_picker_not_available">இந்த சாதனத்தில் கோப்பு தேர்வு பயன்பாடு கிடைக்கவில்லை. தயவுசெய்து ஒரு கோப்பு மேலாளர் பயன்பாட்டை நிறுவுங்கள்.</string>
 </resources>

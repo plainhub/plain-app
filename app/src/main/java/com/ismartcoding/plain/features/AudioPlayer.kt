@@ -17,8 +17,8 @@ import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.events.AudioActionEvent
-import com.ismartcoding.plain.preference.AudioPlayingPreference
-import com.ismartcoding.plain.preference.AudioPlaylistPreference
+import com.ismartcoding.plain.preferences.AudioPlayingPreference
+import com.ismartcoding.plain.preferences.AudioPlaylistPreference
 import com.ismartcoding.plain.services.AudioPlayerService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

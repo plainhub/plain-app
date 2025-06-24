@@ -21,7 +21,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.preference.AudioPlayingPreference
+import com.ismartcoding.plain.preferences.AudioPlayingPreference
 import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.enums.AudioServiceAction

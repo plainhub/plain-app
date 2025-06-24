@@ -30,7 +30,7 @@ import com.ismartcoding.plain.data.DFavoriteFolder
 import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.events.FolderKanbanSelectEvent
 import com.ismartcoding.plain.features.file.FileSystemHelper
-import com.ismartcoding.plain.preference.FavoriteFoldersPreference
+import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NoDataColumn

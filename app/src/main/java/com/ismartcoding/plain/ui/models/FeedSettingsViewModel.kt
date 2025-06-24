@@ -10,9 +10,9 @@ import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
-import com.ismartcoding.plain.preference.FeedAutoRefreshIntervalPreference
-import com.ismartcoding.plain.preference.FeedAutoRefreshOnlyWifiPreference
-import com.ismartcoding.plain.preference.FeedAutoRefreshPreference
+import com.ismartcoding.plain.preferences.FeedAutoRefreshIntervalPreference
+import com.ismartcoding.plain.preferences.FeedAutoRefreshOnlyWifiPreference
+import com.ismartcoding.plain.preferences.FeedAutoRefreshPreference
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

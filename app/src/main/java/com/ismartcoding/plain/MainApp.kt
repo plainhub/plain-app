@@ -12,22 +12,25 @@ import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.events.AcquireWakeLockEvent
 import com.ismartcoding.plain.events.AppEvents
+import com.ismartcoding.plain.events.StartNearbyServiceEvent
 import com.ismartcoding.plain.helpers.AppHelper
-import com.ismartcoding.plain.preference.AudioPlayModePreference
-import com.ismartcoding.plain.preference.CheckUpdateTimePreference
-import com.ismartcoding.plain.preference.ClientIdPreference
-import com.ismartcoding.plain.preference.DarkThemePreference
-import com.ismartcoding.plain.preference.FeedAutoRefreshPreference
-import com.ismartcoding.plain.preference.HttpPortPreference
-import com.ismartcoding.plain.preference.HttpsPortPreference
-import com.ismartcoding.plain.preference.HttpsPreference
-import com.ismartcoding.plain.preference.KeyStorePasswordPreference
-import com.ismartcoding.plain.preference.PasswordPreference
-import com.ismartcoding.plain.preference.UrlTokenPreference
-import com.ismartcoding.plain.preference.WebPreference
-import com.ismartcoding.plain.preference.dataStore
-import com.ismartcoding.plain.preference.getPreferencesAsync
+import com.ismartcoding.plain.preferences.AudioPlayModePreference
+import com.ismartcoding.plain.preferences.CheckUpdateTimePreference
+import com.ismartcoding.plain.preferences.ClientIdPreference
+import com.ismartcoding.plain.preferences.DarkThemePreference
+import com.ismartcoding.plain.preferences.FeedAutoRefreshPreference
+import com.ismartcoding.plain.preferences.HttpPortPreference
+import com.ismartcoding.plain.preferences.HttpsPortPreference
+import com.ismartcoding.plain.preferences.HttpsPreference
+import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
+import com.ismartcoding.plain.preferences.PasswordPreference
+import com.ismartcoding.plain.preferences.SignatureKeyPreference
+import com.ismartcoding.plain.preferences.UrlTokenPreference
+import com.ismartcoding.plain.preferences.WebPreference
+import com.ismartcoding.plain.preferences.dataStore
+import com.ismartcoding.plain.preferences.getPreferencesAsync
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
+import com.ismartcoding.plain.web.ChatApiManager
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import dalvik.system.ZipPathValidator
@@ -58,6 +61,7 @@ class MainApp : Application() {
             ClientIdPreference.ensureValueAsync(instance, preferences)
             KeyStorePasswordPreference.ensureValueAsync(instance, preferences)
             UrlTokenPreference.ensureValueAsync(instance, preferences)
+            SignatureKeyPreference.ensureKeyPairAsync(instance, preferences)
 
             DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(preferences)))
             if (PlugInControlReceiver.isUSBConnected(this@MainApp)) {
@@ -67,9 +71,12 @@ class MainApp : Application() {
                 HttpServerManager.resetPasswordAsync()
             }
             HttpServerManager.loadTokenCache()
+            ChatApiManager.loadKeyCacheAsync()
             if (FeedAutoRefreshPreference.get(preferences)) {
                 FeedFetchWorker.startRepeatWorkerAsync(instance)
             }
+            // Start Nearby service (always listen regardless of discoverable setting)
+            sendEvent(StartNearbyServiceEvent())
             HttpServerManager.clientTsInterval()
             if (AppFeatureType.CHECK_UPDATES.has() && checkUpdateTime < System.currentTimeMillis() - Constants.ONE_DAY_MS) {
                 AppHelper.checkUpdateAsync(this@MainApp, false)

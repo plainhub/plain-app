@@ -46,7 +46,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.preference.DocSortByPreference
+import com.ismartcoding.plain.preferences.DocSortByPreference
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.ActionButtonSort
 import com.ismartcoding.plain.ui.base.HorizontalSpace

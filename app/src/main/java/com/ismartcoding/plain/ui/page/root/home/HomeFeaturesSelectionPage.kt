@@ -33,9 +33,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.preference.HomeFeaturesPreference
-import com.ismartcoding.plain.preference.dataFlow
-import com.ismartcoding.plain.preference.dataStore
+import com.ismartcoding.plain.preferences.HomeFeaturesPreference
+import com.ismartcoding.plain.preferences.dataFlow
+import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PIcon

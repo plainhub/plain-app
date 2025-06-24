@@ -88,20 +88,17 @@ class DLinkPreview(
 data class DChat(
     @PrimaryKey var id: String = StringHelper.shortUUID(),
 ) : DEntityBase() {
-    @ColumnInfo(name = "is_me")
-    var isMe: Boolean = false
+    @ColumnInfo(name = "from_id")
+    var fromId: String = "" // me|local|peer_id
+
+    @ColumnInfo(name = "to_id")
+    var toId: String = "" // me|local|peer_id
+
+    @ColumnInfo(name = "group_id")
+    var groupId: String = "" // chat group id, empty if not a group chat
 
     @ColumnInfo(name = "content")
     lateinit var content: DMessageContent
-
-    val name: String
-        get() {
-            return if (isMe) {
-                getString(R.string.me)
-            } else {
-                getString(R.string.app_name)
-            }
-        }
 
     companion object {
         fun parseContent(content: String): DMessageContent {
@@ -138,6 +135,9 @@ data class ChatItemDataUpdate(
 interface ChatDao {
     @Query("SELECT * FROM chats")
     fun getAll(): List<DChat>
+    
+    @Query("SELECT * FROM chats WHERE to_id = :toId OR from_id = :toId")
+    fun getByChatId(toId: String): List<DChat>
 
     @Insert
     fun insert(vararg item: DChat)

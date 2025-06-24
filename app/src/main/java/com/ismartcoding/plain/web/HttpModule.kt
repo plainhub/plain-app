@@ -41,9 +41,9 @@ import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.helpers.UrlHelper
-import com.ismartcoding.plain.preference.AuthTwoFactorPreference
-import com.ismartcoding.plain.preference.PasswordPreference
-import com.ismartcoding.plain.preference.PasswordTypePreference
+import com.ismartcoding.plain.preferences.AuthTwoFactorPreference
+import com.ismartcoding.plain.preferences.PasswordPreference
+import com.ismartcoding.plain.preferences.PasswordTypePreference
 import com.ismartcoding.plain.web.websocket.WebSocketSession
 import io.ktor.client.request.get
 import io.ktor.client.statement.readRawBytes
@@ -89,7 +89,6 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSockets
 import io.ktor.server.websocket.webSocket
-import io.ktor.utils.io.core.use
 import io.ktor.utils.io.jvm.javaio.copyTo
 import io.ktor.utils.io.toByteArray
 import io.ktor.websocket.CloseReason
@@ -519,7 +518,7 @@ object HttpModule {
                                 when (part.name) {
                                     "info" -> {
                                         var requestStr = ""
-                                        val decryptedBytes = CryptoHelper.aesDecrypt(token, part.provider().toByteArray())
+                                        val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, part.provider().toByteArray())
                                         if (decryptedBytes != null) {
                                             requestStr = decryptedBytes.decodeToString()
                                         }
@@ -596,7 +595,7 @@ object HttpModule {
                                 when (part.name) {
                                     "info" -> {
                                         var requestStr = ""
-                                        val decryptedBytes = CryptoHelper.aesDecrypt(token, part.provider().toByteArray())
+                                        val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, part.provider().toByteArray())
                                         if (decryptedBytes != null) {
                                             requestStr = decryptedBytes.decodeToString()
                                         }
@@ -689,14 +688,14 @@ object HttpModule {
                                     var r: AuthRequest? = null
                                     val hash = CryptoHelper.sha512(PasswordPreference.getAsync(MainApp.instance).toByteArray())
                                     val token = HttpServerManager.hashToToken(hash)
-                                    val decryptedBytes = CryptoHelper.aesDecrypt(token, frame.readBytes())
+                                    val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, frame.readBytes())
                                     if (decryptedBytes != null) {
                                         r = jsonDecode<AuthRequest>(decryptedBytes.decodeToString())
                                     }
                                     if (r?.password == hash) {
                                         val event = ConfirmToAcceptLoginEvent(this, clientId, r)
                                         if (AuthTwoFactorPreference.getAsync(MainApp.instance)) {
-                                            send(CryptoHelper.aesEncrypt(token, JsonHelper.jsonEncode(AuthResponse(AuthStatus.PENDING))))
+                                            send(CryptoHelper.chaCha20Encrypt(token, JsonHelper.jsonEncode(AuthResponse(AuthStatus.PENDING))))
                                             sendEvent(event)
                                         } else {
                                             coIO {
@@ -711,7 +710,7 @@ object HttpModule {
                                 } else {
                                     val token = HttpServerManager.tokenCache[clientId]
                                     if (token != null) {
-                                        val decryptedBytes = CryptoHelper.aesDecrypt(token, frame.readBytes())
+                                        val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, frame.readBytes())
                                         if (decryptedBytes != null) {
                                             LogCat.d("ws: add session ${session.id}, ts: ${decryptedBytes.decodeToString()}")
                                             HttpServerManager.wsSessions.add(session)
@@ -737,7 +736,10 @@ object HttpModule {
                 }
             }
         }
-        install(SXGraphQL) {
+        install(MainGraphQL) {
+            init()
+        }
+        install(PeerGraphQL) {
             init()
         }
     }

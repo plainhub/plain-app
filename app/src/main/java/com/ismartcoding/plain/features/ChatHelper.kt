@@ -16,9 +16,10 @@ import kotlinx.coroutines.coroutineScope
 import java.io.File
 
 object ChatHelper {
-    suspend fun sendAsync(message: DMessageContent): DChat {
+    suspend fun sendAsync(message: DMessageContent, fromId: String = "me", toId: String = "local"): DChat {
         val item = DChat()
-        item.isMe = true
+        item.fromId = fromId
+        item.toId = toId
         item.content = message
         AppDatabase.instance.chatDao().insert(item)
         return item

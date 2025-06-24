@@ -1,12 +1,11 @@
 package com.ismartcoding.plain.ui.base
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.preference.LocalDarkTheme
+import com.ismartcoding.plain.preferences.LocalDarkTheme
 
 @Composable
 fun PSwitch(

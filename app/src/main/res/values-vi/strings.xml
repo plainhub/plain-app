@@ -201,6 +201,18 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="qrcode">Mã QR</string>
     <string name="scanner">Máy quét</string>
+    <string name="nearby">Gần đây</string>
+    <string name="nearby_devices">Thiết bị gần đây</string>
+    <string name="searching_nearby_devices">Đang tìm kiếm thiết bị gần đây...</string>
+    <string name="no_nearby_devices_found">Không tìm thấy thiết bị gần đây</string>
+    <string name="make_discoverable">Cho phép phát hiện</string>
+    <string name="make_discoverable_desc">Cho phép các thiết bị khác phát hiện thiết bị này trên mạng</string>
+    <string name="discover_nearby_devices">Khám phá thiết bị gần đây</string>
+    <string name="stop_discovering">Dừng tìm kiếm</string>
+    <string name="tap_discover_to_start">Nhấn \"Khám phá thiết bị gần đây\" để bắt đầu tìm kiếm</string>
+    <string name="make_sure_devices_same_network">Đảm bảo các thiết bị khác cùng mạng và có thể phát hiện được</string>
+    <string name="last_seen">Lần cuối thấy</string>
+    <string name="device_discovered">Đã phát hiện thiết bị</string>
     <string name="link_preview_image">Ảnh xem trước liên kết</string>
     <string name="loading_link_preview">Đang tải xem trước liên kết…</string>
     <string name="link_preview_error">Không thể tải xem trước liên kết</string>
@@ -599,7 +611,6 @@
     <string name="pdf_open_error">Không thể mở tệp PDF.</string>
     <string name="audio_play_error">Không thể phát tệp âm thanh.</string>
     <string name="copy">Sao chép</string>
-    <string name="send_to_pc">Gửi đến máy tính</string>
     <string name="home">Trang chủ</string>
     <string name="clear_all">Xóa tất cả</string>
     <string name="clear_all_confirm">Bạn có chắc chắn muốn xóa danh sách phát không? Hành động này không thể hoàn tác.</string>
@@ -626,4 +637,5 @@
     <string name="cannot_open_file_not_accessible">Không thể mở tệp. Tệp này không thể truy cập được thông qua ứng dụng.</string>
     <string name="unknown_error">Đã xảy ra lỗi không xác định.</string>
     <string name="customize_home_features">Tùy chỉnh các tính năng trang chủ</string>
+    <string name="file_picker_not_available">Không có ứng dụng chọn tệp nào có sẵn trên thiết bị này. Vui lòng cài đặt ứng dụng quản lý tệp.</string>
 </resources>

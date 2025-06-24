@@ -201,6 +201,18 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="qrcode">QRCode</string>
     <string name="scanner">Scanner</string>
+    <string name="nearby">Nelle vicinanze</string>
+    <string name="nearby_devices">Dispositivi nelle vicinanze</string>
+    <string name="searching_nearby_devices">Ricerca dispositivi nelle vicinanze...</string>
+    <string name="no_nearby_devices_found">Nessun dispositivo nelle vicinanze trovato</string>
+    <string name="make_discoverable">Rendi rilevabile</string>
+    <string name="make_discoverable_desc">Consenti ad altri dispositivi di rilevare questo dispositivo sulla rete</string>
+    <string name="discover_nearby_devices">Scopri dispositivi nelle vicinanze</string>
+    <string name="stop_discovering">Interrompi ricerca</string>
+    <string name="tap_discover_to_start">Tocca \"Scopri dispositivi nelle vicinanze\" per iniziare la ricerca</string>
+    <string name="make_sure_devices_same_network">Assicurati che altri dispositivi siano sulla stessa rete e rilevabili</string>
+    <string name="last_seen">Ultima connessione</string>
+    <string name="device_discovered">Dispositivo scoperto</string>
     <string name="link_preview_image">Immagine anteprima link</string>
     <string name="loading_link_preview">Caricamento anteprima link…</string>
     <string name="link_preview_error">Caricamento anteprima link fallito</string>
@@ -599,7 +611,6 @@
     <string name="pdf_open_error">Impossibile aprire il file PDF.</string>
     <string name="audio_play_error">Impossibile riprodurre il file audio.</string>
     <string name="copy">Copia</string>
-    <string name="send_to_pc">Invia al PC</string>
     <string name="home">Home</string>
     <string name="clear_all">Cancella tutto</string>
     <string name="clear_all_confirm">Sei sicuro di voler cancellare la playlist? Questa azione non può essere annullata.</string>
@@ -626,4 +637,5 @@
     <string name="cannot_open_file_not_accessible">Impossibile aprire il file. Questo file non è accessibile tramite l\'app.</string>
     <string name="unknown_error">Si è verificato un errore sconosciuto.</string>
     <string name="customize_home_features">Personalizza le funzionalità della home</string>
+    <string name="file_picker_not_available">Nessuna app di selezione file disponibile su questo dispositivo. Si prega di installare un\'app file manager.</string>
 </resources>

@@ -11,7 +11,7 @@ import com.ismartcoding.lib.pdfviewer.listener.OnPageErrorListener
 import com.ismartcoding.lib.pdfviewer.scroll.DefaultScrollHandle
 import com.ismartcoding.lib.pdfviewer.util.FitPolicy
 import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.preference.LocalDarkTheme
+import com.ismartcoding.plain.preferences.LocalDarkTheme
 
 @Composable
 fun PdfView(

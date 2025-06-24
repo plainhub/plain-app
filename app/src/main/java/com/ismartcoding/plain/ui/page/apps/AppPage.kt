@@ -49,7 +49,6 @@ import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PIconTextActionButton
-import com.ismartcoding.plain.ui.base.PIconTextButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -255,11 +254,11 @@ fun AppPage(
                     PCard {
                         PListItem(
                             title = stringResource(R.string.source_directory),
-                            desc = item?.appInfo?.sourceDir ?: "",
+                            subtitle = item?.appInfo?.sourceDir ?: "",
                         )
                         PListItem(
                             title = stringResource(R.string.data_directory),
-                            desc = item?.appInfo?.dataDir ?: "",
+                            subtitle = item?.appInfo?.dataDir ?: "",
                         )
                     }
                 }

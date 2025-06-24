@@ -52,7 +52,7 @@ class Routing {
     object PomodoroTimer
 
     @Serializable
-    object Chat
+    data class Chat(val id: String = "")
 
     @Serializable
     object ChatText
@@ -110,4 +110,7 @@ class Routing {
     
     @Serializable
     data class Files(val fileType: Int = 0)
+
+    @Serializable
+    object Nearby
 }

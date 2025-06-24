@@ -201,6 +201,18 @@
     <string name="bluetooth">ব্লুটুথ</string>
     <string name="qrcode">কিউআরকোড</string>
     <string name="scanner">স্ক্যানার</string>
+    <string name="nearby">কাছাকাছি</string>
+    <string name="nearby_devices">কাছাকাছি ডিভাইস</string>
+    <string name="searching_nearby_devices">কাছাকাছি ডিভাইস খুঁজছি...</string>
+    <string name="no_nearby_devices_found">কাছাকাছি কোন ডিভাইস পাওয়া যায়নি</string>
+    <string name="make_discoverable">খুঁজে পাওয়া যায় এমন করুন</string>
+    <string name="make_discoverable_desc">অন্য ডিভাইসগুলিকে নেটওয়ার্কে এই ডিভাইসটি খুঁজে পেতে অনুমতি দিন</string>
+    <string name="discover_nearby_devices">কাছাকাছি ডিভাইস খুঁজে বের করুন</string>
+    <string name="stop_discovering">খোঁজা বন্ধ করুন</string>
+    <string name="tap_discover_to_start">খোঁজা শুরু করতে \"কাছাকাছি ডিভাইস খুঁজে বের করুন\" ট্যাপ করুন</string>
+    <string name="make_sure_devices_same_network">নিশ্চিত করুন যে অন্য ডিভাইসগুলি একই নেটওয়ার্কে আছে এবং খুঁজে পাওয়া যায়</string>
+    <string name="last_seen">সর্বশেষ দেখা</string>
+    <string name="device_discovered">ডিভাইস আবিষ্কৃত</string>
     <string name="link_preview_image">লিঙ্ক প্রিভিউ ছবি</string>
     <string name="loading_link_preview">লিঙ্ক প্রিভিউ লোড হচ্ছে…</string>
     <string name="link_preview_error">লিঙ্ক প্রিভিউ লোড করতে ব্যর্থ হয়েছে</string>
@@ -599,7 +611,6 @@
     <string name="pdf_open_error">PDF ফাইল খুলতে ব্যর্থ।</string>
     <string name="audio_play_error">অডিও ফাইল চালাতে ব্যর্থ।</string>
     <string name="copy">কপি করুন</string>
-    <string name="send_to_pc">পিসিতে পাঠান</string>
     <string name="home">হোম</string>
     <string name="clear_all">সব মুছে ফেলুন</string>
     <string name="clear_all_confirm">আপনি কি প্লেলিস্ট সাফ করতে চান? এই কাজটি ফেরত নেওয়া যাবে না।</string>
@@ -626,4 +637,5 @@
     <string name="cannot_open_file_not_accessible">ফাইল খুলতে ব্যর্থ। এই ফাইলটি অ্যাপ দ্বারা অ্যাক্সেস করা যাবে না।</string>
     <string name="unknown_error">অজানা ত্রুটি ঘটেছে।</string>
     <string name="customize_home_features">হোম ফিচার কাস্টমাইজ করুন</string>
+    <string name="file_picker_not_available">এই ডিভাইসে কোনো ফাইল নির্বাচক অ্যাপ উপলব্ধ নেই। দয়া করে একটি ফাইল ম্যানেজার অ্যাপ ইনস্টল করুন।</string>
 </resources>

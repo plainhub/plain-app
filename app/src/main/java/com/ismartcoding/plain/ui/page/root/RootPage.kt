@@ -20,6 +20,7 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
+import com.ismartcoding.plain.ui.models.ChatListViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
@@ -33,10 +34,12 @@ import com.ismartcoding.plain.ui.page.images.ImagesPageState
 import com.ismartcoding.plain.ui.page.root.components.RootNavigationBar
 import com.ismartcoding.plain.ui.page.root.components.RootTabType
 import com.ismartcoding.plain.ui.page.root.contents.TabContentAudio
+import com.ismartcoding.plain.ui.page.root.contents.TabContentChat
 import com.ismartcoding.plain.ui.page.root.contents.TabContentHome
 import com.ismartcoding.plain.ui.page.root.contents.TabContentImages
 import com.ismartcoding.plain.ui.page.root.contents.TabContentVideos
 import com.ismartcoding.plain.ui.page.root.topbars.TopBarAudio
+import com.ismartcoding.plain.ui.page.root.topbars.TopBarChat
 import com.ismartcoding.plain.ui.page.root.topbars.TopBarHome
 import com.ismartcoding.plain.ui.page.root.topbars.TopBarImages
 import com.ismartcoding.plain.ui.page.root.topbars.TopBarVideos
@@ -63,13 +66,13 @@ fun RootPage(
     audioPlaylistVM: AudioPlaylistViewModel = viewModel(key = "audioPlaylistVM"),
     audioFoldersVM: MediaFoldersViewModel = viewModel(key = "audioFoldersVM"),
     audioCastVM: CastViewModel = viewModel(key = "audioCastVM"),
+    chatListVM: ChatListViewModel = viewModel(key = "chatListVM"),
 ) {
     val context = LocalContext.current
-    val activity = context as? Activity
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(
         initialPage = RootTabType.HOME.value,
-        pageCount = { 4 }
+        pageCount = { 5 }
     )
 
     val imagesState = ImagesPageState.create(
@@ -195,6 +198,12 @@ fun RootPage(
                         castVM = videoCastVM,
                     )
                 }
+
+                RootTabType.CHAT.value -> {
+                    TopBarChat(
+                        navController = navController
+                    )
+                }
             }
         },
         bottomBar = {
@@ -270,6 +279,14 @@ fun RootPage(
                         TabContentVideos(
                             videosState,
                             videosVM, videoTagsVM, videoFoldersVM, videoCastVM, paddingValues
+                        )
+                    }
+
+                    RootTabType.CHAT.value -> {
+                        TabContentChat(
+                            navController = navController,
+                            chatListVM = chatListVM,
+                            paddingValues = paddingValues
                         )
                     }
                 }

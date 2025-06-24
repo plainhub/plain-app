@@ -39,8 +39,8 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.preference.ImageGridCellsPerRowPreference
-import com.ismartcoding.plain.preference.ImageSortByPreference
+import com.ismartcoding.plain.preferences.ImageGridCellsPerRowPreference
+import com.ismartcoding.plain.preferences.ImageSortByPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.NoDataColumn

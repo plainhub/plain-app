@@ -10,7 +10,7 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.extensions.toJsValue
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.media.FileMediaStoreHelper
-import com.ismartcoding.plain.preference.EditorWrapContentPreference
+import com.ismartcoding.plain.preferences.EditorWrapContentPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -9,19 +9,38 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.R
+import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.extensions.formatTime
+import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.theme.secondaryTextColor
 
 @Composable
-fun ChatName(m: VChat) {
+fun ChatName(m: VChat, peer: DPeer?) {
     Row(
         modifier = Modifier
             .padding(vertical = 8.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            text = m.name.uppercase(),
+            text = when (m.fromId) {
+                "local" -> {
+                    getString(R.string.local_chat)
+                }
+
+                peer?.id -> {
+                    peer.name
+                }
+
+                "me" -> {
+                    getString(R.string.me)
+                }
+
+                else -> {
+                    getString(R.string.unknown)
+                }
+            },
             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(end = 4.dp),
         )

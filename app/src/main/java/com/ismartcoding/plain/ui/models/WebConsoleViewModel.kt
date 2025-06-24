@@ -8,7 +8,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.preference.KeepAwakePreference
+import com.ismartcoding.plain.preferences.KeepAwakePreference
 import com.ismartcoding.plain.events.AcquireWakeLockEvent
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationEvent
 import com.ismartcoding.plain.events.ReleaseWakeLockEvent

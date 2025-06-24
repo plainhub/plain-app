@@ -3,12 +3,14 @@ package com.ismartcoding.plain.db
 import android.content.Context
 import androidx.room.AutoMigration
 import androidx.room.Database
+
 import androidx.room.DeleteTable
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.AutoMigrationSpec
 import androidx.sqlite.db.SupportSQLiteDatabase
+
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
 
@@ -22,23 +24,14 @@ class AiChatsDeletionSpec : AutoMigrationSpec
     entities = [
         DChat::class, DSession::class, DTag::class, DTagRelation::class,
         DNote::class, DFeed::class, DFeedEntry::class, DBook::class, DBookChapter::class,
-        DPomodoroItem::class,
+        DPomodoroItem::class, DPeer::class, DChatGroup::class,
     ],
-    version = 5,
+    version = 6,
     autoMigrations = [
-        AutoMigration(from = 1, to = 2, spec = AppDatabase.AutoMigration1To2::class),
-        AutoMigration(
-            from = 2,
-            to = 3,
-            spec = BoxesDeletionSpec::class
-        ), AutoMigration(
-            from = 3,
-            to = 4,
-            spec = AiChatsDeletionSpec::class
-        ), AutoMigration(
-            from = 4,
-            to = 5
-        )
+        AutoMigration(from = 1, to = 2),
+        AutoMigration(from = 2, to = 3, spec = BoxesDeletionSpec::class),
+        AutoMigration(from = 3, to = 4, spec = AiChatsDeletionSpec::class),
+        AutoMigration(from = 4, to = 5)
     ],
     exportSchema = true,
 )
@@ -62,9 +55,10 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun pomodoroItemDao(): PomodoroItemDao
 
-    class AutoMigration1To2 : AutoMigrationSpec {
+    abstract fun peerDao(): PeerDao
 
-    }
+    abstract fun chatGroupDao(): ChatGroupDao
+
 
     companion object {
         @Volatile
@@ -79,6 +73,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         private fun buildDatabase(context: Context): AppDatabase {
             return Room.databaseBuilder(context, AppDatabase::class.java, Constants.DATABASE_NAME)
+                .addMigrations(Migrations.MIGRATION_5_6)
                 .addCallback(
                     object : RoomDatabase.Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {

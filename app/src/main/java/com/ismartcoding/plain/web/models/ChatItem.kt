@@ -11,7 +11,8 @@ import kotlinx.serialization.Transient
 @Serializable
 data class ChatItem(
     val id: ID,
-    val isMe: Boolean,
+    val fromId: String,
+    val toId: String,
     val content: String,
     val createdAt: Instant,
     val updatedAt: Instant,
@@ -56,5 +57,5 @@ sealed class ChatItemContent() {
 }
 
 fun DChat.toModel(): ChatItem {
-    return ChatItem(ID(id), isMe, content.toJSONString(), createdAt, updatedAt, content)
+    return ChatItem(ID(id), fromId, toId, content.toJSONString(), createdAt, updatedAt, content)
 }

@@ -31,7 +31,7 @@ import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.helpers.AppLogHelper
 import com.ismartcoding.plain.helpers.ShareHelper
-import com.ismartcoding.plain.preference.LocalDarkTheme
+import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.AceEditor
 import com.ismartcoding.plain.ui.base.ActionButtonMore
 import com.ismartcoding.plain.ui.base.NavigationBackIcon

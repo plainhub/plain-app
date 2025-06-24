@@ -6,8 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.preference.LocalDarkTheme
-import com.ismartcoding.plain.ui.theme.palette.onDark
+import com.ismartcoding.plain.preferences.LocalDarkTheme
 
 @Composable
 fun ColorScheme.cardContainer(): Color {

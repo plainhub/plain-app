@@ -18,7 +18,7 @@ import com.ismartcoding.plain.extensions.toDNotification
 import com.ismartcoding.plain.events.CancelNotificationsEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.packageManager
-import com.ismartcoding.plain.preference.NotificationFilterPreference
+import com.ismartcoding.plain.preferences.NotificationFilterPreference
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
@@ -113,23 +113,45 @@ class PNotificationListenerService : NotificationListenerService() {
                     }
                 }
             }
+        } catch (ex: SecurityException) {
+            LogCat.e("SecurityException when getting active notifications: ${ex.message}")
+            isConnected = false
+            return
+        } catch (ex: Exception) {
+            LogCat.e("Error getting active notifications: ${ex.message}")
+        }
+
+        try {
 
             events.add(receiveEventHandler<CancelNotificationsEvent> { event ->
-                if (event.ids.size == TempData.notifications.size) {
-                    cancelAllNotifications()
-                    TempData.notifications.clear()
-                } else {
-                    event.ids.forEach { id ->
-                        try {
-                            cancelNotification(id)
-                        } catch (ex: Exception) {
-                            LogCat.e(ex.toString())
+                if (!isConnected) {
+                    LogCat.w("PNotificationListenerService: not connected, ignoring cancel request")
+                    return@receiveEventHandler
+                }
+                
+                try {
+                    if (event.ids.size == TempData.notifications.size) {
+                        cancelAllNotifications()
+                        TempData.notifications.clear()
+                    } else {
+                        event.ids.forEach { id ->
+                            try {
+                                cancelNotification(id)
+                            } catch (ex: Exception) {
+                                LogCat.e("Failed to cancel notification $id: ${ex.message}")
+                            }
                         }
                     }
+                } catch (ex: SecurityException) {
+                    LogCat.e("SecurityException when canceling notifications: ${ex.message}")
+                    // Service might have lost permission, mark as disconnected
+                    isConnected = false
+                } catch (ex: Exception) {
+                    LogCat.e("Error canceling notifications: ${ex.message}")
                 }
             })
         } catch (ex: Exception) {
-            LogCat.e(ex.toString())
+            LogCat.e("Error setting up event handlers: ${ex.message}")
         }
     }
 
@@ -137,7 +159,12 @@ class PNotificationListenerService : NotificationListenerService() {
         super.onListenerDisconnected()
         isConnected = false
         LogCat.d("PNotificationListenerService: onListenerDisconnected")
-        events.clear()
+        try {
+            events.forEach { it.cancel() }
+            events.clear()
+        } catch (ex: Exception) {
+            LogCat.e("Error cleaning up events: ${ex.message}")
+        }
     }
 
     companion object {

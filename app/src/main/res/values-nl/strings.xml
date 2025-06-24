@@ -201,6 +201,18 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="qrcode">QRCode</string>
     <string name="scanner">Scanner</string>
+    <string name="nearby">In de buurt</string>
+    <string name="nearby_devices">Apparaten in de buurt</string>
+    <string name="searching_nearby_devices">Zoeken naar apparaten in de buurt...</string>
+    <string name="no_nearby_devices_found">Geen apparaten in de buurt gevonden</string>
+    <string name="make_discoverable">Vindbaar maken</string>
+    <string name="make_discoverable_desc">Andere apparaten toestaan dit apparaat op het netwerk te ontdekken</string>
+    <string name="discover_nearby_devices">Ontdek apparaten in de buurt</string>
+    <string name="stop_discovering">Stop zoeken</string>
+    <string name="tap_discover_to_start">Tik op \"Ontdek apparaten in de buurt\" om te beginnen met zoeken</string>
+    <string name="make_sure_devices_same_network">Zorg ervoor dat andere apparaten op hetzelfde netwerk zijn en vindbaar zijn</string>
+    <string name="last_seen">Laatst gezien</string>
+    <string name="device_discovered">Apparaat ontdekt</string>
     <string name="link_preview_image">Linkvoorbeeldafbeelding</string>
     <string name="loading_link_preview">Linkvoorbeeld laden…</string>
     <string name="link_preview_error">Linkvoorbeeld laden mislukt</string>
@@ -599,7 +611,6 @@
     <string name="pdf_open_error">Kan PDF-bestand niet openen.</string>
     <string name="audio_play_error">Kan audiobestand niet afspelen.</string>
     <string name="copy">Kopiëren</string>
-    <string name="send_to_pc">Naar pc verzenden</string>
     <string name="home">Home</string>
     <string name="clear_all">Alles wissen</string>
     <string name="clear_all_confirm">Weet je zeker dat je de afspeellijst wilt wissen? Dit kan niet ongedaan worden gemaakt.</string>
@@ -626,4 +637,5 @@
     <string name="cannot_open_file_not_accessible">Kan bestand niet openen. Dit bestand is niet toegankelijk via de app.</string>
     <string name="unknown_error">Er is een onbekende fout opgetreden.</string>
     <string name="customize_home_features">Home-functies aanpassen</string>
+    <string name="file_picker_not_available">Er is geen bestandsselectie-app beschikbaar op dit apparaat. Installeer een bestandsbeheer-app.</string>
 </resources>

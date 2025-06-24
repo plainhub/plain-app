@@ -16,9 +16,9 @@ import com.ismartcoding.plain.data.Version
 import com.ismartcoding.plain.data.toVersion
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.helpers.ScreenHelper
-import com.ismartcoding.plain.preference.LocalKeepScreenOn
-import com.ismartcoding.plain.preference.LocalNewVersion
-import com.ismartcoding.plain.preference.LocalSkipVersion
+import com.ismartcoding.plain.preferences.LocalKeepScreenOn
+import com.ismartcoding.plain.preferences.LocalNewVersion
+import com.ismartcoding.plain.preferences.LocalSkipVersion
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSettings
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem

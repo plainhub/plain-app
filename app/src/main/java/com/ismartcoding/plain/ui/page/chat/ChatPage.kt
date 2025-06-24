@@ -49,13 +49,14 @@ import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
-import com.ismartcoding.plain.enums.FilesType
+import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
@@ -67,12 +68,12 @@ import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.extensions.getDuration
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.features.ChatHelper
+import com.ismartcoding.plain.features.PeerChatHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.VideoHelper
-import com.ismartcoding.plain.preference.ChatInputTextPreference
-import com.ismartcoding.plain.ui.base.ActionButtonFolders
+import com.ismartcoding.plain.preferences.ChatInputTextPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
@@ -94,15 +95,14 @@ import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
 import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
-import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.ChatInput
 import com.ismartcoding.plain.ui.page.chat.components.ChatListItem
 import com.ismartcoding.plain.web.models.toModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.io.File
 import kotlinx.datetime.Clock
+import java.io.File
 
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
@@ -111,6 +111,7 @@ fun ChatPage(
     navController: NavHostController,
     audioPlaylistVM: AudioPlaylistViewModel,
     chatVM: ChatViewModel,
+    id: String = "",
 ) {
     val context = LocalContext.current
     val itemsState = chatVM.itemsFlow.collectAsState()
@@ -118,6 +119,17 @@ fun ChatPage(
     var inputValue by remember { mutableStateOf("") }
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
+    var toName by remember { mutableStateOf("") }
+    var peer by remember { mutableStateOf<DPeer?>(null) }
+
+    // Parse chat type and real ID from the id parameter
+    val (chatType, toId) = remember(id) {
+        when {
+            id.startsWith("peer:") -> "peer" to id.removePrefix("peer:")
+            id.startsWith("group:") -> "group" to id.removePrefix("group:")
+            else -> "local" to "local"
+        }
+    }
 
     val imageWidthDp = remember {
         (configuration.screenWidthDp.dp - 44.dp) / 3
@@ -129,7 +141,7 @@ fun ChatPage(
     }
     val refreshState =
         rememberRefreshLayoutState {
-            chatVM.fetch(context)
+            chatVM.fetch(context, toId)
             setRefreshState(RefreshContentState.Finished)
         }
     val scrollState = rememberLazyListState()
@@ -142,7 +154,24 @@ fun ChatPage(
         if (!once.value) {
             once.value = true
             inputValue = ChatInputTextPreference.getAsync(context)
-            chatVM.fetch(context)
+            chatVM.fetch(context, toId)
+        }
+    }
+
+    // Load chat name based on chat type and id
+    LaunchedEffect(chatType, toId) {
+        withIO {
+            when (chatType) {
+                "peer" -> {
+                    peer = AppDatabase.instance.peerDao().getById(toId)
+                    toName = peer?.name ?: ""
+                }
+
+                "group" -> {
+                    val group = AppDatabase.instance.chatGroupDao().getById(toId)
+                    toName = group?.name ?: ""
+                }
+            }
         }
     }
 
@@ -239,7 +268,7 @@ fun ChatPage(
                                     DMessageFiles(items),
                                 )
                             }
-                        val item = withIO { ChatHelper.sendAsync(content) }
+                        val item = withIO { ChatHelper.sendAsync(content, toId) }
                         DialogHelper.hideLoading()
                         chatVM.addAll(arrayListOf(item))
                         val m = item.toModel()
@@ -276,7 +305,14 @@ fun ChatPage(
     val pageTitle = if (chatVM.selectMode.value) {
         LocaleHelper.getStringF(R.string.x_selected, "count", chatVM.selectedIds.size)
     } else {
-        stringResource(id = R.string.send_to_pc)
+        when (chatType) {
+            "local" -> stringResource(id = R.string.local_chat)
+            "group", "peer" -> {
+                toName
+            }
+
+            else -> stringResource(id = R.string.chat)
+        }
     }
     PScaffold(
         modifier = Modifier
@@ -310,10 +346,6 @@ fun ChatPage(
                             },
                         )
                         HorizontalSpace(dp = 8.dp)
-                    } else {
-                        ActionButtonFolders {
-                            navController.navigate(Routing.Files(FilesType.APP.ordinal))
-                        }
                     }
                 },
             )
@@ -350,6 +382,7 @@ fun ChatPage(
                                 audioPlaylistVM,
                                 itemsState.value,
                                 m = m,
+                                peer = peer,
                                 index = index,
                                 imageWidthDp = imageWidthDp,
                                 imageWidthPx = imageWidthPx.value,
@@ -396,14 +429,14 @@ fun ChatPage(
                                     size = file.length(),
                                     summary = summary
                                 )
-                                
+
                                 // Send the file as a message
                                 val content = DMessageContent(
                                     DMessageType.FILES.value,
                                     DMessageFiles(listOf(messageFile))
                                 )
-                                
-                                val item = withIO { ChatHelper.sendAsync(content) }
+
+                                val item = withIO { ChatHelper.sendAsync(content, fromId = "me", toId = toId) }
                                 chatVM.addAll(arrayListOf(item))
                                 val m = item.toModel()
                                 m.data = m.getContentData()
@@ -417,9 +450,31 @@ fun ChatPage(
                                         ),
                                     ),
                                 )
+
+                                // Send message to peer if it's a peer chat
+                                when (chatType) {
+                                    "peer" -> {
+                                        withIO {
+                                            val success = PeerChatHelper.sendMessageToPeerAsync(toId, content)
+                                            if (!success) {
+                                                // Show error message on main thread when sending fails
+                                                scope.launch {
+                                                    DialogHelper.showMessage(
+                                                        LocaleHelper.getString(R.string.failed_to_send_message_to_peer)
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    "group" -> {
+                                        // TODO: Implement group message sending
+                                    }
+                                }
                             } else {
                                 // Send as normal text message
-                                val item = withIO { ChatHelper.sendAsync(DMessageContent(DMessageType.TEXT.value, DMessageText(inputValue))) }
+                                val messageContent = DMessageContent(DMessageType.TEXT.value, DMessageText(inputValue))
+                                val item = withIO { ChatHelper.sendAsync(messageContent, fromId = "me", toId = toId) }
                                 chatVM.addAll(arrayListOf(item))
                                 val m = item.toModel()
                                 m.data = m.getContentData()
@@ -434,8 +489,28 @@ fun ChatPage(
                                     ),
                                 )
                                 sendEvent(FetchLinkPreviewsEvent(item))
+                                when (chatType) {
+                                    "peer" -> {
+                                        // Send message to peer
+                                        withIO {
+                                            val success = PeerChatHelper.sendMessageToPeerAsync(toId, messageContent)
+                                            if (!success) {
+                                                // Show error message on main thread when sending fails
+                                                scope.launch {
+                                                    DialogHelper.showMessage(
+                                                        LocaleHelper.getString(R.string.failed_to_send_message_to_peer)
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    "group" -> {
+                                        // TODO: Implement group message sending
+                                    }
+                                }
                             }
-                            
+
                             // Reset input and scroll regardless of message type
                             inputValue = ""
                             withIO { ChatInputTextPreference.putAsync(context, inputValue) }

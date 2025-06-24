@@ -17,14 +17,14 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.data.HttpServerCheckResult
 import com.ismartcoding.plain.enums.HttpServerState
-import com.ismartcoding.plain.preference.PasswordPreference
+import com.ismartcoding.plain.preferences.PasswordPreference
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.SessionClientTsUpdate
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
-import com.ismartcoding.plain.preference.KeyStorePasswordPreference
+import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.web.websocket.WebSocketSession
 import io.ktor.client.plugins.websocket.ws
@@ -54,7 +54,7 @@ import kotlin.concurrent.timerTask
 
 object HttpServerManager {
     private const val SSL_KEY_ALIAS = Constants.SSL_NAME
-    var tokenCache = mutableMapOf<String, ByteArray>() // cache the session token, format: <client_id>:<token>
+    val tokenCache = mutableMapOf<String, ByteArray>() // cache the session token, format: <client_id>:<token>
     val clientIpCache = mutableMapOf<String, String>() // format: <client_id>:<client_ip>
     val wsSessions = Collections.synchronizedSet<WebSocketSession>(LinkedHashSet())
     val clientRequestTs = mutableMapOf<String, Long>()
@@ -238,7 +238,7 @@ object HttpServerManager {
         event: ConfirmToAcceptLoginEvent,
         clientIp: String,
     ) {
-        val token = CryptoHelper.generateAESKey()
+        val token = CryptoHelper.generateChaCha20Key()
         SessionList.addOrUpdateAsync(event.clientId) {
             val r = event.request
             it.clientIP = clientIp
@@ -250,7 +250,7 @@ object HttpServerManager {
         }
         HttpServerManager.loadTokenCache()
         event.session.send(
-            CryptoHelper.aesEncrypt(
+            CryptoHelper.chaCha20Encrypt(
                 HttpServerManager.passwordToToken(),
                 JsonHelper.jsonEncode(
                     AuthResponse(

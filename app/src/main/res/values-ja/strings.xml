@@ -198,6 +198,18 @@
     <string name="bluetooth">Bluetooth</string>
     <string name="qrcode">QRコード</string>
     <string name="scanner">スキャナー</string>
+    <string name="nearby">近く</string>
+    <string name="nearby_devices">近くのデバイス</string>
+    <string name="searching_nearby_devices">近くのデバイスを検索中...</string>
+    <string name="no_nearby_devices_found">近くにデバイスが見つかりません</string>
+    <string name="make_discoverable">発見可能にする</string>
+    <string name="make_discoverable_desc">他のデバイスがネットワーク上でこのデバイスを発見できるようにします</string>
+    <string name="discover_nearby_devices">近くのデバイスを発見</string>
+    <string name="stop_discovering">発見を停止</string>
+    <string name="tap_discover_to_start">「近くのデバイスを発見」をタップして検索を開始</string>
+    <string name="make_sure_devices_same_network">他のデバイスが同じネットワーク上にあり、発見可能であることを確認してください</string>
+    <string name="last_seen">最終確認</string>
+    <string name="device_discovered">デバイスが見つかりました</string>
     <string name="link_preview_image">リンクプレビュー画像</string>
     <string name="loading_link_preview">リンクプレビューを読み込んでいます…</string>
     <string name="link_preview_error">リンクプレビューの読み込みに失敗しました</string>
@@ -599,7 +611,6 @@
     <string name="pdf_open_error">PDFファイルを開けませんでした。</string>
     <string name="audio_play_error">音声ファイルを再生できませんでした。</string>
     <string name="copy">コピー</string>
-    <string name="send_to_pc">PCに送信</string>
     <string name="home">ホーム</string>
     <string name="clear_all">すべてクリア</string>
     <string name="clear_all_confirm">プレイリストをクリアしますか？この操作は元に戻せません。</string>
@@ -626,4 +637,5 @@
     <string name="cannot_open_file_not_accessible">ファイルを開けません。このファイルはアプリからアクセスできません。</string>
     <string name="unknown_error">不明なエラーが発生しました。</string>
     <string name="customize_home_features">ホーム機能をカスタマイズ</string>
+    <string name="file_picker_not_available">このデバイスにはファイル選択アプリが利用できません。ファイルマネージャーアプリをインストールしてください。</string>
 </resources>

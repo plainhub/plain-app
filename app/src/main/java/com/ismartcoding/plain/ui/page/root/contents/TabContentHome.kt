@@ -30,9 +30,9 @@ import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
 import com.ismartcoding.plain.helpers.AppHelper
-import com.ismartcoding.plain.preference.HttpPortPreference
-import com.ismartcoding.plain.preference.HttpsPortPreference
-import com.ismartcoding.plain.preference.LocalWeb
+import com.ismartcoding.plain.preferences.HttpPortPreference
+import com.ismartcoding.plain.preferences.HttpsPortPreference
+import com.ismartcoding.plain.preferences.LocalWeb
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
@@ -60,10 +60,9 @@ fun TabContentHome(
     val webEnabled = LocalWeb.current
     val context = LocalContext.current
     var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.can(context)) }
-    val sharedFlow = Channel.sharedFlow
 
-    LaunchedEffect(sharedFlow) {
-        sharedFlow.collect { event ->
+    LaunchedEffect(Unit) {
+        Channel.sharedFlow.collect { event ->
             when (event) {
                 is PermissionsResultEvent -> {
                     systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.can(context)

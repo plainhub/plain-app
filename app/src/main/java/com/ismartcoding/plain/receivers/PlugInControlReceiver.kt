@@ -10,7 +10,7 @@ import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.events.AcquireWakeLockEvent
 import com.ismartcoding.plain.events.ReleaseWakeLockEvent
-import com.ismartcoding.plain.preference.KeepAwakePreference
+import com.ismartcoding.plain.preferences.KeepAwakePreference
 
 class PlugInControlReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {

@@ -59,7 +59,7 @@ object FileHelper {
         if (path.startsWith("https://", true) || path.startsWith("http://", true)) {
             return path
         }
-        return Base64.encodeToString(CryptoHelper.aesEncrypt(TempData.urlToken, path), Base64.NO_WRAP)
+        return Base64.encodeToString(CryptoHelper.chaCha20Encrypt(TempData.urlToken, path), Base64.NO_WRAP)
     }
 
     fun rename(

@@ -39,7 +39,7 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.preference.PackageSortByPreference
+import com.ismartcoding.plain.preferences.PackageSortByPreference
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.ActionButtonSort
 import com.ismartcoding.plain.ui.base.BottomSpace

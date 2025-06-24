@@ -15,7 +15,7 @@ object WebSocketHelper {
             if (event.data is WebSocketData.Text) {
                 val token = HttpServerManager.tokenCache[it.clientId]
                 if (token != null) {
-                    it.session.send(addIntPrefixToByteArray(event.type.value, CryptoHelper.aesEncrypt(token, event.data.value)))
+                    it.session.send(addIntPrefixToByteArray(event.type.value, CryptoHelper.chaCha20Encrypt(token, event.data.value)))
                 }
             } else if (event.data is WebSocketData.Binary) {
                 it.session.send(addIntPrefixToByteArray(event.type.value, event.data.value as ByteArray))

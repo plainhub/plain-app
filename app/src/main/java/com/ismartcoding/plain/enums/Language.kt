@@ -2,7 +2,7 @@ package com.ismartcoding.plain.enums
 
 import android.content.Context
 import android.os.LocaleList
-import com.ismartcoding.plain.preference.LanguagePreference
+import com.ismartcoding.plain.preferences.LanguagePreference
 import java.util.*
 
 object Language {
