@@ -53,8 +53,8 @@ fun NavHostController.navigateTextFile(path: String, title: String = "", mediaId
     }
 }
 
-fun NavHostController.navigateFiles(fileType: FilesType = FilesType.INTERNAL_STORAGE) {
-    navigate(Routing.Files(fileType.ordinal)) {
+fun NavHostController.navigateFiles(folderPath: String = "") {
+    navigate(Routing.Files(folderPath)) {
         launchSingleTop = true
     }
 }

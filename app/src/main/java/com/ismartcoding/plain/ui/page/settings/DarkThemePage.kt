@@ -96,7 +96,7 @@ fun DarkThemePage(navController: NavHostController) {
                             }
                         }
                     }
-                    BottomSpace()
+                    BottomSpace(paddingValues)
                 }
             }
         },

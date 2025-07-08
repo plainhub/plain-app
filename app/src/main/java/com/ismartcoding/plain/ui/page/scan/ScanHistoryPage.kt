@@ -75,7 +75,7 @@ fun ScanHistoryPage(
                             VerticalSpace(dp = 8.dp)
                         }
                         item {
-                            BottomSpace()
+                            BottomSpace(paddingValues)
                         }
                     }
                 } else {

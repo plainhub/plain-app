@@ -4,6 +4,7 @@ enum class PickFileType {
     IMAGE,
     IMAGE_VIDEO,
     FILE,
+    FOLDER,
 }
 
 enum class PickFileTag {
@@ -14,4 +15,5 @@ enum class PickFileTag {
     BOOK,
     RESTORE,
     POMODORO,
+    CHAT_FILES_SAVE_FOLDER,
 }

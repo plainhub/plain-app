@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.page.web
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,40 +31,30 @@ import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isTV
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationResultEvent
-import com.ismartcoding.plain.features.Permission
-import com.ismartcoding.plain.features.PermissionItem
-import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
-import com.ismartcoding.plain.helpers.AppHelper
+import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.features.PermissionItem
+import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.preferences.ApiPermissionsPreference
-import com.ismartcoding.plain.preferences.HttpPortPreference
-import com.ismartcoding.plain.preferences.HttpsPortPreference
 import com.ismartcoding.plain.preferences.LocalApiPermissions
 import com.ismartcoding.plain.preferences.LocalKeepAwake
-import com.ismartcoding.plain.preferences.LocalWeb
 import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
-import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PClickableText
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PListItem
-import com.ismartcoding.plain.ui.base.PMainSwitch
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
@@ -74,15 +63,12 @@ import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.components.WebAddress
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.VClickText
 import com.ismartcoding.plain.ui.models.WebConsoleViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import com.ismartcoding.plain.web.HttpServerManager
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -95,14 +81,12 @@ fun WebSettingsPage(
 ) {
     WebSettingsProvider {
         val context = LocalContext.current
-        val webEnabled = LocalWeb.current
         val keepAwake = LocalKeepAwake.current
         val scope = rememberCoroutineScope()
         val enabledPermissions = LocalApiPermissions.current
         var permissionList by remember { mutableStateOf(Permissions.getWebList(context)) }
         var shouldIgnoreOptimize by remember { mutableStateOf(!powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)) }
         var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.can(context)) }
-        var isVPNConnected by remember { mutableStateOf(NetworkHelper.isVPNConnected(context)) }
         val sharedFlow = Channel.sharedFlow
 
         val learnMore = stringResource(id = R.string.learn_more)
@@ -121,7 +105,6 @@ fun WebSettingsPage(
 
                     is WindowFocusChangedEvent -> {
                         shouldIgnoreOptimize = !powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)
-                        isVPNConnected = NetworkHelper.isVPNConnected(context)
                     }
 
                     is IgnoreBatteryOptimizationResultEvent -> {
@@ -193,59 +176,6 @@ fun WebSettingsPage(
             LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 item {
                     TopSpace()
-                    if (webEnabled) {
-                        if (mainVM.httpServerError.isNotEmpty()) {
-                            PAlert(title = stringResource(id = R.string.error), description = mainVM.httpServerError, AlertType.ERROR) {
-                                if (HttpServerManager.portsInUse.isNotEmpty()) {
-                                    PMiniOutlineButton(
-                                        label = stringResource(R.string.change_port),
-                                        click = {
-                                            scope.launch(Dispatchers.IO) {
-                                                if (HttpServerManager.portsInUse.contains(TempData.httpPort)) {
-                                                    HttpPortPreference.putAsync(context, HttpServerManager.httpPorts.filter { it != TempData.httpPort }.random())
-                                                }
-                                                if (HttpServerManager.portsInUse.contains(TempData.httpsPort)) {
-                                                    HttpsPortPreference.putAsync(context, HttpServerManager.httpsPorts.filter { it != TempData.httpsPort }.random())
-                                                }
-                                                coMain {
-                                                    AlertDialog.Builder(context)
-                                                        .setTitle(R.string.restart_app_title)
-                                                        .setMessage(R.string.restart_app_message)
-                                                        .setPositiveButton(R.string.relaunch_app) { _, _ ->
-                                                            AppHelper.relaunch(context)
-                                                        }
-                                                        .setCancelable(false)
-                                                        .create()
-                                                        .show()
-                                                }
-                                            }
-                                        },
-                                    )
-                                }
-                                PMiniOutlineButton(
-                                    label = stringResource(R.string.relaunch_app),
-                                    modifier = Modifier.padding(start = 16.dp),
-                                    click = {
-                                        AppHelper.relaunch(context)
-                                    },
-                                )
-                            }
-                        } else {
-                            if (isVPNConnected) {
-                                PAlert(title = stringResource(id = R.string.attention), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
-                            }
-                            if (!systemAlertWindow) {
-                                PAlert(title = stringResource(id = R.string.attention), description = stringResource(id = R.string.system_alert_window_warning), AlertType.WARNING) {
-                                    PMiniOutlineButton(
-                                        label = stringResource(R.string.grant_permission),
-                                        click = {
-                                            sendEvent(RequestPermissionsEvent(Permission.SYSTEM_ALERT_WINDOW))
-                                        },
-                                    )
-                                }
-                            }
-                        }
-                    }
                     PClickableText(
                         text = fullText,
                         clickTexts = listOf(
@@ -258,28 +188,6 @@ fun WebSettingsPage(
                             .padding(start = 24.dp, end = 24.dp, bottom = 16.dp),
                         style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
                     )
-                }
-                item {
-                    VerticalSpace(dp = 8.dp)
-                    PMainSwitch(
-                        title = stringResource(id = mainVM.httpServerState.getTextId()),
-                        activated = webEnabled,
-                        enable = !mainVM.httpServerState.isProcessing()
-                    ) {
-                        mainVM.enableHttpServer(context, it)
-                    }
-                }
-                if (webEnabled) {
-                    item {
-                        VerticalSpace(dp = 16.dp)
-                        PCard {
-                            WebAddress(context, mainVM)
-                            VerticalSpace(dp = 16.dp)
-                        }
-                    }
-                }
-                item {
-                    VerticalSpace(dp = 16.dp)
                     Subtitle(
                         text = stringResource(R.string.permissions),
                     )
@@ -399,7 +307,7 @@ fun WebSettingsPage(
                     }
                 }
                 item {
-                    BottomSpace()
+                    BottomSpace(paddingValues)
                 }
             }
         })

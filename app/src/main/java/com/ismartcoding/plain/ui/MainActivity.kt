@@ -478,11 +478,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun doPickFile(event: PickFileEvent) {
         try {
-            pickFileActivityLauncher.launch(FilePickHelper.getPickFileIntent(event.multiple))
+            val intent = when (event.type) {
+                PickFileType.FOLDER -> FilePickHelper.getPickFolderIntent()
+                else -> FilePickHelper.getPickFileIntent(event.multiple)
+            }
+            pickFileActivityLauncher.launch(intent)
         } catch (e: ActivityNotFoundException) {
             LogCat.w("ACTION_OPEN_DOCUMENT not supported, trying fallback")
             try {
-                pickFileActivityLauncher.launch(FilePickHelper.getFallbackPickFileIntent(event.multiple))
+                // Only try fallback for file selection, not folder selection
+                if (event.type != PickFileType.FOLDER) {
+                    pickFileActivityLauncher.launch(FilePickHelper.getFallbackPickFileIntent(event.multiple))
+                } else {
+                    LogCat.e("No folder picker available on this device")
+                    DialogHelper.showErrorMessage(getString(R.string.file_picker_not_available))
+                }
             } catch (e2: ActivityNotFoundException) {
                 LogCat.e("No file picker available on this device")
                 DialogHelper.showErrorMessage(getString(R.string.file_picker_not_available))

@@ -259,7 +259,7 @@ fun AppsPage(
                                             }
                                         }
                                         LoadMoreRefreshContent(appsVM.noMore.value)
-                                        BottomSpace()
+                                        BottomSpace(paddingValues)
                                     }
                                 }
                             }

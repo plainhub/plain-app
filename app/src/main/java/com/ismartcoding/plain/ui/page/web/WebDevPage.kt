@@ -96,7 +96,7 @@ fun WebDevPage(navController: NavHostController) {
                                 },
                             )
                         }
-                        BottomSpace()
+                        BottomSpace(paddingValues)
                     }
                 }
             },

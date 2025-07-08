@@ -248,7 +248,7 @@ fun NotificationSettingsPage(
             }
 
             item {
-                BottomSpace()
+                BottomSpace(paddingValues)
             }
         }
     }

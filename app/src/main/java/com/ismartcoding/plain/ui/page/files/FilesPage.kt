@@ -79,13 +79,14 @@ import com.ismartcoding.plain.ui.page.files.components.FilePasteBar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun FilesPage(
     navController: NavHostController,
-    fileType: FilesType? = null,
     audioPlaylistVM: AudioPlaylistViewModel,
+    folderPath: String = "",
     filesVM: FilesViewModel = viewModel(),
 ) {
     val context = LocalContext.current
@@ -137,16 +138,27 @@ fun FilesPage(
         }
     }
 
-    LaunchedEffect(fileType) {
+    LaunchedEffect(folderPath) {
         scope.launch(Dispatchers.IO) {
-            filesVM.loadLastPathAsync(context)
-            // Only override the inferred type if explicitly passed
-            fileType?.let { type ->
-                if (type == FilesType.APP) {
-                    val rootPath = FileSystemHelper.getExternalFilesDirPath(context)
-                    filesVM.initSelectedPath(rootPath, type, rootPath, rootPath)
+            if (folderPath.isNotEmpty()) {
+                val targetDir = File(folderPath)
+                if (targetDir.exists()) {
+                    val appDataPath = FileSystemHelper.getExternalFilesDirPath(context)
+                    val type = if (folderPath.startsWith(appDataPath)) {
+                        FilesType.APP
+                    } else {
+                        FilesType.INTERNAL_STORAGE
+                    }
+                    val rootPath = when (type) {
+                        FilesType.APP -> appDataPath
+                        else -> FileSystemHelper.getInternalStoragePath()
+                    }
+                    filesVM.initSelectedPath(rootPath, type, folderPath, folderPath)
+                } else {
+                    filesVM.loadLastPathAsync(context)
                 }
-                // Add other specific file type handling here if needed
+            } else {
+                filesVM.loadLastPathAsync(context)
             }
             filesVM.loadAsync(context)
             audioPlaylistVM.loadAsync(context)

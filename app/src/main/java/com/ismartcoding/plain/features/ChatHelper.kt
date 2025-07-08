@@ -10,19 +10,32 @@ import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageText
+import com.ismartcoding.plain.db.DPeer
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import java.io.File
 
 object ChatHelper {
-    suspend fun sendAsync(message: DMessageContent, fromId: String = "me", toId: String = "local"): DChat {
+    suspend fun sendAsync(message: DMessageContent, fromId: String = "me", toId: String = "local", peer: DPeer? = null): DChat {
         val item = DChat()
         item.fromId = fromId
         item.toId = toId
         item.content = message
+        item.status = when {
+            peer != null -> "pending"
+            else -> "sent"
+        }
         AppDatabase.instance.chatDao().insert(item)
         return item
+    }
+
+    suspend fun getAsync(id: String): DChat? {
+        return AppDatabase.instance.chatDao().getById(id)
+    }
+
+    suspend fun updateStatusAsync(id: String, status: String) {
+        AppDatabase.instance.chatDao().updateStatus(id, status)
     }
 
     suspend fun fetchLinkPreviewsAsync(context: Context, urls: List<String>): List<DLinkPreview> {
@@ -39,10 +52,6 @@ object ChatHelper {
         }
 
         return emptyList()
-    }
-
-    suspend fun getAsync(id: String): DChat? {
-        return AppDatabase.instance.chatDao().getById(id)
     }
 
     suspend fun deleteAsync(

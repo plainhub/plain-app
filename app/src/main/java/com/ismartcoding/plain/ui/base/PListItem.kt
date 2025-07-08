@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.R
@@ -80,6 +81,7 @@ fun PListItem(
                     Text(
                         text = it,
                         style = MaterialTheme.typography.listItemSubtitle(),
+                        overflow = TextOverflow.Visible
                     )
                 }
             }

@@ -2,15 +2,11 @@ package com.ismartcoding.lib.helpers
 
 import android.util.Base64
 import com.google.crypto.tink.CleartextKeysetHandle
-import com.google.crypto.tink.JsonKeysetReader
 import com.google.crypto.tink.JsonKeysetWriter
 import com.google.crypto.tink.KeysetHandle
-import com.google.crypto.tink.signature.PublicKeySignFactory
-import com.google.crypto.tink.signature.PublicKeyVerifyFactory
 import com.google.crypto.tink.signature.SignatureConfig
 import com.google.crypto.tink.signature.SignatureKeyTemplates
 import com.ismartcoding.lib.logcat.LogCat
-import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.RandomAccessFile
 import java.nio.channels.FileChannel
@@ -140,7 +136,6 @@ object CryptoHelper {
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec)
             val ciphertext = cipher.doFinal(content)
             
-            // Return nonce + ciphertext (similar to AES-GCM format)
             nonce + ciphertext
         } catch (ex: Exception) {
             LogCat.e("Failed to encrypt with ChaCha20-Poly1305: ${ex.message}")
@@ -261,8 +256,6 @@ object CryptoHelper {
         return keyPair.public.encoded
     }
 
-
-    
     /**
      * Ed25519 key pair with Tink handles for signing/verifying
      */
@@ -303,10 +296,6 @@ object CryptoHelper {
         }
     }
 
-    
-
-
-    
     /**
      * Sign data using raw Ed25519 private key (32 bytes)
      */
@@ -323,10 +312,7 @@ object CryptoHelper {
             null
         }
     }
-    
 
-
-    
     /**
      * Extract raw Ed25519 public key (32 bytes) from Tink KeysetHandle
      * @param publicKeyBytes Tink public KeysetHandle serialized as JSON bytes, Base64 encoded
@@ -356,31 +342,17 @@ object CryptoHelper {
             null
         }
     }
-    
 
-    
-    /**
-     * Verify signature using raw Ed25519 public key (32 bytes)
-     */
-    fun verifySignatureWithRawEd25519PublicKey(rawPublicKey: ByteArray, data: ByteArray, signature: ByteArray): Boolean {
+    fun verifySignatureWithRawEd25519PublicKey(publicKey: ByteArray, data: ByteArray, signature: ByteArray): Boolean {
         return try {
-            require(rawPublicKey.size == 32) { "Ed25519 public key must be 32 bytes, got ${rawPublicKey.size}" }
             initializeTink()
-            
-            // Use Tink's Ed25519Verifier directly with the raw public key
-            val verifier = com.google.crypto.tink.subtle.Ed25519Verify(rawPublicKey)
+            val verifier = com.google.crypto.tink.subtle.Ed25519Verify(publicKey)
             verifier.verify(signature, data)
             true
         } catch (ex: Exception) {
-            // Tink's verifier throws a GeneralSecurityException on invalid signature.
-            // This is expected for invalid signatures, so we don't need to log it as an error.
-            if (ex !is java.security.GeneralSecurityException) {
-                LogCat.e("verifySignatureWithRawEd25519PublicKey: ${ex.message}")
-            }
             false
         }
     }
-
 
     fun encodeKeyToBase64(key: Key): String {
         return Base64.encodeToString(key.encoded, Base64.NO_WRAP)

@@ -12,12 +12,16 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.chat.DownloadQueue
+import com.ismartcoding.plain.chat.PeerChatHelper.MAX_TIMESTAMP_DIFF_MS
+import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
+import com.ismartcoding.plain.db.DMessageFiles
+import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.features.ChatHelper
-import com.ismartcoding.plain.features.PeerChatHelper
 import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.toModel
@@ -35,6 +39,7 @@ import io.ktor.server.routing.routing
 import io.ktor.util.AttributeKey
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
+import kotlin.math.abs
 
 class PeerGraphQL(val schema: Schema) {
     class Configuration : SchemaConfigurationDSL() {
@@ -50,18 +55,41 @@ class PeerGraphQL(val schema: Schema) {
                 mutation("createChatItem") {
                     resolver { content: String, context: Context ->
                         val call = context.get<ApplicationCall>()!!
-                        val clientId = call.request.header("c-id") ?: ""
+
+                        val fromId = call.request.header("c-id") ?: ""
                         val gid = call.request.header("c-gid") ?: ""
                         val item =
                             ChatHelper.sendAsync(
                                 DChat.parseContent(content),
-                                clientId,
+                                fromId,
                                 "me"
                             )
 
                         if (item.content.type == DMessageType.TEXT.value) {
                             sendEvent(FetchLinkPreviewsEvent(item))
                         }
+
+                        // Download files from peer automatically using queue
+                        if (setOf(DMessageType.FILES.value, DMessageType.IMAGES.value).contains(item.content.type)) {
+                            val files = when (item.content.value) {
+                                is DMessageFiles -> (item.content.value as DMessageFiles).items
+                                is DMessageImages -> (item.content.value as DMessageImages).items
+                                else -> emptyList()
+                            }
+
+                            val peer = AppDatabase.instance.peerDao().getById(fromId)
+                            if (peer != null) {
+                                // Add files to download queue instead of downloading directly
+                                files.forEach { file ->
+                                    DownloadQueue.addDownloadTask(
+                                        messageFile = file,
+                                        peer = peer,
+                                        messageId = item.id
+                                    )
+                                }
+                            }
+                        }
+
                         sendEvent(HttpApiEvents.MessageCreatedEvent(arrayListOf(item)))
                         arrayListOf(item).map { it.toModel() }
                     }
@@ -82,7 +110,7 @@ class PeerGraphQL(val schema: Schema) {
     }
 
     companion object Feature : BaseApplicationPlugin<Application, Configuration, PeerGraphQL> {
-        override val key = AttributeKey<PeerGraphQL>("KGraphQL")
+        override val key = AttributeKey<PeerGraphQL>("PeerGraphQL")
 
         private suspend fun executeGraphqlQL(
             schema: Schema,
@@ -121,6 +149,13 @@ class PeerGraphQL(val schema: Schema) {
                             return@post
                         }
 
+                        val publicKey = ChatApiManager.peerPublicKeyCache[clientId]
+                        if (publicKey == null) {
+                            LogCat.e("Peer public key not found for clientId: $clientId")
+                            call.respond(HttpStatusCode.InternalServerError)
+                            return@post
+                        }
+
                         var decryptedStr = ""
                         val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, call.receive())
                         if (decryptedBytes != null) {
@@ -132,46 +167,39 @@ class PeerGraphQL(val schema: Schema) {
                         }
 
                         // Extract timestamp, signature and GraphQL JSON from decrypted string
-                        // Format: "timestamp|signature|GraphQL_JSON"
-                        var timestamp: String? = null
-                        var signature: String? = null
-                        var requestStr = decryptedStr
-                        
+                        // Format: "signature|timestamp|GraphQL_JSON"
+                        var timestamp = 0L
+                        var signature = ""
+                        var requestStr = ""
+
                         if (decryptedStr.contains("|")) {
                             val parts = decryptedStr.split("|", limit = 3)
-                            if (parts.size == 3) {
-                                // Full format: timestamp|signature|GraphQL_JSON
-                                timestamp = parts[0]
-                                signature = parts[1]
-                                requestStr = parts[2]
-                                LogCat.d("[Request] Extracted timestamp: $timestamp, signature: ${signature?.take(10)}...")
-                            } else if (parts.size == 2) {
-                                // Legacy format: timestamp|GraphQL_JSON
-                                timestamp = parts[0]
-                                requestStr = parts[1]
-                                LogCat.d("[Request] Extracted timestamp: $timestamp")
-                            }
+                            signature = parts[0]
+                            timestamp = parts[1].toLongOrNull() ?: 0L
+                            requestStr = parts[2]
                         }
 
                         LogCat.d("[Request] GraphQL: $requestStr")
-                        
-                        // Verify peer message signature at route level for better security
-                        if (signature != null && timestamp != null) {
-                            val isValid = PeerChatHelper.verifyPeerMessageAsync(
-                                peerId = clientId, 
-                                content = requestStr, 
-                                signature = signature, 
-                                timestamp = timestamp.toLongOrNull() ?: 0L
-                            )
-                            if (!isValid) {
-                                LogCat.e("Invalid signature from peer $clientId")
-                                call.respond(HttpStatusCode.Unauthorized)
-                                return@post
-                            }
-                            LogCat.d("Signature verified successfully for peer $clientId")
+
+                        val currentTime = System.currentTimeMillis()
+                        // Verify timestamp is within acceptable range, replay attacks are not allowed
+                        if (abs(currentTime - timestamp) > MAX_TIMESTAMP_DIFF_MS) {
+                            LogCat.e("Message timestamp is too old or in the future: $timestamp - rejected")
+                            call.respond(HttpStatusCode.BadRequest)
+                            return@post
                         }
-                        
-                        ChatApiManager.clientRequestTs[clientId] = System.currentTimeMillis() // record the api request time
+
+                        val signatureBytes = Base64.decode(signature, Base64.NO_WRAP)
+                        val messageBytes = "$timestamp$requestStr".toByteArray()
+                        val isValid = CryptoHelper.verifySignatureWithRawEd25519PublicKey(publicKey, messageBytes, signatureBytes)
+                        if (!isValid) {
+                            LogCat.e("Invalid signature from peer $clientId")
+                            call.respond(HttpStatusCode.Unauthorized)
+                            return@post
+                        }
+
+                        ChatApiManager.clientRequestTs[clientId] = currentTime
+
                         val r = executeGraphqlQL(schema, requestStr, call) // Signature already verified at route level
                         call.respondBytes(CryptoHelper.chaCha20Encrypt(token, r))
                     }

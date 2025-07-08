@@ -78,7 +78,7 @@ fun WebLearnMorePage(navController: NavHostController, webVM: WebConsoleViewMode
                                 webVM.dig(context)
                             }
                         }
-                        BottomSpace()
+                        BottomSpace(paddingValues)
                     }
                 }
             },

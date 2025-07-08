@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -40,7 +38,6 @@ import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.ismartcoding.lib.extensions.dp2px
-import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.getFilenameFromPath
@@ -53,8 +50,10 @@ import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.chat.DownloadQueue
 import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.db.DMessageFiles
+import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.Permissions
@@ -72,7 +71,6 @@ import com.ismartcoding.plain.ui.nav.navigatePdf
 import com.ismartcoding.plain.ui.nav.navigateTextFile
 import com.ismartcoding.plain.ui.page.audio.AudioPlayerPage
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
-import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -80,12 +78,14 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.File
 
+
 @Composable
 fun ChatFiles(
     context: Context,
     items: List<VChat>,
     navController: NavHostController,
     m: VChat,
+    peer: DPeer?,
     audioPlaylistVM: AudioPlaylistViewModel,
     previewerState: MediaPreviewerState,
 ) {
@@ -95,6 +95,7 @@ fun ChatFiles(
 
     val currentPlayingPath = audioPlaylistVM.selectedPath
     var showAudioPlayer by remember { mutableStateOf(false) }
+    val downloadProgressMap by DownloadQueue.downloadProgress.collectAsState(mapOf())
 
     LaunchedEffect(currentPlayingPath.value) {
         if (showAudioPlayer) {
@@ -102,13 +103,33 @@ fun ChatFiles(
         }
     }
 
-    Column(Modifier.padding(horizontal = 16.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.cardBackgroundNormal)) {
+    Column(
+        Modifier
+            .padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.cardBackgroundNormal)
+    ) {
         fileItems.forEachIndexed { index, item ->
             val itemState = rememberTransformItemState()
+            val previewPath = item.getPreviewPath(context, peer)
             val path = item.uri.getFinalPath(context)
-            val isAudio = path.isAudioFast()
+            val fileName = item.fileName.ifEmpty { path.getFilenameFromPath() }
+            val isAudio = fileName.isAudioFast()
             val isCurrentlyPlaying = currentPlayingPath.value == path && isAudio
             val isPlaying by AudioPlayer.isPlayingFlow.collectAsState()
+
+            val downloadTask = downloadProgressMap[item.id]
+            val isDownloading = downloadTask?.isDownloading() == true
+            val downloadProgress = downloadTask?.let {
+                if (it.messageFile.size > 0) it.downloadedSize.toFloat() / it.messageFile.size.toFloat() else 0f
+            } ?: 0f
+
+            // Auto-start download for remote files
+            LaunchedEffect(item.uri) {
+                if (item.isRemoteFile() && downloadTask == null && peer != null) {
+                    DownloadQueue.addDownloadTask(item, peer, m.id)
+                }
+            }
 
             var progress by remember { mutableFloatStateOf(0f) }
             val duration by remember { mutableFloatStateOf(item.duration.toFloat()) }
@@ -134,7 +155,11 @@ fun ChatFiles(
                         Modifier
                             .fillMaxWidth()
                             .clickable {
-                                if (path.isImageFast() || path.isVideoFast()) {
+                                if (isDownloading) {
+                                    // If currently downloading, do nothing
+                                    return@clickable
+                                }
+                                if (fileName.isImageFast() || fileName.isVideoFast()) {
                                     coMain {
                                         keyboardController?.hide()
                                         withIO { MediaPreviewData.setDataAsync(context, itemState, items.reversed(), item) }
@@ -147,9 +172,9 @@ fun ChatFiles(
                                     Permissions.checkNotification(context, R.string.audio_notification_prompt) {
                                         AudioPlayer.play(context, DPlaylistAudio.fromPath(context, path))
                                     }
-                                } else if (path.isTextFile()) {
+                                } else if (fileName.isTextFile()) {
                                     navController.navigateTextFile(path, mediaId = "", type = TextFileType.CHAT)
-                                } else if (path.isPdfFile()) {
+                                } else if (fileName.isPdfFile()) {
                                     navController.navigatePdf(File(path).toUri())
                                 } else {
                                     navController.navigateOtherFile(path)
@@ -169,20 +194,13 @@ fun ChatFiles(
                                     Modifier
                                         .fillMaxWidth()
                                         .padding(bottom = 8.dp, end = 8.dp),
-                                text = path.getFilenameFromPath(),
+                                text = fileName,
                                 style = MaterialTheme.typography.listItemTitle(),
                                 color = if (isCurrentlyPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                             )
-                            Text(
-                                modifier =
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .padding(end = 8.dp),
-                                text = item.size.formatBytes() + if (item.duration > 0) " / ${item.duration.formatDuration()}" else "",
-                                style = MaterialTheme.typography.listItemSubtitle(),
-                            )
+
                             // Display summary for text files if available
-                            if (path.isTextFile() && item.summary.isNotEmpty()) {
+                            if (fileName.isTextFile() && item.summary.isNotEmpty()) {
                                 Text(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -194,25 +212,41 @@ fun ChatFiles(
                                 )
                             }
                         }
-                        if (path.isImageFast() || path.isVideoFast()) {
-                            TransformImageView(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .clip(RoundedCornerShape(4.dp)),
-                                path = path,
-                                key = item.id,
-                                itemState = itemState,
-                                previewerState = previewerState,
-                                widthPx = context.dp2px(48)
-                            )
-                        } else {
-                            AsyncImage(
-                                model = AppHelper.getFileIconPath(path.getFilenameExtension()),
-                                modifier = Modifier
-                                    .size(48.dp),
-                                alignment = Alignment.Center,
-                                contentDescription = path,
-                            )
+
+                        Box {
+                            if (fileName.isImageFast() || fileName.isVideoFast()) {
+                                TransformImageView(
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clip(RoundedCornerShape(4.dp)),
+                                    path = previewPath,
+                                    key = item.id,
+                                    itemState = itemState,
+                                    previewerState = previewerState,
+                                    widthPx = context.dp2px(48)
+                                )
+                            } else {
+                                AsyncImage(
+                                    model = AppHelper.getFileIconPath(fileName.getFilenameExtension()),
+                                    modifier = Modifier
+                                        .size(48.dp),
+                                    alignment = Alignment.Center,
+                                    contentDescription = fileName,
+                                )
+                            }
+
+                            if (isDownloading) {
+                                DownloadProgressOverlay(
+                                    modifier = Modifier
+                                        .size(48.dp),
+                                    downloadProgress = downloadProgress,
+                                    status = downloadTask.status,
+                                    onPause = { DownloadQueue.pauseDownload(item.id) },
+                                    onResume = { DownloadQueue.resumeDownload(item.id) },
+                                    onCancel = { DownloadQueue.removeDownload(item.id) },
+                                    size = 32.dp
+                                )
+                            }
                         }
                     }
                 }

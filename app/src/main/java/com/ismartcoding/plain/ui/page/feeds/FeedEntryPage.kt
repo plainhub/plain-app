@@ -355,7 +355,7 @@ fun FeedEntryPage(
                     }
 
                     item {
-                        BottomSpace()
+                        BottomSpace(paddingValues)
                     }
                 }
             }

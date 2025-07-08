@@ -215,7 +215,7 @@ fun WebSecurityPage(navController: NavHostController) {
                                 }
                             },
                         )
-                        BottomSpace()
+                        BottomSpace(paddingValues)
                     }
                 }
             },

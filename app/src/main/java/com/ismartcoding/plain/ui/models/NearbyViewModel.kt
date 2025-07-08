@@ -15,10 +15,8 @@ import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
 import com.ismartcoding.plain.events.PairingFailedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.StartNearbyDiscoveryEvent
-import com.ismartcoding.plain.events.StartPairingEvent
 import com.ismartcoding.plain.events.StopNearbyDiscoveryEvent
 import com.ismartcoding.plain.features.nearby.NearbyPairManager
-import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import com.ismartcoding.plain.web.ChatApiManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -116,7 +114,9 @@ class NearbyViewModel : ViewModel() {
 
     fun startPairing(device: DNearbyDevice) {
         pairingInProgress.add(device.id)
-        sendEvent(StartPairingEvent(device))
+        viewModelScope.launch(Dispatchers.IO) {
+            NearbyPairManager.startPairingAsync(device)
+        }
     }
 
     fun unpairDevice(deviceId: String) {
@@ -144,11 +144,7 @@ class NearbyViewModel : ViewModel() {
         NearbyPairManager.cancelPairing(deviceId)
     }
 
-    fun updateDiscoverable(context: Context, discoverable: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
-            NearbyDiscoverablePreference.putAsync(context, discoverable)
-        }
-    }
+
 
     fun isPaired(deviceId: String): Boolean {
         return pairedDevices.any { it.id == deviceId && it.status == "paired" }

@@ -76,6 +76,7 @@ import com.ismartcoding.plain.ui.page.apps.AppPage
 import com.ismartcoding.plain.ui.page.apps.AppsPage
 import com.ismartcoding.plain.ui.page.chat.ChatEditTextPage
 import com.ismartcoding.plain.ui.page.chat.ChatPage
+import com.ismartcoding.plain.ui.page.chat.ChatSettingsPage
 import com.ismartcoding.plain.ui.page.chat.ChatTextPage
 import com.ismartcoding.plain.ui.page.docs.DocsPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntriesPage
@@ -218,6 +219,16 @@ fun Main(
                     pomodoroVM.resetTimer()
                 }
 
+                is HttpApiEvents.DownloadTaskDoneEvent -> {
+                    scope.launch(Dispatchers.IO) {
+                        val messageId = event.downloadTask.messageId
+                        val chat = AppDatabase.instance.chatDao().getById(messageId)
+                        if (chat != null) {
+                            chatVM.update(chat)
+                        }
+                    }
+                }
+
                 else -> {
                     // Handle other events if necessary
                 }
@@ -266,6 +277,7 @@ fun Main(
                     val r = backStackEntry.toRoute<Routing.Chat>()
                     ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = chatVM, r.id)
                 }
+                composable<Routing.ChatSettings> { ChatSettingsPage(navController) }
                 composable<Routing.ScanHistory> { ScanHistoryPage(navController) }
                 composable<Routing.Scan> { ScanPage(navController) }
                 composable<Routing.Apps> { AppsPage(navController) }
@@ -341,7 +353,7 @@ fun Main(
 
                 composable<Routing.Files> { backStackEntry ->
                     val r = backStackEntry.toRoute<Routing.Files>()
-                    FilesPage(navController, FilesType.entries[r.fileType], audioPlaylistVM)
+                    FilesPage(navController, audioPlaylistVM, r.folderPath)
                 }
                 
                 composable<Routing.Nearby> { 

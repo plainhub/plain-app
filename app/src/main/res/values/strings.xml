@@ -433,7 +433,6 @@
     <string name="sdcard">SD card</string>
     <string name="recents">Recents</string>
     <string name="send_message">Send message</string>
-    <string name="failed_to_send_message_to_peer">Failed to send message to peer</string>
     <string name="srl_footer_pulling">Pull up to load more</string>
     <string name="srl_footer_release">Release to load more</string>
     <string name="srl_footer_loading">Loading…</string>
@@ -639,6 +638,8 @@
     <string name="unknown_error">Unknown error occurred.</string>
     <string name="customize_home_features">Customize Home Features</string>
     <string name="file_picker_not_available">No file picker app is available on this device. Please install a file manager app.</string>
+    <string name="image">Image</string>
+    <string name="text_message">Text message</string>
     <string name="pair">Pair</string>
     <string name="unpair">Unpair</string>
     <string name="paired">Paired</string>
@@ -649,9 +650,13 @@
     <string name="allow">Allow</string>
     <string name="deny">Deny</string>
     <string name="chat">Chat</string>
+    <string name="chat_settings">Chat settings</string>
+    <string name="chat_files_save_directory">Chat files save directory</string>
+    <string name="default_app_directory">Default (App directory)</string>
     <string name="local_chat_desc">Local assistant chat</string>
     <string name="no_paired_devices">No paired devices</string>
     <string name="paired_devices">Paired devices</string>
+    <string name="unpaired_devices">Unpaired devices</string>
     <string name="local_chat">Local</string>
     <string name="peer_chat">Peer Chat</string>
     <string name="group_chat">Group Chat</string>

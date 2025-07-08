@@ -220,7 +220,7 @@ fun AboutPage(
                     }
                 }
                 item {
-                    BottomSpace()
+                    BottomSpace(paddingValues)
                 }
             }
         },

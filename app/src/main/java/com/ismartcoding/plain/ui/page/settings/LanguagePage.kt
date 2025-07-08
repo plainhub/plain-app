@@ -69,7 +69,7 @@ fun LanguagePage(navController: NavHostController) {
                     }
                 }
                 item {
-                    BottomSpace()
+                    BottomSpace(paddingValues)
                 }
             }
         },

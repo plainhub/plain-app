@@ -12,6 +12,7 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.DNearbyDevice
+import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.enums.ActionSourceType
 import com.ismartcoding.plain.enums.ActionType
@@ -26,6 +27,8 @@ import com.ismartcoding.plain.features.bluetooth.BluetoothFindOneEvent
 import com.ismartcoding.plain.features.bluetooth.BluetoothPermissionResultEvent
 import com.ismartcoding.plain.features.bluetooth.BluetoothUtil
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
+import com.ismartcoding.plain.features.nearby.NearbyDiscoverManager
+import com.ismartcoding.plain.features.nearby.NearbyPairManager
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.ui.models.FolderOption
@@ -35,18 +38,13 @@ import io.ktor.server.websocket.DefaultWebSocketServerSession
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
-import com.ismartcoding.plain.features.nearby.NearbyDiscoverManager
-import com.ismartcoding.plain.features.nearby.NearbyPairManager
-import com.ismartcoding.plain.data.*
-import com.ismartcoding.plain.db.AppDatabase
 
 data class NearbyDeviceFoundEvent(val device: DNearbyDevice) : ChannelEvent()
 
 // Pairing events
 data class PairingRequestReceivedEvent(val request: DPairingRequest, val fromIp: String) : ChannelEvent()
-data class StartPairingEvent(val device: DNearbyDevice) : ChannelEvent()
 data class PairingResponseEvent(val request: DPairingRequest, val fromIp: String, val accepted: Boolean) : ChannelEvent()
-data class PairingSuccessEvent(val deviceId: String, val deviceName: String, val deviceIp: String, val aesKey: String) : ChannelEvent()
+data class PairingSuccessEvent(val deviceId: String, val deviceName: String, val deviceIp: String, val key: String) : ChannelEvent()
 data class PairingFailedEvent(val deviceId: String, val reason: String) : ChannelEvent()
 data class PairingCancelledEvent(val fromId: String) : ChannelEvent()
 
@@ -223,12 +221,6 @@ object AppEvents {
 
                     is StartNearbyServiceEvent -> {
                         NearbyDiscoverManager.startListener()
-                    }
-
-                    is StartPairingEvent -> {
-                        coIO {
-                            NearbyPairManager.startPairingAsync(event.device)
-                        }
                     }
 
                     is PairingResponseEvent -> {

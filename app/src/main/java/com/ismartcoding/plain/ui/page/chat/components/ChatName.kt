@@ -2,22 +2,27 @@ package com.ismartcoding.plain.ui.page.chat.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.extensions.formatTime
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.ui.base.HorizontalSpace
+import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.theme.secondaryTextColor
 
 @Composable
-fun ChatName(m: VChat, peer: DPeer?) {
+fun ChatName(m: VChat, peer: DPeer?, onRetry: (() -> Unit)? = null) {
     Row(
         modifier = Modifier
             .padding(vertical = 8.dp, horizontal = 16.dp),
@@ -44,9 +49,35 @@ fun ChatName(m: VChat, peer: DPeer?) {
             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(end = 4.dp),
         )
+        
         Text(
             text = m.createdAt.formatTime(),
             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal, color = MaterialTheme.colorScheme.secondaryTextColor),
         )
+
+        // Show status indicator based on message status
+        when (m.status) {
+            "pending" -> {
+                HorizontalSpace(4.dp)
+                CircularProgressIndicator(
+                    modifier = Modifier.size(12.dp),
+                    strokeWidth = 1.5.dp,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            "failed" -> {
+                if (onRetry != null) {
+                    HorizontalSpace(4.dp)
+                    PIconButton(
+                        icon = R.drawable.rotate_ccw,
+                        contentDescription = stringResource(R.string.try_again),
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(16.dp)
+                    ) {
+                        onRetry()
+                    }
+                }
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.db
 
+import android.content.Context
 import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Entity
@@ -7,12 +8,11 @@ import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
+import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.IData
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -53,7 +53,7 @@ enum class DMessageType(val value: String) {
 class DMessageText(val text: String, val linkPreviews: List<DLinkPreview> = emptyList())
 
 @Serializable
-class DMessageFile(
+data class DMessageFile(
     override var id: String = StringHelper.shortUUID(),
     val uri: String,
     val size: Long,
@@ -61,7 +61,24 @@ class DMessageFile(
     val width: Int = 0,
     val height: Int = 0,
     val summary: String = "",
-) : IData
+    val fileName: String = "",
+) : IData {
+    fun isRemoteFile(): Boolean {
+        return uri.startsWith("fid:")
+    }
+
+    fun parseFileId(): String {
+        return uri.replace("fid:", "")
+    }
+
+    fun getPreviewPath(context: Context, peer: DPeer?): String {
+        return if (uri.startsWith("fid:")) {
+            peer?.getFileUrl(parseFileId()) + "&w=200&h=200"
+        } else {
+            uri.getFinalPath(context)
+        }
+    }
+}
 
 @Serializable
 class DMessageImages(val items: List<DMessageFile>)
@@ -84,18 +101,23 @@ class DLinkPreview(
     val createdAt: Instant = Clock.System.now()
 )
 
-@Entity(tableName = "chats")
+@Entity(
+    tableName = "chats",
+)
 data class DChat(
     @PrimaryKey var id: String = StringHelper.shortUUID(),
 ) : DEntityBase() {
-    @ColumnInfo(name = "from_id")
+    @ColumnInfo(name = "from_id", index = true)
     var fromId: String = "" // me|local|peer_id
 
-    @ColumnInfo(name = "to_id")
+    @ColumnInfo(name = "to_id", index = true)
     var toId: String = "" // me|local|peer_id
 
-    @ColumnInfo(name = "group_id")
+    @ColumnInfo(name = "group_id", index = true)
     var groupId: String = "" // chat group id, empty if not a group chat
+
+    @ColumnInfo(name = "status")
+    var status: String = "" // pending, sent, failed
 
     @ColumnInfo(name = "content")
     lateinit var content: DMessageContent
@@ -135,9 +157,24 @@ data class ChatItemDataUpdate(
 interface ChatDao {
     @Query("SELECT * FROM chats")
     fun getAll(): List<DChat>
-    
-    @Query("SELECT * FROM chats WHERE to_id = :toId OR from_id = :toId")
+
+    @Query("SELECT * FROM chats WHERE to_id = :toId OR from_id = :toId ORDER BY created_at ASC")
     fun getByChatId(toId: String): List<DChat>
+
+    @Query(
+        """
+        SELECT * FROM chats c
+        INNER JOIN (
+            SELECT from_id, to_id, MAX(created_at) as max_created_at
+            FROM chats 
+            GROUP BY from_id, to_id
+        ) latest ON c.from_id = latest.from_id 
+                 AND c.to_id = latest.to_id 
+                 AND c.created_at = latest.max_created_at
+        ORDER BY c.created_at DESC
+    """
+    )
+    fun getAllLatestChats(): List<DChat>
 
     @Insert
     fun insert(vararg item: DChat)
@@ -147,6 +184,9 @@ interface ChatDao {
 
     @Update
     fun update(vararg item: DChat)
+
+    @Query("UPDATE chats SET status = :status WHERE id = :id")
+    fun updateStatus(id: String, status: String)
 
     @Update(entity = DChat::class)
     fun updateData(item: ChatItemDataUpdate)

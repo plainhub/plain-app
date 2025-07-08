@@ -181,7 +181,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                     }
                 }
                 item {
-                    BottomSpace()
+                    BottomSpace(paddingValues)
                 }
             }
         },

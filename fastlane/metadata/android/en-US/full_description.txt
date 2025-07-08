@@ -1,7 +1,7 @@
 PlainApp is an open-source application that allows you to manage your phone through a web browser. Access files, videos, music, contacts, and more from your desktop using a secure, easy to use web interface!
 
 Features:
-  - Privacy oriented: We take your privacy seriously and use TLS + AES-GCM-256 encryption to ensure your data is secure.
+  - Privacy oriented: We take your privacy seriously and use TLS + ChaCha20 encryption to ensure your data is secure.
   - Ad-free forever: You won't be bombarded with ads when using PlainApp.
   - No cloud services or third-party data storage: All data is kept on your device, so you have complete control over your information.
   - User-friendly: PlainApp has a modern, customizable interface with multi-language support, light/dark theme options, and e-ink screen compatibility.

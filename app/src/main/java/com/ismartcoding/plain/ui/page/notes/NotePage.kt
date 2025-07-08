@@ -301,8 +301,7 @@ fun NotePage(
                         )
                     }
                     item {
-                        VerticalSpace(dp = paddingValues.calculateBottomPadding())
-                        BottomSpace()
+                        BottomSpace(paddingValues)
                     }
                 }
             }

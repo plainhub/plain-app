@@ -11,7 +11,7 @@ PlainApp is an open-source app that lets you securely manage your phone from a w
 **Privacy First**
 - All data stays on your device — no cloud, no third-party storage
 - No Firebase Messaging or Analytics; only crash logs (optional) via Firebase Crashlytics
-- Secured with TLS + AES-GCM-256 encryption
+- Secured with TLS + ChaCha20 encryption
 
 **Ad-Free, Always**
 - 100% ad-free experience, forever

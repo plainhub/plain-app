@@ -426,14 +426,15 @@
     <string name="api_service_is_running">网页服务运行中</string>
     <string name="screen_mirror_service_is_running">屏幕镜像服务运行中</string>
     <string name="cast">投屏</string>
+    <string name="image">图片</string>
     <string name="images">图片</string>
     <string name="audios">音频</string>
     <string name="videos">视频</string>
     <string name="files">文件</string>
+    <string name="text_message">文本消息</string>
     <string name="sdcard">存储卡</string>
     <string name="recents">最近</string>
     <string name="send_message">发送消息</string>
-    <string name="failed_to_send_message_to_peer">发送消息到对等设备失败</string>
     <string name="srl_footer_pulling">上拉加载更多</string>
     <string name="srl_footer_release">释放立即加载</string>
     <string name="srl_footer_loading">正在加载…</string>
@@ -652,6 +653,7 @@
     <string name="local_chat_desc">本地助手聊天</string>
     <string name="no_paired_devices">无已配对设备</string>
     <string name="paired_devices">已配对设备</string>
+    <string name="unpaired_devices">未配对设备</string>
     <string name="local_chat">助手</string>
     <string name="peer_chat">设备聊天</string>
     <string name="group_chat">群组聊天</string>

@@ -34,23 +34,17 @@ object NearbyDiscoverManager {
     private var periodicBroadcastJob: Job? = null
     private val networkManager = UdpMulticastManager()
 
-    suspend fun discoverSpecificDevice(targetDeviceId: String, sharedKey: String) {
-        try {
-            // Use shared key to encrypt target device ID
-            val encryptedToId = Base64.encodeToString(
-                CryptoHelper.chaCha20Encrypt(sharedKey, targetDeviceId),
-                Base64.NO_WRAP
-            )
-            sendDiscoveryMessage(
-                DDiscoverRequest(
-                    fromId = TempData.clientId,
-                    toId = encryptedToId
+    fun discoverSpecificDevice(toId: String, key: ByteArray) {
+        sendDiscoveryMessage(
+            DDiscoverRequest(
+                fromId = TempData.clientId,
+                toId = Base64.encodeToString(
+                    CryptoHelper.chaCha20Encrypt(key, toId),
+                    Base64.NO_WRAP
                 )
             )
-            LogCat.d("Directed discovery sent for device: $targetDeviceId")
-        } catch (e: Exception) {
-            LogCat.e("Error sending directed discovery: ${e.message}")
-        }
+        )
+        LogCat.d("Directed discovery sent for device: $toId")
     }
 
     fun startListener() {
@@ -122,16 +116,19 @@ object NearbyDiscoverManager {
                 val discoverMessage = message.removePrefix(NearbyMessageType.DISCOVER.toPrefix())
                 coIO { processDiscoveryRequest(discoverMessage, senderIP) }
             }
+
             message.startsWith(NearbyMessageType.PAIR_REQUEST.toPrefix()) -> {
                 val request = JsonHelper.jsonDecode<DPairingRequest>(message.removePrefix(NearbyMessageType.PAIR_REQUEST.toPrefix()))
                 sendEvent(PairingRequestReceivedEvent(request, senderIP))
             }
+
             message.startsWith(NearbyMessageType.PAIR_RESPONSE.toPrefix()) -> {
                 val response = JsonHelper.jsonDecode<DPairingResponse>(message.removePrefix(NearbyMessageType.PAIR_RESPONSE.toPrefix()))
                 coIO {
                     NearbyPairManager.handlePairingResponse(response, senderIP)
                 }
             }
+
             message.startsWith(NearbyMessageType.PAIR_CANCEL.toPrefix()) -> {
                 val cancel = JsonHelper.jsonDecode<DPairingCancel>(message.removePrefix(NearbyMessageType.PAIR_CANCEL.toPrefix()))
                 NearbyPairManager.handlePairingCancel(cancel)

@@ -133,7 +133,7 @@ fun FeedSettingsPage(
                 })
             }
             item {
-                BottomSpace()
+                BottomSpace(paddingValues)
             }
         }
     }

@@ -100,6 +100,9 @@ class Routing {
     object FeedSettings
 
     @Serializable
+    object ChatSettings
+
+    @Serializable
     object AudioPlayer
 
     @Serializable
@@ -109,7 +112,7 @@ class Routing {
     data class AppDetails(val id: String)
     
     @Serializable
-    data class Files(val fileType: Int = 0)
+    data class Files(val folderPath: String = "")
 
     @Serializable
     object Nearby

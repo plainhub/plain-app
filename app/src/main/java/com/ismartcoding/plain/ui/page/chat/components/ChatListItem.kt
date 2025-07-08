@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -40,15 +39,14 @@ import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
-import com.ismartcoding.plain.ui.nav.navigateChatEditText
-import com.ismartcoding.plain.ui.nav.navigateChatText
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.models.enterSelectMode
 import com.ismartcoding.plain.ui.models.select
-import com.ismartcoding.plain.ui.theme.PlainTheme
+import com.ismartcoding.plain.ui.nav.navigateChatEditText
+import com.ismartcoding.plain.ui.nav.navigateChatText
 import com.ismartcoding.plain.ui.theme.cardBackgroundActive
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
@@ -109,18 +107,21 @@ fun ChatListItem(
                                 },
                             ),
                 ) {
-                    ChatName(m, peer)
+                    ChatName(m, peer) {
+                        // Retry failed message using ViewModel
+                        chatVM.retryMessage(m.id)
+                    }
                     when (m.type) {
                         DMessageType.IMAGES.value -> {
-                            ChatImages(context, items, m, imageWidthDp, imageWidthPx, previewerState)
+                            ChatImages(context, items, m, peer, imageWidthDp, imageWidthPx, previewerState, chatVM)
                         }
 
                         DMessageType.FILES.value -> {
-                            ChatFiles(context, items, navController, m, audioPlaylistVM, previewerState)
+                            ChatFiles(context, items, navController, m, peer, audioPlaylistVM, previewerState)
                         }
 
                         DMessageType.TEXT.value -> {
-                            ChatText(context,  chatVM,focusManager, m, onDoubleClick = {
+                            ChatText(context, chatVM, focusManager, m, onDoubleClick = {
                                 val content = (m.value as DMessageText).text
                                 navController.navigateChatText(content)
                             }, onLongClick = {

@@ -286,7 +286,8 @@ fun RootPage(
                         TabContentChat(
                             navController = navController,
                             chatListVM = chatListVM,
-                            paddingValues = paddingValues
+                            paddingValues = paddingValues,
+                            pagerState = pagerState,
                         )
                     }
                 }

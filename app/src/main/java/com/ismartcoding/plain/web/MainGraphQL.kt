@@ -91,6 +91,7 @@ import com.ismartcoding.plain.preferences.AudioPlayingPreference
 import com.ismartcoding.plain.preferences.AudioPlaylistPreference
 import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.preferences.AuthDevTokenPreference
+import com.ismartcoding.plain.preferences.ChatFilesSaveFolderPreference
 import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
@@ -165,51 +166,13 @@ class MainGraphQL(val schema: Schema) {
             val uploadTmpDir = File(MainApp.instance.filesDir, "upload_tmp")
             schemaBlock = {
                 query("chatItems") {
-                    resolver { ->
+                    resolver { id: String ->
                         val dao = AppDatabase.instance.chatDao()
-                        var items = dao.getAll()
-                        if (!TempData.chatItemsMigrated) {
-                            val context = MainApp.instance
-                            TempData.chatItemsMigrated = true
-                            val types = setOf("app", "storage", "work", "social", "exchange")
-                            val ids = items.filter { types.contains(it.content.type) }.map { it.id }
-                            if (ids.isNotEmpty()) {
-                                dao.deleteByIds(ids)
-                                items = items.filter { !types.contains(it.content.type) }
-                            }
-                            items.filter { setOf(DMessageType.IMAGES.value, DMessageType.FILES.value).contains(it.content.type) }.forEach {
-                                if (it.content.value is DMessageImages) {
-                                    val c = it.content.value as DMessageImages
-                                    if (c.items.any { i -> !i.uri.startsWith("app://") }) {
-                                        it.content.value =
-                                            DMessageImages(
-                                                c.items.map { i ->
-                                                    DMessageFile(i.id, i.uri.toAppUrl(context), i.size, i.duration, i.width, i.height)
-                                                },
-                                            )
-                                        dao.update(it)
-                                    }
-                                } else if (it.content.value is DMessageFiles) {
-                                    val c = it.content.value as DMessageFiles
-                                    if (c.items.any { i -> !i.uri.startsWith("app://") }) {
-                                        it.content.value =
-                                            DMessageFiles(
-                                                c.items.map { i ->
-                                                    DMessageFile(i.id, i.uri.toAppUrl(context), i.size, i.duration, i.width, i.height)
-                                                },
-                                            )
-                                        dao.update(it)
-                                    }
-                                }
-                            }
-                        }
+                        val items = dao.getByChatId(id.replace("peer:", ""))
                         items.map { it.toModel() }
                     }
                 }
                 type<ChatItem> {
-//                    property(ChatItem::_content) {
-//                        ignore = true
-//                    }
                     property("data") {
                         resolver { c: ChatItem ->
                             c.getContentData()
@@ -692,7 +655,8 @@ class MainGraphQL(val schema: Schema) {
                             internalStoragePath = FileSystemHelper.getInternalStoragePath(),
                             downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath,
                             developerMode = DeveloperModePreference.getAsync(context),
-                            favoriteFolders = FavoriteFoldersPreference.getValueAsync(context).map { it.toModel() }
+                            favoriteFolders = FavoriteFoldersPreference.getValueAsync(context).map { it.toModel() },
+                            customChatFolder = ChatFilesSaveFolderPreference.getAsync(context),
                         )
                     }
                 }
@@ -1478,7 +1442,7 @@ class MainGraphQL(val schema: Schema) {
     }
 
     companion object Feature : BaseApplicationPlugin<Application, Configuration, MainGraphQL> {
-        override val key = AttributeKey<MainGraphQL>("KGraphQL")
+        override val key = AttributeKey<MainGraphQL>("MainGraphQL")
 
         private suspend fun executeGraphqlQL(
             schema: Schema,

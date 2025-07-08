@@ -284,7 +284,7 @@ fun AppPage(
                     }
                 }
                 item {
-                    BottomSpace()
+                    BottomSpace(paddingValues)
                 }
             }
         },

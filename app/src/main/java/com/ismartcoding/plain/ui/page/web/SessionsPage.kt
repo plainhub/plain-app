@@ -132,7 +132,7 @@ fun SessionsPage(
                             VerticalSpace(dp = 16.dp)
                         }
                         item {
-                            BottomSpace()
+                            BottomSpace(paddingValues)
                         }
                     }
                 } else {

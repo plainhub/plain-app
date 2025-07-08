@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -63,6 +64,7 @@ fun ImagePreviewActions(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 32.dp)
+            .navigationBarsPadding()
             .alpha(state.uiAlpha.value)
     ) {
         if (!state.showActions) {

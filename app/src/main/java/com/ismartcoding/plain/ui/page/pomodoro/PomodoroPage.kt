@@ -384,7 +384,7 @@ fun PomodoroPage(
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
-                    BottomSpace()
+                    BottomSpace(paddingValues)
                 }
             }
         }

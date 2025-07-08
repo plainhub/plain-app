@@ -41,9 +41,9 @@ android {
                 else -> 0
             }
 
-        val vCode = 379
+        val vCode = 382
         versionCode = vCode - singleAbiNum
-        versionName = "2.0.15"
+        versionName = "2.1.0"
 
         ndk {
             //noinspection ChromeOsAbiSupport
@@ -206,7 +206,7 @@ dependencies {
     implementation(libs.coil.svg)
     implementation(libs.coil.gif)
     implementation(libs.coil.compose)
-    implementation(libs.coil.network.ktor)
+    implementation(libs.coil.network.okhttp)
 
     implementation(libs.zxing.core)
 

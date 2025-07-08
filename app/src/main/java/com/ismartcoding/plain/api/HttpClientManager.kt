@@ -2,17 +2,19 @@ package com.ismartcoding.plain.api
 
 import android.util.Base64
 import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.cookies.*
-import io.ktor.client.plugins.logging.*
+import com.ismartcoding.plain.helpers.PhoneHelper
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.BrowserUserAgent
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.cookies.HttpCookies
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
-import io.ktor.client.request.headers
 import io.ktor.http.headers
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
@@ -46,6 +48,8 @@ object HttpClientManager {
                 set("accept", "*/*")
             }
         }
+
+    fun downloadClient() = HttpClient(CIO)
 
     fun httpClient() =
         HttpClient(CIO) {

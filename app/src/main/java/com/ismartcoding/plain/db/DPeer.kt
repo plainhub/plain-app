@@ -7,11 +7,12 @@ import androidx.room.Insert
 import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
+import com.ismartcoding.lib.extensions.urlEncode
 import com.ismartcoding.lib.helpers.StringHelper
 
 @Entity(tableName = "peers")
 data class DPeer(
-    @PrimaryKey var id: String = StringHelper.shortUUID(),
+    @PrimaryKey var id: String,
 ) : DEntityBase() {
     @ColumnInfo(name = "name")
     var name: String = ""
@@ -33,6 +34,18 @@ data class DPeer(
 
     @ColumnInfo(name = "device_type")
     var deviceType: String = "" // phone, tablet, pc, etc.
+
+    fun getApiUrl(): String {
+        return "${getBaseUrl()}/peer_graphql"
+    }
+
+    fun getBaseUrl(): String {
+        return "https://${ip}:${port}"
+    }
+
+    fun getFileUrl(fileId: String): String {
+        return "${getBaseUrl()}/fs?id=${fileId.urlEncode()}"
+    }
 }
 
 @Dao

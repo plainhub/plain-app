@@ -257,7 +257,7 @@ fun SoundMeterPage(navController: NavHostController) {
                             avg = 0f
                         }
                     }
-                    BottomSpace()
+                    BottomSpace(paddingValues)
                 }
             }
         },

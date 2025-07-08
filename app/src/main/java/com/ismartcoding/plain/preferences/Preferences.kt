@@ -616,6 +616,11 @@ object ChatInputTextPreference : BasePreference<String>() {
     override val key = stringPreferencesKey("chat_input_text")
 }
 
+object ChatFilesSaveFolderPreference : BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("chat_files_save_dir")
+}
+
 object VideoPlaylistPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("video_playlist")

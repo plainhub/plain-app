@@ -159,8 +159,8 @@ object NearbyPairManager {
                     ?: throw Exception("Failed to sign pairing response")
 
                 val requestEcdhPublicKey = Base64.decode(request.ecdhPublicKey, Base64.NO_WRAP)
-                val aesKey = CryptoHelper.computeECDHSharedKey(keyPair.private, requestEcdhPublicKey)
-                if (aesKey != null) {
+                val encryptKey = CryptoHelper.computeECDHSharedKey(keyPair.private, requestEcdhPublicKey)
+                if (encryptKey != null) {
                     // Store peer in database with signature public key
                     storePeerInDatabase(
                         request.fromId, 
@@ -168,11 +168,11 @@ object NearbyPairManager {
                         fromIp, 
                         request.port, 
                         request.deviceType, 
-                        aesKey,
+                        encryptKey,
                         request.signaturePublicKey
                     )
                     sendPairingMessage(NearbyMessageType.PAIR_RESPONSE, JsonHelper.jsonEncode(response), fromIp)
-                    sendEvent(PairingSuccessEvent(request.fromId, request.fromName, fromIp, aesKey))
+                    sendEvent(PairingSuccessEvent(request.fromId, request.fromName, fromIp, encryptKey))
                 } else {
                     throw Exception("Failed to compute shared key")
                 }
@@ -263,10 +263,9 @@ object NearbyPairManager {
             LogCat.d("Pairing response signature verified successfully")
 
             if (response.accepted) {
-                // Calculate shared AES key
                 val responseEcdhPublicKey = Base64.decode(response.ecdhPublicKey, Base64.NO_WRAP)
-                val aesKey = CryptoHelper.computeECDHSharedKey(session.keyPair.private, responseEcdhPublicKey)
-                if (aesKey != null) {
+                val encryptKey = CryptoHelper.computeECDHSharedKey(session.keyPair.private, responseEcdhPublicKey)
+                if (encryptKey != null) {
                     // Store peer in database with signature public key
                     storePeerInDatabase(
                         response.fromId, 
@@ -274,10 +273,10 @@ object NearbyPairManager {
                         senderIP, 
                         response.port, 
                         response.deviceType, 
-                        aesKey,
+                        encryptKey,
                         response.signaturePublicKey
                     )
-                    sendEvent(PairingSuccessEvent(response.fromId, session.deviceName, senderIP, aesKey))
+                    sendEvent(PairingSuccessEvent(response.fromId, session.deviceName, senderIP, encryptKey))
                     LogCat.d("Pairing completed successfully with ${session.deviceName}")
                 } else {
                     throw Exception("Failed to compute shared key")
@@ -304,12 +303,12 @@ object NearbyPairManager {
     }
 
     private suspend fun storePeerInDatabase(
-        deviceId: String, 
-        deviceName: String, 
-        deviceIp: String, 
-        port: Int, 
-        deviceType: DeviceType, 
-        aesKey: String,
+        deviceId: String,
+        deviceName: String,
+        deviceIp: String,
+        port: Int,
+        deviceType: DeviceType,
+        key: String,
         signaturePublicKey: String
     ) {
         try {
@@ -322,7 +321,7 @@ object NearbyPairManager {
                     ip = deviceIp
                     this.port = port
                     this.deviceType = deviceType.value
-                    key = aesKey
+                    this.key = key
                     publicKey = signaturePublicKey // Save raw Ed25519 signature public key (32 bytes)
                     status = "paired"
                     updatedAt = currentTime
@@ -330,13 +329,13 @@ object NearbyPairManager {
                 AppDatabase.instance.peerDao().update(existingPeer)
                 LogCat.d("Updated existing peer with signature public key: $deviceId")
             } else {
-                AppDatabase.instance.peerDao().insert(DPeer().apply {
+                AppDatabase.instance.peerDao().insert(DPeer(deviceId).apply {
                     id = deviceId
                     name = deviceName
                     ip = deviceIp
                     this.port = port
                     this.deviceType = deviceType.value
-                    key = aesKey
+                    this.key = key
                     publicKey = signaturePublicKey // Save raw Ed25519 signature public key (32 bytes)
                     status = "paired"
                     createdAt = currentTime

@@ -35,7 +35,7 @@ Receive PAIR_REQUEST → Show dialog → User Allow/Deny → Send PAIR_RESPONSE
 
 ### 3. Complete Pairing
 **If Accepted:**
-- Both devices compute shared AES key using ECDH
+- Both devices compute shared ChaCha20 key using ECDH
 - Store peer info in database
 - Pairing success
 
@@ -53,7 +53,7 @@ Receive PAIR_REQUEST → Show dialog → User Allow/Deny → Send PAIR_RESPONSE
 ## Security
 
 - **ECDH Key Exchange** - Secure key agreement
-- **AES Encryption** - For future communications
+- **ChaCha20 Encryption** - For future communications
 - **Session Cleanup** - No leaked cryptographic data
 
 ## Network Protocol
@@ -66,7 +66,7 @@ Receive PAIR_REQUEST → Show dialog → User Allow/Deny → Send PAIR_RESPONSE
 
 Paired devices stored with:
 - Device ID, name, IP address
-- Shared AES encryption key
+- Shared ChaCha20 encryption key
 - Pairing status and timestamp
 
 ## UI States

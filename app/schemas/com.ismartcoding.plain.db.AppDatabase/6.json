@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "31c14a5898c64ea46d0ef12b08133e97",
+    "identityHash": "e9c004b176ce3b0c2a886737cafa1f73",
     "entities": [
       {
         "tableName": "chats",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `from_id` TEXT NOT NULL, `to_id` TEXT NOT NULL, `group_id` TEXT NOT NULL, `content` TEXT NOT NULL, `created_at` TEXT NOT NULL, `updated_at` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `from_id` TEXT NOT NULL, `to_id` TEXT NOT NULL, `group_id` TEXT NOT NULL, `status` TEXT NOT NULL, `content` TEXT NOT NULL, `created_at` TEXT NOT NULL, `updated_at` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -29,6 +29,12 @@
           {
             "fieldPath": "groupId",
             "columnName": "group_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -56,7 +62,36 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "indices": [
+          {
+            "name": "index_chats_from_id",
+            "unique": false,
+            "columnNames": [
+              "from_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chats_from_id` ON `${TABLE_NAME}` (`from_id`)"
+          },
+          {
+            "name": "index_chats_to_id",
+            "unique": false,
+            "columnNames": [
+              "to_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chats_to_id` ON `${TABLE_NAME}` (`to_id`)"
+          },
+          {
+            "name": "index_chats_group_id",
+            "unique": false,
+            "columnNames": [
+              "group_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_chats_group_id` ON `${TABLE_NAME}` (`group_id`)"
+          }
+        ]
       },
       {
         "tableName": "sessions",
@@ -729,7 +764,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '31c14a5898c64ea46d0ef12b08133e97')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e9c004b176ce3b0c2a886737cafa1f73')"
     ]
   }
 }
