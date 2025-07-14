@@ -12,6 +12,7 @@ import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
+import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import com.ismartcoding.plain.web.ChatApiManager
 import kotlinx.coroutines.Dispatchers
@@ -125,7 +126,13 @@ class ChatListViewModel : ViewModel() {
     fun removePeer(context: Context, peerId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                // Delete all chat messages and associated files for this peer
+                ChatHelper.deleteAllChatsByPeerAsync(context, peerId)
+                
+                // Delete the peer record
                 AppDatabase.instance.peerDao().delete(peerId)
+                
+                // Reload key cache and peers list
                 ChatApiManager.loadKeyCacheAsync()
                 loadPeers()
             } catch (e: Exception) {

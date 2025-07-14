@@ -11,7 +11,7 @@ PlainApp is an open-source app that lets you securely manage your phone from a w
 **Privacy First**
 - All data stays on your device — no cloud, no third-party storage
 - No Firebase Messaging or Analytics; only crash logs (optional) via Firebase Crashlytics
-- Secured with TLS + ChaCha20 encryption
+- Secured with TLS + ChaCha20-Poly1305 encryption
 
 **Ad-Free, Always**
 - 100% ad-free experience, forever
@@ -34,6 +34,8 @@ Access a self-hosted webpage on the same network to manage your phone:
 - RSS reader with clean UI
 - Video and audio player (in-app and on the web)
 - TV casting for media
+- Pomodoro timer
+- Peer-to-peer chat and file sharing
 
 **Always Improving**
 - More features are on the way
@@ -47,13 +49,6 @@ Reddit: https://www.reddit.com/r/plainapp
 Discord: https://discord.gg/RQWcS6DEEe
 
 QQ Group: 812409393
-
-## Disclaimer
-
-- ⚠️ The project is under **very active** development.
-- ⚠️ Expect bugs and breaking changes.
-- ⚠️ It is not perfect, I am always looking for ways to improve. If you find that the app is missing a certain feature, please don't hesitate to submit a feature request.
-- ⚠️ I kindly request everyone to ask questions and engage in discussions in a friendly manner.
 
 ## Donations :heart:
 

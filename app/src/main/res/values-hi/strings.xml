@@ -666,4 +666,5 @@
     <string name="phone">फ़ोन</string>
     <string name="tablet">टैबलेट</string>
     <string name="tv">टीवी और प्रोजेक्टर</string>
+    <string name="delete_peer_warning">इस डिवाइस को हटाने से सभी संबंधित चैट संदेश और फ़ाइलें भी हट जाएंगी। यह क्रिया पूर्ववत नहीं की जा सकती।</string>
 </resources>

@@ -666,4 +666,5 @@
     <string name="phone">Телефон</string>
     <string name="tablet">Планшет</string>
     <string name="tv">ТВ и проектор</string>
+    <string name="delete_peer_warning">Удаление этого устройства также удалит все связанные сообщения чата и файлы. Это действие нельзя отменить.</string>
 </resources>

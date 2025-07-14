@@ -2,18 +2,23 @@ package com.ismartcoding.plain.ui.page.root.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,7 +34,10 @@ import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.extensions.timeAgo
+import com.ismartcoding.plain.ui.base.PDropdownMenu
+import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.theme.green
 import com.ismartcoding.plain.ui.theme.grey
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
@@ -45,78 +53,125 @@ fun PeerListItem(
     icon: Int,
     online: Boolean? = null,
     latestChat: DChat? = null,
+    peerId: String? = null,
+    onDelete: ((String) -> Unit)? = null,
+    onClick: () -> Unit = {},
 ) {
+    val showContextMenu = remember { mutableStateOf(false) }
+    val deleteText = stringResource(id = R.string.delete)
+    val deleteWarningText = stringResource(id = R.string.delete_peer_warning)
+    val cancelText = stringResource(id = R.string.cancel)
+    
     Surface(
-        modifier =
-            modifier,
-        color = Color.Unspecified,
-    ) {
-        Row(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp, 8.dp, 8.dp, 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .size(40.dp)
-                    .padding(2.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(icon),
-                    contentDescription = title,
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                if (online != null) {
-                    Box(
-                        modifier = Modifier
-                            .size(10.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surface)
-                            .padding(1.dp)
-                            .clip(CircleShape)
-                            .background(
-                                if (online)
-                                    MaterialTheme.colorScheme.green
-                                else
-                                    MaterialTheme.colorScheme.grey
-                            )
-                            .align(Alignment.BottomEnd)
-                    )
+        modifier = modifier.combinedClickable(
+            onClick = onClick,
+            onLongClick = {
+                if (peerId != null && onDelete != null) {
+                    showContextMenu.value = true
                 }
             }
-            Column(
+        ),
+        color = Color.Unspecified,
+    ) {
+        Box {
+            Row(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(vertical = 8.dp)
+                    .fillMaxWidth()
+                    .padding(4.dp, 8.dp, 8.dp, 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                Box(
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .size(40.dp)
+                        .padding(2.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.listItemTitle(),
-                        modifier = Modifier.weight(1f)
+                    Icon(
+                        painter = painterResource(icon),
+                        contentDescription = title,
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.primary
                     )
-                    latestChat?.let { chat ->
-                        Text(
-                            text = chat.createdAt.timeAgo(),
-                            style = MaterialTheme.typography.listItemSubtitle(),
+                    if (online != null) {
+                        Box(
+                            modifier = Modifier
+                                .size(10.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.surface)
+                                .padding(1.dp)
+                                .clip(CircleShape)
+                                .background(
+                                    if (online)
+                                        MaterialTheme.colorScheme.green
+                                    else
+                                        MaterialTheme.colorScheme.grey
+                                )
+                                .align(Alignment.BottomEnd)
                         )
                     }
                 }
-                VerticalSpace(dp = 8.dp)
-                Text(
-                    text = latestChat?.let { getMessagePreview(it) } ?: desc,
-                    style = MaterialTheme.typography.listItemSubtitle(),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(vertical = 8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.listItemTitle(),
+                            modifier = Modifier.weight(1f)
+                        )
+                        latestChat?.let { chat ->
+                            Text(
+                                text = chat.createdAt.timeAgo(),
+                                style = MaterialTheme.typography.listItemSubtitle(),
+                            )
+                        }
+                    }
+                    VerticalSpace(dp = 8.dp)
+                    Text(
+                        text = latestChat?.let { getMessagePreview(it) } ?: desc,
+                        style = MaterialTheme.typography.listItemSubtitle(),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+            
+            // Context menu for peer items
+            if (peerId != null && onDelete != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 32.dp)
+                        .wrapContentSize(Alignment.Center),
+                ) {
+                    PDropdownMenu(
+                        expanded = showContextMenu.value,
+                        onDismissRequest = {
+                            showContextMenu.value = false
+                        },
+                    ) {
+                        PDropdownMenuItem(
+                            text = { Text(deleteText) },
+                            onClick = {
+                                showContextMenu.value = false
+                                DialogHelper.showConfirmDialog(
+                                    title = deleteText,
+                                    message = deleteWarningText,
+                                    confirmButton = Pair(deleteText) {
+                                        onDelete(peerId)
+                                    },
+                                    dismissButton = Pair(cancelText) {}
+                                )
+                            },
+                        )
+                    }
+                }
             }
         }
     }

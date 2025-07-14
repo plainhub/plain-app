@@ -205,10 +205,10 @@ fun TabContentChat(
                     icon = R.drawable.bot,
                     latestChat = chatListVM.getLatestChat("local"),
                     modifier = PlainTheme
-                        .getCardModifier()
-                        .clickable {
-                            navController.navigate(Routing.Chat(""))
-                        }
+                        .getCardModifier(),
+                    onClick = {
+                        navController.navigate(Routing.Chat("local"))
+                    }
                 )
             }
 
@@ -227,11 +227,14 @@ fun TabContentChat(
                         icon = DeviceType.fromValue(peer.deviceType).getIcon(),
                         online = chatListVM.getPeerOnlineStatus(peer.id),
                         latestChat = chatListVM.getLatestChat(peer.id),
-                        modifier = PlainTheme
-                            .getCardModifier()
-                            .clickable {
-                                navController.navigate(Routing.Chat("peer:${peer.id}"))
-                            }
+                        peerId = peer.id,
+                        onDelete = { peerId ->
+                            chatListVM.removePeer(context, peerId)
+                        },
+                        onClick = {
+                            navController.navigate(Routing.Chat("peer:${peer.id}"))
+                        },
+                        modifier = PlainTheme.getCardModifier()
                     )
                     VerticalSpace(8.dp)
                 }
@@ -252,11 +255,14 @@ fun TabContentChat(
                         icon = DeviceType.fromValue(peer.deviceType).getIcon(),
                         online = chatListVM.getPeerOnlineStatus(peer.id),
                         latestChat = chatListVM.getLatestChat(peer.id),
-                        modifier = PlainTheme
-                            .getCardModifier()
-                            .clickable {
-                                navController.navigate(Routing.Chat("peer:${peer.id}"))
-                            }
+                        peerId = peer.id,
+                        onDelete = { peerId ->
+                            chatListVM.removePeer(context, peerId)
+                        },
+                        onClick = {
+                            navController.navigate(Routing.Chat("peer:${peer.id}"))
+                        },
+                        modifier = PlainTheme.getCardModifier()
                     )
                     VerticalSpace(8.dp)
                 }

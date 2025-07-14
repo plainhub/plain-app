@@ -666,4 +666,5 @@
     <string name="phone">Telefon</string>
     <string name="tablet">Tablet</string>
     <string name="tv">TV &amp; Projektor</string>
+    <string name="delete_peer_warning">Das Löschen dieses Geräts wird auch alle zugehörigen Chat-Nachrichten und Dateien löschen. Diese Aktion kann nicht rückgängig gemacht werden.</string>
 </resources>

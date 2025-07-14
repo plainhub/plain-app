@@ -666,4 +666,5 @@
     <string name="phone">தொலைபேசி</string>
     <string name="tablet">டேப்லெட்</string>
     <string name="tv">டிவி மற்றும் புரொஜெக்டர்</string>
+    <string name="delete_peer_warning">இந்த சாதனத்தை நீக்குவது அனைத்து தொடர்புடைய அரட்டை செய்திகள் மற்றும் கோப்புகளையும் நீக்கும். இந்த செயலை மாற்ற முடியாது.</string>
 </resources>

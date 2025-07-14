@@ -666,4 +666,5 @@
     <string name="phone">Telefoon</string>
     <string name="tablet">Tablet</string>
     <string name="tv">TV &amp; projector</string>
+    <string name="delete_peer_warning">Het verwijderen van dit apparaat zal ook alle gerelateerde chatberichten en bestanden verwijderen. Deze actie kan niet ongedaan worden gemaakt.</string>
 </resources>

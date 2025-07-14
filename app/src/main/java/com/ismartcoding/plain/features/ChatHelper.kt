@@ -60,20 +60,57 @@ object ChatHelper {
         value: Any?,
     ) {
         AppDatabase.instance.chatDao().delete(id)
-        if (value is DMessageFiles) {
-            value.items.forEach {
-                File(it.uri.getFinalPath(context)).delete()
+        when (value) {
+            is DMessageFiles -> {
+                value.items.forEach {
+                    File(it.uri.getFinalPath(context)).delete()
+                }
             }
-        } else if (value is DMessageImages) {
-            value.items.forEach {
-                File(it.uri.getFinalPath(context)).delete()
+
+            is DMessageImages -> {
+                value.items.forEach {
+                    File(it.uri.getFinalPath(context)).delete()
+                }
             }
-        } else if (value is DMessageText) {
-            value.linkPreviews.forEach { preview ->
-                preview.imageLocalPath?.let { path ->
-                    LinkPreviewHelper.deletePreviewImage(context, path)
+
+            is DMessageText -> {
+                value.linkPreviews.forEach { preview ->
+                    preview.imageLocalPath?.let { path ->
+                        LinkPreviewHelper.deletePreviewImage(context, path)
+                    }
                 }
             }
         }
+    }
+
+    suspend fun deleteAllChatsByPeerAsync(context: Context, peerId: String) {
+        val chatDao = AppDatabase.instance.chatDao()
+        val chats = chatDao.getByChatId(peerId)
+        
+        // Delete all associated files first
+        for (chat in chats) {
+            when (val value = chat.content.value) {
+                is DMessageFiles -> {
+                    value.items.forEach {
+                        File(it.uri.getFinalPath(context)).delete()
+                    }
+                }
+                is DMessageImages -> {
+                    value.items.forEach {
+                        File(it.uri.getFinalPath(context)).delete()
+                    }
+                }
+                is DMessageText -> {
+                    value.linkPreviews.forEach { preview ->
+                        preview.imageLocalPath?.let { path ->
+                            LinkPreviewHelper.deletePreviewImage(context, path)
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Delete all chat records for this peer using SQL query
+        chatDao.deleteByPeerId(peerId)
     }
 }

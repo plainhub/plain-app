@@ -196,4 +196,7 @@ interface ChatDao {
 
     @Query("DELETE FROM chats WHERE id in (:ids)")
     fun deleteByIds(ids: List<String>)
+
+    @Query("DELETE FROM chats WHERE to_id = :peerId OR from_id = :peerId")
+    fun deleteByPeerId(peerId: String)
 }

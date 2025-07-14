@@ -666,4 +666,5 @@
     <string name="phone">Telefon</string>
     <string name="tablet">Tablet</string>
     <string name="tv">TV ve projektör</string>
+    <string name="delete_peer_warning">Bu cihazı silmek aynı zamanda ilgili tüm sohbet mesajlarını ve dosyalarını da silecektir. Bu eylem geri alınamaz.</string>
 </resources>

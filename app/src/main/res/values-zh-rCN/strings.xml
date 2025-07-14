@@ -659,4 +659,5 @@
     <string name="group_chat">群组聊天</string>
     <string name="pair_devices_hint">前往附近设备页面配对设备</string>
     <string name="add_device">添加设备</string>
+    <string name="delete_peer_warning">删除此设备将同时删除所有相关的聊天记录和文件。此操作无法撤销。</string>
 </resources>
