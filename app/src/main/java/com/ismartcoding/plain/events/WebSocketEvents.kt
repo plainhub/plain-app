@@ -46,6 +46,7 @@ enum class EventType(val value: Int) {
     NOTIFICATION_REFRESHED(10),
     POMODORO_ACTION(11),
     POMODORO_SETTINGS_UPDATE(12),
+    CHAT_SETTINGS_UPDATE(13),
 }
 
 

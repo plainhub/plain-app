@@ -263,6 +263,8 @@
     <string name="about_desc">Nome del client, versione, log, donazione</string>
     <string name="require_confirmation">Richiedi conferma</string>
     <string name="web_console">Web sul PC</string>
+    <string name="web_service_required_for_chat">Per ricevere messaggi da altri, si prega di abilitare il servizio Web sul PC.</string>
+    <string name="enable_web_service">Abilita servizio Web</string>
     <string name="backup_restore">Backup e ripristino</string>
     <string name="backup">Backup</string>
     <string name="backup_desc">Effettua il backup o ripristina i dati di PlainApp</string>
@@ -411,6 +413,7 @@
     <string name="feature_WRITE_CONTACTS">Gestisci i contatti</string>
     <string name="feature_NOTIFICATION_LISTENER">Gestisci le notifiche</string>
     <string name="feature_READ_PHONE_NUMBERS">Leggi i numeri di telefono</string>
+    <string name="feature_QUERY_ALL_PACKAGES">Gestisci app</string>
     <string name="notification_filter_settings">Impostazioni filtro notifiche</string>
     <string name="notification_filter_settings_desc">Scegli come le notifiche devono essere inviate al tuo PC</string>
     <string name="filter_mode">Modalità filtro</string>

@@ -260,6 +260,8 @@
     <string name="about_desc">Имя клиента, версия, журналы, пожертвование</string>
     <string name="require_confirmation">Требовать подтверждение</string>
     <string name="web_console">Веб на ПК</string>
+    <string name="web_service_required_for_chat">Чтобы получать сообщения от других, пожалуйста, включите службу Веб на ПК.</string>
+    <string name="enable_web_service">Включить веб-службу</string>
     <string name="backup_restore">Резервное копирование и восстановление</string>
     <string name="backup">Резервное копирование</string>
     <string name="backup_desc">Создание резервной копии или восстановление данных PlainApp</string>
@@ -411,6 +413,7 @@
     <string name="feature_WRITE_CONTACTS">Управление контактами</string>
     <string name="feature_NOTIFICATION_LISTENER">Управление уведомлениями</string>
     <string name="feature_READ_PHONE_NUMBERS">Чтение телефонных номеров</string>
+    <string name="feature_QUERY_ALL_PACKAGES">Управление приложениями</string>
     <string name="notification_filter_settings">Настройки фильтра уведомлений</string>
     <string name="notification_filter_settings_desc">Выберите, как уведомления должны быть отправлены на ваш компьютер</string>
     <string name="filter_mode">Режим фильтра</string>

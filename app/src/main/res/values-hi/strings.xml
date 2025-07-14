@@ -263,6 +263,8 @@
     <string name="about_desc">क्लाइंट नाम, संस्करण, लॉग, दान</string>
     <string name="require_confirmation">पुष्टिकरण की आवश्यकता है</string>
     <string name="web_console">पीसी पर वेब</string>
+    <string name="web_service_required_for_chat">दूसरों से संदेश प्राप्त करने के लिए, कृपया पीसी पर वेब सेवा सक्षम करें।</string>
+    <string name="enable_web_service">वेब सेवा सक्षम करें</string>
     <string name="backup_restore">बैकअप और पुनर्स्थापित करें</string>
     <string name="backup">बैकअप</string>
     <string name="backup_desc">PlainApp डेटा का बैकअप और पुनर्स्थापित करें</string>
@@ -411,6 +413,7 @@
     <string name="feature_WRITE_CONTACTS">संपर्क प्रबंधित करें</string>
     <string name="feature_NOTIFICATION_LISTENER">सूचना सुनने वाला</string>
     <string name="feature_READ_PHONE_NUMBERS">फ़ोन नंबर पढ़ें</string>
+    <string name="feature_QUERY_ALL_PACKAGES">ऐप्स प्रबंधित करें</string>
     <string name="notification_filter_settings">सूचना फ़िल्टर सेटिंग्स</string>
     <string name="notification_filter_settings_desc">आपके कंप्यूटर को सूचना कैसे भेजा जाए उसे चुनें</string>
     <string name="filter_mode">फ़िल्टर मोड</string>

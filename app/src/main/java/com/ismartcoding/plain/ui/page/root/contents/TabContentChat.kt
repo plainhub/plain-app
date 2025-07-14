@@ -30,12 +30,17 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.features.nearby.NearbyDiscoverManager
+import com.ismartcoding.plain.preferences.LocalWeb
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.preferences.dataStore
+import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.PMiniOutlineButton
+import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -44,6 +49,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.models.ChatListViewModel
+import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.root.components.PeerListItem
 import com.ismartcoding.plain.ui.page.root.components.RootTabType
@@ -58,6 +64,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun TabContentChat(
     navController: NavHostController,
+    mainVM: MainViewModel,
     chatListVM: ChatListViewModel,
     paddingValues: PaddingValues,
     pagerState: PagerState
@@ -66,6 +73,7 @@ fun TabContentChat(
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     val pairedPeers = chatListVM.pairedPeers
     val unpairedPeers = chatListVM.unpairedPeers
+    val webEnabled = LocalWeb.current
 
     val scope = rememberCoroutineScope()
 
@@ -176,6 +184,24 @@ fun TabContentChat(
                 TopSpace()
             }
 
+            // Web service alert - similar to TabContentHome
+            item {
+                if (!webEnabled) {
+                    PAlert(
+                        title = stringResource(id = R.string.attention),
+                        description = stringResource(id = R.string.web_service_required_for_chat),
+                        AlertType.WARNING
+                    ) {
+                        PMiniOutlineButton(
+                            label = stringResource(R.string.enable_web_service),
+                            click = {
+                                mainVM.enableHttpServer(context, true)
+                            }
+                        )
+                    }
+                }
+            }
+
             item {
                 PCard {
                     PListItem(
@@ -183,12 +209,12 @@ fun TabContentChat(
                         subtitle = stringResource(R.string.make_discoverable_desc),
                         icon = R.drawable.wifi,
                         action = {
-                            Switch(
-                                checked = isDiscoverable,
-                                onCheckedChange = { enabled ->
-                                    chatListVM.updateDiscoverable(context, enabled)
-                                }
+                            PSwitch(
+                                activated = isDiscoverable
                             )
+                            { enabled ->
+                                chatListVM.updateDiscoverable(context, enabled)
+                            }
                         }
                     )
                 }

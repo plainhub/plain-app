@@ -263,6 +263,8 @@
     <string name="about_desc">ক্লায়েন্টের নাম, সংস্করণ, লগ, অনুদান</string>
     <string name="require_confirmation">নিশ্চিত প্রয়োজন</string>
     <string name="web_console">ওয়েব কনসোল পিসি উপর</string>
+    <string name="web_service_required_for_chat">অন্যদের থেকে বার্তা পেতে, অনুগ্রহ করে পিসিতে ওয়েব পরিষেবা সক্রিয় করুন।</string>
+    <string name="enable_web_service">ওয়েব পরিষেবা সক্রিয় করুন</string>
     <string name="backup_restore">ব্যাকআপ এবং পুনরুদ্ধার</string>
     <string name="backup">ব্যাকআপ</string>
     <string name="backup_desc">প্লেনঅ্যাপ ডেটা ব্যাকআপ বা পুনরুদ্ধার করুন</string>
@@ -411,6 +413,7 @@
     <string name="feature_WRITE_CONTACTS">যোগাযোগ পরিচালনা</string>
     <string name="feature_NOTIFICATION_LISTENER">বিজ্ঞপ্তি পরিচালক</string>
     <string name="feature_READ_PHONE_NUMBERS">ফোন নম্বর পড়ুন</string>
+    <string name="feature_QUERY_ALL_PACKAGES">অ্যাপ্স পরিচালনা করুন</string>
     <string name="notification_filter_settings">বিজ্ঞপ্তি ফিল্টার সেটিংস</string>
     <string name="notification_filter_settings_desc">কিভাবে পিসি এ বিজ্ঞপ্তি প্রেরণ করবে তা নির্বাচন করুন</string>
     <string name="filter_mode">ফিল্টার মোড</string>

@@ -151,8 +151,8 @@
     <string name="web_dig">1. De computerbrowser kan de webpagina niet openen.\n\nDe draadloze router heeft mogelijk AP-isolatie ingeschakeld, waardoor communicatie tussen de computer en de telefoon wordt voorkomen. Ga naar de instellingeninterface van de router om de AP-isolatiefunctie uit te schakelen.\n\n2. De computerbrowser geeft een waarschuwing weer nadat u een HTTPS-webpagina-adres hebt ingevoerd: "Uw verbinding is niet privé."\n\nU kunt op "Doorgaan naar x.x.x.x (onveilig)" klikken om door te gaan. Simple gebruikt een zelfondertekend TLS-certificaat om de website te versleutelen.</string>
     <string name="learn_more">Meer informatie…</string>
     <string name="http_server_state_on">Service draait</string>
-    <string name="http_server_state_starting">Service wordt gestart...</string>
-    <string name="http_server_state_stopping">Service wordt gestopt...</string>
+    <string name="http_server_state_starting">Service wordt gestart…</string>
+    <string name="http_server_state_stopping">Service wordt gestopt…</string>
     <string name="http_server_state_error">Starten mislukt</string>
     <string name="change_port">Poort wijzigen</string>
     <string name="custom_sound">Aangepast geluid</string>
@@ -263,6 +263,8 @@
     <string name="about_desc">Clientnaam, versie, logboeken, donatie</string>
     <string name="require_confirmation">Bevestiging vereisen</string>
     <string name="web_console">Web op pc</string>
+    <string name="web_service_required_for_chat">Om berichten van anderen te ontvangen, schakelt u de Web op pc-service in.</string>
+    <string name="enable_web_service">Web-service inschakelen</string>
     <string name="backup_restore">Back-up &amp; herstellen</string>
     <string name="backup">Back-up</string>
     <string name="backup_desc">Back-up maken of PlainApp-gegevens herstellen</string>
@@ -411,6 +413,7 @@
     <string name="feature_WRITE_CONTACTS">Contacten beheren</string>
     <string name="feature_NOTIFICATION_LISTENER">Meldingen beheren</string>
     <string name="feature_READ_PHONE_NUMBERS">Telefoonnummers lezen</string>
+    <string name="feature_QUERY_ALL_PACKAGES">Apps beheren</string>
     <string name="notification_filter_settings">Notificatiefilterinstellingen</string>
     <string name="notification_filter_settings_desc">Kies hoe notificaties naar uw PC moeten worden verzonden</string>
     <string name="filter_mode">Filtermodus</string>

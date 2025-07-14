@@ -20,13 +20,11 @@ import com.ismartcoding.lib.extensions.isAudioFast
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.extensions.scanFileByConnection
-import com.ismartcoding.lib.extensions.toAppUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
-import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.logcat.LogCat
@@ -39,9 +37,6 @@ import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.db.DMessageFile
-import com.ismartcoding.plain.db.DMessageFiles
-import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DataType
@@ -82,6 +77,7 @@ import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.DeviceInfoHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.NotificationsHelper
+import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.packageManager
@@ -198,7 +194,7 @@ class MainGraphQL(val schema: Schema) {
                 }
                 query("messageCount") {
                     resolver { query: String ->
-                        if (Permission.READ_SMS.can(MainApp.instance)) {
+                        if (Permission.READ_SMS.enabledAndCanAsync(MainApp.instance)) {
                             SmsMediaStoreHelper.countAsync(MainApp.instance, query)
                         } else {
                             0
@@ -228,7 +224,7 @@ class MainGraphQL(val schema: Schema) {
                 query("imageCount") {
                     resolver { query: String ->
                         val context = MainApp.instance
-                        if (Permission.WRITE_EXTERNAL_STORAGE.can(context)) {
+                        if (Permission.WRITE_EXTERNAL_STORAGE.enabledAndCanAsync(context)) {
                             ImageMediaStoreHelper.countAsync(context, query)
                         } else {
                             0
@@ -238,7 +234,7 @@ class MainGraphQL(val schema: Schema) {
                 query("mediaBuckets") {
                     resolver { type: DataType ->
                         val context = MainApp.instance
-                        if (Permission.WRITE_EXTERNAL_STORAGE.can(context)) {
+                        if (Permission.WRITE_EXTERNAL_STORAGE.enabledAndCanAsync(context)) {
                             if (type == DataType.IMAGE) {
                                 ImageMediaStoreHelper.getBucketsAsync(context).map { it.toModel() }
                             } else if (type == DataType.AUDIO) {
@@ -279,7 +275,7 @@ class MainGraphQL(val schema: Schema) {
                 }
                 query("videoCount") {
                     resolver { query: String ->
-                        if (Permission.WRITE_EXTERNAL_STORAGE.can(MainApp.instance)) {
+                        if (Permission.WRITE_EXTERNAL_STORAGE.enabledAndCanAsync(MainApp.instance)) {
                             VideoMediaStoreHelper.countAsync(MainApp.instance, query)
                         } else {
                             0
@@ -308,7 +304,7 @@ class MainGraphQL(val schema: Schema) {
                 }
                 query("audioCount") {
                     resolver { query: String ->
-                        if (Permission.WRITE_EXTERNAL_STORAGE.can(MainApp.instance)) {
+                        if (Permission.WRITE_EXTERNAL_STORAGE.enabledAndCanAsync(MainApp.instance)) {
                             AudioMediaStoreHelper.countAsync(MainApp.instance, query)
                         } else {
                             0
@@ -341,7 +337,7 @@ class MainGraphQL(val schema: Schema) {
                 query("contactCount") {
                     resolver { query: String ->
                         val context = MainApp.instance
-                        if (Permission.READ_CONTACTS.can(context)) {
+                        if (Permission.READ_CONTACTS.enabledAndCanAsync(context)) {
                             ContactMediaStoreHelper.countAsync(context, query)
                         } else {
                             0
@@ -385,7 +381,7 @@ class MainGraphQL(val schema: Schema) {
                 query("callCount") {
                     resolver { query: String ->
                         val context = MainApp.instance
-                        if (Permission.READ_CALL_LOG.can(context)) {
+                        if (Permission.READ_CALL_LOG.enabledAndCanAsync(context)) {
                             CallMediaStoreHelper.countAsync(context, query)
                         } else {
                             0
@@ -399,11 +395,13 @@ class MainGraphQL(val schema: Schema) {
                 }
                 query("packages") {
                     resolver { offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
+                        Permissions.checkAsync(MainApp.instance, setOf(Permission.QUERY_ALL_PACKAGES))
                         PackageHelper.searchAsync(query, limit, offset, sortBy).map { it.toModel() }
                     }
                 }
                 query("packageStatuses") {
                     resolver { ids: List<ID> ->
+                        Permissions.checkAsync(MainApp.instance, setOf(Permission.QUERY_ALL_PACKAGES))
                         PackageHelper.getPackageInfoMap(ids.map { it.value }).map {
                             val pkg = it.value
                             val updatedAt = if (pkg != null) Instant.fromEpochMilliseconds(pkg.lastUpdateTime) else null
@@ -413,7 +411,11 @@ class MainGraphQL(val schema: Schema) {
                 }
                 query("packageCount") {
                     resolver { query: String ->
-                        PackageHelper.count(query)
+                        if (Permission.QUERY_ALL_PACKAGES.enabledAndCanAsync(MainApp.instance)) {
+                            PackageHelper.count(query)
+                        } else {
+                            0
+                        }
                     }
                 }
                 query("storageStats") {
@@ -673,6 +675,7 @@ class MainGraphQL(val schema: Schema) {
                 }
                 mutation("uninstallPackages") {
                     resolver { ids: List<ID> ->
+                        Permissions.checkAsync(MainApp.instance, setOf(Permission.QUERY_ALL_PACKAGES))
                         ids.forEach {
                             PackageHelper.uninstall(MainActivity.instance.get()!!, it.value)
                         }
@@ -681,6 +684,7 @@ class MainGraphQL(val schema: Schema) {
                 }
                 mutation("installPackage") {
                     resolver { path: String ->
+                        Permissions.checkAsync(MainApp.instance, setOf(Permission.QUERY_ALL_PACKAGES))
                         val file = File(path)
                         if (!file.exists()) {
                             throw GraphQLError("File does not exist")

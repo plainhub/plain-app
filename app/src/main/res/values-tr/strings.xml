@@ -263,6 +263,8 @@
     <string name="about_desc">İstemci adı, sürüm, günlükler, bağış</string>
     <string name="require_confirmation">Onay gerektir</string>
     <string name="web_console">PC\'de Web</string>
+    <string name="web_service_required_for_chat">Başkalarından mesaj almak için lütfen PC\'de Web hizmetini etkinleştirin.</string>
+    <string name="enable_web_service">Web hizmetini etkinleştir</string>
     <string name="backup_restore">Yedekleme ve geri yükleme</string>
     <string name="backup">Yedekle</string>
     <string name="backup_desc">PlainApp verilerini yedekle veya geri yükle</string>
@@ -411,6 +413,7 @@
     <string name="feature_WRITE_CONTACTS">Kişileri yönet</string>
     <string name="feature_NOTIFICATION_LISTENER">Bildirimleri yönet</string>
     <string name="feature_READ_PHONE_NUMBERS">Telefon numaralarını oku</string>
+    <string name="feature_QUERY_ALL_PACKAGES">Uygulamaları yönet</string>
     <string name="notification_filter_settings">Bildirim filtre ayarları</string>
     <string name="notification_filter_settings_desc">Bildirimlerin PC\'ye nasıl gönderileceğini seçin</string>
     <string name="filter_mode">Filtre modu</string>

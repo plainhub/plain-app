@@ -22,11 +22,14 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
+import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.PickFileEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.preferences.ChatFilesSaveFolderPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
@@ -108,6 +111,7 @@ fun ChatSettingsPage(navController: NavHostController) {
                                         ChatFilesSaveFolderPreference.putAsync(context, actualPath)
                                         chatFilesSaveFolder = actualPath
                                     }
+                                    sendEvent(WebSocketEvent(EventType.CHAT_SETTINGS_UPDATE, ""))
                                 }
                             }
                         } catch (ex: Exception) {

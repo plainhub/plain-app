@@ -263,6 +263,8 @@
     <string name="about_desc">Tên khách hàng, phiên bản, nhật ký, quyên góp</string>
     <string name="require_confirmation">Yêu cầu xác nhận</string>
     <string name="web_console">Web trên PC</string>
+    <string name="web_service_required_for_chat">Để nhận tin nhắn từ người khác, vui lòng bật dịch vụ Web trên PC.</string>
+    <string name="enable_web_service">Bật dịch vụ Web</string>
     <string name="backup_restore">Sao lưu &amp; khôi phục</string>
     <string name="backup">Sao lưu</string>
     <string name="backup_desc">Sao lưu hoặc khôi phục dữ liệu PlainApp</string>
@@ -411,6 +413,7 @@
     <string name="feature_WRITE_CONTACTS">Quản lý danh bạ</string>
     <string name="feature_NOTIFICATION_LISTENER">Quản lý thông báo</string>
     <string name="feature_READ_PHONE_NUMBERS">Đọc số điện thoại</string>
+    <string name="feature_QUERY_ALL_PACKAGES">Quản lý ứng dụng</string>
     <string name="notification_filter_settings">Cài đặt lọc thông báo</string>
     <string name="notification_filter_settings_desc">Chọn cách thông báo được gửi đến PC của bạn</string>
     <string name="filter_mode">Chế độ lọc</string>

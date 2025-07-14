@@ -25,7 +25,7 @@ Access a self-hosted webpage on the same network to manage your phone:
 - Files: Internal storage, SD card, USB, images, videos, audio
 - Contacts, SMS, and call logs
 - Installed apps (with APK export)
-- Notifications and device info
+- Notifications mirroring and device info
 - Screen mirroring
 - PWA support — add the web app to your desktop/home screen
 
@@ -35,6 +35,7 @@ Access a self-hosted webpage on the same network to manage your phone:
 - Video and audio player (in-app and on the web)
 - TV casting for media
 - Pomodoro timer
+- Sound meter
 - Peer-to-peer chat and file sharing
 
 **Always Improving**

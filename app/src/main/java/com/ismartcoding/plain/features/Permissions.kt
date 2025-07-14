@@ -55,6 +55,7 @@ enum class Permission {
     READ_PHONE_STATE,
     READ_PHONE_NUMBERS,
     SCHEDULE_EXACT_ALARM,
+    QUERY_ALL_PACKAGES,
     NONE
     ;
 
@@ -75,6 +76,10 @@ enum class Permission {
         return "android.permission.${this.name}"
     }
 
+    suspend fun enabledAndCanAsync(context: Context): Boolean {
+        return can(context) && isEnabledAsync(context)
+    }
+
     fun can(context: Context): Boolean {
         return when {
             this == WRITE_EXTERNAL_STORAGE -> {
@@ -83,6 +88,10 @@ enum class Permission {
 
             this == WRITE_SETTINGS -> {
                 Settings.System.canWrite(context)
+            }
+
+            this == QUERY_ALL_PACKAGES -> {
+                true
             }
 
             this == POST_NOTIFICATIONS -> {
@@ -302,6 +311,11 @@ object Permissions {
         list.add(
             PermissionItem.create(context, R.drawable.file_digit, Permission.READ_PHONE_NUMBERS, setOf(Permission.READ_PHONE_STATE, Permission.READ_PHONE_NUMBERS))
         )
+        if (AppFeatureType.APPS.has()) {
+            list.add(
+                PermissionItem.create(context, R.drawable.package2, Permission.QUERY_ALL_PACKAGES)
+            )
+        }
         return list
     }
 

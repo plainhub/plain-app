@@ -267,6 +267,8 @@
     <string name="about_desc">客戶端名稱、版本、日誌、捐贈</string>
     <string name="require_confirmation">需要二次確認</string>
     <string name="web_console">電腦瀏覽器訪問</string>
+    <string name="web_service_required_for_chat">要接收其他人發送的訊息，請啟用電腦瀏覽器服務。</string>
+    <string name="enable_web_service">啟用網頁服務</string>
     <string name="backup_restore">備份與恢復</string>
     <string name="backup">備份</string>
     <string name="backup_desc">備份或者恢復簡樸應用數據</string>
@@ -411,6 +413,7 @@
     <string name="feature_WRITE_CONTACTS">管理聯絡人</string>
     <string name="feature_NOTIFICATION_LISTENER">管理通知</string>
     <string name="feature_READ_PHONE_NUMBERS">讀取電話號碼</string>
+    <string name="feature_QUERY_ALL_PACKAGES">管理應用程式</string>
     <string name="notification_filter_settings">通知過濾設置</string>
     <string name="notification_filter_settings_desc">選擇通知如何發送到您的PC</string>
     <string name="filter_mode">過濾模式</string>

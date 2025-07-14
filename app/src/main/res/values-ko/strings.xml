@@ -263,6 +263,8 @@
     <string name="about_desc">클라이언트 이름, 버전, 로그, 기부</string>
     <string name="require_confirmation">확인 필요</string>
     <string name="web_console">웹(PC)에서</string>
+    <string name="web_service_required_for_chat">다른 사람으로부터 메시지를 받으려면 웹(PC) 서비스를 활성화하세요.</string>
+    <string name="enable_web_service">웹 서비스 활성화</string>
     <string name="backup_restore">백업 및 복원</string>
     <string name="backup">백업</string>
     <string name="backup_desc">PlainApp 데이터 백업 또는 복원</string>
@@ -411,6 +413,7 @@
     <string name="feature_WRITE_CONTACTS">연락처 관리</string>
     <string name="feature_NOTIFICATION_LISTENER">알림 관리</string>
     <string name="feature_READ_PHONE_NUMBERS">전화 번호 읽기</string>
+    <string name="feature_QUERY_ALL_PACKAGES">앱 관리</string>
     <string name="notification_filter_settings">알림 필터 설정</string>
     <string name="notification_filter_settings_desc">PC에 알림을 보내는 방법을 선택하세요</string>
     <string name="filter_mode">필터 모드</string>

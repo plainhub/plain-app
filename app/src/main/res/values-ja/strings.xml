@@ -260,6 +260,8 @@
     <string name="about_desc">クライアント名、バージョン、ログ、寄付</string>
     <string name="require_confirmation">確認が必要</string>
     <string name="web_console">PC上のWeb</string>
+    <string name="web_service_required_for_chat">他の人からメッセージを受信するには、PC上のWebサービスを有効にしてください。</string>
+    <string name="enable_web_service">Webサービスを有効にする</string>
     <string name="backup_restore">バックアップ＆復元</string>
     <string name="backup">バックアップ</string>
     <string name="backup_desc">PlainAppのデータをバックアップまたは復元します</string>
@@ -411,6 +413,7 @@
     <string name="feature_WRITE_CONTACTS">連絡先の管理</string>
     <string name="feature_NOTIFICATION_LISTENER">通知の管理</string>
     <string name="feature_READ_PHONE_NUMBERS">電話番号の読み取り</string>
+    <string name="feature_QUERY_ALL_PACKAGES">アプリの管理</string>
     <string name="notification_filter_settings">通知フィルター設定</string>
     <string name="notification_filter_settings_desc">PCに通知を送信する方法を選択してください</string>
     <string name="filter_mode">フィルターモード</string>

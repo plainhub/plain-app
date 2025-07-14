@@ -285,6 +285,7 @@ fun RootPage(
                     RootTabType.CHAT.value -> {
                         TabContentChat(
                             navController = navController,
+                            mainVM = mainVM,
                             chatListVM = chatListVM,
                             paddingValues = paddingValues,
                             pagerState = pagerState,

@@ -264,6 +264,8 @@
     <string name="about_desc">客户端名称、版本、日志、捐赠</string>
     <string name="require_confirmation">需要二次确认</string>
     <string name="web_console">电脑网页</string>
+    <string name="web_service_required_for_chat">要接收其他人发送的消息，请启用电脑网页服务。</string>
+    <string name="enable_web_service">启用网页服务</string>
     <string name="backup_restore">备份与恢复</string>
     <string name="backup">备份</string>
     <string name="backup_desc">备份或者恢复简朴应用数据</string>
@@ -420,6 +422,7 @@
     <string name="blocked_apps">阻止的应用</string>
     <string name="add_app">添加应用</string>
     <string name="feature_READ_PHONE_NUMBERS">读取话号码</string>
+    <string name="feature_QUERY_ALL_PACKAGES">管理应用</string>
     <string name="system_permission_granted">已获取系统权限</string>
     <string name="system_permission_not_granted">未获取系统权限</string>
     <string name="open_permission_settings">系统权限设置</string>

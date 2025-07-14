@@ -73,6 +73,7 @@ fun TabContentHome(
                     mainVM.isNetworkConnected = NetworkHelper.isNetworkConnected(context)
                     mainVM.ip4s = NetworkHelper.getDeviceIP4s().filter { it.isNotEmpty() }
                     mainVM.ip4 = NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }
+                    systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.can(context)
                 }
             }
         }

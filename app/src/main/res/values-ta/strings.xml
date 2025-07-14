@@ -263,6 +263,8 @@
     <string name="about_desc">İstemci adı, sürüm, günlükler, bağış</string>
     <string name="require_confirmation">உறுதிப்பார்வை தேவை</string>
     <string name="web_console">வலைத்தளம் கணினியில்</string>
+    <string name="web_service_required_for_chat">மற்றவர்களிடமிருந்து செய்திகளைப் பெற, கணினியில் வலைத்தள சேவையை இயக்கவும்.</string>
+    <string name="enable_web_service">வலைத்தள சேவையை இயக்கு</string>
     <string name="backup_restore">காப்பு &amp; மீட்டமை</string>
     <string name="backup">காப்பு</string>
     <string name="backup_desc">எளிதாக்குக அல்லது மீட்டமைக்க ப்ளேனப் தரவை</string>
@@ -411,6 +413,7 @@
     <string name="feature_WRITE_CONTACTS">தொடர்புகளை நிர்வகிக்கவும்</string>
     <string name="feature_NOTIFICATION_LISTENER">அறிவிப்புகளை நிர்வகிக்கவும்</string>
     <string name="feature_READ_PHONE_NUMBERS">போன் எண்களை படிக்கவும்</string>
+    <string name="feature_QUERY_ALL_PACKAGES">பயன்பாடுகளை நிர்வகிக்கவும்</string>
     <string name="notification_filter_settings">அறிவிப்பு வடிகட்டி அமைப்புகள்</string>
     <string name="notification_filter_settings_desc">உங்கள் கணக்கு அனுமதிகளை எவ்வாறு பயன்படுத்தலாம் என்பதை தேர்ந்தெடுக்கவும்</string>
     <string name="filter_mode">வடிகட்டி முறை</string>
