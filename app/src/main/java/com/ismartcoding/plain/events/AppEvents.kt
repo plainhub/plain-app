@@ -27,8 +27,8 @@ import com.ismartcoding.plain.features.bluetooth.BluetoothFindOneEvent
 import com.ismartcoding.plain.features.bluetooth.BluetoothPermissionResultEvent
 import com.ismartcoding.plain.features.bluetooth.BluetoothUtil
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
-import com.ismartcoding.plain.features.nearby.NearbyDiscoverManager
-import com.ismartcoding.plain.features.nearby.NearbyPairManager
+import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
+import com.ismartcoding.plain.chat.discover.NearbyPairManager
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.ui.models.FolderOption

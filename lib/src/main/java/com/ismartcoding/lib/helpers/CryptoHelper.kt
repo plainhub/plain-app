@@ -4,8 +4,10 @@ import android.util.Base64
 import com.google.crypto.tink.CleartextKeysetHandle
 import com.google.crypto.tink.JsonKeysetWriter
 import com.google.crypto.tink.KeysetHandle
+import com.google.crypto.tink.aead.AeadConfig
 import com.google.crypto.tink.signature.SignatureConfig
 import com.google.crypto.tink.signature.SignatureKeyTemplates
+import com.google.crypto.tink.subtle.XChaCha20Poly1305
 import com.ismartcoding.lib.logcat.LogCat
 import java.io.ByteArrayOutputStream
 import java.io.RandomAccessFile
@@ -22,27 +24,25 @@ import java.security.SecureRandom
 import java.security.spec.ECGenParameterSpec
 import java.security.spec.X509EncodedKeySpec
 import java.util.Random
-import javax.crypto.Cipher
 import javax.crypto.KeyAgreement
-import javax.crypto.spec.IvParameterSpec
-import javax.crypto.spec.SecretKeySpec
 
 object CryptoHelper {
-    
+
     @Volatile
     private var tinkInitialized = false
-    
+
     /**
-     * Initialize Google Tink for Ed25519 signatures
+     * Initialize Google Tink for Ed25519 signatures and XChaCha20-Poly1305 AEAD
      */
     private fun initializeTink() {
         if (!tinkInitialized) {
             synchronized(this) {
                 if (!tinkInitialized) {
                     try {
+                        AeadConfig.register()
                         SignatureConfig.register()
                         tinkInitialized = true
-                        LogCat.d("Google Tink initialized successfully (Ed25519 signatures)")
+                        LogCat.d("Google Tink initialized successfully (Ed25519 signatures + XChaCha20-Poly1305 AEAD)")
                     } catch (ex: Exception) {
                         LogCat.e("Failed to initialize Google Tink: ${ex.message}")
                         throw ex
@@ -51,7 +51,7 @@ object CryptoHelper {
             }
         }
     }
-    
+
     fun sha512(input: ByteArray) = hashString("SHA-512", input)
 
     fun sha256(input: ByteArray) = hashString("SHA-256", input)
@@ -122,25 +122,8 @@ object CryptoHelper {
         key: ByteArray,
         content: ByteArray,
     ): ByteArray {
-        return try {
-            require(key.size == 32) { "ChaCha20 key must be 32 bytes, got ${key.size}" }
-            
-            // Generate random 12-byte nonce for ChaCha20-Poly1305
-            val nonce = ByteArray(12)
-            SecureRandom.getInstanceStrong().nextBytes(nonce)
-            
-            val cipher = Cipher.getInstance("ChaCha20-Poly1305")
-            val secretKey = SecretKeySpec(key, "ChaCha20")
-            val ivSpec = IvParameterSpec(nonce) // Use IvParameterSpec for ChaCha20-Poly1305
-            
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec)
-            val ciphertext = cipher.doFinal(content)
-            
-            nonce + ciphertext
-        } catch (ex: Exception) {
-            LogCat.e("Failed to encrypt with ChaCha20-Poly1305: ${ex.message}")
-            throw ex
-        }
+        val aead = XChaCha20Poly1305(key)
+        return aead.encrypt(content, null)
     }
 
     fun chaCha20Encrypt(
@@ -149,8 +132,6 @@ object CryptoHelper {
     ): ByteArray {
         return chaCha20Encrypt(key, content.toByteArray())
     }
-    
-
 
     fun chaCha20Decrypt(
         key: String,
@@ -164,34 +145,19 @@ object CryptoHelper {
         content: ByteArray,
     ): ByteArray? {
         return try {
-            require(key.size == 32) { "ChaCha20 key must be 32 bytes, got ${key.size}" }
-            require(content.size >= 12) { "Content must be at least 12 bytes (nonce + ciphertext)" }
-            
-            // Extract nonce and ciphertext
-            val nonce = content.copyOfRange(0, 12)
-            val ciphertext = content.copyOfRange(12, content.size)
-            
-            val cipher = Cipher.getInstance("ChaCha20-Poly1305")
-            val secretKey = SecretKeySpec(key, "ChaCha20")
-            val ivSpec = IvParameterSpec(nonce) // Use IvParameterSpec for ChaCha20-Poly1305
-            
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec)
-            cipher.doFinal(ciphertext)
+            val aead = XChaCha20Poly1305(key)
+            aead.decrypt(content, null)
         } catch (ex: Exception) {
-            LogCat.e("Failed to decrypt with ChaCha20-Poly1305: ${ex.message}")
+            LogCat.e("Failed to decrypt with XChaCha20-Poly1305: ${ex.message}")
             null
         }
     }
-    
-
 
     fun generateChaCha20Key(): String {
-        val bytes = ByteArray(32) // ChaCha20 uses 32-byte keys
+        val bytes = ByteArray(32) // XChaCha20 uses 32-byte keys
         SecureRandom.getInstanceStrong().nextBytes(bytes)
         return Base64.encodeToString(bytes, Base64.NO_WRAP)
     }
-    
-
 
     fun randomPassword(n: Int): String {
         val characterSet = "23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ"
@@ -220,7 +186,7 @@ object CryptoHelper {
      * Compute shared ChaCha20 key using ECDH protocol
      * @param privateKey Our private key
      * @param publicKeyBytes Other party's public key bytes
-     * @return Base64 encoded ChaCha20 key or null if failed
+     * @return Base64 encoded XChaCha20 key or null if failed
      */
     fun computeECDHSharedKey(privateKey: PrivateKey, publicKeyBytes: ByteArray): String? {
         return try {
@@ -228,21 +194,21 @@ object CryptoHelper {
             val keyFactory = KeyFactory.getInstance("EC")
             val publicKeySpec = X509EncodedKeySpec(publicKeyBytes)
             val publicKey = keyFactory.generatePublic(publicKeySpec)
-            
+
             // Perform ECDH key agreement
             val keyAgreement = KeyAgreement.getInstance("ECDH")
             keyAgreement.init(privateKey)
             keyAgreement.doPhase(publicKey, true)
-            
+
             // Generate shared secret
             val sharedSecret = keyAgreement.generateSecret()
-            
-            // Use SHA-256 to derive ChaCha20 key from shared secret
+
+            // Use SHA-256 to derive XChaCha20 key from shared secret
             val digest = MessageDigest.getInstance("SHA-256")
-            val chaCha20KeyBytes = digest.digest(sharedSecret)
-            
-            // Return Base64 encoded ChaCha20 key
-            Base64.encodeToString(chaCha20KeyBytes, Base64.NO_WRAP)
+            val xChaCha20KeyBytes = digest.digest(sharedSecret)
+
+            // Return Base64 encoded XChaCha20 key
+            Base64.encodeToString(xChaCha20KeyBytes, Base64.NO_WRAP)
         } catch (ex: Exception) {
             LogCat.e("ECDH key computation failed: ${ex.message}")
             null
@@ -263,29 +229,29 @@ object CryptoHelper {
         val privateKeyBytes: ByteArray,  // Tink private KeysetHandle serialized as JSON bytes
         val publicKey: String            // Tink public KeysetHandle serialized as JSON bytes, Base64 encoded
     )
-    
+
     /**
      * Generate Ed25519 key pair using Google Tink (supports all Android versions)
      */
     fun generateEd25519KeyPair(): Ed25519KeyPair {
         initializeTink()
-        
+
         try {
             // Generate private key using Ed25519 key template
             val privateKeyHandle = KeysetHandle.generateNew(SignatureKeyTemplates.ED25519)
-            
+
             // Get public key
             val publicKeyHandle = privateKeyHandle.publicKeysetHandle
-            
+
             // Serialize keys to JSON for storage
             val privateKeyOutputStream = ByteArrayOutputStream()
             CleartextKeysetHandle.write(privateKeyHandle, JsonKeysetWriter.withOutputStream(privateKeyOutputStream))
             val privateKeyBytes = privateKeyOutputStream.toByteArray()
-            
+
             val publicKeyOutputStream = ByteArrayOutputStream()
             CleartextKeysetHandle.write(publicKeyHandle, JsonKeysetWriter.withOutputStream(publicKeyOutputStream))
             val publicKeyBytesRaw = publicKeyOutputStream.toByteArray()
-            
+
             return Ed25519KeyPair(
                 privateKeyBytes = privateKeyBytes,
                 publicKey = Base64.encodeToString(publicKeyBytesRaw, Base64.NO_WRAP)
@@ -323,19 +289,19 @@ object CryptoHelper {
             val publicKeyBytesDecoded = Base64.decode(publicKeyBytes, Base64.NO_WRAP)
             val jsonString = String(publicKeyBytesDecoded, Charsets.UTF_8)
             val jsonObject = org.json.JSONObject(jsonString)
-            
+
             val keyArray = jsonObject.getJSONArray("key")
             val firstKey = keyArray.getJSONObject(0)
             val keyData = firstKey.getJSONObject("keyData")
             val keyValueBase64 = keyData.getString("value")
-            
+
             val keyValueBytes = Base64.decode(keyValueBase64, Base64.NO_WRAP)
-            
+
             // Ed25519PublicKey protobuf format: 0x12 0x20 + 32_bytes_key (field 2)
             if (keyValueBytes.size >= 34 && keyValueBytes[0].toInt() == 0x12 && keyValueBytes[1].toInt() == 0x20) {
                 return keyValueBytes.copyOfRange(2, 34) // Extract 32 bytes
             }
-            
+
             null
         } catch (ex: Exception) {
             LogCat.e("Failed to extract raw Ed25519 public key: ${ex.message}")

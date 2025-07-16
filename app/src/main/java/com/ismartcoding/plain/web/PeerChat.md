@@ -1,6 +1,6 @@
 # Peer-to-Peer Chat System
 
-A secure, end-to-end encrypted peer-to-peer chat implementation with Ed25519 digital signatures and ChaCha20-Poly1305 encryption.
+A secure, end-to-end encrypted peer-to-peer chat implementation with Ed25519 digital signatures and XChaCha20-Poly1305 encryption.
 
 ## Overview
 
@@ -20,7 +20,7 @@ This system enables secure communication between paired devices without relying 
 ```
 Application Layer    →  GraphQL mutations/queries
 Signature Layer      →  Ed25519 digital signatures  
-Encryption Layer     →  ChaCha20-Poly1305 AEAD
+Encryption Layer     →  XChaCha20-Poly1305 AEAD
 Transport Layer      →  HTTPS with custom certificates
 ```
 
@@ -36,11 +36,11 @@ executeRequest(needSignature = true)
 1. Build GraphQL JSON
 2. Generate signature (timestamp + GraphQL JSON)
 3. Assemble request (timestamp|signature|GraphQL_JSON)
-4. Encrypt with ChaCha20-Poly1305
+4. Encrypt with XChaCha20-Poly1305
 5. Send HTTPS request
     ↓
 Server receives and processes:
-1. Decrypt with ChaCha20-Poly1305
+1. Decrypt with XChaCha20-Poly1305
 2. Parse timestamp|signature|GraphQL_JSON
 3. Verify Ed25519 signature
 4. Execute GraphQL if valid
@@ -50,7 +50,7 @@ Server receives and processes:
 ## Security Features
 
 ### 🔐 End-to-End Encryption
-- **Algorithm**: ChaCha20-Poly1305 AEAD
+- **Algorithm**: XChaCha20-Poly1305 AEAD
 - **Key Exchange**: ECDH (secp256r1) during pairing
 - **Key Derivation**: SHA-256 hash of ECDH shared secret
 
@@ -197,7 +197,7 @@ private const val MAX_TIMESTAMP_DIFF_MS = 5 * 60 * 1000L
 val httpClient = HttpClientManager.createCryptoHttpClient(peer.key, 10)
 
 // Signature algorithms
-Ed25519 (signing), ChaCha20-Poly1305 (encryption), ECDH secp256r1 (key exchange)
+Ed25519 (signing), XChaCha20-Poly1305 (encryption), ECDH secp256r1 (key exchange)
 ```
 
 ## Troubleshooting
@@ -216,7 +216,7 @@ Ed25519 (signing), ChaCha20-Poly1305 (encryption), ECDH secp256r1 (key exchange)
 
 3. **Decryption Failed**
    - Validate ECDH shared key
-   - Check ChaCha20 key derivation
+   - Check XChaCha20 key derivation
    - Verify encryption/decryption key consistency
 
 ### Debug Mode

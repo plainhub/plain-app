@@ -15,29 +15,74 @@ data class FilterField(
 )
 
 object SearchHelper {
-    private val GROUP_DELIMITER = "(?:[^\\s\"]+|\"[^\"]*\")+".toRegex()
     var FILTER_DELIMITER = ":"
     const val NOT_TYPE = "NOT"
-    private val INVERT =
-        mapOf(
-            "=" to "!=",
-            ">=" to "<",
-            ">" to "<=",
-            "!=" to "=",
-            "<=" to ">",
-            "<" to ">=",
-            "in" to "nin",
-            "nin" to "in",
-        )
-    val NUMBER_OPS = setOf(">", ">=", "<", "<=")
-    private var GROUP_TYPES = INVERT.keys.filter { !setOf("in", "nin").contains(it) }
 
-    private fun splitInGroup(s: String): List<String> {
-        return GROUP_DELIMITER.findAll(s).toList().map { it.value }
+    private val INVERT = mapOf(
+        "=" to "!=",
+        ">=" to "<",
+        ">" to "<=",
+        "!=" to "=",
+        "<=" to ">",
+        "<" to ">=",
+        "in" to "nin",
+        "nin" to "in",
+    )
+
+    val NUMBER_OPS = setOf(">", ">=", "<", "<=")
+    private val GROUP_TYPES = INVERT.keys.filter { it != "in" && it != "nin" }
+
+    // 更稳健的分词器，支持单双引号、转义、空格等
+    private fun splitInGroup(input: String): List<String> {
+        val result = mutableListOf<String>()
+        val sb = StringBuilder()
+        var quoteChar: Char? = null
+        var escape = false
+
+        for (c in input) {
+            when {
+                escape -> {
+                    sb.append(c)
+                    escape = false
+                }
+                c == '\\' -> {
+                    escape = true
+                }
+                quoteChar != null -> {
+                    if (c == quoteChar) {
+                        quoteChar = null
+                    } else {
+                        sb.append(c)
+                    }
+                }
+                c == '"' || c == '\'' -> {
+                    quoteChar = c
+                }
+                c.isWhitespace() -> {
+                    if (sb.isNotEmpty()) {
+                        result.add(sb.toString())
+                        sb.clear()
+                    }
+                }
+                else -> {
+                    sb.append(c)
+                }
+            }
+        }
+        if (sb.isNotEmpty()) {
+            result.add(sb.toString())
+        }
+
+        return result
     }
 
+    // 仅移除首尾的匹配引号
     private fun removeQuotation(s: String): String {
-        return s.replace("['\"]+".toRegex(), "")
+        return if ((s.startsWith('"') && s.endsWith('"')) || (s.startsWith('\'') && s.endsWith('\''))) {
+            s.substring(1, s.length - 1)
+        } else {
+            s
+        }
     }
 
     private fun detectGroupType(group: String): String {
@@ -74,13 +119,10 @@ object SearchHelper {
 
     // q = "Hello World" username:plain ids:1,2,3 stars:>10 stars:<100 NOT language:javascript
     fun parse(q: String): List<FilterField> {
-        if (q.isEmpty()) {
-            return emptyList()
-        }
-        val groups =
-            splitInGroup(q).map {
-                parseGroup(it)
-            }
+        if (q.isEmpty()) return emptyList()
+
+        val groups = splitInGroup(q).map { parseGroup(it) }
+
         var invert = false
         groups.forEach {
             if (it.op == NOT_TYPE) {

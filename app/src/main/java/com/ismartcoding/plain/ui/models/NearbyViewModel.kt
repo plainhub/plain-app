@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.models
 
-import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -16,7 +15,7 @@ import com.ismartcoding.plain.events.PairingFailedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.StartNearbyDiscoveryEvent
 import com.ismartcoding.plain.events.StopNearbyDiscoveryEvent
-import com.ismartcoding.plain.features.nearby.NearbyPairManager
+import com.ismartcoding.plain.chat.discover.NearbyPairManager
 import com.ismartcoding.plain.web.ChatApiManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
