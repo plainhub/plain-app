@@ -730,7 +730,7 @@ class MainGraphQL(val schema: Schema) {
                         if (item.content.type == DMessageType.TEXT.value) {
                             sendEvent(FetchLinkPreviewsEvent(item))
                         }
-                        sendEvent(HttpApiEvents.MessageCreatedEvent(arrayListOf(item)))
+                        sendEvent(HttpApiEvents.MessageCreatedEvent("local", arrayListOf(item)))
                         arrayListOf(item).map { it.toModel() }
                     }
                 }

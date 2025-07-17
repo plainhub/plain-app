@@ -21,6 +21,7 @@ object ChatFileSaveHelper {
     suspend fun generateChatFilePathAsync(
         context: Context,
         fileName: String,
+        customDir: String,
         pickFileType: PickFileType? = null
     ): ChatFilePath {
         var actualFileName = fileName
@@ -29,7 +30,6 @@ object ChatFileSaveHelper {
             actualFileName = "$actualFileName.jpg"
         }
 
-        val customDir = ChatFilesSaveFolderPreference.getAsync(context)
         val targetDir =  if (customDir.isEmpty()) {
             context.getExternalFilesDir(null)!!
         } else {

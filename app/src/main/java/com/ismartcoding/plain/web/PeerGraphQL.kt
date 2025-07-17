@@ -90,7 +90,7 @@ class PeerGraphQL(val schema: Schema) {
                             }
                         }
 
-                        sendEvent(HttpApiEvents.MessageCreatedEvent(arrayListOf(item)))
+                        sendEvent(HttpApiEvents.MessageCreatedEvent(fromId, arrayListOf(item)))
                         arrayListOf(item).map { it.toModel() }
                     }
                 }

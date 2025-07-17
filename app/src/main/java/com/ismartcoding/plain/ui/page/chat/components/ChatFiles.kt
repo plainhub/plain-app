@@ -38,6 +38,7 @@ import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import coil3.compose.AsyncImage
 import com.ismartcoding.lib.extensions.dp2px
+import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.getFilenameFromPath
@@ -71,6 +72,7 @@ import com.ismartcoding.plain.ui.nav.navigatePdf
 import com.ismartcoding.plain.ui.nav.navigateTextFile
 import com.ismartcoding.plain.ui.page.audio.AudioPlayerPage
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
+import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -197,6 +199,15 @@ fun ChatFiles(
                                 text = fileName,
                                 style = MaterialTheme.typography.listItemTitle(),
                                 color = if (isCurrentlyPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            )
+
+                            Text(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(end = 8.dp),
+                                text = item.size.formatBytes() + if (item.duration > 0) " / ${item.duration.formatDuration()}" else "",
+                                style = MaterialTheme.typography.listItemSubtitle(),
                             )
 
                             // Display summary for text files if available

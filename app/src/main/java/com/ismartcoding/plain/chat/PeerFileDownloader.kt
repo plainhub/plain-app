@@ -8,6 +8,7 @@ import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.helpers.ChatFileSaveHelper
+import com.ismartcoding.plain.preferences.ChatFilesSaveFolderPreference
 import kotlinx.coroutines.flow.MutableStateFlow
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -51,7 +52,8 @@ object PeerFileDownloader {
             task.status = DownloadStatus.DOWNLOADING
             task.downloadedSize = 0
 
-            val chatFilePath = ChatFileSaveHelper.generateChatFilePathAsync(context, fileName)
+            val customDir = ChatFilesSaveFolderPreference.getAsync(context)
+            val chatFilePath = ChatFileSaveHelper.generateChatFilePathAsync(context, fileName, customDir)
             val localFile = File(chatFilePath.path).apply {
                 parentFile?.mkdirs()
                 createNewFile()

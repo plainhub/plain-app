@@ -52,11 +52,13 @@ import com.ismartcoding.plain.events.DeleteChatItemViewEvent
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.extensions.getDuration
+import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.ChatFileSaveHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.VideoHelper
+import com.ismartcoding.plain.preferences.ChatFilesSaveFolderPreference
 import com.ismartcoding.plain.preferences.ChatInputTextPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -139,9 +141,11 @@ fun ChatPage(
                 }
 
                 is HttpApiEvents.MessageCreatedEvent -> {
-                    chatVM.addAll(event.items)
-                    scope.launch {
-                        scrollState.scrollToItem(0)
+                    if (chatVM.chatState.value.toId == event.fromId) {
+                        chatVM.addAll(event.items)
+                        scope.launch {
+                            scrollState.scrollToItem(0)
+                        }
                     }
                 }
 
@@ -302,13 +306,12 @@ private fun handleFileSelection(
                             }
                         }
                         val size = file.size
-                        
-                        // Generate chat file save path
-                        val chatFilePath = ChatFileSaveHelper.generateChatFilePathAsync(context, fileName, event.type)
-                        
+
+                        val chatFilePath = ChatFileSaveHelper.generateChatFilePathAsync(context, fileName, "", event.type)
+
                         // Copy file to destination
                         FileHelper.copyFile(context, uri, chatFilePath.path)
-                        
+
                         val dstFile = File(chatFilePath.path)
                         val intrinsicSize = if (chatFilePath.path.isImageFast()) ImageHelper.getIntrinsicSize(
                             chatFilePath.path,
