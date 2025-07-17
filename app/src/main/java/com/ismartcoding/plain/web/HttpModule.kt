@@ -404,9 +404,15 @@ object HttpModule {
 
                         val fileName = (q["name"] ?: file.name).urlEncode().replace("+", "%20")
                         if (q["dl"] == "1") {
-                            call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
+                            call.response.header(
+                                "Content-Disposition",
+                                "attachment; filename=\"${fileName}\"; filename*=utf-8''${fileName}"
+                            )
                         } else {
-                            call.response.header("Content-Disposition", "inline;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
+                            call.response.header(
+                                "Content-Disposition",
+                                "inline; filename=\"${fileName}\"; filename*=utf-8''${fileName}"
+                            )
                         }
 
                         call.response.header("Access-Control-Expose-Headers", "Content-Disposition") 
