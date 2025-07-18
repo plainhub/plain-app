@@ -669,5 +669,7 @@
     <string name="phone">ফোন</string>
     <string name="tablet">ট্যাবলেট</string>
     <string name="tv">টিভি এবং প্রজেক্টর</string>
-    <string name="delete_peer_warning">এই ডিভাইসটি মুছে ফেলা সমস্ত সম্পর্কিত চ্যাট বার্তা এবং ফাইলগুলিও মুছে ফেলবে। এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না।</string>
+    <string name="delete_peer_warning">এই ডিভাইসটি মুছে ফেলা সমস্ত সম্পর্কিত চ্যাট বার্তা মুছে ফেলবে। এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না।</string>
+    <string name="forward">সরাসরি</string>
+    <string name="sent">পাঠানো</string>
 </resources>

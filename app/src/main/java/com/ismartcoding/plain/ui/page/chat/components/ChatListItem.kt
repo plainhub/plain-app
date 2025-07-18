@@ -63,6 +63,7 @@ fun ChatListItem(
     imageWidthPx: Int,
     focusManager: FocusManager,
     previewerState: MediaPreviewerState,
+    onForward: (VChat) -> Unit = {},
 ) {
     val showContextMenu = remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -156,6 +157,14 @@ fun ChatListItem(
                                 chatVM.select(m.id)
                                 chatVM.selectedItem.value = null
                                 showContextMenu.value = false
+                            },
+                        )
+                        PDropdownMenuItem(
+                            text = { Text(stringResource(id = R.string.forward)) },
+                            onClick = {
+                                chatVM.selectedItem.value = null
+                                showContextMenu.value = false
+                                onForward(m)
                             },
                         )
                         if (m.value is DMessageText) {

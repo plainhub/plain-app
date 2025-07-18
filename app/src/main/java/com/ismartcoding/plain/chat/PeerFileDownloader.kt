@@ -1,8 +1,10 @@
 package com.ismartcoding.plain.chat
 
 import android.content.Context
+import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageFiles
@@ -59,6 +61,7 @@ object PeerFileDownloader {
                 createNewFile()
             }
 
+
             var downloadedBytes = 0L
             val client = createUnsafeOkHttpClient()
             task.httpClient = client
@@ -72,7 +75,7 @@ object PeerFileDownloader {
                 return null
             }
 
-            response.body?.byteStream()?.use { inputStream ->
+            response.body.byteStream().use { inputStream ->
                 localFile.outputStream().use { outputStream ->
                     val buffer = ByteArray(8192)
                     var lastProgressUpdate = System.currentTimeMillis()
@@ -105,6 +108,7 @@ object PeerFileDownloader {
                 task.status = DownloadStatus.COMPLETED
                 task.downloadedSize = downloadedBytes
                 task.downloadSpeed = 0
+                MainApp.instance.scanFileByConnection(localFile, null)
                 updateMessageFileUri(task.messageId, messageFile.uri, chatFilePath.getFinalPath())
                 return localFile.absolutePath
             } else {

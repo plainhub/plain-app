@@ -669,5 +669,7 @@
     <string name="phone">전화</string>
     <string name="tablet">태블릿</string>
     <string name="tv">TV 및 프로젝터</string>
-    <string name="delete_peer_warning">이 기기를 삭제하면 관련된 모든 채팅 메시지와 파일도 삭제됩니다. 이 작업은 되돌릴 수 없습니다.</string>
+    <string name="delete_peer_warning">이 장치를 삭제하면 관련된 모든 채팅 메시지도 삭제됩니다. 이 작업은 되돌릴 수 없습니다.</string>
+    <string name="forward">전달</string>
+    <string name="sent">전송됨</string>
 </resources>

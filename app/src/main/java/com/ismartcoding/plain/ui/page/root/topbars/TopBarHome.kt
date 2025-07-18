@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.ui.page.root.topbars
 
+import android.os.Build
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -46,7 +47,7 @@ fun TopBarHome(
                 navController.navigate(Routing.Settings)
             }
         },
-        title = stringResource(id = R.string.app_name),
+        title = stringResource(id = R.string.app_name) + if (BuildConfig.DEBUG) " - DEBUG" else "",
         actions = {
             ActionButtonMoreWithMenu { dismiss ->
                 PDropdownMenuItem(

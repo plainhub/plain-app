@@ -669,5 +669,7 @@
     <string name="phone">Telefone</string>
     <string name="tablet">Tablet</string>
     <string name="tv">TV e projetor</string>
-    <string name="delete_peer_warning">Excluir este dispositivo também excluirá todas as mensagens de chat e arquivos relacionados. Esta ação não pode ser desfeita.</string>
+    <string name="delete_peer_warning">Excluir este dispositivo também excluirá todas as mensagens de chat. Esta ação não pode ser desfeita.</string>
+    <string name="forward">Avançar</string>
+    <string name="sent">Enviado</string>
 </resources>

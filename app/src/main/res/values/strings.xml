@@ -669,5 +669,7 @@
     <string name="phone">Phone</string>
     <string name="tablet">Tablet</string>
     <string name="tv">TV &amp; projector</string>
-    <string name="delete_peer_warning">Deleting this device will also delete all related chat messages and files. This action cannot be undone.</string>
+    <string name="delete_peer_warning">Deleting this device will also delete all related chat messages. This action cannot be undone.</string>
+    <string name="forward">Forward</string>
+    <string name="sent">Sent</string>
 </resources>

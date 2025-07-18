@@ -669,5 +669,7 @@
     <string name="phone">Điện thoại</string>
     <string name="tablet">Máy tính bảng</string>
     <string name="tv">TV và máy chiếu</string>
-    <string name="delete_peer_warning">Xóa thiết bị này cũng sẽ xóa tất cả tin nhắn trò chuyện và tệp liên quan. Hành động này không thể hoàn tác.</string>
+    <string name="delete_peer_warning">Xóa thiết bị này cũng sẽ xóa tất cả tin nhắn trò chuyện. Hành động này không thể hoàn tác.</string>
+    <string name="forward">Tiếp tục</string>
+    <string name="sent">Đã gửi</string>
 </resources>

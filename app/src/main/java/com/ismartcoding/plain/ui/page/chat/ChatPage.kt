@@ -52,13 +52,11 @@ import com.ismartcoding.plain.events.DeleteChatItemViewEvent
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.extensions.getDuration
-import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.ChatFileSaveHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.VideoHelper
-import com.ismartcoding.plain.preferences.ChatFilesSaveFolderPreference
 import com.ismartcoding.plain.preferences.ChatInputTextPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.HorizontalSpace
@@ -76,13 +74,17 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.ChatListViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
+import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
 import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.ui.page.chat.components.ChatInput
 import com.ismartcoding.plain.ui.page.chat.components.ChatListItem
+import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
+import com.ismartcoding.plain.ui.page.chat.components.ForwardTarget
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -95,6 +97,7 @@ fun ChatPage(
     navController: NavHostController,
     audioPlaylistVM: AudioPlaylistViewModel,
     chatVM: ChatViewModel,
+    chatListVM: ChatListViewModel,
     id: String = "",
 ) {
     val context = LocalContext.current
@@ -102,6 +105,8 @@ fun ChatPage(
     val chatState = chatVM.chatState.collectAsState()
     val scope = rememberCoroutineScope()
     var inputValue by remember { mutableStateOf("") }
+    var showForwardDialog by remember { mutableStateOf(false) }
+    var messageToForward by remember { mutableStateOf<VChat?>(null) }
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
 
@@ -131,6 +136,7 @@ fun ChatPage(
             chatVM.initializeChatStateAsync(id)
             chatVM.fetchAsync(chatVM.chatState.value.toId)
         }
+        chatListVM.loadPeers()
     }
 
     LaunchedEffect(sharedFlow) {
@@ -249,6 +255,10 @@ fun ChatPage(
                                 imageWidthPx = imageWidthPx.value,
                                 focusManager = focusManager,
                                 previewerState = previewerState,
+                                onForward = { message ->
+                                    messageToForward = message
+                                    showForwardDialog = true
+                                }
                             )
                         }
 
@@ -279,6 +289,33 @@ fun ChatPage(
             }
         }
     }
+
+    if (showForwardDialog) {
+        ForwardTargetDialog(
+            chatListVM = chatListVM,
+            onDismiss = {
+                showForwardDialog = false
+                messageToForward = null
+            },
+            onTargetSelected = { target ->
+                messageToForward?.let { message ->
+                    when (target) {
+                        is ForwardTarget.Local -> {
+                            chatVM.forwardMessageToLocal(message.id) { success ->
+                                DialogHelper.showSuccess(R.string.sent)
+                            }
+                        }
+                        is ForwardTarget.Peer -> {
+                            chatVM.forwardMessage(message.id, target.peer) { success ->
+                                DialogHelper.showSuccess(R.string.sent)
+                            }
+                        }
+                    }
+                }
+            }
+        )
+    }
+
     MediaPreviewer(state = previewerState)
 }
 

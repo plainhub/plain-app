@@ -66,6 +66,7 @@ import com.ismartcoding.plain.ui.base.PToast
 import com.ismartcoding.plain.ui.base.ToastEvent
 import com.ismartcoding.plain.ui.base.coil.newImageLoader
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.ChatListViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.NotesViewModel
@@ -122,6 +123,7 @@ fun Main(
     feedTagsVM: TagsViewModel = viewModel(key = "feedTagsVM"),
     noteTagsVM: TagsViewModel = viewModel(key = "noteTagsVM"),
     chatVM: ChatViewModel = viewModel(key = "chatVM"),
+    chatListVM: ChatListViewModel = viewModel(key = "chatListVM"),
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -275,7 +277,7 @@ fun Main(
                 }
                 composable<Routing.Chat> { backStackEntry ->
                     val r = backStackEntry.toRoute<Routing.Chat>()
-                    ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = chatVM, r.id)
+                    ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = chatVM, chatListVM = chatListVM, r.id)
                 }
                 composable<Routing.ChatSettings> { ChatSettingsPage(navController) }
                 composable<Routing.ScanHistory> { ScanHistoryPage(navController) }

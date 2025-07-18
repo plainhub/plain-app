@@ -225,4 +225,50 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
             sendEvent(WebSocketEvent(EventType.MESSAGE_DELETED, json.toString()))
         }
     }
+
+    fun forwardMessage(messageId: String, targetPeer: DPeer, onResult: (Boolean) -> Unit = {}) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val item = ChatHelper.getAsync(messageId) ?: return@launch
+            val newItem = ChatHelper.sendAsync(
+                message = item.content,
+                fromId = "me",
+                toId = targetPeer.id,
+                peer = targetPeer
+            )
+
+            val model = newItem.toModel().apply { data = getContentData() }
+            sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
+
+            // Handle link previews for text messages
+            if (newItem.content.type == DMessageType.TEXT.value) {
+                sendEvent(FetchLinkPreviewsEvent(newItem))
+            }
+
+            val success = PeerChatHelper.sendToPeerAsync(targetPeer, newItem.content)
+            updateMessageStatus(newItem, success)
+            onResult(success)
+        }
+    }
+
+    fun forwardMessageToLocal(messageId: String, onResult: (Boolean) -> Unit = {}) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val item = ChatHelper.getAsync(messageId) ?: return@launch
+            val newItem = ChatHelper.sendAsync(
+                message = item.content,
+                fromId = "me",
+                toId = "local",
+                peer = null
+            )
+
+            val model = newItem.toModel().apply { data = getContentData() }
+            sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
+
+            // Handle link previews for text messages
+            if (newItem.content.type == DMessageType.TEXT.value) {
+                sendEvent(FetchLinkPreviewsEvent(newItem))
+            }
+
+            onResult(true)
+        }
+    }
 }

@@ -47,30 +47,36 @@ fun PDialogListItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) {
-            if (icon is ImageVector) {
-                Icon(
-                    modifier = Modifier.padding(end = 16.dp),
-                    imageVector = icon,
-                    contentDescription = title,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            } else if (icon is Painter) {
-                Image(
-                    modifier =
-                    Modifier
-                        .padding(end = 16.dp)
-                        .size(24.dp),
-                    painter = icon,
-                    contentDescription = title,
-                )
-            } else if (icon is String) {
-                AsyncImage(
-                    model = icon,
-                    contentDescription = title,
-                    modifier = Modifier
-                        .size(24.dp),
-                )
-                HorizontalSpace(dp = 16.dp)
+            when (icon) {
+                is ImageVector -> {
+                    Icon(
+                        modifier = Modifier.padding(end = 16.dp),
+                        imageVector = icon,
+                        contentDescription = title,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+
+                is Painter -> {
+                    Image(
+                        modifier =
+                            Modifier
+                                .padding(end = 16.dp)
+                                .size(24.dp),
+                        painter = icon,
+                        contentDescription = title,
+                    )
+                }
+
+                is String -> {
+                    AsyncImage(
+                        model = icon,
+                        contentDescription = title,
+                        modifier = Modifier
+                            .size(24.dp),
+                    )
+                    HorizontalSpace(dp = 16.dp)
+                }
             }
         }
         Column(

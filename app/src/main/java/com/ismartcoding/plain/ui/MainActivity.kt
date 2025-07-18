@@ -20,6 +20,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -86,12 +88,15 @@ import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.ChatListViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
+import com.ismartcoding.plain.ui.page.chat.components.ForwardTarget
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.nav.navigatePdf
 import com.ismartcoding.plain.ui.nav.navigateTextFile
 import com.ismartcoding.plain.ui.page.Main
+import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.web.models.toModel
 import io.ktor.websocket.CloseReason
@@ -110,7 +115,11 @@ class MainActivity : AppCompatActivity() {
     private val mainVM: MainViewModel by viewModels()
     private val audioPlaylistVM: AudioPlaylistViewModel by viewModels()
     val pomodoroVM: PomodoroViewModel by viewModels()
+    private val chatListVM: ChatListViewModel by viewModels()
     private val navControllerState = mutableStateOf<NavHostController?>(null)
+    
+    private var showForwardTargetDialog by mutableStateOf(false)
+    private var pendingFileUris by mutableStateOf<Set<Uri>?>(null)
 
     private val screenCapture =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -219,6 +228,36 @@ class MainActivity : AppCompatActivity() {
                 Main(navControllerState, onLaunched = {
                     handleIntent(intent)
                 }, mainVM, audioPlaylistVM, pomodoroVM)
+                
+                if (showForwardTargetDialog) {
+                    ForwardTargetDialog(
+                        chatListVM = chatListVM,
+                        onDismiss = {
+                            showForwardTargetDialog = false
+                            pendingFileUris = null
+                        },
+                        onTargetSelected = { target ->
+                            pendingFileUris?.let { uris ->
+                                when (target) {
+                                    is ForwardTarget.Local -> {
+                                        navControllerState.value?.navigate(Routing.Chat("local"))
+                                        coIO {
+                                            delay(1000)
+                                            sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris))
+                                        }
+                                    }
+                                    is ForwardTarget.Peer -> {
+                                        navControllerState.value?.navigate(Routing.Chat("peer:${target.peer.id}"))
+                                        coIO {
+                                            delay(1000)
+                                            sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    )
+                }
             }
         }
 
@@ -545,36 +584,30 @@ class MainActivity : AppCompatActivity() {
                             ),
                         ),
                     )
-                    navControllerState.value?.navigate(Routing.Chat)
+                    navControllerState.value?.navigate(Routing.Chat("local"))
                 }
                 return
             }
 
             val uri = intent.parcelable(Intent.EXTRA_STREAM) as? Uri ?: return
-            DialogHelper.showConfirmDialog(
-                "", LocaleHelper.getString(R.string.confirm_to_send_file_to_file_assistant),
-                confirmButton = LocaleHelper.getString(R.string.ok) to {
-                    navControllerState.value?.navigate(Routing.Chat)
-                    coIO {
-                        delay(1000)
-                        sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, setOf(uri)))
-                    }
-                },
-                dismissButton = LocaleHelper.getString(R.string.cancel) to {})
+            coMain {
+                DialogHelper.showLoading()
+                withIO { chatListVM.loadPeers() }
+                DialogHelper.hideLoading()
+                pendingFileUris = setOf(uri)
+                showForwardTargetDialog = true
+            }
         } else if (intent.action == Intent.ACTION_SEND_MULTIPLE) {
-            DialogHelper.showConfirmDialog(
-                "", LocaleHelper.getString(R.string.confirm_to_send_files_to_file_assistant),
-                confirmButton = LocaleHelper.getString(R.string.ok) to {
-                    val uris = intent.parcelableArrayList<Uri>(Intent.EXTRA_STREAM)
-                    if (uris != null) {
-                        navControllerState.value?.navigate(Routing.Chat)
-                        coIO {
-                            delay(1000)
-                            sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris.toSet()))
-                        }
-                    }
-                },
-                dismissButton = LocaleHelper.getString(R.string.cancel) to {})
+            val uris = intent.parcelableArrayList<Uri>(Intent.EXTRA_STREAM)
+            if (uris != null) {
+                coMain {
+                    DialogHelper.showLoading()
+                    withIO { chatListVM.loadPeers() }
+                    DialogHelper.hideLoading()
+                    pendingFileUris = uris.toSet()
+                    showForwardTargetDialog = true
+                }
+            }
         }
     }
 

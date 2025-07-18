@@ -669,5 +669,7 @@
     <string name="phone">電話</string>
     <string name="tablet">平板電腦</string>
     <string name="tv">電視和投影機</string>
-    <string name="delete_peer_warning">刪除此設備將同時刪除所有相關的聊天記錄和文件。此操作無法撤銷。</string>
+    <string name="delete_peer_warning">刪除此設備將同時刪除所有相關的聊天記錄。此操作無法撤銷。</string>
+    <string name="forward">轉發</string>
+    <string name="sent">已發送</string>
 </resources>
