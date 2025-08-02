@@ -672,4 +672,6 @@
     <string name="delete_peer_warning">इस उपकरण को हटाने से संबंधित सभी चैट संदेश भी हटा दिए जाएंगे। यह क्रिया पूर्ववत नहीं की जा सकती।</string>
     <string name="forward">आगे</string>
     <string name="sent">भेजा गया</string>
+    <string name="device_type">डिवाइस प्रकार</string>
+    <string name="port">पोर्ट</string>
 </resources>

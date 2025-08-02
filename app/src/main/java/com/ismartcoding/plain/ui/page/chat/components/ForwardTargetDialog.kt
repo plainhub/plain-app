@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.page.chat.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
@@ -51,7 +50,7 @@ fun ForwardTargetDialog(
                             onDismiss()
                         },
                         title = stringResource(id = R.string.local_chat),
-                        desc = stringResource(id = R.string.local_chat_desc),
+                        subtitle = stringResource(id = R.string.local_chat_desc),
                         showMore = true
                     )
                 }
@@ -64,7 +63,7 @@ fun ForwardTargetDialog(
                                 onDismiss()
                             },
                             title = peer.name,
-                            desc = peer.ip,
+                            subtitle = peer.ip,
                             showMore = true
                         )
                     }

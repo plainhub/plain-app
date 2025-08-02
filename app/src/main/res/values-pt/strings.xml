@@ -672,4 +672,6 @@
     <string name="delete_peer_warning">Excluir este dispositivo também excluirá todas as mensagens de chat. Esta ação não pode ser desfeita.</string>
     <string name="forward">Avançar</string>
     <string name="sent">Enviado</string>
+    <string name="device_type">Tipo de dispositivo</string>
+    <string name="port">Porta</string>
 </resources>

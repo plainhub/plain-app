@@ -8,7 +8,8 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
 import com.ismartcoding.lib.extensions.urlEncode
-import com.ismartcoding.lib.helpers.StringHelper
+import com.ismartcoding.plain.R
+import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 
 @Entity(tableName = "peers")
 data class DPeer(
@@ -45,6 +46,14 @@ data class DPeer(
 
     fun getFileUrl(fileId: String): String {
         return "${getBaseUrl()}/fs?id=${fileId.urlEncode()}"
+    }
+
+    fun getStatusText(): String {
+        return when (status) {
+            "paired" -> getString(R.string.paired)
+            "unpaired" -> getString(R.string.unpaired)
+            else -> getString(R.string.unknown)
+        }
     }
 }
 

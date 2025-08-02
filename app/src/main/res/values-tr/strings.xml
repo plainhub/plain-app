@@ -672,4 +672,6 @@
     <string name="delete_peer_warning">Bu cihazı silmek aynı zamanda ilgili tüm sohbet mesajlarını da silecektir. Bu eylem geri alınamaz.</string>
     <string name="forward">İleri</string>
     <string name="sent">Gönderildi</string>
+    <string name="device_type">Cihaz türü</string>
+    <string name="port">Port</string>
 </resources>

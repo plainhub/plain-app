@@ -16,7 +16,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -46,6 +50,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DMessageFile
+import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
@@ -62,6 +67,9 @@ import com.ismartcoding.plain.ui.base.AnimatedBottomAction
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
+import com.ismartcoding.plain.ui.base.PDialogListItem
+import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.PTopRightButton
@@ -106,6 +114,7 @@ fun ChatPage(
     val scope = rememberCoroutineScope()
     var inputValue by remember { mutableStateOf("") }
     var showForwardDialog by remember { mutableStateOf(false) }
+    var showPeerInfoDialog by remember { mutableStateOf(false) }
     var messageToForward by remember { mutableStateOf<VChat?>(null) }
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
@@ -213,6 +222,14 @@ fun ChatPage(
                             },
                         )
                         HorizontalSpace(dp = 8.dp)
+                    } else if (chatState.value.peer != null) {
+                        PIconButton(
+                            icon = R.drawable.ellipsis,
+                            contentDescription = stringResource(R.string.more),
+                            click = {
+                                showPeerInfoDialog = true
+                            }
+                        )
                     }
                 },
             )
@@ -317,6 +334,44 @@ fun ChatPage(
     }
 
     MediaPreviewer(state = previewerState)
+
+    if (showPeerInfoDialog) {
+        AlertDialog(
+            onDismissRequest = { showPeerInfoDialog = false },
+            title = { Text(chatState.value.peer?.name ?: "") },
+            text = {
+                Column {
+                    chatState.value.peer?.let { peer ->
+                        PDialogListItem(
+                            title = stringResource(R.string.ip_address),
+                            subtitle = peer.ip,
+                        )
+                        PDialogListItem(
+                            title = stringResource(R.string.port),
+                            subtitle = peer.port.toString(),
+                        )
+                        PDialogListItem(
+                            title = stringResource(R.string.device_type),
+                            subtitle = DeviceType.fromValue(peer.deviceType).getText(),
+                        )
+                        PDialogListItem(
+                            title = stringResource(R.string.status),
+                            subtitle = peer.getStatusText(),
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showPeerInfoDialog = false
+                    }
+                ) {
+                    Text(stringResource(id = R.string.close))
+                }
+            }
+        )
+    }
 }
 
 private fun handleFileSelection(

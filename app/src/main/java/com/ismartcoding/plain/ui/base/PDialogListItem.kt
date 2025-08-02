@@ -17,24 +17,20 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil3.compose.AsyncImage
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.ui.theme.palette.onDark
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PDialogListItem(
     modifier: Modifier = Modifier,
     title: String,
-    desc: String? = null,
+    subtitle: String? = null,
     value: String? = null,
-    icon: Any? = null,
+    icon: Int? = null,
     separatedActions: Boolean = false,
     showMore: Boolean = false,
     action: (@Composable () -> Unit)? = null,
@@ -47,37 +43,15 @@ fun PDialogListItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) {
-            when (icon) {
-                is ImageVector -> {
-                    Icon(
-                        modifier = Modifier.padding(end = 16.dp),
-                        imageVector = icon,
-                        contentDescription = title,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-
-                is Painter -> {
-                    Image(
-                        modifier =
-                            Modifier
-                                .padding(end = 16.dp)
-                                .size(24.dp),
-                        painter = icon,
-                        contentDescription = title,
-                    )
-                }
-
-                is String -> {
-                    AsyncImage(
-                        model = icon,
-                        contentDescription = title,
-                        modifier = Modifier
-                            .size(24.dp),
-                    )
-                    HorizontalSpace(dp = 16.dp)
-                }
-            }
+            Image(
+                modifier =
+                    Modifier
+                        .padding(end = 16.dp)
+                        .size(24.dp),
+                painter = painterResource(icon),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
+                contentDescription = title,
+            )
         }
         Column(
             modifier = Modifier
@@ -88,7 +62,7 @@ fun PDialogListItem(
                 text = title,
                 style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp),
             )
-            desc?.let {
+            subtitle?.let {
                 VerticalSpace(dp = 8.dp)
                 SelectionContainer {
                     Text(

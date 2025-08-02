@@ -665,4 +665,6 @@
     <string name="delete_peer_warning">删除此设备将同时删除所有相关的聊天记录。此操作无法撤销。</string>
     <string name="forward">转发</string>
     <string name="sent">已发送</string>
+    <string name="device_type">设备类型</string>
+    <string name="port">端口</string>
 </resources>

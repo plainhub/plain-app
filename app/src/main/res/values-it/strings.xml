@@ -672,4 +672,6 @@
     <string name="delete_peer_warning">Eliminare questo dispositivo eliminerà anche tutti i messaggi di chat. Questa azione non può essere annullata.</string>
     <string name="forward">Inoltra</string>
     <string name="sent">Inviato</string>
+    <string name="device_type">Tipo di dispositivo</string>
+    <string name="port">Porta</string>
 </resources>

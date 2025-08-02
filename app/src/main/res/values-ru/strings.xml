@@ -672,4 +672,6 @@
     <string name="delete_peer_warning">Удаление этого устройства также удалит все связанные сообщения чата. Это действие нельзя отменить.</string>
     <string name="forward">Передать</string>
     <string name="sent">Отправлено</string>
+    <string name="device_type">Тип устройства</string>
+    <string name="port">Порт</string>
 </resources>
