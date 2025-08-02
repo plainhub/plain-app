@@ -38,5 +38,5 @@ jobs:
           body: "## What's Changed"
           draft: true
           prerelease: false
-          artifacts: ./app/build/outputs/apk/github/release/PlainApp-${{ env.version_name }}.apk,./app/build/outputs/apk/china/release/PlainApp-${{ env.version_name }}-china.apk
+          artifacts: ./PlainApp-${{ env.version_name }}.apk,./PlainApp-${{ env.version_name  }}-armeabi-v7a.apk
 

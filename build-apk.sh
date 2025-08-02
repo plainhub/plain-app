@@ -35,11 +35,13 @@ cat > ./local.properties <<EOF
 sdk.dir=/Users/$USER/Library/Android/sdk
 EOF
 
+# Build default APK (arm64-v8a)
 ./gradlew assembleGithubRelease || err_and_exit "assembleGithubRelease failed"
-#./gradlew assembleChinaRelease || err_and_exit "assembleChinaRelease failed"
-
 BUILD_FILE="PlainApp-$(getVersionName).apk"
-mv ./app/build/outputs/apk/github/release/app-github-release.apk ./app/build/outputs/apk/github/release/$BUILD_FILE
+mv ./app/build/outputs/apk/github/release/app-github-release.apk ./$BUILD_FILE
 
-#BUILD_FILE="PlainApp-$(getVersionName)-china.apk"
-#mv ./app/build/outputs/apk/china/release/app-china-release.apk ./app/build/outputs/apk/china/release/$BUILD_FILE
+# Build armeabi-v7a APK
+./gradlew clean
+./gradlew assembleGithubRelease -PabiFilters=armeabi-v7a || err_and_exit "assembleGithubRelease armeabi-v7a failed"
+ARMV7_BUILD_FILE="PlainApp-$(getVersionName)-armeabi-v7a.apk"
+mv ./app/build/outputs/apk/github/release/app-github-release.apk ./$ARMV7_BUILD_FILE
