@@ -1,27 +1,22 @@
 package com.ismartcoding.plain.services
 
-
-import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.drawable.Icon
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
-import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.isTPlus
-import com.ismartcoding.plain.BuildConfig
-import com.ismartcoding.plain.Constants
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.enums.QSTileServiceAction
-import com.ismartcoding.plain.events.StartHttpServerEvent
+import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.enums.HttpServerState
+import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.web.HttpServerManager
-import java.lang.ref.SoftReference
 
 class QSTileService : TileService() {
+    private var httpServerStateListener: ((HttpServerState) -> Unit)? = null
+
     fun setState(state: Int) {
         if (state == Tile.STATE_INACTIVE) {
             qsTile?.state = Tile.STATE_INACTIVE
@@ -36,86 +31,85 @@ class QSTileService : TileService() {
         qsTile?.updateTile()
     }
 
-    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onStartListening() {
         super.onStartListening()
-        setState(Tile.STATE_INACTIVE)
-        mMsgReceive = ReceiveMessageHandler(this)
-        if (isTPlus()) {
-            registerReceiver(mMsgReceive, IntentFilter(Constants.BROADCAST_ACTION_ACTIVITY), Context.RECEIVER_EXPORTED)
-        } else {
-            registerReceiver(mMsgReceive, IntentFilter(Constants.BROADCAST_ACTION_ACTIVITY))
+
+        // Register HTTP server state listener
+        httpServerStateListener = { state ->
+            when (state) {
+                HttpServerState.ON -> setState(Tile.STATE_ACTIVE)
+                HttpServerState.OFF -> setState(Tile.STATE_INACTIVE)
+                HttpServerState.STARTING -> setState(Tile.STATE_INACTIVE)
+                HttpServerState.STOPPING -> setState(Tile.STATE_INACTIVE)
+                HttpServerState.ERROR -> setState(Tile.STATE_INACTIVE)
+            }
         }
 
-        sendMsg(this, Constants.BROADCAST_ACTION_SERVICE, QSTileServiceAction.MSG_REGISTER_CLIENT.value, "")
+        // Listen for HTTP server state changes
+        receiveEventHandler<HttpServerStateChangedEvent> { event ->
+            httpServerStateListener?.invoke(event.state)
+        }
+
+        // Check current server state
+        coIO {
+            try {
+                // First check if webEnabled is true in TempData
+                if (TempData.webEnabled) {
+                    val checkResult = HttpServerManager.checkServerAsync()
+                    if (checkResult.websocket && checkResult.http) {
+                        setState(Tile.STATE_ACTIVE)
+                    } else {
+                        // Service should be running but isn't responding
+                        LogCat.d("Web service enabled but not responding, setting inactive state")
+                        setState(Tile.STATE_INACTIVE)
+                    }
+                } else {
+                    setState(Tile.STATE_INACTIVE)
+                }
+            } catch (e: Exception) {
+                LogCat.e("Failed to check server state: ${e.message}")
+                setState(Tile.STATE_INACTIVE)
+            }
+        }
     }
 
     override fun onStopListening() {
         super.onStopListening()
 
-        unregisterReceiver(mMsgReceive)
-        mMsgReceive = null
+        // Unregister HTTP server state listener
+        httpServerStateListener = null
     }
 
     override fun onClick() {
         super.onClick()
         when (qsTile.state) {
             Tile.STATE_INACTIVE -> {
-                coIO {
-                    WebPreference.putAsync(this@QSTileService, true)
-                    sendEvent(StartHttpServerEvent())
+                // Start the service directly
+                qsTile?.state = Tile.STATE_UNAVAILABLE
+                qsTile?.updateTile()
+
+                // Launch the app with unlockAndRun
+                unlockAndRun {
+                    val intent = Intent(this, Class.forName("com.ismartcoding.plain.ui.MainActivity"))
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    intent.putExtra("start_web_service", true)
+                    startActivity(intent)
                 }
             }
 
             Tile.STATE_ACTIVE -> {
+                // Stop service
+                qsTile?.state = Tile.STATE_UNAVAILABLE
+                qsTile?.updateTile()
+
                 coIO {
                     WebPreference.putAsync(this@QSTileService, false)
                     HttpServerManager.stopServiceAsync(this@QSTileService)
+                    setState(Tile.STATE_INACTIVE)
                 }
             }
         }
     }
 
-    private var mMsgReceive: BroadcastReceiver? = null
 
-    private class ReceiveMessageHandler(context: QSTileService) : BroadcastReceiver() {
-        internal var mReference: SoftReference<QSTileService> = SoftReference(context)
-        override fun onReceive(ctx: Context?, intent: Intent?) {
-            val context = mReference.get()
-            when (intent?.getIntExtra("key", 0)) {
-                QSTileServiceAction.MSG_STATE_RUNNING.value -> {
-                    context?.setState(Tile.STATE_ACTIVE)
-                }
-
-                QSTileServiceAction.MSG_STATE_NOT_RUNNING.value -> {
-                    context?.setState(Tile.STATE_INACTIVE)
-                }
-
-                QSTileServiceAction.MSG_STATE_START_SUCCESS.value -> {
-                    context?.setState(Tile.STATE_ACTIVE)
-                }
-
-                QSTileServiceAction.MSG_STATE_START_FAILURE.value -> {
-                    context?.setState(Tile.STATE_INACTIVE)
-                }
-
-                QSTileServiceAction.MSG_STATE_STOP_SUCCESS.value -> {
-                    context?.setState(Tile.STATE_INACTIVE)
-                }
-            }
-        }
-    }
-
-    private fun sendMsg(ctx: Context, action: String, what: Int, content: String) {
-        try {
-            val intent = Intent()
-            intent.action = action
-            intent.`package` = BuildConfig.APPLICATION_ID
-            intent.putExtra("key", what)
-            intent.putExtra("content", content)
-            ctx.sendBroadcast(intent)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
 }

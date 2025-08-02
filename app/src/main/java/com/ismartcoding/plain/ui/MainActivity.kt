@@ -64,6 +64,7 @@ import com.ismartcoding.plain.events.PickFileEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.events.RestartAppEvent
+import com.ismartcoding.plain.events.StartHttpServerEvent
 import com.ismartcoding.plain.events.StartScreenMirrorEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
@@ -549,6 +550,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleIntent(intent: Intent) {
+        if (intent.getBooleanExtra("start_web_service", false)) {
+            coIO {
+                WebPreference.putAsync(this@MainActivity, true)
+                sendEvent(StartHttpServerEvent())
+            }
+        }
+        
         if (intent.action == Intent.ACTION_VIEW) {
             val uri = intent.data
             if (uri != null) {

@@ -100,7 +100,7 @@ object HttpServerManager {
     suspend fun checkServerAsync(): HttpServerCheckResult {
         var websocket = false
         var http = false
-        var retry = 3
+        var retry = 2
         val client = HttpClientManager.httpClient()
         while (retry-- > 0) {
             try {
@@ -113,7 +113,7 @@ object HttpServerManager {
                 }
                 retry = 0
             } catch (ex: Exception) {
-                delay(1000)
+                delay(300)
                 ex.printStackTrace()
                 LogCat.e(ex.toString())
             }
