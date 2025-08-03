@@ -556,6 +556,8 @@
     <string name="foreground_service_notification_prompt">कृपया इस ऐप को पृष्ठभूमि में चलने और महत्वपूर्ण फ़ंक्शन या सेवाओं की पेशेवरता के लिए सूचनाएँ दिखाने की अनुमति दें।</string>
     <string name="internal_storage">आंतरिक स्टोरेज</string>
     <string name="enter_this_address_tips">अपने कंप्यूटर के ब्राउज़र में ऊपर दिए गए पते को डालें, यह सुनिश्चित करें कि आपका फोन और कंप्यूटर एक ही स्थानीय नेटवर्क में हैं।</string>
+    <string name="mdns_hostname">mDNS होस्टनाम</string>
+    <string name="mdns_hostname_invalid">होस्टनाम का अंत .local से होना चाहिए</string>
     <string name="last_visit_at">आखिरी बार दौरा किया गया</string>
     <string name="app_restored">ऐप डेटा पुनः प्राप्त हो गया है, आपको ऐप को मजबूरी से बंद करना होगा और उसे फिर से नए रूप में शुरू करना होगा।</string>
     <string name="welcome_text">स्वागत है! आप इस पृष्ठ पर टेक्स्ट, चित्र, और वीडियो आसानी से भेज सकते हैं, और उन्हें अपने कंप्यूटर पर देख सकते हैं।\nअगर आपको कोई समस्या आती है, तो कृपया सहायता के लिए ismartcoding@gmail.com पर एक ईमेल भेजें या हमारे Discord चर्चा में शामिल हों: https://discord.gg/RQWcS6DEEe।</string>

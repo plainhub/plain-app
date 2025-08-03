@@ -41,6 +41,7 @@ workRuntimeKtxVersion = "2.10.2"
 ztZipVersion = "1.17"
 devtoolsKspVersion = "2.2.0-2.0.2"
 tinkAndroidVersion = "1.18.0"
+jmdnsVersion = "3.6.1"
 
 [libraries]
 android-gif-drawable = { module = "pl.droidsonroids.gif:android-gif-drawable", version.ref = "androidGifDrawableVersion" }
@@ -162,6 +163,7 @@ pdfium-android = { module = "com.github.barteksc:pdfium-android", version.ref = 
 
 zt-zip = { module = "org.zeroturnaround:zt-zip", version.ref = "ztZipVersion" }
 tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "tinkAndroidVersion" }
+jmdns = { module = "org.jmdns:jmdns", version.ref = "jmdnsVersion" }
 
 [plugins]
 devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "devtoolsKspVersion" }

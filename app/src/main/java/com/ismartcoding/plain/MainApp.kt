@@ -23,6 +23,7 @@ import com.ismartcoding.plain.preferences.HttpPortPreference
 import com.ismartcoding.plain.preferences.HttpsPortPreference
 import com.ismartcoding.plain.preferences.HttpsPreference
 import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
+import com.ismartcoding.plain.preferences.MdnsHostnamePreference
 import com.ismartcoding.plain.preferences.PasswordPreference
 import com.ismartcoding.plain.preferences.SignatureKeyPreference
 import com.ismartcoding.plain.preferences.UrlTokenPreference
@@ -62,6 +63,7 @@ class MainApp : Application() {
             KeyStorePasswordPreference.ensureValueAsync(instance, preferences)
             UrlTokenPreference.ensureValueAsync(instance, preferences)
             SignatureKeyPreference.ensureKeyPairAsync(instance, preferences)
+            MdnsHostnamePreference.ensureValueAsync(preferences)
 
             DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(preferences)))
             if (PlugInControlReceiver.isUSBConnected(this@MainApp)) {

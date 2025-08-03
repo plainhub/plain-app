@@ -9,6 +9,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
@@ -30,6 +34,8 @@ fun TextFieldDialog(
     errorText: String = "",
     dismissText: String = stringResource(R.string.cancel),
     confirmText: String = stringResource(R.string.confirm),
+    validator: (String) -> Boolean = { true },
+    validationErrorText: String = "",
     onValueChange: (String) -> Unit = {},
     onDismissRequest: () -> Unit = {},
     onConfirm: (String) -> Unit = {},
@@ -39,6 +45,10 @@ fun TextFieldDialog(
         ),
 ) {
     val focusManager = LocalFocusManager.current
+    var currentValue by remember { mutableStateOf(value) }
+    var showValidationError by remember { mutableStateOf(false) }
+    val displayErrorText = if (showValidationError) validationErrorText else errorText
+    
     AlertDialog(
         modifier = modifier.fillMaxWidth(),
         containerColor = MaterialTheme.colorScheme.surface,
@@ -61,24 +71,38 @@ fun TextFieldDialog(
             ClipboardTextField(
                 modifier = modifier,
                 readOnly = readOnly,
-                value = value,
+                value = currentValue,
                 singleLine = singleLine,
-                onValueChange = onValueChange,
+                onValueChange = { 
+                    currentValue = it
+                    showValidationError = false
+                    onValueChange(it)
+                },
                 placeholder = placeholder,
                 isPassword = isPassword,
-                errorText = errorText,
+                errorText = displayErrorText,
                 keyboardOptions = keyboardOptions,
                 focusManager = focusManager,
                 requestFocus = true,
-                onConfirm = onConfirm,
+                onConfirm = { 
+                    if (validator(it)) {
+                        onConfirm(it)
+                    } else {
+                        showValidationError = true
+                    }
+                },
             )
         },
         confirmButton = {
             Button(
-                enabled = value.isNotBlank(),
+                enabled = currentValue.isNotBlank(),
                 onClick = {
-                    focusManager.clearFocus()
-                    onConfirm(value)
+                    if (validator(currentValue)) {
+                        focusManager.clearFocus()
+                        onConfirm(currentValue)
+                    } else {
+                        showValidationError = true
+                    }
                 },
             ) {
                 Text(confirmText)

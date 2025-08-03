@@ -556,6 +556,8 @@
     <string name="foreground_service_notification_prompt">Sta deze app toe om op de achtergrond uit te voeren en meldingen weer te geven om essentiële functionaliteit of services te bieden.</string>
     <string name="internal_storage">Interne opslag</string>
     <string name="enter_this_address_tips">Voer het bovenstaande adres in uw computerbrowser in en zorg ervoor dat uw telefoon en computer zich in hetzelfde lokale netwerk bevinden.</string>
+    <string name="mdns_hostname">mDNS-hostnaam</string>
+    <string name="mdns_hostname_invalid">Hostnaam moet eindigen met .local</string>
     <string name="last_visit_at">Laatst bezocht op</string>
     <string name="app_restored">APP-gegevens zijn hersteld, u moet de app geforceerd afsluiten en de app opnieuw starten als nieuw.</string>
     <string name="welcome_text">Welkom! U kunt eenvoudig tekst, afbeeldingen en video\'s naar deze pagina sturen en ze op uw computer bekijken.\nAls u problemen ondervindt, aarzel dan niet om een e-mail te sturen naar ismartcoding@gmail.com voor hulp of neem deel aan onze Discord-discussie op: https://discord.gg/RQWcS6DEEe.</string>

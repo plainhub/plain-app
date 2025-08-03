@@ -61,8 +61,8 @@ fun WebAddressBar(
     val port = if (isHttps) TempData.httpsPort else TempData.httpPort
     var portDialogVisible by remember { mutableStateOf(false) }
     var qrCodeDialogVisible by remember { mutableStateOf(false) }
-    var ip4 = mainVM.ip4
-    var ip4s = mainVM.ip4s.ifEmpty { listOf("127.0.0.1") }
+    val ip4 = mainVM.ip4
+    val ip4s = listOf(TempData.mdnsHostname) + mainVM.ip4s.ifEmpty { listOf("127.0.0.1") }
     val scope = rememberCoroutineScope()
     var qrCodeUrl by remember { mutableStateOf("") }
 

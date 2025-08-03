@@ -74,7 +74,7 @@ object HttpServerManager {
     }
 
     fun getNotificationContent(): String {
-        val ip = NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }
+        val ip = TempData.mdnsHostname
         return "http://$ip:${TempData.httpPort}\nhttps://$ip:${TempData.httpsPort}"
     }
 

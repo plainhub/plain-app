@@ -556,6 +556,8 @@
     <string name="foreground_service_notification_prompt">Пожалуйста, разрешите этому приложению работать в фоновом режиме и отображать уведомления для обеспечения важных функций или услуг.</string>
     <string name="internal_storage">Внутреннее хранилище</string>
     <string name="enter_this_address_tips">Введите вышеуказанный адрес в браузер вашего компьютера, убедившись, что ваш телефон и компьютер находятся в одной локальной сети.</string>
+    <string name="mdns_hostname">Имя хоста mDNS</string>
+    <string name="mdns_hostname_invalid">Имя хоста должно заканчиваться на .local</string>
     <string name="last_visit_at">Последнее посещение в</string>
     <string name="app_restored">Данные приложения восстановлены, вам нужно выйти из приложения и снова запустить его, как новое.</string>
     <string name="welcome_text">Добро пожаловать! Вы можете легко отправлять текст, изображения и видео на эту страницу и просматривать их на своем компьютере.\nЕсли у вас возникнут проблемы, не стесняйтесь отправить электронное письмо на адрес ismartcoding@gmail.com для получения помощи или присоединиться к нашей дискуссии в Discord по адресу: https://discord.gg/RQWcS6DEEe.</string>

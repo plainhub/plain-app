@@ -757,3 +757,14 @@ object NearbyDiscoverablePreference : BasePreference<Boolean>() {
     override val default = false
     override val key = booleanPreferencesKey("nearby_discoverable")
 }
+
+object MdnsHostnamePreference : BasePreference<String>() {
+    override val default = "plainapp.local"
+    override val key = stringPreferencesKey("mdns_hostname")
+
+    suspend fun ensureValueAsync(
+        preferences: Preferences,
+    ) {
+        TempData.mdnsHostname = get(preferences).ifEmpty { default }
+    }
+}

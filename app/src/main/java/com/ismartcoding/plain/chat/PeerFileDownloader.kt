@@ -2,46 +2,19 @@ package com.ismartcoding.plain.chat
 
 import android.content.Context
 import com.ismartcoding.lib.extensions.scanFileByConnection
-import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.helpers.ChatFileSaveHelper
 import com.ismartcoding.plain.preferences.ChatFilesSaveFolderPreference
-import kotlinx.coroutines.flow.MutableStateFlow
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.File
-import java.security.SecureRandom
-import java.security.cert.X509Certificate
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
 
 object PeerFileDownloader {
-    private val _downloadProgress = MutableStateFlow<Map<String, DownloadProgress>>(emptyMap())
-
-    private fun createUnsafeOkHttpClient(): OkHttpClient {
-        val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
-            override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {}
-            override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {}
-            override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
-        })
-        val sslContext = SSLContext.getInstance("TLS")
-        sslContext.init(null, trustAllCerts, SecureRandom())
-        val sslSocketFactory = sslContext.socketFactory
-
-        return OkHttpClient.Builder()
-            .sslSocketFactory(sslSocketFactory, trustAllCerts[0] as X509TrustManager)
-            .hostnameVerifier { hostname, _ ->
-                NetworkHelper.isLocalNetworkAddress(hostname)
-            }
-            .build()
-    }
-
     suspend fun downloadAsync(
         context: Context,
         task: DownloadTask
@@ -63,7 +36,7 @@ object PeerFileDownloader {
 
 
             var downloadedBytes = 0L
-            val client = createUnsafeOkHttpClient()
+            val client = HttpClientManager.createUnsafeOkHttpClient()
             task.httpClient = client
 
             val response = client.newCall(Request.Builder().url(downloadUrl).build()).execute()
@@ -160,11 +133,5 @@ object PeerFileDownloader {
         // Update database
         AppDatabase.instance.chatDao().updateData(ChatItemDataUpdate(messageId, content))
         LogCat.d("Updated message file URI: $originalUri -> $newLocalPath")
-    }
-
-    private fun updateProgress(fileId: String, fileName: String, downloaded: Long, total: Long, status: DownloadStatus) {
-        val currentProgress = _downloadProgress.value.toMutableMap()
-        currentProgress[fileId] = DownloadProgress(fileId, fileName, downloaded, total, status)
-        _downloadProgress.value = currentProgress
     }
 }

@@ -556,6 +556,8 @@
     <string name="foreground_service_notification_prompt">প্রাথমিক কাজ বা সেবা প্রদান করতে এই অ্যাপটি ব্যাকগ্রাউন্ডে চালান এবং বিশেষ মাধ্যমে বিজ্ঞপ্তি দেখাতে এই অ্যাপটির অনুমতি দিন।</string>
     <string name="internal_storage">অভ্যন্তরীণ স্টোরেজ</string>
     <string name="enter_this_address_tips">আপনার কম্পিউটারের ব্রাউজারে উপরের ঠিকানা লিখুন, নিশ্চিত করুন যে আপনার ফোন এবং কম্পিউটারটি একই স্থানীয় নেটওয়ার্কে আছে।</string>
+    <string name="mdns_hostname">mDNS হোস্টনেম</string>
+    <string name="mdns_hostname_invalid">হোস্টনেম অবশ্যই .local দিয়ে শেষ হতে হবে</string>
     <string name="last_visit_at">শেষ দেখা</string>
     <string name="app_restored">এপ্লিকেশন ডেটা পুনরুদ্ধার করা হয়েছে, আপনাকে অ্যাপটি বন্ধ করে নিতে এবং এপ্লিকেশনটি আবার একটি নতুন অবস্থায় শুরু করতে বাধ্য করা হবে।</string>
     <string name="welcome_text">স্বাগতম! আপনি সহজেই এই পৃষ্ঠাতে টেক্সট, চিত্র, এবং ভিডিও প্রেরণ করতে পারেন এবং তাদের আপনার কম্পিউটারে দেখতে পারেন।\nযদি আপনি যে কোনও সমস্যার সম্মুখীন হন, তবে সাহায্যের জন্য অনুগ্রহ করে ismartcoding@gmail.com ঠিকানায় একটি ইমেল পাঠাতে বা আমাদের Discord আলোচনায় যোগদান করতে স্বাগতম: https://discord.gg/RQWcS6DEEe।</string>
@@ -672,4 +674,6 @@
     <string name="delete_peer_warning">এই ডিভাইসটি মুছে ফেলা সমস্ত সম্পর্কিত চ্যাট বার্তা মুছে ফেলবে। এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না।</string>
     <string name="forward">সরাসরি</string>
     <string name="sent">পাঠানো</string>
+    <string name="device_type">ডিভাইসের ধরণ</string>
+    <string name="port">পোর্ট</string>
 </resources>

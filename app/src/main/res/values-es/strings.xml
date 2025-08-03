@@ -556,6 +556,8 @@
     <string name="foreground_service_notification_prompt">Por favor, permita que esta aplicación se ejecute en segundo plano y muestre notificaciones para proporcionar funcionalidad o servicios esenciales.</string>
     <string name="internal_storage">Almacenamiento interno</string>
     <string name="enter_this_address_tips">Ingrese la dirección anterior en el navegador de su computadora, asegurándose de que su teléfono y su computadora estén en la misma red local.</string>
+    <string name="mdns_hostname">Nombre de host mDNS</string>
+    <string name="mdns_hostname_invalid">El nombre de host debe terminar con .local</string>
     <string name="last_visit_at">Última visita a las</string>
     <string name="app_restored">Se restauraron los datos de la APLICACIÓN, debes salir forzosamente de esta aplicación y volver a iniciarla como nueva.</string>
     <string name="welcome_text">¡Bienvenido! Puedes enviar fácilmente texto, imágenes y videos a esta página y verlos en tu computadora.\nSi encuentras algún problema, no dudes en enviar un correo electrónico a ismartcoding@gmail.com para obtener ayuda o unirte a nuestra discusión en Discord en: https://discord.gg/RQWcS6DEEe.</string>

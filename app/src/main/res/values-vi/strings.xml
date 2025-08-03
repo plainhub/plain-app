@@ -556,6 +556,8 @@
     <string name="foreground_service_notification_prompt">Vui lòng cho phép ứng dụng này chạy trong nền và hiển thị thông báo để cung cấp chức năng hoặc dịch vụ cần thiết.</string>
     <string name="internal_storage">Bộ nhớ trong</string>
     <string name="enter_this_address_tips">Nhập địa chỉ trên vào trình duyệt của máy tính của bạn, đảm bảo rằng điện thoại và máy tính của bạn đang kết nối với cùng một mạng cục bộ.</string>
+    <string name="mdns_hostname">Tên máy chủ mDNS</string>
+    <string name="mdns_hostname_invalid">Tên máy chủ phải kết thúc bằng .local</string>
     <string name="last_visit_at">Lần ghé thăm cuối cùng tại</string>
     <string name="app_restored">Dữ liệu ứng dụng được khôi phục, bạn cần tắt ứng dụng này và khởi động lại ứng dụng như mới.</string>
     <string name="welcome_text">Chào mừng! Bạn có thể dễ dàng gửi văn bản, hình ảnh và video đến trang này và xem chúng trên máy tính của mình. Nếu bạn gặp bất kỳ vấn đề nào, vui lòng gửi email đến ismartcoding@gmail.com để được hỗ trợ hoặc tham gia trò chuyện Discord của chúng tôi tại: https://discord.gg/RQWcS6DEEe.</string>

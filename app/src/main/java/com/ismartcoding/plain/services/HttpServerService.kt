@@ -23,6 +23,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.web.HttpServerManager
+import com.ismartcoding.plain.web.NsdHelper
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.delay
@@ -113,6 +114,7 @@ class HttpServerService : LifecycleService() {
         if (checkResult.websocket && checkResult.http) {
             HttpServerManager.httpServerError = ""
             HttpServerManager.portsInUse.clear()
+            NsdHelper.registerService(this, TempData.httpPort)
             sendEvent(HttpServerStateChangedEvent(HttpServerState.ON))
         } else {
             if (!checkResult.http) {
@@ -145,12 +147,17 @@ class HttpServerService : LifecycleService() {
 
     override fun onDestroy() {
         super.onDestroy()
+        // Ensure NSD service is unregistered
+        NsdHelper.unregisterService()
         stopForeground(STOP_FOREGROUND_REMOVE)
     }
 
     private suspend fun stopHttpServerAsync() {
         LogCat.d("stopHttpServer")
         try {
+            // Unregister NSD service
+            NsdHelper.unregisterService()
+            
             val client = HttpClientManager.httpClient()
             val r = client.get(UrlHelper.getShutdownUrl())
             if (r.status == HttpStatusCode.Gone) {

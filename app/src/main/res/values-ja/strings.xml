@@ -556,6 +556,8 @@
     <string name="foreground_service_notification_prompt">本アプリをバックグラウンドで実行し、重要な機能やサービスを提供するために通知を表示する許可をお願いします。</string>
     <string name="internal_storage">内部ストレージ</string>
     <string name="enter_this_address_tips">上記のアドレスをコンピューターのブラウザに入力して、電話とコンピューターが同じローカルネットワークにあることを確認してください。</string>
+    <string name="mdns_hostname">mDNSホスト名</string>
+    <string name="mdns_hostname_invalid">ホスト名は.localで終わる必要があります</string>
     <string name="last_visit_at">前回の訪問時刻</string>
     <string name="app_restored">アプリのデータが復元されました。新しい状態でアプリを再起動する必要があります。</string>
     <string name="welcome_text">ようこそ！このページにテキスト、画像、動画を簡単に送信し、コンピュータで表示することができます。\n問題が発生した場合は、お手伝いが必要な場合はismartcoding@gmail.comにメールを送信するか、次のDiscordのディスカッションに参加してください：https://discord.gg/RQWcS6DEEe。</string>

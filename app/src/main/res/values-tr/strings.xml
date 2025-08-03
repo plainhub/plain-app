@@ -556,6 +556,8 @@
     <string name="foreground_service_notification_prompt">Lütfen bu uygulamanın arka planda çalışmasına ve temel işlevsellik veya hizmetleri sağlamak için bildirimler göstermesine izin verin.</string>
     <string name="internal_storage">Dahili depolama</string>
     <string name="enter_this_address_tips">Yukarıdaki adresi bilgisayarınızın tarayıcısına girin, telefonunuzun ve bilgisayarınızın aynı yerel ağda olduğundan emin olun.</string>
+    <string name="mdns_hostname">mDNS ana bilgisayar adı</string>
+    <string name="mdns_hostname_invalid">Ana bilgisayar adı .local ile bitmelidir</string>
     <string name="last_visit_at">Son ziyaret</string>
     <string name="app_restored">Uygulama verileri geri yüklendi, uygulamayı zorla kapatmanız ve yeni olarak tekrar başlatmanız gerekiyor.</string>
     <string name="welcome_text">Hoş geldiniz! Bu sayfaya kolayca metin, resim ve video gönderebilir ve bunları bilgisayarınızda görüntüleyebilirsiniz.\nHerhangi bir sorunla karşılaşırsanız, lütfen yardım için ismartcoding@gmail.com adresine e-posta göndermekten veya Discord tartışmamıza katılmaktan çekinmeyin: https://discord.gg/RQWcS6DEEe.</string>

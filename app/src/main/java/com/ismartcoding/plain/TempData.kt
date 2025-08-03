@@ -10,6 +10,7 @@ object TempData {
     var httpPort: Int = 8080
     var httpsPort: Int = 8443
     var urlToken = "" // use to encrypt or decrypt params in url
+    var mdnsHostname = "plainapp.local" // mDNS hostname for local network discovery
     val notifications = mutableListOf<DNotification>()
     var audioPlayMode = MediaPlayMode.REPEAT
 

@@ -41,9 +41,9 @@ android {
                 else -> 0
             }
 
-        val vCode = 403
+        val vCode = 406
         versionCode = vCode - singleAbiNum
-        versionName = "2.1.7"
+        versionName = "2.1.8"
 
         ndk {
             //noinspection ChromeOsAbiSupport
@@ -221,4 +221,7 @@ dependencies {
     
     // Google Tink for cryptography (Ed25519 support on all Android versions)
     implementation(libs.tink.android)
+    
+    // JmDNS for mDNS service discovery
+    implementation(libs.jmdns)
 }

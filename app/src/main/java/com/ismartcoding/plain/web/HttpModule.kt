@@ -374,6 +374,7 @@ object HttpModule {
                     } else {
                         path = decryptedId
                     }
+
                     if (path.startsWith("content://")) {
                         val bytes = withIO { context.contentResolver.openInputStream(Uri.parse(path))?.buffered()?.use { it.readBytes() } }
                         if (bytes != null) {

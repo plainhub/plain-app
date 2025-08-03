@@ -556,6 +556,8 @@
     <string name="foreground_service_notification_prompt">இந்த ஆப்ஸ் பின்னியின் இயல்புநிலையில் ஓடுவதும் அறிவிக்குவதும் பெற அனுமதிக்குத் தயவுசெய்து அனுமதியை கொடுங்கள்.</string>
     <string name="internal_storage">உள் சேமிப்பு</string>
     <string name="enter_this_address_tips">உங்கள் கணினியின் உலாவியில் மேலே குறிப்பிட்ட முகவரியை உள்ளிடுக, உங்கள் போன் மற்றும் கணினியை ஒரே உள்ளாக்க வலிமையானதாக உறுதிப்படுத்துங்கள்.</string>
+    <string name="mdns_hostname">mDNS ஹோஸ்ட்நேம்</string>
+    <string name="mdns_hostname_invalid">ஹோஸ்ட்நேம் .local உடன் முடிவடைய வேண்டும்</string>
     <string name="last_visit_at">கடைசி பரிந்துரை</string>
     <string name="app_restored">ஆப்லிகேஷன் தரவு மீட்கப்பட்டுள்ளது, இதை புரிந்திருக்க உங்கள் ஆப்லிகேஷனை புதுப்பிக்கவும்.</string>
     <string name="welcome_text">வரவேற்கிறோம்! நீங்கள் எளிதாக உங்கள் கணினியில் உருவாக்கப்பட்ட உரை, புகைப்படங்கள் மற்றும் காணொளிகளை அனுப்ப முடியும்.\nஏனெனில் உங்களிடம் ஏதும் பிரச்சினை ஏற்பட்டால், தயவுசெய்து உதவி பெற இஸ்மார்ட் கோடிங்குமின்றி மின்னஞ்சல் அனுப்பவும் அல்லது எங்கள் டிஸ்கார்ட் உரையில் இணைந்துகொள்கின்றது: https://discord.gg/RQWcS6DEEe.</string>
@@ -672,4 +674,6 @@
     <string name="delete_peer_warning">இந்த சாதனத்தை நீக்குவது அனைத்து தொடர்புடைய அரட்டை செய்திகளையும் நீக்கும். இந்த செயலை மாற்ற முடியாது.</string>
     <string name="forward">முன்னோக்கி</string>
     <string name="sent">அனுப்பியது</string>
+    <string name="device_type">சாதன வகை</string>
+    <string name="port">போர்ட்</string>
 </resources>

@@ -558,6 +558,8 @@
     <string name="foreground_service_notification_prompt">请允许此应用在后台运行并显示通知，以便提供必要的功能或服务。</string>
     <string name="internal_storage">内部存储</string>
     <string name="enter_this_address_tips">在电脑浏览器中输入以上地址，需确保手机和电脑在同一局域网中。</string>
+    <string name="mdns_hostname">mDNS主机名</string>
+    <string name="mdns_hostname_invalid">主机名必须以.local结尾</string>
     <string name="last_visit_at">最后访问时间</string>
     <string name="app_restored">应用数据已经恢复，您需要重启应用。</string>
     <string name="welcome_text">欢迎使用！您可以轻松地将文本、图片和视频发送到本页面，并在您的电脑上查看。\n如果您遇到问题，请发送邮件至ismartcoding@gmail.com寻求帮助，或者加入QQ群讨论: 812409393。</string>

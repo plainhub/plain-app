@@ -556,6 +556,8 @@
     <string name="foreground_service_notification_prompt">백그라운드에서 실행되고 필수 기능 또는 서비스를 제공하기 위해 알림을 표시하려면 이 앱에 허용해주세요.</string>
     <string name="internal_storage">내부 저장소</string>
     <string name="enter_this_address_tips">컴퓨터 브라우저에서 위의 주소를 입력하고 휴대전화와 컴퓨터가 동일한 로컬 네트워크에 있는지 확인하십시오.</string>
+    <string name="mdns_hostname">mDNS 호스트명</string>
+    <string name="mdns_hostname_invalid">호스트명은 .local로 끝나야 합니다</string>
     <string name="last_visit_at">마지막 방문 날짜</string>
     <string name="app_restored">앱 데이터가 복원되었습니다. 앱을 강제 종료하고 새로 시작해야 합니다.</string>
     <string name="welcome_text">환영합니다! 이 페이지로 텍스트, 이미지 및 비디오를 쉽게 보내고 컴퓨터에서 볼 수 있습니다.\n문제가 발생하면 도움이 필요하면 ismartcoding@gmail.com으로 이메일을 보내거나 https://discord.gg/RQWcS6DEEe에서 디스코드 토론에 참여하세요.</string>

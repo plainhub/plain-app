@@ -556,6 +556,8 @@
     <string name="foreground_service_notification_prompt">Please allow this app to run in the background and show notifications to provide essential functionality or services.</string>
     <string name="internal_storage">Internal storage</string>
     <string name="enter_this_address_tips">Enter the above address in your computer\'s browser, ensuring that your phone and computer are on the same local network.</string>
+    <string name="mdns_hostname">mDNS Hostname</string>
+    <string name="mdns_hostname_invalid">Hostname must end with .local</string>
     <string name="last_visit_at">Last visit at</string>
     <string name="app_restored">APP data is restored, you need to force quit this app and start the app again as new.</string>
     <string name="welcome_text">Welcome! You can easily send text, images, and videos to this page and view them on your computer.\nIf you encounter any issues, please feel free to send an email to ismartcoding@gmail.com for assistance or join our Discord discussion at: https://discord.gg/RQWcS6DEEe.</string>

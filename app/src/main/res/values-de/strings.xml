@@ -556,6 +556,8 @@
     <string name="foreground_service_notification_prompt">Bitte erlauben Sie dieser App, im Hintergrund ausgeführt zu werden und Benachrichtigungen anzuzeigen, um wesentliche Funktionen oder Dienste bereitzustellen.</string>
     <string name="internal_storage">Interner Speicher</string>
     <string name="enter_this_address_tips">Geben Sie die obige Adresse in den Browser Ihres Computers ein und stellen Sie sicher, dass Ihr Telefon und Ihr Computer im selben lokalen Netzwerk sind.</string>
+    <string name="mdns_hostname">mDNS-Hostname</string>
+    <string name="mdns_hostname_invalid">Hostname muss mit .local enden</string>
     <string name="last_visit_at">Zuletzt besucht um</string>
     <string name="app_restored">APP-Daten wurden wiederhergestellt. Sie müssen die App zwangsweise beenden und die App erneut als neu starten.</string>
     <string name="welcome_text">Willkommen! Sie können ganz einfach Text, Bilder und Videos auf dieser Seite senden und sie auf Ihrem Computer anzeigen.\nWenn Sie auf Probleme stoßen, senden Sie bitte eine E-Mail an ismartcoding@gmail.com, um Unterstützung zu erhalten, oder nehmen Sie an unserer Discord-Diskussion teil unter: https://discord.gg/RQWcS6DEEe.</string>

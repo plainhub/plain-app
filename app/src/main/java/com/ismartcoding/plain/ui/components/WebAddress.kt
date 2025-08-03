@@ -3,20 +3,34 @@ package com.ismartcoding.plain.ui.components
 import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.preferences.HttpsPreference
+import com.ismartcoding.plain.preferences.MdnsHostnamePreference
 import com.ismartcoding.plain.ui.base.PageIndicator
+import com.ismartcoding.plain.ui.base.TextFieldDialog
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.MainViewModel
@@ -45,7 +59,34 @@ fun WebAddress(
         }
     }
 
+    var showHostnameDialog by remember { mutableStateOf(false) }
+    var hostname by remember { mutableStateOf(TempData.mdnsHostname) }
+
     VerticalSpace(dp = 16.dp)
+
+    // mDNS Hostname section
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "mDNS: $hostname",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+
+        TextButton(
+            onClick = { showHostnameDialog = true }
+        ) {
+            Text(stringResource(id = R.string.edit))
+        }
+    }
+
+    VerticalSpace(dp = 8.dp)
+
+    // HTTP/HTTPS address section
     HorizontalPager(
         modifier = Modifier.padding(horizontal = 16.dp),
         state = pagerState,
@@ -59,4 +100,36 @@ fun WebAddress(
         }
     }
     PageIndicator(pagerState)
+
+    // Hostname edit dialog
+    if (showHostnameDialog) {
+        TextFieldDialog(
+            title = stringResource(id = R.string.mdns_hostname),
+            value = hostname,
+            confirmText = stringResource(R.string.save),
+            placeholder = hostname,
+            onDismissRequest = { showHostnameDialog = false },
+            onConfirm = { newHostname ->
+                hostname = newHostname
+                TempData.mdnsHostname = newHostname
+                scope.launch {
+                    withIO { MdnsHostnamePreference.putAsync(context, newHostname) }
+                    androidx.appcompat.app.AlertDialog.Builder(context)
+                        .setTitle(R.string.restart_app_title)
+                        .setMessage(R.string.restart_app_message)
+                        .setPositiveButton(R.string.relaunch_app) { _, _ ->
+                            AppHelper.relaunch(context)
+                        }
+                        .setCancelable(false)
+                        .create()
+                        .show()
+                }
+                showHostnameDialog = false
+            },
+            validator = { input ->
+                input.isNotEmpty() && input.endsWith(".local")
+            },
+            validationErrorText = stringResource(id = R.string.mdns_hostname_invalid)
+        )
+    }
 }
