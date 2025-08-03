@@ -103,8 +103,8 @@ object NearbyDiscoverManager {
     }
 
     private fun handleReceivedMessage(message: String, senderIP: String) {
-        val ownIP = NetworkHelper.getDeviceIP4()
-        if (senderIP == ownIP) return
+        val ownIPs = NetworkHelper.getDeviceIP4s()
+        if (ownIPs.contains(senderIP)) return
 
         when {
             message.startsWith(NearbyMessageType.DISCOVER_REPLY.toPrefix()) -> {

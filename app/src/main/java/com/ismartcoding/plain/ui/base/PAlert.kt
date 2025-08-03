@@ -35,7 +35,7 @@ fun PAlert(
     PCard {
         Row(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp, bottom = 8.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {

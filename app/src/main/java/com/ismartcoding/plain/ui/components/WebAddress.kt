@@ -1,13 +1,16 @@
 package com.ismartcoding.plain.ui.components
 
+import android.content.ClipData
 import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -26,14 +29,20 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.clipboardManager
+import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.preferences.HttpsPreference
 import com.ismartcoding.plain.preferences.MdnsHostnamePreference
+import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PageIndicator
 import com.ismartcoding.plain.ui.base.TextFieldDialog
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.MainViewModel
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import kotlinx.coroutines.launch
 
 // https://developer.android.com/jetpack/compose/layouts/pager
@@ -62,27 +71,23 @@ fun WebAddress(
     var showHostnameDialog by remember { mutableStateOf(false) }
     var hostname by remember { mutableStateOf(TempData.mdnsHostname) }
 
-    VerticalSpace(dp = 16.dp)
+    VerticalSpace(dp = 8.dp)
 
-    // mDNS Hostname section
-    Row(
-        modifier = Modifier
+    PListItem(
+        Modifier
+            .padding(horizontal = 16.dp)
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "mDNS: $hostname",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        TextButton(
-            onClick = { showHostnameDialog = true }
-        ) {
-            Text(stringResource(id = R.string.edit))
-        }
-    }
+            .background(
+                color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                shape = RoundedCornerShape(12.dp),
+            ),
+        title = "mDNS",
+        subtitle = hostname,
+        action = {
+            PIconButton(icon = R.drawable.pen, contentDescription = stringResource(id = R.string.edit), click = {
+                showHostnameDialog = true
+            })
+        })
 
     VerticalSpace(dp = 8.dp)
 
