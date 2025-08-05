@@ -629,7 +629,7 @@
     <string name="empty_playlist">Sua lista de reprodução está vazia</string>
     <string name="drag_number_to_reorder">Arraste o número para reordenar</string>
     <string name="remove_from_playlist">Remover da lista</string>
-    <string name="no_internet_connection">Nenhuma conexão de internet. Verifique sua conexão.</string>
+    <string name="no_network_connection">Sem conexão de rede.</string>
     <string name="access_phone_web">Acesse seu telefone a partir de um navegador de computador.</string>
     <string name="scan_qrcode_to_access_web">Digitalize o código QR para acessar o endereço da web</string>
     <string name="cannot_share_system_component">Não é possível compartilhar o componente do sistema. Este arquivo é um módulo do sistema protegido.</string>

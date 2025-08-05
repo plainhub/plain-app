@@ -629,7 +629,7 @@
     <string name="empty_playlist">재생 목록이 비어 있습니다</string>
     <string name="drag_number_to_reorder">번호를 드래그하여 순서 변경</string>
     <string name="remove_from_playlist">재생 목록에서 제거</string>
-    <string name="no_internet_connection">인터넷 연결이 없습니다. 네트워크를 확인하세요.</string>
+    <string name="no_network_connection">네트워크 연결이 없습니다.</string>
     <string name="access_phone_web">컴퓨터 브라우저에서 휴대전화를 액세스하세요.</string>
     <string name="scan_qrcode_to_access_web">웹 주소에 액세스하려면 QR 코드를 스캔하세요</string>
     <string name="cannot_share_system_component">시스템 구성 요소를 공유할 수 없습니다. 이 파일은 보호된 시스템 모듈입니다.</string>

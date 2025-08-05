@@ -629,7 +629,7 @@
     <string name="empty_playlist">您的播放清單為空</string>
     <string name="drag_number_to_reorder">拖曳編號以重新排序</string>
     <string name="remove_from_playlist">從播放清單中移除</string>
-    <string name="no_internet_connection">無網路連線。請檢查您的網路。</string>
+    <string name="no_network_connection">沒有網路連線。</string>
     <string name="access_phone_web">從電腦瀏覽器訪問您的手機。</string>
     <string name="scan_qrcode_to_access_web">掃描二維碼訪問網頁</string>
     <string name="cannot_share_system_component">無法共享系統組件。此文件是受保護的系統模組。</string>

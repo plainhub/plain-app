@@ -629,7 +629,7 @@
     <string name="empty_playlist">Your playlist is empty</string>
     <string name="drag_number_to_reorder">Drag the number to reorder playlist items</string>
     <string name="remove_from_playlist">Remove from playlist</string>
-    <string name="no_internet_connection">No internet connection. Please check your network.</string>
+    <string name="no_network_connection">No network connection.</string>
     <string name="access_phone_web">Access your phone from a computer browser.</string>
     <string name="scan_qrcode_to_access_web">Scan QR code to access web address</string>
     <string name="cannot_share_system_component">Cannot share system component. This file is a protected system module.</string>

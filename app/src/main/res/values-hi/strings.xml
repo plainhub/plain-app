@@ -629,7 +629,7 @@
     <string name="empty_playlist">आपकी प्लेलिस्ट खाली है</string>
     <string name="drag_number_to_reorder">क्रम बदलने के लिए नंबर खींचें</string>
     <string name="remove_from_playlist">प्लेलिस्ट से हटाएं</string>
-    <string name="no_internet_connection">इंटरनेट कनेक्शन नहीं है। कृपया अपना नेटवर्क जांचें।</string>
+    <string name="no_network_connection">कोई नेटवर्क कनेक्शन नहीं।</string>
     <string name="access_phone_web">कंप्यूटर ब्राउज़र से अपने फ़ोन तक पहुँचें।</string>
     <string name="scan_qrcode_to_access_web">वेब पता तक पहुँचने के लिए QR कोड स्कैन करें</string>
     <string name="cannot_share_system_component">सिस्टम घटक साझा करना संभव नहीं है। यह फ़ाइल एक सुरक्षित सिस्टम मॉड्यूल है।</string>

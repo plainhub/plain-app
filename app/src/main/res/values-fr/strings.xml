@@ -629,7 +629,7 @@
     <string name="empty_playlist">Votre liste de lecture est vide</string>
     <string name="drag_number_to_reorder">Faites glisser le numéro pour réorganiser la liste</string>
     <string name="remove_from_playlist">Supprimer de la liste</string>
-    <string name="no_internet_connection">Aucune connexion internet. Veuillez vérifier votre connexion.</string>
+    <string name="no_network_connection">Aucune connexion réseau.</string>
     <string name="access_phone_web">Accédez à votre téléphone depuis un navigateur sur un ordinateur.</string>
     <string name="scan_qrcode_to_access_web">Scannez le code QR ci-dessus pour accéder à votre téléphone depuis un navigateur sur un ordinateur.</string>
     <string name="cannot_share_system_component">Impossible de partager le composant du système. Ce fichier est un module du système protégé.</string>

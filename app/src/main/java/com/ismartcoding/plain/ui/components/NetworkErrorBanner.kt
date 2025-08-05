@@ -13,8 +13,8 @@ fun NetworkErrorBanner(
     if (isVisible) {
         PAlert(
             title = stringResource(R.string.warning),
-            description = stringResource(R.string.no_internet_connection),
-            type = AlertType.ERROR,
+            description = stringResource(R.string.no_network_connection),
+            type = AlertType.WARNING,
         )
     }
 } 

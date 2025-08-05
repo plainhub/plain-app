@@ -629,7 +629,7 @@
     <string name="empty_playlist">Ваш плейлист пуст</string>
     <string name="drag_number_to_reorder">Перетащите номер для изменения порядка</string>
     <string name="remove_from_playlist">Удалить из плейлиста</string>
-    <string name="no_internet_connection">Нет подключения к интернету. Пожалуйста, проверьте вашу сеть.</string>
+    <string name="no_network_connection">Нет сетевого подключения.</string>
     <string name="access_phone_web">Получите доступ к телефону через браузер на компьютере.</string>
     <string name="scan_qrcode_to_access_web">Сканируйте QR-код, чтобы получить доступ к веб-адресу</string>
     <string name="cannot_share_system_component">Невозможно поделиться системным компонентом. Этот файл является защищенным системным модулем.</string>
