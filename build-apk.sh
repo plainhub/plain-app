@@ -37,7 +37,7 @@ EOF
 
 # Build default APK (arm64-v8a)
 ./gradlew assembleGithubRelease || err_and_exit "assembleGithubRelease failed"
-BUILD_FILE="PlainApp-$(getVersionName).apk"
+BUILD_FILE="PlainApp-$(getVersionName)-default.apk"
 mv ./app/build/outputs/apk/github/release/app-github-release.apk ./$BUILD_FILE
 
 # Build armeabi-v7a APK

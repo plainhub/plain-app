@@ -38,5 +38,5 @@ jobs:
           body: "## What's Changed"
           draft: true
           prerelease: false
-          artifacts: ./PlainApp-${{ env.version_name }}.apk,./PlainApp-${{ env.version_name  }}-armeabi-v7a.apk
+          artifacts: ./PlainApp-${{ env.version_name  }}-armeabi-v7a.apk,./PlainApp-${{ env.version_name }}-default.apk
 
