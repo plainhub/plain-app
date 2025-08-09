@@ -76,6 +76,7 @@ import io.ktor.server.plugins.origin
 import io.ktor.server.plugins.partialcontent.PartialContent
 import io.ktor.server.request.header
 import io.ktor.server.request.receiveMultipart
+import io.ktor.server.request.receive
 import io.ktor.server.request.receiveText
 import io.ktor.server.response.header
 import io.ktor.server.response.respond
@@ -666,6 +667,20 @@ object HttpModule {
                     return@post
                 }
                 HttpServerManager.clientIpCache[clientId] = call.request.origin.remoteAddress
+                // If request body is not empty, try to decrypt with the token corresponding to c-id.
+                // If decrypt succeeds, return 200; otherwise continue with the original handling.
+                val bodyBytes = runCatching { call.receive<ByteArray>() }.getOrNull()
+                if (bodyBytes != null && bodyBytes.isNotEmpty()) {
+                    val token = HttpServerManager.tokenCache[clientId]
+                    if (token != null) {
+                        val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, bodyBytes)
+                        if (decryptedBytes != null) {
+                            call.respond(HttpStatusCode.OK)
+                            return@post
+                        }
+                    }
+                }
+
                 if (PasswordTypePreference.getValueAsync(MainApp.instance) == PasswordType.NONE) {
                     call.respondText(HttpServerManager.resetPasswordAsync())
                 } else {
