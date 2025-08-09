@@ -3,9 +3,12 @@ package com.ismartcoding.plain.web
 import android.content.Context
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.withTimeout
 import java.net.InetAddress
 import javax.jmdns.JmDNS
 import javax.jmdns.ServiceInfo
@@ -17,6 +20,7 @@ object NsdHelper {
     private var nsdManager: NsdManager? = null
     private var registrationListener: NsdManager.RegistrationListener? = null
     private var jmDNS: JmDNS? = null
+    private var unregisterJob: Job? = null
     
     /**
      * Register the HTTP service with NSD and mDNS
@@ -98,25 +102,28 @@ object NsdHelper {
      * Unregister the service when no longer needed
      */
     fun unregisterService() {
-        // Unregister Android NSD
-        registrationListener?.let { listener ->
-            try {
-                nsdManager?.unregisterService(listener)
-                LogCat.d("Unregistered Android NSD service")
-            } catch (e: Exception) {
-                LogCat.e("Failed to unregister Android NSD service: ${e.message}")
+        val listener = registrationListener.also { registrationListener = null }
+        val jmdns = jmDNS.also { jmDNS = null }
+
+        unregisterJob?.cancel()
+
+        unregisterJob = coIO {
+            listener?.let { l ->
+                runCatching { nsdManager?.unregisterService(l) }
+                    .onSuccess { LogCat.d("Unregistered Android NSD service") }
+                    .onFailure { LogCat.e("Failed to unregister Android NSD service: ${it.message}") }
+            }
+
+            jmdns?.let { j ->
+                runCatching {
+                    withTimeout(5_000) {
+                        runCatching { j.unregisterAllServices() }
+                        runCatching { j.close() }
+                    }
+                }
+                    .onSuccess { LogCat.d("Unregistered JmDNS service") }
+                    .onFailure { LogCat.e("Failed to shutdown JmDNS: ${it.message}") }
             }
         }
-        registrationListener = null
-        
-        // Unregister JmDNS
-        try {
-            jmDNS?.unregisterAllServices()
-            jmDNS?.close()
-            LogCat.d("Unregistered JmDNS service")
-        } catch (e: Exception) {
-            LogCat.e("Failed to unregister JmDNS service: ${e.message}")
-        }
-        jmDNS = null
     }
 }
