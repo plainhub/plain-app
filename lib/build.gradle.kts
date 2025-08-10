@@ -44,11 +44,12 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     api(libs.androidx.appcompat)
 
+
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
 //    api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
-    implementation(libs.pdfium.android)
+    implementation(files("libs/PdfiumAndroid-2.0.0-release.aar"))
 
     api(libs.gson)
 
