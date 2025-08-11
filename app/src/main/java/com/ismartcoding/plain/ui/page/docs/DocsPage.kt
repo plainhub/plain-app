@@ -223,9 +223,7 @@ fun DocsPage(
                             docsVM.exitSelectMode()
                         }
                     } else {
-                        NavigationBackIcon {
-                            navController.popBackStack()
-                        }
+                        NavigationBackIcon { navController.navigateUp() }
                     }
                 },
                 title = pageTitle,

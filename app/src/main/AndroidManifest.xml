@@ -164,7 +164,7 @@
         </service>
 
         <service
-            android:name=".services.AudioPlayerService"
+            android:name="com.ismartcoding.plain.services.AudioPlayerService"
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="mediaPlayback">

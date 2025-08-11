@@ -119,7 +119,7 @@ fun ChatEditTextPage(
                                     ),
                                 )
                                 focusManager.clearFocus()
-                                navController.popBackStack()
+                                navController.navigateUp()
                             }
                         }
                     }

@@ -160,9 +160,7 @@ fun FeedsPage(
                             feedsVM.exitSelectMode()
                         }
                     } else {
-                        NavigationBackIcon {
-                            navController.popBackStack()
-                        }
+                        NavigationBackIcon { navController.navigateUp() }
                     }
                 },
                 title = pageTitle,

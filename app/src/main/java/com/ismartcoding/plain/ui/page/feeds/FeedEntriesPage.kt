@@ -283,9 +283,7 @@ fun FeedEntriesPage(
                             feedEntriesVM.exitSelectMode()
                         }
                     } else {
-                        NavigationBackIcon {
-                            navController.popBackStack()
-                        }
+                        NavigationBackIcon { navController.navigateUp() }
                     }
                 },
                 title = pageTitle,

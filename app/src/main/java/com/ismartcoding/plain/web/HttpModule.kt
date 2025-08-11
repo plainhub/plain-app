@@ -133,7 +133,6 @@ object HttpModule {
                 allowHost("127.0.0.1:3000")
             }
             allowHeadersPrefixed("c-")
-            allowHeader("x-box-api")
         }
 
         install(ConditionalHeaders)

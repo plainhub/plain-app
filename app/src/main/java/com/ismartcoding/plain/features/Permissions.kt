@@ -175,15 +175,14 @@ enum class Permission {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 intentLauncher?.launch(intent)
             } catch (e: Exception) {
-                val intent = Intent()
-                intent.action = Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                if (intent.resolveActivity(packageManager) != null) {
-                    intentLauncher?.launch(intent)
+                val appDetailsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.parse("package:${context.packageName}")
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                if (appDetailsIntent.resolveActivity(packageManager) != null) {
+                    intentLauncher?.launch(appDetailsIntent)
                 } else {
-                    DialogHelper.showMessage(
-                        "ActivityNotFoundException: No Activity found to handle Intent act=android.settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION",
-                    )
+                    DialogHelper.showMessage("Cannot open app settings to grant storage access.")
                 }
             }
         } else if (this == WRITE_SETTINGS) {

@@ -91,7 +91,7 @@ class PreviewerPlaceholder(
 fun MediaPreviewer(
     state: MediaPreviewerState,
     getItem: (Int) -> PreviewItem = { index ->
-        MediaPreviewData.items[index]
+        MediaPreviewData.items.getOrNull(index) ?: PreviewItem(index.toString())
     },
     castVM: CastViewModel = viewModel(),
     tagsVM: TagsViewModel? = null,
@@ -156,59 +156,68 @@ fun MediaPreviewer(
 
                             ) {
                             key(page) {
-                                val item = remember(page) {
-                                    getItem(page)
+                                val item = remember(page, MediaPreviewData.items.size) {
+                                    MediaPreviewData.items.getOrNull(page)
                                 }
-                                MediaViewer(
-                                    modifier = Modifier.fillMaxSize(),
-                                    pagerState = state.pagerState,
-                                    videoState = state.videoState,
-                                    page = page,
-                                    model = getModel(item),
-                                    state = viewerState,
-                                    boundClip = false,
-                                    gesture = GestureScope(
-                                        onTap = {
-                                            state.showActions = !state.showActions
-                                        },
-                                        onDoubleTap = {
-                                            scope.launch {
-                                                viewerState.toggleScale(it)
-                                            }
-                                            false
-                                        },
-                                        onLongPress = {}
-                                    ),
-                                )
+                                if (item != null) {
+                                    MediaViewer(
+                                        modifier = Modifier.fillMaxSize(),
+                                        pagerState = state.pagerState,
+                                        videoState = state.videoState,
+                                        page = page,
+                                        model = getModel(item),
+                                        state = viewerState,
+                                        boundClip = false,
+                                        gesture = GestureScope(
+                                            onTap = {
+                                                state.showActions = !state.showActions
+                                            },
+                                            onDoubleTap = {
+                                                scope.launch {
+                                                    viewerState.toggleScale(it)
+                                                }
+                                                false
+                                            },
+                                            onLongPress = {}
+                                        ),
+                                    )
+                                }
                             }
                         }
                     },
                 )
             }
-            val m = remember(state.pagerState.currentPage) {
-                getItem(state.pagerState.currentPage)
+            val m = remember(state.pagerState.currentPage, MediaPreviewData.items.size) {
+                MediaPreviewData.items.getOrNull(state.pagerState.currentPage)
             }
-            if (m.path.isVideoFast()) {
-                VideoPreviewActions(context = context, castViewModel = castVM, m = m, state)
-            } else {
-                ImagePreviewActions(context = context, castViewModel = castVM, m = m, state)
+            if (m != null) {
+                if (m.path.isVideoFast()) {
+                    VideoPreviewActions(context = context, castViewModel = castVM, m = m, state)
+                } else {
+                    ImagePreviewActions(context = context, castViewModel = castVM, m = m, state)
+                }
             }
         }
     }
     if (state.showMediaInfo) {
-        val m = getItem(state.pagerState.currentPage)
-        ViewMediaBottomSheet(
-            m,
-            tagsVM, tagsMap, tagsState,
-            onDismiss = {
-                state.showMediaInfo = false
-            },
-            onRenamedAsync = onRenamed,
-            deleteAction = {
-                deleteAction(m)
-            },
-            onTagsChangedAsync = onTagsChanged
-        )
+        val m = MediaPreviewData.items.getOrNull(state.pagerState.currentPage)
+        if (m != null) {
+            ViewMediaBottomSheet(
+                m,
+                tagsVM, tagsMap, tagsState,
+                onDismiss = {
+                    state.showMediaInfo = false
+                },
+                onRenamedAsync = onRenamed,
+                deleteAction = {
+                    deleteAction(m)
+                },
+                onTagsChangedAsync = onTagsChanged
+            )
+        } else {
+            // No valid item; ensure the info panel is closed
+            state.showMediaInfo = false
+        }
     }
 
     state.ticket.Next()

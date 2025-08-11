@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
@@ -130,7 +131,7 @@ class MainActivity : AppCompatActivity() {
                     val service = Intent(this, ScreenMirrorService::class.java)
                     service.putExtra("code", result.resultCode)
                     service.putExtra("data", result.data)
-                    startService(service)
+                    ContextCompat.startForegroundService(this, service)
                 } else {
                     sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, image))
                 }

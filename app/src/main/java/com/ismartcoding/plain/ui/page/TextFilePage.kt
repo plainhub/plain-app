@@ -83,7 +83,7 @@ fun TextFilePage(
     if (textFileVM.showMoreActions.value) {
         ViewTextFileBottomSheet(textFileVM, path, textFileVM.file.value, onDeleted = {
             scope.launch {
-                navController.popBackStack()
+                navController.navigateUp()
             }
         })
     }
@@ -99,9 +99,7 @@ fun TextFilePage(
                 navController = navController,
                 navigationIcon = {
                     if (textFileVM.readOnly.value) {
-                        NavigationBackIcon {
-                            navController.popBackStack()
-                        }
+                        NavigationBackIcon { navController.navigateUp() }
                     } else {
                         NavigationCloseIcon {
                             textFileVM.exitEditMode()

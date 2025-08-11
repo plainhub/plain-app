@@ -75,7 +75,7 @@ object NotificationHelper {
             )
 
         return NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID).apply {
-            setSmallIcon(R.drawable.notification)
+            setSmallIcon(R.drawable.ic_stat_notification)
             setContentTitle(title)
             setContentText(description)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

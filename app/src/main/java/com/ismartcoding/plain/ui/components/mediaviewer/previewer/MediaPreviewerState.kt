@@ -54,7 +54,9 @@ fun rememberPreviewerState(
     verticalDragType: VerticalDragType = VerticalDragType.UpAndDown,
     @IntRange(from = 0) initialPage: Int = 0,
     pageCount: () -> Int = { MediaPreviewData.items.size },
-    getKey: (Int) -> Any = { MediaPreviewData.items[it].id },
+    getKey: (Int) -> Any = { index ->
+        MediaPreviewData.items.getOrNull(index)?.id ?: index
+    },
 ): MediaPreviewerState {
     val pagerState = rememberPagerState(initialPage, pageCount = pageCount)
     val mediaPreviewerState = rememberSaveable(saver = MediaPreviewerState.getSaver(pagerState)) {

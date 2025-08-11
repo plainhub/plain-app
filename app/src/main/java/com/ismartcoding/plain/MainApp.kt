@@ -2,6 +2,8 @@ package com.ismartcoding.plain
 
 import android.app.Application
 import android.os.Build
+import android.view.textclassifier.TextClassificationManager
+import android.view.textclassifier.TextClassifier
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.isUPlus
@@ -49,6 +51,13 @@ class MainApp : Application() {
         // https://stackoverflow.com/questions/77683434/the-getnextentry-method-of-zipinputstream-throws-a-zipexception-invalid-zip-ent
         if (isUPlus()) {
             ZipPathValidator.clearCallback()
+        }
+
+        // Disable Smart Text Selection to avoid framework crash in SmartSelectSprite
+        try {
+            val manager = getSystemService(TextClassificationManager::class.java)
+            manager?.setTextClassifier(TextClassifier.NO_OP)
+        } catch (_: Throwable) {
         }
 
         coIO {

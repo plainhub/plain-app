@@ -7,6 +7,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -45,8 +46,10 @@ data class ImagesPageState(
             tagsVM: TagsViewModel,
             imageFoldersVM: MediaFoldersViewModel,
         ): ImagesPageState {
-            tagsVM.dataType.value = imagesVM.dataType
-            imageFoldersVM.dataType.value = imagesVM.dataType
+            LaunchedEffect(Unit) {
+                tagsVM.dataType.value = imagesVM.dataType
+                imageFoldersVM.dataType.value = imagesVM.dataType
+            }
             val tagsState by tagsVM.itemsFlow.collectAsState()
             val pagerState = rememberPagerState(pageCount = { 
                 tagsState.size + if (AppFeatureType.MEDIA_TRASH.has()) 2 else 1 

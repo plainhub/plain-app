@@ -207,9 +207,7 @@ fun ChatPage(
                             chatVM.exitSelectMode()
                         }
                     } else {
-                        NavigationBackIcon {
-                            navController.popBackStack()
-                        }
+                        NavigationBackIcon { navController.navigateUp() }
                     }
                 },
                 title = pageTitle,

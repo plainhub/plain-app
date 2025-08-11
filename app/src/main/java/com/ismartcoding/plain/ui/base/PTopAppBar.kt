@@ -22,7 +22,7 @@ fun PTopAppBar(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     navigationIcon: (@Composable () -> Unit)? = {
-        NavigationBackIcon { navController.popBackStack() }
+        NavigationBackIcon { navController.navigateUp() }
     },
     title: String,
     subtitle: String = "",

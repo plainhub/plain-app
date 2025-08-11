@@ -19,6 +19,7 @@ import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
+import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
 import com.ismartcoding.plain.ui.base.IconTextRenameButton
 import com.ismartcoding.plain.ui.base.IconTextSelectButton
 import com.ismartcoding.plain.ui.base.IconTextShareButton
@@ -76,6 +77,9 @@ fun ViewDocBottomSheet(
                     IconTextShareButton {
                         ShareHelper.sharePaths(context, setOf(m.path))
                         onDismiss()
+                    }
+                    IconTextOpenWithButton {
+                        ShareHelper.openPathWith(context, m.path)
                     }
                     IconTextRenameButton {
                         docsVM.showRenameDialog.value = true

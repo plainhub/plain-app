@@ -9,6 +9,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import com.ismartcoding.plain.data.DAudio
 import com.ismartcoding.plain.data.DMediaBucket
@@ -40,8 +41,10 @@ data class AudioPageState(
             tagsVM: TagsViewModel,
             mediaFoldersVM: MediaFoldersViewModel,
         ): AudioPageState {
-            tagsVM.dataType.value = audioVM.dataType
-            mediaFoldersVM.dataType.value = audioVM.dataType
+            LaunchedEffect(Unit) {
+                tagsVM.dataType.value = audioVM.dataType
+                mediaFoldersVM.dataType.value = audioVM.dataType
+            }
             val tagsState by tagsVM.itemsFlow.collectAsState()
             val pagerState = rememberPagerState(pageCount = { 
                 tagsState.size + if (AppFeatureType.MEDIA_TRASH.has()) 2 else 1 

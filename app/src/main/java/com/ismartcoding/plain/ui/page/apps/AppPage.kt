@@ -103,7 +103,7 @@ fun AppPage(
     LaunchedEffect(lifecycleEvent) {
         if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
             if (PackageHelper.isUninstalled(id)) {
-                navController.popBackStack()
+                navController.navigateUp()
             }
         }
     }

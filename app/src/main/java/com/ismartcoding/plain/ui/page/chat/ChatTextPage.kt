@@ -34,7 +34,7 @@ fun ChatTextPage(
             PTopAppBar(
                 navController = navController,
                 navigationIcon = {
-                    NavigationCloseIcon { navController.popBackStack() }
+                    NavigationCloseIcon { navController.navigateUp() }
                 },
                 title = ""
             )

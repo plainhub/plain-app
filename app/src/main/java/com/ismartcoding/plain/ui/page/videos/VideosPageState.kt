@@ -6,6 +6,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,8 +47,10 @@ data class VideosPageState(
             tagsVM: TagsViewModel,
             mediaFoldersVM: MediaFoldersViewModel,
         ): VideosPageState {
-            mediaFoldersVM.dataType.value = videosVM.dataType
-            tagsVM.dataType.value = videosVM.dataType
+            LaunchedEffect(Unit) {
+                mediaFoldersVM.dataType.value = videosVM.dataType
+                tagsVM.dataType.value = videosVM.dataType
+            }
             val tagsState by tagsVM.itemsFlow.collectAsState()
             val pagerState = rememberPagerState(pageCount = { 
                 tagsState.size + if (AppFeatureType.MEDIA_TRASH.has()) 2 else 1 

@@ -67,9 +67,7 @@ fun NearbyPage(
             PTopAppBar(
                 navController = navController,
                 navigationIcon = {
-                    NavigationBackIcon {
-                        navController.popBackStack()
-                    }
+                    NavigationBackIcon { navController.navigateUp() }
                 },
                 title = stringResource(R.string.nearby_devices)
             )

@@ -28,6 +28,7 @@ import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
 import com.ismartcoding.plain.ui.base.IconTextFavoriteButton
+import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
 import com.ismartcoding.plain.ui.base.IconTextRenameButton
 import com.ismartcoding.plain.ui.base.IconTextSelectButton
 import com.ismartcoding.plain.ui.base.IconTextShareButton
@@ -119,6 +120,11 @@ fun FileInfoBottomSheet(
                     IconTextShareButton {
                         ShareHelper.sharePaths(context, setOf(file.path))
                         onDismiss()
+                    }
+                    if (!file.isDir) {
+                        IconTextOpenWithButton {
+                            ShareHelper.openPathWith(context, file.path)
+                        }
                     }
                     IconTextRenameButton {
                         filesVM.showRenameDialog.value = true

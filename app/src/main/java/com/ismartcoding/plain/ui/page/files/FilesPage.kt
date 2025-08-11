@@ -294,9 +294,7 @@ fun FilesPage(
                             filesVM.exitSelectMode()
                         }
                     } else {
-                        NavigationBackIcon {
-                            navController.popBackStack()
-                        }
+                        NavigationBackIcon { navController.navigateUp() }
                     }
                 },
                 actions = {
