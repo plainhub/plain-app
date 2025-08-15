@@ -56,7 +56,7 @@ fun ForwardTargetDialog(
                 }
                 
                 if (pairedPeers.isNotEmpty()) {
-                    items(pairedPeers) { peer ->
+                    items(pairedPeers, key = { it.id }) { peer ->
                         PDialogListItem(
                             modifier = Modifier.clickable {
                                 onTargetSelected(ForwardTarget.Peer(peer))

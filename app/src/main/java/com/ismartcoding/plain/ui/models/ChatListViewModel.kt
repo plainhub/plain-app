@@ -18,6 +18,7 @@ import com.ismartcoding.plain.web.ChatApiManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
@@ -96,19 +97,35 @@ class ChatListViewModel : ViewModel() {
                     }
                 }
 
-                latestChatCache.clear()
-                latestChatCache.putAll(chatCache)
+                // Prepare new lists off the main thread
+                val newPairedPeers = allPeers
+                    .filter { it.status == "paired" }
+                    .sortedWith(
+                        compareByDescending<DPeer> { peer ->
+                            chatCache[peer.id]?.createdAt ?: Instant.DISTANT_PAST
+                        }.thenBy { Pinyin.toPinyin(it.name) }
+                    )
+                val newUnpairedPeers = allPeers
+                    .filter { it.status == "unpaired" }
+                    .sortedBy { Pinyin.toPinyin(it.name) }
 
-                // Sort paired peers by latest chat time (most recent first), then by name
-                pairedPeers.clear()
-                pairedPeers.addAll(allPeers.filter { it.status == "paired" }.toList()
-                    .sortedWith(compareByDescending<DPeer> { getLatestChat(it.id)?.createdAt ?: Instant.DISTANT_PAST }.thenBy { Pinyin.toPinyin(it.name) }))
-                unpairedPeers.clear()
-                unpairedPeers.addAll(allPeers.filter { it.status == "unpaired" }.toList().sortedBy { Pinyin.toPinyin(it.name) })
+                // Apply state updates on the main thread to avoid snapshot violations
+                withContext(Dispatchers.Main) {
+                    latestChatCache.clear()
+                    latestChatCache.putAll(chatCache)
+
+                    pairedPeers.clear()
+                    pairedPeers.addAll(newPairedPeers)
+
+                    unpairedPeers.clear()
+                    unpairedPeers.addAll(newUnpairedPeers)
+                }
             } catch (e: Exception) {
-                pairedPeers.clear()
-                unpairedPeers.clear()
-                latestChatCache.clear()
+                withContext(Dispatchers.Main) {
+                    pairedPeers.clear()
+                    unpairedPeers.clear()
+                    latestChatCache.clear()
+                }
             }
         }
     }
@@ -142,9 +159,12 @@ class ChatListViewModel : ViewModel() {
     }
 
     fun updatePeerLastActive(peerId: String) {
-        val currentMap = onlineMap.value.toMutableMap()
-        currentMap[peerId] = Clock.System.now()
-        onlineMap.value = currentMap
+        // Ensure state mutation happens on the main thread
+        viewModelScope.launch(Dispatchers.Main) {
+            val currentMap = onlineMap.value.toMutableMap()
+            currentMap[peerId] = Clock.System.now()
+            onlineMap.value = currentMap
+        }
     }
 
     fun isPeerOnline(peerId: String): Boolean {

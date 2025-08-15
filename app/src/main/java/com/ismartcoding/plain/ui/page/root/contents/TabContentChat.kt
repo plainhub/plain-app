@@ -142,8 +142,10 @@ fun TabContentChat(
     // Device discovery timer with dynamic interval
     LaunchedEffect(Unit) {
         while (isActive) {
+            // Snapshot the current peers list on the main thread to avoid reading state on IO
+            val peersSnapshot = pairedPeers.toList()
             scope.launch(Dispatchers.IO) {
-                pairedPeers.forEach { peer ->
+                peersSnapshot.forEach { peer ->
                     val key = ChatApiManager.peerKeyCache[peer.id]
                     if (key != null) {
                         try {
@@ -243,7 +245,8 @@ fun TabContentChat(
                 }
 
                 items(
-                    items = pairedPeers,
+                    items = pairedPeers.toList(),
+                    key = { it.id }
                 ) { peer ->
                     PeerListItem(
                         title = peer.name,
@@ -271,7 +274,8 @@ fun TabContentChat(
                 }
 
                 items(
-                    items = unpairedPeers,
+                    items = unpairedPeers.toList(),
+                    key = { it.id }
                 ) { peer ->
                     PeerListItem(
                         title = peer.name,
