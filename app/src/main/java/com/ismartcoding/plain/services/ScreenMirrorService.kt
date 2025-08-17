@@ -41,6 +41,7 @@ class ScreenMirrorService : LifecycleService() {
     private var mBitmap: Bitmap? = null
     private lateinit var orientationEventListener: OrientationEventListener
     private var isPortrait = true
+    private var notificationId: Int = 0
 
     private var mMediaProjection: MediaProjection? = null
     private var mImageReaderPortrait: ImageReader? = null
@@ -74,14 +75,6 @@ class ScreenMirrorService : LifecycleService() {
                     }
                 }
             }
-        val notification =
-            NotificationHelper.createServiceNotification(
-                this,
-                "${BuildConfig.APPLICATION_ID}.action.stop_screen_mirror",
-                getString(R.string.screen_mirror_service_is_running),
-            )
-        val id = NotificationHelper.generateId()
-        ServiceCompat.startForeground(this, id, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
     }
 
     @SuppressLint("WrongConstant")
@@ -95,6 +88,22 @@ class ScreenMirrorService : LifecycleService() {
             mResultCode = intent.getIntExtra("code", -1)
             mResultData = intent.parcelable("data")
         }
+
+        // Acquire MediaProjection before starting FGS with mediaProjection type to satisfy Android 14/15
+        if (mResultCode != -1 && mResultData != null && mMediaProjection == null) {
+            mMediaProjection = mediaProjectionManager.getMediaProjection(mResultCode, mResultData!!)
+        }
+
+        if (notificationId == 0) {
+            notificationId = NotificationHelper.generateId()
+        }
+        val notification =
+            NotificationHelper.createServiceNotification(
+                this,
+                "${BuildConfig.APPLICATION_ID}.action.stop_screen_mirror",
+                getString(R.string.screen_mirror_service_is_running),
+            )
+        ServiceCompat.startForeground(this, notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
 
         mImageReaderHandlerThread = HandlerThread("ImageReader")
         mImageReaderHandlerThread?.start()
@@ -172,7 +181,9 @@ class ScreenMirrorService : LifecycleService() {
     }
 
     private fun doMirror() {
-        mMediaProjection = mediaProjectionManager.getMediaProjection(mResultCode, mResultData!!)
+        if (mMediaProjection == null) {
+            mMediaProjection = mediaProjectionManager.getMediaProjection(mResultCode, mResultData!!)
+        }
         val width =
             if (isPortrait) {
                 widthPortrait

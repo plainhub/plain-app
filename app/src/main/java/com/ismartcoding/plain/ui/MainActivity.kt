@@ -131,7 +131,7 @@ class MainActivity : AppCompatActivity() {
                     val service = Intent(this, ScreenMirrorService::class.java)
                     service.putExtra("code", result.resultCode)
                     service.putExtra("data", result.data)
-                    startService(service)
+                    ContextCompat.startForegroundService(this, service)
                 } else {
                     sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, image))
                 }
