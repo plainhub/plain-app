@@ -188,7 +188,11 @@ abstract class BaseMediaContentHelper {
             put(MediaStore.MediaColumns.IS_TRASHED, 1)
         }
         ids.forEach { id ->
-            context.contentResolver.update(getItemUri(id), contentValues, null, null)
+            try {
+                context.contentResolver.update(getItemUri(id), contentValues, null, null)
+            } catch (ex: Exception) {
+                LogCat.w("Failed to trash media id=$id: ${ex.message}")
+            }
         }
     }
 
@@ -202,7 +206,11 @@ abstract class BaseMediaContentHelper {
             put(MediaStore.MediaColumns.IS_TRASHED, 0)
         }
         ids.forEach { id ->
-            context.contentResolver.update(getItemUri(id), contentValues, null, null)
+            try {
+                context.contentResolver.update(getItemUri(id), contentValues, null, null)
+            } catch (ex: Exception) {
+                LogCat.w("Failed to restore media id=$id: ${ex.message}")
+            }
         }
     }
 
