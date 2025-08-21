@@ -158,7 +158,7 @@ object HttpServerManager {
             generateSSLKeyStore(file, password)
         }
 
-        return KeyStore.getInstance(KeyStore.getDefaultType()).apply {
+        return KeyStore.getInstance("BKS", "BC").apply {
             try {
                 file.inputStream().use {
                     load(it, password.toCharArray())

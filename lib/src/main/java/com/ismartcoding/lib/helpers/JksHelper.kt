@@ -28,7 +28,7 @@ object JksHelper {
 
         val keyPair = keyPairGenerator.genKeyPair()
 
-        val keyStore = KeyStore.getInstance(KeyStore.getDefaultType())
+        val keyStore = KeyStore.getInstance("BKS", "BC")
         keyStore.load(null, null)
 
         val x509CertificateHolder = createTrustHolder(keyPair, "SHA256withECDSA", commonName)
