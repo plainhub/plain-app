@@ -279,7 +279,9 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun doWhenReadyAsync() {
         // PackageHelper.cacheAppLabels()
-        PNotificationListenerService.toggle(this@MainActivity, Permission.NOTIFICATION_LISTENER.isEnabledAsync(this@MainActivity))
+        val webEnabled = WebPreference.getAsync(this@MainActivity)
+        val permissionEnabled = Permission.NOTIFICATION_LISTENER.isEnabledAsync(this@MainActivity)
+        PNotificationListenerService.toggle(this@MainActivity, webEnabled && permissionEnabled)
     }
 
     override fun onDestroy() {

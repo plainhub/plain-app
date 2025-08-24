@@ -91,6 +91,8 @@ object HttpServerManager {
             ex.printStackTrace()
         }
         context.stopService(Intent(context, HttpServerService::class.java))
+        // Ensure notification listener is disabled when server is stopped explicitly
+        com.ismartcoding.plain.services.PNotificationListenerService.toggle(context, false)
         httpServerError = ""
         portsInUse.clear()
         sendEvent(HttpServerStateChangedEvent(HttpServerState.OFF))

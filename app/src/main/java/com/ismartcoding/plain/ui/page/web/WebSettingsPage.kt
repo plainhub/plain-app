@@ -99,7 +99,8 @@ fun WebSettingsPage(
                         permissionList = Permissions.getWebList(context)
                         systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.can(context)
                         if (event.map[Permission.NOTIFICATION_LISTENER.toSysPermission()] == true) {
-                            PNotificationListenerService.toggle(context, true)
+                            // Only enable listener if web is enabled
+                            PNotificationListenerService.toggle(context, WebPreference.getAsync(context))
                         }
                     }
 
@@ -125,7 +126,9 @@ fun WebSettingsPage(
             scope.launch {
                 withIO { ApiPermissionsPreference.putAsync(context, m.permission, enable) }
                 if (m.permission == Permission.NOTIFICATION_LISTENER) {
-                    PNotificationListenerService.toggle(context, enable)
+                    // Enable only when web is enabled; otherwise disable
+                    val webEnabled = WebPreference.getAsync(context)
+                    PNotificationListenerService.toggle(context, enable && webEnabled)
                 }
                 if (enable) {
                     val ps = m.permissions.filter { !it.can(context) }

@@ -24,6 +24,7 @@ import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.web.NsdHelper
+import com.ismartcoding.plain.features.Permission
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.delay
@@ -116,6 +117,7 @@ class HttpServerService : LifecycleService() {
             HttpServerManager.portsInUse.clear()
             NsdHelper.registerService(this, TempData.httpPort)
             sendEvent(HttpServerStateChangedEvent(HttpServerState.ON))
+            PNotificationListenerService.toggle(this, Permission.NOTIFICATION_LISTENER.isEnabledAsync(this))
         } else {
             if (!checkResult.http) {
                 if (PortHelper.isPortInUse(TempData.httpPort)) {
@@ -142,6 +144,7 @@ class HttpServerService : LifecycleService() {
             }
 
             sendEvent(HttpServerStateChangedEvent(HttpServerState.ERROR))
+            PNotificationListenerService.toggle(this, false)
         }
     }
 
@@ -167,5 +170,6 @@ class HttpServerService : LifecycleService() {
             LogCat.e(ex.toString())
             ex.printStackTrace()
         }
+        PNotificationListenerService.toggle(this, false)
     }
 }
