@@ -39,7 +39,6 @@ import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.components.NetworkErrorBanner
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.page.root.home.HomeFeatures
 import com.ismartcoding.plain.ui.page.root.home.HomeWeb
@@ -70,7 +69,6 @@ fun TabContentHome(
 
                 is WindowFocusChangedEvent -> {
                     mainVM.isVPNConnected = NetworkHelper.isVPNConnected(context)
-                    mainVM.isNetworkConnected = NetworkHelper.isNetworkConnected(context)
                     mainVM.ip4s = NetworkHelper.getDeviceIP4s().filter { it.isNotEmpty() }
                     mainVM.ip4 = NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }
                     systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.can(context)
@@ -84,11 +82,6 @@ fun TabContentHome(
         .padding(top = paddingValues.calculateTopPadding())) {
         item {
             TopSpace()
-        }
-        item {
-            NetworkErrorBanner(
-                isVisible = !mainVM.isNetworkConnected && webEnabled
-            )
         }
         item {
             if (webEnabled) {

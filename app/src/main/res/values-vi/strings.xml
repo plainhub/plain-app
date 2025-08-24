@@ -629,7 +629,6 @@
     <string name="empty_playlist">Danh sách phát của bạn trống</string>
     <string name="drag_number_to_reorder">Kéo số để sắp xếp lại</string>
     <string name="remove_from_playlist">Xóa khỏi danh sách phát</string>
-    <string name="no_network_connection">Không có kết nối mạng.</string>
     <string name="access_phone_web">Truy cập điện thoại của bạn từ trình duyệt máy tính.</string>
     <string name="scan_qrcode_to_access_web">Quét mã QR để truy cập địa chỉ web</string>
     <string name="cannot_share_system_component">Không thể chia sẻ thành phần hệ thống. Tệp này là một mô-đun hệ thống được bảo vệ.</string>

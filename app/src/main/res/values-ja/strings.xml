@@ -629,7 +629,6 @@
     <string name="empty_playlist">プレイリストが空です</string>
     <string name="drag_number_to_reorder">番号をドラッグして順番を変更</string>
     <string name="remove_from_playlist">プレイリストから削除</string>
-    <string name="no_network_connection">ネットワーク接続がありません。</string>
     <string name="access_phone_web">コンピュータのブラウザから携帯電話にアクセスします。</string>
     <string name="scan_qrcode_to_access_web">WebアドレスにアクセスするためにQRコードをスキャンします</string>
     <string name="cannot_share_system_component">システムコンポーネントを共有できません。このファイルは保護されたシステムモジュールです。</string>

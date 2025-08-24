@@ -629,7 +629,6 @@
     <string name="empty_playlist">Çalma listeniz boş</string>
     <string name="drag_number_to_reorder">Sıralamak için numarayı sürükleyin</string>
     <string name="remove_from_playlist">Çalma listesinden kaldır</string>
-    <string name="no_network_connection">Ağ bağlantısı yok.</string>
     <string name="access_phone_web">Telefonunuza bir bilgisayar tarayıcısından erişin.</string>
     <string name="scan_qrcode_to_access_web">Web adresine erişmek için QR kodunu tarayın</string>
     <string name="cannot_share_system_component">Sistem bileşenini paylaşamazsınız. Bu dosya bir korumalı sistem modülüdür.</string>

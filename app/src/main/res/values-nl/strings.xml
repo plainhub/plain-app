@@ -629,7 +629,6 @@
     <string name="empty_playlist">Je afspeellijst is leeg</string>
     <string name="drag_number_to_reorder">Sleep het nummer om opnieuw te ordenen</string>
     <string name="remove_from_playlist">Verwijderen uit afspeellijst</string>
-    <string name="no_network_connection">Geen netwerkverbinding.</string>
     <string name="access_phone_web">Toegang tot je telefoon via een computerbrowser.</string>
     <string name="scan_qrcode_to_access_web">Scan QR code to access web address</string>
     <string name="cannot_share_system_component">Kan systeemcomponent niet delen. Dit bestand is een beveiligd systeemmodule.</string>

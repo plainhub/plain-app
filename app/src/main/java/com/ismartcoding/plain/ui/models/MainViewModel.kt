@@ -30,7 +30,6 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     var httpServerState by savedStateHandle.saveable {
         mutableStateOf(HttpServerState.OFF)
     }
-    var isNetworkConnected by savedStateHandle.saveable { mutableStateOf(true) }
     var isVPNConnected by savedStateHandle.saveable { mutableStateOf(false) }
     var ip4s by savedStateHandle.saveable { mutableStateOf(emptyList<String>()) }
     var ip4 by savedStateHandle.saveable { mutableStateOf("") }

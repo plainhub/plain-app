@@ -629,7 +629,6 @@
     <string name="empty_playlist">Tu lista de reproducción está vacía</string>
     <string name="drag_number_to_reorder">Arrastra el número para reordenar los elementos</string>
     <string name="remove_from_playlist">Eliminar de la lista</string>
-    <string name="no_network_connection">Sin conexión de red.</string>
     <string name="access_phone_web">Accede a tu teléfono desde el navegador de una computadora.</string>
     <string name="scan_qrcode_to_access_web">Escanea el código QR para acceder a la dirección web</string>
     <string name="cannot_share_system_component">No se puede compartir el componente del sistema. Este archivo es un módulo del sistema protegido.</string>

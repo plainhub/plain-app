@@ -629,7 +629,6 @@
     <string name="empty_playlist">আপনার প্লেলিস্ট খালি</string>
     <string name="drag_number_to_reorder">প্লেলিস্ট পুনরায় সাজাতে নম্বরটি টানুন</string>
     <string name="remove_from_playlist">প্লেলিস্ট থেকে সরান</string>
-    <string name="no_network_connection">কোনো নেটওয়ার্ক সংযোগ নেই।</string>
     <string name="access_phone_web">একটি কম্পিউটার ব্রাউজার থেকে আপনার ফোন অ্যাক্সেস করুন।</string>
     <string name="scan_qrcode_to_access_web">ওয়েব ঠিকানা অ্যাক্সেস করতে QR কোড স্ক্যান করুন</string>
     <string name="cannot_share_system_component">সিস্টেম কম্পোনেন্ট শেয়ার করা যাবে না। এই ফাইলটি একটি সুরক্ষিত সিস্টেম মডিউল।</string>
