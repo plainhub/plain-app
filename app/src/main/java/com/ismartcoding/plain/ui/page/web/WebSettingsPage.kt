@@ -47,6 +47,7 @@ import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.preferences.ApiPermissionsPreference
 import com.ismartcoding.plain.preferences.LocalApiPermissions
 import com.ismartcoding.plain.preferences.LocalKeepAwake
+import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
