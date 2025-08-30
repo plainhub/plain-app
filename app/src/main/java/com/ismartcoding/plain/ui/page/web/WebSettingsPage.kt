@@ -88,6 +88,7 @@ fun WebSettingsPage(
         var permissionList by remember { mutableStateOf(Permissions.getWebList(context)) }
         var shouldIgnoreOptimize by remember { mutableStateOf(!powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)) }
         var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.can(context)) }
+        var notificationListenerGranted by remember { mutableStateOf(Permission.NOTIFICATION_LISTENER.can(context)) }
         val sharedFlow = Channel.sharedFlow
 
         val learnMore = stringResource(id = R.string.learn_more)
@@ -99,6 +100,7 @@ fun WebSettingsPage(
                     is PermissionsResultEvent -> {
                         permissionList = Permissions.getWebList(context)
                         systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.can(context)
+                        notificationListenerGranted = Permission.NOTIFICATION_LISTENER.can(context)
                         if (event.map[Permission.NOTIFICATION_LISTENER.toSysPermission()] == true) {
                             // Only enable listener if web is enabled
                             PNotificationListenerService.toggle(context, WebPreference.getAsync(context))
@@ -107,6 +109,7 @@ fun WebSettingsPage(
 
                     is WindowFocusChangedEvent -> {
                         shouldIgnoreOptimize = !powerManager.isIgnoringBatteryOptimizations(BuildConfig.APPLICATION_ID)
+                        notificationListenerGranted = Permission.NOTIFICATION_LISTENER.can(context)
                     }
 
                     is IgnoreBatteryOptimizationResultEvent -> {
@@ -230,7 +233,7 @@ fun WebSettingsPage(
                                 title = permission.getText(),
                                 subtitle =
                                     stringResource(
-                                        if (m.granted) R.string.system_permission_granted else R.string.system_permission_not_granted,
+                                        if (notificationListenerGranted) R.string.system_permission_granted else R.string.system_permission_not_granted,
                                     ),
                             ) {
                                 PSwitch(activated = enabledPermissions.contains(permission.name)) { enable ->
