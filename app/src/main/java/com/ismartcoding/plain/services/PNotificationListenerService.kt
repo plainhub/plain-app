@@ -14,6 +14,7 @@ import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.activityManager
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.extensions.toDNotification
 import com.ismartcoding.plain.events.CancelNotificationsEvent
 import com.ismartcoding.plain.features.Permission
@@ -169,6 +170,9 @@ class PNotificationListenerService : NotificationListenerService() {
 
     companion object {
         fun toggle(context: Context, enable: Boolean) {
+            if (!AppFeatureType.NOTIFICATIONS.has()) {
+                return
+            }
             if (enable) {
                 val collectorComponent = ComponentName(context, PNotificationListenerService::class.java)
                 LogCat.d("ensureCollectorRunning collectorComponent: $collectorComponent")
