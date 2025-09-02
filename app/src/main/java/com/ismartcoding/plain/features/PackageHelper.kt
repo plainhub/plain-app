@@ -90,7 +90,9 @@ object PackageHelper {
                         getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES))
                     } catch (ex: Exception) {
                         LogCat.d(ex.toString())
-                        getPackage(it.appInfo, PackageInfo())
+                        getPackage(it.appInfo, PackageInfo().apply {
+                            this.packageName = it.id
+                        })
                     }
                 }.sorted(sortBy).drop(offset).take(limit)
             }
@@ -100,7 +102,9 @@ object PackageHelper {
                     getPackage(it.appInfo, packageManager.getPackageInfo(it.id, PackageManager.GET_SIGNING_CERTIFICATES))
                 } catch (ex: Exception) {
                     LogCat.d(ex.toString())
-                    getPackage(it.appInfo, PackageInfo())
+                    getPackage(it.appInfo, PackageInfo().apply {
+                        this.packageName = it.id
+                    })
                 }
             }.filter {
                 text.isEmpty()
@@ -196,7 +200,9 @@ object PackageHelper {
             )
         } catch (ex: Exception) {
             LogCat.d(ex.toString())
-            return DPackageDetail(ApplicationInfo(), PackageInfo(), packageName, "", "", "", "", 0, emptyList(), Instant.DISTANT_PAST, Instant.DISTANT_PAST)
+            return DPackageDetail(ApplicationInfo(), PackageInfo().apply {
+                this.packageName = packageName
+            }, packageName, "", "", "", "", 0, emptyList(), Instant.DISTANT_PAST, Instant.DISTANT_PAST)
         }
     }
 
