@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +29,7 @@ import com.ismartcoding.plain.ui.models.VPackage
 import com.ismartcoding.plain.ui.theme.listItemDescription
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
+import com.ismartcoding.plain.packageManager
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -52,12 +54,19 @@ fun PackageListItem(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            val icon = remember(item.id) {
+                try {
+                    packageManager.getApplicationIcon(item.id)
+                } catch (e: Exception) {
+                    null
+                }
+            }
             Image(
                 modifier =
                 Modifier
                     .padding(end = 16.dp)
                     .size(48.dp),
-                painter = rememberDrawablePainter(drawable = item.icon),
+                painter = rememberDrawablePainter(drawable = icon),
                 contentDescription = item.name,
             )
             Column(
