@@ -675,4 +675,6 @@
     <string name="sent">Sent</string>
     <string name="device_type">Device type</string>
     <string name="port">Port</string>
+    <string name="cannot_move_folder_into_itself">Cannot move a folder into itself or its subfolder.</string>
+    <string name="cannot_copy_folder_into_itself">Cannot copy a folder into itself or its subfolder.</string>
 </resources>

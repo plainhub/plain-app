@@ -675,4 +675,6 @@
     <string name="sent">Đã gửi</string>
     <string name="device_type">Loại thiết bị</string>
     <string name="port">Cổng</string>
+    <string name="cannot_move_folder_into_itself">Không thể di chuyển một thư mục vào chính nó hoặc vào thư mục con của nó.</string>
+    <string name="cannot_copy_folder_into_itself">Không thể sao chép một thư mục vào chính nó hoặc vào thư mục con của nó.</string>
 </resources>

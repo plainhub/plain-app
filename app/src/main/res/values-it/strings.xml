@@ -675,4 +675,6 @@
     <string name="sent">Inviato</string>
     <string name="device_type">Tipo di dispositivo</string>
     <string name="port">Porta</string>
+    <string name="cannot_move_folder_into_itself">Impossibile spostare una cartella in se stessa o in una sua sottocartella.</string>
+    <string name="cannot_copy_folder_into_itself">Impossibile copiare una cartella in se stessa o in una sua sottocartella.</string>
 </resources>

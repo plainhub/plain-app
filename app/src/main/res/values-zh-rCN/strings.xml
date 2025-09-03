@@ -668,4 +668,6 @@
     <string name="sent">已发送</string>
     <string name="device_type">设备类型</string>
     <string name="port">端口</string>
+    <string name="cannot_move_folder_into_itself">无法将文件夹移动到其自身或其子文件夹中。</string>
+    <string name="cannot_copy_folder_into_itself">无法将文件夹复制到其自身或其子文件夹中。</string>
 </resources>

@@ -675,4 +675,6 @@
     <string name="sent">Gönderildi</string>
     <string name="device_type">Cihaz türü</string>
     <string name="port">Port</string>
+    <string name="cannot_move_folder_into_itself">Bir klasör kendi içine veya alt klasörüne taşınamaz.</string>
+    <string name="cannot_copy_folder_into_itself">Bir klasör kendi içine veya alt klasörüne kopyalanamaz.</string>
 </resources>

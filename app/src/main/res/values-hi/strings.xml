@@ -675,4 +675,6 @@
     <string name="sent">भेजा गया</string>
     <string name="device_type">डिवाइस प्रकार</string>
     <string name="port">पोर्ट</string>
+    <string name="cannot_move_folder_into_itself">किसी फ़ोल्डर को उसके भीतर या उसकी उपफ़ोल्डर में नहीं ले जाया जा सकता।</string>
+    <string name="cannot_copy_folder_into_itself">किसी फ़ोल्डर को उसके भीतर या उसकी उपफ़ोल्डर में कॉपी नहीं किया जा सकता।</string>
 </resources>

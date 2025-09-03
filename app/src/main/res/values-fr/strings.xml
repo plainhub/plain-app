@@ -675,4 +675,6 @@
     <string name="sent">Envoyé</string>
     <string name="device_type">Type d\'appareil</string>
     <string name="port">Port</string>
+    <string name="cannot_move_folder_into_itself">Impossible de déplacer un dossier dans lui-même ou dans l’un de ses sous-dossiers.</string>
+    <string name="cannot_copy_folder_into_itself">Impossible de copier un dossier dans lui-même ou dans l’un de ses sous-dossiers.</string>
 </resources>

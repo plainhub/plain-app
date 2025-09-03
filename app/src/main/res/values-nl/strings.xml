@@ -675,4 +675,6 @@
     <string name="sent">Verzonden</string>
     <string name="device_type">Apparaattype</string>
     <string name="port">Poort</string>
+    <string name="cannot_move_folder_into_itself">Kan een map niet naar zichzelf of een submap verplaatsen.</string>
+    <string name="cannot_copy_folder_into_itself">Kan een map niet naar zichzelf of een submap kopiëren.</string>
 </resources>

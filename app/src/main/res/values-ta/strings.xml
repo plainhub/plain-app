@@ -675,4 +675,6 @@
     <string name="sent">அனுப்பியது</string>
     <string name="device_type">சாதன வகை</string>
     <string name="port">போர்ட்</string>
+    <string name="cannot_move_folder_into_itself">ஒரு கோப்புறையை அதற்குள்ளே அல்லது அதன் உட்புறை கோப்புறைக்கு நகர்த்த முடியாது.</string>
+    <string name="cannot_copy_folder_into_itself">ஒரு கோப்புறையை அதற்குள்ளே அல்லது அதன் உட்புறை கோப்புறைக்கு நகலெடுக்க முடியாது.</string>
 </resources>

@@ -675,4 +675,6 @@
     <string name="sent">Enviado</string>
     <string name="device_type">Tipo de dispositivo</string>
     <string name="port">Porta</string>
+    <string name="cannot_move_folder_into_itself">Não é possível mover uma pasta para dentro de si mesma ou de uma subpasta.</string>
+    <string name="cannot_copy_folder_into_itself">Não é possível copiar uma pasta para dentro de si mesma ou de uma subpasta.</string>
 </resources>

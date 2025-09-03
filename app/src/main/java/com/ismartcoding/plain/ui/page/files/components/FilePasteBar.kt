@@ -68,11 +68,25 @@ fun FilePasteBar(
                         DialogHelper.showLoading()
                         withContext(Dispatchers.IO) {
                             filesVM.cutFiles.forEach {
-                                val dstFile = File(filesVM.selectedPath + "/" + it.id.getFilenameFromPath())
+                                val srcFile = File(it.id)
+                                val dstDir = File(filesVM.selectedPath)
+                                val srcCanonical = srcFile.canonicalFile
+                                val dstCanonical = dstDir.canonicalFile
+
+                                // Prevent moving a directory into itself or its descendants
+                                if (srcCanonical.isDirectory &&
+                                    (dstCanonical.path == srcCanonical.path ||
+                                            dstCanonical.path.startsWith(srcCanonical.path + "/"))
+                                ) {
+                                    DialogHelper.showErrorMessage(LocaleHelper.getString(R.string.cannot_move_folder_into_itself))
+                                    return@forEach
+                                }
+
+                                val dstFile = File(dstCanonical, srcCanonical.name)
                                 if (!dstFile.exists()) {
-                                    Path(it.id).moveTo(dstFile.toPath(), true)
+                                    srcCanonical.toPath().moveTo(dstFile.toPath(), true)
                                 } else {
-                                    Path(it.id).moveTo(Path(dstFile.newPath()), true)
+                                    srcCanonical.toPath().moveTo(Path(dstFile.newPath()), true)
                                 }
                             }
                             filesVM.cutFiles.clear()
@@ -84,11 +98,25 @@ fun FilePasteBar(
                         DialogHelper.showLoading()
                         withContext(Dispatchers.IO) {
                             filesVM.copyFiles.forEach {
-                                val dstFile = File(filesVM.selectedPath + "/" + it.id.getFilenameFromPath())
+                                val srcFile = File(it.id)
+                                val dstDir = File(filesVM.selectedPath)
+                                val srcCanonical = srcFile.canonicalFile
+                                val dstCanonical = dstDir.canonicalFile
+
+                                // Prevent copying a directory into itself or its descendants
+                                if (srcCanonical.isDirectory &&
+                                    (dstCanonical.path == srcCanonical.path ||
+                                            dstCanonical.path.startsWith(srcCanonical.path + "/"))
+                                ) {
+                                    DialogHelper.showErrorMessage(LocaleHelper.getString(R.string.cannot_copy_folder_into_itself))
+                                    return@forEach
+                                }
+
+                                val dstFile = File(dstCanonical, srcCanonical.name)
                                 if (!dstFile.exists()) {
-                                    File(it.id).copyRecursively(dstFile, true)
+                                    srcCanonical.copyRecursively(dstFile, true)
                                 } else {
-                                    File(it.id).copyRecursively(File(dstFile.newPath()), true)
+                                    srcCanonical.copyRecursively(File(dstFile.newPath()), true)
                                 }
                             }
                             filesVM.copyFiles.clear()

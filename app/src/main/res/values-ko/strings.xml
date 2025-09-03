@@ -675,4 +675,6 @@
     <string name="sent">전송됨</string>
     <string name="device_type">장치 유형</string>
     <string name="port">포트</string>
+    <string name="cannot_move_folder_into_itself">폴더를 자기 자신 또는 하위 폴더로 이동할 수 없습니다.</string>
+    <string name="cannot_copy_folder_into_itself">폴더를 자기 자신 또는 하위 폴더로 복사할 수 없습니다.</string>
 </resources>

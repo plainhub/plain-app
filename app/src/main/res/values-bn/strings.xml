@@ -675,4 +675,6 @@
     <string name="sent">পাঠানো</string>
     <string name="device_type">ডিভাইসের ধরণ</string>
     <string name="port">পোর্ট</string>
+    <string name="cannot_move_folder_into_itself">কোনো ফোল্ডারকে নিজেই বা তার উপ-ফোল্ডারে সরানো যায় না।</string>
+    <string name="cannot_copy_folder_into_itself">কোনো ফোল্ডারকে নিজেই বা তার উপ-ফোল্ডারে কপি করা যায় না।</string>
 </resources>

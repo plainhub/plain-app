@@ -675,4 +675,6 @@
     <string name="sent">Отправлено</string>
     <string name="device_type">Тип устройства</string>
     <string name="port">Порт</string>
+    <string name="cannot_move_folder_into_itself">Нельзя переместить папку в саму себя или в её подпапку.</string>
+    <string name="cannot_copy_folder_into_itself">Нельзя скопировать папку в саму себя или в её подпапку.</string>
 </resources>
