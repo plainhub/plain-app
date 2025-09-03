@@ -69,7 +69,7 @@ enum class Permission {
 
     suspend fun isEnabledAsync(context: Context): Boolean {
         val apiPermissions = ApiPermissionsPreference.getAsync(context)
-        return apiPermissions.contains(this.toString())
+        return apiPermissions.contains(name)
     }
 
     fun toSysPermission(): String {

@@ -337,7 +337,7 @@ class MainGraphQL(val schema: Schema) {
                 query("contactCount") {
                     resolver { query: String ->
                         val context = MainApp.instance
-                        if (Permission.READ_CONTACTS.enabledAndCanAsync(context)) {
+                        if (Permission.WRITE_CONTACTS.enabledAndCanAsync(context)) {
                             ContactMediaStoreHelper.countAsync(context, query)
                         } else {
                             0
@@ -381,7 +381,7 @@ class MainGraphQL(val schema: Schema) {
                 query("callCount") {
                     resolver { query: String ->
                         val context = MainApp.instance
-                        if (Permission.READ_CALL_LOG.enabledAndCanAsync(context)) {
+                        if (Permission.WRITE_CALL_LOG.enabledAndCanAsync(context)) {
                             CallMediaStoreHelper.countAsync(context, query)
                         } else {
                             0
