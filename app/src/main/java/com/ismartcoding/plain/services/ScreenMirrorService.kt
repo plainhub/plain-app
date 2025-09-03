@@ -118,6 +118,7 @@ class ScreenMirrorService : LifecycleService() {
         super.onDestroy()
         release()
         mImageReaderHandlerThread?.quitSafely()
+        mBitmap?.recycle()
         mBitmap = null
         orientationEventListener.disable()
     }
@@ -159,7 +160,11 @@ class ScreenMirrorService : LifecycleService() {
 //        }
         LogCat.d("quality: $quality, size: $size, $newWidth x $newHeight")
 
-        return outputStream.toByteArray()
+        val bytes = outputStream.toByteArray()
+        if (newBitmap !== bitmap) {
+            newBitmap.recycle()
+        }
+        return bytes
     }
 
     private fun resize() {
@@ -196,8 +201,8 @@ class ScreenMirrorService : LifecycleService() {
             } else {
                 heightLandscape
             }
-        mImageReaderPortrait = ImageReader.newInstance(widthPortrait, heightPortrait, PixelFormat.RGBA_8888, 2)
-        mImageReaderLandscape = ImageReader.newInstance(widthLandscape, heightLandscape, PixelFormat.RGBA_8888, 2)
+        mImageReaderPortrait = ImageReader.newInstance(widthPortrait, heightPortrait, PixelFormat.RGBA_8888, 1)
+        mImageReaderLandscape = ImageReader.newInstance(widthLandscape, heightLandscape, PixelFormat.RGBA_8888, 1)
         mMediaProjection?.registerCallback(
             object : MediaProjection.Callback() {
                 override fun onStop() {
@@ -215,9 +220,15 @@ class ScreenMirrorService : LifecycleService() {
                 null,
             )
 
-        mImageReaderPortrait?.setOnImageAvailableListener({
+        mImageReaderPortrait?.setOnImageAvailableListener(createImageAvailableListener(heightPortrait, true), handler!!)
+
+        mImageReaderLandscape?.setOnImageAvailableListener(createImageAvailableListener(heightLandscape, false), handler!!)
+    }
+
+    private fun createImageAvailableListener(requiredHeightParam: Int, sendWhenPortrait: Boolean): ImageReader.OnImageAvailableListener {
+        return ImageReader.OnImageAvailableListener { reader ->
+            val image = reader.acquireLatestImage()
             try {
-                val image = it.acquireLatestImage()
                 if (image != null) {
                     val planes = image.planes
                     val pixelStride = planes[0].pixelStride
@@ -225,43 +236,31 @@ class ScreenMirrorService : LifecycleService() {
                     val rowStride = planes[0].rowStride
                     val newWidth = rowStride / pixelStride
 
-                    mBitmap = Bitmap.createBitmap(newWidth, heightPortrait, Bitmap.Config.ARGB_8888)
-                    mBitmap?.copyPixelsFromBuffer(buffer)
-                    if (mBitmap != null && instance != null && isPortrait) {
+                    val requiredWidth = newWidth
+                    val requiredHeight = requiredHeightParam
+                    var bitmap = mBitmap
+                    if (bitmap == null || bitmap.width != requiredWidth || bitmap.height != requiredHeight) {
+                        bitmap?.recycle()
+                        bitmap = Bitmap.createBitmap(requiredWidth, requiredHeight, Bitmap.Config.ARGB_8888)
+                        mBitmap = bitmap
+                    }
+                    bitmap?.copyPixelsFromBuffer(buffer)
+                    val orientationOk = if (sendWhenPortrait) isPortrait else !isPortrait
+                    if (bitmap != null && instance != null && orientationOk) {
                         sendEvent(
-                            WebSocketEvent(EventType.SCREEN_MIRRORING, bitmapToByteArray(mBitmap!!, newWidth, heightPortrait)),
+                            WebSocketEvent(
+                                EventType.SCREEN_MIRRORING,
+                                bitmapToByteArray(bitmap, requiredWidth, requiredHeight),
+                            ),
                         )
                     }
-                    image.close()
                 }
             } catch (ex: Exception) {
                 LogCat.e(ex)
+            } finally {
+                image?.close()
             }
-        }, handler!!)
-
-        mImageReaderLandscape?.setOnImageAvailableListener({
-            try {
-                val image = it.acquireLatestImage()
-                if (image != null) {
-                    val planes = image.planes
-                    val pixelStride = planes[0].pixelStride
-                    val buffer = planes[0].buffer
-                    val rowStride = planes[0].rowStride
-                    val newWidth = rowStride / pixelStride
-
-                    mBitmap = Bitmap.createBitmap(newWidth, heightLandscape, Bitmap.Config.ARGB_8888)
-                    mBitmap?.copyPixelsFromBuffer(buffer)
-                    if (mBitmap != null && instance != null && !isPortrait) {
-                        sendEvent(
-                            WebSocketEvent(EventType.SCREEN_MIRRORING, bitmapToByteArray(mBitmap!!, newWidth, heightLandscape)),
-                        )
-                    }
-                    image.close()
-                }
-            } catch (ex: Exception) {
-                LogCat.e(ex)
-            }
-        }, handler!!)
+        }
     }
 
     private fun release() {
