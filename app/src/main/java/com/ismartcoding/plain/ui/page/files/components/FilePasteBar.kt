@@ -83,10 +83,26 @@ fun FilePasteBar(
                                 }
 
                                 val dstFile = File(dstCanonical, srcCanonical.name)
-                                if (!dstFile.exists()) {
-                                    srcCanonical.toPath().moveTo(dstFile.toPath(), true)
-                                } else {
-                                    srcCanonical.toPath().moveTo(Path(dstFile.newPath()), true)
+                                try {
+                                    if (!dstFile.exists()) {
+                                        srcCanonical.toPath().moveTo(dstFile.toPath(), true)
+                                    } else {
+                                        srcCanonical.toPath().moveTo(Path(dstFile.newPath()), true)
+                                    }
+                                } catch (e: Exception) {
+                                    // Fallback: copy then delete (handles cross-filesystem moves)
+                                    try {
+                                        val target = if (!dstFile.exists()) dstFile else File(dstFile.newPath())
+                                        if (srcCanonical.isDirectory) {
+                                            srcCanonical.copyRecursively(target, true)
+                                            srcCanonical.deleteRecursively()
+                                        } else {
+                                            srcCanonical.copyTo(target, true)
+                                            srcCanonical.delete()
+                                        }
+                                    } catch (ex: Exception) {
+                                        DialogHelper.showErrorMessage(ex.message ?: LocaleHelper.getString(R.string.unknown_error))
+                                    }
                                 }
                             }
                             filesVM.cutFiles.clear()
@@ -113,10 +129,14 @@ fun FilePasteBar(
                                 }
 
                                 val dstFile = File(dstCanonical, srcCanonical.name)
-                                if (!dstFile.exists()) {
-                                    srcCanonical.copyRecursively(dstFile, true)
-                                } else {
-                                    srcCanonical.copyRecursively(File(dstFile.newPath()), true)
+                                try {
+                                    if (!dstFile.exists()) {
+                                        srcCanonical.copyRecursively(dstFile, true)
+                                    } else {
+                                        srcCanonical.copyRecursively(File(dstFile.newPath()), true)
+                                    }
+                                } catch (e: Exception) {
+                                    DialogHelper.showErrorMessage(e.message ?: LocaleHelper.getString(R.string.unknown_error))
                                 }
                             }
                             filesVM.copyFiles.clear()
