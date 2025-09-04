@@ -129,6 +129,11 @@ class PNotificationListenerService : NotificationListenerService() {
                     LogCat.w("PNotificationListenerService: not connected, ignoring cancel request")
                     return@receiveEventHandler
                 }
+                if (!Permission.NOTIFICATION_LISTENER.can(applicationContext)) {
+                    LogCat.w("PNotificationListenerService: permission not granted, ignoring cancel request")
+                    isConnected = false
+                    return@receiveEventHandler
+                }
                 
                 try {
                     if (event.ids.size == TempData.notifications.size) {
@@ -165,6 +170,11 @@ class PNotificationListenerService : NotificationListenerService() {
             events.clear()
         } catch (ex: Exception) {
             LogCat.e("Error cleaning up events: ${ex.message}")
+        }
+        try {
+            requestRebind(ComponentName(applicationContext, PNotificationListenerService::class.java))
+        } catch (ex: Exception) {
+            LogCat.e("Error requesting rebind: ${ex.message}")
         }
     }
 

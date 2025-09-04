@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -65,36 +66,37 @@ fun MediaVideo(
     val scope = rememberCoroutineScope()
     val viewerAlpha = remember { Animatable(0F) }
     val context = LocalContext.current
+    val appContext = remember(context) { context.applicationContext }
 
-    // 容器大小
+    // Container size
     var bSize by remember { mutableStateOf(IntSize(0, 0)) }
-    // 容器比例
+    // Container aspect ratio
     val bRatio by remember { derivedStateOf { bSize.width.toFloat() / bSize.height.toFloat() } }
-    // 视频原始大小
+    // Video intrinsic size
     var vSize by remember { mutableStateOf(IntSize(0, 0)) }
-    // 视频原始比例
+    // Video intrinsic aspect ratio
     val vRatio by remember { derivedStateOf { if (vSize.height == 0) 1f else vSize.width.toFloat() / vSize.height.toFloat() } }
-    // 是否宽度与容器大小一致
+    // Whether width matches the container width
     var widthFixed by remember { mutableStateOf(false) }
-    // 长宽是否均超出容器长宽
+    // Whether both width and height exceed container bounds
     val superSize by remember {
         derivedStateOf {
             vSize.height > bSize.height && vSize.width > bSize.width
         }
     }
-    // 显示大小
+    // Display size
     val uSize by remember {
         derivedStateOf {
             if (vSize == IntSize.Zero || bSize == IntSize.Zero) {
                 bSize
             } else if (vRatio > bRatio) {
-                // 宽度一致
+                // Match container width
                 val uW = bSize.width
                 val uH = uW / vRatio
                 widthFixed = true
                 IntSize(uW, uH.toInt())
             } else {
-                // 高度一致
+                // Match container height
                 val uH = bSize.height
                 val uW = uH * vRatio
                 widthFixed = false
@@ -102,7 +104,7 @@ fun MediaVideo(
             }
         }
     }
-    // 视频显示的真实大小
+    // Actual rendered video size
     val rSize by remember {
         derivedStateOf {
             IntSize(
@@ -135,19 +137,19 @@ fun MediaVideo(
         }
     }
 
-    // 视频是否加载成功
+    // Whether the video is successfully specified/loaded
     var videoSpecified by remember { mutableStateOf(false) }
 
-    // 初始化视频尺寸
+    // Initialize video dimensions
     LaunchedEffect(model.path) {
         if (model.intrinsicSize == IntSize.Zero) {
-            // 尝试从不同的数据源获取视频尺寸
+            // Try to obtain video dimensions from various sources
             when (val data = model.data) {
                 is com.ismartcoding.plain.data.DVideo -> {
                     model.initAsync(data)
                 }
                 else -> {
-                    // 如果没有data，直接使用VideoHelper获取尺寸
+                    // If there is no data, use VideoHelper to get the size directly
                     val size = com.ismartcoding.plain.helpers.VideoHelper.getIntrinsicSize(model.path)
                     if (size != IntSize.Zero) {
                         model.intrinsicSize = size
@@ -198,7 +200,7 @@ fun MediaVideo(
         }
         videoState.initData(player)
         mediaSession?.release()
-        mediaSession = MediaSession.Builder(context, ForwardingPlayer(player))
+        mediaSession = MediaSession.Builder(appContext, ForwardingPlayer(player))
             .setId("VideoPlayerMediaSession_${UUID.randomUUID().toString().lowercase().split("-").first()}")
             .build()
         val exoPlayerMediaItems = listOf(
@@ -218,6 +220,13 @@ fun MediaVideo(
         player.setMediaItems(exoPlayerMediaItems)
         player.prepare()
         player.play()
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            mediaSession?.release()
+            mediaSession = null
+        }
     }
 
     Box(
