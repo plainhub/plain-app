@@ -65,7 +65,7 @@ Your donation is highly appreciated. Thank you!
 
 ## Screenshots
 
-| ![files](screenshots/app-files.jpg)  | ![home](screenshots/app-home.jpg)        | ![music player](screenshots/app-music-player.jpg) |                                                  |
+| ![files](screenshots/app-files.jpg)  | ![home](screenshots/app-home.png)        | ![music player](screenshots/app-music-player.jpg) | ![chat](screenshots/app-chat.png)                |
 |--------------------------------------|------------------------------------------|---------------------------------------------------|--------------------------------------------------|
 | ![audio](screenshots/app-audio.jpg)  | ![images](screenshots/app-images.jpg)    | ![videos](screenshots/app-videos.jpg)             | ![rss](screenshots/app-rss.jpg)                  |
 | ![home](screenshots/web-home.png)    | ![images](screenshots/web-images.png)    | ![videos](screenshots/web-videos.png)             | ![notes](screenshots/web-notes.png)              |
