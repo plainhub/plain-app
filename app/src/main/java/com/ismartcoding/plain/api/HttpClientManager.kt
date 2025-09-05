@@ -25,6 +25,7 @@ import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLContext
+import javax.net.ssl.KeyManager
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
@@ -79,7 +80,8 @@ object HttpClientManager {
         val insecureSocketFactory =
             SSLContext.getInstance("TLSv1.2").apply {
                 val trustAllCerts = arrayOf<TrustManager>(naiveTrustManager)
-                init(null, trustAllCerts, SecureRandom())
+                // Avoid triggering default KeyManager lookup (which can require BKS on some devices)
+                init(arrayOf<KeyManager>(), trustAllCerts, SecureRandom())
             }.socketFactory
 
         sslSocketFactory(insecureSocketFactory, naiveTrustManager)
@@ -133,7 +135,8 @@ object HttpClientManager {
             override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
         })
         val sslContext = SSLContext.getInstance("TLS")
-        sslContext.init(null, trustAllCerts, SecureRandom())
+        // Avoid default KeyManager to prevent KeyStoreException: BKS not found
+        sslContext.init(arrayOf<KeyManager>(), trustAllCerts, SecureRandom())
         val sslSocketFactory = sslContext.socketFactory
 
         return OkHttpClient.Builder()
