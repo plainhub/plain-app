@@ -220,7 +220,9 @@ object AppEvents {
                     }
 
                     is StartNearbyServiceEvent -> {
-                        NearbyDiscoverManager.startListener()
+                        coIO {
+                            NearbyDiscoverManager.startListener()
+                        }
                     }
 
                     is PairingResponseEvent -> {
