@@ -245,14 +245,23 @@ fun ScanPage(navController: NavHostController) {
                                 },
                             )
                             try {
-                                val cameraProviderFeature = ProcessCameraProvider.getInstance(context)
-                                cameraProvider = cameraProviderFeature.get()
-                                cameraProvider?.bindToLifecycle(
-                                    lifecycleOwner,
-                                    selector,
-                                    preview,
-                                    imageAnalysis,
-                                )
+                                val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+                                cameraProviderFuture.addListener({
+                                    try {
+                                        val provider = cameraProviderFuture.get()
+                                        cameraProvider = provider
+                                        provider.unbindAll()
+                                        provider.bindToLifecycle(
+                                            lifecycleOwner,
+                                            selector,
+                                            preview,
+                                            imageAnalysis,
+                                        )
+                                    } catch (e: Exception) {
+                                        LogCat.e(e)
+                                        e.printStackTrace()
+                                    }
+                                }, ContextCompat.getMainExecutor(context))
                             } catch (e: Exception) {
                                 LogCat.e(e)
                                 e.printStackTrace()
