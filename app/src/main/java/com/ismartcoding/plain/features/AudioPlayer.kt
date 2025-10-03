@@ -197,9 +197,9 @@ object AudioPlayer {
             }
 
             LogCat.d("skipTo: ${audio.path}")
-            TempData.audioPlayPosition = 0
             coMain {
                 ensurePlayer(context) {
+                    TempData.audioPlayPosition = 0
                     doPlay(audio)
                 }
             }

@@ -7,6 +7,7 @@ import android.service.quicksettings.TileService
 import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.HttpServerState
@@ -90,7 +91,7 @@ class QSTileService : TileService() {
 
                 // Launch the app with unlockAndRun
                 unlockAndRun {
-                    val intent = Intent(this, Class.forName("com.ismartcoding.plain.ui.MainActivity"))
+                    val intent = Intent(MainApp.instance, Class.forName("com.ismartcoding.plain.ui.MainActivity"))
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     intent.putExtra("start_web_service", true)
                     startActivity(intent)
@@ -103,7 +104,7 @@ class QSTileService : TileService() {
                 qsTile?.updateTile()
 
                 coIO {
-                    WebPreference.putAsync(this@QSTileService, false)
+                    WebPreference.putAsync(MainApp.instance, false)
                     HttpServerManager.stopServiceAsync(this@QSTileService)
                     setState(Tile.STATE_INACTIVE)
                 }
