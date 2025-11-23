@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.web
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import com.ismartcoding.lib.channel.sendEvent
@@ -58,6 +60,7 @@ import io.ktor.http.content.LastModifiedVersion
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.http.contentType
+import io.ktor.http.defaultForFile
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCallPipeline
@@ -403,20 +406,21 @@ object HttpModule {
                             return@get
                         }
 
+                        call.response.header("Access-Control-Expose-Headers", "Content-Disposition")
                         val fileName = (q["name"] ?: file.name).urlEncode().replace("+", "%20")
                         if (q["dl"] == "1") {
                             call.response.header(
                                 "Content-Disposition",
                                 "attachment; filename=\"${fileName}\"; filename*=utf-8''${fileName}"
                             )
+                            call.respondFile(file)
+                            return@get
                         } else {
                             call.response.header(
                                 "Content-Disposition",
                                 "inline; filename=\"${fileName}\"; filename*=utf-8''${fileName}"
                             )
                         }
-
-                        call.response.header("Access-Control-Expose-Headers", "Content-Disposition") 
 
                         if (path.isImageFast()) {
                             val imageType = ImageHelper.getImageType(path)
@@ -438,7 +442,24 @@ object HttpModule {
                             return@get
                         }
 
-                        call.respondFile(file)
+                        val bytes = file.readBytes()
+
+                        val isHeif = bytes.size >= 12 &&
+                                bytes[4] == 0x66.toByte() && // 'f'
+                                bytes[5] == 0x74.toByte() && // 't'
+                                bytes[6] == 0x79.toByte() && // 'y'
+                                bytes[7] == 0x70.toByte() && // 'p'
+                                String(bytes.copyOfRange(8, 12)) in listOf("heic", "heix", "hevc", "hevx", "avif")
+
+                        if (isHeif) {
+                            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                            val output = ByteArrayOutputStream()
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, output)
+                            call.respondBytes(output.toByteArray(), ContentType.Image.PNG)
+                        } else {
+                            val contentType = ContentType.defaultForFile(file)
+                            call.respondBytes(bytes, contentType)
+                        }
                     }
                 } catch (ex: Exception) {
                     ex.printStackTrace()
