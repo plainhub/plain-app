@@ -125,6 +125,7 @@ fun TabContentVideos(
         videosVM.hasPermission.value = AppFeatureType.FILES.hasPermission(context)
         if (videosVM.hasPermission.value) {
             scope.launch(Dispatchers.IO) {
+                videosState.cellsPerRow.value = VideoGridCellsPerRowPreference.getAsync(context)
                 videosVM.sortBy.value = VideoSortByPreference.getValueAsync(context)
                 videosVM.loadAsync(context, tagsVM)
                 mediaFoldersVM.loadAsync(context)

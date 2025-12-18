@@ -125,6 +125,7 @@ fun TabContentImages(
         imagesVM.hasPermission.value = AppFeatureType.FILES.hasPermission(context)
         if (imagesVM.hasPermission.value) {
             scope.launch(Dispatchers.IO) {
+                imagesState.cellsPerRow.value = ImageGridCellsPerRowPreference.getAsync(context)
                 imagesVM.sortBy.value = ImageSortByPreference.getValueAsync(context)
                 imagesVM.loadAsync(context, tagsVM)
                 mediaFoldersVM.loadAsync(context)
