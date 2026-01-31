@@ -21,7 +21,7 @@ import java.net.SocketTimeoutException
 class UdpMulticastManager {
     companion object {
         private const val MULTICAST_ADDRESS = "224.0.0.100"
-        private const val RECEIVE_TIMEOUT = 1000             // Reduced timeout for better responsiveness
+        private const val RECEIVE_TIMEOUT = 10_000            // Longer timeout to reduce wakeups and battery drain
         private const val BUFFER_SIZE = 2048
     }
 

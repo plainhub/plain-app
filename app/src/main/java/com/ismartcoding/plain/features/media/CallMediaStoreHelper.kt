@@ -14,6 +14,8 @@ import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.getTimeValue
 import com.ismartcoding.lib.extensions.map
 import com.ismartcoding.plain.data.DCall
+import com.ismartcoding.plain.extensions.normalizeComparison
+import com.ismartcoding.plain.extensions.parseEpochMillis
 import com.ismartcoding.plain.helpers.QueryHelper
 
 object CallMediaStoreHelper : BaseContentHelper() {
@@ -47,6 +49,18 @@ object CallMediaStoreHelper : BaseContentHelper() {
 
                     "type" -> {
                         where.add("${CallLog.Calls.TYPE} = ?", it.value)
+                    }
+
+                    "duration" -> {
+                        val (op, rawValue) = it.normalizeComparison(defaultOp = "=")
+                        val seconds = rawValue.trim().toLongOrNull() ?: return@forEach
+                        where.add("${CallLog.Calls.DURATION} $op ?", seconds.toString())
+                    }
+
+                    "start_time" -> {
+                        val (op, rawValue) = it.normalizeComparison(defaultOp = "=")
+                        val ts = rawValue.parseEpochMillis() ?: return@forEach
+                        where.add("${CallLog.Calls.DATE} $op ?", ts.toString())
                     }
                 }
             }

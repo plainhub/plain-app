@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.PowerManager
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.ChannelEvent
+import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.logcat.LogCat
@@ -29,7 +30,9 @@ import com.ismartcoding.plain.features.bluetooth.BluetoothUtil
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
 import com.ismartcoding.plain.chat.discover.NearbyPairManager
+import com.ismartcoding.plain.preferences.KeepAwakePreference
 import com.ismartcoding.plain.powerManager
+import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.ui.models.FolderOption
 import com.ismartcoding.plain.web.AuthRequest
@@ -203,6 +206,10 @@ object AppEvents {
                         var retry = 3
                         val context = MainApp.instance
                         coIO {
+                            val keepAwake = KeepAwakePreference.getAsync(context)
+                            if (keepAwake || PlugInControlReceiver.isUSBConnected(context)) {
+                                sendEvent(AcquireWakeLockEvent())
+                            }
                             while (retry > 0) {
                                 try {
                                     androidx.core.content.ContextCompat.startForegroundService(

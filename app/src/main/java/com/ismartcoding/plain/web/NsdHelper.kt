@@ -14,87 +14,159 @@ import javax.jmdns.JmDNS
 import javax.jmdns.ServiceInfo
 
 object NsdHelper {
-    private const val SERVICE_TYPE = "_http._tcp.local."
+    private const val SERVICE_TYPE_HTTP = "_http._tcp.local."
+    private const val SERVICE_TYPE_HTTPS = "_https._tcp.local."
     private const val SERVICE_NAME = "PlainApp"
     
     private var nsdManager: NsdManager? = null
-    private var registrationListener: NsdManager.RegistrationListener? = null
+    private val registrationListeners = mutableListOf<NsdManager.RegistrationListener>()
     private var jmDNS: JmDNS? = null
     private var unregisterJob: Job? = null
     
+    private data class ServiceDescriptor(
+        val type: String,
+        val name: String,
+        val port: Int,
+        val description: String,
+        val attributes: Map<String, String> = emptyMap(),
+    )
+
     /**
-     * Register the HTTP service with NSD and mDNS
+     * Backwards-compatible wrapper: registers only the HTTP service.
      */
-    fun registerService(context: Context, port: Int) {
+    fun registerService(context: Context, port: Int): Boolean {
+        return registerServices(context, httpPort = port, httpsPort = null)
+    }
+
+    /**
+     * Register both HTTP and HTTPS services with Android NSD and JmDNS.
+     * Returns true if at least one registration path succeeded.
+     */
+    fun registerServices(context: Context, httpPort: Int?, httpsPort: Int?): Boolean {
         unregisterService()
-        
+
+        val hostname = TempData.mdnsHostname
+        val services = buildList {
+            if (httpPort != null && httpPort > 0) {
+                add(
+                    ServiceDescriptor(
+                        type = SERVICE_TYPE_HTTP,
+                        name = SERVICE_NAME,
+                        port = httpPort,
+                        description = "Plain App HTTP Web Service",
+                        attributes = mapOf(
+                            "path" to "/",
+                            "hostname" to hostname,
+                            "scheme" to "http",
+                        ),
+                    )
+                )
+            }
+
+            if (httpsPort != null && httpsPort > 0) {
+                add(
+                    ServiceDescriptor(
+                        type = SERVICE_TYPE_HTTPS,
+                        name = SERVICE_NAME,
+                        port = httpsPort,
+                        description = "Plain App HTTPS Web Service",
+                        attributes = mapOf(
+                            "path" to "/",
+                            "hostname" to hostname,
+                            "scheme" to "https",
+                        ),
+                    )
+                )
+            }
+        }
+
+        var androidOk = false
+        var jmdnsOk = false
+
+        if (services.isEmpty()) {
+            LogCat.e("No services to register (ports missing)")
+            return false
+        }
+
         // Register with Android NSD
-        registerWithAndroidNsd(context, port)
-        
+        androidOk = registerWithAndroidNsd(context, services)
+
         // Register with JmDNS for better mDNS support
-        registerWithJmDNS(port)
+        jmdnsOk = registerWithJmDNS(services)
+
+        return androidOk || jmdnsOk
     }
-    
-    private fun registerWithAndroidNsd(context: Context, port: Int) {
-        val serviceInfo = NsdServiceInfo().apply {
-            serviceName = SERVICE_NAME
-            serviceType = SERVICE_TYPE
-            this.port = port
-            setAttribute("path", "/")
-            setAttribute("hostname", TempData.mdnsHostname)
-        }
-        
+
+    private fun registerWithAndroidNsd(context: Context, services: List<ServiceDescriptor>): Boolean {
         nsdManager = context.getSystemService(Context.NSD_SERVICE) as NsdManager
-        
-        registrationListener = object : NsdManager.RegistrationListener {
-            override fun onServiceRegistered(serviceInfo: NsdServiceInfo) {
-                // The service has been registered
-                LogCat.d("NSD service registered: ${serviceInfo.serviceName}")
+
+        var ok = false
+        for (service in services) {
+            val serviceInfo = NsdServiceInfo().apply {
+                serviceName = service.name
+                serviceType = service.type
+                port = service.port
+                service.attributes.forEach { (k, v) ->
+                    if (v.isNotEmpty()) setAttribute(k, v)
+                }
             }
-            
-            override fun onRegistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
-                LogCat.e("NSD registration failed: error code $errorCode")
+
+            val listener = object : NsdManager.RegistrationListener {
+                override fun onServiceRegistered(serviceInfo: NsdServiceInfo) {
+                    LogCat.d("NSD service registered: ${serviceInfo.serviceType} ${serviceInfo.serviceName}")
+                }
+
+                override fun onRegistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
+                    LogCat.e("NSD registration failed: ${serviceInfo.serviceType} error code $errorCode")
+                }
+
+                override fun onServiceUnregistered(serviceInfo: NsdServiceInfo) {
+                    LogCat.d("NSD service unregistered: ${serviceInfo.serviceType} ${serviceInfo.serviceName}")
+                }
+
+                override fun onUnregistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
+                    LogCat.e("NSD unregistration failed: ${serviceInfo.serviceType} error code $errorCode")
+                }
             }
-            
-            override fun onServiceUnregistered(serviceInfo: NsdServiceInfo) {
-                LogCat.d("NSD service unregistered: ${serviceInfo.serviceName}")
-            }
-            
-            override fun onUnregistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
-                LogCat.e("NSD unregistration failed: error code $errorCode")
+
+            try {
+                nsdManager?.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, listener)
+                registrationListeners.add(listener)
+                ok = true
+                LogCat.d("Registering Android NSD service ${service.type} on port ${service.port}")
+            } catch (e: Exception) {
+                LogCat.e("Failed to register Android NSD service ${service.type}: ${e.message}")
             }
         }
-        
-        try {
-            nsdManager?.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener)
-            LogCat.d("Registering Android NSD service on port $port")
-        } catch (e: Exception) {
-            LogCat.e("Failed to register Android NSD service: ${e.message}")
-        }
+
+        return ok
     }
-    
-    private fun registerWithJmDNS(port: Int) {
+
+    private fun registerWithJmDNS(services: List<ServiceDescriptor>): Boolean {
         try {
             val ip = NetworkHelper.getDeviceIP4()
             if (ip.isEmpty()) {
                 LogCat.e("Failed to get device IP for JmDNS")
-                return
+                return false
             }
-            
+
             val addr = InetAddress.getByName(ip)
             jmDNS = JmDNS.create(addr, TempData.mdnsHostname)
-            
-            val serviceInfo = ServiceInfo.create(
-                SERVICE_TYPE,
-                SERVICE_NAME,
-                port,
-                "Plain App Web Service"
-            )
-            
-            jmDNS?.registerService(serviceInfo)
-            LogCat.d("Registered JmDNS service on ${TempData.mdnsHostname}:$port")
+
+            for (service in services) {
+                val info = ServiceInfo.create(
+                    service.type,
+                    service.name,
+                    service.port,
+                    service.description
+                )
+                jmDNS?.registerService(info)
+                LogCat.d("Registered JmDNS service ${service.type} on ${TempData.mdnsHostname}:${service.port}")
+            }
+            return true
         } catch (e: Exception) {
             LogCat.e("Failed to register JmDNS service: ${e.message}")
+            return false
         }
     }
     
@@ -102,17 +174,17 @@ object NsdHelper {
      * Unregister the service when no longer needed
      */
     fun unregisterService() {
-        val listener = registrationListener.also { registrationListener = null }
+        val listeners = registrationListeners.toList().also { registrationListeners.clear() }
         val jmdns = jmDNS.also { jmDNS = null }
 
         unregisterJob?.cancel()
 
         unregisterJob = coIO {
-            listener?.let { l ->
+            listeners.forEach { l ->
                 runCatching { nsdManager?.unregisterService(l) }
-                    .onSuccess { LogCat.d("Unregistered Android NSD service") }
                     .onFailure { LogCat.e("Failed to unregister Android NSD service: ${it.message}") }
             }
+            if (listeners.isNotEmpty()) LogCat.d("Unregistered Android NSD service(s): ${listeners.size}")
 
             jmdns?.let { j ->
                 runCatching {

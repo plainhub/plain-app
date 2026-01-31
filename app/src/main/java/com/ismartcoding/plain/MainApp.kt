@@ -75,7 +75,7 @@ class MainApp : Application() {
             MdnsHostnamePreference.ensureValueAsync(preferences)
 
             DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(preferences)))
-            if (PlugInControlReceiver.isUSBConnected(this@MainApp)) {
+            if (TempData.webEnabled && PlugInControlReceiver.isUSBConnected(this@MainApp)) {
                 sendEvent(AcquireWakeLockEvent())
             }
             if (PasswordPreference.get(preferences).isEmpty()) {

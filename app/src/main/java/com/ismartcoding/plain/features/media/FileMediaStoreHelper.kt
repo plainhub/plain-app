@@ -8,6 +8,8 @@ import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.enums.FileType
+import com.ismartcoding.plain.extensions.normalizeComparison
+import com.ismartcoding.plain.extensions.parseSizeToBytes
 import com.ismartcoding.plain.extensions.sorted
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -72,6 +74,15 @@ object FileMediaStoreHelper : BaseContentHelper() {
                     }
                     "show_hidden" -> {
                         showHidden = it.value.toBoolean()
+                    }
+                    "file_size" -> {
+                        val (rawOp, rawValue) = it.normalizeComparison(defaultOp = "=")
+                        val bytes = rawValue.parseSizeToBytes() ?: return@forEach
+                        val op = when (rawOp) {
+                            ">", ">=", "<", "<=", "!=", "=" -> rawOp
+                            else -> "="
+                        }
+                        where.add("${MediaStore.Files.FileColumns.SIZE} $op ?", bytes.toString())
                     }
                     "ids" -> {
                         where.addIn(MediaStore.Files.FileColumns._ID, it.value.split(","))

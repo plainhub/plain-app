@@ -727,6 +727,14 @@ object HttpModule {
                         when (frame) {
                             is Frame.Binary -> {
                                 if (q["auth"] == "1") {
+                                    val clientIp = HttpServerManager.getClientIpForLogin(clientId, call.request.origin.remoteAddress)
+                                    val rateLimitKey = clientIp.ifEmpty { "cid:$clientId" }
+                                    if (!HttpServerManager.tryAcquireLoginAttempt(rateLimitKey)) {
+                                        LogCat.e("ws: too_many_login_attempts, key=$rateLimitKey")
+                                        close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "too_many_login_attempts"))
+                                        return@webSocket
+                                    }
+
                                     var r: AuthRequest? = null
                                     val hash = CryptoHelper.sha512(PasswordPreference.getAsync(MainApp.instance).toByteArray())
                                     val token = HttpServerManager.hashToToken(hash)
@@ -741,7 +749,6 @@ object HttpModule {
                                             sendEvent(event)
                                         } else {
                                             coIO {
-                                                val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
                                                 HttpServerManager.respondTokenAsync(event, clientIp)
                                             }
                                         }

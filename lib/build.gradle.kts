@@ -89,4 +89,6 @@ dependencies {
     
     // Google Tink for cryptography (Ed25519 support on all Android versions)
     api(libs.tink.android)
+
+    testImplementation("junit:junit:4.13.2")
 }

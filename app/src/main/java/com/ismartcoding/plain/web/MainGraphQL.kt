@@ -78,7 +78,6 @@ import com.ismartcoding.plain.helpers.DeviceInfoHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.NotificationsHelper
 import com.ismartcoding.plain.helpers.PhoneHelper
-import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.preferences.ApiPermissionsPreference
@@ -101,6 +100,7 @@ import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import com.ismartcoding.plain.web.loaders.FeedsLoader
 import com.ismartcoding.plain.web.loaders.FileInfoLoader
+import com.ismartcoding.plain.web.loaders.MountsLoader
 import com.ismartcoding.plain.web.loaders.TagsLoader
 import com.ismartcoding.plain.web.models.ActionResult
 import com.ismartcoding.plain.web.models.App
@@ -121,7 +121,6 @@ import com.ismartcoding.plain.web.models.NoteInput
 import com.ismartcoding.plain.web.models.PackageInstallPending
 import com.ismartcoding.plain.web.models.PackageStatus
 import com.ismartcoding.plain.web.models.PomodoroToday
-import com.ismartcoding.plain.web.models.StorageStats
 import com.ismartcoding.plain.web.models.Tag
 import com.ismartcoding.plain.web.models.TempValue
 import com.ismartcoding.plain.web.models.Video
@@ -418,14 +417,9 @@ class MainGraphQL(val schema: Schema) {
                         }
                     }
                 }
-                query("storageStats") {
+                query("mounts") {
                     resolver { ->
-                        val context = MainApp.instance
-                        StorageStats(
-                            FileSystemHelper.getInternalStorageStats().toModel(),
-                            FileSystemHelper.getSDCardStorageStats(context).toModel(),
-                            FileSystemHelper.getUSBStorageStats().map { it.toModel() },
-                        )
+                        MountsLoader.load(MainApp.instance)
                     }
                 }
                 query("screenMirrorState") {
@@ -484,15 +478,8 @@ class MainGraphQL(val schema: Schema) {
 //                        val appFolder = context.getExternalFilesDir(null)?.path ?: ""
 //                        val internalPath = FileSystemHelper.getInternalStoragePath()
                         //   if (!isQPlus() || root.startsWith(appFolder) || !root.startsWith(internalPath)) {
-                        val filterFields = QueryHelper.parseAsync(query)
-                        val showHidden = filterFields.find { it.name == "show_hidden" }?.value?.toBoolean() ?: false
-                        val text = filterFields.find { it.name == "text" }?.value ?: ""
-                        val parent = filterFields.find { it.name == "parent" }?.value ?: ""
-                        if (text.isNotEmpty()) {
-                            FileSystemHelper.search(text, parent.ifEmpty { root }, showHidden).sorted(sortBy).drop(offset).take(limit).map { it.toModel() }
-                        } else {
-                            FileSystemHelper.getFilesList(parent.ifEmpty { root }, showHidden, sortBy).drop(offset).take(limit).map { it.toModel() }
-                        }
+
+                        FileSystemHelper.search(query, root, sortBy).drop(offset).take(limit).map { it.toModel() }
 //                        } else {
 //                            FileMediaStoreHelper.searchAsync(MainApp.instance, query, limit, offset, sortBy).map { it.toModel() }
 //                        }
@@ -1413,7 +1400,9 @@ class MainGraphQL(val schema: Schema) {
                 mutation("addFavoriteFolder") {
                     resolver { rootPath: String, fullPath: String ->
                         val context = MainApp.instance
-                        val folder = DFavoriteFolder(rootPath, fullPath)
+                        val current = FavoriteFoldersPreference.getValueAsync(context)
+                            .firstOrNull { it.fullPath == fullPath }
+                        val folder = DFavoriteFolder(rootPath, fullPath, alias = current?.alias)
                         val updatedFolders = FavoriteFoldersPreference.addAsync(context, folder)
                         updatedFolders.map { it.toModel() }
                     }
@@ -1423,6 +1412,23 @@ class MainGraphQL(val schema: Schema) {
                         val context = MainApp.instance
                         val updatedFolders = FavoriteFoldersPreference.removeAsync(context, fullPath)
                         updatedFolders.map { it.toModel() }
+                    }
+                }
+
+                mutation("setFavoriteFolderAlias") {
+                    resolver { fullPath: String, alias: String ->
+                        val context = MainApp.instance
+                        val trimmed = alias.trim()
+                        val updated = FavoriteFoldersPreference.getValueAsync(context)
+                            .map {
+                                if (it.fullPath == fullPath) {
+                                    it.copy(alias = trimmed)
+                                } else {
+                                    it
+                                }
+                            }
+                        FavoriteFoldersPreference.putAsync(context, updated)
+                        updated.map { it.toModel() }
                     }
                 }
                 enum<MediaPlayMode>()

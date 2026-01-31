@@ -23,6 +23,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.web.HttpServerManager
+import com.ismartcoding.plain.web.MdnsNsdReregistrar
 import com.ismartcoding.plain.web.NsdHelper
 import com.ismartcoding.plain.features.Permission
 import io.ktor.client.request.get
@@ -30,10 +31,21 @@ import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.delay
 
 class HttpServerService : LifecycleService() {
+    private var serverState: HttpServerState = HttpServerState.OFF
+    private var mdnsNsdReregistrar: MdnsNsdReregistrar? = null
+
     @SuppressLint("InlinedApi")
     override fun onCreate() {
         super.onCreate()
         NotificationHelper.ensureDefaultChannel()
+
+        mdnsNsdReregistrar = MdnsNsdReregistrar(
+            context = this,
+            isActive = { serverState == HttpServerState.ON },
+            hostnameProvider = { TempData.mdnsHostname },
+            httpPortProvider = { TempData.httpPort },
+            httpsPortProvider = { TempData.httpsPort },
+        ).also { it.start() }
         
         lifecycle.addObserver(object : LifecycleEventObserver {
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
@@ -99,7 +111,8 @@ class HttpServerService : LifecycleService() {
 
     private suspend fun startHttpServerAsync() {
         LogCat.d("startHttpServer")
-        sendEvent(HttpServerStateChangedEvent(HttpServerState.STARTING))
+        serverState = HttpServerState.STARTING
+        sendEvent(HttpServerStateChangedEvent(serverState))
         try {
             HttpServerManager.portsInUse.clear()
             HttpServerManager.httpServerError = ""
@@ -115,8 +128,9 @@ class HttpServerService : LifecycleService() {
         if (checkResult.websocket && checkResult.http) {
             HttpServerManager.httpServerError = ""
             HttpServerManager.portsInUse.clear()
-            NsdHelper.registerService(this, TempData.httpPort)
-            sendEvent(HttpServerStateChangedEvent(HttpServerState.ON))
+            NsdHelper.registerServices(this, httpPort = TempData.httpPort, httpsPort = TempData.httpsPort)
+            serverState = HttpServerState.ON
+            sendEvent(HttpServerStateChangedEvent(serverState))
             PNotificationListenerService.toggle(this, Permission.NOTIFICATION_LISTENER.isEnabledAsync(this))
         } else {
             if (!checkResult.http) {
@@ -143,13 +157,16 @@ class HttpServerService : LifecycleService() {
                 LocaleHelper.getString(R.string.http_server_failed)
             }
 
-            sendEvent(HttpServerStateChangedEvent(HttpServerState.ERROR))
+            serverState = HttpServerState.ERROR
+            sendEvent(HttpServerStateChangedEvent(serverState))
             PNotificationListenerService.toggle(this, false)
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        mdnsNsdReregistrar?.stop()
+        mdnsNsdReregistrar = null
         // Ensure NSD service is unregistered
         NsdHelper.unregisterService()
         stopForeground(STOP_FOREGROUND_REMOVE)
@@ -171,5 +188,7 @@ class HttpServerService : LifecycleService() {
             ex.printStackTrace()
         }
         PNotificationListenerService.toggle(this, false)
+
+        serverState = HttpServerState.OFF
     }
 }

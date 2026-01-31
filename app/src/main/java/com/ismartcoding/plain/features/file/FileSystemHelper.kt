@@ -6,11 +6,16 @@ import android.os.StatFs
 import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.text.TextUtils
+import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.plain.extensions.getDirectChildrenCount
+import com.ismartcoding.plain.extensions.normalizeComparison
+import com.ismartcoding.plain.extensions.parseSizeToBytes
 import com.ismartcoding.lib.isRPlus
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.sorted
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.storageManager
 import com.ismartcoding.plain.storageStatsManager
 import kotlinx.datetime.Instant
@@ -223,6 +228,47 @@ object FileSystemHelper {
         }
 
         return files.sorted(sortBy)
+    }
+
+    suspend fun search(
+        query: String,
+        root: String,
+        sortBy: FileSortBy,
+    ): List<DFile> {
+        val filterFields = QueryHelper.parseAsync(query)
+        val showHidden = filterFields.find { it.name == "show_hidden" }?.value?.toBoolean() ?: false
+        val text = filterFields.find { it.name == "text" }?.value ?: ""
+        val parent = filterFields.find { it.name == "parent" }?.value ?: ""
+        val fileSizeFields = filterFields.filter { it.name == "file_size" }
+        val dir = parent.ifEmpty { root }
+        val items = if (text.isNotEmpty() || fileSizeFields.isNotEmpty()) {
+            // When filtering by file size, users expect a search over the directory tree,
+            // not only the current folder's direct children.
+            search(text, dir, showHidden).sorted(sortBy)
+        } else {
+            getFilesList(dir, showHidden, sortBy)
+        }
+
+        if (fileSizeFields.isEmpty()) return items
+        return items.filter { !it.isDir && matchFileSizeFilters(it.size, fileSizeFields) }
+    }
+
+    private fun matchFileSizeFilters(size: Long, fileSizeFields: List<FilterField>): Boolean {
+        for (f in fileSizeFields) {
+            val (op, rawValue) = f.normalizeComparison(defaultOp = "=")
+            val bytes = rawValue.toLongOrNull() ?: return false
+            val ok = when (op) {
+                ">" -> size > bytes
+                ">=" -> size >= bytes
+                "<" -> size < bytes
+                "<=" -> size <= bytes
+                "!=" -> size != bytes
+                "=", "" -> size == bytes
+                else -> true
+            }
+            if (!ok) return false
+        }
+        return true
     }
 
     fun search(

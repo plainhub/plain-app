@@ -9,19 +9,22 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.lib.channel.receiveEventHandler
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 object BluetoothPermission {
     private lateinit var enableBluetoothActivityLauncher: ActivityResultLauncher<Intent>
     private lateinit var requestBluetoothLocationPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var requestBluetoothScanConnectPermissionLauncher: ActivityResultLauncher<Array<String>>
+    private var collectJob: Job? = null
     fun init(activity: ComponentActivity) {
         enableBluetoothActivityLauncher =
             activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -60,10 +63,11 @@ object BluetoothPermission {
                 }
             }
 
-        val sharedFlow = Channel.sharedFlow
-        coMain {
-            sharedFlow.collect { event ->
-                when (event) {
+        collectJob?.cancel()
+        collectJob = activity.lifecycleScope.launch {
+            activity.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                Channel.sharedFlow.collect { event ->
+                    when (event) {
                     is RequestEnableBluetoothEvent -> {
                         enableBluetoothActivityLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
                     }
@@ -94,6 +98,7 @@ object BluetoothPermission {
                     }
                 }
 
+                }
             }
         }
     }

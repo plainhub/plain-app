@@ -32,7 +32,6 @@ object SearchHelper {
     val NUMBER_OPS = setOf(">", ">=", "<", "<=")
     private val GROUP_TYPES = INVERT.keys.filter { it != "in" && it != "nin" }
 
-    // 更稳健的分词器，支持单双引号、转义、空格等
     private fun splitInGroup(input: String): List<String> {
         val result = mutableListOf<String>()
         val sb = StringBuilder()
@@ -86,7 +85,11 @@ object SearchHelper {
     }
 
     private fun detectGroupType(group: String): String {
-        return GROUP_TYPES.find { group.contains(it) } ?: ""
+        // Match by prefix and prefer longer operators first.
+        // Example: ">=60" must match ">=" (not "=").
+        return GROUP_TYPES
+            .sortedByDescending { it.length }
+            .find { group.startsWith(it) } ?: ""
     }
 
     private fun splitGroup(q: String): QueryGroup {
@@ -128,7 +131,7 @@ object SearchHelper {
             if (it.op == NOT_TYPE) {
                 invert = true
             } else if (invert) {
-                it.op = INVERT[it.op] ?: ""
+                it.op = INVERT[it.op] ?: it.op
                 invert = false
             }
         }

@@ -22,6 +22,7 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.SessionClientTsUpdate
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.events.HttpServerStateChangedEvent
+import com.ismartcoding.plain.events.ReleaseWakeLockEvent
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
@@ -40,7 +41,9 @@ import io.ktor.server.netty.Netty
 import io.ktor.server.netty.NettyApplicationEngine
 import io.ktor.websocket.send
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.datetime.Instant
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -49,6 +52,7 @@ import java.security.KeyStore
 import java.security.cert.X509Certificate
 import java.util.Collections
 import java.util.Timer
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.set
 import kotlin.concurrent.timerTask
 
@@ -62,6 +66,45 @@ object HttpServerManager {
     val portsInUse = mutableSetOf<Int>()
     val httpsPorts = setOf(8043, 8143, 8243, 8343, 8443, 8543, 8643, 8743, 8843, 8943)
     val httpPorts = setOf(8080, 8180, 8280, 8380, 8480, 8580, 8680, 8780, 8880, 8980)
+
+    private const val LOGIN_RATE_LIMIT_WINDOW_MS = 60_000L
+    private const val LOGIN_RATE_LIMIT_MAX_ATTEMPTS = 5
+
+    private data class RateLimitWindow(var startMs: Long, var count: Int)
+
+    private val loginAttemptsByKey = ConcurrentHashMap<String, RateLimitWindow>()
+
+    private var clientTsJob: Job? = null
+
+    fun tryAcquireLoginAttempt(key: String, nowMs: Long = System.currentTimeMillis()): Boolean {
+        if (key.isBlank()) return true
+        val window = loginAttemptsByKey.compute(key) { _, existing ->
+            if (existing == null || nowMs - existing.startMs >= LOGIN_RATE_LIMIT_WINDOW_MS) {
+                RateLimitWindow(nowMs, 1)
+            } else {
+                existing.count += 1
+                existing
+            }
+        } ?: return true
+
+        // Opportunistic cleanup of stale entries
+        if (loginAttemptsByKey.size > 5_000) {
+            val threshold = nowMs - (LOGIN_RATE_LIMIT_WINDOW_MS * 2)
+            loginAttemptsByKey.entries.removeIf { it.value.startMs < threshold }
+        }
+
+        return window.count <= LOGIN_RATE_LIMIT_MAX_ATTEMPTS
+    }
+
+    fun getClientIpForLogin(clientId: String, remoteAddress: String?): String {
+        val cached = clientIpCache[clientId]
+        if (!cached.isNullOrEmpty()) return cached
+        val ip = remoteAddress ?: ""
+        if (ip.isNotEmpty()) {
+            clientIpCache[clientId] = ip
+        }
+        return ip
+    }
 
     val notificationId: Int by lazy {
         NotificationHelper.generateId()
@@ -93,6 +136,9 @@ object HttpServerManager {
         context.stopService(Intent(context, HttpServerService::class.java))
         // Ensure notification listener is disabled when server is stopped explicitly
         com.ismartcoding.plain.services.PNotificationListenerService.toggle(context, false)
+
+        // Web server is off; don't keep holding the http_server wakelock.
+        sendEvent(ReleaseWakeLockEvent())
         httpServerError = ""
         portsInUse.clear()
         sendEvent(HttpServerStateChangedEvent(HttpServerState.OFF))
@@ -218,22 +264,33 @@ object HttpServerManager {
     }
 
     fun clientTsInterval() {
-        val duration = 5000L
-        Timer().schedule(
-            timerTask {
+        if (clientTsJob?.isActive == true) return
+
+        // When there are active sessions/clients we update frequently, otherwise we back off.
+        val activeIntervalMs = 5_000L
+        val idleIntervalMs = 60_000L
+        val activeWindowMs = 5_000L
+
+        clientTsJob = coIO {
+            while (kotlinx.coroutines.currentCoroutineContext().isActive) {
                 val now = System.currentTimeMillis()
                 val updates =
-                    clientRequestTs.filter { it.value + duration > now }
+                    clientRequestTs
+                        .filter { it.value + activeWindowMs > now }
                         .map { SessionClientTsUpdate(it.key, Instant.fromEpochMilliseconds(it.value)) }
+
                 if (updates.isNotEmpty()) {
-                    coIO {
+                    runCatching {
                         AppDatabase.instance.sessionDao().updateTs(updates)
+                    }.onFailure {
+                        LogCat.e("Failed to update client session timestamps: ${it.message}")
                     }
+                    delay(activeIntervalMs)
+                } else {
+                    delay(idleIntervalMs)
                 }
-            },
-            duration,
-            duration,
-        )
+            }
+        }
     }
 
     suspend fun respondTokenAsync(
