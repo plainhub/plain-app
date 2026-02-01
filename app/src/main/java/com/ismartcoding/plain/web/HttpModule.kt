@@ -441,24 +441,23 @@ object HttpModule {
                             }
                             return@get
                         }
-
-                        val bytes = file.readBytes()
-
-                        val isHeif = bytes.size >= 12 &&
-                                bytes[4] == 0x66.toByte() && // 'f'
-                                bytes[5] == 0x74.toByte() && // 't'
-                                bytes[6] == 0x79.toByte() && // 'y'
-                                bytes[7] == 0x70.toByte() && // 'p'
-                                String(bytes.copyOfRange(8, 12)) in listOf("heic", "heix", "hevc", "hevx", "avif")
+                        val header = ByteArray(12)
+                        val headerSize = file.inputStream().use { it.read(header) }
+                        val isHeif = headerSize >= 12 &&
+                                header[4] == 0x66.toByte() && // 'f'
+                                header[5] == 0x74.toByte() && // 't'
+                                header[6] == 0x79.toByte() && // 'y'
+                                header[7] == 0x70.toByte() && // 'p'
+                                String(header.copyOfRange(8, 12)) in listOf("heic", "heix", "hevc", "hevx", "avif")
 
                         if (isHeif) {
+                            val bytes = file.readBytes()
                             val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                             val output = ByteArrayOutputStream()
                             bitmap.compress(Bitmap.CompressFormat.PNG, 100, output)
                             call.respondBytes(output.toByteArray(), ContentType.Image.PNG)
                         } else {
-                            val contentType = ContentType.defaultForFile(file)
-                            call.respondBytes(bytes, contentType)
+                            call.respondFile(file)
                         }
                     }
                 } catch (ex: Exception) {
