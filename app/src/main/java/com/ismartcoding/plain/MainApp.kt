@@ -16,6 +16,7 @@ import com.ismartcoding.plain.events.AcquireWakeLockEvent
 import com.ismartcoding.plain.events.AppEvents
 import com.ismartcoding.plain.events.StartNearbyServiceEvent
 import com.ismartcoding.plain.helpers.AppHelper
+import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.preferences.AudioPlayModePreference
 import com.ismartcoding.plain.preferences.CheckUpdateTimePreference
 import com.ismartcoding.plain.preferences.ClientIdPreference
@@ -45,6 +46,9 @@ class MainApp : Application() {
         instance = this
 
         LogCat.addLogAdapter(DiskLogAdapter(DiskLogFormatStrategy.getInstance(this)))
+
+        // Create default notification channel early so the app appears in system notification settings
+        NotificationHelper.ensureDefaultChannel()
 
         AppEvents.register()
 
