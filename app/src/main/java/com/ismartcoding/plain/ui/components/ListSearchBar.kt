@@ -32,6 +32,12 @@ fun <T : IData> ListSearchBar(
 ) {
     val focusRequester = remember { FocusRequester() }
     val windowInfo = LocalWindowInfo.current
+    
+    // Request focus immediately when the search bar is first displayed (issue #248)
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+    
     LaunchedEffect(windowInfo) {
         snapshotFlow { windowInfo.isWindowFocused }.collect { isWindowFocused ->
             if (isWindowFocused && viewModel.searchActive.value) {
