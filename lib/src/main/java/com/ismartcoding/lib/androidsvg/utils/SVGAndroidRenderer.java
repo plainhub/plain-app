@@ -94,6 +94,7 @@ import java.util.Stack;
  * The rendering part of AndroidSVG.
  */
 
+@SuppressWarnings("deprecation")
 public class SVGAndroidRenderer {
     private static final String TAG = "SVGAndroidRenderer";
 
@@ -447,7 +448,9 @@ public class SVGAndroidRenderer {
 
     private void parentPush(SvgContainer obj) {
         parentStack.push(obj);
-        matrixStack.push(canvas.getMatrix());
+        Matrix currentMatrix = new Matrix();
+        canvas.getMatrix(currentMatrix);
+        matrixStack.push(currentMatrix);
     }
 
 
@@ -523,7 +526,8 @@ public class SVGAndroidRenderer {
             // It will be rendered at the same width no matter how the document contents are transformed.
 
             // First step: get the current canvas matrix
-            Matrix currentMatrix = canvas.getMatrix();
+            Matrix currentMatrix = new Matrix();
+            canvas.getMatrix(currentMatrix);
             // Transform the path using this transform
             Path transformedPath = new Path();
             path.transform(currentMatrix, transformedPath);
@@ -703,7 +707,9 @@ public class SVGAndroidRenderer {
                     obj.boundingBox.maxX(), obj.boundingBox.maxY(),
                     obj.boundingBox.minX, obj.boundingBox.maxY()};
             // Now concatenate the parent's matrix to create a child-to-parent transform
-            m.preConcat(canvas.getMatrix());
+            Matrix currentMatrix = new Matrix();
+            canvas.getMatrix(currentMatrix);
+            m.preConcat(currentMatrix);
             m.mapPoints(pts);
             // Finally, find the bounding box of the transformed points
             RectF rect = new RectF(pts[0], pts[1], pts[0], pts[1]);

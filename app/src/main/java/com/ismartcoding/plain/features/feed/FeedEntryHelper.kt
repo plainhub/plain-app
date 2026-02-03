@@ -7,7 +7,7 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DFeedEntry
 import com.ismartcoding.plain.db.FeedEntryDao
 import com.ismartcoding.plain.helpers.QueryHelper
-import kotlinx.datetime.Clock
+import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
@@ -69,7 +69,7 @@ object FeedEntryHelper {
         updateItem: DFeedEntry.() -> Unit,
     ): String {
         val item = feedEntryDao.getById(id) ?: return id
-        item.updatedAt = Clock.System.now()
+        item.updatedAt = TimeHelper.now()
         updateItem(item)
         feedEntryDao.update(item)
 
@@ -79,7 +79,7 @@ object FeedEntryHelper {
     fun updateAsync(
         item: DFeedEntry,
     ) {
-        item.updatedAt = Clock.System.now()
+        item.updatedAt = TimeHelper.now()
         feedEntryDao.update(item)
     }
 
@@ -103,7 +103,7 @@ object FeedEntryHelper {
             } else if (it.name == "feed_id") {
                 where.add("feed_id=?", it.value)
             } else if (it.name == "today" && it.value == "true") {
-                val currentDateTime = Clock.System.now()
+                val currentDateTime = TimeHelper.now()
                 val timeZone = TimeZone.currentSystemDefault()
                 val startOfDay = currentDateTime.toLocalDateTime(timeZone)
                     .date

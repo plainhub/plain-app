@@ -6,7 +6,7 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DNote
 import com.ismartcoding.plain.db.NoteDao
 import com.ismartcoding.plain.helpers.QueryHelper
-import kotlinx.datetime.Clock
+import com.ismartcoding.plain.helpers.TimeHelper
 
 object NoteHelper {
     private val noteDao: NoteDao by lazy {
@@ -88,7 +88,7 @@ object NoteHelper {
             item = DNote(id)
             isInsert = true
         } else {
-            item.updatedAt = Clock.System.now()
+            item.updatedAt = TimeHelper.now()
         }
 
         updateItem(item)
@@ -113,7 +113,7 @@ object NoteHelper {
             item = DNote()
             isInsert = true
         } else {
-            item.updatedAt = Clock.System.now()
+            item.updatedAt = TimeHelper.now()
         }
 
         updateItem(item)
@@ -128,12 +128,12 @@ object NoteHelper {
     }
 
     fun trashAsync(ids: Set<String>) {
-        val now = Clock.System.now()
+        val now = TimeHelper.now()
         noteDao.trash(ids, now, now)
     }
 
     fun restoreAsync(ids: Set<String>) {
-        noteDao.trash(ids, null, Clock.System.now())
+        noteDao.trash(ids, null, TimeHelper.now())
     }
 
     fun deleteAsync(ids: Set<String>) {

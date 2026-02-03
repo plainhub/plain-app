@@ -1,13 +1,11 @@
 plugins {
     id("com.android.library")
     id("com.google.devtools.ksp")
-    kotlin("android")
-    kotlin("kapt")
     kotlin("plugin.serialization") version libs.versions.kotlin
 }
 
 android {
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 28
@@ -28,8 +26,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+            freeCompilerArgs.add("-nowarn")
+        }
     }
     packaging {
         resources {
@@ -40,6 +41,7 @@ android {
     namespace = "com.ismartcoding.lib"
 }
 
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     api(libs.androidx.appcompat)
@@ -49,7 +51,7 @@ dependencies {
 
 //    api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
-    implementation(files("libs/PdfiumAndroid-2.0.0-release.aar"))
+    compileOnly(files("libs/PdfiumAndroid-2.0.0-release.aar"))
 
     api(libs.gson)
 
@@ -90,5 +92,5 @@ dependencies {
     // Google Tink for cryptography (Ed25519 support on all Android versions)
     api(libs.tink.android)
 
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.junit)
 }

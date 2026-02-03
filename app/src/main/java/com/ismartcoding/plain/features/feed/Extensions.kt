@@ -14,13 +14,13 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.api.ApiResult
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.db.DFeedEntry
+import com.ismartcoding.plain.helpers.TimeHelper
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.util.cio.writeChannel
 import io.ktor.utils.io.copyAndClose
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import java.io.File
 import java.util.Locale
@@ -111,7 +111,7 @@ suspend fun DFeedEntry.fetchContentAsync(): ApiResult {
                     } else if (content.isEmpty()) {
                         content = description
                     }
-                    updatedAt = Clock.System.now()
+                    updatedAt = TimeHelper.now()
                     FeedEntryHelper.updateAsync(this)
                 }
             }

@@ -15,11 +15,11 @@ import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.db.DFeedCount
 import com.ismartcoding.plain.db.FeedDao
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
-import kotlinx.datetime.Clock
 import java.io.Reader
 import java.io.Writer
 import java.util.Date
@@ -57,7 +57,7 @@ object FeedHelper {
         updateItem: DFeed.() -> Unit,
     ): String {
         val item = feedDao.getById(id) ?: return id
-        item.updatedAt = Clock.System.now()
+        item.updatedAt = TimeHelper.now()
         updateItem(item)
         feedDao.update(item)
         return id

@@ -1,46 +1,48 @@
 [versions]
-androidGifDrawableVersion="1.2.29"
+androidGifDrawableVersion="1.2.30"
 appcompatVersion="1.7.1"
 bcprovJdk15onVersion="1.70"
 coil="3.3.0"
-coreKtxVersion="1.16.0"
+coreKtxVersion="1.17.0"
 firebaseCrashlyticsGradleVersion="3.0.6"
 glideVersion="5.0.5"
 googleServicesVersion="4.4.3"
-gradle= "8.11.2"
+gradle= "9.0.0"
 accompanistDrawablepainterVersion = "0.37.3"
 cameraCoreVersion = "1.4.2"
-compose = "1.9.1"
-activityComposeVersion = "1.10.1"
-composeBom = "2025.09.00"
-coreSplashscreenVersion = "1.0.1"
-coreVersion = "3.5.3"
+compose = "1.10.2"
+activityComposeVersion = "1.12.2"
+composeBom = "2026.01.01"
+coreSplashscreenVersion = "1.2.0"
+coreVersion = "3.5.4"
 datastorePreferencesVersion = "1.1.7"
 firebaseCrashlyticsKtxVersion = "19.4.4"
 firebaseBomVersion = "34.2.0"
 gsonVersion="2.13.2"
-jsoupVersion="1.15.3"
+jsoupVersion="1.22.1"
+junitVersion="4.13.2"
 kgraphql = "0.19.0"
-kotlin ="2.2.20"
-kotlinxDatetimeVersion="0.6.1"
-kotlinxSerializationJsonVersion="1.9.0"
+kotlin ="2.3.0"
+kotlinxDatetimeVersion="0.7.1"
+kotlinxSerializationJsonVersion="1.10.0"
 kotlinxCoroutinesVersion ="1.10.2"
-ktor = "3.1.3"
+ktor = "3.4.0"
 leakcanaryAndroidVersion = "2.14"
 lifecycleExtensionsVersion="2.2.0"
-lifecycleViewmodelKtxVersion="2.9.3"
+lifecycleViewmodelKtxVersion="2.10.0"
 markwon="4.6.2"
-media3 = "1.8.0"
+media3 = "1.9.0"
 navigationComposeVersion = "2.9.3"
-material3Version = "1.3.2"
-okhttpVersion="5.1.0"
+material3Version = "1.4.0"
+okhttpVersion="5.3.2"
 room = "2.7.2"
 transitionVersion="1.6.0"
 workRuntimeKtxVersion = "2.10.3"
 ztZipVersion = "1.17"
-devtoolsKspVersion = "2.2.0-2.0.2"
-tinkAndroidVersion = "1.18.0"
-jmdnsVersion = "3.6.2"
+devtoolsKspVersion = "2.3.2"
+tinkAndroidVersion = "1.20.0"
+jmdnsVersion = "3.6.3"
+playPublisherVersion = "4.0.0"
 
 [libraries]
 android-gif-drawable = { module = "pl.droidsonroids.gif:android-gif-drawable", version.ref = "androidGifDrawableVersion" }
@@ -78,6 +80,7 @@ camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraCor
 camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraCoreVersion" }
 
 # media3
+junit = { module = "junit:junit", version.ref = "junitVersion" }
 media3-cast = { module = "androidx.media3:media3-cast", version.ref = "media3" }
 media3-datasource = { module = "androidx.media3:media3-datasource", version.ref = "media3" }
 media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
@@ -166,3 +169,4 @@ jmdns = { module = "org.jmdns:jmdns", version.ref = "jmdnsVersion" }
 [plugins]
 devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "devtoolsKspVersion" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+play-publisher = { id = "com.github.triplet.play", version.ref = "playPublisherVersion" }

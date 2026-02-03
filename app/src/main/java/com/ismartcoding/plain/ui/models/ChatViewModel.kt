@@ -13,6 +13,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.chat.PeerChatHelper
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
+import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.db.DChatGroup
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
@@ -146,7 +147,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     }
 
     private fun createLongTextFile(text: String, context: Context): DMessageContent {
-        val timestamp = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+        val timestamp = TimeHelper.now().toEpochMilliseconds()
         val fileName = "message-$timestamp.txt"
         val dir = context.getExternalFilesDir(android.os.Environment.DIRECTORY_DOCUMENTS)
         if (!dir!!.exists()) {

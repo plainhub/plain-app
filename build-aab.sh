@@ -29,6 +29,10 @@ cat > ./local.properties <<EOF
 sdk.dir=/Users/$USER/Library/Android/sdk
 EOF
 
+cat > ./app/play-config.json <<EOF
+$PLAY_STORE_CONFIG_JSON
+EOF
+
 ./gradlew :app:bundleRelease || err_and_exit "build failed"
 
 BUILD_FILE="PlainApp-$(getVersionName).aab"

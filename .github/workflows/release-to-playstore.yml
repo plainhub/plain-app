@@ -1,16 +1,16 @@
-name: Generated AAB
+name: Release to Play Store
 
 on:
   workflow_dispatch:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     env:
       ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
 
     steps:
       - uses: actions/checkout@v4
@@ -21,7 +21,7 @@ jobs:
       - name: Set Up JDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu' # See 'Supported distributions' for available options
+          distribution: 'zulu'
           java-version: '17'
           cache: 'gradle'
 
@@ -30,6 +30,9 @@ jobs:
 
       - name: Build aab
         run: bash build-aab.sh
+
+      - name: Publish to Play Store (Internal)
+        run: ./gradlew publishGoogleReleaseBundle
 
       - name: Save aab
         uses: actions/upload-artifact@v4

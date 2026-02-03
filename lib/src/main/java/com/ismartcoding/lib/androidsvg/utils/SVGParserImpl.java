@@ -3907,7 +3907,7 @@ class SVGParserImpl implements SVGParser
             language = language.substring(0, hyphenPos);
          }
          // Get canonical version of language code in case it has changed (see the JavaDoc for Locale.getLanguage())
-         language = new Locale(language, "", "").getLanguage();
+         language = new Locale.Builder().setLanguage(language).build().getLanguage();
          result.add(language);
          scan.skipWhitespace();
       }

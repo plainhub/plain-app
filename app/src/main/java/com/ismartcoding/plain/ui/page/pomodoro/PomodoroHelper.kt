@@ -23,9 +23,9 @@ import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
+import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.ui.MainActivity
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.math.PI
@@ -45,7 +45,7 @@ object PomodoroHelper {
         NotificationHelper.ensureDefaultChannel()
         val database = AppDatabase.Companion.instance
         val pomodoroDao = database.pomodoroItemDao()
-        val today = Clock.System.now()
+        val today = TimeHelper.now()
             .toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
         val todayRecord = CoroutinesHelper.withIO { pomodoroDao.getByDate(today) }
         val completedPomodoros = todayRecord?.completedCount ?: 0

@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.db
 
 import androidx.room.*
+import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.datetime.*
 
 @Entity(tableName = "sessions")
@@ -32,7 +33,7 @@ data class SessionClientTsUpdate(
     @ColumnInfo(name = "client_id")
     var clientId: String,
     @ColumnInfo(name = "updated_at")
-    val updatedAt: Instant = Clock.System.now(),
+    val updatedAt: Instant = TimeHelper.now(),
 )
 
 @Dao

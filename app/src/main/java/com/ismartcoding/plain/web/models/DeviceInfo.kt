@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.data.DDeviceInfo
-import kotlinx.datetime.Clock
+import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.datetime.Instant
 
 class DeviceInfo {
@@ -22,7 +22,7 @@ class DeviceInfo {
     var displayVersion: String = ""
     var buildBrand: String = ""
     var buildHost: String = ""
-    var buildTime: Instant = Clock.System.now()
+    var buildTime: Instant = TimeHelper.now()
     var uptime = 0L
     var buildUser: String = ""
     var serial: String = ""

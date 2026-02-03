@@ -12,12 +12,12 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPomodoroItem
 import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroHelper
+import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -156,7 +156,7 @@ class PomodoroViewModel : ViewModel() {
         record.apply {
             this.completedCount = completedPomodoros
             this.totalWorkSeconds += workSeconds
-            this.updatedAt = Clock.System.now()
+            this.updatedAt = TimeHelper.now()
         }
         pomodoroDao.update(record)
 
@@ -175,7 +175,7 @@ class PomodoroViewModel : ViewModel() {
     }
 
     private fun getCurrentDateString(): String {
-        return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
+        return TimeHelper.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
     }
 
     fun formatTime(seconds: Int): String {

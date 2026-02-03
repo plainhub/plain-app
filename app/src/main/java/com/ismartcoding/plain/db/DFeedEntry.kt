@@ -6,8 +6,8 @@ import com.ismartcoding.lib.extensions.getSummary
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.data.IDData
 import com.ismartcoding.plain.data.IData
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.serialization.Serializable
 
 // https://validator.w3.org/feed/docs/rss2.html
@@ -32,7 +32,7 @@ data class DFeedEntry(
     var rawId: String = ""
 
     @ColumnInfo(name = "published_at")
-    var publishedAt: Instant = Clock.System.now()
+    var publishedAt: Instant = TimeHelper.now()
 
     @ColumnInfo(name = "read")
     var read: Boolean = false

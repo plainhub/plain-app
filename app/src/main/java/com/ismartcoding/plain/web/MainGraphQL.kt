@@ -78,6 +78,7 @@ import com.ismartcoding.plain.helpers.DeviceInfoHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.NotificationsHelper
 import com.ismartcoding.plain.helpers.PhoneHelper
+import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.preferences.ApiPermissionsPreference
@@ -446,7 +447,7 @@ class MainGraphQL(val schema: Schema) {
                 query("pomodoroToday") {
                     resolver { ->
                         val dao = AppDatabase.instance.pomodoroItemDao()
-                        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
+                        val today = TimeHelper.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
                         val vm = MainActivity.instance.get()!!.pomodoroVM
                         PomodoroToday(
                             date = today,

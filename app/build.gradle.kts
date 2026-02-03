@@ -1,6 +1,7 @@
 import java.io.FileInputStream
 import java.util.Properties
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("com.android.application")
@@ -9,10 +10,9 @@ plugins {
     id("kotlin-parcelize")
     id("androidx.room")
     id("com.google.devtools.ksp")
-    kotlin("android")
-    kotlin("kapt")
     kotlin("plugin.serialization") version libs.versions.kotlin
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.play.publisher)
 }
 
 room {
@@ -27,11 +27,11 @@ rootProject.file("keystore.properties").let {
 }
 
 android {
-    compileSdk = 35
+    compileSdk = 36
     defaultConfig {
         applicationId = "com.ismartcoding.plain"
         minSdk = 28
-        targetSdk = 35
+        targetSdk = 36
 
         val abiFilterList = if (hasProperty("abiFilters")) property("abiFilters").toString().split(';') else listOf()
         val singleAbiNum =
@@ -77,7 +77,7 @@ android {
             isMinifyEnabled = false
             isDebuggable = true
             ndk {
-                debugSymbolLevel = "SYMBOL_TABLE"
+                debugSymbolLevel = "NONE"
             }
             configure<CrashlyticsExtension> {
                 mappingFileUploadEnabled = false
@@ -129,6 +129,7 @@ android {
         jniLibs {
             // useLegacyPackaging = true
             excludes += listOf("META-INF/*")
+            keepDebugSymbols += listOf("**/*.so")
         }
         resources {
             excludes += listOf("META-INF/*")
@@ -136,13 +137,23 @@ android {
     }
     namespace = "com.ismartcoding.plain"
 
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.add("-nowarn")
+        }
     }
+}
+
+play {
+    serviceAccountCredentials.set(file("play-config.json"))
+    track.set("internal")
+    defaultToAppBundles.set(true)
 }
 
 dependencies {
     implementation(project(":lib"))
+    implementation(files("$rootDir/lib/libs/PdfiumAndroid-2.0.0-release.aar"))
 
     implementation(platform(libs.compose.bom))
 

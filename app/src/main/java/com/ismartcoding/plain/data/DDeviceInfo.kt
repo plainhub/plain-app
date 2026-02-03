@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.data
 
 import com.ismartcoding.plain.web.models.DPhoneNumber
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import com.ismartcoding.plain.helpers.TimeHelper
 
 class DDeviceInfo {
     var deviceName = ""
@@ -22,7 +22,7 @@ class DDeviceInfo {
     var displayVersion: String = ""
     var buildBrand: String = ""
     var buildHost: String = ""
-    var buildTime: Instant = Clock.System.now()
+    var buildTime: Instant = TimeHelper.now()
     var uptime: Long = 0L
     var buildUser: String = ""
     var serial: String = ""

@@ -2,7 +2,7 @@ package com.ismartcoding.plain.web
 
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DSession
-import kotlinx.datetime.Clock
+import com.ismartcoding.plain.helpers.TimeHelper
 
 object SessionList {
     fun getItemsAsync(): List<DSession> {
@@ -20,7 +20,7 @@ object SessionList {
             item.clientId = clientId
             isInsert = true
         } else {
-            item.updatedAt = Clock.System.now()
+            item.updatedAt = TimeHelper.now()
         }
 
         updateItem(item)

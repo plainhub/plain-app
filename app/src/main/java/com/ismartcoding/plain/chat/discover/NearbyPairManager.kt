@@ -21,9 +21,9 @@ import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager.MULTICAST_PORT
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.helpers.SignatureHelper
+import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.web.ChatApiManager
-import kotlinx.datetime.Clock
 import java.util.concurrent.ConcurrentHashMap
 import android.util.Base64
 import kotlin.math.abs
@@ -313,7 +313,7 @@ object NearbyPairManager {
     ) {
         try {
             val existingPeer = AppDatabase.instance.peerDao().getById(deviceId)
-            val currentTime = Clock.System.now()
+            val currentTime = TimeHelper.now()
 
             if (existingPeer != null) {
                 existingPeer.apply {

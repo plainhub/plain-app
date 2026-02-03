@@ -13,8 +13,8 @@ import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.data.IData
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.serialization.Serializable
 import org.json.JSONObject
 
@@ -98,7 +98,7 @@ class DLinkPreview(
     val siteName: String? = null,
     val domain: String? = null,
     @kotlinx.serialization.Transient val hasError: Boolean = false,
-    val createdAt: Instant = Clock.System.now()
+    val createdAt: Instant = TimeHelper.now()
 )
 
 @Entity(
@@ -150,7 +150,7 @@ data class ChatItemDataUpdate(
     var id: String,
     var content: DMessageContent,
     @ColumnInfo(name = "updated_at")
-    val updatedAt: Instant = Clock.System.now(),
+    val updatedAt: Instant = TimeHelper.now(),
 )
 
 @Dao
@@ -163,7 +163,7 @@ interface ChatDao {
 
     @Query(
         """
-        SELECT * FROM chats c
+        SELECT c.* FROM chats c
         INNER JOIN (
             SELECT from_id, to_id, MAX(created_at) as max_created_at
             FROM chats 

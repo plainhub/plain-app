@@ -5,7 +5,7 @@ import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.db.*
 import com.ismartcoding.plain.helpers.QueryHelper
-import kotlinx.datetime.Clock
+import com.ismartcoding.plain.helpers.TimeHelper
 
 object BookHelper {
     val bookDao: BookDao by lazy {
@@ -45,7 +45,7 @@ object BookHelper {
         updateItem: DBook.() -> Unit,
     ): String {
         val item = bookDao.getById(id) ?: return id
-        item.updatedAt = Clock.System.now()
+        item.updatedAt = TimeHelper.now()
         updateItem(item)
         bookDao.update(item)
 

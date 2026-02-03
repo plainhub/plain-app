@@ -15,13 +15,13 @@ import com.ismartcoding.plain.events.PairingFailedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.StartNearbyDiscoveryEvent
 import com.ismartcoding.plain.events.StopNearbyDiscoveryEvent
+import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.chat.discover.NearbyPairManager
 import com.ismartcoding.plain.web.ChatApiManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 
 class NearbyViewModel : ViewModel() {
     val nearbyDevices = mutableStateListOf<DNearbyDevice>()
@@ -100,7 +100,7 @@ class NearbyViewModel : ViewModel() {
         cleanupJob = viewModelScope.launch {
             while (isDiscovering.value) {
                 delay(20000) // Check every 20 seconds
-                val currentTime = Clock.System.now()
+                val currentTime = TimeHelper.now()
                 nearbyDevices.removeIf { (currentTime - it.lastSeen).inWholeSeconds > 60 }
             }
         }
@@ -124,7 +124,7 @@ class NearbyViewModel : ViewModel() {
                 val peer = AppDatabase.instance.peerDao().getById(deviceId)
                 if (peer != null) {
                     peer.status = "unpaired"
-                    peer.updatedAt = kotlinx.datetime.Clock.System.now()
+                    peer.updatedAt = TimeHelper.now()
                     AppDatabase.instance.peerDao().update(peer)
                     ChatApiManager.loadKeyCacheAsync()
                     loadAsync()

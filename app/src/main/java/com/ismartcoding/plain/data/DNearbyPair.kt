@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.data
 
 import com.ismartcoding.plain.enums.DeviceType
+import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
@@ -48,5 +49,5 @@ data class DPairingSession(
     val deviceName: String,
     val deviceIp: String,
     val keyPair: java.security.KeyPair,
-    val timestamp: Instant = kotlinx.datetime.Clock.System.now()
+    val timestamp: Instant = TimeHelper.now()
 )

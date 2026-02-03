@@ -15,11 +15,11 @@ import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
 import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import com.ismartcoding.plain.web.ChatApiManager
+import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.seconds
 
@@ -162,14 +162,14 @@ class ChatListViewModel : ViewModel() {
         // Ensure state mutation happens on the main thread
         viewModelScope.launch(Dispatchers.Main) {
             val currentMap = onlineMap.value.toMutableMap()
-            currentMap[peerId] = Clock.System.now()
+            currentMap[peerId] = TimeHelper.now()
             onlineMap.value = currentMap
         }
     }
 
     fun isPeerOnline(peerId: String): Boolean {
         val lastActive = onlineMap.value[peerId] ?: return false
-        val now = Clock.System.now()
+        val now = TimeHelper.now()
         return (now - lastActive) <= 15.seconds
     }
 
@@ -204,7 +204,7 @@ class ChatListViewModel : ViewModel() {
                     }
 
                     if (needsUpdate) {
-                        peer.updatedAt = Clock.System.now()
+                        peer.updatedAt = TimeHelper.now()
                         AppDatabase.instance.peerDao().update(peer)
                         loadPeers()
                     }

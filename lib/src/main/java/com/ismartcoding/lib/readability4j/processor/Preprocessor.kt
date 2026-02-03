@@ -31,7 +31,7 @@ class Preprocessor {
 
     private fun removeScripts(document: Document) {
         ProcessorHelper.removeNodes(document, "script") { scriptNode ->
-            scriptNode.`val`(null) // TODO: what is this good for?
+            scriptNode.`val`("") // TODO: what is this good for?
             scriptNode.removeAttr("src")
             true
         }
@@ -119,10 +119,10 @@ class Preprocessor {
             // all sibling nodes as children of the <p> until we hit another <br>
             // chain.
             if (replaced) {
-                val p = br.ownerDocument()?.createElement("p")
+                val p = br.ownerDocument()?.createElement("p") ?: return@forEach
                 br.replaceWith(p)
 
-                next = p?.nextSibling()
+                next = p.nextSibling()
                 while (next != null) {
                     // If we've hit another <br><br>, we're done adding children to this <p>.
                     if (next.nodeName() == "br") {
@@ -133,7 +133,7 @@ class Preprocessor {
 
                     // Otherwise, make this node a child of the new <p>.
                     val sibling = next.nextSibling()
-                    p?.appendChild(next)
+                    p.appendChild(next)
                     next = sibling
                 }
             }

@@ -23,9 +23,9 @@ import com.ismartcoding.plain.events.PairingRequestReceivedEvent
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
+import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.datetime.Clock
 
 object NearbyDiscoverManager {
     private const val BROADCAST_INTERVAL = 5000L         // 5 seconds broadcast interval
@@ -196,7 +196,7 @@ object NearbyDiscoverManager {
                         deviceType = reply.deviceType,
                         version = reply.version,
                         platform = reply.platform,
-                        lastSeen = Clock.System.now()
+                        lastSeen = TimeHelper.now()
                     )
                 )
             )

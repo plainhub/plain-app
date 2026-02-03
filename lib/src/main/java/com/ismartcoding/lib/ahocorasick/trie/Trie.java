@@ -213,6 +213,7 @@ public class Trie {
          * @return This builder.
          * @deprecated Use ignoreCase()
          */
+        @Deprecated
         public TrieBuilder caseInsensitive() {
             return ignoreCase();
         }
@@ -221,6 +222,7 @@ public class Trie {
          * @return This builder.
          * @deprecated Use ignoreOverlaps()
          */
+        @Deprecated
         public TrieBuilder removeOverlaps() {
             return ignoreOverlaps();
         }

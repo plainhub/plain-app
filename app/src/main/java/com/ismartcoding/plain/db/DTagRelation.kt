@@ -3,6 +3,7 @@ package com.ismartcoding.plain.db
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 import kotlinx.datetime.*
+import com.ismartcoding.plain.helpers.TimeHelper
 
 @Entity(tableName = "tag_relations", primaryKeys = ["tag_id", "key", "type"])
 data class DTagRelation(
@@ -12,7 +13,7 @@ data class DTagRelation(
     var type: Int = 0,
 ) {
     @ColumnInfo(name = "created_at")
-    var createdAt: Instant = Clock.System.now()
+    var createdAt: Instant = TimeHelper.now()
     var size: Long = 0
     var title: String = ""
 }

@@ -7,7 +7,7 @@ import com.ismartcoding.plain.db.DTagCount
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.db.TagDao
 import com.ismartcoding.plain.db.TagRelationDao
-import kotlinx.datetime.Clock
+import com.ismartcoding.plain.helpers.TimeHelper
 
 object TagHelper {
     private val tagDao: TagDao by lazy {
@@ -38,7 +38,7 @@ object TagHelper {
             isInsert = true
         }
 
-        item.updatedAt = Clock.System.now()
+        item.updatedAt = TimeHelper.now()
 
         updateItem(item)
 

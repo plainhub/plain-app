@@ -63,7 +63,7 @@ public class SvgMediaDecoder extends MediaDecoder {
         final int width = (int) (w * density + .5F);
         final int height = (int) (h * density + .5F);
 
-        final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
+        final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         final Canvas canvas = new Canvas(bitmap);
         canvas.scale(density, density);
         svg.renderToCanvas(canvas);

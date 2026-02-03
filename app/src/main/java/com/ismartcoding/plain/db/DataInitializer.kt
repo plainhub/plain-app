@@ -8,14 +8,14 @@ import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.DataType
-import kotlinx.datetime.Clock
+import com.ismartcoding.plain.helpers.TimeHelper
 
 class DataInitializer(val context: Context, val db: SupportSQLiteDatabase) {
     private data class TagItem(val nameKey: Int, val type: DataType)
 
     private data class MessageItem(val content: String, val fromId: String, val toId: String)
 
-    private val now = Clock.System.now().toString()
+    private val now = TimeHelper.now().toString()
 
     private val tags =
         arrayOf(
