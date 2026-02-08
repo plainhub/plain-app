@@ -142,7 +142,6 @@ class HttpServerService : LifecycleService() {
                     HttpServerManager.portsInUse.add(TempData.httpsPort)
                 }
             }
-
             HttpServerManager.httpServerError = if (HttpServerManager.portsInUse.isNotEmpty()) {
                 LocaleHelper.getStringF(
                     if (HttpServerManager.portsInUse.size > 1) {

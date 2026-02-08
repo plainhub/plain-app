@@ -44,6 +44,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.datetime.Instant
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -146,36 +147,38 @@ object HttpServerManager {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun checkServerAsync(): HttpServerCheckResult {
-        var websocket = false
-        var http = false
-        var retry = 2
-        val client = HttpClientManager.httpClient()
-        while (retry-- > 0) {
-            try {
-                client.ws(urlString = UrlHelper.getWsTestUrl()) {
-                    val reason = this.closeReason.getCompleted()
-                    LogCat.d("closeReason: $reason")
-                    if (reason?.message == BuildConfig.APPLICATION_ID) {
-                        websocket = true
+        return withTimeoutOrNull(5000) {
+            var websocket = false
+            var http = false
+            var retry = 2
+            val client = HttpClientManager.httpClient()
+            while (retry-- > 0) {
+                try {
+                    client.ws(urlString = UrlHelper.getWsTestUrl()) {
+                        val reason = this.closeReason.getCompleted()
+                        LogCat.d("closeReason: $reason")
+                        if (reason?.message == BuildConfig.APPLICATION_ID) {
+                            websocket = true
+                        }
                     }
+                    retry = 0
+                } catch (ex: Exception) {
+                    delay(300)
+                    ex.printStackTrace()
+                    LogCat.e(ex.toString())
                 }
-                retry = 0
+            }
+
+            try {
+                val r = client.get(UrlHelper.getHealthCheckUrl())
+                http = r.bodyAsText() == BuildConfig.APPLICATION_ID
             } catch (ex: Exception) {
-                delay(300)
                 ex.printStackTrace()
                 LogCat.e(ex.toString())
             }
-        }
 
-        try {
-            val r = client.get(UrlHelper.getHealthCheckUrl())
-            http = r.bodyAsText() == BuildConfig.APPLICATION_ID
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            LogCat.e(ex.toString())
-        }
-
-        return HttpServerCheckResult(websocket, http)
+            HttpServerCheckResult(websocket, http)
+        } ?: HttpServerCheckResult(false, false)
     }
 
     private suspend fun passwordToToken(): ByteArray {

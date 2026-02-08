@@ -56,7 +56,8 @@ object HttpClientManager {
     fun httpClient() =
         HttpClient(CIO) {
             install(HttpTimeout) {
-                requestTimeoutMillis = HttpApiTimeout.MEDIUM_SECONDS * 1000L
+                requestTimeoutMillis = HttpApiTimeout.DEFAULT_SECONDS * 1000L
+                connectTimeoutMillis = HttpApiTimeout.DEFAULT_SECONDS * 1000L
             }
             install(WebSockets)
         }

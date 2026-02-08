@@ -918,6 +918,18 @@ class MainGraphQL(val schema: Schema) {
                         dst != null
                     }
                 }
+                mutation("writeTextFile") {
+                    resolver { path: String, content: String, overwrite: Boolean ->
+                        Permission.WRITE_EXTERNAL_STORAGE.checkAsync(MainApp.instance)
+                        val file = java.io.File(path)
+                        if (!overwrite && file.exists()) {
+                            throw GraphQLError("File already exists")
+                        }
+                        file.writeText(content)
+                        MainApp.instance.scanFileByConnection(path)
+                        file.toModel()
+                    }
+                }
                 mutation("copyFile") {
                     resolver { src: String, dst: String, overwrite: Boolean ->
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(MainApp.instance)

@@ -2,6 +2,7 @@ import java.io.FileInputStream
 import java.util.Properties
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("com.android.application")
@@ -136,15 +137,14 @@ android {
         }
     }
     namespace = "com.ismartcoding.plain"
-
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-            freeCompilerArgs.add("-nowarn")
-        }
-    }
 }
 
+tasks.withType<KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+        freeCompilerArgs.add("-nowarn")
+    }
+}
 play {
     serviceAccountCredentials.set(file("play-config.json"))
     track.set("internal")
@@ -230,7 +230,7 @@ dependencies {
     debugImplementation(libs.leakcanary.android)
     implementation(kotlin("stdlib", libs.versions.kotlin.get()))
     
-    // Google Tink for cryptography (Ed25519 support on all Android versions)
+    // For cryptography (Ed25519 support on all Android versions)
     implementation(libs.tink.android)
     
     // JmDNS for mDNS service discovery
