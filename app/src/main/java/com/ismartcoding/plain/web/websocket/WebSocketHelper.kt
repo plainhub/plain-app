@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.web.websocket
 
 import com.ismartcoding.lib.helpers.CryptoHelper
+import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketData
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.web.HttpServerManager
@@ -21,6 +22,23 @@ object WebSocketHelper {
                 it.session.send(addIntPrefixToByteArray(event.type.value, event.data.value as ByteArray))
             }
         }
+    }
+
+    suspend fun sendSignalingToClientAsync(clientId: String, json: String) {
+        HttpServerManager.wsSessions
+            .toList()
+            .filter { it.clientId == clientId }
+            .forEach {
+                val token = HttpServerManager.tokenCache[it.clientId]
+                if (token != null) {
+                    it.session.send(
+                        addIntPrefixToByteArray(
+                            EventType.WEBRTC_SIGNALING.value,
+                            CryptoHelper.chaCha20Encrypt(token, json),
+                        ),
+                    )
+                }
+            }
     }
 }
 

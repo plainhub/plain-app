@@ -5,6 +5,7 @@ import android.os.Environment
 import com.apurebase.kgraphql.GraphQLError
 import com.apurebase.kgraphql.GraphqlRequest
 import com.apurebase.kgraphql.KGraphQL
+import com.apurebase.kgraphql.Context
 import com.apurebase.kgraphql.context
 import com.apurebase.kgraphql.helpers.getFields
 import com.apurebase.kgraphql.schema.Schema
@@ -24,6 +25,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
+import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.isRPlus
@@ -41,6 +43,7 @@ import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.MediaPlayMode
+import com.ismartcoding.plain.enums.ScreenMirrorMode
 import com.ismartcoding.plain.events.CancelNotificationsEvent
 import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
@@ -78,6 +81,7 @@ import com.ismartcoding.plain.helpers.DeviceInfoHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.NotificationsHelper
 import com.ismartcoding.plain.helpers.PhoneHelper
+import com.ismartcoding.plain.web.websocket.WebRtcSignalingMessage
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.packageManager
@@ -131,6 +135,7 @@ import com.ismartcoding.plain.workers.FeedFetchWorker
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.application.BaseApplicationPlugin
 import io.ktor.server.application.call
@@ -425,13 +430,7 @@ class MainGraphQL(val schema: Schema) {
                 }
                 query("screenMirrorState") {
                     resolver { ->
-                        val image = ScreenMirrorService.instance?.getLatestImage()
-                        if (image != null) {
-                            sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, image))
-                            true
-                        } else {
-                            false
-                        }
+                        ScreenMirrorService.instance?.isRunning() == true
                     }
                 }
                 query("screenMirrorQuality") {
@@ -826,10 +825,25 @@ class MainGraphQL(val schema: Schema) {
                     }
                 }
                 mutation("updateScreenMirrorQuality") {
-                    resolver { quality: Int, resolution: Int ->
-                        val qualityData = DScreenMirrorQuality(quality, resolution)
+                    resolver { mode: ScreenMirrorMode ->
+                        val resolution = when (mode) {
+                            ScreenMirrorMode.AUTO -> 1080
+                            ScreenMirrorMode.HD -> 1080
+                            ScreenMirrorMode.SMOOTH -> 720
+                        }
+                        val qualityData = DScreenMirrorQuality(mode, resolution)
                         ScreenMirrorQualityPreference.putAsync(MainApp.instance, qualityData)
                         ScreenMirrorService.qualityData = qualityData
+                        ScreenMirrorService.instance?.onQualityChanged()
+                        true
+                    }
+                }
+
+                mutation("sendWebRtcSignaling") {
+                    resolver { payload: WebRtcSignalingMessage, context: Context ->
+                        val call = context.get<ApplicationCall>()
+                        val clientId = call?.request?.header("c-id") ?: ""
+                        ScreenMirrorService.instance?.handleWebRtcSignaling(clientId, payload)
                         true
                     }
                 }
@@ -1449,9 +1463,10 @@ class MainGraphQL(val schema: Schema) {
                 enum<Permission>()
                 enum<FileSortBy>()
                 enum<PomodoroState>()
-                stringScalar<Instant> {
-                    deserialize = { value: String -> Instant.parse(value) }
-                    serialize = Instant::toString
+                enum<ScreenMirrorMode>()
+                stringScalar<kotlin.time.Instant> {
+                    deserialize = { value: String -> kotlin.time.Instant.parse(value) }
+                    serialize = kotlin.time.Instant::toString
                 }
 
                 stringScalar<ID> {
@@ -1470,9 +1485,14 @@ class MainGraphQL(val schema: Schema) {
         private suspend fun executeGraphqlQL(
             schema: Schema,
             query: String,
+            call: ApplicationCall,
         ): String {
             val request = Json.decodeFromString(GraphqlRequest.serializer(), query)
-            return schema.execute(request.query, request.variables.toString(), context {})
+            return schema.execute(
+                request.query,
+                request.variables.toString(),
+                context { +call },
+            )
         }
 
         override fun install(
@@ -1513,7 +1533,7 @@ class MainGraphQL(val schema: Schema) {
 
                             LogCat.d("[Request] $requestStr")
                             HttpServerManager.clientRequestTs[clientId] = System.currentTimeMillis() // record the api request time
-                            val r = executeGraphqlQL(schema, requestStr)
+                            val r = executeGraphqlQL(schema, requestStr, call)
                             call.respondBytes(CryptoHelper.chaCha20Encrypt(token, r))
                         } else {
                             val authStr = call.request.header("authorization")?.split(" ")
@@ -1529,7 +1549,7 @@ class MainGraphQL(val schema: Schema) {
                             val requestStr = call.receiveText()
                             LogCat.d("[Request] $requestStr")
                             HttpServerManager.clientRequestTs[clientId] = System.currentTimeMillis() // record the api request time
-                            val r = executeGraphqlQL(schema, requestStr)
+                            val r = executeGraphqlQL(schema, requestStr, call)
                             call.respondText(r, contentType = ContentType.Application.Json)
                         }
                     }

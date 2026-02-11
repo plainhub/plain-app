@@ -1,9 +1,12 @@
 package com.ismartcoding.plain.data
 
+import com.ismartcoding.plain.enums.ScreenMirrorMode
 import kotlinx.serialization.Serializable
+
+
 
 @Serializable
 data class DScreenMirrorQuality(
-    val quality: Int = 50,
-    val resolution: Int = 720 // 480p, 720p，1080p，4k
+    val mode: ScreenMirrorMode = ScreenMirrorMode.AUTO,
+    val resolution: Int = 1080,
 )

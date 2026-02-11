@@ -126,14 +126,11 @@ class MainActivity : AppCompatActivity() {
     private val screenCapture =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-                val image = ScreenMirrorService.instance?.getLatestImage()
-                if (image == null) {
+                if (ScreenMirrorService.instance == null) {
                     val service = Intent(this, ScreenMirrorService::class.java)
                     service.putExtra("code", result.resultCode)
                     service.putExtra("data", result.data)
                     ContextCompat.startForegroundService(this, service)
-                } else {
-                    sendEvent(WebSocketEvent(EventType.SCREEN_MIRRORING, image))
                 }
             }
         }

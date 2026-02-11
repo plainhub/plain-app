@@ -42,9 +42,9 @@ android {
                 else -> 0
             }
 
-        val vCode = 457
+        val vCode = 460
         versionCode = vCode - singleAbiNum
-        versionName = "2.1.24"
+        versionName = "2.1.25"
 
         ndk {
             //noinspection ChromeOsAbiSupport
@@ -235,4 +235,7 @@ dependencies {
     
     // JmDNS for mDNS service discovery
     implementation(libs.jmdns)
+
+    // WebRTC for screen mirroring
+    implementation(libs.stream.webrtc.android)
 }

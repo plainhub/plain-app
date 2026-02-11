@@ -43,6 +43,7 @@ devtoolsKspVersion = "2.3.2"
 tinkAndroidVersion = "1.20.0"
 jmdnsVersion = "3.6.3"
 playPublisherVersion = "4.0.0"
+streamWebrtcVersion = "1.3.1"
 
 [libraries]
 android-gif-drawable = { module = "pl.droidsonroids.gif:android-gif-drawable", version.ref = "androidGifDrawableVersion" }
@@ -165,6 +166,7 @@ leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", ve
 zt-zip = { module = "org.zeroturnaround:zt-zip", version.ref = "ztZipVersion" }
 tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "tinkAndroidVersion" }
 jmdns = { module = "org.jmdns:jmdns", version.ref = "jmdnsVersion" }
+stream-webrtc-android = { module = "io.getstream:stream-webrtc-android", version.ref = "streamWebrtcVersion" }
 
 [plugins]
 devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "devtoolsKspVersion" }

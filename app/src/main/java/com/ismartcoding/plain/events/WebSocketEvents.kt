@@ -13,9 +13,7 @@ sealed class WebSocketData {
 
             other as Binary
 
-            if (!value.contentEquals(other.value)) return false
-
-            return true
+            return value.contentEquals(other.value)
         }
 
         override fun hashCode(): Int {
@@ -40,6 +38,7 @@ enum class EventType(val value: Int) {
     MESSAGE_UPDATED(3),
     FEEDS_FETCHED(4),
     SCREEN_MIRRORING(5),
+    WEBRTC_SIGNALING(6),
     NOTIFICATION_CREATED(7),
     NOTIFICATION_UPDATED(8),
     NOTIFICATION_DELETED(9),
