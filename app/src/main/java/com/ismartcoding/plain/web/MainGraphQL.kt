@@ -25,7 +25,6 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.isRPlus
@@ -43,18 +42,17 @@ import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.MediaPlayMode
+import com.ismartcoding.plain.enums.ScreenMirrorControlAction
 import com.ismartcoding.plain.enums.ScreenMirrorMode
+import com.ismartcoding.plain.data.ScreenMirrorControlInput
 import com.ismartcoding.plain.events.CancelNotificationsEvent
 import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
-import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.StartScreenMirrorEvent
 import com.ismartcoding.plain.events.RequestScreenMirrorAudioEvent
-import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.extensions.newPath
-import com.ismartcoding.plain.extensions.sorted
 import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.features.NoteHelper
@@ -102,6 +100,7 @@ import com.ismartcoding.plain.preferences.VideoPlaylistPreference
 import com.ismartcoding.plain.receivers.BatteryReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.ScreenMirrorService
+import com.ismartcoding.plain.services.PlainAccessibilityService
 import com.ismartcoding.plain.ui.MainActivity
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
 import com.ismartcoding.plain.web.loaders.FeedsLoader
@@ -151,7 +150,6 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.util.AttributeKey
 import kotlinx.coroutines.coroutineScope
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -432,6 +430,11 @@ class MainGraphQL(val schema: Schema) {
                 query("screenMirrorState") {
                     resolver { ->
                         ScreenMirrorService.instance?.isRunning() == true
+                    }
+                }
+                query("screenMirrorControlEnabled") {
+                    resolver { ->
+                        PlainAccessibilityService.isEnabled()
                     }
                 }
                 query("screenMirrorQuality") {
@@ -859,6 +862,15 @@ class MainGraphQL(val schema: Schema) {
                         val call = context.get<ApplicationCall>()
                         val clientId = call?.request?.header("c-id") ?: ""
                         ScreenMirrorService.instance?.handleWebRtcSignaling(clientId, payload)
+                        true
+                    }
+                }
+                mutation("sendScreenMirrorControl") {
+                    resolver { input: ScreenMirrorControlInput ->
+                        val service = PlainAccessibilityService.instance
+                            ?: throw GraphQLError("Accessibility service is not enabled")
+                        val screenSize = PlainAccessibilityService.getScreenSize(MainApp.instance)
+                        service.dispatchControl(input, screenSize.x, screenSize.y)
                         true
                     }
                 }
@@ -1479,6 +1491,7 @@ class MainGraphQL(val schema: Schema) {
                 enum<FileSortBy>()
                 enum<PomodoroState>()
                 enum<ScreenMirrorMode>()
+                enum<ScreenMirrorControlAction>()
                 stringScalar<kotlin.time.Instant> {
                     deserialize = { value: String -> kotlin.time.Instant.parse(value) }
                     serialize = kotlin.time.Instant::toString
@@ -1536,18 +1549,14 @@ class MainGraphQL(val schema: Schema) {
                                 return@post
                             }
 
-                            var requestStr = ""
                             val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, call.receive())
-                            if (decryptedBytes != null) {
-                                requestStr = decryptedBytes.decodeToString()
-                            }
+                            val requestStr = decryptedBytes?.decodeToString() ?: ""
                             if (requestStr.isEmpty()) {
                                 call.respond(HttpStatusCode.Unauthorized)
                                 return@post
                             }
 
-                            LogCat.d("[Request] $requestStr")
-                            HttpServerManager.clientRequestTs[clientId] = System.currentTimeMillis() // record the api request time
+                            HttpServerManager.clientRequestTs[clientId] = System.currentTimeMillis()
                             val r = executeGraphqlQL(schema, requestStr, call)
                             call.respondBytes(CryptoHelper.chaCha20Encrypt(token, r))
                         } else {

@@ -678,4 +678,6 @@
     <string name="port">連接埠</string>
     <string name="cannot_move_folder_into_itself">無法將資料夾移動到其自身或其子資料夾中。</string>
     <string name="cannot_copy_folder_into_itself">無法將資料夾複製到其自身或其子資料夾中。</string>
+    <string name="accessibility_service_description">PlainApp 使用此無障礙服務以在螢幕鏡像時啟用遠端控制。它會注入來自網頁介面的觸控事件（點擊、滑動、捲動）以及導覽操作（返回、主畫面、最近任務）。</string>
+    <string name="accessibility_service_label">PlainApp 遠端控制</string>
 </resources>

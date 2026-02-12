@@ -678,4 +678,6 @@
     <string name="port">Порт</string>
     <string name="cannot_move_folder_into_itself">Нельзя переместить папку в саму себя или в её подпапку.</string>
     <string name="cannot_copy_folder_into_itself">Нельзя скопировать папку в саму себя или в её подпапку.</string>
+    <string name="accessibility_service_description">PlainApp использует эту службу специальных возможностей, чтобы включить удалённое управление во время трансляции экрана. Она внедряет касания (нажатие, свайп, прокрутка) и действия навигации (Назад, Домой, Недавние), отправленные из веб‑интерфейса.</string>
+    <string name="accessibility_service_label">Удалённое управление PlainApp</string>
 </resources>

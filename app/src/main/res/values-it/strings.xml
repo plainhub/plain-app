@@ -678,4 +678,6 @@
     <string name="port">Porta</string>
     <string name="cannot_move_folder_into_itself">Impossibile spostare una cartella in se stessa o in una sua sottocartella.</string>
     <string name="cannot_copy_folder_into_itself">Impossibile copiare una cartella in se stessa o in una sua sottocartella.</string>
+    <string name="accessibility_service_description">PlainApp usa questo servizio di accessibilità per abilitare il controllo remoto durante il mirroring dello schermo. Inietta eventi di tocco (tap, scorrimento, trascinamento) e azioni di navigazione (Indietro, Home, Recenti) inviate dall\'interfaccia web.</string>
+    <string name="accessibility_service_label">Controllo remoto PlainApp</string>
 </resources>

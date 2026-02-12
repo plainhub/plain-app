@@ -70,6 +70,11 @@ class ScreenMirrorWebRtcManager(
     private var statsHandler: android.os.Handler? = null
     private val statsIntervalMs = 3000L
 
+    // ── Frame-rate limiter (isScreencast=true disables adaptOutputFormat) ─
+    private var lastFrameTimeNs = 0L
+    private val targetFps = 30
+    private val minFrameIntervalNs = 1_000_000_000L / targetFps
+
     // ── Public API ────────────────────────────────────────────────────────
 
     /**
@@ -114,8 +119,15 @@ class ScreenMirrorWebRtcManager(
         )
 
         // Start forwarding frames: SurfaceTextureHelper → VideoSource
+        // Cap at targetFps to prevent encoder overload and latency build-up.
+        // (adaptOutputFormat is a no-op when isScreencast=true, so we drop frames manually.)
         surfaceTextureHelper!!.startListening { frame ->
-            videoSource!!.capturerObserver.onFrameCaptured(frame)
+            val now = System.nanoTime()
+            if (now - lastFrameTimeNs >= minFrameIntervalNs) {
+                lastFrameTimeNs = now
+                videoSource!!.capturerObserver.onFrameCaptured(frame)
+            }
+            // Skipped frames are automatically released by SurfaceTextureHelper
         }
         videoSource!!.capturerObserver.onCapturerStarted(true)
 
@@ -248,7 +260,7 @@ class ScreenMirrorWebRtcManager(
                 // Tear down any previous session for this client (re-negotiation).
                 peerSessions.remove(clientId)?.release()
 
-                val session = WebRtcPeerSession(clientId, factory, track, audioTrack) { computeTargetBitrateKbps() }
+                val session = WebRtcPeerSession(clientId, factory, track, audioTrack, { computeTargetBitrateKbps() }, { getQuality().mode })
                 peerSessions[clientId] = session
                 session.createPeerConnectionAndOffer()
 

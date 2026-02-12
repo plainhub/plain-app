@@ -429,6 +429,8 @@
     <string name="api_service_is_running">Web service is running</string>
     <string name="screen_mirror_service_is_running">Screen mirror service is running</string>
     <string name="screen_mirror_audio_permission_settings_message">Microphone permission is disabled. Please enable it in Settings to mirror system audio.</string>
+    <string name="accessibility_service_description">PlainApp uses this accessibility service to enable remote control during screen mirroring. It injects touch events (tap, swipe, scroll) and navigation actions (Back, Home, Recents) sent from the web interface.</string>
+    <string name="accessibility_service_label">PlainApp Remote Control</string>
     <string name="cast">Cast</string>
     <string name="images">Images</string>
     <string name="audios">Audio</string>

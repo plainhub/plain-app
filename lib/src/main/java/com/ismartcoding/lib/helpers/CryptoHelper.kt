@@ -10,6 +10,7 @@ import com.google.crypto.tink.signature.SignatureKeyTemplates
 import com.google.crypto.tink.subtle.XChaCha20Poly1305
 import com.ismartcoding.lib.logcat.LogCat
 import java.io.ByteArrayOutputStream
+import java.util.concurrent.ConcurrentHashMap
 import java.io.RandomAccessFile
 import java.nio.channels.FileChannel
 import java.nio.file.Files
@@ -27,6 +28,26 @@ import java.util.Random
 import javax.crypto.KeyAgreement
 
 object CryptoHelper {
+
+    // Cache XChaCha20Poly1305 instances per key to avoid expensive re-construction on every encrypt/decrypt.
+    // Key is the hex representation of the raw key bytes.
+    private val aeadCache = ConcurrentHashMap<String, XChaCha20Poly1305>()
+
+    private fun getAead(key: ByteArray): XChaCha20Poly1305 {
+        val keyHex = bytesToHash(key)
+        return aeadCache.getOrPut(keyHex) { XChaCha20Poly1305(key) }
+    }
+
+    /**
+     * Clear cached AEAD instances. Call when keys are rotated or sessions are invalidated.
+     */
+    fun clearAeadCache() {
+        aeadCache.clear()
+    }
+
+    fun removeAeadCache(key: ByteArray) {
+        aeadCache.remove(bytesToHash(key))
+    }
 
     @Volatile
     private var tinkInitialized = false
@@ -122,8 +143,7 @@ object CryptoHelper {
         key: ByteArray,
         content: ByteArray,
     ): ByteArray {
-        val aead = XChaCha20Poly1305(key)
-        return aead.encrypt(content, null)
+        return getAead(key).encrypt(content, null)
     }
 
     fun chaCha20Encrypt(
@@ -145,8 +165,7 @@ object CryptoHelper {
         content: ByteArray,
     ): ByteArray? {
         return try {
-            val aead = XChaCha20Poly1305(key)
-            aead.decrypt(content, null)
+            getAead(key).decrypt(content, null)
         } catch (ex: Exception) {
             LogCat.e("Failed to decrypt with XChaCha20-Poly1305: ${ex.message}")
             null

@@ -678,4 +678,6 @@
     <string name="port">포트</string>
     <string name="cannot_move_folder_into_itself">폴더를 자기 자신 또는 하위 폴더로 이동할 수 없습니다.</string>
     <string name="cannot_copy_folder_into_itself">폴더를 자기 자신 또는 하위 폴더로 복사할 수 없습니다.</string>
+    <string name="accessibility_service_description">PlainApp은 화면 미러링 중 원격 제어를 활성화하기 위해 이 접근성 서비스를 사용합니다. 웹 인터페이스에서 전송된 터치 이벤트(탭, 스와이프, 스크롤)와 내비게이션 동작(뒤로, 홈, 최근 앱)을 주입합니다.</string>
+    <string name="accessibility_service_label">PlainApp 원격 제어</string>
 </resources>
