@@ -1,21 +1,32 @@
 package com.ismartcoding.plain.services.webrtc
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
+import android.media.AudioAttributes
+import android.media.AudioFormat
+import android.media.AudioPlaybackCaptureConfiguration
+import android.media.AudioRecord
 import android.media.projection.MediaProjection
+import android.os.Build
 import android.view.Surface
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DScreenMirrorQuality
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.ScreenMirrorMode
 import com.ismartcoding.plain.web.websocket.WebRtcSignalingMessage
+import org.webrtc.AudioSource
+import org.webrtc.AudioTrack
 import org.webrtc.DefaultVideoDecoderFactory
 import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.EglBase
+import org.webrtc.MediaConstraints
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.SurfaceTextureHelper
 import org.webrtc.VideoSource
 import org.webrtc.VideoTrack
+import org.webrtc.audio.JavaAudioDeviceModule
 import kotlin.math.max
 import kotlin.math.min
 
@@ -38,6 +49,11 @@ class ScreenMirrorWebRtcManager(
     private var peerConnectionFactory: PeerConnectionFactory? = null
     private var videoSource: VideoSource? = null
     private var videoTrack: VideoTrack? = null
+    private var audioSource: AudioSource? = null
+    private var audioTrack: AudioTrack? = null
+    private var audioDeviceModule: JavaAudioDeviceModule? = null
+    @Volatile
+    private var audioSwapped = false
     private var surfaceTextureHelper: SurfaceTextureHelper? = null
     private var eglBase: EglBase? = null
 
@@ -67,9 +83,8 @@ class ScreenMirrorWebRtcManager(
             return
         }
 
-        ensurePeerConnectionFactory()
-
         mediaProjection = projection
+        ensurePeerConnectionFactory(projection)
         projection.registerCallback(object : MediaProjection.Callback() {
             override fun onStop() {
                 LogCat.d("webrtc: MediaProjection stopped")
@@ -105,12 +120,120 @@ class ScreenMirrorWebRtcManager(
         videoSource!!.capturerObserver.onCapturerStarted(true)
 
         LogCat.d("webrtc: VirtualDisplay created ${width}x${height} dpi=$dpi")
+
+        // Create audio source and track (JavaAudioDeviceModule handles actual capture)
+        audioSource = factory.createAudioSource(MediaConstraints())
+        audioTrack = factory.createAudioTrack("screen_audio", audioSource)
+        audioTrack?.setEnabled(true)
+        LogCat.d("webrtc: audio track created, enabled=${audioTrack?.enabled()}")
     }
 
     /**
-     * Route an incoming signaling message to the appropriate [WebRtcPeerSession].
-     * A `"ready"` message creates (or re-creates) a session for [clientId].
+     * Swap the internal mic-based AudioRecord inside WebRtcAudioRecord (via reflection)
+     * with one that captures system audio using AudioPlaybackCaptureConfiguration.
+     * Called on the WebRTC audio recording thread from AudioRecordStateCallback.
      */
+    @SuppressLint("MissingPermission")
+    private fun swapToPlaybackCapture(projection: MediaProjection) {
+        if (!AppFeatureType.MIRROR_AUDIO.has()) {
+            LogCat.d("webrtc: audio swap skipped, API < Q")
+            return
+        }
+        if (audioSwapped) {
+            LogCat.d("webrtc: audio swap already done")
+            return
+        }
+
+        // Check RECORD_AUDIO permission at runtime (required for AudioPlaybackCapture)
+        if (context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)
+            != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            LogCat.e("webrtc: RECORD_AUDIO permission not granted, cannot capture audio")
+            return
+        }
+
+        try {
+            val adm = audioDeviceModule ?: run {
+                LogCat.e("webrtc: audioDeviceModule is null")
+                return
+            }
+
+            // Access JavaAudioDeviceModule.audioInput (WebRtcAudioRecord)
+            LogCat.d("webrtc: audio swap step 1 - accessing audioInput field")
+            val audioInputField = adm.javaClass.getDeclaredField("audioInput")
+            audioInputField.isAccessible = true
+            val audioInput = audioInputField.get(adm) ?: run {
+                LogCat.e("webrtc: audioInput is null")
+                return
+            }
+
+            // Access WebRtcAudioRecord.audioRecord (android.media.AudioRecord)
+            LogCat.d("webrtc: audio swap step 2 - accessing audioRecord field from ${audioInput.javaClass.name}")
+            val audioRecordField = audioInput.javaClass.getDeclaredField("audioRecord")
+            audioRecordField.isAccessible = true
+            val oldRecord = audioRecordField.get(audioInput) as? AudioRecord ?: run {
+                LogCat.e("webrtc: audioRecord is null or not AudioRecord")
+                return
+            }
+
+            // Read params from the existing AudioRecord to match WebRTC's expectations
+            val sampleRate = oldRecord.sampleRate
+            val channelCount = oldRecord.channelCount
+            val channelConfig = if (channelCount == 1) AudioFormat.CHANNEL_IN_MONO else AudioFormat.CHANNEL_IN_STEREO
+            val encoding = oldRecord.audioFormat
+            LogCat.d("webrtc: audio swap step 3 - old record params: rate=$sampleRate ch=$channelCount encoding=$encoding state=${oldRecord.state}")
+
+            // Stop & release the mic-based AudioRecord
+            try { oldRecord.stop() } catch (e: Exception) {
+                LogCat.d("webrtc: old record stop exception (expected): ${e.message}")
+            }
+            oldRecord.release()
+            LogCat.d("webrtc: audio swap step 4 - old record released")
+
+            // Create a new AudioRecord that captures system audio via MediaProjection
+            val playbackConfig = AudioPlaybackCaptureConfiguration.Builder(projection)
+                .addMatchingUsage(AudioAttributes.USAGE_MEDIA)
+                .addMatchingUsage(AudioAttributes.USAGE_GAME)
+                .addMatchingUsage(AudioAttributes.USAGE_UNKNOWN)
+                .build()
+
+            val bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, encoding) * 2
+            LogCat.d("webrtc: audio swap step 5 - creating playback capture AudioRecord (bufSize=$bufferSize)")
+            val newRecord = AudioRecord.Builder()
+                .setAudioPlaybackCaptureConfig(playbackConfig)
+                .setAudioFormat(
+                    AudioFormat.Builder()
+                        .setSampleRate(sampleRate)
+                        .setChannelMask(channelConfig)
+                        .setEncoding(encoding)
+                        .build()
+                )
+                .setBufferSizeInBytes(bufferSize)
+                .build()
+
+            if (newRecord.state != AudioRecord.STATE_INITIALIZED) {
+                LogCat.e("webrtc: Playback-capture AudioRecord failed to initialise (state=${newRecord.state})")
+                newRecord.release()
+                return
+            }
+
+            // Replace the field and start the new AudioRecord
+            audioRecordField.set(audioInput, newRecord)
+            newRecord.startRecording()
+            audioSwapped = true
+
+            LogCat.d("webrtc: audio swap DONE - system audio capture active (rate=$sampleRate ch=$channelCount recordingState=${newRecord.recordingState})")
+        } catch (e: Exception) {
+            LogCat.e("webrtc: Failed to swap to playback capture: ${e.javaClass.simpleName}: ${e.message}")
+            e.printStackTrace()
+        }
+    }
+
+    private fun releaseAudioCapture() {
+        audioTrack = null
+        audioSource?.dispose()
+        audioSource = null
+    }
+
     fun handleSignaling(clientId: String, message: WebRtcSignalingMessage) {
         when (message.type) {
             "ready" -> {
@@ -125,7 +248,7 @@ class ScreenMirrorWebRtcManager(
                 // Tear down any previous session for this client (re-negotiation).
                 peerSessions.remove(clientId)?.release()
 
-                val session = WebRtcPeerSession(clientId, factory, track) { computeTargetBitrateKbps() }
+                val session = WebRtcPeerSession(clientId, factory, track, audioTrack) { computeTargetBitrateKbps() }
                 peerSessions[clientId] = session
                 session.createPeerConnectionAndOffer()
 
@@ -177,6 +300,11 @@ class ScreenMirrorWebRtcManager(
         peerSessions.values.forEach { it.release() }
         peerSessions.clear()
 
+        releaseAudioCapture()
+        audioDeviceModule?.release()
+        audioDeviceModule = null
+        audioSwapped = false
+
         virtualDisplay?.release()
         virtualDisplay = null
 
@@ -205,7 +333,7 @@ class ScreenMirrorWebRtcManager(
 
     // ── Private helpers ───────────────────────────────────────────────────
 
-    private fun ensurePeerConnectionFactory() {
+    private fun ensurePeerConnectionFactory(projection: MediaProjection) {
         if (peerConnectionFactory != null) return
 
         if (!webrtcInitialized) {
@@ -218,12 +346,35 @@ class ScreenMirrorWebRtcManager(
         }
 
         eglBase = EglBase.create()
+
+        // Create JavaAudioDeviceModule for system audio capture.
+        // Disable HW AEC/NS (not needed for system audio) and register a
+        // state callback to swap the internal mic AudioRecord with one
+        // using AudioPlaybackCaptureConfiguration once recording starts.
+        val adm = JavaAudioDeviceModule.builder(context)
+            .setUseHardwareAcousticEchoCanceler(false)
+            .setUseHardwareNoiseSuppressor(false)
+            .setAudioRecordStateCallback(object : JavaAudioDeviceModule.AudioRecordStateCallback {
+                override fun onWebRtcAudioRecordStart() {
+                    swapToPlaybackCapture(projection)
+                }
+                override fun onWebRtcAudioRecordStop() {
+                    audioSwapped = false
+                }
+            })
+            .createAudioDeviceModule()
+        audioDeviceModule = adm
+
         val encoderFactory = DefaultVideoEncoderFactory(eglBase!!.eglBaseContext, true, true)
         val decoderFactory = DefaultVideoDecoderFactory(eglBase!!.eglBaseContext)
         peerConnectionFactory = PeerConnectionFactory.builder()
             .setVideoEncoderFactory(encoderFactory)
             .setVideoDecoderFactory(decoderFactory)
+            .setAudioDeviceModule(adm)
             .createPeerConnectionFactory()
+
+        // Keep the ADM Java object alive so that our AudioRecordStateCallback
+        // can use reflection to swap the internal AudioRecord later.
     }
 
     /**

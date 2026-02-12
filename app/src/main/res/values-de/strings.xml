@@ -428,6 +428,7 @@
     <string name="open_permission_settings">Berechtigungseinstellungen öffnen</string>
     <string name="api_service_is_running">API-Dienst läuft</string>
     <string name="screen_mirror_service_is_running">Der Bildschirmspiegelungsdienst läuft</string>
+    <string name="screen_mirror_audio_permission_settings_message">Die Mikrofonberechtigung ist deaktiviert. Bitte aktivieren Sie sie in den Einstellungen, um Systemaudio zu spiegeln.</string>
     <string name="cast">Übertragen</string>
     <string name="images">Bilder</string>
     <string name="audios">Audio</string>

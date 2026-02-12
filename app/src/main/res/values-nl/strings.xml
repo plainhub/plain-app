@@ -428,6 +428,7 @@
     <string name="open_permission_settings">Toestemmingsinstellingen openen</string>
     <string name="api_service_is_running">API-service wordt uitgevoerd</string>
     <string name="screen_mirror_service_is_running">Screen mirror service is running</string>
+    <string name="screen_mirror_audio_permission_settings_message">Microfoontoestemming is uitgeschakeld. Schakel deze in bij Instellingen om systeemaudio te spiegelen.</string>
     <string name="cast">Cast</string>
     <string name="images">Afbeeldingen</string>
     <string name="audios">Audio</string>

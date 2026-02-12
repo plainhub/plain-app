@@ -428,6 +428,7 @@
     <string name="open_permission_settings">系统权限设置</string>
     <string name="api_service_is_running">网页服务运行中</string>
     <string name="screen_mirror_service_is_running">屏幕镜像服务运行中</string>
+    <string name="screen_mirror_audio_permission_settings_message">麦克风权限被禁用，请到设置里开启后才能镜像系统音频。</string>
     <string name="cast">投屏</string>
     <string name="image">图片</string>
     <string name="images">图片</string>

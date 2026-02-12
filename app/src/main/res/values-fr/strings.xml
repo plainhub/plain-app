@@ -428,6 +428,7 @@
     <string name="open_permission_settings">Ouvrir les paramètres d\'autorisation</string>
     <string name="api_service_is_running">Le service API est en cours d\'exécution</string>
     <string name="screen_mirror_service_is_running">Le service de mise en miroir de l\'écran est en cours d\'exécution</string>
+    <string name="screen_mirror_audio_permission_settings_message">L\'autorisation du microphone est désactivée. Veuillez l\'activer dans les paramètres pour refléter l\'audio système.</string>
     <string name="cast">Diffuser</string>
     <string name="images">Images</string>
     <string name="audios">Audio</string>

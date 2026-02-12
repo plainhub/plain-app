@@ -428,6 +428,7 @@
     <string name="open_permission_settings">許可設定を開く</string>
     <string name="api_service_is_running">APIサービスが実行されています</string>
     <string name="screen_mirror_service_is_running">スクリーンミラーサービスが実行されています</string>
+    <string name="screen_mirror_audio_permission_settings_message">マイクの権限が無効です。システムオーディオをミラーリングするには、設定で有効にしてください。</string>
     <string name="cast">キャスト</string>
     <string name="images">画像</string>
     <string name="audios">オーディオ</string>

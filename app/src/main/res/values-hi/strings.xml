@@ -428,6 +428,7 @@
     <string name="open_permission_settings">अनुमति सेटिंग्स खोलें</string>
     <string name="api_service_is_running">एपीआई सेवा चल रही है</string>
     <string name="screen_mirror_service_is_running">स्क्रीन मिरर सेवा चल रही है</string>
+    <string name="screen_mirror_audio_permission_settings_message">माइक्रोफोन अनुमति बंद है। सिस्टम ऑडियो मिरर करने के लिए इसे सेटिंग्स में चालू करें।</string>
     <string name="cast">कास्ट करें</string>
     <string name="images">तस्वीरें</string>
     <string name="audios">ऑडियो</string>

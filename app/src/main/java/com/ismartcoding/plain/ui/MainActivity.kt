@@ -66,6 +66,7 @@ import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.events.RestartAppEvent
 import com.ismartcoding.plain.events.StartHttpServerEvent
+import com.ismartcoding.plain.events.RequestScreenMirrorAudioEvent
 import com.ismartcoding.plain.events.StartScreenMirrorEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
@@ -119,7 +120,7 @@ class MainActivity : AppCompatActivity() {
     val pomodoroVM: PomodoroViewModel by viewModels()
     private val chatListVM: ChatListViewModel by viewModels()
     private val navControllerState = mutableStateOf<NavHostController?>(null)
-    
+
     private var showForwardTargetDialog by mutableStateOf(false)
     private var pendingFileUris by mutableStateOf<Set<Uri>?>(null)
 
@@ -133,6 +134,41 @@ class MainActivity : AppCompatActivity() {
                     ContextCompat.startForegroundService(this, service)
                 }
             }
+        }
+
+    // Request RECORD_AUDIO before launching screen capture so system audio can be mirrored.
+    private val recordAudioForMirror =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { _ ->
+            // Proceed to screen capture regardless of whether the user granted audio.
+            try {
+                screenCapture.launch(mediaProjectionManager.createScreenCaptureIntent())
+            } catch (e: IllegalStateException) {
+                LogCat.e("Error launching screen capture: ${e.message}")
+            }
+        }
+
+    // Request RECORD_AUDIO mid-session (user toggled audio on after mirroring started).
+    private val recordAudioForMirrorLate =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) {
+                sendScreenMirrorAudioStatus(true)
+            } else {
+                val sysPermission = android.Manifest.permission.RECORD_AUDIO
+                val canAskAgain = shouldShowRequestPermissionRationale(sysPermission)
+                if (!canAskAgain && !Permission.RECORD_AUDIO.can(this@MainActivity)) {
+                    // Permission permanently denied, guide user to Settings.
+                    // Status will be sent when dialog/settings flow completes.
+                    showRecordAudioPermissionSettingsGuide()
+                } else {
+                    sendScreenMirrorAudioStatus(false)
+                }
+            }
+        }
+
+    // Launched when user taps "View in Settings" for RECORD_AUDIO; on return we re-check.
+    private val appDetailsSettingsForAudioLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            sendScreenMirrorAudioStatus(Permission.RECORD_AUDIO.can(this@MainActivity))
         }
 
     private val pickMedia =
@@ -176,6 +212,44 @@ class MainActivity : AppCompatActivity() {
             WindowCompat.getInsetsController(window, window.decorView)
         windowInsetsController.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
+
+    private fun sendScreenMirrorAudioStatus(granted: Boolean) {
+        sendEvent(
+            WebSocketEvent(
+                EventType.SCREEN_MIRROR_AUDIO_GRANTED,
+                JsonHelper.jsonEncode(granted),
+            ),
+        )
+    }
+
+    private fun openAppDetailsSettingsForAudio() {
+        try {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.parse("package:$packageName")
+            }
+            appDetailsSettingsForAudioLauncher.launch(intent)
+        } catch (e: Exception) {
+            try {
+                appDetailsSettingsForAudioLauncher.launch(Intent(Settings.ACTION_SETTINGS))
+            } catch (e2: Exception) {
+                DialogHelper.showMessage(LocaleHelper.getString(R.string.open_permission_settings))
+                sendScreenMirrorAudioStatus(false)
+            }
+        }
+    }
+
+    private fun showRecordAudioPermissionSettingsGuide() {
+        DialogHelper.showConfirmDialog(
+            LocaleHelper.getString(R.string.permission_required),
+            LocaleHelper.getString(R.string.screen_mirror_audio_permission_settings_message),
+            confirmButton = Pair(LocaleHelper.getString(R.string.view_in_settings)) {
+                openAppDetailsSettingsForAudio()
+            },
+            dismissButton = Pair(LocaleHelper.getString(R.string.cancel)) {
+                sendScreenMirrorAudioStatus(false)
+            },
+        )
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
@@ -227,7 +301,7 @@ class MainActivity : AppCompatActivity() {
                 Main(navControllerState, onLaunched = {
                     handleIntent(intent)
                 }, mainVM, audioPlaylistVM, pomodoroVM)
-                
+
                 if (showForwardTargetDialog) {
                     ForwardTargetDialog(
                         chatListVM = chatListVM,
@@ -245,6 +319,7 @@ class MainActivity : AppCompatActivity() {
                                             sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris))
                                         }
                                     }
+
                                     is ForwardTarget.Peer -> {
                                         navControllerState.value?.navigate(Routing.Chat("peer:${target.peer.id}"))
                                         coIO {
@@ -332,9 +407,27 @@ class MainActivity : AppCompatActivity() {
 
                     is StartScreenMirrorEvent -> {
                         try {
-                            screenCapture.launch(mediaProjectionManager.createScreenCaptureIntent())
+                            if (event.audio && Permission.RECORD_AUDIO.can(this@MainActivity)) {
+                                // Request RECORD_AUDIO first; callback will launch screen capture
+                                recordAudioForMirror.launch(android.Manifest.permission.RECORD_AUDIO)
+                            } else {
+                                screenCapture.launch(mediaProjectionManager.createScreenCaptureIntent())
+                            }
                         } catch (e: IllegalStateException) {
                             LogCat.e("Error launching screen capture: ${e.message}")
+                        }
+                    }
+
+                    is RequestScreenMirrorAudioEvent -> {
+                        try {
+                            if (Permission.RECORD_AUDIO.can(this@MainActivity)) {
+                                // Already granted, notify web immediately
+                                sendScreenMirrorAudioStatus(true)
+                            } else {
+                                recordAudioForMirrorLate.launch(android.Manifest.permission.RECORD_AUDIO)
+                            }
+                        } catch (e: IllegalStateException) {
+                            LogCat.e("Error requesting RECORD_AUDIO: ${e.message}")
                         }
                     }
 
@@ -491,7 +584,7 @@ class MainActivity : AppCompatActivity() {
                             pairingRequestDialog = null
                         }
                     }
-                    
+
                     is PairingCancelledEvent -> {
                         try {
                             if (pairingRequestDialog?.isShowing == true) {
@@ -556,7 +649,7 @@ class MainActivity : AppCompatActivity() {
                 sendEvent(StartHttpServerEvent())
             }
         }
-        
+
         if (intent.action == Intent.ACTION_VIEW) {
             val uri = intent.data
             if (uri != null) {

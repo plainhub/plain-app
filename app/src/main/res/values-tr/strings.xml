@@ -428,6 +428,7 @@
     <string name="open_permission_settings">İzin ayarlarını aç</string>
     <string name="api_service_is_running">Web hizmeti çalışıyor</string>
     <string name="screen_mirror_service_is_running">Ekran yansıtma hizmeti çalışıyor</string>
+    <string name="screen_mirror_audio_permission_settings_message">Mikrofon izni devre dışı. Sistem sesini yansıtmak için Ayarlar bölümünden etkinleştirin.</string>
     <string name="cast">Yayınla</string>
     <string name="images">Resimler</string>
     <string name="audios">Ses Dosyaları</string>

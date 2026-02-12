@@ -428,6 +428,7 @@
     <string name="open_permission_settings">Apri impostazioni permessi</string>
     <string name="api_service_is_running">Il servizio API è in esecuzione</string>
     <string name="screen_mirror_service_is_running">Il servizio di duplicazione dello schermo è in esecuzione</string>
+    <string name="screen_mirror_audio_permission_settings_message">L\'autorizzazione del microfono è disattivata. Abilitala nelle Impostazioni per specchiare l\'audio di sistema.</string>
     <string name="cast">Trasmetti</string>
     <string name="images">Immagini</string>
     <string name="audios">Audio</string>

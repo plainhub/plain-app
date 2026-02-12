@@ -428,6 +428,7 @@
     <string name="open_permission_settings">Открыть настройки разрешений</string>
     <string name="api_service_is_running">Служба API запущена</string>
     <string name="screen_mirror_service_is_running">Служба зеркального отображения экрана запущена</string>
+    <string name="screen_mirror_audio_permission_settings_message">Разрешение на микрофон отключено. Включите его в настройках, чтобы зеркалировать системный звук.</string>
     <string name="cast">Транслировать</string>
     <string name="images">Изображения</string>
     <string name="audios">Аудио</string>

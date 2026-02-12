@@ -428,6 +428,7 @@
     <string name="open_permission_settings">Abrir configurações de permissão</string>
     <string name="api_service_is_running">O serviço da API está em execução</string>
     <string name="screen_mirror_service_is_running">O serviço de espelhamento de tela está em execução</string>
+    <string name="screen_mirror_audio_permission_settings_message">A permissão do microfone está desativada. Ative-a nas Configurações para espelhar o áudio do sistema.</string>
     <string name="cast">Transmitir</string>
     <string name="images">Imagens</string>
     <string name="audios">Áudio</string>

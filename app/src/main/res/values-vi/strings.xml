@@ -428,6 +428,7 @@
     <string name="open_permission_settings">Mở cài đặt quyền</string>
     <string name="api_service_is_running">Dịch vụ API đang chạy</string>
     <string name="screen_mirror_service_is_running">Dịch vụ phản chiếu màn hình đang chạy</string>
+    <string name="screen_mirror_audio_permission_settings_message">Quyền micro đang bị tắt. Hãy bật trong Cài đặt để phản chiếu âm thanh hệ thống.</string>
     <string name="cast">Phát</string>
     <string name="images">Hình ảnh</string>
     <string name="audios">Âm thanh</string>

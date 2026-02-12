@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.enums
 
 import android.content.Context
+import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.data.DFeaturePermission
@@ -20,6 +21,7 @@ enum class AppFeatureType {
     POMODORO_TIMER,
     NOTIFICATIONS,
     CHECK_UPDATES,
+    MIRROR_AUDIO,
     MEDIA_TRASH;
 
     fun has(): Boolean {
@@ -28,6 +30,9 @@ enum class AppFeatureType {
                 BuildConfig.CHANNEL != AppChannelType.GOOGLE.name
             }
 
+            MIRROR_AUDIO -> {
+                isQPlus()
+            }
             MEDIA_TRASH -> {
                 isRPlus() // Android 11+
             }
