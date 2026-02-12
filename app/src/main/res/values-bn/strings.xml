@@ -428,6 +428,7 @@
     <string name="open_permission_settings">অনুমতি সেটিংস খুলুন</string>
     <string name="api_service_is_running">API সেবা চলছে</string>
     <string name="screen_mirror_service_is_running">স্ক্রিন মিরর সেবা চলছে</string>
+    <string name="screen_mirror_audio_permission_settings_message">মাইক্রোফোন অনুমতি নিষ্ক্রিয় আছে। সিস্টেম অডিও মিরর করতে সেটিংসে এটি চালু করুন।</string>
     <string name="cast">প্রসারণ করুন</string>
     <string name="images">চিত্র</string>
     <string name="audios">অডিও</string>

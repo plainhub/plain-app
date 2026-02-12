@@ -58,7 +58,9 @@ class StartHttpServerEvent : ChannelEvent()
 
 class HttpServerStateChangedEvent(val state: HttpServerState) : ChannelEvent()
 
-class StartScreenMirrorEvent : ChannelEvent()
+class StartScreenMirrorEvent(val audio: Boolean) : ChannelEvent()
+
+class RequestScreenMirrorAudioEvent : ChannelEvent()
 
 class RestartAppEvent : ChannelEvent()
 

@@ -5,6 +5,7 @@ import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.web.websocket.WebRtcSignalingMessage
 import com.ismartcoding.plain.web.websocket.WebSocketHelper
+import org.webrtc.AudioTrack
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
 import org.webrtc.PeerConnection
@@ -24,6 +25,7 @@ class WebRtcPeerSession(
     val clientId: String,
     private val peerConnectionFactory: PeerConnectionFactory,
     private val videoTrack: VideoTrack,
+    private val audioTrack: AudioTrack?,
     private val computeTargetBitrateKbps: () -> Int,
 ) {
     private var peerConnection: PeerConnection? = null
@@ -73,6 +75,7 @@ class WebRtcPeerSession(
         )
 
         videoSender = peerConnection?.addTrack(videoTrack, listOf("screen_stream"))
+        audioTrack?.let { peerConnection?.addTrack(it, listOf("screen_stream")) }
         updateVideoBitrate()
         createOffer()
     }

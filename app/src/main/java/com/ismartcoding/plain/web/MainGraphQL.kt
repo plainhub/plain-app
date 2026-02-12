@@ -51,6 +51,7 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.StartScreenMirrorEvent
+import com.ismartcoding.plain.events.RequestScreenMirrorAudioEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.extensions.sorted
@@ -624,6 +625,10 @@ class MainGraphQL(val schema: Schema) {
                     resolver { ->
                         val context = MainApp.instance
                         val apiPermissions = ApiPermissionsPreference.getAsync(context)
+                        val grantedPermissions = Permission.entries.filter { apiPermissions.contains(it.name) && it.can(MainApp.instance) }.toMutableList()
+                        if (Permission.RECORD_AUDIO.can(context) && !grantedPermissions.contains(Permission.RECORD_AUDIO)) {
+                            grantedPermissions.add(Permission.RECORD_AUDIO)
+                        }
                         App(
                             usbConnected = PlugInControlReceiver.isUSBConnected(context),
                             urlToken = TempData.urlToken,
@@ -635,7 +640,7 @@ class MainGraphQL(val schema: Schema) {
                             BuildConfig.VERSION_CODE,
                             Build.VERSION.SDK_INT,
                             BuildConfig.CHANNEL,
-                            Permission.entries.filter { apiPermissions.contains(it.name) && it.can(MainApp.instance) },
+                            grantedPermissions,
                             AudioPlaylistPreference.getValueAsync(context).map { it.toModel() },
                             TempData.audioPlayMode,
                             AudioPlayingPreference.getValueAsync(context),
@@ -811,10 +816,20 @@ class MainGraphQL(val schema: Schema) {
                     }
                 }
                 mutation("startScreenMirror") {
-                    resolver { ->
+                    resolver { audio: Boolean ->
                         ScreenMirrorService.qualityData = ScreenMirrorQualityPreference.getValueAsync(MainApp.instance)
-                        sendEvent(StartScreenMirrorEvent())
+                        sendEvent(StartScreenMirrorEvent(audio))
                         true
+                    }
+                }
+                mutation("requestScreenMirrorAudio") {
+                    resolver { ->
+                        if (Permission.RECORD_AUDIO.can(MainApp.instance)) {
+                            true
+                        } else {
+                            sendEvent(RequestScreenMirrorAudioEvent())
+                            false
+                        }
                     }
                 }
                 mutation("stopScreenMirror") {

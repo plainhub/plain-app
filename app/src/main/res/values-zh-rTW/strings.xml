@@ -428,6 +428,7 @@
     <string name="open_permission_settings">系統權限設置</string>
     <string name="api_service_is_running">API服務運行中</string>
     <string name="screen_mirror_service_is_running">螢幕鏡像服務運行中</string>
+    <string name="screen_mirror_audio_permission_settings_message">麥克風權限已被停用，請到設定中開啟後才能鏡像系統音訊。</string>
     <string name="cast">投屏</string>
     <string name="images">圖片</string>
     <string name="audios">音訊</string>

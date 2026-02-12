@@ -428,6 +428,7 @@
     <string name="open_permission_settings">Open permission settings</string>
     <string name="api_service_is_running">Web service is running</string>
     <string name="screen_mirror_service_is_running">Screen mirror service is running</string>
+    <string name="screen_mirror_audio_permission_settings_message">Microphone permission is disabled. Please enable it in Settings to mirror system audio.</string>
     <string name="cast">Cast</string>
     <string name="images">Images</string>
     <string name="audios">Audio</string>

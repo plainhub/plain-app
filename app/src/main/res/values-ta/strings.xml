@@ -428,6 +428,7 @@
     <string name="open_permission_settings">அனுமதி அமைப்புகளை திற</string>
     <string name="api_service_is_running">API சேவை செயல்பாடு நடக்கின்றது</string>
     <string name="screen_mirror_service_is_running">திரை மிரர் சேவை செயல்படுகின்றது</string>
+    <string name="screen_mirror_audio_permission_settings_message">மைக்ரோஃபோன் அனுமதி முடக்கப்பட்டுள்ளது. அமைப்புகளில் இயக்கி, சிஸ்டம் ஆடியோவை பிரதிமைப்படுத்தவும்.</string>
     <string name="cast">அறிவிக்க</string>
     <string name="images">படங்கள்</string>
     <string name="audios">ஒலிகள்</string>
