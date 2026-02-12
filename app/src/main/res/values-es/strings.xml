@@ -678,4 +678,6 @@
     <string name="port">Puerto</string>
     <string name="cannot_move_folder_into_itself">No se puede mover una carpeta dentro de sí misma o de una subcarpeta.</string>
     <string name="cannot_copy_folder_into_itself">No se puede copiar una carpeta dentro de sí misma o de una subcarpeta.</string>
+    <string name="accessibility_service_description">PlainApp usa este servicio de accesibilidad para habilitar el control remoto durante la duplicación de pantalla. Inyecta eventos táctiles (toque, deslizamiento, desplazamiento) y acciones de navegación (Atrás, Inicio, Recientes) enviadas desde la interfaz web.</string>
+    <string name="accessibility_service_label">Control remoto de PlainApp</string>
 </resources>

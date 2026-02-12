@@ -119,11 +119,6 @@ class ScreenMirrorService : LifecycleService() {
     fun isRunning(): Boolean = running
 
     fun handleWebRtcSignaling(clientId: String, message: WebRtcSignalingMessage) {
-        if (message.type == "control") {
-            LogCat.d("webrtc: control message received")
-            return
-        }
-
         webRtcManager.handleSignaling(clientId, message)
     }
 

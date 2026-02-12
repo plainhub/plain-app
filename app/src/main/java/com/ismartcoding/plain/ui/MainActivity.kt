@@ -87,6 +87,7 @@ import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.receivers.NetworkStateReceiver
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.PNotificationListenerService
+import com.ismartcoding.plain.services.PlainAccessibilityService
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
@@ -604,6 +605,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        PlainAccessibilityService.invalidateScreenSizeCache()
         lifecycleScope.launch(Dispatchers.IO) {
             Language.initLocaleAsync(this@MainActivity)
         }

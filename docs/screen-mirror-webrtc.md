@@ -1,54 +1,45 @@
-# Screen Mirror (WebRTC) – Requirements & Implementation Notes
+# Screen Mirror (WebRTC) – Implementation Notes
 
-This document describes how Screen Mirror works in this project after migrating from WebSocket JPEG frame streaming to WebRTC.
+This document describes how Screen Mirror works in this project after migrating from sending JPEG frames to WebRTC video.
 
 ## Goals
 
-- High-performance screen mirroring (low latency, smoother frame delivery).
-- Use WebRTC video instead of sending images over WebSocket.
-- Keep signaling over the project’s existing encrypted WebSocket protocol (ChaCha20, binary frames with an integer event type prefix).
-- Make responsibilities clear:
-  - Android WebRTC/capture logic lives in a dedicated manager.
-  - The Android Service is a thin lifecycle/permission wrapper.
-  - The web UI is a WebRTC *answerer* that renders a `<video>`.
+- Low-latency screen mirroring that feels “real-time” on LAN.
+- Smooth delivery (avoid bursty frame updates and multi-second backlog).
+- Keep signaling on the app’s existing messaging channel (reliable delivery, encrypted transport), but keep the media path on WebRTC.
+- Clear separation of responsibilities:
+  - Android owns capture + encoding + WebRTC sending.
+  - The Android Service is only lifecycle/permission glue.
+  - The web UI is a WebRTC answerer that renders a video element.
 
 ## Architecture Overview
 
 ### Android (producer)
 
-- Captures the device screen via `MediaProjection`.
-- Feeds frames into WebRTC using `org.webrtc.ScreenCapturerAndroid`.
-- Creates a `VideoTrack` and adds it to a `PeerConnection`.
-- Acts as the **offerer** in SDP negotiation.
+- Captures the device screen via MediaProjection.
+- Renders the screen into a VirtualDisplay surface.
+- Feeds frames into WebRTC as a screen-cast video track.
+- Acts as the offerer in SDP negotiation.
 
-Primary responsibility class:
+Audio (optional):
 
-- `app/src/main/java/com/ismartcoding/plain/services/webrtc/ScreenMirrorWebRtcManager.kt`
-
-The service wrapper:
-
-- `app/src/main/java/com/ismartcoding/plain/services/ScreenMirrorService.kt`
+- Produces an audio track.
+- On supported Android versions, system audio can be captured via playback-capture (requires the relevant permission).
 
 ### Web (consumer)
 
-- Creates an `RTCPeerConnection`.
-- Acts as the **answerer**.
-- Attaches the received remote stream to a `<video>` element (autoplay + muted).
+- Creates an RTCPeerConnection.
+- Acts as the answerer.
+- Attaches the received remote stream to a video element (autoplay + playsinline + muted).
 
-Primary files:
+Low-latency playback:
 
-- `plain-web/src/lib/webrtc-client.ts`
-- `plain-web/src/lib/webrtc-signaling.ts`
-- `plain-web/src/views/ScreenMirrorView.vue`
+- The receiver side minimizes buffering on supported browsers by reducing the jitter buffer target. This reduces the “always-behind” feeling on stable networks.
 
-### Signaling Transport (encrypted WebSocket)
+### Signaling transport
 
-- Signaling messages are JSON objects, but transported over the existing **encrypted** WebSocket channel.
-- The encrypted message payload is carried inside a binary frame prefixed by an integer event type.
-- This project reserves an event type for WebRTC signaling:
-  - Android enum: `WEBRTC_SIGNALING`
-
-On the server side, WebSocket routing and encryption integration is handled in the existing WebSocket module (Ktor).
+- Signaling messages are small JSON objects (ready / offer / answer / ICE candidate).
+- They are carried over the project’s existing secure messaging channel (implementation detail may vary by platform), separate from the WebRTC media.
 
 ## Signaling Flow
 
@@ -57,84 +48,70 @@ On the server side, WebSocket routing and encryption integration is handled in t
 - Android = Offerer
 - Web = Answerer
 
-### Message types
+### Message types (conceptual)
 
-Typical signaling message shapes (conceptual):
-
-- `{"type":"ready"}`
-- `{"type":"offer","sdp":"..."}`
-- `{"type":"answer","sdp":"..."}`
-- `{"type":"ice_candidate","candidate":{...}}`
+- ready
+- offer (SDP)
+- answer (SDP)
+- ice_candidate
 
 ### Handshake sequence
 
-1. Web connects to the app’s WebSocket and completes the existing encrypted handshake.
-2. Web initializes `RTCPeerConnection`.
-3. Web sends `ready` to Android (encrypted signaling event).
-4. Android receives `ready`, creates a fresh `PeerConnection` (if needed), creates an SDP offer, and sends `offer`.
-5. Web receives `offer`, sets remote description, creates `answer`, and sends `answer`.
-6. Both sides exchange ICE candidates.
-7. Web receives the remote track and starts playback.
+1. Web initializes RTCPeerConnection.
+2. Web sends ready.
+3. Android creates (or refreshes) a peer connection, creates an offer, and sends offer.
+4. Web sets the remote offer, creates an answer, and sends answer.
+5. Both sides exchange ICE candidates.
+6. Web receives the remote track(s) and starts playback.
 
-The `ready` message exists to avoid a negotiation deadlock where the web UI is waiting for an offer but Android never starts negotiation.
+The ready message prevents a deadlock where the web UI is waiting for an offer but Android does not start negotiation yet.
 
-## Video Capture / Streaming Details (Android)
+## Video Capture & Latency Characteristics (Android)
 
-- Screen capture starts via `ScreenCapturerAndroid.startCapture(width, height, fps)`.
-- Quality changes use `ScreenCapturerAndroid.changeCaptureFormat(width, height, fps)` when possible.
+### Capture pipeline
 
-Logging:
+- Capture starts once MediaProjection permission is granted.
+- A VirtualDisplay is created once and resized on orientation/quality changes (avoids re-creating MediaProjection).
+- Frames are forwarded into WebRTC as a screen-cast source.
 
-- The WebRTC manager logs requested capture resolutions and whether `startCapture()` / `changeCaptureFormat()` succeeds or throws.
-- Use these logs to confirm that capture is running at the expected resolution after a quality change.
+### Frame-rate and backlog control
 
-## Quality Presets
+- Capture is capped to 30 fps.
+- Frame dropping is used intentionally when necessary to prevent encoder overload and latency build-up (it is better to drop frames than to deliver them late).
 
-The web UI exposes exactly three presets:
+## Quality Modes
 
-- 480p
-- 720p
-- 1080p
+The UI exposes three modes:
 
-Selecting a preset:
+- AUTO
+  - Targets high quality when the network is good.
+  - Uses periodic WebRTC stats to adapt resolution (typically between 1080p and 720p) based on bitrate, loss, and RTT.
+- HD
+  - Prefers sharper output (1080p-class capture) and higher bitrate.
+- SMOOTH
+  - Prioritizes “feels real-time” latency.
+  - Uses 720p-class capture and parameters that favor stable frame-rate and fast bitrate convergence.
 
-- Sends a GraphQL mutation to update the quality/resolution on Android.
-- Restarts WebRTC negotiation from the web side by re-initializing the WebRTC client and sending `ready` again.
+When the quality mode changes:
 
-Notes:
-
-- Resolution changes can require renegotiation; restarting negotiation after updating the preset makes the behavior deterministic.
+- Android updates capture size and encoder bitrate.
+- The web side may restart negotiation to make behavior deterministic across browsers.
 
 ## Troubleshooting
 
-### ICE connected but no video displayed
+### Connected but no video
 
-Check these first:
+- Ensure the video element can autoplay:
+  - It must be muted.
+  - It must exist in the DOM when tracks arrive (or the stream must be attached once it exists).
+- Verify signaling order:
+  - Web sent ready.
+  - Android sent offer.
+  - Web sent answer.
+- Check Android logs for capture start and VirtualDisplay creation/resizing.
 
-- Web `<video>` element:
-  - Must exist in DOM when track arrives.
-  - Must be `muted` to allow autoplay in most browsers.
-- Verify signaling:
-  - Web sends `ready`.
-  - Android sends `offer`.
-  - Web sends `answer`.
-- Verify capture logs on Android:
-  - Confirm `startCapture()` succeeded.
-  - Confirm `changeCaptureFormat()` succeeded on quality change.
+### Quality changed and stream looks stuck / blank
 
-### Quality changed, stream is blank
-
-- Confirm the GraphQL mutation succeeded.
-- Confirm Android logs show the new capture format.
-- Confirm the web side restarted negotiation (new `ready` -> `offer` -> `answer`).
-
-## Key “where to look” map
-
-- Android stream production (capture/track/SDP/ICE):
-  - `ScreenMirrorWebRtcManager.kt`
-- Android lifecycle + permissions + delegation:
-  - `ScreenMirrorService.kt`
-- Web negotiation + video attachment:
-  - `ScreenMirrorView.vue`, `webrtc-client.ts`
-- Encrypted signaling transport:
-  - `webrtc-signaling.ts` (web) and WebSocket helper (android/server)
+- Confirm the quality change request reached Android.
+- Confirm Android resized capture and updated bitrate.
+- Confirm the web side restarted the WebRTC session (ready → offer → answer) if that is part of the UI flow.

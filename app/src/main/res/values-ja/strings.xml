@@ -678,4 +678,6 @@
     <string name="port">ポート</string>
     <string name="cannot_move_folder_into_itself">フォルダをそれ自身またはそのサブフォルダ内に移動できません。</string>
     <string name="cannot_copy_folder_into_itself">フォルダをそれ自身またはそのサブフォルダ内にコピーできません。</string>
+    <string name="accessibility_service_description">PlainApp は画面ミラーリング中のリモート操作を有効にするために、このユーザー補助サービスを使用します。Web インターフェースから送信されたタッチ操作（タップ、スワイプ、スクロール）およびナビゲーション操作（戻る、ホーム、最近のアプリ）を注入します。</string>
+    <string name="accessibility_service_label">PlainApp リモート操作</string>
 </resources>

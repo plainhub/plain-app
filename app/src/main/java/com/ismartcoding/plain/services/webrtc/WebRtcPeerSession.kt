@@ -3,6 +3,7 @@ package com.ismartcoding.plain.services.webrtc
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.enums.ScreenMirrorMode
 import com.ismartcoding.plain.web.websocket.WebRtcSignalingMessage
 import com.ismartcoding.plain.web.websocket.WebSocketHelper
 import org.webrtc.AudioTrack
@@ -27,6 +28,7 @@ class WebRtcPeerSession(
     private val videoTrack: VideoTrack,
     private val audioTrack: AudioTrack?,
     private val computeTargetBitrateKbps: () -> Int,
+    private val getMode: () -> ScreenMirrorMode,
 ) {
     private var peerConnection: PeerConnection? = null
     private var videoSender: RtpSender? = null
@@ -117,9 +119,30 @@ class WebRtcPeerSession(
         if (encodings.isEmpty()) return
 
         val maxKbps = computeTargetBitrateKbps()
+        val mode = getMode()
         val encoding = encodings[0]
         encoding.maxBitrateBps = maxKbps * 1000
-        params.degradationPreference = RtpParameters.DegradationPreference.MAINTAIN_RESOLUTION
+        encoding.maxFramerate = 30
+
+        when (mode) {
+            ScreenMirrorMode.SMOOTH -> {
+                // SMOOTH: prioritize real-time delivery (< 500 ms end-to-end).
+                // - High minBitrate (80 %) so the congestion controller converges
+                //   almost immediately instead of ramping up slowly.
+                // - MAINTAIN_FRAMERATE: we already cap resolution at 720 p,
+                //   so under pressure we allow slight resolution drop rather
+                //   than sacrificing fps (dropping fps *feels* like lag).
+                encoding.minBitrateBps = maxKbps * 800
+                params.degradationPreference = RtpParameters.DegradationPreference.MAINTAIN_FRAMERATE
+            }
+            else -> {
+                // HD / AUTO: balanced – allow both resolution and fps to degrade;
+                // MAINTAIN_RESOLUTION caused fps to drop to 1-5 which *felt* like
+                // seconds of lag.
+                encoding.minBitrateBps = maxKbps * 500
+                params.degradationPreference = RtpParameters.DegradationPreference.BALANCED
+            }
+        }
         sender.parameters = params
     }
 
