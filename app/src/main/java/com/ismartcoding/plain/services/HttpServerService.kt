@@ -113,17 +113,57 @@ class HttpServerService : LifecycleService() {
         LogCat.d("startHttpServer")
         serverState = HttpServerState.STARTING
         sendEvent(HttpServerStateChangedEvent(serverState))
-        try {
-            HttpServerManager.portsInUse.clear()
-            HttpServerManager.httpServerError = ""
-            HttpServerManager.createHttpServerAsync(MainApp.instance).start(wait = false)
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            LogCat.e(ex.toString())
-            HttpServerManager.httpServerError = ex.toString()
+
+        HttpServerManager.portsInUse.clear()
+        HttpServerManager.httpServerError = ""
+
+        // Stop any previously running server instance and wait for ports to be released
+        HttpServerManager.stopPreviousServer()
+        if (PortHelper.isPortInUse(TempData.httpPort) || PortHelper.isPortInUse(TempData.httpsPort)) {
+            LogCat.d("Ports still in use after stopping previous server, waiting...")
+            HttpServerManager.waitForPortsAvailable(TempData.httpPort, TempData.httpsPort)
         }
 
-        delay(1000) // make sure server is running
+        // Try starting server with retry on BindException
+        var serverStarted = false
+        var lastError: Exception? = null
+        val maxRetries = 3
+        for (attempt in 1..maxRetries) {
+            try {
+                val server = HttpServerManager.createHttpServerAsync(MainApp.instance)
+                server.start(wait = false)
+                HttpServerManager.server = server
+                serverStarted = true
+                break
+            } catch (ex: Exception) {
+                lastError = ex
+                LogCat.e("Server start attempt $attempt/$maxRetries failed: ${ex.message}")
+                // If it's a BindException, the old socket may not be fully released yet
+                if (ex is java.net.BindException || ex.cause is java.net.BindException) {
+                    if (attempt < maxRetries) {
+                        HttpServerManager.stopPreviousServer()
+                        HttpServerManager.waitForPortsAvailable(TempData.httpPort, TempData.httpsPort, maxWaitMs = 3000)
+                    }
+                } else {
+                    break // non-port error, no point retrying
+                }
+            }
+        }
+
+        if (!serverStarted) {
+            HttpServerManager.httpServerError = lastError?.toString() ?: ""
+            HttpServerManager.httpServerError = if (HttpServerManager.httpServerError.isNotEmpty()) {
+                LocaleHelper.getString(R.string.http_server_failed) + " (${HttpServerManager.httpServerError})"
+            } else {
+                LocaleHelper.getString(R.string.http_server_failed)
+            }
+            serverState = HttpServerState.ERROR
+            sendEvent(HttpServerStateChangedEvent(serverState))
+            PNotificationListenerService.toggle(this, false)
+            return
+        }
+
+        delay(500) // brief wait for server to fully bind ports
         val checkResult = HttpServerManager.checkServerAsync()
         if (checkResult.websocket && checkResult.http) {
             HttpServerManager.httpServerError = ""
@@ -168,6 +208,7 @@ class HttpServerService : LifecycleService() {
         mdnsNsdReregistrar = null
         // Ensure NSD service is unregistered
         NsdHelper.unregisterService()
+        HttpServerManager.server = null
         stopForeground(STOP_FOREGROUND_REMOVE)
     }
 
@@ -183,9 +224,16 @@ class HttpServerService : LifecycleService() {
                 LogCat.d("http server is stopped")
             }
         } catch (ex: Exception) {
-            LogCat.e(ex.toString())
-            ex.printStackTrace()
+            LogCat.e("Graceful shutdown failed: ${ex.message}")
+            // Fallback: force stop via stored server reference
+            try {
+                HttpServerManager.server?.stop(500, 1000)
+                LogCat.d("Server force-stopped via stored reference")
+            } catch (e: Exception) {
+                LogCat.e("Force stop also failed: ${e.message}")
+            }
         }
+        HttpServerManager.server = null
         PNotificationListenerService.toggle(this, false)
 
         serverState = HttpServerState.OFF

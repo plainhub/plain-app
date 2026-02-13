@@ -2,6 +2,7 @@ package com.ismartcoding.plain.services.webrtc
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Point
 import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
 import android.media.AudioAttributes
@@ -11,6 +12,7 @@ import android.media.AudioRecord
 import android.media.projection.MediaProjection
 import android.os.Build
 import android.view.Surface
+import android.view.WindowManager
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.enums.AppFeatureType
@@ -405,9 +407,9 @@ class ScreenMirrorWebRtcManager(
     }
 
     private fun computeCaptureSize(): Pair<Int, Int> {
-        val metrics = context.resources.displayMetrics
-        val width = metrics.widthPixels
-        val height = metrics.heightPixels
+        val realSize = getRealScreenSize()
+        val width = realSize.x
+        val height = realSize.y
 
         val shortSide = min(width, height)
         val targetShort = getEffectiveResolution()
@@ -419,6 +421,24 @@ class ScreenMirrorWebRtcManager(
         getIsPortrait()
 
         return Pair(targetWidth, targetHeight)
+    }
+
+    /**
+     * Get the real physical screen dimensions including system bars.
+     * displayMetrics.widthPixels/heightPixels may exclude the navigation bar
+     * on Android <= 11, causing wrong capture aspect ratio and black bars.
+     */
+    private fun getRealScreenSize(): Point {
+        val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val bounds = wm.currentWindowMetrics.bounds
+            Point(bounds.width(), bounds.height())
+        } else {
+            val size = Point()
+            @Suppress("DEPRECATION")
+            wm.defaultDisplay.getRealSize(size)
+            size
+        }
     }
 
     private fun getEffectiveResolution(): Int {

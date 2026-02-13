@@ -8,6 +8,7 @@ import android.graphics.Path
 import android.graphics.Point
 import android.os.Build
 import android.provider.Settings
+import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
@@ -145,13 +146,32 @@ class PlainAccessibilityService : AccessibilityService() {
         private var cachedScreenSize: Point? = null
 
         /**
-         * Get the screen size for coordinate mapping (cached).
+         * Get the real physical screen size for coordinate mapping (cached).
+         * Uses real display size to include navigation bar and status bar areas,
+         * which are visible in the screen mirror video captured by MediaProjection.
          */
         fun getScreenSize(context: Context): Point {
             return cachedScreenSize ?: run {
-                val displayMetrics = context.resources.displayMetrics
-                val size = Point(displayMetrics.widthPixels, displayMetrics.heightPixels)
+                val size = getRealScreenSize(context)
                 cachedScreenSize = size
+                size
+            }
+        }
+
+        /**
+         * Get the real physical screen dimensions including system bars (nav bar, status bar).
+         * On Android <= 11, displayMetrics.widthPixels/heightPixels may exclude the navigation
+         * bar, causing coordinate mapping errors for screen mirror touch control.
+         */
+        private fun getRealScreenSize(context: Context): Point {
+            val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val bounds = wm.currentWindowMetrics.bounds
+                Point(bounds.width(), bounds.height())
+            } else {
+                val size = Point()
+                @Suppress("DEPRECATION")
+                wm.defaultDisplay.getRealSize(size)
                 size
             }
         }
