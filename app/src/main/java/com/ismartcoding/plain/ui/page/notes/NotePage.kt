@@ -49,6 +49,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.cut
+import com.ismartcoding.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.TagRelationStub
@@ -181,7 +182,7 @@ fun NotePage(
     }
 
     SideEffect {
-        if (noteVM.editMode) {
+        if (noteVM.editMode && context.isGestureInteractionMode()) {
             insetsController.hide(WindowInsetsCompat.Type.navigationBars())
         } else {
             insetsController.show(WindowInsetsCompat.Type.navigationBars())

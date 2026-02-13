@@ -7,6 +7,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JksHelper
+import com.ismartcoding.lib.helpers.PortHelper
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.lib.logcat.LogCat
@@ -67,6 +68,9 @@ object HttpServerManager {
     val portsInUse = mutableSetOf<Int>()
     val httpsPorts = setOf(8043, 8143, 8243, 8343, 8443, 8543, 8643, 8743, 8843, 8943)
     val httpPorts = setOf(8080, 8180, 8280, 8380, 8480, 8580, 8680, 8780, 8880, 8980)
+
+    @Volatile
+    var server: EmbeddedServer<*, *>? = null
 
     private const val LOGIN_RATE_LIMIT_WINDOW_MS = 60_000L
     private const val LOGIN_RATE_LIMIT_MAX_ATTEMPTS = 5
@@ -142,7 +146,40 @@ object HttpServerManager {
         sendEvent(ReleaseWakeLockEvent())
         httpServerError = ""
         portsInUse.clear()
+        server = null
         sendEvent(HttpServerStateChangedEvent(HttpServerState.OFF))
+    }
+
+    fun stopPreviousServer() {
+        try {
+            server?.stop(1000, 2000)
+            LogCat.d("Previous server instance stopped")
+        } catch (e: Exception) {
+            LogCat.e("Error stopping previous server: ${e.message}")
+        } finally {
+            server = null
+        }
+    }
+
+    /**
+     * Wait for ports to become available after stopping a previous server.
+     * Returns true if both ports are free within the timeout.
+     */
+    suspend fun waitForPortsAvailable(httpPort: Int, httpsPort: Int, maxWaitMs: Long = 5000): Boolean {
+        val interval = 200L
+        var elapsed = 0L
+        while (elapsed < maxWaitMs) {
+            val httpFree = !PortHelper.isPortInUse(httpPort)
+            val httpsFree = !PortHelper.isPortInUse(httpsPort)
+            if (httpFree && httpsFree) {
+                LogCat.d("Ports $httpPort and $httpsPort are free after ${elapsed}ms")
+                return true
+            }
+            delay(interval)
+            elapsed += interval
+        }
+        LogCat.e("Ports still in use after ${maxWaitMs}ms - http:${PortHelper.isPortInUse(httpPort)}, https:${PortHelper.isPortInUse(httpsPort)}")
+        return false
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -155,7 +192,7 @@ object HttpServerManager {
             while (retry-- > 0) {
                 try {
                     client.ws(urlString = UrlHelper.getWsTestUrl()) {
-                        val reason = this.closeReason.getCompleted()
+                        val reason = this.closeReason.await()
                         LogCat.d("closeReason: $reason")
                         if (reason?.message == BuildConfig.APPLICATION_ID) {
                             websocket = true
@@ -163,9 +200,8 @@ object HttpServerManager {
                     }
                     retry = 0
                 } catch (ex: Exception) {
-                    delay(300)
-                    ex.printStackTrace()
-                    LogCat.e(ex.toString())
+                    delay(500)
+                    LogCat.e("WebSocket check failed: ${ex.message}")
                 }
             }
 
