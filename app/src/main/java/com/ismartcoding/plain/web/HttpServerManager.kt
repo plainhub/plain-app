@@ -147,7 +147,7 @@ object HttpServerManager {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun checkServerAsync(): HttpServerCheckResult {
-        return withTimeoutOrNull(5000) {
+        return withTimeoutOrNull(9000) {
             var websocket = false
             var http = false
             var retry = 2
