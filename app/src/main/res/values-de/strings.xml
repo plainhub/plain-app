@@ -408,6 +408,7 @@
     <string name="browser_https_error_tips">Wenn du den Fehler "Deine Verbindung ist nicht privat" siehst, klicke einfach auf die Schaltfläche "Erweitert" und dann auf die Schaltfläche "Zu … fortsetzen", dann vertraut Chrome dieser URL für den Rest der Browsersitzung.</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">Dateien verwalten</string>
     <string name="feature_READ_SMS">Nachrichten lesen</string>
+    <string name="feature_SEND_SMS">Nachrichten senden</string>
     <string name="feature_WRITE_CALL_LOG">Anrufliste verwalten</string>
     <string name="feature_CALL_PHONE">Telefonanruf tätigen</string>
     <string name="feature_WRITE_CONTACTS">Kontakte verwalten</string>

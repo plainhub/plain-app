@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.Build
 import android.view.textclassifier.TextClassificationManager
 import android.view.textclassifier.TextClassifier
+import coil3.SingletonImageLoader
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.isUPlus
@@ -33,6 +34,7 @@ import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.preferences.getPreferencesAsync
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
+import com.ismartcoding.plain.ui.base.coil.newImageLoader
 import com.ismartcoding.plain.web.ChatApiManager
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
@@ -43,6 +45,10 @@ class MainApp : Application() {
         super.onCreate()
 
         instance = this
+
+        SingletonImageLoader.setSafe { context ->
+            newImageLoader(context)
+        }
 
         LogCat.addLogAdapter(DiskLogAdapter(DiskLogFormatStrategy.getInstance(this)))
 

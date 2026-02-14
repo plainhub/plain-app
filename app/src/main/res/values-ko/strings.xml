@@ -408,6 +408,7 @@
     <string name="browser_https_error_tips">"Your connection is not private" 오류가 표시되면 단숨에 "Advanced" 버튼을 클릭하고 "Proceed to …" 버튼을 클릭하세요. 그러면 Chrome이 브라우저 세션의 나머지 기간 동안이 URL을 신뢰하게 됩니다.</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">파일 관리</string>
     <string name="feature_READ_SMS">메시지 읽기</string>
+    <string name="feature_SEND_SMS">메시지 보내기</string>
     <string name="feature_WRITE_CALL_LOG">통화 기록 관리</string>
     <string name="feature_CALL_PHONE">전화 걸기</string>
     <string name="feature_WRITE_CONTACTS">연락처 관리</string>

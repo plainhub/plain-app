@@ -101,14 +101,13 @@ object HttpServerManager {
         return window.count <= LOGIN_RATE_LIMIT_MAX_ATTEMPTS
     }
 
-    fun getClientIpForLogin(clientId: String, remoteAddress: String?): String {
+    fun getClientIpForLogin(clientId: String, remoteAddress: String): String {
         val cached = clientIpCache[clientId]
         if (!cached.isNullOrEmpty()) return cached
-        val ip = remoteAddress ?: ""
-        if (ip.isNotEmpty()) {
-            clientIpCache[clientId] = ip
+        if (remoteAddress.isNotEmpty()) {
+            clientIpCache[clientId] = remoteAddress
         }
-        return ip
+        return remoteAddress
     }
 
     val notificationId: Int by lazy {

@@ -408,6 +408,7 @@
     <string name="browser_https_error_tips">Si ves el error "Tu conexión no es privada", simplemente haz clic en el botón "Avanzado" y luego en el botón "Continuar a ...", así Chrome confiará en esta URL durante el resto de la sesión del navegador.</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">Gestionar archivos</string>
     <string name="feature_READ_SMS">Leer mensajes</string>
+    <string name="feature_SEND_SMS">Enviar mensajes</string>
     <string name="feature_WRITE_CALL_LOG">Gestionar registro de llamadas</string>
     <string name="feature_CALL_PHONE">Realizar llamada telefónica</string>
     <string name="feature_WRITE_CONTACTS">Gestionar contactos</string>

@@ -408,6 +408,7 @@
     <string name="browser_https_error_tips">Nếu bạn thấy lỗi "Kết nối của bạn không riêng tư", đơn giản là nhấn vào nút "Nâng cao" và nhấn vào nút "Tiếp tục tới …", sau đó Chrome sẽ tin tưởng vào URL này cho phần còn lại của phiên duyệt.</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">Quản lý tập tin</string>
     <string name="feature_READ_SMS">Đọc tin nhắn</string>
+    <string name="feature_SEND_SMS">Gửi tin nhắn</string>
     <string name="feature_WRITE_CALL_LOG">Quản lý nhật ký cuộc gọi</string>
     <string name="feature_CALL_PHONE">Gọi điện thoại</string>
     <string name="feature_WRITE_CONTACTS">Quản lý danh bạ</string>

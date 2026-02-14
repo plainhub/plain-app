@@ -75,6 +75,7 @@ import com.ismartcoding.plain.features.media.FileMediaStoreHelper
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.SmsMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
+import com.ismartcoding.plain.features.sms.SmsHelper
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.DeviceInfoHelper
 import com.ismartcoding.plain.helpers.FileHelper
@@ -903,6 +904,17 @@ class MainGraphQL(val schema: Schema) {
                     resolver { number: String ->
                         Permission.CALL_PHONE.checkAsync(MainApp.instance)
                         CallMediaStoreHelper.call(MainActivity.instance.get()!!, number)
+                        true
+                    }
+                }
+                mutation("sendSms") {
+                    resolver { number: String, body: String ->
+                        Permission.SEND_SMS.checkAsync(MainApp.instance)
+                        try {
+                            SmsHelper.sendText(MainApp.instance, number, body)
+                        } catch (e: IllegalArgumentException) {
+                            throw GraphQLError(e.message ?: "Invalid SMS input")
+                        }
                         true
                     }
                 }

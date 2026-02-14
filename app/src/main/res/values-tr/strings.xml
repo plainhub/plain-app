@@ -408,6 +408,7 @@
     <string name="browser_https_error_tips">Eğer "Bağlantınız gizli değil" hatası görürseniz, sadece "Gelişmiş" düğmesine tıklayın ve "… devam et" düğmesine tıklayın, sonra Chrome bu URL\'ye tarayıcı oturumu boyunca güvenecektir.</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">Dosyaları yönet</string>
     <string name="feature_READ_SMS">Mesajları oku</string>
+    <string name="feature_SEND_SMS">Mesaj gönder</string>
     <string name="feature_WRITE_CALL_LOG">Arama kaydını yönet</string>
     <string name="feature_CALL_PHONE">Telefon araması yap</string>
     <string name="feature_WRITE_CONTACTS">Kişileri yönet</string>

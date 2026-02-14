@@ -408,6 +408,7 @@
     <string name="browser_https_error_tips">如果Chrome瀏覽器顯示"您的連接不是私密連接"，請點擊頁面"高級"按鈕繼續。</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">管理檔案</string>
     <string name="feature_READ_SMS">讀取簡訊</string>
+    <string name="feature_SEND_SMS">發送簡訊</string>
     <string name="feature_WRITE_CALL_LOG">管理通話記錄</string>
     <string name="feature_CALL_PHONE">撥打電話</string>
     <string name="feature_WRITE_CONTACTS">管理聯絡人</string>

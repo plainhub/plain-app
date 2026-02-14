@@ -299,7 +299,22 @@ object Permissions {
         )
 
         if (AppFeatureType.SMS.has()) {
-            list.add(PermissionItem.create(context, R.drawable.message_square_text, Permission.READ_SMS))
+            list.add(
+                PermissionItem.create(
+                    context,
+                    R.drawable.message_square_text,
+                    Permission.READ_SMS,
+                    setOf(Permission.READ_SMS),
+                )
+            )
+            list.add(
+                PermissionItem.create(
+                    context,
+                    R.drawable.message_square_text,
+                    Permission.SEND_SMS,
+                    setOf( Permission.SEND_SMS),
+                )
+            )
         }
         if (AppFeatureType.CALLS.has()) {
             list.add(PermissionItem.create(context, R.drawable.call_log, Permission.WRITE_CALL_LOG, setOf(Permission.READ_CALL_LOG, Permission.WRITE_CALL_LOG)))

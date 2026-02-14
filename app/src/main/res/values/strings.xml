@@ -408,6 +408,7 @@
     <string name="browser_https_error_tips">If you see \"Your connection is not private\" error, simply click the "Advanced" button and click "Proceed to …" button, then Chrome will trust this URL for the remainder of the browser session.</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">Manage files</string>
     <string name="feature_READ_SMS">Read messages</string>
+    <string name="feature_SEND_SMS">Send messages</string>
     <string name="feature_WRITE_CALL_LOG">Manage call log</string>
     <string name="feature_CALL_PHONE">Make phone call</string>
     <string name="feature_WRITE_CONTACTS">Manage contacts</string>

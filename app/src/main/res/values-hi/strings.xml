@@ -408,6 +408,7 @@
     <string name="browser_https_error_tips">अगर आपको \"आपका कनेक्शन निजी नहीं है\" त्रुटि दिखाई देती है, तो सीधे \"उन्नत\" बटन पर क्लिक करें और \"पर जाएं ...\" बटन पर क्लिक करें, तब क्रोम इस URL को ब्राउज़र सत्र के लिए विश्वसनीय बना देगा।</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">फ़ाइलें प्रबंधित करें</string>
     <string name="feature_READ_SMS">संदेश पढ़ें</string>
+    <string name="feature_SEND_SMS">संदेश भेजें</string>
     <string name="feature_WRITE_CALL_LOG">कॉल लॉग प्रबंधित करें</string>
     <string name="feature_CALL_PHONE">फ़ोन कॉल करें</string>
     <string name="feature_WRITE_CONTACTS">संपर्क प्रबंधित करें</string>
