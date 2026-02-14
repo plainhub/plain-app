@@ -28,6 +28,8 @@ class WebRtcPeerSession(
     private val videoTrack: VideoTrack,
     private val audioTrack: AudioTrack?,
     private val computeTargetBitrateKbps: () -> Int,
+    private val computeStartBitrateKbps: () -> Int,
+    private val getTargetFps: () -> Int,
     private val getMode: () -> ScreenMirrorMode,
 ) {
     private var peerConnection: PeerConnection? = null
@@ -119,28 +121,31 @@ class WebRtcPeerSession(
         if (encodings.isEmpty()) return
 
         val maxKbps = computeTargetBitrateKbps()
+        val startKbps = computeStartBitrateKbps()
+        val fps = getTargetFps()
         val mode = getMode()
         val encoding = encodings[0]
         encoding.maxBitrateBps = maxKbps * 1000
-        encoding.maxFramerate = 30
+        encoding.maxFramerate = fps
 
         when (mode) {
             ScreenMirrorMode.SMOOTH -> {
-                // SMOOTH: prioritize real-time delivery (< 500 ms end-to-end).
-                // - High minBitrate (80 %) so the congestion controller converges
-                //   almost immediately instead of ramping up slowly.
-                // - MAINTAIN_FRAMERATE: we already cap resolution at 720 p,
-                //   so under pressure we allow slight resolution drop rather
-                //   than sacrificing fps (dropping fps *feels* like lag).
-                encoding.minBitrateBps = maxKbps * 800
-                params.degradationPreference = RtpParameters.DegradationPreference.MAINTAIN_FRAMERATE
+                // SMOOTH 720p: start at 1.5 Mbps, max 2 Mbps.
+                // For screen content at 720p, 2 Mbps is more than enough for
+                // crisp text/UI. Use MAINTAIN_RESOLUTION so text stays sharp
+                // and fps drops gracefully under pressure (screen content is
+                // mostly static, lower fps is barely noticeable).
+                encoding.minBitrateBps = startKbps * 800
+                params.degradationPreference = RtpParameters.DegradationPreference.MAINTAIN_RESOLUTION
             }
             else -> {
-                // HD / AUTO: balanced – allow both resolution and fps to degrade;
-                // MAINTAIN_RESOLUTION caused fps to drop to 1-5 which *felt* like
-                // seconds of lag.
-                encoding.minBitrateBps = maxKbps * 500
-                params.degradationPreference = RtpParameters.DegradationPreference.BALANCED
+                // HD / AUTO: professional remote-desktop strategy.
+                // Prioritize resolution (text clarity) over framerate.
+                // Screen content is mostly static UI — dropping from 20 to 10 fps
+                // is acceptable, but dropping resolution makes text unreadable.
+                // Start conservatively to avoid initial bufferbloat.
+                encoding.minBitrateBps = startKbps * 500
+                params.degradationPreference = RtpParameters.DegradationPreference.MAINTAIN_RESOLUTION
             }
         }
         sender.parameters = params

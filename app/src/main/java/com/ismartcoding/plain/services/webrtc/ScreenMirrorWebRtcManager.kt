@@ -74,8 +74,8 @@ class ScreenMirrorWebRtcManager(
 
     // ── Frame-rate limiter (isScreencast=true disables adaptOutputFormat) ─
     private var lastFrameTimeNs = 0L
-    private val targetFps = 30
-    private val minFrameIntervalNs = 1_000_000_000L / targetFps
+    private var targetFps = 20
+    private var minFrameIntervalNs = 1_000_000_000L / targetFps
 
     // ── Public API ────────────────────────────────────────────────────────
 
@@ -262,7 +262,7 @@ class ScreenMirrorWebRtcManager(
                 // Tear down any previous session for this client (re-negotiation).
                 peerSessions.remove(clientId)?.release()
 
-                val session = WebRtcPeerSession(clientId, factory, track, audioTrack, { computeTargetBitrateKbps() }, { getQuality().mode })
+                val session = WebRtcPeerSession(clientId, factory, track, audioTrack, { computeTargetBitrateKbps() }, { computeStartBitrateKbps() }, { targetFps }, { getQuality().mode })
                 peerSessions[clientId] = session
                 session.createPeerConnectionAndOffer()
 
@@ -450,16 +450,35 @@ class ScreenMirrorWebRtcManager(
         }
     }
 
+    /**
+     * Compute target bitrate for screen content.
+     * Professional remote-desktop approach: screen content is mostly static UI/text,
+     * so we use much lower bitrates than video streaming.
+     * H.264/VP8 with high QP is fine for UI — sharp text, infrequent keyframes.
+     */
     private fun computeTargetBitrateKbps(): Int {
         val resolution = getEffectiveResolution()
-        // LAN bitrates for screen content (sharp text/UI edges)
-        // resolution = short side, so 1080p on a 20:9 phone ≈ 1080×2400
         return when {
-            resolution >= 1080 -> 20000
-            resolution >= 720 -> 10000
-            else -> 4000
+            resolution >= 1080 -> 4000   // 1080p: 4 Mbps max (was 20 Mbps)
+            resolution >= 720  -> 2000   // 720p:  2 Mbps max (was 10 Mbps)
+            else               -> 1000
         }
     }
+
+    /**
+     * Compute initial (starting) bitrate for the congestion controller.
+     * Start conservatively so the first few seconds don't cause bufferbloat.
+     */
+    private fun computeStartBitrateKbps(): Int {
+        val resolution = getEffectiveResolution()
+        return when {
+            resolution >= 1080 -> 3000   // start at 3 Mbps, ramp to 4
+            resolution >= 720  -> 1500   // start at 1.5 Mbps, ramp to 2
+            else               -> 800
+        }
+    }
+
+    fun getTargetFps(): Int = targetFps
 
     // ── Adaptive stats monitoring (AUTO mode) ─────────────────────────────
 
@@ -486,23 +505,56 @@ class ScreenMirrorWebRtcManager(
         val session = peerSessions.values.firstOrNull() ?: return
         session.getStats { availableBitrateKbps, packetLossPercent, rttMs ->
             val oldResolution = adaptiveResolution
+            val oldFps = targetFps
 
-            // Downgrade: high packet loss or low available bitrate
-            val shouldDowngrade = packetLossPercent > 5.0 || rttMs > 150 ||
-                    (availableBitrateKbps in 1 until 8000)
-            // Upgrade: plenty of bandwidth and good network
-            val shouldUpgrade = availableBitrateKbps > 15000 && packetLossPercent < 1.0 && rttMs < 50
-
-            if (shouldDowngrade && adaptiveResolution > 720) {
-                adaptiveResolution = 720
-            } else if (shouldUpgrade && adaptiveResolution < 1080) {
-                adaptiveResolution = 1080
+            // ── Step 1: Aggressive ABR — react to packet loss first ──
+            if (packetLossPercent > 2.0) {
+                // High packet loss: drop fps first (cheaper than resolution change)
+                if (targetFps > 10) {
+                    targetFps = max(10, (targetFps * 0.7).toInt())
+                    minFrameIntervalNs = 1_000_000_000L / targetFps
+                }
+                // If fps already low and still losing packets, drop resolution
+                if (packetLossPercent > 5.0 && adaptiveResolution > 720) {
+                    adaptiveResolution = 720
+                }
             }
 
-            if (oldResolution != adaptiveResolution) {
-                LogCat.d("webrtc: adaptive resolution $oldResolution → $adaptiveResolution " +
+            // ── Step 2: RTT-based degradation ──
+            if (rttMs > 150) {
+                if (targetFps > 15) {
+                    targetFps = 15
+                    minFrameIntervalNs = 1_000_000_000L / targetFps
+                }
+                if (rttMs > 300 && adaptiveResolution > 720) {
+                    adaptiveResolution = 720
+                }
+            }
+
+            // ── Step 3: Bandwidth-based degradation ──
+            if (availableBitrateKbps in 1 until 2000) {
+                if (adaptiveResolution > 720) adaptiveResolution = 720
+                if (targetFps > 15) {
+                    targetFps = 15
+                    minFrameIntervalNs = 1_000_000_000L / targetFps
+                }
+            }
+
+            // ── Step 4: Upgrade when network is healthy ──
+            val isHealthy = availableBitrateKbps > 4000 && packetLossPercent < 1.0 && rttMs < 50
+            if (isHealthy) {
+                if (adaptiveResolution < 1080) adaptiveResolution = 1080
+                if (targetFps < 20) {
+                    targetFps = 20
+                    minFrameIntervalNs = 1_000_000_000L / targetFps
+                }
+            }
+
+            val changed = oldResolution != adaptiveResolution || oldFps != targetFps
+            if (changed) {
+                LogCat.d("webrtc: adaptive ${oldResolution}p@${oldFps}fps → ${adaptiveResolution}p@${targetFps}fps " +
                     "(bw=${availableBitrateKbps}kbps loss=${String.format("%.1f", packetLossPercent)}% rtt=${String.format("%.0f", rttMs)}ms)")
-                resizeVirtualDisplay()
+                if (oldResolution != adaptiveResolution) resizeVirtualDisplay()
                 peerSessions.values.forEach { it.updateVideoBitrate() }
             }
         }
