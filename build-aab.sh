@@ -12,6 +12,7 @@ function getVersionName()
 }
 
 sed -i -e '/READ_SMS/d' ./app/src/main/AndroidManifest.xml
+sed -i -e '/SEND_SMS/d' ./app/src/main/AndroidManifest.xml
 sed -i -e '/READ_CALL_LOG/d' ./app/src/main/AndroidManifest.xml
 sed -i -e '/WRITE_CALL_LOG/d' ./app/src/main/AndroidManifest.xml
 sed -i -e '/REQUEST_INSTALL_PACKAGES/d' ./app/src/main/AndroidManifest.xml

@@ -36,8 +36,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import coil3.annotation.ExperimentalCoilApi
-import coil3.compose.setSingletonImageLoaderFactory
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isGestureInteractionMode
@@ -64,7 +62,6 @@ import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.PToast
 import com.ismartcoding.plain.ui.base.ToastEvent
-import com.ismartcoding.plain.ui.base.coil.newImageLoader
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChatListViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
@@ -111,7 +108,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalCoilApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Main(
     navControllerState: MutableState<NavHostController?>,
@@ -239,8 +236,6 @@ fun Main(
     }
 
     AppTheme(useDarkTheme = useDarkTheme) {
-        setSingletonImageLoaderFactory(::newImageLoader)
-
         DisposableEffect(useDarkTheme) {
             val window = (view.context as Activity).window
             WindowCompat.getInsetsController(window, window.decorView).apply {

@@ -408,6 +408,7 @@
     <string name="browser_https_error_tips">Als u de fout "Uw verbinding is niet privé" ziet, klikt u eenvoudig op de knop "Geavanceerd" en vervolgens op de knop "Doorgaan naar …", dan zal Chrome deze URL vertrouwen voor de rest van de browsersessie.</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">Bestanden beheren</string>
     <string name="feature_READ_SMS">Berichten lezen</string>
+    <string name="feature_SEND_SMS">Berichten verzenden</string>
     <string name="feature_WRITE_CALL_LOG">Oproeplog beheren</string>
     <string name="feature_CALL_PHONE">Telefoonoproep maken</string>
     <string name="feature_WRITE_CONTACTS">Contacten beheren</string>

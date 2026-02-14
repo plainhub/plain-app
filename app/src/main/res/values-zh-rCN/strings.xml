@@ -408,6 +408,7 @@
     <string name="browser_https_error_tips">如果使用 HTTPS 地址，Chrome浏览器将会显示\"您的连接不是私密连接\"，请点击页面"高级"按钮继续。</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">管理文件</string>
     <string name="feature_READ_SMS">阅读短信</string>
+    <string name="feature_SEND_SMS">发送短信</string>
     <string name="feature_WRITE_CALL_LOG">管理通话记录</string>
     <string name="feature_CALL_PHONE">拨打电话</string>
     <string name="feature_WRITE_CONTACTS">管理联系人</string>

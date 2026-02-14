@@ -408,6 +408,7 @@
     <string name="browser_https_error_tips">"Your connection is not private"エラーが表示された場合は、「詳細」ボタンをクリックし、「...に進む」ボタンをクリックするだけで、ChromeがこのURLをブラウザセッションの残りの期間信頼します。</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">ファイルの管理</string>
     <string name="feature_READ_SMS">メッセージの読み取り</string>
+    <string name="feature_SEND_SMS">メッセージの送信</string>
     <string name="feature_WRITE_CALL_LOG">通話ログの管理</string>
     <string name="feature_CALL_PHONE">電話をかける</string>
     <string name="feature_WRITE_CONTACTS">連絡先の管理</string>

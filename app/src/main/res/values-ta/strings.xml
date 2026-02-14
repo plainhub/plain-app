@@ -408,6 +408,7 @@
     <string name="browser_https_error_tips">நீங்களில் "உங்கள் இணைப்பு தனிநபராகுகிறது" பிழையைக் காண்க, எளிதாக "மேம்படுத்தவும்" பொத்தானை அழுத்தி "தொலைநிலை அவாற்கு ..." எனும் பொத்தானை அழுத்திக் கொள்ளவும், அப்போது குரோம் இந்த URL ஐ உங்களுக்கு மீதமுள்ள அந்தரங்கம் விரிவு கொள்ளும்.</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">கோப்புகளை நிர்வகிக்கவும்</string>
     <string name="feature_READ_SMS">செய்திகளை படிக்கவும்</string>
+    <string name="feature_SEND_SMS">செய்திகளை அனுப்பவும்</string>
     <string name="feature_WRITE_CALL_LOG">கால் பதிவு நிர்வகிக்கவும்</string>
     <string name="feature_CALL_PHONE">போன் கலையாக அழை</string>
     <string name="feature_WRITE_CONTACTS">தொடர்புகளை நிர்வகிக்கவும்</string>

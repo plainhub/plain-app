@@ -408,6 +408,7 @@
     <string name="browser_https_error_tips">Se você ver o erro "Sua conexão não é particular", clique no botão "Avançado" e clique no botão "Prosseguir para...", então o Chrome confiará nesta URL pelo restante da sessão do navegador.</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">Gerenciar arquivos</string>
     <string name="feature_READ_SMS">Ler mensagens</string>
+    <string name="feature_SEND_SMS">Enviar mensagens</string>
     <string name="feature_WRITE_CALL_LOG">Gerenciar registro de chamadas</string>
     <string name="feature_CALL_PHONE">Fazer chamada telefônica</string>
     <string name="feature_WRITE_CONTACTS">Gerenciar contatos</string>

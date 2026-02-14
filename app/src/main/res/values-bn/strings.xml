@@ -408,6 +408,7 @@
     <string name="browser_https_error_tips">আপনি যদি "আপনার সংযোগ ব্যক্তিগত নয়" ত্রুটি দেখেন, তাহলে সহজভাবে "উন্নত" বোতামে ক্লিক করুন এবং "এগিয়ে যান" বোতামে ক্লিক করুন, তারপর ক্রোম এই URL টি ব্রাউজার সেশনের বাকি অংশের জন্য আত্মবিশ্বাস করবে।</string>
     <string name="feature_WRITE_EXTERNAL_STORAGE">ফাইল পরিচালনা</string>
     <string name="feature_READ_SMS">বার্তা পড়ুন</string>
+    <string name="feature_SEND_SMS">বার্তা পাঠান</string>
     <string name="feature_WRITE_CALL_LOG">কল লগ পরিচালনা</string>
     <string name="feature_CALL_PHONE">ফোন কল করুন</string>
     <string name="feature_WRITE_CONTACTS">যোগাযোগ পরিচালনা</string>
