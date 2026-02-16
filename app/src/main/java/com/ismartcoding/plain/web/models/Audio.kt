@@ -3,7 +3,7 @@ package com.ismartcoding.plain.web.models
 import com.ismartcoding.plain.data.DAudio
 import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.helpers.FileHelper
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class Audio(
     val id: ID,

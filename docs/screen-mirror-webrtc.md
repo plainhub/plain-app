@@ -115,3 +115,66 @@ When the quality mode changes:
 - Confirm the quality change request reached Android.
 - Confirm Android resized capture and updated bitrate.
 - Confirm the web side restarted the WebRTC session (ready → offer → answer) if that is part of the UI flow.
+
+## Known Device Edge Cases (Must Keep)
+
+These cases were observed on real Android 11 devices. They are easy to regress if capture-size logic is simplified.
+
+### Case A: using displayMetrics causes wrong aspect ratio on Android 11
+
+- Symptom:
+  - Mirrored image can have black bars / wrong crop on some devices.
+- Root cause:
+  - `displayMetrics.widthPixels/heightPixels` may exclude navigation-bar area on Android <= 11.
+  - The produced capture surface size does not match real physical display pixels.
+- Required behavior:
+  - Use real display size for capture, not app-window metrics.
+
+### Case B: Switching quality modes causes black bars on some Android 11 devices
+
+- Symptom:
+  - First connection in HD/AUTO mode displays correctly (no black bars).
+  - After switching to SMOOTH and then back to HD, right and bottom edges show black bars.
+  - The logged capture dimensions are identical both times — the numbers are correct, but the rendering is wrong.
+- Root cause:
+  - `VirtualDisplay.resize()` on some Android 11 devices does not correctly update the internal rendering region when going from a smaller size back to a larger one (e.g. 720p → 1080p). The compositor continues to render at the old smaller area within the now-larger Surface.
+  - Initial creation with `createVirtualDisplay()` always works correctly.
+  - Previous attempts to fix via scale-factor capping or DPI scaling did not help because the bug is in the resize path itself, not in the computed dimensions.
+- Fix:
+  - **Never use `VirtualDisplay.resize()`**. Instead, release the old VirtualDisplay and recreate it from the saved MediaProjection each time the quality or orientation changes.
+  - Also recreate the Surface wrapper around SurfaceTexture to ensure clean state after buffer size change.
+- Required behavior:
+  - `resizeVirtualDisplay()` must release the old VirtualDisplay and create a new one — not call `vd.resize()`.
+  - The MediaProjection must be kept alive (it is obtained once) and reused for new VirtualDisplay instances.
+  - For Android <= 11, prefer `Display.Mode.physicalWidth/physicalHeight` (with rotation handling) as capture base size.
+  - Keep a fallback to `getRealSize()` only if mode dimensions are invalid.
+
+## Regression Checklist (Screen Size / Black Bars)
+
+When changing `ScreenMirrorWebRtcManager` capture logic, verify all items below:
+
+- **Never use `VirtualDisplay.resize()`**: Always release and recreate the VirtualDisplay. The `resize()` method is broken on some Android 11 devices when upscaling.
+- Android 11 physical device:
+  - HD mode has no right/bottom black bars.
+  - Smooth mode remains correct.
+  - **Switch SMOOTH → HD must not produce black bars** (the critical regression case).
+- Rotate portrait/landscape after mirroring starts:
+  - No black bars after VirtualDisplay recreation.
+- Check logs:
+  - `VirtualDisplay created {w}x{h} dpi={dpi}` (initial) and `VirtualDisplay recreated {w}x{h} dpi={dpi}` (on quality/orientation change) values are consistent.
+- Android version matrix:
+  - Android 12+ path still uses `WindowMetrics`.
+  - Android <= 11 path still uses display mode physical size first.
+- If refactoring metrics code:
+  - Do not replace real-screen logic with `displayMetrics.widthPixels/heightPixels`.
+  - Do not reintroduce `VirtualDisplay.resize()` as an "optimization".
+
+## Suggested Quick Manual Test Script
+
+1. Connect web mirror, set HD, observe full-bleed frame for 20s.
+2. Switch to Smooth, observe no crop/black bar regression.
+3. **Switch back to HD — verify NO black bars on right/bottom** (critical case).
+4. Rotate device twice, verify frame remains full-bleed in both modes.
+5. Switch AUTO ↔ HD ↔ SMOOTH repeatedly, verify no persistent edge bars.
+3. Rotate device twice, verify frame remains full-bleed in both modes.
+4. Switch AUTO ↔ HD ↔ Smooth repeatedly, verify no persistent edge bars.

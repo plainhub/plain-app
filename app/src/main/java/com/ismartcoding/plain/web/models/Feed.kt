@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.db.DFeed
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class Feed(
     val id: ID,

@@ -2,7 +2,7 @@ package com.ismartcoding.plain.features.file
 
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.plain.data.IData
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class DFile(
     var name: String,

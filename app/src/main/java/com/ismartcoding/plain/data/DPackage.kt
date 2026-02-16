@@ -3,7 +3,7 @@ package com.ismartcoding.plain.data
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import com.ismartcoding.plain.features.PackageHelper
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class DPackage(
     val appInfo: ApplicationInfo,

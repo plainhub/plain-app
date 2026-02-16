@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.data.DVideo
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class Video(
     var id: ID,

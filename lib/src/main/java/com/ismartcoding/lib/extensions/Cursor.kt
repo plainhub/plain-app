@@ -3,7 +3,7 @@ package com.ismartcoding.lib.extensions
 import android.database.Cursor
 import androidx.core.database.getIntOrNull
 import androidx.core.database.getLongOrNull
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 // https://developer.android.com/training/data-storage/room/accessing-data#kotlin
 

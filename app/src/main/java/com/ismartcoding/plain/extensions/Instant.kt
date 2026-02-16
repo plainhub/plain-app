@@ -3,7 +3,7 @@ package com.ismartcoding.plain.extensions
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.TimeAgoHelper
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import java.text.DateFormat
 import java.util.Calendar
 

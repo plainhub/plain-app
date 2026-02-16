@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.data
 
 import com.ismartcoding.plain.enums.DeviceType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class DNearbyDevice(
     val id: String,

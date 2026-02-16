@@ -14,11 +14,13 @@ import android.net.wifi.WifiManager
 import android.os.BatteryManager
 import android.os.PowerManager
 import android.os.storage.StorageManager
+import android.telephony.SmsManager
 import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
 import android.view.inputmethod.InputMethodManager
 import androidx.core.app.NotificationManagerCompat
 import com.ismartcoding.lib.extensions.getSystemServiceCompat
+import com.ismartcoding.lib.isSPlus
 
 val contentResolver: ContentResolver by lazy { MainApp.instance.contentResolver }
 
@@ -91,6 +93,15 @@ val audioManager: android.media.AudioManager by lazy {
 val uiModeManager: UiModeManager by lazy {
     MainApp.instance.getSystemServiceCompat(UiModeManager::class.java)
 }
+
+val smsManager: SmsManager by lazy {
+    if (isSPlus()) {
+        MainApp.instance.getSystemService(SmsManager::class.java) ?: SmsManager.getDefault()
+    } else {
+        SmsManager.getDefault()
+    }
+}
+
 
 
 

@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.data
 
 import androidx.compose.ui.unit.IntSize
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @kotlinx.serialization.Serializable
 data class DVideo(

@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.data
 
 import com.ismartcoding.plain.web.models.DPhoneNumber
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import com.ismartcoding.plain.helpers.TimeHelper
 
 class DDeviceInfo {

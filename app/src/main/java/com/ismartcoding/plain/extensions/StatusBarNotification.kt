@@ -6,7 +6,7 @@ import androidx.core.app.NotificationCompat
 import com.ismartcoding.lib.extensions.getString2
 import com.ismartcoding.plain.data.DNotification
 import com.ismartcoding.plain.features.PackageHelper
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 fun StatusBarNotification.toDNotification(): DNotification {
     val appName = PackageHelper.getLabel(packageName)

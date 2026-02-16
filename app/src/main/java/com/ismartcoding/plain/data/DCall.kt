@@ -3,7 +3,7 @@ package com.ismartcoding.plain.data
 import com.ismartcoding.lib.phonegeo.PhoneNumberLookup
 import com.ismartcoding.lib.phonegeo.algo.LookupAlgorithm
 import com.ismartcoding.plain.web.models.PhoneGeo
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class DCall(
     override var id: String,

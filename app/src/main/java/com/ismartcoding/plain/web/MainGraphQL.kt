@@ -73,8 +73,8 @@ import com.ismartcoding.plain.features.media.CallMediaStoreHelper
 import com.ismartcoding.plain.features.media.ContactMediaStoreHelper
 import com.ismartcoding.plain.features.media.FileMediaStoreHelper
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
-import com.ismartcoding.plain.features.media.SmsMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
+import com.ismartcoding.plain.features.sms.SmsConversationHelper
 import com.ismartcoding.plain.features.sms.SmsHelper
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.DeviceInfoHelper
@@ -151,7 +151,7 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.util.AttributeKey
 import kotlinx.coroutines.coroutineScope
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.json.Json
@@ -180,13 +180,13 @@ class MainGraphQL(val schema: Schema) {
                         }
                     }
                 }
-                query("messages") {
+                query("sms") {
                     configure {
                         executor = Executor.DataLoaderPrepared
                     }
                     resolver { offset: Int, limit: Int, query: String ->
                         Permission.READ_SMS.checkAsync(MainApp.instance)
-                        SmsMediaStoreHelper.searchAsync(MainApp.instance, query, limit, offset).map { it.toModel() }
+                        SmsHelper.searchAsync(MainApp.instance, query, limit, offset).map { it.toModel() }
                     }
                     type<Message> {
                         dataProperty("tags") {
@@ -197,10 +197,25 @@ class MainGraphQL(val schema: Schema) {
                         }
                     }
                 }
-                query("messageCount") {
+                query("smsConversations") {
+                    resolver { offset: Int, limit: Int, query: String ->
+                        Permission.READ_SMS.checkAsync(MainApp.instance)
+                        SmsConversationHelper.searchConversationsAsync(MainApp.instance, query, limit, offset).map { it.toModel() }
+                    }
+                }
+                query("smsCount") {
                     resolver { query: String ->
                         if (Permission.READ_SMS.enabledAndCanAsync(MainApp.instance)) {
-                            SmsMediaStoreHelper.countAsync(MainApp.instance, query)
+                            SmsHelper.countAsync(MainApp.instance, query)
+                        } else {
+                            0
+                        }
+                    }
+                }
+                query("smsConversationCount") {
+                    resolver { query: String ->
+                        if (Permission.READ_SMS.enabledAndCanAsync(MainApp.instance)) {
+                            SmsConversationHelper.conversationCountAsync(MainApp.instance, query)
                         } else {
                             0
                         }
@@ -911,8 +926,9 @@ class MainGraphQL(val schema: Schema) {
                     resolver { number: String, body: String ->
                         Permission.SEND_SMS.checkAsync(MainApp.instance)
                         try {
-                            SmsHelper.sendText(MainApp.instance, number, body)
-                        } catch (e: IllegalArgumentException) {
+                            SmsHelper.sendText(number, body)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                             throw GraphQLError(e.message ?: "Invalid SMS input")
                         }
                         true
@@ -1189,7 +1205,7 @@ class MainGraphQL(val schema: Schema) {
                             }
 
                             DataType.SMS -> {
-                                items = SmsMediaStoreHelper.getIdsAsync(context, query).map { TagRelationStub(it) }
+                                items = SmsHelper.getIdsAsync(context, query).map { TagRelationStub(it) }
                             }
 
                             DataType.CONTACT -> {
@@ -1258,7 +1274,7 @@ class MainGraphQL(val schema: Schema) {
                             }
 
                             DataType.SMS -> {
-                                ids = SmsMediaStoreHelper.getIdsAsync(context, query)
+                                ids = SmsHelper.getIdsAsync(context, query)
                             }
 
                             DataType.CONTACT -> {

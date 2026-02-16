@@ -17,7 +17,7 @@ import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 class FeedSettingsViewModel : ViewModel() {
     var showIntervalDialog = mutableStateOf(false)

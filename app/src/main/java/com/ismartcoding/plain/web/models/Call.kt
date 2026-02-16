@@ -2,7 +2,7 @@ package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.data.DCall
 import com.ismartcoding.plain.helpers.FileHelper
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class Call(
     var id: ID,

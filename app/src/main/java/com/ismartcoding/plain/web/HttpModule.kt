@@ -31,9 +31,9 @@ import com.ismartcoding.plain.data.UploadInfo
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.enums.PasswordType
+import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.extensions.newFile
 import com.ismartcoding.plain.extensions.toThumbBytesAsync
-import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.media.AudioMediaStoreHelper
@@ -41,6 +41,7 @@ import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.ImageHelper
+import com.ismartcoding.plain.helpers.Mp4Helper
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.preferences.AuthTwoFactorPreference
@@ -60,7 +61,6 @@ import io.ktor.http.content.LastModifiedVersion
 import io.ktor.http.content.PartData
 import io.ktor.http.content.forEachPart
 import io.ktor.http.contentType
-import io.ktor.http.defaultForFile
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCallPipeline
@@ -78,8 +78,8 @@ import io.ktor.server.plugins.forwardedheaders.ForwardedHeaders
 import io.ktor.server.plugins.origin
 import io.ktor.server.plugins.partialcontent.PartialContent
 import io.ktor.server.request.header
-import io.ktor.server.request.receiveMultipart
 import io.ktor.server.request.receive
+import io.ktor.server.request.receiveMultipart
 import io.ktor.server.request.receiveText
 import io.ktor.server.response.header
 import io.ktor.server.response.respond
@@ -379,9 +379,23 @@ object HttpModule {
                     }
 
                     if (path.startsWith("content://")) {
-                        val bytes = withIO { context.contentResolver.openInputStream(Uri.parse(path))?.buffered()?.use { it.readBytes() } }
+                        val uri = Uri.parse(path)
+                        val mimeType = context.contentResolver.getType(uri).orEmpty()
+                        if (mimeType.equals("video/3gpp", true) || mimeType.equals("video/3gp", true) || path.endsWith(".3gp", true)) {
+                            val mp4Bytes = withIO { Mp4Helper.convert3gpToMp4(context, uri) }
+                            if (mp4Bytes != null) {
+                                call.respondBytes(mp4Bytes, ContentType.parse("video/mp4"))
+                                return@get
+                            }
+                        }
+
+                        val bytes = withIO { context.contentResolver.openInputStream(uri)?.buffered()?.use { it.readBytes() } }
                         if (bytes != null) {
-                            call.respondBytes(bytes)
+                            if (!mimeType.isNullOrEmpty()) {
+                                call.respondBytes(bytes, ContentType.parse(mimeType))
+                            } else {
+                                call.respondBytes(bytes, ContentType.Application.OctetStream)
+                            }
                         } else {
                             call.respond(HttpStatusCode.NotFound)
                         }
@@ -502,14 +516,14 @@ object HttpModule {
                             CastPlayer.isPlaying.value = false
                         }
                     }
-                    
+
                     // 尝试解析播放位置信息
                     if (xml.contains("RelTime val=") && xml.contains("TrackDuration val=")) {
                         withIO {
                             try {
                                 val relTimeMatch = Regex("RelTime val=\"([^\"]+)\"").find(xml)
                                 val durationMatch = Regex("TrackDuration val=\"([^\"]+)\"").find(xml)
-                                
+
                                 if (relTimeMatch != null && durationMatch != null) {
                                     val relTime = relTimeMatch.groupValues[1]
                                     val trackDuration = durationMatch.groupValues[1]
@@ -791,4 +805,5 @@ object HttpModule {
             init()
         }
     }
+
 }

@@ -3,7 +3,7 @@ package com.ismartcoding.plain.web.models
 import com.ismartcoding.plain.data.DContact
 import com.ismartcoding.plain.features.contact.*
 import com.ismartcoding.plain.helpers.FileHelper
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class ContentItem(var value: String, var type: Int, var label: String)
 

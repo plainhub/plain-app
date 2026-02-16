@@ -16,7 +16,7 @@ import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.subscriptionManager
 import com.ismartcoding.plain.telephonyManager
 import com.ismartcoding.plain.web.models.DPhoneNumber
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 
 object DeviceInfoHelper {

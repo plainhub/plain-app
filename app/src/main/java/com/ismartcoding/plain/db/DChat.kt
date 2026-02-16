@@ -13,7 +13,7 @@ import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.data.IData
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.serialization.Serializable
 import org.json.JSONObject

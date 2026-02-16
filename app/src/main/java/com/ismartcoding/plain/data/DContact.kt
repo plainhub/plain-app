@@ -4,7 +4,7 @@ import com.ismartcoding.lib.extensions.containsChinese
 import com.ismartcoding.plain.features.contact.DContactPhoneNumber
 import com.ismartcoding.plain.features.contact.DContentItem
 import com.ismartcoding.plain.features.contact.DOrganization
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class DContactSource(var name: String, var type: String)
 

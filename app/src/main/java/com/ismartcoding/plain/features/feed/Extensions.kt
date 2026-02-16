@@ -21,7 +21,7 @@ import io.ktor.client.request.headers
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.util.cio.writeChannel
 import io.ktor.utils.io.copyAndClose
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import java.io.File
 import java.util.Locale
 import java.util.UUID
