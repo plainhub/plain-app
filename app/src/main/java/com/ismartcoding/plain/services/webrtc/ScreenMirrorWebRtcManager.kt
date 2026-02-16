@@ -13,6 +13,7 @@ import android.media.projection.MediaProjection
 import android.os.Build
 import android.view.Surface
 import android.view.WindowManager
+import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.enums.AppFeatureType
@@ -106,8 +107,7 @@ class ScreenMirrorWebRtcManager(
         videoTrack = factory.createVideoTrack("screen_video", videoSource)
 
         // Create VirtualDisplay → Surface(SurfaceTexture) → SurfaceTextureHelper → VideoSource
-        val (width, height) = computeCaptureSize()
-        val dpi = context.resources.displayMetrics.densityDpi
+        val (width, height, dpi) = computeCaptureSize()
 
         surfaceTextureHelper!!.setTextureSize(width, height)
         displaySurface = Surface(surfaceTextureHelper!!.surfaceTexture)
@@ -392,21 +392,42 @@ class ScreenMirrorWebRtcManager(
     }
 
     /**
-     * Resize the existing [VirtualDisplay] to match the current quality / orientation.
-     * No need to recreate the MediaProjection or VirtualDisplay.
+     * Recreate the [VirtualDisplay] to match the current quality / orientation.
+     *
+     * We intentionally avoid [VirtualDisplay.resize] because on some Android 11
+     * devices it does not correctly update the rendering region when going from
+     * a smaller size back to a larger one (e.g. SMOOTH → HD), leaving black bars
+     * on the right and bottom edges even though the dimensions are correct.
+     * Releasing and recreating the VirtualDisplay is reliable across all devices.
      */
     private fun resizeVirtualDisplay() {
-        val vd = virtualDisplay ?: return
-        val (width, height) = computeCaptureSize()
-        val dpi = context.resources.displayMetrics.densityDpi
+        val projection = mediaProjection ?: return
+        val (width, height, dpi) = computeCaptureSize()
 
+        // Release old VirtualDisplay
+        virtualDisplay?.release()
+        virtualDisplay = null
+
+        // Update SurfaceTexture buffer size
         surfaceTextureHelper?.setTextureSize(width, height)
-        vd.resize(width, height, dpi)
 
-        LogCat.d("webrtc: VirtualDisplay resized ${width}x${height} dpi=$dpi")
+        // Recreate Surface to ensure clean state after buffer size change
+        displaySurface?.release()
+        displaySurface = Surface(surfaceTextureHelper!!.surfaceTexture)
+
+        // Create fresh VirtualDisplay with the new dimensions
+        virtualDisplay = projection.createVirtualDisplay(
+            "WebRTC_ScreenCapture",
+            width, height, dpi,
+            DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+            displaySurface,
+            null, null,
+        )
+
+        LogCat.d("webrtc: VirtualDisplay recreated ${width}x${height} dpi=$dpi")
     }
 
-    private fun computeCaptureSize(): Pair<Int, Int> {
+    private fun computeCaptureSize(): Triple<Int, Int, Int> {
         val realSize = getRealScreenSize()
         val width = realSize.x
         val height = realSize.y
@@ -417,27 +438,53 @@ class ScreenMirrorWebRtcManager(
 
         val targetWidth = makeEven(max(2, (width * scale).toInt()))
         val targetHeight = makeEven(max(2, (height * scale).toInt()))
+        val dpi = context.resources.displayMetrics.densityDpi
 
         getIsPortrait()
 
-        return Pair(targetWidth, targetHeight)
+        return Triple(targetWidth, targetHeight, dpi)
     }
 
     /**
      * Get the real physical screen dimensions including system bars.
-     * displayMetrics.widthPixels/heightPixels may exclude the navigation bar
-     * on Android <= 11, causing wrong capture aspect ratio and black bars.
+     *
+     * On Android 12+ we use WindowMetrics which is accurate.
+     * On Android 11 and below, Display.getRealSize() may report dimensions that
+     * include non-renderable areas (e.g. rounded-corner padding or system-bar
+     * offsets) on some devices, causing the VirtualDisplay surface to be larger
+     * than the actual mirrored content and producing black bars on the right /
+     * bottom edges.  Display.Mode.physicalWidth/Height returns the exact pixel
+     * resolution of the active display mode and avoids this mismatch.
      */
     private fun getRealScreenSize(): Point {
         val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        return if (isSPlus()) {
             val bounds = wm.currentWindowMetrics.bounds
             Point(bounds.width(), bounds.height())
         } else {
-            val size = Point()
             @Suppress("DEPRECATION")
-            wm.defaultDisplay.getRealSize(size)
-            size
+            val display = wm.defaultDisplay
+            val mode = display.mode
+            var w = mode.physicalWidth
+            var h = mode.physicalHeight
+            if (w > 0 && h > 0) {
+                // physicalWidth/Height are in the display's natural orientation;
+                // swap for landscape so the VirtualDisplay dimensions match.
+                @Suppress("DEPRECATION")
+                val rotation = display.rotation
+                if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
+                    val tmp = w
+                    w = h
+                    h = tmp
+                }
+                Point(w, h)
+            } else {
+                // Fallback for devices that report invalid mode dimensions.
+                val size = Point()
+                @Suppress("DEPRECATION")
+                display.getRealSize(size)
+                size
+            }
         }
     }
 

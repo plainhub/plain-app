@@ -11,7 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class VSession(val clientId: String, val clientIP: String, val osName: String, val osVersion: String, val browserName: String, val browserVersion: String, val createdAt: Instant, val updatedAt: Instant) {
     companion object {

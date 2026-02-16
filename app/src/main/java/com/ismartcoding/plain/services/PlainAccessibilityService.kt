@@ -10,6 +10,7 @@ import android.os.Build
 import android.provider.Settings
 import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
+import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.ScreenMirrorControlInput
@@ -59,12 +60,14 @@ class PlainAccessibilityService : AccessibilityService() {
                 val y = (control.y ?: return) * screenHeight
                 dispatchTap(x, y)
             }
+
             ScreenMirrorControlAction.LONG_PRESS -> {
                 val x = (control.x ?: return) * screenWidth
                 val y = (control.y ?: return) * screenHeight
                 val duration = control.duration ?: 500L
                 dispatchLongPress(x, y, duration)
             }
+
             ScreenMirrorControlAction.SWIPE -> {
                 val startX = (control.x ?: return) * screenWidth
                 val startY = (control.y ?: return) * screenHeight
@@ -73,6 +76,7 @@ class PlainAccessibilityService : AccessibilityService() {
                 val duration = control.duration ?: 300L
                 dispatchSwipe(startX, startY, endX, endY, duration)
             }
+
             ScreenMirrorControlAction.SCROLL -> {
                 val x = (control.x ?: return) * screenWidth
                 val y = (control.y ?: return) * screenHeight
@@ -81,20 +85,23 @@ class PlainAccessibilityService : AccessibilityService() {
                 val scrollDistance = deltaY.coerceIn(-500f, 500f)
                 dispatchSwipe(x, y, x, y + scrollDistance, 200L)
             }
+
             ScreenMirrorControlAction.BACK -> {
                 performGlobalAction(GLOBAL_ACTION_BACK)
             }
+
             ScreenMirrorControlAction.HOME -> {
                 performGlobalAction(GLOBAL_ACTION_HOME)
             }
+
             ScreenMirrorControlAction.RECENTS -> {
                 performGlobalAction(GLOBAL_ACTION_RECENTS)
             }
+
             ScreenMirrorControlAction.LOCK_SCREEN -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    performGlobalAction(GLOBAL_ACTION_LOCK_SCREEN)
-                }
+                performGlobalAction(GLOBAL_ACTION_LOCK_SCREEN)
             }
+
             ScreenMirrorControlAction.KEY -> {
                 // Key injection requires InputManager or root; skip for now
                 LogCat.d("Key action not yet supported: ${control.key}")
@@ -165,7 +172,7 @@ class PlainAccessibilityService : AccessibilityService() {
          */
         private fun getRealScreenSize(context: Context): Point {
             val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return if (isSPlus()) {
                 val bounds = wm.currentWindowMetrics.bounds
                 Point(bounds.width(), bounds.height())
             } else {

@@ -46,7 +46,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withTimeoutOrNull
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileOutputStream

@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.features.file.DFile
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class File(
     var name: String,

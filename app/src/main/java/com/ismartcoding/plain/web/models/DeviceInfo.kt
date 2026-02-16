@@ -2,7 +2,7 @@ package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.data.DDeviceInfo
 import com.ismartcoding.plain.helpers.TimeHelper
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 class DeviceInfo {
     var deviceName: String = ""

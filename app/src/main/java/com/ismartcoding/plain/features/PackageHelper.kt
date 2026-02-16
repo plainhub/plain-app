@@ -20,7 +20,7 @@ import com.ismartcoding.plain.extensions.isSystemApp
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.packageManager
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import java.io.File
 import javax.security.cert.X509Certificate
 

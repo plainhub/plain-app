@@ -2,7 +2,7 @@ package com.ismartcoding.plain.ui.models
 
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.db.DChat
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class VChat(
     override var id: String, 

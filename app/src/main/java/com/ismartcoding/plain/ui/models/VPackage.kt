@@ -3,7 +3,7 @@ package com.ismartcoding.plain.ui.models
 import com.ismartcoding.plain.data.DCertificate
 import com.ismartcoding.plain.data.DPackage
 import com.ismartcoding.plain.data.IData
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class VPackage(
     override var id: String,

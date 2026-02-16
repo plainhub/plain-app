@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.data
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class DImageMeta(
     val make: String,

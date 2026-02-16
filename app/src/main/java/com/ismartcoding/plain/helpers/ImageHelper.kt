@@ -9,7 +9,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DImageMeta
 import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import java.io.File
 import java.io.IOException
 import java.time.LocalDateTime

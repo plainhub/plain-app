@@ -18,7 +18,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.storageManager
 import com.ismartcoding.plain.storageStatsManager
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import java.io.File
 import java.util.Collections
 import java.util.Locale

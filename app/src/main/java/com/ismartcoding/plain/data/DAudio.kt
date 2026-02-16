@@ -2,7 +2,7 @@ package com.ismartcoding.plain.data
 
 import android.net.Uri
 import com.ismartcoding.lib.extensions.formatDuration
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class DAudio(
     override var id: String,

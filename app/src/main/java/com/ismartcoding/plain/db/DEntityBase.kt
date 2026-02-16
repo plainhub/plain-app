@@ -2,7 +2,7 @@ package com.ismartcoding.plain.db
 
 import androidx.room.ColumnInfo
 import com.ismartcoding.plain.helpers.TimeHelper
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 abstract class DEntityBase {
     @ColumnInfo(name = "created_at")
