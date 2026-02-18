@@ -12,13 +12,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +37,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.clipboardManager
@@ -41,8 +46,11 @@ import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.QrCodeGenerateHelper
 import com.ismartcoding.plain.preferences.HttpPortPreference
 import com.ismartcoding.plain.preferences.HttpsPortPreference
+import com.ismartcoding.plain.preferences.MdnsHostnamePreference
 import com.ismartcoding.plain.ui.base.HorizontalSpace
+import com.ismartcoding.plain.ui.base.PDialogRadioRow
 import com.ismartcoding.plain.ui.base.PIconButton
+import com.ismartcoding.plain.ui.base.PTextField
 import com.ismartcoding.plain.ui.base.RadioDialog
 import com.ismartcoding.plain.ui.base.RadioDialogOption
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -61,8 +69,10 @@ fun WebAddressBar(
     val port = if (isHttps) TempData.httpsPort else TempData.httpPort
     var portDialogVisible by remember { mutableStateOf(false) }
     var qrCodeDialogVisible by remember { mutableStateOf(false) }
+    var mdnsEditDialogVisible by remember { mutableStateOf(false) }
+    var hostname by remember { mutableStateOf(TempData.mdnsHostname) }
     val ip4 = mainVM.ip4
-    val ip4s = listOf(TempData.mdnsHostname) + mainVM.ip4s.ifEmpty { listOf("127.0.0.1") }
+    val ip4s = listOf(hostname) + mainVM.ip4s.ifEmpty { listOf("127.0.0.1") }
     val scope = rememberCoroutineScope()
     var qrCodeUrl by remember { mutableStateOf("") }
 
@@ -105,7 +115,11 @@ fun WebAddressBar(
                     contentDescription = stringResource(id = R.string.edit),
                     tint = MaterialTheme.colorScheme.onSurface,
                     click = {
-                        portDialogVisible = true
+                        if (ip == hostname) {
+                            mdnsEditDialogVisible = true
+                        } else {
+                            portDialogVisible = true
+                        }
                     },
                 )
                 PIconButton(
@@ -124,6 +138,120 @@ fun WebAddressBar(
         }
     }
 
+    // Combined mDNS edit dialog: hostname + port
+    if (mdnsEditDialogVisible) {
+        val ports = if (isHttps) HttpServerManager.httpsPorts else HttpServerManager.httpPorts
+        var editHostname by remember { mutableStateOf(hostname) }
+        var selectedPort by remember { mutableStateOf(port) }
+        var hostnameError by remember { mutableStateOf(false) }
+
+        AlertDialog(
+            modifier = Modifier.fillMaxWidth(),
+            containerColor = MaterialTheme.colorScheme.surface,
+            onDismissRequest = { mdnsEditDialogVisible = false },
+            title = {
+                Text(
+                    text = stringResource(id = R.string.edit),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            },
+            text = {
+                Column {
+                    // mDNS hostname section
+                    Text(
+                        text = stringResource(id = R.string.mdns_hostname),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    PTextField(
+                        readOnly = false,
+                        value = editHostname,
+                        singleLine = true,
+                        onValueChange = {
+                            editHostname = it
+                            hostnameError = false
+                        },
+                        placeholder = hostname,
+                        errorMessage = if (hostnameError) stringResource(id = R.string.mdns_hostname_invalid) else "",
+                    )
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    // Port section
+                    Text(
+                        text = stringResource(id = R.string.change_port),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    LazyColumn(modifier = Modifier.height(200.dp)) {
+                        items(ports.toList()) { p ->
+                            PDialogRadioRow(
+                                selected = p == selectedPort,
+                                onClick = { selectedPort = p },
+                                text = p.toString(),
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        // Validate hostname
+                        if (editHostname.isEmpty() || !editHostname.endsWith(".local")) {
+                            hostnameError = true
+                            return@Button
+                        }
+
+                        val hostnameChanged = editHostname != hostname
+                        val portChanged = selectedPort != port
+
+                        if (hostnameChanged) {
+                            hostname = editHostname
+                            TempData.mdnsHostname = editHostname
+                            scope.launch {
+                                withIO { MdnsHostnamePreference.putAsync(context, editHostname) }
+                            }
+                        }
+                        if (portChanged) {
+                            scope.launch(Dispatchers.IO) {
+                                if (isHttps) {
+                                    HttpsPortPreference.putAsync(context, selectedPort)
+                                } else {
+                                    HttpPortPreference.putAsync(context, selectedPort)
+                                }
+                            }
+                        }
+
+                        mdnsEditDialogVisible = false
+
+                        if (hostnameChanged || portChanged) {
+                            androidx.appcompat.app.AlertDialog.Builder(context)
+                                .setTitle(R.string.restart_app_title)
+                                .setMessage(R.string.restart_app_message)
+                                .setPositiveButton(R.string.relaunch_app) { _, _ ->
+                                    AppHelper.relaunch(context)
+                                }
+                                .setCancelable(false)
+                                .create()
+                                .show()
+                        }
+                    },
+                ) {
+                    Text(stringResource(R.string.save))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { mdnsEditDialogVisible = false }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            },
+        )
+    }
+
+    // Port dialog for IP address rows
     if (portDialogVisible) {
         RadioDialog(
             title = stringResource(R.string.change_port),

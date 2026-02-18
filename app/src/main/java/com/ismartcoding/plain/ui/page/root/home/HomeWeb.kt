@@ -45,6 +45,7 @@ fun HomeWeb(
             mainVM.enableHttpServer(context, it)
         }
         if (webEnabled) {
+            VerticalSpace(dp = 8.dp)
             WebAddress(context, mainVM)
         }
         VerticalSpace(dp = 16.dp)
