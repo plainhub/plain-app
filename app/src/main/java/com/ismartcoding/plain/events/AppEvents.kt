@@ -10,6 +10,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.DNearbyDevice
@@ -23,6 +24,7 @@ import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.features.AudioPlayer
+import com.ismartcoding.plain.features.BookmarkHelper
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.bluetooth.BluetoothFindOneEvent
 import com.ismartcoding.plain.features.bluetooth.BluetoothPermissionResultEvent
@@ -36,6 +38,7 @@ import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.ui.models.FolderOption
 import com.ismartcoding.plain.web.AuthRequest
+import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.WebSocketHelper
 import io.ktor.server.websocket.DefaultWebSocketServerSession
 import kotlinx.coroutines.Job
@@ -65,6 +68,8 @@ class RequestScreenMirrorAudioEvent : ChannelEvent()
 class RestartAppEvent : ChannelEvent()
 
 class FetchLinkPreviewsEvent(val chat: DChat) : ChannelEvent()
+
+class FetchBookmarkMetadataEvent(val bookmarkId: String, val url: String) : ChannelEvent()
 
 class ConfirmDialogEvent(
     val title: String,
@@ -167,6 +172,20 @@ object AppEvents {
                     is CancelSleepTimerEvent -> {
                         sleepTimerJob?.cancel()
                         sleepTimerJob = null
+                    }
+
+                    is FetchBookmarkMetadataEvent -> {
+                        coIO {
+                            val updated = BookmarkHelper.fetchAndUpdateSingle(MainApp.instance, event.bookmarkId)
+                            if (updated != null) {
+                                sendEvent(
+                                    WebSocketEvent(
+                                        EventType.BOOKMARK_UPDATED,
+                                        jsonEncode(listOf(updated.toModel())),
+                                    ),
+                                )
+                            }
+                        }
                     }
 
                     is WebSocketEvent -> {

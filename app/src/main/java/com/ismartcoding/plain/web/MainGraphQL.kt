@@ -48,12 +48,14 @@ import com.ismartcoding.plain.data.ScreenMirrorControlInput
 import com.ismartcoding.plain.events.CancelNotificationsEvent
 import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
+import com.ismartcoding.plain.events.FetchBookmarkMetadataEvent
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.StartScreenMirrorEvent
 import com.ismartcoding.plain.events.RequestScreenMirrorAudioEvent
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.features.AudioPlayer
+import com.ismartcoding.plain.features.BookmarkHelper
 import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.PackageHelper
@@ -127,6 +129,8 @@ import com.ismartcoding.plain.web.models.NoteInput
 import com.ismartcoding.plain.web.models.PackageInstallPending
 import com.ismartcoding.plain.web.models.PackageStatus
 import com.ismartcoding.plain.web.models.PomodoroToday
+import com.ismartcoding.plain.web.models.Bookmark
+import com.ismartcoding.plain.web.models.BookmarkGroup
 import com.ismartcoding.plain.web.models.Tag
 import com.ismartcoding.plain.web.models.TempValue
 import com.ismartcoding.plain.web.models.Video
@@ -1511,6 +1515,69 @@ class MainGraphQL(val schema: Schema) {
                             }
                         FavoriteFoldersPreference.putAsync(context, updated)
                         updated.map { it.toModel() }
+                    }
+                }
+
+                // ─── Bookmark Queries ──────────────────────────────────────────────
+                query("bookmarks") {
+                    resolver { ->
+                        BookmarkHelper.getAll().map { it.toModel() }
+                    }
+                }
+                query("bookmarkGroups") {
+                    resolver { ->
+                        BookmarkHelper.getAllGroups().map { it.toModel() }
+                    }
+                }
+
+                // ─── Bookmark Mutations ────────────────────────────────────────────
+                mutation("addBookmarks") {
+                    resolver { urls: List<String>, groupId: String ->
+                        val created = BookmarkHelper.addBookmarks(urls, groupId)
+                        created.forEach { b -> sendEvent(FetchBookmarkMetadataEvent(b.id, b.url)) }
+                        created.map { it.toModel() }
+                    }
+                }
+                mutation("updateBookmark") {
+                    resolver { id: ID, title: String, groupId: String, pinned: Boolean, sortOrder: Int ->
+                        BookmarkHelper.updateBookmark(id.value) {
+                            this.title = title
+                            this.groupId = groupId
+                            this.pinned = pinned
+                            this.sortOrder = sortOrder
+                        }?.toModel()
+                    }
+                }
+                mutation("deleteBookmarks") {
+                    resolver { ids: List<ID> ->
+                        BookmarkHelper.deleteBookmarks(ids.map { it.value }.toSet(), MainApp.instance)
+                        true
+                    }
+                }
+                mutation("recordBookmarkClick") {
+                    resolver { id: ID ->
+                        BookmarkHelper.recordClick(id.value)
+                        true
+                    }
+                }
+                mutation("createBookmarkGroup") {
+                    resolver { name: String ->
+                        BookmarkHelper.createGroup(name).toModel()
+                    }
+                }
+                mutation("updateBookmarkGroup") {
+                    resolver { id: ID, name: String, collapsed: Boolean, sortOrder: Int ->
+                        BookmarkHelper.updateGroup(id.value) {
+                            this.name = name
+                            this.collapsed = collapsed
+                            this.sortOrder = sortOrder
+                        }?.toModel()
+                    }
+                }
+                mutation("deleteBookmarkGroup") {
+                    resolver { id: ID ->
+                        BookmarkHelper.deleteGroup(id.value)
+                        true
                     }
                 }
                 enum<MediaPlayMode>()
