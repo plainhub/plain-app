@@ -47,6 +47,7 @@ enum class EventType(val value: Int) {
     POMODORO_SETTINGS_UPDATE(12),
     CHAT_SETTINGS_UPDATE(13),
     SCREEN_MIRROR_AUDIO_GRANTED(14),
+    BOOKMARK_UPDATED(15),
 }
 
 

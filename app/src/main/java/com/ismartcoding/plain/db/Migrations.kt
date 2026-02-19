@@ -69,4 +69,5 @@ object Migrations {
             db.execSQL("CREATE INDEX index_chats_group_id ON chats(group_id)")
         }
     }
+
 } 
