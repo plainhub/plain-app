@@ -1,11 +1,15 @@
 package com.ismartcoding.plain.chat
 
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.HttpApiEvents
+import com.ismartcoding.plain.events.WebSocketEvent
+import kotlinx.serialization.Serializable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -15,6 +19,16 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
+
+@Serializable
+data class DownloadProgressItem(
+    val id: String,
+    val messageId: String,
+    val downloaded: Long,
+    val total: Long,
+    val speed: Long,
+    val status: String,
+)
 
 object DownloadQueue {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -162,6 +176,17 @@ object DownloadQueue {
             task.copy() // Create a new copy to trigger Flow update
         }
         _downloadProgress.value = progressMap
+        val items = progressMap.values.map { task ->
+            DownloadProgressItem(
+                id = task.id,
+                messageId = task.messageId,
+                downloaded = task.downloadedSize,
+                total = task.messageFile.size,
+                speed = task.downloadSpeed,
+                status = task.status.name.lowercase(),
+            )
+        }
+        sendEvent(WebSocketEvent(EventType.DOWNLOAD_PROGRESS, JsonHelper.jsonEncode(items)))
     }
 
     fun notifyProgressUpdate() {
