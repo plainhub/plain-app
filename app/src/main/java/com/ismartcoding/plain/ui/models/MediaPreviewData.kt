@@ -27,7 +27,7 @@ object MediaPreviewData {
             if (item.value is DMessageImages) {
                 newItems.addAll((item.value as DMessageImages).items)
             } else if (item.value is DMessageFiles) {
-                newItems.addAll((item.value as DMessageFiles).items.filter { it.uri.isVideoFast() || it.uri.isImageFast() })
+                newItems.addAll((item.value as DMessageFiles).items.filter { it.fileName.isVideoFast() || it.fileName.isImageFast() })
             }
         }
         items = newItems.map { f ->
@@ -78,7 +78,7 @@ object MediaPreviewData {
             if (it.path.isImageFast()) {
                 it.initImageAsync()
             }
-            itemState.intrinsicSize = it.intrinsicSize?.toSize()
+            itemState.intrinsicSize = it.intrinsicSize.toSize()
         }
     }
 }

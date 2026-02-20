@@ -48,6 +48,7 @@ import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DVideo
+import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
@@ -187,7 +188,8 @@ fun VideoPreviewActions(
                                     DialogHelper.showMessage(r.message)
                                 }
                             } else {
-                                val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_MOVIES) }
+                                val newName = (m.data as? DMessageFile)?.fileName?.takeIf { it.isNotEmpty() } ?: ""
+                                val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_MOVIES, newName = newName) }
                                 if (r.isNotEmpty()) {
                                     DialogHelper.showMessage(LocaleHelper.getStringF(R.string.video_save_to, "path", r))
                                 } else {

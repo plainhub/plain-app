@@ -22,6 +22,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.DVideo
+import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.extensions.formatDateTime
@@ -171,7 +172,7 @@ fun ViewMediaBottomSheet(
                 VerticalSpace(dp = 16.dp)
                 PCard {
                     PListItem(title = stringResource(id = R.string.file_size), value = m.size.formatBytes())
-                    val mimeType = m.path.getMimeType()
+                    val mimeType = m.getMimeType()
                     PListItem(title = stringResource(id = R.string.type), value = mimeType)
                     val intrinsicSize = m.intrinsicSize
                     if (intrinsicSize.width > 0 && intrinsicSize.height > 0) {

@@ -1,13 +1,16 @@
 package com.ismartcoding.plain.ui.components.mediaviewer
 
 import androidx.compose.ui.unit.IntSize
+import com.ismartcoding.lib.extensions.getMimeType
 import com.ismartcoding.lib.extensions.isImageFast
+import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.VideoHelper
+import kotlin.text.ifEmpty
 
 data class PreviewItem(
     val id: String,
@@ -18,6 +21,40 @@ data class PreviewItem(
 ) {
     var intrinsicSize: IntSize = IntSize.Zero
     var rotation: Int = -1
+
+    /**
+     * Returns true if this item is a video.
+     * Falls back to checking [DMessageFile.fileName] or [DVideo] data when the
+     * path has no file extension (e.g. content-addressable hash paths).
+     */
+    fun isVideo(): Boolean {
+        if (path.isVideoFast()) return true
+        return when (val d = data) {
+            is DMessageFile -> d.fileName.isVideoFast()
+            is DVideo -> true
+            else -> false
+        }
+    }
+
+    fun getMimeType(): String {
+       return path.getMimeType().ifEmpty {
+            if (data is DMessageFile) data.fileName.getMimeType() else ""
+        }
+    }
+
+    /**
+     * Returns true if this item is an image.
+     * Falls back to checking [DMessageFile.fileName] or [DImage] data when the
+     * path has no file extension.
+     */
+    fun isImage(): Boolean {
+        if (path.isImageFast()) return true
+        return when (val d = data) {
+            is DMessageFile -> d.fileName.isImageFast()
+            is DImage -> true
+            else -> false
+        }
+    }
 
     fun initAsync(m: DImage) {
         rotation = m.rotation
@@ -47,7 +84,7 @@ data class PreviewItem(
     }
 
     fun initAsync(item: DMessageFile) {
-        if (path.isImageFast()) {
+        if (item.fileName.isImageFast()) {
             rotation = ImageHelper.getRotation(path)
             if (item.width > 0 && item.height > 0) {
                 intrinsicSize = IntSize(item.width, item.height)

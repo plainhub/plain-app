@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.formatDuration
+import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.chat.DownloadQueue
@@ -105,7 +106,8 @@ fun ChatImages(
                         key = item.id,
                         itemState = itemState,
                         previewerState = previewerState,
-                        widthPx = imageWidthPx
+                        widthPx = imageWidthPx,
+                        forceVideoDecoder = item.fileName.isVideoFast(),
                     )
 
                     if (isDownloading) {

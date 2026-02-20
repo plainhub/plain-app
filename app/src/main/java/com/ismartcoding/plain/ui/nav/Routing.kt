@@ -100,9 +100,6 @@ class Routing {
     object FeedSettings
 
     @Serializable
-    object ChatSettings
-
-    @Serializable
     object AudioPlayer
 
     @Serializable

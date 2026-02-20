@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ismartcoding.lib.extensions.isUrl
-import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.enums.ImageType
@@ -60,13 +59,13 @@ val DEFAULT_PREVIEWER_EXIT_TRANSITION =
 // 默认淡入淡出动画窗格
 val DEFAULT_CROSS_FADE_ANIMATE_SPEC: AnimationSpec<Float> = tween(80)
 
-// 加载占位默认的进入动画
+// Default enter animation for placeholder
 val DEFAULT_PLACEHOLDER_ENTER_TRANSITION = fadeIn(tween(200))
 
-// 加载占位默认的退出动画
+// Default exit animation for placeholder
 val DEFAULT_PLACEHOLDER_EXIT_TRANSITION = fadeOut(tween(200))
 
-// 默认的加载占位
+// Default placeholder content
 val DEFAULT_PREVIEWER_PLACEHOLDER_CONTENT = @Composable {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -75,11 +74,10 @@ val DEFAULT_PREVIEWER_PLACEHOLDER_CONTENT = @Composable {
         CircularProgressIndicator(color = Color.White.copy(0.2F))
     }
 }
-
-// 文件存在性缓存，避免重复检查
+// File existence cache to avoid repeated checks
 private val fileExistsCache = ConcurrentHashMap<String, Boolean>()
 
-// 加载时的占位内容
+// Placeholder content during loading
 class PreviewerPlaceholder(
     var enterTransition: EnterTransition = DEFAULT_PLACEHOLDER_ENTER_TRANSITION,
     var exitTransition: ExitTransition = DEFAULT_PLACEHOLDER_EXIT_TRANSITION,
@@ -191,7 +189,7 @@ fun MediaPreviewer(
                 MediaPreviewData.items.getOrNull(state.pagerState.currentPage)
             }
             if (m != null) {
-                if (m.path.isVideoFast()) {
+                if (m.isVideo()) {
                     VideoPreviewActions(context = context, castViewModel = castVM, m = m, state)
                 } else {
                     ImagePreviewActions(context = context, castViewModel = castVM, m = m, state)
@@ -226,7 +224,7 @@ fun MediaPreviewer(
 @Composable
 fun getModel(item: PreviewItem): Any? {
     val model: Any?
-    if (item.path.isVideoFast() || item.path.isUrl()) {
+    if (item.isVideo() || item.path.isUrl()) {
         model = item
     } else if (item.size <= 2000 * 1000) {
         // If the image size is less than 2MB, load the image directly
@@ -243,7 +241,7 @@ fun getModel(item: PreviewItem): Any? {
                 item.rotation
             }
             
-            // 使用缓存检查文件是否存在，避免重复文件系统调用
+            // Use cache to check file existence, avoid repeated file system calls
             val fileExists = remember(item.path) {
                 fileExistsCache.getOrPut(item.path) {
                     File(item.path).exists()
@@ -259,7 +257,7 @@ fun getModel(item: PreviewItem): Any? {
                         File(item.path).inputStream()
                     } catch (e: Exception) {
                         // If there's any error opening the file, return null to handle gracefully
-                        // 如果文件访问失败，从缓存中移除该条目
+                        // If file access fails, remove the entry from cache
                         fileExistsCache.remove(item.path)
                         null
                     }

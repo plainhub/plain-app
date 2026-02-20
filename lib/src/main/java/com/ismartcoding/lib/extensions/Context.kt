@@ -99,3 +99,6 @@ fun Context.isTV(): Boolean {
     return packageManager.hasSystemFeature("android.hardware.type.television")
 }
 
+fun Context.appDir(): String {
+    return getExternalFilesDir(null)?.path?.removeSuffix("/") ?: ""
+}

@@ -2,14 +2,17 @@ package com.ismartcoding.plain.ui.components.mediaviewer.previewer
 
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.util.fastAny
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
@@ -17,23 +20,23 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
-// 默认下拉关闭缩放阈值
+// Default scale threshold for drag-to-close
 const val DEFAULT_SCALE_TO_CLOSE_MIN_VALUE = 0.9F
 
 enum class VerticalDragType {
-    // 不开启垂直手势
+    // No vertical gesture
     None,
 
-    // 仅开启下拉手势
+    // Only enable downward drag gesture
     Down,
 
-    // 支持上下拉手势
+    // Support both upward and downward drag gestures
     UpAndDown,
     ;
 }
 
 /**
- * 增加垂直方向拖拽的能力
+ * Adds vertical drag capability
  */
 @OptIn(ExperimentalFoundationApi::class)
 open class PreviewerVerticalDragState(
@@ -45,18 +48,18 @@ open class PreviewerVerticalDragState(
 
 
     /**
-     * viewer容器缩小关闭
+     * Shrink and close viewer container
      */
     private suspend fun viewerContainerShrinkDown() {
         stateCloseStart()
         viewerContainerState?.cancelOpenTransform()
         listOf(
             scope.async {
-                // 退出结束后隐藏content
+                // Hide content after exit
                 viewerContainerState?.transformContentAlpha?.snapTo(0F)
             },
             scope.async {
-                // 动画隐藏UI
+                // Animate UI to hide
                 uiAlpha.animateTo(0F, DEFAULT_SOFT_ANIMATION_SPEC)
             },
             scope.async {
@@ -69,143 +72,175 @@ open class PreviewerVerticalDragState(
     }
 
     /**
-     * 响应下拉关闭
+     * Respond to downward drag to close
      */
     private suspend fun dragDownClose() {
-        // 刷新transform的pos
+        // Refresh transform position
         transformState?.notifyEnterChanged()
-        // 关闭loading
+        // Close loading
         viewerContainerState?.showLoading = false
-        // 等待下一帧，确保transform的pos刷新成功
+        // Wait for next frame to ensure transform position is refreshed
         ticket.awaitNextTicket()
-        // 将container的pos复制给transform
+        // Copy container position to transform
         viewerContainerState?.copyViewerContainerStateToTransformState()
-        // container重置
+        // Reset container
         viewerContainerState?.resetImmediately()
-        // 切换到transform
+        // Switch to transform
         transformSnapToViewer(false)
-        // 等待下一帧
+        // Wait for next frame
         ticket.awaitNextTicket()
-        // 执行转换关闭
+        // Execute transform close
         closeTransform()
-        // 解除loading限制
+        // Remove loading restriction
         viewerContainerState?.showLoading = true
     }
 
     /**
-     * 设置下拉手势的方法
+     * Set up drag-to-close gesture.
+     * Use custom awaitEachGesture instead of detectVerticalDragGestures,
+     * so that when multi-touch is detected, vertical drag is immediately aborted,
+     * restoring image viewer's two-finger zoom/pan gestures,
+     * ensuring two-finger operation does not degrade to single-sided movement.
      * @param pointerInputScope PointerInputScope
      */
-     suspend fun verticalDrag(pointerInputScope: PointerInputScope) {
+    suspend fun verticalDrag(pointerInputScope: PointerInputScope) {
+        if (verticalDragType == VerticalDragType.None) return
         pointerInputScope.apply {
-            // 记录开始时的位置
-            var vStartOffset by mutableStateOf<Offset?>(null)
-            // 标记是否为下拉关闭
-            var vOrientationDown by mutableStateOf<Boolean?>(null)
-            // 如果getKay不为空才开始检测手势
+            awaitEachGesture {
+                // Wait for the first finger down (not requiring unconsumed, so parent can also receive event)
+                val firstDown = awaitFirstDown(requireUnconsumed = false)
 
-            if (verticalDragType != VerticalDragType.None) detectVerticalDragGestures(
-                onDragStart = OnDragStart@{
-                    // 如果imageViewerState不存在，无法进行下拉手势
-                    if (mediaViewerState == null) return@OnDragStart
+                // Record initial position and direction
+                var vStartOffset: Offset? = null
+                var vOrientationDown: Boolean? = null
+                // Mark whether vertical drag is activated
+                var dragActivated = false
+
+                // Initialize transform state (same as original logic)
+                if (mediaViewerState != null) {
                     var transformItemState: TransformItemState? = null
-                    // 查询当前transformItem
                     getKey?.apply {
                         findTransformItem(invoke(pagerState.currentPage))?.apply {
                             transformItemState = this
                         }
                     }
-                    // 判断是否允许变换退出，如果允许就标记动作开始
-                    // setExitState后，在下拉过程中，itemState不会从界面上消失
                     if (canTransformOut) {
                         transformState?.setEnterState()
                     } else {
                         transformState?.setExitState()
                     }
-                    // 更新当前transformItem
                     transformState?.itemState = transformItemState
-                    // 只有viewer的缩放率为1时才允许下拉手势
+
+                    // Only allow drag-to-close when viewer scale is 1
                     if (mediaViewerState?.scale?.value == 1F) {
-                        vStartOffset = it
-                        // 进入下拉手势时禁用viewer的手势
+                        vStartOffset = firstDown.position
+                        dragActivated = true
+                        // Disable viewer gesture input when entering drag-to-close to avoid conflict
                         mediaViewerState?.allowGestureInput = false
                     }
-                },
-                onDragEnd = OnDragEnd@{
-                    // 如果开始位置为空，就退出
+                }
 
-                    if (vStartOffset == null) return@OnDragEnd
-                    // 如果containerState为空，就退出
-                    if (viewerContainerState == null) return@OnDragEnd
-                    // 重置开始位置和方向
+                do {
+                    val event = awaitPointerEvent()
 
-                    vStartOffset = null
-                    vOrientationDown = null
-                    // 解除viewer的手势输入限制
-                    mediaViewerState?.allowGestureInput = true
-                    // 缩放小于阈值，执行关闭动画，大于就恢复原样
+                    // --- Key fix: detect multi-touch ---
+                    // When two or more fingers are detected, immediately abort vertical drag,
+                    // reset container position and restore viewer gesture input,
+                    // let inner two-finger zoom/pan gestures take over.
+                    if (event.changes.size > 1) {
+                        if (dragActivated) {
+                            // Smoothly restore container to initial state
+                            scope.launch {
+                                uiAlpha.animateTo(1F, DEFAULT_SOFT_ANIMATION_SPEC)
+                            }
+                            scope.launch {
+                                viewerContainerState?.reset(DEFAULT_SOFT_ANIMATION_SPEC)
+                            }
+                            dragActivated = false
+                            vStartOffset = null
+                            vOrientationDown = null
+                        }
+                        // Restore viewer gesture input, let inner detectTransformGestures handle two-finger operation
+                        mediaViewerState?.allowGestureInput = true
+                        // Exit this gesture loop, do not consume event, let inner handler take over
+                        break
+                    }
 
-                    if (viewerContainerState!!.scale.value < scaleToCloseMinValue) {
+                    val change = event.changes.firstOrNull() ?: break
 
-                        scope.launch {
-                            if (getKey != null && canTransformOut) {
-                                val key = getKey!!.invoke(pagerState.currentPage)
-                                val transformItem = findTransformItem(key)
-                                // 如果item在画面内，就执行变换关闭，否则缩小关闭
-                                if (transformItem != null) {
-                                    dragDownClose()
-                                } else {
-                                    viewerContainerShrinkDown()
+                    when {
+                        // Finger move: handle vertical drag logic
+                        dragActivated && event.type == PointerEventType.Move -> {
+                            if (vStartOffset == null || viewerContainerState == null) continue
+
+                            val dragAmountY = change.position.y - change.previousPosition.y
+                            if (vOrientationDown == null) vOrientationDown = dragAmountY > 0
+
+                            if (vOrientationDown == true || verticalDragType == VerticalDragType.UpAndDown) {
+                                val offsetY = change.position.y - vStartOffset!!.y
+                                val offsetX = change.position.x - vStartOffset!!.x
+                                val containerHeight = viewerContainerState!!.containerSize.height
+                                val scale = (containerHeight - offsetY.absoluteValue).div(containerHeight)
+                                scope.launch {
+                                    uiAlpha.snapTo(scale)
+                                    viewerContainerState?.offsetX?.snapTo(offsetX)
+                                    viewerContainerState?.offsetY?.snapTo(offsetY)
+                                    viewerContainerState?.scale?.snapTo(scale)
                                 }
                             } else {
-                                viewerContainerShrinkDown()
+                                // Not downward drag, restore gesture input, avoid UI lag
+                                mediaViewerState?.allowGestureInput = true
+                                dragActivated = false
                             }
-                            // 结束动画后需要把关闭的UI打开
-                            uiAlpha.snapTo(1F)
                         }
-                    } else {
-                        scope.launch {
-                            uiAlpha.animateTo(1F, DEFAULT_SOFT_ANIMATION_SPEC)
-                        }
-                        scope.launch {
-                            viewerContainerState?.reset(DEFAULT_SOFT_ANIMATION_SPEC)
+
+                        // Finger release: determine whether to close or reset
+                        dragActivated && event.type == PointerEventType.Release -> {
+                            vStartOffset = null
+                            vOrientationDown = null
+                            dragActivated = false
+                            mediaViewerState?.allowGestureInput = true
+
+                            if ((viewerContainerState?.scale?.value ?: 1F) < scaleToCloseMinValue) {
+                                scope.launch {
+                                    if (getKey != null && canTransformOut) {
+                                        val key = getKey!!.invoke(pagerState.currentPage)
+                                        val transformItem = findTransformItem(key)
+                                        // If item is in view, execute transform close, otherwise shrink close
+                                        if (transformItem != null) {
+                                            dragDownClose()
+                                        } else {
+                                            viewerContainerShrinkDown()
+                                        }
+                                    } else {
+                                        viewerContainerShrinkDown()
+                                    }
+                                    // Restore UI after animation ends
+                                    uiAlpha.snapTo(1F)
+                                }
+                            } else {
+                                scope.launch {
+                                    uiAlpha.animateTo(1F, DEFAULT_SOFT_ANIMATION_SPEC)
+                                }
+                                scope.launch {
+                                    viewerContainerState?.reset(DEFAULT_SOFT_ANIMATION_SPEC)
+                                }
+                            }
+                            break
                         }
                     }
-                },
-                onVerticalDrag = OnVerticalDrag@{ change, dragAmount ->
-                    if (mediaViewerState == null) return@OnVerticalDrag
-                    if (viewerContainerState == null) return@OnVerticalDrag
-                    if (vStartOffset == null) return@OnVerticalDrag
-                    if (vOrientationDown == null) vOrientationDown = dragAmount > 0
-                    if (vOrientationDown == true || verticalDragType == VerticalDragType.UpAndDown) {
-                        val offsetY = change.position.y - vStartOffset!!.y
-                        val offsetX = change.position.x - vStartOffset!!.x
-                        val containerHeight = viewerContainerState!!.containerSize.height
-                        val scale = (containerHeight - offsetY.absoluteValue).div(
-                            containerHeight
-                        )
-                        scope.launch {
-                            uiAlpha.snapTo(scale)
-                            viewerContainerState?.offsetX?.snapTo(offsetX)
-                            viewerContainerState?.offsetY?.snapTo(offsetY)
-                            viewerContainerState?.scale?.snapTo(scale)
-                        }
-                    } else {
-                        // 如果不是向上，就返还输入权，以免页面卡顿
-                        mediaViewerState?.allowGestureInput = true
-                    }
-                }
-            )
+                } while (event.changes.fastAny { it.pressed })
+            }
         }
     }
 
     /**
-     * 开启垂直手势的类型
+     * Type of vertical gesture enabled
      */
     var verticalDragType by mutableStateOf(verticalDragType)
 
     /**
-     * 下拉关闭的缩放的阈值，当scale小于这个值，就关闭，否则还原
+     * Scale threshold for drag-to-close. When scale is less than this value, close; otherwise, reset.
      */
     private var scaleToCloseMinValue by mutableFloatStateOf(scaleToCloseMinValue)
 

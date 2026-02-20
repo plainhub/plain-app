@@ -41,6 +41,7 @@ import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.ui.base.coil.ForceVideoDecoder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
@@ -67,6 +68,7 @@ fun TransformImageView(
     itemState: TransformItemState,
     previewerState: MediaPreviewerState,
     widthPx: Int,
+    forceVideoDecoder: Boolean = false,
 ) {
     TransformImageView(
         modifier = modifier,
@@ -82,6 +84,11 @@ fun TransformImageView(
                     .Builder(LocalContext.current)
                     .data(uri ?: path)
                     .size(widthPx)
+                    .apply {
+                        if (forceVideoDecoder) {
+                            decoderFactory(ForceVideoDecoder.Factory())
+                        }
+                    }
                     .build(),
                 filterQuality = FilterQuality.None
             )

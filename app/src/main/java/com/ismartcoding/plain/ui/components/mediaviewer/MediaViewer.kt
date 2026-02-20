@@ -32,7 +32,6 @@ import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import com.ismartcoding.lib.extensions.isUrl
-import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.ui.components.mediaviewer.hugeimage.ImageDecoder
 import com.ismartcoding.plain.ui.components.mediaviewer.hugeimage.MediaHugeImage
@@ -342,7 +341,7 @@ fun MediaViewer(
         when (model) {
             is PreviewItem,
             -> {
-                if (model.path.isVideoFast() && !model.path.isUrl()) {
+                if (model.isVideo() && !model.path.isUrl()) {
                     MediaVideo(
                         pagerState = pagerState,
                         videoState = videoState,

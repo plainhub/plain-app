@@ -15,5 +15,4 @@ enum class PickFileTag {
     BOOK,
     RESTORE,
     POMODORO,
-    CHAT_FILES_SAVE_FOLDER,
 }
