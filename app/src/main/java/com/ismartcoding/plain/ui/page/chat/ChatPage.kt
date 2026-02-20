@@ -20,7 +20,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -48,6 +47,7 @@ import com.ismartcoding.lib.extensions.queryOpenableFile
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.StringHelper
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.enums.DeviceType
@@ -59,7 +59,7 @@ import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.extensions.getDuration
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.ChatFileSaveHelper
-import com.ismartcoding.plain.helpers.FileHelper
+import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.VideoHelper
 import com.ismartcoding.plain.preferences.ChatInputTextPreference
@@ -69,7 +69,6 @@ import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PDialogListItem
 import com.ismartcoding.plain.ui.base.PIconButton
-import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.PTopRightButton
@@ -388,8 +387,8 @@ private fun handleFileSelection(
                     val file = context.contentResolver.queryOpenableFile(uri)
                     if (file != null) {
                         var fileName = file.displayName
+                        val mimeType = context.contentResolver.getType(uri) ?: ""
                         if (event.type == PickFileType.IMAGE_VIDEO) {
-                            val mimeType = context.contentResolver.getType(uri)
                             val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
                             if (extension.isNotEmpty()) {
                                 fileName = fileName.getFilenameWithoutExtension() + "." + extension
@@ -397,22 +396,20 @@ private fun handleFileSelection(
                         }
                         val size = file.size
 
-                        val chatFilePath = ChatFileSaveHelper.generateChatFilePathAsync(context, fileName, "", event.type)
+                        // Import into content-addressable store (dedup by hash)
+                        val fidUri = ChatFileSaveHelper.importFromUri(context, uri, mimeType)
+                        val realPath = AppFileStore.resolveUri(context, fidUri)
 
-                        // Copy file to destination
-                        FileHelper.copyFile(context, uri, chatFilePath.path)
-
-                        val dstFile = File(chatFilePath.path)
-                        val intrinsicSize = if (chatFilePath.path.isImageFast()) ImageHelper.getIntrinsicSize(
-                            chatFilePath.path,
-                            ImageHelper.getRotation(chatFilePath.path)
-                        ) else if (chatFilePath.path.isVideoFast()) VideoHelper.getIntrinsicSize(chatFilePath.path) else IntSize.Zero
+                        val intrinsicSize = if (fileName.isImageFast()) ImageHelper.getIntrinsicSize(
+                            realPath,
+                            ImageHelper.getRotation(realPath)
+                        ) else if (fileName.isVideoFast()) VideoHelper.getIntrinsicSize(realPath) else IntSize.Zero
                         items.add(
                             DMessageFile(
                                 StringHelper.shortUUID(),
-                                chatFilePath.getFinalPath(),
+                                fidUri,
                                 size,
-                                dstFile.getDuration(context),
+                                File(realPath).getDuration(context),
                                 intrinsicSize.width,
                                 intrinsicSize.height,
                                 "",
@@ -428,9 +425,28 @@ private fun handleFileSelection(
         }
 
         DialogHelper.hideLoading()
+        val previousTopMessageId = chatVM.itemsFlow.value.firstOrNull()?.id
         chatVM.sendFiles(items, event.type == PickFileType.IMAGE_VIDEO)
-        scrollState.scrollToItem(0)
+        scrollToLatestAfterFileSend(chatVM, scrollState, previousTopMessageId)
         delay(200)
         focusManager.clearFocus()
     }
+}
+
+private suspend fun scrollToLatestAfterFileSend(
+    chatVM: ChatViewModel,
+    scrollState: LazyListState,
+    previousTopMessageId: String?
+) {
+    repeat(20) {
+        val currentTopMessageId = chatVM.itemsFlow.value.firstOrNull()?.id
+        if (currentTopMessageId != null && currentTopMessageId != previousTopMessageId) {
+            scrollState.scrollToItem(0)
+            return
+        }
+        delay(50)
+    }
+
+    // Fallback when list update is delayed or no new item is created.
+    scrollState.scrollToItem(0)
 }

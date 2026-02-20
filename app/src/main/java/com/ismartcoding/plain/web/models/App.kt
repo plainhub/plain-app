@@ -8,7 +8,7 @@ data class App(
     val urlToken: String,
     val httpPort: Int,
     val httpsPort: Int,
-    val externalFilesDir: String,
+    val appDir: String,
     val deviceName: String,
     val battery: Int,
     val appVersion: Int,
@@ -24,5 +24,4 @@ data class App(
     val downloadsDir: String,
     val developerMode: Boolean,
     val favoriteFolders: List<FavoriteFolder>,
-    val customChatFolder: String,
 )

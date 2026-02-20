@@ -49,6 +49,7 @@ import com.ismartcoding.lib.extensions.isTextFile
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.chat.DownloadQueue
 import com.ismartcoding.plain.data.DPlaylistAudio
@@ -240,7 +241,8 @@ fun ChatFiles(
                                     key = item.id,
                                     itemState = itemState,
                                     previewerState = previewerState,
-                                    widthPx = context.dp2px(48)
+                                    widthPx = context.dp2px(48),
+                                    forceVideoDecoder = fileName.isVideoFast(),
                                 )
                             } else {
                                 AsyncImage(

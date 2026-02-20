@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.features
 
 import android.content.Context
-import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
@@ -9,12 +8,11 @@ import com.ismartcoding.plain.db.DLinkPreview
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
-import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.helpers.AppFileStore
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import java.io.File
 
 object ChatHelper {
     suspend fun sendAsync(message: DMessageContent, fromId: String = "me", toId: String = "local", peer: DPeer? = null): DChat {
@@ -60,55 +58,24 @@ object ChatHelper {
         value: Any?,
     ) {
         AppDatabase.instance.chatDao().delete(id)
-//        when (value) {
-//            is DMessageFiles -> {
-//                value.items.forEach {
-//                    File(it.uri.getFinalPath(context)).delete()
-//                }
-//            }
-//
-//            is DMessageImages -> {
-//                value.items.forEach {
-//                    File(it.uri.getFinalPath(context)).delete()
-//                }
-//            }
-//
-//            is DMessageText -> {
-//                value.linkPreviews.forEach { preview ->
-//                    preview.imageLocalPath?.let { path ->
-//                        LinkPreviewHelper.deletePreviewImage(context, path)
-//                    }
-//                }
-//            }
-//        }
+        // Release content-addressable file references (decrements refCount, deletes file when 0)
+        when (value) {
+            is DMessageFiles -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
+            is DMessageImages -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
+        }
     }
 
     suspend fun deleteAllChatsByPeerAsync(context: Context, peerId: String) {
         val chatDao = AppDatabase.instance.chatDao()
         val chats = chatDao.getByChatId(peerId)
-        
-        // Delete all associated files first
-//        for (chat in chats) {
-//            when (val value = chat.content.value) {
-//                is DMessageFiles -> {
-//                    value.items.forEach {
-//                        File(it.uri.getFinalPath(context)).delete()
-//                    }
-//                }
-//                is DMessageImages -> {
-//                    value.items.forEach {
-//                        File(it.uri.getFinalPath(context)).delete()
-//                    }
-//                }
-//                is DMessageText -> {
-//                    value.linkPreviews.forEach { preview ->
-//                        preview.imageLocalPath?.let { path ->
-//                            LinkPreviewHelper.deletePreviewImage(context, path)
-//                        }
-//                    }
-//                }
-//            }
-//        }
+
+        // Release file references for all chats before deleting
+        for (chat in chats) {
+            when (val value = chat.content.value) {
+                is DMessageFiles -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
+                is DMessageImages -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
+            }
+        }
         
         // Delete all chat records for this peer using SQL query
         chatDao.deleteByPeerId(peerId)

@@ -1,72 +1,46 @@
 package com.ismartcoding.plain.helpers
 
 import android.content.Context
-import com.ismartcoding.lib.extensions.getFilenameFromPath
-import com.ismartcoding.plain.enums.PickFileType
-import com.ismartcoding.plain.features.file.FileSystemHelper
-import com.ismartcoding.plain.preferences.ChatFilesSaveFolderPreference
+import android.net.Uri
 import java.io.File
 
-data class ChatFilePath(val path: String, val dir: String, val isAppDirectory: Boolean = false) {
-    fun getFinalPath(): String {
-        return if (isAppDirectory) {
-            "app://${path.getFilenameFromPath()}"
-        } else {
-            path
+object ChatFileSaveHelper {
+    /**
+     * Import a file from a content-resolver [uri] into the content-addressable
+     * chat file store with two-step dedup.
+     *
+     * Returns a `fid:{sha256}` URI to embed in [com.ismartcoding.plain.db.DMessageFile.uri].
+     */
+    fun importFromUri(
+        context: Context,
+        uri: Uri,
+        mimeType: String = "",
+    ): String {
+        val tempFile = File(context.cacheDir, "chat_import_${System.currentTimeMillis()}_${Thread.currentThread().id}")
+        tempFile.parentFile?.mkdirs()
+        try {
+            FileHelper.copyFile(context, uri, tempFile.absolutePath)
+            val dFile = AppFileStore.importFile(context, tempFile, mimeType, deleteSrc = true)
+            return AppFileStore.toFidUri(dFile.id)
+        } finally {
+            // Guard: if importFile did not consume (due to error path), clean up
+            if (tempFile.exists()) tempFile.delete()
         }
+    }
+
+    /**
+     * Import an already-downloaded / on-disk [srcFile] into the content-addressable
+     * chat file store.
+     *
+     * [srcFile] is deleted on success (move semantics via [deleteSrc]).
+     * Returns a `fid:{sha256}` URI to embed in [com.ismartcoding.plain.db.DMessageFile.uri].
+     */
+    fun importDownloadedFile(
+        context: Context,
+        srcFile: File,
+        mimeType: String = "",
+    ): String {
+        val dFile = AppFileStore.importFile(context, srcFile, mimeType, deleteSrc = true)
+        return AppFileStore.toFidUri(dFile.id)
     }
 }
-
-object ChatFileSaveHelper {
-    suspend fun generateChatFilePathAsync(
-        context: Context,
-        fileName: String,
-        customDir: String,
-        pickFileType: PickFileType? = null
-    ): ChatFilePath {
-        var actualFileName = fileName
-
-        if (pickFileType == PickFileType.IMAGE_VIDEO && !actualFileName.contains(".")) {
-            actualFileName = "$actualFileName.jpg"
-        }
-
-        val targetDir =  if (customDir.isEmpty()) {
-            context.getExternalFilesDir(null)!!
-        } else {
-            val dir = File(customDir)
-            if (!dir.exists()) {
-                dir.mkdirs()
-            }
-            dir
-        }
-
-        var destFile = File(targetDir.absolutePath, actualFileName)
-        if (destFile.exists()) {
-            destFile = generateUniqueFile(destFile)
-        }
-
-        val prefix = FileSystemHelper.getExternalFilesDirPath(context)
-        val isAppDirectory = targetDir.absolutePath.startsWith(prefix)
-
-        return ChatFilePath(destFile.absolutePath, targetDir.absolutePath, isAppDirectory)
-    }
-
-    private fun generateUniqueFile(originalFile: File): File {
-        val nameWithoutExt = originalFile.nameWithoutExtension
-        val ext = originalFile.extension
-        var index = 1
-        var newFile: File
-
-        do {
-            val newName = if (ext.isNotEmpty()) {
-                "$nameWithoutExt($index).$ext"
-            } else {
-                "$nameWithoutExt($index)"
-            }
-            newFile = File(originalFile.parent, newName)
-            index++
-        } while (newFile.exists())
-
-        return newFile
-    }
-} 

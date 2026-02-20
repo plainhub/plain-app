@@ -32,6 +32,7 @@ import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DImage
+import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -172,7 +173,8 @@ fun ImagePreviewActions(
                                 DialogHelper.showMessage(r.message)
                             }
                         } else {
-                            val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_PICTURES) }
+                            val newName = (m.data as? DMessageFile)?.fileName?.takeIf { it.isNotEmpty() } ?: ""
+                            val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_PICTURES, newName = newName) }
                             if (r.isNotEmpty()) {
                                 DialogHelper.showMessage(LocaleHelper.getStringF(R.string.image_save_to, "path", r))
                             } else {

@@ -63,18 +63,37 @@ data class DMessageFile(
     val summary: String = "",
     val fileName: String = "",
 ) : IData {
+    /** True when this file must be downloaded from a remote peer (fsid: scheme). */
     fun isRemoteFile(): Boolean {
         return uri.startsWith("fsid:")
     }
 
+    /**
+     * True when this file is stored in the local content-addressable store.
+     * The [uri] has the form  fid:{sha256hex}.
+     */
+    fun isFidFile(): Boolean {
+        return uri.startsWith("fid:")
+    }
+
+    /**
+     * Returns the SHA-256 fileId for fid: URIs.
+     * Returns an empty string for other URI schemes.
+     */
+    fun localFileId(): String {
+        return if (isFidFile()) uri.removePrefix("fid:") else ""
+    }
+
+    /** Remote fileId extracted from a fsid: URI (used as query param for /fs endpoint). */
     fun parseFileId(): String {
         return uri.replace("fsid:", "")
     }
 
     fun getPreviewPath(context: Context, peer: DPeer?): String {
-        return if (uri.startsWith("fsid:")) {
+        return if (isRemoteFile()) {
             peer?.getFileUrl(parseFileId()) + "&w=200&h=200"
         } else {
+            // Handles fid:, app://, and absolute paths via getFinalPath extension
             uri.getFinalPath(context)
         }
     }

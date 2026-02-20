@@ -25,8 +25,16 @@ fun String.getFilenameWithoutExtensionFromPath() = substring(lastIndexOf("/") + 
 
 // handle URLs like `app://Pictures/test.png`
 fun String.getFinalPath(context: Context): String {
+    val appDir = context.appDir()
     if (this.startsWith("app://", true)) {
-        return context.getExternalFilesDir(null)?.path?.removeSuffix("/") + "/" + this.substring("app://".length)
+        return appDir + "/" + this.substring("app://".length)
+    }
+
+    // handle content-addressable chat files: fid:{sha256hex}
+    // Path is derived deterministically: {appDir}/files/{h[0..1]}/{h[2..3]}/{h}
+    if (this.startsWith("fid:", true)) {
+        val hash = this.substring("fid:".length)
+        return "$appDir/${hash.substring(0, 2)}/${hash.substring(2, 4)}/$hash"
     }
 
     return this
@@ -47,11 +55,6 @@ fun String.isUrl(): Boolean {
     } catch (e: Exception) {
         false
     }
-}
-
-fun String.toAppUrl(context: Context): String {
-    val prefix = context.getExternalFilesDir(null)?.path?.removeSuffix("/") + "/"
-    return this.replace(prefix, "app://")
 }
 
 fun String.getFilenameWithoutExtension() = substringBeforeLast(".")

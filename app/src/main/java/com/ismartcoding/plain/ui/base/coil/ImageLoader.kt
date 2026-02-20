@@ -6,6 +6,7 @@ import coil3.disk.DiskCache
 import coil3.disk.directory
 import coil3.gif.AnimatedImageDecoder
 import coil3.memory.MemoryCache
+import coil3.video.VideoFrameDecoder
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.allowRgb565
 import coil3.request.crossfade
@@ -23,6 +24,7 @@ fun newImageLoader(context: PlatformContext): ImageLoader {
         .components {
             add(SvgDecoder.Factory(true))
             add(AnimatedImageDecoder.Factory())
+            add(VideoFrameDecoder.Factory()) // enables thumbnail extraction for videos with known extensions
             add(ThumbnailDecoder.Factory())
             add(OkHttpNetworkFetcherFactory(unsafeOkHttpClient))
         }

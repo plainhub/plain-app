@@ -15,6 +15,7 @@ import com.apurebase.kgraphql.schema.execution.Execution
 import com.apurebase.kgraphql.schema.execution.Executor
 import com.ismartcoding.lib.apk.ApkParsers
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.appDir
 import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.isAudioFast
@@ -93,7 +94,6 @@ import com.ismartcoding.plain.preferences.AudioPlayingPreference
 import com.ismartcoding.plain.preferences.AudioPlaylistPreference
 import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.preferences.AuthDevTokenPreference
-import com.ismartcoding.plain.preferences.ChatFilesSaveFolderPreference
 import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
@@ -519,7 +519,7 @@ class MainGraphQL(val schema: Schema) {
                     }
                 }
                 query("fileInfo") {
-                    resolver { id: ID, path: String ->
+                    resolver { id: ID, path: String, fileName: String ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
                         val finalPath = path.getFinalPath(context)
@@ -527,17 +527,17 @@ class MainGraphQL(val schema: Schema) {
                         val updatedAt = Instant.fromEpochMilliseconds(file.lastModified())
                         var tags = emptyList<Tag>()
                         var data: MediaFileInfo? = null
-                        if (finalPath.isImageFast()) {
+                        if (fileName.isImageFast()) {
                             if (id.value.isNotEmpty()) {
                                 tags = TagsLoader.load(id.value, DataType.IMAGE)
                             }
                             data = FileInfoLoader.loadImage(finalPath)
-                        } else if (finalPath.isVideoFast()) {
+                        } else if (fileName.isVideoFast()) {
                             if (id.value.isNotEmpty()) {
                                 tags = TagsLoader.load(id.value, DataType.VIDEO)
                             }
                             data = FileInfoLoader.loadVideo(context, finalPath)
-                        } else if (finalPath.isAudioFast()) {
+                        } else if (fileName.isAudioFast()) {
                             if (id.value.isNotEmpty()) {
                                 tags = TagsLoader.load(id.value, DataType.AUDIO)
                             }
@@ -666,7 +666,7 @@ class MainGraphQL(val schema: Schema) {
                             urlToken = TempData.urlToken,
                             httpPort = TempData.httpPort,
                             httpsPort = TempData.httpsPort,
-                            externalFilesDir = context.getExternalFilesDir(null)?.path ?: "",
+                            appDir = context.appDir(),
                             deviceName = DeviceNamePreference.getAsync(context).ifEmpty { PhoneHelper.getDeviceName(context) },
                             PhoneHelper.getBatteryPercentage(context),
                             BuildConfig.VERSION_CODE,
@@ -682,7 +682,6 @@ class MainGraphQL(val schema: Schema) {
                             downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath,
                             developerMode = DeveloperModePreference.getAsync(context),
                             favoriteFolders = FavoriteFoldersPreference.getValueAsync(context).map { it.toModel() },
-                            customChatFolder = ChatFilesSaveFolderPreference.getAsync(context),
                         )
                     }
                 }
