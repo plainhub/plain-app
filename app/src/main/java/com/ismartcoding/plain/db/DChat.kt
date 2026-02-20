@@ -64,15 +64,15 @@ data class DMessageFile(
     val fileName: String = "",
 ) : IData {
     fun isRemoteFile(): Boolean {
-        return uri.startsWith("fid:")
+        return uri.startsWith("fsid:")
     }
 
     fun parseFileId(): String {
-        return uri.replace("fid:", "")
+        return uri.replace("fsid:", "")
     }
 
     fun getPreviewPath(context: Context, peer: DPeer?): String {
-        return if (uri.startsWith("fid:")) {
+        return if (uri.startsWith("fsid:")) {
             peer?.getFileUrl(parseFileId()) + "&w=200&h=200"
         } else {
             uri.getFinalPath(context)

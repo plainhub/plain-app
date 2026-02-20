@@ -114,7 +114,10 @@ import com.ismartcoding.plain.web.models.ActionResult
 import com.ismartcoding.plain.web.models.App
 import com.ismartcoding.plain.web.models.Audio
 import com.ismartcoding.plain.web.models.Call
+import com.ismartcoding.plain.chat.PeerChatHelper
+import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.web.models.ChatItem
+import com.ismartcoding.plain.web.models.Peer
 import com.ismartcoding.plain.web.models.Contact
 import com.ismartcoding.plain.web.models.ContactGroup
 import com.ismartcoding.plain.web.models.ContactInput
@@ -177,6 +180,12 @@ class MainGraphQL(val schema: Schema) {
                         items.map { it.toModel() }
                     }
                 }
+                query("peers") {
+                    resolver { ->
+                        AppDatabase.instance.peerDao().getAll().map { it.toModel() }
+                    }
+                }
+                type<Peer> {}
                 type<ChatItem> {
                     property("data") {
                         resolver { c: ChatItem ->
@@ -736,16 +745,27 @@ class MainGraphQL(val schema: Schema) {
                         true
                     }
                 }
-                mutation("createChatItem") {
-                    resolver { content: String ->
-                        var item =
-                            ChatHelper.sendAsync(
-                                DChat.parseContent(content),
-                            )
+                mutation("sendChatItem") {
+                    resolver { toId: String, content: String ->
+                        val peerId = toId.removePrefix("peer:")
+                        val isPeer = toId.startsWith("peer:")
+                        val peer: DPeer? = if (isPeer) AppDatabase.instance.peerDao().getById(peerId) else null
+                        val item = ChatHelper.sendAsync(
+                            DChat.parseContent(content),
+                            fromId = "me",
+                            toId = if (isPeer) peerId else toId,
+                            peer = peer
+                        )
                         if (item.content.type == DMessageType.TEXT.value) {
                             sendEvent(FetchLinkPreviewsEvent(item))
                         }
-                        sendEvent(HttpApiEvents.MessageCreatedEvent("local", arrayListOf(item)))
+                        if (isPeer && peer != null) {
+                            val success = PeerChatHelper.sendToPeerAsync(peer, item.content)
+                            val status = if (success) "sent" else "failed"
+                            ChatHelper.updateStatusAsync(item.id, status)
+                            item.status = status
+                        }
+                        sendEvent(HttpApiEvents.MessageCreatedEvent(if (isPeer) peerId else toId, arrayListOf(item)))
                         arrayListOf(item).map { it.toModel() }
                     }
                 }

@@ -1,21 +1,16 @@
 package com.ismartcoding.plain.ui.page.root.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.theme.navBarBackground
 import com.ismartcoding.plain.ui.theme.navBarUnselectedColor
@@ -28,92 +23,47 @@ fun RootNavigationBar(
 ) {
     val navBarColor = MaterialTheme.colorScheme.navBarBackground
     val unselectedColor = MaterialTheme.colorScheme.navBarUnselectedColor
-    
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(navBarColor)
-            .padding(top = 8.dp)
-            .navigationBarsPadding(), // This will automatically avoid the system navigation gesture area
-        horizontalArrangement = Arrangement.SpaceEvenly,
-        verticalAlignment = Alignment.CenterVertically
+
+    data class NavItem(val tab: Int, val icon: Int, val label: Int)
+
+    val items = listOf(
+        NavItem(RootTabType.HOME.value, R.drawable.house, R.string.home),
+        NavItem(RootTabType.CHAT.value, R.drawable.message_circle, R.string.chat),
+        NavItem(RootTabType.AUDIO.value, R.drawable.music, R.string.audios),
+        NavItem(RootTabType.IMAGES.value, R.drawable.image, R.string.images),
+        NavItem(RootTabType.VIDEOS.value, R.drawable.video, R.string.videos),
+    )
+
+    NavigationBar(
+        modifier = modifier,
+        containerColor = navBarColor,
     ) {
-        IconButton(
-            onClick = { onTabSelected(RootTabType.HOME.value) },
-            modifier = Modifier.size(48.dp)
-        ) {
-            Icon(
-                painterResource(R.drawable.house),
-                contentDescription = stringResource(R.string.home),
-                modifier = Modifier.size(24.dp),
-                tint = if (selectedTab == RootTabType.HOME.value)
-                    MaterialTheme.colorScheme.primary 
-                else 
-                    unselectedColor
+        items.forEach { item ->
+            val selected = selectedTab == item.tab
+            NavigationBarItem(
+                selected = selected,
+                onClick = { onTabSelected(item.tab) },
+                icon = {
+                    Icon(
+                        painter = painterResource(item.icon),
+                        contentDescription = stringResource(item.label),
+                    )
+                },
+                label = {
+                    Text(
+                        text = stringResource(item.label),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+                    unselectedIconColor = unselectedColor,
+                    unselectedTextColor = unselectedColor,
+                ),
             )
         }
-
-        IconButton(
-            onClick = { onTabSelected(RootTabType.CHAT.value) },
-            modifier = Modifier.size(48.dp)
-        ) {
-            Icon(
-                painterResource(R.drawable.message_circle),
-                contentDescription = stringResource(R.string.chat),
-                modifier = Modifier.size(24.dp),
-                tint = if (selectedTab == RootTabType.CHAT.value)
-                    MaterialTheme.colorScheme.primary
-                else
-                    unselectedColor
-            )
-        }
-
-        IconButton(
-            onClick = { onTabSelected(RootTabType.AUDIO.value) },
-            modifier = Modifier.size(48.dp)
-        ) {
-            Icon(
-                painterResource(R.drawable.music),
-                contentDescription = stringResource(R.string.audios),
-                modifier = Modifier.size(24.dp),
-                tint = if (selectedTab == RootTabType.AUDIO.value)
-                    MaterialTheme.colorScheme.primary
-                else
-                    unselectedColor
-            )
-        }
-        
-        IconButton(
-            onClick = { onTabSelected(RootTabType.IMAGES.value) },
-            modifier = Modifier.size(48.dp)
-        ) {
-            Icon(
-                painterResource(R.drawable.image),
-                contentDescription = stringResource(R.string.images),
-                modifier = Modifier.size(24.dp),
-                tint = if (selectedTab == RootTabType.IMAGES.value)
-                    MaterialTheme.colorScheme.primary 
-                else 
-                    unselectedColor
-            )
-        }
-        
-
-        
-        IconButton(
-            onClick = { onTabSelected(RootTabType.VIDEOS.value) },
-            modifier = Modifier.size(48.dp)
-        ) {
-            Icon(
-                painterResource(R.drawable.video),
-                contentDescription = stringResource(R.string.videos),
-                modifier = Modifier.size(24.dp),
-                tint = if (selectedTab == RootTabType.VIDEOS.value)
-                    MaterialTheme.colorScheme.primary 
-                else 
-                    unselectedColor
-            )
-        }
-
     }
 }

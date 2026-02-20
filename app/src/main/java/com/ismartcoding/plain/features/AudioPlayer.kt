@@ -45,11 +45,17 @@ object AudioPlayer {
     private var player: Player? = null
     var playerProgress: Long = 0 // player progress in milliseconds
         get() {
-            return if (player?.isPlaying == true) {
-                player?.currentPosition ?: 0
-            } else {
-                TempData.audioPlayPosition
+            val currentPlayer = player
+            if (currentPlayer == null) {
+                return TempData.audioPlayPosition
             }
+
+            val currentPosition = currentPlayer.currentPosition
+            // Keep UI stable right after seek when player may briefly report 0.
+            if (currentPosition == 0L && TempData.audioPlayPosition > 0L) {
+                return TempData.audioPlayPosition
+            }
+            return currentPosition
         }
 
     fun ensurePlayer(context: Context, callback: suspend () -> Unit = {}) {
@@ -139,14 +145,12 @@ object AudioPlayer {
         coMain {
             val seekPosition = progress * 1000
             TempData.audioPlayPosition = seekPosition
-            if (player?.isPlaying == true) {
-                player?.pause()
-                player?.seekTo(seekPosition)
-                player?.prepare()
-                player?.play()
-            } else {
-                play()
+            val currentPlayer = player
+            if (currentPlayer != null) {
+                currentPlayer.seekTo(seekPosition)
+                return@coMain
             }
+            play()
         }
     }
 

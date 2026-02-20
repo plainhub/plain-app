@@ -10,6 +10,7 @@ import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
 import com.apurebase.kgraphql.schema.dsl.SchemaConfigurationDSL
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CryptoHelper
+import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.DownloadQueue
@@ -19,8 +20,10 @@ import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HttpApiEvents
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.ID
@@ -91,6 +94,9 @@ class PeerGraphQL(val schema: Schema) {
                         }
 
                         sendEvent(HttpApiEvents.MessageCreatedEvent(fromId, arrayListOf(item)))
+                        val model = item.toModel()
+                        model.data = model.getContentData()
+                        sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
                         arrayListOf(item).map { it.toModel() }
                     }
                 }

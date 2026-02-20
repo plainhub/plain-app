@@ -21,7 +21,7 @@ object PeerChatHelper {
                     val files = content.value as DMessageFiles
                     val modifiedFiles = files.items.map { file ->
                         val fileId = FileHelper.getFileId(file.uri)
-                        file.copy(uri = "fid:$fileId") // Update URI to use file ID
+                        file.copy(uri = "fsid:$fileId") // Update URI to use file ID
                     }
                     DMessageContent(content.type, DMessageFiles(modifiedFiles))
                 }
@@ -30,7 +30,7 @@ object PeerChatHelper {
                     val images = content.value as DMessageImages
                     val modifiedImages = images.items.map { image ->
                         val fileId = FileHelper.getFileId(image.uri)
-                        image.copy(uri = "fid:$fileId") // Update URI to use file ID
+                        image.copy(uri = "fsid:$fileId") // Update URI to use file ID
                     }
                     DMessageContent(content.type, DMessageImages(modifiedImages))
                 }

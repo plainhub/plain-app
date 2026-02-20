@@ -24,6 +24,7 @@ import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.HttpClientManager
+import okhttp3.Request
 import com.ismartcoding.plain.data.DownloadFileItem
 import com.ismartcoding.plain.data.DownloadFileItemWrap
 import com.ismartcoding.plain.data.UploadChunkInfo
@@ -477,6 +478,52 @@ object HttpModule {
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                     call.respondText("File is expired or does not exist. $ex", status = HttpStatusCode.Forbidden)
+                }
+            }
+
+            get("/proxyfs") {
+                val q = call.request.queryParameters
+                val id = q["id"] ?: ""
+                if (id.isEmpty()) {
+                    call.respond(HttpStatusCode.BadRequest)
+                    return@get
+                }
+
+                try {
+                    val peerUrl = UrlHelper.decrypt(id)
+                    if (peerUrl.isEmpty() || !peerUrl.startsWith("http")) {
+                        call.respond(HttpStatusCode.BadRequest, "Invalid peer URL")
+                        return@get
+                    }
+
+                    val client = HttpClientManager.createUnsafeOkHttpClient()
+                    val request = Request.Builder().url(peerUrl).build()
+
+                    val response = withIO { client.newCall(request).execute() }
+
+                    call.response.status(HttpStatusCode.fromValue(response.code))
+
+                    for ((name, value) in response.headers) {
+                        if (!name.equals("Transfer-Encoding", true) &&
+                            !name.equals("Connection", true)
+                        ) {
+                            call.response.headers.append(name, value)
+                        }
+                    }
+
+                    val body = response.body ?: run {
+                        call.respond(HttpStatusCode.NotFound)
+                        return@get
+                    }
+
+                    call.respondOutputStream {
+                        body.byteStream().use { input ->
+                            input.copyTo(this)
+                        }
+                    }
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                    call.respond(HttpStatusCode.InternalServerError, ex.message ?: "")
                 }
             }
 

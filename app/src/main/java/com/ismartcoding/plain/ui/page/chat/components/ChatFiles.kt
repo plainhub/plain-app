@@ -24,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -74,10 +73,8 @@ import com.ismartcoding.plain.ui.page.audio.AudioPlayerPage
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import java.io.File
 
 
@@ -93,7 +90,6 @@ fun ChatFiles(
 ) {
     val fileItems = (m.value as DMessageFiles).items
     val keyboardController = LocalSoftwareKeyboardController.current
-    val scope = rememberCoroutineScope()
 
     val currentPlayingPath = audioPlaylistVM.selectedPath
     var showAudioPlayer by remember { mutableStateOf(false) }
@@ -133,20 +129,30 @@ fun ChatFiles(
                 }
             }
 
-            var progress by remember { mutableFloatStateOf(0f) }
-            val duration by remember { mutableFloatStateOf(item.duration.toFloat()) }
+            var progress by remember(item.id) { mutableFloatStateOf(0f) }
+            var duration by remember(item.id) { mutableFloatStateOf(item.duration.toFloat()) }
+            var isDraggingProgress by remember(item.id) { mutableStateOf(false) }
 
-            var progressUpdateJob: Job? = null
+            LaunchedEffect(path, isAudio, isCurrentlyPlaying) {
+                if (isAudio && isCurrentlyPlaying && duration <= 0f) {
+                    val loadedDuration = withIO {
+                        runCatching {
+                            DPlaylistAudio.fromPath(context, path).duration.toFloat()
+                        }.getOrDefault(0f)
+                    }
+                    if (loadedDuration > 0f) {
+                        duration = loadedDuration
+                    }
+                }
+            }
 
-            LaunchedEffect(isCurrentlyPlaying, isPlaying) {
-                progressUpdateJob?.cancel()
-
-                if (isCurrentlyPlaying && isPlaying) {
-                    progressUpdateJob = scope.launch {
-                        while (isActive) {
+            LaunchedEffect(isCurrentlyPlaying, isPlaying, isDraggingProgress) {
+                if (isCurrentlyPlaying) {
+                    while (isActive) {
+                        if (!isDraggingProgress) {
                             progress = AudioPlayer.playerProgress / 1000f
-                            delay(500)
                         }
+                        delay(500)
                     }
                 }
             }
@@ -279,10 +285,16 @@ fun ChatFiles(
                                     .fillMaxWidth()
                                     .height(20.dp),
                                 onProgressChange = { newProgress ->
-                                    progress = newProgress * duration
+                                    isDraggingProgress = true
+                                    if (duration > 0f) {
+                                        progress = newProgress * duration
+                                    }
                                 },
                                 onValueChangeFinished = {
-                                    AudioPlayer.seekTo(progress.toLong())
+                                    if (duration > 0f) {
+                                        AudioPlayer.seekTo(progress.toLong())
+                                    }
+                                    isDraggingProgress = false
                                 },
                                 trackColor = MaterialTheme.colorScheme.surfaceVariant,
                                 progressColor = MaterialTheme.colorScheme.primary,
