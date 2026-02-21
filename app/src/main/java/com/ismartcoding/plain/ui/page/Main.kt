@@ -344,7 +344,7 @@ fun Main(
 
                 composable<Routing.OtherFile> { backStackEntry ->
                     val r = backStackEntry.toRoute<Routing.OtherFile>()
-                    OtherFilePage(navController, r.path)
+                    OtherFilePage(navController, r.path, r.title)
                 }
 
                 composable<Routing.PdfViewer> {

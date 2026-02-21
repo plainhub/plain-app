@@ -37,8 +37,8 @@ fun NavHostController.navigatePdf(uri: Uri) {
     }
 }
 
-fun NavHostController.navigateOtherFile(path: String) {
-    navigate(Routing.OtherFile(path)) {
+fun NavHostController.navigateOtherFile(path: String, title: String = "") {
+    navigate(Routing.OtherFile(path, title)) {
         launchSingleTop = true
     }
 }

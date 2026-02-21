@@ -107,8 +107,9 @@ class MdnsNsdReregistrar(
                 LogCat.d("Network changed ($reason), re-registering NSD/JmDNS (attempt ${attemptIndex + 1}/$maxAttempts)")
 
                 runCatching {
-                    NsdHelper.unregisterService()
-                    delay(200)
+                    // registerServices() calls unregisterService() internally; do not call it
+                    // separately here — a redundant call would cancel the running unregister job
+                    // and leave stale listeners that produce "listener not registered" errors.
                     NsdHelper.registerServices(
                         context = appContext,
                         httpPort = if (httpOk) httpPort else null,

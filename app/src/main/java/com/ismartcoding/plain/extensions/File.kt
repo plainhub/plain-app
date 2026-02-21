@@ -145,12 +145,14 @@ fun File.toThumbBytesAsync(
 }
 
 fun File.getDuration(context: Context): Long {
-    if (!this.name.isVideoFast() && !this.name.isAudioFast()) {
-        return 0L
-    }
     val retriever = MediaMetadataRetriever()
-    retriever.setDataSource(context, Uri.fromFile(this))
-    val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-    retriever.release()
-    return (time?.toLong()?.div(1000)) ?: 0L
+    return try {
+        retriever.setDataSource(context, Uri.fromFile(this))
+        val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+        (time?.toLong()?.div(1000)) ?: 0L
+    } catch (ex: Exception) {
+        0L
+    } finally {
+        runCatching { retriever.release() }
+    }
 }

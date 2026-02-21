@@ -107,7 +107,7 @@ fun ChatImages(
                         itemState = itemState,
                         previewerState = previewerState,
                         widthPx = imageWidthPx,
-                        forceVideoDecoder = item.fileName.isVideoFast(),
+                        forceVideoDecoder = item.fileName.isVideoFast() && !item.isRemoteFile(),
                     )
 
                     if (isDownloading) {

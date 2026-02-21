@@ -79,6 +79,7 @@ import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.features.sms.SmsConversationHelper
 import com.ismartcoding.plain.features.sms.SmsHelper
+import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.DeviceInfoHelper
 import com.ismartcoding.plain.helpers.FileHelper
@@ -508,14 +509,7 @@ class MainGraphQL(val schema: Schema) {
                     resolver { root: String, offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-//                        val appFolder = context.getExternalFilesDir(null)?.path ?: ""
-//                        val internalPath = FileSystemHelper.getInternalStoragePath()
-                        //   if (!isQPlus() || root.startsWith(appFolder) || !root.startsWith(internalPath)) {
-
                         FileSystemHelper.search(query, root, sortBy).drop(offset).take(limit).map { it.toModel() }
-//                        } else {
-//                            FileMediaStoreHelper.searchAsync(MainApp.instance, query, limit, offset, sortBy).map { it.toModel() }
-//                        }
                     }
                 }
                 query("fileInfo") {
@@ -1013,12 +1007,13 @@ class MainGraphQL(val schema: Schema) {
                 mutation("writeTextFile") {
                     resolver { path: String, content: String, overwrite: Boolean ->
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(MainApp.instance)
-                        val file = java.io.File(path)
+                        val resolvedPath = path.getFinalPath(MainApp.instance)
+                        val file = java.io.File(resolvedPath)
                         if (!overwrite && file.exists()) {
                             throw GraphQLError("File already exists")
                         }
                         file.writeText(content)
-                        MainApp.instance.scanFileByConnection(path)
+                        MainApp.instance.scanFileByConnection(resolvedPath)
                         file.toModel()
                     }
                 }
@@ -1460,7 +1455,7 @@ class MainGraphQL(val schema: Schema) {
                     }
                 }
                 mutation("mergeChunks") {
-                    resolver { fileId: String, totalChunks: Int, path: String, replace: Boolean ->
+                    resolver { fileId: String, totalChunks: Int, path: String, replace: Boolean, isAppFile: Boolean ->
                         val chunkDir = File(uploadTmpDir, fileId)
                         if (!chunkDir.exists()) {
                             throw GraphQLError("No chunks found for $fileId")
@@ -1498,8 +1493,14 @@ class MainGraphQL(val schema: Schema) {
                             }
                         }
                         chunkDir.deleteRecursively()
-                        MainApp.instance.scanFileByConnection(outputFile, null)
-                        outputFile.absolutePath
+                        if (isAppFile) {
+                            // Import into content-addressable store; returns SHA-256 hash
+                            val dFile = AppFileStore.importFile(MainApp.instance, outputFile, "", deleteSrc = true)
+                            dFile.id
+                        } else {
+                            MainApp.instance.scanFileByConnection(outputFile, null)
+                            outputFile.absolutePath
+                        }
                     }
                 }
                 mutation("addFavoriteFolder") {

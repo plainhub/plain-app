@@ -19,6 +19,9 @@ object NsdHelper {
     private const val SERVICE_NAME = "PlainApp"
     
     private var nsdManager: NsdManager? = null
+    // Only listeners whose onServiceRegistered callback has fired are stored here.
+    // This prevents attempting to unregister listeners whose NSD registration failed,
+    // which would throw "listener not registered".
     private val registrationListeners = mutableListOf<NsdManager.RegistrationListener>()
     private var jmDNS: JmDNS? = null
     private var unregisterJob: Job? = null
@@ -113,10 +116,14 @@ object NsdHelper {
 
             val listener = object : NsdManager.RegistrationListener {
                 override fun onServiceRegistered(serviceInfo: NsdServiceInfo) {
+                    // Add to the tracked list only after confirmed registration so that
+                    // unregisterService() never attempts to unregister a failed listener.
+                    registrationListeners.add(this)
                     LogCat.d("NSD service registered: ${serviceInfo.serviceType} ${serviceInfo.serviceName}")
                 }
 
                 override fun onRegistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
+                    // Do NOT add to registrationListeners; nothing to unregister.
                     LogCat.e("NSD registration failed: ${serviceInfo.serviceType} error code $errorCode")
                 }
 
@@ -131,7 +138,6 @@ object NsdHelper {
 
             try {
                 nsdManager?.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, listener)
-                registrationListeners.add(listener)
                 ok = true
                 LogCat.d("Registering Android NSD service ${service.type} on port ${service.port}")
             } catch (e: Exception) {
@@ -177,7 +183,9 @@ object NsdHelper {
         val listeners = registrationListeners.toList().also { registrationListeners.clear() }
         val jmdns = jmDNS.also { jmDNS = null }
 
-        unregisterJob?.cancel()
+        // Do NOT cancel a running unregister job. Each call owns its own snapshot of
+        // listeners (taken above) so concurrent jobs work on disjoint sets — cancelling
+        // the previous job would leave its listeners permanently registered with NSD.
 
         unregisterJob = coIO {
             listeners.forEach { l ->

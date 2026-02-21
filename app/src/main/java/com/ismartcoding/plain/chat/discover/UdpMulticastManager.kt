@@ -6,12 +6,15 @@ import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager.MULTICAST_PORT
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.isActive
 import java.net.DatagramPacket
 import java.net.InetAddress
+import java.net.InetSocketAddress
 import java.net.MulticastSocket
+import java.net.SocketAddress
 import java.net.SocketTimeoutException
 
 /**
@@ -69,11 +72,13 @@ class UdpMulticastManager {
         LogCat.d("Starting multicast message flow subscription")
 
         try {
-            socket = MulticastSocket(MULTICAST_PORT).apply {
-                soTimeout = RECEIVE_TIMEOUT
-                reuseAddress = true
-            }
-            
+                // Create unbound first so reuseAddress takes effect before bind
+                socket = MulticastSocket(null as SocketAddress?).apply {
+                    reuseAddress = true
+                    soTimeout = RECEIVE_TIMEOUT
+                }
+                socket.bind(InetSocketAddress(MULTICAST_PORT))
+
             val multicastAddress = InetAddress.getByName(MULTICAST_ADDRESS)
             socket.joinGroup(multicastAddress)
             
@@ -123,19 +128,27 @@ class UdpMulticastManager {
 
     /**
      * Start receiver using callback (maintains backward compatibility)
-     * Now internally uses the subscription-based approach
+     * Now internally uses the subscription-based approach with auto-restart on failure
      */
     fun startReceiver(onMessage: (message: String, senderIP: String) -> Unit) {
         if (receiverJob?.isActive == true) return
 
         onMessageReceived = onMessage
         receiverJob = coIO {
-            try {
-                messageFlow().collect { multicastMessage ->
-                    onMessageReceived?.invoke(multicastMessage.message, multicastMessage.senderIP)
+            while (isActive) {
+                try {
+                    messageFlow().collect { multicastMessage ->
+                        onMessageReceived?.invoke(multicastMessage.message, multicastMessage.senderIP)
+                    }
+                } catch (e: Exception) {
+                    LogCat.e("Error in receiver flow: ${e.message}")
                 }
-            } catch (e: Exception) {
-                LogCat.e("Error in receiver flow: ${e.message}")
+                // Flow ended — either due to a socket error (isActive=true, restart)
+                // or intentional stop/cancel (isActive=false, exit loop)
+                if (isActive) {
+                    LogCat.d("Multicast receiver restarting in 2s...")
+                    delay(2000)
+                }
             }
         }
     }
