@@ -12,7 +12,6 @@ All chat files are stored in a content-addressable store keyed by their SHA-256 
 
 ```
 {app external files dir}/
-  files/
     ab/cd/abcd1234...   ← hash used as filename, split into 2-char subdirs
 ```
 

@@ -43,6 +43,7 @@ import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.Mp4Helper
+import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.preferences.AuthTwoFactorPreference
@@ -264,14 +265,23 @@ object HttpModule {
                     return@get
                 }
 
-                val path = UrlHelper.decrypt(id)
-                val folder = File(path)
+                val decryptedId = UrlHelper.decrypt(id)
+                var dirPath: String
+                var jsonName = ""
+                if (decryptedId.startsWith("{")) {
+                    val json = JSONObject(decryptedId)
+                    dirPath = json.optString("path")
+                    jsonName = json.optString("name")
+                } else {
+                    dirPath = decryptedId
+                }
+                val folder = File(dirPath)
                 if (!folder.exists() || !folder.isDirectory) {
                     call.respond(HttpStatusCode.NotFound)
                     return@get
                 }
 
-                val fileName = (q["name"] ?: "${folder.name}.zip").urlEncode().replace("+", "%20")
+                val fileName = (jsonName.ifEmpty { "${folder.name}.zip" }).urlEncode().replace("+", "%20")
                 call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
                 call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
                 call.respondOutputStream(ContentType.Application.Zip) {
@@ -371,10 +381,12 @@ object HttpModule {
                     val decryptedId = UrlHelper.decrypt(id).getFinalPath(context)
                     var path: String
                     var mediaId = ""
+                    var jsonName = ""
                     if (decryptedId.startsWith("{")) {
                         val json = JSONObject(decryptedId)
-                        path = json.optString("path")
+                        path = json.optString("path").getFinalPath(context)
                         mediaId = json.optString("mediaId")
+                        jsonName = json.optString("name")
                     } else {
                         path = decryptedId
                     }
@@ -422,7 +434,7 @@ object HttpModule {
                         }
 
                         call.response.header("Access-Control-Expose-Headers", "Content-Disposition")
-                        val fileName = (q["name"] ?: file.name).urlEncode().replace("+", "%20")
+                        val fileName = (jsonName.ifEmpty { file.name }).urlEncode().replace("+", "%20")
                         if (q["dl"] == "1") {
                             call.response.header(
                                 "Content-Disposition",
@@ -620,28 +632,41 @@ object HttpModule {
 
                                     "file" -> {
                                         fileName = part.originalFileName as String
-                                        if (info.dir.isEmpty() || fileName.isEmpty()) {
-                                            call.respond(HttpStatusCode.BadRequest)
-                                            return@forEachPart
-                                        }
-                                        var destFile = File("${info.dir}/$fileName")
-                                        if (destFile.exists()) {
-                                            if (info.replace) {
-                                                destFile.delete()
-                                            } else {
-                                                destFile = destFile.newFile()
-                                                fileName = destFile.name
+                                        if (info.isAppFile) {
+                                            // Import into content-addressable chat file store for deduplication
+                                            val tempFile = File(MainApp.instance.cacheDir, "chat_upload_${System.currentTimeMillis()}_${Thread.currentThread().id}")
+                                            tempFile.parentFile?.mkdirs()
+                                            part.provider().let { input ->
+                                                val outputStream = FileOutputStream(tempFile)
+                                                input.copyTo(outputStream)
+                                                outputStream.close()
                                             }
-                                        }
-                                        LogCat.d("Upload: ${info.dir}, ${destFile.absolutePath}")
-                                        destFile.parentFile?.mkdirs()
+                                            val dFile = AppFileStore.importFile(MainApp.instance, tempFile, part.contentType?.toString() ?: "", deleteSrc = true)
+                                            fileName = dFile.id // SHA-256 hash — client forms fid:{hash}
+                                        } else {
+                                            if (info.dir.isEmpty() || fileName.isEmpty()) {
+                                                call.respond(HttpStatusCode.BadRequest)
+                                                return@forEachPart
+                                            }
+                                            var destFile = File("${info.dir}/$fileName")
+                                            if (destFile.exists()) {
+                                                if (info.replace) {
+                                                    destFile.delete()
+                                                } else {
+                                                    destFile = destFile.newFile()
+                                                    fileName = destFile.name
+                                                }
+                                            }
+                                            LogCat.d("Upload: ${info.dir}, ${destFile.absolutePath}")
+                                            destFile.parentFile?.mkdirs()
 
-                                        part.provider().let { input ->
-                                            val outputStream = FileOutputStream(destFile)
-                                            input.copyTo(outputStream)
-                                            outputStream.close()
+                                            part.provider().let { input ->
+                                                val outputStream = FileOutputStream(destFile)
+                                                input.copyTo(outputStream)
+                                                outputStream.close()
+                                            }
+                                            MainApp.instance.scanFileByConnection(destFile, null)
                                         }
-                                        MainApp.instance.scanFileByConnection(destFile, null)
                                     }
 
                                     else -> {}

@@ -16,11 +16,14 @@ import com.ismartcoding.plain.activityManager
 import com.ismartcoding.plain.api.HttpClientManager
 
 fun newImageLoader(context: PlatformContext): ImageLoader {
+    // Always use applicationContext to avoid leaking Activity instances through
+    // the lazy diskCache / memoryCache initializer lambdas held by RealImageLoader.
+    val appContext = context.applicationContext
     val memoryPercent = if (activityManager.isLowRamDevice) 0.25 else 0.75
     
     val unsafeOkHttpClient = HttpClientManager.createUnsafeOkHttpClient()
     
-    return ImageLoader.Builder(context)
+    return ImageLoader.Builder(appContext)
         .components {
             add(SvgDecoder.Factory(true))
             add(AnimatedImageDecoder.Factory())
@@ -30,12 +33,12 @@ fun newImageLoader(context: PlatformContext): ImageLoader {
         }
         .memoryCache {
             MemoryCache.Builder()
-                .maxSizePercent(context, percent = memoryPercent)
+                .maxSizePercent(appContext, percent = memoryPercent)
                 .build()
         }
         .diskCache {
             DiskCache.Builder()
-                .directory(context.cacheDir.resolve("image_cache").absoluteFile)
+                .directory(appContext.cacheDir.resolve("image_cache").absoluteFile)
                 .maxSizePercent(1.0)
                 .build()
         }

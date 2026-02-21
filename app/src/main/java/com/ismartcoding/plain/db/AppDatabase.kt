@@ -26,7 +26,7 @@ class AiChatsDeletionSpec : AutoMigrationSpec
         DNote::class, DFeed::class, DFeedEntry::class, DBook::class, DBookChapter::class,
         DPomodoroItem::class, DPeer::class, DChatGroup::class,
         DBookmark::class, DBookmarkGroup::class,
-        DFile::class,
+        DAppFile::class,
     ],
     version = 8,
     autoMigrations = [
@@ -67,7 +67,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun bookmarkGroupDao(): BookmarkGroupDao
 
-    abstract fun fileDao(): FileDao
+    abstract fun appFileDao(): AppFileDao
 
     companion object {
         @Volatile

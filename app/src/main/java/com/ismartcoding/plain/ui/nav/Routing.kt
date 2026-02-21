@@ -70,7 +70,7 @@ class Routing {
     object Apps
 
     @Serializable
-    data class OtherFile(val path: String)
+    data class OtherFile(val path: String, val title: String)
 
     @Serializable
     object Docs

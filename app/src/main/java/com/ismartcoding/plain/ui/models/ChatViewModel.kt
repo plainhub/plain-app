@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 import org.json.JSONArray
 
 data class ChatState(
-    val toId: String = "local",
+    val toId: String = "",
     val toName: String = "",
     val peer: DPeer? = null,
     val group: DChatGroup? = null
@@ -97,6 +97,12 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val state = _chatState.value
 
+            // Block sending to unpaired peers
+            if (state.peer != null && state.peer.status != "paired") {
+                onResult(false)
+                return@launch
+            }
+
             // Insert message with appropriate initial status
             val item = ChatHelper.sendAsync(
                 message = content,
@@ -144,6 +150,64 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
             DMessageContent(DMessageType.FILES.value, DMessageFiles(files))
         }
         sendMessage(content, onResult)
+    }
+
+    /**
+     * Insert a placeholder message immediately with [status] = "pending" so
+     * the UI renders thumbnail previews right away. Returns the inserted [DChat]
+     * id; call [updateFilesMessage] once real fid: URIs are ready.
+     */
+    suspend fun sendFilesImmediate(files: List<DMessageFile>, isImageVideo: Boolean): String {
+        val state = _chatState.value
+        val content = if (isImageVideo) {
+            DMessageContent(DMessageType.IMAGES.value, DMessageImages(files))
+        } else {
+            DMessageContent(DMessageType.FILES.value, DMessageFiles(files))
+        }
+        val item = com.ismartcoding.plain.db.AppDatabase.instance.chatDao().let { dao ->
+            val chat = com.ismartcoding.plain.db.DChat()
+            chat.fromId = "me"
+            chat.toId = state.toId
+            chat.content = content
+            chat.status = "pending"
+            dao.insert(chat)
+            chat
+        }
+        addAll(listOf(item))
+        return item.id
+    }
+
+    /**
+     * Replace the placeholder message's content with fully-imported [DMessageFile]s
+     * and transition the status to "sent" / "pending".
+     */
+    fun updateFilesMessage(messageId: String, files: List<DMessageFile>, isImageVideo: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val state = _chatState.value
+            val content = if (isImageVideo) {
+                DMessageContent(DMessageType.IMAGES.value, DMessageImages(files))
+            } else {
+                DMessageContent(DMessageType.FILES.value, DMessageFiles(files))
+            }
+            val newStatus = if (state.peer != null) "pending" else "sent"
+            val dao = com.ismartcoding.plain.db.AppDatabase.instance.chatDao()
+            dao.getById(messageId)?.let { item ->
+                item.content = content
+                item.status = newStatus
+                dao.update(item)
+
+                val model = item.toModel().apply { data = getContentData() }
+                sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
+
+                if (state.peer != null) {
+                    val success = com.ismartcoding.plain.chat.PeerChatHelper.sendToPeerAsync(state.peer, content)
+                    val finalStatus = if (success) "sent" else "failed"
+                    dao.updateStatus(messageId, finalStatus)
+                    item.status = finalStatus
+                }
+                update(item)
+            }
+        }
     }
 
     private fun createLongTextFile(text: String, context: Context): DMessageContent {

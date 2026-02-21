@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -279,7 +280,8 @@ fun ChatPage(
                     }
                 }
             }
-            if (!chatVM.showBottomActions()) {
+            val peer = chatState.value.peer
+            if (!chatVM.showBottomActions() && (peer == null || peer.status == "paired")) {
                 ChatInput(
                     value = inputValue,
                     hint = stringResource(id = R.string.chat_input_hint),
@@ -379,57 +381,74 @@ private fun handleFileSelection(
     focusManager: FocusManager
 ) {
     coMain {
-        DialogHelper.showLoading()
-        val items = mutableListOf<DMessageFile>()
-        withIO {
-            event.uris.forEach { uri ->
-                try {
-                    val file = context.contentResolver.queryOpenableFile(uri)
-                    if (file != null) {
-                        var fileName = file.displayName
-                        val mimeType = context.contentResolver.getType(uri) ?: ""
-                        if (event.type == PickFileType.IMAGE_VIDEO) {
-                            val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
-                            if (extension.isNotEmpty()) {
-                                fileName = fileName.getFilenameWithoutExtension() + "." + extension
-                            }
-                        }
-                        val size = file.size
-
-                        // Import into content-addressable store (dedup by hash)
-                        val fidUri = ChatFileSaveHelper.importFromUri(context, uri, mimeType)
-                        val realPath = AppFileStore.resolveUri(context, fidUri)
-
-                        val intrinsicSize = if (fileName.isImageFast()) ImageHelper.getIntrinsicSize(
-                            realPath,
-                            ImageHelper.getRotation(realPath)
-                        ) else if (fileName.isVideoFast()) VideoHelper.getIntrinsicSize(realPath) else IntSize.Zero
-                        items.add(
-                            DMessageFile(
-                                StringHelper.shortUUID(),
-                                fidUri,
-                                size,
-                                File(realPath).getDuration(context),
-                                intrinsicSize.width,
-                                intrinsicSize.height,
-                                "",
-                                fileName
-                            )
-                        )
+        // --- 1. Build placeholder DMessageFile list from original content:// URIs
+        //        so Coil can immediately render thumbnails.
+        val placeholderItems = mutableListOf<DMessageFile>()
+        event.uris.forEach { uri ->
+            val file = context.contentResolver.queryOpenableFile(uri)
+            if (file != null) {
+                var fileName = file.displayName
+                val mimeType = context.contentResolver.getType(uri) ?: ""
+                if (event.type == PickFileType.IMAGE_VIDEO) {
+                    val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType) ?: ""
+                    if (extension.isNotEmpty()) {
+                        fileName = fileName.getFilenameWithoutExtension() + "." + extension
                     }
-                } catch (ex: Exception) {
-                    DialogHelper.showMessage(ex)
-                    ex.printStackTrace()
                 }
+                placeholderItems.add(
+                    DMessageFile(
+                        id = StringHelper.shortUUID(),
+                        uri = uri.toString(), // content:// URI for immediate preview
+                        size = file.size,
+                        fileName = fileName,
+                    )
+                )
             }
         }
 
-        DialogHelper.hideLoading()
-        val previousTopMessageId = chatVM.itemsFlow.value.firstOrNull()?.id
-        chatVM.sendFiles(items, event.type == PickFileType.IMAGE_VIDEO)
-        scrollToLatestAfterFileSend(chatVM, scrollState, previousTopMessageId)
+        if (placeholderItems.isEmpty()) return@coMain
+
+        // --- 2. Insert message immediately with status="pending"
+        val isImageVideo = event.type == PickFileType.IMAGE_VIDEO
+        val messageId = withIO { chatVM.sendFilesImmediate(placeholderItems, isImageVideo) }
+        scrollToLatestAfterFileSend(chatVM, scrollState, null)
         delay(200)
         focusManager.clearFocus()
+
+        // --- 3. Import files in background, then update the message with real fid: URIs
+        withIO {
+            val finalItems = mutableListOf<DMessageFile>()
+            event.uris.forEachIndexed { index, uri ->
+                try {
+                    val placeholder = placeholderItems[index]
+                    val mimeType = context.contentResolver.getType(uri) ?: ""
+                    val fidUri = ChatFileSaveHelper.importFromUri(context, uri, mimeType)
+                    val realPath = AppFileStore.resolveUri(context, fidUri)
+                    val intrinsicSize = if (placeholder.fileName.isImageFast())
+                        ImageHelper.getIntrinsicSize(realPath, ImageHelper.getRotation(realPath))
+                    else if (placeholder.fileName.isVideoFast())
+                        VideoHelper.getIntrinsicSize(realPath)
+                    else IntSize.Zero
+                    finalItems.add(
+                        DMessageFile(
+                            id = placeholder.id,
+                            uri = fidUri,
+                            size = placeholder.size,
+                            duration = java.io.File(realPath).getDuration(context),
+                            width = intrinsicSize.width,
+                            height = intrinsicSize.height,
+                            summary = placeholder.summary,
+                            fileName = placeholder.fileName,
+                        )
+                    )
+                } catch (ex: Exception) {
+                    DialogHelper.showMessage(ex)
+                    ex.printStackTrace()
+                    finalItems.add(placeholderItems[index])
+                }
+            }
+            chatVM.updateFilesMessage(messageId, finalItems, isImageVideo)
+        }
     }
 }
 

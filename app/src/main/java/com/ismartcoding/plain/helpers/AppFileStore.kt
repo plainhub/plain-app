@@ -5,8 +5,8 @@ import android.webkit.MimeTypeMap
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.db.AppDatabase
-import com.ismartcoding.plain.db.DFile
-import com.ismartcoding.plain.db.FileDao
+import com.ismartcoding.plain.db.DAppFile
+import com.ismartcoding.plain.db.AppFileDao
 import java.io.File
 
 /**
@@ -56,9 +56,9 @@ object AppFileStore {
      * 2. Full SHA-256 check only when weak matches.
      *
      * - If an identical file already exists, increments refCount and returns
-     *   the existing [DFile].
+     *   the existing [DAppFile].
      * - Otherwise copies/moves [srcFile] into the store directory and inserts
-     *   a new [DFile] row.
+     *   a new [DAppFile] row.
      *
      * @param srcFile    Source file to import. Caller retains ownership; this
      *                   method copies the content (does not delete srcFile).
@@ -72,8 +72,8 @@ object AppFileStore {
         srcFile: File,
         mimeType: String = "",
         deleteSrc: Boolean = false,
-    ): DFile {
-        val dao = AppDatabase.instance.fileDao()
+    ): DAppFile {
+        val dao = AppDatabase.instance.appFileDao()
         val size = srcFile.length()
         val strongHash by lazy { FileHashHelper.strongHash(srcFile) }
 
@@ -101,8 +101,8 @@ object AppFileStore {
         context: Context,
         data: ByteArray,
         mimeType: String = "",
-    ): DFile {
-        val dao = AppDatabase.instance.fileDao()
+    ): DAppFile {
+        val dao = AppDatabase.instance.appFileDao()
         val size = data.size.toLong()
         val strongHash = FileHashHelper.strongHash(data)
 
@@ -120,7 +120,7 @@ object AppFileStore {
         destFile.writeBytes(data)
 
         val effectiveMime = mimeType.ifEmpty { "application/octet-stream" }
-        val record = DFile(strongHash).apply {
+        val record = DAppFile(strongHash).apply {
             this.size = size
             this.mimeType = effectiveMime
             this.realPath = destFile.absolutePath
@@ -138,7 +138,7 @@ object AppFileStore {
      * When refCount reaches 0 the physical file is deleted.
      */
     fun release(context: Context, fileId: String) {
-        val dao = AppDatabase.instance.fileDao()
+        val dao = AppDatabase.instance.appFileDao()
         dao.decrementRefCount(fileId)
         val updated = dao.getById(fileId) ?: return
         if (updated.refCount <= 0) {
@@ -157,11 +157,11 @@ object AppFileStore {
 
     private fun tryReuseExisting(
         context: Context,
-        dao: FileDao,
+        dao: AppFileDao,
         srcFile: File,
         strongHash: String,
         deleteSrc: Boolean,
-    ): DFile? {
+    ): DAppFile? {
         val existing = dao.getById(strongHash) ?: return null
         val targetFile = destFile(context, strongHash)
 
@@ -205,14 +205,14 @@ object AppFileStore {
 
     private fun insertNew(
         context: Context,
-        dao: FileDao,
+        dao: AppFileDao,
         srcFile: File,
         size: Long,
         weakHash: String,
         strongHash: String,
         mimeType: String,
         deleteSrc: Boolean,
-    ): DFile {
+    ): DAppFile {
         val destFile = destFile(context, strongHash)
         storeSourceFile(srcFile, destFile, deleteSrc)
 
@@ -221,7 +221,7 @@ object AppFileStore {
             MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext) ?: "application/octet-stream"
         }
 
-        val record = DFile(strongHash).apply {
+        val record = DAppFile(strongHash).apply {
             this.size = size
             this.mimeType = effectiveMime
             this.realPath = destFile.absolutePath

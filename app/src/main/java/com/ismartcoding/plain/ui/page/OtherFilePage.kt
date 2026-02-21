@@ -38,7 +38,8 @@ import java.io.File
 @Composable
 fun OtherFilePage(
     navController: NavHostController,
-    path: String
+    path: String,
+    title: String
 ) {
     val context = LocalContext.current
     val file = File(path)
@@ -47,7 +48,7 @@ fun OtherFilePage(
         topBar = {
             PTopAppBar(
                 navController = navController,
-                title = file.name,
+                title = title.ifEmpty { file.name },
                 actions = {
                     PIconButton(
                         icon = R.drawable.share_2,
@@ -78,7 +79,7 @@ fun OtherFilePage(
                         )
                         SelectionContainer {
                             Text(
-                                text = file.name,
+                                text = title.ifEmpty { file.name },
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
                                     .padding(horizontal = 32.dp),
