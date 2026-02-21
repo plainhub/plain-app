@@ -26,7 +26,7 @@ Access a self-hosted webpage on the same network to manage your phone:
 - Contacts, SMS, and call logs
 - Installed apps (with APK export)
 - Notifications mirroring and device info
-- Screen mirroring
+- Screen mirroring (Audio, Remote control)
 - PWA support — add the web app to your desktop/home screen
 
 **Built-in Tools**
@@ -69,9 +69,9 @@ Your donation is highly appreciated. Thank you!
 |--------------------------------------|------------------------------------------|---------------------------------------------------|--------------------------------------------------|
 | ![audio](screenshots/app-audio.jpg)  | ![images](screenshots/app-images.jpg)    | ![videos](screenshots/app-videos.jpg)             | ![rss](screenshots/app-rss.jpg)                  |
 | ![home](screenshots/web-home.png)    | ![images](screenshots/web-images.png)    | ![videos](screenshots/web-videos.png)             | ![notes](screenshots/web-notes.png)              |
-| ![files](screenshots/web-files.png)  | ![encryption](screenshots/web-calls.png) | ![messages](screenshots/web-messages.png)         | ![contacts](screenshots/web-contacts.png)        |
-| ![audio](screenshots/web-audios.png) | ![rss](screenshots/web-rss.png)          | ![encryption](screenshots/web-encryption.png)     | ![encryption](screenshots/web-screen-mirror.png) |
-| ![audio](screenshots/web-image.png)  | ![rss](screenshots/web-video.png)        |                                                   |                                                  |
+| ![files](screenshots/web-files.png)  | ![calls](screenshots/web-calls.png) | ![messages](screenshots/web-messages.png)         | ![contacts](screenshots/web-contacts.png)        |
+| ![audio](screenshots/web-audio.png) | ![rss](screenshots/web-rss.png)          | ![encryption](screenshots/web-encryption.png)     | ![encryption](screenshots/web-screen-mirror.png) |
+| ![image](screenshots/web-image.png)  | ![video](screenshots/web-video.png)      | ![chat](screenshots/web-chat.png)     |                                                  |
 
 ## Compatibility
 
