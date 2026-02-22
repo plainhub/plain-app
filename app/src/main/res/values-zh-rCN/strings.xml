@@ -674,4 +674,8 @@
     <string name="cannot_copy_folder_into_itself">无法将文件夹复制到其自身或其子文件夹中。</string>
     <string name="accessibility_service_description">简朴使用此无障碍服务以在屏幕镜像时启用远程控制。它会注入来自网页端的触摸事件（点击、滑动、滚动）以及导航操作（返回、主页、最近任务）。</string>
     <string name="accessibility_service_label">简朴远程控制</string>
+    <string name="chat_info">聊天信息</string>
+    <string name="clear_messages">清空消息</string>
+    <string name="clear_messages_confirm">确定要清空所有消息吗？此操作无法撤销。</string>
+    <string name="messages_cleared">消息已清空！</string>
 </resources>

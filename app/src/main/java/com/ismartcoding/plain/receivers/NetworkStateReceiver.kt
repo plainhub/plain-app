@@ -8,6 +8,7 @@ import android.net.wifi.WifiManager
 import androidx.core.app.NotificationManagerCompat
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
+import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.locale.LocaleHelper
@@ -28,7 +29,7 @@ class NetworkStateReceiver : BroadcastReceiver() {
                         NotificationManagerCompat.from(context).notify(
                             notificationId, NotificationHelper.createServiceNotification(
                                 context,
-                                "${BuildConfig.APPLICATION_ID}.action.stop_http_server",
+                                Constants.ACTION_STOP_HTTP_SERVER,
                                 LocaleHelper.getString(R.string.api_service_is_running),
                                 HttpServerManager.getNotificationContent()
                             )

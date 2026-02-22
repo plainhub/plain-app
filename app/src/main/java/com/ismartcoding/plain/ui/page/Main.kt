@@ -73,6 +73,7 @@ import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.apps.AppPage
 import com.ismartcoding.plain.ui.page.apps.AppsPage
 import com.ismartcoding.plain.ui.page.chat.ChatEditTextPage
+import com.ismartcoding.plain.ui.page.chat.ChatInfoPage
 import com.ismartcoding.plain.ui.page.chat.ChatPage
 import com.ismartcoding.plain.ui.page.chat.ChatTextPage
 import com.ismartcoding.plain.ui.page.docs.DocsPage
@@ -280,6 +281,9 @@ fun Main(
                 composable<Routing.Chat> { backStackEntry ->
                     val r = backStackEntry.toRoute<Routing.Chat>()
                     ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = chatVM, chatListVM = chatListVM, r.id)
+                }
+                composable<Routing.ChatInfo> {
+                    ChatInfoPage(navController, chatVM = chatVM)
                 }
                 composable<Routing.ScanHistory> { ScanHistoryPage(navController) }
                 composable<Routing.Scan> { ScanPage(navController) }

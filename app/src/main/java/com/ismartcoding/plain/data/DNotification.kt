@@ -12,5 +12,6 @@ data class DNotification(
     val silent: Boolean,
     val title: String,
     val body: String,
-    val actions: List<String>
+    val actions: List<String>,
+    val replyActions: List<String>
 )

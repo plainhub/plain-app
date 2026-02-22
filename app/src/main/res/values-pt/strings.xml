@@ -681,4 +681,8 @@
     <string name="cannot_copy_folder_into_itself">Não é possível copiar uma pasta para dentro de si mesma ou de uma subpasta.</string>
     <string name="accessibility_service_description">O PlainApp usa este serviço de acessibilidade para permitir o controle remoto durante o espelhamento de tela. Ele injeta eventos de toque (toque, deslizar, rolar) e ações de navegação (Voltar, Início, Recentes) enviados pela interface web.</string>
     <string name="accessibility_service_label">Controle remoto do PlainApp</string>
+    <string name="chat_info">Informações do chat</string>
+    <string name="clear_messages">Limpar mensagens</string>
+    <string name="clear_messages_confirm">Tem certeza de que deseja limpar todas as mensagens? Esta ação não pode ser desfeita.</string>
+    <string name="messages_cleared">Mensagens apagadas!</string>
 </resources>

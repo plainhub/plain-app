@@ -80,4 +80,19 @@ object ChatHelper {
         // Delete all chat records for this peer using SQL query
         chatDao.deleteByPeerId(peerId)
     }
+
+    suspend fun deleteAllChatsAsync(context: Context, toId: String) {
+        val chatDao = AppDatabase.instance.chatDao()
+        val chats = chatDao.getByChatId(toId)
+
+        // Release file references for all chats before deleting
+        for (chat in chats) {
+            when (val value = chat.content.value) {
+                is DMessageFiles -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
+                is DMessageImages -> value.items.forEach { if (it.isFidFile()) AppFileStore.release(context, it.localFileId()) }
+            }
+        }
+
+        chatDao.deleteByPeerId(toId)
+    }
 }

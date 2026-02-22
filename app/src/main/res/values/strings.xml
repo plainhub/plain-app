@@ -667,6 +667,8 @@
     <string name="unpaired_devices">Unpaired devices</string>
     <string name="local_chat">Local</string>
     <string name="peer_chat">Peer Chat</string>
+    <string name="peer_chat_reply">Reply</string>
+    <string name="peer_chat_type_reply">Type a reply…</string>
     <string name="group_chat">Group Chat</string>
     <string name="pair_devices_hint">Go to Nearby tab to pair with devices</string>
     <string name="add_device">Add device</string>
@@ -679,6 +681,10 @@
     <string name="sent">Sent</string>
     <string name="device_type">Device type</string>
     <string name="port">Port</string>
+    <string name="chat_info">Chat Info</string>
+    <string name="clear_messages">Clear Messages</string>
+    <string name="clear_messages_confirm">Are you sure you want to clear all messages? This action cannot be undone.</string>
+    <string name="messages_cleared">Messages cleared!</string>
     <string name="cannot_move_folder_into_itself">Cannot move a folder into itself or its subfolder.</string>
     <string name="cannot_copy_folder_into_itself">Cannot copy a folder into itself or its subfolder.</string>
 </resources>

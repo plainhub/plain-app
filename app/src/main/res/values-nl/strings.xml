@@ -681,4 +681,8 @@
     <string name="cannot_copy_folder_into_itself">Kan een map niet naar zichzelf of een submap kopiëren.</string>
     <string name="accessibility_service_description">PlainApp gebruikt deze toegankelijkheidsservice om afstandsbediening tijdens schermspiegeling mogelijk te maken. Het injecteert aanraakgebeurtenissen (tikken, vegen, scrollen) en navigatieacties (Terug, Start, Recent) die vanuit de webinterface worden verzonden.</string>
     <string name="accessibility_service_label">PlainApp Afstandsbediening</string>
+    <string name="chat_info">Chatinfo</string>
+    <string name="clear_messages">Berichten wissen</string>
+    <string name="clear_messages_confirm">Weet u zeker dat u alle berichten wilt wissen? Deze actie kan niet ongedaan worden gemaakt.</string>
+    <string name="messages_cleared">Berichten gewist!</string>
 </resources>

@@ -681,4 +681,8 @@
     <string name="cannot_copy_folder_into_itself">Impossible de copier un dossier dans lui-même ou dans l’un de ses sous-dossiers.</string>
     <string name="accessibility_service_description">PlainApp utilise ce service d\'accessibilité pour permettre le contrôle à distance pendant la mise en miroir de l\'écran. Il injecte des événements tactiles (tap, balayage, défilement) et des actions de navigation (Retour, Accueil, Récents) envoyés depuis l\'interface Web.</string>
     <string name="accessibility_service_label">Contrôle à distance PlainApp</string>
+    <string name="chat_info">Infos du chat</string>
+    <string name="clear_messages">Effacer les messages</string>
+    <string name="clear_messages_confirm">Êtes-vous sûr de vouloir effacer tous les messages ? Cette action est irréversible.</string>
+    <string name="messages_cleared">Messages effacés !</string>
 </resources>

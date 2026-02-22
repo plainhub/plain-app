@@ -681,4 +681,8 @@
     <string name="cannot_copy_folder_into_itself">Ein Ordner kann nicht in sich selbst oder in einen Unterordner kopiert werden.</string>
     <string name="accessibility_service_description">PlainApp verwendet diesen Bedienungshilfen-/Accessibility-Dienst, um während der Bildschirmspiegelung die Fernsteuerung zu ermöglichen. Er injiziert Touch-Ereignisse (Tippen, Wischen, Scrollen) und Navigationsaktionen (Zurück, Home, Zuletzt verwendet), die von der Weboberfläche gesendet werden.</string>
     <string name="accessibility_service_label">PlainApp Fernsteuerung</string>
+    <string name="chat_info">Chat-Info</string>
+    <string name="clear_messages">Nachrichten löschen</string>
+    <string name="clear_messages_confirm">Möchten Sie wirklich alle Nachrichten löschen? Diese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="messages_cleared">Nachrichten gelöscht!</string>
 </resources>

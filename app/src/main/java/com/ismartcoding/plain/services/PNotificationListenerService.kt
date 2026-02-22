@@ -12,6 +12,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.activityManager
 import com.ismartcoding.plain.enums.AppFeatureType
@@ -48,8 +49,8 @@ class PNotificationListenerService : NotificationListenerService() {
             return false
         }
 
-        if (applicationContext.packageName == packageName) {
-            // Don't send our own notifications
+        if (applicationContext.packageName == packageName && !BuildConfig.DEBUG) {
+            // Don't send our own notifications (allow in DEBUG for testing)
             return false
         }
 
@@ -64,6 +65,13 @@ class PNotificationListenerService : NotificationListenerService() {
                 TempData.notifications.remove(old)
             }
             TempData.notifications.add(n)
+            // Store raw actions for reply support
+            val rawActions = statusBarNotification.notification.actions
+            if (rawActions != null) {
+                TempData.notificationActions[n.id] = rawActions
+            } else {
+                TempData.notificationActions.remove(n.id)
+            }
             coIO {
                 val enable = Permission.NOTIFICATION_LISTENER.isEnabledAsync(applicationContext)
                 if (enable) {
@@ -88,6 +96,7 @@ class PNotificationListenerService : NotificationListenerService() {
             val old = TempData.notifications.find { it.id == statusBarNotification.key }
             if (old != null) {
                 TempData.notifications.remove(old)
+                TempData.notificationActions.remove(old.id)
                 sendEvent(
                     WebSocketEvent(
                         EventType.NOTIFICATION_DELETED,
@@ -108,9 +117,15 @@ class PNotificationListenerService : NotificationListenerService() {
             val notifications = activeNotifications
             if (notifications != null) {
                 TempData.notifications.clear()
+                TempData.notificationActions.clear()
                 for (notification in notifications) {
                     if (isValidNotification(notification)) {
-                        TempData.notifications.add(notification.toDNotification())
+                        val n = notification.toDNotification()
+                        TempData.notifications.add(n)
+                        val rawActions = notification.notification.actions
+                        if (rawActions != null) {
+                            TempData.notificationActions[n.id] = rawActions
+                        }
                     }
                 }
             }
@@ -158,6 +173,17 @@ class PNotificationListenerService : NotificationListenerService() {
             })
         } catch (ex: Exception) {
             LogCat.e("Error setting up event handlers: ${ex.message}")
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        isConnected = false
+        try {
+            events.forEach { it.cancel() }
+            events.clear()
+        } catch (ex: Exception) {
+            LogCat.e("Error cleaning up events in onDestroy: ${ex.message}")
         }
     }
 

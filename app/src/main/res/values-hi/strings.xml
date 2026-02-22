@@ -681,4 +681,8 @@
     <string name="cannot_copy_folder_into_itself">किसी फ़ोल्डर को उसके भीतर या उसकी उपफ़ोल्डर में कॉपी नहीं किया जा सकता।</string>
     <string name="accessibility_service_description">PlainApp स्क्रीन मिररिंग के दौरान रिमोट नियंत्रण सक्षम करने के लिए इस एक्सेसिबिलिटी सेवा का उपयोग करता है। यह वेब इंटरफ़ेस से भेजे गए टच इवेंट (टैप, स्वाइप, स्क्रॉल) और नेविगेशन क्रियाएँ (वापस, होम, हाल के ऐप्स) इंजेक्ट करता है।</string>
     <string name="accessibility_service_label">PlainApp रिमोट नियंत्रण</string>
+    <string name="chat_info">चैट जानकारी</string>
+    <string name="clear_messages">संदेश हटाएं</string>
+    <string name="clear_messages_confirm">क्या आप वाकई सभी संदेश हटाना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।</string>
+    <string name="messages_cleared">संदेश हटा दिए गए!</string>
 </resources>

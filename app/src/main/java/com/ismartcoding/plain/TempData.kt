@@ -1,5 +1,6 @@
 package com.ismartcoding.plain
 
+import android.app.Notification
 import com.ismartcoding.plain.data.DNotification
 import com.ismartcoding.plain.enums.MediaPlayMode
 
@@ -12,6 +13,8 @@ object TempData {
     var urlToken = "" // use to encrypt or decrypt params in url
     var mdnsHostname = "plainapp.local" // mDNS hostname for local network discovery
     val notifications = mutableListOf<DNotification>()
+    // Stores notification actions (including RemoteInput reply actions) keyed by notification id
+    val notificationActions = mutableMapOf<String, Array<out Notification.Action>>()
     var audioPlayMode = MediaPlayMode.REPEAT
 
     var audioSleepTimerFutureTime = 0L
