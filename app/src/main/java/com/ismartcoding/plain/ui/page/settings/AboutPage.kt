@@ -33,7 +33,9 @@ import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.AppLogHelper
 import com.ismartcoding.plain.helpers.UrlHelper
+import com.ismartcoding.plain.preferences.AutoCheckUpdatePreference
 import com.ismartcoding.plain.preferences.DeveloperModePreference
+import com.ismartcoding.plain.preferences.LocalAutoCheckUpdate
 import com.ismartcoding.plain.preferences.SkipVersionPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PCard
@@ -62,6 +64,7 @@ fun AboutPage(
     val scope = rememberCoroutineScope()
     var fileSize by remember { mutableLongStateOf(AppLogHelper.getFileSize(context)) }
     var developerMode by remember { mutableStateOf(false) }
+    val autoCheckUpdate = LocalAutoCheckUpdate.current
 
     LaunchedEffect(Unit) {
         scope.launch(Dispatchers.IO) {
@@ -89,6 +92,16 @@ fun AboutPage(
                                 value = TempData.clientId,
                             )
                         }
+                        PListItem(
+                            modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = {
+                                developerMode = true
+                                scope.launch(Dispatchers.IO) {
+                                    DeveloperModePreference.putAsync(context, true)
+                                }
+                            }),
+                            title = stringResource(R.string.android_version),
+                            value = MainApp.getAndroidVersion(),
+                        )
                         if (AppFeatureType.CHECK_UPDATES.has()) {
                             PListItem(
                                 title = stringResource(R.string.app_version),
@@ -112,22 +125,24 @@ fun AboutPage(
                                     }
                                 },
                             )
+                            PListItem(
+                                title = stringResource(R.string.auto_check_update),
+                                subtitle = stringResource(R.string.auto_check_update_desc),
+                            ) {
+                                PSwitch(
+                                    activated = autoCheckUpdate,
+                                ) {
+                                    scope.launch(Dispatchers.IO) {
+                                        AutoCheckUpdatePreference.putAsync(context, it)
+                                    }
+                                }
+                            }
                         } else {
                             PListItem(
                                 title = stringResource(R.string.app_version),
                                 value = MainApp.getAppVersion(),
                             )
                         }
-                        PListItem(
-                            modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = {
-                                developerMode = true
-                                scope.launch(Dispatchers.IO) {
-                                    DeveloperModePreference.putAsync(context, true)
-                                }
-                            }),
-                            title = stringResource(R.string.android_version),
-                            value = MainApp.getAndroidVersion(),
-                        )
                     }
                 }
                 item {

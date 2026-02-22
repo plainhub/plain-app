@@ -98,6 +98,8 @@
     <string name="rate_limit">The request rate is limited</string>
     <string name="check_failure">Failed to check for updates</string>
     <string name="check_update">Check for updates</string>
+    <string name="auto_check_update">Auto check for updates</string>
+    <string name="auto_check_update_desc">Automatically check for new versions on app launch</string>
     <string name="is_latest_version">This is the latest version of the app</string>
     <string name="change_log">Changelog</string>
     <string name="update">Update</string>

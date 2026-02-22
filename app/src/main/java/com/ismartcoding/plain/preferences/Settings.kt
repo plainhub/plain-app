@@ -24,6 +24,7 @@ data class Settings(
     val newVersionLog: String,
     val newVersionSize: Long,
     val newVersionDownloadUrl: String,
+    val autoCheckUpdate: Boolean,
 )
 
 val LocalThemeIndex = compositionLocalOf { ThemeIndexPreference.default }
@@ -42,6 +43,7 @@ val LocalNewVersionPublishDate = compositionLocalOf { NewVersionPublishDatePrefe
 val LocalNewVersionLog = compositionLocalOf { NewVersionLogPreference.default }
 val LocalNewVersionSize = compositionLocalOf { NewVersionSizePreference.default }
 val LocalNewVersionDownloadUrl = compositionLocalOf { NewVersionDownloadUrlPreference.default }
+val LocalAutoCheckUpdate = compositionLocalOf { AutoCheckUpdatePreference.default }
 
 
 @Composable
@@ -63,6 +65,7 @@ fun SettingsProvider(content: @Composable () -> Unit) {
             newVersionLog = NewVersionLogPreference.default,
             newVersionSize = NewVersionSizePreference.default,
             newVersionDownloadUrl = NewVersionDownloadUrlPreference.default,
+            autoCheckUpdate = AutoCheckUpdatePreference.default,
         )
     val settings =
         remember {
@@ -82,6 +85,7 @@ fun SettingsProvider(content: @Composable () -> Unit) {
                     newVersionLog = NewVersionLogPreference.get(it),
                     newVersionSize = NewVersionSizePreference.get(it),
                     newVersionDownloadUrl = NewVersionDownloadUrlPreference.get(it),
+                    autoCheckUpdate = AutoCheckUpdatePreference.get(it),
                 )
             }
         }.collectAsStateValue(
@@ -103,6 +107,7 @@ fun SettingsProvider(content: @Composable () -> Unit) {
         LocalNewVersionLog provides settings.newVersionLog,
         LocalNewVersionSize provides settings.newVersionSize,
         LocalNewVersionDownloadUrl provides settings.newVersionDownloadUrl,
+        LocalAutoCheckUpdate provides settings.autoCheckUpdate,
     ) {
         content()
     }

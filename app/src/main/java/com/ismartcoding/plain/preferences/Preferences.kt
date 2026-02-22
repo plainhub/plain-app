@@ -101,6 +101,11 @@ object NewVersionSizePreference : BasePreference<Long>() {
     override val key = longPreferencesKey("new_version_size")
 }
 
+object AutoCheckUpdatePreference : BasePreference<Boolean>() {
+    override val default = true
+    override val key = booleanPreferencesKey("auto_check_update")
+}
+
 object UrlTokenPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("url_token")
