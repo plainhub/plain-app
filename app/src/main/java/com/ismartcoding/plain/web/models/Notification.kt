@@ -15,9 +15,10 @@ data class Notification(
     val silent: Boolean,
     val title: String,
     val body: String,
-    val actions: List<String>
+    val actions: List<String>,
+    val replyActions: List<String>
 )
 
 fun DNotification.toModel(): Notification {
-    return Notification(ID(id), onlyOnce, isClearable, appId, appName, time, silent, title, body, actions)
+    return Notification(ID(id), onlyOnce, isClearable, appId, appName, time, silent, title, body, actions, replyActions)
 }

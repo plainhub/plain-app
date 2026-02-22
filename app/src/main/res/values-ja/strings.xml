@@ -681,4 +681,8 @@
     <string name="cannot_copy_folder_into_itself">フォルダをそれ自身またはそのサブフォルダ内にコピーできません。</string>
     <string name="accessibility_service_description">PlainApp は画面ミラーリング中のリモート操作を有効にするために、このユーザー補助サービスを使用します。Web インターフェースから送信されたタッチ操作（タップ、スワイプ、スクロール）およびナビゲーション操作（戻る、ホーム、最近のアプリ）を注入します。</string>
     <string name="accessibility_service_label">PlainApp リモート操作</string>
+    <string name="chat_info">チャット情報</string>
+    <string name="clear_messages">メッセージを削除</string>
+    <string name="clear_messages_confirm">すべてのメッセージを削除しますか？この操作は取り消せません。</string>
+    <string name="messages_cleared">メッセージを削除しました！</string>
 </resources>

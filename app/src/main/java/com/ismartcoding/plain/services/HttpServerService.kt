@@ -13,6 +13,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.PortHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
+import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
@@ -73,7 +74,7 @@ class HttpServerService : LifecycleService() {
         try {
             val notification = NotificationHelper.createServiceNotification(
                 this,
-                "${BuildConfig.APPLICATION_ID}.action.stop_http_server",
+                Constants.ACTION_STOP_HTTP_SERVER,
                 getString(R.string.api_service_is_running),
                 HttpServerManager.getNotificationContent()
             )

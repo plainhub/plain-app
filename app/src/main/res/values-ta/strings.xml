@@ -681,4 +681,8 @@
     <string name="cannot_copy_folder_into_itself">ஒரு கோப்புறையை அதற்குள்ளே அல்லது அதன் உட்புறை கோப்புறைக்கு நகலெடுக்க முடியாது.</string>
     <string name="accessibility_service_description">திரை பிரதிபலிப்பின் போது தொலை கட்டுப்பாட்டை இயக்க PlainApp இந்த அணுகல்திறன் சேவையை பயன்படுத்துகிறது. இது வலை இடைமுகத்திலிருந்து அனுப்பப்படும் தொடுதல் நிகழ்வுகள் (தட்டுதல், ஸ்வைப், ஸ்க்ரோல்) மற்றும் வழிசெலுத்தல் செயல்கள் (பின்னால், முகப்பு, சமீபத்தியவை) ஆகியவற்றை செலுத்துகிறது.</string>
     <string name="accessibility_service_label">PlainApp தொலை கட்டுப்பாடு</string>
+    <string name="chat_info">சாட் தகவல்</string>
+    <string name="clear_messages">செய்திகளை அழி</string>
+    <string name="clear_messages_confirm">அனைத்து செய்திகளையும் அழிக்க விரும்புகிறீர்களா? இந்த செயலை மீட்டெடுக்க முடியாது.</string>
+    <string name="messages_cleared">செய்திகள் அழிக்கப்பட்டன!</string>
 </resources>

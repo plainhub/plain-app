@@ -55,6 +55,9 @@ class Routing {
     data class Chat(val id: String = "")
 
     @Serializable
+    data class ChatInfo(val chatId: String)
+
+    @Serializable
     object ChatText
 
     @Serializable

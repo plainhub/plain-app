@@ -24,7 +24,12 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.WebSocketEvent
+import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.features.ChatHelper
+import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.helpers.NotificationHelper
+import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.toModel
@@ -97,6 +102,26 @@ class PeerGraphQL(val schema: Schema) {
                         val model = item.toModel()
                         model.data = model.getContentData()
                         sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
+
+                        // Send local notification with reply support
+                        val notificationPeer = AppDatabase.instance.peerDao().getById(fromId)
+                        if (notificationPeer != null) {
+                            val messageText = when (item.content.type) {
+                                DMessageType.TEXT.value -> (item.content.value as? DMessageText)?.text ?: ""
+                                DMessageType.IMAGES.value -> getString(R.string.images)
+                                DMessageType.FILES.value -> getString(R.string.files)
+                                else -> ""
+                            }
+                            if (messageText.isNotEmpty()) {
+                                NotificationHelper.sendPeerMessageNotification(
+                                    context = MainApp.instance,
+                                    peerId = fromId,
+                                    peerName = notificationPeer.name.ifEmpty { getString(R.string.peer_chat) },
+                                    messageText = messageText,
+                                )
+                            }
+                        }
+
                         arrayListOf(item).map { it.toModel() }
                     }
                 }

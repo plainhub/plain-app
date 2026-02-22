@@ -681,4 +681,8 @@
     <string name="cannot_copy_folder_into_itself">無法將資料夾複製到其自身或其子資料夾中。</string>
     <string name="accessibility_service_description">PlainApp 使用此無障礙服務以在螢幕鏡像時啟用遠端控制。它會注入來自網頁介面的觸控事件（點擊、滑動、捲動）以及導覽操作（返回、主畫面、最近任務）。</string>
     <string name="accessibility_service_label">PlainApp 遠端控制</string>
+    <string name="chat_info">聊天資訊</string>
+    <string name="clear_messages">清空訊息</string>
+    <string name="clear_messages_confirm">確定要清空所有訊息嗎？此操作無法復原。</string>
+    <string name="messages_cleared">訊息已清空！</string>
 </resources>

@@ -46,6 +46,9 @@ import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.enums.ScreenMirrorControlAction
 import com.ismartcoding.plain.enums.ScreenMirrorMode
 import com.ismartcoding.plain.data.ScreenMirrorControlInput
+import android.app.RemoteInput
+import android.content.Intent
+import android.os.Bundle
 import com.ismartcoding.plain.events.CancelNotificationsEvent
 import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
@@ -735,6 +738,24 @@ class MainGraphQL(val schema: Schema) {
                 mutation("cancelNotifications") {
                     resolver { ids: List<ID> ->
                         sendEvent(CancelNotificationsEvent(ids.map { it.value }.toSet()))
+                        true
+                    }
+                }
+                mutation("replyNotification") {
+                    resolver { id: ID, actionIndex: Int, text: String ->
+                        val actions = TempData.notificationActions[id.value]
+                            ?: throw GraphQLError("notification_not_found")
+                        // Only consider reply-capable actions (those with remoteInputs)
+                        val replyActions = actions.filter { it.remoteInputs != null && it.remoteInputs.isNotEmpty() }
+                        val action = replyActions.getOrNull(actionIndex)
+                            ?: throw GraphQLError("action_not_found")
+                        val remoteInputs = action.remoteInputs!!
+                        val remoteInput = remoteInputs.first()
+                        val intent = Intent()
+                        val bundle = Bundle()
+                        bundle.putCharSequence(remoteInput.resultKey, text)
+                        RemoteInput.addResultsToIntent(remoteInputs, intent, bundle) // uses android.app.RemoteInput
+                        action.actionIntent.send(MainApp.instance, 0, intent)
                         true
                     }
                 }

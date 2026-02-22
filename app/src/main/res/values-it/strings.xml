@@ -681,4 +681,8 @@
     <string name="cannot_copy_folder_into_itself">Impossibile copiare una cartella in se stessa o in una sua sottocartella.</string>
     <string name="accessibility_service_description">PlainApp usa questo servizio di accessibilità per abilitare il controllo remoto durante il mirroring dello schermo. Inietta eventi di tocco (tap, scorrimento, trascinamento) e azioni di navigazione (Indietro, Home, Recenti) inviate dall\'interfaccia web.</string>
     <string name="accessibility_service_label">Controllo remoto PlainApp</string>
+    <string name="chat_info">Info chat</string>
+    <string name="clear_messages">Cancella messaggi</string>
+    <string name="clear_messages_confirm">Sei sicuro di voler cancellare tutti i messaggi? Questa azione non può essere annullata.</string>
+    <string name="messages_cleared">Messaggi cancellati!</string>
 </resources>

@@ -681,4 +681,8 @@
     <string name="cannot_copy_folder_into_itself">কোনো ফোল্ডারকে নিজেই বা তার উপ-ফোল্ডারে কপি করা যায় না।</string>
     <string name="accessibility_service_description">স্ক্রিন মিররিং চলাকালীন দূরবর্তী নিয়ন্ত্রণ সক্ষম করতে PlainApp এই অ্যাক্সেসিবিলিটি সার্ভিস ব্যবহার করে। এটি ওয়েব ইন্টারফেস থেকে পাঠানো টাচ ইভেন্ট (ট্যাপ, সোয়াইপ, স্ক্রল) এবং ন্যাভিগেশন অ্যাকশন (পেছনে, হোম, সাম্প্রতিক) ইনজেক্ট করে।</string>
     <string name="accessibility_service_label">PlainApp দূরবর্তী নিয়ন্ত্রণ</string>
+    <string name="chat_info">চ্যাট তথ্য</string>
+    <string name="clear_messages">বার্তা মুছুন</string>
+    <string name="clear_messages_confirm">আপনি কি সব বার্তা মুছতে চান? এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না।</string>
+    <string name="messages_cleared">বার্তাগুলি মুছে ফেলা হয়েছে!</string>
 </resources>

@@ -681,4 +681,8 @@
     <string name="cannot_copy_folder_into_itself">Bir klasör kendi içine veya alt klasörüne kopyalanamaz.</string>
     <string name="accessibility_service_description">PlainApp, ekran yansıtma sırasında uzaktan kontrolü etkinleştirmek için bu erişilebilirlik hizmetini kullanır. Web arayüzünden gönderilen dokunma olaylarını (dokunma, kaydırma, kaydırarak gezinme) ve gezinme eylemlerini (Geri, Ana ekran, Son kullanılanlar) enjekte eder.</string>
     <string name="accessibility_service_label">PlainApp Uzaktan Kontrol</string>
+    <string name="chat_info">Sohbet Bilgisi</string>
+    <string name="clear_messages">Mesajları Temizle</string>
+    <string name="clear_messages_confirm">Tüm mesajları temizlemek istediğinizden emin misiniz? Bu işlem geri alınamaz.</string>
+    <string name="messages_cleared">Mesajlar temizlendi!</string>
 </resources>

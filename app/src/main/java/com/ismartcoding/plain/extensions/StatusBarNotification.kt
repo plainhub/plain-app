@@ -13,6 +13,7 @@ fun StatusBarNotification.toDNotification(): DNotification {
     val title = notification.extras.getString2(Notification.EXTRA_TITLE)
     val text = notification.extras.getString2(Notification.EXTRA_TEXT)
     val actions = mutableListOf<String>()
+    val replyActions = mutableListOf<String>()
 
     if (notification.actions != null) {
         for (action in notification.actions) {
@@ -20,12 +21,12 @@ fun StatusBarNotification.toDNotification(): DNotification {
                 continue
             }
 
-            // Check whether it is a reply action. We have special treatment for them
             if (action.remoteInputs != null && action.remoteInputs.isNotEmpty()) {
-                continue
+                // Reply action - collect separately
+                replyActions.add(action.title.toString())
+            } else {
+                actions.add(action.title.toString())
             }
-
-            actions.add(action.title.toString())
         }
     }
 
@@ -39,6 +40,7 @@ fun StatusBarNotification.toDNotification(): DNotification {
         silent = notification.flags and Notification.FLAG_INSISTENT != 0,
         title = title,
         body = text,
-        actions = actions
+        actions = actions,
+        replyActions = replyActions
     )
 }

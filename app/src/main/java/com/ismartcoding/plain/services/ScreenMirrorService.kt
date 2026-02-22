@@ -10,6 +10,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isPortrait
 import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.plain.BuildConfig
+import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.events.EventType
@@ -75,7 +76,7 @@ class ScreenMirrorService : LifecycleService() {
         val notification =
             NotificationHelper.createServiceNotification(
                 this,
-                "${BuildConfig.APPLICATION_ID}.action.stop_screen_mirror",
+                Constants.ACTION_STOP_SCREEN_MIRROR,
                 getString(R.string.screen_mirror_service_is_running),
             )
         ServiceCompat.startForeground(

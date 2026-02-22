@@ -217,8 +217,16 @@
             android:name=".receivers.ServiceStopBroadcastReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="${applicationId}.action.stop_http_server" />
-                <action android:name="${applicationId}.action.stop_screen_mirror" />
+                <action android:name="${applicationId}.action.STOP_HTTP_SERVER" />
+                <action android:name="${applicationId}.action.STOP_SCREEN_MIRROR" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".receivers.PeerChatReplyReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="${applicationId}.action.PEER_CHAT_REPLY" />
             </intent-filter>
         </receiver>
 

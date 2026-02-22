@@ -7,12 +7,16 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.RemoteInput
 import com.ismartcoding.lib.extensions.notificationManager
 import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.receivers.PeerChatReplyReceiver
 import com.ismartcoding.plain.receivers.ServiceStopBroadcastReceiver
 import com.ismartcoding.plain.ui.MainActivity
 
@@ -56,6 +60,61 @@ object NotificationHelper {
                 },
             )
         }
+    }
+
+    fun ensureChatChannel() {
+        val notificationManager = MainApp.instance.notificationManager
+        if (notificationManager.getNotificationChannel(Constants.CHAT_NOTIFICATION_CHANNEL_ID) == null) {
+            notificationManager.createNotificationChannel(
+                NotificationChannel(
+                    Constants.CHAT_NOTIFICATION_CHANNEL_ID,
+                    getString(R.string.peer_chat),
+                    NotificationManager.IMPORTANCE_HIGH,
+                ),
+            )
+        }
+    }
+
+    fun sendPeerMessageNotification(context: Context, peerId: String, peerName: String, messageText: String) {
+        if (!Permission.POST_NOTIFICATIONS.can(context)) return
+        ensureChatChannel()
+
+        val notificationId = ("peer_chat_$peerId").hashCode()
+
+        val replyIntent = Intent(context, PeerChatReplyReceiver::class.java).apply {
+            action = Constants.ACTION_PEER_CHAT_REPLY
+            putExtra(PeerChatReplyReceiver.EXTRA_PEER_ID, peerId)
+        }
+        val replyPendingIntent = PendingIntent.getBroadcast(
+            context,
+            notificationId,
+            replyIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
+        )
+
+        val remoteInput = RemoteInput.Builder(PeerChatReplyReceiver.KEY_TEXT_REPLY)
+            .setLabel(getString(R.string.peer_chat_type_reply))
+            .build()
+
+        val replyAction = NotificationCompat.Action.Builder(
+            R.drawable.ic_stat_notification,
+            getString(R.string.peer_chat_reply),
+            replyPendingIntent,
+        )
+            .addRemoteInput(remoteInput)
+            .build()
+
+        val notification = NotificationCompat.Builder(context, Constants.CHAT_NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_stat_notification)
+            .setContentTitle(peerName)
+            .setContentText(messageText)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(createContentIntent(context))
+            .addAction(replyAction)
+            .build()
+
+        NotificationManagerCompat.from(context).notify(notificationId, notification)
     }
 
     fun createServiceNotification(

@@ -291,6 +291,15 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
         }
     }
 
+    fun clearAllMessages(context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val toId = _chatState.value.toId
+            ChatHelper.deleteAllChatsAsync(context, toId)
+            _itemsFlow.value = mutableStateListOf()
+            sendEvent(WebSocketEvent(EventType.MESSAGE_CLEARED, JsonHelper.jsonEncode(toId)))
+        }
+    }
+
     fun forwardMessage(messageId: String, targetPeer: DPeer, onResult: (Boolean) -> Unit = {}) {
         viewModelScope.launch(Dispatchers.IO) {
             val item = ChatHelper.getAsync(messageId) ?: return@launch
