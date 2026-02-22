@@ -18,6 +18,7 @@ import com.ismartcoding.plain.events.AppEvents
 import com.ismartcoding.plain.events.StartNearbyServiceEvent
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.preferences.AudioPlayModePreference
+import com.ismartcoding.plain.preferences.AutoCheckUpdatePreference
 import com.ismartcoding.plain.preferences.CheckUpdateTimePreference
 import com.ismartcoding.plain.preferences.ClientIdPreference
 import com.ismartcoding.plain.preferences.DarkThemePreference
@@ -74,6 +75,7 @@ class MainApp : Application() {
             TempData.httpsPort = HttpsPortPreference.get(preferences)
             TempData.audioPlayMode = AudioPlayModePreference.getValue(preferences)
             val checkUpdateTime = CheckUpdateTimePreference.get(preferences)
+            val autoCheckUpdate = AutoCheckUpdatePreference.get(preferences)
             ClientIdPreference.ensureValueAsync(instance, preferences)
             KeyStorePasswordPreference.ensureValueAsync(instance, preferences)
             UrlTokenPreference.ensureValueAsync(instance, preferences)
@@ -95,7 +97,7 @@ class MainApp : Application() {
             // Start Nearby service (always listen regardless of discoverable setting)
             sendEvent(StartNearbyServiceEvent())
             HttpServerManager.clientTsInterval()
-            if (AppFeatureType.CHECK_UPDATES.has() && checkUpdateTime < System.currentTimeMillis() - Constants.ONE_DAY_MS) {
+            if (AppFeatureType.CHECK_UPDATES.has() && autoCheckUpdate && checkUpdateTime < System.currentTimeMillis() - Constants.ONE_DAY_MS) {
                 AppHelper.checkUpdateAsync(this@MainApp, false)
             }
         }
