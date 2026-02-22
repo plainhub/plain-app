@@ -13,6 +13,7 @@ import android.media.projection.MediaProjection
 import android.os.Build
 import android.view.Surface
 import android.view.WindowManager
+import com.ismartcoding.lib.isBPlus
 import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DScreenMirrorQuality
@@ -392,39 +393,50 @@ class ScreenMirrorWebRtcManager(
     }
 
     /**
-     * Recreate the [VirtualDisplay] to match the current quality / orientation.
+     * Resize or recreate the [VirtualDisplay] to match the current quality / orientation.
      *
-     * We intentionally avoid [VirtualDisplay.resize] because on some Android 11
-     * devices it does not correctly update the rendering region when going from
-     * a smaller size back to a larger one (e.g. SMOOTH → HD), leaving black bars
-     * on the right and bottom edges even though the dimensions are correct.
-     * Releasing and recreating the VirtualDisplay is reliable across all devices.
+     * Android 16+ (API 36): [MediaProjection.createVirtualDisplay] may only be called once per
+     * [MediaProjection] instance. Re-calling it throws "Don't re-use the resultData…".
+     * We must use [VirtualDisplay.resize] on these versions.
+     *
+     * Android <= 15: [VirtualDisplay.resize] is broken on some Android 11 devices when going
+     * from a smaller size back to a larger one (e.g. SMOOTH → HD), leaving black bars on the
+     * right and bottom edges. Releasing and recreating the VirtualDisplay is the reliable fix.
      */
     private fun resizeVirtualDisplay() {
         val projection = mediaProjection ?: return
         val (width, height, dpi) = computeCaptureSize()
 
-        // Release old VirtualDisplay
-        virtualDisplay?.release()
-        virtualDisplay = null
+        if (isBPlus()) {
+            // Android 16+: createVirtualDisplay is one-shot per MediaProjection — use resize().
+            surfaceTextureHelper?.setTextureSize(width, height)
+            virtualDisplay?.resize(width, height, dpi)
+            LogCat.d("webrtc: VirtualDisplay resized ${width}x${height} dpi=$dpi")
+        } else {
+            // Android <= 15: recreate to avoid black-bar regression on Android 11 devices.
 
-        // Update SurfaceTexture buffer size
-        surfaceTextureHelper?.setTextureSize(width, height)
+            // Release old VirtualDisplay
+            virtualDisplay?.release()
+            virtualDisplay = null
 
-        // Recreate Surface to ensure clean state after buffer size change
-        displaySurface?.release()
-        displaySurface = Surface(surfaceTextureHelper!!.surfaceTexture)
+            // Update SurfaceTexture buffer size
+            surfaceTextureHelper?.setTextureSize(width, height)
 
-        // Create fresh VirtualDisplay with the new dimensions
-        virtualDisplay = projection.createVirtualDisplay(
-            "WebRTC_ScreenCapture",
-            width, height, dpi,
-            DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-            displaySurface,
-            null, null,
-        )
+            // Recreate Surface to ensure clean state after buffer size change
+            displaySurface?.release()
+            displaySurface = Surface(surfaceTextureHelper!!.surfaceTexture)
 
-        LogCat.d("webrtc: VirtualDisplay recreated ${width}x${height} dpi=$dpi")
+            // Create fresh VirtualDisplay with the new dimensions
+            virtualDisplay = projection.createVirtualDisplay(
+                "WebRTC_ScreenCapture",
+                width, height, dpi,
+                DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+                displaySurface,
+                null, null,
+            )
+
+            LogCat.d("webrtc: VirtualDisplay recreated ${width}x${height} dpi=$dpi")
+        }
     }
 
     private fun computeCaptureSize(): Triple<Int, Int, Int> {

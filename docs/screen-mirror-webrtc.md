@@ -141,8 +141,9 @@ These cases were observed on real Android 11 devices. They are easy to regress i
   - Initial creation with `createVirtualDisplay()` always works correctly.
   - Previous attempts to fix via scale-factor capping or DPI scaling did not help because the bug is in the resize path itself, not in the computed dimensions.
 - Fix:
-  - **Never use `VirtualDisplay.resize()`**. Instead, release the old VirtualDisplay and recreate it from the saved MediaProjection each time the quality or orientation changes.
-  - Also recreate the Surface wrapper around SurfaceTexture to ensure clean state after buffer size change.
+  - **Never use `VirtualDisplay.resize()` on Android ≤ 15**. Instead, release the old VirtualDisplay and recreate it from the saved MediaProjection each time the quality or orientation changes.
+  - On Android 16+ (API 36), `createVirtualDisplay` may only be called once per `MediaProjection` instance; use `VirtualDisplay.resize()` on those versions.
+  - Also recreate the Surface wrapper around SurfaceTexture to ensure clean state after buffer size change (Android ≤ 15 path only).
 - Required behavior:
   - `resizeVirtualDisplay()` must release the old VirtualDisplay and create a new one — not call `vd.resize()`.
   - The MediaProjection must be kept alive (it is obtained once) and reused for new VirtualDisplay instances.
@@ -153,7 +154,8 @@ These cases were observed on real Android 11 devices. They are easy to regress i
 
 When changing `ScreenMirrorWebRtcManager` capture logic, verify all items below:
 
-- **Never use `VirtualDisplay.resize()`**: Always release and recreate the VirtualDisplay. The `resize()` method is broken on some Android 11 devices when upscaling.
+- **Android 16+ (API 36) uses `VirtualDisplay.resize()`**: `MediaProjection#createVirtualDisplay` may only be called once on Android 16+. On those versions `resizeVirtualDisplay()` calls `resize()` instead of recreating.
+- **Android ≤ 15 uses recreate, never `VirtualDisplay.resize()`**: The `resize()` method is broken on some Android 11 devices when upscaling. The VirtualDisplay is released and a new one created from the saved MediaProjection.
 - Android 11 physical device:
   - HD mode has no right/bottom black bars.
   - Smooth mode remains correct.
