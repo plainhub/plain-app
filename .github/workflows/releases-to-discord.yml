@@ -42,12 +42,12 @@ jobs:
         with:
           webhook-url: ${{ secrets.RELEASE_WEBHOOK_URL }}
           username: "Release"
-          avatar-url: "https://cdn.discordapp.com/avatars/1184778180515606560/52b7876fc8cefa73f593c7f8b95811f3.webp?size=160"
+          avatar-url: "https://cdn.discordapp.com/icons/1109007781337505823/39f69a2c514e3d448db625017213698d.webp?size=160"
           content: "||@everyone||"
           embed-title: "📦 New Release: ${{ env.RELEASE_NAME }}"
           embed-url: "${{ env.RELEASE_URL }}"
           embed-description: "${{ env.RELEASE_BODY }}"
           embed-color: 2105893
           embed-footer-text: "Changelog"
-          embed-footer-icon-url: "https://cdn.discordapp.com/avatars/1184778180515606560/52b7876fc8cefa73f593c7f8b95811f3.webp?size=160"
+          embed-footer-icon-url: "https://cdn.discordapp.com/icons/1109007781337505823/39f69a2c514e3d448db625017213698d.webp?size=160"
           embed-timestamp: "${{ env.RELEASE_TIMESTAMP }}"
