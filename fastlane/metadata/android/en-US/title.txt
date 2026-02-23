@@ -1,1 +1,1 @@
-PlainApp: File & Web Access
+PlainApp: Phone Web Portal

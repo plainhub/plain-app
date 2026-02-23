@@ -1,1 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" height="48px" viewBox="0 0 24 24" width="48px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><circle cx="7.2" cy="14.4" r="3.2"/><circle cx="14.8" cy="18" r="2"/><circle cx="15.2" cy="8.8" r="4.8"/></svg>
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <path fill="#1A73E8" fill-rule="evenodd" d="
+    M72 48 H112 C140 48 152 72 152 96 C152 120 140 144 112 144 H96 V152 C96 160 90 168 80 168 H76 C66 168 60 160 60 152 V60 C60 52 66 48 76 48 Z
+    M104 78 A18 18 0 1 0 104 114 A18 18 0 1 0 104 78 Z" />
+</svg>

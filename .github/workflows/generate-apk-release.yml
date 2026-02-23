@@ -3,6 +3,9 @@ name: Generated APK
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
 
