@@ -14,27 +14,14 @@ import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 @Entity(tableName = "peers")
 data class DPeer(
     @PrimaryKey var id: String,
+    @ColumnInfo(name = "name") var name: String = "",
+    @ColumnInfo(name = "ip") var ip: String = "",
+    @ColumnInfo(name = "key") var key: String = "",
+    @ColumnInfo(name = "public_key") var publicKey: String = "",
+    @ColumnInfo(name = "status") var status: String = "", // paired, unpaired
+    @ColumnInfo(name = "port") var port: Int = 0,
+    @ColumnInfo(name = "device_type") var deviceType: String = "", // phone, tablet, pc, etc.
 ) : DEntityBase() {
-    @ColumnInfo(name = "name")
-    var name: String = ""
-
-    @ColumnInfo(name = "ip")
-    var ip: String = ""
-
-    @ColumnInfo(name = "key")
-    var key: String = ""
-
-    @ColumnInfo(name = "public_key")
-    var publicKey: String = ""
-
-    @ColumnInfo(name = "status")
-    var status: String = "" // paired, unpaired
-
-    @ColumnInfo(name = "port")
-    var port: Int = 0
-
-    @ColumnInfo(name = "device_type")
-    var deviceType: String = "" // phone, tablet, pc, etc.
 
     fun getApiUrl(): String {
         return "${getBaseUrl()}/peer_graphql"

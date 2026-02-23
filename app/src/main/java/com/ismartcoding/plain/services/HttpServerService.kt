@@ -125,19 +125,14 @@ class HttpServerService : LifecycleService() {
             HttpServerManager.waitForPortsAvailable(TempData.httpPort, TempData.httpsPort)
         }
 
-        // Try starting server with retry on BindException
-        var serverStarted = false
-        var lastError: Exception? = null
         val maxRetries = 3
         for (attempt in 1..maxRetries) {
             try {
                 val server = HttpServerManager.createHttpServerAsync(MainApp.instance)
                 server.start(wait = false)
                 HttpServerManager.server = server
-                serverStarted = true
                 break
             } catch (ex: Exception) {
-                lastError = ex
                 LogCat.e("Server start attempt $attempt/$maxRetries failed: ${ex.message}")
                 // If it's a BindException, the old socket may not be fully released yet
                 if (ex is java.net.BindException || ex.cause is java.net.BindException) {
@@ -149,19 +144,6 @@ class HttpServerService : LifecycleService() {
                     break // non-port error, no point retrying
                 }
             }
-        }
-
-        if (!serverStarted) {
-            HttpServerManager.httpServerError = lastError?.toString() ?: ""
-            HttpServerManager.httpServerError = if (HttpServerManager.httpServerError.isNotEmpty()) {
-                LocaleHelper.getString(R.string.http_server_failed) + " (${HttpServerManager.httpServerError})"
-            } else {
-                LocaleHelper.getString(R.string.http_server_failed)
-            }
-            serverState = HttpServerState.ERROR
-            sendEvent(HttpServerStateChangedEvent(serverState))
-            PNotificationListenerService.toggle(this, false)
-            return
         }
 
         delay(500) // brief wait for server to fully bind ports
@@ -201,6 +183,20 @@ class HttpServerService : LifecycleService() {
             sendEvent(HttpServerStateChangedEvent(serverState))
             PNotificationListenerService.toggle(this, false)
         }
+    }
+
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        super.onTaskRemoved(rootIntent)
+        // User swiped away the app from recents; stop server immediately to release ports.
+        NsdHelper.unregisterService()
+        try {
+            HttpServerManager.server?.stop(500, 1000)
+        } catch (e: Exception) {
+            LogCat.e("Error stopping server on task removed: ${e.message}")
+        } finally {
+            HttpServerManager.server = null
+        }
+        stopSelf()
     }
 
     override fun onDestroy() {
