@@ -43,10 +43,10 @@ object UrlHelper {
     }
 
     fun getPolicyUrl(): String {
-        return "https://ismartcoding.github.io/plain-app/policy.html"
+        return "https://plainhub.github.io/plain-app/policy.html"
     }
 
     fun getTermsUrl(): String {
-        return "https://ismartcoding.github.io/plain-app/terms.html"
+        return "https://plainhub.github.io/plain-app/terms.html"
     }
 }

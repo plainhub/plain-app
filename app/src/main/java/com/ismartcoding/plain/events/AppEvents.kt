@@ -32,6 +32,7 @@ import com.ismartcoding.plain.features.bluetooth.BluetoothUtil
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
 import com.ismartcoding.plain.chat.discover.NearbyPairManager
+import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.preferences.KeepAwakePreference
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
@@ -86,6 +87,8 @@ class LoadingDialogEvent(
 class WindowFocusChangedEvent(val hasFocus: Boolean) : ChannelEvent()
 
 class DeleteChatItemViewEvent(val id: String) : ChannelEvent()
+
+data class PeerUpdatedEvent(val peer: DPeer) : ChannelEvent()
 
 class ConfirmToAcceptLoginEvent(
     val session: DefaultWebSocketServerSession,

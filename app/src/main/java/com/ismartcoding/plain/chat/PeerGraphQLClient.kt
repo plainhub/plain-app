@@ -75,9 +75,9 @@ object PeerGraphQLClient {
 
             val httpClient = HttpClientManager.createCryptoHttpClient(peer.key, 10)
             val response = httpClient.newCall(request).execute()
-            val responseBody = response.body?.string()
+            val responseBody = response.body.string()
 
-            if (response.isSuccessful && responseBody != null) {
+            if (response.isSuccessful) {
                 LogCat.d("GraphQL response: $responseBody")
                 parseGraphQLResponse(responseBody)
             } else {

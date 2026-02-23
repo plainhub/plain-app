@@ -6,12 +6,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.Channel
+import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.pinyin.Pinyin
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
+import com.ismartcoding.plain.events.PeerUpdatedEvent
 import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import com.ismartcoding.plain.web.ChatApiManager
@@ -193,6 +195,11 @@ class ChatListViewModel : ViewModel() {
                         needsUpdate = true
                     }
 
+                    if (peer.port != device.port) {
+                        peer.port = device.port
+                        needsUpdate = true
+                    }
+
                     if (peer.name != device.name) {
                         peer.name = device.name
                         needsUpdate = true
@@ -207,6 +214,7 @@ class ChatListViewModel : ViewModel() {
                         peer.updatedAt = TimeHelper.now()
                         AppDatabase.instance.peerDao().update(peer)
                         loadPeers()
+                        sendEvent(PeerUpdatedEvent(peer))
                     }
 
                     // Update last active time for this peer

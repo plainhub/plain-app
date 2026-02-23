@@ -352,8 +352,11 @@ class ScreenMirrorWebRtcManager(
         if (peerConnectionFactory != null) return
 
         if (!webrtcInitialized) {
+            // Use applicationContext so that the NetworkMonitorAutoDetect BroadcastReceiver
+            // registered by WebRTC is tied to the app lifetime, not the service context.
+            // This prevents "Service has leaked IntentReceiver" errors on service destruction.
             PeerConnectionFactory.initialize(
-                PeerConnectionFactory.InitializationOptions.builder(context)
+                PeerConnectionFactory.InitializationOptions.builder(context.applicationContext)
                     .setEnableInternalTracer(false)
                     .createInitializationOptions(),
             )

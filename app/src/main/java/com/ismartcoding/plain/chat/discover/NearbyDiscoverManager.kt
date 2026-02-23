@@ -193,6 +193,7 @@ object NearbyDiscoverManager {
                         id = reply.id,
                         name = reply.name,
                         ip = senderIP,
+                        port = reply.port,
                         deviceType = reply.deviceType,
                         version = reply.version,
                         platform = reply.platform,
@@ -200,9 +201,9 @@ object NearbyDiscoverManager {
                     )
                 )
             )
-            LogCat.d("Device discovered: ${reply.name} at $senderIP")
+            LogCat.d("ProcessDiscoveryReply: $reply")
         } catch (e: Exception) {
-            LogCat.e("Error processing discovery reply: ${e.message}")
+            LogCat.e("Error ProcessDiscoveryReply: ${e.message}")
         }
     }
 }

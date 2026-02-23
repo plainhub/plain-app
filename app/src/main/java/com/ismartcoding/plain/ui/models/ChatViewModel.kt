@@ -6,8 +6,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.chat.PeerChatHelper
@@ -22,11 +24,14 @@ import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
+import com.ismartcoding.plain.events.PeerUpdatedEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.web.ChatApiManager
 import com.ismartcoding.plain.web.models.toModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,6 +56,21 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
 
     private val _chatState = MutableStateFlow(ChatState())
     val chatState: StateFlow<ChatState> get() = _chatState
+
+    init {
+        viewModelScope.launch {
+            Channel.sharedFlow.collect { event ->
+                when (event) {
+                    is PeerUpdatedEvent -> {
+                        val currentPeer = _chatState.value.peer
+                        if (currentPeer != null && currentPeer.id == event.peer.id) {
+                            _chatState.value = _chatState.value.copy(peer = event.peer, toName = event.peer.name)
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     suspend fun initializeChatStateAsync(chatId: String) {
         var toId = ""
@@ -125,6 +145,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
             if (state.peer != null) {
                 val success = PeerChatHelper.sendToPeerAsync(state.peer, content)
                 updateMessageStatus(item, success)
+                if (!success) triggerPeerRediscovery(state.peer.id)
                 onResult(success)
             } else {
                 onResult(true)
@@ -141,15 +162,6 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
             }
             sendMessage(content, onResult)
         }
-    }
-
-    fun sendFiles(files: List<DMessageFile>, isImageVideo: Boolean, onResult: (Boolean) -> Unit = {}) {
-        val content = if (isImageVideo) {
-            DMessageContent(DMessageType.IMAGES.value, DMessageImages(files))
-        } else {
-            DMessageContent(DMessageType.FILES.value, DMessageFiles(files))
-        }
-        sendMessage(content, onResult)
     }
 
     /**
@@ -204,6 +216,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
                     val finalStatus = if (success) "sent" else "failed"
                     dao.updateStatus(messageId, finalStatus)
                     item.status = finalStatus
+                    if (!success) triggerPeerRediscovery(state.peer.id)
                 }
                 update(item)
             }
@@ -232,6 +245,13 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
         return DMessageContent(DMessageType.FILES.value, DMessageFiles(listOf(messageFile)))
     }
 
+    private fun triggerPeerRediscovery(peerId: String) {
+        val key = ChatApiManager.peerKeyCache[peerId]
+        if (key != null) {
+            NearbyDiscoverManager.discoverSpecificDevice(peerId, key)
+        }
+    }
+
     private suspend fun updateMessageStatus(item: DChat, success: Boolean) {
         val newStatus = if (success) "sent" else "failed"
         ChatHelper.updateStatusAsync(item.id, newStatus)
@@ -248,9 +268,9 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
                 ChatHelper.updateStatusAsync(messageId, "pending")
                 item.status = "pending"
                 update(item)
-
                 val success = PeerChatHelper.sendToPeerAsync(state.peer, item.content)
                 updateMessageStatus(item, success)
+                if (!success) triggerPeerRediscovery(state.peer.id)
             }
         }
     }
@@ -320,6 +340,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
 
             val success = PeerChatHelper.sendToPeerAsync(targetPeer, newItem.content)
             updateMessageStatus(newItem, success)
+            if (!success) triggerPeerRediscovery(targetPeer.id)
             onResult(success)
         }
     }

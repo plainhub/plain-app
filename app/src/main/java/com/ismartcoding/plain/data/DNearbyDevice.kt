@@ -7,6 +7,7 @@ data class DNearbyDevice(
     val id: String,
     val name: String,
     val ip: String,
+    val port: Int,
     val deviceType: DeviceType,
     val version: String,
     val platform: String,
