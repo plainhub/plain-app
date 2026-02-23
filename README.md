@@ -98,13 +98,13 @@ Your donation is highly appreciated. Thank you!
 
 <table>
   <tr>
-    <td><img src="screenshots/app-files.jpg" alt="files"/></td>
+    <td><img src="screenshots/app-files.png" alt="files"/></td>
     <td><img src="screenshots/app-home.png" alt="home"/></td>
     <td><img src="screenshots/app-music-player.jpg" alt="music player"/></td>
     <td><img src="screenshots/app-chat.png" alt="chat"/></td>
   </tr>
   <tr>
-    <td><img src="screenshots/app-audio.jpg" alt="audio"/></td>
+    <td><img src="screenshots/app-audio.png" alt="audio"/></td>
     <td><img src="screenshots/app-images.jpg" alt="images"/></td>
     <td><img src="screenshots/app-videos.jpg" alt="videos"/></td>
     <td><img src="screenshots/app-rss.jpg" alt="rss"/></td>
