@@ -7,13 +7,24 @@ import java.net.Inet4Address
 import java.net.NetworkInterface
 
 object NetworkHelper {
+    /**
+     * Returns true for interface names that are typically VPN tunnels.
+     * These should be excluded when picking a physical LAN address for JmDNS because
+     * mDNS is a link-local protocol and cannot traverse VPN tunnels.
+     */
+    fun isVpnInterface(name: String): Boolean {
+        return name.startsWith("tun") || name.startsWith("ppp") ||
+            name.startsWith("ipsec") || name.startsWith("tap") ||
+            name == "VirtualBox Host-Only Network"
+    }
+
     fun getDeviceIP4(): String {
         try {
             val en = NetworkInterface.getNetworkInterfaces()
             val map = mutableMapOf<String, String>()
             while (en?.hasMoreElements() == true) {
                 val intf = en.nextElement()
-                if (intf.isUp) {
+                if (intf.isUp && !isVpnInterface(intf.name)) {
                     val enumIpAddr = intf.inetAddresses
                     while (enumIpAddr.hasMoreElements()) {
                         val inetAddress = enumIpAddr.nextElement()
@@ -24,7 +35,10 @@ object NetworkHelper {
                 }
             }
             if (map.isNotEmpty()) {
-                return map["wlan0"] ?: map.values.first()
+                // Prefer wlan0 (primary Wi-Fi), then any Wi-Fi-like interface, then fallback
+                return map["wlan0"]
+                    ?: map.entries.firstOrNull { it.key.startsWith("wlan") }?.value
+                    ?: map.values.first()
             }
         } catch (ex: Exception) {
             ex.printStackTrace()

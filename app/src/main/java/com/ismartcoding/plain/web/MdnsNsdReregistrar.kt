@@ -2,6 +2,7 @@ package com.ismartcoding.plain.web
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.NetworkRequest
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.logcat.LogCat
 import kotlinx.coroutines.Job
@@ -57,7 +58,13 @@ class MdnsNsdReregistrar(
         }
 
         runCatching {
-            cm.registerDefaultNetworkCallback(networkCallback!!)
+            // Use a broad NetworkRequest so we get callbacks for ALL networks
+            // (Wi-Fi, Ethernet, VLAN sub-interfaces, VPN) rather than only the
+            // current default network.  This ensures mDNS is re-registered whenever
+            // any interface comes up or changes IP — e.g. a VPN connecting while
+            // Wi-Fi is already the default, or a VLAN assignment changing.
+            val request = NetworkRequest.Builder().build()
+            cm.registerNetworkCallback(request, networkCallback!!)
         }
             .onSuccess { LogCat.d("Registered network callback for mDNS re-register") }
             .onFailure {

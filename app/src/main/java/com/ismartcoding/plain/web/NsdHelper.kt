@@ -10,6 +10,7 @@ import com.ismartcoding.plain.TempData
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.withTimeout
 import java.net.InetAddress
+import java.net.NetworkInterface
 import javax.jmdns.JmDNS
 import javax.jmdns.ServiceInfo
 
@@ -24,6 +25,8 @@ object NsdHelper {
     // which would throw "listener not registered".
     private val registrationListeners = mutableListOf<NsdManager.RegistrationListener>()
     private var jmDNS: JmDNS? = null
+    // All JmDNS instances (one per physical network interface)
+    private var jmDNSInstances: List<JmDNS> = emptyList()
     private var unregisterJob: Job? = null
     
     private data class ServiceDescriptor(
@@ -149,31 +152,50 @@ object NsdHelper {
     }
 
     private fun registerWithJmDNS(services: List<ServiceDescriptor>): Boolean {
-        try {
-            val ip = NetworkHelper.getDeviceIP4()
-            if (ip.isEmpty()) {
-                LogCat.e("Failed to get device IP for JmDNS")
-                return false
+        // Collect all physical (non-VPN) IPv4 addresses.  mDNS is link-local and must be
+        // announced on each interface separately; a single JmDNS bound to one IP won't be
+        // reachable from other subnets (Wi-Fi VLAN, Ethernet, etc.).
+        val ips = NetworkHelper.getDeviceIP4s().filter { ip ->
+            try {
+                val ni = NetworkInterface.getByInetAddress(InetAddress.getByName(ip))
+                ni != null && !NetworkHelper.isVpnInterface(ni.name)
+            } catch (_: Exception) {
+                false
             }
+        }
 
-            val addr = InetAddress.getByName(ip)
-            jmDNS = JmDNS.create(addr, TempData.mdnsHostname)
-
-            for (service in services) {
-                val info = ServiceInfo.create(
-                    service.type,
-                    service.name,
-                    service.port,
-                    service.description
-                )
-                jmDNS?.registerService(info)
-                LogCat.d("Registered JmDNS service ${service.type} on ${TempData.mdnsHostname}:${service.port}")
-            }
-            return true
-        } catch (e: Exception) {
-            LogCat.e("Failed to register JmDNS service: ${e.message}")
+        if (ips.isEmpty()) {
+            LogCat.e("Failed to get any physical device IP for JmDNS")
             return false
         }
+
+        var anyOk = false
+        val instances = mutableListOf<JmDNS>()
+        for (ip in ips) {
+            try {
+                val addr = InetAddress.getByName(ip)
+                val instance = JmDNS.create(addr, TempData.mdnsHostname)
+                for (service in services) {
+                    val info = ServiceInfo.create(
+                        service.type,
+                        service.name,
+                        service.port,
+                        service.description
+                    )
+                    instance.registerService(info)
+                }
+                instances.add(instance)
+                LogCat.d("Registered JmDNS service on $ip (${TempData.mdnsHostname})")
+                anyOk = true
+            } catch (e: Exception) {
+                LogCat.e("Failed to register JmDNS on $ip: ${e.message}")
+            }
+        }
+        // Store only the first instance for legacy unregister path; extra instances are
+        // kept in jmDNSInstances and cleaned up in unregisterService().
+        jmDNS = instances.firstOrNull()
+        jmDNSInstances = instances
+        return anyOk
     }
     
     /**
@@ -181,7 +203,10 @@ object NsdHelper {
      */
     fun unregisterService() {
         val listeners = registrationListeners.toList().also { registrationListeners.clear() }
-        val jmdns = jmDNS.also { jmDNS = null }
+        val instances = jmDNSInstances.also {
+            jmDNSInstances = emptyList()
+            jmDNS = null
+        }
 
         // Do NOT cancel a running unregister job. Each call owns its own snapshot of
         // listeners (taken above) so concurrent jobs work on disjoint sets — cancelling
@@ -194,14 +219,14 @@ object NsdHelper {
             }
             if (listeners.isNotEmpty()) LogCat.d("Unregistered Android NSD service(s): ${listeners.size}")
 
-            jmdns?.let { j ->
+            instances.forEach { j ->
                 runCatching {
                     withTimeout(5_000) {
                         runCatching { j.unregisterAllServices() }
                         runCatching { j.close() }
                     }
                 }
-                    .onSuccess { LogCat.d("Unregistered JmDNS service") }
+                    .onSuccess { LogCat.d("Unregistered JmDNS instance") }
                     .onFailure { LogCat.e("Failed to shutdown JmDNS: ${it.message}") }
             }
         }
