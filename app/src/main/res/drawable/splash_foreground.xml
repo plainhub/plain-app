@@ -3,18 +3,14 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-  <group android:scaleX="2.088"
-      android:scaleY="2.088"
-      android:translateX="28.944"
-      android:translateY="28.944">
+  <group
+      android:scaleX="0.25"
+      android:scaleY="0.25"
+      android:translateX="29"
+      android:translateY="29">
     <path
-        android:fillColor="@color/splash_icon"
-        android:pathData="M7.2,14.4m-3.2,0a3.2,3.2 0,1 1,6.4 0a3.2,3.2 0,1 1,-6.4 0"/>
-    <path
-        android:fillColor="@color/splash_icon"
-        android:pathData="M14.8,18m-2,0a2,2 0,1 1,4 0a2,2 0,1 1,-4 0"/>
-    <path
-        android:fillColor="@color/splash_icon"
-        android:pathData="M15.2,8.8m-4.8,0a4.8,4.8 0,1 1,9.6 0a4.8,4.8 0,1 1,-9.6 0"/>
+        android:fillColor="@color/app_icon"
+        android:fillType="evenOdd"
+        android:pathData="M72,48 H112 C140,48 152,72 152,96 C152,120 140,144 112,144 H96 V152 C96,160 90,168 80,168 H76 C66,168 60,160 60,152 V60 C60,52 66,48 76,48 Z M104,96m-18,0a18,18 0,1 1,36 0a18,18 0,1 1,-36 0"/>
   </group>
 </vector>

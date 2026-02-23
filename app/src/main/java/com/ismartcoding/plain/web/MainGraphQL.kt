@@ -137,6 +137,7 @@ import com.ismartcoding.plain.web.models.PackageInstallPending
 import com.ismartcoding.plain.web.models.PackageStatus
 import com.ismartcoding.plain.web.models.PomodoroToday
 import com.ismartcoding.plain.web.models.Bookmark
+import com.ismartcoding.plain.web.models.BookmarkInput
 import com.ismartcoding.plain.web.models.BookmarkGroup
 import com.ismartcoding.plain.web.models.Tag
 import com.ismartcoding.plain.web.models.TempValue
@@ -1580,12 +1581,13 @@ class MainGraphQL(val schema: Schema) {
                     }
                 }
                 mutation("updateBookmark") {
-                    resolver { id: ID, title: String, groupId: String, pinned: Boolean, sortOrder: Int ->
+                    resolver { id: ID, input: BookmarkInput ->
                         BookmarkHelper.updateBookmark(id.value) {
-                            this.title = title
-                            this.groupId = groupId
-                            this.pinned = pinned
-                            this.sortOrder = sortOrder
+                            this.url = input.url
+                            this.title = input.title
+                            this.groupId = input.groupId
+                            this.pinned = input.pinned
+                            this.sortOrder = input.sortOrder
                         }?.toModel()
                     }
                 }

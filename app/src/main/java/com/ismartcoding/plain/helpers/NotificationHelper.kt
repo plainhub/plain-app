@@ -97,7 +97,7 @@ object NotificationHelper {
             .build()
 
         val replyAction = NotificationCompat.Action.Builder(
-            R.drawable.ic_stat_notification,
+            R.drawable.notification,
             getString(R.string.peer_chat_reply),
             replyPendingIntent,
         )
@@ -105,7 +105,7 @@ object NotificationHelper {
             .build()
 
         val notification = NotificationCompat.Builder(context, Constants.CHAT_NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_stat_notification)
+            .setSmallIcon(R.drawable.notification)
             .setContentTitle(peerName)
             .setContentText(messageText)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -134,7 +134,7 @@ object NotificationHelper {
             )
 
         return NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID).apply {
-            setSmallIcon(R.drawable.ic_stat_notification)
+            setSmallIcon(R.drawable.notification)
             setContentTitle(title)
             setContentText(description)
             setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

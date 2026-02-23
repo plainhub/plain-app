@@ -1,23 +1,46 @@
-PlainApp is an open-source application that allows you to manage your phone through a web browser. Access files, videos, music, contacts, and more from your desktop using a secure, easy to use web interface!
+**PlainApp** is a free, open-source Android app that turns your phone into a self-hosted management hub you can access from any web browser on the same network — no accounts, no cloud, no subscriptions. Whether you need to transfer files, read SMS, browse photos, or mirror your screen, PlainApp puts full control back in your hands.
 
-Features:
-  - Privacy oriented: We take your privacy seriously and use TLS + ChaCha20 encryption to ensure your data is secure.
-  - Ad-free forever: You won't be bombarded with ads when using PlainApp.
-  - No cloud services or third-party data storage: All data is kept on your device, so you have complete control over your information.
-  - User-friendly: PlainApp has a modern, customizable interface with multi-language support, light/dark theme options, and e-ink screen compatibility.
-  - Desktop management: You can manage your phone from your desktop by visiting a self-hosted webpage wirelessly.
-  - Contacts management: You can manage these features on the self-hosted webpage as well.
-  - File management: Manage files, images, videos, and audios on the self-hosted webpage.
-  - Note-taking: Use PlainApp to manage your notes with a built-in Markdown editor.
-  - RSS reader: Read articles in a clean UI.
-  - TV casting: Cast your videos, images, and audios to your TV.
-  - Video and audio playback: Play videos and audios in the app and on the webpage.
-  - Backup and export: Backup and export your app data for safekeeping.
-  - ChatGPT conversation UI (web only)
-  - SMS, Calls: Read your SMS and calls on webpage.
-  - Apps: View your apps and download apk from phone.(web only)
-  - Screen mirror: Mirror your phone on webpage.
-  - And more features are planned for the future.
+## Why PlainApp?
+
+Most phone-management tools either route your data through their own servers, lock features behind subscriptions, or plague you with ads. PlainApp is different:
+
+- **100% local** — your data never leaves your network
+- **End-to-end encrypted** — every connection is secured with TLS + XChaCha20-Poly1305
+- **Completely free and ad-free** — no purchases, no upsells, ever
+- **Fully open-source** — audit the code, build your own binary, or contribute
+
+## Features
+
+### 🌐 Web-Based Phone Management
+Open a browser on any desktop or laptop connected to the same Wi-Fi network and get a full dashboard to manage your Android device — no app installation required on the computer side. Supports PWA so you can pin it to your desktop like a native app.
+
+| Category | What you can do |
+|---|---|
+| **Files** | Browse internal storage, SD card, and USB drives; upload, download, rename, delete |
+| **Media** | View and manage photos, videos, and audio; stream them directly in the browser |
+| **Contacts** | View, search, and manage your contacts |
+| **SMS & Calls** | Read messages and call logs; send SMS from your desktop |
+| **Apps** | List installed apps and export APKs |
+| **Notifications** | Mirror phone notifications to the browser in real time |
+| **Screen Mirror** | Live-stream the phone screen to the browser with audio and remote control support |
+| **Device Info** | Check battery, storage, network, and system details |
+
+### 📱 Built-in Android Tools
+PlainApp is also a capable standalone app — not just a server:
+
+- **Markdown Notes** — write and organize notes with a clean editor
+- **RSS Reader** — follow your favorite websites with a distraction-free reader
+- **Video & Audio Player** — full-featured media player with playlist support
+- **TV Cast** — cast media to any DLNA/Chromecast-compatible TV
+- **Peer-to-Peer Chat & File Sharing** — share files and messages directly between devices without a server
+- **Pomodoro Timer** — stay focused with a built-in work timer
+- **Sound Meter** — measure ambient noise levels in real time
+
+### 🔒 Privacy & Security
+- No Firebase Analytics or Messaging — crash reporting (via Firebase Crashlytics) is optional and opt-in
+- Zero data sent to any third-party server
+- All traffic between phone and browser is encrypted (TLS + XChaCha20-Poly1305)
+- No account registration required
 
 Github: https://github.com/ismartcoding/plain-app
 Reddit: https://www.reddit.com/r/plainapp
