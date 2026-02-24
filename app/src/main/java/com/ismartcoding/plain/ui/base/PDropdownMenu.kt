@@ -115,13 +115,3 @@ fun PDropdownMenuItemSettings(onClick: () -> Unit) {
         )
     }, onClick = onClick)
 }
-
-@Composable
-fun PDropdownMenuItemCellsPerRow(onClick: () -> Unit) {
-    PDropdownMenuItem(text = { Text(stringResource(R.string.cells_per_row)) }, leadingIcon = {
-        Icon(
-            painter = painterResource(R.drawable.grid_3x3),
-            contentDescription = stringResource(id = R.string.cells_per_row)
-        )
-    }, onClick = onClick)
-}

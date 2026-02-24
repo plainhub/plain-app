@@ -3,8 +3,11 @@ package com.ismartcoding.plain.ui.components.mediaviewer.video
 import androidx.annotation.OptIn
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Box
+import kotlinx.coroutines.withTimeoutOrNull
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.PagerState
@@ -240,7 +243,21 @@ fun MediaVideo(
                 bSize = it
             }
             .pointerInput(Unit) {
-                detectTapGestures(onLongPress = gesture.onLongPress)
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    val longPressTimeout = viewConfiguration.longPressTimeoutMillis
+                    val released = withTimeoutOrNull(longPressTimeout) {
+                        waitForUpOrCancellation()
+                    }
+                    if (released == null) {
+                        // Long press detected
+                        gesture.onLongPress(down.position)
+                        videoState.startSpeedBoost()
+                        // Wait for pointer release to restore speed
+                        waitForUpOrCancellation()
+                        videoState.stopSpeedBoost()
+                    }
+                }
             }
             .pointerInput(key1 = videoSpecified) {
                 if (videoSpecified) detectTransformGestures(

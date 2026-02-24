@@ -61,7 +61,6 @@
     <string name="metering_mode_other">Khác</string>
     <string name="white_balance_auto">Tự động</string>
     <string name="white_balance_manual">Thủ công</string>
-    <string name="cells_per_row">Số ô mỗi hàng</string>
     <string name="exit_cast_mode">Thoát chế độ trình chiếu</string>
     <string name="rotate">Xoay</string>
     <string name="image_save_to">Hình ảnh đã được lưu vào {{path}}</string>
