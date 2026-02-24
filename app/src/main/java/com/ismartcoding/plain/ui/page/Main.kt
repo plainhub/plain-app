@@ -363,8 +363,9 @@ fun Main(
                     FilesPage(navController, audioPlaylistVM, r.folderPath)
                 }
                 
-                composable<Routing.Nearby> { 
-                    NearbyPage(navController)
+                composable<Routing.Nearby> { backStackEntry ->
+                    val r = backStackEntry.toRoute<Routing.Nearby>()
+                    NearbyPage(navController, pairDeviceJson = r.pairDeviceJson)
                 }
             }
 

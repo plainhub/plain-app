@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 class VideosViewModel : BaseMediaViewModel<DVideo>() {
     override val dataType = DataType.VIDEO
     val scrollStateMap = mutableStateMapOf<Int, LazyGridState>()
-    val showCellsPerRowDialog = mutableStateOf(false)
 
     fun delete(context: Context, tagsVM: TagsViewModel, ids: Set<String>) {
         viewModelScope.launch(Dispatchers.IO) {

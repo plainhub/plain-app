@@ -61,7 +61,6 @@
     <string name="metering_mode_other">其他</string>
     <string name="white_balance_auto">自動</string>
     <string name="white_balance_manual">手動</string>
-    <string name="cells_per_row">每行格數</string>
     <string name="exit_cast_mode">退出投影模式</string>
     <string name="rotate">旋轉</string>
     <string name="image_save_to">圖片已保存至{{path}}</string>
@@ -211,6 +210,11 @@
     <string name="stop_discovering">停止發現</string>
     <string name="tap_discover_to_start">點擊「發現附近裝置」開始搜尋</string>
     <string name="make_sure_devices_same_network">確保其他裝置在同一網路中且可被發現</string>
+    <string name="show_qr_code">顯示 QR 碼</string>
+    <string name="pair_via_qr_title">透過 QR 碼配對</string>
+    <string name="pair_via_qr_desc">在另一台裝置上開啟 PlainApp，點擊掃描按鈕，然後掃描此 QR 碼進行配對。</string>
+    <string name="pair_with_device">與 %s 配對</string>
+    <string name="confirm_pair_with_device">你要與 %s 配對嗎？</string>
     <string name="last_seen">最後上線</string>
     <string name="device_discovered">發現裝置</string>
     <string name="link_preview_image">鏈接預覽圖片</string>
@@ -432,6 +436,7 @@
     <string name="screen_mirror_audio_permission_settings_message">麥克風權限已被停用，請到設定中開啟後才能鏡像系統音訊。</string>
     <string name="cast">投屏</string>
     <string name="images">圖片</string>
+    <string name="video">影片</string>
     <string name="audios">音訊</string>
     <string name="videos">影片</string>
     <string name="files">檔案</string>
@@ -645,7 +650,6 @@
     <string name="customize_home_features">自定義首頁功能</string>
     <string name="file_picker_not_available">此設備上沒有可用的檔案選擇器應用程式。請安裝檔案管理器應用程式。</string>
     <string name="image">圖片</string>
-    <string name="text_message">文字訊息</string>
     <string name="pair">配對</string>
     <string name="unpair">解除配對</string>
     <string name="paired">已配對</string>

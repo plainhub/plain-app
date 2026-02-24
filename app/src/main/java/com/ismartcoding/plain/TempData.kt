@@ -19,4 +19,7 @@ object TempData {
 
     var audioSleepTimerFutureTime = 0L
     var audioPlayPosition = 0L // audio play position in milliseconds
+
+    // The peer ID whose ChatPage is currently open; empty when no peer chat is active.
+    var activeChatPeerId = ""
 }

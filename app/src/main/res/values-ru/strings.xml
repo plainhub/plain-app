@@ -61,7 +61,6 @@
     <string name="metering_mode_other">Другое</string>
     <string name="white_balance_auto">Авто</string>
     <string name="white_balance_manual">Ручной</string>
-    <string name="cells_per_row">Ячеек в строке</string>
     <string name="exit_cast_mode">Выйти из режима передачи</string>
     <string name="rotate">Повернуть</string>
     <string name="image_save_to">Изображение сохранено в {{path}}</string>
@@ -208,6 +207,11 @@
     <string name="stop_discovering">Остановить поиск</string>
     <string name="tap_discover_to_start">Нажмите \"Обнаружить устройства рядом\" для начала поиска</string>
     <string name="make_sure_devices_same_network">Убедитесь, что другие устройства находятся в той же сети и обнаруживаемы</string>
+    <string name="show_qr_code">Показать QR-код</string>
+    <string name="pair_via_qr_title">Сопряжение по QR-коду</string>
+    <string name="pair_via_qr_desc">Откройте PlainApp на другом устройстве, нажмите кнопку сканирования и отсканируйте этот QR-код для сопряжения.</string>
+    <string name="pair_with_device">Сопряжение с %s</string>
+    <string name="confirm_pair_with_device">Вы хотите выполнить сопряжение с %s?</string>
     <string name="last_seen">Последний раз в сети</string>
     <string name="device_discovered">Устройство обнаружено</string>
     <string name="link_preview_image">Изображение предварительного просмотра ссылки</string>
@@ -432,6 +436,7 @@
     <string name="screen_mirror_audio_permission_settings_message">Разрешение на микрофон отключено. Включите его в настройках, чтобы зеркалировать системный звук.</string>
     <string name="cast">Транслировать</string>
     <string name="images">Изображения</string>
+    <string name="video">Видео</string>
     <string name="audios">Аудио</string>
     <string name="videos">Видео</string>
     <string name="files">Файлы</string>
@@ -645,7 +650,6 @@
     <string name="customize_home_features">Настроить функции дома</string>
     <string name="file_picker_not_available">На этом устройстве нет приложения для выбора файлов. Пожалуйста, установите приложение файлового менеджера.</string>
     <string name="image">Изображение</string>
-    <string name="text_message">Текстовое сообщение</string>
     <string name="pair">Сопрячь</string>
     <string name="unpair">Отсоединить</string>
     <string name="paired">Сопряжен</string>

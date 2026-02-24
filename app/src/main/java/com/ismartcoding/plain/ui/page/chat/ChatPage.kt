@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.Channel
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.lib.extensions.getFilenameWithoutExtension
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
@@ -44,7 +46,6 @@ import com.ismartcoding.lib.extensions.queryOpenableFile
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.StringHelper
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.enums.PickFileTag
@@ -54,8 +55,8 @@ import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.extensions.getDuration
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.helpers.ChatFileSaveHelper
 import com.ismartcoding.plain.helpers.AppFileStore
+import com.ismartcoding.plain.helpers.ChatFileSaveHelper
 import com.ismartcoding.plain.helpers.ImageHelper
 import com.ismartcoding.plain.helpers.VideoHelper
 import com.ismartcoding.plain.preferences.ChatInputTextPreference
@@ -64,7 +65,6 @@ import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PIconButton
-import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.PTopRightButton
@@ -84,14 +84,14 @@ import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
 import com.ismartcoding.plain.ui.models.showBottomActions
 import com.ismartcoding.plain.ui.models.toggleSelectAll
+import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.ChatInput
 import com.ismartcoding.plain.ui.page.chat.components.ChatListItem
-import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
 import com.ismartcoding.plain.ui.page.chat.components.ForwardTarget
+import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.io.File
 
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
@@ -132,6 +132,18 @@ fun ChatPage(
     val focusManager = LocalFocusManager.current
     val sharedFlow = Channel.sharedFlow
     val previewerState = rememberPreviewerState()
+
+    DisposableEffect(id) {
+        val peerId = id.removePrefix("peer:")
+        if (id.startsWith("peer:")) {
+            TempData.activeChatPeerId = peerId
+        }
+        onDispose {
+            if (id.startsWith("peer:")) {
+                TempData.activeChatPeerId = ""
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         inputValue = ChatInputTextPreference.getAsync(context)

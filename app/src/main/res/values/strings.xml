@@ -61,7 +61,6 @@
     <string name="metering_mode_other">Other</string>
     <string name="white_balance_auto">Auto</string>
     <string name="white_balance_manual">Manual</string>
-    <string name="cells_per_row">Cells per row</string>
     <string name="exit_cast_mode">Exit cast mode</string>
     <string name="rotate">Rotate</string>
     <string name="image_save_to">Image saved to {{path}}</string>
@@ -210,6 +209,11 @@
     <string name="stop_discovering">Stop discovering</string>
     <string name="tap_discover_to_start">Tap \"Discover nearby devices\" to start searching</string>
     <string name="make_sure_devices_same_network">Make sure other devices are on the same network and discoverable</string>
+    <string name="show_qr_code">Show QR code</string>
+    <string name="pair_via_qr_title">Pair via QR code</string>
+    <string name="pair_via_qr_desc">Open PlainApp on another device, tap the scan button, and scan this QR code to pair.</string>
+    <string name="pair_with_device">Pair with %s</string>
+    <string name="confirm_pair_with_device">Do you want to pair with %s?</string>
     <string name="last_seen">Last seen</string>
     <string name="device_discovered">Device discovered</string>
     <string name="link_preview_image">Link preview image</string>
@@ -435,7 +439,9 @@
     <string name="accessibility_service_description">PlainApp uses this accessibility service to enable remote control during screen mirroring. It injects touch events (tap, swipe, scroll) and navigation actions (Back, Home, Recents) sent from the web interface.</string>
     <string name="accessibility_service_label">PlainApp Remote Control</string>
     <string name="cast">Cast</string>
+    <string name="image">Image</string>
     <string name="images">Images</string>
+    <string name="video">Video</string>
     <string name="audios">Audio</string>
     <string name="videos">Videos</string>
     <string name="files">Files</string>
@@ -648,8 +654,6 @@
     <string name="unknown_error">Unknown error occurred.</string>
     <string name="customize_home_features">Customize Home Features</string>
     <string name="file_picker_not_available">No file picker app is available on this device. Please install a file manager app.</string>
-    <string name="image">Image</string>
-    <string name="text_message">Text message</string>
     <string name="pair">Pair</string>
     <string name="unpair">Unpair</string>
     <string name="paired">Paired</string>

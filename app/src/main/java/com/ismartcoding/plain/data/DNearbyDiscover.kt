@@ -22,4 +22,6 @@ data class DDiscoverReply(
     val deviceType: DeviceType,
     val version: String,
     val platform: String,
+    @EncodeDefault(EncodeDefault.Mode.NEVER)
+    val ips: List<String> = emptyList(), // All IP addresses of the device
 )

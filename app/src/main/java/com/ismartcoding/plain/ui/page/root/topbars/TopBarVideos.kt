@@ -38,7 +38,6 @@ fun TopBarVideos(
                 videosVM.scrollStateMap[videosState.pagerState.currentPage]?.scrollToItem(0)
             }
         },
-        onCellsPerRowClick = { videosVM.showCellsPerRowDialog.value = true },
         onSearchAction = { context, tagsVM ->
             scope.launch(Dispatchers.IO) {
                 videosVM.loadAsync(context, tagsVM)

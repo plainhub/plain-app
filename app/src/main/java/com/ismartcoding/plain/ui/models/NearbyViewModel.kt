@@ -6,8 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DNearbyDevice
+import com.ismartcoding.plain.data.DQrPairData
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
@@ -15,8 +19,10 @@ import com.ismartcoding.plain.events.PairingFailedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.StartNearbyDiscoveryEvent
 import com.ismartcoding.plain.events.StopNearbyDiscoveryEvent
+import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.chat.discover.NearbyPairManager
+import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.web.ChatApiManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -42,7 +48,7 @@ class NearbyViewModel : ViewModel() {
             Channel.sharedFlow.collect { event ->
                 when (event) {
                     is NearbyDeviceFoundEvent -> {
-                        val existingIndex = nearbyDevices.indexOfFirst { it.ip == event.device.ip }
+                        val existingIndex = nearbyDevices.indexOfFirst { it.id == event.device.id }
                         if (existingIndex >= 0) {
                             nearbyDevices[existingIndex] = event.device
                         } else {
@@ -141,6 +147,28 @@ class NearbyViewModel : ViewModel() {
     fun cancelPairing(deviceId: String) {
         pairingInProgress.removeIf { it == deviceId }
         NearbyPairManager.cancelPairing(deviceId)
+    }
+
+    fun startPairingFromDevice(device: DNearbyDevice) {
+        if (!nearbyDevices.any { it.id == device.id }) {
+            nearbyDevices.add(device)
+        }
+        startPairing(device)
+    }
+
+    suspend fun getQrDataAsync(): DQrPairData {
+        val context = MainApp.instance
+        val allIps = NetworkHelper.getDeviceIP4s().toList()
+        val deviceName = DeviceNamePreference.getAsync(context).ifEmpty {
+            PhoneHelper.getDeviceName(context)
+        }
+        return DQrPairData(
+            id = TempData.clientId,
+            name = deviceName,
+            port = TempData.httpsPort,
+            deviceType = PhoneHelper.getDeviceType(context),
+            ips = allIps,
+        )
     }
 
 

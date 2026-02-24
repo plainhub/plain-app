@@ -62,7 +62,7 @@ fun ChatInfoPage(
                     PCard {
                         PListItem(
                             title = stringResource(R.string.ip_address),
-                            value = peer.ip,
+                            value = peer.getBestIp(),
                         )
                         PListItem(
                             title = stringResource(R.string.port),

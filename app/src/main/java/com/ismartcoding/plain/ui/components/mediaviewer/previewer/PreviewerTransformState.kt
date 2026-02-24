@@ -114,6 +114,7 @@ open class PreviewerTransformState(
 
     var showActions by mutableStateOf(true)
     var showMediaInfo by mutableStateOf(false)
+    var pagerUserScrollEnabled by mutableStateOf(true)
 
     // 是否正在进行动画
     var animating by mutableStateOf(false)

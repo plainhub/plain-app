@@ -46,7 +46,6 @@ open class PreviewerVerticalDragState(
     pagerState: PagerState,
 ) : PreviewerTransformState(scope, pagerState) {
 
-
     /**
      * Shrink and close viewer container
      */
@@ -107,16 +106,13 @@ open class PreviewerVerticalDragState(
         if (verticalDragType == VerticalDragType.None) return
         pointerInputScope.apply {
             awaitEachGesture {
-                // Wait for the first finger down (not requiring unconsumed, so parent can also receive event)
                 val firstDown = awaitFirstDown(requireUnconsumed = false)
 
-                // Record initial position and direction
                 var vStartOffset: Offset? = null
                 var vOrientationDown: Boolean? = null
-                // Mark whether vertical drag is activated
                 var dragActivated = false
+                var directionLocked = false
 
-                // Initialize transform state (same as original logic)
                 if (mediaViewerState != null) {
                     var transformItemState: TransformItemState? = null
                     getKey?.apply {
@@ -131,11 +127,9 @@ open class PreviewerVerticalDragState(
                     }
                     transformState?.itemState = transformItemState
 
-                    // Only allow drag-to-close when viewer scale is 1
                     if (mediaViewerState?.scale?.value == 1F) {
                         vStartOffset = firstDown.position
                         dragActivated = true
-                        // Disable viewer gesture input when entering drag-to-close to avoid conflict
                         mediaViewerState?.allowGestureInput = false
                     }
                 }
@@ -143,70 +137,74 @@ open class PreviewerVerticalDragState(
                 do {
                     val event = awaitPointerEvent()
 
-                    // --- Key fix: detect multi-touch ---
-                    // When two or more fingers are detected, immediately abort vertical drag,
-                    // reset container position and restore viewer gesture input,
-                    // let inner two-finger zoom/pan gestures take over.
                     if (event.changes.size > 1) {
                         if (dragActivated) {
-                            // Smoothly restore container to initial state
-                            scope.launch {
-                                uiAlpha.animateTo(1F, DEFAULT_SOFT_ANIMATION_SPEC)
-                            }
-                            scope.launch {
-                                viewerContainerState?.reset(DEFAULT_SOFT_ANIMATION_SPEC)
-                            }
+                            scope.launch { uiAlpha.animateTo(1F, DEFAULT_SOFT_ANIMATION_SPEC) }
+                            scope.launch { viewerContainerState?.reset(DEFAULT_SOFT_ANIMATION_SPEC) }
                             dragActivated = false
                             vStartOffset = null
                             vOrientationDown = null
                         }
-                        // Restore viewer gesture input, let inner detectTransformGestures handle two-finger operation
+                        pagerUserScrollEnabled = true
                         mediaViewerState?.allowGestureInput = true
-                        // Exit this gesture loop, do not consume event, let inner handler take over
                         break
                     }
 
                     val change = event.changes.firstOrNull() ?: break
 
                     when {
-                        // Finger move: handle vertical drag logic
                         dragActivated && event.type == PointerEventType.Move -> {
                             if (vStartOffset == null || viewerContainerState == null) continue
 
-                            val dragAmountY = change.position.y - change.previousPosition.y
-                            if (vOrientationDown == null) vOrientationDown = dragAmountY > 0
+                            val dx = change.position.x - vStartOffset!!.x
+                            val dy = change.position.y - vStartOffset!!.y
+
+                            if (!directionLocked) {
+                                if (dx.absoluteValue < viewConfiguration.touchSlop && dy.absoluteValue < viewConfiguration.touchSlop) continue
+                                directionLocked = true
+                                if (dx.absoluteValue > dy.absoluteValue) {
+                                    // Horizontal — unblock pager and stop vertical handling
+                                    pagerUserScrollEnabled = true
+                                    mediaViewerState?.allowGestureInput = true
+                                    dragActivated = false
+                                    vStartOffset = null
+                                    continue
+                                }
+                                // Vertical — block pager
+                                pagerUserScrollEnabled = false
+                                vOrientationDown = dy > 0
+                            }
 
                             if (vOrientationDown == true || verticalDragType == VerticalDragType.UpAndDown) {
-                                val offsetY = change.position.y - vStartOffset!!.y
-                                val offsetX = change.position.x - vStartOffset!!.x
                                 val containerHeight = viewerContainerState!!.containerSize.height
-                                val scale = (containerHeight - offsetY.absoluteValue).div(containerHeight)
+                                val scale = (containerHeight - dy.absoluteValue).div(containerHeight)
                                 scope.launch {
                                     uiAlpha.snapTo(scale)
-                                    viewerContainerState?.offsetX?.snapTo(offsetX)
-                                    viewerContainerState?.offsetY?.snapTo(offsetY)
+                                    viewerContainerState?.offsetX?.snapTo(dx)
+                                    viewerContainerState?.offsetY?.snapTo(dy)
                                     viewerContainerState?.scale?.snapTo(scale)
                                 }
+                                change.consume()
                             } else {
-                                // Not downward drag, restore gesture input, avoid UI lag
+                                pagerUserScrollEnabled = true
                                 mediaViewerState?.allowGestureInput = true
                                 dragActivated = false
+                                vStartOffset = null
                             }
                         }
 
-                        // Finger release: determine whether to close or reset
                         dragActivated && event.type == PointerEventType.Release -> {
+                            pagerUserScrollEnabled = true
+                            mediaViewerState?.allowGestureInput = true
                             vStartOffset = null
                             vOrientationDown = null
                             dragActivated = false
-                            mediaViewerState?.allowGestureInput = true
 
                             if ((viewerContainerState?.scale?.value ?: 1F) < scaleToCloseMinValue) {
                                 scope.launch {
                                     if (getKey != null && canTransformOut) {
                                         val key = getKey!!.invoke(pagerState.currentPage)
                                         val transformItem = findTransformItem(key)
-                                        // If item is in view, execute transform close, otherwise shrink close
                                         if (transformItem != null) {
                                             dragDownClose()
                                         } else {
@@ -215,21 +213,19 @@ open class PreviewerVerticalDragState(
                                     } else {
                                         viewerContainerShrinkDown()
                                     }
-                                    // Restore UI after animation ends
                                     uiAlpha.snapTo(1F)
                                 }
                             } else {
-                                scope.launch {
-                                    uiAlpha.animateTo(1F, DEFAULT_SOFT_ANIMATION_SPEC)
-                                }
-                                scope.launch {
-                                    viewerContainerState?.reset(DEFAULT_SOFT_ANIMATION_SPEC)
-                                }
+                                scope.launch { uiAlpha.animateTo(1F, DEFAULT_SOFT_ANIMATION_SPEC) }
+                                scope.launch { viewerContainerState?.reset(DEFAULT_SOFT_ANIMATION_SPEC) }
                             }
                             break
                         }
                     }
                 } while (event.changes.fastAny { it.pressed })
+
+                pagerUserScrollEnabled = true
+                mediaViewerState?.allowGestureInput = true
             }
         }
     }

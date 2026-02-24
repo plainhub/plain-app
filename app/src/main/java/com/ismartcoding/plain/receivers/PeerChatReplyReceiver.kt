@@ -12,6 +12,7 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
+import com.ismartcoding.plain.features.ChatHelper
 
 class PeerChatReplyReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -32,7 +33,10 @@ class PeerChatReplyReceiver : BroadcastReceiver() {
                 return@coIO
             }
             val content = DMessageContent(DMessageType.TEXT.value, DMessageText(replyText))
-            val success = PeerChatHelper.sendToPeerAsync(peer, content)
+            val item = ChatHelper.sendAsync(content, fromId = "me", toId = peerId, peer = peer)
+            val success = PeerChatHelper.sendToPeerAsync(peer, item.content)
+            val finalStatus = if (success) "sent" else "failed"
+            ChatHelper.updateStatusAsync(item.id, finalStatus)
             if (success) {
                 LogCat.d("PeerChatReplyReceiver: reply sent to peer $peerId")
             } else {

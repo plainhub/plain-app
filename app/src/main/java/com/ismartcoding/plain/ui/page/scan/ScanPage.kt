@@ -48,12 +48,18 @@ import com.google.zxing.NotFoundException
 import com.google.zxing.PlanarYUVLuminanceSource
 import com.google.zxing.Result
 import com.google.zxing.common.HybridBinarizer
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.DQrPairData
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.features.Permission
@@ -92,6 +98,7 @@ fun ScanPage(navController: NavHostController) {
     }
     var showScanResultSheet by remember { mutableStateOf(false) }
     var scanResult by remember { mutableStateOf("") }
+    var pendingPairData by remember { mutableStateOf<DQrPairData?>(null) }
 
     LaunchedEffect(sharedFlow) {
         sharedFlow.collect { event ->
@@ -128,7 +135,12 @@ fun ScanPage(navController: NavHostController) {
                             if (result != null) {
                                 scanResult = result.text
                                 addScanResult(context, scope, scanResult)
-                                showScanResultSheet = true
+                                val pairData = DQrPairData.fromQrContent(scanResult)
+                                if (pairData != null) {
+                                    pendingPairData = pairData
+                                } else {
+                                    showScanResultSheet = true
+                                }
                             }
                         } catch (ex: Exception) {
                             DialogHelper.hideLoading()
@@ -157,6 +169,35 @@ fun ScanPage(navController: NavHostController) {
             showScanResultSheet = false
             cameraDetecting = true
         }
+    }
+
+    pendingPairData?.let { pairData ->
+        AlertDialog(
+            onDismissRequest = {
+                pendingPairData = null
+                cameraDetecting = true
+            },
+            title = { Text(stringResource(R.string.pair_via_qr_title)) },
+            text = { Text(stringResource(R.string.confirm_pair_with_device, pairData.name)) },
+            confirmButton = {
+                Button(onClick = {
+                    navController.navigate(Routing.Nearby(JsonHelper.jsonEncode(pairData))) {
+                        popUpTo(Routing.Scan) { inclusive = true }
+                    }
+                    pendingPairData = null
+                }) {
+                    Text(stringResource(R.string.pair))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    pendingPairData = null
+                    cameraDetecting = true
+                }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
     }
 
     PScaffold(
@@ -216,13 +257,15 @@ fun ScanPage(navController: NavHostController) {
                                                         val result = decode(reader, imageProxy, data)
                                                         scanResult = result.text
                                                         addScanResult(context, scope, scanResult)
-                                                        showScanResultSheet = true
+                                                        val pairData1 = DQrPairData.fromQrContent(scanResult)
+                                                        if (pairData1 != null) { pendingPairData = pairData1 } else { showScanResultSheet = true }
                                                     } catch (e: NotFoundException) {
                                                         for (i in data.indices) data[i] = (255 - (data[i].toInt() and 0xff)).toByte()
                                                         val result = decode(reader, imageProxy, data)
                                                         scanResult = result.text
                                                         addScanResult(context, scope, scanResult)
-                                                        showScanResultSheet = true
+                                                        val pairData2 = DQrPairData.fromQrContent(scanResult)
+                                                        if (pairData2 != null) { pendingPairData = pairData2 } else { showScanResultSheet = true }
                                                     }
                                                 } catch (e: java.lang.Exception) {
                                                     cameraDetecting = true

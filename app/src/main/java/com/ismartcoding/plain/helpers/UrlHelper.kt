@@ -25,6 +25,10 @@ object UrlHelper {
         return "http://localhost:${TempData.httpPort}/health_check"
     }
 
+    fun getHealthCheckHttpsUrl(ip: String, port: Int): String {
+        return "https://$ip:$port/health_check"
+    }
+
     fun getWsTestUrl(): String {
         return "ws://localhost:${TempData.httpPort}?test=1"
     }
