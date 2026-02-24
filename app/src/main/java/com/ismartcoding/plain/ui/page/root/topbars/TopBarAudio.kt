@@ -38,7 +38,6 @@ fun TopBarAudio(
                 audioVM.scrollStateMap[audioState.pagerState.currentPage]?.scrollToItem(0)
             }
         },
-        showCellsPerRowDialog = false,
         onSearchAction = { context, tagsVM ->
             scope.launch(Dispatchers.IO) {
                 audioVM.loadAsync(context, tagsVM)

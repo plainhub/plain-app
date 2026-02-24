@@ -61,7 +61,6 @@
     <string name="metering_mode_other">Diğer</string>
     <string name="white_balance_auto">Otomatik</string>
     <string name="white_balance_manual">Manuel</string>
-    <string name="cells_per_row">Satır başına hücre</string>
     <string name="exit_cast_mode">Yayın modundan çık</string>
     <string name="rotate">Döndür</string>
     <string name="image_save_to">Görüntü {{path}} konumuna kaydedildi</string>
@@ -203,7 +202,7 @@
     <string name="scanner">Tarayıcı</string>
     <string name="nearby">Yakınlarda</string>
     <string name="nearby_devices">Yakınlardaki cihazlar</string>
-    <string name="searching_nearby_devices">Yakınlardaki cihazlar aranıyor...</string>
+    <string name="searching_nearby_devices">Yakınlardaki cihazlar aranıyor…</string>
     <string name="no_nearby_devices_found">Yakınlarda cihaz bulunamadı</string>
     <string name="make_discoverable">Keşfedilebilir yap</string>
     <string name="make_discoverable_desc">Diğer cihazların bu cihazı ağda keşfetmesine izin ver</string>
@@ -211,6 +210,11 @@
     <string name="stop_discovering">Aramayı durdur</string>
     <string name="tap_discover_to_start">Aramaya başlamak için \"Yakınlardaki cihazları keşfet\"e dokunun</string>
     <string name="make_sure_devices_same_network">Diğer cihazların aynı ağda ve keşfedilebilir olduğundan emin olun</string>
+    <string name="show_qr_code">QR kodunu göster</string>
+    <string name="pair_via_qr_title">QR koduyla eşleştir</string>
+    <string name="pair_via_qr_desc">Başka bir cihazda PlainApp\'i açın, tarama düğmesine dokunun ve eşleştirmek için bu QR kodunu tarayın.</string>
+    <string name="pair_with_device">%s ile eşleştir</string>
+    <string name="confirm_pair_with_device">%s ile eşleştirmek istiyor musunuz?</string>
     <string name="last_seen">Son görülme</string>
     <string name="device_discovered">Cihaz keşfedildi</string>
     <string name="link_preview_image">Bağlantı önizleme görüntüsü</string>
@@ -432,6 +436,7 @@
     <string name="screen_mirror_audio_permission_settings_message">Mikrofon izni devre dışı. Sistem sesini yansıtmak için Ayarlar bölümünden etkinleştirin.</string>
     <string name="cast">Yayınla</string>
     <string name="images">Resimler</string>
+    <string name="video">Video</string>
     <string name="audios">Ses Dosyaları</string>
     <string name="videos">Videolar</string>
     <string name="files">Dosyalar</string>
@@ -645,7 +650,6 @@
     <string name="customize_home_features">Ana sayfa özelliklerini özelleştir</string>
     <string name="file_picker_not_available">Bu cihazda dosya seçici uygulaması mevcut değil. Lütfen bir dosya yöneticisi uygulaması yükleyin.</string>
     <string name="image">Görüntü</string>
-    <string name="text_message">Metin mesajı</string>
     <string name="pair">Eşleştir</string>
     <string name="unpair">Eşleştirmeyi kaldır</string>
     <string name="paired">Eşleştirildi</string>

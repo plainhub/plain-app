@@ -61,7 +61,6 @@
     <string name="metering_mode_other">その他</string>
     <string name="white_balance_auto">オート</string>
     <string name="white_balance_manual">マニュアル</string>
-    <string name="cells_per_row">行ごとのセル数</string>
     <string name="exit_cast_mode">キャストモードを終了</string>
     <string name="rotate">回転</string>
     <string name="image_save_to">{{path}} に画像が保存されました</string>
@@ -208,6 +207,11 @@
     <string name="stop_discovering">発見を停止</string>
     <string name="tap_discover_to_start">「近くのデバイスを発見」をタップして検索を開始</string>
     <string name="make_sure_devices_same_network">他のデバイスが同じネットワーク上にあり、発見可能であることを確認してください</string>
+    <string name="show_qr_code">QRコードを表示</string>
+    <string name="pair_via_qr_title">QRコードでペア設定</string>
+    <string name="pair_via_qr_desc">別のデバイスで PlainApp を開き、スキャンボタンをタップして、このQRコードをスキャンしてペア設定してください。</string>
+    <string name="pair_with_device">%s とペア設定</string>
+    <string name="confirm_pair_with_device">%s とペア設定しますか？</string>
     <string name="last_seen">最終確認</string>
     <string name="device_discovered">デバイスが見つかりました</string>
     <string name="link_preview_image">リンクプレビュー画像</string>
@@ -432,6 +436,7 @@
     <string name="screen_mirror_audio_permission_settings_message">マイクの権限が無効です。システムオーディオをミラーリングするには、設定で有効にしてください。</string>
     <string name="cast">キャスト</string>
     <string name="images">画像</string>
+    <string name="video">ビデオ</string>
     <string name="audios">オーディオ</string>
     <string name="videos">ビデオ</string>
     <string name="files">ファイル</string>
@@ -645,7 +650,6 @@
     <string name="customize_home_features">ホーム機能をカスタマイズ</string>
     <string name="file_picker_not_available">このデバイスにはファイル選択アプリが利用できません。ファイルマネージャーアプリをインストールしてください。</string>
     <string name="image">画像</string>
-    <string name="text_message">テキストメッセージ</string>
     <string name="pair">ペアリング</string>
     <string name="unpair">ペアリング解除</string>
     <string name="paired">ペアリング済み</string>

@@ -27,7 +27,7 @@ fun NearbyDeviceItem(
     ) {
         PListItem(
             title = item.name,
-            subtitle = item.ip,
+            subtitle = item.getBestIp(),
             icon = item.deviceType.getIcon(),
             action = {
                 when {

@@ -15,7 +15,7 @@ Most phone-management tools either route your data through their own servers, lo
 - **Completely free and ad-free** — no purchases, no upsells, ever
 - **Fully open-source** — audit the code, build your own binary, or contribute
 
-## Features
+## Features 
 
 ### 🌐 Web-Based Phone Management
 Open a browser on any desktop or laptop connected to the same Wi-Fi network and get a full dashboard to manage your Android device — no app installation required on the computer side. Supports PWA so you can pin it to your desktop like a native app.
@@ -170,7 +170,7 @@ Please don’t leave a one-star review without giving it a fair try.
 1. Generate `release.jks` file under `$rootProject/app` folder.
 
 ```bash
-keytool -genkey -v -keystore ./app/release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias plain
+keytool -genkeypair -v -keystore ./app/release.jks -alias release -keyalg RSA  -keysize 4096 -validity 36500
 ```
 
 2. Create `keystore.properties` file with following content under `$rootProject` folder.

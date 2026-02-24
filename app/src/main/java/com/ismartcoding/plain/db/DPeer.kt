@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Update
 import com.ismartcoding.lib.extensions.urlEncode
+import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 
@@ -23,12 +24,22 @@ data class DPeer(
     @ColumnInfo(name = "device_type") var deviceType: String = "", // phone, tablet, pc, etc.
 ) : DEntityBase() {
 
+    fun getIpList(): List<String> {
+        return ip.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+    }
+
+    fun getBestIp(): String {
+        val ips = getIpList()
+        if (ips.isEmpty()) return ip
+        return NetworkHelper.getBestIp(ips)
+    }
+
     fun getApiUrl(): String {
         return "${getBaseUrl()}/peer_graphql"
     }
 
     fun getBaseUrl(): String {
-        return "https://${ip}:${port}"
+        return "https://${getBestIp()}:${port}"
     }
 
     fun getFileUrl(fileId: String): String {

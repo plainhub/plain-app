@@ -34,8 +34,6 @@ fun <T : IData> MediaTopBar(
     bucketsMap: Map<String, DMediaBucket>,
     itemsState: List<T>,
     scrollToTop: () -> Unit,
-    showCellsPerRowDialog: Boolean = true,
-    onCellsPerRowClick: (() -> Unit)? = null,
     onSearchAction: (context: android.content.Context, tagsViewModel: TagsViewModel) -> Unit
 ) {
     val context = LocalContext.current
@@ -96,12 +94,6 @@ fun <T : IData> MediaTopBar(
                         dismiss()
                         mediaVM.showTagsDialog.value = true
                     })
-                    if (showCellsPerRowDialog && onCellsPerRowClick != null) {
-                        PDropdownMenuItemCellsPerRow(onClick = {
-                            dismiss()
-                            onCellsPerRowClick()
-                        })
-                    }
                 }
             }
         },

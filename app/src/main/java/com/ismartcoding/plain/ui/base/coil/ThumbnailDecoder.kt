@@ -91,7 +91,9 @@ class ThumbnailDecoder(
     }
 
     private fun isSizeValid(bitmap: Bitmap, options: Options, size: Size): Boolean {
-//        if (options.allowInexactSize) return true // TODO: Fix this.
+        // Thumbnails from ContentResolver.loadThumbnail() are already scaled to the requested
+        // size. Accept any bitmap that already fits within the requested bounds (multiplier <= 1.0)
+        // to avoid an unnecessary slow-path software canvas redraw.
         val multiplier = DecodeUtils.computeSizeMultiplier(
             srcWidth = bitmap.width,
             srcHeight = bitmap.height,
@@ -99,7 +101,7 @@ class ThumbnailDecoder(
             dstHeight = size.height.pxOrElse { bitmap.height },
             scale = options.scale,
         )
-        return multiplier == 1.0
+        return multiplier <= 1.0
     }
 
     private fun Size.toAndroidSize(fallbackWidth: Int = 200, fallbackHeight: Int = 200) =

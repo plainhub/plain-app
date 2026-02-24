@@ -61,7 +61,6 @@
     <string name="metering_mode_other">Andere</string>
     <string name="white_balance_auto">Automatisch</string>
     <string name="white_balance_manual">Manuell</string>
-    <string name="cells_per_row">Zellen pro Reihe</string>
     <string name="exit_cast_mode">Cast-Modus beenden</string>
     <string name="rotate">Drehen</string>
     <string name="image_save_to">Bild gespeichert unter {{path}}</string>
@@ -208,6 +207,11 @@
     <string name="stop_discovering">Suche stoppen</string>
     <string name="tap_discover_to_start">Tippe auf \"Geräte in der Nähe entdecken\", um die Suche zu starten</string>
     <string name="make_sure_devices_same_network">Stelle sicher, dass andere Geräte im selben Netzwerk sind und auffindbar sind</string>
+    <string name="show_qr_code">QR-Code anzeigen</string>
+    <string name="pair_via_qr_title">Per QR-Code koppeln</string>
+    <string name="pair_via_qr_desc">Öffne PlainApp auf einem anderen Gerät, tippe auf die Schaltfläche zum Scannen und scanne diesen QR-Code, um zu koppeln.</string>
+    <string name="pair_with_device">Mit %s koppeln</string>
+    <string name="confirm_pair_with_device">Möchtest du dich mit %s koppeln?</string>
     <string name="last_seen">Zuletzt gesehen</string>
     <string name="device_discovered">Gerät entdeckt</string>
     <string name="link_preview_image">Link-Vorschau-Bild</string>
@@ -432,6 +436,7 @@
     <string name="screen_mirror_audio_permission_settings_message">Die Mikrofonberechtigung ist deaktiviert. Bitte aktivieren Sie sie in den Einstellungen, um Systemaudio zu spiegeln.</string>
     <string name="cast">Übertragen</string>
     <string name="images">Bilder</string>
+    <string name="video">Video</string>
     <string name="audios">Audio</string>
     <string name="videos">Videos</string>
     <string name="files">Dateien</string>
@@ -645,7 +650,6 @@
     <string name="customize_home_features">Startseitenfunktionen anpassen</string>
     <string name="file_picker_not_available">Es ist keine Dateiauswahl-App auf diesem Gerät verfügbar. Bitte installieren Sie eine Dateimanager-App.</string>
     <string name="image">Bild</string>
-    <string name="text_message">Textnachricht</string>
     <string name="pair">Koppeln</string>
     <string name="unpair">Entkoppeln</string>
     <string name="paired">Gekoppelt</string>

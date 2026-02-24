@@ -30,6 +30,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
+import com.ismartcoding.plain.ui.base.pinchZoomGrid
+import com.ismartcoding.plain.ui.base.rememberBoostFlingBehavior
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.Channel
@@ -45,8 +48,6 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PFilterChip
-import com.ismartcoding.plain.ui.base.RadioDialog
-import com.ismartcoding.plain.ui.base.RadioDialogOption
 import com.ismartcoding.plain.ui.base.dragselect.gridDragSelect
 import com.ismartcoding.plain.ui.base.fastscroll.LazyVerticalGridScrollbar
 import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
@@ -95,6 +96,7 @@ fun TabContentImages(
     val scope = rememberCoroutineScope()
     var isFirstTime by remember { mutableStateOf(true) }
     val density = LocalDensity.current
+    val hapticFeedback = LocalHapticFeedback.current
     val imageWidthPx = remember(cellsPerRow.value) {
         density.run { ((configuration.screenWidthDp.dp - ((cellsPerRow.value - 1) * 2).dp) / cellsPerRow.value).toPx().toInt() }
     }
@@ -183,25 +185,6 @@ fun TabContentImages(
         }
     }
 
-    if (imagesVM.showCellsPerRowDialog.value) {
-        RadioDialog(
-            title = stringResource(R.string.cells_per_row),
-            options = IntRange(2, 10).map { value ->
-                RadioDialogOption(
-                    text = value.toString(),
-                    selected = value == cellsPerRow.value,
-                ) {
-                    scope.launch(Dispatchers.IO) {
-                        ImageGridCellsPerRowPreference.putAsync(context, value)
-                        cellsPerRow.value = value
-                    }
-                }
-            },
-        ) {
-            imagesVM.showCellsPerRowDialog.value = false
-        }
-    }
-
     ViewImageBottomSheet(imagesVM, tagsVM, tagsMapState, tagsState, dragSelectState)
 
     if (imagesVM.showSortDialog.value) {
@@ -276,19 +259,28 @@ fun TabContentImages(
                     if (itemsState.isNotEmpty()) {
                         val scrollState = rememberLazyGridState()
                         imagesVM.scrollStateMap[index] = scrollState
+                        val flingBehavior = rememberBoostFlingBehavior(cellsPerRow.value / 3f)
                         LazyVerticalGridScrollbar(
                             state = scrollState,
                         ) {
                             LazyVerticalGrid(
                                 columns = GridCells.Fixed(cellsPerRow.value),
                                 state = scrollState,
+                                flingBehavior = flingBehavior,
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .nestedScroll(scrollBehavior.nestedScrollConnection)
                                     .gridDragSelect(
                                         items = itemsState,
                                         state = dragSelectState,
-                                    ),
+                                    )
+                                    .pinchZoomGrid(
+                                        cellsPerRow = cellsPerRow,
+                                        hapticFeedback = hapticFeedback,
+                                        scope = scope,
+                                    ) { newCells ->
+                                        ImageGridCellsPerRowPreference.putAsync(context, newCells)
+                                    },
                                 horizontalArrangement = Arrangement.spacedBy(2.dp),
                                 verticalArrangement = Arrangement.spacedBy(2.dp),
                             ) {

@@ -3,9 +3,6 @@ package com.ismartcoding.plain.ui.components.mediaviewer.video
 import android.app.PictureInPictureParams
 import android.content.Context
 import android.content.pm.PackageManager
-import android.media.AudioManager
-import android.util.Rational
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -13,7 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.media3.exoplayer.ExoPlayer
 import com.ismartcoding.lib.isTPlus
-import com.ismartcoding.plain.audioManager
+import android.util.Rational
+import androidx.compose.runtime.getValue
 
 class VideoState {
     var isPlaying by mutableStateOf(false)
@@ -24,6 +22,7 @@ class VideoState {
     var enablePip by mutableStateOf(false)
     var isFullscreenMode by mutableStateOf(false)
     var speed by mutableFloatStateOf(1f)
+    var isSpeedBoostActive by mutableStateOf(false)
     var player: ExoPlayer? = null
     var isSeeking = false
 
@@ -38,6 +37,20 @@ class VideoState {
     fun changeSpeed(speed: Float) {
         this.speed = speed
         player?.setPlaybackSpeed(speed)
+    }
+
+    fun startSpeedBoost() {
+        if (!isSpeedBoostActive) {
+            isSpeedBoostActive = true
+            player?.setPlaybackSpeed(2f)
+        }
+    }
+
+    fun stopSpeedBoost() {
+        if (isSpeedBoostActive) {
+            isSpeedBoostActive = false
+            player?.setPlaybackSpeed(speed)
+        }
     }
 
     fun seekTo(position: Long) {
@@ -64,7 +77,7 @@ class VideoState {
 
     fun toggleMute() {
         if (isMuted) {
-            player?.volume = audioManager.getStreamVolume(AudioManager.STREAM_SYSTEM).toFloat()
+            player?.volume = 1f
             isMuted = false
         } else {
             player?.volume = 0f

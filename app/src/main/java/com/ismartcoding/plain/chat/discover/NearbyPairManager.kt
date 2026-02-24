@@ -3,6 +3,7 @@ package com.ismartcoding.plain.chat.discover
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
@@ -73,10 +74,11 @@ object NearbyPairManager {
                 ?: throw Exception("Failed to get raw Ed25519 public key")
 
             // Create pairing session
+            val bestIp = device.getBestIp()
             val session = DPairingSession(
                 deviceId = device.id,
                 deviceName = device.name,
-                deviceIp = device.ip,
+                deviceIp = bestIp,
                 keyPair = keyPair,
             )
             activePairingSessions[device.id] = session
@@ -93,11 +95,12 @@ object NearbyPairManager {
                 ecdhPublicKey = ecdhPublicKey,
                 signaturePublicKey = signaturePublicKey,
                 timestamp = currentTimestamp,
+                ips = NetworkHelper.getDeviceIP4s().toList(),
             )
             request.signature = SignatureHelper.signTextAsync(request.toSignatureData())
                 ?: throw Exception("Failed to sign pairing request")
             
-            sendPairingMessage(NearbyMessageType.PAIR_REQUEST, JsonHelper.jsonEncode(request), device.ip)
+            sendPairingMessage(NearbyMessageType.PAIR_REQUEST, JsonHelper.jsonEncode(request), bestIp)
         } catch (e: Exception) {
             LogCat.e("Error starting pairing: ${e.message}")
             sendEvent(PairingFailedEvent(device.id, "Failed to send pairing request"))
@@ -153,6 +156,7 @@ object NearbyPairManager {
                     signaturePublicKey = signaturePublicKey,
                     accepted = true,
                     timestamp = responseTimestamp,
+                    ips = NetworkHelper.getDeviceIP4s().toList(),
                 )
 
                 response.signature = SignatureHelper.signTextAsync(response.toSignatureData())
@@ -162,10 +166,11 @@ object NearbyPairManager {
                 val encryptKey = CryptoHelper.computeECDHSharedKey(keyPair.private, requestEcdhPublicKey)
                 if (encryptKey != null) {
                     // Store peer in database with signature public key
+                    val peerIps = (listOf(fromIp) + request.ips).distinct()
                     storePeerInDatabase(
                         request.fromId, 
                         request.fromName, 
-                        fromIp, 
+                        peerIps, 
                         request.port, 
                         request.deviceType, 
                         encryptKey,
@@ -267,10 +272,11 @@ object NearbyPairManager {
                 val encryptKey = CryptoHelper.computeECDHSharedKey(session.keyPair.private, responseEcdhPublicKey)
                 if (encryptKey != null) {
                     // Store peer in database with signature public key
+                    val peerIps = (listOf(senderIP) + response.ips).distinct()
                     storePeerInDatabase(
                         response.fromId, 
                         session.deviceName, 
-                        senderIP, 
+                        peerIps, 
                         response.port, 
                         response.deviceType, 
                         encryptKey,
@@ -305,7 +311,7 @@ object NearbyPairManager {
     private suspend fun storePeerInDatabase(
         deviceId: String,
         deviceName: String,
-        deviceIp: String,
+        deviceIps: List<String>,
         port: Int,
         deviceType: DeviceType,
         key: String,
@@ -314,11 +320,12 @@ object NearbyPairManager {
         try {
             val existingPeer = AppDatabase.instance.peerDao().getById(deviceId)
             val currentTime = TimeHelper.now()
+            val ipString = deviceIps.joinToString(",")
 
             if (existingPeer != null) {
                 existingPeer.apply {
                     name = deviceName
-                    ip = deviceIp
+                    ip = ipString
                     this.port = port
                     this.deviceType = deviceType.value
                     this.key = key
@@ -332,7 +339,7 @@ object NearbyPairManager {
                 AppDatabase.instance.peerDao().insert(DPeer(deviceId).apply {
                     id = deviceId
                     name = deviceName
-                    ip = deviceIp
+                    ip = ipString
                     this.port = port
                     this.deviceType = deviceType.value
                     this.key = key

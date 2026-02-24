@@ -26,10 +26,21 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ismartcoding.lib.extensions.isUrl
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.enums.ImageType
@@ -133,6 +144,7 @@ fun MediaPreviewer(
                 modifier = Modifier
                     .fillMaxSize(),
                 pageSpacing = 16.dp,
+                userScrollEnabled = state.pagerUserScrollEnabled,
             ) { page ->
                 val viewerState = rememberViewerState()
                 val viewerContainerState = rememberViewerContainerState(
@@ -193,6 +205,40 @@ fun MediaPreviewer(
                     VideoPreviewActions(context = context, castViewModel = castVM, m = m, state)
                 } else {
                     ImagePreviewActions(context = context, castViewModel = castVM, m = m, state)
+                }
+            }
+            // 2x speed boost indicator shown during long-press
+            AnimatedVisibility(
+                visible = state.videoState.isSpeedBoostActive,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .statusBarsPadding()
+                    .padding(top = 16.dp),
+                enter = fadeIn(tween(150)),
+                exit = fadeOut(tween(150)),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .background(
+                            color = Color.Black.copy(alpha = 0.6f),
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)
+                        )
+                        .padding(horizontal = 16.dp, vertical = 6.dp),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.double_arrow_right),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Text(
+                        text = " 2x",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                    )
                 }
             }
         }

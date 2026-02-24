@@ -29,10 +29,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.db.DMessageFiles
-import com.ismartcoding.plain.db.DMessageImages
-import com.ismartcoding.plain.db.DMessageText
-import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.extensions.timeAgo
 import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
@@ -134,7 +130,7 @@ fun PeerListItem(
                     }
                     VerticalSpace(dp = 8.dp)
                     Text(
-                        text = latestChat?.let { getMessagePreview(it) } ?: desc,
+                        text = latestChat?.getMessagePreview() ?: desc,
                         style = MaterialTheme.typography.listItemSubtitle(),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -177,31 +173,3 @@ fun PeerListItem(
     }
 }
 
-@Composable
-private fun getMessagePreview(chat: DChat): String {
-    return when (chat.content.type) {
-        DMessageType.TEXT.value -> {
-            val textMessage = chat.content.value as? DMessageText
-            textMessage?.text?.take(50) ?: stringResource(R.string.text_message)
-        }
-        DMessageType.IMAGES.value -> {
-            val imagesMessage = chat.content.value as? DMessageImages
-            val count = imagesMessage?.items?.size ?: 0
-            if (count > 1) {
-                "$count ${stringResource(R.string.images)}"
-            } else {
-                stringResource(R.string.image)
-            }
-        }
-        DMessageType.FILES.value -> {
-            val filesMessage = chat.content.value as? DMessageFiles
-            val count = filesMessage?.items?.size ?: 0
-            if (count > 1) {
-                "$count ${stringResource(R.string.files)}"
-            } else {
-                stringResource(R.string.file)
-            }
-        }
-        else -> stringResource(R.string.message)
-    }
-}

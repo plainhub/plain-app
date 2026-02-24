@@ -115,5 +115,5 @@ class Routing {
     data class Files(val folderPath: String = "")
 
     @Serializable
-    object Nearby
+    data class Nearby(val pairDeviceJson: String = "")
 }

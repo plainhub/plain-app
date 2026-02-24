@@ -61,7 +61,6 @@
     <string name="metering_mode_other">Otro</string>
     <string name="white_balance_auto">Automático</string>
     <string name="white_balance_manual">Manual</string>
-    <string name="cells_per_row">Celdas por fila</string>
     <string name="exit_cast_mode">Salir del modo de transmisión</string>
     <string name="rotate">Rotar</string>
     <string name="image_save_to">Imagen guardada en {{path}}</string>
@@ -208,6 +207,11 @@
     <string name="stop_discovering">Detener búsqueda</string>
     <string name="tap_discover_to_start">Toca \"Descubrir dispositivos cercanos\" para comenzar a buscar</string>
     <string name="make_sure_devices_same_network">Asegúrate de que otros dispositivos estén en la misma red y sean detectables</string>
+    <string name="show_qr_code">Mostrar código QR</string>
+    <string name="pair_via_qr_title">Emparejar mediante código QR</string>
+    <string name="pair_via_qr_desc">Abre PlainApp en otro dispositivo, toca el botón de escaneo y escanea este código QR para emparejar.</string>
+    <string name="pair_with_device">Emparejar con %s</string>
+    <string name="confirm_pair_with_device">¿Quieres emparejar con %s?</string>
     <string name="last_seen">Última conexión</string>
     <string name="device_discovered">Dispositivo descubierto</string>
     <string name="link_preview_image">Vista previa de enlace</string>
@@ -432,6 +436,7 @@
     <string name="screen_mirror_audio_permission_settings_message">El permiso del micrófono está desactivado. Actívelo en Ajustes para reflejar el audio del sistema.</string>
     <string name="cast">Transmitir</string>
     <string name="images">Imágenes</string>
+    <string name="video">Vídeo</string>
     <string name="audios">Audio</string>
     <string name="videos">Videos</string>
     <string name="files">Archivos</string>
@@ -645,7 +650,6 @@
     <string name="customize_home_features">Personalizar características de inicio</string>
     <string name="file_picker_not_available">No hay una aplicación de selección de archivos disponible en este dispositivo. Por favor instale una aplicación de administrador de archivos.</string>
     <string name="image">Imagen</string>
-    <string name="text_message">Mensaje de texto</string>
     <string name="pair">Emparejar</string>
     <string name="unpair">Desemparejar</string>
     <string name="paired">Emparejado</string>

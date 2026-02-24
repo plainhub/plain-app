@@ -12,7 +12,9 @@ import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import kotlin.time.Instant
 import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.serialization.Serializable
@@ -140,6 +142,47 @@ data class DChat(
 
     @ColumnInfo(name = "content")
     lateinit var content: DMessageContent
+
+    fun getMessagePreview(): String {
+        return when (content.type) {
+            DMessageType.TEXT.value -> {
+                val textMessage = content.value as? DMessageText
+                textMessage?.text?.take(50) ?: getString(R.string.message)
+            }
+
+            DMessageType.IMAGES.value -> {
+                val imagesMessage = content.value as? DMessageImages
+                val items = imagesMessage?.items ?: emptyList()
+                val videoCount = items.count { it.duration > 0 }
+                val imageCount = items.size - videoCount
+                when {
+                    imageCount > 0 && videoCount > 0 -> {
+                        val imgPart = if (imageCount > 1) "$imageCount ${getString(R.string.images)}" else getString(R.string.image)
+                        val vidPart = if (videoCount > 1) "$videoCount ${getString(R.string.videos)}" else getString(R.string.video)
+                        "$imgPart, $vidPart"
+                    }
+                    videoCount > 0 -> {
+                        if (videoCount > 1) "$videoCount ${getString(R.string.videos)}" else getString(R.string.video)
+                    }
+                    else -> {
+                        if (imageCount > 1) "$imageCount ${getString(R.string.images)}" else getString(R.string.image)
+                    }
+                }
+            }
+
+            DMessageType.FILES.value -> {
+                val filesMessage = content.value as? DMessageFiles
+                val count = filesMessage?.items?.size ?: 0
+                if (count > 1) {
+                    "$count ${getString(R.string.files)}"
+                } else {
+                    getString(R.string.file)
+                }
+            }
+
+            else -> getString(R.string.message)
+        }
+    }
 
     companion object {
         fun parseContent(content: String): DMessageContent {

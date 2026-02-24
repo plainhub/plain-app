@@ -61,7 +61,6 @@
     <string name="metering_mode_other">Khác</string>
     <string name="white_balance_auto">Tự động</string>
     <string name="white_balance_manual">Thủ công</string>
-    <string name="cells_per_row">Số ô mỗi hàng</string>
     <string name="exit_cast_mode">Thoát chế độ trình chiếu</string>
     <string name="rotate">Xoay</string>
     <string name="image_save_to">Hình ảnh đã được lưu vào {{path}}</string>
@@ -211,6 +210,11 @@
     <string name="stop_discovering">Dừng tìm kiếm</string>
     <string name="tap_discover_to_start">Nhấn \"Khám phá thiết bị gần đây\" để bắt đầu tìm kiếm</string>
     <string name="make_sure_devices_same_network">Đảm bảo các thiết bị khác cùng mạng và có thể phát hiện được</string>
+    <string name="show_qr_code">Hiển thị mã QR</string>
+    <string name="pair_via_qr_title">Ghép đôi qua mã QR</string>
+    <string name="pair_via_qr_desc">Mở PlainApp trên thiết bị khác, nhấn nút quét và quét mã QR này để ghép đôi.</string>
+    <string name="pair_with_device">Ghép đôi với %s</string>
+    <string name="confirm_pair_with_device">Bạn có muốn ghép đôi với %s không?</string>
     <string name="last_seen">Lần cuối thấy</string>
     <string name="device_discovered">Đã phát hiện thiết bị</string>
     <string name="link_preview_image">Ảnh xem trước liên kết</string>
@@ -432,6 +436,7 @@
     <string name="screen_mirror_audio_permission_settings_message">Quyền micro đang bị tắt. Hãy bật trong Cài đặt để phản chiếu âm thanh hệ thống.</string>
     <string name="cast">Phát</string>
     <string name="images">Hình ảnh</string>
+    <string name="video">Video</string>
     <string name="audios">Âm thanh</string>
     <string name="videos">Video</string>
     <string name="files">Tập tin</string>
@@ -645,7 +650,6 @@
     <string name="customize_home_features">Tùy chỉnh các tính năng trang chủ</string>
     <string name="file_picker_not_available">Không có ứng dụng chọn tệp nào có sẵn trên thiết bị này. Vui lòng cài đặt ứng dụng quản lý tệp.</string>
     <string name="image">Hình ảnh</string>
-    <string name="text_message">Tin nhắn văn bản</string>
     <string name="pair">Ghép nối</string>
     <string name="unpair">Hủy ghép nối</string>
     <string name="paired">Đã ghép nối</string>

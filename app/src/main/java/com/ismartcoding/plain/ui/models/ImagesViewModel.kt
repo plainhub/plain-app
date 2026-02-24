@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 class ImagesViewModel : BaseMediaViewModel<DImage>() {
     override val dataType = DataType.IMAGE
     val scrollStateMap = mutableStateMapOf<Int, LazyGridState>()
-    var showCellsPerRowDialog = mutableStateOf(false)
 
     fun delete(context: Context, tagsVM: TagsViewModel, ids: Set<String>) {
         viewModelScope.launch(Dispatchers.IO) {

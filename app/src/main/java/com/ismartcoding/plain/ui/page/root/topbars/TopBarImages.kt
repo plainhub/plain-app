@@ -38,7 +38,6 @@ fun TopBarImages(
                 imagesVM.scrollStateMap[imagesState.pagerState.currentPage]?.scrollToItem(0)
             }
         },
-        onCellsPerRowClick = { imagesVM.showCellsPerRowDialog.value = true },
         onSearchAction = { context, tagsVM ->
             scope.launch(Dispatchers.IO) {
                 imagesVM.loadAsync(context, tagsVM)

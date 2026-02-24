@@ -31,6 +31,12 @@ jobs:
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
+      - name: Restore keystore
+        run: echo "${{ secrets.KEYSTORE_B64 }}" | base64 --decode > ./app/release.jks
+
+      - name: Restore google-services.json
+        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > ./app/google-services.json
+
       - name: Build apk
         run: bash build-apk.sh
 

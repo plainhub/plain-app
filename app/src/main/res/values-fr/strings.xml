@@ -61,7 +61,6 @@
     <string name="metering_mode_other">Autre</string>
     <string name="white_balance_auto">Automatique</string>
     <string name="white_balance_manual">Manuel</string>
-    <string name="cells_per_row">Cellules par ligne</string>
     <string name="exit_cast_mode">Quitter le mode de diffusion</string>
     <string name="rotate">Faire pivoter</string>
     <string name="image_save_to">Image enregistrée dans {{path}}</string>
@@ -208,6 +207,11 @@
     <string name="stop_discovering">Arrêter la recherche</string>
     <string name="tap_discover_to_start">Appuyez sur \"Découvrir les appareils à proximité\" pour commencer la recherche</string>
     <string name="make_sure_devices_same_network">Assurez-vous que les autres appareils sont sur le même réseau et détectables</string>
+    <string name="show_qr_code">Afficher le code QR</string>
+    <string name="pair_via_qr_title">Associer via un code QR</string>
+    <string name="pair_via_qr_desc">Ouvrez PlainApp sur un autre appareil, appuyez sur le bouton de scan, puis scannez ce code QR pour associer les appareils.</string>
+    <string name="pair_with_device">Associer avec %s</string>
+    <string name="confirm_pair_with_device">Voulez-vous vous associer avec %s ?</string>
     <string name="last_seen">Dernière connexion</string>
     <string name="device_discovered">Appareil découvert</string>
     <string name="link_preview_image">Image de prévisualisation du lien</string>
@@ -432,6 +436,7 @@
     <string name="screen_mirror_audio_permission_settings_message">L\'autorisation du microphone est désactivée. Veuillez l\'activer dans les paramètres pour refléter l\'audio système.</string>
     <string name="cast">Diffuser</string>
     <string name="images">Images</string>
+    <string name="video">Vidéo</string>
     <string name="audios">Audio</string>
     <string name="videos">Vidéos</string>
     <string name="files">Fichiers</string>
@@ -645,7 +650,6 @@
     <string name="customize_home_features">Personnaliser les fonctionnalités de l\'accueil</string>
     <string name="file_picker_not_available">Aucune application de sélection de fichiers n\'est disponible sur cet appareil. Veuillez installer une application de gestionnaire de fichiers.</string>
     <string name="image">Image</string>
-    <string name="text_message">Message texte</string>
     <string name="pair">Coupler</string>
     <string name="unpair">Découpler</string>
     <string name="paired">Couplé</string>
