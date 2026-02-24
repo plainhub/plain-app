@@ -61,7 +61,6 @@
     <string name="metering_mode_other">Outro</string>
     <string name="white_balance_auto">Automático</string>
     <string name="white_balance_manual">Manual</string>
-    <string name="cells_per_row">Células por linha</string>
     <string name="exit_cast_mode">Sair do modo de transmissão</string>
     <string name="rotate">Girar</string>
     <string name="image_save_to">Imagem salva em {{path}}</string>

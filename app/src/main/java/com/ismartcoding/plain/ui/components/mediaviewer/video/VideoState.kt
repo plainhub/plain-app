@@ -22,6 +22,7 @@ class VideoState {
     var enablePip by mutableStateOf(false)
     var isFullscreenMode by mutableStateOf(false)
     var speed by mutableFloatStateOf(1f)
+    var isSpeedBoostActive by mutableStateOf(false)
     var player: ExoPlayer? = null
     var isSeeking = false
 
@@ -36,6 +37,20 @@ class VideoState {
     fun changeSpeed(speed: Float) {
         this.speed = speed
         player?.setPlaybackSpeed(speed)
+    }
+
+    fun startSpeedBoost() {
+        if (!isSpeedBoostActive) {
+            isSpeedBoostActive = true
+            player?.setPlaybackSpeed(2f)
+        }
+    }
+
+    fun stopSpeedBoost() {
+        if (isSpeedBoostActive) {
+            isSpeedBoostActive = false
+            player?.setPlaybackSpeed(speed)
+        }
     }
 
     fun seekTo(position: Long) {

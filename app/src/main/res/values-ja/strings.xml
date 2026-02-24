@@ -61,7 +61,6 @@
     <string name="metering_mode_other">その他</string>
     <string name="white_balance_auto">オート</string>
     <string name="white_balance_manual">マニュアル</string>
-    <string name="cells_per_row">行ごとのセル数</string>
     <string name="exit_cast_mode">キャストモードを終了</string>
     <string name="rotate">回転</string>
     <string name="image_save_to">{{path}} に画像が保存されました</string>

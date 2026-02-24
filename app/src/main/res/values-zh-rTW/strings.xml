@@ -61,7 +61,6 @@
     <string name="metering_mode_other">其他</string>
     <string name="white_balance_auto">自動</string>
     <string name="white_balance_manual">手動</string>
-    <string name="cells_per_row">每行格數</string>
     <string name="exit_cast_mode">退出投影模式</string>
     <string name="rotate">旋轉</string>
     <string name="image_save_to">圖片已保存至{{path}}</string>
