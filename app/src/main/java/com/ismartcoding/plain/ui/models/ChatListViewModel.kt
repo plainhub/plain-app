@@ -190,8 +190,10 @@ class ChatListViewModel : ViewModel() {
                     // Update peer information if anything has changed
                     var needsUpdate = false
 
-                    if (peer.ip != device.ip) {
-                        peer.ip = device.ip
+                    // Use all advertised IPs from discovery reply
+                    val newIpString = device.ips.joinToString(",")
+                    if (peer.ip != newIpString) {
+                        peer.ip = newIpString
                         needsUpdate = true
                     }
 

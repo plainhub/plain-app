@@ -133,6 +133,7 @@ fun MediaPreviewer(
                 modifier = Modifier
                     .fillMaxSize(),
                 pageSpacing = 16.dp,
+                userScrollEnabled = state.pagerUserScrollEnabled,
             ) { page ->
                 val viewerState = rememberViewerState()
                 val viewerContainerState = rememberViewerContainerState(

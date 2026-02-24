@@ -440,7 +440,9 @@
     <string name="accessibility_service_description">PlainApp uses this accessibility service to enable remote control during screen mirroring. It injects touch events (tap, swipe, scroll) and navigation actions (Back, Home, Recents) sent from the web interface.</string>
     <string name="accessibility_service_label">PlainApp Remote Control</string>
     <string name="cast">Cast</string>
+    <string name="image">Image</string>
     <string name="images">Images</string>
+    <string name="video">Video</string>
     <string name="audios">Audio</string>
     <string name="videos">Videos</string>
     <string name="files">Files</string>
@@ -653,8 +655,6 @@
     <string name="unknown_error">Unknown error occurred.</string>
     <string name="customize_home_features">Customize Home Features</string>
     <string name="file_picker_not_available">No file picker app is available on this device. Please install a file manager app.</string>
-    <string name="image">Image</string>
-    <string name="text_message">Text message</string>
     <string name="pair">Pair</string>
     <string name="unpair">Unpair</string>
     <string name="paired">Paired</string>

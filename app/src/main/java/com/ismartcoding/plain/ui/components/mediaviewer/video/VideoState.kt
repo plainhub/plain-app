@@ -3,9 +3,6 @@ package com.ismartcoding.plain.ui.components.mediaviewer.video
 import android.app.PictureInPictureParams
 import android.content.Context
 import android.content.pm.PackageManager
-import android.media.AudioManager
-import android.util.Rational
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableLongStateOf
@@ -13,7 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.media3.exoplayer.ExoPlayer
 import com.ismartcoding.lib.isTPlus
-import com.ismartcoding.plain.audioManager
+import android.util.Rational
+import androidx.compose.runtime.getValue
 
 class VideoState {
     var isPlaying by mutableStateOf(false)
@@ -64,7 +62,7 @@ class VideoState {
 
     fun toggleMute() {
         if (isMuted) {
-            player?.volume = audioManager.getStreamVolume(AudioManager.STREAM_SYSTEM).toFloat()
+            player?.volume = 1f
             isMuted = false
         } else {
             player?.volume = 0f

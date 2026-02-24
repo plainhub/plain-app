@@ -18,11 +18,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -33,6 +31,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DQrPairData
+import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
@@ -41,7 +40,6 @@ import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.ui.models.NearbyViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.NearbyDeviceItem
@@ -56,7 +54,6 @@ fun NearbyPage(
 ) {
     val nearbyDevices = nearbyVM.nearbyDevices
     val isDiscovering by nearbyVM.isDiscovering
-    val scope = rememberCoroutineScope()
 
     var showQrSheet by remember { mutableStateOf(false) }
     var qrData by remember { mutableStateOf<DQrPairData?>(null) }

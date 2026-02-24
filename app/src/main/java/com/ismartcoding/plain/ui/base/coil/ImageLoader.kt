@@ -11,7 +11,6 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.allowRgb565
 import coil3.request.crossfade
 import coil3.svg.SvgDecoder
-import coil3.util.DebugLogger
 import com.ismartcoding.plain.activityManager
 import com.ismartcoding.plain.api.HttpClientManager
 
@@ -27,8 +26,13 @@ fun newImageLoader(context: PlatformContext): ImageLoader {
         .components {
             add(SvgDecoder.Factory(true))
             add(AnimatedImageDecoder.Factory())
-            add(VideoFrameDecoder.Factory()) // enables thumbnail extraction for videos with known extensions
+            // ThumbnailDecoder must be before VideoFrameDecoder: for content:// video URIs,
+            // ThumbnailDecoder uses ContentResolver.loadThumbnail() which reads the pre-generated
+            // MediaStore thumbnail cache (fast). VideoFrameDecoder uses MediaMetadataRetriever
+            // which opens and decodes the full video file (slow). ThumbnailDecoder only fires for
+            // content:// URIs (ContentMetadata check), so file-based paths still reach VideoFrameDecoder.
             add(ThumbnailDecoder.Factory())
+            add(VideoFrameDecoder.Factory()) // fallback for file:// video paths without content URI
             add(OkHttpNetworkFetcherFactory(unsafeOkHttpClient))
         }
         .memoryCache {
@@ -44,6 +48,5 @@ fun newImageLoader(context: PlatformContext): ImageLoader {
         }
         .crossfade(100)
         .allowRgb565(true)
-        .logger(DebugLogger())
         .build()
 }

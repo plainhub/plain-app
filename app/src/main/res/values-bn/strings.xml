@@ -211,6 +211,11 @@
     <string name="stop_discovering">খোঁজা বন্ধ করুন</string>
     <string name="tap_discover_to_start">খোঁজা শুরু করতে \"কাছাকাছি ডিভাইস খুঁজে বের করুন\" ট্যাপ করুন</string>
     <string name="make_sure_devices_same_network">নিশ্চিত করুন যে অন্য ডিভাইসগুলি একই নেটওয়ার্কে আছে এবং খুঁজে পাওয়া যায়</string>
+    <string name="show_qr_code">QR কোড দেখান</string>
+    <string name="pair_via_qr_title">QR কোডের মাধ্যমে জোড়া লাগান</string>
+    <string name="pair_via_qr_desc">অন্য ডিভাইসে PlainApp খুলুন, স্ক্যান বোতামে ট্যাপ করুন এবং জোড়া লাগাতে এই QR কোড স্ক্যান করুন।</string>
+    <string name="pair_with_device">%s-এর সঙ্গে জোড়া লাগান</string>
+    <string name="confirm_pair_with_device">আপনি কি %s-এর সঙ্গে জোড়া লাগাতে চান?</string>
     <string name="last_seen">সর্বশেষ দেখা</string>
     <string name="device_discovered">ডিভাইস আবিষ্কৃত</string>
     <string name="link_preview_image">লিঙ্ক প্রিভিউ ছবি</string>
@@ -432,6 +437,7 @@
     <string name="screen_mirror_audio_permission_settings_message">মাইক্রোফোন অনুমতি নিষ্ক্রিয় আছে। সিস্টেম অডিও মিরর করতে সেটিংসে এটি চালু করুন।</string>
     <string name="cast">প্রসারণ করুন</string>
     <string name="images">চিত্র</string>
+    <string name="video">ভিডিও</string>
     <string name="audios">অডিও</string>
     <string name="videos">ভিডিও</string>
     <string name="files">ফাইলগুলি</string>
@@ -645,7 +651,6 @@
     <string name="customize_home_features">হোম ফিচার কাস্টমাইজ করুন</string>
     <string name="file_picker_not_available">এই ডিভাইসে কোনো ফাইল নির্বাচক অ্যাপ উপলব্ধ নেই। দয়া করে একটি ফাইল ম্যানেজার অ্যাপ ইনস্টল করুন।</string>
     <string name="image">ছবি</string>
-    <string name="text_message">টেক্সট বার্তা</string>
     <string name="pair">জোড়া</string>
     <string name="unpair">আলাদা করা</string>
     <string name="paired">জোড়া লাগানো</string>

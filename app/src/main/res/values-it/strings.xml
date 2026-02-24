@@ -211,6 +211,11 @@
     <string name="stop_discovering">Interrompi ricerca</string>
     <string name="tap_discover_to_start">Tocca \"Scopri dispositivi nelle vicinanze\" per iniziare la ricerca</string>
     <string name="make_sure_devices_same_network">Assicurati che altri dispositivi siano sulla stessa rete e rilevabili</string>
+    <string name="show_qr_code">Mostra codice QR</string>
+    <string name="pair_via_qr_title">Associa tramite codice QR</string>
+    <string name="pair_via_qr_desc">Apri PlainApp su un altro dispositivo, tocca il pulsante di scansione e scansiona questo codice QR per associare i dispositivi.</string>
+    <string name="pair_with_device">Associa con %s</string>
+    <string name="confirm_pair_with_device">Vuoi associare con %s?</string>
     <string name="last_seen">Ultima connessione</string>
     <string name="device_discovered">Dispositivo scoperto</string>
     <string name="link_preview_image">Immagine anteprima link</string>
@@ -432,6 +437,7 @@
     <string name="screen_mirror_audio_permission_settings_message">L\'autorizzazione del microfono è disattivata. Abilitala nelle Impostazioni per specchiare l\'audio di sistema.</string>
     <string name="cast">Trasmetti</string>
     <string name="images">Immagini</string>
+    <string name="video">Video</string>
     <string name="audios">Audio</string>
     <string name="videos">Video</string>
     <string name="files">File</string>
@@ -645,7 +651,6 @@
     <string name="customize_home_features">Personalizza le funzionalità della home</string>
     <string name="file_picker_not_available">Nessuna app di selezione file disponibile su questo dispositivo. Si prega di installare un\'app file manager.</string>
     <string name="image">Immagine</string>
-    <string name="text_message">Messaggio di testo</string>
     <string name="pair">Accoppia</string>
     <string name="unpair">Disaccoppia</string>
     <string name="paired">Accoppiato</string>

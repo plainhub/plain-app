@@ -7,6 +7,8 @@ import android.net.Uri
 import androidx.core.content.FileProvider
 import com.ismartcoding.lib.extensions.getMimeType
 import com.ismartcoding.lib.extensions.getMimeTypeFromUri
+import com.ismartcoding.lib.extensions.isImageFast
+import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
@@ -16,6 +18,34 @@ import java.io.File
 import java.io.IOException
 
 object ShareHelper {
+    private fun resolveShareMimeType(
+        context: Context,
+        file: File,
+        preferredMimeType: String = "",
+    ): String {
+        if (preferredMimeType.isNotBlank()) {
+            return preferredMimeType
+        }
+        val fromPath = file.path.getMimeType()
+        if (fromPath.isNotBlank()) {
+            return fromPath
+        }
+        val inferred = when {
+            file.path.isImageFast() -> "image/*"
+            file.path.isVideoFast() -> "video/*"
+            else -> ""
+        }
+        if (inferred.isNotBlank()) {
+            return inferred
+        }
+        return try {
+            val uri = FileProvider.getUriForFile(context, Constants.AUTHORITY, file)
+            context.getMimeTypeFromUri(uri).ifEmpty { "*/*" }
+        } catch (_: Exception) {
+            "*/*"
+        }
+    }
+
     fun shareUri(
         context: Context,
         uri: Uri,
@@ -131,7 +161,8 @@ object ShareHelper {
 
     fun shareFile(
         context: Context,
-        file: File
+        file: File,
+        mimeType: String = "",
     ) {
         // Check if the file can be accessed by FileProvider
         if (!isFileAccessibleByProvider(file)) {
@@ -147,7 +178,7 @@ object ShareHelper {
         
         try {
             val intent = Intent(Intent.ACTION_SEND)
-            intent.type = file.path.getMimeType()
+            intent.type = resolveShareMimeType(context, file, mimeType)
             intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, Constants.AUTHORITY, file))
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             val chooserIntent = Intent.createChooser(intent, getString(R.string.share))

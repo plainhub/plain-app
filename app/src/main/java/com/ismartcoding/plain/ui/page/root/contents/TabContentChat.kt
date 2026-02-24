@@ -155,13 +155,14 @@ fun TabContentChat(
                         try {
                             if (peer.ip.isNotEmpty() && peer.port > 0) {
                                 try {
+                                    val bestIp = peer.getBestIp()
                                     val client = HttpClientManager.createUnsafeOkHttpClient()
                                         .newBuilder()
                                         .connectTimeout(3, TimeUnit.SECONDS)
                                         .readTimeout(3, TimeUnit.SECONDS)
                                         .build()
                                     val request = Request.Builder()
-                                        .url(UrlHelper.getHealthCheckHttpsUrl(peer.ip, peer.port))
+                                        .url(UrlHelper.getHealthCheckHttpsUrl(bestIp, peer.port))
                                         .get()
                                         .build()
                                     if (client.newCall(request).execute().use { it.isSuccessful }) {
@@ -274,7 +275,7 @@ fun TabContentChat(
                 ) { peer ->
                     PeerListItem(
                         title = peer.name,
-                        desc = peer.ip,
+                        desc = peer.getBestIp(),
                         icon = DeviceType.fromValue(peer.deviceType).getIcon(),
                         online = chatListVM.getPeerOnlineStatus(peer.id),
                         latestChat = chatListVM.getLatestChat(peer.id),

@@ -211,6 +211,11 @@
     <string name="stop_discovering">खोजना बंद करें</string>
     <string name="tap_discover_to_start">खोजना शुरू करने के लिए \"पास के डिवाइस खोजें\" टैप करें</string>
     <string name="make_sure_devices_same_network">सुनिश्चित करें कि अन्य डिवाइस समान नेटवर्क पर हैं और खोजे जा सकते हैं</string>
+    <string name="show_qr_code">QR कोड दिखाएँ</string>
+    <string name="pair_via_qr_title">QR कोड से पेयर करें</string>
+    <string name="pair_via_qr_desc">दूसरे डिवाइस पर PlainApp खोलें, स्कैन बटन पर टैप करें और पेयर करने के लिए इस QR कोड को स्कैन करें।</string>
+    <string name="pair_with_device">%s के साथ पेयर करें</string>
+    <string name="confirm_pair_with_device">क्या आप %s के साथ पेयर करना चाहते हैं?</string>
     <string name="last_seen">अंतिम बार देखा गया</string>
     <string name="device_discovered">डिवाइस खोजा गया</string>
     <string name="link_preview_image">लिंक पूर्वावलोकन छवि</string>
@@ -432,6 +437,7 @@
     <string name="screen_mirror_audio_permission_settings_message">माइक्रोफोन अनुमति बंद है। सिस्टम ऑडियो मिरर करने के लिए इसे सेटिंग्स में चालू करें।</string>
     <string name="cast">कास्ट करें</string>
     <string name="images">तस्वीरें</string>
+    <string name="video">वीडियो</string>
     <string name="audios">ऑडियो</string>
     <string name="videos">वीडियो</string>
     <string name="files">फ़ाइलें</string>
@@ -645,7 +651,6 @@
     <string name="customize_home_features">होम फीचर्स कॉस्टमाइज करें</string>
     <string name="file_picker_not_available">इस डिवाइस पर कोई फ़ाइल चयनकर्ता ऐप उपलब्ध नहीं है। कृपया एक फ़ाइल मैनेजर ऐप इंस्टॉल करें।</string>
     <string name="image">छवि</string>
-    <string name="text_message">पाठ संदेश</string>
     <string name="pair">जोड़ना</string>
     <string name="unpair">अलग करना</string>
     <string name="paired">जोड़ा गया</string>
