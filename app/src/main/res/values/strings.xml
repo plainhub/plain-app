@@ -210,6 +210,11 @@
     <string name="stop_discovering">Stop discovering</string>
     <string name="tap_discover_to_start">Tap \"Discover nearby devices\" to start searching</string>
     <string name="make_sure_devices_same_network">Make sure other devices are on the same network and discoverable</string>
+    <string name="show_qr_code">Show QR code</string>
+    <string name="pair_via_qr_title">Pair via QR code</string>
+    <string name="pair_via_qr_desc">Open PlainApp on another device, tap the scan button, and scan this QR code to pair.</string>
+    <string name="pair_with_device">Pair with %s</string>
+    <string name="confirm_pair_with_device">Do you want to pair with %s?</string>
     <string name="last_seen">Last seen</string>
     <string name="device_discovered">Device discovered</string>
     <string name="link_preview_image">Link preview image</string>
