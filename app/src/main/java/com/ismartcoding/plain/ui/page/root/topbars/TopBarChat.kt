@@ -33,7 +33,7 @@ fun TopBarChat(
             }
             IconButton(
                 onClick = {
-                    navController.navigate(Routing.Nearby)
+                    navController.navigate(Routing.Nearby())
                 }
             ) {
                 Icon(

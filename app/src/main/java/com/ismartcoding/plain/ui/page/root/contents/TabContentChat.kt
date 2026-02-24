@@ -26,8 +26,10 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
+import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.preferences.LocalWeb
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import com.ismartcoding.plain.preferences.dataFlow
@@ -58,6 +60,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import okhttp3.Request
+import java.util.concurrent.TimeUnit
 
 @Composable
 fun TabContentChat(
@@ -149,7 +153,27 @@ fun TabContentChat(
                     val key = ChatApiManager.peerKeyCache[peer.id]
                     if (key != null) {
                         try {
-                            NearbyDiscoverManager.discoverSpecificDevice(peer.id, key)
+                            if (peer.ip.isNotEmpty() && peer.port > 0) {
+                                try {
+                                    val client = HttpClientManager.createUnsafeOkHttpClient()
+                                        .newBuilder()
+                                        .connectTimeout(3, TimeUnit.SECONDS)
+                                        .readTimeout(3, TimeUnit.SECONDS)
+                                        .build()
+                                    val request = Request.Builder()
+                                        .url(UrlHelper.getHealthCheckHttpsUrl(peer.ip, peer.port))
+                                        .get()
+                                        .build()
+                                    if (client.newCall(request).execute().use { it.isSuccessful }) {
+                                        chatListVM.updatePeerLastActive(peer.id)
+                                    }
+                                } catch (e: Exception) {
+                                    LogCat.d("Health check failed for ${peer.ip}:${peer.port} - ${e.message}")
+                                    NearbyDiscoverManager.discoverSpecificDevice(peer.id, key)
+                                }
+                            } else {
+                                NearbyDiscoverManager.discoverSpecificDevice(peer.id, key)
+                            }
                         } catch (e: Exception) {
                             e.printStackTrace()
                             LogCat.e("Error discovering device ${peer.id}: ${e.message}")
