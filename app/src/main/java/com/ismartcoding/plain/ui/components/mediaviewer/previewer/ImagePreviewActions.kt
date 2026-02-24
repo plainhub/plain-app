@@ -109,20 +109,20 @@ fun ImagePreviewActions(
                         val tempFile = File.createTempFile("imagePreviewShare", "." + m.path.getFilenameExtension(), File(context.cacheDir, "/image_cache"))
                         if (cachedPath != null) {
                             cachedPath.toFile().copyTo(tempFile, true)
-                            ShareHelper.shareFile(context, tempFile)
+                            ShareHelper.shareFile(context, tempFile, m.getMimeType().ifEmpty { "image/*" })
                         } else {
                             DialogHelper.showLoading()
                             val r = withIO { DownloadHelper.downloadToTempAsync(m.path, tempFile) }
                             DialogHelper.hideLoading()
                             if (r.success) {
-                                ShareHelper.shareFile(context, File(r.path))
+                                ShareHelper.shareFile(context, File(r.path), m.getMimeType().ifEmpty { "image/*" })
                             } else {
                                 DialogHelper.showMessage(r.message)
                             }
                         }
                     }
                 } else {
-                    ShareHelper.shareFile(context, File(m.path))
+                    ShareHelper.shareFile(context, File(m.path), m.getMimeType().ifEmpty { "image/*" })
                 }
             }
             HorizontalSpace(dp = 20.dp)

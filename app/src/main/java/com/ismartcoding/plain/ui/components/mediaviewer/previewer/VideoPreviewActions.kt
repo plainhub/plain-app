@@ -154,13 +154,13 @@ fun VideoPreviewActions(
                             val r = withIO { DownloadHelper.downloadToTempAsync(m.path, tempFile) }
                             DialogHelper.hideLoading()
                             if (r.success) {
-                                ShareHelper.shareFile(context, File(r.path))
+                                ShareHelper.shareFile(context, File(r.path), m.getMimeType().ifEmpty { "video/*" })
                             } else {
                                 DialogHelper.showMessage(r.message)
                             }
                         }
                     } else {
-                        ShareHelper.shareFile(context, File(m.path))
+                        ShareHelper.shareFile(context, File(m.path), m.getMimeType().ifEmpty { "video/*" })
                     }
                 }
                 HorizontalSpace(dp = 20.dp)

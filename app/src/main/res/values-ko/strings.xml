@@ -211,6 +211,11 @@
     <string name="stop_discovering">검색 중지</string>
     <string name="tap_discover_to_start">\"근처 기기 검색\"을 눌러 검색 시작</string>
     <string name="make_sure_devices_same_network">다른 기기가 같은 네트워크에 있고 검색 가능한지 확인하세요</string>
+    <string name="show_qr_code">QR 코드 표시</string>
+    <string name="pair_via_qr_title">QR 코드로 페어링</string>
+    <string name="pair_via_qr_desc">다른 기기에서 PlainApp을 열고 스캔 버튼을 탭한 다음, 이 QR 코드를 스캔하여 페어링하세요.</string>
+    <string name="pair_with_device">%s와 페어링</string>
+    <string name="confirm_pair_with_device">%s와 페어링하시겠습니까?</string>
     <string name="last_seen">마지막 확인</string>
     <string name="device_discovered">기기 발견됨</string>
     <string name="link_preview_image">링크 미리보기 이미지</string>
@@ -432,6 +437,7 @@
     <string name="screen_mirror_audio_permission_settings_message">마이크 권한이 비활성화되어 있습니다. 시스템 오디오를 미러링하려면 설정에서 활성화해 주세요.</string>
     <string name="cast">캐스트</string>
     <string name="images">이미지</string>
+    <string name="video">비디오</string>
     <string name="audios">오디오</string>
     <string name="videos">비디오</string>
     <string name="files">파일</string>
@@ -645,7 +651,6 @@
     <string name="customize_home_features">홈 기능 사용자 정의</string>
     <string name="file_picker_not_available">이 기기에 파일 선택 앱이 없습니다. 파일 관리자 앱을 설치해 주세요.</string>
     <string name="image">이미지</string>
-    <string name="text_message">텍스트 메시지</string>
     <string name="pair">페어링</string>
     <string name="unpair">페어링 해제</string>
     <string name="paired">페어링됨</string>

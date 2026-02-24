@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.Channel
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.lib.extensions.getFilenameWithoutExtension
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
@@ -130,6 +132,18 @@ fun ChatPage(
     val focusManager = LocalFocusManager.current
     val sharedFlow = Channel.sharedFlow
     val previewerState = rememberPreviewerState()
+
+    DisposableEffect(id) {
+        val peerId = id.removePrefix("peer:")
+        if (id.startsWith("peer:")) {
+            TempData.activeChatPeerId = peerId
+        }
+        onDispose {
+            if (id.startsWith("peer:")) {
+                TempData.activeChatPeerId = ""
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         inputValue = ChatInputTextPreference.getAsync(context)

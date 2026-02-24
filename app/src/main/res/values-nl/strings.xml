@@ -211,6 +211,11 @@
     <string name="stop_discovering">Stop zoeken</string>
     <string name="tap_discover_to_start">Tik op \"Ontdek apparaten in de buurt\" om te beginnen met zoeken</string>
     <string name="make_sure_devices_same_network">Zorg ervoor dat andere apparaten op hetzelfde netwerk zijn en vindbaar zijn</string>
+    <string name="show_qr_code">QR-code tonen</string>
+    <string name="pair_via_qr_title">Koppelen via QR-code</string>
+    <string name="pair_via_qr_desc">Open PlainApp op een ander apparaat, tik op de scanknop en scan deze QR-code om te koppelen.</string>
+    <string name="pair_with_device">Koppelen met %s</string>
+    <string name="confirm_pair_with_device">Wil je koppelen met %s?</string>
     <string name="last_seen">Laatst gezien</string>
     <string name="device_discovered">Apparaat ontdekt</string>
     <string name="link_preview_image">Linkvoorbeeldafbeelding</string>
@@ -432,6 +437,7 @@
     <string name="screen_mirror_audio_permission_settings_message">Microfoontoestemming is uitgeschakeld. Schakel deze in bij Instellingen om systeemaudio te spiegelen.</string>
     <string name="cast">Cast</string>
     <string name="images">Afbeeldingen</string>
+    <string name="video">Video</string>
     <string name="audios">Audio</string>
     <string name="videos">Video\'s</string>
     <string name="files">Bestanden</string>
@@ -645,7 +651,6 @@
     <string name="customize_home_features">Home-functies aanpassen</string>
     <string name="file_picker_not_available">Er is geen bestandsselectie-app beschikbaar op dit apparaat. Installeer een bestandsbeheer-app.</string>
     <string name="image">Afbeelding</string>
-    <string name="text_message">Tekstbericht</string>
     <string name="pair">Koppelen</string>
     <string name="unpair">Ontkoppelen</string>
     <string name="paired">Gekoppeld</string>

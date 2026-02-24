@@ -211,6 +211,11 @@
     <string name="stop_discovering">Parar busca</string>
     <string name="tap_discover_to_start">Toque em \"Descobrir dispositivos próximos\" para começar a procurar</string>
     <string name="make_sure_devices_same_network">Certifique-se de que outros dispositivos estão na mesma rede e são detectáveis</string>
+    <string name="show_qr_code">Mostrar código QR</string>
+    <string name="pair_via_qr_title">Emparelhar via código QR</string>
+    <string name="pair_via_qr_desc">Abra o PlainApp em outro dispositivo, toque no botão de digitalizar e escaneie este código QR para emparelhar.</string>
+    <string name="pair_with_device">Emparelhar com %s</string>
+    <string name="confirm_pair_with_device">Deseja emparelhar com %s?</string>
     <string name="last_seen">Última conexão</string>
     <string name="device_discovered">Dispositivo descoberto</string>
     <string name="link_preview_image">Imagem de pré-visualização de link</string>
@@ -432,6 +437,7 @@
     <string name="screen_mirror_audio_permission_settings_message">A permissão do microfone está desativada. Ative-a nas Configurações para espelhar o áudio do sistema.</string>
     <string name="cast">Transmitir</string>
     <string name="images">Imagens</string>
+    <string name="video">Vídeo</string>
     <string name="audios">Áudio</string>
     <string name="videos">Vídeos</string>
     <string name="files">Arquivos</string>
@@ -645,7 +651,6 @@
     <string name="customize_home_features">Personalizar as funcionalidades da home</string>
     <string name="file_picker_not_available">Nenhum aplicativo de seleção de arquivos disponível neste dispositivo. Por favor, instale um aplicativo gerenciador de arquivos.</string>
     <string name="image">Imagem</string>
-    <string name="text_message">Mensagem de texto</string>
     <string name="pair">Emparelhar</string>
     <string name="unpair">Desemparelhar</string>
     <string name="paired">Emparelhado</string>

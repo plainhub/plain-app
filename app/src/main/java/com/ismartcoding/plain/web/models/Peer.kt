@@ -16,5 +16,5 @@ data class Peer(
 )
 
 fun DPeer.toModel(): Peer {
-    return Peer(id, name, ip, status, port, deviceType, createdAt, updatedAt)
+    return Peer(id, name, getBestIp(), status, port, deviceType, createdAt, updatedAt)
 }

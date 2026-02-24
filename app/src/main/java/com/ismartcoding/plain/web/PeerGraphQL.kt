@@ -24,7 +24,6 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.features.ChatHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.NotificationHelper
@@ -78,7 +77,11 @@ class PeerGraphQL(val schema: Schema) {
                         }
 
                         // Download files from peer automatically using queue
-                        if (setOf(DMessageType.FILES.value, DMessageType.IMAGES.value).contains(item.content.type)) {
+                        if (setOf(
+                                DMessageType.FILES.value,
+                                DMessageType.IMAGES.value
+                            ).contains(item.content.type)
+                        ) {
                             val files = when (item.content.value) {
                                 is DMessageFiles -> (item.content.value as DMessageFiles).items
                                 is DMessageImages -> (item.content.value as DMessageImages).items
@@ -101,25 +104,23 @@ class PeerGraphQL(val schema: Schema) {
                         sendEvent(HttpApiEvents.MessageCreatedEvent(fromId, arrayListOf(item)))
                         val model = item.toModel()
                         model.data = model.getContentData()
-                        sendEvent(WebSocketEvent(EventType.MESSAGE_CREATED, JsonHelper.jsonEncode(listOf(model))))
+                        sendEvent(
+                            WebSocketEvent(
+                                EventType.MESSAGE_CREATED,
+                                JsonHelper.jsonEncode(listOf(model))
+                            )
+                        )
 
                         // Send local notification with reply support
+                        // Skip notification when the user already has this peer's chat open.
                         val notificationPeer = AppDatabase.instance.peerDao().getById(fromId)
-                        if (notificationPeer != null) {
-                            val messageText = when (item.content.type) {
-                                DMessageType.TEXT.value -> (item.content.value as? DMessageText)?.text ?: ""
-                                DMessageType.IMAGES.value -> getString(R.string.images)
-                                DMessageType.FILES.value -> getString(R.string.files)
-                                else -> ""
-                            }
-                            if (messageText.isNotEmpty()) {
-                                NotificationHelper.sendPeerMessageNotification(
-                                    context = MainApp.instance,
-                                    peerId = fromId,
-                                    peerName = notificationPeer.name.ifEmpty { getString(R.string.peer_chat) },
-                                    messageText = messageText,
-                                )
-                            }
+                        if (notificationPeer != null && TempData.activeChatPeerId != fromId) {
+                            NotificationHelper.sendPeerMessageNotification(
+                                context = MainApp.instance,
+                                peerId = fromId,
+                                peerName = notificationPeer.name.ifEmpty { getString(R.string.peer_chat) },
+                                messageText = item.getMessagePreview(),
+                            )
                         }
 
                         arrayListOf(item).map { it.toModel() }
@@ -174,7 +175,8 @@ class PeerGraphQL(val schema: Schema) {
                         }
                         val clientId = call.request.header("c-id") ?: ""
                         val gid = call.request.header("c-gid") ?: ""
-                        val token = if (gid.isNotEmpty()) ChatApiManager.groupKeyCache[gid] else ChatApiManager.peerKeyCache[clientId]
+                        val token =
+                            if (gid.isNotEmpty()) ChatApiManager.groupKeyCache[gid] else ChatApiManager.peerKeyCache[clientId]
                         if (token == null) {
                             call.respond(HttpStatusCode.Unauthorized)
                             return@post
@@ -222,7 +224,11 @@ class PeerGraphQL(val schema: Schema) {
 
                         val signatureBytes = Base64.decode(signature, Base64.NO_WRAP)
                         val messageBytes = "$timestamp$requestStr".toByteArray()
-                        val isValid = CryptoHelper.verifySignatureWithRawEd25519PublicKey(publicKey, messageBytes, signatureBytes)
+                        val isValid = CryptoHelper.verifySignatureWithRawEd25519PublicKey(
+                            publicKey,
+                            messageBytes,
+                            signatureBytes
+                        )
                         if (!isValid) {
                             LogCat.e("Invalid signature from peer $clientId")
                             call.respond(HttpStatusCode.Unauthorized)
@@ -231,7 +237,11 @@ class PeerGraphQL(val schema: Schema) {
 
                         ChatApiManager.clientRequestTs[clientId] = currentTime
 
-                        val r = executeGraphqlQL(schema, requestStr, call) // Signature already verified at route level
+                        val r = executeGraphqlQL(
+                            schema,
+                            requestStr,
+                            call
+                        ) // Signature already verified at route level
                         call.respondBytes(CryptoHelper.chaCha20Encrypt(token, r))
                     }
                 }

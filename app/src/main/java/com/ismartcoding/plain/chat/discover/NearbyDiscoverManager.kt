@@ -91,7 +91,8 @@ object NearbyDiscoverManager {
                 deviceType = PhoneHelper.getDeviceType(context),
                 port = TempData.httpsPort,
                 version = BuildConfig.VERSION_NAME,
-                platform = "android"
+                platform = "android",
+                ips = NetworkHelper.getDeviceIP4s().toList(),
             )
 
             val message = "${NearbyMessageType.DISCOVER_REPLY.toPrefix()}${JsonHelper.jsonEncode(reply)}"
@@ -109,7 +110,7 @@ object NearbyDiscoverManager {
         when {
             message.startsWith(NearbyMessageType.DISCOVER_REPLY.toPrefix()) -> {
                 val replyMessage = message.removePrefix(NearbyMessageType.DISCOVER_REPLY.toPrefix())
-                processDiscoveryReply(replyMessage, senderIP)
+                processDiscoveryReply(replyMessage)
             }
 
             message.startsWith(NearbyMessageType.DISCOVER.toPrefix()) -> {
@@ -184,7 +185,7 @@ object NearbyDiscoverManager {
         }
     }
 
-    private fun processDiscoveryReply(message: String, senderIP: String) {
+    private fun processDiscoveryReply(message: String) {
         try {
             val reply = JsonHelper.jsonDecode<DDiscoverReply>(message)
             sendEvent(
@@ -192,7 +193,7 @@ object NearbyDiscoverManager {
                     DNearbyDevice(
                         id = reply.id,
                         name = reply.name,
-                        ip = senderIP,
+                        ips = reply.ips,
                         port = reply.port,
                         deviceType = reply.deviceType,
                         version = reply.version,

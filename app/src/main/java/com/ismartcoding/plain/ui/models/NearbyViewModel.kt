@@ -48,7 +48,7 @@ class NearbyViewModel : ViewModel() {
             Channel.sharedFlow.collect { event ->
                 when (event) {
                     is NearbyDeviceFoundEvent -> {
-                        val existingIndex = nearbyDevices.indexOfFirst { it.ip == event.device.ip }
+                        val existingIndex = nearbyDevices.indexOfFirst { it.id == event.device.id }
                         if (existingIndex >= 0) {
                             nearbyDevices[existingIndex] = event.device
                         } else {
@@ -156,19 +156,18 @@ class NearbyViewModel : ViewModel() {
         startPairing(device)
     }
 
-    suspend fun getQrDataAsync(): DQrPairData? {
+    suspend fun getQrDataAsync(): DQrPairData {
         val context = MainApp.instance
-        val ip = NetworkHelper.getDeviceIP4()
-        if (ip.isEmpty()) return null
+        val allIps = NetworkHelper.getDeviceIP4s().toList()
         val deviceName = DeviceNamePreference.getAsync(context).ifEmpty {
             PhoneHelper.getDeviceName(context)
         }
         return DQrPairData(
             id = TempData.clientId,
             name = deviceName,
-            ip = ip,
             port = TempData.httpsPort,
             deviceType = PhoneHelper.getDeviceType(context),
+            ips = allIps,
         )
     }
 

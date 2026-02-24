@@ -208,6 +208,11 @@
     <string name="stop_discovering">停止发现</string>
     <string name="tap_discover_to_start">点击\"发现附近设备\"开始搜索</string>
     <string name="make_sure_devices_same_network">确保其他设备在同一网络中且可被发现</string>
+    <string name="show_qr_code">显示二维码</string>
+    <string name="pair_via_qr_title">通过二维码配对</string>
+    <string name="pair_via_qr_desc">在另一台设备上打开 PlainApp，点击扫描按钮，然后扫描此二维码进行配对。</string>
+    <string name="pair_with_device">与 %s 配对</string>
+    <string name="confirm_pair_with_device">你要与 %s 配对吗？</string>
     <string name="last_seen">最后在线</string>
     <string name="device_discovered">发现设备</string>
     <string name="link_preview_image">链接预览图片</string>
@@ -433,10 +438,10 @@
     <string name="cast">投屏</string>
     <string name="image">图片</string>
     <string name="images">图片</string>
+    <string name="video">视频</string>
     <string name="audios">音频</string>
     <string name="videos">视频</string>
     <string name="files">文件</string>
-    <string name="text_message">文本消息</string>
     <string name="sdcard">存储卡</string>
     <string name="recents">最近</string>
     <string name="send_message">发送消息</string>
