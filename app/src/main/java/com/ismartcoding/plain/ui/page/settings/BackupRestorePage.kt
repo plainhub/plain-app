@@ -1,9 +1,5 @@
 package com.ismartcoding.plain.ui.page.settings
 
-import android.app.Activity
-import android.content.Intent
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import android.os.Build
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -24,12 +22,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.ismartcoding.lib.channel.Channel
+import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.isP
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.enums.ExportFileType
+import com.ismartcoding.plain.enums.PickFileTag
+import com.ismartcoding.plain.enums.PickFileType
+import com.ismartcoding.plain.events.ExportFileEvent
+import com.ismartcoding.plain.events.ExportFileResultEvent
+import com.ismartcoding.plain.events.PickFileEvent
+import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.extensions.formatName
 import com.ismartcoding.plain.ui.base.PCircularButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
-import com.ismartcoding.plain.ui.helpers.FilePickHelper
 import com.ismartcoding.plain.ui.models.BackupRestoreViewModel
 import java.util.Date
 
@@ -40,24 +47,23 @@ fun BackupRestorePage(
     backupRestoreVM: BackupRestoreViewModel = viewModel(),
 ) {
     val context = LocalContext.current
-    val exportLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data = result.data
-                if (data?.data != null) {
-                    backupRestoreVM.backup(context, data.data!!)
+    val sharedFlow = Channel.sharedFlow
+    LaunchedEffect(sharedFlow) {
+        sharedFlow.collect { event ->
+            when (event) {
+                is PickFileResultEvent -> {
+                    if (event.tag != PickFileTag.RESTORE) return@collect
+                    event.uris.firstOrNull()?.let {
+                        backupRestoreVM.restore(context, it)
+                    }
+                }
+                is ExportFileResultEvent -> {
+                    if (event.type != ExportFileType.BACKUP) return@collect
+                    backupRestoreVM.backup(context, event.uri)
                 }
             }
         }
-
-    val restoreLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-                FilePickHelper.getUris(result.data!!).firstOrNull()?.let {
-                    backupRestoreVM.restore(context, it)
-                }
-            }
-        }
+    }
 
     PScaffold(
         topBar = {
@@ -87,13 +93,16 @@ fun BackupRestorePage(
                         icon = R.drawable.database_backup,
                         description = stringResource(R.string.backup),
                         onClick = {
-                            exportLauncher.launch(
-                                Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                                    type = "text/*"
-                                    addCategory(Intent.CATEGORY_OPENABLE)
-                                    putExtra(Intent.EXTRA_TITLE, "backup_" + Date().formatName() + ".zip")
-                                },
-                            )
+                            val fileName = "backup_" + Date().formatName() + ".zip"
+                            // ACTION_CREATE_DOCUMENT is broken on many Samsung Android 9 devices:
+                            // it returns RESULT_CANCELED with no URI even after the user picks a location.
+                            // On Android 9 and below, skip the file picker and write directly to
+                            // app-specific external storage instead.
+                            if (isP()) {
+                                backupRestoreVM.backupToFile(context, fileName)
+                            } else {
+                                sendEvent(ExportFileEvent(ExportFileType.BACKUP, fileName))
+                            }
                         }
                     )
 
@@ -104,7 +113,7 @@ fun BackupRestorePage(
                         icon = R.drawable.archive_restore,
                         description = stringResource(R.string.restore),
                         onClick = {
-                            restoreLauncher.launch(FilePickHelper.getPickFileIntent(false))
+                            sendEvent(PickFileEvent(PickFileTag.RESTORE, PickFileType.FILE, false))
                         }
                     )
                 }

@@ -3,6 +3,9 @@ package com.ismartcoding.lib
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
 
+@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.P)
+fun isP() = Build.VERSION.SDK_INT == Build.VERSION_CODES.P
+
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.Q)
 fun isQPlus() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 

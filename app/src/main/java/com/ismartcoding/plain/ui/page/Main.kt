@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.page
 
 import android.app.Activity
 import android.net.Uri
+import android.view.WindowManager
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -133,6 +134,16 @@ fun Main(
     }
     var loadingDialogEvent by remember {
         mutableStateOf<LoadingDialogEvent?>(null)
+    }
+    // Keep screen on while a loading dialog is visible so long-running operations
+    // (backup, restore, etc.) don't let the screen turn off mid-operation.
+    val activity = context as? Activity
+    LaunchedEffect(loadingDialogEvent) {
+        if (loadingDialogEvent != null) {
+            activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
     }
     var toastState by remember {
         mutableStateOf<ToastEvent?>(null)

@@ -178,7 +178,7 @@ keytool -genkeypair -v -keystore ./app/release.jks -alias release -keyalg RSA  -
 ```
 storePassword=
 keyPassword=
-keyAlias=plain
+keyAlias=release
 storeFile=release.jks
 ```
 

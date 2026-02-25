@@ -39,6 +39,8 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.lib.isP
+import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
@@ -188,18 +190,29 @@ class MainActivity : AppCompatActivity() {
 
     private val pickFileActivityLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-                sendEvent(PickFileResultEvent(pickFileTag, pickFileType, FilePickHelper.getUris(result.data!!)))
+            // On Samsung Android 9, ACTION_GET_CONTENT / ACTION_OPEN_DOCUMENT may return
+            // RESULT_CANCELED even after the user selects a file. Try to extract URIs regardless.
+            val uris = result.data?.let { FilePickHelper.getUris(it) } ?: emptySet()
+            if (uris.isNotEmpty()) {
+                sendEvent(PickFileResultEvent(pickFileTag, pickFileType, uris))
+            } else if (result.resultCode != Activity.RESULT_OK) {
+                LogCat.d("pickFileActivityLauncher: cancelled (resultCode=${result.resultCode})")
+            } else {
+                LogCat.e("pickFileActivityLauncher: RESULT_OK but no URIs found")
             }
         }
 
     private val exportFileActivityLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data = result.data
-                if (data?.data != null) {
-                    sendEvent(ExportFileResultEvent(exportFileType, data.data!!))
-                }
+            // On Samsung Android 9, ACTION_CREATE_DOCUMENT may return RESULT_CANCELED even after
+            // the user picks a save location. Try to extract the URI regardless of resultCode.
+            val uri = result.data?.data
+            if (uri != null) {
+                sendEvent(ExportFileResultEvent(exportFileType, uri))
+            } else if (result.resultCode != Activity.RESULT_OK) {
+                LogCat.d("exportFileActivityLauncher: cancelled (resultCode=${result.resultCode})")
+            } else {
+                LogCat.e("exportFileActivityLauncher: RESULT_OK but uri is null")
             }
         }
 
@@ -291,10 +304,17 @@ class MainActivity : AppCompatActivity() {
         }
         if (isTPlus()) {
             registerReceiver(plugInReceiver, powerConnectionFilter, RECEIVER_NOT_EXPORTED)
-            registerReceiver(networkStateReceiver, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION), RECEIVER_NOT_EXPORTED)
+            registerReceiver(
+                networkStateReceiver,
+                IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION),
+                RECEIVER_NOT_EXPORTED
+            )
         } else {
             registerReceiver(plugInReceiver, powerConnectionFilter)
-            registerReceiver(networkStateReceiver, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION))
+            registerReceiver(
+                networkStateReceiver,
+                IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION)
+            )
         }
 
         setContent {
@@ -317,7 +337,13 @@ class MainActivity : AppCompatActivity() {
                                         navControllerState.value?.navigate(Routing.Chat("local"))
                                         coIO {
                                             delay(1000)
-                                            sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris))
+                                            sendEvent(
+                                                PickFileResultEvent(
+                                                    PickFileTag.SEND_MESSAGE,
+                                                    PickFileType.FILE,
+                                                    uris
+                                                )
+                                            )
                                         }
                                     }
 
@@ -325,7 +351,13 @@ class MainActivity : AppCompatActivity() {
                                         navControllerState.value?.navigate(Routing.Chat("peer:${target.peer.id}"))
                                         coIO {
                                             delay(1000)
-                                            sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris))
+                                            sendEvent(
+                                                PickFileResultEvent(
+                                                    PickFileTag.SEND_MESSAGE,
+                                                    PickFileType.FILE,
+                                                    uris
+                                                )
+                                            )
                                         }
                                     }
                                 }
@@ -377,13 +409,20 @@ class MainActivity : AppCompatActivity() {
                     is HttpServerStateChangedEvent -> {
                         mainVM.httpServerError = HttpServerManager.httpServerError
                         mainVM.httpServerState = event.state
-                        if (event.state == HttpServerState.ON && !Permission.WRITE_EXTERNAL_STORAGE.can(this@MainActivity)) {
+                        if (event.state == HttpServerState.ON && !Permission.WRITE_EXTERNAL_STORAGE.can(
+                                this@MainActivity
+                            )
+                        ) {
                             DialogHelper.showConfirmDialog(
                                 LocaleHelper.getString(R.string.confirm),
                                 LocaleHelper.getString(R.string.storage_permission_confirm)
                             ) {
                                 coIO {
-                                    ApiPermissionsPreference.putAsync(this@MainActivity, Permission.WRITE_EXTERNAL_STORAGE, true)
+                                    ApiPermissionsPreference.putAsync(
+                                        this@MainActivity,
+                                        Permission.WRITE_EXTERNAL_STORAGE,
+                                        true
+                                    )
                                     sendEvent(RequestPermissionsEvent(Permission.WRITE_EXTERNAL_STORAGE))
                                 }
                             }
@@ -391,14 +430,21 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     is PermissionsResultEvent -> {
-                        if (event.map.containsKey(Permission.WRITE_SETTINGS.toSysPermission()) && Permission.WRITE_SETTINGS.can(this@MainActivity)) {
+                        if (event.map.containsKey(Permission.WRITE_SETTINGS.toSysPermission()) && Permission.WRITE_SETTINGS.can(
+                                this@MainActivity
+                            )
+                        ) {
                             val enable = !KeepScreenOnPreference.getAsync(this@MainActivity)
                             ScreenHelper.saveOn(this@MainActivity, enable)
                             if (enable) {
-                                ScreenHelper.saveTimeout(this@MainActivity, contentResolver.getSystemScreenTimeout())
+                                ScreenHelper.saveTimeout(
+                                    this@MainActivity,
+                                    contentResolver.getSystemScreenTimeout()
+                                )
                                 contentResolver.setSystemScreenTimeout(Int.MAX_VALUE)
                             } else {
-                                val systemScreenTimeout = SystemScreenTimeoutPreference.getAsync(this@MainActivity)
+                                val systemScreenTimeout =
+                                    SystemScreenTimeoutPreference.getAsync(this@MainActivity)
                                 contentResolver.setSystemScreenTimeout(
                                     if (systemScreenTimeout > 0) systemScreenTimeout else 5000 * 60,
                                 ) // default 5 minutes
@@ -445,7 +491,8 @@ class MainActivity : AppCompatActivity() {
 
                     is RestartAppEvent -> {
                         val intent = Intent(this@MainActivity, MainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                         startActivity(intent)
                         Runtime.getRuntime().exit(0)
                     }
@@ -454,7 +501,8 @@ class MainActivity : AppCompatActivity() {
                         try {
                             pickFileType = event.type
                             pickFileTag = event.tag
-                            var type: ActivityResultContracts.PickVisualMedia.VisualMediaType? = null
+                            var type: ActivityResultContracts.PickVisualMedia.VisualMediaType? =
+                                null
                             when (event.type) {
                                 PickFileType.IMAGE_VIDEO -> {
                                     type = ActivityResultContracts.PickVisualMedia.ImageAndVideo
@@ -490,7 +538,10 @@ class MainActivity : AppCompatActivity() {
                             exportFileType = event.type
                             exportFileActivityLauncher.launch(
                                 Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                                    type = "text/*"
+                                    type = when (event.type) {
+                                        ExportFileType.BACKUP -> "application/zip"
+                                        else -> "text/*"
+                                    }
                                     addCategory(Intent.CATEGORY_OPENABLE)
                                     putExtra(Intent.EXTRA_TITLE, event.fileName)
                                 },
@@ -514,7 +565,13 @@ class MainActivity : AppCompatActivity() {
                             val r = event.request
                             requestToConnectDialog =
                                 AlertDialog.Builder(instance.get()!!)
-                                    .setTitle(getStringF(R.string.request_to_connect, "ip", clientIp))
+                                    .setTitle(
+                                        getStringF(
+                                            R.string.request_to_connect,
+                                            "ip",
+                                            clientIp
+                                        )
+                                    )
                                     .setMessage(
                                         getStringF(
                                             R.string.client_ua,
@@ -565,12 +622,23 @@ class MainActivity : AppCompatActivity() {
                             pairingRequestDialog =
                                 AlertDialog.Builder(instance.get()!!)
                                     .setTitle(getString(R.string.pairing_request))
-                                    .setMessage(getString(R.string.pairing_request_message, request.fromName))
+                                    .setMessage(
+                                        getString(
+                                            R.string.pairing_request_message,
+                                            request.fromName
+                                        )
+                                    )
                                     .setPositiveButton(getString(R.string.allow)) { _, _ ->
                                         sendEvent(PairingResponseEvent(request, event.fromIp, true))
                                     }
                                     .setNegativeButton(getString(R.string.deny)) { _, _ ->
-                                        sendEvent(PairingResponseEvent(request, event.fromIp, false))
+                                        sendEvent(
+                                            PairingResponseEvent(
+                                                request,
+                                                event.fromIp,
+                                                false
+                                            )
+                                        )
                                     }
                                     .setCancelable(false)
                                     .create()
@@ -615,25 +683,16 @@ class MainActivity : AppCompatActivity() {
         try {
             val intent = when (event.type) {
                 PickFileType.FOLDER -> FilePickHelper.getPickFolderIntent()
-                else -> FilePickHelper.getPickFileIntent(event.multiple)
+                else if (isQPlus()) -> FilePickHelper.getPickFileIntent(event.multiple)
+                // ACTION_GET_CONTENT instead of ACTION_OPEN_DOCUMENT: ACTION_OPEN_DOCUMENT has a
+                // known OEM bug on Samsung Android 9 where it silently returns RESULT_CANCELED
+                // even after a file is selected. ACTION_GET_CONTENT is universally reliable.
+                else -> FilePickHelper.getFallbackPickFileIntent(event.multiple)
             }
             pickFileActivityLauncher.launch(intent)
         } catch (e: ActivityNotFoundException) {
-            LogCat.w("ACTION_OPEN_DOCUMENT not supported, trying fallback")
-            try {
-                // Only try fallback for file selection, not folder selection
-                if (event.type != PickFileType.FOLDER) {
-                    pickFileActivityLauncher.launch(FilePickHelper.getFallbackPickFileIntent(event.multiple))
-                } else {
-                    LogCat.e("No folder picker available on this device")
-                    DialogHelper.showErrorMessage(getString(R.string.file_picker_not_available))
-                }
-            } catch (e2: ActivityNotFoundException) {
-                LogCat.e("No file picker available on this device")
-                DialogHelper.showErrorMessage(getString(R.string.file_picker_not_available))
-            } catch (e2: IllegalStateException) {
-                LogCat.e("Error launching fallback pick file activity: ${e2.message}")
-            }
+            LogCat.e("No file picker available on this device")
+            DialogHelper.showErrorMessage(getString(R.string.file_picker_not_available))
         } catch (e: IllegalStateException) {
             LogCat.e("Error launching pick file activity: ${e.message}")
         }
@@ -673,7 +732,12 @@ class MainActivity : AppCompatActivity() {
                 val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT) ?: return
                 coMain {
                     val item = withIO {
-                        ChatHelper.sendAsync(DMessageContent(DMessageType.TEXT.value, DMessageText(sharedText)))
+                        ChatHelper.sendAsync(
+                            DMessageContent(
+                                DMessageType.TEXT.value,
+                                DMessageText(sharedText)
+                            )
+                        )
                     }
                     val m = item.toModel()
                     m.data = m.getContentData()
