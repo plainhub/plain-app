@@ -27,7 +27,7 @@ function try_print_missing_rules()
 cat > ./keystore.properties <<EOF
 storePassword=$ANDROID_STORE_PASSWORD
 keyPassword=$ANDROID_KEY_PASSWORD
-keyAlias=plain
+keyAlias=release
 storeFile=release.jks
 EOF
 
