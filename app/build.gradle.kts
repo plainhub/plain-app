@@ -20,6 +20,45 @@ room {
     schemaDirectory("$projectDir/schemas")
 }
 
+// Auto-generate a placeholder google-services.json if the real one is absent.
+// This lets contributors build without Firebase credentials.
+// Replace app/google-services.json with your real file to enable Firebase services.
+val googleServicesFile = file("google-services.json")
+if (!googleServicesFile.exists()) {
+    googleServicesFile.writeText(
+        """
+        {
+          "project_info": {
+            "project_number": "000000000000",
+            "project_id": "placeholder-project",
+            "storage_bucket": "placeholder-project.appspot.com"
+          },
+          "client": [
+            {
+              "client_info": {
+                "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+                "android_client_info": { "package_name": "com.ismartcoding.plain" }
+              },
+              "oauth_client": [],
+              "api_key": [{ "current_key": "placeholder" }],
+              "services": { "appinvite_service": { "other_platform_oauth_client": [] } }
+            },
+            {
+              "client_info": {
+                "mobilesdk_app_id": "1:000000000000:android:1111111111111111111111",
+                "android_client_info": { "package_name": "com.ismartcoding.plain.debug" }
+              },
+              "oauth_client": [],
+              "api_key": [{ "current_key": "placeholder" }],
+              "services": { "appinvite_service": { "other_platform_oauth_client": [] } }
+            }
+          ],
+          "configuration_version": "1"
+        }
+        """.trimIndent()
+    )
+}
+
 val keystoreProperties = Properties()
 rootProject.file("keystore.properties").let {
     if (it.exists()) {

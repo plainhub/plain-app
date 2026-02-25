@@ -35,7 +35,9 @@ jobs:
         run: echo "${{ secrets.KEYSTORE_B64 }}" | base64 --decode > ./app/release.jks
 
       - name: Restore google-services.json
-        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > ./app/google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: printf '%s' "$GOOGLE_SERVICES_JSON" > ./app/google-services.json
 
       - name: Build apk
         run: bash build-apk.sh
