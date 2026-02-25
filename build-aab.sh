@@ -23,7 +23,7 @@ perl -i -0pe 's/\n\s+<service\n[^<]*\.services\.PlainAccessibilityService[\s\S]*
 cat > ./keystore.properties <<EOF
 storePassword=$ANDROID_STORE_PASSWORD
 keyPassword=$ANDROID_KEY_PASSWORD
-keyAlias=plain
+keyAlias=release
 storeFile=release.jks
 EOF
 

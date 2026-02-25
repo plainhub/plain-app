@@ -59,7 +59,10 @@ object FileHelper {
         if (path.startsWith("https://", true) || path.startsWith("http://", true)) {
             return path
         }
-        return Base64.encodeToString(CryptoHelper.chaCha20Encrypt(TempData.urlToken, path), Base64.NO_WRAP)
+        return Base64.encodeToString(
+            CryptoHelper.chaCha20Encrypt(TempData.urlToken, path),
+            Base64.NO_WRAP
+        )
     }
 
     fun rename(
@@ -148,8 +151,7 @@ object FileHelper {
     }
 
 
-
-    private fun createPublicFile(fileName: String, dirName: String): File {
+    fun createPublicFile(fileName: String, dirName: String): File {
         val dir = PathHelper.getPlainPublicDir(dirName)
         if (!dir.exists()) {
             dir.mkdirs()
