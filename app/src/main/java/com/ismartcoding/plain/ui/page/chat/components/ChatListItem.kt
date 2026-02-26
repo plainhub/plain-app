@@ -183,15 +183,17 @@ fun ChatListItem(
                                     DialogHelper.showTextCopiedMessage(text)
                                 },
                             )
-                            PDropdownMenuItem(
-                                text = { Text(stringResource(id = R.string.edit_text)) },
-                                onClick = {
-                                    chatVM.selectedItem.value = null
-                                    showContextMenu.value = false
-                                    val content = (m.value as DMessageText).text
-                                    navController.navigateChatEditText(m.id, content)
-                                },
-                            )
+                            if (m.fromId == "me") {
+                                PDropdownMenuItem(
+                                    text = { Text(stringResource(id = R.string.edit_text)) },
+                                    onClick = {
+                                        chatVM.selectedItem.value = null
+                                        showContextMenu.value = false
+                                        val content = (m.value as DMessageText).text
+                                        navController.navigateChatEditText(m.id, content)
+                                    },
+                                )
+                            }
                         }
                         PDropdownMenuItem(
                             text = { Text(stringResource(id = R.string.delete)) },
