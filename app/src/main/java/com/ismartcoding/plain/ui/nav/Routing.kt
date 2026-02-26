@@ -34,7 +34,7 @@ class Routing {
     object WebLearnMore
 
     @Serializable
-    object Text
+    data class Text(val title: String, val content: String, val language: String)
 
     @Serializable
     object Sessions
@@ -58,10 +58,10 @@ class Routing {
     data class ChatInfo(val chatId: String)
 
     @Serializable
-    object ChatText
+    data class ChatText(val content: String)
 
     @Serializable
-    data class ChatEditText(val id: String)
+    data class ChatEditText(val id: String, val content: String)
 
     @Serializable
     object Scan
@@ -88,7 +88,7 @@ class Routing {
     data class NoteDetail(val id: String)
 
     @Serializable
-    object PdfViewer
+    data class PdfViewer(val uri: String)
 
     @Serializable
     object Feeds
@@ -106,7 +106,7 @@ class Routing {
     object AudioPlayer
 
     @Serializable
-    object TextFile
+    data class TextFile(val path: String, val title: String = "", val mediaId: String = "", val type: String = "")
 
     @Serializable
     data class AppDetails(val id: String)

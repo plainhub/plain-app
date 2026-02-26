@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -102,7 +103,7 @@ fun MediaPreviewer(
     getItem: (Int) -> PreviewItem = { index ->
         MediaPreviewData.items.getOrNull(index) ?: PreviewItem(index.toString())
     },
-    castVM: CastViewModel = viewModel(),
+    castVM: CastViewModel = viewModel(LocalContext.current as ComponentActivity),
     tagsVM: TagsViewModel? = null,
     tagsMap: Map<String, List<DTagRelation>>? = null,
     tagsState: List<DTag> = emptyList(),

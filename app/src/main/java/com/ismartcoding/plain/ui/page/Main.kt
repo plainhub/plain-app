@@ -331,30 +331,24 @@ fun Main(
                     NotePage(navController, r.id, "", notesVM = notesVM, tagsVM = noteTagsVM)
                 }
 
-                composable<Routing.Text> {
-                    val title = navController.previousBackStackEntry?.savedStateHandle?.get("title") ?: ""
-                    val content = navController.previousBackStackEntry?.savedStateHandle?.get("content") ?: ""
-                    val language = navController.previousBackStackEntry?.savedStateHandle?.get("language") ?: ""
-                    TextPage(navController, title, content, language)
+                composable<Routing.Text> { backStackEntry ->
+                    val r = backStackEntry.toRoute<Routing.Text>()
+                    TextPage(navController, r.title, r.content, r.language)
                 }
 
-                composable<Routing.TextFile> {
-                    val path = navController.previousBackStackEntry?.savedStateHandle?.get("path") ?: ""
-                    val title = navController.previousBackStackEntry?.savedStateHandle?.get("title") ?: ""
-                    val type = navController.previousBackStackEntry?.savedStateHandle?.get("type") ?: ""
-                    val mediaId = navController.previousBackStackEntry?.savedStateHandle?.get("mediaId") ?: ""
-                    TextFilePage(navController, path, title, mediaId, type)
+                composable<Routing.TextFile> { backStackEntry ->
+                    val r = backStackEntry.toRoute<Routing.TextFile>()
+                    TextFilePage(navController, r.path, r.title, r.mediaId, r.type)
                 }
 
-                composable<Routing.ChatText> {
-                    val content = navController.previousBackStackEntry?.savedStateHandle?.get("content") ?: ""
-                    ChatTextPage(navController, content)
+                composable<Routing.ChatText> { backStackEntry ->
+                    val r = backStackEntry.toRoute<Routing.ChatText>()
+                    ChatTextPage(navController, r.content)
                 }
 
                 composable<Routing.ChatEditText> { backStackEntry ->
-                    val content = navController.previousBackStackEntry?.savedStateHandle?.get("content") ?: ""
                     val r = backStackEntry.toRoute<Routing.ChatEditText>()
-                    ChatEditTextPage(navController, r.id, content, chatVM)
+                    ChatEditTextPage(navController, r.id, r.content, chatVM)
                 }
 
                 composable<Routing.OtherFile> { backStackEntry ->
@@ -362,11 +356,9 @@ fun Main(
                     OtherFilePage(navController, r.path, r.title)
                 }
 
-                composable<Routing.PdfViewer> {
-                    val uri = navController.previousBackStackEntry?.savedStateHandle?.get<Uri>("uri")
-                    if (uri != null) {
-                        PdfPage(navController, uri)
-                    }
+                composable<Routing.PdfViewer> { backStackEntry ->
+                    val r = backStackEntry.toRoute<Routing.PdfViewer>()
+                    PdfPage(navController, Uri.parse(r.uri))
                 }
 
                 composable<Routing.Files> { backStackEntry ->
