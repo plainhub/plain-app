@@ -689,4 +689,8 @@
     <string name="clear_messages">Limpar mensagens</string>
     <string name="clear_messages_confirm">Tem certeza de que deseja limpar todas as mensagens? Esta ação não pode ser desfeita.</string>
     <string name="messages_cleared">Mensagens apagadas!</string>
+    <string name="auto_check_update">Verificar atualizações automaticamente</string>
+    <string name="auto_check_update_desc">Verificar automaticamente novas versões ao iniciar o aplicativo</string>
+    <string name="peer_chat_reply">Responder</string>
+    <string name="peer_chat_type_reply">Digite uma resposta…</string>
 </resources>

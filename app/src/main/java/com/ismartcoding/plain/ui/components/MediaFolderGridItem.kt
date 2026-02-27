@@ -59,9 +59,13 @@ fun MediaFolderGridItem(
         scope.launch(Dispatchers.IO) {
             val bitmaps = mutableListOf<Bitmap>()
             m.topItems.forEach { path ->
-                val bm = BitmapHelper.decodeBitmapFromFileAsync(context, path, 200, 200)
-                if (bm != null) {
-                    bitmaps.add(bm)
+                try {
+                    val bm = BitmapHelper.decodeBitmapFromFileAsync(context, path, 200, 200)
+                    if (bm != null) {
+                        bitmaps.add(bm)
+                    }
+                } catch (ex: Exception) {
+                    LogCat.e(ex.toString())
                 }
             }
             try {

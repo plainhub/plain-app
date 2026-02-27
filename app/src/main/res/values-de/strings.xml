@@ -689,4 +689,8 @@
     <string name="clear_messages">Nachrichten löschen</string>
     <string name="clear_messages_confirm">Möchten Sie wirklich alle Nachrichten löschen? Diese Aktion kann nicht rückgängig gemacht werden.</string>
     <string name="messages_cleared">Nachrichten gelöscht!</string>
+    <string name="auto_check_update">Automatisch nach Updates suchen</string>
+    <string name="auto_check_update_desc">Beim App-Start automatisch nach neuen Versionen suchen</string>
+    <string name="peer_chat_reply">Antworten</string>
+    <string name="peer_chat_type_reply">Antwort eingeben…</string>
 </resources>

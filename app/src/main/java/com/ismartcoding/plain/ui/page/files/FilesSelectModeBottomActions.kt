@@ -140,9 +140,16 @@ fun FilesSelectModeBottomActions(
                         if (destFile.exists()) {
                             destPath = destFile.newPath()
                         }
-                        withIO {
-                            ZipHelper.zip(selectedFiles.map { it.path }, destPath)
-                            filesVM.loadAsync(context)
+                        val success = withIO {
+                            try {
+                                ZipHelper.zip(selectedFiles.map { it.path }, destPath)
+                            } catch (e: Exception) {
+                                DialogHelper.showErrorMessage(e.message ?: e.toString())
+                                false
+                            }
+                        }
+                        if (success) {
+                            withIO { filesVM.loadAsync(context) }
                         }
                         DialogHelper.hideLoading()
                         filesVM.exitSelectMode()

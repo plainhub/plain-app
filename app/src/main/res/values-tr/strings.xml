@@ -689,4 +689,8 @@
     <string name="clear_messages">Mesajları Temizle</string>
     <string name="clear_messages_confirm">Tüm mesajları temizlemek istediğinizden emin misiniz? Bu işlem geri alınamaz.</string>
     <string name="messages_cleared">Mesajlar temizlendi!</string>
+    <string name="auto_check_update">Güncellemeleri otomatik denetle</string>
+    <string name="auto_check_update_desc">Uygulama açıldığında otomatik olarak yeni sürümleri denetle</string>
+    <string name="peer_chat_reply">Yanıtla</string>
+    <string name="peer_chat_type_reply">Bir yanıt yazın…</string>
 </resources>

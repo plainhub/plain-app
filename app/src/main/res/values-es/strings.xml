@@ -689,4 +689,8 @@
     <string name="clear_messages">Borrar mensajes</string>
     <string name="clear_messages_confirm">¿Está seguro de que desea borrar todos los mensajes? Esta acción no se puede deshacer.</string>
     <string name="messages_cleared">¡Mensajes borrados!</string>
+    <string name="auto_check_update">Buscar actualizaciones automáticamente</string>
+    <string name="auto_check_update_desc">Buscar nuevas versiones automáticamente al abrir la aplicación</string>
+    <string name="peer_chat_reply">Responder</string>
+    <string name="peer_chat_type_reply">Escribe una respuesta…</string>
 </resources>

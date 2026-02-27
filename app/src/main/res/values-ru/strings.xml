@@ -689,4 +689,8 @@
     <string name="clear_messages">Очистить сообщения</string>
     <string name="clear_messages_confirm">Вы уверены, что хотите очистить все сообщения? Это действие невозможно отменить.</string>
     <string name="messages_cleared">Сообщения удалены!</string>
+    <string name="auto_check_update">Автоматическая проверка обновлений</string>
+    <string name="auto_check_update_desc">Автоматически проверять наличие новых версий при запуске приложения</string>
+    <string name="peer_chat_reply">Ответить</string>
+    <string name="peer_chat_type_reply">Введите ответ…</string>
 </resources>

@@ -689,4 +689,8 @@
     <string name="clear_messages">Cancella messaggi</string>
     <string name="clear_messages_confirm">Sei sicuro di voler cancellare tutti i messaggi? Questa azione non può essere annullata.</string>
     <string name="messages_cleared">Messaggi cancellati!</string>
+    <string name="auto_check_update">Controlla aggiornamenti automaticamente</string>
+    <string name="auto_check_update_desc">Controlla automaticamente le nuove versioni all\'avvio dell\'app</string>
+    <string name="peer_chat_reply">Rispondi</string>
+    <string name="peer_chat_type_reply">Scrivi una risposta…</string>
 </resources>

@@ -689,4 +689,8 @@
     <string name="clear_messages">বার্তা মুছুন</string>
     <string name="clear_messages_confirm">আপনি কি সব বার্তা মুছতে চান? এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না।</string>
     <string name="messages_cleared">বার্তাগুলি মুছে ফেলা হয়েছে!</string>
+    <string name="auto_check_update">স্বয়ংক্রিয় আপডেট পরীক্ষা</string>
+    <string name="auto_check_update_desc">অ্যাপ চালু হলে স্বয়ংক্রিয়ভাবে নতুন সংস্করণ খোঁজে</string>
+    <string name="peer_chat_reply">উত্তর দিন</string>
+    <string name="peer_chat_type_reply">একটি উত্তর লিখুন…</string>
 </resources>

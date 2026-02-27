@@ -689,4 +689,8 @@
     <string name="clear_messages">Xóa tin nhắn</string>
     <string name="clear_messages_confirm">Bạn có chắc chắn muốn xóa tất cả tin nhắn không? Hành động này không thể hoàn tác.</string>
     <string name="messages_cleared">Tin nhắn đã được xóa!</string>
+    <string name="auto_check_update">Tự động kiểm tra cập nhật</string>
+    <string name="auto_check_update_desc">Tự động kiểm tra phiên bản mới khi khởi động ứng dụng</string>
+    <string name="peer_chat_reply">Trả lời</string>
+    <string name="peer_chat_type_reply">Nhập câu trả lời…</string>
 </resources>

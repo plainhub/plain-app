@@ -35,6 +35,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
@@ -89,8 +90,13 @@ fun WebSecurityPage(navController: NavHostController) {
             }
             scope.launch(Dispatchers.IO) {
                 keyStorePassword = KeyStorePasswordPreference.getAsync(context)
-                sslSignature = HttpServerManager.getSSLSignature(context, keyStorePassword).joinToString(" ") {
-                    "%02x".format(it).uppercase()
+                try {
+                    sslSignature = HttpServerManager.getSSLSignature(context, keyStorePassword).joinToString(" ") {
+                        "%02x".format(it).uppercase()
+                    }
+                } catch (ex: Exception) {
+                    LogCat.e("Failed to get SSL signature: ${ex.message}")
+                    ex.printStackTrace()
                 }
             }
         }

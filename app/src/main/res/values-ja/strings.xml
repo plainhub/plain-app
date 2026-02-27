@@ -689,4 +689,8 @@
     <string name="clear_messages">メッセージを削除</string>
     <string name="clear_messages_confirm">すべてのメッセージを削除しますか？この操作は取り消せません。</string>
     <string name="messages_cleared">メッセージを削除しました！</string>
+    <string name="auto_check_update">自動でアップデートを確認</string>
+    <string name="auto_check_update_desc">アプリ起動時に自動で新しいバージョンを確認する</string>
+    <string name="peer_chat_reply">返信</string>
+    <string name="peer_chat_type_reply">返信を入力…</string>
 </resources>
