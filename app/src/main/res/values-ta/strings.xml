@@ -689,4 +689,8 @@
     <string name="clear_messages">செய்திகளை அழி</string>
     <string name="clear_messages_confirm">அனைத்து செய்திகளையும் அழிக்க விரும்புகிறீர்களா? இந்த செயலை மீட்டெடுக்க முடியாது.</string>
     <string name="messages_cleared">செய்திகள் அழிக்கப்பட்டன!</string>
+    <string name="auto_check_update">தானியங்கு புதுப்பிப்பு சரிபார்ப்பு</string>
+    <string name="auto_check_update_desc">பயன்பாடு திறக்கும்போது புதிய பதிப்புகளை தானியங்கியாக சரிபார்க்கவும்</string>
+    <string name="peer_chat_reply">பதிலளி</string>
+    <string name="peer_chat_type_reply">பதிலை தட்டச்சு செய்யவும்…</string>
 </resources>

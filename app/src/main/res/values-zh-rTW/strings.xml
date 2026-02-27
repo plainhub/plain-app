@@ -689,4 +689,8 @@
     <string name="clear_messages">清空訊息</string>
     <string name="clear_messages_confirm">確定要清空所有訊息嗎？此操作無法復原。</string>
     <string name="messages_cleared">訊息已清空！</string>
+    <string name="auto_check_update">自動檢查更新</string>
+    <string name="auto_check_update_desc">應用程式啟動時自動檢查新版本</string>
+    <string name="peer_chat_reply">回覆</string>
+    <string name="peer_chat_type_reply">輸入回覆…</string>
 </resources>

@@ -233,8 +233,18 @@ object HttpServerManager {
 
     fun generateSSLKeyStore(file: File, password: String) {
         val keyStore = JksHelper.genJksFile(SSL_KEY_ALIAS, password, Constants.SSL_NAME)
-        FileOutputStream(file).use {
-            keyStore.store(it, password.toCharArray())
+        // Write to a temp file first, then atomically rename to the target.
+        // This prevents a partially-written (corrupted) keystore if the process
+        // is killed mid-write (OOM, force-stop, reboot, etc.).
+        val tmp = File(file.parent, "${file.name}.tmp")
+        try {
+            FileOutputStream(tmp).use {
+                keyStore.store(it, password.toCharArray())
+            }
+            tmp.renameTo(file)
+        } catch (ex: Exception) {
+            tmp.delete()
+            throw ex
         }
     }
 
@@ -256,10 +266,16 @@ object HttpServerManager {
                 if (file.exists()) {
                     file.delete()
                 }
-                generateSSLKeyStore(file, password)
-                // Reload the newly generated keystore
-                file.inputStream().use {
-                    load(it, password.toCharArray())
+                try {
+                    generateSSLKeyStore(file, password)
+                    // Reload the newly generated keystore
+                    file.inputStream().use {
+                        load(it, password.toCharArray())
+                    }
+                } catch (ex2: Exception) {
+                    LogCat.e("Failed to regenerate keystore: ${ex2.message}")
+                    ex2.printStackTrace()
+                    throw ex2
                 }
             }
         }

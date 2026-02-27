@@ -689,4 +689,8 @@
     <string name="clear_messages">Berichten wissen</string>
     <string name="clear_messages_confirm">Weet u zeker dat u alle berichten wilt wissen? Deze actie kan niet ongedaan worden gemaakt.</string>
     <string name="messages_cleared">Berichten gewist!</string>
+    <string name="auto_check_update">Automatisch controleren op updates</string>
+    <string name="auto_check_update_desc">Automatisch controleren op nieuwe versies bij het openen van de app</string>
+    <string name="peer_chat_reply">Beantwoorden</string>
+    <string name="peer_chat_type_reply">Typ een antwoord…</string>
 </resources>

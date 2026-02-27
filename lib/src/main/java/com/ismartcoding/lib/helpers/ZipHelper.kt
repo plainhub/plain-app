@@ -16,7 +16,13 @@ object ZipHelper {
         targetPath: String,
     ): Boolean {
         val queue = LinkedList<String>()
-        val fos = FileOutputStream(File(targetPath))
+        val fos: FileOutputStream
+        try {
+            fos = FileOutputStream(File(targetPath))
+        } catch (exception: Exception) {
+            LogCat.e(exception.toString())
+            return false
+        }
         val zout = ZipOutputStream(fos)
         var res: Closeable = fos
 

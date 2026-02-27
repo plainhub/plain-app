@@ -689,4 +689,8 @@
     <string name="clear_messages">메시지 지우기</string>
     <string name="clear_messages_confirm">모든 메시지를 지우시겠습니까? 이 작업은 되돌릴 수 없습니다.</string>
     <string name="messages_cleared">메시지가 삭제되었습니다!</string>
+    <string name="auto_check_update">자동 업데이트 확인</string>
+    <string name="auto_check_update_desc">앱 실행 시 자동으로 새 버전 확인</string>
+    <string name="peer_chat_reply">답장</string>
+    <string name="peer_chat_type_reply">답장 입력…</string>
 </resources>

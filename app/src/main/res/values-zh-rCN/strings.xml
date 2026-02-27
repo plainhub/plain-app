@@ -682,4 +682,15 @@
     <string name="clear_messages">清空消息</string>
     <string name="clear_messages_confirm">确定要清空所有消息吗？此操作无法撤销。</string>
     <string name="messages_cleared">消息已清空！</string>
+    <string name="auto_check_update">自动检查更新</string>
+    <string name="auto_check_update_desc">应用启动时自动检查新版本</string>
+    <string name="peer_chat_reply">回复</string>
+    <string name="peer_chat_type_reply">输入回复…</string>
+    <string name="chat_settings">聊天设置</string>
+    <string name="chat_files_save_directory">聊天文件保存目录</string>
+    <string name="default_app_directory">默认（应用目录）</string>
+    <string name="computer">电脑</string>
+    <string name="phone">手机</string>
+    <string name="tablet">平板</string>
+    <string name="tv">电视和投影仪</string>
 </resources>

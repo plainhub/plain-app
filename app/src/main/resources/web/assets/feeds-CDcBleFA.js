@@ -1,1 +1,0 @@
-import{D as a,C as d,E as o}from"./index-Cn6MD5BA.js";const l=e=>({viewAll:()=>{d(e,"/feeds")},viewFeed:s=>{const u=a([{name:"feed_id",op:"",value:s.id}]);d(e,`/feeds?q=${o(u)}`)},viewToday:()=>{const s=a([{name:"today",op:"",value:"true"}]);d(e,`/feeds?q=${o(s)}`)}});export{l as u};

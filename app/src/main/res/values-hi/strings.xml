@@ -689,4 +689,8 @@
     <string name="clear_messages">संदेश हटाएं</string>
     <string name="clear_messages_confirm">क्या आप वाकई सभी संदेश हटाना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।</string>
     <string name="messages_cleared">संदेश हटा दिए गए!</string>
+    <string name="auto_check_update">अपडेट स्वचालित रूप से जांचें</string>
+    <string name="auto_check_update_desc">ऐप खुलने पर स्वचालित रूप से नए संस्करण की जांच करें</string>
+    <string name="peer_chat_reply">उत्तर दें</string>
+    <string name="peer_chat_type_reply">उत्तर टाइप करें…</string>
 </resources>

@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.ui.base.markdowntext
 
+import android.os.Build
 import android.text.method.LinkMovementMethod
+import android.view.textclassifier.TextClassifier
 import android.widget.TextView
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -41,6 +43,10 @@ fun MarkdownText(
                 setLinkTextColor(linkTextColor.toArgb())
 
                 setTextIsSelectable(isTextSelectable)
+
+                // Disable smart text selection to prevent SmartSelectSprite crash
+                // when the view has scrolled and bounding rectangles become invalid
+                setTextClassifier(TextClassifier.NO_OP)
 
                 movementMethod = LinkMovementMethod.getInstance()
 

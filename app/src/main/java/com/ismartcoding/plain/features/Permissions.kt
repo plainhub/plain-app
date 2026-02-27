@@ -373,8 +373,19 @@ object Permissions {
             intentLauncherMap[permission] =
                 activity.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                     canContinue = true
-                    val map = mapOf(permission.toSysPermission() to permission.can(MainApp.instance))
-                    sendEvent(PermissionsResultEvent(map))
+                    if (permission == Permission.WRITE_EXTERNAL_STORAGE) {
+                        // Environment.isExternalStorageManager() may not immediately reflect the
+                        // granted state when returning from ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION.
+                        // Add a short delay to let the system propagate the permission change.
+                        coIO {
+                            delay(1500)
+                            val map = mapOf(permission.toSysPermission() to permission.can(MainApp.instance))
+                            sendEvent(PermissionsResultEvent(map))
+                        }
+                    } else {
+                        val map = mapOf(permission.toSysPermission() to permission.can(MainApp.instance))
+                        sendEvent(PermissionsResultEvent(map))
+                    }
                 }
         }
 

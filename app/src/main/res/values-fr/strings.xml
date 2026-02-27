@@ -689,4 +689,8 @@
     <string name="clear_messages">Effacer les messages</string>
     <string name="clear_messages_confirm">Êtes-vous sûr de vouloir effacer tous les messages ? Cette action est irréversible.</string>
     <string name="messages_cleared">Messages effacés !</string>
+    <string name="auto_check_update">Vérifier les mises à jour automatiquement</string>
+    <string name="auto_check_update_desc">Rechercher automatiquement les nouvelles versions au démarrage de l\'application</string>
+    <string name="peer_chat_reply">Répondre</string>
+    <string name="peer_chat_type_reply">Écrire une réponse…</string>
 </resources>
