@@ -104,6 +104,7 @@ import io.ktor.websocket.readBytes
 import io.ktor.websocket.send
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
@@ -115,6 +116,10 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 object HttpModule {
+    // Limit concurrent zip operations to 1 to prevent resource exhaustion
+    // when the web UI triggers multiple download requests (e.g. double-click).
+    private val zipSemaphore = Semaphore(1)
+
     @SuppressLint("SuspiciousIndentation")
     val module: Application.() -> Unit = {
         install(CachingHeaders) {
@@ -265,29 +270,38 @@ object HttpModule {
                     return@get
                 }
 
-                val decryptedId = UrlHelper.decrypt(id)
-                var dirPath: String
-                var jsonName = ""
-                if (decryptedId.startsWith("{")) {
-                    val json = JSONObject(decryptedId)
-                    dirPath = json.optString("path")
-                    jsonName = json.optString("name")
-                } else {
-                    dirPath = decryptedId
-                }
-                val folder = File(dirPath)
-                if (!folder.exists() || !folder.isDirectory) {
-                    call.respond(HttpStatusCode.NotFound)
+                if (!zipSemaphore.tryAcquire()) {
+                    call.respond(HttpStatusCode.TooManyRequests)
                     return@get
                 }
 
-                val fileName = (jsonName.ifEmpty { "${folder.name}.zip" }).urlEncode().replace("+", "%20")
-                call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
-                call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
-                call.respondOutputStream(ContentType.Application.Zip) {
-                    ZipOutputStream(this).use { zip ->
-                        ZipHelper.zipFolderToStreamAsync(folder, zip)
+                try {
+                    val decryptedId = UrlHelper.decrypt(id)
+                    var dirPath: String
+                    var jsonName = ""
+                    if (decryptedId.startsWith("{")) {
+                        val json = JSONObject(decryptedId)
+                        dirPath = json.optString("path")
+                        jsonName = json.optString("name")
+                    } else {
+                        dirPath = decryptedId
                     }
+                    val folder = File(dirPath)
+                    if (!folder.exists() || !folder.isDirectory) {
+                        call.respond(HttpStatusCode.NotFound)
+                        return@get
+                    }
+
+                    val fileName = (jsonName.ifEmpty { "${folder.name}.zip" }).urlEncode().replace("+", "%20")
+                    call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
+                    call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
+                    call.respondOutputStream(ContentType.Application.Zip) {
+                        ZipOutputStream(this).use { zip ->
+                            ZipHelper.zipFolderToStreamAsync(folder, zip)
+                        }
+                    }
+                } finally {
+                    zipSemaphore.release()
                 }
             }
 
@@ -296,6 +310,11 @@ object HttpModule {
                 val id = query["id"] ?: ""
                 if (id.isEmpty()) {
                     call.respond(HttpStatusCode.BadRequest)
+                    return@get
+                }
+
+                if (!zipSemaphore.tryAcquire()) {
+                    call.respond(HttpStatusCode.TooManyRequests)
                     return@get
                 }
 
@@ -366,6 +385,8 @@ object HttpModule {
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                     call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
+                } finally {
+                    zipSemaphore.release()
                 }
             }
 
