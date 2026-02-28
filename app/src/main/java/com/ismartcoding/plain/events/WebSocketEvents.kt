@@ -49,6 +49,7 @@ enum class EventType(val value: Int) {
     SCREEN_MIRROR_AUDIO_GRANTED(14),
     BOOKMARK_UPDATED(15),
     DOWNLOAD_PROGRESS(16),
+    MMS_SENT(17),
 }
 
 

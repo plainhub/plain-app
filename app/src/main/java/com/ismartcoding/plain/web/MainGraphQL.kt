@@ -52,11 +52,14 @@ import android.os.Bundle
 import com.ismartcoding.plain.events.CancelNotificationsEvent
 import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
+import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchBookmarkMetadataEvent
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HttpApiEvents
+import com.ismartcoding.plain.events.StartMmsPollingEvent
 import com.ismartcoding.plain.events.StartScreenMirrorEvent
 import com.ismartcoding.plain.events.RequestScreenMirrorAudioEvent
+import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.BookmarkHelper
@@ -82,6 +85,8 @@ import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.features.sms.SmsConversationHelper
 import com.ismartcoding.plain.features.sms.SmsHelper
+import com.ismartcoding.plain.features.sms.MmsHelper
+import com.ismartcoding.plain.features.sms.DMessageAttachment
 import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.DeviceInfoHelper
@@ -971,6 +976,45 @@ class MainGraphQL(val schema: Schema) {
                             throw GraphQLError(e.message ?: "Invalid SMS input")
                         }
                         true
+                    }
+                }
+                mutation("sendMms") {
+                    resolver { number: String, body: String, attachmentPaths: List<String>, threadId: String ->
+                        try {
+                            val context = MainApp.instance
+                            val resolvedAttachments = attachmentPaths.map { path ->
+                                val resolvedPath = AppFileStore.resolveUri(context, path)
+                                val file = java.io.File(resolvedPath)
+                                if (!file.exists()) {
+                                    throw IllegalArgumentException("Attachment file not found: $resolvedPath")
+                                }
+                                val mimeType = android.webkit.MimeTypeMap.getSingleton()
+                                    .getMimeTypeFromExtension(file.extension)
+                                    ?: "application/octet-stream"
+                                Pair(resolvedPath, mimeType)
+                            }
+                            val launchTimeSec = System.currentTimeMillis() / 1000 - 1
+                            MmsHelper.launchDefaultSmsApp(number, body, resolvedAttachments)
+
+                            val pendingId = "pending_mms_${System.currentTimeMillis()}"
+                            val pendingEntry = com.ismartcoding.plain.DPendingMms(
+                                id = pendingId,
+                                number = number,
+                                body = body,
+                                attachments = resolvedAttachments.map { (path, mimeType) ->
+                                    DMessageAttachment(path, mimeType, java.io.File(path).name)
+                                },
+                                threadId = threadId,
+                                launchTimeSec = launchTimeSec,
+                                createdAt = Instant.fromEpochMilliseconds(System.currentTimeMillis()),
+                            )
+                            TempData.pendingMmsMessages.add(pendingEntry)
+                            sendEvent(StartMmsPollingEvent(pendingId, launchTimeSec, resolvedAttachments.map { it.first }))
+                            pendingId
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            throw GraphQLError(e.message ?: "Failed to launch SMS app for MMS")
+                        }
                     }
                 }
                 mutation("setClip") {

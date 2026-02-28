@@ -31,6 +31,10 @@ object SmsHelper {
     private const val MMS_ADDR_TYPE_TO = 151
     private const val MMS_INSERT_ADDRESS_TOKEN = "insert-address-token"
 
+    // Only include actual content PDUs; exclude notification/delivery-report frames.
+    // 128 = m-send-req (outgoing), 130 = m-retrieve-conf (incoming with content)
+    private const val MMS_CONTENT_FILTER = "m_type IN (128, 130)"
+
     fun sendText(to: String, message: String) {
         val parts = smsManager.divideMessage(message)
         if (parts.size > 1) {
@@ -145,6 +149,7 @@ object SmsHelper {
             // SMS type 1=inbox, 2=sent; MMS MESSAGE_BOX 1=inbox, 2=sent
             mmsWhere.add("${Telephony.Mms.MESSAGE_BOX} = ?", typeCondition.value)
         }
+        mmsWhere.add(MMS_CONTENT_FILTER)
 
         val mmsItems = context.contentResolver.queryCursor(
             mmsUri,
@@ -166,7 +171,7 @@ object SmsHelper {
                 serviceCenter = "",
                 read = cursor.getIntValue(Telephony.Mms.READ, cache) == 1,
                 threadId = cursor.getStringValue(Telephony.Mms.THREAD_ID, cache),
-                type = if (cursor.getIntValue(Telephony.Mms.MESSAGE_BOX, cache) == 2) 2 else 1,
+                type = cursor.getIntValue(Telephony.Mms.MESSAGE_BOX, cache),
                 subscriptionId = cursor.getIntValue(Telephony.Mms.SUBSCRIPTION_ID, cache),
                 isMms = true,
                 attachments = bodyAndAttachments.second,
@@ -202,7 +207,7 @@ object SmsHelper {
                 Telephony.Mms._ID, Telephony.Mms.DATE, Telephony.Mms.THREAD_ID,
                 Telephony.Mms.MESSAGE_BOX, Telephony.Mms.READ, Telephony.Mms.SUBSCRIPTION_ID,
             ),
-            "${Telephony.Mms.THREAD_ID} = ?",
+            "${Telephony.Mms.THREAD_ID} = ? AND $MMS_CONTENT_FILTER",
             arrayOf(threadId),
             "${Telephony.Mms.DATE} DESC"
         )?.map { cursor, cache ->
@@ -216,7 +221,7 @@ object SmsHelper {
                 serviceCenter = "",
                 read = cursor.getIntValue(Telephony.Mms.READ, cache) == 1,
                 threadId = cursor.getStringValue(Telephony.Mms.THREAD_ID, cache),
-                type = if (cursor.getIntValue(Telephony.Mms.MESSAGE_BOX, cache) == 2) 2 else 1,
+                type = cursor.getIntValue(Telephony.Mms.MESSAGE_BOX, cache),
                 subscriptionId = cursor.getIntValue(Telephony.Mms.SUBSCRIPTION_ID, cache),
                 isMms = true,
                 attachments = bodyAndAttachments.second,
@@ -372,7 +377,13 @@ object SmsHelper {
 
         // Count MMS (only when no text/ids filter which are SMS-specific)
         val mmsCount = if (query.isEmpty() || (!query.contains("text") && !query.contains("ids"))) {
-            queryCount(context, mmsUri)
+            val typeCondition = conditions.firstOrNull { it.name == "type" }
+            if (typeCondition != null) {
+                // Map SMS type to MMS msg_box (1=inbox, 2=sent, 3=drafts, 4=outbox)
+                queryCount(context, mmsUri, "${Telephony.Mms.MESSAGE_BOX} = ? AND $MMS_CONTENT_FILTER", arrayOf(typeCondition.value))
+            } else {
+                queryCount(context, mmsUri, MMS_CONTENT_FILTER, null)
+            }
         } else 0
 
         return smsCount + mmsCount
@@ -380,7 +391,7 @@ object SmsHelper {
 
     private fun countByThread(context: Context, threadId: String): Int {
         val smsCount = queryCount(context, smsUri, "${Telephony.Sms.THREAD_ID} = ?", arrayOf(threadId))
-        val mmsCount = queryCount(context, mmsUri, "${Telephony.Mms.THREAD_ID} = ?", arrayOf(threadId))
+        val mmsCount = queryCount(context, mmsUri, "${Telephony.Mms.THREAD_ID} = ? AND $MMS_CONTENT_FILTER", arrayOf(threadId))
         return smsCount + mmsCount
     }
 

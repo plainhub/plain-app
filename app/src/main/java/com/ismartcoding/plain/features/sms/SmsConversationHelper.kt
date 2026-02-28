@@ -233,9 +233,11 @@ object SmsConversationHelper {
             return emptyList()
         }
 
+        val conditions = QueryHelper.parseAsync(query)
         val where = buildWhereAsync(query)
         val ids = linkedSetOf<String>()
 
+        // Query SMS table for matching thread IDs
         context.contentResolver.queryCursor(
             smsUri,
             arrayOf(Telephony.Sms.THREAD_ID),
@@ -246,6 +248,34 @@ object SmsConversationHelper {
             val cache = mutableMapOf<String, Int>()
             while (cursor.moveToNext()) {
                 ids.add(cursor.getStringValue(Telephony.Sms.THREAD_ID, cache))
+            }
+        }
+
+        // Also query MMS table for matching thread IDs (SMS type maps to MMS msg_box)
+        val hasTextOrIdsFilter = conditions.any { it.name == "text" || it.name == "ids" }
+        if (!hasTextOrIdsFilter) {
+            val mmsWhere = ContentWhere()
+            val typeCondition = conditions.firstOrNull { it.name == "type" }
+            if (typeCondition != null) {
+                mmsWhere.add("${Telephony.Mms.MESSAGE_BOX} = ?", typeCondition.value)
+            }
+            val threadIdCondition = conditions.firstOrNull { it.name == "thread_id" }
+            if (threadIdCondition != null) {
+                mmsWhere.add("${Telephony.Mms.THREAD_ID} = ?", threadIdCondition.value)
+            }
+            mmsWhere.add("m_type IN (128, 130)")
+
+            context.contentResolver.queryCursor(
+                mmsUri,
+                arrayOf(Telephony.Mms.THREAD_ID),
+                mmsWhere.toSelection(),
+                mmsWhere.args.toTypedArray(),
+                "${Telephony.Mms.DATE} DESC"
+            )?.use { cursor ->
+                val cache = mutableMapOf<String, Int>()
+                while (cursor.moveToNext()) {
+                    ids.add(cursor.getStringValue(Telephony.Mms.THREAD_ID, cache))
+                }
             }
         }
 
