@@ -13,6 +13,7 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DNearbyDevice
 import com.ismartcoding.plain.data.DPairingRequest
 import com.ismartcoding.plain.db.DChat
@@ -124,6 +125,18 @@ class IgnoreBatteryOptimizationResultEvent : ChannelEvent()
 class CancelNotificationsEvent(val ids: Set<String>) : ChannelEvent()
 
 class ClearAudioPlaylistEvent : ChannelEvent()
+
+/**
+ * Fired after the default SMS app is launched for an MMS send.
+ * AppEvents will poll content://mms until the row appears, then
+ * remove the pending entry from TempData, delete the attachment
+ * files on device, and emit MMS_SENT to all web clients.
+ */
+data class StartMmsPollingEvent(
+    val pendingId: String,
+    val launchTimeSec: Long,
+    val attachmentPaths: List<String>,
+) : ChannelEvent()
 
 class FeedStatusEvent(val feedId: String, val status: FeedWorkerStatus) : ChannelEvent()
 
@@ -268,6 +281,30 @@ object AppEvents {
 
                     is StopNearbyDiscoveryEvent -> {
                         NearbyDiscoverManager.stopPeriodicDiscovery()
+                    }
+
+                    is StartMmsPollingEvent -> {
+                        coIO {
+                            val context = MainApp.instance
+                            repeat(150) { // 2 s × 150 = 5 minutes max
+                                delay(2000)
+                                val found = context.contentResolver.query(
+                                    Uri.parse("content://mms"),
+                                    arrayOf("_id"),
+                                    "msg_box = 2 AND m_type = 128 AND date >= ?",
+                                    arrayOf(event.launchTimeSec.toString()),
+                                    null
+                                )?.use { cursor -> cursor.count > 0 } ?: false
+                                if (found) {
+                                    TempData.pendingMmsMessages.removeIf { it.id == event.pendingId }
+                                    event.attachmentPaths.forEach { path ->
+                                        try { java.io.File(path).delete() } catch (_: Exception) {}
+                                    }
+                                    sendEvent(WebSocketEvent(EventType.MMS_SENT, jsonEncode(event.pendingId)))
+                                    return@coIO
+                                }
+                            }
+                        }
                     }
                 }
             }
