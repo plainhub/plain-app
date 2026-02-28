@@ -168,7 +168,7 @@ fun ImagePreviewActions(
                             val r = withIO { DownloadHelper.downloadAsync(m.path, dir.absolutePath) }
                             DialogHelper.hideLoading()
                             if (r.success) {
-                                DialogHelper.showMessage(LocaleHelper.getStringF(R.string.image_save_to, "path", r.path))
+                                DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(R.string.image_save_to, "path", r.path))
                             } else {
                                 DialogHelper.showMessage(r.message)
                             }

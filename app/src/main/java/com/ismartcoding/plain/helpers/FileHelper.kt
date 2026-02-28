@@ -100,8 +100,8 @@ object FileHelper {
         }
     }
 
-    fun copyFileToDownloads(path: String): String {
-        return copyFileToPublicDir(path, Environment.DIRECTORY_DOWNLOADS)
+    fun copyFileToDownloads(path: String, newName: String = ""): String {
+        return copyFileToPublicDir(path, Environment.DIRECTORY_DOWNLOADS, newName)
     }
 
     fun copyFileToPublicDir(path: String, dirName: String, newName: String = ""): String {
