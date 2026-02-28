@@ -3,8 +3,8 @@ package com.ismartcoding.plain.db
 import android.content.Context
 import androidx.room.AutoMigration
 import androidx.room.Database
-
 import androidx.room.DeleteTable
+import androidx.room.RenameTable
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
@@ -20,15 +20,18 @@ class BoxesDeletionSpec : AutoMigrationSpec
 @DeleteTable(tableName = "aichats")
 class AiChatsDeletionSpec : AutoMigrationSpec
 
+@RenameTable(fromTableName = "chat_groups", toTableName = "chat_channels")
+class ChatGroupsRenameMigrationSpec : AutoMigrationSpec
+
 @Database(
     entities = [
         DChat::class, DSession::class, DTag::class, DTagRelation::class,
         DNote::class, DFeed::class, DFeedEntry::class, DBook::class, DBookChapter::class,
-        DPomodoroItem::class, DPeer::class, DChatGroup::class,
+        DPomodoroItem::class, DPeer::class, DChatChannel::class,
         DBookmark::class, DBookmarkGroup::class,
         DAppFile::class,
     ],
-    version = 8,
+    version = 9,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3, spec = BoxesDeletionSpec::class),
@@ -36,6 +39,7 @@ class AiChatsDeletionSpec : AutoMigrationSpec
         AutoMigration(from = 4, to = 5),
         AutoMigration(from = 6, to = 7),
         AutoMigration(from = 7, to = 8),
+        AutoMigration(from = 8, to = 9, spec = ChatGroupsRenameMigrationSpec::class),
     ],
     exportSchema = true,
 )
@@ -61,7 +65,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun peerDao(): PeerDao
 
-    abstract fun chatGroupDao(): ChatGroupDao
+    abstract fun chatChannelDao(): ChatChannelDao
 
     abstract fun bookmarkDao(): BookmarkDao
 

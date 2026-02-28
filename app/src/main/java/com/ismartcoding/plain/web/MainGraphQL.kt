@@ -1727,10 +1727,10 @@ class MainGraphQL(val schema: Schema) {
                     if (e is GraphQLError) {
                         val clientId = call.request.header("c-id") ?: ""
                         val type = call.request.header("c-type") ?: "" // peer
-                        val gid = call.request.header("c-gid") ?: "" // chat group id
+                        val gid = call.request.header("c-gid") ?: "" // chat channel id
                         if (clientId.isNotEmpty()) {
                             val token = if (gid.isNotEmpty()) {
-                                ChatApiManager.groupKeyCache[gid]
+                                ChatApiManager.channelKeyCache[gid]
                             } else if (type == "peer") {
                                 ChatApiManager.peerKeyCache[gid]
                             } else {

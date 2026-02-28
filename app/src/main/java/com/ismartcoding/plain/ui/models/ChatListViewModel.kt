@@ -10,6 +10,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.pinyin.Pinyin
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
+import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
@@ -28,6 +29,9 @@ import kotlin.time.Duration.Companion.seconds
 class ChatListViewModel : ViewModel() {
     val pairedPeers = mutableStateListOf<DPeer>()
     val unpairedPeers = mutableStateListOf<DPeer>()
+    val channels = mutableStateListOf<DChatChannel>()
+    val showCreateChannelDialog = mutableStateOf(false)
+    val manageMembersChannelId = mutableStateOf<String?>(null)
 
     // Cache for latest chat messages: chatId -> DChat
     private val latestChatCache = mutableMapOf<String, DChat>()
@@ -68,20 +72,26 @@ class ChatListViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val allPeers = AppDatabase.instance.peerDao().getAll()
+                val allChannels = AppDatabase.instance.chatChannelDao().getAll()
                 val chatDao = AppDatabase.instance.chatDao()
 
                 // Load all latest chat messages in one query
                 val chatCache = mutableMapOf<String, DChat>()
                 val latestChats = chatDao.getAllLatestChats()
 
-                // Build peer ID set for fast lookup
+                // Build peer ID set and channel ID set for fast lookup
                 val peerIds = allPeers.map { it.id }.toSet()
+                val channelIds = allChannels.map { it.id }.toSet()
 
                 latestChats.forEach { chat ->
                     val chatId = when {
                         // Local chat: me <-> local
                         (chat.fromId == "me" && chat.toId == "local") ||
                                 (chat.fromId == "local" && chat.toId == "me") -> "local"
+
+                        // Channel chat: me -> channel_id
+                        chat.fromId == "me" && channelIds.contains(chat.toId) -> chat.toId
+                        chat.toId == "me" && channelIds.contains(chat.fromId) -> chat.fromId
 
                         // Peer chat: me <-> peer_id
                         chat.fromId == "me" && peerIds.contains(chat.toId) -> chat.toId
@@ -121,11 +131,15 @@ class ChatListViewModel : ViewModel() {
 
                     unpairedPeers.clear()
                     unpairedPeers.addAll(newUnpairedPeers)
+
+                    channels.clear()
+                    channels.addAll(allChannels.sortedBy { it.name.lowercase() })
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     pairedPeers.clear()
                     unpairedPeers.clear()
+                    channels.clear()
                     latestChatCache.clear()
                 }
             }
@@ -177,6 +191,64 @@ class ChatListViewModel : ViewModel() {
 
     fun getPeerOnlineStatus(peerId: String): Boolean? {
         return if (onlineMap.value.containsKey(peerId)) isPeerOnline(peerId) else false
+    }
+
+    fun createChannel(name: String, onDone: () -> Unit = {}) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val channel = DChatChannel()
+            channel.name = name.trim()
+            AppDatabase.instance.chatChannelDao().insert(channel)
+            loadPeers()
+            withContext(Dispatchers.Main) { onDone() }
+        }
+    }
+
+    fun renameChannel(channelId: String, newName: String, onDone: () -> Unit = {}) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val channel = AppDatabase.instance.chatChannelDao().getById(channelId)
+            if (channel != null) {
+                channel.name = newName.trim()
+                channel.updatedAt = TimeHelper.now()
+                AppDatabase.instance.chatChannelDao().update(channel)
+                loadPeers()
+                withContext(Dispatchers.Main) { onDone() }
+            }
+        }
+    }
+
+    fun removeChannel(context: Context, channelId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                ChatHelper.deleteAllChatsAsync(context, channelId)
+                AppDatabase.instance.chatChannelDao().delete(channelId)
+                loadPeers()
+            } catch (_: Exception) {
+            }
+        }
+    }
+
+    fun addChannelMember(channelId: String, peerId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val channel = AppDatabase.instance.chatChannelDao().getById(channelId) ?: return@launch
+            if (!channel.members.contains(peerId)) {
+                channel.members = ArrayList(channel.members + peerId)
+                channel.updatedAt = TimeHelper.now()
+                AppDatabase.instance.chatChannelDao().update(channel)
+                loadPeers()
+            }
+        }
+    }
+
+    fun removeChannelMember(channelId: String, peerId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val channel = AppDatabase.instance.chatChannelDao().getById(channelId) ?: return@launch
+            if (channel.members.contains(peerId)) {
+                channel.members = ArrayList(channel.members.filter { it != peerId })
+                channel.updatedAt = TimeHelper.now()
+                AppDatabase.instance.chatChannelDao().update(channel)
+                loadPeers()
+            }
+        }
     }
 
     private fun handleDeviceFound(event: NearbyDeviceFoundEvent) {

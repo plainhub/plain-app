@@ -176,7 +176,7 @@ class PeerGraphQL(val schema: Schema) {
                         val clientId = call.request.header("c-id") ?: ""
                         val gid = call.request.header("c-gid") ?: ""
                         val token =
-                            if (gid.isNotEmpty()) ChatApiManager.groupKeyCache[gid] else ChatApiManager.peerKeyCache[clientId]
+                            if (gid.isNotEmpty()) ChatApiManager.channelKeyCache[gid] else ChatApiManager.peerKeyCache[clientId]
                         if (token == null) {
                             call.respond(HttpStatusCode.Unauthorized)
                             return@post
