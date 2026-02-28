@@ -55,6 +55,9 @@ import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.base.PScrollableTabRow
+import androidx.compose.material3.MaterialTheme
+import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.ui.helpers.groupMediaByDate
 import com.ismartcoding.plain.ui.page.cast.CastDialog
 import com.ismartcoding.plain.ui.components.FileSortDialog
 import com.ismartcoding.plain.ui.components.ImageGridItem
@@ -284,27 +287,57 @@ fun TabContentImages(
                                 horizontalArrangement = Arrangement.spacedBy(2.dp),
                                 verticalArrangement = Arrangement.spacedBy(2.dp),
                             ) {
-                                items(
-                                    itemsState,
-                                    key = {
-                                        it.id
-                                    },
-                                    contentType = {
-                                        "image"
-                                    },
-                                    span = {
-                                        GridItemSpan(1)
-                                    }) { m ->
-                                    ImageGridItem(
-                                        modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
-                                        imagesVM,
-                                        castVM,
-                                        m,
-                                        showSize = cellsPerRow.value < 6,
-                                        previewerState,
-                                        dragSelectState,
-                                        imageWidthPx,
-                                    )
+                                val isGroupMode = imagesVM.sortBy.value == FileSortBy.TAKEN_AT_DESC
+                                if (isGroupMode) {
+                                    val groupedItems = groupMediaByDate(itemsState) { it.takenAt ?: it.createdAt }
+                                    groupedItems.forEach { group ->
+                                        item(
+                                            span = { GridItemSpan(maxLineSpan) },
+                                            key = "header_${group.dateKey}",
+                                            contentType = "header"
+                                        ) {
+                                            Text(
+                                                text = group.dateLabel,
+                                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                                style = MaterialTheme.typography.titleSmall,
+                                            )
+                                        }
+                                        items(
+                                            group.items,
+                                            key = { it.id },
+                                            contentType = { "image" },
+                                            span = { GridItemSpan(1) }
+                                        ) { m ->
+                                            ImageGridItem(
+                                                modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
+                                                imagesVM,
+                                                castVM,
+                                                m,
+                                                showSize = cellsPerRow.value < 6,
+                                                previewerState,
+                                                dragSelectState,
+                                                imageWidthPx,
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    items(
+                                        itemsState,
+                                        key = { it.id },
+                                        contentType = { "image" },
+                                        span = { GridItemSpan(1) }
+                                    ) { m ->
+                                        ImageGridItem(
+                                            modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
+                                            imagesVM,
+                                            castVM,
+                                            m,
+                                            showSize = cellsPerRow.value < 6,
+                                            previewerState,
+                                            dragSelectState,
+                                            imageWidthPx,
+                                        )
+                                    }
                                 }
                                 item(
                                     span = { GridItemSpan(maxLineSpan) },

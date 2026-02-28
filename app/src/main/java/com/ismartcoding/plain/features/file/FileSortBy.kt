@@ -12,7 +12,6 @@ enum class FileSortBy {
     SIZE_DESC,
     NAME_ASC,
     NAME_DESC,
-    TAKEN_AT_ASC,
     TAKEN_AT_DESC,
     ;
 
@@ -36,11 +35,8 @@ enum class FileSortBy {
             SIZE_DESC -> {
                 R.string.largest_first
             }
-            TAKEN_AT_ASC -> {
-                R.string.taken_at_oldest_first
-            }
             TAKEN_AT_DESC -> {
-                R.string.taken_at_newest_first
+                R.string.group_by_taken_at
             }
         }
     }
@@ -65,11 +61,8 @@ enum class FileSortBy {
             SIZE_DESC -> {
                 SortBy(MediaStore.MediaColumns.SIZE, SortDirection.DESC)
             }
-            TAKEN_AT_ASC -> {
-                SortBy(MediaStore.Images.Media.DATE_TAKEN, SortDirection.ASC)
-            }
             TAKEN_AT_DESC -> {
-                SortBy(MediaStore.Images.Media.DATE_TAKEN, SortDirection.DESC)
+                SortBy("CASE WHEN ${MediaStore.Images.Media.DATE_TAKEN} > 0 THEN ${MediaStore.Images.Media.DATE_TAKEN} ELSE ${MediaStore.MediaColumns.DATE_ADDED} * 1000 END", SortDirection.DESC)
             }
         }
     }
@@ -93,9 +86,6 @@ enum class FileSortBy {
             }
             SIZE_DESC -> {
                 SortBy(MediaStore.MediaColumns.SIZE, SortDirection.DESC)
-            }
-            TAKEN_AT_ASC -> {
-                SortBy(MediaStore.MediaColumns.DATE_MODIFIED, SortDirection.ASC)
             }
             TAKEN_AT_DESC -> {
                 SortBy(MediaStore.MediaColumns.DATE_MODIFIED, SortDirection.DESC)

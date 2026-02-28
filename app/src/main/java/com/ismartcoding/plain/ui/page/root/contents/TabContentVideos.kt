@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,6 +43,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.preferences.VideoGridCellsPerRowPreference
 import com.ismartcoding.plain.preferences.VideoSortByPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -68,6 +70,7 @@ import com.ismartcoding.plain.ui.page.root.MediaFoldersBottomSheet
 import com.ismartcoding.plain.ui.page.tags.TagsBottomSheet
 import com.ismartcoding.plain.ui.page.videos.VideosPageState
 import com.ismartcoding.plain.ui.page.videos.ViewVideoBottomSheet
+import com.ismartcoding.plain.ui.helpers.groupMediaByDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -284,28 +287,59 @@ fun TabContentVideos(
                                 horizontalArrangement = Arrangement.spacedBy(2.dp),
                                 verticalArrangement = Arrangement.spacedBy(2.dp),
                             ) {
-                                items(
-                                    itemsState,
-                                    key = {
-                                        it.id
-                                    },
-                                    contentType = {
-                                        "video"
-                                    },
-                                    span = {
-                                        GridItemSpan(1)
-                                    }) { m ->
-                                    VideoGridItem(
-                                        modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
-                                        videosVM,
-                                        castVM,
-                                        m,
-                                        showSize = cellsPerRow.value < 6,
-                                        previewerState,
-                                        dragSelectState,
-                                        imageWidthPx,
-                                        sort = videosVM.sortBy.value,
-                                    )
+                                val isGroupMode = videosVM.sortBy.value == FileSortBy.TAKEN_AT_DESC
+                                if (isGroupMode) {
+                                    val groupedItems = groupMediaByDate(itemsState) { it.takenAt ?: it.createdAt }
+                                    groupedItems.forEach { group ->
+                                        item(
+                                            span = { GridItemSpan(maxLineSpan) },
+                                            key = "header_${group.dateKey}",
+                                            contentType = "header"
+                                        ) {
+                                            Text(
+                                                text = group.dateLabel,
+                                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                                                style = MaterialTheme.typography.titleSmall,
+                                            )
+                                        }
+                                        items(
+                                            group.items,
+                                            key = { it.id },
+                                            contentType = { "video" },
+                                            span = { GridItemSpan(1) }
+                                        ) { m ->
+                                            VideoGridItem(
+                                                modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
+                                                videosVM,
+                                                castVM,
+                                                m,
+                                                showSize = cellsPerRow.value < 6,
+                                                previewerState,
+                                                dragSelectState,
+                                                imageWidthPx,
+                                                sort = videosVM.sortBy.value,
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    items(
+                                        itemsState,
+                                        key = { it.id },
+                                        contentType = { "video" },
+                                        span = { GridItemSpan(1) }
+                                    ) { m ->
+                                        VideoGridItem(
+                                            modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
+                                            videosVM,
+                                            castVM,
+                                            m,
+                                            showSize = cellsPerRow.value < 6,
+                                            previewerState,
+                                            dragSelectState,
+                                            imageWidthPx,
+                                            sort = videosVM.sortBy.value,
+                                        )
+                                    }
                                 }
                                 item(
                                     span = { GridItemSpan(maxLineSpan) },
