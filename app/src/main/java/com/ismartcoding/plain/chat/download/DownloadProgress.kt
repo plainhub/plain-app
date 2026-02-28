@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.chat
+package com.ismartcoding.plain.chat.download
 
 data class DownloadProgress(
     val fileId: String,

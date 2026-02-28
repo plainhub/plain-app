@@ -24,7 +24,7 @@ import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.preferences.DeviceNamePreference
-import com.ismartcoding.plain.web.ChatApiManager
+import com.ismartcoding.plain.chat.ChatCacheManager
 import java.util.concurrent.ConcurrentHashMap
 import android.util.Base64
 import kotlin.math.abs
@@ -62,17 +62,13 @@ object NearbyPairManager {
     suspend fun startPairingAsync(device: DNearbyDevice) {
         try {
             val context = MainApp.instance
-            val deviceName = DeviceNamePreference.getAsync(context).ifEmpty {
-                PhoneHelper.getDeviceName(context)
-            }
+            val deviceName = TempData.deviceName
 
             // Generate ECDH key pair for this pairing session
             val keyPair = CryptoHelper.generateECDHKeyPair()
             
             // Get our raw Ed25519 signature public key (32 bytes)
             val signaturePublicKey = SignatureHelper.getRawPublicKeyBase64Async()
-                ?: throw Exception("Failed to get raw Ed25519 public key")
-
             // Create pairing session
             val bestIp = device.getBestIp()
             val session = DPairingSession(
@@ -132,8 +128,6 @@ object NearbyPairManager {
                 
                 // Get our raw Ed25519 signature public key (32 bytes)
                 val signaturePublicKey = SignatureHelper.getRawPublicKeyBase64Async()
-                    ?: throw Exception("Failed to get raw Ed25519 public key")
-
                 // Create pairing session
                 val session = DPairingSession(
                     deviceId = request.fromId,
@@ -184,8 +178,6 @@ object NearbyPairManager {
             } else {
                 // Send rejection response with signature for security
                 val signaturePublicKey = SignatureHelper.getRawPublicKeyBase64Async()
-                    ?: throw Exception("Failed to get raw Ed25519 public key for rejection")
-                
                 val rejectionTimestamp = System.currentTimeMillis()
                 
                 val response = DPairingResponse(
@@ -350,7 +342,7 @@ object NearbyPairManager {
                 })
                 LogCat.d("Inserted new peer with signature public key: $deviceId")
             }
-            ChatApiManager.loadKeyCacheAsync()
+            ChatCacheManager.loadKeyCacheAsync()
         } catch (e: Exception) {
             LogCat.e("Error storing peer in database: ${e.message}")
             throw e

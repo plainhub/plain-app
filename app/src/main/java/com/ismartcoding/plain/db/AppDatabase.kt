@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.DeleteTable
+import androidx.room.RenameColumn
 import androidx.room.RenameTable
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -23,6 +24,9 @@ class AiChatsDeletionSpec : AutoMigrationSpec
 @RenameTable(fromTableName = "chat_groups", toTableName = "chat_channels")
 class ChatGroupsRenameMigrationSpec : AutoMigrationSpec
 
+@RenameColumn(tableName = "chats", fromColumnName = "group_id", toColumnName = "channel_id")
+class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
+
 @Database(
     entities = [
         DChat::class, DSession::class, DTag::class, DTagRelation::class,
@@ -31,7 +35,7 @@ class ChatGroupsRenameMigrationSpec : AutoMigrationSpec
         DBookmark::class, DBookmarkGroup::class,
         DAppFile::class,
     ],
-    version = 9,
+    version = 12,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3, spec = BoxesDeletionSpec::class),
@@ -40,10 +44,13 @@ class ChatGroupsRenameMigrationSpec : AutoMigrationSpec
         AutoMigration(from = 6, to = 7),
         AutoMigration(from = 7, to = 8),
         AutoMigration(from = 8, to = 9, spec = ChatGroupsRenameMigrationSpec::class),
+        AutoMigration(from = 9, to = 10),
+        AutoMigration(from = 10, to = 11, spec = ChatsGroupIdToChannelIdSpec::class),
+        AutoMigration(from = 11, to = 12),
     ],
     exportSchema = true,
 )
-@TypeConverters(DateConverter::class, StringListConverter::class, ChatItemContentConverter::class)
+@TypeConverters(DateConverter::class, ChannelMemberListConverter::class, ChatItemContentConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun chatDao(): ChatDao
 

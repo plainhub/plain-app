@@ -296,6 +296,7 @@
     <string name="new_tag">New tag</string>
     <string name="edit_tag">Edit tag</string>
     <string name="name_optional">Name (optional)</string>
+    <string name="peer_id">ID</string>
     <string name="ip_address">IP address</string>
     <string name="rss_url">RSS URL</string>
     <string name="mac_address">MAC address</string>
@@ -693,6 +694,12 @@
     <string name="remove_member">Remove</string>
     <string name="no_paired_peers_available">No paired peers available to add</string>
     <string name="delete_channel">Delete Channel</string>
+    <string name="leave_channel">Leave Channel</string>
+    <string name="leave_channel_warning">Are you sure you want to leave this channel? You will no longer receive messages.</string>
+    <string name="channel_invite">Channel Invite</string>
+    <string name="channel_invite_message">%1$s invited you to join channel \"%2$s\"</string>
+    <string name="decline">Decline</string>
+    <string name="pending_invite">Pending invite</string>
     <string name="delete_device">Delete Device</string>
     <string name="pair_devices_hint">Go to Nearby tab to pair with devices</string>
     <string name="add_device">Add device</string>
@@ -711,4 +718,7 @@
     <string name="messages_cleared">Messages cleared!</string>
     <string name="cannot_move_folder_into_itself">Cannot move a folder into itself or its subfolder.</string>
     <string name="cannot_copy_folder_into_itself">Cannot copy a folder into itself or its subfolder.</string>
+    <string name="delivery_status">Delivery Status</string>
+    <string name="delivery_status_summary">%1$d / %2$d delivered</string>
+    <string name="resend_selected">Resend Selected</string>
 </resources>

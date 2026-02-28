@@ -11,7 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.chat.DownloadStatus
+import com.ismartcoding.plain.chat.download.DownloadStatus
 import com.ismartcoding.plain.ui.base.PIconButton
 
 @Composable

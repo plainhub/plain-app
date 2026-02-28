@@ -693,4 +693,7 @@
     <string name="phone">手机</string>
     <string name="tablet">平板</string>
     <string name="tv">电视和投影仪</string>
+    <string name="delivery_status">发送状态</string>
+    <string name="delivery_status_summary">%1$d / %2$d 已送达</string>
+    <string name="resend_selected">重新发送选中</string>
 </resources>

@@ -21,6 +21,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.Version
 import com.ismartcoding.plain.data.toVersion
 import com.ismartcoding.plain.enums.AppFeatureType
@@ -60,9 +61,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
     var deviceName by remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        scope.launch(Dispatchers.IO) {
-            deviceName = DeviceNamePreference.getAsync(context).ifEmpty { PhoneHelper.getDeviceName(context) }
-        }
+        deviceName = TempData.deviceName
     }
 
     UpdateDialog(updateViewModel)
@@ -71,9 +70,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
         DeviceRenameDialog(deviceName, onDismiss = {
             showDeviceRenameDialog = false
         }, onDone = {
-            deviceName = it.ifEmpty {
-                PhoneHelper.getDeviceName(context)
-            }
+            deviceName = TempData.deviceName
         })
     }
 

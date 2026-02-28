@@ -60,7 +60,7 @@ import com.ismartcoding.plain.events.RequestScreenMirrorAudioEvent
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.BookmarkHelper
-import com.ismartcoding.plain.features.ChatHelper
+import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.Permission
@@ -119,6 +119,8 @@ import com.ismartcoding.plain.web.models.App
 import com.ismartcoding.plain.web.models.Audio
 import com.ismartcoding.plain.web.models.Call
 import com.ismartcoding.plain.chat.PeerChatHelper
+import com.ismartcoding.plain.chat.ChannelChatHelper
+import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.Peer
@@ -136,9 +138,7 @@ import com.ismartcoding.plain.web.models.NoteInput
 import com.ismartcoding.plain.web.models.PackageInstallPending
 import com.ismartcoding.plain.web.models.PackageStatus
 import com.ismartcoding.plain.web.models.PomodoroToday
-import com.ismartcoding.plain.web.models.Bookmark
 import com.ismartcoding.plain.web.models.BookmarkInput
-import com.ismartcoding.plain.web.models.BookmarkGroup
 import com.ismartcoding.plain.web.models.Tag
 import com.ismartcoding.plain.web.models.TempValue
 import com.ismartcoding.plain.web.models.Video
@@ -181,7 +181,11 @@ class MainGraphQL(val schema: Schema) {
                 query("chatItems") {
                     resolver { id: String ->
                         val dao = AppDatabase.instance.chatDao()
-                        val items = dao.getByChatId(id.replace("peer:", ""))
+                        val items = if (id.startsWith("channel:")) {
+                            dao.getByChannelId(id.removePrefix("channel:"))
+                        } else {
+                            dao.getByChatId(id.replace("peer:", ""))
+                        }
                         items.map { it.toModel() }
                     }
                 }
@@ -665,7 +669,7 @@ class MainGraphQL(val schema: Schema) {
                             httpPort = TempData.httpPort,
                             httpsPort = TempData.httpsPort,
                             appDir = context.appDir(),
-                            deviceName = DeviceNamePreference.getAsync(context).ifEmpty { PhoneHelper.getDeviceName(context) },
+                            deviceName = TempData.deviceName,
                             PhoneHelper.getBatteryPercentage(context),
                             BuildConfig.VERSION_CODE,
                             Build.VERSION.SDK_INT,
@@ -762,33 +766,52 @@ class MainGraphQL(val schema: Schema) {
                 }
                 mutation("sendChatItem") {
                     resolver { toId: String, content: String ->
+                        val isChannel = toId.startsWith("channel:")
+                        val channelId = if (isChannel) toId.removePrefix("channel:") else ""
                         val peerId = toId.removePrefix("peer:")
                         val isPeer = toId.startsWith("peer:")
                         val peer: DPeer? = if (isPeer) AppDatabase.instance.peerDao().getById(peerId) else null
-                        val item = ChatHelper.sendAsync(
+                        val item = ChatDbHelper.sendAsync(
                             DChat.parseContent(content),
                             fromId = "me",
-                            toId = if (isPeer) peerId else toId,
+                            toId = when {
+                                isChannel -> ""
+                                isPeer -> peerId
+                                else -> toId
+                            },
+                            channelId = channelId,
                             peer = peer
                         )
                         if (item.content.type == DMessageType.TEXT.value) {
                             sendEvent(FetchLinkPreviewsEvent(item))
                         }
-                        if (isPeer && peer != null) {
+                        if (isChannel) {
+                            val channel = AppDatabase.instance.chatChannelDao().getById(channelId)
+                            if (channel != null) {
+                                val statusData = ChannelChatHelper.sendAsync(channel, item.content)
+                                ChatDbHelper.updateStatusAndDataAsync(item.id, statusData)
+                                item.status = when {
+                                    statusData == null -> "failed"
+                                    statusData.total == 0 || statusData.allDelivered -> "sent"
+                                    statusData.allFailed -> "failed"
+                                    else -> "partial"
+                                }
+                            }
+                        } else if (isPeer && peer != null) {
                             val success = PeerChatHelper.sendToPeerAsync(peer, item.content)
                             val status = if (success) "sent" else "failed"
-                            ChatHelper.updateStatusAsync(item.id, status)
+                            ChatDbHelper.updateStatusAsync(item.id, status)
                             item.status = status
                         }
-                        sendEvent(HttpApiEvents.MessageCreatedEvent(if (isPeer) peerId else toId, arrayListOf(item)))
+                        sendEvent(HttpApiEvents.MessageCreatedEvent(if (isChannel) channelId else if (isPeer) peerId else toId, arrayListOf(item)))
                         arrayListOf(item).map { it.toModel() }
                     }
                 }
                 mutation("deleteChatItem") {
                     resolver { id: ID ->
-                        val item = ChatHelper.getAsync(id.value)
+                        val item = ChatDbHelper.getAsync(id.value)
                         if (item != null) {
-                            ChatHelper.deleteAsync(MainApp.instance, item.id, item.content.value)
+                            ChatDbHelper.deleteAsync(MainApp.instance, item.id, item.content.value)
                             sendEvent(DeleteChatItemViewEvent(item.id))
                         }
                         true
@@ -1727,12 +1750,12 @@ class MainGraphQL(val schema: Schema) {
                     if (e is GraphQLError) {
                         val clientId = call.request.header("c-id") ?: ""
                         val type = call.request.header("c-type") ?: "" // peer
-                        val gid = call.request.header("c-gid") ?: "" // chat channel id
+                        val channelId = call.request.header("c-cid") ?: "" // chat channel id
                         if (clientId.isNotEmpty()) {
-                            val token = if (gid.isNotEmpty()) {
-                                ChatApiManager.channelKeyCache[gid]
+                            val token = if (channelId.isNotEmpty()) {
+                                ChatCacheManager.channelKeyCache[channelId]
                             } else if (type == "peer") {
-                                ChatApiManager.peerKeyCache[gid]
+                                ChatCacheManager.peerKeyCache[channelId]
                             } else {
                                 HttpServerManager.tokenCache[clientId]
                             }

@@ -39,7 +39,6 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.lib.isP
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.lib.logcat.LogCat
@@ -52,6 +51,7 @@ import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.enums.Language
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
+import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.ExportFileEvent
@@ -73,7 +73,7 @@ import com.ismartcoding.plain.events.StartScreenMirrorEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
 import com.ismartcoding.plain.features.AudioPlayer
-import com.ismartcoding.plain.features.ChatHelper
+import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.bluetooth.BluetoothPermission
@@ -118,6 +118,7 @@ class MainActivity : AppCompatActivity() {
     private var exportFileType = ExportFileType.OPML
     private var requestToConnectDialog: AlertDialog? = null
     private var pairingRequestDialog: AlertDialog? = null
+    private var channelInviteDialog: AlertDialog? = null
     private val mainVM: MainViewModel by viewModels()
     private val audioPlaylistVM: AudioPlaylistViewModel by viewModels()
     val pomodoroVM: PomodoroViewModel by viewModels()
@@ -654,6 +655,43 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
 
+                    is ChannelInviteReceivedEvent -> {
+                        try {
+                            if (channelInviteDialog?.isShowing == true) {
+                                channelInviteDialog?.dismiss()
+                                channelInviteDialog = null
+                            }
+
+                            channelInviteDialog =
+                                AlertDialog.Builder(instance.get()!!)
+                                    .setTitle(getString(R.string.channel_invite))
+                                    .setMessage(
+                                        getString(
+                                            R.string.channel_invite_message,
+                                            event.ownerPeerName,
+                                            event.channelName,
+                                        )
+                                    )
+                                    .setPositiveButton(getString(R.string.accept)) { _, _ ->
+                                        chatListVM.acceptChannelInvite(event.channelId)
+                                    }
+                                    .setNegativeButton(getString(R.string.decline)) { _, _ ->
+                                        chatListVM.declineChannelInvite(this@MainActivity, event.channelId)
+                                    }
+                                    .setCancelable(false)
+                                    .create()
+
+                            if (Permission.SYSTEM_ALERT_WINDOW.can(this@MainActivity)) {
+                                channelInviteDialog?.window?.setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY)
+                            }
+                            channelInviteDialog?.window?.setDimAmount(0.8f)
+                            channelInviteDialog?.show()
+                        } catch (e: Exception) {
+                            LogCat.e("Error showing channel invite dialog: ${e.message}")
+                            channelInviteDialog = null
+                        }
+                    }
+
                     is PairingCancelledEvent -> {
                         try {
                             if (pairingRequestDialog?.isShowing == true) {
@@ -732,7 +770,7 @@ class MainActivity : AppCompatActivity() {
                 val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT) ?: return
                 coMain {
                     val item = withIO {
-                        ChatHelper.sendAsync(
+                        ChatDbHelper.sendAsync(
                             DMessageContent(
                                 DMessageType.TEXT.value,
                                 DMessageText(sharedText)

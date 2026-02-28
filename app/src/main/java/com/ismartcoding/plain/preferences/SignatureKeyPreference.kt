@@ -68,17 +68,13 @@ object SignatureKeyPreference : BasePreference<String>() {
         }
     }
 
-    suspend fun getKeyPairAsync(context: Context): DSignatureKeyPair? {
+    suspend fun getKeyPairAsync(context: Context): DSignatureKeyPair {
         val keyPairJson = getAsync(context)
-        if (keyPairJson.isEmpty()) {
-            return null
-        }
-
         return JsonHelper.jsonDecode<DSignatureKeyPair>(keyPairJson)
     }
 
-    suspend fun getPublicKeyBytesAsync(context: Context): ByteArray? {
-        val keyPair = getKeyPairAsync(context) ?: return null
+    suspend fun getPublicKeyBytesAsync(context: Context): ByteArray {
+        val keyPair = getKeyPairAsync(context)
         return Base64.decode(keyPair.publicKey, Base64.NO_WRAP)
     }
 }

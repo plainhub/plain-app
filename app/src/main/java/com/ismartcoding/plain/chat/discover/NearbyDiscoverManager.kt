@@ -82,9 +82,7 @@ object NearbyDiscoverManager {
     private suspend fun sendDiscoveryReply(targetIP: String) {
         try {
             val context = MainApp.instance
-            val deviceName = DeviceNamePreference.getAsync(context).ifEmpty {
-                PhoneHelper.getDeviceName(context)
-            }
+            val deviceName = TempData.deviceName
             val reply = DDiscoverReply(
                 id = TempData.clientId,
                 name = deviceName,

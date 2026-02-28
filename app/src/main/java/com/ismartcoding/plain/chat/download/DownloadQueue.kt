@@ -1,9 +1,10 @@
-package com.ismartcoding.plain.chat
+package com.ismartcoding.plain.chat.download
 
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.chat.download.PeerFileDownloader
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.events.EventType

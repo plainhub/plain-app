@@ -113,7 +113,7 @@ object HttpClientManager {
                             .post(CryptoHelper.chaCha20Encrypt(token, requestBodyStr).toRequestBody(requestBody.contentType()))
                             .build(),
                     )
-                val responseBody = response.body!!
+                val responseBody = response.body
                 val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, responseBody.bytes())
                 if (decryptedBytes != null) {
                     val json = decryptedBytes.decodeToString()

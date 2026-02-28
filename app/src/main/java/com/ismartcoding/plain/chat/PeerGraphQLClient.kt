@@ -2,7 +2,9 @@ package com.ismartcoding.plain.chat
 
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.api.HttpClientManager
+import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.db.toJSONString
 import com.ismartcoding.plain.helpers.SignatureHelper
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
@@ -20,14 +22,18 @@ data class GraphQLError(
 )
 
 object PeerGraphQLClient {
+    /**
+     * Send a chat message to a paired peer (peer-to-peer chat).
+     * Uses [DPeer.key] for encryption.
+     */
     suspend fun createChatItem(
         peer: DPeer,
         clientId: String,
-        content: String
+        content: DMessageContent,
     ): GraphQLResponse? {
-        val mutation = """
-                mutation CreateChatItem(${'$'}content: String!) {
-                    createChatItem(content: ${'$'}content) {
+        val mutation = $$"""
+                mutation CreateChatItem($content: String!) {
+                    createChatItem(content: $content) {
                         id
                         fromId
                         toId
@@ -36,18 +42,102 @@ object PeerGraphQLClient {
                 }
             """.trimIndent()
 
-        val variables = mapOf(
-            "content" to content
+        return execute(
+            peer = peer,
+            clientId = clientId,
+            query = mutation,
+            variables = mapOf("content" to content.toJSONString())
         )
-
-        return execute(peer, clientId, mutation, variables)
     }
 
-    private suspend fun execute(
+    /**
+     * Send a channel system message to a peer.
+     * If the peer is paired (peer.key is non-empty), uses the peer's shared key.
+     * Otherwise, uses [channelKey] with c-cid header for non-paired channel members.
+     */
+    suspend fun sendChannelSystemMessage(
         peer: DPeer,
         clientId: String,
+        type: String,
+        payload: String,
+        channelId: String = "",
+        channelKey: String = "",
+    ): GraphQLResponse? {
+        val mutation = $$"""
+                mutation ChannelSystemMessage($type: String!, $payload: String!) {
+                    channelSystemMessage(type: $type, payload: $payload)
+                }
+            """.trimIndent()
+
+        val variables = mapOf(
+            "type" to type,
+            "payload" to payload,
+        )
+
+        // Use channel key if peer is not paired
+        val useChannelKey = peer.key.isEmpty() && channelKey.isNotEmpty()
+        return if (useChannelKey) {
+            execute(
+                peer = peer,
+                encryptionKey = channelKey,
+                clientId = clientId,
+                query = mutation,
+                variables = variables,
+                channelId = channelId,
+            )
+        } else {
+            execute(peer = peer, clientId = clientId, query = mutation, variables = variables)
+        }
+    }
+
+    /**
+     * Send a chat message to a channel member.
+     * Uses [channelKey] for ChaCha20 encryption and includes [channelId] via the c-cid header
+     * so the receiver can look up the correct decryption key and member public keys.
+     */
+    suspend fun createChannelChatItem(
+        peer: DPeer,
+        channelId: String,
+        channelKey: String,
+        clientId: String,
+        content: DMessageContent,
+    ): GraphQLResponse? {
+        val mutation = $$"""
+                mutation CreateChatItem($content: String!) {
+                    createChatItem(content: $content) {
+                        id
+                        fromId
+                        toId
+                        createdAt
+                    }
+                }
+            """.trimIndent()
+
+        return execute(
+            peer = peer,
+            encryptionKey = channelKey,
+            clientId = clientId,
+            query = mutation,
+            variables = mapOf("content" to content.toJSONString()),
+            channelId = channelId,
+        )
+    }
+
+    /**
+     * Core execution: signs, encrypts and sends a GraphQL request to [peer].
+     *
+     * @param encryptionKey  ChaCha20 key – either [DPeer.key] (peer chat) or
+     *                       [DChatChannel.key] (channel chat).
+     * @param channelId      When non-empty the `c-cid` header is added so the
+     *                       receiver selects the channel-key path.
+     */
+    private suspend fun execute(
+        peer: DPeer,
+        encryptionKey: String = peer.key,
+        clientId: String,
         query: String,
-        variables: Map<String, String>
+        variables: Map<String, String>,
+        channelId: String = "",
     ): GraphQLResponse? {
         return try {
 
@@ -67,14 +157,16 @@ object PeerGraphQLClient {
             // Format: signature|timestamp|GraphQL_JSON
             val requestBody = "$signature|$timestamp|$requestJson".toRequestBody("application/json".toMediaType())
 
-            val request = Request.Builder()
+            val requestBuilder = Request.Builder()
                 .url(peer.getApiUrl())
                 .post(requestBody)
                 .addHeader("c-id", clientId)
-                .build()
+            if (channelId.isNotEmpty()) {
+                requestBuilder.addHeader("c-cid", channelId)
+            }
 
-            val httpClient = HttpClientManager.createCryptoHttpClient(peer.key, 10)
-            val response = httpClient.newCall(request).execute()
+            val httpClient = HttpClientManager.createCryptoHttpClient(encryptionKey, 10)
+            val response = httpClient.newCall(requestBuilder.build()).execute()
             val responseBody = response.body.string()
 
             if (response.isSuccessful) {

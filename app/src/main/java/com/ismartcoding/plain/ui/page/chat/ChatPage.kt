@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.lib.extensions.getFilenameWithoutExtension
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
@@ -47,6 +46,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
@@ -134,13 +134,16 @@ fun ChatPage(
     val previewerState = rememberPreviewerState()
 
     DisposableEffect(id) {
-        val peerId = id.removePrefix("peer:")
         if (id.startsWith("peer:")) {
-            TempData.activeChatPeerId = peerId
+            ChatCacheManager.activeChatPeerId = id.removePrefix("peer:")
+        } else if (id.startsWith("channel:")) {
+            ChatCacheManager.activeChatChannelId = id.removePrefix("channel:")
         }
         onDispose {
             if (id.startsWith("peer:")) {
-                TempData.activeChatPeerId = ""
+                ChatCacheManager.activeChatPeerId = ""
+            } else if (id.startsWith("channel:")) {
+                ChatCacheManager.activeChatChannelId = ""
             }
         }
     }
@@ -193,7 +196,13 @@ fun ChatPage(
     val pageTitle = if (chatVM.selectMode.value) {
         LocaleHelper.getStringF(R.string.x_selected, "count", chatVM.selectedIds.size)
     } else {
-        chatState.value.toName
+        val state = chatState.value
+        val channel = state.channel
+        if (channel != null) {
+            "${state.toName} (${channel.joinedMembers().size})"
+        } else {
+            state.toName
+        }
     }
 
     PScaffold(

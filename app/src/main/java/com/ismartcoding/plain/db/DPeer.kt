@@ -19,11 +19,12 @@ data class DPeer(
     @ColumnInfo(name = "ip") var ip: String = "",
     @ColumnInfo(name = "key") var key: String = "",
     @ColumnInfo(name = "public_key") var publicKey: String = "",
-    @ColumnInfo(name = "status") var status: String = "", // paired, unpaired
+    @ColumnInfo(name = "status") var status: String = "", // paired, unpaired, channel
     @ColumnInfo(name = "port") var port: Int = 0,
     @ColumnInfo(name = "device_type") var deviceType: String = "", // phone, tablet, pc, etc.
 ) : DEntityBase() {
-
+    fun isPaired(): Boolean = status == "paired"
+    fun isChannel(): Boolean = status == "channel"
     fun getIpList(): List<String> {
         return ip.split(",").map { it.trim() }.filter { it.isNotEmpty() }
     }
@@ -50,7 +51,7 @@ data class DPeer(
         return when (status) {
             "paired" -> getString(R.string.paired)
             "unpaired" -> getString(R.string.unpaired)
-            else -> getString(R.string.unknown)
+            else -> ""
         }
     }
 }
@@ -63,8 +64,14 @@ interface PeerDao {
     @Query("SELECT * FROM peers where status = 'paired'")
     fun getAllPaired(): List<DPeer>
 
+    @Query("SELECT * FROM peers where status IN ('paired', 'channel')")
+    fun getAllWithPublicKey(): List<DPeer>
+
     @Query("SELECT * FROM peers WHERE id = :id")
     fun getById(id: String): DPeer?
+
+    @Query("SELECT * FROM peers WHERE id IN (:ids)")
+    fun getByIds(ids: List<String>): List<DPeer>
 
     @Insert
     fun insert(vararg item: DPeer)

@@ -58,7 +58,7 @@ import com.ismartcoding.plain.ui.page.root.components.ChannelListItem
 import com.ismartcoding.plain.ui.page.root.components.PeerListItem
 import com.ismartcoding.plain.ui.page.root.components.RootTabType
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import com.ismartcoding.plain.web.ChatApiManager
+import com.ismartcoding.plain.chat.ChatCacheManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
@@ -160,7 +160,7 @@ fun TabContentChat(
             val peersSnapshot = pairedPeers.toList()
             scope.launch(Dispatchers.IO) {
                 peersSnapshot.forEach { peer ->
-                    val key = ChatApiManager.peerKeyCache[peer.id]
+                    val key = ChatCacheManager.peerKeyCache[peer.id]
                     if (key != null) {
                         try {
                             if (peer.ip.isNotEmpty() && peer.port > 0) {
@@ -284,20 +284,24 @@ fun TabContentChat(
                     items = channels.toList(),
                     key = { it.id }
                 ) { channel ->
+                    val isOwner = channel.owner == "me"
                     ChannelListItem(
                         name = channel.name,
                         channelId = channel.id,
-                        latestChat = chatListVM.getLatestChat(channel.id),
-                        onDelete = { channelId ->
+                        isOwner = isOwner,
+                        onDelete = if (isOwner) { { channelId ->
                             chatListVM.removeChannel(context, channelId)
-                        },
-                        onRename = { channelId ->
+                        } } else null,
+                        onRename = if (isOwner) { { channelId ->
                             renameChannelId = channelId
                             renameChannelName = channel.name
-                        },
-                        onManageMembers = { channelId ->
+                        } } else null,
+                        onManageMembers = if (isOwner) { { channelId ->
                             manageMembersChannelId = channelId
-                        },
+                        } } else null,
+                        onLeave = if (!isOwner) { { channelId ->
+                            chatListVM.leaveChannel(context, channelId)
+                        } } else null,
                         onClick = {
                             navController.navigate(Routing.Chat("channel:${channel.id}"))
                         },

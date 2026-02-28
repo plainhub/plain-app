@@ -13,7 +13,8 @@ import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.chat.DownloadQueue
+import com.ismartcoding.plain.chat.ChannelSystemMessageHandler
+import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.chat.PeerChatHelper.MAX_TIMESTAMP_DIFF_MS
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
@@ -24,11 +25,12 @@ import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.features.ChatHelper
+import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.web.models.ChatItem
 import com.ismartcoding.plain.web.models.ID
 import com.ismartcoding.plain.web.models.toModel
@@ -59,17 +61,26 @@ class PeerGraphQL(val schema: Schema) {
                         }
                     }
                 }
+                mutation("channelSystemMessage") {
+                    resolver { type: String, payload: String, context: Context ->
+                        val call = context.get<ApplicationCall>()!!
+                        val fromId = call.request.header("c-id") ?: ""
+                        ChannelSystemMessageHandler.handle(fromId, type, payload)
+                        true
+                    }
+                }
                 mutation("createChatItem") {
                     resolver { content: String, context: Context ->
                         val call = context.get<ApplicationCall>()!!
 
                         val fromId = call.request.header("c-id") ?: ""
-                        val gid = call.request.header("c-gid") ?: ""
+                        val channelId = call.request.header("c-cid") ?: ""
                         val item =
-                            ChatHelper.sendAsync(
+                            ChatDbHelper.sendAsync(
                                 DChat.parseContent(content),
                                 fromId,
-                                "me"
+                                toId = if (channelId.isEmpty()) "me" else "",
+                                channelId = channelId
                             )
 
                         if (item.content.type == DMessageType.TEXT.value) {
@@ -101,7 +112,7 @@ class PeerGraphQL(val schema: Schema) {
                             }
                         }
 
-                        sendEvent(HttpApiEvents.MessageCreatedEvent(fromId, arrayListOf(item)))
+                        sendEvent(HttpApiEvents.MessageCreatedEvent(channelId.ifEmpty { fromId }, arrayListOf(item)))
                         val model = item.toModel()
                         model.data = model.getContentData()
                         sendEvent(
@@ -114,13 +125,33 @@ class PeerGraphQL(val schema: Schema) {
                         // Send local notification with reply support
                         // Skip notification when the user already has this peer's chat open.
                         val notificationPeer = AppDatabase.instance.peerDao().getById(fromId)
-                        if (notificationPeer != null && TempData.activeChatPeerId != fromId) {
-                            NotificationHelper.sendPeerMessageNotification(
-                                context = MainApp.instance,
-                                peerId = fromId,
-                                peerName = notificationPeer.name.ifEmpty { getString(R.string.peer_chat) },
-                                messageText = item.getMessagePreview(),
-                            )
+                        if (channelId.isEmpty()) {
+                            // Peer-to-peer message
+                            if (notificationPeer != null && ChatCacheManager.activeChatPeerId != fromId) {
+                                NotificationHelper.sendPeerMessageNotification(
+                                    context = MainApp.instance,
+                                    peerId = fromId,
+                                    peerName = notificationPeer.name.ifEmpty { getString(R.string.peer_chat) },
+                                    messageText = item.getMessagePreview(),
+                                )
+                            }
+                        } else {
+                            // Channel message
+                            val notificationChannel = AppDatabase.instance.chatChannelDao().getById(channelId)
+                            if (notificationChannel != null && ChatCacheManager.activeChatChannelId != channelId) {
+                                val senderName = notificationPeer?.name?.ifEmpty { null }
+                                val messageText = if (senderName != null) {
+                                    "$senderName: ${item.getMessagePreview()}"
+                                } else {
+                                    item.getMessagePreview()
+                                }
+                                NotificationHelper.sendPeerMessageNotification(
+                                    context = MainApp.instance,
+                                    peerId = channelId,
+                                    peerName = notificationChannel.name.ifEmpty { getString(R.string.peer_chat) },
+                                    messageText = messageText,
+                                )
+                            }
                         }
 
                         arrayListOf(item).map { it.toModel() }
@@ -174,17 +205,26 @@ class PeerGraphQL(val schema: Schema) {
                             return@post
                         }
                         val clientId = call.request.header("c-id") ?: ""
-                        val gid = call.request.header("c-gid") ?: ""
-                        val token =
-                            if (gid.isNotEmpty()) ChatApiManager.channelKeyCache[gid] else ChatApiManager.peerKeyCache[clientId]
+                        val channelId = call.request.header("c-cid") ?: ""
+                        // Determine the decryption key:
+                        // 1. If c-cid is present, always use the channel key (supports non-paired members).
+                        // 2. Otherwise, use the peer's shared key (paired peer-to-peer chat).
+                        val token = if (channelId.isNotEmpty()) {
+                            ChatCacheManager.channelKeyCache[channelId]
+                        } else {
+                            ChatCacheManager.peerKeyCache[clientId]
+                        }
                         if (token == null) {
                             call.respond(HttpStatusCode.Unauthorized)
                             return@post
                         }
 
-                        val publicKey = ChatApiManager.peerPublicKeyCache[clientId]
+                        // Resolve the sender's Ed25519 public key from peerPublicKeyCache.
+                        // Both paired peers and channel-only peers have their public keys
+                        // stored in the peers table and loaded into this cache.
+                        val publicKey = ChatCacheManager.peerPublicKeyCache[clientId]
                         if (publicKey == null) {
-                            LogCat.e("Peer public key not found for clientId: $clientId")
+                            LogCat.e("Public key not found for clientId: $clientId (channel: $channelId)")
                             call.respond(HttpStatusCode.InternalServerError)
                             return@post
                         }
@@ -234,8 +274,6 @@ class PeerGraphQL(val schema: Schema) {
                             call.respond(HttpStatusCode.Unauthorized)
                             return@post
                         }
-
-                        ChatApiManager.clientRequestTs[clientId] = currentTime
 
                         val r = executeGraphqlQL(
                             schema,

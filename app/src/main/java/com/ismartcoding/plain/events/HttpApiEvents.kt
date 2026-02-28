@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.events
 
 import com.ismartcoding.lib.channel.ChannelEvent
-import com.ismartcoding.plain.chat.DownloadTask
+import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.db.DChat
 
 // The events sent from the HTTP API

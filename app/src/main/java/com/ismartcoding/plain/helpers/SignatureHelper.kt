@@ -44,23 +44,11 @@ object SignatureHelper {
     }
     
     /**
-     * Get the device's public key as Base64 string for transmission
-     */
-    suspend fun getPublicKeyBase64Async(): String? {
-        val publicKeyBytes = getPublicKeyBytesAsync()
-        return publicKeyBytes?.let { CryptoHelper.encodeToBase64(it) }
-    }
-    
-    /**
      * Get the device's raw Ed25519 public key (32 bytes) as Base64 string for peer communication
      * Raw keys are now stored directly in preferences
      */
-    suspend fun getRawPublicKeyBase64Async(): String? {
-        val keyPair = SignatureKeyPreference.getKeyPairAsync(MainApp.instance) ?: return null
-        LogCat.d("getRawPublicKeyBase64Async: keyPair.publicKey = '${keyPair.publicKey}'")
-        LogCat.d("getRawPublicKeyBase64Async: keyPair.publicKey length = ${keyPair.publicKey.length}")
-        
-        // 验证解码后的长度
+    suspend fun getRawPublicKeyBase64Async(): String {
+        val keyPair = SignatureKeyPreference.getKeyPairAsync(MainApp.instance)
         try {
             val decoded = Base64.decode(keyPair.publicKey, Base64.NO_WRAP)
             LogCat.d("getRawPublicKeyBase64Async: decoded length = ${decoded.size}")

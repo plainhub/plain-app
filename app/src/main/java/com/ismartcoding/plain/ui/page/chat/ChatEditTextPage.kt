@@ -29,7 +29,7 @@ import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
-import com.ismartcoding.plain.features.ChatHelper
+import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -98,7 +98,7 @@ fun ChatEditTextPage(
                                 if (linksChanged) {
                                     val addedUrls = newUrls - originalUrls.toSet()
                                     if (addedUrls.isNotEmpty()) {
-                                        val linkPreviews = withIO { ChatHelper.fetchLinkPreviewsAsync(context, addedUrls) }
+                                        val linkPreviews = withIO { ChatDbHelper.fetchLinkPreviewsAsync(context, addedUrls) }
                                         updatedLinkPreviews.addAll(linkPreviews.filter { !it.hasError })
                                     }
                                 }
