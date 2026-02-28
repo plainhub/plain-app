@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.chat
+package com.ismartcoding.plain.chat.download
 
 enum class DownloadStatus {
     PENDING,

@@ -16,6 +16,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -23,8 +25,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.db.ChannelMember
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.enums.DeviceType
 
 @Composable
 fun ChannelMembersDialog(
@@ -34,6 +38,9 @@ fun ChannelMembersDialog(
     onRemoveMember: (peerId: String) -> Unit,
     onDismiss: () -> Unit,
 ) {
+    // Track members locally so that Add/Remove actions update the UI immediately
+    val currentMembers = remember { mutableStateListOf<ChannelMember>().apply { addAll(channel.members) } }
+
     AlertDialog(
         modifier = Modifier.fillMaxWidth(),
         containerColor = MaterialTheme.colorScheme.surface,
@@ -62,12 +69,23 @@ fun ChannelMembersDialog(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     items(pairedPeers, key = { it.id }) { peer ->
-                        val isMember = channel.members.contains(peer.id)
+                        val member = currentMembers.find { it.id == peer.id }
+                        val isMember = member != null
+                        val isPending = member?.isPending() == true
                         PeerMemberRow(
                             peer = peer,
                             isMember = isMember,
-                            onAdd = { onAddMember(peer.id) },
-                            onRemove = { onRemoveMember(peer.id) },
+                            isPending = isPending,
+                            onAdd = {
+                                if (member == null) {
+                                    currentMembers.add(ChannelMember(id = peer.id, status = ChannelMember.STATUS_PENDING))
+                                }
+                                onAddMember(peer.id)
+                            },
+                            onRemove = {
+                                currentMembers.removeAll { it.id == peer.id }
+                                onRemoveMember(peer.id)
+                            },
                         )
                     }
                 }
@@ -86,6 +104,7 @@ fun ChannelMembersDialog(
 private fun PeerMemberRow(
     peer: DPeer,
     isMember: Boolean,
+    isPending: Boolean,
     onAdd: () -> Unit,
     onRemove: () -> Unit,
 ) {
@@ -110,20 +129,29 @@ private fun PeerMemberRow(
                 )
             } else {
                 Icon(
-                    painter = painterResource(R.drawable.contact_round),
+                    painter = painterResource(DeviceType.fromValue(peer.deviceType).getIcon()),
                     contentDescription = null,
                     modifier = Modifier.size(18.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            Text(
-                text = peer.name.ifBlank { peer.getBestIp() },
-                style = MaterialTheme.typography.bodyMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            Column {
+                Text(
+                    text = peer.name.ifBlank { peer.getBestIp() },
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                if (isPending) {
+                    Text(
+                        text = stringResource(R.string.pending_invite),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
         }
-        if (isMember) {
+        if (isMember || isPending) {
             OutlinedButton(
                 onClick = onRemove,
                 colors = ButtonDefaults.outlinedButtonColors(

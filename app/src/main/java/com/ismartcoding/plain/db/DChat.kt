@@ -15,6 +15,7 @@ import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.helpers.FileHelper
 import kotlin.time.Instant
 import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.serialization.Serializable
@@ -43,7 +44,34 @@ fun DMessageContent.toJSONString(): String {
     return obj.toString()
 }
 
-class DMessageContent(val type: String, var value: Any? = null)
+class DMessageContent(val type: String, var value: Any? = null) {
+    /**
+     * Rewrite local file/image URIs to `fsid:` references for transmission.
+     */
+    fun toPeerMessageContent(): DMessageContent {
+        return when (type) {
+            DMessageType.FILES.value -> {
+                val files = value as DMessageFiles
+                val modified = files.items.map { file ->
+                    val fileId = FileHelper.getFileId(file.uri)
+                    file.copy(uri = "fsid:$fileId")
+                }
+                DMessageContent(type, DMessageFiles(modified))
+            }
+
+            DMessageType.IMAGES.value -> {
+                val images = value as DMessageImages
+                val modified = images.items.map { image ->
+                    val fileId = FileHelper.getFileId(image.uri)
+                    image.copy(uri = "fsid:$fileId")
+                }
+                DMessageContent(type, DMessageImages(modified))
+            }
+
+            else -> this
+        }
+    }
+}
 
 enum class DMessageType(val value: String) {
     TEXT("text"),
@@ -107,6 +135,47 @@ class DMessageImages(val items: List<DMessageFile>)
 @Serializable
 class DMessageFiles(val items: List<DMessageFile>)
 
+/**
+ * Per-member delivery result for a single recipient.
+ * [error] is null when the message was delivered successfully.
+ */
+@Serializable
+data class DMessageDeliveryResult(
+    val peerId: String,
+    val peerName: String,
+    val error: String? = null,
+)
+
+/**
+ * Aggregated delivery status for a channel broadcast.
+ * Stored as JSON in the [DChat.statusData] column.
+ */
+@Serializable
+data class DMessageStatusData(
+    val results: List<DMessageDeliveryResult> = emptyList(),
+) {
+    val total: Int get() = results.size
+    val deliveredCount: Int get() = results.count { it.error == null }
+    val failedCount: Int get() = results.count { it.error != null }
+    val failedResults: List<DMessageDeliveryResult> get() = results.filter { it.error != null }
+    val deliveredResults: List<DMessageDeliveryResult> get() = results.filter { it.error == null }
+    val allDelivered: Boolean get() = total > 0 && failedCount == 0
+    val allFailed: Boolean get() = total > 0 && deliveredCount == 0
+    val hasPartialFailure: Boolean get() = deliveredCount > 0 && failedCount > 0
+    fun deliveryLabel(): String = "$deliveredCount/$total"
+
+    companion object {
+        fun fromJson(json: String): DMessageStatusData? {
+            if (json.isEmpty()) return null
+            return try {
+                jsonDecode<DMessageStatusData>(json)
+            } catch (e: Exception) {
+                null
+            }
+        }
+    }
+}
+
 @Serializable
 class DLinkPreview(
     val url: String,
@@ -134,14 +203,23 @@ data class DChat(
     @ColumnInfo(name = "to_id", index = true)
     var toId: String = "" // me|local|peer_id
 
-    @ColumnInfo(name = "group_id", index = true)
-    var groupId: String = "" // chat group id, empty if not a group chat
+    @ColumnInfo(name = "channel_id", index = true)
+    var channelId: String = "" // chat channel id, empty if not a channel chat
 
     @ColumnInfo(name = "status")
-    var status: String = "" // pending, sent, failed
+    var status: String = "" // pending, sent, partial, failed
+
+    /**
+     * JSON-encoded [DMessageStatusData], populated for channel broadcast messages.
+     * Empty string means no per-member data is available.
+     */
+    @ColumnInfo(name = "status_data", defaultValue = "")
+    var statusData: String = ""
 
     @ColumnInfo(name = "content")
     lateinit var content: DMessageContent
+
+    fun parseStatusData(): DMessageStatusData? = DMessageStatusData.fromJson(statusData)
 
     fun getMessagePreview(): String {
         return when (content.type) {
@@ -161,9 +239,11 @@ data class DChat(
                         val vidPart = if (videoCount > 1) "$videoCount ${getString(R.string.videos)}" else getString(R.string.video)
                         "$imgPart, $vidPart"
                     }
+
                     videoCount > 0 -> {
                         if (videoCount > 1) "$videoCount ${getString(R.string.videos)}" else getString(R.string.video)
                     }
+
                     else -> {
                         if (imageCount > 1) "$imageCount ${getString(R.string.images)}" else getString(R.string.image)
                     }
@@ -215,24 +295,44 @@ data class ChatItemDataUpdate(
     val updatedAt: Instant = TimeHelper.now(),
 )
 
+data class ChatItemStatusUpdate(
+    val id: String,
+    val status: String,
+    @ColumnInfo(name = "status_data")
+    val statusData: String = "",
+    @ColumnInfo(name = "updated_at")
+    val updatedAt: Instant = TimeHelper.now(),
+)
+
 @Dao
 interface ChatDao {
     @Query("SELECT * FROM chats")
     fun getAll(): List<DChat>
 
-    @Query("SELECT * FROM chats WHERE to_id = :toId OR from_id = :toId ORDER BY created_at ASC")
+    @Query("SELECT * FROM chats WHERE channel_id = '' AND (to_id = :toId OR from_id = :toId) ORDER BY created_at ASC")
     fun getByChatId(toId: String): List<DChat>
+
+    @Query("SELECT * FROM chats WHERE channel_id = :channelId ORDER BY created_at ASC")
+    fun getByChannelId(channelId: String): List<DChat>
 
     @Query(
         """
         SELECT c.* FROM chats c
         INNER JOIN (
-            SELECT from_id, to_id, MAX(created_at) as max_created_at
-            FROM chats 
+            SELECT '' as from_id, '' as to_id, channel_id, MAX(created_at) as max_created_at
+            FROM chats
+            WHERE channel_id != ''
+            GROUP BY channel_id
+            UNION ALL
+            SELECT from_id, to_id, '' as channel_id, MAX(created_at) as max_created_at
+            FROM chats
+            WHERE channel_id = ''
             GROUP BY from_id, to_id
-        ) latest ON c.from_id = latest.from_id 
-                 AND c.to_id = latest.to_id 
-                 AND c.created_at = latest.max_created_at
+        ) latest ON (
+            (c.channel_id != '' AND c.channel_id = latest.channel_id AND c.created_at = latest.max_created_at)
+            OR
+            (c.channel_id = '' AND c.from_id = latest.from_id AND c.to_id = latest.to_id AND c.created_at = latest.max_created_at)
+        )
         ORDER BY c.created_at DESC
     """
     )
@@ -250,6 +350,12 @@ interface ChatDao {
     @Query("UPDATE chats SET status = :status WHERE id = :id")
     fun updateStatus(id: String, status: String)
 
+    @Query("UPDATE chats SET status = :status, status_data = :statusData WHERE id = :id")
+    fun updateStatusAndData(id: String, status: String, statusData: String)
+
+    @Update(entity = DChat::class)
+    fun updateStatusData(item: ChatItemStatusUpdate)
+
     @Update(entity = DChat::class)
     fun updateData(item: ChatItemDataUpdate)
 
@@ -259,6 +365,9 @@ interface ChatDao {
     @Query("DELETE FROM chats WHERE id in (:ids)")
     fun deleteByIds(ids: List<String>)
 
-    @Query("DELETE FROM chats WHERE to_id = :peerId OR from_id = :peerId")
-    fun deleteByPeerId(peerId: String)
+    @Query("DELETE FROM chats WHERE channel_id = '' AND (to_id = :peerId OR from_id = :peerId)")
+    fun deleteByChatId(peerId: String)
+
+    @Query("DELETE FROM chats WHERE channel_id = :channelId")
+    fun deleteByChannelId(channelId: String)
 }

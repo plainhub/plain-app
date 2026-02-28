@@ -5,19 +5,18 @@ import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import kotlinx.datetime.*
 
-class StringListConverter {
+class ChannelMemberListConverter {
     @TypeConverter
-    fun toJSON(list: ArrayList<String>): String {
+    fun toJSON(list: List<ChannelMember>): String {
         return jsonEncode(list)
     }
 
     @TypeConverter
-    fun fromJSON(value: String): ArrayList<String> {
+    fun fromJSON(value: String): List<ChannelMember> {
         if (value.isEmpty()) {
-            return arrayListOf()
+            return emptyList()
         }
-
-        return jsonDecode<ArrayList<String>>(value)
+        return jsonDecode<List<ChannelMember>>(value)
     }
 }
 

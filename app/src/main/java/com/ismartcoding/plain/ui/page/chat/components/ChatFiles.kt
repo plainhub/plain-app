@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ismartcoding.plain.chat.DownloadQueue
+import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState

@@ -50,7 +50,6 @@ import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.events.AudioActionEvent
 import com.ismartcoding.plain.events.ConfirmDialogEvent
 import com.ismartcoding.plain.events.EventType
@@ -58,7 +57,8 @@ import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.features.ChatHelper
+import com.ismartcoding.plain.chat.ChatDbHelper
+import com.ismartcoding.plain.events.ChannelUpdatedEvent
 import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.PToast
@@ -190,7 +190,7 @@ fun Main(
                         val data = event.chat.content.value as DMessageText
                         val urls = LinkPreviewHelper.extractUrls(data.text)
                         if (urls.isNotEmpty()) {
-                            val links = ChatHelper.fetchLinkPreviewsAsync(context, urls).filter { !it.hasError }
+                            val links = ChatDbHelper.fetchLinkPreviewsAsync(context, urls).filter { !it.hasError }
                             if (links.isNotEmpty()) {
                                 val updatedMessageText = DMessageText(data.text, links)
                                 event.chat.content = DMessageContent(DMessageType.TEXT.value, updatedMessageText)
@@ -246,6 +246,9 @@ fun Main(
                         }
                     }
                 }
+                is ChannelUpdatedEvent -> {
+                    chatListVM.loadPeers()
+                }
 
                 else -> {
                     // Handle other events if necessary
@@ -294,7 +297,7 @@ fun Main(
                     ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = chatVM, chatListVM = chatListVM, r.id)
                 }
                 composable<Routing.ChatInfo> {
-                    ChatInfoPage(navController, chatVM = chatVM)
+                    ChatInfoPage(navController, chatVM = chatVM, chatListVM = chatListVM)
                 }
                 composable<Routing.ScanHistory> { ScanHistoryPage(navController) }
                 composable<Routing.Scan> { ScanPage(navController) }

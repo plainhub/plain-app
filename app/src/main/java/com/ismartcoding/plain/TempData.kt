@@ -8,6 +8,7 @@ object TempData {
     var webEnabled = false
     var webHttps = false
     var clientId = ""
+    var deviceName = ""
     var httpPort: Int = 8080
     var httpsPort: Int = 8443
     var urlToken = "" // use to encrypt or decrypt params in url
@@ -19,7 +20,4 @@ object TempData {
 
     var audioSleepTimerFutureTime = 0L
     var audioPlayPosition = 0L // audio play position in milliseconds
-
-    // The peer ID whose ChatPage is currently open; empty when no peer chat is active.
-    var activeChatPeerId = ""
 }

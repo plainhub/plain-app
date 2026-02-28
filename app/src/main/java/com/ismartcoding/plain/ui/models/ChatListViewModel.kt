@@ -7,17 +7,22 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.pinyin.Pinyin
+import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.chat.ChannelSystemMessageSender
 import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.db.ChannelMember
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.events.ChannelUpdatedEvent
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
 import com.ismartcoding.plain.events.PeerUpdatedEvent
-import com.ismartcoding.plain.features.ChatHelper
+import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
-import com.ismartcoding.plain.web.ChatApiManager
+import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.helpers.TimeHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -58,6 +63,8 @@ class ChatListViewModel : ViewModel() {
                     is NearbyDeviceFoundEvent -> {
                         handleDeviceFound(event)
                     }
+
+
                 }
             }
         }
@@ -85,13 +92,12 @@ class ChatListViewModel : ViewModel() {
 
                 latestChats.forEach { chat ->
                     val chatId = when {
+                        // Channel chat: identified by channelId field
+                        chat.channelId.isNotEmpty() && channelIds.contains(chat.channelId) -> chat.channelId
+
                         // Local chat: me <-> local
                         (chat.fromId == "me" && chat.toId == "local") ||
                                 (chat.fromId == "local" && chat.toId == "me") -> "local"
-
-                        // Channel chat: me -> channel_id
-                        chat.fromId == "me" && channelIds.contains(chat.toId) -> chat.toId
-                        chat.toId == "me" && channelIds.contains(chat.fromId) -> chat.fromId
 
                         // Peer chat: me <-> peer_id
                         chat.fromId == "me" && peerIds.contains(chat.toId) -> chat.toId
@@ -120,6 +126,9 @@ class ChatListViewModel : ViewModel() {
                 val newUnpairedPeers = allPeers
                     .filter { it.status == "unpaired" }
                     .sortedBy { Pinyin.toPinyin(it.name) }
+
+                // Refresh peer name cache before switching to main thread
+                ChatCacheManager.refreshPeerNamesCache(allPeers)
 
                 // Apply state updates on the main thread to avoid snapshot violations
                 withContext(Dispatchers.Main) {
@@ -160,13 +169,13 @@ class ChatListViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Delete all chat messages and associated files for this peer
-                ChatHelper.deleteAllChatsByPeerAsync(context, peerId)
+                ChatDbHelper.deleteAllChatsByPeerAsync(context, peerId)
                 
                 // Delete the peer record
                 AppDatabase.instance.peerDao().delete(peerId)
                 
                 // Reload key cache and peers list
-                ChatApiManager.loadKeyCacheAsync()
+                ChatCacheManager.loadKeyCacheAsync()
                 loadPeers()
             } catch (e: Exception) {
                 // Handle error if needed
@@ -197,7 +206,15 @@ class ChatListViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val channel = DChatChannel()
             channel.name = name.trim()
+            channel.owner = "me"
+            channel.key = CryptoHelper.generateChaCha20Key()
+            channel.version = 1
+
+            // Seed with the owner as the first joined member (id only)
+            channel.members = listOf(ChannelMember(id = TempData.clientId))
+
             AppDatabase.instance.chatChannelDao().insert(channel)
+            ChatCacheManager.loadKeyCacheAsync()
             loadPeers()
             withContext(Dispatchers.Main) { onDone() }
         }
@@ -208,8 +225,13 @@ class ChatListViewModel : ViewModel() {
             val channel = AppDatabase.instance.chatChannelDao().getById(channelId)
             if (channel != null) {
                 channel.name = newName.trim()
+                channel.version++
                 channel.updatedAt = TimeHelper.now()
                 AppDatabase.instance.chatChannelDao().update(channel)
+                // Broadcast update to all members if we are the owner
+                if (channel.owner == "me") {
+                    ChannelSystemMessageSender.broadcastUpdate(channel)
+                }
                 loadPeers()
                 withContext(Dispatchers.Main) { onDone() }
             }
@@ -219,8 +241,14 @@ class ChatListViewModel : ViewModel() {
     fun removeChannel(context: Context, channelId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                ChatHelper.deleteAllChatsAsync(context, channelId)
+                val channel = AppDatabase.instance.chatChannelDao().getById(channelId) ?: return@launch
+                // If we are the owner, broadcast kick to all members
+                if (channel.owner == "me") {
+                    ChannelSystemMessageSender.broadcastKick(channel)
+                }
+                ChatDbHelper.deleteAllChatsAsync(context, channelId)
                 AppDatabase.instance.chatChannelDao().delete(channelId)
+                ChatCacheManager.loadKeyCacheAsync()
                 loadPeers()
             } catch (_: Exception) {
             }
@@ -230,24 +258,95 @@ class ChatListViewModel : ViewModel() {
     fun addChannelMember(channelId: String, peerId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val channel = AppDatabase.instance.chatChannelDao().getById(channelId) ?: return@launch
-            if (!channel.members.contains(peerId)) {
-                channel.members = ArrayList(channel.members + peerId)
-                channel.updatedAt = TimeHelper.now()
-                AppDatabase.instance.chatChannelDao().update(channel)
-                loadPeers()
+            if (channel.owner != "me") return@launch // Only owner can add members
+            if (channel.hasMember(peerId)) return@launch
+
+            val peer = AppDatabase.instance.peerDao().getById(peerId)
+
+            // Add as a pending member (id + status only; other info is in the peers table)
+            channel.members = channel.members + ChannelMember(
+                id = peerId,
+                status = ChannelMember.STATUS_PENDING,
+            )
+
+            channel.version++
+            channel.updatedAt = TimeHelper.now()
+            AppDatabase.instance.chatChannelDao().update(channel)
+
+            // Attempt to send the invite
+            if (peer != null) {
+                ChannelSystemMessageSender.sendInvite(channel, peer)
             }
+            // If peer is offline, the invite stays as pending and will be retried
+
+            loadPeers()
         }
     }
 
     fun removeChannelMember(channelId: String, peerId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val channel = AppDatabase.instance.chatChannelDao().getById(channelId) ?: return@launch
-            if (channel.members.contains(peerId)) {
-                channel.members = ArrayList(channel.members.filter { it != peerId })
-                channel.updatedAt = TimeHelper.now()
-                AppDatabase.instance.chatChannelDao().update(channel)
-                loadPeers()
+            if (channel.owner != "me") return@launch // Only owner can remove members
+            if (!channel.hasMember(peerId)) return@launch
+
+            channel.members = channel.members.filter { it.id != peerId }
+            channel.version++
+            channel.updatedAt = TimeHelper.now()
+            AppDatabase.instance.chatChannelDao().update(channel)
+
+            // Send kick to the removed peer
+            val peer = AppDatabase.instance.peerDao().getById(peerId)
+            if (peer != null) {
+                ChannelSystemMessageSender.sendKick(channelId, peer, channel.key)
             }
+
+            // Broadcast updated membership to remaining members
+            ChannelSystemMessageSender.broadcastUpdate(channel)
+            loadPeers()
+        }
+    }
+
+    /** Non-owner member leaves a channel voluntarily. */
+    fun leaveChannel(context: Context, channelId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val channel = AppDatabase.instance.chatChannelDao().getById(channelId) ?: return@launch
+            if (channel.owner == "me") return@launch // Owner cannot leave; must delete
+
+            // Send leave notification to the owner
+            val ownerPeer = AppDatabase.instance.peerDao().getById(channel.owner)
+            if (ownerPeer != null) {
+                ChannelSystemMessageSender.sendLeave(channelId, ownerPeer, channel.key)
+            }
+
+            // Delete locally regardless of whether the owner received the message
+            ChatDbHelper.deleteAllChatsAsync(context, channelId)
+            AppDatabase.instance.chatChannelDao().delete(channelId)
+            ChatCacheManager.loadKeyCacheAsync()
+            loadPeers()
+        }
+    }
+
+    /** Accept a received channel invite. */
+    fun acceptChannelInvite(channelId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val channel = AppDatabase.instance.chatChannelDao().getById(channelId) ?: return@launch
+            val ownerPeer = AppDatabase.instance.peerDao().getById(channel.owner) ?: return@launch
+            ChannelSystemMessageSender.sendInviteAccept(channelId, ownerPeer)
+        }
+    }
+
+    /** Decline a received channel invite — delete the channel locally and notify owner. */
+    fun declineChannelInvite(context: Context, channelId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val channel = AppDatabase.instance.chatChannelDao().getById(channelId) ?: return@launch
+            val ownerPeer = AppDatabase.instance.peerDao().getById(channel.owner)
+            if (ownerPeer != null) {
+                ChannelSystemMessageSender.sendInviteDecline(channelId, ownerPeer)
+            }
+            ChatDbHelper.deleteAllChatsAsync(context, channelId)
+            AppDatabase.instance.chatChannelDao().delete(channelId)
+            ChatCacheManager.loadKeyCacheAsync()
+            loadPeers()
         }
     }
 
@@ -293,10 +392,29 @@ class ChatListViewModel : ViewModel() {
 
                     // Update last active time for this peer
                     updatePeerLastActive(device.id)
+
+                    // Retry pending channel invites for this peer
+                    retryPendingChannelInvites(peer)
                 }
             } catch (e: Exception) {
                 // Handle error silently
             }
+        }
+    }
+
+    /**
+     * When a paired peer comes online, check if any of our owned channels have
+     * pending invites for this peer and re-send them.
+     */
+    private suspend fun retryPendingChannelInvites(peer: DPeer) {
+        try {
+            val channels = AppDatabase.instance.chatChannelDao().getOwnedChannels()
+            channels.filter { ch -> ch.findMember(peer.id)?.isPending() == true }
+                .forEach { channel ->
+                    ChannelSystemMessageSender.sendInvite(channel, peer)
+                }
+        } catch (e: Exception) {
+            // Best-effort retry
         }
     }
 } 

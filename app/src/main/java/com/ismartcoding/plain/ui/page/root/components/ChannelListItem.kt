@@ -3,7 +3,6 @@ package com.ismartcoding.plain.ui.page.root.components
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,13 +24,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.db.DChat
-import com.ismartcoding.plain.extensions.timeAgo
 import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
-import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.ui.theme.listItemSubtitle
 import com.ismartcoding.plain.ui.theme.listItemTitle
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -40,10 +35,11 @@ fun ChannelListItem(
     modifier: Modifier = Modifier,
     name: String,
     channelId: String,
-    latestChat: DChat? = null,
+    isOwner: Boolean = true,
     onDelete: ((String) -> Unit)? = null,
     onRename: ((String) -> Unit)? = null,
     onManageMembers: ((String) -> Unit)? = null,
+    onLeave: ((String) -> Unit)? = null,
     onClick: () -> Unit = {},
 ) {
     val showContextMenu = remember { mutableStateOf(false) }
@@ -52,6 +48,8 @@ fun ChannelListItem(
     val renameText = stringResource(id = R.string.rename)
     val cancelText = stringResource(id = R.string.cancel)
     val manageMembersText = stringResource(id = R.string.manage_members)
+    val leaveText = stringResource(id = R.string.leave_channel)
+    val leaveWarningText = stringResource(id = R.string.leave_channel_warning)
 
     Surface(
         modifier = modifier.combinedClickable(
@@ -83,35 +81,13 @@ fun ChannelListItem(
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(vertical = 8.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = name,
-                            style = MaterialTheme.typography.listItemTitle(),
-                            modifier = Modifier.weight(1f)
-                        )
-                        latestChat?.let { chat ->
-                            Text(
-                                text = chat.createdAt.timeAgo(),
-                                style = MaterialTheme.typography.listItemSubtitle(),
-                            )
-                        }
-                    }
-                    VerticalSpace(dp = 8.dp)
-                    Text(
-                        text = latestChat?.getMessagePreview() ?: "",
-                        style = MaterialTheme.typography.listItemSubtitle(),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.listItemTitle(),
+                    modifier = Modifier.weight(1f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
 
             // Context menu
@@ -155,6 +131,22 @@ fun ChannelListItem(
                                     message = deleteWarningText,
                                     confirmButton = Pair(deleteText) {
                                         onDelete(channelId)
+                                    },
+                                    dismissButton = Pair(cancelText) {}
+                                )
+                            },
+                        )
+                    }
+                    if (onLeave != null) {
+                        PDropdownMenuItem(
+                            text = { Text(leaveText) },
+                            onClick = {
+                                showContextMenu.value = false
+                                DialogHelper.showConfirmDialog(
+                                    title = leaveText,
+                                    message = leaveWarningText,
+                                    confirmButton = Pair(leaveText) {
+                                        onLeave(channelId)
                                     },
                                     dismissButton = Pair(cancelText) {}
                                 )

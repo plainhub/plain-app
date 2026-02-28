@@ -14,8 +14,8 @@ import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
-import com.ismartcoding.plain.chat.DownloadQueue
-import com.ismartcoding.plain.chat.DownloadTask
+import com.ismartcoding.plain.chat.download.DownloadQueue
+import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState

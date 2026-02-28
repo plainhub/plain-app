@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
+import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.db.DPeer
@@ -66,6 +67,7 @@ fun ChatListItem(
     onForward: (VChat) -> Unit = {},
 ) {
     val showContextMenu = remember { mutableStateOf(false) }
+    val showDeliveryDialog = remember { mutableStateOf<DMessageStatusData?>(null) }
     val context = LocalContext.current
     val selected = chatVM.selectedItem.value?.id == m.id || chatVM.selectedIds.contains(m.id)
     Column {
@@ -108,10 +110,16 @@ fun ChatListItem(
                                 },
                             ),
                 ) {
-                    ChatName(m, peer) {
-                        // Retry failed message using ViewModel
-                        chatVM.retryMessage(m.id)
-                    }
+                    ChatName(
+                        m = m,
+                        onRetry = {
+                            // Retry failed message using ViewModel
+                            chatVM.retryMessage(m.id)
+                        },
+                        onShowDeliveryDetails = { statusData ->
+                            showDeliveryDialog.value = statusData
+                        },
+                    )
                     when (m.type) {
                         DMessageType.IMAGES.value -> {
                             ChatImages(context, items, m, peer, imageWidthDp, imageWidthPx, previewerState, chatVM)
@@ -208,5 +216,18 @@ fun ChatListItem(
             }
         }
         VerticalSpace(4.dp)
+
+        // Delivery status dialog (channel messages)
+        showDeliveryDialog.value?.let { statusData ->
+            DeliveryStatusDialog(
+                statusData = statusData,
+                onResend = { peerIds ->
+                    chatVM.resendToMembers(m.id, peerIds)
+                },
+                onDismiss = {
+                    showDeliveryDialog.value = null
+                },
+            )
+        }
     }
 }

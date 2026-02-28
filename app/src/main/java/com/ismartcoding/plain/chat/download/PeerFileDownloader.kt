@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.chat
+package com.ismartcoding.plain.chat.download
 
 import android.content.Context
 import android.webkit.MimeTypeMap
@@ -9,8 +9,8 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.ChatItemDataUpdate
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
-import com.ismartcoding.plain.helpers.ChatFileSaveHelper
 import com.ismartcoding.plain.helpers.AppFileStore
+import com.ismartcoding.plain.helpers.ChatFileSaveHelper
 import okhttp3.Request
 import java.io.File
 
@@ -109,7 +109,7 @@ object PeerFileDownloader {
     }
 
     private fun updateMessageFileUri(messageId: String, originalUri: String, newUri: String) {
-        val message = AppDatabase.instance.chatDao().getById(messageId) ?: return
+        val message = AppDatabase.Companion.instance.chatDao().getById(messageId) ?: return
         val content = message.content
 
         when (content.value) {
@@ -130,7 +130,7 @@ object PeerFileDownloader {
             }
         }
 
-        AppDatabase.instance.chatDao().updateData(ChatItemDataUpdate(messageId, content))
+        AppDatabase.Companion.instance.chatDao().updateData(ChatItemDataUpdate(messageId, content))
         LogCat.d("PeerFileDownloader: updated URI $originalUri -> $newUri")
     }
 }

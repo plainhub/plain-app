@@ -34,13 +34,13 @@ import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.chat.DownloadQueue
+import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import com.ismartcoding.plain.chat.DownloadTask
+import com.ismartcoding.plain.chat.download.DownloadTask
 import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DPeer

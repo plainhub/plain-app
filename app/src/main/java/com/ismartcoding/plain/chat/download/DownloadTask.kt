@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.chat
+package com.ismartcoding.plain.chat.download
 
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DPeer

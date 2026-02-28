@@ -23,7 +23,7 @@ import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.chat.discover.NearbyPairManager
 import com.ismartcoding.plain.preferences.DeviceNamePreference
-import com.ismartcoding.plain.web.ChatApiManager
+import com.ismartcoding.plain.chat.ChatCacheManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -132,7 +132,7 @@ class NearbyViewModel : ViewModel() {
                     peer.status = "unpaired"
                     peer.updatedAt = TimeHelper.now()
                     AppDatabase.instance.peerDao().update(peer)
-                    ChatApiManager.loadKeyCacheAsync()
+                    ChatCacheManager.loadKeyCacheAsync()
                     loadAsync()
                     LogCat.d("Device unpaired: $deviceId")
                 } else {
@@ -159,9 +159,7 @@ class NearbyViewModel : ViewModel() {
     suspend fun getQrDataAsync(): DQrPairData {
         val context = MainApp.instance
         val allIps = NetworkHelper.getDeviceIP4s().toList()
-        val deviceName = DeviceNamePreference.getAsync(context).ifEmpty {
-            PhoneHelper.getDeviceName(context)
-        }
+        val deviceName = TempData.deviceName
         return DQrPairData(
             id = TempData.clientId,
             name = deviceName,

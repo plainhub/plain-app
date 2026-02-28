@@ -14,6 +14,7 @@ import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.data.DVideo
@@ -277,6 +278,11 @@ object DeveloperModePreference : BasePreference<Boolean>() {
 object DeviceNamePreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("device_name")
+
+    override suspend fun putAsync(context: Context, value: String) {
+        TempData.deviceName = value.ifEmpty { PhoneHelper.getDeviceName(context) }
+        super.putAsync(context, value)
+    }
 }
 
 object HttpsPreference : BasePreference<Boolean>() {

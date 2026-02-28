@@ -21,7 +21,9 @@ import com.ismartcoding.plain.preferences.AudioPlayModePreference
 import com.ismartcoding.plain.preferences.AutoCheckUpdatePreference
 import com.ismartcoding.plain.preferences.CheckUpdateTimePreference
 import com.ismartcoding.plain.preferences.ClientIdPreference
+import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.preferences.DarkThemePreference
+import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.preferences.FeedAutoRefreshPreference
 import com.ismartcoding.plain.preferences.HttpPortPreference
 import com.ismartcoding.plain.preferences.HttpsPortPreference
@@ -36,7 +38,7 @@ import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.preferences.getPreferencesAsync
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.ui.base.coil.newImageLoader
-import com.ismartcoding.plain.web.ChatApiManager
+import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import dalvik.system.ZipPathValidator
@@ -77,6 +79,7 @@ class MainApp : Application() {
             val checkUpdateTime = CheckUpdateTimePreference.get(preferences)
             val autoCheckUpdate = AutoCheckUpdatePreference.get(preferences)
             ClientIdPreference.ensureValueAsync(instance, preferences)
+            TempData.deviceName = DeviceNamePreference.get(preferences).ifEmpty { PhoneHelper.getDeviceName(instance) }
             KeyStorePasswordPreference.ensureValueAsync(instance, preferences)
             UrlTokenPreference.ensureValueAsync(instance, preferences)
             SignatureKeyPreference.ensureKeyPairAsync(instance, preferences)
@@ -90,7 +93,7 @@ class MainApp : Application() {
                 HttpServerManager.resetPasswordAsync()
             }
             HttpServerManager.loadTokenCache()
-            ChatApiManager.loadKeyCacheAsync()
+            ChatCacheManager.loadKeyCacheAsync()
             if (FeedAutoRefreshPreference.get(preferences)) {
                 FeedFetchWorker.startRepeatWorkerAsync(instance)
             }
