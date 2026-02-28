@@ -15,6 +15,7 @@ data class DImage(
     val bucketId: String,
     val createdAt: Instant,
     val updatedAt: Instant,
+    val takenAt: Instant?,
 ) : IData {
     fun getRotatedSize(): IntSize {
         if (rotation == 90 || rotation == 270) {

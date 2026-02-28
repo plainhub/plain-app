@@ -29,5 +29,9 @@ fun List<DFile>.sorted(sortBy: FileSortBy): List<DFile> {
         FileSortBy.DATE_DESC -> {
             this.sortedWith(comparator.thenByDescending { it.updatedAt })
         }
+
+        else -> {
+            this.sortedWith(comparator.thenBy { it.name.lowercase() })
+        }
     }
 }

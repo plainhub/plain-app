@@ -15,6 +15,7 @@ import com.ismartcoding.plain.data.DVideo
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.MediaType
 import com.ismartcoding.plain.features.file.FileSortBy
+import kotlin.time.Instant
 
 object VideoMediaStoreHelper : BaseMediaContentHelper() {
     // https://stackoverflow.com/questions/63111091/java-lang-illegalargumentexception-volume-external-primary-not-found-in-android
@@ -33,6 +34,7 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
             MediaStore.Video.Media.WIDTH,
             MediaStore.Video.Media.HEIGHT,
             MediaStore.Video.Media.BUCKET_ID,
+            MediaStore.Video.Media.DATE_TAKEN,
         )
         if (isQPlus()) {
             projection.add(MediaStore.Video.Media.ORIENTATION)
@@ -75,7 +77,9 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
             val rotation = if (isQPlus()) cursor.getIntValue(MediaStore.Video.Media.ORIENTATION, cache) else 0
             val path = cursor.getStringValue(MediaStore.Video.Media.DATA, cache)
             val bucketId = cursor.getStringValue(MediaStore.Video.Media.BUCKET_ID, cache)
-            DVideo(id, title, path, duration, size, width, height, rotation, bucketId, createdAt, updatedAt)
+            val dateTakenMs = cursor.getLongValue(MediaStore.Video.Media.DATE_TAKEN, cache)
+            val takenAt = if (dateTakenMs > 0) Instant.fromEpochMilliseconds(dateTakenMs) else null
+            DVideo(id, title, path, duration, size, width, height, rotation, bucketId, createdAt, updatedAt, takenAt)
         } ?: emptyList()
     }
 

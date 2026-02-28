@@ -15,6 +15,7 @@ import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.MediaType
 import com.ismartcoding.plain.features.file.FileSortBy
+import kotlin.time.Instant
 
 object ImageMediaStoreHelper : BaseMediaContentHelper() {
     override val uriExternal: Uri = if (isQPlus()) MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Images.Media.EXTERNAL_CONTENT_URI
@@ -28,6 +29,7 @@ object ImageMediaStoreHelper : BaseMediaContentHelper() {
             MediaStore.Images.Media.SIZE,
             MediaStore.Images.Media.DATE_ADDED,
             MediaStore.Images.Media.DATE_MODIFIED,
+            MediaStore.Images.Media.DATE_TAKEN,
             MediaStore.Images.Media.WIDTH,
             MediaStore.Images.Media.HEIGHT,
             MediaStore.Images.Media.ORIENTATION,
@@ -62,12 +64,14 @@ object ImageMediaStoreHelper : BaseMediaContentHelper() {
             val size = cursor.getLongValue(MediaStore.Images.Media.SIZE, cache)
             val createdAt = cursor.getTimeSecondsValue(MediaStore.Images.Media.DATE_ADDED, cache)
             val updatedAt = cursor.getTimeSecondsValue(MediaStore.Images.Media.DATE_MODIFIED, cache)
+            val takenAtMs = cursor.getLongValue(MediaStore.Images.Media.DATE_TAKEN, cache)
+            val takenAt = if (takenAtMs > 0) Instant.fromEpochMilliseconds(takenAtMs) else null
             val width = cursor.getIntValue(MediaStore.Images.Media.WIDTH, cache)
             val height = cursor.getIntValue(MediaStore.Images.Media.HEIGHT, cache)
             val rotation = cursor.getIntValue(MediaStore.Images.Media.ORIENTATION, cache)
             val path = cursor.getStringValue(MediaStore.Images.Media.DATA, cache)
             val bucketId = cursor.getStringValue(MediaStore.Images.Media.BUCKET_ID, cache)
-            DImage(id, title, path, size, width, height, rotation, bucketId, createdAt, updatedAt)
+            DImage(id, title, path, size, width, height, rotation, bucketId, createdAt, updatedAt, takenAt)
         } ?: emptyList()
     }
 

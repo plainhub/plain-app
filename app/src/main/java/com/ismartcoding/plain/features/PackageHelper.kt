@@ -358,6 +358,7 @@ object PackageHelper {
             FileSortBy.SIZE_DESC -> this.sortedByDescending { it.size }
             FileSortBy.DATE_ASC -> this.sortedBy { it.updatedAt }
             FileSortBy.DATE_DESC -> this.sortedByDescending { it.updatedAt }
+            else -> this.sortedBy { Pinyin.toPinyin(it.name).lowercase() }
         }
     }
 }

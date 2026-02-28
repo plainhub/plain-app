@@ -500,6 +500,8 @@
     <string name="add_new_folder">Add new folder</string>
     <string name="newest_date_first">Newest date first</string>
     <string name="oldest_date_first">Oldest date first</string>
+    <string name="taken_at_newest_first">Photo taken time (newest first)</string>
+    <string name="taken_at_oldest_first">Photo taken time (oldest first)</string>
     <string name="largest_first">Largest first</string>
     <string name="smallest_first">Smallest first</string>
     <string name="create">Create</string>
