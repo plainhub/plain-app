@@ -201,7 +201,8 @@ fun RootPage(
 
                 RootTabType.CHAT.value -> {
                     TopBarChat(
-                        navController = navController
+                        navController = navController,
+                        chatListVM = chatListVM,
                     )
                 }
             }

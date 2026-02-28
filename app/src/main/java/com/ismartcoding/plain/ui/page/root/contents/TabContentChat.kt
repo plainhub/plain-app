@@ -51,6 +51,10 @@ import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.models.ChatListViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.ui.page.chat.components.CreateChannelDialog
+import com.ismartcoding.plain.ui.page.chat.components.ChannelMembersDialog
+import com.ismartcoding.plain.ui.page.chat.components.RenameChannelDialog
+import com.ismartcoding.plain.ui.page.root.components.ChannelListItem
 import com.ismartcoding.plain.ui.page.root.components.PeerListItem
 import com.ismartcoding.plain.ui.page.root.components.RootTabType
 import com.ismartcoding.plain.ui.theme.PlainTheme
@@ -94,6 +98,12 @@ fun TabContentChat(
         chatListVM.loadPeers()
         setRefreshState(RefreshContentState.Finished)
     }
+
+    var showCreateChannelDialog by chatListVM.showCreateChannelDialog
+    var renameChannelId by remember { mutableStateOf<String?>(null) }
+    var renameChannelName by remember { mutableStateOf("") }
+    var manageMembersChannelId by chatListVM.manageMembersChannelId
+    val channels = chatListVM.channels
 
     // Monitor app lifecycle
     DisposableEffect(lifecycleOwner) {
@@ -263,6 +273,40 @@ fun TabContentChat(
                 )
             }
 
+            // Channels section
+            if (channels.isNotEmpty()) {
+                item {
+                    VerticalSpace(dp = 16.dp)
+                    Subtitle(stringResource(R.string.channels))
+                }
+
+                items(
+                    items = channels.toList(),
+                    key = { it.id }
+                ) { channel ->
+                    ChannelListItem(
+                        name = channel.name,
+                        channelId = channel.id,
+                        latestChat = chatListVM.getLatestChat(channel.id),
+                        onDelete = { channelId ->
+                            chatListVM.removeChannel(context, channelId)
+                        },
+                        onRename = { channelId ->
+                            renameChannelId = channelId
+                            renameChannelName = channel.name
+                        },
+                        onManageMembers = { channelId ->
+                            manageMembersChannelId = channelId
+                        },
+                        onClick = {
+                            navController.navigate(Routing.Chat("channel:${channel.id}"))
+                        },
+                        modifier = PlainTheme.getCardModifier()
+                    )
+                    VerticalSpace(8.dp)
+                }
+            }
+
             if (pairedPeers.isNotEmpty()) {
                 item {
                     VerticalSpace(dp = 16.dp)
@@ -325,5 +369,42 @@ fun TabContentChat(
                 BottomSpace(paddingValues)
             }
         }
+    }
+
+    if (showCreateChannelDialog) {
+        CreateChannelDialog(
+            onDismiss = { showCreateChannelDialog = false },
+            onConfirm = { name ->
+                showCreateChannelDialog = false
+                chatListVM.createChannel(name)
+            }
+        )
+    }
+
+    if (renameChannelId != null) {
+        RenameChannelDialog(
+            currentName = renameChannelName,
+            onDismiss = { renameChannelId = null },
+            onConfirm = { newName ->
+                val id = renameChannelId!!
+                renameChannelId = null
+                chatListVM.renameChannel(id, newName)
+            }
+        )
+    }
+
+    val managedChannel = manageMembersChannelId?.let { id -> channels.find { it.id == id } }
+    if (managedChannel != null) {
+        ChannelMembersDialog(
+            channel = managedChannel,
+            pairedPeers = chatListVM.pairedPeers.toList(),
+            onAddMember = { peerId ->
+                chatListVM.addChannelMember(managedChannel.id, peerId)
+            },
+            onRemoveMember = { peerId ->
+                chatListVM.removeChannelMember(managedChannel.id, peerId)
+            },
+            onDismiss = { manageMembersChannelId = null },
+        )
     }
 } 

@@ -9,8 +9,8 @@ import androidx.room.Query
 import androidx.room.Update
 import com.ismartcoding.lib.helpers.StringHelper
 
-@Entity(tableName = "chat_groups")
-data class DChatGroup(
+@Entity(tableName = "chat_channels")
+data class DChatChannel(
     @PrimaryKey var id: String = StringHelper.shortUUID(),
 ) : DEntityBase() {
     @ColumnInfo(name = "name")
@@ -24,22 +24,22 @@ data class DChatGroup(
 }
 
 @Dao
-interface ChatGroupDao {
-    @Query("SELECT * FROM chat_groups")
-    fun getAll(): List<DChatGroup>
+interface ChatChannelDao {
+    @Query("SELECT * FROM chat_channels")
+    fun getAll(): List<DChatChannel>
 
-    @Query("SELECT * FROM chat_groups WHERE id = :id")
-    fun getById(id: String): DChatGroup?
+    @Query("SELECT * FROM chat_channels WHERE id = :id")
+    fun getById(id: String): DChatChannel?
 
     @Insert
-    fun insert(vararg item: DChatGroup)
+    fun insert(vararg item: DChatChannel)
 
     @Update
-    fun update(vararg item: DChatGroup)
+    fun update(vararg item: DChatChannel)
 
-    @Query("DELETE FROM chat_groups WHERE id = :id")
+    @Query("DELETE FROM chat_channels WHERE id = :id")
     fun delete(id: String)
 
-    @Query("DELETE FROM chat_groups WHERE id in (:ids)")
+    @Query("DELETE FROM chat_channels WHERE id in (:ids)")
     fun deleteByIds(ids: List<String>)
 } 

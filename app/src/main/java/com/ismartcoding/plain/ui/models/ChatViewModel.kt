@@ -16,7 +16,7 @@ import com.ismartcoding.plain.chat.PeerChatHelper
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.helpers.TimeHelper
-import com.ismartcoding.plain.db.DChatGroup
+import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageContent
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DMessageFiles
@@ -44,7 +44,7 @@ data class ChatState(
     val toId: String = "",
     val toName: String = "",
     val peer: DPeer? = null,
-    val group: DChatGroup? = null
+    val channel: DChatChannel? = null
 )
 
 class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
@@ -75,7 +75,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     suspend fun initializeChatStateAsync(chatId: String) {
         var toId = ""
         var peer: DPeer? = null
-        var group: DChatGroup? = null
+        var channel: DChatChannel? = null
         var toName = ""
 
         when {
@@ -85,10 +85,10 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
                 toName = peer?.name ?: ""
             }
 
-            chatId.startsWith("group:") -> {
-                toId = chatId.removePrefix("group:")
-                group = AppDatabase.instance.chatGroupDao().getById(toId)
-                group?.name ?: ""
+            chatId.startsWith("channel:") -> {
+                toId = chatId.removePrefix("channel:")
+                channel = AppDatabase.instance.chatChannelDao().getById(toId)
+                toName = channel?.name ?: ""
             }
 
             else -> {
@@ -101,7 +101,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
             toId = toId,
             toName = toName,
             peer = peer,
-            group = group
+            channel = channel
         )
     }
 
