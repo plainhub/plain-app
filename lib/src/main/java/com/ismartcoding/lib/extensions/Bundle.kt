@@ -9,14 +9,24 @@ import com.ismartcoding.lib.data.enums.SortDirection
 import com.ismartcoding.lib.isTPlus
 
 fun Bundle.sort(sortBy: SortBy) {
-    putStringArray(
-        ContentResolver.QUERY_ARG_SORT_COLUMNS,
-        arrayOf(sortBy.field),
-    )
-    putInt(
-        ContentResolver.QUERY_ARG_SORT_DIRECTION,
-        if (sortBy.direction == SortDirection.ASC) ContentResolver.QUERY_SORT_DIRECTION_ASCENDING else ContentResolver.QUERY_SORT_DIRECTION_DESCENDING,
-    )
+    val isExpression = sortBy.field.contains(' ') || sortBy.field.contains('(')
+    if (isExpression) {
+        // Raw SQL sort expression (e.g. CASE WHEN ... END) — use SQL_SORT_ORDER
+        // which is supported on API 26+ and works with QUERY_ARG_LIMIT/OFFSET.
+        putString(
+            ContentResolver.QUERY_ARG_SQL_SORT_ORDER,
+            "${sortBy.field} ${sortBy.direction}",
+        )
+    } else {
+        putStringArray(
+            ContentResolver.QUERY_ARG_SORT_COLUMNS,
+            arrayOf(sortBy.field),
+        )
+        putInt(
+            ContentResolver.QUERY_ARG_SORT_DIRECTION,
+            if (sortBy.direction == SortDirection.ASC) ContentResolver.QUERY_SORT_DIRECTION_ASCENDING else ContentResolver.QUERY_SORT_DIRECTION_DESCENDING,
+        )
+    }
 }
 
 fun Bundle.where(

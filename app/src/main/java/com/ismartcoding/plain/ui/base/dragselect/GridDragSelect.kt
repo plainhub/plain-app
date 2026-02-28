@@ -45,13 +45,33 @@ fun Modifier.gridDragSelect(
         return@composed this
     }
     pointerInput(Unit) {
+        // Helper: find the items-list index of the data item at a touch point.
+        // Uses the grid item's key to look up the item in the items list, so it
+        // works correctly even when non-data items (e.g. group headers) are in the grid.
+        fun findItemIndex(gridState: LazyGridState, position: Offset): Int? {
+            val found = gridState.layoutInfo.visibleItemsInfo.find { itemInfo ->
+                itemInfo.size.toIntRect().contains(position.round() - itemInfo.offset)
+            }
+            if (found != null) {
+                val key = found.key
+                val idx = items.indexOfFirst { it.id == key }
+                return if (idx >= 0) idx else null
+            }
+            // If past the last item, select to the end of the data list
+            val lastItem = gridState.layoutInfo.visibleItemsInfo.lastOrNull()
+                ?.takeIf { it.index == gridState.layoutInfo.totalItemsCount - 1 }
+            if (lastItem != null && position.y > lastItem.offset.y) {
+                return items.size - 1
+            }
+            return null
+        }
+
         detectDragGestures(
             onDragStart = { offset ->
-                state.gridState()?.itemIndexAtPosition(offset)?.let { startIndex ->
-                    val item = items.getOrNull(startIndex)
-                    if (item != null) {
+                state.gridState()?.let { gridState ->
+                    findItemIndex(gridState, offset)?.let { startIndex ->
                         haptics?.performHapticFeedback(HapticFeedbackType.LongPress)
-                        state.startDrag(item.id, startIndex)
+                        state.startDrag(items[startIndex].id, startIndex)
                     }
                 }
             },
@@ -62,7 +82,7 @@ fun Modifier.gridDragSelect(
                     val gridState = gridState() ?: return@whenDragging
                     autoScrollSpeed.value = gridState.calculateScrollSpeed(change, scrollThreshold)
 
-                    val itemPosition = gridState.getItemPosition(change.position)
+                    val itemPosition = findItemIndex(gridState, change.position)
                         ?: return@whenDragging
 
                     if (itemPosition == dragState.current) {
@@ -97,29 +117,6 @@ private fun LazyGridState.calculateScrollSpeed(
         distanceFromTop < scrollThreshold -> -(scrollThreshold - distanceFromTop)
         else -> 0f
     }
-}
-
-private fun LazyGridState.itemIndexAtPosition(hitPoint: Offset): Int? {
-    val found = layoutInfo.visibleItemsInfo.find { itemInfo ->
-        itemInfo.size.toIntRect().contains(hitPoint.round() - itemInfo.offset)
-    }
-
-    return found?.index
-}
-
-fun LazyGridState.getItemPosition(hitPoint: Offset): Int? {
-    return itemIndexAtPosition(hitPoint)
-        ?: if (isPastLastItem(hitPoint)) layoutInfo.totalItemsCount - 1 else null
-}
-
-private fun LazyGridState.isPastLastItem(hitPoint: Offset): Boolean {
-    // Get the last item in the list
-    val lastItem = layoutInfo.visibleItemsInfo.lastOrNull()
-        ?.takeIf { it.index == layoutInfo.totalItemsCount - 1 }
-        ?: return false
-
-    // Determine if we have dragged past the last item in the list
-    return hitPoint.y > lastItem.offset.y
 }
 
 private fun List<IData>.getWithinRangeIds(
