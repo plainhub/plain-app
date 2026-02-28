@@ -16,6 +16,7 @@ data class DVideo(
     val bucketId: String,
     val createdAt: Instant,
     val updatedAt: Instant,
+    val takenAt: Instant?,
 ) : IMedia, IData {
 
     fun getRotatedSize(): IntSize {

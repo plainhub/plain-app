@@ -12,8 +12,9 @@ data class Video(
     val bucketId: String,
     val createdAt: Instant,
     val updatedAt: Instant,
+    val takenAt: Instant?,
 )
 
 fun DVideo.toModel(): Video {
-    return Video(ID(id), title, path, duration, size, bucketId, createdAt, updatedAt)
+    return Video(ID(id), title, path, duration, size, bucketId, createdAt, updatedAt, takenAt)
 }
