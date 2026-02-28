@@ -973,6 +973,14 @@ class MainGraphQL(val schema: Schema) {
                         true
                     }
                 }
+                mutation("setClip") {
+                    resolver { text: String ->
+                        val clipboard = MainApp.instance.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                        val clip = android.content.ClipData.newPlainText("text", text)
+                        clipboard.setPrimaryClip(clip)
+                        true
+                    }
+                }
                 mutation("updateContactGroup") {
                     resolver { id: ID, name: String ->
                         Permission.WRITE_CONTACTS.checkAsync(MainApp.instance)
