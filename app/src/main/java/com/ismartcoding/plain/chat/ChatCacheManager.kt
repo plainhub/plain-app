@@ -3,15 +3,13 @@ package com.ismartcoding.plain.chat
 import android.util.Base64
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
-import kotlin.collections.forEach
 
 object ChatCacheManager {
     val peerKeyCache = mutableMapOf<String, ByteArray>()
     val peerPublicKeyCache = mutableMapOf<String, ByteArray>()
     val channelKeyCache = mutableMapOf<String, ByteArray>()
-    /** Cache of peer id → display name used by chat UI to resolve sender names.
-     *  Local peers data takes priority; channel member names fill in the rest. */
-    val peerNamesCache = mutableMapOf<String, String>()
+    /** Cache of peer id → DPeer used by chat UI to resolve sender info (name, avatar, etc.). */
+    val peerMap = mutableMapOf<String, DPeer>()
 
     // The peer ID whose ChatPage is currently open; empty when no peer chat is active.
     var activeChatPeerId = ""
@@ -51,16 +49,13 @@ object ChatCacheManager {
         }
     }
 
-    /** Rebuild [peerNamesCache] from the latest [peers] data.
-     *  Channel members no longer carry names; all names come from the peers table. */
-    fun refreshPeerNamesCache(peers: List<DPeer>) {
-        val cache = mutableMapOf<String, String>()
+    /** Rebuild [peerMap] from the latest [peers] data. */
+    fun refreshPeerMap(peers: List<DPeer>) {
+        val cache = mutableMapOf<String, DPeer>()
         peers.forEach { peer ->
-            if (peer.name.isNotEmpty()) {
-                cache[peer.id] = peer.name
-            }
+            cache[peer.id] = peer
         }
-        peerNamesCache.clear()
-        peerNamesCache.putAll(cache)
+        peerMap.clear()
+        peerMap.putAll(cache)
     }
 }

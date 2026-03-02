@@ -245,9 +245,9 @@ object ChannelSystemMessageHandler {
             return
         }
 
-        // Delete channel and its chats locally
-        dao.delete(msg.channelId)
-        AppDatabase.instance.chatDao().deleteByChannelId(msg.channelId)
+        // Update channel status to kicked; keep channel and chat history intact
+        channel.status = DChatChannel.STATUS_KICKED
+        dao.update(channel)
 
         runBlocking(Dispatchers.IO) {
             ChatCacheManager.loadKeyCacheAsync()

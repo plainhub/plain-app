@@ -19,11 +19,9 @@ import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.events.PairingCancelledEvent
 import com.ismartcoding.plain.events.PairingFailedEvent
 import com.ismartcoding.plain.events.PairingSuccessEvent
-import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager.MULTICAST_PORT
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.helpers.SignatureHelper
 import com.ismartcoding.plain.helpers.TimeHelper
-import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.chat.ChatCacheManager
 import java.util.concurrent.ConcurrentHashMap
 import android.util.Base64
@@ -209,7 +207,7 @@ object NearbyPairManager {
     }
 
     private fun sendPairingMessage(type: NearbyMessageType, message: String, targetIp: String) {
-        UdpUnicastManager.sendUnicast("${type.toPrefix()}${message}", targetIp, MULTICAST_PORT)
+        NearbyNetwork.sendUnicast("${type.toPrefix()}${message}", targetIp)
     }
 
     fun cancelPairing(deviceId: String) {

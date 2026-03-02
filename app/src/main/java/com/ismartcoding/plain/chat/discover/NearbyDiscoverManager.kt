@@ -1,5 +1,9 @@
 package com.ismartcoding.plain.chat.discover
 
+import android.net.ConnectivityManager
+import android.net.LinkProperties
+import android.net.Network
+import android.net.NetworkRequest
 import android.util.Base64
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
@@ -21,171 +25,155 @@ import com.ismartcoding.plain.enums.NearbyMessageType
 import com.ismartcoding.plain.events.NearbyDeviceFoundEvent
 import com.ismartcoding.plain.events.PairingRequestReceivedEvent
 import com.ismartcoding.plain.helpers.PhoneHelper
-import com.ismartcoding.plain.preferences.DeviceNamePreference
-import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
+/**
+ * Central manager for nearby device discovery.
+ *
+ * Responsibilities:
+ *  - Lifecycle: start/stop the multicast listener and network watcher.
+ *  - Discovery: periodic broadcast + directed queries, reply to incoming requests.
+ *  - Message routing: dispatch incoming datagrams to discovery or [NearbyPairManager].
+ */
 object NearbyDiscoverManager {
-    private const val BROADCAST_INTERVAL = 5000L         // 5 seconds broadcast interval
-    const val MULTICAST_PORT = 52352            // Same port as multicast for unicast replies
+    private const val BROADCAST_INTERVAL_MS = 5_000L
 
-    private var periodicBroadcastJob: Job? = null
-    private val networkManager = UdpMulticastManager()
+    private var broadcastJob: Job? = null
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private var restartJob: Job? = null
 
-    fun discoverSpecificDevice(toId: String, key: ByteArray) {
-        sendDiscoveryMessage(
-            DDiscoverRequest(
-                fromId = TempData.clientId,
-                toId = Base64.encodeToString(
-                    CryptoHelper.chaCha20Encrypt(key, toId),
-                    Base64.NO_WRAP
-                )
-            )
-        )
-        LogCat.d("Directed discovery sent for device: $toId")
+    // ---- Lifecycle -------------------------------------------------------------
+
+    /**
+     * Start the multicast listener **and** register a network-change watcher so the
+     * socket is recreated whenever WiFi (dis)connects.  Call once at app startup.
+     */
+    fun start() {
+        NearbyNetwork.startReceiver(::onDatagram)
+        registerNetworkWatcher()
     }
 
-    fun startListener() {
-        networkManager.startReceiver { message, senderIP ->
-            handleReceivedMessage(message, senderIP)
-        }
-    }
+    // ---- Periodic broadcast discovery ------------------------------------------
 
     fun startPeriodicDiscovery() {
-        if (periodicBroadcastJob?.isActive == true) return
-        periodicBroadcastJob = coIO {
+        if (broadcastJob?.isActive == true) return
+        broadcastJob = coIO {
             while (true) {
-                try {
-                    sendDiscoveryMessage(DDiscoverRequest())
-                } catch (e: Exception) {
-                    LogCat.e("Error in periodic discovery: ${e.message}")
-                }
-                delay(BROADCAST_INTERVAL)
+                runCatching { broadcastDiscover(DDiscoverRequest()) }
+                    .onFailure { LogCat.e("Periodic discovery error: ${it.message}") }
+                delay(BROADCAST_INTERVAL_MS)
             }
         }
-        LogCat.d("Started periodic discovery broadcasting")
     }
 
     fun stopPeriodicDiscovery() {
-        periodicBroadcastJob?.cancel()
-        periodicBroadcastJob = null
-        LogCat.d("Stopped periodic discovery broadcasting")
+        broadcastJob?.cancel()
+        broadcastJob = null
     }
 
-    private fun sendDiscoveryMessage(request: DDiscoverRequest) {
-        val message = "${NearbyMessageType.DISCOVER.toPrefix()}${JsonHelper.jsonEncode(request)}"
-        networkManager.sendMulticast(message)
-    }
-
-    private suspend fun sendDiscoveryReply(targetIP: String) {
-        try {
-            val context = MainApp.instance
-            val deviceName = TempData.deviceName
-            val reply = DDiscoverReply(
-                id = TempData.clientId,
-                name = deviceName,
-                deviceType = PhoneHelper.getDeviceType(context),
-                port = TempData.httpsPort,
-                version = BuildConfig.VERSION_NAME,
-                platform = "android",
-                ips = NetworkHelper.getDeviceIP4s().toList(),
+    /** Send a directed discovery to a specific paired device. */
+    fun discoverSpecificDevice(toId: String, key: ByteArray) {
+        broadcastDiscover(
+            DDiscoverRequest(
+                fromId = TempData.clientId,
+                toId = Base64.encodeToString(CryptoHelper.chaCha20Encrypt(key, toId), Base64.NO_WRAP),
             )
+        )
+    }
 
-            val message = "${NearbyMessageType.DISCOVER_REPLY.toPrefix()}${JsonHelper.jsonEncode(reply)}"
-            UdpUnicastManager.sendUnicast(message, targetIP, MULTICAST_PORT)
-            LogCat.d("Discovery reply sent via unicast to $targetIP")
-        } catch (e: Exception) {
-            LogCat.e("Error sending discovery reply: ${e.message}")
+    // ---- Network watcher -------------------------------------------------------
+
+    private fun registerNetworkWatcher() {
+        if (networkCallback != null) return
+        val cm = MainApp.instance.getSystemService(ConnectivityManager::class.java) ?: return
+
+        networkCallback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) = scheduleRestart("onAvailable")
+            override fun onLinkPropertiesChanged(network: Network, lp: LinkProperties) =
+                scheduleRestart("onLinkPropertiesChanged")
+        }
+        runCatching { cm.registerNetworkCallback(NetworkRequest.Builder().build(), networkCallback!!) }
+            .onFailure {
+                LogCat.e("Network callback registration failed: ${it.message}")
+                networkCallback = null
+            }
+    }
+
+    private fun scheduleRestart(reason: String) {
+        restartJob?.cancel()
+        restartJob = coIO {
+            delay(1_500) // debounce rapid network churn
+            LogCat.d("Network change ($reason) — restarting multicast listener")
+            NearbyNetwork.stopReceiver()
+            NearbyNetwork.startReceiver(::onDatagram)
         }
     }
 
-    private fun handleReceivedMessage(message: String, senderIP: String) {
-        val ownIPs = NetworkHelper.getDeviceIP4s()
-        if (ownIPs.contains(senderIP)) return
+    // ---- Message routing -------------------------------------------------------
 
-        when {
-            message.startsWith(NearbyMessageType.DISCOVER_REPLY.toPrefix()) -> {
-                val replyMessage = message.removePrefix(NearbyMessageType.DISCOVER_REPLY.toPrefix())
-                processDiscoveryReply(replyMessage)
-            }
+    private fun onDatagram(message: String, senderIP: String) {
+        if (NetworkHelper.getDeviceIP4s().contains(senderIP)) return
 
-            message.startsWith(NearbyMessageType.DISCOVER.toPrefix()) -> {
-                val discoverMessage = message.removePrefix(NearbyMessageType.DISCOVER.toPrefix())
-                coIO { processDiscoveryRequest(discoverMessage, senderIP) }
-            }
+        val type = NearbyMessageType.entries.firstOrNull { message.startsWith(it.toPrefix()) } ?: return
+        val payload = message.removePrefix(type.toPrefix())
 
-            message.startsWith(NearbyMessageType.PAIR_REQUEST.toPrefix()) -> {
-                val request = JsonHelper.jsonDecode<DPairingRequest>(message.removePrefix(NearbyMessageType.PAIR_REQUEST.toPrefix()))
+        when (type) {
+            NearbyMessageType.DISCOVER -> coIO { handleDiscoverRequest(payload, senderIP) }
+            NearbyMessageType.DISCOVER_REPLY -> handleDiscoverReply(payload)
+            NearbyMessageType.PAIR_REQUEST -> {
+                val request = JsonHelper.jsonDecode<DPairingRequest>(payload)
                 sendEvent(PairingRequestReceivedEvent(request, senderIP))
             }
-
-            message.startsWith(NearbyMessageType.PAIR_RESPONSE.toPrefix()) -> {
-                val response = JsonHelper.jsonDecode<DPairingResponse>(message.removePrefix(NearbyMessageType.PAIR_RESPONSE.toPrefix()))
-                coIO {
-                    NearbyPairManager.handlePairingResponse(response, senderIP)
-                }
+            NearbyMessageType.PAIR_RESPONSE -> {
+                val response = JsonHelper.jsonDecode<DPairingResponse>(payload)
+                coIO { NearbyPairManager.handlePairingResponse(response, senderIP) }
             }
-
-            message.startsWith(NearbyMessageType.PAIR_CANCEL.toPrefix()) -> {
-                val cancel = JsonHelper.jsonDecode<DPairingCancel>(message.removePrefix(NearbyMessageType.PAIR_CANCEL.toPrefix()))
+            NearbyMessageType.PAIR_CANCEL -> {
+                val cancel = JsonHelper.jsonDecode<DPairingCancel>(payload)
                 NearbyPairManager.handlePairingCancel(cancel)
             }
         }
     }
 
-    private suspend fun processDiscoveryRequest(message: String, senderIP: String) {
+    // ---- Discovery logic -------------------------------------------------------
+
+    private fun broadcastDiscover(request: DDiscoverRequest) {
+        val message = "${NearbyMessageType.DISCOVER.toPrefix()}${JsonHelper.jsonEncode(request)}"
+        NearbyNetwork.sendMulticast(message)
+    }
+
+    private suspend fun handleDiscoverRequest(payload: String, senderIP: String) {
         try {
-            val request = JsonHelper.jsonDecode<DDiscoverRequest>(message)
-            val context = MainApp.instance
-            val isDiscoverable = NearbyDiscoverablePreference.getAsync(context)
-            val shouldRespond = isDiscoverable || shouldRespondToDirectedQuery(request)
-            if (shouldRespond) {
-                sendDiscoveryReply(senderIP)
-                LogCat.d("Sent discovery reply to $senderIP")
-            } else {
-                LogCat.d("Discovery request ignored from $senderIP")
+            val request = JsonHelper.jsonDecode<DDiscoverRequest>(payload)
+            val discoverable = NearbyDiscoverablePreference.getAsync(MainApp.instance)
+            if (discoverable || isDirectedQueryForUs(request)) {
+                sendDiscoverReply(senderIP)
             }
         } catch (e: Exception) {
-            LogCat.e("Error processing discovery request: ${e.message}")
+            LogCat.e("Error handling discover request: ${e.message}")
         }
     }
 
-    private fun shouldRespondToDirectedQuery(request: DDiscoverRequest): Boolean {
-        // Must include fromId and toId
-        if (request.fromId.isEmpty() || request.toId.isEmpty()) {
-            return false
-        }
-
-        // Check if fromId is a paired device
-        val senderPeer = AppDatabase.instance.peerDao().getById(request.fromId)
-        if (senderPeer == null || senderPeer.status != "paired") {
-            LogCat.d("Unknown fromId: ${request.fromId}")
-            return false
-        }
-
-        // Use shared key to decrypt toId
-        try {
-            val encryptedBytes = Base64.decode(request.toId, Base64.NO_WRAP)
-            val decryptedBytes = CryptoHelper.chaCha20Decrypt(senderPeer.key, encryptedBytes)
-            val decryptedToId = decryptedBytes?.decodeToString()
-            if (decryptedToId == TempData.clientId) {
-                LogCat.d("Directed query verified from ${request.fromId}")
-                return true
-            } else {
-                LogCat.d("Decrypted toId does not match our ID")
-                return false
-            }
-        } catch (e: Exception) {
-            LogCat.e("Error decrypting toId: ${e.message}")
-            return false
-        }
+    private fun sendDiscoverReply(targetIP: String) {
+        val reply = DDiscoverReply(
+            id = TempData.clientId,
+            name = TempData.deviceName,
+            deviceType = PhoneHelper.getDeviceType(MainApp.instance),
+            port = TempData.httpsPort,
+            version = BuildConfig.VERSION_NAME,
+            platform = "android",
+            ips = NetworkHelper.getDeviceIP4s().toList(),
+        )
+        val message = "${NearbyMessageType.DISCOVER_REPLY.toPrefix()}${JsonHelper.jsonEncode(reply)}"
+        NearbyNetwork.sendUnicast(message, targetIP)
     }
 
-    private fun processDiscoveryReply(message: String) {
+    private fun handleDiscoverReply(payload: String) {
         try {
-            val reply = JsonHelper.jsonDecode<DDiscoverReply>(message)
+            val reply = JsonHelper.jsonDecode<DDiscoverReply>(payload)
             sendEvent(
                 NearbyDeviceFoundEvent(
                     DNearbyDevice(
@@ -196,13 +184,30 @@ object NearbyDiscoverManager {
                         deviceType = reply.deviceType,
                         version = reply.version,
                         platform = reply.platform,
-                        lastSeen = TimeHelper.now()
+                        lastSeen = TimeHelper.now(),
                     )
                 )
             )
-            LogCat.d("ProcessDiscoveryReply: $reply")
         } catch (e: Exception) {
-            LogCat.e("Error ProcessDiscoveryReply: ${e.message}")
+            LogCat.e("Error handling discover reply: ${e.message}")
+        }
+    }
+
+    private fun isDirectedQueryForUs(request: DDiscoverRequest): Boolean {
+        if (request.fromId.isEmpty() || request.toId.isEmpty()) return false
+
+        val peer = AppDatabase.instance.peerDao().getById(request.fromId)
+        if (peer == null || peer.status != "paired") return false
+
+        return try {
+            val decrypted = CryptoHelper.chaCha20Decrypt(
+                peer.key,
+                Base64.decode(request.toId, Base64.NO_WRAP),
+            )
+            decrypted?.decodeToString() == TempData.clientId
+        } catch (e: Exception) {
+            LogCat.e("Error verifying directed query: ${e.message}")
+            false
         }
     }
 }

@@ -43,7 +43,7 @@ fun ChatName(
             text = when {
                 m.fromId == "local" -> getString(R.string.local_chat)
                 m.fromId == "me" -> getString(R.string.me)
-                else -> ChatCacheManager.peerNamesCache[m.fromId] ?: getString(R.string.unknown)
+                else -> ChatCacheManager.peerMap[m.fromId]?.name ?: getString(R.string.unknown)
             },
 
             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),

@@ -6,6 +6,20 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 object Migrations {
     val MIGRATION_5_6 = object : Migration(5, 6) {
         override fun migrate(db: SupportSQLiteDatabase) {
+            // Ensure pomodoro_items exists in case it was missing from a prior incomplete migration
+            db.execSQL("""
+                CREATE TABLE IF NOT EXISTS `pomodoro_items` (
+                    `id` TEXT NOT NULL,
+                    `date` TEXT NOT NULL,
+                    `completed_count` INTEGER NOT NULL,
+                    `total_work_seconds` INTEGER NOT NULL,
+                    `total_break_seconds` INTEGER NOT NULL,
+                    `created_at` TEXT NOT NULL,
+                    `updated_at` TEXT NOT NULL,
+                    PRIMARY KEY(`id`)
+                )
+            """)
+
             // Create new table with desired structure
             db.execSQL("""
                 CREATE TABLE chats_new (

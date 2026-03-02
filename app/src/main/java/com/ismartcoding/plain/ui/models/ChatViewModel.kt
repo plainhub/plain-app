@@ -68,9 +68,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
                 when (event) {
                     is PeerUpdatedEvent -> {
                         // Keep cache entry up-to-date for this peer
-                        if (event.peer.name.isNotEmpty()) {
-                            ChatCacheManager.peerNamesCache[event.peer.id] = event.peer.name
-                        }
+                        ChatCacheManager.peerMap[event.peer.id] = event.peer
                         val currentPeer = _chatState.value.peer
                         if (currentPeer != null && currentPeer.id == event.peer.id) {
                             _chatState.value = _chatState.value.copy(peer = event.peer, toName = event.peer.name)

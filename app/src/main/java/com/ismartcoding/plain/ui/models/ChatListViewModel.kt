@@ -60,6 +60,10 @@ class ChatListViewModel : ViewModel() {
                         }
                     }
 
+                    is ChannelUpdatedEvent -> {
+                        loadPeers()
+                    }
+
                     is NearbyDeviceFoundEvent -> {
                         handleDeviceFound(event)
                     }
@@ -127,8 +131,8 @@ class ChatListViewModel : ViewModel() {
                     .filter { it.status == "unpaired" }
                     .sortedBy { Pinyin.toPinyin(it.name) }
 
-                // Refresh peer name cache before switching to main thread
-                ChatCacheManager.refreshPeerNamesCache(allPeers)
+                // Refresh peer map cache before switching to main thread
+                ChatCacheManager.refreshPeerMap(allPeers)
 
                 // Apply state updates on the main thread to avoid snapshot violations
                 withContext(Dispatchers.Main) {
@@ -168,12 +172,27 @@ class ChatListViewModel : ViewModel() {
     fun removePeer(context: Context, peerId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                // Delete all chat messages and associated files for this peer
+                // Delete all direct (peer-to-peer) chat messages and associated files for this peer
                 ChatDbHelper.deleteAllChatsByPeerAsync(context, peerId)
-                
-                // Delete the peer record
-                AppDatabase.instance.peerDao().delete(peerId)
-                
+
+                // Check if the peer is a member of any channel before deleting
+                val isChannelMember = AppDatabase.instance.chatChannelDao().getAll()
+                    .any { it.hasMember(peerId) }
+
+                val peerDao = AppDatabase.instance.peerDao()
+                if (isChannelMember) {
+                    // Downgrade the peer to channel-only: clear pairing key but keep the record
+                    val peer = peerDao.getById(peerId)
+                    if (peer != null) {
+                        peer.key = ""
+                        peer.status = "channel"
+                        peerDao.update(peer)
+                    }
+                } else {
+                    // Not a channel member — safe to delete the peer record entirely
+                    peerDao.delete(peerId)
+                }
+
                 // Reload key cache and peers list
                 ChatCacheManager.loadKeyCacheAsync()
                 loadPeers()
@@ -318,9 +337,9 @@ class ChatListViewModel : ViewModel() {
                 ChannelSystemMessageSender.sendLeave(channelId, ownerPeer, channel.key)
             }
 
-            // Delete locally regardless of whether the owner received the message
-            ChatDbHelper.deleteAllChatsAsync(context, channelId)
-            AppDatabase.instance.chatChannelDao().delete(channelId)
+            // Update status to left; keep channel and chat history intact
+            channel.status = DChatChannel.STATUS_LEFT
+            AppDatabase.instance.chatChannelDao().update(channel)
             ChatCacheManager.loadKeyCacheAsync()
             loadPeers()
         }

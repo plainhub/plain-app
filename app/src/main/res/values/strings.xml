@@ -696,6 +696,8 @@
     <string name="delete_channel">Delete Channel</string>
     <string name="leave_channel">Leave Channel</string>
     <string name="leave_channel_warning">Are you sure you want to leave this channel? You will no longer receive messages.</string>
+    <string name="channel_left_notice">You have left this channel and can no longer send messages.</string>
+    <string name="channel_kicked_notice">You were removed from this channel and can no longer send messages.</string>
     <string name="channel_invite">Channel Invite</string>
     <string name="channel_invite_message">%1$s invited you to join channel \"%2$s\"</string>
     <string name="decline">Decline</string>

@@ -7,9 +7,11 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,6 +19,8 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -27,8 +31,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -36,6 +42,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.extensions.getFilenameWithoutExtension
@@ -45,11 +52,14 @@ import com.ismartcoding.lib.extensions.queryOpenableFile
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.StringHelper
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
+import com.ismartcoding.plain.events.ChannelUpdatedEvent
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.PickFileResultEvent
@@ -179,6 +189,12 @@ fun ChatPage(
                     }
                     handleFileSelection(event, context, chatVM, scrollState, focusManager)
                 }
+
+                is ChannelUpdatedEvent -> {
+                    scope.launch(Dispatchers.IO) {
+                        chatVM.refreshChannelAsync()
+                    }
+                }
             }
         }
     }
@@ -279,7 +295,7 @@ fun ChatPage(
                                 audioPlaylistVM,
                                 itemsState.value,
                                 m = m,
-                                peer = chatState.value.peer,
+                                peer = chatState.value.peer ?: ChatCacheManager.peerMap[m.fromId],
                                 index = index,
                                 imageWidthDp = imageWidthDp,
                                 imageWidthPx = imageWidthPx.value,
@@ -296,7 +312,27 @@ fun ChatPage(
                 }
             }
             val peer = chatState.value.peer
-            if (!chatVM.showBottomActions() && (peer == null || peer.status == "paired")) {
+            val channel = chatState.value.channel
+            val channelInactive = channel != null &&
+                (channel.status == DChatChannel.STATUS_LEFT || channel.status == DChatChannel.STATUS_KICKED)
+            if (channelInactive) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = if (channel!!.status == DChatChannel.STATUS_KICKED)
+                            stringResource(R.string.channel_kicked_notice)
+                        else
+                            stringResource(R.string.channel_left_notice),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            } else if (!chatVM.showBottomActions() && (peer == null || peer.status == "paired")) {
                 ChatInput(
                     value = inputValue,
                     hint = stringResource(id = R.string.chat_input_hint),
