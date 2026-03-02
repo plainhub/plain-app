@@ -30,6 +30,7 @@ import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DPeer

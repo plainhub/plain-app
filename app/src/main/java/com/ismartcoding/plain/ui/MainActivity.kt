@@ -95,6 +95,7 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChatListViewModel
+import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.page.chat.components.ForwardTarget
@@ -123,6 +124,7 @@ class MainActivity : AppCompatActivity() {
     private val audioPlaylistVM: AudioPlaylistViewModel by viewModels()
     val pomodoroVM: PomodoroViewModel by viewModels()
     private val chatListVM: ChatListViewModel by viewModels()
+    private val chatVM: ChatViewModel by viewModels()
     private val navControllerState = mutableStateOf<NavHostController?>(null)
 
     private var showForwardTargetDialog by mutableStateOf(false)
@@ -322,7 +324,7 @@ class MainActivity : AppCompatActivity() {
             SettingsProvider {
                 Main(navControllerState, onLaunched = {
                     handleIntent(intent)
-                }, mainVM, audioPlaylistVM, pomodoroVM)
+                }, mainVM, audioPlaylistVM, pomodoroVM, chatVM = chatVM, chatListVM = chatListVM)
 
                 if (showForwardTargetDialog) {
                     ForwardTargetDialog(
@@ -455,7 +457,7 @@ class MainActivity : AppCompatActivity() {
 
                     is StartScreenMirrorEvent -> {
                         try {
-                            if (event.audio && Permission.RECORD_AUDIO.can(this@MainActivity)) {
+                            if (event.audio && !Permission.RECORD_AUDIO.can(this@MainActivity)) {
                                 // Request RECORD_AUDIO first; callback will launch screen capture
                                 recordAudioForMirror.launch(android.Manifest.permission.RECORD_AUDIO)
                             } else {

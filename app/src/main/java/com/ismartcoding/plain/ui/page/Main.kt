@@ -58,7 +58,6 @@ import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.chat.ChatDbHelper
-import com.ismartcoding.plain.events.ChannelUpdatedEvent
 import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.PToast
@@ -246,10 +245,6 @@ fun Main(
                         }
                     }
                 }
-                is ChannelUpdatedEvent -> {
-                    chatListVM.loadPeers()
-                }
-
                 else -> {
                     // Handle other events if necessary
                 }

@@ -49,6 +49,7 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.enums.DeviceType
@@ -257,8 +258,8 @@ fun ChatInfoPage(
                 }
             }
 
-            // Leave channel button (non-owner only)
-            if (liveChannel != null && !isOwner) {
+            // Leave channel button (non-owner, still joined)
+            if (liveChannel != null && !isOwner && liveChannel.status == DChatChannel.STATUS_JOINED) {
                 item {
                     VerticalSpace(dp = 16.dp)
                     POutlinedButton(
@@ -274,6 +275,34 @@ fun ChatInfoPage(
                                 message = leaveChannelWarningText,
                                 confirmButton = Pair(leaveChannelText) {
                                     chatListVM.leaveChannel(context, liveChannel.id)
+                                    navController.navigateUp()
+                                },
+                                dismissButton = Pair(cancelText) {},
+                            )
+                        },
+                    )
+                }
+            }
+
+            // Delete channel button (non-owner who has left or been kicked)
+            if (liveChannel != null && !isOwner &&
+                (liveChannel.status == DChatChannel.STATUS_LEFT || liveChannel.status == DChatChannel.STATUS_KICKED)
+            ) {
+                item {
+                    VerticalSpace(dp = 16.dp)
+                    POutlinedButton(
+                        text = deleteChannelText,
+                        type = ButtonType.DANGER,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(40.dp)
+                            .padding(horizontal = 16.dp),
+                        onClick = {
+                            DialogHelper.showConfirmDialog(
+                                title = deleteChannelText,
+                                message = deleteChannelWarningText,
+                                confirmButton = Pair(deleteChannelText) {
+                                    chatListVM.removeChannel(context, liveChannel.id)
                                     navController.popBackStack(navController.graph.startDestinationId, false)
                                 },
                                 dismissButton = Pair(cancelText) {},

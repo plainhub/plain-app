@@ -79,7 +79,7 @@ data class DChatChannel(
     suspend fun getPeersAsync(): List<DPeer> {
         val ids = memberIds()
         val dbPeers = AppDatabase.instance.peerDao().getByIds(ids).associateBy { it.id }
-        return ids.map { peerId ->
+        return ids.mapNotNull { peerId ->
             if (peerId == TempData.clientId) {
                 DPeer(
                     id = peerId,
@@ -90,11 +90,7 @@ data class DChatChannel(
                     deviceType = DeviceType.PHONE.value,
                 )
             } else {
-                dbPeers[peerId] ?: DPeer(
-                    id = peerId,
-                    name = "",
-                    deviceType = DeviceType.PHONE.value,
-                )
+                dbPeers[peerId]
             }
         }
     }
@@ -131,7 +127,8 @@ data class DChatChannel(
 
     companion object {
         const val STATUS_JOINED = "joined"
-        const val STATUS_PENDING = "left"
+        const val STATUS_LEFT = "left"
+        const val STATUS_KICKED = "kicked"
     }
 }
 
