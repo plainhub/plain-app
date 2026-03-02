@@ -12,6 +12,7 @@ import com.ismartcoding.lib.data.enums.SortDirection
 import com.ismartcoding.lib.extensions.find
 import com.ismartcoding.lib.extensions.getIntValue
 import com.ismartcoding.lib.extensions.getPagingCursorWithSql
+import com.ismartcoding.lib.extensions.getSearchCursorWithSql
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.lib.extensions.getTimeValue
@@ -29,6 +30,10 @@ object SmsHelper {
     private const val MMS_ADDR_TYPE_FROM = 137
     private const val MMS_ADDR_TYPE_TO = 151
     private const val MMS_INSERT_ADDRESS_TOKEN = "insert-address-token"
+
+    // Only include actual content PDUs; exclude notification/delivery-report frames.
+    // 128 = m-send-req (outgoing), 130 = m-retrieve-conf (incoming with content)
+    private const val MMS_CONTENT_FILTER = "m_type IN (128, 130)"
 
     fun sendText(to: String, message: String) {
         val parts = smsManager.divideMessage(message)
@@ -117,12 +122,66 @@ object SmsHelper {
             return searchByThreadAsync(context, threadId, limit, offset)
         }
 
-        return context.contentResolver.getPagingCursorWithSql(
-            smsUri, getProjection(), buildWhereAsync(query),
-            limit, offset, SortBy(Telephony.Sms.DATE, SortDirection.DESC)
+        val where = buildWhereAsync(query)
+        val hasTextOrIdsFilter = conditions.any { it.name == "text" || it.name == "ids" }
+
+        // When filtering by text/ids (SMS-specific columns), skip MMS, use normal paging
+        if (hasTextOrIdsFilter) {
+            return context.contentResolver.getPagingCursorWithSql(
+                smsUri, getProjection(), where,
+                limit, offset, SortBy(Telephony.Sms.DATE, SortDirection.DESC)
+            )?.map { cursor, cache ->
+                cursorToSmsMessage(cursor, cache)
+            } ?: emptyList()
+        }
+
+        // Fetch all SMS (no paging yet — will paginate after merging with MMS)
+        val smsItems = context.contentResolver.getSearchCursorWithSql(
+            smsUri, getProjection(), where
         )?.map { cursor, cache ->
             cursorToSmsMessage(cursor, cache)
         } ?: emptyList()
+
+        // Also query MMS and merge
+        val mmsWhere = ContentWhere()
+        val typeCondition = conditions.firstOrNull { it.name == "type" }
+        if (typeCondition != null) {
+            // SMS type 1=inbox, 2=sent; MMS MESSAGE_BOX 1=inbox, 2=sent
+            mmsWhere.add("${Telephony.Mms.MESSAGE_BOX} = ?", typeCondition.value)
+        }
+        mmsWhere.add(MMS_CONTENT_FILTER)
+
+        val mmsItems = context.contentResolver.queryCursor(
+            mmsUri,
+            arrayOf(
+                Telephony.Mms._ID, Telephony.Mms.DATE, Telephony.Mms.THREAD_ID,
+                Telephony.Mms.MESSAGE_BOX, Telephony.Mms.READ, Telephony.Mms.SUBSCRIPTION_ID,
+            ),
+            mmsWhere.toSelection(),
+            mmsWhere.args.toTypedArray(),
+            "${Telephony.Mms.DATE} DESC"
+        )?.map { cursor, cache ->
+            val rawMmsId = cursor.getStringValue(Telephony.Mms._ID, cache)
+            val bodyAndAttachments = readMmsBodyAndAttachments(context, rawMmsId)
+            DMessage(
+                id = "mms_$rawMmsId",
+                body = bodyAndAttachments.first,
+                address = readMmsAddress(context, rawMmsId),
+                date = cursor.getTimeSecondsValue(Telephony.Mms.DATE, cache),
+                serviceCenter = "",
+                read = cursor.getIntValue(Telephony.Mms.READ, cache) == 1,
+                threadId = cursor.getStringValue(Telephony.Mms.THREAD_ID, cache),
+                type = cursor.getIntValue(Telephony.Mms.MESSAGE_BOX, cache),
+                subscriptionId = cursor.getIntValue(Telephony.Mms.SUBSCRIPTION_ID, cache),
+                isMms = true,
+                attachments = bodyAndAttachments.second,
+            )
+        } ?: emptyList()
+
+        return smsItems.plus(mmsItems)
+            .sortedByDescending { it.date }
+            .drop(offset)
+            .take(limit)
     }
 
     private suspend fun searchByThreadAsync(
@@ -148,7 +207,7 @@ object SmsHelper {
                 Telephony.Mms._ID, Telephony.Mms.DATE, Telephony.Mms.THREAD_ID,
                 Telephony.Mms.MESSAGE_BOX, Telephony.Mms.READ, Telephony.Mms.SUBSCRIPTION_ID,
             ),
-            "${Telephony.Mms.THREAD_ID} = ?",
+            "${Telephony.Mms.THREAD_ID} = ? AND $MMS_CONTENT_FILTER",
             arrayOf(threadId),
             "${Telephony.Mms.DATE} DESC"
         )?.map { cursor, cache ->
@@ -162,7 +221,7 @@ object SmsHelper {
                 serviceCenter = "",
                 read = cursor.getIntValue(Telephony.Mms.READ, cache) == 1,
                 threadId = cursor.getStringValue(Telephony.Mms.THREAD_ID, cache),
-                type = if (cursor.getIntValue(Telephony.Mms.MESSAGE_BOX, cache) == 2) 2 else 1,
+                type = cursor.getIntValue(Telephony.Mms.MESSAGE_BOX, cache),
                 subscriptionId = cursor.getIntValue(Telephony.Mms.SUBSCRIPTION_ID, cache),
                 isMms = true,
                 attachments = bodyAndAttachments.second,
@@ -318,7 +377,13 @@ object SmsHelper {
 
         // Count MMS (only when no text/ids filter which are SMS-specific)
         val mmsCount = if (query.isEmpty() || (!query.contains("text") && !query.contains("ids"))) {
-            queryCount(context, mmsUri)
+            val typeCondition = conditions.firstOrNull { it.name == "type" }
+            if (typeCondition != null) {
+                // Map SMS type to MMS msg_box (1=inbox, 2=sent, 3=drafts, 4=outbox)
+                queryCount(context, mmsUri, "${Telephony.Mms.MESSAGE_BOX} = ? AND $MMS_CONTENT_FILTER", arrayOf(typeCondition.value))
+            } else {
+                queryCount(context, mmsUri, MMS_CONTENT_FILTER, null)
+            }
         } else 0
 
         return smsCount + mmsCount
@@ -326,7 +391,7 @@ object SmsHelper {
 
     private fun countByThread(context: Context, threadId: String): Int {
         val smsCount = queryCount(context, smsUri, "${Telephony.Sms.THREAD_ID} = ?", arrayOf(threadId))
-        val mmsCount = queryCount(context, mmsUri, "${Telephony.Mms.THREAD_ID} = ?", arrayOf(threadId))
+        val mmsCount = queryCount(context, mmsUri, "${Telephony.Mms.THREAD_ID} = ? AND $MMS_CONTENT_FILTER", arrayOf(threadId))
         return smsCount + mmsCount
     }
 
