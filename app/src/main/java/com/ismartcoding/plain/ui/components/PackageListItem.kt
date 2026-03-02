@@ -1,5 +1,8 @@
 package com.ismartcoding.plain.ui.components
 
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
@@ -16,6 +19,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
@@ -54,9 +59,17 @@ fun PackageListItem(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            val context = LocalContext.current
+            val density = LocalDensity.current
             val icon = remember(item.id) {
                 try {
-                    packageManager.getApplicationIcon(item.id)
+                    val drawable = packageManager.getApplicationIcon(item.id)
+                    val sizePx = with(density) { 48.dp.roundToPx() }
+                    val bitmap = Bitmap.createBitmap(sizePx, sizePx, Bitmap.Config.ARGB_8888)
+                    val canvas = Canvas(bitmap)
+                    drawable.setBounds(0, 0, sizePx, sizePx)
+                    drawable.draw(canvas)
+                    BitmapDrawable(context.resources, bitmap)
                 } catch (e: Exception) {
                     null
                 }
