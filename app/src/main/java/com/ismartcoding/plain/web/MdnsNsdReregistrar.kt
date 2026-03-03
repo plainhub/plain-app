@@ -90,12 +90,14 @@ class MdnsNsdReregistrar(
 
         reregisterJob?.cancel()
         reregisterJob = coIO {
-            delay(1200) // debounce network churn (VPN/Wi-Fi toggles can fire multiple callbacks)
+            delay(2000) // debounce network churn (VPN/Wi-Fi toggles can fire multiple callbacks)
 
-            val maxAttempts = 5
+            // Keep retries low: each attempt creates JmDNS Timer threads. Excessive retries
+            // under network churn exhaust the OS thread limit (OOM: pthread_create failed).
+            val maxAttempts = 3
             repeat(maxAttempts) { attemptIndex ->
                 if (!isActive()) return@coIO
-                if (attemptIndex > 0) delay(1500)
+                if (attemptIndex > 0) delay(3000)
 
                 val hostname = hostnameProvider().trim()
                 val httpPort = httpPortProvider()

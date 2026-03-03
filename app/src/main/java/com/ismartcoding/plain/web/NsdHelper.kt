@@ -8,9 +8,11 @@ import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.TempData
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import java.net.InetAddress
 import java.net.NetworkInterface
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.jmdns.JmDNS
 import javax.jmdns.ServiceInfo
 
@@ -28,6 +30,8 @@ object NsdHelper {
     // All JmDNS instances (one per physical network interface)
     private var jmDNSInstances: List<JmDNS> = emptyList()
     private var unregisterJob: Job? = null
+    // Prevents concurrent registerServices() calls that would stack up JmDNS threads
+    private val registering = AtomicBoolean(false)
     
     private data class ServiceDescriptor(
         val type: String,
@@ -49,7 +53,19 @@ object NsdHelper {
      * Returns true if at least one registration path succeeded.
      */
     fun registerServices(context: Context, httpPort: Int?, httpsPort: Int?): Boolean {
-        unregisterService()
+        if (!registering.compareAndSet(false, true)) {
+            LogCat.d("registerServices already in progress, skipping")
+            return false
+        }
+        try {
+        return registerServicesInternal(context, httpPort, httpsPort)
+        } finally {
+            registering.set(false)
+        }
+    }
+
+    private fun registerServicesInternal(context: Context, httpPort: Int?, httpsPort: Int?): Boolean {
+        unregisterService(waitForJmDns = true)
 
         val hostname = TempData.mdnsHostname
         val services = buildList {
@@ -187,6 +203,10 @@ object NsdHelper {
                 instances.add(instance)
                 LogCat.d("Registered JmDNS service on $ip (${TempData.mdnsHostname})")
                 anyOk = true
+            } catch (e: OutOfMemoryError) {
+                // JmDNS spawns Timer/Thread objects; if the system is out of threads we
+                // must not crash — log and give up on this interface.
+                LogCat.e("OOM creating JmDNS on $ip (too many threads?): ${e.message}")
             } catch (e: Exception) {
                 LogCat.e("Failed to register JmDNS on $ip: ${e.message}")
             }
@@ -199,35 +219,59 @@ object NsdHelper {
     }
     
     /**
-     * Unregister the service when no longer needed
+     * Unregister the service when no longer needed.
+     *
+     * @param waitForJmDns when true, blocks the calling thread until all JmDNS instances have
+     *   been closed.  This MUST be true when called before creating new JmDNS instances so that
+     *   old Timer/Thread objects are fully destroyed before new ones are spawned — preventing
+     *   thread exhaustion (OOM: pthread_create failed).
      */
-    fun unregisterService() {
+    fun unregisterService(waitForJmDns: Boolean = false) {
         val listeners = registrationListeners.toList().also { registrationListeners.clear() }
         val instances = jmDNSInstances.also {
             jmDNSInstances = emptyList()
             jmDNS = null
         }
 
-        // Do NOT cancel a running unregister job. Each call owns its own snapshot of
-        // listeners (taken above) so concurrent jobs work on disjoint sets — cancelling
-        // the previous job would leave its listeners permanently registered with NSD.
+        // NSD unregister is always fire-and-forget (async via Android's NsdManager).
+        listeners.forEach { l ->
+            runCatching { nsdManager?.unregisterService(l) }
+                .onFailure { LogCat.e("Failed to unregister Android NSD service: ${it.message}") }
+        }
+        if (listeners.isNotEmpty()) LogCat.d("Unregistered Android NSD service(s): ${listeners.size}")
 
-        unregisterJob = coIO {
-            listeners.forEach { l ->
-                runCatching { nsdManager?.unregisterService(l) }
-                    .onFailure { LogCat.e("Failed to unregister Android NSD service: ${it.message}") }
-            }
-            if (listeners.isNotEmpty()) LogCat.d("Unregistered Android NSD service(s): ${listeners.size}")
+        if (instances.isEmpty()) return
 
-            instances.forEach { j ->
-                runCatching {
-                    withTimeout(5_000) {
-                        runCatching { j.unregisterAllServices() }
-                        runCatching { j.close() }
+        if (waitForJmDns) {
+            // Block until all JmDNS threads/timers have stopped before the caller creates new
+            // ones.  Without this the old Timer threads keep running and we exhaust the OS
+            // thread limit, triggering OOM: pthread_create failed.
+            runBlocking {
+                instances.forEach { j ->
+                    runCatching {
+                        withTimeout(5_000) {
+                            runCatching { j.unregisterAllServices() }
+                            runCatching { j.close() }
+                        }
                     }
+                        .onSuccess { LogCat.d("Closed JmDNS instance (sync)") }
+                        .onFailure { LogCat.e("Failed to shutdown JmDNS (sync): ${it.message}") }
                 }
-                    .onSuccess { LogCat.d("Unregistered JmDNS instance") }
-                    .onFailure { LogCat.e("Failed to shutdown JmDNS: ${it.message}") }
+            }
+        } else {
+            // Do NOT cancel a running unregister job. Each call owns its own snapshot of
+            // instances so concurrent jobs work on disjoint sets.
+            unregisterJob = coIO {
+                instances.forEach { j ->
+                    runCatching {
+                        withTimeout(5_000) {
+                            runCatching { j.unregisterAllServices() }
+                            runCatching { j.close() }
+                        }
+                    }
+                        .onSuccess { LogCat.d("Closed JmDNS instance (async)") }
+                        .onFailure { LogCat.e("Failed to shutdown JmDNS (async): ${it.message}") }
+                }
             }
         }
     }
