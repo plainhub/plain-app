@@ -59,7 +59,6 @@ import androidx.compose.material3.MaterialTheme
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.ui.helpers.groupMediaByDate
 import com.ismartcoding.plain.ui.page.cast.CastDialog
-import com.ismartcoding.plain.ui.components.FileSortDialog
 import com.ismartcoding.plain.ui.components.ImageGridItem
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.CastViewModel
@@ -189,18 +188,6 @@ fun TabContentImages(
     }
 
     ViewImageBottomSheet(imagesVM, tagsVM, tagsMapState, tagsState, dragSelectState)
-
-    if (imagesVM.showSortDialog.value) {
-        FileSortDialog(imagesVM.sortBy, onSelected = {
-            scope.launch(Dispatchers.IO) {
-                ImageSortByPreference.putAsync(context, it)
-                imagesVM.sortBy.value = it
-                imagesVM.loadAsync(context, tagsVM)
-            }
-        }, onDismiss = {
-            imagesVM.showSortDialog.value = false
-        })
-    }
 
     MediaFoldersBottomSheet(imagesVM, mediaFoldersVM, tagsVM)
     if (imagesVM.showTagsDialog.value) {

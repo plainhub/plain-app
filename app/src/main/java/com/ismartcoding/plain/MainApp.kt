@@ -30,6 +30,7 @@ import com.ismartcoding.plain.preferences.HttpsPortPreference
 import com.ismartcoding.plain.preferences.HttpsPreference
 import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
 import com.ismartcoding.plain.preferences.MdnsHostnamePreference
+import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import com.ismartcoding.plain.preferences.PasswordPreference
 import com.ismartcoding.plain.preferences.SignatureKeyPreference
 import com.ismartcoding.plain.preferences.UrlTokenPreference
@@ -76,6 +77,7 @@ class MainApp : Application() {
             TempData.httpPort = HttpPortPreference.get(preferences)
             TempData.httpsPort = HttpsPortPreference.get(preferences)
             TempData.audioPlayMode = AudioPlayModePreference.getValue(preferences)
+            TempData.nearbyDiscoverable = NearbyDiscoverablePreference.getAsync(instance)
             val checkUpdateTime = CheckUpdateTimePreference.get(preferences)
             val autoCheckUpdate = AutoCheckUpdatePreference.get(preferences)
             ClientIdPreference.ensureValueAsync(instance, preferences)

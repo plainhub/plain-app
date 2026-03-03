@@ -127,10 +127,12 @@ object NearbyDiscoverManager {
                 val request = JsonHelper.jsonDecode<DPairingRequest>(payload)
                 sendEvent(PairingRequestReceivedEvent(request, senderIP))
             }
+
             NearbyMessageType.PAIR_RESPONSE -> {
                 val response = JsonHelper.jsonDecode<DPairingResponse>(payload)
                 coIO { NearbyPairManager.handlePairingResponse(response, senderIP) }
             }
+
             NearbyMessageType.PAIR_CANCEL -> {
                 val cancel = JsonHelper.jsonDecode<DPairingCancel>(payload)
                 NearbyPairManager.handlePairingCancel(cancel)
@@ -148,9 +150,15 @@ object NearbyDiscoverManager {
     private suspend fun handleDiscoverRequest(payload: String, senderIP: String) {
         try {
             val request = JsonHelper.jsonDecode<DDiscoverRequest>(payload)
-            val discoverable = NearbyDiscoverablePreference.getAsync(MainApp.instance)
-            if (discoverable || isDirectedQueryForUs(request)) {
-                sendDiscoverReply(senderIP)
+            if (request.toId.isNotEmpty()) {
+                if (isDirectedQueryForUs(request)) {
+                    sendDiscoverReply(senderIP)
+                }
+            } else {
+                val discoverable = NearbyDiscoverablePreference.getAsync(MainApp.instance)
+                if (discoverable) {
+                    sendDiscoverReply(senderIP)
+                }
             }
         } catch (e: Exception) {
             LogCat.e("Error handling discover request: ${e.message}")
@@ -198,16 +206,10 @@ object NearbyDiscoverManager {
 
         val peer = AppDatabase.instance.peerDao().getById(request.fromId)
         if (peer == null || peer.status != "paired") return false
-
-        return try {
-            val decrypted = CryptoHelper.chaCha20Decrypt(
-                peer.key,
-                Base64.decode(request.toId, Base64.NO_WRAP),
-            )
-            decrypted?.decodeToString() == TempData.clientId
-        } catch (e: Exception) {
-            LogCat.e("Error verifying directed query: ${e.message}")
-            false
-        }
+        val decrypted = CryptoHelper.chaCha20Decrypt(
+            peer.key,
+            Base64.decode(request.toId, Base64.NO_WRAP),
+        )
+        return decrypted?.decodeToString() == TempData.clientId
     }
 }

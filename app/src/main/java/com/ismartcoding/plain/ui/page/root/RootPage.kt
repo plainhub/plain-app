@@ -20,7 +20,8 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
-import com.ismartcoding.plain.ui.models.ChatListViewModel
+import com.ismartcoding.plain.ui.models.ChannelViewModel
+import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
@@ -66,7 +67,8 @@ fun RootPage(
     audioPlaylistVM: AudioPlaylistViewModel = viewModel(key = "audioPlaylistVM"),
     audioFoldersVM: MediaFoldersViewModel = viewModel(key = "audioFoldersVM"),
     audioCastVM: CastViewModel = viewModel(key = "audioCastVM"),
-    chatListVM: ChatListViewModel = viewModel(key = "chatListVM"),
+    peerVM: PeerViewModel = viewModel(key = "peerVM"),
+    channelVM: ChannelViewModel = viewModel(key = "channelVM"),
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -202,7 +204,7 @@ fun RootPage(
                 RootTabType.CHAT.value -> {
                     TopBarChat(
                         navController = navController,
-                        chatListVM = chatListVM,
+                        channelVM = channelVM,
                     )
                 }
             }
@@ -287,7 +289,8 @@ fun RootPage(
                         TabContentChat(
                             navController = navController,
                             mainVM = mainVM,
-                            chatListVM = chatListVM,
+                            peerVM = peerVM,
+                            channelVM = channelVM,
                             paddingValues = paddingValues,
                             pagerState = pagerState,
                         )

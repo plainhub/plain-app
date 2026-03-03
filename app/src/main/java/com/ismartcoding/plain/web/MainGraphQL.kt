@@ -39,6 +39,8 @@ import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
+import com.ismartcoding.plain.db.DMessageDeliveryResult
+import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DataType
@@ -803,10 +805,23 @@ class MainGraphQL(val schema: Schema) {
                                 }
                             }
                         } else if (isPeer && peer != null) {
-                            val success = PeerChatHelper.sendToPeerAsync(peer, item.content)
-                            val status = if (success) "sent" else "failed"
-                            ChatDbHelper.updateStatusAsync(item.id, status)
-                            item.status = status
+                            val error = PeerChatHelper.sendToPeerAsync(peer, item.content)
+                            val statusData = if (error == null) {
+                                DMessageStatusData()
+                            } else {
+                                DMessageStatusData(
+                                    listOf(
+                                        DMessageDeliveryResult(
+                                            peerId = peer.id,
+                                            peerName = peer.name,
+                                            error = error,
+                                        ),
+                                    ),
+                                )
+                            }
+                            ChatDbHelper.updateStatusAndDataAsync(item.id, statusData)
+                            item.status = if (error == null) "sent" else "failed"
+                            item.statusData = if (error == null) "" else jsonEncode(statusData)
                         }
                         sendEvent(HttpApiEvents.MessageCreatedEvent(if (isChannel) channelId else if (isPeer) peerId else toId, arrayListOf(item)))
                         arrayListOf(item).map { it.toModel() }

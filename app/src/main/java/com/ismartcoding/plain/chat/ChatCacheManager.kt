@@ -34,10 +34,13 @@ object ChatCacheManager {
             }
         }
 
-        // Load keys from chat_channels table
+        // Load keys from chat_channels table (only active channels)
         val channels = AppDatabase.instance.chatChannelDao().getAll()
         channels.forEach { channel ->
-            channelKeyCache[channel.id] = Base64.decode(channel.key, Base64.NO_WRAP)
+            // Exclude left/kicked channels so we reject incoming messages
+            if (channel.status == "joined") {
+                channelKeyCache[channel.id] = Base64.decode(channel.key, Base64.NO_WRAP)
+            }
         }
     }
 

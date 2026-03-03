@@ -112,6 +112,7 @@ fun ChatListItem(
                 ) {
                     ChatName(
                         m = m,
+                        isPeerChat = peer != null,
                         onRetry = {
                             // Retry failed message using ViewModel
                             chatVM.retryMessage(m.id)
@@ -217,17 +218,29 @@ fun ChatListItem(
         }
         VerticalSpace(4.dp)
 
-        // Delivery status dialog (channel messages)
+        // Delivery status dialog (channel and peer-to-peer messages)
         showDeliveryDialog.value?.let { statusData ->
-            DeliveryStatusDialog(
-                statusData = statusData,
-                onResend = { peerIds ->
-                    chatVM.resendToMembers(m.id, peerIds)
-                },
-                onDismiss = {
-                    showDeliveryDialog.value = null
-                },
-            )
+            if (peer != null) {
+                PeerDeliveryStatusDialog(
+                    statusData = statusData,
+                    onRetry = {
+                        chatVM.retryMessage(m.id)
+                    },
+                    onDismiss = {
+                        showDeliveryDialog.value = null
+                    },
+                )
+            } else {
+                ChannelDeliveryStatusDialog(
+                    statusData = statusData,
+                    onResend = { peerIds ->
+                        chatVM.resendToMembers(m.id, peerIds)
+                    },
+                    onDismiss = {
+                        showDeliveryDialog.value = null
+                    },
+                )
+            }
         }
     }
 }

@@ -32,7 +32,6 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
     var bucketId = mutableStateOf("")
     var showLoading = mutableStateOf(true)
     var hasPermission = mutableStateOf(false)
-    val showSortDialog = mutableStateOf(false)
     var total = mutableIntStateOf(0)
     var totalTrash = mutableIntStateOf(0)
     val showFoldersDialog = mutableStateOf(false)

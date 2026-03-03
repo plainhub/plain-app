@@ -124,6 +124,22 @@ object PeerGraphQLClient {
     }
 
     /**
+     * Send a ping to the peer to check if they are reachable and still paired.
+     * Returns true only when the peer responds successfully with our shared key,
+     * which means they haven't unbound yet.
+     */
+    suspend fun ping(peer: DPeer, clientId: String): Boolean {
+        val query = """{ ping }"""
+        val response = execute(
+            peer = peer,
+            clientId = clientId,
+            query = query,
+            variables = emptyMap()
+        )
+        return response?.isSuccess == true
+    }
+
+    /**
      * Core execution: signs, encrypts and sends a GraphQL request to [peer].
      *
      * @param encryptionKey  ChaCha20 key – either [DPeer.key] (peer chat) or

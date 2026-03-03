@@ -28,21 +28,12 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DMessageDeliveryResult
 import com.ismartcoding.plain.db.DMessageStatusData
 
-/**
- * Dialog that shows per-member delivery status for a channel message.
- *
- * - Delivered members are shown with a green check.
- * - Failed members are shown with a red warning icon, their truncated error message,
- *   and a pre-checked checkbox. Users may deselect members they do not want to retry.
- * - "Resend selected" triggers [onResend] with the list of selected peer IDs.
- */
 @Composable
-fun DeliveryStatusDialog(
+fun ChannelDeliveryStatusDialog(
     statusData: DMessageStatusData,
     onResend: (peerIds: List<String>) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    // Pre-select all failed members by default
     val selectedIds = remember {
         mutableStateListOf<String>().apply {
             addAll(statusData.failedResults.map { it.peerId })
@@ -75,13 +66,11 @@ fun DeliveryStatusDialog(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
-                // Delivered members first
                 items(statusData.deliveredResults, key = { "d_${it.peerId}" }) { result ->
-                    DeliveryResultRow(result = result, isSelected = false, onToggle = null)
+                    ChannelDeliveryResultRow(result = result, isSelected = false, onToggle = null)
                 }
-                // Failed members
                 items(statusData.failedResults, key = { "f_${it.peerId}" }) { result ->
-                    DeliveryResultRow(
+                    ChannelDeliveryResultRow(
                         result = result,
                         isSelected = selectedIds.contains(result.peerId),
                         onToggle = {
@@ -115,7 +104,7 @@ fun DeliveryStatusDialog(
 }
 
 @Composable
-private fun DeliveryResultRow(
+private fun ChannelDeliveryResultRow(
     result: DMessageDeliveryResult,
     isSelected: Boolean,
     onToggle: (() -> Unit)?,
@@ -128,7 +117,6 @@ private fun DeliveryResultRow(
         verticalAlignment = Alignment.Top,
     ) {
         if (isSuccess) {
-            // Green check icon aligned with first line
             Icon(
                 painter = painterResource(R.drawable.check),
                 contentDescription = null,
@@ -138,7 +126,6 @@ private fun DeliveryResultRow(
                     .padding(top = 1.dp),
             )
         } else {
-            // Checkbox (pre-selected) for failed members
             Checkbox(
                 checked = isSelected,
                 onCheckedChange = { onToggle?.invoke() },

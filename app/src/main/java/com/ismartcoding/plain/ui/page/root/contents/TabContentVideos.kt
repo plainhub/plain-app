@@ -58,7 +58,7 @@ import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.page.cast.CastDialog
-import com.ismartcoding.plain.ui.components.FileSortDialog
+
 import com.ismartcoding.plain.ui.components.VideoGridItem
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.CastViewModel
@@ -189,18 +189,6 @@ fun TabContentVideos(
     }
 
     ViewVideoBottomSheet(videosVM, tagsVM, tagsMapState, tagsState, dragSelectState)
-
-    if (videosVM.showSortDialog.value) {
-        FileSortDialog(videosVM.sortBy, onSelected = {
-            scope.launch(Dispatchers.IO) {
-                VideoSortByPreference.putAsync(context, it)
-                videosVM.sortBy.value = it
-                videosVM.loadAsync(context, tagsVM)
-            }
-        }, onDismiss = {
-            videosVM.showSortDialog.value = false
-        })
-    }
 
     MediaFoldersBottomSheet(videosVM, mediaFoldersVM, tagsVM)
     if (videosVM.showTagsDialog.value) {

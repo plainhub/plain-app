@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.ui.base.PDialogListItem
-import com.ismartcoding.plain.ui.models.ChatListViewModel
+import com.ismartcoding.plain.ui.models.PeerViewModel
 
 sealed class ForwardTarget {
     data class Peer(val peer: DPeer) : ForwardTarget()
@@ -25,11 +25,11 @@ sealed class ForwardTarget {
 
 @Composable
 fun ForwardTargetDialog(
-    chatListVM: ChatListViewModel,
+    peerVM: PeerViewModel,
     onDismiss: () -> Unit,
     onTargetSelected: (ForwardTarget) -> Unit
 ) {
-    val pairedPeers = chatListVM.pairedPeers
+    val pairedPeers = peerVM.pairedPeers
     
     AlertDialog(
         containerColor = MaterialTheme.colorScheme.surface,

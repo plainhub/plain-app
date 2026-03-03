@@ -62,6 +62,7 @@ import com.ismartcoding.plain.events.IgnoreBatteryOptimizationResultEvent
 import com.ismartcoding.plain.events.PairingCancelledEvent
 import com.ismartcoding.plain.events.PairingRequestReceivedEvent
 import com.ismartcoding.plain.events.PairingResponseEvent
+import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.PickFileEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
@@ -94,7 +95,8 @@ import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.helpers.FilePickHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
-import com.ismartcoding.plain.ui.models.ChatListViewModel
+import com.ismartcoding.plain.ui.models.ChannelViewModel
+import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
@@ -123,7 +125,8 @@ class MainActivity : AppCompatActivity() {
     private val mainVM: MainViewModel by viewModels()
     private val audioPlaylistVM: AudioPlaylistViewModel by viewModels()
     val pomodoroVM: PomodoroViewModel by viewModels()
-    private val chatListVM: ChatListViewModel by viewModels()
+    private val peerVM: PeerViewModel by viewModels()
+    private val channelVM: ChannelViewModel by viewModels()
     private val chatVM: ChatViewModel by viewModels()
     private val navControllerState = mutableStateOf<NavHostController?>(null)
 
@@ -324,11 +327,11 @@ class MainActivity : AppCompatActivity() {
             SettingsProvider {
                 Main(navControllerState, onLaunched = {
                     handleIntent(intent)
-                }, mainVM, audioPlaylistVM, pomodoroVM, chatVM = chatVM, chatListVM = chatListVM)
+                }, mainVM, audioPlaylistVM, pomodoroVM, chatVM = chatVM, peerVM = peerVM, channelVM = channelVM)
 
                 if (showForwardTargetDialog) {
                     ForwardTargetDialog(
-                        chatListVM = chatListVM,
+                        peerVM = peerVM,
                         onDismiss = {
                             showForwardTargetDialog = false
                             pendingFileUris = null
@@ -675,10 +678,10 @@ class MainActivity : AppCompatActivity() {
                                         )
                                     )
                                     .setPositiveButton(getString(R.string.accept)) { _, _ ->
-                                        chatListVM.acceptChannelInvite(event.channelId)
+                                        channelVM.acceptChannelInvite(event.channelId)
                                     }
                                     .setNegativeButton(getString(R.string.decline)) { _, _ ->
-                                        chatListVM.declineChannelInvite(this@MainActivity, event.channelId)
+                                        channelVM.declineChannelInvite(this@MainActivity, event.channelId)
                                     }
                                     .setCancelable(false)
                                     .create()
@@ -704,6 +707,13 @@ class MainActivity : AppCompatActivity() {
                         } catch (e: Exception) {
                             LogCat.e("Error closing pairing dialog: ${e.message}")
                             pairingRequestDialog = null
+                        }
+                    }
+
+                    is PairingSuccessEvent -> {
+                        withIO { peerVM.loadPeers() }
+                        navControllerState.value?.navigate(Routing.Chat("peer:${event.deviceId}")) {
+                            popUpTo<Routing.Nearby> { inclusive = true }
                         }
                     }
                 }
@@ -799,7 +809,7 @@ class MainActivity : AppCompatActivity() {
             val uri = intent.parcelable(Intent.EXTRA_STREAM) as? Uri ?: return
             coMain {
                 DialogHelper.showLoading()
-                withIO { chatListVM.loadPeers() }
+                withIO { peerVM.loadPeers() }
                 DialogHelper.hideLoading()
                 pendingFileUris = setOf(uri)
                 showForwardTargetDialog = true
@@ -809,7 +819,7 @@ class MainActivity : AppCompatActivity() {
             if (uris != null) {
                 coMain {
                     DialogHelper.showLoading()
-                    withIO { chatListVM.loadPeers() }
+                    withIO { peerVM.loadPeers() }
                     DialogHelper.hideLoading()
                     pendingFileUris = uris.toSet()
                     showForwardTargetDialog = true

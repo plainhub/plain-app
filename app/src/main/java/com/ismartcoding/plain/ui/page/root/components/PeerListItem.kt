@@ -54,6 +54,7 @@ fun PeerListItem(
     onClick: () -> Unit = {},
 ) {
     val showContextMenu = remember { mutableStateOf(false) }
+    val deleteDeleteText = stringResource(id = R.string.delete_device)
     val deleteText = stringResource(id = R.string.delete)
     val deleteWarningText = stringResource(id = R.string.delete_peer_warning)
     val cancelText = stringResource(id = R.string.cancel)
@@ -153,11 +154,11 @@ fun PeerListItem(
                         },
                     ) {
                         PDropdownMenuItem(
-                            text = { Text(deleteText) },
+                            text = { Text(deleteDeleteText) },
                             onClick = {
                                 showContextMenu.value = false
                                 DialogHelper.showConfirmDialog(
-                                    title = deleteText,
+                                    title = deleteDeleteText,
                                     message = deleteWarningText,
                                     confirmButton = Pair(deleteText) {
                                         onDelete(peerId)

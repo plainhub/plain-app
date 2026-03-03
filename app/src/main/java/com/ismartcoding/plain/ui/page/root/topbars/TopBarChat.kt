@@ -17,7 +17,7 @@ import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.ui.base.ActionButtonFolders
 import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
-import com.ismartcoding.plain.ui.models.ChatListViewModel
+import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.nav.navigateFiles
 
@@ -25,7 +25,7 @@ import com.ismartcoding.plain.ui.nav.navigateFiles
 @Composable
 fun TopBarChat(
     navController: NavHostController,
-    chatListVM: ChatListViewModel,
+    channelVM: ChannelViewModel,
 ) {
     val context = LocalContext.current
     val showMenu = remember { mutableStateOf(false) }
@@ -61,7 +61,7 @@ fun TopBarChat(
                         },
                         onClick = {
                             showMenu.value = false
-                            chatListVM.showCreateChannelDialog.value = true
+                            channelVM.showCreateChannelDialog.value = true
                         },
                     )
                     PDropdownMenuItem(

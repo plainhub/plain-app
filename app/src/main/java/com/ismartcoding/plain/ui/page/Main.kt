@@ -58,12 +58,14 @@ import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.chat.ChatDbHelper
+import com.ismartcoding.plain.events.ChannelUpdatedEvent
 import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.PToast
 import com.ismartcoding.plain.ui.base.ToastEvent
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
-import com.ismartcoding.plain.ui.models.ChatListViewModel
+import com.ismartcoding.plain.ui.models.ChannelViewModel
+import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.NotesViewModel
@@ -116,11 +118,13 @@ fun Main(
     mainVM: MainViewModel,
     audioPlaylistVM: AudioPlaylistViewModel,
     pomodoroVM: PomodoroViewModel,
+    chatVM: ChatViewModel,
+    peerVM: PeerViewModel,
+    channelVM: ChannelViewModel,
     notesVM: NotesViewModel = viewModel(key = "notesVM"),
     feedTagsVM: TagsViewModel = viewModel(key = "feedTagsVM"),
     noteTagsVM: TagsViewModel = viewModel(key = "noteTagsVM"),
-    chatVM: ChatViewModel = viewModel(key = "chatVM"),
-    chatListVM: ChatListViewModel = viewModel(key = "chatListVM"),
+
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -245,6 +249,14 @@ fun Main(
                         }
                     }
                 }
+
+                is ChannelUpdatedEvent -> {
+                    // ChannelViewModel and ChatViewModel each self-refresh via their own
+                    // ChannelUpdatedEvent listeners. Main.kt only needs to refresh the peer
+                    // list so that the latest-chat preview cache stays accurate.
+                    peerVM.loadPeers()
+                }
+
                 else -> {
                     // Handle other events if necessary
                 }
@@ -289,10 +301,10 @@ fun Main(
                 }
                 composable<Routing.Chat> { backStackEntry ->
                     val r = backStackEntry.toRoute<Routing.Chat>()
-                    ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = chatVM, chatListVM = chatListVM, r.id)
+                    ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = chatVM, peerVM = peerVM, channelVM = channelVM, r.id)
                 }
                 composable<Routing.ChatInfo> {
-                    ChatInfoPage(navController, chatVM = chatVM, chatListVM = chatListVM)
+                    ChatInfoPage(navController, chatVM = chatVM, peerVM = peerVM, channelVM = channelVM)
                 }
                 composable<Routing.ScanHistory> { ScanHistoryPage(navController) }
                 composable<Routing.Scan> { ScanPage(navController) }

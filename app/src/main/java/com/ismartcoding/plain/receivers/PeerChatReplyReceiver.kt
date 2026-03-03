@@ -10,6 +10,8 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.chat.PeerChatHelper
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DMessageContent
+import com.ismartcoding.plain.db.DMessageDeliveryResult
+import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.chat.ChatDbHelper
@@ -34,13 +36,16 @@ class PeerChatReplyReceiver : BroadcastReceiver() {
             }
             val content = DMessageContent(DMessageType.TEXT.value, DMessageText(replyText))
             val item = ChatDbHelper.sendAsync(content, fromId = "me", toId = peerId, peer = peer)
-            val success = PeerChatHelper.sendToPeerAsync(peer, item.content)
-            val finalStatus = if (success) "sent" else "failed"
-            ChatDbHelper.updateStatusAsync(item.id, finalStatus)
-            if (success) {
-                LogCat.d("PeerChatReplyReceiver: reply sent to peer $peerId")
+            val error = PeerChatHelper.sendToPeerAsync(peer, item.content)
+            if (error != null) {
+                val statusData = DMessageStatusData(
+                    listOf(DMessageDeliveryResult(peer.id, peer.name, error))
+                )
+                ChatDbHelper.updateStatusAndDataAsync(item.id, statusData)
+                LogCat.e("PeerChatReplyReceiver: failed to send reply to peer $peerId: $error")
             } else {
-                LogCat.e("PeerChatReplyReceiver: failed to send reply to peer $peerId")
+                ChatDbHelper.updateStatusAsync(item.id, "sent")
+                LogCat.d("PeerChatReplyReceiver: reply sent to peer $peerId")
             }
             // Always cancel the notification so the reply spinner clears on MIUI and other OEMs.
             NotificationManagerCompat.from(context).cancel(notificationId)

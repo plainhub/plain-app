@@ -14,7 +14,6 @@ import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.DeviceType
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.SignatureHelper
 import kotlinx.serialization.Serializable
 
@@ -38,35 +37,25 @@ data class ChannelMember(
 @Entity(tableName = "chat_channels")
 data class DChatChannel(
     @PrimaryKey var id: String = StringHelper.shortUUID(),
-) : DEntityBase() {
-    @ColumnInfo(name = "name")
-    var name: String = ""
-
-    @ColumnInfo(name = "key")
-    var key: String = ""
-
+    @ColumnInfo(name = "name") var name: String = "",
+    @ColumnInfo(name = "key") var key: String = "",
     /** peer.id of the device that created this channel.
      *  Sentinel value "me" when this device is the owner. */
-    @ColumnInfo(name = "owner", defaultValue = "")
-    var owner: String = ""
-
+    @ColumnInfo(name = "owner", defaultValue = "") var owner: String = "",
     /** All channel members (both joined and pending).
      *  Each entry carries only the peer id and membership status;
      *  other metadata (name, publicKey, IP, port) lives in the `peers` table. */
-    @ColumnInfo(name = "members")
-    var members: List<ChannelMember> = emptyList()
-
+    @ColumnInfo(name = "members") var members: List<ChannelMember> = emptyList(),
     /** Monotonically increasing counter; incremented on every mutation.
      *  Receivers ignore updates whose version ≤ their local version. */
-    @ColumnInfo(name = "version", defaultValue = "0")
-    var version: Long = 0
-
-    @ColumnInfo(name = "status", defaultValue = STATUS_JOINED)
-    var status: String = STATUS_JOINED
+    @ColumnInfo(name = "version", defaultValue = "0") var version: Long = 0,
+    @ColumnInfo(name = "status", defaultValue = "joined") var status: String = STATUS_JOINED,
+) : DEntityBase() {
 
     // ── Helpers ─────────────────────────────────────────────────────
 
     fun memberIds(): List<String> = members.map { it.id }
+    fun memberIdsNotMe(): List<String> = members.filter { it.id != TempData.clientId }.map { it.id }
 
     fun joinedMembers(): List<ChannelMember> = members.filter { it.isJoined() }
 

@@ -26,10 +26,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
-import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.preferences.LocalWeb
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
 import com.ismartcoding.plain.preferences.dataFlow
@@ -48,7 +46,8 @@ import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
-import com.ismartcoding.plain.ui.models.ChatListViewModel
+import com.ismartcoding.plain.ui.models.ChannelViewModel
+import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.CreateChannelDialog
@@ -64,21 +63,21 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import okhttp3.Request
-import java.util.concurrent.TimeUnit
+import com.ismartcoding.plain.chat.PeerGraphQLClient
 
 @Composable
 fun TabContentChat(
     navController: NavHostController,
     mainVM: MainViewModel,
-    chatListVM: ChatListViewModel,
+    peerVM: PeerViewModel,
+    channelVM: ChannelViewModel,
     paddingValues: PaddingValues,
     pagerState: PagerState
 ) {
     val context = LocalContext.current
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
-    val pairedPeers = chatListVM.pairedPeers
-    val unpairedPeers = chatListVM.unpairedPeers
+    val pairedPeers = peerVM.pairedPeers
+    val unpairedPeers = peerVM.unpairedPeers
     val webEnabled = LocalWeb.current
 
     val scope = rememberCoroutineScope()
@@ -95,15 +94,15 @@ fun TabContentChat(
     }.collectAsStateValue(initial = NearbyDiscoverablePreference.default)
 
     val refreshState = rememberRefreshLayoutState {
-        chatListVM.loadPeers()
+        peerVM.loadPeers()
         setRefreshState(RefreshContentState.Finished)
     }
 
-    var showCreateChannelDialog by chatListVM.showCreateChannelDialog
+    var showCreateChannelDialog by channelVM.showCreateChannelDialog
     var renameChannelId by remember { mutableStateOf<String?>(null) }
     var renameChannelName by remember { mutableStateOf("") }
-    var manageMembersChannelId by chatListVM.manageMembersChannelId
-    val channels = chatListVM.channels
+    var manageMembersChannelId by channelVM.manageMembersChannelId
+    val channels = channelVM.channels.collectAsStateValue()
 
     // Monitor app lifecycle
     DisposableEffect(lifecycleOwner) {
@@ -150,7 +149,7 @@ fun TabContentChat(
     }
 
     LaunchedEffect(Unit) {
-        chatListVM.loadPeers()
+        peerVM.loadPeers()
     }
 
     // Device discovery timer with dynamic interval
@@ -165,21 +164,15 @@ fun TabContentChat(
                         try {
                             if (peer.ip.isNotEmpty() && peer.port > 0) {
                                 try {
-                                    val bestIp = peer.getBestIp()
-                                    val client = HttpClientManager.createUnsafeOkHttpClient()
-                                        .newBuilder()
-                                        .connectTimeout(3, TimeUnit.SECONDS)
-                                        .readTimeout(3, TimeUnit.SECONDS)
-                                        .build()
-                                    val request = Request.Builder()
-                                        .url(UrlHelper.getHealthCheckHttpsUrl(bestIp, peer.port))
-                                        .get()
-                                        .build()
-                                    if (client.newCall(request).execute().use { it.isSuccessful }) {
-                                        chatListVM.updatePeerLastActive(peer.id)
+                                    if (PeerGraphQLClient.ping(peer, peer.id)) {
+                                        peerVM.updatePeerLastActive(peer.id)
+                                    } else {
+                                        // Peer is reachable but rejected our key (unbound)
+                                        LogCat.d("Ping rejected by ${peer.ip}:${peer.port} - peer may have unbound")
+                                        NearbyDiscoverManager.discoverSpecificDevice(peer.id, key)
                                     }
                                 } catch (e: Exception) {
-                                    LogCat.d("Health check failed for ${peer.ip}:${peer.port} - ${e.message}")
+                                    LogCat.d("Ping failed for ${peer.ip}:${peer.port} - ${e.message}")
                                     NearbyDiscoverManager.discoverSpecificDevice(peer.id, key)
                                 }
                             } else {
@@ -248,7 +241,7 @@ fun TabContentChat(
                                 activated = isDiscoverable
                             )
                             { enabled ->
-                                chatListVM.updateDiscoverable(context, enabled)
+                                peerVM.updateDiscoverable(context, enabled)
                             }
                         }
                     )
@@ -264,7 +257,7 @@ fun TabContentChat(
                     title = stringResource(R.string.local_chat),
                     desc = stringResource(R.string.local_chat_desc),
                     icon = R.drawable.bot,
-                    latestChat = chatListVM.getLatestChat("local"),
+                    latestChat = peerVM.getLatestChat("local"),
                     modifier = PlainTheme
                         .getCardModifier(),
                     onClick = {
@@ -287,21 +280,6 @@ fun TabContentChat(
                     val isOwner = channel.owner == "me"
                     ChannelListItem(
                         name = channel.name,
-                        channelId = channel.id,
-                        isOwner = isOwner,
-                        onDelete = if (isOwner) { { channelId ->
-                            chatListVM.removeChannel(context, channelId)
-                        } } else null,
-                        onRename = if (isOwner) { { channelId ->
-                            renameChannelId = channelId
-                            renameChannelName = channel.name
-                        } } else null,
-                        onManageMembers = if (isOwner) { { channelId ->
-                            manageMembersChannelId = channelId
-                        } } else null,
-                        onLeave = if (!isOwner) { { channelId ->
-                            chatListVM.leaveChannel(context, channelId)
-                        } } else null,
                         onClick = {
                             navController.navigate(Routing.Chat("channel:${channel.id}"))
                         },
@@ -313,7 +291,7 @@ fun TabContentChat(
 
             if (pairedPeers.isNotEmpty()) {
                 item {
-                    VerticalSpace(dp = 16.dp)
+                    VerticalSpace(dp = 8.dp)
                     Subtitle(stringResource(R.string.paired_devices))
                 }
 
@@ -325,11 +303,11 @@ fun TabContentChat(
                         title = peer.name,
                         desc = peer.getBestIp(),
                         icon = DeviceType.fromValue(peer.deviceType).getIcon(),
-                        online = chatListVM.getPeerOnlineStatus(peer.id),
-                        latestChat = chatListVM.getLatestChat(peer.id),
+                        online = peerVM.getPeerOnlineStatus(peer.id),
+                        latestChat = peerVM.getLatestChat(peer.id),
                         peerId = peer.id,
                         onDelete = { peerId ->
-                            chatListVM.removePeer(context, peerId)
+                            peerVM.removePeer(context, peerId)
                         },
                         onClick = {
                             navController.navigate(Routing.Chat("peer:${peer.id}"))
@@ -354,11 +332,11 @@ fun TabContentChat(
                         title = peer.name,
                         desc = peer.ip,
                         icon = DeviceType.fromValue(peer.deviceType).getIcon(),
-                        online = chatListVM.getPeerOnlineStatus(peer.id),
-                        latestChat = chatListVM.getLatestChat(peer.id),
+                        online = peerVM.getPeerOnlineStatus(peer.id),
+                        latestChat = peerVM.getLatestChat(peer.id),
                         peerId = peer.id,
                         onDelete = { peerId ->
-                            chatListVM.removePeer(context, peerId)
+                            peerVM.removePeer(context, peerId)
                         },
                         onClick = {
                             navController.navigate(Routing.Chat("peer:${peer.id}"))
@@ -380,7 +358,7 @@ fun TabContentChat(
             onDismiss = { showCreateChannelDialog = false },
             onConfirm = { name ->
                 showCreateChannelDialog = false
-                chatListVM.createChannel(name)
+                channelVM.createChannel(name)
             }
         )
     }
@@ -392,7 +370,7 @@ fun TabContentChat(
             onConfirm = { newName ->
                 val id = renameChannelId!!
                 renameChannelId = null
-                chatListVM.renameChannel(id, newName)
+                channelVM.renameChannel(id, newName)
             }
         )
     }
@@ -401,12 +379,12 @@ fun TabContentChat(
     if (managedChannel != null) {
         ChannelMembersDialog(
             channel = managedChannel,
-            pairedPeers = chatListVM.pairedPeers.toList(),
+            pairedPeers = peerVM.pairedPeers.toList(),
             onAddMember = { peerId ->
-                chatListVM.addChannelMember(managedChannel.id, peerId)
+                channelVM.addChannelMember(managedChannel.id, peerId)
             },
             onRemoveMember = { peerId ->
-                chatListVM.removeChannelMember(managedChannel.id, peerId)
+                channelVM.removeChannelMember(managedChannel.id, peerId)
             },
             onDismiss = { manageMembersChannelId = null },
         )

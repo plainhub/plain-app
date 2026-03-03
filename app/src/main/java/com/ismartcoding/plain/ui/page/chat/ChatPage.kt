@@ -59,7 +59,6 @@ import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
-import com.ismartcoding.plain.events.ChannelUpdatedEvent
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.PickFileResultEvent
@@ -87,8 +86,10 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
-import com.ismartcoding.plain.ui.models.ChatListViewModel
+import com.ismartcoding.plain.ui.models.ChannelViewModel
+import com.ismartcoding.plain.ui.models.ChatType
 import com.ismartcoding.plain.ui.models.ChatViewModel
+import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import com.ismartcoding.plain.ui.models.isAllSelected
@@ -110,12 +111,14 @@ fun ChatPage(
     navController: NavHostController,
     audioPlaylistVM: AudioPlaylistViewModel,
     chatVM: ChatViewModel,
-    chatListVM: ChatListViewModel,
+    peerVM: PeerViewModel,
+    channelVM: ChannelViewModel,
     id: String = "",
 ) {
     val context = LocalContext.current
     val itemsState = chatVM.itemsFlow.collectAsState()
     val chatState = chatVM.chatState.collectAsState()
+    val channelsState = channelVM.channels.collectAsState()
     val scope = rememberCoroutineScope()
     var inputValue by remember { mutableStateOf("") }
     var showForwardDialog by remember { mutableStateOf(false) }
@@ -164,7 +167,7 @@ fun ChatPage(
             chatVM.initializeChatStateAsync(id)
             chatVM.fetchAsync(chatVM.chatState.value.toId)
         }
-        chatListVM.loadPeers()
+        peerVM.loadPeers()
     }
 
     LaunchedEffect(sharedFlow) {
@@ -189,12 +192,6 @@ fun ChatPage(
                     }
                     handleFileSelection(event, context, chatVM, scrollState, focusManager)
                 }
-
-                is ChannelUpdatedEvent -> {
-                    scope.launch(Dispatchers.IO) {
-                        chatVM.refreshChannelAsync()
-                    }
-                }
             }
         }
     }
@@ -213,9 +210,9 @@ fun ChatPage(
         LocaleHelper.getStringF(R.string.x_selected, "count", chatVM.selectedIds.size)
     } else {
         val state = chatState.value
-        val channel = state.channel
-        if (channel != null) {
-            "${state.toName} (${channel.joinedMembers().size})"
+        if (state.chatType == ChatType.CHANNEL) {
+            val channel = channelsState.value.find { it.id == state.toId }
+            if (channel != null) "${state.toName} (${channel.joinedMembers().size})" else state.toName
         } else {
             state.toName
         }
@@ -295,7 +292,8 @@ fun ChatPage(
                                 audioPlaylistVM,
                                 itemsState.value,
                                 m = m,
-                                peer = chatState.value.peer ?: ChatCacheManager.peerMap[m.fromId],
+                                peer = (if (chatState.value.chatType == ChatType.PEER) ChatCacheManager.peerMap[chatState.value.toId] else null)
+                                ?: ChatCacheManager.peerMap[m.fromId],
                                 index = index,
                                 imageWidthDp = imageWidthDp,
                                 imageWidthPx = imageWidthPx.value,
@@ -311,8 +309,8 @@ fun ChatPage(
                     }
                 }
             }
-            val peer = chatState.value.peer
-            val channel = chatState.value.channel
+            val peer = if (chatState.value.chatType == ChatType.PEER) ChatCacheManager.peerMap[chatState.value.toId] else null
+            val channel = if (chatState.value.chatType == ChatType.CHANNEL) channelsState.value.find { it.id == chatState.value.toId } else null
             val channelInactive = channel != null &&
                 (channel.status == DChatChannel.STATUS_LEFT || channel.status == DChatChannel.STATUS_KICKED)
             if (channelInactive) {
@@ -323,7 +321,7 @@ fun ChatPage(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = if (channel!!.status == DChatChannel.STATUS_KICKED)
+                        text = if (channel.status == DChatChannel.STATUS_KICKED)
                             stringResource(R.string.channel_kicked_notice)
                         else
                             stringResource(R.string.channel_left_notice),
@@ -359,7 +357,7 @@ fun ChatPage(
 
     if (showForwardDialog) {
         ForwardTargetDialog(
-            chatListVM = chatListVM,
+            peerVM = peerVM,
             onDismiss = {
                 showForwardDialog = false
                 messageToForward = null

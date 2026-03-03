@@ -28,6 +28,7 @@ import com.ismartcoding.plain.db.DMessageText
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
+import com.ismartcoding.plain.events.ChannelUpdatedEvent
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.PeerUpdatedEvent
@@ -41,13 +42,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
+
+enum class ChatType { LOCAL, PEER, CHANNEL }
 
 data class ChatState(
     val toId: String = "",
     val toName: String = "",
-    val peer: DPeer? = null,
-    val channel: DChatChannel? = null,
+    val chatType: ChatType = ChatType.LOCAL,
     /** Set of peer ids known to be online; used for leader election. */
     val onlinePeerIds: Set<String> = emptySet(),
 )
@@ -69,9 +72,18 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
                     is PeerUpdatedEvent -> {
                         // Keep cache entry up-to-date for this peer
                         ChatCacheManager.peerMap[event.peer.id] = event.peer
-                        val currentPeer = _chatState.value.peer
-                        if (currentPeer != null && currentPeer.id == event.peer.id) {
-                            _chatState.value = _chatState.value.copy(peer = event.peer, toName = event.peer.name)
+                        if (_chatState.value.chatType == ChatType.PEER && _chatState.value.toId == event.peer.id) {
+                            _chatState.value = _chatState.value.copy(toName = event.peer.name)
+                        }
+                    }
+                    is ChannelUpdatedEvent -> {
+                        if (_chatState.value.chatType != ChatType.CHANNEL) return@collect
+                        val channelId = _chatState.value.toId
+                        val updated = withContext(Dispatchers.IO) {
+                            AppDatabase.instance.chatChannelDao().getById(channelId)
+                        }
+                        _chatState.update { state ->
+                            state.copy(toName = updated?.name ?: state.toName)
                         }
                     }
                 }
@@ -80,59 +92,48 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     }
 
     suspend fun initializeChatStateAsync(chatId: String) {
-        var toId = ""
-        var peer: DPeer? = null
-        var channel: DChatChannel? = null
-        var toName = ""
-
         when {
             chatId.startsWith("peer:") -> {
-                toId = chatId.removePrefix("peer:")
-                peer = AppDatabase.instance.peerDao().getById(toId)
-                toName = peer?.name ?: ""
+                val toId = chatId.removePrefix("peer:")
+                val peer = AppDatabase.instance.peerDao().getById(toId)
+                _chatState.value = _chatState.value.copy(
+                    toId = toId,
+                    toName = peer?.name ?: "",
+                    chatType = ChatType.PEER,
+                )
             }
 
             chatId.startsWith("channel:") -> {
-                toId = chatId.removePrefix("channel:")
-                channel = AppDatabase.instance.chatChannelDao().getById(toId)
-                toName = channel?.name ?: ""
+                val toId = chatId.removePrefix("channel:")
+                val channel = AppDatabase.instance.chatChannelDao().getById(toId)
+                _chatState.value = _chatState.value.copy(
+                    toId = toId,
+                    toName = channel?.name ?: "",
+                    chatType = ChatType.CHANNEL,
+                )
             }
 
             else -> {
-                toId = "local"
-                toName = getString(R.string.local_chat)
+                _chatState.value = _chatState.value.copy(
+                    toId = "local",
+                    toName = getString(R.string.local_chat),
+                    chatType = ChatType.LOCAL,
+                )
             }
         }
-
-        _chatState.value = _chatState.value.copy(
-            toId = toId,
-            toName = toName,
-            peer = peer,
-            channel = channel
-        )
-    }
-
-    suspend fun refreshChannelAsync() {
-        val state = _chatState.value
-        val channelId = state.channel?.id ?: return
-        val updated = AppDatabase.instance.chatChannelDao().getById(channelId)
-        _chatState.value = state.copy(
-            channel = updated,
-            toName = updated?.name ?: state.toName
-        )
     }
 
     suspend fun fetchAsync(toId: String) {
         val state = _chatState.value
         val dao = AppDatabase.instance.chatDao()
-        val list = if (state.channel != null) {
-            dao.getByChannelId(state.channel.id)
+        val isChannel = state.chatType == ChatType.CHANNEL
+        val list = if (isChannel) {
+            dao.getByChannelId(state.toId)
         } else {
             dao.getByChatId(toId)
         }
-        val channel = state.channel
         _itemsFlow.value = list.sortedByDescending { it.createdAt }.map { chat ->
-            val fromName = if (channel != null && chat.fromId != "me") {
+            val fromName = if (isChannel && chat.fromId != "me") {
                 // Look up sender name from peers table (channel members no longer carry names)
                 AppDatabase.instance.peerDao().getById(chat.fromId)?.name ?: ""
             } else ""
@@ -145,18 +146,21 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
             val state = _chatState.value
 
             // Block sending to unpaired peers
-            if (state.peer != null && state.peer.status != "paired") {
-                onResult(false)
-                return@launch
+            if (state.chatType == ChatType.PEER) {
+                val peer = AppDatabase.instance.peerDao().getById(state.toId)
+                if (peer == null || peer.status != "paired") {
+                    onResult(false)
+                    return@launch
+                }
             }
 
             // Insert message with appropriate initial status
             val item = ChatDbHelper.sendAsync(
                 message = content,
                 fromId = "me",
-                toId = if (state.channel != null) "" else state.toId,
-                channelId = state.channel?.id ?: "",
-                peer = state.peer,
+                toId = if (state.chatType == ChatType.CHANNEL) "" else state.toId,
+                channelId = if (state.chatType == ChatType.CHANNEL) state.toId else "",
+                peer = if (state.chatType == ChatType.PEER) AppDatabase.instance.peerDao().getById(state.toId) else null,
                 isRemote = state.isRemote()
             )
 
@@ -204,11 +208,11 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
         } else {
             DMessageContent(DMessageType.FILES.value, DMessageFiles(files))
         }
-        val item = com.ismartcoding.plain.db.AppDatabase.instance.chatDao().let { dao ->
-            val chat = com.ismartcoding.plain.db.DChat()
+        val item = AppDatabase.instance.chatDao().let { dao ->
+            val chat = DChat()
             chat.fromId = "me"
-            chat.toId = if (state.channel != null) "" else state.toId
-            chat.channelId = state.channel?.id ?: ""
+            chat.toId = if (state.chatType == ChatType.CHANNEL) "" else state.toId
+            chat.channelId = if (state.chatType == ChatType.CHANNEL) state.toId else ""
             chat.content = content
             chat.status = "pending"
             dao.insert(chat)
@@ -272,7 +276,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     }
 
     /** Whether the current chat targets a remote destination (peer or channel). */
-    private fun ChatState.isRemote(): Boolean = peer != null || channel != null
+    private fun ChatState.isRemote(): Boolean = chatType != ChatType.LOCAL
 
     /**
      * Wraps the outcome of a remote delivery attempt.
@@ -290,25 +294,39 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
      * Returns [DeliveryOutcome] summarising success and per-member data.
      */
     private suspend fun deliverToRemoteAsync(state: ChatState, content: DMessageContent): DeliveryOutcome {
-        return when {
-            state.peer != null -> {
-                val success = PeerChatHelper.sendToPeerAsync(state.peer, content)
-                if (!success) triggerPeerRediscovery(state.peer.id)
-                DeliveryOutcome(success)
+        return when (state.chatType) {
+            ChatType.PEER -> {
+                val peer = AppDatabase.instance.peerDao().getById(state.toId)
+                    ?: return DeliveryOutcome(
+                        false,
+                        DMessageStatusData(listOf(DMessageDeliveryResult(state.toId, state.toId, "Peer not found")))
+                    )
+                val error = PeerChatHelper.sendToPeerAsync(peer, content)
+                if (error != null) {
+                    triggerPeerRediscovery(state.toId)
+                    return DeliveryOutcome(
+                        false,
+                        DMessageStatusData(listOf(DMessageDeliveryResult(peer.id, peer.name, error)))
+                    )
+                }
+                DeliveryOutcome(true)
             }
-            state.channel != null -> {
+
+            ChatType.CHANNEL -> {
+                val channel = AppDatabase.instance.chatChannelDao().getById(state.toId)
+                    ?: return DeliveryOutcome(false)
                 val statusData = ChannelChatHelper.sendAsync(
-                    channel = state.channel,
+                    channel = channel,
                     content = content,
                     onlinePeerIds = state.onlinePeerIds,
                 )
                 if (statusData == null) {
                     // No leader available — trigger rediscovery
-                    val leaderId = state.channel.electLeader(state.onlinePeerIds)
+                    val leaderId = channel.electLeader(state.onlinePeerIds)
                     if (leaderId != null && leaderId != TempData.clientId) {
                         triggerPeerRediscovery(leaderId)
                     } else {
-                        ChannelChatHelper.getRecipientIds(state.channel).forEach { memberId ->
+                        ChannelChatHelper.getRecipientIds(channel).forEach { memberId ->
                             triggerPeerRediscovery(memberId)
                         }
                     }
@@ -318,6 +336,7 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
                     DeliveryOutcome(success, statusData)
                 }
             }
+
             else -> DeliveryOutcome(true)
         }
     }
@@ -344,9 +363,15 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
                 JsonHelper.jsonEncode(outcome.statusData)
             else ""
         } else {
-            val newStatus = if (outcome.success) "sent" else "failed"
-            ChatDbHelper.updateStatusAsync(item.id, newStatus)
-            item.status = newStatus
+            if (outcome.success) {
+                // Clear any stale failure statusData so the error badge disappears
+                ChatDbHelper.updateStatusAndDataAsync(item.id, DMessageStatusData())
+                item.statusData = ""
+                item.status = "sent"
+            } else {
+                ChatDbHelper.updateStatusAsync(item.id, "failed")
+                item.status = "failed"
+            }
         }
         update(item)
     }
@@ -373,7 +398,8 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     fun resendToMembers(messageId: String, peerIds: List<String>) {
         viewModelScope.launch(Dispatchers.IO) {
             val state = _chatState.value
-            val channel = state.channel ?: return@launch
+            if (state.chatType != ChatType.CHANNEL) return@launch
+            val channel = AppDatabase.instance.chatChannelDao().getById(state.toId) ?: return@launch
             val item = ChatDbHelper.getAsync(messageId) ?: return@launch
 
             // Mark as pending to show progress
@@ -453,8 +479,8 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
     fun clearAllMessages(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             val state = _chatState.value
-            if (state.channel != null) {
-                ChatDbHelper.deleteAllChannelChatsAsync(context, state.channel.id)
+            if (state.chatType == ChatType.CHANNEL) {
+                ChatDbHelper.deleteAllChannelChatsAsync(context, state.toId)
             } else {
                 ChatDbHelper.deleteAllChatsAsync(context, state.toId)
             }
@@ -481,10 +507,18 @@ class ChatViewModel : ISelectableViewModel<VChat>, ViewModel() {
                 sendEvent(FetchLinkPreviewsEvent(newItem))
             }
 
-            val success = PeerChatHelper.sendToPeerAsync(targetPeer, newItem.content)
-            updateMessageStatus(newItem, DeliveryOutcome(success))
-            if (!success) triggerPeerRediscovery(targetPeer.id)
-            onResult(success)
+            val error = PeerChatHelper.sendToPeerAsync(targetPeer, newItem.content)
+            val outcome = if (error != null) {
+                triggerPeerRediscovery(targetPeer.id)
+                DeliveryOutcome(
+                    false,
+                    DMessageStatusData(listOf(DMessageDeliveryResult(targetPeer.id, targetPeer.name, error)))
+                )
+            } else {
+                DeliveryOutcome(true)
+            }
+            updateMessageStatus(newItem, outcome)
+            onResult(error == null)
         }
     }
 

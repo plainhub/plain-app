@@ -263,7 +263,7 @@
     <string name="language">Language</string>
     <string name="language_desc">English, Chinese and more</string>
     <string name="about">About</string>
-    <string name="about_desc">Client name, version, logs, donation</string>
+    <string name="about_desc">Client name, version, logs</string>
     <string name="require_confirmation">Require confirmation</string>
     <string name="web_console">Web on PC</string>
     <string name="web_service_required_for_chat">To receive messages from others, please enable Web on PC service.</string>
@@ -577,6 +577,7 @@
     <string name="app_restored">APP data is restored, you need to force quit this app and start the app again as new.</string>
     <string name="welcome_text">Welcome! You can easily send text, images, and videos to this page and view them on your computer.\nIf you encounter any issues, please feel free to send an email to ismartcoding@gmail.com for assistance or join our Discord discussion at: https://discord.gg/RQWcS6DEEe.</string>
     <string name="donation">Donation</string>
+    <string name="donation_desc">Support this app on Ko-fi</string>
     <string name="logs">Logs</string>
     <string name="restart_app_title">Restart app</string>
     <string name="http_server_failed">HTTP server started failed. To restart it, please tap the "Relaunch APP" button.</string>
@@ -702,6 +703,9 @@
     <string name="channel_invite_message">%1$s invited you to join channel \"%2$s\"</string>
     <string name="decline">Decline</string>
     <string name="pending_invite">Pending invite</string>
+    <string name="pending_members">Pending Members</string>
+    <string name="resend_invite">Resend Invite</string>
+    <string name="kick_member">Kick</string>
     <string name="delete_device">Delete Device</string>
     <string name="pair_devices_hint">Go to Nearby tab to pair with devices</string>
     <string name="add_device">Add device</string>

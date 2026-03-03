@@ -225,13 +225,6 @@ fun AboutPage(
                             title = stringResource(R.string.privacy_policy),
                             showMore = true,
                         )
-                        PListItem(
-                            modifier = Modifier.clickable {
-                                WebHelper.open(context, "https://ko-fi.com/ismartcoding")
-                            },
-                            title = stringResource(R.string.donation),
-                            showMore = true,
-                        )
                     }
                 }
                 item {

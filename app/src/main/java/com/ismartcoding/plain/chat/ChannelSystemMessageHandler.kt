@@ -3,6 +3,7 @@ package com.ismartcoding.plain.chat
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.ChannelMember
 import com.ismartcoding.plain.db.DChatChannel
@@ -43,8 +44,12 @@ object ChannelSystemMessageHandler {
         val dao = AppDatabase.instance.chatChannelDao()
         val peerDao = AppDatabase.instance.peerDao()
 
-        // Avoid duplicate processing
-        if (dao.getById(msg.channelId) != null) {
+        val existingChannel = dao.getById(msg.channelId)
+        val isReinvite = existingChannel != null &&
+            (existingChannel.status == DChatChannel.STATUS_LEFT || existingChannel.status == DChatChannel.STATUS_KICKED)
+
+        // Avoid duplicate processing for channels that are already active
+        if (existingChannel != null && !isReinvite) {
             LogCat.d("Channel ${msg.channelId} already exists locally, ignoring invite")
             return
         }
@@ -73,15 +78,28 @@ object ChannelSystemMessageHandler {
             }
         }
 
-        // Store channel locally with members carrying only id + status
-        val channel = DChatChannel()
-        channel.id = msg.channelId
-        channel.name = msg.channelName
-        channel.key = msg.key
-        channel.owner = fromId
-        channel.members = msg.members
-        channel.version = msg.version
-        dao.insert(channel)
+        if (isReinvite) {
+            // Re-invite after leaving or being kicked: update metadata and restore joined status
+            val channel = existingChannel
+            channel.name = msg.channelName
+            channel.key = msg.key
+            channel.owner = fromId
+            channel.members = msg.members
+            channel.version = msg.version
+            channel.status = DChatChannel.STATUS_JOINED
+            dao.update(channel)
+            LogCat.d("Re-invite for channel ${msg.channelId} (was ${existingChannel.status}), restored to joined")
+        } else {
+            // Store channel locally with members carrying only id + status
+            val channel = DChatChannel()
+            channel.id = msg.channelId
+            channel.name = msg.channelName
+            channel.key = msg.key
+            channel.owner = fromId
+            channel.members = msg.members
+            channel.version = msg.version
+            dao.insert(channel)
+        }
 
         // Refresh key cache so we can decrypt channel messages
         runBlocking(Dispatchers.IO) {
@@ -247,6 +265,8 @@ object ChannelSystemMessageHandler {
 
         // Update channel status to kicked; keep channel and chat history intact
         channel.status = DChatChannel.STATUS_KICKED
+        // Remove self from the members list so we no longer appear in the members grid
+        channel.members = channel.members.filter { it.id != TempData.clientId }
         dao.update(channel)
 
         runBlocking(Dispatchers.IO) {

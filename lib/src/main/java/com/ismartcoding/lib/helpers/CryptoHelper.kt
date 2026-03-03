@@ -167,7 +167,6 @@ object CryptoHelper {
         return try {
             getAead(key).decrypt(content, null)
         } catch (ex: Exception) {
-            LogCat.e("Failed to decrypt with XChaCha20-Poly1305: ${ex.message}")
             null
         }
     }
@@ -284,18 +283,12 @@ object CryptoHelper {
     /**
      * Sign data using raw Ed25519 private key (32 bytes)
      */
-    fun signDataWithRawEd25519PrivateKey(rawPrivateKey: ByteArray, data: ByteArray): ByteArray? {
-        return try {
-            require(rawPrivateKey.size == 32) { "Ed25519 private key must be 32 bytes, got ${rawPrivateKey.size}" }
-            initializeTink()
-
-            // Use Tink's Ed25519Signer directly with the raw private key
-            val signer = com.google.crypto.tink.subtle.Ed25519Sign(rawPrivateKey)
-            signer.sign(data)
-        } catch (ex: Exception) {
-            LogCat.e("signDataWithRawEd25519PrivateKey: ${ex.message}")
-            null
-        }
+    fun signDataWithRawEd25519PrivateKey(rawPrivateKey: ByteArray, data: ByteArray): ByteArray {
+        require(rawPrivateKey.size == 32) { "Ed25519 private key must be 32 bytes, got ${rawPrivateKey.size}" }
+        initializeTink()
+        // Use Tink's Ed25519Signer directly with the raw private key
+        val signer = com.google.crypto.tink.subtle.Ed25519Sign(rawPrivateKey)
+        return signer.sign(data)
     }
 
     /**
@@ -337,10 +330,6 @@ object CryptoHelper {
         } catch (ex: Exception) {
             false
         }
-    }
-
-    fun encodeKeyToBase64(key: Key): String {
-        return Base64.encodeToString(key.encoded, Base64.NO_WRAP)
     }
 
     fun encodeToBase64(bytes: ByteArray): String {

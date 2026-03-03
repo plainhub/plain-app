@@ -5,12 +5,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -18,18 +14,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.Version
 import com.ismartcoding.plain.data.toVersion
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.extensions.getText
 import com.ismartcoding.plain.events.AppEvents
+import com.ismartcoding.plain.extensions.getText
 import com.ismartcoding.plain.preferences.DarkThemePreference
-import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.preferences.LocalNewVersion
 import com.ismartcoding.plain.preferences.LocalSkipVersion
@@ -42,7 +35,7 @@ import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.components.DeviceRenameDialog
+import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import kotlinx.coroutines.Dispatchers
@@ -57,22 +50,8 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
     val darkTheme = LocalDarkTheme.current
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    var showDeviceRenameDialog by remember { mutableStateOf(false) }
-    var deviceName by remember { mutableStateOf("") }
-
-    LaunchedEffect(Unit) {
-        deviceName = TempData.deviceName
-    }
 
     UpdateDialog(updateViewModel)
-
-    if (showDeviceRenameDialog) {
-        DeviceRenameDialog(deviceName, onDismiss = {
-            showDeviceRenameDialog = false
-        }, onDone = {
-            deviceName = TempData.deviceName
-        })
-    }
 
     PScaffold(
         topBar = {
@@ -84,16 +63,15 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                     TopSpace()
                 }
                 item {
-                    PCard {
-                        PListItem(
-                            modifier = Modifier.clickable {
-                                showDeviceRenameDialog = true
-                            }, 
-                            title = stringResource(R.string.device_name), 
-                            value = deviceName.ifEmpty { PhoneHelper.getDeviceName(context) }, 
-                            showMore = true
-                        )
-                    }
+                    PBanner(
+                        title = stringResource(R.string.donation),
+                        desc = stringResource(R.string.donation_desc),
+                        icon = R.drawable.rocket,
+                        backgroundColor = androidx.compose.material3.MaterialTheme.colorScheme.errorContainer,
+                        onClick = {
+                            WebHelper.open(context, "https://ko-fi.com/ismartcoding")
+                        },
+                    )
                     VerticalSpace(dp = 16.dp)
                 }
                 item {

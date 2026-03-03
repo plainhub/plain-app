@@ -40,6 +40,8 @@ object TempData {
     val notificationActions = mutableMapOf<String, Array<out Notification.Action>>()
     var audioPlayMode = MediaPlayMode.REPEAT
 
+    var nearbyDiscoverable = false
+
     var audioSleepTimerFutureTime = 0L
     var audioPlayPosition = 0L // audio play position in milliseconds
 

@@ -92,8 +92,7 @@ object NearbyPairManager {
                 ips = NetworkHelper.getDeviceIP4s().toList(),
             )
             request.signature = SignatureHelper.signTextAsync(request.toSignatureData())
-                ?: throw Exception("Failed to sign pairing request")
-            
+
             sendPairingMessage(NearbyMessageType.PAIR_REQUEST, JsonHelper.jsonEncode(request), bestIp)
         } catch (e: Exception) {
             LogCat.e("Error starting pairing: ${e.message}")
@@ -152,7 +151,6 @@ object NearbyPairManager {
                 )
 
                 response.signature = SignatureHelper.signTextAsync(response.toSignatureData())
-                    ?: throw Exception("Failed to sign pairing response")
 
                 val requestEcdhPublicKey = Base64.decode(request.ecdhPublicKey, Base64.NO_WRAP)
                 val encryptKey = CryptoHelper.computeECDHSharedKey(keyPair.private, requestEcdhPublicKey)
@@ -190,7 +188,6 @@ object NearbyPairManager {
                 )
                 
                 response.signature = SignatureHelper.signTextAsync(response.toSignatureData())
-                    ?: throw Exception("Failed to sign pairing rejection response")
 
                 sendPairingMessage(NearbyMessageType.PAIR_RESPONSE, JsonHelper.jsonEncode(response), fromIp)
                 LogCat.d("Signed pairing rejection response sent to ${request.fromName}")

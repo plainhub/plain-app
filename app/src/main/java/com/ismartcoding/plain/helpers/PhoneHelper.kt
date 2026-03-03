@@ -15,11 +15,13 @@ import com.ismartcoding.plain.uiModeManager
 
 object PhoneHelper {
     fun getDeviceName(context: Context): String {
-        var name = ""
-        try {
-            name = Settings.Secure.getString(context.contentResolver, "bluetooth_name") ?: ""
-        } catch (e: Exception) {
-            LogCat.e(e.toString())
+        var name = Settings.Global.getString(context.contentResolver, Settings.Global.DEVICE_NAME) ?: ""
+        if (name.isEmpty()) {
+            try {
+                name = Settings.Secure.getString(context.contentResolver, "bluetooth_name") ?: ""
+            } catch (e: Exception) {
+                LogCat.e(e.toString())
+            }
         }
         if (name.isEmpty()) {
             val manufacturer = Build.MANUFACTURER

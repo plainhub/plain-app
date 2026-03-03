@@ -31,6 +31,7 @@ import com.ismartcoding.plain.ui.theme.secondaryTextColor
 @Composable
 fun ChatName(
     m: VChat,
+    isPeerChat: Boolean = false,
     onRetry: (() -> Unit)? = null,
     onShowDeliveryDetails: ((DMessageStatusData) -> Unit)? = null,
 ) {
@@ -66,10 +67,11 @@ fun ChatName(
                 )
             }
 
-            // Channel message with per-member delivery data — show "X/N" badge
+            // Message with delivery data.
             m.fromId == "me" && m.statusData != null && m.statusData.total > 0 -> {
                 val statusData = m.statusData
                 val isAllFailed = statusData.allFailed
+                val isPeerFailureBadge = isPeerChat && isAllFailed
                 val badgeColor = if (isAllFailed) MaterialTheme.colorScheme.error
                                  else MaterialTheme.colorScheme.tertiary
 
@@ -95,7 +97,7 @@ fun ChatName(
                             HorizontalSpace(3.dp)
                         }
                         Text(
-                            text = statusData.deliveryLabel(),
+                            text = if (isPeerFailureBadge) stringResource(R.string.error) else statusData.deliveryLabel(),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = badgeColor,
                                 fontWeight = FontWeight.SemiBold,

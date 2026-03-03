@@ -18,6 +18,7 @@ import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.chat.PeerChatHelper.MAX_TIMESTAMP_DIFF_MS
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
+import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageType
@@ -61,6 +62,11 @@ class PeerGraphQL(val schema: Schema) {
                         }
                     }
                 }
+                query("ping") {
+                    resolver { ->
+                        true
+                    }
+                }
                 mutation("channelSystemMessage") {
                     resolver { type: String, payload: String, context: Context ->
                         val call = context.get<ApplicationCall>()!!
@@ -75,6 +81,15 @@ class PeerGraphQL(val schema: Schema) {
 
                         val fromId = call.request.header("c-id") ?: ""
                         val channelId = call.request.header("c-cid") ?: ""
+
+                        // Reject channel messages if we have left or been kicked
+                        if (channelId.isNotEmpty()) {
+                            val ch = AppDatabase.instance.chatChannelDao().getById(channelId)
+                            if (ch == null || ch.status != DChatChannel.STATUS_JOINED) {
+                                throw IllegalStateException("Channel not joined")
+                            }
+                        }
+
                         val item =
                             ChatDbHelper.sendAsync(
                                 DChat.parseContent(content),

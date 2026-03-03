@@ -407,9 +407,9 @@ abstract class BaseSortByPreference(
     }
 }
 
-object AudioSortByPreference : BaseSortByPreference("audio")
-object VideoSortByPreference : BaseSortByPreference("video")
-object ImageSortByPreference : BaseSortByPreference("image")
+object AudioSortByPreference : BaseSortByPreference("audio", FileSortBy.DATE_DESC)
+object VideoSortByPreference : BaseSortByPreference("video", FileSortBy.TAKEN_AT_DESC)
+object ImageSortByPreference : BaseSortByPreference("image", FileSortBy.TAKEN_AT_DESC)
 object DocSortByPreference : BaseSortByPreference("doc")
 object FileSortByPreference : BaseSortByPreference("file", FileSortBy.NAME_ASC)
 object PackageSortByPreference : BaseSortByPreference("pkg", FileSortBy.NAME_ASC)

@@ -26,12 +26,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DQrPairData
-import com.ismartcoding.plain.events.PairingSuccessEvent
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
@@ -41,9 +39,7 @@ import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.NearbyViewModel
-import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.NearbyDeviceItem
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,16 +70,6 @@ fun NearbyPage(
             }
         }
 
-        // Navigate to Chat page on pairing success
-        launch {
-            Channel.sharedFlow.collect { event ->
-                if (event is PairingSuccessEvent) {
-                    navController.navigate(Routing.Chat("peer:${event.deviceId}")) {
-                        popUpTo<Routing.Nearby> { inclusive = true }
-                    }
-                }
-            }
-        }
     }
 
     // Load QR data when the sheet is about to be shown

@@ -4,7 +4,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.preferences.VideoSortByPreference
 import com.ismartcoding.plain.ui.base.MediaTopBar
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -23,6 +25,7 @@ fun TopBarVideos(
     castVM: CastViewModel,
 ) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     MediaTopBar(
         navController = navController,
@@ -36,6 +39,13 @@ fun TopBarVideos(
         scrollToTop = {
             scope.launch {
                 videosVM.scrollStateMap[videosState.pagerState.currentPage]?.scrollToItem(0)
+            }
+        },
+        onSortSelected = { _, sortBy ->
+            scope.launch(Dispatchers.IO) {
+                VideoSortByPreference.putAsync(context, sortBy)
+                videosVM.sortBy.value = sortBy
+                videosVM.loadAsync(context, tagsVM)
             }
         },
         onSearchAction = { context, tagsVM ->

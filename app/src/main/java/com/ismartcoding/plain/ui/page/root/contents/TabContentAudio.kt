@@ -51,7 +51,6 @@ import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.page.cast.AudioCastPlayerBar
 import com.ismartcoding.plain.ui.page.cast.CastDialog
-import com.ismartcoding.plain.ui.components.FileSortDialog
 import com.ismartcoding.plain.ui.extensions.reset
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
@@ -179,18 +178,6 @@ fun TabContentAudio(
                 tagsState.find { it.id == relation.tagId }
             }
         }
-    }
-
-    if (audioVM.showSortDialog.value) {
-        FileSortDialog(audioVM.sortBy, onSelected = {
-            scope.launch(Dispatchers.IO) {
-                AudioSortByPreference.putAsync(context, it)
-                audioVM.sortBy.value = it
-                audioVM.loadAsync(context, tagsVM)
-            }
-        }, onDismiss = {
-            audioVM.showSortDialog.value = false
-        })
     }
 
     ViewAudioBottomSheet(
