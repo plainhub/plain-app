@@ -275,9 +275,7 @@ object AppEvents {
                     }
 
                     is StartNearbyServiceEvent -> {
-                        coIO {
-                            NearbyDiscoverManager.startListener()
-                        }
+                        NearbyDiscoverManager.start()
                     }
 
                     is PairingResponseEvent -> {
