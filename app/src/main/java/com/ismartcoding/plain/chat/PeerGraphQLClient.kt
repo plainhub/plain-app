@@ -194,7 +194,6 @@ object PeerGraphQLClient {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            LogCat.e("GraphQL request error: ${e.message}")
             null
         }
     }

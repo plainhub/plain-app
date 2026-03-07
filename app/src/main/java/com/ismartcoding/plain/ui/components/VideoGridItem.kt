@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.formatDuration
+import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
@@ -110,6 +111,7 @@ fun VideoGridItem(
         TransformImageView(
             modifier = imageModifier,
             path = m.path,
+            fileName = m.path.getFilenameFromPath(),
             key = m.id,
             uri = VideoMediaStoreHelper.getItemUri(m.id),
             itemState = itemState,

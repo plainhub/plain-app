@@ -4,7 +4,7 @@
 
 [<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt='Get it on Google Play' height="80">](https://play.google.com/store/apps/details?id=com.ismartcoding.plain)
 [<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt='Get it on F-Droid' height="80">](https://f-droid.org/packages/com.ismartcoding.plain/)
-[<img src="https://raw.githubusercontent.com/ismartcoding/plain-app/main/assets/get-it-on-github.png" alt='Get it on GitHub' height="80">](https://github.com/ismartcoding/plain-app/releases/latest)
+[<img src="https://raw.githubusercontent.com/plainhub/plain-app/main/assets/get-it-on-github.png" alt='Get it on GitHub' height="80">](https://github.com/plainhub/plain-app/releases/latest)
 
 ## Why PlainApp?
 

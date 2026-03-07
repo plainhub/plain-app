@@ -50,6 +50,7 @@ enum class EventType(val value: Int) {
     BOOKMARK_UPDATED(15),
     DOWNLOAD_PROGRESS(16),
     MMS_SENT(17),
+    CHANNELS_UPDATED(18),
 }
 
 

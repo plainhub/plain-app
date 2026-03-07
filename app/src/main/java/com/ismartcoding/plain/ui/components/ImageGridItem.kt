@@ -25,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatBytes
+import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DImage
@@ -109,6 +110,7 @@ fun ImageGridItem(
             modifier = imageModifier,
             uri = ImageMediaStoreHelper.getItemUri(m.id),
             path = m.path,
+            fileName = m.path.getFilenameFromPath(),
             key = m.id,
             itemState = itemState,
             previewerState = previewerState,

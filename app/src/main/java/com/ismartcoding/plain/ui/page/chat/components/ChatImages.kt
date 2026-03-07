@@ -104,6 +104,7 @@ fun ChatImages(
                             .size(imageWidthDp)
                             .clip(RoundedCornerShape(6.dp)),
                         path = item.getPreviewPath(context, peer),
+                        fileName = item.fileName,
                         key = item.id,
                         itemState = itemState,
                         previewerState = previewerState,

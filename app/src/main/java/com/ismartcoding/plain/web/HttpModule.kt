@@ -5,9 +5,12 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
+import android.webkit.MimeTypeMap
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.compress
+import com.ismartcoding.lib.extensions.getContentType
 import com.ismartcoding.lib.extensions.getFinalPath
+import com.ismartcoding.lib.extensions.getMimeType
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.extensions.scanFileByConnection
@@ -69,6 +72,7 @@ import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.application.ApplicationStopPreparing
 import io.ktor.server.application.call
 import io.ktor.server.application.install
+import io.ktor.server.http.content.LocalFileContent
 import io.ktor.server.http.content.SPAConfig
 import io.ktor.server.http.content.staticResources
 import io.ktor.server.plugins.autohead.AutoHeadResponse
@@ -470,10 +474,10 @@ object HttpModule {
                             )
                         }
 
-                        if (path.isImageFast()) {
-                            val imageType = ImageHelper.getImageType(path)
+                        if (fileName.isImageFast()) {
+                            val imageType = ImageHelper.getImageType(path, fileName)
                             if (imageType.isApplicableAnimated() || imageType == ImageType.SVG) {
-                                call.respondFile(file)
+                                call.respond(LocalFileContent(file, fileName.getContentType()))
                                 return@get
                             }
                         }
@@ -505,7 +509,7 @@ object HttpModule {
                             bitmap.compress(Bitmap.CompressFormat.PNG, 100, output)
                             call.respondBytes(output.toByteArray(), ContentType.Image.PNG)
                         } else {
-                            call.respondFile(file)
+                            call.respond(LocalFileContent(file, fileName.getContentType()))
                         }
                     }
                 } catch (ex: Exception) {

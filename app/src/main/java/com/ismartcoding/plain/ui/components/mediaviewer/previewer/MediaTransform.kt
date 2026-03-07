@@ -63,6 +63,7 @@ internal val transformItemStateMap = mutableStateMapOf<Any, TransformItemState>(
 fun TransformImageView(
     modifier: Modifier = Modifier,
     path: String,
+    fileName: String,
     key: String,
     uri: Uri? = null,
     itemState: TransformItemState,
@@ -96,13 +97,13 @@ fun TransformImageView(
             if (painter.state.value is AsyncImagePainter.State.Error) {
                 Image(
                     modifier = imageModifier,
-                    painter = painterResource(if (path.isImageFast()) R.drawable.image else R.drawable.file_video),
+                    painter = painterResource(if (fileName.isImageFast()) R.drawable.image else R.drawable.file_video),
                     contentDescription = path,
                     contentScale = ContentScale.Crop,
                 )
             } else {
                 Image(
-                    modifier = if (path.endsWith(".svg", true)) imageModifier.background(Color.White) else imageModifier,
+                    modifier = if (fileName.endsWith(".svg", true)) imageModifier.background(Color.White) else imageModifier,
                     painter = painter,
                     contentDescription = path,
                     contentScale = ContentScale.Crop,

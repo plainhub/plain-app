@@ -41,6 +41,7 @@ fun ChatFileThumbnail(
                     .size(48.dp)
                     .clip(RoundedCornerShape(4.dp)),
                 path = previewPath,
+                fileName = fileName,
                 key = item.id,
                 itemState = itemState,
                 previewerState = previewerState,

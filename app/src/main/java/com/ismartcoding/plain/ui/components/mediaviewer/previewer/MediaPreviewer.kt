@@ -269,7 +269,7 @@ fun MediaPreviewer(
 }
 
 @Composable
-fun getModel(item: PreviewItem): Any? {
+fun getModel(item: PreviewItem): Any {
     val model: Any?
     if (item.isVideo() || item.path.isUrl()) {
         model = item
@@ -277,7 +277,7 @@ fun getModel(item: PreviewItem): Any? {
         // If the image size is less than 2MB, load the image directly
         model = item
     } else {
-        val imageType = remember { ImageHelper.getImageType(item.path) }
+        val imageType = remember { ImageHelper.getImageType(item.path, item.path) }
         if (imageType.isApplicableAnimated() || imageType == ImageType.SVG) {
             model = item
         } else {

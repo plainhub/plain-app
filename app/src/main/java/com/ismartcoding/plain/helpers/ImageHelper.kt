@@ -39,10 +39,9 @@ object ImageHelper {
     private const val HEIF_HEADER_HEVX = "hevx"
 
     private const val SVG_TAG = "<svg"
-    private const val LEFT_ANGLE_BRACKET = '<'
 
-    fun getImageType(path: String): ImageType {
-        val extension = path.getFilenameExtension()
+    fun getImageType(path: String, fileName: String): ImageType {
+        val extension = fileName.getFilenameExtension()
         if (extension == "svg") {
             return ImageType.SVG
         } else if (extension == "png") {

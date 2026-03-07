@@ -162,6 +162,7 @@ fun FileListItem(
                                 .size(40.dp)
                                 .clip(RoundedCornerShape(4.dp)),
                             path = file.path,
+                            fileName = file.name,
                             key = file.path,
                             itemState = itemState,
                             previewerState = previewerState,

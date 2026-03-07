@@ -42,5 +42,5 @@ PlainApp is also a capable standalone app — not just a server:
 - All traffic between phone and browser is encrypted (TLS + XChaCha20-Poly1305)
 - No account registration required
 
-Github: https://github.com/ismartcoding/plain-app
+Github: https://github.com/plainhub/plain-app
 Reddit: https://www.reddit.com/r/plainapp

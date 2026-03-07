@@ -168,11 +168,11 @@ fun TabContentChat(
                                         peerVM.updatePeerLastActive(peer.id)
                                     } else {
                                         // Peer is reachable but rejected our key (unbound)
-                                        LogCat.d("Ping rejected by ${peer.ip}:${peer.port} - peer may have unbound")
+                                        // LogCat.d("Ping rejected by ${peer.ip}:${peer.port} - peer may have unbound")
                                         NearbyDiscoverManager.discoverSpecificDevice(peer.id, key)
                                     }
                                 } catch (e: Exception) {
-                                    LogCat.d("Ping failed for ${peer.ip}:${peer.port} - ${e.message}")
+                                    // LogCat.d("Ping failed for ${peer.ip}:${peer.port} - ${e.message}")
                                     NearbyDiscoverManager.discoverSpecificDevice(peer.id, key)
                                 }
                             } else {

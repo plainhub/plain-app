@@ -215,6 +215,20 @@ object AppEvents {
                         }
                     }
 
+                    is ChannelUpdatedEvent -> {
+                        coIO {
+                            val channels = com.ismartcoding.plain.db.AppDatabase.instance.chatChannelDao().getAll()
+                                .sortedBy { it.name.lowercase() }
+                                .map { it.toModel() }
+                            sendEvent(
+                                WebSocketEvent(
+                                    EventType.CHANNELS_UPDATED,
+                                    jsonEncode(channels),
+                                ),
+                            )
+                        }
+                    }
+
                     is WebSocketEvent -> {
                         coIO {
                             WebSocketHelper.sendEventAsync(event)

@@ -6,6 +6,7 @@ import android.provider.MediaStore
 import android.telephony.PhoneNumberUtils
 import com.ismartcoding.lib.Constants
 import com.ismartcoding.lib.isQPlus
+import io.ktor.http.ContentType
 import java.io.File
 import java.net.URL
 import java.net.URLDecoder
@@ -755,6 +756,15 @@ private val typesMap =
 
 fun String.getMimeType(): String {
     return typesMap[getFilenameExtension().lowercase()] ?: ""
+}
+
+
+fun String.getContentType(): ContentType {
+    return try {
+        ContentType.parse(getMimeType())
+    } catch (e: Exception) {
+        ContentType.Application.OctetStream
+    }
 }
 
 fun String.indexOf(anyOfTheseChars: Array<Char>): Int {
