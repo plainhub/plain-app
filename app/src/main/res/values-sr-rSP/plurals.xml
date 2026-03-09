@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="one">%,d पोस्ट</item>
-        <item quantity="few">%,d पोस्ट</item>
-        <item quantity="other">%,d पोस्ट</item>
+        <item quantity="one">%,d post</item>
+        <item quantity="few">%,d post</item>
+        <item quantity="other">%,d post</item>
     </plurals>
     <plurals name="items">
-        <item quantity="one">%,d आइटम</item>
-        <item quantity="few">%,d आइटम</item>
-        <item quantity="other">%,d आइटम</item>
+        <item quantity="one">%,d elemento</item>
+        <item quantity="few">%,d elementi</item>
+        <item quantity="other">%,d elementi</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="one">%,d फ़ोल्डर</item>
-        <item quantity="few">%,d फ़ोल्डर</item>
-        <item quantity="other">%,d फ़ोल्डर</item>
+        <item quantity="one">%,d cartella</item>
+        <item quantity="few">%,d cartelle</item>
+        <item quantity="other">%,d cartelle</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="one">%,d फ़ाइल</item>
-        <item quantity="few">%,d फ़ाइल</item>
-        <item quantity="other">%,d फ़ाइल</item>
+        <item quantity="one">%,d file</item>
+        <item quantity="few">%,d file</item>
+        <item quantity="other">%,d file</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">%d आइटम की प्रतिलिपि बना रहा है</item>
-        <item quantity="few">%d आइटमों की प्रतिलिपि बना रहा है</item>
-        <item quantity="other">%d आइटमों की प्रतिलिपि बना रहा है</item>
+        <item quantity="one">Copia dell\'elemento %,d</item>
+        <item quantity="few">Copia degli elementi %,d</item>
+        <item quantity="other">Copia degli elementi %,d</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">%d आइटम को ले जा रहा है</item>
-        <item quantity="few">%d आइटमों को ले जा रहा है</item>
-        <item quantity="other">%d आइटमों को ले जा रहा है</item>
+        <item quantity="one">Spostamento dell\'elemento %,d</item>
+        <item quantity="few">Spostamento degli elementi %,d</item>
+        <item quantity="other">Spostamento degli elementi %,d</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="one">%,d घंटा</item>
-        <item quantity="few">%,d घंटे</item>
-        <item quantity="other">%,d घंटे</item>
+        <item quantity="one">%,d ora</item>
+        <item quantity="few">%,d ore</item>
+        <item quantity="other">%,d ore</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="one">%,d मिनट</item>
-        <item quantity="few">%,d मिनट</item>
-        <item quantity="other">%,d मिनट</item>
+        <item quantity="one">%,d minuto</item>
+        <item quantity="few">%,d minuti</item>
+        <item quantity="other">%,d minuti</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="one">%,d सेकंड</item>
-        <item quantity="few">%,d सेकंड</item>
-        <item quantity="other">%,d सेकंड</item>
+        <item quantity="one">%,d secondo</item>
+        <item quantity="few">%,d secondi</item>
+        <item quantity="other">%,d secondi</item>
     </plurals>
     <plurals name="n_pomodoros">
-        <item quantity="one">%,d पोमोडोरो</item>
-        <item quantity="few">%,d पोमोडोरो</item>
-        <item quantity="other">%,d पोमोडोरो</item>
+        <item quantity="one">%,d pomodoro</item>
+        <item quantity="few">%,d pomodoros</item>
+        <item quantity="other">%,d pomodoros</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">आज: %,d पोमोडोरो</item>
-        <item quantity="few">आज: %,d पोमोडोरो</item>
-        <item quantity="other">आज: %,d पोमोडोरो</item>
+        <item quantity="one">Oggi: %,d pomodoro</item>
+        <item quantity="few">Oggi: %,d pomodoros</item>
+        <item quantity="other">Oggi: %,d pomodoros</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="one">कुल: %,d पोमोडोरो</item>
-        <item quantity="few">कुल: %,d पोमोडोरो</item>
-        <item quantity="other">कुल: %,d पोमोडोरो</item>
+        <item quantity="one">Totale: %,d pomodoro</item>
+        <item quantity="few">Totale: %,d pomodoros</item>
+        <item quantity="other">Totale: %,d pomodoros</item>
     </plurals>
 </resources>
