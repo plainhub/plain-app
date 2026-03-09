@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="other">%d பதிவுகள்</item>
+        <item quantity="other">%,d gönderi</item>
     </plurals>
     <plurals name="items">
-        <item quantity="other">%d பொருட்கள்</item>
+        <item quantity="other">%,d öğe</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="other">%d கோப்புறைகள்</item>
+        <item quantity="other">%,d klasör</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="other">%d கோப்புகள்</item>
+        <item quantity="other">%,d dosya</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="other">%d பொருள்கள் நகலை நகலெடுக்கின்றன</item>
+        <item quantity="other">%d öğe kopyalanıyor</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="other">%d பொருள்கள் நகலை நகலெடுக்கின்றன</item>
+        <item quantity="other">%d öğe taşınıyor</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="other">%d மணிநேரம்</item>
+        <item quantity="other">%d saat</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="other">%d நிமிடங்கள்</item>
+        <item quantity="other">%d dakika</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="other">%d விநாடிகள்</item>
+        <item quantity="other">%d saniye</item>
     </plurals>
     <plurals name="n_pomodoros">
-        <item quantity="other">%,d போமோடோரோ</item>
+        <item quantity="other">%,d pomodoro</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="other">இன்று: %,d போமோடோரோ</item>
+        <item quantity="other">Bugün: %,d pomodoro</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="other">மொத்தம்: %,d போமோடோரோ</item>
+        <item quantity="other">Toplam: %,d pomodoro</item>
     </plurals>
 </resources>
