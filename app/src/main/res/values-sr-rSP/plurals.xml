@@ -1,49 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="one">%,d publicación</item>
-        <item quantity="few">%,d publicaciones</item>
-        <item quantity="other">%,d publicaciones</item>
+        <item quantity="one">%,d publication</item>
+        <item quantity="few">%,d publications</item>
+        <item quantity="other">%,d publications</item>
     </plurals>
     <plurals name="items">
-        <item quantity="one">%,d elemento</item>
-        <item quantity="few">%,d elementos</item>
-        <item quantity="other">%,d elementos</item>
+        <item quantity="one">%,d élément</item>
+        <item quantity="few">%,d éléments</item>
+        <item quantity="other">%,d éléments</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="one">%,d carpeta</item>
-        <item quantity="few">%,d carpetas</item>
-        <item quantity="other">%,d carpetas</item>
+        <item quantity="one">%,d dossier</item>
+        <item quantity="few">%,d dossiers</item>
+        <item quantity="other">%,d dossiers</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="one">%,d archivo</item>
-        <item quantity="few">%,d archivos</item>
-        <item quantity="other">%,d archivos</item>
+        <item quantity="one">%,d fichier</item>
+        <item quantity="few">%,d fichiers</item>
+        <item quantity="other">%,d fichiers</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">Copiando %,d elemento</item>
-        <item quantity="few">Copiando %,d elementos</item>
-        <item quantity="other">Copiando %,d elementos</item>
+        <item quantity="one">Copie de l\'élément %,d</item>
+        <item quantity="few">Copie des éléments %,d</item>
+        <item quantity="other">Copie des éléments %,d</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">Moviendo %,d elemento</item>
-        <item quantity="few">Moviendo %,d elementos</item>
-        <item quantity="other">Moviendo %,d elementos</item>
+        <item quantity="one">Déplacement de l\'élément %,d</item>
+        <item quantity="few">Déplacement des éléments %,d</item>
+        <item quantity="other">Déplacement des éléments %,d</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="one">%,d hora</item>
-        <item quantity="few">%,d horas</item>
-        <item quantity="other">%,d horas</item>
+        <item quantity="one">%,d heure</item>
+        <item quantity="few">%,d heures</item>
+        <item quantity="other">%,d heures</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="one">%,d minuto</item>
-        <item quantity="few">%,d minutos</item>
-        <item quantity="other">%,d minutos</item>
+        <item quantity="one">%,d minute</item>
+        <item quantity="few">%,d minutes</item>
+        <item quantity="other">%,d minutes</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="one">%,d segundo</item>
-        <item quantity="few">%,d segundos</item>
-        <item quantity="other">%,d segundos</item>
+        <item quantity="one">%,d seconde</item>
+        <item quantity="few">%,d secondes</item>
+        <item quantity="other">%,d secondes</item>
     </plurals>
     <plurals name="n_pomodoros">
         <item quantity="one">%,d pomodoro</item>
@@ -51,9 +51,9 @@
         <item quantity="other">%,d pomodoros</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">Hoy: %,d pomodoro</item>
-        <item quantity="few">Hoy: %,d pomodoros</item>
-        <item quantity="other">Hoy: %,d pomodoros</item>
+        <item quantity="one">Aujourd\'hui: %,d pomodoro</item>
+        <item quantity="few">Aujourd\'hui: %,d pomodoros</item>
+        <item quantity="other">Aujourd\'hui: %,d pomodoros</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
         <item quantity="one">Total: %,d pomodoro</item>
