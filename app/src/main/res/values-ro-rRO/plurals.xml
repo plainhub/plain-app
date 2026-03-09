@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="one">%d개 게시물</item>
-        <item quantity="few">%d개 게시물</item>
-        <item quantity="other">%d개 게시물</item>
+        <item quantity="one">%,d bericht</item>
+        <item quantity="few">%,d berichten</item>
+        <item quantity="other">%,d berichten</item>
     </plurals>
     <plurals name="items">
-        <item quantity="one">%d개 항목</item>
-        <item quantity="few">%d개 항목</item>
-        <item quantity="other">%d개 항목</item>
+        <item quantity="one">%,d item</item>
+        <item quantity="few">%,d items</item>
+        <item quantity="other">%,d items</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="one">%d개 폴더</item>
-        <item quantity="few">%d개 폴더</item>
-        <item quantity="other">%d개 폴더</item>
+        <item quantity="one">%,d map</item>
+        <item quantity="few">%,d mappen</item>
+        <item quantity="other">%,d mappen</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="one">%d개 파일</item>
-        <item quantity="few">%d개 파일</item>
-        <item quantity="other">%d개 파일</item>
+        <item quantity="one">%,d bestand</item>
+        <item quantity="few">%,d bestanden</item>
+        <item quantity="other">%,d bestanden</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">%d개 항목 복사 중</item>
-        <item quantity="few">%d개 항목 복사 중</item>
-        <item quantity="other">%d개 항목 복사 중</item>
+        <item quantity="one">Kopiëren van %,d item</item>
+        <item quantity="few">Kopiëren van %,d items</item>
+        <item quantity="other">Kopiëren van %,d items</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">%d개 항목 이동 중</item>
-        <item quantity="few">%d개 항목 이동 중</item>
-        <item quantity="other">%d개 항목 이동 중</item>
+        <item quantity="one">Verplaatsen van %,d item</item>
+        <item quantity="few">Verplaatsen van %,d items</item>
+        <item quantity="other">Verplaatsen van %,d items</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="one">%d시간</item>
-        <item quantity="few">%d시간</item>
-        <item quantity="other">%d시간</item>
+        <item quantity="one">%,d uur</item>
+        <item quantity="few">%,d uur</item>
+        <item quantity="other">%,d uur</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="one">%d분</item>
-        <item quantity="few">%d분</item>
-        <item quantity="other">%d분</item>
+        <item quantity="one">%,d minuut</item>
+        <item quantity="few">%,d minuten</item>
+        <item quantity="other">%,d minuten</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="one">%d초</item>
-        <item quantity="few">%d초</item>
-        <item quantity="other">%d초</item>
+        <item quantity="one">%,d seconde</item>
+        <item quantity="few">%,d seconden</item>
+        <item quantity="other">%,d seconden</item>
     </plurals>
     <plurals name="n_pomodoros">
-        <item quantity="one">%,d 포모도로</item>
-        <item quantity="few">%,d 포모도로</item>
-        <item quantity="other">%,d 포모도로</item>
+        <item quantity="one">%,d pomodoro</item>
+        <item quantity="few">%,d pomodoros</item>
+        <item quantity="other">%,d pomodoros</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">오늘: %,d 포모도로</item>
-        <item quantity="few">오늘: %,d 포모도로</item>
-        <item quantity="other">오늘: %,d 포모도로</item>
+        <item quantity="one">Vandaag: %,d pomodoro</item>
+        <item quantity="few">Vandaag: %,d pomodoros</item>
+        <item quantity="other">Vandaag: %,d pomodoros</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="one">총: %,d 포모도로</item>
-        <item quantity="few">총: %,d 포모도로</item>
-        <item quantity="other">총: %,d 포모도로</item>
+        <item quantity="one">Totaal: %,d pomodoro</item>
+        <item quantity="few">Totaal: %,d pomodoros</item>
+        <item quantity="other">Totaal: %,d pomodoros</item>
     </plurals>
 </resources>
