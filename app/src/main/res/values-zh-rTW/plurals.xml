@@ -1,51 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="one">%,d 篇貼文</item>
-        <item quantity="other">%,d 篇貼文</item>
+        <item quantity="other">%,d পোস্টস</item>
     </plurals>
     <plurals name="items">
-        <item quantity="one">%,d 項目</item>
-        <item quantity="other">%,d 項目</item>
+        <item quantity="other">%,d আইটেমস</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="one">%,d 資料夾</item>
-        <item quantity="other">%,d 資料夾</item>
+        <item quantity="other">%,d ফোল্ডারস</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="one">%,d 檔案</item>
-        <item quantity="other">%,d 檔案</item>
+        <item quantity="other">%,d ফাইলস</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">複製 %,d 項目</item>
-        <item quantity="other">複製 %,d 項目</item>
+        <item quantity="other">%,d আইটেমস কপি করা হচ্ছে</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">移動 %,d 項目</item>
-        <item quantity="other">移動 %,d 項目</item>
+        <item quantity="other">%,d আইটেমস সরানো হচ্ছে</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="one">%,d 小時</item>
-        <item quantity="other">%,d 小時</item>
+        <item quantity="other">%,d ঘণ্টা</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="one">%,d 分鐘</item>
-        <item quantity="other">%,d 分鐘</item>
+        <item quantity="other">%,d মিনিট</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="one">%,d 秒</item>
-        <item quantity="other">%,d 秒</item>
+        <item quantity="other">%,d সেকেন্ড</item>
     </plurals>
     <plurals name="n_pomodoros">
-        <item quantity="one">%,d 番茄</item>
-        <item quantity="other">%,d 番茄</item>
+        <item quantity="other">%,d পামোডরো</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">今天: %,d 番茄</item>
-        <item quantity="other">今天: %,d 番茄</item>
+        <item quantity="other">Today: %,d pomodoros</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="one">總共: %,d 番茄</item>
-        <item quantity="other">總共: %,d 番茄</item>
+        <item quantity="other">Total: %,d pomodoros</item>
     </plurals>
 </resources>
