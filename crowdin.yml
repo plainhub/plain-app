@@ -1,3 +1,3 @@
 files:
-  - source: /app/src/main/res/values/strings.xml
+  - source: /app/src/main/res/values-*
     translation: /app/src/main/res/values-%android_code%/%original_file_name%
