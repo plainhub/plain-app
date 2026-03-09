@@ -1,76 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="zero">%,d berichten</item>
-        <item quantity="one">%,d bericht</item>
-        <item quantity="two">%,d berichten</item>
-        <item quantity="few">%,d berichten</item>
-        <item quantity="many">%,d berichten</item>
-        <item quantity="other">%,d berichten</item>
+        <item quantity="zero">%,d postagens</item>
+        <item quantity="one">%,d postagem</item>
+        <item quantity="two">%,d postagens</item>
+        <item quantity="few">%,d postagens</item>
+        <item quantity="many">%,d postagens</item>
+        <item quantity="other">%,d postagens</item>
     </plurals>
     <plurals name="items">
-        <item quantity="zero">%,d items</item>
+        <item quantity="zero">%,d itens</item>
         <item quantity="one">%,d item</item>
-        <item quantity="two">%,d items</item>
-        <item quantity="few">%,d items</item>
-        <item quantity="many">%,d items</item>
-        <item quantity="other">%,d items</item>
+        <item quantity="two">%,d itens</item>
+        <item quantity="few">%,d itens</item>
+        <item quantity="many">%,d itens</item>
+        <item quantity="other">%,d itens</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="zero">%,d mappen</item>
-        <item quantity="one">%,d map</item>
-        <item quantity="two">%,d mappen</item>
-        <item quantity="few">%,d mappen</item>
-        <item quantity="many">%,d mappen</item>
-        <item quantity="other">%,d mappen</item>
+        <item quantity="zero">%,d pastas</item>
+        <item quantity="one">%,d pasta</item>
+        <item quantity="two">%,d pastas</item>
+        <item quantity="few">%,d pastas</item>
+        <item quantity="many">%,d pastas</item>
+        <item quantity="other">%,d pastas</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="zero">%,d bestanden</item>
-        <item quantity="one">%,d bestand</item>
-        <item quantity="two">%,d bestanden</item>
-        <item quantity="few">%,d bestanden</item>
-        <item quantity="many">%,d bestanden</item>
-        <item quantity="other">%,d bestanden</item>
+        <item quantity="zero">%,d arquivos</item>
+        <item quantity="one">%,d arquivo</item>
+        <item quantity="two">%,d arquivos</item>
+        <item quantity="few">%,d arquivos</item>
+        <item quantity="many">%,d arquivos</item>
+        <item quantity="other">%,d arquivos</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="zero">Kopiëren van %,d items</item>
-        <item quantity="one">Kopiëren van %,d item</item>
-        <item quantity="two">Kopiëren van %,d items</item>
-        <item quantity="few">Kopiëren van %,d items</item>
-        <item quantity="many">Kopiëren van %,d items</item>
-        <item quantity="other">Kopiëren van %,d items</item>
+        <item quantity="zero">Copiando %,d itens</item>
+        <item quantity="one">Copiando %,d item</item>
+        <item quantity="two">Copiando %,d itens</item>
+        <item quantity="few">Copiando %,d itens</item>
+        <item quantity="many">Copiando %,d itens</item>
+        <item quantity="other">Copiando %,d itens</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="zero">Verplaatsen van %,d items</item>
-        <item quantity="one">Verplaatsen van %,d item</item>
-        <item quantity="two">Verplaatsen van %,d items</item>
-        <item quantity="few">Verplaatsen van %,d items</item>
-        <item quantity="many">Verplaatsen van %,d items</item>
-        <item quantity="other">Verplaatsen van %,d items</item>
+        <item quantity="zero">Movendo %,d itens</item>
+        <item quantity="one">Movendo %,d item</item>
+        <item quantity="two">Movendo %,d itens</item>
+        <item quantity="few">Movendo %,d itens</item>
+        <item quantity="many">Movendo %,d itens</item>
+        <item quantity="other">Movendo %,d itens</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="zero">%,d uur</item>
-        <item quantity="one">%,d uur</item>
-        <item quantity="two">%,d uur</item>
-        <item quantity="few">%,d uur</item>
-        <item quantity="many">%,d uur</item>
-        <item quantity="other">%,d uur</item>
+        <item quantity="zero">%,d horas</item>
+        <item quantity="one">%,d hora</item>
+        <item quantity="two">%,d horas</item>
+        <item quantity="few">%,d horas</item>
+        <item quantity="many">%,d horas</item>
+        <item quantity="other">%,d horas</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="zero">%,d minuten</item>
-        <item quantity="one">%,d minuut</item>
-        <item quantity="two">%,d minuten</item>
-        <item quantity="few">%,d minuten</item>
-        <item quantity="many">%,d minuten</item>
-        <item quantity="other">%,d minuten</item>
+        <item quantity="zero">%,d minutos</item>
+        <item quantity="one">%,d minuto</item>
+        <item quantity="two">%,d minutos</item>
+        <item quantity="few">%,d minutos</item>
+        <item quantity="many">%,d minutos</item>
+        <item quantity="other">%,d minutos</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="zero">%,d seconden</item>
-        <item quantity="one">%,d seconde</item>
-        <item quantity="two">%,d seconden</item>
-        <item quantity="few">%,d seconden</item>
-        <item quantity="many">%,d seconden</item>
-        <item quantity="other">%,d seconden</item>
+        <item quantity="zero">%,d segundos</item>
+        <item quantity="one">%,d segundo</item>
+        <item quantity="two">%,d segundos</item>
+        <item quantity="few">%,d segundos</item>
+        <item quantity="many">%,d segundos</item>
+        <item quantity="other">%,d segundos</item>
     </plurals>
     <plurals name="n_pomodoros">
         <item quantity="zero">%,d pomodoros</item>
@@ -81,19 +81,19 @@
         <item quantity="other">%,d pomodoros</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="zero">Vandaag: %,d pomodoros</item>
-        <item quantity="one">Vandaag: %,d pomodoro</item>
-        <item quantity="two">Vandaag: %,d pomodoros</item>
-        <item quantity="few">Vandaag: %,d pomodoros</item>
-        <item quantity="many">Vandaag: %,d pomodoros</item>
-        <item quantity="other">Vandaag: %,d pomodoros</item>
+        <item quantity="zero">Hoje: %,d pomodoros</item>
+        <item quantity="one">Hoje: %,d pomodoro</item>
+        <item quantity="two">Hoje: %,d pomodoros</item>
+        <item quantity="few">Hoje: %,d pomodoros</item>
+        <item quantity="many">Hoje: %,d pomodoros</item>
+        <item quantity="other">Hoje: %,d pomodoros</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="zero">Totaal: %,d pomodoros</item>
-        <item quantity="one">Totaal: %,d pomodoro</item>
-        <item quantity="two">Totaal: %,d pomodoros</item>
-        <item quantity="few">Totaal: %,d pomodoros</item>
-        <item quantity="many">Totaal: %,d pomodoros</item>
-        <item quantity="other">Totaal: %,d pomodoros</item>
+        <item quantity="zero">Total: %,d pomodoros</item>
+        <item quantity="one">Total: %,d pomodoro</item>
+        <item quantity="two">Total: %,d pomodoros</item>
+        <item quantity="few">Total: %,d pomodoros</item>
+        <item quantity="many">Total: %,d pomodoros</item>
+        <item quantity="other">Total: %,d pomodoros</item>
     </plurals>
 </resources>
