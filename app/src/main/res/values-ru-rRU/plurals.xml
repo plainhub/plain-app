@@ -1,75 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="one">%,d запись</item>
-        <item quantity="few">%,d записей</item>
-        <item quantity="many">%,d записей</item>
-        <item quantity="other">%,d записей</item>
+        <item quantity="one">%d பதிவு</item>
+        <item quantity="few">%d பதிவுகள்</item>
+        <item quantity="many">%d பதிவுகள்</item>
+        <item quantity="other">%d பதிவுகள்</item>
     </plurals>
     <plurals name="items">
-        <item quantity="one">%,d элемент</item>
-        <item quantity="few">%,d элементов</item>
-        <item quantity="many">%,d элементов</item>
-        <item quantity="other">%,d элементов</item>
+        <item quantity="one">%d பொருள்</item>
+        <item quantity="few">%d பொருட்கள்</item>
+        <item quantity="many">%d பொருட்கள்</item>
+        <item quantity="other">%d பொருட்கள்</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="one">%,d папка</item>
-        <item quantity="few">%,d папок</item>
-        <item quantity="many">%,d папок</item>
-        <item quantity="other">%,d папок</item>
+        <item quantity="one">%d கோப்புறை</item>
+        <item quantity="few">%d கோப்புறைகள்</item>
+        <item quantity="many">%d கோப்புறைகள்</item>
+        <item quantity="other">%d கோப்புறைகள்</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="one">%,d файл</item>
-        <item quantity="few">%,d файлов</item>
-        <item quantity="many">%,d файлов</item>
-        <item quantity="other">%,d файлов</item>
+        <item quantity="one">%d கோப்பு</item>
+        <item quantity="few">%d கோப்புகள்</item>
+        <item quantity="many">%d கோப்புகள்</item>
+        <item quantity="other">%d கோப்புகள்</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">Копирование %,d элемента</item>
-        <item quantity="few">Копирование %,d элементов</item>
-        <item quantity="many">Копирование %,d элементов</item>
-        <item quantity="other">Копирование %,d элементов</item>
+        <item quantity="one">%d பொருள் நகலை நகலெடுக்கின்றன</item>
+        <item quantity="few">%d பொருள்கள் நகலை நகலெடுக்கின்றன</item>
+        <item quantity="many">%d பொருள்கள் நகலை நகலெடுக்கின்றன</item>
+        <item quantity="other">%d பொருள்கள் நகலை நகலெடுக்கின்றன</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">Перемещение %,d элемента</item>
-        <item quantity="few">Перемещение %,d элементов</item>
-        <item quantity="many">Перемещение %,d элементов</item>
-        <item quantity="other">Перемещение %,d элементов</item>
+        <item quantity="one">%d பொருள் நகலை நகலெடுக்கின்றன</item>
+        <item quantity="few">%d பொருள்கள் நகலை நகலெடுக்கின்றன</item>
+        <item quantity="many">%d பொருள்கள் நகலை நகலெடுக்கின்றன</item>
+        <item quantity="other">%d பொருள்கள் நகலை நகலெடுக்கின்றன</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="one">%,d час</item>
-        <item quantity="few">%,d часов</item>
-        <item quantity="many">%,d часов</item>
-        <item quantity="other">%,d часов</item>
+        <item quantity="one">%d மணிநேரம்</item>
+        <item quantity="few">%d மணிநேரம்</item>
+        <item quantity="many">%d மணிநேரம்</item>
+        <item quantity="other">%d மணிநேரம்</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="one">%,d минута</item>
-        <item quantity="few">%,d минут</item>
-        <item quantity="many">%,d минут</item>
-        <item quantity="other">%,d минут</item>
+        <item quantity="one">%d நிமிடம்</item>
+        <item quantity="few">%d நிமிடங்கள்</item>
+        <item quantity="many">%d நிமிடங்கள்</item>
+        <item quantity="other">%d நிமிடங்கள்</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="one">%,d секунда</item>
-        <item quantity="few">%,d секунд</item>
-        <item quantity="many">%,d секунд</item>
-        <item quantity="other">%,d секунд</item>
+        <item quantity="one">%d விநாடி</item>
+        <item quantity="few">%d விநாடிகள்</item>
+        <item quantity="many">%d விநாடிகள்</item>
+        <item quantity="other">%d விநாடிகள்</item>
     </plurals>
     <plurals name="n_pomodoros">
-        <item quantity="one">%,d помидор</item>
-        <item quantity="few">%,d помидоров</item>
-        <item quantity="many">%,d помидоров</item>
-        <item quantity="other">%,d помидоров</item>
+        <item quantity="one">%,d போமோடோரோ</item>
+        <item quantity="few">%,d போமோடோரோ</item>
+        <item quantity="many">%,d போமோடோரோ</item>
+        <item quantity="other">%,d போமோடோரோ</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">Сегодня: %,d помидор</item>
-        <item quantity="few">Сегодня: %,d помидоров</item>
-        <item quantity="many">Сегодня: %,d помидоров</item>
-        <item quantity="other">Сегодня: %,d помидоров</item>
+        <item quantity="one">இன்று: %,d போமோடோரோ</item>
+        <item quantity="few">இன்று: %,d போமோடோரோ</item>
+        <item quantity="many">இன்று: %,d போமோடோரோ</item>
+        <item quantity="other">இன்று: %,d போமோடோரோ</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="one">Всего: %,d помидор</item>
-        <item quantity="few">Всего: %,d помидоров</item>
-        <item quantity="many">Всего: %,d помидоров</item>
-        <item quantity="other">Всего: %,d помидоров</item>
+        <item quantity="one">மொத்தம்: %,d போமோடோரோ</item>
+        <item quantity="few">மொத்தம்: %,d போமோடோரோ</item>
+        <item quantity="many">மொத்தம்: %,d போமோடோரோ</item>
+        <item quantity="other">மொத்தம்: %,d போமோடோரோ</item>
     </plurals>
 </resources>
