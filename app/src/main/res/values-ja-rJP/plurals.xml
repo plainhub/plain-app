@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="other">%,d postagens</item>
+        <item quantity="other">%,d записей</item>
     </plurals>
     <plurals name="items">
-        <item quantity="other">%,d itens</item>
+        <item quantity="other">%,d элементов</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="other">%,d pastas</item>
+        <item quantity="other">%,d папок</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="other">%,d arquivos</item>
+        <item quantity="other">%,d файлов</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="other">Copiando %,d itens</item>
+        <item quantity="other">Копирование %,d элементов</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="other">Movendo %,d itens</item>
+        <item quantity="other">Перемещение %,d элементов</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="other">%,d horas</item>
+        <item quantity="other">%,d часов</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="other">%,d minutos</item>
+        <item quantity="other">%,d минут</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="other">%,d segundos</item>
+        <item quantity="other">%,d секунд</item>
     </plurals>
     <plurals name="n_pomodoros">
-        <item quantity="other">%,d pomodoros</item>
+        <item quantity="other">%,d помидоров</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="other">Hoje: %,d pomodoros</item>
+        <item quantity="other">Сегодня: %,d помидоров</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="other">Total: %,d pomodoros</item>
+        <item quantity="other">Всего: %,d помидоров</item>
     </plurals>
 </resources>
