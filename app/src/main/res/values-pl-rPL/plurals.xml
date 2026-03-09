@@ -1,75 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="one">%,d bài viết</item>
-        <item quantity="few">%,d bài viết</item>
-        <item quantity="many">%,d bài viết</item>
-        <item quantity="other">%,d bài viết</item>
+        <item quantity="one">%,d个帖子</item>
+        <item quantity="few">%,d个帖子</item>
+        <item quantity="many">%,d个帖子</item>
+        <item quantity="other">%,d个帖子</item>
     </plurals>
     <plurals name="items">
-        <item quantity="one">%,d mục</item>
-        <item quantity="few">%,d mục</item>
-        <item quantity="many">%,d mục</item>
-        <item quantity="other">%,d mục</item>
+        <item quantity="one">%,d项</item>
+        <item quantity="few">%,d项</item>
+        <item quantity="many">%,d项</item>
+        <item quantity="other">%,d项</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="one">%,d thư mục</item>
-        <item quantity="few">%,d thư mục</item>
-        <item quantity="many">%,d thư mục</item>
-        <item quantity="other">%,d thư mục</item>
+        <item quantity="one">%,d个目录</item>
+        <item quantity="few">%,d个目录</item>
+        <item quantity="many">%,d个目录</item>
+        <item quantity="other">%,d个目录</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="one">%,d tập tin</item>
-        <item quantity="few">%,d tập tin</item>
-        <item quantity="many">%,d tập tin</item>
-        <item quantity="other">%,d tập tin</item>
+        <item quantity="one">%,d个文件</item>
+        <item quantity="few">%,d个文件</item>
+        <item quantity="many">%,d个文件</item>
+        <item quantity="other">%,d个文件</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">Đang sao chép %,d mục</item>
-        <item quantity="few">Đang sao chép %,d mục</item>
-        <item quantity="many">Đang sao chép %,d mục</item>
-        <item quantity="other">Đang sao chép %,d mục</item>
+        <item quantity="one">复制%,d项</item>
+        <item quantity="few">复制%,d项</item>
+        <item quantity="many">复制%,d项</item>
+        <item quantity="other">复制%,d项</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">Đang di chuyển %,d mục</item>
-        <item quantity="few">Đang di chuyển %,d mục</item>
-        <item quantity="many">Đang di chuyển %,d mục</item>
-        <item quantity="other">Đang di chuyển %,d mục</item>
+        <item quantity="one">移动%,d项</item>
+        <item quantity="few">移动%,d项</item>
+        <item quantity="many">移动%,d项</item>
+        <item quantity="other">移动%,d项</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="one">%,d giờ</item>
-        <item quantity="few">%,d giờ</item>
-        <item quantity="many">%,d giờ</item>
-        <item quantity="other">%,d giờ</item>
+        <item quantity="one">%,d小时</item>
+        <item quantity="few">%,d小时</item>
+        <item quantity="many">%,d小时</item>
+        <item quantity="other">%,d小时</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="one">%,d phút</item>
-        <item quantity="few">%,d phút</item>
-        <item quantity="many">%,d phút</item>
-        <item quantity="other">%,d phút</item>
+        <item quantity="one">%,d分钟</item>
+        <item quantity="few">%,d分钟</item>
+        <item quantity="many">%,d分钟</item>
+        <item quantity="other">%,d分钟</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="one">%,d giây</item>
-        <item quantity="few">%,d giây</item>
-        <item quantity="many">%,d giây</item>
-        <item quantity="other">%,d giây</item>
+        <item quantity="one">%,d秒</item>
+        <item quantity="few">%,d秒</item>
+        <item quantity="many">%,d秒</item>
+        <item quantity="other">%,d秒</item>
     </plurals>
     <plurals name="n_pomodoros">
-        <item quantity="one">%,d pomodoro</item>
-        <item quantity="few">%,d pomodoro</item>
-        <item quantity="many">%,d pomodoro</item>
-        <item quantity="other">%,d pomodoro</item>
+        <item quantity="one">%,d个番茄</item>
+        <item quantity="few">%,d个番茄</item>
+        <item quantity="many">%,d个番茄</item>
+        <item quantity="other">%,d个番茄</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">Hôm nay: %,d pomodoro</item>
-        <item quantity="few">Hôm nay: %,d pomodoro</item>
-        <item quantity="many">Hôm nay: %,d pomodoro</item>
-        <item quantity="other">Hôm nay: %,d pomodoro</item>
+        <item quantity="one">今天: %,d个番茄</item>
+        <item quantity="few">今天: %,d个番茄</item>
+        <item quantity="many">今天: %,d个番茄</item>
+        <item quantity="other">今天: %,d个番茄</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="one">Tổng: %,d pomodoro</item>
-        <item quantity="few">Tổng: %,d pomodoro</item>
-        <item quantity="many">Tổng: %,d pomodoro</item>
-        <item quantity="other">Tổng: %,d pomodoro</item>
+        <item quantity="one">总共: %,d个番茄</item>
+        <item quantity="few">总共: %,d个番茄</item>
+        <item quantity="many">总共: %,d个番茄</item>
+        <item quantity="other">总共: %,d个番茄</item>
     </plurals>
 </resources>
