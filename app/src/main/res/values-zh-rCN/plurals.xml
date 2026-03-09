@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="other">%,d个帖子</item>
+        <item quantity="other">%,d 篇貼文</item>
     </plurals>
     <plurals name="items">
-        <item quantity="other">%,d项</item>
+        <item quantity="other">%,d 項目</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="other">%,d个目录</item>
+        <item quantity="other">%,d 資料夾</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="other">%,d个文件</item>
+        <item quantity="other">%,d 檔案</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="other">复制%,d项</item>
+        <item quantity="other">複製 %,d 項目</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="other">移动%,d项</item>
+        <item quantity="other">移動 %,d 項目</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="other">%,d小时</item>
+        <item quantity="other">%,d 小時</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="other">%,d分钟</item>
+        <item quantity="other">%,d 分鐘</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="other">%,d秒</item>
+        <item quantity="other">%,d 秒</item>
     </plurals>
     <plurals name="n_pomodoros">
-        <item quantity="other">%,d个番茄</item>
+        <item quantity="other">%,d 番茄</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="other">今天: %,d个番茄</item>
+        <item quantity="other">今天: %,d 番茄</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="other">总共: %,d个番茄</item>
+        <item quantity="other">總共: %,d 番茄</item>
     </plurals>
 </resources>
