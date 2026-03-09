@@ -1,75 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="one">%,d পোস্ট</item>
-        <item quantity="few">%,d পোস্টস</item>
-        <item quantity="many">%,d পোস্টস</item>
-        <item quantity="other">%,d পোস্টস</item>
+        <item quantity="one">%,d Beitrag</item>
+        <item quantity="few">%,d Beiträge</item>
+        <item quantity="many">%,d Beiträge</item>
+        <item quantity="other">%,d Beiträge</item>
     </plurals>
     <plurals name="items">
-        <item quantity="one">%,d আইটেম</item>
-        <item quantity="few">%,d আইটেমস</item>
-        <item quantity="many">%,d আইটেমস</item>
-        <item quantity="other">%,d আইটেমস</item>
+        <item quantity="one">%,d Element</item>
+        <item quantity="few">%,d Elemente</item>
+        <item quantity="many">%,d Elemente</item>
+        <item quantity="other">%,d Elemente</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="one">%,d ফোল্ডার</item>
-        <item quantity="few">%,d ফোল্ডারস</item>
-        <item quantity="many">%,d ফোল্ডারস</item>
-        <item quantity="other">%,d ফোল্ডারস</item>
+        <item quantity="one">%,d Ordner</item>
+        <item quantity="few">%,d Ordner</item>
+        <item quantity="many">%,d Ordner</item>
+        <item quantity="other">%,d Ordner</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="one">%,d ফাইল</item>
-        <item quantity="few">%,d ফাইলস</item>
-        <item quantity="many">%,d ফাইলস</item>
-        <item quantity="other">%,d ফাইলস</item>
+        <item quantity="one">%,d Datei</item>
+        <item quantity="few">%,d Dateien</item>
+        <item quantity="many">%,d Dateien</item>
+        <item quantity="other">%,d Dateien</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">%,d আইটেম কপি করা হচ্ছে</item>
-        <item quantity="few">%,d আইটেমস কপি করা হচ্ছে</item>
-        <item quantity="many">%,d আইটেমস কপি করা হচ্ছে</item>
-        <item quantity="other">%,d আইটেমস কপি করা হচ্ছে</item>
+        <item quantity="one">Kopiere %,d Element</item>
+        <item quantity="few">Kopiere %,d Elemente</item>
+        <item quantity="many">Kopiere %,d Elemente</item>
+        <item quantity="other">Kopiere %,d Elemente</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">%,d আইটেম সরানো হচ্ছে</item>
-        <item quantity="few">%,d আইটেমস সরানো হচ্ছে</item>
-        <item quantity="many">%,d আইটেমস সরানো হচ্ছে</item>
-        <item quantity="other">%,d আইটেমস সরানো হচ্ছে</item>
+        <item quantity="one">Verschiebe %,d Element</item>
+        <item quantity="few">Verschiebe %,d Elemente</item>
+        <item quantity="many">Verschiebe %,d Elemente</item>
+        <item quantity="other">Verschiebe %,d Elemente</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="one">%,d ঘণ্টা</item>
-        <item quantity="few">%,d ঘণ্টা</item>
-        <item quantity="many">%,d ঘণ্টা</item>
-        <item quantity="other">%,d ঘণ্টা</item>
+        <item quantity="one">%,d Stunde</item>
+        <item quantity="few">%,d Stunden</item>
+        <item quantity="many">%,d Stunden</item>
+        <item quantity="other">%,d Stunden</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="one">%,d মিনিট</item>
-        <item quantity="few">%,d মিনিট</item>
-        <item quantity="many">%,d মিনিট</item>
-        <item quantity="other">%,d মিনিট</item>
+        <item quantity="one">%,d Minute</item>
+        <item quantity="few">%,d Minuten</item>
+        <item quantity="many">%,d Minuten</item>
+        <item quantity="other">%,d Minuten</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="one">%,d সেকেন্ড</item>
-        <item quantity="few">%,d সেকেন্ড</item>
-        <item quantity="many">%,d সেকেন্ড</item>
-        <item quantity="other">%,d সেকেন্ড</item>
+        <item quantity="one">%,d Sekunde</item>
+        <item quantity="few">%,d Sekunden</item>
+        <item quantity="many">%,d Sekunden</item>
+        <item quantity="other">%,d Sekunden</item>
     </plurals>
     <plurals name="n_pomodoros">
-        <item quantity="one">%,d পামোডরো</item>
-        <item quantity="few">%,d পামোডরো</item>
-        <item quantity="many">%,d পামোডরো</item>
-        <item quantity="other">%,d পামোডরো</item>
+        <item quantity="one">%,d Pomodoro</item>
+        <item quantity="few">%,d Pomodoros</item>
+        <item quantity="many">%,d Pomodoros</item>
+        <item quantity="other">%,d Pomodoros</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">Today: %,d pomodoro</item>
-        <item quantity="few">Today: %,d pomodoros</item>
-        <item quantity="many">Today: %,d pomodoros</item>
-        <item quantity="other">Today: %,d pomodoros</item>
+        <item quantity="one">Heute: %,d Pomodoro</item>
+        <item quantity="few">Heute: %,d Pomodoros</item>
+        <item quantity="many">Heute: %,d Pomodoros</item>
+        <item quantity="other">Heute: %,d Pomodoros</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="one">Total: %,d pomodoro</item>
-        <item quantity="few">Total: %,d pomodoros</item>
-        <item quantity="many">Total: %,d pomodoros</item>
-        <item quantity="other">Total: %,d pomodoros</item>
+        <item quantity="one">Gesamt: %,d Pomodoro</item>
+        <item quantity="few">Gesamt: %,d Pomodoros</item>
+        <item quantity="many">Gesamt: %,d Pomodoros</item>
+        <item quantity="other">Gesamt: %,d Pomodoros</item>
     </plurals>
 </resources>
