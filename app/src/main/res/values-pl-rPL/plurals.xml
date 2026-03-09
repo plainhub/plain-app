@@ -1,75 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="one">%,d postagem</item>
-        <item quantity="few">%,d postagens</item>
-        <item quantity="many">%,d postagens</item>
-        <item quantity="other">%,d postagens</item>
+        <item quantity="one">%,d запись</item>
+        <item quantity="few">%,d записей</item>
+        <item quantity="many">%,d записей</item>
+        <item quantity="other">%,d записей</item>
     </plurals>
     <plurals name="items">
-        <item quantity="one">%,d item</item>
-        <item quantity="few">%,d itens</item>
-        <item quantity="many">%,d itens</item>
-        <item quantity="other">%,d itens</item>
+        <item quantity="one">%,d элемент</item>
+        <item quantity="few">%,d элементов</item>
+        <item quantity="many">%,d элементов</item>
+        <item quantity="other">%,d элементов</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="one">%,d pasta</item>
-        <item quantity="few">%,d pastas</item>
-        <item quantity="many">%,d pastas</item>
-        <item quantity="other">%,d pastas</item>
+        <item quantity="one">%,d папка</item>
+        <item quantity="few">%,d папок</item>
+        <item quantity="many">%,d папок</item>
+        <item quantity="other">%,d папок</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="one">%,d arquivo</item>
-        <item quantity="few">%,d arquivos</item>
-        <item quantity="many">%,d arquivos</item>
-        <item quantity="other">%,d arquivos</item>
+        <item quantity="one">%,d файл</item>
+        <item quantity="few">%,d файлов</item>
+        <item quantity="many">%,d файлов</item>
+        <item quantity="other">%,d файлов</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">Copiando %,d item</item>
-        <item quantity="few">Copiando %,d itens</item>
-        <item quantity="many">Copiando %,d itens</item>
-        <item quantity="other">Copiando %,d itens</item>
+        <item quantity="one">Копирование %,d элемента</item>
+        <item quantity="few">Копирование %,d элементов</item>
+        <item quantity="many">Копирование %,d элементов</item>
+        <item quantity="other">Копирование %,d элементов</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">Movendo %,d item</item>
-        <item quantity="few">Movendo %,d itens</item>
-        <item quantity="many">Movendo %,d itens</item>
-        <item quantity="other">Movendo %,d itens</item>
+        <item quantity="one">Перемещение %,d элемента</item>
+        <item quantity="few">Перемещение %,d элементов</item>
+        <item quantity="many">Перемещение %,d элементов</item>
+        <item quantity="other">Перемещение %,d элементов</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="one">%,d hora</item>
-        <item quantity="few">%,d horas</item>
-        <item quantity="many">%,d horas</item>
-        <item quantity="other">%,d horas</item>
+        <item quantity="one">%,d час</item>
+        <item quantity="few">%,d часов</item>
+        <item quantity="many">%,d часов</item>
+        <item quantity="other">%,d часов</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="one">%,d minuto</item>
-        <item quantity="few">%,d minutos</item>
-        <item quantity="many">%,d minutos</item>
-        <item quantity="other">%,d minutos</item>
+        <item quantity="one">%,d минута</item>
+        <item quantity="few">%,d минут</item>
+        <item quantity="many">%,d минут</item>
+        <item quantity="other">%,d минут</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="one">%,d segundo</item>
-        <item quantity="few">%,d segundos</item>
-        <item quantity="many">%,d segundos</item>
-        <item quantity="other">%,d segundos</item>
+        <item quantity="one">%,d секунда</item>
+        <item quantity="few">%,d секунд</item>
+        <item quantity="many">%,d секунд</item>
+        <item quantity="other">%,d секунд</item>
     </plurals>
     <plurals name="n_pomodoros">
-        <item quantity="one">%,d pomodoro</item>
-        <item quantity="few">%,d pomodoros</item>
-        <item quantity="many">%,d pomodoros</item>
-        <item quantity="other">%,d pomodoros</item>
+        <item quantity="one">%,d помидор</item>
+        <item quantity="few">%,d помидоров</item>
+        <item quantity="many">%,d помидоров</item>
+        <item quantity="other">%,d помидоров</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">Hoje: %,d pomodoro</item>
-        <item quantity="few">Hoje: %,d pomodoros</item>
-        <item quantity="many">Hoje: %,d pomodoros</item>
-        <item quantity="other">Hoje: %,d pomodoros</item>
+        <item quantity="one">Сегодня: %,d помидор</item>
+        <item quantity="few">Сегодня: %,d помидоров</item>
+        <item quantity="many">Сегодня: %,d помидоров</item>
+        <item quantity="other">Сегодня: %,d помидоров</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="one">Total: %,d pomodoro</item>
-        <item quantity="few">Total: %,d pomodoros</item>
-        <item quantity="many">Total: %,d pomodoros</item>
-        <item quantity="other">Total: %,d pomodoros</item>
+        <item quantity="one">Всего: %,d помидор</item>
+        <item quantity="few">Всего: %,d помидоров</item>
+        <item quantity="many">Всего: %,d помидоров</item>
+        <item quantity="other">Всего: %,d помидоров</item>
     </plurals>
 </resources>
