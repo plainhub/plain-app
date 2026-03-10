@@ -1,5 +1,16 @@
 files:
   - source: /app/src/main/res/values/strings.xml
-    translation: /app/src/main/res/values-%android_code%/%original_file_name%
-  - source: /app/src/main/res/values/plurals.xml
-    translation: /app/src/main/res/values-%android_code%/%original_file_name%
+    translation: /app/src/main/res/values-%two_letters_code%/strings.xml
+    type: android
+
+  - source: /app/src/main/res/values/strings.xml
+    translation: /app/src/main/res/values-zh-rCN/strings.xml
+    languages_mapping:
+      two_letters_code:
+        zh-CN: zh-rCN
+
+  - source: /app/src/main/res/values/strings.xml
+    translation: /app/src/main/res/values-zh-rTW/strings.xml
+    languages_mapping:
+      two_letters_code:
+        zh-TW: zh-rTW
