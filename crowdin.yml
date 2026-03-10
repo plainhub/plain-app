@@ -1,15 +1,20 @@
 files:
+
+  # strings
   - source: /app/src/main/res/values/strings.xml
-    translation: /app/src/main/res/values-%two_letters_code%/%original_file_name%
-  - source: /app/src/main/res/values/plurals.xml
-    translation: /app/src/main/res/values-%two_letters_code%/%original_file_name%
-  - source: /app/src/main/res/values/strings.xml
-    translation: /app/src/main/res/values-zh-rCN/strings.xml
+    translation: /app/src/main/res/values-%two_letters_code%/strings.xml
+    type: android
     languages_mapping:
       two_letters_code:
         zh-CN: zh-rCN
-  - source: /app/src/main/res/values/strings.xml
-    translation: /app/src/main/res/values-zh-rTW/strings.xml
+        zh-TW: zh-rTW
+
+  # plurals
+  - source: /app/src/main/res/values/plurals.xml
+    translation: /app/src/main/res/values-%two_letters_code%/plurals.xml
+    type: android
     languages_mapping:
       two_letters_code:
+        zh-CN: zh-rCN
         zh-TW: zh-rTW
+
