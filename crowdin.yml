@@ -1,5 +1,7 @@
 files:
   - source: /app/src/main/res/values/strings.xml
+    ignore:
+      - /app/src/main/res/values-night/**
     translation: /app/src/main/res/values-%two_letters_code%/strings.xml
     type: android
     languages_mapping:
@@ -7,10 +9,7 @@ files:
         zh-CN: zh-rCN
         zh-TW: zh-rTW
   - source: /app/src/main/res/values/plurals.xml
+    ignore:
+      - /app/src/main/res/values-night/**
     translation: /app/src/main/res/values-%two_letters_code%/plurals.xml
     type: android
-    languages_mapping:
-      two_letters_code:
-        zh-CN: zh-rCN
-        zh-TW: zh-rTW
-
