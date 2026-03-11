@@ -13,7 +13,7 @@ import android.media.projection.MediaProjection
 import android.os.Build
 import android.view.Surface
 import android.view.WindowManager
-import com.ismartcoding.lib.isBPlus
+import com.ismartcoding.lib.isUPlus
 import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DScreenMirrorQuality
@@ -398,11 +398,11 @@ class ScreenMirrorWebRtcManager(
     /**
      * Resize or recreate the [VirtualDisplay] to match the current quality / orientation.
      *
-     * Android 16+ (API 36): [MediaProjection.createVirtualDisplay] may only be called once per
+     * Android 14+ (API 34): [MediaProjection.createVirtualDisplay] may only be called once per
      * [MediaProjection] instance. Re-calling it throws "Don't re-use the resultData…".
      * We must use [VirtualDisplay.resize] on these versions.
      *
-     * Android <= 15: [VirtualDisplay.resize] is broken on some Android 11 devices when going
+     * Android <= 13: [VirtualDisplay.resize] is broken on some Android 11 devices when going
      * from a smaller size back to a larger one (e.g. SMOOTH → HD), leaving black bars on the
      * right and bottom edges. Releasing and recreating the VirtualDisplay is the reliable fix.
      */
@@ -410,13 +410,13 @@ class ScreenMirrorWebRtcManager(
         val projection = mediaProjection ?: return
         val (width, height, dpi) = computeCaptureSize()
 
-        if (isBPlus()) {
-            // Android 16+: createVirtualDisplay is one-shot per MediaProjection — use resize().
+        if (isUPlus()) {
+            // Android 14+: createVirtualDisplay is one-shot per MediaProjection — use resize().
             surfaceTextureHelper?.setTextureSize(width, height)
             virtualDisplay?.resize(width, height, dpi)
             LogCat.d("webrtc: VirtualDisplay resized ${width}x${height} dpi=$dpi")
         } else {
-            // Android <= 15: recreate to avoid black-bar regression on Android 11 devices.
+            // Android <= 13: recreate to avoid black-bar regression on Android 11 devices.
 
             // Release old VirtualDisplay
             virtualDisplay?.release()

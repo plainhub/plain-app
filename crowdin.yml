@@ -1,6 +1,4 @@
 files:
-
-  # strings
   - source: /app/src/main/res/values/strings.xml
     translation: /app/src/main/res/values-%two_letters_code%/strings.xml
     type: android
@@ -8,8 +6,6 @@ files:
       two_letters_code:
         zh-CN: zh-rCN
         zh-TW: zh-rTW
-
-  # plurals
   - source: /app/src/main/res/values/plurals.xml
     translation: /app/src/main/res/values-%two_letters_code%/plurals.xml
     type: android
