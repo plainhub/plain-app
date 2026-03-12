@@ -1,0 +1,54 @@
+name: Crowdin — Sync Translations
+
+# Pull approved translations from Crowdin on a weekly schedule and open a PR.
+# Can also be triggered manually from the Actions tab.
+on:
+  schedule:
+    - cron: '0 9 * * 1' # Every Monday at 09:00 UTC
+  workflow_dispatch:
+
+jobs:
+  sync-translations:
+    runs-on: ubuntu-latest
+
+    # Needed to push the l10n branch and open a PR
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Download translations from Crowdin and open PR
+        uses: crowdin/github-action@v2
+        with:
+          upload_sources: false
+          upload_translations: false
+          download_translations: true
+
+          # Branch that accumulates all translation files before merging.
+          # The action creates / force-resets this branch each run.
+          localization_branch_name: l10n/crowdin-translations
+
+          create_pull_request: true
+          pull_request_title: 'chore(i18n): sync translations from Crowdin'
+          pull_request_body: |
+            Automated translation sync via [Crowdin GitHub Action](https://github.com/crowdin/github-action).
+
+            **What's in this PR**
+            - Latest translations fetched from Crowdin for all supported locales
+            - Only keys that have changed since the last sync are modified
+
+            Review the file diffs and merge when the translations look correct.
+            You can re-run the _Crowdin — Sync Translations_ workflow any time to refresh this PR.
+          pull_request_base_branch_name: main
+          pull_request_labels: 'i18n,automated'
+
+          # Set to true if you only want 100 % approved strings in the repo.
+          # false keeps the repo up-to-date with in-progress translations too.
+          export_only_approved: false
+
+          # crowdin.yml at repo root is used automatically
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
