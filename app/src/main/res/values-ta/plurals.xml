@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="one">%d பதிவு</item>
-        <item quantity="other">%d பதிவுகள்</item>
+        <item quantity="one">%,d post</item>
+        <item quantity="other">%,d posts</item>
     </plurals>
     <plurals name="items">
-        <item quantity="one">%d பொருள்</item>
-        <item quantity="other">%d பொருட்கள்</item>
+        <item quantity="one">%,d item</item>
+        <item quantity="other">%,d items</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="one">%d கோப்புறை</item>
-        <item quantity="other">%d கோப்புறைகள்</item>
+        <item quantity="one">%,d folder</item>
+        <item quantity="other">%,d folders</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="one">%d கோப்பு</item>
-        <item quantity="other">%d கோப்புகள்</item>
+        <item quantity="one">%,d file</item>
+        <item quantity="other">%,d files</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">%d பொருள் நகலை நகலெடுக்கின்றன</item>
-        <item quantity="other">%d பொருள்கள் நகலை நகலெடுக்கின்றன</item>
+        <item quantity="one">Copying %,d item</item>
+        <item quantity="other">Copying %,d items</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">%d பொருள் நகலை நகலெடுக்கின்றன</item>
-        <item quantity="other">%d பொருள்கள் நகலை நகலெடுக்கின்றன</item>
+        <item quantity="one">Moving %,d item</item>
+        <item quantity="other">Moving %,d items</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="one">%d மணிநேரம்</item>
-        <item quantity="other">%d மணிநேரம்</item>
+        <item quantity="one">%,d hour</item>
+        <item quantity="other">%,d hours</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="one">%d நிமிடம்</item>
-        <item quantity="other">%d நிமிடங்கள்</item>
+        <item quantity="one">%,d minute</item>
+        <item quantity="other">%,d minutes</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="one">%d விநாடி</item>
-        <item quantity="other">%d விநாடிகள்</item>
+        <item quantity="one">%,d second</item>
+        <item quantity="other">%,d seconds</item>
     </plurals>
     <plurals name="n_pomodoros">
-        <item quantity="one">%,d போமோடோரோ</item>
-        <item quantity="other">%,d போமோடோரோ</item>
+        <item quantity="one">%,d pomodoro</item>
+        <item quantity="other">%,d pomodoros</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">இன்று: %,d போமோடோரோ</item>
-        <item quantity="other">இன்று: %,d போமோடோரோ</item>
+        <item quantity="one">Today: %,d pomodoro</item>
+        <item quantity="other">Today: %,d pomodoros</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="one">மொத்தம்: %,d போமோடோரோ</item>
-        <item quantity="other">மொத்தம்: %,d போமோடோரோ</item>
+        <item quantity="one">Total: %,d pomodoro</item>
+        <item quantity="other">Total: %,d pomodoros</item>
     </plurals>
 </resources>

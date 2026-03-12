@@ -1,51 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="one">%,d 件の投稿</item>
-        <item quantity="other">%,d 件の投稿</item>
+        <item quantity="other">%,d posts</item>
     </plurals>
     <plurals name="items">
-        <item quantity="one">%,d 件のアイテム</item>
-        <item quantity="other">%,d 件のアイテム</item>
+        <item quantity="other">%,d items</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="one">%,d 個のフォルダ</item>
-        <item quantity="other">%,d 個のフォルダ</item>
+        <item quantity="other">%,d folders</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="one">%,d 個のファイル</item>
-        <item quantity="other">%,d 個のファイル</item>
+        <item quantity="other">%,d files</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">%d 個のアイテムをコピー中</item>
-        <item quantity="other">%d 個のアイテムをコピー中</item>
+        <item quantity="other">Copying %,d items</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">%d 個のアイテムを移動中</item>
-        <item quantity="other">%d 個のアイテムを移動中</item>
+        <item quantity="other">Moving %,d items</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="one">%,d 時間</item>
-        <item quantity="other">%,d 時間</item>
+        <item quantity="other">%,d hours</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="one">%,d 分</item>
-        <item quantity="other">%,d 分</item>
+        <item quantity="other">%,d minutes</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="one">%,d 秒</item>
-        <item quantity="other">%,d 秒</item>
+        <item quantity="other">%,d seconds</item>
     </plurals>
     <plurals name="n_pomodoros">
-        <item quantity="one">%,d ポモドーロ</item>
-        <item quantity="other">%,d ポモドーロ</item>
+        <item quantity="other">%,d pomodoros</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">今日: %,d ポモドーロ</item>
-        <item quantity="other">今日: %,d ポモドーロ</item>
+        <item quantity="other">Today: %,d pomodoros</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="one">合計: %,d ポモドーロ</item>
-        <item quantity="other">合計: %,d ポモドーロ</item>
+        <item quantity="other">Total: %,d pomodoros</item>
     </plurals>
 </resources>
