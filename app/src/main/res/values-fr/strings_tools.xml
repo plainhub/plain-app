@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="sound_meter">Détecteur de son</string>
+    <string name="pomodoro_timer">Minuteur Pomodoro</string>
+    <string name="short_break">Courte Pause</string>
+    <string name="long_break">Longue Pause</string>
+    <string name="tomatoes_today">Tomates Aujourd\'hui</string>
+    <string name="current_round">Tour</string>
+    <string name="work_duration">Durée de Travail (minutes)</string>
+    <string name="short_break_duration">Durée de Pause Courte (minutes)</string>
+    <string name="long_break_duration">Durée de Pause Longue (minutes)</string>
+    <string name="pomodoros_before_long_break">Pomodoros Avant Pause Longue</string>
+    <string name="total_pomodoros">Total des Pomodoros</string>
+    <string name="session_complete">Session Terminée !</string>
+    <string name="time_for_break">C\'est l\'heure de la pause !</string>
+    <string name="back_to_work">Retour au travail !</string>
+    <string name="pomodoro_stats">Statistiques Pomodoro</string>
+    <string name="work_time">Temps de Travail</string>
+    <string name="round_counter">Tour %1$d sur %2$d</string>
+    <string name="drag_to_adjust_progress">Glissez pour ajuster la progression</string>
+    <string name="today_completed">Terminé Aujourd\'hui</string>
+    <string name="pomodoro_notification_prompt">Pour afficher les notifications Pomodoro et les alertes du minuteur lorsque les sessions sont terminées, veuillez accorder la permission de recevoir des notifications de l\'application.</string>
+    <string name="work_session_complete">Session de Travail Terminée !</string>
+    <string name="great_job_short_break">Excellent travail ! C\'est l\'heure d\'une courte pause 😊</string>
+    <string name="great_job_long_break">Excellent travail ! C\'est l\'heure d\'une longue pause 😊</string>
+    <string name="break_complete">Pause Terminée !</string>
+    <string name="time_to_work">C\'est l\'heure de retourner au travail 💪</string>
+    <string name="long_break_complete">Longue Pause Terminée !</string>
+    <string name="ready_for_work">Prêt pour une autre session de travail ? 🚀</string>
+    <string name="grant_permission_button">Accorder la Permission</string>
+    <string name="sleep_timer_permission_message">Le minuteur de sommeil a besoin de la permission de programmer des alarmes précises pour fonctionner correctement en arrière-plan. Cela garantit que le minuteur fonctionne même lorsque l\'application n\'est pas active.</string>
+    <string name="play_sound_on_complete">Lire le son lorsque la tâche est terminée</string>
+    <string name="custom_sound">Son personnalisé</string>
+    <string name="select_sound">Sélectionner un son</string>
+    <string name="checked">Coché</string>
+    <string name="min">MIN</string>
+    <string name="avg">MOY</string>
+    <string name="max">MAX</string>
+    <string name="decibel_values">Valeur de décibels de référence</string>
+    <string-array name="decibel_values">
+        <item>10 dB : Respiration, Presque silencieux</item>
+        <item>20 dB : Moustique, Bruissement des feuilles</item>
+        <item>30 dB : Bibliothèque calme, Musique de fond douce</item>
+        <item>40 dB : Conversation calme, Ronronnement du réfrigérateur</item>
+        <item>50 dB : Pluie modérée, Bruit léger de la circulation</item>
+        <item>60 dB : Conversation normale, Environnement de bureau</item>
+        <item>70 dB : Aspirateur, Circulation animée dans la rue</item>
+        <item>80 dB : Klaxon de voiture, Élimination des déchets</item>
+        <item>90 dB : Moto, Métro</item>
+        <item>100 dB : Tronçonneuse, Musique de concert</item>
+        <item>110 dB : Concert de rock, Coup de tonnerre</item>
+        <item>120 dB : Moteur d\'avion au décollage, Sirène d\'ambulance</item>
+        <item>130 dB : Détonation de fusil, Marteau-piqueur</item>
+        <item>140 dB : Avion militaire à réaction, Feux d\'artifice</item>
+    </string-array>
+</resources>

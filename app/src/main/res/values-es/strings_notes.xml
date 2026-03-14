@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="save_to_notes">Guardar en notas</string>
+    <string name="note">Nota</string>
+    <string name="editor_settings">Configuración del editor</string>
+    <string name="show_line_numbers">Mostrar números de línea</string>
+    <string name="wrap_content">Ajustar contenido</string>
+    <string name="syntax_highlight">Resaltado de sintaxis</string>
+    <string name="insert_image">Insertar imagen</string>
+    <string name="image_url">URL de la imagen</string>
+    <string name="image_description">Descripción de la imagen</string>
+    <string name="width">Ancho</string>
+    <string name="browse">Examinar</string>
+    <string name="move_to_trash">Mover a la papelera</string>
+    <string name="trash">Papelera</string>
+    <string name="todo">Por hacer</string>
+    <string name="children_songs">Canciones infantiles</string>
+    <string name="light_music">Música ligera</string>
+    <string name="movie">Película</string>
+    <string name="family">Familia</string>
+    <string name="important">Importante</string>
+    <string name="inspirations">Inspiraciones</string>
+    <string name="personal">Personal</string>
+    <string name="work">Trabajo</string>
+    <string name="note_sample1"># Mi texto de ejemplo de Markdown\n\n## Encabezado 2\n\n### Encabezado 3\n\nEste es un texto **negrita** y un texto *cursiva*. \n\nAquí hay una lista no ordenada:\n\n- Elemento 1\n- Elemento 2\n- Elemento 3\n\nY aquí hay una lista ordenada:\n\n1. Primer elemento\n2. Segundo elemento\n3. Tercer elemento\n\nAquí tienes un ejemplo de una cita en bloque:\n\n> \\\"La mayor gloria en la vida no consiste en no caer nunca, sino en levantarse cada vez que caemos.\\\" - Nelson Mandela\n\nTambién puedes agregar enlaces de esta manera: [Google](https://www.google.com)\n\nY imágenes como esta:\n\n![Logo de Markdown](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### Tabla\n\nAquí tienes un ejemplo de una tabla:\n\n| Nombre   | Edad | Género |\n| ------ | --- | ------ |\n| Alicia  | 20  | Femenino |\n| Bob    | 25  | Masculino |\n| Carlos| 30  | Masculino |\n\n### Fórmula matemática\n\nTambién puedes incluir fórmulas matemáticas usando KaTeX. Aquí tienes un ejemplo:\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
+</resources>

@@ -1,8 +1,8 @@
 /**
  * i18n-find-untranslated.mjs  (plain-app / Android)
  *
- * Compares every locale strings.xml against the base English one in
- * app/src/main/res/values/strings.xml and writes scripts/i18n-todo.json:
+ * Compares every locale strings_*.xml set against the base English strings
+ * in app/src/main/res/values/strings_*.xml and writes scripts/i18n-todo.json:
  *   - missing  : names present in base but absent in locale
  *   - english  : names whose value equals the English one and looks like
  *                real English text (not loanwords / unchanged brand names)
@@ -24,6 +24,18 @@ function parseStrings(file) {
     map.set(m[1], m[2])
   }
   return map
+}
+
+/** Merge all strings_*.xml (and legacy strings.xml) in a directory into one Map. */
+function parseAllStringsInDir(dir) {
+  const merged = new Map()
+  if (!fs.existsSync(dir)) return merged
+  for (const f of fs.readdirSync(dir)) {
+    if (!/^strings.*\.xml$/.test(f)) continue
+    const filePath = path.join(dir, f)
+    for (const [k, v] of parseStrings(filePath)) merged.set(k, v)
+  }
+  return merged
 }
 
 // Android XML entity / CDATA decode (best-effort for comparison only)
@@ -77,8 +89,7 @@ const langMap = {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 const resDir = path.resolve('app/src/main/res')
-const baseFile = path.join(resDir, 'values', 'strings.xml')
-const baseMap = parseStrings(baseFile)
+const baseMap = parseAllStringsInDir(path.join(resDir, 'values'))
 
 // Load stable cache
 const stableFile = path.resolve('scripts/i18n-stable.json')
@@ -91,10 +102,10 @@ let totalMissing = 0
 let totalEnglish = 0
 
 for (const [dir, lang] of Object.entries(langMap)) {
-  const locFile = path.join(resDir, dir, 'strings.xml')
-  if (!fs.existsSync(locFile)) continue
+  const locDir = path.join(resDir, dir)
+  if (!fs.existsSync(locDir)) continue
 
-  const locMap = parseStrings(locFile)
+  const locMap = parseAllStringsInDir(locDir)
   const stableKeys = stable[dir] ?? []
   const missing = []
   const english = []

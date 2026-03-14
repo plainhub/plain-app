@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="sound_meter">Schallpegelmesser</string>
+    <string name="pomodoro_timer">Pomodoro-Timer</string>
+    <string name="short_break">Kurze Pause</string>
+    <string name="long_break">Lange Pause</string>
+    <string name="tomatoes_today">Tomaten heute</string>
+    <string name="current_round">Runde</string>
+    <string name="work_duration">Arbeitsdauer (Minuten)</string>
+    <string name="short_break_duration">Dauer der kurzen Pause (Minuten)</string>
+    <string name="long_break_duration">Dauer der langen Pause (Minuten)</string>
+    <string name="pomodoros_before_long_break">Pomodoros vor langer Pause</string>
+    <string name="total_pomodoros">Gesamte Pomodoros</string>
+    <string name="session_complete">Sitzung abgeschlossen!</string>
+    <string name="time_for_break">Zeit für eine Pause!</string>
+    <string name="back_to_work">Zurück an die Arbeit!</string>
+    <string name="pomodoro_stats">Pomodoro-Statistiken</string>
+    <string name="work_time">Arbeitszeit</string>
+    <string name="round_counter">Runde %1$d von %2$d</string>
+    <string name="drag_to_adjust_progress">Ziehen, um den Fortschritt anzupassen</string>
+    <string name="today_completed">Heute abgeschlossen</string>
+    <string name="pomodoro_notification_prompt">Um Pomodoro-Benachrichtigungen und Timer-Alarme bei abgeschlossenen Sitzungen anzuzeigen, erteilen Sie bitte die Berechtigung, Benachrichtigungen von der App zu empfangen.</string>
+    <string name="work_session_complete">Arbeitssitzung abgeschlossen!</string>
+    <string name="great_job_short_break">Tolle Arbeit! Zeit für eine kurze Pause 😊</string>
+    <string name="great_job_long_break">Tolle Arbeit! Zeit für eine lange Pause 😊</string>
+    <string name="break_complete">Pause abgeschlossen!</string>
+    <string name="time_to_work">Zeit, wieder an die Arbeit zu gehen 💪</string>
+    <string name="long_break_complete">Lange Pause abgeschlossen!</string>
+    <string name="ready_for_work">Bereit für die nächste Arbeitssitzung? 🚀</string>
+    <string name="grant_permission_button">Berechtigung erteilen</string>
+    <string name="sleep_timer_permission_message">Der Schlaf-Timer benötigt die Berechtigung, genaue Alarme zu planen, um im Hintergrund ordnungsgemäß zu funktionieren. Dadurch funktioniert der Timer auch, wenn die App nicht aktiv ist.</string>
+    <string name="play_sound_on_complete">Sound abspielen, wenn abgeschlossen</string>
+    <string name="custom_sound">Benutzerdefinierter Ton</string>
+    <string name="select_sound">Ton auswählen</string>
+    <string name="checked">Ausgewählt</string>
+    <string name="min">MIN</string>
+    <string name="avg">DURCHSCHNITT</string>
+    <string name="max">MAX</string>
+    <string name="decibel_values">Dezibelwertreferenz</string>
+    <string-array name="decibel_values">
+        <item>10 dB: Atmung, Fast leise</item>
+        <item>20 dB: Moskito, Raschelnde Blätter</item>
+        <item>30 dB: Stille Bibliothek, Leise Hintergrundmusik</item>
+        <item>40 dB: Leises Gespräch, Kühlschranksummen</item>
+        <item>50 dB: Mäßiger Regen, Leichter Verkehrslärm</item>
+        <item>60 dB: Normales Gespräch, Büroumgebung</item>
+        <item>70 dB: Staubsauger, Belebter Straßenverkehr</item>
+        <item>80 dB: Autohupe, Müllentsorgung</item>
+        <item>90 dB: Motorrad, U-Bahnzug</item>
+        <item>100 dB: Kettensäge, Konzertmusik</item>
+        <item>110 dB: Rockkonzert, Donnerschlag</item>
+        <item>120 dB: Düsentriebwerk beim Start, Krankenwagensirene</item>
+        <item>130 dB: Schrotflintenschuss, Presslufthammer</item>
+        <item>140 dB: Militärjet, Feuerwerk</item>
+    </string-array>
+</resources>

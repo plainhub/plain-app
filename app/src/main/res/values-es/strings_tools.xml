@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="sound_meter">Medidor de sonido</string>
+    <string name="pomodoro_timer">Temporizador Pomodoro</string>
+    <string name="short_break">Pausa corta</string>
+    <string name="long_break">Pausa larga</string>
+    <string name="tomatoes_today">Tomates de hoy</string>
+    <string name="current_round">Ronda</string>
+    <string name="work_duration">Duración del trabajo (minutos)</string>
+    <string name="short_break_duration">Duración de la pausa corta (minutos)</string>
+    <string name="long_break_duration">Duración de la pausa larga (minutos)</string>
+    <string name="pomodoros_before_long_break">Pomodoros antes de la pausa larga</string>
+    <string name="total_pomodoros">Pomodoros totales</string>
+    <string name="session_complete">¡Sesión completada!</string>
+    <string name="time_for_break">¡Hora de una pausa!</string>
+    <string name="back_to_work">¡De vuelta al trabajo!</string>
+    <string name="pomodoro_stats">Estadísticas Pomodoro</string>
+    <string name="work_time">Tiempo de trabajo</string>
+    <string name="round_counter">Ronda %1$d de %2$d</string>
+    <string name="drag_to_adjust_progress">Arrastra para ajustar el progreso</string>
+    <string name="today_completed">Completado hoy</string>
+    <string name="pomodoro_notification_prompt">Para mostrar notificaciones y alertas del temporizador Pomodoro al finalizar las sesiones, concede permiso para recibir notificaciones de la aplicación.</string>
+    <string name="work_session_complete">¡Sesión de trabajo completada!</string>
+    <string name="great_job_short_break">¡Buen trabajo! Hora de una pausa corta 😊</string>
+    <string name="great_job_long_break">¡Buen trabajo! Hora de una pausa larga 😊</string>
+    <string name="break_complete">¡Pausa completada!</string>
+    <string name="time_to_work">Es hora de volver al trabajo 💪</string>
+    <string name="long_break_complete">¡Pausa larga completada!</string>
+    <string name="ready_for_work">¿Listo para otra sesión de trabajo? 🚀</string>
+    <string name="grant_permission_button">Conceder permiso</string>
+    <string name="sleep_timer_permission_message">El temporizador de suspensión necesita permiso para programar alarmas exactas y funcionar correctamente en segundo plano. Esto asegura que funcione incluso cuando la app no esté activa.</string>
+    <string name="play_sound_on_complete">Reproducir sonido al finalizar</string>
+    <string name="custom_sound">Sonido personalizado</string>
+    <string name="select_sound">Seleccionar sonido</string>
+    <string name="checked">Seleccionado</string>
+    <string name="min">Mínimo</string>
+    <string name="avg">Promedio</string>
+    <string name="max">Máximo</string>
+    <string name="decibel_values">Valores de decibelios de referencia</string>
+    <string-array name="decibel_values">
+        <item>10 dB: Respiración, Casi en silencio</item>
+        <item>20 dB: Mosquito, Hojas susurrantes</item>
+        <item>30 dB: Biblioteca tranquila, Música de fondo suave</item>
+        <item>40 dB: Conversación tranquila, Zumbido de refrigerador</item>
+        <item>50 dB: Lluvia moderada, Ruido de tráfico ligero</item>
+        <item>60 dB: Conversación normal, Entorno de oficina</item>
+        <item>70 dB: Aspiradora, Tráfico intenso en la calle</item>
+        <item>80 dB: Bocina de automóvil, Trituradora de basura</item>
+        <item>90 dB: Motocicleta, Tren del metro</item>
+        <item>100 dB: Motosierra, Música de concierto</item>
+        <item>110 dB: Concierto de rock, Trueno</item>
+        <item>120 dB: Motor de avión al despegar, Sirena de ambulancia</item>
+        <item>130 dB: Disparo de escopeta, Martillo percutor</item>
+        <item>140 dB: Avión militar a reacción, Fuegos artificiales</item>
+    </string-array>
+</resources>

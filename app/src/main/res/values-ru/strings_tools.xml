@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="sound_meter">Звуковой метр</string>
+    <string name="pomodoro_timer">Таймер Помодоро</string>
+    <string name="short_break">Короткий перерыв</string>
+    <string name="long_break">Длинный перерыв</string>
+    <string name="tomatoes_today">Сегодняшние помидоры</string>
+    <string name="current_round">Раунд</string>
+    <string name="work_duration">Продолжительность работы (минуты)</string>
+    <string name="short_break_duration">Продолжительность короткого перерыва (минуты)</string>
+    <string name="long_break_duration">Продолжительность длинного перерыва (минуты)</string>
+    <string name="pomodoros_before_long_break">Помодоро до длинного перерыва</string>
+    <string name="total_pomodoros">Всего помодоро</string>
+    <string name="session_complete">Сессия завершена!</string>
+    <string name="time_for_break">Время для перерыва!</string>
+    <string name="back_to_work">Возвращайтесь к работе!</string>
+    <string name="pomodoro_stats">Статистика Помодоро</string>
+    <string name="work_time">Время работы</string>
+    <string name="round_counter">Раунд %1$d из %2$d</string>
+    <string name="drag_to_adjust_progress">Перетащите, чтобы скорректировать прогресс</string>
+    <string name="today_completed">Завершено сегодня</string>
+    <string name="pomodoro_notification_prompt">Чтобы отображать уведомления и оповещения после завершения сессий, предоставьте приложению разрешение на отправку уведомлений.</string>
+    <string name="work_session_complete">Рабочая сессия завершена!</string>
+    <string name="great_job_short_break">Отличная работа! Время для короткого перерыва 😊</string>
+    <string name="great_job_long_break">Отличная работа! Время для длинного перерыва 😊</string>
+    <string name="break_complete">Перерыв завершен!</string>
+    <string name="time_to_work">Пора вернуться к работе 💪</string>
+    <string name="long_break_complete">Длинный перерыв завершен!</string>
+    <string name="ready_for_work">Готовы к новой рабочей сессии? 🚀</string>
+    <string name="grant_permission_button">Предоставить разрешение</string>
+    <string name="sleep_timer_permission_message">Таймер сна требует разрешения на установку точных будильников для корректной работы в фоновом режиме, даже когда приложение не активно.</string>
+    <string name="play_sound_on_complete">Воспроизвести звук при завершении</string>
+    <string name="custom_sound">Пользовательский звук</string>
+    <string name="select_sound">Выбрать звук</string>
+    <string name="checked">Выбрано</string>
+    <string name="min">МИН</string>
+    <string name="avg">СРЕД</string>
+    <string name="max">МАКС</string>
+    <string name="decibel_values">Справочное значение уровня децибел</string>
+    <string-array name="decibel_values">
+        <item>10 дБ: Дыхание, Почти тихо</item>
+        <item>20 дБ: Комар, Шелест листьев</item>
+        <item>30 дБ: Тихая библиотека, Тихая фоновая музыка</item>
+        <item>40 дБ: Тихий разговор, Гул холодильника</item>
+        <item>50 дБ: Умеренный дождь, Легкий шум трафика</item>
+        <item>60 дБ: Обычный разговор, Офисная среда</item>
+        <item>70 дБ: Пылесос, Оживленное уличное движение</item>
+        <item>80 дБ: Гудок автомобиля, Утилизация мусора</item>
+        <item>90 дБ: Мотоцикл, Подземка</item>
+        <item>100 дБ: Бензопила, Концертная музыка</item>
+        <item>110 дБ: Рок-концерт, Гром</item>
+        <item>120 дБ: Реактивный двигатель на взлете, Сирена скорой помощи</item>
+        <item>130 дБ: Выстрел из ружья, Пневматический молот</item>
+        <item>140 дБ: Военный реактивный истребитель, Фейерверк</item>
+    </string-array>
+</resources>

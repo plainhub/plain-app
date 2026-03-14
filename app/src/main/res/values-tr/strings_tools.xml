@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="custom_sound">Özel ses</string>
+    <string name="select_sound">Ses seç</string>
+    <string name="sound_meter">Ses ölçer</string>
+    <string name="pomodoro_timer">Pomodoro Zamanlayıcısı</string>
+    <string name="short_break">Kısa mola</string>
+    <string name="long_break">Uzun mola</string>
+    <string name="tomatoes_today">Bugünkü domatesler</string>
+    <string name="current_round">Tur</string>
+    <string name="work_duration">Çalışma süresi (dakika)</string>
+    <string name="short_break_duration">Kısa mola süresi (dakika)</string>
+    <string name="long_break_duration">Uzun mola süresi (dakika)</string>
+    <string name="pomodoros_before_long_break">Uzun moladan önceki Pomodoro sayısı</string>
+    <string name="total_pomodoros">Toplam Pomodoro</string>
+    <string name="session_complete">Oturum tamamlandı!</string>
+    <string name="time_for_break">Mola zamanı!</string>
+    <string name="back_to_work">Çalışmaya geri dön!</string>
+    <string name="pomodoro_stats">Pomodoro İstatistikleri</string>
+    <string name="work_time">Çalışma süresi</string>
+    <string name="round_counter">%2$d turdan %1$d</string>
+    <string name="drag_to_adjust_progress">İlerlemenizi ayarlamak için sürükleyin</string>
+    <string name="today_completed">Bugün tamamlandı</string>
+    <string name="pomodoro_notification_prompt">Oturumlar tamamlandığında Pomodoro bildirimleri ve uyarılarını gösterebilmek için uygulamaya bildirim izni verin.</string>
+    <string name="work_session_complete">Çalışma oturumu tamamlandı!</string>
+    <string name="great_job_short_break">Harika iş! Kısa bir mola zamanı 😊</string>
+    <string name="great_job_long_break">Harika iş! Uzun bir mola zamanı 😊</string>
+    <string name="break_complete">Mola tamamlandı!</string>
+    <string name="time_to_work">Çalışmaya geri dönme zamanı 💪</string>
+    <string name="long_break_complete">Uzun mola tamamlandı!</string>
+    <string name="ready_for_work">Yeni bir çalışma oturumuna hazır mısın? 🚀</string>
+    <string name="grant_permission_button">İzin ver</string>
+    <string name="sleep_timer_permission_message">Uyku zamanlayıcısının arka planda düzgün çalışabilmesi için tam zamanlı alarmları planlamak adına izne ihtiyacı vardır.</string>
+    <string name="play_sound_on_complete">Tamamlandığında ses çal</string>
+    <string name="checked">Kontrol edildi</string>
+    <string name="min">MIN</string>
+    <string name="avg">ORT</string>
+    <string name="max">MAX</string>
+    <string name="decibel_values">Desibel değeri referansı</string>
+    <string-array name="decibel_values">
+        <item>10 dB: Nefes alma, Neredeyse sessiz</item>
+        <item>20 dB: Sivrisinek, Hışırdayan yapraklar</item>
+        <item>30 dB: Sessiz kütüphane, Yumuşak arka plan müziği</item>
+        <item>40 dB: Sessiz konuşma, Buzdolabı uğultusu</item>
+        <item>50 dB: Orta şiddette yağmur, Hafif trafik gürültüsü</item>
+        <item>60 dB: Normal konuşma, Ofis ortamı</item>
+        <item>70 dB: Elektrikli süpürge, Yoğun cadde trafiği</item>
+        <item>80 dB: Araba kornası, Çöp öğütücü</item>
+        <item>90 dB: Motosiklet, Metro treni</item>
+        <item>100 dB: Motorlu testere, Konser müziği</item>
+        <item>110 dB: Rock konseri, Gök gürültüsü</item>
+        <item>120 dB: Kalkış yapan jet motoru, Ambulans sireni</item>
+        <item>130 dB: Av tüfeği patlaması, Kırıcı</item>
+        <item>140 dB: Askeri jet uçağı, Havai fişek</item>
+    </string-array>
+</resources>

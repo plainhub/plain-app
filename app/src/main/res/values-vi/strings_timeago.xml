@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="timeago_now">ngay bây giờ</string>
+    <string name="timeago_oneminute_past">1 phút trước</string>
+    <string name="timeago_xminutes_past">%1\$s phút trước</string>
+    <string name="timeago_aboutanhour_past">khoảng một giờ trước</string>
+    <string name="timeago_xhours_past">%1\$s giờ trước</string>
+    <string name="timeago_oneday_past">hôm qua</string>
+    <string name="timeago_xdays_past">%1\$s ngày trước</string>
+    <string name="timeago_oneweek_past">một tuần trước</string>
+    <string name="timeago_xweeks_past">%1\$s tuần trước</string>
+    <string name="timeago_aboutamonth_past">khoảng một tháng trước</string>
+    <string name="timeago_xmonths_past">%1\$s tháng trước</string>
+    <string name="timeago_aboutayear_past">khoảng một năm trước</string>
+    <string name="timeago_overayear_past">hơn một năm trước</string>
+    <string name="timeago_almosttwoyears_past">gần hai năm trước</string>
+    <string name="timeago_xyears_past">%1\$s năm trước</string>
+    <string name="timeago_oneminute_future">trong vòng một phút</string>
+    <string name="timeago_xminutes_future">trong vòng %1\$s phút</string>
+    <string name="timeago_aboutanhour_future">trong khoảng một giờ</string>
+    <string name="timeago_xhours_future">trong vòng %1\$s giờ</string>
+    <string name="timeago_oneday_future">ngày mai</string>
+    <string name="timeago_xdays_future">trong vòng %1\$s ngày</string>
+    <string name="timeago_oneweek_future">trong vòng một tuần</string>
+    <string name="timeago_xweeks_future">trong vòng %1\$s tuần</string>
+    <string name="timeago_aboutamonth_future">trong khoảng một tháng</string>
+    <string name="timeago_xmonths_future">trong vòng %1\$s tháng</string>
+    <string name="timeago_aboutayear_future">trong khoảng một năm</string>
+    <string name="timeago_overayear_future">trong vòng hơn một năm</string>
+    <string name="timeago_almosttwoyears_future">trong vòng gần hai năm</string>
+    <string name="timeago_xyears_future">trong vòng %1\$s năm</string>
+</resources>

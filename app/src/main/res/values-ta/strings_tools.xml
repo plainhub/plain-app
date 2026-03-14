@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="custom_sound">பிரத்தியேக ஒலி</string>
+    <string name="select_sound">ஒலியைத் தேர்ந்தெடுக்கவும்</string>
+    <string name="sound_meter">ஒலிக்குக் கோளி</string>
+    <string name="pomodoro_timer">பொமடோரோ நேரமிடி</string>
+    <string name="short_break">குறுகிய இடைவேளை</string>
+    <string name="long_break">நீண்ட இடைவேளை</string>
+    <string name="tomatoes_today">இன்றைய டொமேட்டோக்கள்</string>
+    <string name="current_round">வட்டம்</string>
+    <string name="work_duration">வேலை நேரம் (நிமிடங்கள்)</string>
+    <string name="short_break_duration">குறுகிய இடைவேளை நேரம் (நிமிடங்கள்)</string>
+    <string name="long_break_duration">நீண்ட இடைவேளை நேரம் (நிமிடங்கள்)</string>
+    <string name="pomodoros_before_long_break">நீண்ட இடைவேளைக்கு முன் பொமடோரோ</string>
+    <string name="total_pomodoros">மொத்த பொமடோரோ</string>
+    <string name="session_complete">அமர்வு முடிந்தது!</string>
+    <string name="time_for_break">இடைவேளைக்கு நேரம்!</string>
+    <string name="back_to_work">திரும்பி வேலைக்கு செல்லுங்கள்!</string>
+    <string name="pomodoro_stats">பொமடோரோ புள்ளிவிவரங்கள்</string>
+    <string name="work_time">வேலை நேரம்</string>
+    <string name="round_counter">%2$d இல் %1$d வட்டம்</string>
+    <string name="drag_to_adjust_progress">முன்னேற்றத்தை சரிசெய்ய இழுக்கவும்</string>
+    <string name="today_completed">இன்று முடிக்கப்பட்டவை</string>
+    <string name="pomodoro_notification_prompt">பொமடோரோ அறிவிப்புகள் மற்றும் டைமர் எச்சரிக்கைகளை காட்ட, செயலியில் இருந்து அறிவிப்புகளை பெற அனுமதி கொடுக்கவும்.</string>
+    <string name="work_session_complete">வேலை அமர்வு முடிந்தது!</string>
+    <string name="great_job_short_break">அருமை! குறுகிய இடைவேளை நேரம் 😊</string>
+    <string name="great_job_long_break">அருமை! நீண்ட இடைவேளை நேரம் 😊</string>
+    <string name="break_complete">இடைவேளை முடிந்தது!</string>
+    <string name="time_to_work">திரும்பி வேலை செய்ய நேரம் 💪</string>
+    <string name="long_break_complete">நீண்ட இடைவேளை முடிந்தது!</string>
+    <string name="ready_for_work">மீண்டும் வேலைக்குத் தயாரா? 🚀</string>
+    <string name="grant_permission_button">அனுமதி வழங்கவும்</string>
+    <string name="sleep_timer_permission_message">பின்தோன்றும் நிலையில் நேரத்துக்கேற்ப செயல்பட, உறக்க நேரமிடிக்கு துல்லிய அலாரங்களை திட்டமிட அனுமதி தேவை.</string>
+    <string name="play_sound_on_complete">முடிவுக்கு ஒலியை பதிவிறக்கு</string>
+    <string name="checked">சரிபார்க்கப்பட்டது</string>
+    <string name="min">குறைந்தது</string>
+    <string name="avg">சராசரி</string>
+    <string name="max">அதிகமான</string>
+    <string name="decibel_values">டெசிபெல் மதிப்பு குறிக்கோள்</string>
+    <string-array name="decibel_values">
+        <item>10 dB: உச்சிதம், குழந்தை உயிரில்</item>
+        <item>20 dB: பாரக்கில், இலேவஸில் இலேவஸில்</item>
+        <item>30 dB: குழந்தை மேளம், மெலோடியான் இசை</item>
+        <item>40 dB: இலேவஸில் உரை, ஃபிரிஜிடர் இசை</item>
+        <item>50 dB: மிதமான மழை, எளிமையான சாலை சொல்</item>
+        <item>60 dB: சாதாரண உரை, அலுவலர சொல்</item>
+        <item>70 dB: வேகமான குழந்தைகள், கிடைக்கும் வானகாரி</item>
+        <item>80 dB: கார் ஹார்ன், குழப்பத்திற்கு</item>
+        <item>90 dB: மோட்டார் சைகிள், சப்வே டிரென்</item>
+        <item>100 dB: செய்துபோக்கு, காண்சர்ட் இசை</item>
+        <item>110 dB: ராக் கான்சர்ட், உருட்டுத்தொட்டது</item>
+        <item>120 dB: ஜெட் எஞ்சின் அடையும் போது, அவன்லேன்ச் சைரன்</item>
+        <item>130 dB: ஷாட்கன் பிளாஸ்ட், ஜாக்க்காமர்</item>
+        <item>140 dB: மிலிடரி ஜெட் விமானம், வெடிக்கும்</item>
+    </string-array>
+</resources>

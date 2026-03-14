@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="save_to_notes">Lưu vào ghi chú</string>
+    <string name="note">Ghi chú</string>
+    <string name="editor_settings">Cài đặt biên tập</string>
+    <string name="show_line_numbers">Hiển thị số dòng</string>
+    <string name="wrap_content">Bọc nội dung</string>
+    <string name="syntax_highlight">Đánh dấu cú pháp</string>
+    <string name="insert_image">Chèn hình ảnh</string>
+    <string name="image_url">URL hình ảnh</string>
+    <string name="image_description">Mô tả hình ảnh</string>
+    <string name="width">Chiều rộng</string>
+    <string name="browse">Duyệt</string>
+    <string name="move_to_trash">Di chuyển vào thùng rác</string>
+    <string name="trash">Thùng rác</string>
+    <string name="todo">Làm</string>
+    <string name="children_songs">Nhạc thiếu nhi</string>
+    <string name="light_music">Nhạc nhẹ</string>
+    <string name="movie">Phim</string>
+    <string name="family">Gia đình</string>
+    <string name="important">Quan trọng</string>
+    <string name="inspirations">Sáng tạo</string>
+    <string name="personal">Cá nhân</string>
+    <string name="work">Công việc</string>
+    <string name="note_sample1"># Mẫu Văn bản Markdown của Tôi\n\n## Tiêu đề 2\n\n### Tiêu đề 3\n\nĐây là một số **văn bản in đậm** và một số *văn bản in nghiêng*. \n\nDưới đây là một danh sách không thứ tự:\n\n- Mục 1\n- Mục 2\n- Mục 3\n\nVà dưới đây là một danh sách có thứ tự:\n\n1. Mục đầu tiên\n2. Mục thứ hai\n3. Mục thứ ba\n\nDưới đây là một ví dụ về blockquote:\n\n> \\\"Vinh quang lớn nhất trong cuộc sống không phải là không bao giờ ngã, mà là đứng lên mỗi khi chúng ta ngã.\\\" - Nelson Mandela\n\nBạn cũng có thể thêm liên kết như sau: [Google](https://www.google.com)\n\nVà hình ảnh như sau:\n\n![Biểu tượng Markdown](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### Bảng\n\nDưới đây là một ví dụ về bảng:\n\n| Tên    | Tuổi | Giới tính |\n| ------ | ---- | --------- |\n| Alice  | 20   | Nữ        |\n| Bob    | 25   | Nam       |\n| Charlie| 30   | Nam       |\n\n### Công thức toán học\n\nBạn cũng có thể bao gồm các công thức toán học bằng cách sử dụng KaTeX. Dưới đây là một ví dụ:\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
+</resources>

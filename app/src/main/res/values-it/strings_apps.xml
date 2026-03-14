@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="apps">App</string>
+    <string name="launch">Avvia</string>
+    <string name="uninstall">Disinstalla</string>
+    <string name="view_in_settings">Visualizza nelle impostazioni</string>
+    <string name="source_directory">Directory di origine</string>
+    <string name="data_directory">Directory dati</string>
+    <string name="more_info">Ulteriori informazioni</string>
+    <string name="sdk">Obiettivo: {{ target }}, Minimo: {{ min }}</string>
+    <string name="installed_at">Installato il</string>
+    <string name="app_size">Dimensione app</string>
+    <string name="user_app">App utente</string>
+    <string name="system_app">App di sistema</string>
+    <string name="large_heap">Grande heap</string>
+    <string name="app_type_user">Utente</string>
+    <string name="app_type_system">Sistema</string>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="apps">ऐप्स</string>
+    <string name="launch">लॉन्च करें</string>
+    <string name="uninstall">अनइंस्टॉल करें</string>
+    <string name="view_in_settings">सेटिंग्स में देखें</string>
+    <string name="source_directory">स्रोत निर्देशिका</string>
+    <string name="data_directory">डेटा निर्देशिका</string>
+    <string name="more_info">अधिक जानकारी</string>
+    <string name="sdk">लक्ष्य: {{ target }}, न्यूनतम: {{ min }}</string>
+    <string name="installed_at">इंस्टॉल किया गया</string>
+    <string name="app_size">एप्लिकेशन का आकार</string>
+    <string name="user_app">उपयोगकर्ता ऐप</string>
+    <string name="system_app">सिस्टम ऐप</string>
+    <string name="large_heap">बड़ा ढेर</string>
+    <string name="app_type_user">उपयोगकर्ता</string>
+    <string name="app_type_system">सिस्टम</string>
+</resources>

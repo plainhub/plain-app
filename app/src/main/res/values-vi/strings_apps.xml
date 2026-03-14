@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="apps">Ứng dụng</string>
+    <string name="launch">Khởi chạy</string>
+    <string name="uninstall">Gỡ cài đặt</string>
+    <string name="view_in_settings">Xem trong cài đặt</string>
+    <string name="source_directory">Thư mục nguồn</string>
+    <string name="data_directory">Thư mục dữ liệu</string>
+    <string name="more_info">Thông tin thêm</string>
+    <string name="sdk">Mục tiêu: {{ target }}, Tối thiểu: {{ min }}</string>
+    <string name="installed_at">Đã cài đặt vào</string>
+    <string name="app_size">Kích thước ứng dụng</string>
+    <string name="user_app">Ứng dụng người dùng</string>
+    <string name="system_app">Ứng dụng hệ thống</string>
+    <string name="large_heap">Dải bộ nhớ lớn</string>
+    <string name="app_type_user">Người dùng</string>
+    <string name="app_type_system">Hệ thống</string>
+</resources>

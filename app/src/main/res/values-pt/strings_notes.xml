@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="save_to_notes">Salvar em notas</string>
+    <string name="note">Nota</string>
+    <string name="editor_settings">Configurações do editor</string>
+    <string name="show_line_numbers">Mostrar números de linha</string>
+    <string name="wrap_content">Ajustar conteúdo</string>
+    <string name="syntax_highlight">Realce de sintaxe</string>
+    <string name="insert_image">Inserir imagem</string>
+    <string name="image_url">URL da imagem</string>
+    <string name="image_description">Descrição da imagem</string>
+    <string name="width">Largura</string>
+    <string name="browse">Navegar</string>
+    <string name="move_to_trash">Mover para a lixeira</string>
+    <string name="trash">Lixeira</string>
+    <string name="todo">A fazer</string>
+    <string name="children_songs">Músicas infantis</string>
+    <string name="light_music">Música leve</string>
+    <string name="movie">Filme</string>
+    <string name="family">Família</string>
+    <string name="important">Importante</string>
+    <string name="inspirations">Inspirações</string>
+    <string name="personal">Pessoal</string>
+    <string name="work">Trabalho</string>
+    <string name="note_sample1"># Meu Exemplo de Texto em Markdown\n\n## Título 2\n\n### Título 3\n\nEste é algum **texto em negrito** e algum texto *itálico*. \n\nAqui está uma lista não ordenada:\n\n- Item 1\n- Item 2\n- Item 3\n\nE aqui está uma lista ordenada:\n\n1. Primeiro item\n2. Segundo item\n3. Terceiro item\n\nAqui está um exemplo de bloco de citação:\n\n> \\\"A maior glória na vida não está em nunca cair, mas em levantar-se cada vez que caímos.\\\" - Nelson Mandela\n\nVocê também pode adicionar links assim: [Google](https://www.google.com)\n\nE imagens assim:\n\n![Logotipo do Markdown](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### Tabela\n\nAqui está um exemplo de tabela:\n\n| Nome   | Idade | Gênero |\n| ------ | ----- | ------ |\n| Alice  | 20    | Feminino |\n| Bob    | 25    | Masculino |\n| Charlie| 30    | Masculino |\n\n### Fórmula matemática\n\nVocê também pode incluir fórmulas matemáticas usando KaTeX. Aqui está um exemplo:\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
+</resources>

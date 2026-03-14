@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="save_to_notes">Enregistrer dans les notes</string>
+    <string name="note">Remarque</string>
+    <string name="editor_settings">Paramètres de l\'éditeur</string>
+    <string name="show_line_numbers">Afficher les numéros de ligne</string>
+    <string name="wrap_content">Ajuster le contenu</string>
+    <string name="syntax_highlight">Mise en évidence de la syntaxe</string>
+    <string name="insert_image">Insérer une image</string>
+    <string name="image_url">URL de l\'image</string>
+    <string name="image_description">Description de l\'image</string>
+    <string name="width">Largeur</string>
+    <string name="browse">Naviguer</string>
+    <string name="move_to_trash">Déplacer vers la corbeille</string>
+    <string name="trash">Corbeille</string>
+    <string name="todo">À faire</string>
+    <string name="children_songs">Chansons pour enfants</string>
+    <string name="light_music">Musique légère</string>
+    <string name="movie">Film</string>
+    <string name="family">Famille</string>
+    <string name="important">Important</string>
+    <string name="inspirations">Inspirations</string>
+    <string name="personal">Personnel</string>
+    <string name="work">Travail</string>
+    <string name="note_sample1"># Mon exemple de texte Markdown\n\n## Titre 2\n\n### Titre 3\n\nCeci est un texte **gras** et un texte *italique*. \n\nVoici une liste non ordonnée :\n\n- Élément 1\n- Élément 2\n- Élément 3\n\nEt voici une liste ordonnée :\n\n1. Premier élément\n2. Deuxième élément\n3. Troisième élément\n\nVoici un exemple de citation :\n\n> \\\"La plus grande gloire dans la vie ne consiste pas à ne jamais tomber, mais à se relever chaque fois que nous tombons.\\\" - Nelson Mandela\n\nVous pouvez également ajouter des liens comme ceci : [Google](https://www.google.com)\n\nEt des images comme ceci :\n\n![Logo Markdown](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### Tableau\n\nVoici un exemple de tableau :\n\n| Nom    | Âge | Genre  |\n| ------ | --- | ------ |\n| Alice  | 20  | Femme  |\n| Bob    | 25  | Homme  |\n| Charlie| 30  | Homme  |\n\n### Formule mathématique\n\nVous pouvez également inclure des formules mathématiques en utilisant KaTeX. Voici un exemple :\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
+</resources>

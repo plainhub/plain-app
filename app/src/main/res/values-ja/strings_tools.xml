@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="sound_meter">音量メーター</string>
+    <string name="pomodoro_timer">ポモドーロタイマー</string>
+    <string name="short_break">短い休憩</string>
+    <string name="long_break">長い休憩</string>
+    <string name="tomatoes_today">今日のトマト</string>
+    <string name="current_round">ラウンド</string>
+    <string name="work_duration">作業時間（分）</string>
+    <string name="short_break_duration">短い休憩の時間（分）</string>
+    <string name="long_break_duration">長い休憩の時間（分）</string>
+    <string name="pomodoros_before_long_break">長い休憩前のポモドーロ数</string>
+    <string name="total_pomodoros">合計ポモドーロ</string>
+    <string name="session_complete">セッション完了！</string>
+    <string name="time_for_break">休憩の時間です！</string>
+    <string name="back_to_work">作業に戻りましょう！</string>
+    <string name="pomodoro_stats">ポモドーロ統計</string>
+    <string name="work_time">作業時間</string>
+    <string name="round_counter">%2$d 回中 %1$d 回目</string>
+    <string name="drag_to_adjust_progress">進捗を調整するにはドラッグ</string>
+    <string name="today_completed">今日の完了数</string>
+    <string name="pomodoro_notification_prompt">セッション完了時に通知とアラートを表示するには、アプリに通知の許可を与えてください。</string>
+    <string name="work_session_complete">作業セッション完了！</string>
+    <string name="great_job_short_break">お疲れ様！短い休憩を取りましょう 😊</string>
+    <string name="great_job_long_break">お疲れ様！長い休憩を取りましょう 😊</string>
+    <string name="break_complete">休憩終了！</string>
+    <string name="time_to_work">作業に戻る時間です 💪</string>
+    <string name="long_break_complete">長い休憩終了！</string>
+    <string name="ready_for_work">次の作業セッションの準備はできましたか？ 🚀</string>
+    <string name="grant_permission_button">許可を与える</string>
+    <string name="sleep_timer_permission_message">スリープタイマーを正確にスケジュールするには許可が必要です。アプリが非アクティブな状態でも正常に動作させるためです。</string>
+    <string name="play_sound_on_complete">完了時に音を再生</string>
+    <string name="custom_sound">カスタムサウンド</string>
+    <string name="select_sound">サウンドを選択</string>
+    <string name="checked">選択済み</string>
+    <string name="min">最小</string>
+    <string name="avg">平均</string>
+    <string name="max">最大</string>
+    <string name="decibel_values">デシベル値の参考</string>
+    <string-array name="decibel_values">
+        <item>10 dB: 呼吸、ほぼ静か</item>
+        <item>20 dB: 蚊、葉のざわめき</item>
+        <item>30 dB: 静かな図書館、軽いBGM</item>
+        <item>40 dB: 静かな会話、冷蔵庫の音</item>
+        <item>50 dB: 穏やかな雨、軽い交通音</item>
+        <item>60 dB: 通常の会話、オフィス環境</item>
+        <item>70 dB: 掃除機、交通の多い通り</item>
+        <item>80 dB: 自動車のクラクション、ゴミ処理</item>
+        <item>90 dB: オートバイ、地下鉄の電車</item>
+        <item>100 dB: チェーンソー、コンサート音楽</item>
+        <item>110 dB: ロックコンサート、雷鳴</item>
+        <item>120 dB: 離陸時のジェットエンジン、救急車のサイレン</item>
+        <item>130 dB: 散弾銃の発射音、ジャッキーハンマー</item>
+        <item>140 dB: 軍用ジェット機、花火</item>
+    </string-array>
+</resources>

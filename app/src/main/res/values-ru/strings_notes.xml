@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="save_to_notes">Сохранить в заметки</string>
+    <string name="note">Заметка</string>
+    <string name="editor_settings">Настройки редактора</string>
+    <string name="show_line_numbers">Показать номера строк</string>
+    <string name="wrap_content">Переносить содержимое</string>
+    <string name="syntax_highlight">Подсветка синтаксиса</string>
+    <string name="insert_image">Вставить изображение</string>
+    <string name="image_url">URL изображения</string>
+    <string name="image_description">Описание изображения</string>
+    <string name="width">Ширина</string>
+    <string name="browse">Обзор</string>
+    <string name="move_to_trash">Переместить в корзину</string>
+    <string name="trash">Корзина</string>
+    <string name="todo">Список задач</string>
+    <string name="children_songs">Детские песни</string>
+    <string name="light_music">Легкая музыка</string>
+    <string name="movie">Фильм</string>
+    <string name="family">Семья</string>
+    <string name="important">Важно</string>
+    <string name="inspirations">Вдохновения</string>
+    <string name="personal">Личное</string>
+    <string name="work">Работа</string>
+    <string name="note_sample1"># Мой образец текста Markdown\n\n## Заголовок 2\n\n### Заголовок 3\n\nЭто **жирный текст** и *курсив*. \n\nВот неупорядоченный список:\n\n- Пункт 1\n- Пункт 2\n- Пункт 3\n\nИ вот упорядоченный список:\n\n1. Первый пункт\n2. Второй пункт\n3. Третий пункт\n\nВот пример цитаты:\n\n> \\\"Величайшая слава в жизни заключается не в том, чтобы никогда не падать, а в том, чтобы подниматься каждый раз после падения.\\\" - Нельсон Мандела\n\nТакже можно добавлять ссылки, как вот такую: [Google](https://www.google.com)\n\nИ изображения, как это:\n\n![Логотип Markdown](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### Таблица\n\nВот пример таблицы:\n\n| Имя    | Возраст | Пол    |\n| ------ | ------- | ------ |\n| Алиса  | 20      | Женский |\n| Боб    | 25      | Мужской |\n| Чарли  | 30      | Мужской |\n\n### Математическая формула\n\nВы также можете использовать математические формулы с помощью KaTeX. Вот пример:\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
+</resources>

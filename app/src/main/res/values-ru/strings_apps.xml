@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="apps">Приложения</string>
+    <string name="launch">Запустить</string>
+    <string name="uninstall">Удалить</string>
+    <string name="view_in_settings">Посмотреть в настройках</string>
+    <string name="source_directory">Исходный каталог</string>
+    <string name="data_directory">Каталог данных</string>
+    <string name="more_info">Дополнительная информация</string>
+    <string name="sdk">Цель: {{ target }}, Мин: {{ min }}</string>
+    <string name="installed_at">Установлено</string>
+    <string name="app_size">Размер приложения</string>
+    <string name="user_app">Пользовательское приложение</string>
+    <string name="system_app">Системное приложение</string>
+    <string name="large_heap">Большая куча</string>
+    <string name="app_type_user">Пользователь</string>
+    <string name="app_type_system">Система</string>
+</resources>

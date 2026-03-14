@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="sound_meter">分贝仪</string>
+    <string name="pomodoro_timer">番茄时钟</string>
+    <string name="short_break">短休息</string>
+    <string name="long_break">长休息</string>
+    <string name="tomatoes_today">今日番茄数</string>
+    <string name="current_round">轮次</string>
+    <string name="work_duration">工作时长（分钟）</string>
+    <string name="short_break_duration">短休息时长（分钟）</string>
+    <string name="long_break_duration">长休息时长（分钟）</string>
+    <string name="pomodoros_before_long_break">长休息前的番茄个数</string>
+    <string name="total_pomodoros">总共的番茄数</string>
+    <string name="session_complete">番茄完成！</string>
+    <string name="time_for_break">该休息一下了！</string>
+    <string name="back_to_work">回去继续工作吧！</string>
+    <string name="pomodoro_stats">番茄统计</string>
+    <string name="work_time">工作时间</string>
+    <string name="round_counter">第 %1$d 轮 / 共 %2$d 轮</string>
+    <string name="drag_to_adjust_progress">拖动以调整进度</string>
+    <string name="today_completed">今日完成</string>
+    <string name="pomodoro_notification_prompt">为了在番茄钟完成时显示通知和提醒，请授予应用通知权限。</string>
+    <string name="work_session_complete">工作时段完成！</string>
+    <string name="great_job_short_break">干得好！现在可以短暂休息一下 😊</string>
+    <string name="great_job_long_break">干得好！现在可以好好休息一会儿 😊</string>
+    <string name="break_complete">休息结束！</string>
+    <string name="time_to_work">该回到工作中啦 💪</string>
+    <string name="long_break_complete">长休息结束！</string>
+    <string name="ready_for_work">准备好开始下一轮了吗？🚀</string>
+    <string name="grant_permission_button">授予权限</string>
+    <string name="sleep_timer_permission_message">睡眠定时器需要调度精确闹钟的权限，以确保在后台也能正常工作，即使应用未激活。</string>
+    <string name="play_sound_on_complete">完成时播放声音</string>
+    <string name="custom_sound">自定义音效</string>
+    <string name="select_sound">选择音效</string>
+    <string name="checked">选中</string>
+    <string name="min">最小值</string>
+    <string name="avg">平均值</string>
+    <string name="max">最大值</string>
+    <string name="decibel_values">分贝值参考</string>
+    <string-array name="decibel_values">
+        <item>10 dB: 呼吸声，几乎无声</item>
+        <item>20 dB: 蚊子，树叶沙沙声</item>
+        <item>30 dB: 安静的图书馆，轻柔的背景音乐</item>
+        <item>40 dB: 轻声交谈，冰箱嗡嗡声</item>
+        <item>50 dB: 中等雨声，轻度交通噪音</item>
+        <item>60 dB: 正常对话，办公室环境</item>
+        <item>70 dB: 吸尘器声音，繁忙的街道交通</item>
+        <item>80 dB: 车喇叭声，垃圾处理器</item>
+        <item>90 dB: 摩托车声音，地铁列车</item>
+        <item>100 dB: 链锯声音，音乐会音乐</item>
+        <item>110 dB: 摇滚音乐会，雷声</item>
+        <item>120 dB: 起飞的喷气发动机声音，救护车警报</item>
+        <item>130 dB: 霰弹枪声，手提钻机</item>
+        <item>140 dB: 军用喷气飞机声音，烟花</item>
+    </string-array>
+</resources>

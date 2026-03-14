@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="apps">应用</string>
+    <string name="launch">启动</string>
+    <string name="uninstall">卸载</string>
+    <string name="view_in_settings">在设置中查看</string>
+    <string name="source_directory">源目录</string>
+    <string name="data_directory">数据目录</string>
+    <string name="more_info">更多信息</string>
+    <string name="sdk">目标：{{ target }}，最小：{{ min }}</string>
+    <string name="installed_at">安装时间</string>
+    <string name="app_size">应用大小</string>
+    <string name="user_app">用户应用</string>
+    <string name="system_app">系统应用</string>
+    <string name="large_heap">大堆内存(Large heap)</string>
+    <string name="app_type_user">用户</string>
+    <string name="app_type_system">系统</string>
+</resources>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="custom_sound">कस्टम ध्वनि</string>
+    <string name="select_sound">ध्वनि चुनें</string>
+    <string name="sound_meter">ध्वनि मीटर</string>
+    <string name="pomodoro_timer">पोमोडोरो टाइमर</string>
+    <string name="short_break">छोटा ब्रेक</string>
+    <string name="long_break">लंबा ब्रेक</string>
+    <string name="tomatoes_today">आज के टमाटर</string>
+    <string name="current_round">राउंड</string>
+    <string name="work_duration">कार्य अवधि (मिनट)</string>
+    <string name="short_break_duration">छोटे ब्रेक की अवधि (मिनट)</string>
+    <string name="long_break_duration">लंबे ब्रेक की अवधि (मिनट)</string>
+    <string name="pomodoros_before_long_break">लंबे ब्रेक से पहले पोमोडोरो</string>
+    <string name="total_pomodoros">कुल पोमोडोरो</string>
+    <string name="session_complete">सत्र पूर्ण!</string>
+    <string name="time_for_break">ब्रेक का समय!</string>
+    <string name="back_to_work">वापस काम पर लौटें!</string>
+    <string name="pomodoro_stats">पोमोडोरो आँकड़े</string>
+    <string name="work_time">काम का समय</string>
+    <string name="round_counter">%2$d में से %1$d राउंड</string>
+    <string name="drag_to_adjust_progress">प्रगति समायोजित करने के लिए खींचें</string>
+    <string name="today_completed">आज पूरा हुआ</string>
+    <string name="pomodoro_notification_prompt">पोमोडोरो सूचनाएँ और सत्र समाप्ति पर अलर्ट दिखाने के लिए, कृपया ऐप से सूचनाएँ प्राप्त करने की अनुमति दें।</string>
+    <string name="work_session_complete">कार्य सत्र पूर्ण!</string>
+    <string name="great_job_short_break">बहुत अच्छा! अब एक छोटा ब्रेक 😊</string>
+    <string name="great_job_long_break">बहुत अच्छा! अब एक लंबा ब्रेक 😊</string>
+    <string name="break_complete">ब्रेक पूरा हुआ!</string>
+    <string name="time_to_work">फिर से काम पर लौटने का समय 💪</string>
+    <string name="long_break_complete">लंबा ब्रेक पूरा हुआ!</string>
+    <string name="ready_for_work">क्या आप अगली कार्य सत्र के लिए तैयार हैं? 🚀</string>
+    <string name="grant_permission_button">अनुमति दें</string>
+    <string name="sleep_timer_permission_message">स्लीप टाइमर को पृष्ठभूमि में सही ढंग से काम करने के लिए सटीक अलार्म शेड्यूल करने की अनुमति की आवश्यकता होती है। यह सुनिश्चित करता है कि ऐप सक्रिय न होने पर भी टाइमर काम करे।</string>
+    <string name="play_sound_on_complete">पूर्ण होने पर ध्वनि बजाएं</string>
+    <string name="checked">चेक किया गया</string>
+    <string name="min">न्यूनतम</string>
+    <string name="avg">औसत</string>
+    <string name="max">अधिकतम</string>
+    <string name="decibel_values">डेसिबल मूल्य संदर्भ</string>
+    <string-array name="decibel_values">
+        <item>10 dB: साँस लेना, लगभग शांत</item>
+        <item>20 dB: मच्छर, पत्तों की सुस्ती</item>
+        <item>30 dB: शांत पुस्तकालय, मृदु पृष्ठभूमि संगीत</item>
+        <item>40 dB: शांत वार्ता, फ्रिज हमिंग</item>
+        <item>50 dB: मध्यम बारिश, हल्का यातायात शोर</item>
+        <item>60 dB: सामान्य बातचीत, कार्यालय वातावरण</item>
+        <item>70 dB: वैक्यूम क्लीनर, व्यस्त सड़क यातायात</item>
+        <item>80 dB: कार हॉर्न, कचरे का निपटान</item>
+        <item>90 dB: मोटरसाइकिल, सबवे ट्रेन</item>
+        <item>100 dB: चेनसॉ, संगीत कार्यक्रम</item>
+        <item>110 dB: रॉक कार्यक्रम, बिजली की आवाज़</item>
+        <item>120 dB: जेट इंजन उड़ान, एम्बुलेंस साइरन</item>
+        <item>130 dB: शॉटगन ब्लास्ट, जैकहैमर</item>
+        <item>140 dB: सैन्य जेट विमान, फ़ायरवर्क्स</item>
+    </string-array>
+</resources>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="save_to_notes">ノートに保存</string>
+    <string name="note">メモ</string>
+    <string name="editor_settings">エディター設定</string>
+    <string name="show_line_numbers">行番号を表示</string>
+    <string name="wrap_content">内容を折り返す</string>
+    <string name="syntax_highlight">構文の強調表示</string>
+    <string name="insert_image">画像を挿入</string>
+    <string name="image_url">画像のURL</string>
+    <string name="image_description">画像の説明</string>
+    <string name="width">幅</string>
+    <string name="browse">参照</string>
+    <string name="move_to_trash">ゴミ箱に移動</string>
+    <string name="trash">ゴミ箱</string>
+    <string name="todo">TODO</string>
+    <string name="children_songs">子供の歌</string>
+    <string name="light_music">軽音楽</string>
+    <string name="movie">映画</string>
+    <string name="family">家族</string>
+    <string name="important">重要</string>
+    <string name="inspirations">インスピレーション</string>
+    <string name="personal">個人的</string>
+    <string name="work">仕事</string>
+    <string name="note_sample1"># 私のMarkdownサンプルテキスト\n\n## 見出し2\n\n### 見出し3\n\nこれは**太字のテキスト**と*斜体のテキスト*です。\n\nこちらは順序なしリストです:\n\n- アイテム1\n- アイテム2\n- アイテム3\n\nこちらは順序付きリストです:\n\n1. 最初のアイテム\n2. 2番目のアイテム\n3. 3番目のアイテム\n\n以下は引用の例です:\n\n> 「私たちの生きる中で最大の栄光は、決して転倒しないことにあるのではなく、転倒するたびに立ち上がることにある。」 - ネルソン・マンデラ\n\nまた、次のようにリンクを追加できます：[Google](https://www.google.com)\n\nそして次のように画像を追加できます:\n\n![Markdownロゴ](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### テーブル\n\n以下はテーブルの例です:\n\n| 名前    | 年齢 | 性別   |\n| ------ | --- | ------ |\n| アリス | 20  | 女性   |\n| ボブ   | 25  | 男性   |\n| チャーリー | 30  | 男性   |\n\n### 数式\n\nKaTeXを使って数式を挿入することもできます。以下は例です:\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
+</resources>

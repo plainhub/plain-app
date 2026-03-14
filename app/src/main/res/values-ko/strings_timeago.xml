@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="timeago_now">지금</string>
+    <string name="timeago_oneminute_past">1분 전</string>
+    <string name="timeago_xminutes_past">%1\$s분 전</string>
+    <string name="timeago_aboutanhour_past">1시간 정도 전</string>
+    <string name="timeago_xhours_past">%1\$s시간 전</string>
+    <string name="timeago_oneday_past">어제</string>
+    <string name="timeago_xdays_past">%1\$s일 전</string>
+    <string name="timeago_oneweek_past">1주일 전</string>
+    <string name="timeago_xweeks_past">%1\$s주일 전</string>
+    <string name="timeago_aboutamonth_past">약 1개월 전</string>
+    <string name="timeago_xmonths_past">%1\$s개월 전</string>
+    <string name="timeago_aboutayear_past">약 1년 전</string>
+    <string name="timeago_overayear_past">1년 이상 전</string>
+    <string name="timeago_almosttwoyears_past">거의 2년 전</string>
+    <string name="timeago_xyears_past">%1\$s년 전</string>
+    <string name="timeago_oneminute_future">1분 이내에</string>
+    <string name="timeago_xminutes_future">%1\$s분 이내에</string>
+    <string name="timeago_aboutanhour_future">약 1시간 이내에</string>
+    <string name="timeago_xhours_future">%1\$s시간 이내에</string>
+    <string name="timeago_oneday_future">내일</string>
+    <string name="timeago_xdays_future">%1\$s일 이내에</string>
+    <string name="timeago_oneweek_future">1주일 이내에</string>
+    <string name="timeago_xweeks_future">%1\$s주일 이내에</string>
+    <string name="timeago_aboutamonth_future">약 1개월 이내에</string>
+    <string name="timeago_xmonths_future">%1\$s개월 이내에</string>
+    <string name="timeago_aboutayear_future">약 1년 이내에</string>
+    <string name="timeago_overayear_future">1년 이상 이내에</string>
+    <string name="timeago_almosttwoyears_future">거의 2년 이내에</string>
+    <string name="timeago_xyears_future">%1\$s년 이내에</string>
+</resources>

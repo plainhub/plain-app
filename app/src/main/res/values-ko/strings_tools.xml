@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="custom_sound">커스텀 사운드</string>
+    <string name="select_sound">사운드 선택</string>
+    <string name="sound_meter">음향 미터</string>
+    <string name="pomodoro_timer">포모도로 타이머</string>
+    <string name="short_break">짧은 휴식</string>
+    <string name="long_break">긴 휴식</string>
+    <string name="tomatoes_today">오늘의 토마토</string>
+    <string name="current_round">라운드</string>
+    <string name="work_duration">작업 시간 (분)</string>
+    <string name="short_break_duration">짧은 휴식 시간 (분)</string>
+    <string name="long_break_duration">긴 휴식 시간 (분)</string>
+    <string name="pomodoros_before_long_break">긴 휴식 전 포모도로 수</string>
+    <string name="total_pomodoros">총 포모도로 수</string>
+    <string name="session_complete">세션 완료!</string>
+    <string name="time_for_break">휴식 시간입니다!</string>
+    <string name="back_to_work">작업으로 돌아가세요!</string>
+    <string name="pomodoro_stats">포모도로 통계</string>
+    <string name="work_time">작업 시간</string>
+    <string name="round_counter">%2$d 라운드 중 %1$d 라운드</string>
+    <string name="drag_to_adjust_progress">진행 상황을 조정하려면 드래그하세요</string>
+    <string name="today_completed">오늘 완료된 항목</string>
+    <string name="pomodoro_notification_prompt">세션이 완료될 때 알림과 타이머 경고를 표시하려면 앱에서 알림 권한을 허용하세요.</string>
+    <string name="work_session_complete">작업 세션 완료!</string>
+    <string name="great_job_short_break">잘했어요! 짧은 휴식을 취하세요 😊</string>
+    <string name="great_job_long_break">잘했어요! 긴 휴식을 취하세요 😊</string>
+    <string name="break_complete">휴식 완료!</string>
+    <string name="time_to_work">작업으로 돌아갈 시간입니다 💪</string>
+    <string name="long_break_complete">긴 휴식 완료!</string>
+    <string name="ready_for_work">다음 작업을 시작할 준비가 되셨나요? 🚀</string>
+    <string name="grant_permission_button">권한 부여</string>
+    <string name="sleep_timer_permission_message">수면 타이머가 백그라운드에서 정상적으로 작동하려면 정확한 알람 예약 권한이 필요합니다.</string>
+    <string name="play_sound_on_complete">완료 시 소리 재생</string>
+    <string name="checked">선택됨</string>
+    <string name="min">최소</string>
+    <string name="avg">평균</string>
+    <string name="max">최대</string>
+    <string name="decibel_values">데시벨 값 참조</string>
+    <string-array name="decibel_values">
+        <item>10 dB: 숨소리, 거의 조용함</item>
+        <item>20 dB: 모기, 나뭇잎 속삭임</item>
+        <item>30 dB: 조용한 도서관, 부드러운 배경 음악</item>
+        <item>40 dB: 조용한 대화, 냉장고 소리</item>
+        <item>50 dB: 보통 비, 가벼운 교통 소음</item>
+        <item>60 dB: 보통 대화, 사무실 환경</item>
+        <item>70 dB: 청소기, 번화한 거리 소음</item>
+        <item>80 dB: 차 경적 소리, 생활폐기물 처리기</item>
+        <item>90 dB: 오토바이, 지하철 소리</item>
+        <item>100 dB: 전기톱, 콘서트 음악</item>
+        <item>110 dB: 록 콘서트, 천둥 소리</item>
+        <item>120 dB: 이륙 중인 제트 엔진, 응급 사이렌</item>
+        <item>130 dB: 샷건 발사, 공구용 망치</item>
+        <item>140 dB: 군용 제트 비행기, 불꽃놀이</item>
+    </string-array>
+</resources>

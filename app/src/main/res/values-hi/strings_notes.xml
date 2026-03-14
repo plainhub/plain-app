@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="save_to_notes">नोट्स में सहेजें</string>
+    <string name="note">नोट</string>
+    <string name="editor_settings">संपादक सेटिंग्स</string>
+    <string name="show_line_numbers">लाइन नंबर दिखाएं</string>
+    <string name="wrap_content">सामग्री लपेटें</string>
+    <string name="syntax_highlight">सिंटैक्स हाइलाइट</string>
+    <string name="insert_image">तस्वीर डालें</string>
+    <string name="image_url">तस्वीर URL</string>
+    <string name="image_description">तस्वीर विवरण</string>
+    <string name="width">चौड़ाई</string>
+    <string name="browse">ब्राउज़ करें</string>
+    <string name="move_to_trash">कचरे में डालें</string>
+    <string name="trash">कचरा</string>
+    <string name="todo">करने के लिए</string>
+    <string name="children_songs">बच्चों के गाने</string>
+    <string name="light_music">लाइट म्यूज़िक</string>
+    <string name="movie">मूवी</string>
+    <string name="family">परिवार</string>
+    <string name="important">महत्वपूर्ण</string>
+    <string name="inspirations">प्रेरणाएँ</string>
+    <string name="personal">व्यक्तिगत</string>
+    <string name="work">काम</string>
+    <string name="note_sample1"># मेरा मार्कडाउन नमूना पाठ\n\n## हेडिंग 2\n\n### हेडिंग 3\n\nयह कुछ **बोल्ड पाठ** और कुछ *इटैलिक पाठ* है। \n\nयहाँ एक अव्यवस्थित सूची है:\n\n- आइटम 1\n- आइटम 2\n- आइटम 3\n\nऔर यहाँ एक क्रमित सूची है:\n\n1. पहला आइटम\n2. दूसरा आइटम\n3. तीसरा आइटम\n\nयहाँ एक उद्धरण है एक ब्लॉककोट का:\n\n> "मरने में महानता सिर्फ कभी नहीं गिरने में नहीं होती, बल्कि हर बार हम गिरते समय उठने में होती है।" - नेल्सन मंडेला\n\nआप इस तरह से लिंक भी जोड़ सकते हैं: [गूगल](https://www.google.com)\n\nऔर इस तरह से छवियाँ भी जोड़ सकते हैं:\n\n![मार्कडाउन लोगो](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### तालिका\n\nयहाँ एक तालिका का उदाहरण है:\n\n| नाम   | उम्र | लिंग |\n| ------ | --- | ------ |\n| एलिस  | 20  | महिला |\n| बॉब    | 25  | पुरुष   |\n| चार्ली| 30  | पुरुष   |\n\n### गणितीय सूत्र\n\nआप केटेक्स का उपयोग करके भी गणितीय सूत्र शामिल कर सकते हैं। यहाँ एक उदाहरण है:\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
+</resources>

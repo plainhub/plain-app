@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="save_to_notes">குறிப்புகளில் சேமி</string>
+    <string name="note">குறிப்பு</string>
+    <string name="editor_settings">தொகுப்பு அமைப்புகள்</string>
+    <string name="show_line_numbers">வரி எண்ணிக்கைகளை காட்டு</string>
+    <string name="wrap_content">உள்ளடக்கத்தை முழுவதும் அமை</string>
+    <string name="syntax_highlight">சிந்தனை ஹைலைட்</string>
+    <string name="insert_image">புகைப்படம் சேர்</string>
+    <string name="image_url">புகைப்பட URL</string>
+    <string name="image_description">புகைப்பட விளக்கம்</string>
+    <string name="width">அகலம்</string>
+    <string name="browse">அலைக</string>
+    <string name="move_to_trash">குப்பைக்கு நகர்த்து</string>
+    <string name="trash">குப்பை</string>
+    <string name="todo">செய்ய வேண்டியது</string>
+    <string name="children_songs">குழந்தைகள் பாடல்கள்</string>
+    <string name="light_music">காரிகள் இசை</string>
+    <string name="movie">திரைப்படம்</string>
+    <string name="family">குடும்பம்</string>
+    <string name="important">முக்கியமானது</string>
+    <string name="inspirations">கொந்தளிப்புகள்</string>
+    <string name="personal">தனிப்பட்ட</string>
+    <string name="work">பணி</string>
+    <string name="note_sample1"># எனது மார்க்டவுன் மாதிரி உரை\n\n## தலைப்பு 2\n\n### தலைப்பு 3\n\nஇது சில **தடித்த உரை** மற்றும் சில *முடிவான உரை* ஆகும். \n\nஇது ஒரு காணொளிக்காடு:\n\n- உரை 1\n- உரை 2\n- உரை 3\n\nமற்றும் இது ஒரு வரிசைப்படுத்தப்பட்ட காணொளிக்காடு:\n\n1. முதல் உரை\n2. இரண்டாம் உரை\n3. மூன்றாம் உரை\n\nஇது ஒரு தடவையின் உதாரணம்:\n\n> \\\"உழைத்து நில்காதே வாழும் பொருள், ஒருவருக்குத் தனக்கு ஏற்படுத்துவதில் அனைத்துவரையும் கொண்டு நிற்கும் கருத்து.\\\" - நெல்சன் மேண்டேலா\n\nநீங்கள் இங்கே உள்ளிட இதைப் பயன்படுத்தலாம்: [Google](https://www.google.com)\n\nமற்றும் படங்களை போன்றே இங்கு:\n\n![மார்க்டவுன் லோகோ](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### அட்டவணை\n\nஇது ஒரு அட்டவணையின் உதாரணம்:\n\n| பெயர்  | பதிவு | பாலினம் |\n| ------ | --- | ------ |\n| அலிஸ்  | 20  | பெண்   |\n| பாப்    | 25  | ஆண்   |\n| சார்லி| 30  | ஆண்   |\n\n### கணித பாக்கி\n\nநீங்கள் KaTeX ஐப் பயன்படுத்தி கணித பாக்கிகளையும் சேர்க்கலாம். இது ஒரு உதாரணம்:\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
+</resources>

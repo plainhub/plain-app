@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="save_to_notes">Save to notes</string>
+    <string name="note">Note</string>
+    <string name="editor_settings">Editor settings</string>
+    <string name="show_line_numbers">Show line numbers</string>
+    <string name="wrap_content">Wrap content</string>
+    <string name="syntax_highlight">Syntax highlight</string>
+    <string name="insert_image">Insert image</string>
+    <string name="image_url">Image URL</string>
+    <string name="image_description">Image description</string>
+    <string name="width">Width</string>
+    <string name="browse">Browse</string>
+    <string name="move_to_trash">Move to trash</string>
+    <string name="trash">Trash</string>
+    <string name="todo">TODO</string>
+    <string name="children_songs">Children\'s songs</string>
+    <string name="light_music">Light music</string>
+    <string name="movie">Movie</string>
+    <string name="family">Family</string>
+    <string name="important">Important</string>
+    <string name="inspirations">Inspirations</string>
+    <string name="personal">Personal</string>
+    <string name="work">Work</string>
+    <string name="note_sample1"># My Markdown Sample Text\n\n## Heading 2\n\n### Heading 3\n\nThis is some **bold text** and some *italicized text*. \n\nHere is an unordered list:\n\n- Item 1\n- Item 2\n- Item 3\n\nAnd here is an ordered list:\n\n1. First item\n2. Second item\n3. Third item\n\nHere\'s an example of a blockquote:\n\n> \\\"The greatest glory in living lies not in never falling, but in rising every time we fall.\\\" - Nelson Mandela\n\nYou can also add links like this: [Google](https://www.google.com)\n\nAnd images like this:\n\n![Markdown logo](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### Table\n\nHere\'s an example of a table:\n\n| Name   | Age | Gender |\n| ------ | --- | ------ |\n| Alice  | 20  | Female |\n| Bob    | 25  | Male   |\n| Charlie| 30  | Male   |\n\n### Mathematical formula\n\nYou can also include mathematical formulas using KaTeX. Here\'s an example:\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
+</resources>

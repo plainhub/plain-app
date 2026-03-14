@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="timeago_now">gerade eben</string>
+    <string name="timeago_oneminute_past">vor 1 Minute</string>
+    <string name="timeago_xminutes_past">vor %1\$s Minuten</string>
+    <string name="timeago_aboutanhour_past">vor etwa einer Stunde</string>
+    <string name="timeago_xhours_past">vor %1\$s Stunden</string>
+    <string name="timeago_oneday_past">gestern</string>
+    <string name="timeago_xdays_past">vor %1\$s Tagen</string>
+    <string name="timeago_oneweek_past">vor einer Woche</string>
+    <string name="timeago_xweeks_past">vor %1\$s Wochen</string>
+    <string name="timeago_aboutamonth_past">vor etwa einem Monat</string>
+    <string name="timeago_xmonths_past">vor %1\$s Monaten</string>
+    <string name="timeago_aboutayear_past">vor etwa einem Jahr</string>
+    <string name="timeago_overayear_past">vor mehr als einem Jahr</string>
+    <string name="timeago_almosttwoyears_past">vor fast zwei Jahren</string>
+    <string name="timeago_xyears_past">vor %1\$s Jahren</string>
+    <string name="timeago_oneminute_future">innerhalb einer Minute</string>
+    <string name="timeago_xminutes_future">innerhalb von %1\$s Minuten</string>
+    <string name="timeago_aboutanhour_future">innerhalb etwa einer Stunde</string>
+    <string name="timeago_xhours_future">innerhalb von %1\$s Stunden</string>
+    <string name="timeago_oneday_future">morgen</string>
+    <string name="timeago_xdays_future">innerhalb von %1\$s Tagen</string>
+    <string name="timeago_oneweek_future">innerhalb einer Woche</string>
+    <string name="timeago_xweeks_future">innerhalb von %1\$s Wochen</string>
+    <string name="timeago_aboutamonth_future">innerhalb von etwa einem Monat</string>
+    <string name="timeago_xmonths_future">innerhalb von %1\$s Monaten</string>
+    <string name="timeago_aboutayear_future">innerhalb von etwa einem Jahr</string>
+    <string name="timeago_overayear_future">innerhalb von mehr als einem Jahr</string>
+    <string name="timeago_almosttwoyears_future">innerhalb von fast zwei Jahren</string>
+    <string name="timeago_xyears_future">innerhalb von %1\$s Jahren</string>
+</resources>

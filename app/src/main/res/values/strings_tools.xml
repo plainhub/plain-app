@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="sound_meter">Sound meter</string>
+    <string name="pomodoro_timer">Pomodoro timer</string>
+    <string name="short_break">Short break</string>
+    <string name="long_break">Long break</string>
+    <string name="tomatoes_today">Tomatoes today</string>
+    <string name="current_round">Round</string>
+    <string name="work_duration">Work duration (minutes)</string>
+    <string name="short_break_duration">Short break duration (minutes)</string>
+    <string name="long_break_duration">Long break duration (minutes)</string>
+    <string name="pomodoros_before_long_break">Pomodoros before long break</string>
+    <string name="total_pomodoros">Total pomodoros</string>
+    <string name="session_complete">Session complete!</string>
+    <string name="time_for_break">Time for a break!</string>
+    <string name="back_to_work">Back to work!</string>
+    <string name="pomodoro_stats">Pomodoro stats</string>
+    <string name="work_time">Work time</string>
+    <string name="round_counter">Round %1$d of %2$d</string>
+    <string name="drag_to_adjust_progress">Drag to adjust progress</string>
+    <string name="today_completed">Today completed</string>
+    <string name="pomodoro_notification_prompt">To show pomodoro notifications and timer alerts when sessions complete, please grant permission to receive notifications from the app.</string>
+    <string name="work_session_complete">Work session complete!</string>
+    <string name="great_job_short_break">Great job! Time for a short break 😊</string>
+    <string name="great_job_long_break">Great job! Time for a long break 😊</string>
+    <string name="break_complete">Break complete!</string>
+    <string name="time_to_work">Time to get back to work 💪</string>
+    <string name="long_break_complete">Long break complete!</string>
+    <string name="ready_for_work">Ready for another work session? 🚀</string>
+    <string name="grant_permission_button">Grant permission</string>
+    <string name="sleep_timer_permission_message">Sleep timer needs permission to schedule exact alarms to work properly in the background. This ensures the timer works even when the app is not active.</string>
+    <string name="play_sound_on_complete">Play sound on complete</string>
+    <string name="custom_sound">Custom sound</string>
+    <string name="select_sound">Select sound</string>
+    <string name="checked">Checked</string>
+    <string name="min">MIN</string>
+    <string name="avg">AVG</string>
+    <string name="max">MAX</string>
+    <string name="decibel_values">Decibel value reference</string>
+    <string-array name="decibel_values">
+        <item>10 dB: Breathing, Almost quiet</item>
+        <item>20 dB: Mosquito, Rustling leaves</item>
+        <item>30 dB: Quiet library, Soft background music</item>
+        <item>40 dB: Quiet conversation, Refrigerator humming</item>
+        <item>50 dB: Moderate rainfall, Light traffic noise</item>
+        <item>60 dB: Normal conversation, Office environment</item>
+        <item>70 dB: Vacuum cleaner, Busy street traffic</item>
+        <item>80 dB: Car horn, Garbage disposal</item>
+        <item>90 dB: Motorcycle, Subway train</item>
+        <item>100 dB: Chainsaw, Concert music</item>
+        <item>110 dB: Rock concert, Thunderclap</item>
+        <item>120 dB: Jet engine at takeoff, Ambulance siren</item>
+        <item>130 dB: Shotgun blast, Jackhammer</item>
+        <item>140 dB: Military jet aircraft, Fireworks</item>
+    </string-array>
+</resources>

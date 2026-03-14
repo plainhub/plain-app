@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="timeago_now">刚刚</string>
+    <string name="timeago_oneminute_past">1分钟前</string>
+    <string name="timeago_xminutes_past">%1\$s分钟前</string>
+    <string name="timeago_aboutanhour_past">大约1小时前</string>
+    <string name="timeago_xhours_past">%1\$s小时前</string>
+    <string name="timeago_oneday_past">昨天</string>
+    <string name="timeago_xdays_past">%1\$s天前</string>
+    <string name="timeago_oneweek_past">一周前</string>
+    <string name="timeago_xweeks_past">%1\$s周前</string>
+    <string name="timeago_aboutamonth_past">大约1个月前</string>
+    <string name="timeago_xmonths_past">%1\$s个月前</string>
+    <string name="timeago_aboutayear_past">大约1年前</string>
+    <string name="timeago_overayear_past">超过1年前</string>
+    <string name="timeago_almosttwoyears_past">将近2年前</string>
+    <string name="timeago_xyears_past">%1\$s年前</string>
+    <string name="timeago_oneminute_future">在1分钟内</string>
+    <string name="timeago_xminutes_future">在%1\$s分钟内</string>
+    <string name="timeago_aboutanhour_future">在大约1小时内</string>
+    <string name="timeago_xhours_future">在%1\$s小时内</string>
+    <string name="timeago_oneday_future">明天</string>
+    <string name="timeago_xdays_future">在%1\$s天内</string>
+    <string name="timeago_oneweek_future">在一周内</string>
+    <string name="timeago_xweeks_future">在%1\$s周内</string>
+    <string name="timeago_aboutamonth_future">在大约1个月内</string>
+    <string name="timeago_xmonths_future">在%1\$s个月内</string>
+    <string name="timeago_aboutayear_future">在大约1年内</string>
+    <string name="timeago_overayear_future">在超过1年内</string>
+    <string name="timeago_almosttwoyears_future">在将近2年内</string>
+    <string name="timeago_xyears_future">在%1\$s年内</string>
+</resources>

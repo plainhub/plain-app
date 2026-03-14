@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="save_to_notes">Opslaan in notities</string>
+    <string name="note">Notitie</string>
+    <string name="editor_settings">Instellingen van de editor</string>
+    <string name="show_line_numbers">Regelnummers weergeven</string>
+    <string name="wrap_content">Inhoud omvouwen</string>
+    <string name="syntax_highlight">Syntax highlighting</string>
+    <string name="insert_image">Afbeelding invoegen</string>
+    <string name="image_url">Afbeeldings-URL</string>
+    <string name="image_description">Afbeeldingsbeschrijving</string>
+    <string name="width">Breedte</string>
+    <string name="browse">Bladeren</string>
+    <string name="move_to_trash">Verplaatsen naar prullenbak</string>
+    <string name="trash">Prullenbak</string>
+    <string name="todo">TODO</string>
+    <string name="children_songs">Kinderliedjes</string>
+    <string name="light_music">Lichte muziek</string>
+    <string name="movie">Film</string>
+    <string name="family">Familie</string>
+    <string name="important">Belangrijk</string>
+    <string name="inspirations">Inspiraties</string>
+    <string name="personal">Persoonlijk</string>
+    <string name="work">Werk</string>
+    <string name="note_sample1"># Mijn Markdown Voorbeeldtekst\n\n## Kop 2\n\n### Kop 3\n\nDit is wat **dikgedrukte tekst** en wat *schuingedrukte tekst*. \n\nHier is een ongeordende lijst:\n\n- Item 1\n- Item 2\n- Item 3\n\nEn hier is een geordende lijst:\n\n1. Eerste item\n2. Tweede item\n3. Derde item\n\nHier is een voorbeeld van een blokcitaat:\n\n> \"De grootste glorie ligt niet in nooit vallen, maar in elke keer dat we opstaan.\" - Nelson Mandela\n\nJe kunt ook links toevoegen zoals deze: [Google](https://www.google.com)\n\nEn afbeeldingen zoals deze:\n\n![Markdown logo](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### Tabel\n\nHier is een voorbeeld van een tabel:\n\n| Naam   | Leeftijd | Geslacht |\n| ------ | --- | ------ |\n| Alice  | 20  | Vrouwelijk |\n| Bob    | 25  | Mannelijk   |\n| Charlie| 30  | Mannelijk   |\n\n### Wiskundige formule\n\nJe kunt ook wiskundige formules toevoegen met behulp van KaTeX. Hier is een voorbeeld:\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
+</resources>

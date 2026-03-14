@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="save_to_notes">노트에 저장</string>
+    <string name="note">노트</string>
+    <string name="editor_settings">편집기 설정</string>
+    <string name="show_line_numbers">줄 번호 표시</string>
+    <string name="wrap_content">콘텐츠 자동 줄 바꿈</string>
+    <string name="syntax_highlight">구문 강조</string>
+    <string name="insert_image">이미지 삽입</string>
+    <string name="image_url">이미지 URL</string>
+    <string name="image_description">이미지 설명</string>
+    <string name="width">폭</string>
+    <string name="browse">찾아보기</string>
+    <string name="move_to_trash">휴지통으로 이동</string>
+    <string name="trash">휴지통</string>
+    <string name="todo">할 일</string>
+    <string name="children_songs">어린이 노래</string>
+    <string name="light_music">경음악</string>
+    <string name="movie">영화</string>
+    <string name="family">가족</string>
+    <string name="important">중요</string>
+    <string name="inspirations">영감</string>
+    <string name="personal">개인</string>
+    <string name="work">작업</string>
+    <string name="note_sample1"># 내 마크다운 샘플 텍스트\n\n## 헤딩 2\n\n### 헤딩 3\n\n이것은 **굵은 텍스트**와 *이탤릭체 텍스트*입니다.\n\n여기는 정렬되지 않은 목록입니다:\n\n- 항목 1\n- 항목 2\n- 항목 3\n\n그리고 여기는 정렬된 목록입니다:\n\n1. 첫 번째 항목\n2. 두 번째 항목\n3. 세 번째 항목\n\n인용구의 예는 다음과 같습니다:\n\n> \\\"생명에서 가장 큰 영광은 결코 넘어지지 않는 것이 아니라, 넘어질 때마다 일어서는 데에 있습니다.\\\" - 넬슨 만델라\n\n이와 같이 링크를 추가할 수도 있습니다: [Google](https://www.google.com)\n\n그리고 다음과 같이 이미지를 추가할 수 있습니다:\n\n![Markdown 로고](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### 테이블\n\n테이블의 예는 다음과 같습니다:\n\n| 이름    | 나이 | 성별   |\n| ------- | --- | ------ |\n| 앨리스   | 20  | 여성   |\n| 밥      | 25  | 남성   |\n| 찰리    | 30  | 남성   |\n\n### 수학 공식\n\nKaTeX를 사용하여 수학 공식을 포함할 수도 있습니다. 다음은 예입니다:\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
+</resources>

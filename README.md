@@ -165,12 +165,6 @@ If you run into issues, feel free to open a GitHub issue — I'm always happy to
 
 Please don’t leave a one-star review without giving it a fair try.
 
-## Translation
-
-If you'd like to help translate PlainApp, please join our translation project on Crowdin:
-
-👉 [Translate PlainApp on Crowdin](https://crwd.in/plainapp/458159c6e34514a4d3ea2c5d10be3e252708692)
-
 ## Build
 
 1. Generate `release.jks` file under `$rootProject/app` folder.

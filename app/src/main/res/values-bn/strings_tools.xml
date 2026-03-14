@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="custom_sound">কাস্টম সাউন্ড</string>
+    <string name="select_sound">সাউন্ড নির্বাচন করুন</string>
+    <string name="sound_meter">শব্দ মিটার</string>
+    <string name="pomodoro_timer">পামোডরো টাইমার</string>
+    <string name="short_break">সংক্ষেপ ব্রেক</string>
+    <string name="long_break">দীর্ঘ ব্রেক</string>
+    <string name="tomatoes_today">আজকের টমেটোস</string>
+    <string name="current_round">বর্তমান রাউন্ড</string>
+    <string name="work_duration">কাজের সময়মান (মিনিট)</string>
+    <string name="short_break_duration">সংক্ষেপ ব্রেকের সময়মান (মিনিট)</string>
+    <string name="long_break_duration">দীর্ঘ ব্রেকের সময়মান (মিনিট)</string>
+    <string name="pomodoros_before_long_break">দীর্ঘ ব্রেকের আগে পামোডরোস</string>
+    <string name="total_pomodoros">মোট পামোডরোস</string>
+    <string name="session_complete">সেশন সম্পন্ন!</string>
+    <string name="time_for_break">ব্রেকের সময়!</string>
+    <string name="back_to_work">কাজে ফিরে যান!</string>
+    <string name="pomodoro_stats">পামোডরো স্ট্যাটস</string>
+    <string name="work_time">কাজের সময়</string>
+    <string name="round_counter">রাউন্ড %1$d এর %2$d</string>
+    <string name="drag_to_adjust_progress">প্রস্থাপন করতে ড্র্যাগ করুন</string>
+    <string name="today_completed">আজকের সম্পন্ন</string>
+    <string name="pomodoro_notification_prompt">পামোডরো টাইমার সঠিক ব্যবহারের জন্য ব্যবস্থাপনা করতে নির্দিষ্ট অ্যালার্ম সক্রিয় করতে অনুমতি প্রয়োজন। এটি আপনাকে সম্পূর্ণ ব্যবহার করতে নির্দিষ্ট অ্যালার্ম প্রাপ্ত করতে সাহায্য করে।</string>
+    <string name="work_session_complete">কাজের সেশন সম্পন্ন!</string>
+    <string name="great_job_short_break">ভাল কাজ! সংক্ষেপ ব্রেকের সময় 😊</string>
+    <string name="great_job_long_break">ভাল কাজ! দীর্ঘ ব্রেকের সময় 😊</string>
+    <string name="break_complete">ব্রেক সম্পন্ন!</string>
+    <string name="time_to_work">কাজে ফিরে যান 💪</string>
+    <string name="long_break_complete">দীর্ঘ ব্রেক সম্পন্ন!</string>
+    <string name="ready_for_work">আরেকটি কাজের সেশনের জন্য প্রস্তুত? 🚀</string>
+    <string name="grant_permission_button">অনুমতি প্রদান করুন</string>
+    <string name="sleep_timer_permission_message">স্লিপ টাইমার সঠিক ব্যবহারের জন্য নির্দিষ্ট অ্যালার্ম সক্রিয় করতে অনুমতি প্রয়োজন। এটি আপনাকে সম্পূর্ণ ব্যবহার করতে নির্দিষ্ট অ্যালার্ম প্রাপ্ত করতে সাহায্য করে।</string>
+    <string name="play_sound_on_complete">সম্পন্ন হলে শব্দ বাজান</string>
+    <string name="checked">চেক করা</string>
+    <string name="min">সর্বনিম্ন</string>
+    <string name="avg">গড়</string>
+    <string name="max">সর্বাধিক</string>
+    <string name="decibel_values">ডেসিবেল মান সন্দর্ভ</string>
+    <string-array name="decibel_values">
+        <item>10 dB: শ্বাস, প্রায় শান্ত</item>
+        <item>20 dB: মশা, উত্তেজনাপূর্ণ পাতা</item>
+        <item>30 dB: শান্ত লাইব্রেরি, মৃদু পৃষ্ঠভূমি সঙ্গীত</item>
+        <item>40 dB: শান্ত কথোপকথন, ফ্রিজের হাম</item>
+        <item>50 dB: মাঝারি বৃষ্টি, হালকা যাতায়াত শব্দ</item>
+        <item>60 dB: সাধারণ কথোপকথন, অফিস পরিবেশ</item>
+        <item>70 dB: ব্যাকুয়াম ক্লিনার, চলমান সড়ক যাতায়াত</item>
+        <item>80 dB: গাড়ির শোঙ, আস্তে নেয়া</item>
+        <item>90 dB: মোটরসাইকেল, সাবওয়ে ট্রেন</item>
+        <item>100 dB: চেইনসॉ, সংগীত কনসার্ট</item>
+        <item>110 dB: রক সংস্করণ, বজ্রপাত</item>
+        <item>120 dB: জেট ইঞ্জিন প্রস্থানে, অ্যাম্বুলেন্স সাইরেন</item>
+        <item>130 dB: শটগান ব্লাস্ট, জ্যাকহামার</item>
+        <item>140 dB: সামরিক যেট বিমান, ফায়ারওয়ার্কস</item>
+    </string-array>
+</resources>

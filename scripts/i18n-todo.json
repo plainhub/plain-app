@@ -1,1 +1,32 @@
-{}
+{
+  "values-bn": {
+    "lang": "bn",
+    "missing": [],
+    "english": [
+      {
+        "key": "app_name",
+        "en": "PlainApp"
+      }
+    ]
+  },
+  "values-hi": {
+    "lang": "hi",
+    "missing": [],
+    "english": [
+      {
+        "key": "app_name",
+        "en": "PlainApp"
+      }
+    ]
+  },
+  "values-ko": {
+    "lang": "ko",
+    "missing": [],
+    "english": [
+      {
+        "key": "app_name",
+        "en": "PlainApp"
+      }
+    ]
+  }
+}

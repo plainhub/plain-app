@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="save_to_notes">In Notizen speichern</string>
+    <string name="note">Notiz</string>
+    <string name="editor_settings">Editor-Einstellungen</string>
+    <string name="show_line_numbers">Zeilennummern anzeigen</string>
+    <string name="wrap_content">Inhalt umbrechen</string>
+    <string name="syntax_highlight">Syntax hervorheben</string>
+    <string name="insert_image">Bild einfügen</string>
+    <string name="image_url">Bild-URL</string>
+    <string name="image_description">Bildbeschreibung</string>
+    <string name="width">Breite</string>
+    <string name="browse">Durchsuchen</string>
+    <string name="move_to_trash">In den Papierkorb verschieben</string>
+    <string name="trash">Papierkorb</string>
+    <string name="todo">TODO</string>
+    <string name="children_songs">Kinderlieder</string>
+    <string name="light_music">Leichte Musik</string>
+    <string name="movie">Film</string>
+    <string name="family">Familie</string>
+    <string name="important">Wichtig</string>
+    <string name="inspirations">Inspirationen</string>
+    <string name="personal">Persönlich</string>
+    <string name="work">Arbeit</string>
+    <string name="note_sample1"># Mein Markdown Beispieltext\n\n## Überschrift 2\n\n### Überschrift 3\n\nDies ist ein **fetter Text** und etwas *kursiver Text*.\n\nHier ist eine ungeordnete Liste:\n\n- Element 1\n- Element 2\n- Element 3\n\nUnd hier ist eine geordnete Liste:\n\n1. Erstes Element\n2. Zweites Element\n3. Drittes Element\n\nHier ist ein Beispiel für ein Blockzitat:\n\n> \\\"Der größte Ruhm im Leben liegt nicht darin, niemals zu fallen, sondern jedes Mal aufzustehen, wenn wir fallen.\\\" - Nelson Mandela\n\nSie können auch Links wie diesen hinzufügen: [Google](https://www.google.com)\n\nUnd Bilder wie dieses:\n\n![Markdown-Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### Tabelle\n\nHier ist ein Beispiel für eine Tabelle:\n\n| Name   | Alter | Geschlecht |\n| ------ | ---- | --------- |\n| Alice  | 20   | Weiblich   |\n| Bob    | 25   | Männlich   |\n| Charlie| 30   | Männlich   |\n\n### Mathematische Formel\n\nSie können auch mathematische Formeln mit KaTeX einfügen. Hier ist ein Beispiel:\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
+</resources>

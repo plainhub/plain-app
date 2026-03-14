@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="apps">অ্যাপস</string>
+    <string name="launch">চালাও</string>
+    <string name="uninstall">আনইনস্টল</string>
+    <string name="view_in_settings">সেটিংসে দেখুন</string>
+    <string name="source_directory">উৎস ডিরেক্টরি</string>
+    <string name="data_directory">ডেটা ডিরেক্টরি</string>
+    <string name="more_info">আরও তথ্য</string>
+    <string name="sdk">লক্ষ্য: {{ target }}, ন্যূনতম: {{ min }}</string>
+    <string name="installed_at">ইনস্টল হয়েছে</string>
+    <string name="app_size">অ্যাপ সাইজ</string>
+    <string name="user_app">ব্যবহারকারী অ্যাপ</string>
+    <string name="system_app">সিস্টেম অ্যাপ</string>
+    <string name="large_heap">বড় হিপ</string>
+    <string name="app_type_user">ব্যবহারকারী</string>
+    <string name="app_type_system">সিস্টেম</string>
+</resources>

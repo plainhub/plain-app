@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="custom_sound">Âm thanh tùy chỉnh</string>
+    <string name="select_sound">Chọn âm thanh</string>
+    <string name="sound_meter">Dụng cụ đo âm thanh</string>
+    <string name="pomodoro_timer">Bộ hẹn giờ Pomodoro</string>
+    <string name="short_break">Nghỉ ngắn</string>
+    <string name="long_break">Nghỉ dài</string>
+    <string name="tomatoes_today">Số Pomodoro hôm nay</string>
+    <string name="current_round">Vòng</string>
+    <string name="work_duration">Thời gian làm việc (phút)</string>
+    <string name="short_break_duration">Thời gian nghỉ ngắn (phút)</string>
+    <string name="long_break_duration">Thời gian nghỉ dài (phút)</string>
+    <string name="pomodoros_before_long_break">Số Pomodoro trước nghỉ dài</string>
+    <string name="total_pomodoros">Tổng số Pomodoro</string>
+    <string name="session_complete">Hoàn thành phiên!</string>
+    <string name="time_for_break">Đến giờ nghỉ rồi!</string>
+    <string name="back_to_work">Quay lại làm việc nào!</string>
+    <string name="pomodoro_stats">Thống kê Pomodoro</string>
+    <string name="work_time">Thời gian làm việc</string>
+    <string name="round_counter">Vòng %1$d trên %2$d</string>
+    <string name="drag_to_adjust_progress">Kéo để điều chỉnh tiến độ</string>
+    <string name="today_completed">Hoàn thành hôm nay</string>
+    <string name="pomodoro_notification_prompt">Để hiển thị thông báo và cảnh báo khi hoàn tất phiên Pomodoro, hãy cấp quyền nhận thông báo cho ứng dụng.</string>
+    <string name="work_session_complete">Phiên làm việc hoàn tất!</string>
+    <string name="great_job_short_break">Làm tốt lắm! Đến giờ nghỉ ngắn rồi 😊</string>
+    <string name="great_job_long_break">Làm tốt lắm! Đến giờ nghỉ dài rồi 😊</string>
+    <string name="break_complete">Nghỉ ngơi xong rồi!</string>
+    <string name="time_to_work">Đến lúc quay lại làm việc 💪</string>
+    <string name="long_break_complete">Nghỉ dài kết thúc!</string>
+    <string name="ready_for_work">Sẵn sàng cho phiên làm việc tiếp theo chưa? 🚀</string>
+    <string name="grant_permission_button">Cấp quyền</string>
+    <string name="sleep_timer_permission_message">Bộ hẹn giờ ngủ cần quyền lập lịch báo thức chính xác để hoạt động đúng trong nền, ngay cả khi ứng dụng không hoạt động.</string>
+    <string name="play_sound_on_complete">Phát âm thanh khi hoàn thành</string>
+    <string name="checked">Đã kiểm tra</string>
+    <string name="min">TỐI THIỂU</string>
+    <string name="avg">TRUNG BÌNH</string>
+    <string name="max">TỐI ĐA</string>
+    <string name="decibel_values">Tham chiếu giá trị Decibel</string>
+    <string-array name="decibel_values">
+        <item>10 dB: Hít thở, Gần như yên lặng</item>
+        <item>20 dB: Muỗi, Lá cây rì rào</item>
+        <item>30 dB: Thư viện yên tĩnh, Âm nhạc nền nhẹ nhàng</item>
+        <item>40 dB: Trò chuyện nhỏ, Tiếng ồn của tủ lạnh</item>
+        <item>50 dB: Mưa vừa phải, Tiếng ồn giao thông nhẹ</item>
+        <item>60 dB: Trò chuyện bình thường, Môi trường văn phòng</item>
+        <item>70 dB: Máy hút bụi, Tiếng ồn giao thông đông đúc</item>
+        <item>80 dB: Còi xe hơi, Máy tiêu thụ rác</item>
+        <item>90 dB: Xe máy, Tàu điện ngầm</item>
+        <item>100 dB: Máy cắt cỏ, Âm nhạc hòa nhạc</item>
+        <item>110 dB: Buổi hòa nhạc rock, Tiếng sấm</item>
+        <item>120 dB: Động cơ phản lực khi cất cánh, Còi xe cứu thương</item>
+        <item>130 dB: Súng trường, Máy khoan</item>
+        <item>140 dB: Máy bay chiến đấu quân sự, Pháo hoa</item>
+    </string-array>
+</resources>

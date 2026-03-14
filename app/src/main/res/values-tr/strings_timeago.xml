@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="timeago_now">şimdi</string>
+    <string name="timeago_oneminute_past">1 dakika önce</string>
+    <string name="timeago_xminutes_past">%1$s dakika önce</string>
+    <string name="timeago_aboutanhour_past">yaklaşık bir saat önce</string>
+    <string name="timeago_xhours_past">%1$s saat önce</string>
+    <string name="timeago_oneday_past">dün</string>
+    <string name="timeago_xdays_past">%1$s gün önce</string>
+    <string name="timeago_oneweek_past">bir hafta önce</string>
+    <string name="timeago_xweeks_past">%1$s hafta önce</string>
+    <string name="timeago_aboutamonth_past">yaklaşık bir ay önce</string>
+    <string name="timeago_xmonths_past">%1$s ay önce</string>
+    <string name="timeago_aboutayear_past">yaklaşık bir yıl önce</string>
+    <string name="timeago_overayear_past">bir yıldan fazla önce</string>
+    <string name="timeago_almosttwoyears_past">neredeyse iki yıl önce</string>
+    <string name="timeago_xyears_past">%1$s yıl önce</string>
+    <string name="timeago_oneminute_future">bir dakika içinde</string>
+    <string name="timeago_xminutes_future">%1$s dakika içinde</string>
+    <string name="timeago_aboutanhour_future">yaklaşık bir saat içinde</string>
+    <string name="timeago_xhours_future">%1$s saat içinde</string>
+    <string name="timeago_oneday_future">yarın</string>
+    <string name="timeago_xdays_future">%1$s gün içinde</string>
+    <string name="timeago_oneweek_future">bir hafta içinde</string>
+    <string name="timeago_xweeks_future">%1$s hafta içinde</string>
+    <string name="timeago_aboutamonth_future">yaklaşık bir ay içinde</string>
+    <string name="timeago_xmonths_future">%1$s ay içinde</string>
+    <string name="timeago_aboutayear_future">yaklaşık bir yıl içinde</string>
+    <string name="timeago_overayear_future">bir yıldan fazla süre içinde</string>
+    <string name="timeago_almosttwoyears_future">neredeyse iki yıl içinde</string>
+    <string name="timeago_xyears_future">%1$s yıl içinde</string>
+</resources>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="save_to_notes">নোটসে সংরক্ষণ করুন</string>
+    <string name="note">নোট</string>
+    <string name="editor_settings">সম্পাদক সেটিংস</string>
+    <string name="show_line_numbers">লাইন সংখ্যা দেখান</string>
+    <string name="wrap_content">যে সামগ্রী মুক্তভাবে লুপ্ত</string>
+    <string name="syntax_highlight">সিনট্যাক্স হাইলাইট</string>
+    <string name="insert_image">চিত্র সন্নিবেশ করুন</string>
+    <string name="image_url">চিত্র URL</string>
+    <string name="image_description">চিত্র বর্ণনা</string>
+    <string name="width">প্রস্থ</string>
+    <string name="browse">ব্রাউজ করুন</string>
+    <string name="move_to_trash">ট্র্যাশে সরান</string>
+    <string name="trash">ট্র্যাশ</string>
+    <string name="todo">কাজসূচি</string>
+    <string name="children_songs">শিশুর গান</string>
+    <string name="light_music">হালকা সঙ্গীত</string>
+    <string name="movie">চলচ্চিত্র</string>
+    <string name="family">পরিবার</string>
+    <string name="important">গুরুত্বপূর্ণ</string>
+    <string name="inspirations">অনুপ্রেরণা</string>
+    <string name="personal">ব্যক্তিগত</string>
+    <string name="work">কাজ</string>
+    <string name="note_sample1"># আমার মার্কডাউন নমুনা পাঠ্য\n\n## শিরোনাম 2\n\n### শিরোনাম 3\n\nএটি কিছু **বোল্ড টেক্সট** এবং কিছু *তিরুণভাবে টেক্সট*।\n\nএখানে একটি অবিক্রিয় তালিকা আছে:\n\n- আইটেম 1\n- আইটেম 2\n- আইটেম 3\n\nএবং এখানে একটি অর্ডার করা তালিকা রয়েছে:\n\n1. প্রথম আইটেম\n2. দ্বিতীয় আইটেম\n3. তৃতীয় আইটেম\n\nএখানে একটি ব্লককোটের উদাহরণ:\n\n> \\\"জীবনে শ্রেষ্ঠ গৌরব তাত্ক্ষণিকভাবে পড়ার নয়, বরং প্রতিবার আমরা পড়া বাঁধতে।\\\" - নেলসন ম্যান্ডেলা\n\nআপনি এই ভাবে লিঙ্ক যুক্ত করতে পারেন: [গুগল](https://www.google.com)\n\nএবং এই ভাবে ছবি সংযুক্ত করতে পারেন:\n\n![মার্কডাউন লোগো](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### টেবিল\n\nএখানে একটি টেবিলের উদাহরণ:\n\n| নাম   | বয়স | লিঙ্গ |\n| ------ | --- | ------ |\n| আলিস  | 20  | মহিলা |\n| বব    | 25  | পুরুষ   |\n| চার্লি| 30  | পুরুষ   |\n\n### গণিতিক সূত্র\n\nআপনি কেটেক্স ব্যবহার করে গণিতিক সূত্রগুলি যোগ করতে পারেন। এটি একটি উদাহরণ:\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
+</resources>

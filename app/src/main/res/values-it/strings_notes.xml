@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="save_to_notes">Salva nelle note</string>
+    <string name="note">Nota</string>
+    <string name="editor_settings">Impostazioni editor</string>
+    <string name="show_line_numbers">Mostra numeri di riga</string>
+    <string name="wrap_content">Avvolgi contenuto</string>
+    <string name="syntax_highlight">Evidenziazione sintassi</string>
+    <string name="insert_image">Inserisci immagine</string>
+    <string name="image_url">URL immagine</string>
+    <string name="image_description">Descrizione immagine</string>
+    <string name="width">Larghezza</string>
+    <string name="browse">Sfoglia</string>
+    <string name="move_to_trash">Sposta nel cestino</string>
+    <string name="trash">Cestino</string>
+    <string name="todo">Da fare</string>
+    <string name="children_songs">Canzoni per bambini</string>
+    <string name="light_music">Musica leggera</string>
+    <string name="movie">Film</string>
+    <string name="family">Famiglia</string>
+    <string name="important">Importante</string>
+    <string name="inspirations">Ispirazioni</string>
+    <string name="personal">Personale</string>
+    <string name="work">Lavoro</string>
+    <string name="note_sample1"># Esempio del mio testo in Markdown\n\n## Titolo 2\n\n### Titolo 3\n\nQuesto è del testo in **grassetto** e del testo *corsivo*. \n\nEcco un elenco puntato:\n\n- Elemento 1\n- Elemento 2\n- Elemento 3\n\nE qui un elenco numerato:\n\n1. Primo elemento\n2. Secondo elemento\n3. Terzo elemento\n\nEsempio di citazione:\n\n> \"La più grande gloria nell\'affrontare una difficoltà non consiste nel non cadere mai, ma nel rialzarsi ogni volta che si cade.\" - Nelson Mandela\n\nPuoi anche aggiungere collegamenti come questo: [Google](https://www.google.com)\n\nE immagini come questa:\n\n![Logo di Markdown](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### Tabella\n\nEsempio di tabella:\n\n| Nome   | Età | Genere |\n| ------ | --- | ------ |\n| Alice  | 20  | Femmina |\n| Bob    | 25  | Maschio |\n| Charlie| 30  | Maschio |\n\n### Formula matematica\n\nPuoi anche includere formule matematiche usando KaTeX. Ecco un esempio:\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
+</resources>

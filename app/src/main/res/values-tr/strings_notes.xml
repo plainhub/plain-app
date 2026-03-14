@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="save_to_notes">Notlara kaydet</string>
+    <string name="note">Not</string>
+    <string name="editor_settings">Düzenleyici ayarları</string>
+    <string name="show_line_numbers">Satır numaralarını göster</string>
+    <string name="wrap_content">İçeriği kaydır</string>
+    <string name="syntax_highlight">Sözdizimi vurgulama</string>
+    <string name="insert_image">Resim ekle</string>
+    <string name="image_url">Resim URL\'si</string>
+    <string name="image_description">Resim açıklaması</string>
+    <string name="width">Genişlik</string>
+    <string name="browse">Gözat</string>
+    <string name="move_to_trash">Çöpe taşı</string>
+    <string name="trash">Çöp Kutusu</string>
+    <string name="todo">Yapılacaklar</string>
+    <string name="children_songs">Çocuk şarkıları</string>
+    <string name="light_music">Hafif müzik</string>
+    <string name="movie">Film</string>
+    <string name="family">Aile</string>
+    <string name="important">Önemli</string>
+    <string name="inspirations">İlham veren</string>
+    <string name="personal">Kişisel</string>
+    <string name="work">İş</string>
+    <string name="note_sample1"># Markdown Örnek Metnim\n\n## Başlık 2\n\n### Başlık 3\n\nBu **kalın metin** ve bu *italik metin*. \n\nİşte sırasız bir liste:\n\n- Öğe 1\n- Öğe 2\n- Öğe 3\n\nVe işte sıralı bir liste:\n\n1. Birinci öğe\n2. İkinci öğe\n3. Üçüncü öğe\n\nİşte bir blok alıntı örneği:\n\n> \"Yaşamdaki en büyük zafer hiç düşmemekte değil, her düştüğünde ayağa kalkmakta yatar.\" - Nelson Mandela\n\nAyrıca bağlantıları da bu şekilde ekleyebilirsiniz: [Google](https://www.google.com)\n\nVe resimleri bu şekilde:\n\n![Markdown logosu](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### Tablo\n\nİşte bir tablo örneği:\n\n| İsim   | Yaş | Cinsiyet |\n| ------ | --- | -------- |\n| Ayşe   | 20  | Kadın    |\n| Mehmet | 25  | Erkek    |\n| Can    | 30  | Erkek    |\n\n### Matematiksel formül\n\nAyrıca KaTeX kullanarak matematiksel formülleri de ekleyebilirsiniz. İşte bir örnek:\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
+</resources>

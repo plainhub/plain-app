@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="save_to_notes">保存到筆記</string>
+    <string name="note">筆記</string>
+    <string name="editor_settings">編輯器設置</string>
+    <string name="show_line_numbers">顯示行號</string>
+    <string name="wrap_content">自動換行</string>
+    <string name="syntax_highlight">語法高亮</string>
+    <string name="insert_image">插入圖片</string>
+    <string name="image_url">圖片鏈接</string>
+    <string name="image_description">圖片描述</string>
+    <string name="width">寬度</string>
+    <string name="browse">瀏覽</string>
+    <string name="move_to_trash">移到回收站</string>
+    <string name="trash">回收站</string>
+    <string name="todo">待辦</string>
+    <string name="children_songs">兒歌</string>
+    <string name="light_music">輕音樂</string>
+    <string name="movie">電影</string>
+    <string name="family">家人</string>
+    <string name="important">重要的</string>
+    <string name="inspirations">靈感</string>
+    <string name="personal">個人</string>
+    <string name="work">工作</string>
+    <string name="note_sample1"># 我的 Markdown 示例文本\n\n## 二級標題\n\n### 三級標題\n\n這是一些**粗體文本**和一些*斜體文本*。\n\n這裡是一個無序列表：\n\n- 項目1\n- 項目2\n- 項目3\n\n這裡是一個有序列表：\n\n1. 第一項\n2. 第二項\n3. 第三項\n\n以下是一個塊引用的示例：\n\n> "生命中最偉大的榮耀不在於從不跌倒，而在於每次跌倒後都能爬起來。" - 納爾遜·曼德拉\n\n你還可以像這樣添加鏈接：[谷歌](https://www.google.com)\n\n以及像這樣的圖像：\n\n![Markdown logo](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)\n\n### 表格\n\n以下是一個表格的示例：\n\n| 名字    | 年齡 | 性別   |\n| ------ | --- | ------ |\n| 爱丽丝  | 20  | 女性 |\n| 鲍勃    | 25  | 男性   |\n| 查理 | 30  | 男性   |\n\n### 數學公式\n\n你還可以使用 KaTeX 包括數學公式。以下是一個示例：\n\n$$\n\\int_{-\\infty}^\\infty e^{-x^2} \\, dx = \\sqrt{\\pi}\n$$</string>
+</resources>
