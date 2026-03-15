@@ -135,9 +135,11 @@ object SmsHelper {
             } ?: emptyList()
         }
 
-        // Fetch all SMS (no paging yet — will paginate after merging with MMS)
-        val smsItems = context.contentResolver.getSearchCursorWithSql(
-            smsUri, getProjection(), where
+        // Cap each sub-query so we never load the entire table into memory
+        val fetchCap = offset + limit
+        val smsItems = context.contentResolver.queryCursor(
+            smsUri, getProjection(), where.toSelection(), where.args.toTypedArray(),
+            "${Telephony.Sms.DATE} DESC LIMIT $fetchCap"
         )?.map { cursor, cache ->
             cursorToSmsMessage(cursor, cache)
         } ?: emptyList()
@@ -159,7 +161,7 @@ object SmsHelper {
             ),
             mmsWhere.toSelection(),
             mmsWhere.args.toTypedArray(),
-            "${Telephony.Mms.DATE} DESC"
+            "${Telephony.Mms.DATE} DESC LIMIT $fetchCap"
         )?.map { cursor, cache ->
             val rawMmsId = cursor.getStringValue(Telephony.Mms._ID, cache)
             val bodyAndAttachments = readMmsBodyAndAttachments(context, rawMmsId)
@@ -190,13 +192,17 @@ object SmsHelper {
         limit: Int,
         offset: Int,
     ): List<DMessage> {
+        // Limit each sub-query to offset+limit so we never load an entire thread
+        // into memory.  After merging + sorting we apply the real offset/limit.
+        val fetchCap = offset + limit
+
         // Query SMS and MMS separately — this is reliable across all devices.
         val smsItems = context.contentResolver.queryCursor(
             smsUri,
             getProjection(),
             "${Telephony.Sms.THREAD_ID} = ?",
             arrayOf(threadId),
-            "${Telephony.Sms.DATE} DESC"
+            "${Telephony.Sms.DATE} DESC LIMIT $fetchCap"
         )?.map { cursor, cache ->
             cursorToSmsMessage(cursor, cache)
         } ?: emptyList()
@@ -209,7 +215,7 @@ object SmsHelper {
             ),
             "${Telephony.Mms.THREAD_ID} = ? AND $MMS_CONTENT_FILTER",
             arrayOf(threadId),
-            "${Telephony.Mms.DATE} DESC"
+            "${Telephony.Mms.DATE} DESC LIMIT $fetchCap"
         )?.map { cursor, cache ->
             val rawMmsId = cursor.getStringValue(Telephony.Mms._ID, cache)
             val bodyAndAttachments = readMmsBodyAndAttachments(context, rawMmsId)
