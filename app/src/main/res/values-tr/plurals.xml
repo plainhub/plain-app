@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="one">%,d gönderi</item>
-        <item quantity="other">%,d gönderi</item>
+        <item quantity="one">%,d post</item>
+        <item quantity="other">%,d posts</item>
     </plurals>
     <plurals name="items">
-        <item quantity="one">%,d öğe</item>
-        <item quantity="other">%,d öğe</item>
+        <item quantity="one">%,d item</item>
+        <item quantity="other">%,d items</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="one">%,d klasör</item>
-        <item quantity="other">%,d klasör</item>
+        <item quantity="one">%,d folder</item>
+        <item quantity="other">%,d folders</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="one">%,d dosya</item>
-        <item quantity="other">%,d dosya</item>
+        <item quantity="one">%,d file</item>
+        <item quantity="other">%,d files</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">%d öğe kopyalanıyor</item>
-        <item quantity="other">%d öğe kopyalanıyor</item>
+        <item quantity="one">Copying %,d item</item>
+        <item quantity="other">Copying %,d items</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">%d öğe taşınıyor</item>
-        <item quantity="other">%d öğe taşınıyor</item>
+        <item quantity="one">Moving %,d item</item>
+        <item quantity="other">Moving %,d items</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="one">%d saat</item>
-        <item quantity="other">%d saat</item>
+        <item quantity="one">%,d hour</item>
+        <item quantity="other">%,d hours</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="one">%d dakika</item>
-        <item quantity="other">%d dakika</item>
+        <item quantity="one">%,d minute</item>
+        <item quantity="other">%,d minutes</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="one">%d saniye</item>
-        <item quantity="other">%d saniye</item>
+        <item quantity="one">%,d second</item>
+        <item quantity="other">%,d seconds</item>
     </plurals>
     <plurals name="n_pomodoros">
         <item quantity="one">%,d pomodoro</item>
-        <item quantity="other">%,d pomodoro</item>
+        <item quantity="other">%,d pomodoros</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">Bugün: %,d pomodoro</item>
-        <item quantity="other">Bugün: %,d pomodoro</item>
+        <item quantity="one">Today: %,d pomodoro</item>
+        <item quantity="other">Today: %,d pomodoros</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="one">Toplam: %,d pomodoro</item>
-        <item quantity="other">Toplam: %,d pomodoro</item>
+        <item quantity="one">Total: %,d pomodoro</item>
+        <item quantity="other">Total: %,d pomodoros</item>
     </plurals>
 </resources>

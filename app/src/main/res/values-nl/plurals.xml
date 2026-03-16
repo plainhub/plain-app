@@ -1,51 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="posts">
-        <item quantity="one">%,d bericht</item>
-        <item quantity="other">%,d berichten</item>
+        <item quantity="one">%,d post</item>
+        <item quantity="other">%,d posts</item>
     </plurals>
     <plurals name="items">
         <item quantity="one">%,d item</item>
         <item quantity="other">%,d items</item>
     </plurals>
     <plurals name="x_folders">
-        <item quantity="one">%,d map</item>
-        <item quantity="other">%,d mappen</item>
+        <item quantity="one">%,d folder</item>
+        <item quantity="other">%,d folders</item>
     </plurals>
     <plurals name="x_files">
-        <item quantity="one">%,d bestand</item>
-        <item quantity="other">%,d bestanden</item>
+        <item quantity="one">%,d file</item>
+        <item quantity="other">%,d files</item>
     </plurals>
     <plurals name="copying_items">
-        <item quantity="one">Kopiëren van %,d item</item>
-        <item quantity="other">Kopiëren van %,d items</item>
+        <item quantity="one">Copying %,d item</item>
+        <item quantity="other">Copying %,d items</item>
     </plurals>
     <plurals name="moving_items">
-        <item quantity="one">Verplaatsen van %,d item</item>
-        <item quantity="other">Verplaatsen van %,d items</item>
+        <item quantity="one">Moving %,d item</item>
+        <item quantity="other">Moving %,d items</item>
     </plurals>
     <plurals name="n_hours">
-        <item quantity="one">%,d uur</item>
-        <item quantity="other">%,d uur</item>
+        <item quantity="one">%,d hour</item>
+        <item quantity="other">%,d hours</item>
     </plurals>
     <plurals name="n_minutes">
-        <item quantity="one">%,d minuut</item>
-        <item quantity="other">%,d minuten</item>
+        <item quantity="one">%,d minute</item>
+        <item quantity="other">%,d minutes</item>
     </plurals>
     <plurals name="n_seconds">
-        <item quantity="one">%,d seconde</item>
-        <item quantity="other">%,d seconden</item>
+        <item quantity="one">%,d second</item>
+        <item quantity="other">%,d seconds</item>
     </plurals>
     <plurals name="n_pomodoros">
         <item quantity="one">%,d pomodoro</item>
         <item quantity="other">%,d pomodoros</item>
     </plurals>
     <plurals name="today_stats_pomodoros">
-        <item quantity="one">Vandaag: %,d pomodoro</item>
-        <item quantity="other">Vandaag: %,d pomodoros</item>
+        <item quantity="one">Today: %,d pomodoro</item>
+        <item quantity="other">Today: %,d pomodoros</item>
     </plurals>
     <plurals name="total_stats_pomodoros">
-        <item quantity="one">Totaal: %,d pomodoro</item>
-        <item quantity="other">Totaal: %,d pomodoros</item>
+        <item quantity="one">Total: %,d pomodoro</item>
+        <item quantity="other">Total: %,d pomodoros</item>
     </plurals>
 </resources>
