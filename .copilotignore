@@ -1,0 +1,63 @@
+# Build outputs
+build/
+app/build/
+lib/build/
+*.apk
+*.aab
+*.dex
+*.class
+
+# Gradle cache
+.gradle/
+.kotlin/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Generated code
+app/build/generated/
+app/build/intermediates/
+app/build/kotlin/
+
+# Signing
+release.jks
+keystore.properties
+
+# i18n pipeline artifacts
+scripts/i18n-todo.json
+scripts/i18n-translated.json
+
+# Non-default locale strings (AI should reference values/ only; translations are auto-generated)
+app/src/main/res/values-zh-rCN/
+app/src/main/res/values-zh-rTW/
+app/src/main/res/values-de/
+app/src/main/res/values-fr/
+app/src/main/res/values-es/
+app/src/main/res/values-it/
+app/src/main/res/values-pt/
+app/src/main/res/values-ru/
+app/src/main/res/values-ja/
+app/src/main/res/values-ko/
+app/src/main/res/values-nl/
+app/src/main/res/values-tr/
+app/src/main/res/values-vi/
+app/src/main/res/values-hi/
+app/src/main/res/values-ta/
+app/src/main/res/values-bn/
+
+# Screenshots & marketing assets
+screenshots/
+fastlane/
+
+# Static assets
+app/src/main/res/drawable*/
+app/src/main/res/mipmap*/
+
+# Proguard
+proguard/
+
+# Logs
+*.log
+*.hprof
