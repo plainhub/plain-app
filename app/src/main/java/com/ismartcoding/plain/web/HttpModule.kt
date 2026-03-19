@@ -648,30 +648,35 @@ object HttpModule {
                                             requestStr = decryptedBytes.decodeToString()
                                         }
                                         if (requestStr.isEmpty()) {
-                                            call.respond(HttpStatusCode.Unauthorized)
-                                            return@forEachPart
+                                            throw IllegalStateException("Unauthorized")
                                         }
 
                                         info = jsonDecode<UploadInfo>(requestStr)
                                     }
 
                                     "file" -> {
-                                        fileName = part.originalFileName as String
+                                        // Strip any path components from the filename to prevent
+                                        // directory traversal and duplicate-folder bugs (some browsers
+                                        // include webkitRelativePath in the Content-Disposition filename).
+                                        fileName = File(part.originalFileName as String).name
                                         if (info.isAppFile) {
                                             // Import into content-addressable chat file store for deduplication
                                             val tempFile = File(MainApp.instance.cacheDir, "chat_upload_${System.currentTimeMillis()}_${Thread.currentThread().id}")
                                             tempFile.parentFile?.mkdirs()
-                                            part.provider().let { input ->
-                                                val outputStream = FileOutputStream(tempFile)
-                                                input.copyTo(outputStream)
-                                                outputStream.close()
+                                            FileOutputStream(tempFile).use { fos ->
+                                                part.provider().copyTo(fos)
+                                                fos.fd.sync()
+                                            }
+                                            if (info.size > 0 && tempFile.length() != info.size) {
+                                                val actual = tempFile.length()
+                                                tempFile.delete()
+                                                throw IOException("Size mismatch: expected ${info.size}, got $actual")
                                             }
                                             val dFile = AppFileStore.importFile(MainApp.instance, tempFile, part.contentType?.toString() ?: "", deleteSrc = true)
                                             fileName = dFile.id // SHA-256 hash — client forms fid:{hash}
                                         } else {
                                             if (info.dir.isEmpty() || fileName.isEmpty()) {
-                                                call.respond(HttpStatusCode.BadRequest)
-                                                return@forEachPart
+                                                throw IllegalArgumentException("dir or fileName is empty")
                                             }
                                             var destFile = File("${info.dir}/$fileName")
                                             if (destFile.exists()) {
@@ -685,10 +690,26 @@ object HttpModule {
                                             LogCat.d("Upload: ${info.dir}, ${destFile.absolutePath}")
                                             destFile.parentFile?.mkdirs()
 
-                                            part.provider().let { input ->
-                                                val outputStream = FileOutputStream(destFile)
-                                                input.copyTo(outputStream)
-                                                outputStream.close()
+                                            // Write to a temp file first, then rename atomically.
+                                            // This prevents the file from appearing in listings with a partial size.
+                                            val tempFile = File(destFile.parentFile, ".upload_tmp_${System.currentTimeMillis()}_${Thread.currentThread().id}")
+                                            try {
+                                                FileOutputStream(tempFile).use { fos ->
+                                                    part.provider().copyTo(fos)
+                                                    fos.fd.sync()
+                                                }
+                                                if (info.size > 0 && tempFile.length() != info.size) {
+                                                    val actual = tempFile.length()
+                                                    tempFile.delete()
+                                                    throw IOException("Size mismatch: expected ${info.size}, got $actual")
+                                                }
+                                                if (!tempFile.renameTo(destFile)) {
+                                                    tempFile.copyTo(destFile, overwrite = true)
+                                                    tempFile.delete()
+                                                }
+                                            } catch (e: Exception) {
+                                                tempFile.delete()
+                                                throw e
                                             }
                                             MainApp.instance.scanFileByConnection(destFile, null)
                                         }
@@ -704,6 +725,8 @@ object HttpModule {
                         part.dispose()
                     }
                     call.respond(HttpStatusCode.Created, fileName)
+                } catch (ex: IllegalStateException) {
+                    call.respond(HttpStatusCode.Unauthorized)
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                     call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
@@ -725,7 +748,7 @@ object HttpModule {
 
                 try {
                     lateinit var chunkInfo: UploadChunkInfo
-                    var chunkSaved = false
+                    var savedSize = 0L
 
                     call.receiveMultipart(formFieldLimit = Long.MAX_VALUE).forEachPart { part ->
                         when (part) {
@@ -738,8 +761,7 @@ object HttpModule {
                                             requestStr = decryptedBytes.decodeToString()
                                         }
                                         if (requestStr.isEmpty()) {
-                                            call.respond(HttpStatusCode.Unauthorized)
-                                            return@forEachPart
+                                            throw IllegalStateException("Unauthorized")
                                         }
 
                                         chunkInfo = jsonDecode<UploadChunkInfo>(requestStr)
@@ -747,22 +769,35 @@ object HttpModule {
 
                                     "file" -> {
                                         if (chunkInfo.fileId.isEmpty() || chunkInfo.index < 0) {
-                                            call.respond(HttpStatusCode.BadRequest, "fileId or index is missing or invalid")
-                                            return@forEachPart
+                                            throw IllegalArgumentException("fileId or index is missing or invalid")
+                                        }
+
+                                        // Read entire chunk into memory first (chunks are small)
+                                        // This avoids streaming issues with ByteReadChannel.copyTo under concurrent load
+                                        val bytes = part.provider().toByteArray()
+
+                                        // Verify received size matches expected
+                                        if (chunkInfo.size > 0 && bytes.size.toLong() != chunkInfo.size) {
+                                            throw IOException("Chunk ${chunkInfo.index} size mismatch: expected ${chunkInfo.size}, received ${bytes.size}")
                                         }
 
                                         // Create directory in cache dir using file_id as directory name
                                         val chunkDir = File(MainApp.instance.filesDir, "upload_tmp/${chunkInfo.fileId}")
                                         chunkDir.mkdirs()
 
-                                        // Save chunk file with name chunk_$index
+                                        // Write chunk atomically and sync to disk
                                         val chunkFile = File(chunkDir, "chunk_${chunkInfo.index}")
-                                        part.provider().let { input ->
-                                            val outputStream = FileOutputStream(chunkFile)
-                                            input.copyTo(outputStream)
-                                            outputStream.close()
+                                        FileOutputStream(chunkFile).use { fos ->
+                                            fos.write(bytes)
+                                            fos.fd.sync()
                                         }
-                                        chunkSaved = true
+                                        savedSize = chunkFile.length()
+
+                                        // Final verification: file on disk matches what we wrote
+                                        if (savedSize != bytes.size.toLong()) {
+                                            chunkFile.delete()
+                                            throw IOException("Chunk ${chunkInfo.index} disk verify failed: wrote ${bytes.size}, on disk $savedSize")
+                                        }
                                     }
 
                                     else -> {}
@@ -774,11 +809,13 @@ object HttpModule {
                         part.dispose()
                     }
 
-                    if (chunkSaved) {
-                        call.respond(HttpStatusCode.Created, "chunk_${chunkInfo.index}")
+                    if (savedSize > 0) {
+                        call.respond(HttpStatusCode.Created, "${chunkInfo.index}:$savedSize")
                     } else {
                         call.respond(HttpStatusCode.BadRequest, "chunk upload failed")
                     }
+                } catch (ex: IllegalStateException) {
+                    call.respond(HttpStatusCode.Unauthorized)
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                     call.respond(HttpStatusCode.BadRequest, ex.message ?: "")

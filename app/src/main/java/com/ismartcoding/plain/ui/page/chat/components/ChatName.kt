@@ -32,6 +32,7 @@ import com.ismartcoding.plain.ui.theme.secondaryTextColor
 fun ChatName(
     m: VChat,
     isPeerChat: Boolean = false,
+    isLocal: Boolean = false,
     onRetry: (() -> Unit)? = null,
     onShowDeliveryDetails: ((DMessageStatusData) -> Unit)? = null,
 ) {
@@ -56,68 +57,70 @@ fun ChatName(
             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Normal, color = MaterialTheme.colorScheme.secondaryTextColor),
         )
 
-        // Show status indicator based on message status
-        when {
-            m.status == "pending" -> {
-                HorizontalSpace(4.dp)
-                CircularProgressIndicator(
-                    modifier = Modifier.size(12.dp),
-                    strokeWidth = 1.5.dp,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+        // Show status indicator based on message status (skip for local chat)
+        if (!isLocal) {
+            when {
+                m.status == "pending" -> {
+                    HorizontalSpace(4.dp)
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(12.dp),
+                        strokeWidth = 1.5.dp,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
 
-            // Message with delivery data.
-            m.fromId == "me" && m.statusData != null && m.statusData.total > 0 -> {
-                val statusData = m.statusData
-                val isAllFailed = statusData.allFailed
-                val isPeerFailureBadge = isPeerChat && isAllFailed
-                val badgeColor = if (isAllFailed) MaterialTheme.colorScheme.error
-                                 else MaterialTheme.colorScheme.tertiary
+                // Message with delivery data.
+                m.fromId == "me" && m.statusData != null && m.statusData.total > 0 -> {
+                    val statusData = m.statusData
+                    val isAllFailed = statusData.allFailed
+                    val isPeerFailureBadge = isPeerChat && isAllFailed
+                    val badgeColor = if (isAllFailed) MaterialTheme.colorScheme.error
+                                     else MaterialTheme.colorScheme.tertiary
 
-                HorizontalSpace(6.dp)
-                Surface(
-                    color = badgeColor.copy(alpha = 0.12f),
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable { onShowDeliveryDetails?.invoke(statusData) },
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                    HorizontalSpace(6.dp)
+                    Surface(
+                        color = badgeColor.copy(alpha = 0.12f),
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { onShowDeliveryDetails?.invoke(statusData) },
                     ) {
-                        if (isAllFailed) {
-                            Icon(
-                                painter = painterResource(R.drawable.rotate_ccw),
-                                contentDescription = null,
-                                tint = badgeColor,
-                                modifier = Modifier.size(10.dp),
+                        Row(
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            if (isAllFailed) {
+                                Icon(
+                                    painter = painterResource(R.drawable.rotate_ccw),
+                                    contentDescription = null,
+                                    tint = badgeColor,
+                                    modifier = Modifier.size(10.dp),
+                                )
+                                HorizontalSpace(3.dp)
+                            }
+                            Text(
+                                text = if (isPeerFailureBadge) stringResource(R.string.error) else statusData.deliveryLabel(),
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    color = badgeColor,
+                                    fontWeight = FontWeight.SemiBold,
+                                ),
                             )
-                            HorizontalSpace(3.dp)
                         }
-                        Text(
-                            text = if (isPeerFailureBadge) stringResource(R.string.error) else statusData.deliveryLabel(),
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                color = badgeColor,
-                                fontWeight = FontWeight.SemiBold,
-                            ),
-                        )
                     }
                 }
-            }
 
-            // Peer / no-leader failure — show legacy retry button
-            m.fromId == "me" && m.status == "failed" -> {
-                if (onRetry != null) {
-                    HorizontalSpace(4.dp)
-                    PIconButton(
-                        icon = R.drawable.rotate_ccw,
-                        contentDescription = stringResource(R.string.try_again),
-                        tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(16.dp)
-                    ) {
-                        onRetry()
+                // Peer / no-leader failure — show legacy retry button
+                m.fromId == "me" && m.status == "failed" -> {
+                    if (onRetry != null) {
+                        HorizontalSpace(4.dp)
+                        PIconButton(
+                            icon = R.drawable.rotate_ccw,
+                            contentDescription = stringResource(R.string.try_again),
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(16.dp)
+                        ) {
+                            onRetry()
+                        }
                     }
                 }
             }

@@ -42,6 +42,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
+import com.ismartcoding.plain.ui.models.ChatType
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.VChat
 import com.ismartcoding.plain.ui.models.enterSelectMode
@@ -113,13 +114,13 @@ fun ChatListItem(
                     ChatName(
                         m = m,
                         isPeerChat = peer != null,
-                        onRetry = {
-                            // Retry failed message using ViewModel
-                            chatVM.retryMessage(m.id)
-                        },
-                        onShowDeliveryDetails = { statusData ->
-                            showDeliveryDialog.value = statusData
-                        },
+                        isLocal = chatVM.chatState.value.chatType == ChatType.LOCAL,
+                        onRetry = if (chatVM.chatState.value.chatType != ChatType.LOCAL) {
+                            { chatVM.retryMessage(m.id) }
+                        } else null,
+                        onShowDeliveryDetails = if (chatVM.chatState.value.chatType != ChatType.LOCAL) {
+                            { statusData -> showDeliveryDialog.value = statusData }
+                        } else null,
                     )
                     when (m.type) {
                         DMessageType.IMAGES.value -> {

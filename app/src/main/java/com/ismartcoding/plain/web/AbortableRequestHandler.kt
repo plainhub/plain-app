@@ -26,7 +26,7 @@ class AbortableRequestHandler : ChannelInboundHandlerAdapter() {
 
     override fun channelInactive(ctx: ChannelHandlerContext) {
         val call = ref.getAndSet(null)
-        call?.attributes?.get(ABORT_HANDLER_KEY)?.invoke()
+        call?.attributes?.getOrNull(ABORT_HANDLER_KEY)?.invoke()
         super.channelInactive(ctx)
     }
 }
