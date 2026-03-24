@@ -1,24 +1,21 @@
 package com.ismartcoding.plain.ui.page.root.home
 
 import android.content.Context
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.ui.base.PCard
-import com.ismartcoding.plain.ui.base.PListItem
-import com.ismartcoding.plain.ui.base.PMainSwitch
-import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.components.WebAddress
+import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.enums.HttpServerState
+import com.ismartcoding.plain.features.locale.LocaleHelper
+import com.ismartcoding.plain.helpers.AppHelper
+import com.ismartcoding.plain.preferences.HttpPortPreference
+import com.ismartcoding.plain.preferences.HttpsPortPreference
 import com.ismartcoding.plain.ui.models.MainViewModel
-import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.web.HttpServerManager
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeWeb(
     context: Context,
@@ -26,28 +23,71 @@ fun HomeWeb(
     mainVM: MainViewModel,
     webEnabled: Boolean,
 ) {
-    PCard {
-        PListItem(
-            modifier = Modifier.clickable {
-                navController.navigate(Routing.WebSettings)
-            },
-            icon = R.drawable.laptop,
-            title = stringResource(R.string.web_console),
-            subtitle = stringResource(R.string.access_phone_web),
-            showMore = true,
+    val scope = rememberCoroutineScope()
+    val state = mainVM.httpServerState
+
+    val showSuccess = webEnabled && state == HttpServerState.ON
+    val showLoading = state.isProcessing()
+    val showError = state == HttpServerState.ERROR
+    val errorMessage = buildHomeWebErrorMessage(mainVM)
+
+    val onRestartFix: () -> Unit = {
+        scope.launch {
+            withIO {
+                if (HttpServerManager.portsInUse.contains(TempData.httpPort)) {
+                    val nextHttp = HttpServerManager.httpPorts.filter { it != TempData.httpPort }.random()
+                    HttpPortPreference.putAsync(context, nextHttp)
+                    TempData.httpPort = nextHttp
+                }
+                if (HttpServerManager.portsInUse.contains(TempData.httpsPort)) {
+                    val nextHttps = HttpServerManager.httpsPorts.filter { it != TempData.httpsPort }.random()
+                    HttpsPortPreference.putAsync(context, nextHttps)
+                    TempData.httpsPort = nextHttps
+                }
+            }
+            AppHelper.relaunch(context)
+        }
+    }
+
+    when {
+        !showSuccess && !showLoading && !showError -> {
+            HomeWebEntrySection(
+                onRun = {
+                    if (!webEnabled && !state.isProcessing()) {
+                        mainVM.enableHttpServer(context, true)
+                    }
+                },
+            )
+        }
+
+        showLoading -> HomeWebLoadingSection()
+
+        showError -> {
+            HomeWebErrorSection(
+                context = context,
+                errorMessage = errorMessage,
+                onRestartFix = onRestartFix,
+            )
+        }
+
+        showSuccess -> {
+            HomeWebSuccessSection(
+                context = context,
+                navController = navController,
+                mainVM = mainVM,
+            )
+        }
+    }
+}
+
+private fun buildHomeWebErrorMessage(mainVM: MainViewModel): String {
+    return if (HttpServerManager.portsInUse.isNotEmpty()) {
+        LocaleHelper.getStringF(
+            if (HttpServerManager.portsInUse.size > 1) R.string.http_port_conflict_errors else R.string.http_port_conflict_error,
+            "port",
+            HttpServerManager.portsInUse.joinToString(", "),
         )
-        VerticalSpace(dp = 8.dp)
-        PMainSwitch(
-            title = stringResource(id = mainVM.httpServerState.getTextId()),
-            activated = webEnabled,
-            enable = !mainVM.httpServerState.isProcessing()
-        ) { it ->
-            mainVM.enableHttpServer(context, it)
-        }
-        if (webEnabled) {
-            VerticalSpace(dp = 8.dp)
-            WebAddress(context, mainVM)
-        }
-        VerticalSpace(dp = 16.dp)
+    } else {
+        mainVM.httpServerError.ifEmpty { LocaleHelper.getString(R.string.http_server_failed) }
     }
 }

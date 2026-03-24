@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.page.root
 
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
@@ -12,7 +11,9 @@ import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
+import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
+import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.VideosViewModel
 
@@ -20,7 +21,7 @@ import com.ismartcoding.plain.ui.models.VideosViewModel
 @Composable
 fun RootPageScaffoldContent(
     navController: NavHostController,
-    pagerState: PagerState,
+    currentPage: Int,
     states: RootPageStates,
     mainVM: MainViewModel,
     imagesVM: ImagesViewModel,
@@ -38,13 +39,17 @@ fun RootPageScaffoldContent(
     audioCastVM: CastViewModel,
     peerVM: PeerViewModel,
     channelVM: ChannelViewModel,
-    onTabSelected: (Int) -> Unit,
+    notesVM: NotesViewModel,
+    noteTagsVM: TagsViewModel,
+    feedTagsVM: TagsViewModel,
+    pomodoroVM: PomodoroViewModel,
+    onOpenDrawer: () -> Unit,
 ) {
     PScaffold(
         topBar = {
             RootPageTopBar(
                 navController = navController,
-                pagerState = pagerState,
+                currentPage = currentPage,
                 states = states,
                 imagesVM = imagesVM,
                 imageTagsVM = imageTagsVM,
@@ -56,6 +61,7 @@ fun RootPageScaffoldContent(
                 audioTagsVM = audioTagsVM,
                 audioCastVM = audioCastVM,
                 channelVM = channelVM,
+                onOpenDrawer = onOpenDrawer,
             )
         },
         bottomBar = {
@@ -71,9 +77,9 @@ fun RootPageScaffoldContent(
             )
         },
     ) { paddingValues ->
-        RootPagePagerContent(
+        RootPageContent(
             navController = navController,
-            pagerState = pagerState,
+            currentPage = currentPage,
             paddingValues = paddingValues,
             states = states,
             mainVM = mainVM,
@@ -92,7 +98,11 @@ fun RootPageScaffoldContent(
             audioCastVM = audioCastVM,
             peerVM = peerVM,
             channelVM = channelVM,
-            onTabSelected = onTabSelected,
+            notesVM = notesVM,
+            noteTagsVM = noteTagsVM,
+            feedTagsVM = feedTagsVM,
+            pomodoroVM = pomodoroVM,
+            onOpenDrawer = onOpenDrawer,
         )
     }
 }

@@ -27,11 +27,11 @@ fun RootNavigationBar(
     data class NavItem(val tab: Int, val icon: Int, val label: Int)
 
     val items = listOf(
-        NavItem(RootTabType.HOME.value, R.drawable.house, R.string.home),
-        NavItem(RootTabType.CHAT.value, R.drawable.message_circle, R.string.chat),
-        NavItem(RootTabType.AUDIO.value, R.drawable.music, R.string.audios),
-        NavItem(RootTabType.IMAGES.value, R.drawable.image, R.string.images),
-        NavItem(RootTabType.VIDEOS.value, R.drawable.video, R.string.videos),
+        NavItem(RootPageType.HOME.value, R.drawable.house, R.string.home),
+        NavItem(RootPageType.CHAT.value, R.drawable.message_circle, R.string.chat),
+        NavItem(RootPageType.AUDIO.value, R.drawable.music, R.string.audios),
+        NavItem(RootPageType.IMAGES.value, R.drawable.image, R.string.images),
+        NavItem(RootPageType.VIDEOS.value, R.drawable.video, R.string.videos),
     )
 
     NavigationBar(

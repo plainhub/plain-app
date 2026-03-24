@@ -50,7 +50,7 @@ import com.ismartcoding.plain.preferences.DocSortByPreference
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.ActionButtonSort
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.NavigationBackIcon
+import com.ismartcoding.plain.ui.base.ActionButtonDrawer
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.NoDataColumn
@@ -84,6 +84,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun DocsPage(
     navController: NavHostController,
+    onOpenDrawer: () -> Unit = {},
     docsVM: DocsViewModel = viewModel(),
 ) {
     val context = LocalContext.current
@@ -223,7 +224,7 @@ fun DocsPage(
                             docsVM.exitSelectMode()
                         }
                     } else {
-                        NavigationBackIcon { navController.navigateUp() }
+                        ActionButtonDrawer(onClick = onOpenDrawer)
                     }
                 },
                 title = pageTitle,
@@ -291,7 +292,7 @@ fun DocsPage(
                 NoDataColumn(loading = docsVM.showLoading.value, search = docsVM.showSearchBar.value)
                 return@PScaffold
             }
-            HorizontalPager(state = pagerState) { index ->
+            HorizontalPager(state = pagerState, userScrollEnabled = false) { index ->
                 PullToRefresh(
                     refreshLayoutState = topRefreshLayoutState,
                 ) {

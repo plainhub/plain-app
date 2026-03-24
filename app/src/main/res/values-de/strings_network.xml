@@ -22,8 +22,8 @@
     <string name="run">Ausführen</string>
     <string name="troubleshoot">Fehlerbehebung</string>
     <string name="allow_remote_access_from_pc">Remote-Zugriff vom PC erlauben</string>
-    <string name="http_port_conflict_error">Der Port {{ port }} wird derzeit verwendet. Sie können die Schaltfläche \'Beheben\' drücken, um den Port automatisch zu ändern, oder Sie können das Bearbeitungssymbol neben der URL-Adresse antippen, um manuell einen anderen Port auszuwählen.</string>
-    <string name="http_port_conflict_errors">Die Ports {{ port }} werden derzeit verwendet. Sie haben die Möglichkeit, die Schaltfläche \'Beheben\' zu drücken, um den Port automatisch zu ändern, oder Sie können das Bearbeitungssymbol neben der URL-Adresse antippen, um manuell einen anderen Port auszuwählen.</string>
+    <string name="http_port_conflict_error">Port {{ port }} ist belegt. Tippen Sie auf "App neu starten", um das automatisch zu beheben.</string>
+    <string name="http_port_conflict_errors">Ports {{ port }} sind belegt. Tippen Sie auf "App neu starten", um das automatisch zu beheben.</string>
     <string name="fix">Beheben</string>
     <string name="security">Sicherheit</string>
     <string name="url_token">URL-Token</string>
@@ -32,8 +32,7 @@
     <string name="http_server_error">Der HTTP-Server ist nicht gestartet. Starten Sie die PlainApp erneut und versuchen Sie es erneut. Stellen Sie sicher, dass keine anderen Apps die HTTP- oder HTTPS-Ports belegen. Wenn das Problem weiterhin besteht, geben Sie bitte weitere Details zum Problem an, indem Sie ismartcoding@gmail.com kontaktieren.</string>
     <string name="relaunch_app">App neu starten</string>
     <string name="require_confirmation">Bestätigung erforderlich</string>
-    <string name="web_console">Web auf PC</string>
-    <string name="web_service_required_for_chat">Um Nachrichten von anderen zu erhalten, aktivieren Sie bitte den Web-auf-PC-Dienst.</string>
+    <string name="web_service_required_for_chat">Um Nachrichten von anderen zu erhalten, aktivieren Sie bitte das Telefon-Webportal.</string>
     <string name="enable_web_service">Web-Dienst aktivieren</string>
     <string name="http_port">HTTP-Port</string>
     <string name="https_port">HTTPS-Port</string>
@@ -62,4 +61,13 @@
     <string name="restart_app_message">Fast geschafft! Tippen Sie einfach auf "APP neu starten", um die Änderungen zu übernehmen.</string>
     <string name="access_phone_web">Greifen Sie über einen Computerbrowser auf Ihr Telefon zu.</string>
     <string name="scan_qrcode_to_access_web">Scannen Sie den QR-Code, um auf die Webadresse zuzugreifen</string>
+    <string name="phone_web_portal">Telefon-Webportal</string>
+    <string name="phone_web_portal_desc">Greifen Sie von einem Computerbrowser auf Ihr Telefon zu</string>
+    <string name="same_network_hint">Stellen Sie sicher, dass sich Ihr Computer und Ihr Telefon im selben Netzwerk befinden</string>
+    <string name="ready">Bereit</string>
+    <string name="permission_settings">Berechtigungseinstellungen</string>
+    <string name="web_address_hint">Öffnen Sie eine beliebige der untenstehenden Adressen im Browser Ihres Computers.</string>
+    <string name="home_web_easy_hint">Zum Starten tippen</string>
+    <string name="home_web_easy_loading">Bitte warten…</string>
+    <string name="home_web_easy_failed_title">Konnte nicht gestartet werden</string>
 </resources>

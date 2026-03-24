@@ -22,8 +22,8 @@
     <string name="run">Uitvoeren</string>
     <string name="troubleshoot">Problemen oplossen</string>
     <string name="allow_remote_access_from_pc">Toegang op afstand vanaf de pc toestaan</string>
-    <string name="http_port_conflict_error">Poort {{ port }} wordt momenteel gebruikt. U kunt op de \'Herstellen\' knop tikken om de poort automatisch te wijzigen, of u kunt ervoor kiezen om op het bewerkingspictogram naast het URL-adres te tikken om handmatig een andere poort te selecteren.</string>
-    <string name="http_port_conflict_errors">De poorten {{ port }} worden momenteel gebruikt. U heeft de mogelijkheid om op de \'Herstellen\' knop te tikken om de poort automatisch te wijzigen, of u kunt ervoor kiezen om op het bewerkingspictogram naast het URL-adres te tikken om handmatig een andere poort te selecteren.</string>
+    <string name="http_port_conflict_error">Poort {{ port }} is in gebruik. Tik op "App opnieuw starten", om dit automatisch te herstellen.</string>
+    <string name="http_port_conflict_errors">Poorten {{ port }} zijn in gebruik. Tik op "App opnieuw starten", om dit automatisch te herstellen.</string>
     <string name="fix">Herstellen</string>
     <string name="security">Beveiliging</string>
     <string name="url_token">URL-token</string>
@@ -32,8 +32,7 @@
     <string name="http_server_error">De HTTP-server is niet gestart. Start PlainApp opnieuw en probeer het opnieuw. Zorg ervoor dat er geen andere apps zijn die de HTTP- of HTTPS-poorten bezetten. Als het probleem aanhoudt, geef dan meer details over het probleem door contact op te nemen met ismartcoding@gmail.com.</string>
     <string name="relaunch_app">App opnieuw starten</string>
     <string name="require_confirmation">Bevestiging vereisen</string>
-    <string name="web_console">Web op pc</string>
-    <string name="web_service_required_for_chat">Om berichten van anderen te ontvangen, schakelt u de Web op pc-service in.</string>
+    <string name="web_service_required_for_chat">Om berichten van anderen te ontvangen, schakel het telefoonwebportaal in.</string>
     <string name="enable_web_service">Web-service inschakelen</string>
     <string name="http_port">HTTP-poort</string>
     <string name="https_port">HTTPS-poort</string>
@@ -62,4 +61,13 @@
     <string name="restart_app_message">Bijna klaar! Tik gewoon op "APP opnieuw starten" om het effect te zien.</string>
     <string name="access_phone_web">Toegang tot je telefoon via een computerbrowser.</string>
     <string name="scan_qrcode_to_access_web">Scan QR-code om toegang te krijgen tot het webadres</string>
+    <string name="phone_web_portal">Telefoonwebportaal</string>
+    <string name="phone_web_portal_desc">Open je telefoon via de browser op je computer</string>
+    <string name="same_network_hint">Zorg dat je computer en telefoon met hetzelfde netwerk zijn verbonden</string>
+    <string name="ready">Gereed</string>
+    <string name="permission_settings">Machtigingsinstellingen</string>
+    <string name="web_address_hint">Open een van de onderstaande adressen in de browser op je computer.</string>
+    <string name="home_web_easy_hint">Tik om te starten</string>
+    <string name="home_web_easy_loading">Even geduld…</string>
+    <string name="home_web_easy_failed_title">Kon niet starten</string>
 </resources>

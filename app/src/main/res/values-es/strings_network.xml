@@ -22,8 +22,8 @@
     <string name="run">Ejecutar</string>
     <string name="troubleshoot">Solucionar problemas</string>
     <string name="allow_remote_access_from_pc">Permitir acceso remoto desde PC</string>
-    <string name="http_port_conflict_error">El puerto {{ port }} está actualmente en uso. Puede tocar el botón \'Corregir\' para cambiar automáticamente el puerto, o puede optar por tocar el ícono de edición junto a la dirección URL para seleccionar manualmente un puerto diferente.</string>
-    <string name="http_port_conflict_errors">Los puertos {{ port }} están actualmente en uso. Tiene la opción de tocar el botón \'Corregir\' para cambiar automáticamente el puerto, o puede optar por tocar el ícono de edición junto a la dirección URL para seleccionar manualmente un puerto diferente.</string>
+    <string name="http_port_conflict_error">El puerto {{ port }} está ocupado. Toque "Reiniciar app" para corregirlo automáticamente.</string>
+    <string name="http_port_conflict_errors">Los puertos {{ port }} están ocupados. Toque "Reiniciar app" para corregirlos automáticamente.</string>
     <string name="fix">Corregir</string>
     <string name="security">Seguridad</string>
     <string name="url_token">Token de URL</string>
@@ -32,8 +32,7 @@
     <string name="http_server_error">El servidor HTTP no está iniciado. Vuelve a abrir PlainApp e inténtalo de nuevo. Asegúrate de que no haya otras aplicaciones ocupando los puertos HTTP o HTTPS. Si el problema persiste, proporciona más detalles sobre el problema contactando a ismartcoding@gmail.com.</string>
     <string name="relaunch_app">Vuelve a abrir PlainApp</string>
     <string name="require_confirmation">Requiere confirmación</string>
-    <string name="web_console">Web en PC</string>
-    <string name="web_service_required_for_chat">Para recibir mensajes de otros, por favor habilite el servicio Web en PC.</string>
+    <string name="web_service_required_for_chat">Para recibir mensajes de otras personas, habilita el portal web del teléfono.</string>
     <string name="enable_web_service">Habilitar servicio Web</string>
     <string name="http_port">Puerto HTTP</string>
     <string name="https_port">Puerto HTTPS</string>
@@ -62,4 +61,13 @@
     <string name="restart_app_message">¡Casi listo! Solo toque "Volver a lanzar APP" para que surtan efecto los cambios.</string>
     <string name="access_phone_web">Accede a tu teléfono desde el navegador de una computadora.</string>
     <string name="scan_qrcode_to_access_web">Escanea el código QR para acceder a la dirección web</string>
+    <string name="phone_web_portal">Portal web del teléfono</string>
+    <string name="phone_web_portal_desc">Accede a tu teléfono desde el navegador de una computadora</string>
+    <string name="same_network_hint">Asegúrate de que tu computadora y tu teléfono estén en la misma red</string>
+    <string name="ready">Listo</string>
+    <string name="permission_settings">Configuración de permisos</string>
+    <string name="web_address_hint">Abre cualquiera de las direcciones de abajo en el navegador de tu computadora.</string>
+    <string name="home_web_easy_hint">Toca para iniciar</string>
+    <string name="home_web_easy_loading">Espera…</string>
+    <string name="home_web_easy_failed_title">No se pudo iniciar</string>
 </resources>

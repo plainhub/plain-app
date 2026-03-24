@@ -47,15 +47,16 @@ fun WebAddress(
 
     // HTTP/HTTPS address section
     HorizontalPager(
-        modifier = Modifier.padding(horizontal = 16.dp),
         state = pagerState,
         pageSpacing = 16.dp,
     ) { page ->
         Column {
             val isHttps = page != 0
             WebAddressBar(context, mainVM, isHttps)
-            Tips(text = stringResource(id = R.string.enter_this_address_tips), modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp))
-            VerticalSpace(dp = 8.dp)
+            Tips(
+                stringResource(R.string.same_network_hint),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            )
         }
     }
     PageIndicator(pagerState)

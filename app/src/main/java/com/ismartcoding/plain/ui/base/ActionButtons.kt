@@ -40,6 +40,16 @@ fun ActionButtons(
 }
 
 @Composable
+fun ActionButtonDrawer(onClick: () -> Unit) {
+    PIconButton(
+        icon = R.drawable.menu,
+        contentDescription = stringResource(R.string.more),
+        tint = MaterialTheme.colorScheme.onSurface,
+        click = onClick,
+    )
+}
+
+@Composable
 fun ActionButtonMore(onClick: () -> Unit) {
     PIconButton(
         icon = R.drawable.ellipsis_vertical,
@@ -69,6 +79,28 @@ fun ActionButtonMoreWithMenu(content: @Composable ColumnScope.(dismiss: () -> Un
         }
     }
 }
+
+@Composable
+fun ActionButtonAddWithMenu(content: @Composable ColumnScope.(dismiss: () -> Unit) -> Unit) {
+    var isMenuOpen by remember { mutableStateOf(false) }
+    PIconButton(
+        icon = R.drawable.plus,
+        contentDescription = stringResource(R.string.add),
+        tint = MaterialTheme.colorScheme.onSurface,
+        click = {
+            isMenuOpen = true
+        },
+    )
+    PDropdownMenu(
+        expanded = isMenuOpen,
+        onDismissRequest = { isMenuOpen = false }
+    ) {
+        content {
+            isMenuOpen = false
+        }
+    }
+}
+
 
 @Composable
 fun ActionButtonAdd(onClick: () -> Unit) {

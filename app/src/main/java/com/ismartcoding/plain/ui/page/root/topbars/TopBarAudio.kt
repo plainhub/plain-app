@@ -7,6 +7,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.preferences.AudioSortByPreference
+import com.ismartcoding.plain.ui.base.ActionButtonDrawer
 import com.ismartcoding.plain.ui.base.MediaTopBar
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun TopBarAudio(
     navController: NavHostController,
+    onOpenDrawer: () -> Unit,
     audioState: AudioPageState,
     audioVM: AudioViewModel,
     tagsVM: TagsViewModel,
@@ -40,6 +42,9 @@ fun TopBarAudio(
             scope.launch {
                 audioVM.scrollStateMap[audioState.pagerState.currentPage]?.scrollToItem(0)
             }
+        },
+        defaultNavigationIcon = {
+            ActionButtonDrawer(onClick = onOpenDrawer)
         },
         onSortSelected = { _, sortBy ->
             scope.launch(Dispatchers.IO) {

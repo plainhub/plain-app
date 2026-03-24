@@ -22,8 +22,8 @@
     <string name="run">चलाएं</string>
     <string name="troubleshoot">समस्या समाधान करें</string>
     <string name="allow_remote_access_from_pc">पीसी से दूरस्थ पहुंच की अनुमति दें</string>
-    <string name="http_port_conflict_error">पोर्ट {{ port }} वर्तमान में उपयोग में है। आप पोर्ट को स्वचालित रूप से बदलने के लिए \'सुधारें\' बटन पर टैप कर सकते हैं, या आप URL पते के पास विभिन्न पोर्ट का चयन करने के लिए संपादन आइकन पर टैप कर सकते हैं।</string>
-    <string name="http_port_conflict_errors">पोर्ट {{ port }} वर्तमान में उपयोग में हैं। आप पोर्ट को स्वचालित रूप से बदलने के लिए \'सुधारें\' बटन पर टैप कर सकते हैं, या आप URL पते के पास विभिन्न पोर्ट का चयन करने के लिए संपादन आइकन पर टैप कर सकते हैं।</string>
+    <string name="http_port_conflict_error">पोर्ट {{ port }} उपयोग में है। "ऐप पुनरारंभ करें" पर टैप करें ताकि यह स्वचालित रूप से ठीक हो जाए।</string>
+    <string name="http_port_conflict_errors">पोर्ट {{ port }} उपयोग में हैं। "ऐप पुनरारंभ करें" पर टैप करें ताकि यह स्वचालित रूप से ठीक हो जाए।</string>
     <string name="fix">सुधारें</string>
     <string name="security">सुरक्षा</string>
     <string name="url_token">यूआरएल टोकन</string>
@@ -32,8 +32,7 @@
     <string name="http_server_error">HTTP सर्वर शुरू नहीं हुआ है। PlainApp को फिर से चालने का प्रयास करें और पुन: प्रयास करें। सुनिश्चित करें कि HTTP या HTTPS पोर्ट पर कोई अन्य एप्लिकेशन नहीं है। यदि समस्या बरकरार रहती है, तो कृपया ismartcoding@gmail.com पर समस्या के बारे में अधिक विवरण प्रदान करें।</string>
     <string name="relaunch_app">ऐप फिर से चालू करें</string>
     <string name="require_confirmation">पुष्टिकरण की आवश्यकता है</string>
-    <string name="web_console">पीसी पर वेब</string>
-    <string name="web_service_required_for_chat">दूसरों से संदेश प्राप्त करने के लिए, कृपया पीसी पर वेब सेवा सक्षम करें।</string>
+    <string name="web_service_required_for_chat">दूसरों से संदेश प्राप्त करने के लिए, कृपया फ़ोन वेब पोर्टल सक्षम करें।</string>
     <string name="enable_web_service">वेब सेवा सक्षम करें</string>
     <string name="http_port">HTTP पोर्ट</string>
     <string name="https_port">HTTPS पोर्ट</string>
@@ -62,4 +61,13 @@
     <string name="restart_app_message">लगभग हो गया! केवल प्रभावी बनाने के लिए "ऐप फिर से चालना" टैप करें।</string>
     <string name="access_phone_web">कंप्यूटर ब्राउज़र से अपने फ़ोन तक पहुँचें।</string>
     <string name="scan_qrcode_to_access_web">वेब पता तक पहुँचने के लिए QR कोड स्कैन करें</string>
+    <string name="phone_web_portal">फ़ोन वेब पोर्टल</string>
+    <string name="phone_web_portal_desc">कंप्यूटर ब्राउज़र से अपने फ़ोन को एक्सेस करें</string>
+    <string name="same_network_hint">सुनिश्चित करें कि आपका कंप्यूटर और फ़ोन एक ही नेटवर्क पर हैं</string>
+    <string name="ready">तैयार</string>
+    <string name="permission_settings">अनुमति सेटिंग्स</string>
+    <string name="web_address_hint">नीचे दिए गए किसी भी पते को अपने कंप्यूटर के ब्राउज़र में खोलें।</string>
+    <string name="home_web_easy_hint">शुरू करने के लिए टैप करें</string>
+    <string name="home_web_easy_loading">कृपया प्रतीक्षा करें…</string>
+    <string name="home_web_easy_failed_title">शुरू नहीं हो सका</string>
 </resources>

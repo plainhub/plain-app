@@ -44,7 +44,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.ActionButtonTags
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.NavigationBackIcon
+import com.ismartcoding.plain.ui.base.ActionButtonDrawer
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PDraggableElement
@@ -84,6 +84,7 @@ fun NotesPage(
     navController: NavHostController,
     notesVM: NotesViewModel,
     tagsVM: TagsViewModel,
+    onOpenDrawer: () -> Unit = {},
 ) {
     val itemsState by notesVM.itemsFlow.collectAsState()
     val tagsState by tagsVM.itemsFlow.collectAsState()
@@ -225,7 +226,7 @@ fun NotesPage(
                             notesVM.exitSelectMode()
                         }
                     } else {
-                        NavigationBackIcon { navController.navigateUp() }
+                        ActionButtonDrawer(onClick = onOpenDrawer)
                     }
                 },
                 title = pageTitle,
@@ -304,7 +305,7 @@ fun NotesPage(
                 }
             }
 
-            HorizontalPager(state = pagerState) { index ->
+            HorizontalPager(state = pagerState, userScrollEnabled = false) { index ->
                 PullToRefresh(
                     refreshLayoutState = topRefreshLayoutState,
                 ) {

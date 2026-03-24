@@ -22,8 +22,8 @@
     <string name="run">Запустить</string>
     <string name="troubleshoot">Устранить неполадки</string>
     <string name="allow_remote_access_from_pc">Разрешить удаленный доступ с ПК</string>
-    <string name="http_port_conflict_error">Порт {{ port }} в настоящее время используется. Вы можете нажать кнопку \'Исправить\', чтобы автоматически изменить порт, или выбрать значок редактирования рядом с URL-адресом, чтобы вручную выбрать другой порт.</string>
-    <string name="http_port_conflict_errors">Порты {{ port }} в настоящее время используются. У вас есть возможность нажать кнопку \'Исправить\', чтобы автоматически изменить порт, или выбрать значок редактирования рядом с URL-адресом, чтобы вручную выбрать другой порт.</string>
+    <string name="http_port_conflict_error">Порт {{ port }} занят. Нажмите "Перезапустить приложение", чтобы исправить автоматически.</string>
+    <string name="http_port_conflict_errors">Порты {{ port }} заняты. Нажмите "Перезапустить приложение", чтобы исправить автоматически.</string>
     <string name="fix">Исправить</string>
     <string name="security">Безопасность</string>
     <string name="url_token">Токен URL</string>
@@ -32,8 +32,7 @@
     <string name="http_server_error">HTTP-сервер не запущен. Перезапустите PlainApp и попробуйте снова. Убедитесь, что нет других приложений, занимающих порты HTTP или HTTPS. Если проблема сохраняется, предоставьте более подробную информацию о проблеме, связавшись с ismartcoding@gmail.com.</string>
     <string name="relaunch_app">Перезапустите приложение</string>
     <string name="require_confirmation">Требовать подтверждение</string>
-    <string name="web_console">Веб на ПК</string>
-    <string name="web_service_required_for_chat">Чтобы получать сообщения от других, пожалуйста, включите службу Веб на ПК.</string>
+    <string name="web_service_required_for_chat">Чтобы получать сообщения от других, включите веб-портал телефона.</string>
     <string name="enable_web_service">Включить веб-службу</string>
     <string name="http_port">Порт HTTP</string>
     <string name="https_port">Порт HTTPS</string>
@@ -62,4 +61,13 @@
     <string name="restart_app_message">Почти готово! Просто нажмите "Перезапустить приложение", чтобы изменения вступили в силу.</string>
     <string name="access_phone_web">Получите доступ к телефону через браузер на компьютере.</string>
     <string name="scan_qrcode_to_access_web">Сканируйте QR-код, чтобы получить доступ к веб-адресу</string>
+    <string name="phone_web_portal">Веб-портал телефона</string>
+    <string name="phone_web_portal_desc">Откройте доступ к телефону из браузера на компьютере</string>
+    <string name="same_network_hint">Убедитесь, что компьютер и телефон подключены к одной сети</string>
+    <string name="ready">Готово</string>
+    <string name="permission_settings">Настройки разрешений</string>
+    <string name="web_address_hint">Откройте любой адрес ниже в браузере на компьютере.</string>
+    <string name="home_web_easy_hint">Нажмите, чтобы начать</string>
+    <string name="home_web_easy_loading">Пожалуйста, подождите…</string>
+    <string name="home_web_easy_failed_title">Не удалось запустить</string>
 </resources>

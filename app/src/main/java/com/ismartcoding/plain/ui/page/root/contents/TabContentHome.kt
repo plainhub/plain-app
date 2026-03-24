@@ -25,10 +25,10 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
+import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.preferences.HttpPortPreference
 import com.ismartcoding.plain.preferences.HttpsPortPreference
@@ -77,9 +77,11 @@ fun TabContentHome(
         }
     }
 
-    LazyColumn(Modifier
-        .fillMaxSize()
-        .padding(top = paddingValues.calculateTopPadding())) {
+    LazyColumn(
+        Modifier
+            .fillMaxSize()
+            .padding(top = paddingValues.calculateTopPadding())
+    ) {
         item {
             TopSpace()
         }
@@ -93,10 +95,16 @@ fun TabContentHome(
                                 click = {
                                     scope.launch(Dispatchers.IO) {
                                         if (HttpServerManager.portsInUse.contains(TempData.httpPort)) {
-                                            HttpPortPreference.putAsync(context, HttpServerManager.httpPorts.filter { it != TempData.httpPort }.random())
+                                            HttpPortPreference.putAsync(
+                                                context,
+                                                HttpServerManager.httpPorts.filter { it != TempData.httpPort }.random()
+                                            )
                                         }
                                         if (HttpServerManager.portsInUse.contains(TempData.httpsPort)) {
-                                            HttpsPortPreference.putAsync(context, HttpServerManager.httpsPorts.filter { it != TempData.httpsPort }.random())
+                                            HttpsPortPreference.putAsync(
+                                                context,
+                                                HttpServerManager.httpsPorts.filter { it != TempData.httpsPort }.random()
+                                            )
                                         }
                                         coMain {
                                             AlertDialog.Builder(context)
@@ -123,10 +131,18 @@ fun TabContentHome(
                     }
                 } else {
                     if (mainVM.isVPNConnected) {
-                        PAlert(title = stringResource(id = R.string.attention), description = stringResource(id = R.string.vpn_web_conflict_warning), AlertType.WARNING)
+                        PAlert(
+                            title = stringResource(id = R.string.attention),
+                            description = stringResource(id = R.string.vpn_web_conflict_warning),
+                            AlertType.WARNING
+                        )
                     }
                     if (!systemAlertWindow) {
-                        PAlert(title = stringResource(id = R.string.attention), description = stringResource(id = R.string.system_alert_window_warning), AlertType.WARNING) {
+                        PAlert(
+                            title = stringResource(id = R.string.attention),
+                            description = stringResource(id = R.string.system_alert_window_warning),
+                            AlertType.WARNING
+                        ) {
                             PMiniOutlineButton(
                                 label = stringResource(R.string.grant_permission),
                                 click = {
@@ -141,9 +157,6 @@ fun TabContentHome(
         item {
             HomeWeb(context, navController, mainVM, webEnabled)
             VerticalSpace(dp = 16.dp)
-        }
-        item {
-            HomeFeatures(navController, itemWidth)
         }
         item {
             BottomSpace(paddingValues)

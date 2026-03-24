@@ -21,6 +21,7 @@ import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconTextButton
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+import com.ismartcoding.plain.ui.page.root.components.RootPageType
 import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -28,6 +29,8 @@ import kotlinx.coroutines.flow.map
 fun HomeFeatures(
     navController: NavHostController,
     itemWidth: Dp,
+    onNavigate: (RootPageType) -> Unit = {},
+    onFeatureClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
 
@@ -45,7 +48,7 @@ fun HomeFeatures(
 
     PCard {
         HomeItemFlow {
-            FeatureItem.getList(navController).filter { selectedFeatures.contains(it.type.name) }.forEach { item ->
+            FeatureItem.getList(onNavigate).filter { selectedFeatures.contains(it.type.name) }.forEach { item ->
                 PIconTextButton(
                     icon = painterResource(item.iconRes),
                     stringResource(id = item.titleRes),
@@ -53,6 +56,7 @@ fun HomeFeatures(
                         .width(itemWidth)
                         .clickable {
                             item.click()
+                            onFeatureClick()
                         })
             }
 

@@ -1,10 +1,8 @@
 package com.ismartcoding.plain.ui.page.root.home
 
-import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
-import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.ui.nav.navigateFiles
+import com.ismartcoding.plain.ui.page.root.components.RootPageType
 
 data class FeatureItem(
     val type: AppFeatureType,
@@ -14,35 +12,35 @@ data class FeatureItem(
 ) {
     companion object {
 
-        fun getList(navController: NavHostController): List<FeatureItem> {
+        fun getList(onNavigate: (RootPageType) -> Unit): List<FeatureItem> {
             val list = mutableListOf(
                 FeatureItem(AppFeatureType.FILES, R.string.files, R.drawable.folder) {
-                    navController.navigateFiles()
+                    onNavigate(RootPageType.FILES)
                 },
                 FeatureItem(AppFeatureType.DOCS, R.string.docs, R.drawable.file_text) {
-                    navController.navigate(Routing.Docs)
+                    onNavigate(RootPageType.DOCS)
                 }
             )
 
             if (AppFeatureType.APPS.has()) {
                 list.add(FeatureItem(AppFeatureType.APPS, R.string.apps, R.drawable.layout_grid) {
-                    navController.navigate(Routing.Apps)
+                    onNavigate(RootPageType.APPS)
                 })
             }
 
             list.addAll(
                 listOf(
                     FeatureItem(AppFeatureType.NOTES, R.string.notes, R.drawable.notebook_pen) {
-                        navController.navigate(Routing.Notes)
+                        onNavigate(RootPageType.NOTES)
                     },
-                    FeatureItem(AppFeatureType.FEEDS, R.string.feeds, R.drawable.rss, {
-                        navController.navigate(Routing.FeedEntries(""))
-                    }),
+                    FeatureItem(AppFeatureType.FEEDS, R.string.feeds, R.drawable.rss) {
+                        onNavigate(RootPageType.FEEDS)
+                    },
                     FeatureItem(AppFeatureType.SOUND_METER, R.string.sound_meter, R.drawable.audio_lines) {
-                        navController.navigate(Routing.SoundMeter)
+                        onNavigate(RootPageType.SOUND_METER)
                     },
                     FeatureItem(AppFeatureType.POMODORO_TIMER, R.string.pomodoro_timer, R.drawable.timer) {
-                        navController.navigate(Routing.PomodoroTimer)
+                        onNavigate(RootPageType.POMODORO)
                     },
                 )
             )

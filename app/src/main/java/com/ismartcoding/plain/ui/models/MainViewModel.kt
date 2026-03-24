@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.ui.models
 
 import android.content.Context
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -33,6 +34,7 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
     var isVPNConnected by savedStateHandle.saveable { mutableStateOf(false) }
     var ip4s by savedStateHandle.saveable { mutableStateOf(emptyList<String>()) }
     var ip4 by savedStateHandle.saveable { mutableStateOf("") }
+    var currentRootTab by savedStateHandle.saveable { mutableIntStateOf(0) }
 
     fun enableHttpServer(
         context: Context,

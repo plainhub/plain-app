@@ -22,8 +22,8 @@
     <string name="run">இயக்கு</string>
     <string name="troubleshoot">சிக்கல்களை தீர்க்க</string>
     <string name="allow_remote_access_from_pc">கணினியிலிருந்து தொலைநோக்கி அணுகல் அனுமதி</string>
-    <string name="http_port_conflict_error">போர்ட் {{ port }} தற்போது பயன்பாடுகளில் பயன்படுகின்றது. நீங்கள் ஆட்சேர்க்க முன், போர்டை தானாகவே மாற்ற முடியும் என்று \'பிக்ஸ்\' பொத்தானை தட்டவும், அல்லது URL முகவரியில் உள்ள தொலைபேசி ஐகானுக்கு கீழே கொண்டுவர முடியும்.</string>
-    <string name="http_port_conflict_errors">போர்ட்கள் {{ port }} தற்போது பயன்படுகின்றன. நீங்கள் தானாகவே போர்டை மாற்றம் செய்ய \'பிக்ஸ்\' பொத்தானை தட்டவும், அல்லது URL முகவரியில் உள்ள தொலைபேசி ஐகானுக்கு கீழே கொண்டுவர முடியும்.</string>
+    <string name="http_port_conflict_error">போர்ட் {{ port }} பயன்படுத்தப்படுகிறது. "ஆப் மீண்டும் துவக்கம்" ஐ தட்டவும், இது தன்னிச்சையாக சரிசெய்யப்படும்.</string>
+    <string name="http_port_conflict_errors">போர்டுகள் {{ port }} பயன்படுத்தப்படுகின்றன. "ஆப் மீண்டும் துவக்கம்" ஐ தட்டவும், இது தன்னிச்சையாக சரிசெய்யப்படும்.</string>
     <string name="fix">பிக்ஸ்</string>
     <string name="security">பாதுகாப்பு</string>
     <string name="url_token">URL டோக்கன்</string>
@@ -32,8 +32,7 @@
     <string name="http_server_error">Http சேவையகம் ஆரம்பிக்கப்படவில்லை. PlainApp ஐ மீண்டும் தொடங்கி முயற்சிக்கவும். HTTP அல்லது HTTPS போர்ட்களை பயன்படுகின்ற பிற பயன்பாடுகள் இல்லையெனில் உள்ளிட்ட பிரச்சினைக்கு மேலும் விவரங்களை ismartcoding@gmail.com உடைகளுக்கு அனுப்புக.</string>
     <string name="relaunch_app">புதுப்பிக்க APP</string>
     <string name="require_confirmation">உறுதிப்பார்வை தேவை</string>
-    <string name="web_console">வலைத்தளம் கணினியில்</string>
-    <string name="web_service_required_for_chat">மற்றவர்களிடமிருந்து செய்திகளைப் பெற, கணினியில் வலைத்தள சேவையை இயக்கவும்.</string>
+    <string name="web_service_required_for_chat">மற்றவர்களிடமிருந்து செய்திகளைப் பெற, தொலைபேசி வலை வாயிலை இயக்கவும்.</string>
     <string name="enable_web_service">வலைத்தள சேவையை இயக்கு</string>
     <string name="http_port">HTTP போர்ட்</string>
     <string name="https_port">HTTPS போர்ட்</string>
@@ -62,4 +61,13 @@
     <string name="restart_app_message">விரைவில் முடிந்தது! பிராப்தியை அடைய விட்டு "பராமரிக்க APP" ஐ தட்டவும்.</string>
     <string name="access_phone_web">கணினி உலாவியில் இருந்து உங்கள் கைபேசியை அணுகவும்.</string>
     <string name="scan_qrcode_to_access_web">இணைய முகவரிக்கு அணுக கீரோ குறியை சீக்கிரம் செய்யவும்</string>
+    <string name="phone_web_portal">தொலைபேசி வலை வாயில்</string>
+    <string name="phone_web_portal_desc">கணினி உலாவியில் இருந்து உங்கள் தொலைபேசியை அணுகுங்கள்</string>
+    <string name="same_network_hint">உங்கள் கணினியும் தொலைபேசியும் ஒரே நெட்வொர்க்கில் உள்ளதா என்பதை உறுதிப்படுத்துங்கள்</string>
+    <string name="ready">தயார்</string>
+    <string name="permission_settings">அனுமதி அமைப்புகள்</string>
+    <string name="web_address_hint">கீழே உள்ள எந்த முகவரியையும் உங்கள் கணினி உலாவியில் திறக்கவும்.</string>
+    <string name="home_web_easy_hint">தொடங்கத் தட்டவும்</string>
+    <string name="home_web_easy_loading">தயவு செய்து காத்திருக்கவும்…</string>
+    <string name="home_web_easy_failed_title">தொடங்க முடியவில்லை</string>
 </resources>

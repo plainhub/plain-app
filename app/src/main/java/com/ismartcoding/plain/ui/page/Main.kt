@@ -11,9 +11,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -73,22 +77,21 @@ import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.apps.AppPage
-import com.ismartcoding.plain.ui.page.apps.AppsPage
 import com.ismartcoding.plain.ui.page.chat.ChatEditTextPage
 import com.ismartcoding.plain.ui.page.chat.ChatInfoPage
 import com.ismartcoding.plain.ui.page.chat.ChatPage
 import com.ismartcoding.plain.ui.page.chat.ChatTextPage
-import com.ismartcoding.plain.ui.page.docs.DocsPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntriesPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntryPage
 import com.ismartcoding.plain.ui.page.feeds.FeedSettingsPage
 import com.ismartcoding.plain.ui.page.feeds.FeedsPage
-import com.ismartcoding.plain.ui.page.files.FilesPage
 import com.ismartcoding.plain.ui.page.chat.NearbyPage
+import com.ismartcoding.plain.ui.page.files.FilesPage
 import com.ismartcoding.plain.ui.page.notes.NotePage
-import com.ismartcoding.plain.ui.page.notes.NotesPage
-import com.ismartcoding.plain.ui.page.pomodoro.PomodoroPage
+import com.ismartcoding.plain.ui.page.feeds.FeedsPage
+import com.ismartcoding.plain.ui.base.LocalOpenDrawer
 import com.ismartcoding.plain.ui.page.root.RootPage
+import com.ismartcoding.plain.ui.page.root.components.RootNavigationDrawerContent
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.page.scan.ScanPage
 import com.ismartcoding.plain.ui.page.settings.AboutPage
@@ -96,7 +99,6 @@ import com.ismartcoding.plain.ui.page.settings.BackupRestorePage
 import com.ismartcoding.plain.ui.page.settings.DarkThemePage
 import com.ismartcoding.plain.ui.page.settings.LanguagePage
 import com.ismartcoding.plain.ui.page.settings.SettingsPage
-import com.ismartcoding.plain.ui.page.tools.SoundMeterPage
 import com.ismartcoding.plain.ui.page.web.NotificationSettingsPage
 import com.ismartcoding.plain.ui.page.web.SessionsPage
 import com.ismartcoding.plain.ui.page.web.WebDevPage
@@ -279,12 +281,36 @@ fun Main(
         }
 
         Box(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
+            val drawerState = rememberDrawerState(DrawerValue.Closed)
+            val drawerScope = rememberCoroutineScope()
+            val onOpenDrawer: () -> Unit = { drawerScope.launch { drawerState.open() } }
+            val onCloseDrawer: () -> Unit = { drawerScope.launch { drawerState.close() } }
+            ModalNavigationDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    RootNavigationDrawerContent(
+                        navController = navController,
+                        selectedTab = mainVM.currentRootTab,
+                        onCloseDrawer = onCloseDrawer,
+                        onTabSelected = { tab ->
+                            onCloseDrawer()
+                            mainVM.currentRootTab = tab
+                            if (navController.currentDestination?.route != Routing.Root::class.qualifiedName) {
+                                navController.navigate(Routing.Root) {
+                                    popUpTo(Routing.Root) { inclusive = true }
+                                }
+                            }
+                        },
+                    )
+                },
+            ) {
+            CompositionLocalProvider(LocalOpenDrawer provides onOpenDrawer) {
             NavHost(
                 modifier = Modifier.background(MaterialTheme.colorScheme.surface),
                 navController = navController,
                 startDestination = Routing.Root,
             ) {
-                composable<Routing.Root> { RootPage(navController, mainVM, audioPlaylistVM = audioPlaylistVM) }
+                composable<Routing.Root> { RootPage(navController, mainVM, audioPlaylistVM = audioPlaylistVM, notesVM = notesVM, noteTagsVM = noteTagsVM, feedTagsVM = feedTagsVM, pomodoroVM = pomodoroVM) }
                 composable<Routing.Settings> { SettingsPage(navController) }
                 composable<Routing.DarkTheme> { DarkThemePage(navController) }
                 composable<Routing.Language> { LanguagePage(navController) }
@@ -295,10 +321,6 @@ fun Main(
                 composable<Routing.Sessions> { SessionsPage(navController) }
                 composable<Routing.WebDev> { WebDevPage(navController) }
                 composable<Routing.WebSecurity> { WebSecurityPage(navController) }
-                composable<Routing.SoundMeter> { SoundMeterPage(navController) }
-                composable<Routing.PomodoroTimer> {
-                    PomodoroPage(navController, pomodoroVM)
-                }
                 composable<Routing.Chat> { backStackEntry ->
                     val r = backStackEntry.toRoute<Routing.Chat>()
                     ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = chatVM, peerVM = peerVM, channelVM = channelVM, r.id)
@@ -308,14 +330,9 @@ fun Main(
                 }
                 composable<Routing.ScanHistory> { ScanHistoryPage(navController) }
                 composable<Routing.Scan> { ScanPage(navController) }
-                composable<Routing.Apps> { AppsPage(navController) }
-                composable<Routing.Docs> { DocsPage(navController) }
                 composable<Routing.Feeds> { FeedsPage(navController) }
                 composable<Routing.FeedSettings> { FeedSettingsPage(navController) }
                 composable<Routing.WebLearnMore> { WebLearnMorePage(navController) }
-                composable<Routing.Notes> {
-                    NotesPage(navController, notesVM = notesVM, tagsVM = noteTagsVM)
-                }
                 composable<Routing.AppDetails> { backStackEntry ->
                     val r = backStackEntry.toRoute<Routing.AppDetails>()
                     AppPage(navController, r.id)
@@ -373,7 +390,7 @@ fun Main(
 
                 composable<Routing.Files> { backStackEntry ->
                     val r = backStackEntry.toRoute<Routing.Files>()
-                    FilesPage(navController, audioPlaylistVM, r.folderPath)
+                    FilesPage(navController, audioPlaylistVM, r.folderPath, onOpenDrawer = onOpenDrawer)
                 }
                 
                 composable<Routing.Nearby> { backStackEntry ->
@@ -381,6 +398,8 @@ fun Main(
                     NearbyPage(navController, pairDeviceJson = r.pairDeviceJson)
                 }
             }
+            } // CompositionLocalProvider
+            } // ModalNavigationDrawer
 
             loadingDialogEvent?.let {
                 Dialog(

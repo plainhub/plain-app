@@ -53,7 +53,7 @@ import kotlin.math.abs
 @SuppressLint("MissingPermission")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SoundMeterPage(navController: NavHostController) {
+fun SoundMeterPage(navController: NavHostController, onOpenDrawer: () -> Unit = {}) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var decibelValuesDialogVisible by remember { mutableStateOf(false) }
@@ -155,6 +155,7 @@ fun SoundMeterPage(navController: NavHostController) {
         topBar = {
             PTopAppBar(
                 navController = navController,
+                navigationIcon = { ActionButtonDrawer(onClick = onOpenDrawer) },
                 title = stringResource(id = R.string.sound_meter),
                 actions = {
                     PIconButton(

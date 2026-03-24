@@ -7,6 +7,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.preferences.ImageSortByPreference
+import com.ismartcoding.plain.ui.base.ActionButtonDrawer
 import com.ismartcoding.plain.ui.base.MediaTopBar
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun TopBarImages(
     navController: NavHostController,
+    onOpenDrawer: () -> Unit,
     imagesState: ImagesPageState,
     imagesVM: ImagesViewModel,
     tagsVM: TagsViewModel,
@@ -40,6 +42,9 @@ fun TopBarImages(
             scope.launch {
                 imagesVM.scrollStateMap[imagesState.pagerState.currentPage]?.scrollToItem(0)
             }
+        },
+        defaultNavigationIcon = {
+            ActionButtonDrawer(onClick = onOpenDrawer)
         },
         onSortSelected = { _, sortBy ->
             scope.launch(Dispatchers.IO) {

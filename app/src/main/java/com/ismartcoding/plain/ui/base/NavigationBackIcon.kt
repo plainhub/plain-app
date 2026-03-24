@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.base
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 
 @Composable
@@ -27,3 +28,12 @@ fun NavigationCloseIcon(onClick: () -> Unit = {}) {
     }
 }
 
+@Composable
+fun NavigationDrawerOrBackIcon(navController: NavHostController) {
+    val openDrawer = LocalOpenDrawer.current
+    if (openDrawer != null) {
+        ActionButtonDrawer(onClick = openDrawer)
+    } else {
+        NavigationBackIcon { navController.navigateUp() }
+    }
+}

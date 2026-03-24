@@ -22,8 +22,8 @@
     <string name="run">実行</string>
     <string name="troubleshoot">トラブルシューティング</string>
     <string name="allow_remote_access_from_pc">PCからのリモートアクセスを許可する</string>
-    <string name="http_port_conflict_error">ポート{{ port }}は現在使用中です。ポートを自動的に変更するには \'修正\' ボタンをタップするか、URLアドレスの横にある編集アイコンをタップして手動で異なるポートを選択することができます。</string>
-    <string name="http_port_conflict_errors">{{ port }} ポートは現在使用中です。ポートを自動的に変更するには \'修正\' ボタンをタップするか、URLアドレスの横にある編集アイコンをタップして手動で異なるポートを選択することができます。</string>
+    <string name="http_port_conflict_error">ポート {{ port }} は使用中です。「アプリを再起動」して自動的に修正します。</string>
+    <string name="http_port_conflict_errors">ポート {{ port }} は使用中です。「アプリを再起動」して自動的に修正します。</string>
     <string name="fix">修正</string>
     <string name="security">セキュリティ</string>
     <string name="url_token">URLトークン</string>
@@ -32,8 +32,7 @@
     <string name="http_server_error">HTTPサーバーが起動していません。PlainAppを再起動して、もう一度試してみてください。HTTPまたはHTTPSポートを占有している他のアプリケーションがないことを確認してください。問題が解決しない場合は、ismartcoding@gmail.com に連絡して問題の詳細を提供してください。</string>
     <string name="relaunch_app">アプリを再起動</string>
     <string name="require_confirmation">確認が必要</string>
-    <string name="web_console">PC上のWeb</string>
-    <string name="web_service_required_for_chat">他の人からメッセージを受信するには、PC上のWebサービスを有効にしてください。</string>
+    <string name="web_service_required_for_chat">他の人からメッセージを受信するには、スマホWebポータルを有効にしてください。</string>
     <string name="enable_web_service">Webサービスを有効にする</string>
     <string name="http_port">HTTPポート</string>
     <string name="https_port">HTTPSポート</string>
@@ -62,4 +61,13 @@
     <string name="restart_app_message">ほとんど完了！効果を確認するには、「アプリを再起動」をタップしてください。</string>
     <string name="access_phone_web">コンピュータのブラウザから携帯電話にアクセスします。</string>
     <string name="scan_qrcode_to_access_web">WebアドレスにアクセスするためにQRコードをスキャンします</string>
+    <string name="phone_web_portal">スマホWebポータル</string>
+    <string name="phone_web_portal_desc">パソコンのブラウザーからスマホにアクセスします</string>
+    <string name="same_network_hint">パソコンとスマホが同じネットワークに接続されていることを確認してください</string>
+    <string name="ready">準備完了</string>
+    <string name="permission_settings">権限設定</string>
+    <string name="web_address_hint">以下のいずれかのアドレスをパソコンのブラウザーで開いてください。</string>
+    <string name="home_web_easy_hint">タップして開始</string>
+    <string name="home_web_easy_loading">しばらくお待ちください…</string>
+    <string name="home_web_easy_failed_title">開始できませんでした</string>
 </resources>

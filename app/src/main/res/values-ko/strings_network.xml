@@ -22,8 +22,8 @@
     <string name="run">실행</string>
     <string name="troubleshoot">문제 해결</string>
     <string name="allow_remote_access_from_pc">PC에서 원격 액세스 허용</string>
-    <string name="http_port_conflict_error">포트 {{ port }}가 현재 사용 중입니다. \'수정\' 버튼을 탭하여 포트를 자동으로 변경하거나 URL 주소 옆에 있는 편집 아이콘을 탭하여 수동으로 다른 포트를 선택할 수 있습니다.</string>
-    <string name="http_port_conflict_errors">포트 {{ port }}가 현재 사용 중입니다. \'수정\' 버튼을 탭하여 포트를 자동으로 변경하거나 URL 주소 옆에 있는 편집 아이콘을 탭하여 수동으로 다른 포트를 선택할 수 있습니다.</string>
+    <string name="http_port_conflict_error">포트 {{ port }}가 사용 중입니다. "앱 재시작"을 탭하여 자동으로 수정하세요.</string>
+    <string name="http_port_conflict_errors">포트 {{ port }}들이 사용 중입니다. "앱 재시작"을 탭하여 자동으로 수정하세요.</string>
     <string name="fix">수정</string>
     <string name="security">보안</string>
     <string name="url_token">URL 토큰</string>
@@ -32,8 +32,7 @@
     <string name="http_server_error">Http 서버가 시작되지 않았습니다. PlainApp을 다시 시작하고 다시 시도하십시오. HTTP 또는 HTTPS 포트를 다른 앱이 차지하고 있지 않은지 확인하십시오. 문제가 지속되면 ismartcoding@gmail.com으로 문제에 대한 자세한 내용을 제공해 주십시오.</string>
     <string name="relaunch_app">앱 다시 시작</string>
     <string name="require_confirmation">확인 필요</string>
-    <string name="web_console">웹(PC)에서</string>
-    <string name="web_service_required_for_chat">다른 사람으로부터 메시지를 받으려면 웹(PC) 서비스를 활성화하세요.</string>
+    <string name="web_service_required_for_chat">다른 사람의 메시지를 받으려면 폰 웹 포털을 활성화하세요.</string>
     <string name="enable_web_service">웹 서비스 활성화</string>
     <string name="http_port">HTTP 포트</string>
     <string name="https_port">HTTPS 포트</string>
@@ -62,4 +61,13 @@
     <string name="restart_app_message">거의 완료되었습니다! 효과를 적용하려면 "앱 다시 시작"을 탭하세요.</string>
     <string name="access_phone_web">컴퓨터 브라우저에서 휴대전화를 액세스하세요.</string>
     <string name="scan_qrcode_to_access_web">웹 주소에 액세스하려면 QR 코드를 스캔하세요</string>
+    <string name="phone_web_portal">폰 웹 포털</string>
+    <string name="phone_web_portal_desc">컴퓨터 브라우저에서 휴대폰에 접속하세요</string>
+    <string name="same_network_hint">컴퓨터와 휴대폰이 같은 네트워크에 연결되어 있는지 확인하세요</string>
+    <string name="ready">준비 완료</string>
+    <string name="permission_settings">권한 설정</string>
+    <string name="web_address_hint">아래 주소 중 하나를 컴퓨터 브라우저에서 여세요.</string>
+    <string name="home_web_easy_hint">탭하여 시작</string>
+    <string name="home_web_easy_loading">잠시만 기다려 주세요…</string>
+    <string name="home_web_easy_failed_title">시작할 수 없음</string>
 </resources>

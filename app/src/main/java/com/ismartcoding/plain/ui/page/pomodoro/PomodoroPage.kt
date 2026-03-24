@@ -42,6 +42,7 @@ import com.ismartcoding.plain.events.PomodoroActionData
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
+import com.ismartcoding.plain.ui.base.ActionButtonDrawer
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.CircularTimer
 import com.ismartcoding.plain.ui.base.PIconButton
@@ -60,7 +61,8 @@ import kotlin.math.sqrt
 @Composable
 fun PomodoroPage(
     navController: NavHostController,
-    pomodoroVM: PomodoroViewModel
+    pomodoroVM: PomodoroViewModel,
+    onOpenDrawer: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -87,6 +89,7 @@ fun PomodoroPage(
         topBar = {
             PTopAppBar(
                 navController = navController,
+                navigationIcon = { ActionButtonDrawer(onClick = onOpenDrawer) },
                 title = "",
                 actions = {
                     PIconButton(

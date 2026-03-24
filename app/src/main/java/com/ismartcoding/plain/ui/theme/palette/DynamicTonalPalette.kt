@@ -17,37 +17,44 @@ import com.ismartcoding.plain.ui.theme.PlainColors
 fun dynamicLightColorScheme(): ColorScheme {
     val palettes = LocalTonalPalettes.current
     return lightColorScheme(
-        primary = PlainColors.Light.blue,
+        // iOS systemBlue light
+        primary = PlainColors.Light.blue,           // #007AFF
         onPrimary = Color(0xFFFFFFFF),
-        primaryContainer = Color(0xFFD2E4FF),
+        primaryContainer = Color(0xFFD1E9FF),
         onPrimaryContainer = Color(0xFF001E3C),
-        inversePrimary = palettes primary 80,
-        secondary = Color(0xFF42A5F5),
+        inversePrimary = Color(0xFF4DA3FF),
+        // iOS systemBlue light (secondary)
+        secondary = Color(0xFF007AFF),
         onSecondary = Color(0xFFFFFFFF),
-        secondaryContainer = Color(0xFFE3F2FD),
-        onSecondaryContainer = Color(0xFF0D47A1),
+        secondaryContainer = Color(0xFFE5F0FF),
+        onSecondaryContainer = Color(0xFF001B47),
         tertiary = palettes tertiary 40,
         onTertiary = palettes tertiary 100,
         tertiaryContainer = palettes tertiary 90,
         onTertiaryContainer = palettes tertiary 10,
-        background = Color(0xFFFFFFFF),
-        onBackground = Color(0xFF202124),
+        // iOS systemGroupedBackground light = #EEF1F9
+        background = Color(0xFFEEF1F9),
+        onBackground = Color(0xFF000000),           // iOS label
+        // iOS secondarySystemGroupedBackground = #FFFFFF (cards)
         surface = Color(0xFFFFFFFF),
-        onSurface = Color(0xFF202124),
+        onSurface = Color(0xFF000000),              // iOS label
         surfaceVariant = Color(0xFFFFFFFF),
-        onSurfaceVariant = Color(0xFF5F6368),
-        surfaceTint = Color(0xFF2196F3).copy(alpha = 0.1f),
-        inverseSurface = Color(0xFF202124),
-        inverseOnSurface = Color(0xFFF8F9FA),
-        outline = Color(0xFFDADCE0),
-        outlineVariant = Color(0xFFEEEEEE),
+        onSurfaceVariant = Color(0xFF8E8E93),       // iOS secondaryLabel
+        surfaceTint = Color(0xFF007AFF).copy(alpha = 0.05f),
+        inverseSurface = Color(0xFF1C1C1E),
+        inverseOnSurface = Color(0xFFFFFFFF),
+        // iOS separator light = #C6C6C8
+        outline = Color(0xFFC6C6C8),
+        // iOS opaqueSeparator light = #E5E5EA
+        outlineVariant = Color(0xFFE5E5EA),
         surfaceBright = Color(0xFFFFFFFF),
-        surfaceDim = Color(0xFFF1F3F4),
-        surfaceContainerLowest = Color(0xFFEFF6FF),
-        surfaceContainerLow = Color(0xFFECF2FF),
-        surfaceContainer = Color(0xFFE3EFFF),
-        surfaceContainerHigh = Color(0xFFDCECFF),
-        surfaceContainerHighest = Color(0xFFD1E8FF),
+        surfaceDim = Color(0xFFE5E5EA),
+        // surfaceContainer* used for nested backgrounds
+        surfaceContainerLowest = Color(0xFFFFFFFF),
+        surfaceContainerLow = Color(0xFFF9F9FB),
+        surfaceContainer = Color(0xFFEEF1F9),       // systemGroupedBackground
+        surfaceContainerHigh = Color(0xFFEAEAF0),
+        surfaceContainerHighest = Color(0xFFE5E5EA),
     )
 }
 
@@ -55,46 +62,56 @@ fun dynamicLightColorScheme(): ColorScheme {
 fun dynamicDarkColorScheme(): ColorScheme {
     val palettes = LocalTonalPalettes.current
     val amoledDarkTheme = LocalAmoledDarkTheme.current
-    
-    // Use true black (#000000) for background and surfaces when amoledDarkTheme is enabled
-    val backgroundColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF121212)
-    val surfaceColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF121212)
-    val surfaceVariantColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF202124)
-    val surfaceDimColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF101010)
-    val surfaceContainerLowestColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF0A0A0A)
-    val surfaceContainerLowColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF121212)
+
+    // iOS dark systemGroupedBackground = #000000 for amoled, #1C1C1E for non-amoled
+    val backgroundColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF1C1C1E)
+    // iOS dark secondarySystemGroupedBackground = #2C2C2E (cards) when bg is #1C1C1E
+    val surfaceColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF2C2C2E)
+    // iOS dark tertiarySystemGroupedBackground = #2C2C2E
+    val surfaceVariantColor = if (amoledDarkTheme) Color(0xFF1C1C1E) else Color(0xFF2C2C2E)
+    val surfaceDimColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF000000)
+    val surfaceContainerLowestColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF000000)
+    val surfaceContainerLowColor = if (amoledDarkTheme) Color(0xFF000000) else Color(0xFF1C1C1E)
 
     return darkColorScheme(
-        primary = PlainColors.Dark.blue,
-        onPrimary = Color(0xFFE8EAED),
-        primaryContainer = Color(0xFF004D8F),
-        onPrimaryContainer = Color(0xFFD6E3FF),
-        inversePrimary = palettes primary 40,
-        secondary = Color(0xFF82B1FF),
-        onSecondary = Color(0xFF002171),
-        secondaryContainer = Color(0xFF1A237E),
-        onSecondaryContainer = Color(0xFFE6EEFF),
+        // iOS systemBlue dark = #0A84FF
+        primary = PlainColors.Dark.blue,            // #0A84FF
+        onPrimary = Color(0xFFFFFFFF),
+        primaryContainer = Color(0xFF003D99),
+        onPrimaryContainer = Color(0xFFCCE4FF),
+        inversePrimary = Color(0xFF007AFF),
+        // iOS systemBlue dark (secondary)
+        secondary = Color(0xFF0A84FF),
+        onSecondary = Color(0xFFFFFFFF),
+        secondaryContainer = Color(0xFF003380),
+        onSecondaryContainer = Color(0xFFCCDFFF),
         tertiary = palettes tertiary 80,
         onTertiary = palettes tertiary 20,
         tertiaryContainer = palettes tertiary 30,
         onTertiaryContainer = palettes tertiary 90,
+        // iOS dark systemGroupedBackground = #000000
         background = backgroundColor,
-        onBackground = Color(0xFFE8EAED),
+        onBackground = Color(0xFFFFFFFF),           // iOS dark label
+        // iOS dark secondarySystemGroupedBackground = #1C1C1E
         surface = surfaceColor,
-        onSurface = Color(0xFFE8EAED),
+        onSurface = Color(0xFFFFFFFF),              // iOS dark label
         surfaceVariant = surfaceVariantColor,
-        onSurfaceVariant = Color(0xFFBDC1C6),
-        surfaceTint = Color(0xFF64B5F6).copy(alpha = 0.2f),
-        inverseSurface = Color(0xFFF8F9FA),
-        inverseOnSurface = Color(0xFF202124),
-        outline = Color(0xFF5F6368),
-        outlineVariant = Color(0xFF3C4043),
-        surfaceBright = Color(0xFF3C4043),
+        onSurfaceVariant = Color(0xFF8D8D93),       // iOS dark secondaryLabel
+        surfaceTint = Color(0xFF0A84FF).copy(alpha = 0.08f),
+        inverseSurface = Color(0xFFF2F2F7),
+        inverseOnSurface = Color(0xFF000000),
+        // iOS dark separator = #38383A
+        outline = Color(0xFF38383A),
+        // iOS dark opaqueSeparator = #48484A
+        outlineVariant = Color(0xFF48484A),
+        // iOS dark tertiarySystemGroupedBackground = #2C2C2E
+        surfaceBright = Color(0xFF2C2C2E),
         surfaceDim = surfaceDimColor,
         surfaceContainerLowest = surfaceContainerLowestColor,
         surfaceContainerLow = surfaceContainerLowColor,
-        surfaceContainerHigh = Color(0xFF202124),
-        surfaceContainerHighest = Color(0xFF292A2D),
+        // iOS dark quaternarySystemFill = #3A3A3C
+        surfaceContainerHigh = Color(0xFF2C2C2E),
+        surfaceContainerHighest = Color(0xFF3A3A3C),
     )
 }
 

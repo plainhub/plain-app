@@ -22,8 +22,8 @@
     <string name="run">運行</string>
     <string name="troubleshoot">排除問題</string>
     <string name="allow_remote_access_from_pc">允許電腦遠端存取網頁</string>
-    <string name="http_port_conflict_error">端口 {{ port }} 當前被佔用。您可以點擊\'修復\'按鈕自動更改端口，或者您可以選擇點擊URL地址旁邊的編輯圖標手動選擇不同的端口。</string>
-    <string name="http_port_conflict_errors">端口 {{ port }} 當前被佔用。您可以點擊\'修復\'按鈕自動更改端口，或者您可以選擇點擊URL地址旁邊的編輯圖標手動選擇不同的端口。</string>
+    <string name="http_port_conflict_error">埠 {{ port }} 目前被佔用。點按「重新啟動應用程式」可自動修復。</string>
+    <string name="http_port_conflict_errors">埠 {{ port }} 目前被佔用。點按「重新啟動應用程式」可自動修復。</string>
     <string name="fix">修復</string>
     <string name="security">安全</string>
     <string name="url_token">URL令牌</string>
@@ -32,8 +32,7 @@
     <string name="http_server_error">HTTP伺服器未啟動。重新啟動PlainApp並重試。</string>
     <string name="relaunch_app">重啟應用</string>
     <string name="require_confirmation">需要二次確認</string>
-    <string name="web_console">電腦瀏覽器訪問</string>
-    <string name="web_service_required_for_chat">要接收其他人發送的訊息，請啟用電腦瀏覽器服務。</string>
+    <string name="web_service_required_for_chat">要接收其他人傳送的訊息，請啟用手機網頁入口。</string>
     <string name="enable_web_service">啟用網頁服務</string>
     <string name="http_port">HTTP端口</string>
     <string name="https_port">HTTPS端口</string>
@@ -62,4 +61,13 @@
     <string name="restart_app_message">差一點了！只需點擊「重新啟動應用程式」即可生效。</string>
     <string name="access_phone_web">從電腦瀏覽器訪問您的手機。</string>
     <string name="scan_qrcode_to_access_web">掃描二維碼訪問網頁</string>
+    <string name="phone_web_portal">手機網頁入口</string>
+    <string name="phone_web_portal_desc">在電腦瀏覽器中存取你的手機</string>
+    <string name="same_network_hint">請確認你的電腦與手機位於同一網路</string>
+    <string name="ready">就緒</string>
+    <string name="permission_settings">權限設定</string>
+    <string name="web_address_hint">在電腦瀏覽器中開啟下方任一地址。</string>
+    <string name="home_web_easy_hint">點一下開始</string>
+    <string name="home_web_easy_loading">請稍候…</string>
+    <string name="home_web_easy_failed_title">無法啟動</string>
 </resources>

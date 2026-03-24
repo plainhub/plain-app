@@ -32,7 +32,7 @@ fun PIconTextButton(
 ) {
     Box(
         modifier = modifier
-            .height(100.dp)
+            .height(80.dp)
             .clip(RoundedCornerShape(12.dp))
     ) {
         Column(

@@ -7,6 +7,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.preferences.VideoSortByPreference
+import com.ismartcoding.plain.ui.base.ActionButtonDrawer
 import com.ismartcoding.plain.ui.base.MediaTopBar
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun TopBarVideos(
     navController: NavHostController,
+    onOpenDrawer: () -> Unit,
     videosState: VideosPageState,
     videosVM: VideosViewModel,
     tagsVM: TagsViewModel,
@@ -40,6 +42,9 @@ fun TopBarVideos(
             scope.launch {
                 videosVM.scrollStateMap[videosState.pagerState.currentPage]?.scrollToItem(0)
             }
+        },
+        defaultNavigationIcon = {
+            ActionButtonDrawer(onClick = onOpenDrawer)
         },
         onSortSelected = { _, sortBy ->
             scope.launch(Dispatchers.IO) {

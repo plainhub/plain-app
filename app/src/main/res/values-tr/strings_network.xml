@@ -22,8 +22,8 @@
     <string name="run">Çalıştır</string>
     <string name="troubleshoot">Sorun gider</string>
     <string name="allow_remote_access_from_pc">PC\'den uzaktan erişime izin ver</string>
-    <string name="http_port_conflict_error">{{ port }} portu şu anda kullanımda. Portu otomatik olarak değiştirmek için \'Düzelt\' düğmesine dokunabilir veya URL adresinin yanındaki düzenleme simgesine dokunarak manuel olarak farklı bir port seçebilirsiniz.</string>
-    <string name="http_port_conflict_errors">{{ port }} portları şu anda kullanımda. Portu otomatik olarak değiştirmek için \'Düzelt\' düğmesine dokunabilir veya URL adresinin yanındaki düzenleme simgesine dokunarak manuel olarak farklı bir port seçebilirsiniz.</string>
+    <string name="http_port_conflict_error">{{ port }} portu meşgul. Otomatik düzeltmek için "Uygulamayı Yeniden Başlat"a dokunun.</string>
+    <string name="http_port_conflict_errors">{{ port }} portları meşgul. Otomatik düzeltmek için "Uygulamayı Yeniden Başlat"a dokunun.</string>
     <string name="fix">Düzelt</string>
     <string name="security">Güvenlik</string>
     <string name="url_token">URL belirteci</string>
@@ -32,8 +32,7 @@
     <string name="http_server_error">HTTP sunucusu başlatılmadı. PlainApp\'i yeniden başlatın ve tekrar deneyin.</string>
     <string name="relaunch_app">UYGULAMAYI Yeniden Başlat</string>
     <string name="require_confirmation">Onay gerektir</string>
-    <string name="web_console">PC\'de Web</string>
-    <string name="web_service_required_for_chat">Başkalarından mesaj almak için lütfen PC\'de Web hizmetini etkinleştirin.</string>
+    <string name="web_service_required_for_chat">Başkalarından mesaj almak için lütfen Telefon Web Portalı\'nı etkinleştirin.</string>
     <string name="enable_web_service">Web hizmetini etkinleştir</string>
     <string name="http_port">HTTP bağlantı noktası</string>
     <string name="https_port">HTTPS bağlantı noktası</string>
@@ -62,4 +61,13 @@
     <string name="restart_app_message">Neredeyse bitti! Etkili olması için "Uygulamayı Yeniden Başlat" düğmesine dokunun.</string>
     <string name="access_phone_web">Telefonunuza bir bilgisayar tarayıcısından erişin.</string>
     <string name="scan_qrcode_to_access_web">Web adresine erişmek için QR kodunu tarayın</string>
+    <string name="phone_web_portal">Telefon Web Portalı</string>
+    <string name="phone_web_portal_desc">Telefonunuza bilgisayar tarayıcısından erişin</string>
+    <string name="same_network_hint">Bilgisayarınızın ve telefonunuzun aynı ağda olduğundan emin olun</string>
+    <string name="ready">Hazır</string>
+    <string name="permission_settings">İzin ayarları</string>
+    <string name="web_address_hint">Aşağıdaki adreslerden herhangi birini bilgisayarınızın tarayıcısında açın.</string>
+    <string name="home_web_easy_hint">Başlamak için dokunun</string>
+    <string name="home_web_easy_loading">Lütfen bekleyin…</string>
+    <string name="home_web_easy_failed_title">Başlatılamadı</string>
 </resources>

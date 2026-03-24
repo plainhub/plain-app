@@ -34,7 +34,7 @@ fun WebLearnMorePage(navController: NavHostController, webVM: WebConsoleViewMode
         val context = LocalContext.current
         PScaffold(
             topBar = {
-                PTopAppBar(navController = navController, title = stringResource(R.string.web_console))
+                PTopAppBar(navController = navController, title = stringResource(R.string.phone_web_portal))
             },
             content = { paddingValues ->
                 LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {

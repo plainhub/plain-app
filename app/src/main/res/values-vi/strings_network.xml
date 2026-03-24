@@ -22,8 +22,8 @@
     <string name="run">Chạy</string>
     <string name="troubleshoot">Khắc phục sự cố</string>
     <string name="allow_remote_access_from_pc">Cho phép truy cập từ xa từ PC</string>
-    <string name="http_port_conflict_error">Cổng {{ port }} hiện đang được sử dụng. Bạn có thể nhấn nút \'Sửa\' để tự động thay đổi cổng, hoặc bạn có thể chọn nhấn biểu tượng chỉnh sửa kế bên địa chỉ URL để chọn một cổng khác thủ công.</string>
-    <string name="http_port_conflict_errors">Các cổng {{ port }} hiện đang được sử dụng. Bạn có thể nhấn nút \'Sửa\' để tự động thay đổi cổng, hoặc bạn có thể chọn nhấn biểu tượng chỉnh sửa kế bên địa chỉ URL để chọn một cổng khác thủ công.</string>
+    <string name="http_port_conflict_error">Cổng {{ port }} đang bị chiếm. Nhấn "Khởi động lại ứng dụng" để tự động khắc phục.</string>
+    <string name="http_port_conflict_errors">Các cổng {{ port }} đang bị chiếm. Nhấn "Khởi động lại ứng dụng" để tự động khắc phục.</string>
     <string name="fix">Sửa</string>
     <string name="security">Bảo mật</string>
     <string name="url_token">Token URL</string>
@@ -32,8 +32,7 @@
     <string name="http_server_error">Máy chủ HTTP không được khởi động. Vui lòng khởi động lại PlainApp và thử lại.</string>
     <string name="relaunch_app">Khởi chạy lại ứng dụng</string>
     <string name="require_confirmation">Yêu cầu xác nhận</string>
-    <string name="web_console">Web trên PC</string>
-    <string name="web_service_required_for_chat">Để nhận tin nhắn từ người khác, vui lòng bật dịch vụ Web trên PC.</string>
+    <string name="web_service_required_for_chat">Để nhận tin nhắn từ người khác, vui lòng bật Cổng web điện thoại.</string>
     <string name="enable_web_service">Bật dịch vụ Web</string>
     <string name="http_port">Cổng HTTP</string>
     <string name="https_port">Cổng HTTPS</string>
@@ -62,4 +61,13 @@
     <string name="restart_app_message">Gần xong! Chỉ cần nhấn "Khởi động lại ứng dụng" để thực hiện.</string>
     <string name="access_phone_web">Truy cập điện thoại của bạn từ trình duyệt máy tính.</string>
     <string name="scan_qrcode_to_access_web">Quét mã QR để truy cập địa chỉ web</string>
+    <string name="phone_web_portal">Cổng web điện thoại</string>
+    <string name="phone_web_portal_desc">Truy cập điện thoại của bạn từ trình duyệt trên máy tính</string>
+    <string name="same_network_hint">Đảm bảo máy tính và điện thoại của bạn cùng một mạng</string>
+    <string name="ready">Sẵn sàng</string>
+    <string name="permission_settings">Cài đặt quyền</string>
+    <string name="web_address_hint">Mở một trong các địa chỉ bên dưới trên trình duyệt máy tính của bạn.</string>
+    <string name="home_web_easy_hint">Nhấn để bắt đầu</string>
+    <string name="home_web_easy_loading">Vui lòng chờ…</string>
+    <string name="home_web_easy_failed_title">Không thể khởi động</string>
 </resources>

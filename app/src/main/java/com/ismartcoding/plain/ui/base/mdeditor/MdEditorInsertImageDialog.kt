@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.appDir
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.lib.extensions.queryOpenableFileName
@@ -62,8 +63,7 @@ fun MdEditorInsertImageDialog(
                     try {
                         val fileName = context.contentResolver.queryOpenableFileName(uri)
                         if (fileName.isNotEmpty()) {
-                            val dir = Environment.DIRECTORY_PICTURES
-                            val dst = context.getExternalFilesDir(dir)!!.path + "/$fileName"
+                            val dst = context.appDir() + "/note-images/" + "/$fileName"
                             val dstFile = File(dst)
                             val path =
                                 if (dstFile.exists()) {
@@ -72,7 +72,7 @@ fun MdEditorInsertImageDialog(
                                     dst
                                 }
                             FileHelper.copyFile(context, uri, path)
-                            imageUrl = "app://$dir/${path.getFilenameFromPath()}"
+                            imageUrl = "app://note-images/${path.getFilenameFromPath()}"
                         }
                     } catch (ex: Exception) {
                         // the picked file could be deleted

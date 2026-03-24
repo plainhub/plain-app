@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.ui.theme.red
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun PFilledButton(
@@ -39,7 +40,7 @@ fun PFilledButton(
     val contentColor = when (type) {
         ButtonType.PRIMARY -> MaterialTheme.colorScheme.onPrimary
         ButtonType.SECONDARY -> MaterialTheme.colorScheme.onSecondary
-        ButtonType.DANGER -> MaterialTheme.colorScheme.onError
+        ButtonType.DANGER -> Color.White
     }
 
     Button(

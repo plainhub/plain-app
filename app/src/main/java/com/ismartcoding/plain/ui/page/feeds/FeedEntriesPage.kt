@@ -48,7 +48,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.NavigationBackIcon
+import com.ismartcoding.plain.ui.base.ActionButtonDrawer
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PDropdownMenuItemSettings
@@ -95,6 +95,7 @@ fun FeedEntriesPage(
     navController: NavHostController,
     feedId: String,
     tagsVM: TagsViewModel,
+    onOpenDrawer: () -> Unit = {},
     feedEntriesVM: FeedEntriesViewModel = viewModel(),
     feedsVM: FeedsViewModel = viewModel(),
 ) {
@@ -283,7 +284,7 @@ fun FeedEntriesPage(
                             feedEntriesVM.exitSelectMode()
                         }
                     } else {
-                        NavigationBackIcon { navController.navigateUp() }
+                        ActionButtonDrawer(onClick = onOpenDrawer)
                     }
                 },
                 title = pageTitle,
@@ -368,7 +369,7 @@ fun FeedEntriesPage(
                 NoDataColumn(loading = feedEntriesVM.showLoading.value, search = feedEntriesVM.showSearchBar.value)
                 return@PScaffold
             }
-            HorizontalPager(state = pagerState) { index ->
+            HorizontalPager(state = pagerState, userScrollEnabled = false) { index ->
                 PullToRefresh(
                     refreshLayoutState = topRefreshLayoutState,
                     refreshContent = remember {

@@ -44,6 +44,7 @@ fun <T : IData> MediaTopBar(
     bucketsMap: Map<String, DMediaBucket>,
     itemsState: List<T>,
     scrollToTop: () -> Unit,
+    defaultNavigationIcon: (@Composable () -> Unit)? = null,
     onSortSelected: (context: android.content.Context, sortBy: FileSortBy) -> Unit = { _, _ -> },
     onSearchAction: (context: android.content.Context, tagsViewModel: TagsViewModel) -> Unit
 ) {
@@ -67,6 +68,8 @@ fun <T : IData> MediaTopBar(
                 NavigationCloseIcon {
                     castVM.exitCastMode()
                 }
+            } else {
+                defaultNavigationIcon?.invoke()
             }
         },
         actions = {

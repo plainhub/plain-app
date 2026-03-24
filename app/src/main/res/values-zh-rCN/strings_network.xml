@@ -13,7 +13,7 @@
     <string name="web_dig">1. 电脑浏览器无法打开网页。\n\n无线路由器可能已启用AP隔离，阻止电脑与手机之间的通信。 请前往路由器设置界面禁用AP隔离功能。\n\n2. 在输入HTTPS网页地址后，电脑浏览器显示警告：“您的连接不是私密的。”\n\n您可以单击“继续前往x.x.x.x（不安全）”以继续。 简朴使用自签名的TLS证书加密网站。</string>
     <string name="learn_more">了解更多…</string>
     <string name="http_server_state_on">服务运行中</string>
-    <string name="http_server_state_starting">启动服务中...</string>
+    <string name="http_server_state_starting">启动服务中…</string>
     <string name="http_server_state_stopping">停止服务中...</string>
     <string name="http_server_state_error">启动失败</string>
     <string name="change_port">更改端口</string>
@@ -22,8 +22,8 @@
     <string name="run">启动</string>
     <string name="troubleshoot">排查问题</string>
     <string name="allow_remote_access_from_pc">允许电脑远程访问网页</string>
-    <string name="http_port_conflict_error">端口 {{ port }} 当前被占用。您可以点击\'修复\'按钮自动更改端口，或者您可以选择点击URL地址旁边的编辑图标手动选择不同的端口。</string>
-    <string name="http_port_conflict_errors">端口 {{ port }} 当前被占用。您可以点击\'修复\'按钮自动更改端口，或者您可以选择点击URL地址旁边的编辑图标手动选择不同的端口。</string>
+    <string name="http_port_conflict_error">端口 {{ port }} 已被占用。轻触“重启应用”可自动修复。</string>
+    <string name="http_port_conflict_errors">端口 {{ port }} 已被占用。轻触“重启应用”可自动修复。</string>
     <string name="fix">修复</string>
     <string name="security">安全</string>
     <string name="url_token">URL令牌</string>
@@ -32,8 +32,7 @@
     <string name="http_server_error">HTTP服务器未启动。重新启动应用并重试。</string>
     <string name="relaunch_app">重启应用</string>
     <string name="require_confirmation">需要二次确认</string>
-    <string name="web_console">电脑网页</string>
-    <string name="web_service_required_for_chat">要接收其他人发送的消息，请启用电脑网页服务。</string>
+    <string name="web_service_required_for_chat">要接收其他人发送的消息，请启用手机网页。</string>
     <string name="enable_web_service">启用网页服务</string>
     <string name="http_port">HTTP端口</string>
     <string name="https_port">HTTPS端口</string>
@@ -62,4 +61,13 @@
     <string name="restart_app_message">差一点了！只需点击“重启应用”即可生效。</string>
     <string name="access_phone_web">从电脑浏览器访问您的手机。</string>
     <string name="scan_qrcode_to_access_web">扫描二维码访问网页</string>
+    <string name="phone_web_portal">手机网页</string>
+    <string name="phone_web_portal_desc">在电脑浏览器中访问你的手机</string>
+    <string name="same_network_hint">请确保你的电脑和手机在同一网络下</string>
+    <string name="ready">就绪</string>
+    <string name="permission_settings">权限设置</string>
+    <string name="web_address_hint">在电脑浏览器中打开下方任一地址。</string>
+    <string name="home_web_easy_hint">点击开始</string>
+    <string name="home_web_easy_loading">请稍候…</string>
+    <string name="home_web_easy_failed_title">无法启动</string>
 </resources>

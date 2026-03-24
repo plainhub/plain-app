@@ -1,27 +1,29 @@
 package com.ismartcoding.plain.ui.page.root
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.activity.compose.BackHandler
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.ui.base.LocalOpenDrawer
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
-import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.MediaFoldersViewModel
+import com.ismartcoding.plain.ui.models.NotesViewModel
+import com.ismartcoding.plain.ui.models.PeerViewModel
+import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.models.VideosViewModel
-import com.ismartcoding.plain.ui.page.root.components.RootTabType
+import com.ismartcoding.plain.ui.page.root.components.RootPageType
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RootPage(
     navController: NavHostController,
@@ -36,18 +38,25 @@ fun RootPage(
     videoCastVM: CastViewModel = viewModel(key = "videoCastVM"),
     audioVM: AudioViewModel = viewModel(key = "audioVM"),
     audioTagsVM: TagsViewModel = viewModel(key = "audioTagsVM"),
-    audioPlaylistVM: AudioPlaylistViewModel = viewModel(key = "audioPlaylistVM"),
     audioFoldersVM: MediaFoldersViewModel = viewModel(key = "audioFoldersVM"),
     audioCastVM: CastViewModel = viewModel(key = "audioCastVM"),
+    audioPlaylistVM: AudioPlaylistViewModel,
     peerVM: PeerViewModel = viewModel(key = "peerVM"),
     channelVM: ChannelViewModel = viewModel(key = "channelVM"),
+    notesVM: NotesViewModel = viewModel(key = "notesVM"),
+    noteTagsVM: TagsViewModel = viewModel(key = "noteTagsVM"),
+    feedTagsVM: TagsViewModel = viewModel(key = "feedTagsVM"),
+    pomodoroVM: PomodoroViewModel = viewModel(key = "pomodoroVM"),
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(
-        initialPage = RootTabType.HOME.value,
-        pageCount = { 5 }
-    )
+    val openDrawer = LocalOpenDrawer.current
+
+    BackHandler(
+        enabled = mainVM.currentRootTab != RootPageType.HOME.value,
+    ) {
+        mainVM.currentRootTab = RootPageType.HOME.value
+    }
 
     val states = rememberRootPageStates(
         imagesVM = imagesVM,
@@ -62,7 +71,7 @@ fun RootPage(
     )
 
     RootPageBackHandler(
-        pagerState = pagerState,
+        currentPage = mainVM.currentRootTab,
         states = states,
         context = context,
         scope = scope,
@@ -79,7 +88,7 @@ fun RootPage(
 
     RootPageScaffoldContent(
         navController = navController,
-        pagerState = pagerState,
+        currentPage = mainVM.currentRootTab,
         states = states,
         mainVM = mainVM,
         imagesVM = imagesVM,
@@ -97,11 +106,11 @@ fun RootPage(
         audioCastVM = audioCastVM,
         peerVM = peerVM,
         channelVM = channelVM,
-        onTabSelected = {
-            scope.launch {
-                pagerState.animateScrollToPage(it)
-            }
-        },
+        notesVM = notesVM,
+        noteTagsVM = noteTagsVM,
+        feedTagsVM = feedTagsVM,
+        pomodoroVM = pomodoroVM,
+        onOpenDrawer = { scope.launch { openDrawer?.invoke() } },
     )
 
     RootMediaPreviewers(
@@ -114,4 +123,3 @@ fun RootPage(
         videoTagsVM = videoTagsVM,
     )
 }
-

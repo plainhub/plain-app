@@ -40,6 +40,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.preferences.PackageSortByPreference
+import com.ismartcoding.plain.ui.base.ActionButtonDrawer
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.ActionButtonSort
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -72,6 +73,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AppsPage(
     navController: NavHostController,
+    onOpenDrawer: () -> Unit = {},
     appsVM: AppsViewModel = viewModel(),
 ) {
     val context = LocalContext.current
@@ -176,6 +178,9 @@ fun AppsPage(
                         scrollStateMap[pagerState.currentPage]?.scrollToItem(0)
                     }
                 }), navController = navController,
+                navigationIcon = {
+                    ActionButtonDrawer(onClick = onOpenDrawer)
+                },
                 title = stringResource(id = R.string.apps),
                 scrollBehavior = scrollBehavior,
                 actions = {
@@ -214,7 +219,7 @@ fun AppsPage(
                 NoDataColumn(loading = appsVM.showLoading.value, search = appsVM.showSearchBar.value)
                 return@PScaffold
             }
-            HorizontalPager(state = pagerState) { index ->
+            HorizontalPager(state = pagerState, userScrollEnabled = false) { index ->
                 PullToRefresh(
                     refreshLayoutState = topRefreshLayoutState,
                 ) {

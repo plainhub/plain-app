@@ -91,9 +91,6 @@ fun WebSettingsPage(
         var notificationListenerGranted by remember { mutableStateOf(Permission.NOTIFICATION_LISTENER.can(context)) }
         val sharedFlow = Channel.sharedFlow
 
-        val learnMore = stringResource(id = R.string.learn_more)
-        val fullText = (stringResource(id = R.string.access_phone_web) + " " + learnMore)
-
         LaunchedEffect(sharedFlow) {
             sharedFlow.collect { event ->
                 when (event) {
@@ -146,7 +143,7 @@ fun WebSettingsPage(
         PScaffold(topBar = {
             PTopAppBar(
                 navController = navController,
-                title = stringResource(id = R.string.web_console),
+                title = stringResource(id = R.string.permission_settings),
                 actions = {
                     PMiniOutlineButton(
                         label = stringResource(R.string.sessions),
@@ -183,18 +180,6 @@ fun WebSettingsPage(
             LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                 item {
                     TopSpace()
-                    PClickableText(
-                        text = fullText,
-                        clickTexts = listOf(
-                            VClickText(learnMore) {
-                                navController.navigate(Routing.WebLearnMore)
-                            }
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 24.dp, end = 24.dp, bottom = 16.dp),
-                        style = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
-                    )
                     Subtitle(
                         text = stringResource(R.string.permissions),
                     )

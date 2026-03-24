@@ -59,7 +59,7 @@ fun HomeFeaturesSelectionPage(
         skipPartiallyExpanded = true
     )
 
-    val featureItems = remember { FeatureItem.getList(navController) }
+    val featureItems = remember { FeatureItem.getList {} }
 
     // Get selected features from preferences
     val selectedFeatures = remember {

@@ -14,9 +14,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.file.FileSystemHelper
+import com.ismartcoding.plain.ui.base.ActionButtonAddWithMenu
+import com.ismartcoding.plain.ui.base.ActionButtonDrawer
 import com.ismartcoding.plain.ui.base.ActionButtonFolders
 import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
+import com.ismartcoding.plain.ui.base.PIcon
+import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.nav.navigateFiles
@@ -26,58 +30,48 @@ import com.ismartcoding.plain.ui.nav.navigateFiles
 fun TopBarChat(
     navController: NavHostController,
     channelVM: ChannelViewModel,
+    onOpenDrawer: () -> Unit,
 ) {
     val context = LocalContext.current
     val showMenu = remember { mutableStateOf(false) }
 
-    TopAppBar(
-        title = {
-            Text(stringResource(R.string.chat))
+    PTopAppBar(
+        navController = navController,
+        navigationIcon = {
+            ActionButtonDrawer(onClick = onOpenDrawer)
         },
+        title = stringResource(R.string.chat),
         actions = {
             ActionButtonFolders {
                 navController.navigateFiles(FileSystemHelper.getExternalFilesDirPath(context))
             }
-            IconButton(
-                onClick = {
-                    showMenu.value = true
-                }
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.plus),
-                    contentDescription = stringResource(R.string.create)
+            ActionButtonAddWithMenu { dismiss ->
+                PDropdownMenuItem(
+                    text = { Text(stringResource(R.string.new_channel)) },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.hash),
+                            contentDescription = null,
+                        )
+                    },
+                    onClick = {
+                        dismiss()
+                        channelVM.showCreateChannelDialog.value = true
+                    },
                 )
-                PDropdownMenu(
-                    expanded = showMenu.value,
-                    onDismissRequest = { showMenu.value = false },
-                ) {
-                    PDropdownMenuItem(
-                        text = { Text(stringResource(R.string.new_channel)) },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.hash),
-                                contentDescription = null,
-                            )
-                        },
-                        onClick = {
-                            showMenu.value = false
-                            channelVM.showCreateChannelDialog.value = true
-                        },
-                    )
-                    PDropdownMenuItem(
-                        text = { Text(stringResource(R.string.add_device)) },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.plus),
-                                contentDescription = null,
-                            )
-                        },
-                        onClick = {
-                            showMenu.value = false
-                            navController.navigate(Routing.Nearby())
-                        },
-                    )
-                }
+                PDropdownMenuItem(
+                    text = { Text(stringResource(R.string.add_device)) },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(R.drawable.plus),
+                            contentDescription = null,
+                        )
+                    },
+                    onClick = {
+                        dismiss()
+                        navController.navigate(Routing.Nearby())
+                    },
+                )
             }
         }
     )
