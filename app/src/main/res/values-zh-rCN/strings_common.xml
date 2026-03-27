@@ -22,7 +22,7 @@
     <string name="docs">文档</string>
     <string name="no_results_found">未找到结果</string>
     <string name="search">搜索</string>
-    <string name="unknown_file_description">简朴当前不支持打开此类型的文件。您可以使用其他应用程序打开它。</string>
+    <string name="unknown_file_description">PlainApp当前不支持打开此类型的文件。您可以使用其他应用程序打开它。</string>
     <string name="grant_permission">授予权限</string>
     <string name="load_no_more">没有更多数据了</string>
     <string name="list_empty">暂无数据</string>

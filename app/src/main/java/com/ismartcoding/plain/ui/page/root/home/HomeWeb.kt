@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.page.root.home
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
@@ -26,8 +27,14 @@ fun HomeWeb(
     val scope = rememberCoroutineScope()
     val state = mainVM.httpServerState
 
+    LaunchedEffect(webEnabled) {
+        if (webEnabled) {
+            mainVM.syncHttpServerState(context)
+        }
+    }
+
     val showSuccess = webEnabled && state == HttpServerState.ON
-    val showLoading = state.isProcessing()
+    val showLoading = state.isProcessing() || (webEnabled && state == HttpServerState.OFF)
     val showError = state == HttpServerState.ERROR
     val errorMessage = buildHomeWebErrorMessage(mainVM)
 

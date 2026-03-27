@@ -43,6 +43,10 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
         viewModelScope.launch {
             withIO { WebPreference.putAsync(context, enable) }
             if (enable) {
+                httpServerError = ""
+                if (!httpServerState.isProcessing() && httpServerState != HttpServerState.ON) {
+                    httpServerState = HttpServerState.STARTING
+                }
                 val permission = Permission.POST_NOTIFICATIONS
                 if (permission.can(context)) {
                     sendEvent(StartHttpServerEvent())
@@ -65,6 +69,30 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
                 withIO {
                     HttpServerManager.stopServiceAsync(context)
                 }
+            }
+        }
+    }
+
+    fun syncHttpServerState(context: Context) {
+        viewModelScope.launch {
+            val webEnabled = withIO { WebPreference.getAsync(context) }
+            if (!webEnabled) {
+                if (!httpServerState.isProcessing()) {
+                    httpServerState = HttpServerState.OFF
+                }
+                return@launch
+            }
+
+            if (!httpServerState.isProcessing() && httpServerState != HttpServerState.ON) {
+                httpServerState = HttpServerState.STARTING
+            }
+
+            val check = withIO { HttpServerManager.checkServerAsync() }
+            if (check.http && check.websocket) {
+                httpServerError = ""
+                httpServerState = HttpServerState.ON
+            } else {
+                enableHttpServer(context, true)
             }
         }
     }

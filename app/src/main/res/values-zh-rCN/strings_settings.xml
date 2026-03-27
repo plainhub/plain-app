@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">简朴</string>
+    <string name="app_name">PlainApp</string>
     <string name="app_data">应用数据</string>
     <string name="developer_mode">开发者模式</string>
     <string name="local_cache">本地缓存</string>
@@ -42,7 +42,7 @@
     <string name="about_desc">客户端名称、版本、日志、捐赠</string>
     <string name="backup_restore">备份与恢复</string>
     <string name="backup">备份</string>
-    <string name="backup_desc">备份或者恢复简朴应用数据</string>
+    <string name="backup_desc">备份或者恢复PlainApp应用数据</string>
     <string name="developer_settings">开发者设置</string>
     <string name="features">功能</string>
     <string name="system">系统默认</string>

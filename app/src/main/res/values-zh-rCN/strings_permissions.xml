@@ -34,6 +34,6 @@
     <string name="audio_notification_prompt">为了在通知中心查看媒体控制，请允许该应用接收推送通知。</string>
     <string name="foreground_service_notification_prompt">请允许此应用在后台运行并显示通知，以便提供必要的功能或服务。</string>
     <string name="call_phone_permission_required">为了通过应用程序进行电话通话，请允许访问电话。</string>
-    <string name="accessibility_service_description">简朴使用此无障碍服务以在屏幕镜像时启用远程控制。它会注入来自网页端的触摸事件（点击、滑动、滚动）以及导航操作（返回、主页、最近任务）。</string>
-    <string name="accessibility_service_label">简朴远程控制</string>
+    <string name="accessibility_service_description">PlainApp使用此无障碍服务以在屏幕镜像时启用远程控制。它会注入来自网页端的触摸事件（点击、滑动、滚动）以及导航操作（返回、主页、最近任务）。</string>
+    <string name="accessibility_service_label">PlainApp远程控制</string>
 </resources>
