@@ -24,6 +24,8 @@ import com.ismartcoding.plain.ui.base.PSelectionChip
 import com.ismartcoding.plain.ui.components.NewTagButton
 import com.ismartcoding.plain.ui.components.TagNameDialog
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.models.addToTags
+import com.ismartcoding.plain.ui.models.removeFromTags
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable

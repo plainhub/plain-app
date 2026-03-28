@@ -14,6 +14,15 @@ scripts/check-ui-file-length.sh 150
 Current full violation snapshot is tracked in:
 - `docs/ui-file-length-violations.txt`
 
+## Sync Snapshot
+
+```bash
+scripts/update-ui-file-length-violations.sh 150
+```
+
+- Always run this after refactors that may change line counts.
+- Keep `docs/ui-file-length-violations.txt` as a generated snapshot, not a hand-edited list.
+
 ## Recommended Refactor Order
 
 1. `ui/page/*` pages: split screen state/events/actions into dedicated composables.

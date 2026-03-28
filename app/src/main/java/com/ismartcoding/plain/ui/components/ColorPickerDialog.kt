@@ -33,7 +33,7 @@ import com.ismartcoding.plain.ui.base.ClipboardTextField
 import com.ismartcoding.plain.ui.base.colorpicker.ColorEnvelope
 import com.ismartcoding.plain.ui.base.colorpicker.HsvColorPicker
 import com.ismartcoding.plain.ui.base.colorpicker.rememberColorPickerController
-import com.ismartcoding.plain.ui.theme.palette.safeHexToColor
+import com.ismartcoding.plain.ui.theme.safeHexToColor
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable

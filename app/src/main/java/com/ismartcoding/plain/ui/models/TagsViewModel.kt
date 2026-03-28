@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.DataType
@@ -30,6 +29,10 @@ class TagsViewModel : ViewModel() {
     var editItem = mutableStateOf<DTag?>(null)
     var editTagName = mutableStateOf("")
     var dataType = mutableStateOf(DataType.DEFAULT)
+
+    internal fun updateTagsMap(map: Map<String, List<DTagRelation>>) {
+        _tagsMapFlow.value = map.toMutableMap()
+    }
 
     fun loadAsync(keys: Set<String> = emptySet()) {
         val startTime = System.currentTimeMillis()
@@ -94,63 +97,6 @@ class TagsViewModel : ViewModel() {
             for (key in _tagsMapFlow.value.keys) {
                 _tagsMapFlow.value[key] = _tagsMapFlow.value[key]?.filter { it.tagId != id } ?: emptyList()
             }
-        }
-    }
-
-    fun removeFromTags(ids: Set<String>, tagIds: Set<String>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            for (tagId in tagIds) {
-                TagHelper.deleteTagRelationByKeysTagId(ids, tagId)
-            }
-            for (id in ids) {
-                _tagsMapFlow.value[id] = _tagsMapFlow.value[id]?.filter { !tagIds.contains(it.tagId) } ?: emptyList()
-            }
-            loadAsync()
-        }
-    }
-
-    fun addToTags(items: List<IData>, tagIds: Set<String>) {
-        viewModelScope.launch(Dispatchers.IO) {
-            for (tagId in tagIds) {
-                val existingKeys = TagHelper.getKeysByTagId(tagId)
-                val newItems = items.filter { !existingKeys.contains(it.id) }
-                if (newItems.isNotEmpty()) {
-                    val relations = newItems.map { item ->
-                        TagRelationStub.create(item).toTagRelation(tagId, dataType.value)
-                    }
-                    TagHelper.addTagRelations(relations)
-                    for (item in newItems) {
-                        val id = item.id
-                        _tagsMapFlow.value[id] = _tagsMapFlow.value[id]?.toMutableList()?.apply {
-                            addAll(relations.filter { it.key == id })
-                        } ?: relations.filter { it.key == id }
-                    }
-                }
-            }
-            loadAsync()
-        }
-    }
-
-    suspend fun toggleTagAsync(
-        data: IData, tagId: String
-    ) {
-        val tagIds = _tagsMapFlow.value[data.id]?.map { it.tagId } ?: emptyList()
-        try {
-            if (tagIds.contains(tagId)) {
-                TagHelper.deleteTagRelationByKeysTagId(setOf(data.id), tagId)
-                _tagsMapFlow.value[data.id] = _tagsMapFlow.value[data.id]?.filter { it.tagId != tagId } ?: emptyList()
-            } else {
-                val relation = TagRelationStub.create(data).toTagRelation(tagId, dataType.value)
-                TagHelper.addTagRelations(
-                    listOf(relation)
-                )
-                _tagsMapFlow.value[data.id] = _tagsMapFlow.value[data.id]?.toMutableList()?.apply {
-                    add(relation)
-                } ?: listOf(relation)
-            }
-            loadAsync()
-        } catch (ex: Exception) {
-            LogCat.e(ex.toString())
         }
     }
 

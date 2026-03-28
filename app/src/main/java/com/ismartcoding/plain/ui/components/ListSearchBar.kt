@@ -22,7 +22,7 @@ import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.models.ISearchableViewModel
 import com.ismartcoding.plain.ui.models.exitSearchMode
-import com.ismartcoding.plain.ui.theme.cardContainer
+import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,7 +78,7 @@ fun <T : IData> ListSearchBar(
                     }
                 }
             },
-            colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.cardContainer()),
+            colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.cardBackgroundNormal),
         ) {
         }
     }

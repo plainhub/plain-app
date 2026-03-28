@@ -155,6 +155,8 @@ import com.ismartcoding.plain.web.models.BookmarkInput
 import com.ismartcoding.plain.web.models.Tag
 import com.ismartcoding.plain.web.models.TempValue
 import com.ismartcoding.plain.web.models.Video
+import com.ismartcoding.plain.web.models.AppFile
+import com.ismartcoding.plain.ui.page.appfiles.AppFileDisplayNameHelper
 import com.ismartcoding.plain.web.models.toExportModel
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.workers.FeedFetchWorker
@@ -213,6 +215,20 @@ class MainGraphQL(val schema: Schema) {
                 query("peers") {
                     resolver { ->
                         AppDatabase.instance.peerDao().getAll().map { it.toModel() }
+                    }
+                }
+                query("appFiles") {
+                    resolver { offset: Int, limit: Int ->
+                        val dao = AppDatabase.instance.appFileDao()
+                        val chatDao = AppDatabase.instance.chatDao()
+                        val files = dao.getPage(limit, offset)
+                        val nameMap = AppFileDisplayNameHelper.buildNameMap(chatDao.getAll())
+                        files.map { it.toModel(AppFileDisplayNameHelper.resolveDisplayName(it, nameMap)) }
+                    }
+                }
+                query("appFileCount") {
+                    resolver { ->
+                        AppDatabase.instance.appFileDao().count()
                     }
                 }
                 type<Peer> {}

@@ -1,0 +1,95 @@
+package com.ismartcoding.plain.ui.models
+
+import androidx.lifecycle.viewModelScope
+import com.ismartcoding.lib.upnp.UPnPController
+import com.ismartcoding.plain.data.IMedia
+import com.ismartcoding.plain.features.media.CastPlayer
+import com.ismartcoding.plain.helpers.UrlHelper
+import com.ismartcoding.plain.ui.helpers.DialogHelper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+internal fun CastViewModel.castPath(path: String) {
+    val device = CastPlayer.currentDevice ?: return
+    viewModelScope.launch(Dispatchers.IO) {
+        isLoading.value = true
+        CastPlayer.setCurrentUri(path)
+        try {
+            UPnPController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(path))
+            CastPlayer.isPlaying.value = true
+            if (CastPlayer.sid.isNotEmpty()) {
+                UPnPController.unsubscribeEvent(device, CastPlayer.sid)
+                CastPlayer.sid = ""
+            }
+            trySubscribeEvent()
+        } catch (e: Exception) {
+            DialogHelper.showErrorMessage(e.message ?: "Cast failed")
+        } finally {
+            isLoading.value = false
+        }
+    }
+}
+
+internal fun CastViewModel.castItem(item: IMedia) {
+    val device = CastPlayer.currentDevice ?: return
+    viewModelScope.launch(Dispatchers.IO) {
+        CastPlayer.setCurrentUri(item.path)
+        isLoading.value = true
+        val castItems = CastPlayer.items.value
+        val isInQueue = castItems.any { it.path == item.path }
+        if (!isInQueue) {
+            CastPlayer.addItem(item)
+        }
+        try {
+            UPnPController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(item.path))
+            CastPlayer.isPlaying.value = true
+            if (CastPlayer.sid.isNotEmpty()) {
+                UPnPController.unsubscribeEvent(device, CastPlayer.sid)
+                CastPlayer.sid = ""
+            }
+            trySubscribeEvent()
+        } catch (e: Exception) {
+            DialogHelper.showErrorMessage(e.message ?: "Cast failed")
+        } finally {
+            isLoading.value = false
+        }
+    }
+}
+
+internal suspend fun CastViewModel.trySubscribeEvent() {
+    val device = CastPlayer.currentDevice ?: return
+    try {
+        val sid = UPnPController.subscribeEvent(device, UrlHelper.getCastCallbackUrl())
+        if (sid.isNotEmpty()) {
+            CastPlayer.sid = sid
+            CastPlayer.supportsCallback.value = true
+            startPositionUpdater()
+        } else {
+            CastPlayer.supportsCallback.value = false
+        }
+    } catch (e: Exception) {
+        CastPlayer.supportsCallback.value = false
+    }
+}
+
+internal fun CastViewModel.startPositionUpdater() {
+    val device = CastPlayer.currentDevice ?: return
+    if (!CastPlayer.supportsCallback.value) return
+
+    positionUpdateJob?.cancel()
+
+    positionUpdateJob = viewModelScope.launch(Dispatchers.IO) {
+        while (CastPlayer.currentUri.value.isNotEmpty() && CastPlayer.supportsCallback.value) {
+            try {
+                if (CastPlayer.isPlaying.value) {
+                    val positionInfo = UPnPController.getPositionInfoAsync(device)
+                    CastPlayer.updatePositionInfo(positionInfo.relTime, positionInfo.trackDuration)
+                }
+            } catch (e: Exception) {
+                break
+            }
+            delay(1000)
+        }
+    }
+}

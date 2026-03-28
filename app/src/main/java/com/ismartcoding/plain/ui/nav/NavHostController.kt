@@ -23,8 +23,8 @@ fun NavHostController.navigateChatText(content: String) {
     }
 }
 
-fun NavHostController.navigatePdf(uri: Uri) {
-    navigate(Routing.PdfViewer(uri.toString())) {
+fun NavHostController.navigatePdf(uri: Uri, fileName: String = "") {
+    navigate(Routing.PdfViewer(uri.toString(), fileName)) {
         launchSingleTop = true
     }
 }

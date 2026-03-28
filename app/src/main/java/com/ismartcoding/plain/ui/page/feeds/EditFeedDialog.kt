@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FeedsViewModel
+import com.ismartcoding.plain.ui.models.edit
 
 @Composable
 fun EditFeedDialog(feedsVM: FeedsViewModel) {

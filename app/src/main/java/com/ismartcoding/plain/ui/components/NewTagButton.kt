@@ -16,7 +16,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.ui.theme.cardContainer
+import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 
 @Composable
 fun NewTagButton(click: () -> Unit) {
@@ -25,7 +25,7 @@ fun NewTagButton(click: () -> Unit) {
             .padding(top = 8.dp)
             .size(32.dp)
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.cardContainer())
+            .background(MaterialTheme.colorScheme.cardBackgroundNormal)
             .clickable { click() },
         contentAlignment = Alignment.Center,
     ) {

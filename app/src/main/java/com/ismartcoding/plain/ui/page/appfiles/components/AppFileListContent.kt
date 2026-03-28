@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -15,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.pullrefresh.LoadMoreRefreshContent
 import com.ismartcoding.plain.ui.components.NoDataView
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
@@ -25,8 +27,10 @@ fun AppFileListContent(
     navController: NavHostController,
     files: List<VAppFile>,
     isLoading: Boolean,
+    noMore: Boolean,
     previewerState: MediaPreviewerState,
     onRefresh: () -> Unit,
+    onLoadMore: () -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -62,6 +66,12 @@ fun AppFileListContent(
                 },
             )
         }
-        item { BottomSpace() }
+        item {
+            if (files.isNotEmpty() && !noMore) {
+                LaunchedEffect(Unit) { onLoadMore() }
+            }
+            LoadMoreRefreshContent(noMore)
+            BottomSpace()
+        }
     }
 }

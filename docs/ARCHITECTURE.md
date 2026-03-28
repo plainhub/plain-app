@@ -160,7 +160,14 @@ ui/
 │   ├── tools/         # Tools (1 file)
 │   ├── videos/        # Video gallery (3 files)
 │   └── web/           # Web server settings (7 files)
-└── theme/             # Material3 theming
+└── theme/             # Material3 theming (7 files, no subdirectories)
+    # Theme.kt           — AppTheme composable (dark/light color schemes)
+    # ColorSchemeMore.kt  — App-specific color extensions (backgrounds, nav, wave, masks)
+    # ColorSchemeIOS.kt   — iOS system color extensions (green, red, blue, yellow, etc.)
+    # ColorHelper.kt      — Color utility functions (hex parsing, alwaysLight)
+    # PlainTheme.kt       — Dimensions (margins, radius) + Typography extensions
+    # Type.kt             — Material3 Typography definition
+    # Shapes.kt           — Material3 Shapes definition
 ```
 
 ### `chat/` — Chat System (top-level, 10+ files)
@@ -233,6 +240,13 @@ subscription("noteCreated") { ... }
 ./gradlew :app:assembleGoogleRelease  # Google Play release
 ./gradlew :app:assembleChinaRelease   # China market release
 ./gradlew test                        # Unit tests
+```
+
+## AI Maintenance Shortcuts
+
+```bash
+scripts/check-ui-file-length.sh 150              # Verify UI file length guardrail
+scripts/update-ui-file-length-violations.sh 150  # Sync docs/ui-file-length-violations.txt
 ```
 
 ## Key Dependencies (versions in `gradle/libs.versions.toml`)

@@ -25,214 +25,70 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
 
 @Composable
-fun ActionButtons(
-    content: @Composable FlowRowScope.() -> Unit
-) {
+fun ActionButtons(content: @Composable FlowRowScope.() -> Unit) {
     FlowRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        maxItemsInEachRow = 5,
-        content = content
+        maxItemsInEachRow = 5, content = content
     )
 }
 
 @Composable
 fun ActionButtonDrawer(onClick: () -> Unit) {
-    PIconButton(
-        icon = R.drawable.menu,
-        contentDescription = stringResource(R.string.more),
-        tint = MaterialTheme.colorScheme.onSurface,
-        click = onClick,
-    )
+    PIconButton(icon = R.drawable.menu, contentDescription = stringResource(R.string.more),
+        tint = MaterialTheme.colorScheme.onSurface, click = onClick)
 }
 
 @Composable
 fun ActionButtonMore(onClick: () -> Unit) {
-    PIconButton(
-        icon = R.drawable.ellipsis_vertical,
-        contentDescription = stringResource(R.string.more),
-        tint = MaterialTheme.colorScheme.onSurface,
-        click = onClick,
-    )
+    PIconButton(icon = R.drawable.ellipsis_vertical, contentDescription = stringResource(R.string.more),
+        tint = MaterialTheme.colorScheme.onSurface, click = onClick)
 }
 
 @Composable
 fun ActionButtonMoreWithMenu(content: @Composable ColumnScope.(dismiss: () -> Unit) -> Unit) {
     var isMenuOpen by remember { mutableStateOf(false) }
-    PIconButton(
-        icon = R.drawable.ellipsis_vertical,
-        contentDescription = stringResource(R.string.more),
-        tint = MaterialTheme.colorScheme.onSurface,
-        click = {
-            isMenuOpen = true
-        },
-    )
-    PDropdownMenu(
-        expanded = isMenuOpen,
-        onDismissRequest = { isMenuOpen = false }
-    ) {
-        content {
-            isMenuOpen = false
-        }
-    }
+    PIconButton(icon = R.drawable.ellipsis_vertical, contentDescription = stringResource(R.string.more),
+        tint = MaterialTheme.colorScheme.onSurface, click = { isMenuOpen = true })
+    PDropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }) { content { isMenuOpen = false } }
 }
 
 @Composable
 fun ActionButtonAddWithMenu(content: @Composable ColumnScope.(dismiss: () -> Unit) -> Unit) {
     var isMenuOpen by remember { mutableStateOf(false) }
-    PIconButton(
-        icon = R.drawable.plus,
-        contentDescription = stringResource(R.string.add),
-        tint = MaterialTheme.colorScheme.onSurface,
-        click = {
-            isMenuOpen = true
-        },
-    )
-    PDropdownMenu(
-        expanded = isMenuOpen,
-        onDismissRequest = { isMenuOpen = false }
-    ) {
-        content {
-            isMenuOpen = false
-        }
-    }
+    PIconButton(icon = R.drawable.plus, contentDescription = stringResource(R.string.add),
+        tint = MaterialTheme.colorScheme.onSurface, click = { isMenuOpen = true })
+    PDropdownMenu(expanded = isMenuOpen, onDismissRequest = { isMenuOpen = false }) { content { isMenuOpen = false } }
 }
-
 
 @Composable
 fun ActionButtonAdd(onClick: () -> Unit) {
-    PIconButton(
-        icon = R.drawable.plus,
-        contentDescription = stringResource(R.string.add),
-        tint = MaterialTheme.colorScheme.onSurface,
-        click = onClick,
-    )
+    PIconButton(icon = R.drawable.plus, contentDescription = stringResource(R.string.add),
+        tint = MaterialTheme.colorScheme.onSurface, click = onClick)
 }
 
 @Composable
-fun ActionButtonRefresh(
-    onClick: () -> Unit,
-    loading: Boolean = false
-) {
+fun ActionButtonRefresh(onClick: () -> Unit, loading: Boolean = false) {
     val infiniteTransition = rememberInfiniteTransition(label = "refresh_rotation")
     val rotation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
+        initialValue = 0f, targetValue = 360f,
+        animationSpec = infiniteRepeatable(animation = tween(1000, easing = LinearEasing), repeatMode = RepeatMode.Restart),
         label = "refresh_rotation"
     )
-
-    PIconButton(
-        icon = R.drawable.refresh_ccw,
-        contentDescription = stringResource(R.string.refresh),
+    PIconButton(icon = R.drawable.refresh_ccw, contentDescription = stringResource(R.string.refresh),
         tint = if (loading) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-        modifier = if (loading) Modifier.rotate(rotation) else Modifier,
-        click = onClick,
-    )
+        modifier = if (loading) Modifier.rotate(rotation) else Modifier, click = onClick)
 }
 
-
 @Composable
-fun ActionButtonSettings(
-    showBadge: Boolean = false,
-    onClick: () -> Unit
-) {
-    PIconButton(
-        icon = R.drawable.settings,
-        contentDescription = stringResource(R.string.settings),
-        tint = MaterialTheme.colorScheme.onSurface,
-        showBadge = showBadge,
-        click = onClick,
-    )
+fun ActionButtonSettings(showBadge: Boolean = false, onClick: () -> Unit) {
+    PIconButton(icon = R.drawable.settings, contentDescription = stringResource(R.string.settings),
+        tint = MaterialTheme.colorScheme.onSurface, showBadge = showBadge, click = onClick)
 }
 
 @Composable
 fun ActionButtonSelect(onClick: () -> Unit) {
-    PIconButton(
-        icon = R.drawable.list_checks,
-        contentDescription = stringResource(R.string.select),
-        tint = MaterialTheme.colorScheme.onSurface,
-        click = onClick,
-    )
-}
-
-@Composable
-fun ActionButtonTags(onClick: () -> Unit) {
-    PIconButton(
-        icon = R.drawable.tag,
-        contentDescription = stringResource(R.string.tags),
-        tint = MaterialTheme.colorScheme.onSurface,
-        click = onClick,
-    )
-}
-
-@Composable
-fun ActionButtonSort(onClick: () -> Unit) {
-    PIconButton(
-        icon = R.drawable.sort,
-        contentDescription = stringResource(R.string.sort),
-        tint = MaterialTheme.colorScheme.onSurface,
-        click = onClick,
-    )
-}
-
-
-@Composable
-fun ActionButtonSearch(onClick: () -> Unit) {
-    PIconButton(
-        icon = R.drawable.search,
-        contentDescription = stringResource(R.string.search),
-        tint = MaterialTheme.colorScheme.onSurface,
-        click = onClick,
-    )
-}
-
-
-@Composable
-fun ActionButtonFolderKanban(onClick: () -> Unit) {
-    PIconButton(
-        icon = R.drawable.folder_kanban,
-        contentDescription = stringResource(R.string.folders),
-        tint = MaterialTheme.colorScheme.onSurface,
-        click = onClick,
-    )
-}
-
-@Composable
-fun ActionButtonFolders(onClick: () -> Unit) {
-    PIconButton(
-        icon = R.drawable.folder,
-        contentDescription = stringResource(R.string.folders),
-        tint = MaterialTheme.colorScheme.onSurface,
-        click = onClick,
-    )
-}
-
-@Composable
-fun ActionButtonCast(onClick: () -> Unit) {
-    PIconButton(
-        icon = R.drawable.cast,
-        contentDescription = stringResource(R.string.cast),
-        tint = MaterialTheme.colorScheme.onSurface,
-        click = onClick,
-    )
-}
-
-@Composable
-fun IconTextFavoriteButton(
-    isFavorite: Boolean = false,
-    onClick: () -> Unit
-) {
-    val icon = if (isFavorite) R.drawable.check else R.drawable.plus
-    PIconTextActionButton(
-        icon = icon,
-        text = stringResource(R.string.favorites),
-        click = onClick
-    )
+    PIconButton(icon = R.drawable.list_checks, contentDescription = stringResource(R.string.select),
+        tint = MaterialTheme.colorScheme.onSurface, click = onClick)
 }

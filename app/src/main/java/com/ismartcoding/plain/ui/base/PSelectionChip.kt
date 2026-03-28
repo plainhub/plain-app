@@ -13,7 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.ui.theme.cardContainer
+import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 
 @Composable
 fun PSelectionChip(
@@ -44,7 +44,7 @@ fun PSelectionChip(
         colors = FilterChipDefaults.filterChipColors().copy(
             selectedContainerColor = MaterialTheme.colorScheme.primary,
             selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
-            containerColor = MaterialTheme.colorScheme.cardContainer(),
+            containerColor = MaterialTheme.colorScheme.cardBackgroundNormal,
             labelColor = MaterialTheme.colorScheme.onSurface,
         ),
         border = null,

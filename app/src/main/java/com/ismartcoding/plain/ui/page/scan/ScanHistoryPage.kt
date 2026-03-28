@@ -25,6 +25,7 @@ import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
+import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ScanHistoryViewModel

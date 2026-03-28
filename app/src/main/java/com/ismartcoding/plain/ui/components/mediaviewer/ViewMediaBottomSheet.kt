@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.components.mediaviewer
 
-import android.content.ClipData
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,30 +15,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatBytes
-import com.ismartcoding.lib.extensions.getMimeType
 import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.data.DVideo
-import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.extensions.formatDateTime
-import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
-import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.QrCodeScanHelper
-import com.ismartcoding.plain.helpers.ShareHelper
-import com.ismartcoding.plain.helpers.SvgHelper
-import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.IconTextDeleteButton
-import com.ismartcoding.plain.ui.base.IconTextRenameButton
-import com.ismartcoding.plain.ui.base.IconTextScanQrCodeButton
-import com.ismartcoding.plain.ui.base.IconTextShareButton
 import com.ismartcoding.plain.ui.base.PCard
-import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.Subtitle
@@ -49,7 +34,6 @@ import com.ismartcoding.plain.ui.components.ImageMetaRows
 import com.ismartcoding.plain.ui.components.QrScanResultBottomSheet
 import com.ismartcoding.plain.ui.components.TagSelector
 import com.ismartcoding.plain.ui.components.VideoMetaRows
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -66,17 +50,13 @@ fun ViewMediaBottomSheet(
     deleteAction: () -> Unit = {},
     onTagsChangedAsync: suspend () -> Unit = {},
 ) {
-    var showRenameDialog by remember {
-        mutableStateOf(false)
-    }
+    var showRenameDialog by remember { mutableStateOf(false) }
     var showQrScanResult by remember { mutableStateOf(false) }
     var qrScanResult by remember { mutableStateOf("") }
     val context = LocalContext.current
 
     if (showRenameDialog) {
-        FileRenameDialog(path = m.path, onDismiss = {
-            showRenameDialog = false
-        }, onDoneAsync = {
+        FileRenameDialog(path = m.path, onDismiss = { showRenameDialog = false }, onDoneAsync = {
             m.path = m.path.substring(0, m.path.lastIndexOf("/") + 1) + it
             onRenamedAsync()
             onDismiss()
@@ -91,83 +71,32 @@ fun ViewMediaBottomSheet(
                     val bitmap = BitmapFactory.decodeFile(m.path)
                     if (bitmap != null) {
                         val result = QrCodeScanHelper.tryDecode(bitmap)
-                        if (result != null) {
-                            qrScanResult = result.text
-                        }
+                        if (result != null) { qrScanResult = result.text }
                     }
-                } catch (e: Exception) {
-                }
+                } catch (e: Exception) { }
             }
         }
     }
 
-    PModalBottomSheet(
-        onDismissRequest = {
-            onDismiss()
-        },
-    ) {
+    PModalBottomSheet(onDismissRequest = { onDismiss() }) {
         LazyColumn {
-            item {
-                VerticalSpace(32.dp)
-            }
+            item { VerticalSpace(32.dp) }
             if (m.data is DImage || m.data is DVideo) {
                 item {
-                    ActionButtons {
-                        if (qrScanResult.isNotEmpty()) {
-                            IconTextScanQrCodeButton {
-                                showQrScanResult = true
-                            }
-                        }
-
-                        if (m.data is DImage || m.data is DVideo) {
-                            IconTextShareButton {
-                                if (m.data is DImage) {
-                                    ShareHelper.shareUris(context, listOf(ImageMediaStoreHelper.getItemUri(m.id)))
-                                } else {
-                                    ShareHelper.shareUris(context, listOf(VideoMediaStoreHelper.getItemUri(m.id)))
-                                }
-                                onDismiss()
-                            }
-                        }
-
-                        IconTextRenameButton {
-                            showRenameDialog = true
-                        }
-                        IconTextDeleteButton {
-                            DialogHelper.confirmToDelete {
-                                deleteAction()
-                                onDismiss()
-                            }
-                        }
-                    }
+                    ViewMediaActionButtons(m = m, qrScanResult = qrScanResult,
+                        onShowQrScanResult = { showQrScanResult = true },
+                        onShowRenameDialog = { showRenameDialog = true },
+                        deleteAction = deleteAction, onDismiss = onDismiss)
                 }
                 item {
                     VerticalSpace(dp = 16.dp)
                     Subtitle(text = stringResource(id = R.string.tags))
-                    TagSelector(
-                        data = m.data,
-                        tagsVM = tagsVM!!,
-                        tagsMap = tagsMap!!,
-                        tagsState = tagsState,
-                        onChangedAsync = {
-                            onTagsChangedAsync()
-                        }
-                    )
+                    TagSelector(data = m.data, tagsVM = tagsVM!!, tagsMap = tagsMap!!,
+                        tagsState = tagsState, onChangedAsync = { onTagsChangedAsync() })
                     VerticalSpace(dp = 16.dp)
                 }
             }
-
-            item {
-                PCard {
-                    PListItem(title = m.path, action = {
-                        PIconButton(icon = R.drawable.copy, contentDescription = stringResource(id = R.string.copy_path), click = {
-                            val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.file_path), m.path)
-                            clipboardManager.setPrimaryClip(clip)
-                            DialogHelper.showTextCopiedMessage(m.path)
-                        })
-                    })
-                }
-            }
+            item { ViewMediaPathCard(m = m) }
             item {
                 VerticalSpace(dp = 16.dp)
                 PCard {
@@ -176,7 +105,7 @@ fun ViewMediaBottomSheet(
                     PListItem(title = stringResource(id = R.string.type), value = mimeType)
                     val intrinsicSize = m.intrinsicSize
                     if (intrinsicSize.width > 0 && intrinsicSize.height > 0) {
-                        PListItem(title = stringResource(id = R.string.dimensions), value = "${intrinsicSize.width}×${intrinsicSize.height}")
+                        PListItem(title = stringResource(id = R.string.dimensions), value = "${intrinsicSize.width}\u00d7${intrinsicSize.height}")
                     }
                     if (m.data is DImage) {
                         PListItem(title = stringResource(id = R.string.created_at), value = m.data.createdAt.formatDateTime())
@@ -187,7 +116,6 @@ fun ViewMediaBottomSheet(
                         PListItem(title = stringResource(id = R.string.updated_at), value = m.data.updatedAt.formatDateTime())
                         VideoMetaRows(path = m.path)
                     } else if (m.path.isUrl()) {
-
                     } else if (mimeType.startsWith("image/")) {
                         ImageMetaRows(path = m.path)
                     } else if (mimeType.startsWith("video/")) {
@@ -195,17 +123,11 @@ fun ViewMediaBottomSheet(
                     }
                 }
             }
-            item {
-                BottomSpace()
-            }
+            item { BottomSpace() }
         }
     }
 
     if (showQrScanResult) {
-        QrScanResultBottomSheet(context, qrScanResult) {
-            showQrScanResult = false
-        }
+        QrScanResultBottomSheet(context, qrScanResult) { showQrScanResult = false }
     }
 }
-
-

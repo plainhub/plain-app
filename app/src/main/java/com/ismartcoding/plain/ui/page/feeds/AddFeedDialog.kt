@@ -21,6 +21,8 @@ import com.ismartcoding.plain.ui.base.PDialogTips
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.FeedsViewModel
+import com.ismartcoding.plain.ui.models.add
+import com.ismartcoding.plain.ui.models.fetchChannel
 
 @Composable
 fun AddFeedDialog(feedsVM: FeedsViewModel) {

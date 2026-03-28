@@ -22,6 +22,7 @@ import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.pullrefresh.PullToRefresh
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
+import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState
@@ -39,7 +40,8 @@ fun AppFilesPage(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val previewerState = rememberPreviewerState()
     val files by appFilesVM.itemsFlow.collectAsState()
-    val isLoading = appFilesVM.isLoading.value
+    val isLoading = appFilesVM.showLoading.value
+    val noMore = appFilesVM.noMore.value
 
     val refreshState = rememberRefreshLayoutState {
         scope.launch {
@@ -78,10 +80,16 @@ fun AppFilesPage(
                         navController = navController,
                         files = files,
                         isLoading = isLoading,
+                        noMore = noMore,
                         previewerState = previewerState,
                         onRefresh = {
                             scope.launch {
                                 withIO { appFilesVM.loadAsync() }
+                            }
+                        },
+                        onLoadMore = {
+                            scope.launch {
+                                withIO { appFilesVM.moreAsync() }
                             }
                         },
                     )

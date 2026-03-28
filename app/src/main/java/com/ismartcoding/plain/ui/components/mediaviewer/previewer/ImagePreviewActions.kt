@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.components.mediaviewer.previewer
 
 import android.content.Context
-import android.os.Environment
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,118 +24,63 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import coil3.imageLoader
-import com.ismartcoding.lib.extensions.getFilenameExtension
-import com.ismartcoding.lib.extensions.getFilenameFromPath
-import com.ismartcoding.lib.extensions.isUrl
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DImage
-import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.features.file.DFile
-import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
-import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.helpers.DownloadHelper
-import com.ismartcoding.plain.helpers.FileHelper
-import com.ismartcoding.plain.helpers.PathHelper
-import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PMiniButton
 import com.ismartcoding.plain.ui.base.PMiniOutlineButton
 import com.ismartcoding.plain.ui.page.cast.CastDialog
-import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
 import com.ismartcoding.plain.ui.theme.darkMask
 import com.ismartcoding.plain.ui.theme.lightMask
 import kotlinx.coroutines.launch
-import java.io.File
 
 @Composable
 fun ImagePreviewActions(
     context: Context, castViewModel: CastViewModel,
-    m: PreviewItem, state: MediaPreviewerState
+    m: PreviewItem, state: MediaPreviewerState,
 ) {
     val scope = rememberCoroutineScope()
 
     CastDialog(castViewModel)
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 32.dp)
             .navigationBarsPadding()
-            .alpha(state.uiAlpha.value)
+            .alpha(state.uiAlpha.value),
     ) {
-        if (!state.showActions) {
-            return
-        }
+        if (!state.showActions) return
         if (castViewModel.castMode.value) {
             Row(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
+                modifier = Modifier.align(Alignment.BottomCenter)
                     .clip(RoundedCornerShape(50))
                     .background(MaterialTheme.colorScheme.darkMask())
                     .padding(horizontal = 20.dp, vertical = 8.dp),
             ) {
-                PMiniButton(label = stringResource(id = R.string.cast)) {
-                    castViewModel.cast(m.path)
-                }
+                PMiniButton(label = stringResource(id = R.string.cast)) { castViewModel.cast(m.path) }
                 HorizontalSpace(dp = 20.dp)
-                PMiniOutlineButton(label = stringResource(id = R.string.exit_cast_mode), color = Color.LightGray) {
-                    castViewModel.exitCastMode()
-                }
+                PMiniOutlineButton(label = stringResource(id = R.string.exit_cast_mode), color = Color.LightGray) { castViewModel.exitCastMode() }
             }
             return
         }
         Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
+            modifier = Modifier.align(Alignment.BottomCenter)
                 .clip(RoundedCornerShape(50))
                 .background(MaterialTheme.colorScheme.darkMask())
                 .padding(horizontal = 20.dp, vertical = 8.dp),
         ) {
-            ActionIconButton(
-                icon = R.drawable.share_2,
-                contentDescription = stringResource(R.string.share),
-            ) {
-                if (m.mediaId.isNotEmpty()) {
-                    ShareHelper.shareUris(context, listOf(ImageMediaStoreHelper.getItemUri(m.mediaId)))
-                } else if (m.path.isUrl()) {
-                    scope.launch {
-                        val cachedPath = context.imageLoader
-                            .diskCache?.openSnapshot(m.path)?.data
-                        val tempFile = File.createTempFile("imagePreviewShare", "." + m.path.getFilenameExtension(), File(context.cacheDir, "/image_cache"))
-                        if (cachedPath != null) {
-                            cachedPath.toFile().copyTo(tempFile, true)
-                            ShareHelper.shareFile(context, tempFile, m.getMimeType().ifEmpty { "image/*" })
-                        } else {
-                            DialogHelper.showLoading()
-                            val r = withIO { DownloadHelper.downloadToTempAsync(m.path, tempFile) }
-                            DialogHelper.hideLoading()
-                            if (r.success) {
-                                ShareHelper.shareFile(context, File(r.path), m.getMimeType().ifEmpty { "image/*" })
-                            } else {
-                                DialogHelper.showMessage(r.message)
-                            }
-                        }
-                    }
-                } else {
-                    ShareHelper.shareFile(context, File(m.path), m.getMimeType().ifEmpty { "image/*" })
-                }
+            ActionIconButton(icon = R.drawable.share_2, contentDescription = stringResource(R.string.share)) {
+                scope.launch { sharePreviewImage(context, m) }
             }
             HorizontalSpace(dp = 20.dp)
-            ActionIconButton(
-                icon = R.drawable.cast,
-                contentDescription = stringResource(R.string.cast),
-            ) {
+            ActionIconButton(icon = R.drawable.cast, contentDescription = stringResource(R.string.cast)) {
                 castViewModel.showCastDialog.value = true
             }
             HorizontalSpace(dp = 20.dp)
-            ActionIconButton(
-                icon = R.drawable.rotate_cw_square,
-                contentDescription = stringResource(R.string.rotate),
-            ) {
+            ActionIconButton(icon = R.drawable.rotate_cw_square, contentDescription = stringResource(R.string.rotate)) {
                 scope.launch {
                     state.viewerContainerState?.viewerState?.let {
                         it.rotation.animateTo(it.rotation.value + 90, SpringSpec())
@@ -145,50 +89,12 @@ fun ImagePreviewActions(
             }
             if (m.data !is DImage && m.data !is DFile) {
                 HorizontalSpace(dp = 20.dp)
-                ActionIconButton(
-                    icon = R.drawable.save,
-                    contentDescription = stringResource(R.string.save),
-                ) {
-                    scope.launch {
-                        if (m.path.isUrl()) {
-                            DialogHelper.showLoading()
-                            val cachedPath = context.imageLoader
-                                .diskCache?.openSnapshot(m.path)?.data
-                            if (cachedPath != null) {
-                                val r = withIO { FileHelper.copyFileToPublicDir(cachedPath.toString(), Environment.DIRECTORY_PICTURES, newName = m.path.getFilenameFromPath()) }
-                                DialogHelper.hideLoading()
-                                if (r.isNotEmpty()) {
-                                    DialogHelper.showMessage(LocaleHelper.getStringF(R.string.image_save_to, "path", r))
-                                } else {
-                                    DialogHelper.showMessage(LocaleHelper.getString(R.string.image_save_to_failed))
-                                }
-                                return@launch
-                            }
-                            val dir = PathHelper.getPlainPublicDir(Environment.DIRECTORY_PICTURES)
-                            val r = withIO { DownloadHelper.downloadAsync(m.path, dir.absolutePath) }
-                            DialogHelper.hideLoading()
-                            if (r.success) {
-                                DialogHelper.showConfirmDialog("", LocaleHelper.getStringF(R.string.image_save_to, "path", r.path))
-                            } else {
-                                DialogHelper.showMessage(r.message)
-                            }
-                        } else {
-                            val newName = (m.data as? DMessageFile)?.fileName?.takeIf { it.isNotEmpty() } ?: ""
-                            val r = withIO { FileHelper.copyFileToPublicDir(m.path, Environment.DIRECTORY_PICTURES, newName = newName) }
-                            if (r.isNotEmpty()) {
-                                DialogHelper.showMessage(LocaleHelper.getStringF(R.string.image_save_to, "path", r))
-                            } else {
-                                DialogHelper.showMessage(LocaleHelper.getString(R.string.image_save_to_failed))
-                            }
-                        }
-                    }
+                ActionIconButton(icon = R.drawable.save, contentDescription = stringResource(R.string.save)) {
+                    scope.launch { savePreviewImage(context, m) }
                 }
             }
             HorizontalSpace(dp = 20.dp)
-            ActionIconButton(
-                icon = R.drawable.ellipsis,
-                contentDescription = stringResource(R.string.more_info),
-            ) {
+            ActionIconButton(icon = R.drawable.ellipsis, contentDescription = stringResource(R.string.more_info)) {
                 state.showMediaInfo = true
             }
         }
@@ -198,14 +104,10 @@ fun ImagePreviewActions(
 @Composable
 fun ActionIconButton(icon: Int, contentDescription: String, click: () -> Unit) {
     Box(
-        modifier = Modifier
-            .size(32.dp)
-            .clip(CircleShape)
+        modifier = Modifier.size(32.dp).clip(CircleShape)
             .background(MaterialTheme.colorScheme.lightMask())
-            .clickable {
-                click()
-            },
-        contentAlignment = Alignment.Center
+            .clickable { click() },
+        contentAlignment = Alignment.Center,
     ) {
         Icon(
             modifier = Modifier.size(18.dp),

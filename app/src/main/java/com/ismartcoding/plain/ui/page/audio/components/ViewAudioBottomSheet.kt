@@ -4,32 +4,19 @@ import android.content.ClipData
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.extensions.getMimeType
-import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
-import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.features.media.AudioMediaStoreHelper
-import com.ismartcoding.plain.helpers.ShareHelper
-import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.IconTextDeleteButton
-import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
-import com.ismartcoding.plain.ui.base.IconTextRenameButton
-import com.ismartcoding.plain.ui.base.IconTextRestoreButton
-import com.ismartcoding.plain.ui.base.IconTextSelectButton
-import com.ismartcoding.plain.ui.base.IconTextShareButton
-import com.ismartcoding.plain.ui.base.IconTextTrashButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PListItem
@@ -59,8 +46,6 @@ fun ViewAudioBottomSheet(
         audioVM.selectedItem.value = null
     }
 
-    val scope = rememberCoroutineScope()
-
     if (audioVM.showRenameDialog.value) {
         FileRenameDialog(path = m.path, onDismiss = {
             audioVM.showRenameDialog.value = false
@@ -80,53 +65,14 @@ fun ViewAudioBottomSheet(
                 VerticalSpace(32.dp)
             }
             item {
-                ActionButtons {
-                    if (!audioVM.showSearchBar.value) {
-                        IconTextSelectButton {
-                            dragSelectState.enterSelectMode()
-                            dragSelectState.select(m.id)
-                            onDismiss()
-                        }
-                    }
-                    IconTextShareButton {
-                        ShareHelper.shareUris(context, listOf(AudioMediaStoreHelper.getItemUri(m.id)))
-                        onDismiss()
-                    }
-                    if (!m.path.isUrl()) {
-                        IconTextOpenWithButton {
-                            ShareHelper.openPathWith(context, m.path)
-                        }
-                    }
-                    IconTextRenameButton {
-                        audioVM.showRenameDialog.value = true
-                    }
-                    if (AppFeatureType.MEDIA_TRASH.has()) {
-                        if (audioVM.trash.value) {
-                            IconTextRestoreButton {
-                                audioVM.restore(context, tagsVM, setOf(m.id))
-                                onDismiss()
-                            }
-                            IconTextDeleteButton {
-                                DialogHelper.confirmToDelete {
-                                    audioVM.delete(context, tagsVM, setOf(m.id))
-                                    onDismiss()
-                                }
-                            }
-                        } else {
-                            IconTextTrashButton {
-                                audioVM.trash(context, tagsVM, setOf(m.id))
-                                onDismiss()
-                            }
-                        }
-                    } else {
-                        IconTextDeleteButton {
-                            DialogHelper.confirmToDelete {
-                                audioVM.delete(context, tagsVM, setOf(m.id))
-                                onDismiss()
-                            }
-                        }
-                    }
-                }
+                AudioActionButtons(
+                    m = m,
+                    audioVM = audioVM,
+                    tagsVM = tagsVM,
+                    dragSelectState = dragSelectState,
+                    context = context,
+                    onDismiss = onDismiss,
+                )
             }
             if (!audioVM.trash.value) {
                 item {

@@ -34,6 +34,7 @@ import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.PTopRightButton
 import com.ismartcoding.plain.ui.base.pullrefresh.RefreshContentState
+import com.ismartcoding.plain.ui.base.pullrefresh.setRefreshState
 import com.ismartcoding.plain.ui.base.pullrefresh.rememberRefreshLayoutState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberPreviewerState

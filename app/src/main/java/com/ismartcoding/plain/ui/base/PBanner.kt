@@ -29,7 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ismartcoding.plain.ui.theme.palette.alwaysLight
+import com.ismartcoding.plain.ui.theme.alwaysLight
 
 
 @Composable

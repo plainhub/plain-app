@@ -130,7 +130,7 @@ fun MainNavGraph(
         }
         composable<Routing.PdfViewer> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.PdfViewer>()
-            PdfPage(navController, Uri.parse(r.uri))
+            PdfPage(navController, Uri.parse(r.uri), r.fileName)
         }
         composable<Routing.Files> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.Files>()

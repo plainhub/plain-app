@@ -44,6 +44,7 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.root.components.RootNavigationDrawerContent
 import com.ismartcoding.plain.ui.theme.AppTheme
+import com.ismartcoding.plain.ui.theme.backgroundNormal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -104,7 +105,7 @@ fun Main(
             onDispose { }
         }
 
-        Box(modifier = Modifier.background(MaterialTheme.colorScheme.surface)) {
+        Box(modifier = Modifier.background(MaterialTheme.colorScheme.backgroundNormal)) {
             val drawerState = rememberDrawerState(DrawerValue.Closed)
             val drawerScope = rememberCoroutineScope()
             val onOpenDrawer: () -> Unit = { drawerScope.launch { drawerState.open() } }

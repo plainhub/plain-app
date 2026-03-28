@@ -163,11 +163,18 @@ object ShareHelper {
         context: Context,
         file: File,
         mimeType: String = "",
+        displayName: String = "",
     ) {
+        val fileToShare = if (displayName.isNotEmpty() && displayName != file.name) {
+            val tempDir = File(context.cacheDir, "share_temp").apply { mkdirs() }
+            tempDir.listFiles()?.forEach { it.delete() }
+            File(tempDir, displayName).also { file.copyTo(it, overwrite = true) }
+        } else {
+            file
+        }
         // Check if the file can be accessed by FileProvider
-        if (!isFileAccessibleByProvider(file)) {
-            // Show a message that this system file cannot be shared
-            val errorMessage = if (file.absolutePath.startsWith("/apex/")) {
+        if (!isFileAccessibleByProvider(fileToShare)) {
+            val errorMessage = if (fileToShare.absolutePath.startsWith("/apex/")) {
                 getString(R.string.cannot_share_system_component)
             } else {
                 getString(R.string.cannot_share_system_file)
@@ -175,19 +182,16 @@ object ShareHelper {
             DialogHelper.showErrorMessage(errorMessage)
             return
         }
-        
         try {
             val intent = Intent(Intent.ACTION_SEND)
-            intent.type = resolveShareMimeType(context, file, mimeType)
-            intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, Constants.AUTHORITY, file))
+            intent.type = resolveShareMimeType(context, fileToShare, mimeType)
+            intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, Constants.AUTHORITY, fileToShare))
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             val chooserIntent = Intent.createChooser(intent, getString(R.string.share))
             chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, getExcludeComponentNames(context).toTypedArray())
             context.startActivity(chooserIntent)
         } catch (e: IllegalArgumentException) {
-            // This handles the "Failed to find configured root" error
-            val errorMessage = getString(R.string.cannot_share_file_not_accessible)
-            DialogHelper.showErrorMessage(errorMessage)
+            DialogHelper.showErrorMessage(getString(R.string.cannot_share_file_not_accessible))
         } catch (e: Exception) {
             DialogHelper.showErrorMessage(e.message ?: getString(R.string.unknown_error))
         }

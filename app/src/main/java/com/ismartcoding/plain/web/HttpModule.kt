@@ -32,6 +32,7 @@ import com.ismartcoding.plain.data.DownloadFileItem
 import com.ismartcoding.plain.data.DownloadFileItemWrap
 import com.ismartcoding.plain.data.UploadChunkInfo
 import com.ismartcoding.plain.data.UploadInfo
+import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.enums.PasswordType
@@ -49,6 +50,7 @@ import com.ismartcoding.plain.helpers.Mp4Helper
 import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.helpers.TempHelper
 import com.ismartcoding.plain.helpers.UrlHelper
+import com.ismartcoding.plain.ui.page.appfiles.AppFileDisplayNameHelper
 import com.ismartcoding.plain.preferences.AuthTwoFactorPreference
 import com.ismartcoding.plain.preferences.PasswordPreference
 import com.ismartcoding.plain.preferences.PasswordTypePreference
@@ -348,6 +350,18 @@ object HttpModule {
 
                         DataType.IMAGE.name -> {
                             paths = ImageMediaStoreHelper.searchAsync(context, q, Int.MAX_VALUE, 0, FileSortBy.DATE_DESC).map { DownloadFileItem(it.path, "") }
+                        }
+
+                        DataType.APP_FILE.name -> {
+                            val appFileDao = AppDatabase.instance.appFileDao()
+                            val chatDao = AppDatabase.instance.chatDao()
+                            val ids = q.removePrefix("ids:").split(",").filter { it.isNotEmpty() }
+                            val appFiles = if (ids.isNotEmpty()) appFileDao.getByIds(ids) else appFileDao.getAll()
+                            val nameMap = AppFileDisplayNameHelper.buildNameMap(chatDao.getAll())
+                            paths = appFiles.map { file ->
+                                val displayName = AppFileDisplayNameHelper.resolveDisplayName(file, nameMap)
+                                DownloadFileItem("fid:${file.id}".getFinalPath(context), displayName)
+                            }
                         }
 
                         DataType.FILE.name -> {

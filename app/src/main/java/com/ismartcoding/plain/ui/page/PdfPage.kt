@@ -24,14 +24,16 @@ import com.ismartcoding.plain.ui.base.PdfView
 fun PdfPage(
     navController: NavHostController,
     uri: Uri,
+    fileName: String = "",
 ) {
     val context = LocalContext.current
+    val title = fileName.ifEmpty { uri.getFileName(context) }
 
     PScaffold(
         topBar = {
             PTopAppBar(
                 navController = navController,
-                title = uri.getFileName(context),
+                title = title,
                 actions = {
                     PIconButton(
                         icon = R.drawable.share_2,
@@ -41,7 +43,7 @@ fun PdfPage(
                         if (uri.scheme == "content") {
                             ShareHelper.shareUri(context, uri)
                         } else {
-                            ShareHelper.shareFile(context, uri.toFile())
+                            ShareHelper.shareFile(context, uri.toFile(), displayName = fileName)
                         }
                     }
                 },

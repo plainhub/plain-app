@@ -78,4 +78,13 @@ interface AppFileDao {
 
     @Query("SELECT * FROM files ORDER BY created_at DESC")
     fun getAll(): List<DAppFile>
+
+    @Query("SELECT * FROM files ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
+    fun getPage(limit: Int, offset: Int): List<DAppFile>
+
+    @Query("SELECT COUNT(*) FROM files")
+    fun count(): Int
+
+    @Query("SELECT * FROM files WHERE id IN (:ids)")
+    fun getByIds(ids: List<String>): List<DAppFile>
 }

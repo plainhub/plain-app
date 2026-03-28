@@ -32,6 +32,7 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformImage
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
 import com.ismartcoding.lib.extensions.dp2px
 import com.ismartcoding.plain.ui.models.VAppFile
+import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 
 @Composable
 fun AppFileListItem(
@@ -52,7 +53,7 @@ fun AppFileListItem(
             .padding(horizontal = 16.dp, vertical = 4.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(8.dp),
-        color = MaterialTheme.colorScheme.surface,
+        color = MaterialTheme.colorScheme.cardBackgroundNormal,
         tonalElevation = 1.dp,
     ) {
         Row(

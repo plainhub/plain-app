@@ -4,20 +4,13 @@ import android.content.Context
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPomodoroItem
-import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
-import com.ismartcoding.plain.ui.page.pomodoro.PomodoroHelper
 import com.ismartcoding.plain.helpers.TimeHelper
+import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.ui.page.pomodoro.PomodoroState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -42,7 +35,7 @@ class PomodoroViewModel : ViewModel() {
     var todayRecord = mutableStateOf<DPomodoroItem?>(null)
 
     private val pomodoroDao = AppDatabase.instance.pomodoroItemDao()
-    private var timerJob: Job? = null
+    internal var timerJob: Job? = null
     private var eventHandler: Job? = null
 
     suspend fun loadAsync(context: Context) {
@@ -59,49 +52,18 @@ class PomodoroViewModel : ViewModel() {
         startCountdownTimer()
     }
 
-    private fun startCountdownTimer() {
-        timerJob?.cancel()
-        timerJob = viewModelScope.launch(Dispatchers.IO) {
-            while (isRunning.value && !isPaused.value && timeLeft.intValue > 0) {
-                delay(1000L) // 1 second interval
-                if (isRunning.value && !isPaused.value && timeLeft.intValue > 0) {
-                    timeLeft.intValue--
-                }
-            }
-
-            // When timer reaches zero, send completion event
-            if (isRunning.value && !isPaused.value && timeLeft.intValue <= 0) {
-                val context = MainApp.instance
-                if (settings.value.showNotification) {
-                    PomodoroHelper.showNotificationAsync(context, currentState.value)
-                }
-                try {
-                    PomodoroHelper.playCompletionSound(context, settings.value)
-                } catch (e: Exception) {
-                    LogCat.e("Failed to play Pomodoro sound: ${e.message}")
-                }
-                when (currentState.value) {
-                    PomodoroState.WORK -> handleWorkSessionCompleteAsync(isSkip = false)
-                    PomodoroState.SHORT_BREAK, PomodoroState.LONG_BREAK -> handleBreakSessionComplete()
-                }
-                resetSessionState()
-            }
-        }
-    }
-
     fun pauseSession() {
-        stopTimer()
+        cancelTimer()
         isRunning.value = false
         isPaused.value = true
     }
 
     fun resetTimer() {
-        stopTimer()
+        cancelTimer()
         resetToInitialState()
     }
 
-
-    private fun stopTimer() {
+    internal fun cancelTimer() {
         timerJob?.cancel()
         timerJob = null
     }
@@ -144,37 +106,12 @@ class PomodoroViewModel : ViewModel() {
     }
 
     fun resetSessionState() {
-        stopTimer()
+        cancelTimer()
         isRunning.value = false
         isPaused.value = false
     }
 
-    private suspend fun updateDailyRecord(completedPomodoros: Int, workSeconds: Int) {
-        val today = getCurrentDateString()
-        val record = pomodoroDao.getByDate(today) ?: createNewRecord(today)
-
-        record.apply {
-            this.completedCount = completedPomodoros
-            this.totalWorkSeconds += workSeconds
-            this.updatedAt = TimeHelper.now()
-        }
-        pomodoroDao.update(record)
-
-        // Update local state
-        todayRecord.value = record
-    }
-
-    private fun createNewRecord(date: String): DPomodoroItem {
-        val record = DPomodoroItem().apply {
-            this.date = date
-            this.completedCount = 0
-            this.totalWorkSeconds = 0
-        }
-        pomodoroDao.insert(record)
-        return record
-    }
-
-    private fun getCurrentDateString(): String {
+    internal fun getCurrentDateString(): String {
         return TimeHelper.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
     }
 

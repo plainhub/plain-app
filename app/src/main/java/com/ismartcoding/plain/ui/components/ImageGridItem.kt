@@ -1,29 +1,18 @@
 package com.ismartcoding.plain.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
@@ -37,9 +26,6 @@ import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransf
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.MediaPreviewData
-import com.ismartcoding.plain.ui.theme.darkMask
-import com.ismartcoding.plain.ui.theme.lightMask
-import com.ismartcoding.plain.R
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -101,13 +87,8 @@ fun ImageGridItem(
                 },
             ),
     ) {
-        val imageModifier = Modifier
-            .fillMaxSize()
-            .align(Alignment.Center)
-            .aspectRatio(1f)
-
         TransformImageView(
-            modifier = imageModifier,
+            modifier = Modifier.fillMaxSize().align(Alignment.Center).aspectRatio(1f),
             uri = ImageMediaStoreHelper.getItemUri(m.id),
             path = m.path,
             fileName = m.path.getFilenameFromPath(),
@@ -118,56 +99,19 @@ fun ImageGridItem(
         )
 
         if (selected) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.lightMask())
-                    .aspectRatio(1f)
-            )
+            SelectedOverlay()
         } else if (castVM.castMode.value) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.darkMask())
-                    .aspectRatio(1f)
-            ) {
-                Icon(
-                    modifier =
-                    Modifier
-                        .align(Alignment.Center)
-                        .size(48.dp),
-                    painter = painterResource(R.drawable.cast),
-                    contentDescription = null,
-                    tint = Color.LightGray
-                )
-            }
+            CastModeOverlay()
         }
 
         if (inSelectionMode) {
-            Checkbox(
-                modifier =
-                Modifier
-                    .align(Alignment.TopStart),
-                checked = selected,
-                onCheckedChange = {
-                    dragSelectState.select(m.id)
-                })
+            Box(modifier = Modifier.align(Alignment.TopStart)) {
+                SelectionCheckbox(selected = selected, id = m.id, dragSelectState = dragSelectState)
+            }
         }
         if (showSize) {
-            Box(
-                modifier =
-                Modifier
-                    .align(Alignment.BottomEnd)
-                    .background(MaterialTheme.colorScheme.darkMask()),
-            ) {
-                Text(
-                    modifier =
-                    Modifier
-                        .padding(horizontal = 4.dp, vertical = 2.dp),
-                    text = m.size.formatBytes(),
-                    color = Color.White,
-                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal),
-                )
+            Box(modifier = Modifier.align(Alignment.BottomEnd)) {
+                SizeLabel(text = m.size.formatBytes())
             }
         }
     }

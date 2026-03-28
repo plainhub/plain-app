@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.base.mdeditor
 
-import android.os.Environment
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -14,7 +13,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,22 +22,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.appDir
-import com.ismartcoding.lib.extensions.getFilenameFromPath
-import com.ismartcoding.plain.extensions.newPath
-import com.ismartcoding.lib.extensions.queryOpenableFileName
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.enums.PickFileType
 import com.ismartcoding.plain.events.PickFileEvent
-import com.ismartcoding.plain.events.PickFileResultEvent
-import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.add
 import com.ismartcoding.plain.ui.models.MdEditorViewModel
-import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
 @Composable
@@ -47,41 +37,12 @@ fun MdEditorInsertImageDialog(
     mdEditorVM: MdEditorViewModel,
 ) {
     val context = LocalContext.current
-    var imageUrl by remember { mutableStateOf("") }
+    val imageUrlState = remember { mutableStateOf("") }
+    var imageUrl by imageUrlState
     var description by remember { mutableStateOf("") }
     var width by remember { mutableStateOf("") }
-    val sharedFlow = Channel.sharedFlow
 
-    LaunchedEffect(sharedFlow) {
-        sharedFlow.collect { event ->
-            when (event) {
-                is PickFileResultEvent -> {
-                    if (event.tag != PickFileTag.EDITOR) {
-                        return@collect
-                    }
-                    val uri = event.uris.first()
-                    try {
-                        val fileName = context.contentResolver.queryOpenableFileName(uri)
-                        if (fileName.isNotEmpty()) {
-                            val dst = context.appDir() + "/note-images/" + "/$fileName"
-                            val dstFile = File(dst)
-                            val path =
-                                if (dstFile.exists()) {
-                                    dstFile.newPath()
-                                } else {
-                                    dst
-                                }
-                            FileHelper.copyFile(context, uri, path)
-                            imageUrl = "app://note-images/${path.getFilenameFromPath()}"
-                        }
-                    } catch (ex: Exception) {
-                        // the picked file could be deleted
-                        ex.printStackTrace()
-                    }
-                }
-            }
-        }
-    }
+    PickImageEffect(context = context, imageUrl = imageUrlState)
 
     AlertDialog(
         containerColor = MaterialTheme.colorScheme.surface,

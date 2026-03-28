@@ -6,16 +6,12 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.lib.rss.model.RssChannel
-import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.db.DFeed
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.feed.FeedHelper
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.features.TagHelper
-import com.ismartcoding.plain.workers.FeedFetchWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +26,7 @@ class FeedsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
     var showAddDialog = mutableStateOf(false)
     var showEditDialog = mutableStateOf(false)
     var selectedItem = mutableStateOf<DFeed?>(null)
-    private var editId = mutableStateOf("")
+    internal var editId = mutableStateOf("")
     var editUrl = mutableStateOf("")
     var editName = mutableStateOf("")
     var editFetchContent = mutableStateOf(false)
@@ -53,69 +49,11 @@ class FeedsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
         showLoading.value = false
     }
 
-    fun add() {
-        editUrlError.value = ""
-        viewModelScope.launch(Dispatchers.IO) {
-            val id = FeedHelper.addAsync {
-                this.url = editUrl.value
-                this.name = editName.value
-                this.fetchContent = editFetchContent.value
-            }
-            FeedFetchWorker.oneTimeRequest(id)
-            loadAsync(withCount = true)
-            showAddDialog.value = false
-        }
-    }
-
-    fun fetchChannel() {
-        editUrlError.value = ""
-        if (!editUrl.value.isUrl()) {
-            editUrlError.value = getString(R.string.invalid_url)
-            return
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            if (FeedHelper.getByUrl(editUrl.value) != null) {
-                editUrlError.value = getString(R.string.already_added)
-                return@launch
-            }
-            try {
-                rssChannel.value = FeedHelper.fetchAsync(editUrl.value)
-                rssChannel.value?.let {
-                    editName.value = it.title ?: ""
-                }
-            } catch (e: Exception) {
-                editUrlError.value = e.message ?: getString(R.string.error)
-            }
-        }
-    }
-
     fun updateFetchContent(id: String, value: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             FeedHelper.updateAsync(id) {
                 this.fetchContent = value
             }
-        }
-    }
-
-    fun edit() {
-        editUrlError.value = ""
-        if (!editUrl.value.isUrl()) {
-            editUrlError.value = getString(R.string.invalid_url)
-            return
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            val a = FeedHelper.getByUrl(editUrl.value)
-            if (a != null && a.id != editId.value) {
-                editUrlError.value = getString(R.string.already_added)
-                return@launch
-            }
-            FeedHelper.updateAsync(editId.value) {
-                this.name = editName.value
-                this.url = editUrl.value
-                this.fetchContent = editFetchContent.value
-            }
-            loadAsync(withCount = true)
-            showEditDialog.value = false
         }
     }
 
@@ -133,23 +71,5 @@ class FeedsViewModel(private val savedStateHandle: SavedStateHandle) : ISelectab
                 }
             }
         }
-    }
-
-    fun showAddDialog() {
-        rssChannel.value = null
-        editUrlError.value = ""
-        editUrl.value = ""
-        editName.value = ""
-        editFetchContent.value = false
-        showAddDialog.value = true
-    }
-
-    fun showEditDialog(item: DFeed) {
-        editUrlError.value = ""
-        editId.value = item.id
-        editUrl.value = item.url
-        editName.value = item.name
-        editFetchContent.value = item.fetchContent
-        showEditDialog.value = true
     }
 }

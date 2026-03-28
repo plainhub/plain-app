@@ -27,6 +27,7 @@ import com.ismartcoding.plain.ui.base.PSelectionChip
 import com.ismartcoding.plain.ui.components.NewTagButton
 import com.ismartcoding.plain.ui.components.TagNameDialog
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.models.toggleTagAsync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

@@ -18,6 +18,7 @@ import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.db.DTagRelation
 import com.ismartcoding.plain.ui.base.PSelectionChip
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.models.toggleTagAsync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.page.files
 
 import android.content.ClipData
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
@@ -19,19 +18,11 @@ import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.getMimeType
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
-import com.ismartcoding.plain.data.DFavoriteFolder
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
-import com.ismartcoding.plain.ui.base.ActionButtons
+import com.ismartcoding.plain.data.DFavoriteFolder
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.IconTextDeleteButton
-import com.ismartcoding.plain.ui.base.IconTextFavoriteButton
-import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
-import com.ismartcoding.plain.ui.base.IconTextRenameButton
-import com.ismartcoding.plain.ui.base.IconTextSelectButton
-import com.ismartcoding.plain.ui.base.IconTextShareButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PListItem
@@ -40,24 +31,17 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.FileRenameDialog
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.FilesViewModel
-import com.ismartcoding.plain.ui.models.enterSelectMode
-import com.ismartcoding.plain.ui.models.select
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FileInfoBottomSheet(
-    filesVM: FilesViewModel
-) {
+fun FileInfoBottomSheet(filesVM: FilesViewModel) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val file = filesVM.selectedFile.value ?: return
     var isFavorite by remember { mutableStateOf(false) }
-    
-    val onDismiss = {
-        filesVM.selectedFile.value = null
-    }
+    val onDismiss = { filesVM.selectedFile.value = null }
 
     LaunchedEffect(file.path) {
         if (file.isDir) {
@@ -76,66 +60,26 @@ fun FileInfoBottomSheet(
         })
     }
 
-    PModalBottomSheet(
-        onDismissRequest = {
-            onDismiss()
-        },
-    ) {
+    PModalBottomSheet(onDismissRequest = { onDismiss() }) {
         LazyColumn {
+            item { VerticalSpace(32.dp) }
             item {
-                VerticalSpace(32.dp)
-            }
-            item {
-                ActionButtons {
-                    if (!filesVM.showSearchBar.value) {
-                        IconTextSelectButton {
-                            filesVM.enterSelectMode()
-                            filesVM.select(file.path)
-                            onDismiss()
-                        }
-                    }
-
-                    if (file.isDir) {
-                        IconTextFavoriteButton(
-                            isFavorite = isFavorite
-                        ) {
-                            scope.launch(Dispatchers.IO) {
-                                if (isFavorite) {
-                                    FavoriteFoldersPreference.removeAsync(context, file.path)
-                                    isFavorite = false
-                                } else {
-                                    FavoriteFoldersPreference.addAsync(
-                                        context,
-                                        DFavoriteFolder(
-                                            rootPath = filesVM.rootPath,
-                                            fullPath = file.path
-                                        )
-                                    )
-                                    isFavorite = true
-                                }
+                FileInfoActionButtons(
+                    file = file, filesVM = filesVM, isFavorite = isFavorite,
+                    onFavoriteToggle = {
+                        scope.launch(Dispatchers.IO) {
+                            if (isFavorite) {
+                                FavoriteFoldersPreference.removeAsync(context, file.path)
+                                isFavorite = false
+                            } else {
+                                FavoriteFoldersPreference.addAsync(context, DFavoriteFolder(rootPath = filesVM.rootPath, fullPath = file.path))
+                                isFavorite = true
                             }
                         }
-                    }
-
-                    IconTextShareButton {
-                        ShareHelper.sharePaths(context, setOf(file.path))
-                        onDismiss()
-                    }
-                    if (!file.isDir) {
-                        IconTextOpenWithButton {
-                            ShareHelper.openPathWith(context, file.path)
-                        }
-                    }
-                    IconTextRenameButton {
-                        filesVM.showRenameDialog.value = true
-                    }
-                    IconTextDeleteButton {
-                        DialogHelper.confirmToDelete {
-                            filesVM.deleteFiles(setOf(file.path))
-                            onDismiss()
-                        }
-                    }
-                }
+                    },
+                    showRenameDialog = filesVM.showRenameDialog,
+                    context = context, scope = scope, onDismiss = onDismiss,
+                )
                 VerticalSpace(dp = 24.dp)
                 PCard {
                     PListItem(title = file.path, action = {
@@ -159,9 +103,7 @@ fun FileInfoBottomSheet(
                     }
                 }
             }
-            item {
-                BottomSpace()
-            }
+            item { BottomSpace() }
         }
     }
-} 
+}

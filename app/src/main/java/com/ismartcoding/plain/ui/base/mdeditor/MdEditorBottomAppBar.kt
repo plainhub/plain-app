@@ -29,8 +29,10 @@ import com.ismartcoding.plain.ui.components.ColorPickerDialog
 import com.ismartcoding.plain.ui.extensions.inlineWrap
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.MdEditorViewModel
-import com.ismartcoding.plain.ui.theme.bottomAppBarContainer
-import com.ismartcoding.plain.ui.theme.palette.checkColorHex
+import com.ismartcoding.plain.ui.models.mdAccessoryItems
+import com.ismartcoding.plain.ui.models.mdAccessoryItems2
+import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
+import com.ismartcoding.plain.ui.theme.checkColorHex
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
 @Composable
@@ -66,7 +68,7 @@ fun MdEditorBottomAppBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(56.dp)
-            .background(MaterialTheme.colorScheme.bottomAppBarContainer()),
+            .background(MaterialTheme.colorScheme.cardBackgroundNormal),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (mdEditorVM.level == 0) {
@@ -76,7 +78,7 @@ fun MdEditorBottomAppBar(
                     .weight(1f)
                     .horizontalScroll(scrollState),
             ) {
-                MdEditorViewModel.mdAccessoryItems.forEach { button ->
+                mdAccessoryItems.forEach { button ->
                     TextButton(onClick = {
                         mdEditorVM.textFieldState.edit { inlineWrap(button.before, button.after) }
                     }) {
@@ -91,7 +93,7 @@ fun MdEditorBottomAppBar(
                     .weight(1f)
                     .horizontalScroll(scrollState2),
             ) {
-                MdEditorViewModel.mdAccessoryItems2.forEach { button ->
+                mdAccessoryItems2.forEach { button ->
                     PIconButton(
                         icon = button.icon,
                         contentDescription = "",
