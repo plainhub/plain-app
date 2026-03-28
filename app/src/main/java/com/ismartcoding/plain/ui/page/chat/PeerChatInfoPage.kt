@@ -28,6 +28,7 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChatType
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
+import com.ismartcoding.plain.ui.models.clearAllMessages
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

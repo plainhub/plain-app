@@ -75,4 +75,7 @@ interface AppFileDao {
 
     @Update
     fun update(file: DAppFile)
+
+    @Query("SELECT * FROM files ORDER BY created_at DESC")
+    fun getAll(): List<DAppFile>
 }

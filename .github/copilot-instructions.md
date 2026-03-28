@@ -9,6 +9,7 @@
 - **Coroutines** — Use `coIO`, `coMain` from `lib/helpers/CoroutinesHelper.kt` for side effects.
 - **State** — `MutableStateFlow` in ViewModels, collected by Compose.
 - **Short paths** — `app/.../plain/` = `app/src/main/java/com/ismartcoding/plain/`, `lib/.../lib/` = `lib/src/main/java/com/ismartcoding/lib/`
+- **Max 150 lines per file** — Split into smaller files when a file reaches 150 lines. It is strictly forbidden to reduce line count by removing blank lines or whitespace — every split must be a genuine logical decomposition.
 
 ## Naming Conventions
 

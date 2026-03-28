@@ -2,28 +2,22 @@ package com.ismartcoding.plain.ui.page.root.topbars
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.ui.base.ActionButtonAddWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonDrawer
 import com.ismartcoding.plain.ui.base.ActionButtonFolders
-import com.ismartcoding.plain.ui.base.PDropdownMenu
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
-import com.ismartcoding.plain.ui.base.PIcon
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.ui.nav.navigateFiles
+import com.ismartcoding.plain.ui.nav.navigateAppFiles
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +26,6 @@ fun TopBarChat(
     channelVM: ChannelViewModel,
     onOpenDrawer: () -> Unit,
 ) {
-    val context = LocalContext.current
     val showMenu = remember { mutableStateOf(false) }
 
     PTopAppBar(
@@ -43,7 +36,7 @@ fun TopBarChat(
         title = stringResource(R.string.chat),
         actions = {
             ActionButtonFolders {
-                navController.navigateFiles(FileSystemHelper.getExternalFilesDirPath(context))
+                navController.navigateAppFiles()
             }
             ActionButtonAddWithMenu { dismiss ->
                 PDropdownMenuItem(

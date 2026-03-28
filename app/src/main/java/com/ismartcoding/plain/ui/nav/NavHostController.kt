@@ -46,3 +46,9 @@ fun NavHostController.navigateFiles(folderPath: String = "") {
         launchSingleTop = true
     }
 }
+
+fun NavHostController.navigateAppFiles() {
+    navigate(Routing.AppFiles) {
+        launchSingleTop = true
+    }
+}

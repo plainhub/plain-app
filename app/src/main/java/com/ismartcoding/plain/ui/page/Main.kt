@@ -1,21 +1,12 @@
 package com.ismartcoding.plain.ui.page
 
 import android.app.Activity
-import android.net.Uri
 import android.view.WindowManager
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Composable
@@ -27,92 +18,35 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
-import com.ismartcoding.lib.channel.Channel
-import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isGestureInteractionMode
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.isQPlus
-import com.ismartcoding.plain.db.AppDatabase
-import com.ismartcoding.plain.db.ChatItemDataUpdate
-import com.ismartcoding.plain.db.DMessageContent
-import com.ismartcoding.plain.db.DMessageText
-import com.ismartcoding.plain.db.DMessageType
-import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.events.AudioActionEvent
 import com.ismartcoding.plain.events.ConfirmDialogEvent
-import com.ismartcoding.plain.events.EventType
-import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
-import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.LoadingDialogEvent
-import com.ismartcoding.plain.events.WebSocketEvent
-import com.ismartcoding.plain.chat.ChatDbHelper
-import com.ismartcoding.plain.events.ChannelUpdatedEvent
-import com.ismartcoding.plain.features.LinkPreviewHelper
 import com.ismartcoding.plain.preferences.LocalDarkTheme
-import com.ismartcoding.plain.ui.base.PToast
+import com.ismartcoding.plain.ui.base.LocalOpenDrawer
 import com.ismartcoding.plain.ui.base.ToastEvent
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
-import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.NotesViewModel
+import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.ui.page.apps.AppPage
-import com.ismartcoding.plain.ui.page.chat.ChatEditTextPage
-import com.ismartcoding.plain.ui.page.chat.ChatInfoPage
-import com.ismartcoding.plain.ui.page.chat.ChatPage
-import com.ismartcoding.plain.ui.page.chat.ChatTextPage
-import com.ismartcoding.plain.ui.page.feeds.FeedEntriesPage
-import com.ismartcoding.plain.ui.page.feeds.FeedEntryPage
-import com.ismartcoding.plain.ui.page.feeds.FeedSettingsPage
-import com.ismartcoding.plain.ui.page.feeds.FeedsPage
-import com.ismartcoding.plain.ui.page.chat.NearbyPage
-import com.ismartcoding.plain.ui.page.files.FilesPage
-import com.ismartcoding.plain.ui.page.notes.NotePage
-import com.ismartcoding.plain.ui.page.feeds.FeedsPage
-import com.ismartcoding.plain.ui.base.LocalOpenDrawer
-import com.ismartcoding.plain.ui.page.root.RootPage
 import com.ismartcoding.plain.ui.page.root.components.RootNavigationDrawerContent
-import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
-import com.ismartcoding.plain.ui.page.scan.ScanPage
-import com.ismartcoding.plain.ui.page.settings.AboutPage
-import com.ismartcoding.plain.ui.page.settings.BackupRestorePage
-import com.ismartcoding.plain.ui.page.settings.DarkThemePage
-import com.ismartcoding.plain.ui.page.settings.LanguagePage
-import com.ismartcoding.plain.ui.page.settings.SettingsPage
-import com.ismartcoding.plain.ui.page.web.NotificationSettingsPage
-import com.ismartcoding.plain.ui.page.web.SessionsPage
-import com.ismartcoding.plain.ui.page.web.WebDevPage
-import com.ismartcoding.plain.ui.page.web.WebLearnMorePage
-import com.ismartcoding.plain.ui.page.web.WebSecurityPage
-import com.ismartcoding.plain.ui.page.web.WebSettingsPage
 import com.ismartcoding.plain.ui.theme.AppTheme
-import com.ismartcoding.plain.web.models.toModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Main(
     navControllerState: MutableState<NavHostController?>,
@@ -126,7 +60,6 @@ fun Main(
     notesVM: NotesViewModel = viewModel(key = "notesVM"),
     feedTagsVM: TagsViewModel = viewModel(key = "feedTagsVM"),
     noteTagsVM: TagsViewModel = viewModel(key = "noteTagsVM"),
-
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -134,137 +67,29 @@ fun Main(
     navControllerState.value = navController
     val useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current)
     val view = LocalView.current
-    var confirmDialogEvent by remember {
-        mutableStateOf<ConfirmDialogEvent?>(null)
-    }
-    var loadingDialogEvent by remember {
-        mutableStateOf<LoadingDialogEvent?>(null)
-    }
-    // Keep screen on while a loading dialog is visible so long-running operations
-    // (backup, restore, etc.) don't let the screen turn off mid-operation.
+
+    var confirmDialogEvent by remember { mutableStateOf<ConfirmDialogEvent?>(null) }
+    var loadingDialogEvent by remember { mutableStateOf<LoadingDialogEvent?>(null) }
+    var toastState by remember { mutableStateOf<ToastEvent?>(null) }
+
     val activity = context as? Activity
     LaunchedEffect(loadingDialogEvent) {
-        if (loadingDialogEvent != null) {
-            activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        } else {
-            activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
+        if (loadingDialogEvent != null) activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        else activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
-    var toastState by remember {
-        mutableStateOf<ToastEvent?>(null)
-    }
-    var dismissToastJob: Job? = null
-
-    val sharedFlow = Channel.sharedFlow
 
     LaunchedEffect(Unit) {
         onLaunched()
-        scope.launch(Dispatchers.IO) {
-            pomodoroVM.loadAsync(context)
-        }
+        scope.launch(Dispatchers.IO) { pomodoroVM.loadAsync(context) }
     }
-    LaunchedEffect(sharedFlow) {
-        sharedFlow.collect { event ->
-            when (event) {
-                is AudioActionEvent -> {
-                    if (event.action == AudioAction.MEDIA_ITEM_TRANSITION) {
-                        scope.launch(Dispatchers.IO) {
-                            audioPlaylistVM.loadAsync(context)
-                        }
-                    }
-                }
-                is ConfirmDialogEvent -> {
-                    confirmDialogEvent = event
-                }
 
-                is LoadingDialogEvent -> {
-                    loadingDialogEvent = if (event.show) event else null
-                }
-
-                is ToastEvent -> {
-                    toastState = event
-                    dismissToastJob?.cancel()
-                    dismissToastJob = coIO {
-                        delay(event.duration)
-                        toastState = null
-                    }
-                }
-
-                is FetchLinkPreviewsEvent -> {
-                    scope.launch(Dispatchers.IO) {
-                        val data = event.chat.content.value as DMessageText
-                        val urls = LinkPreviewHelper.extractUrls(data.text)
-                        if (urls.isNotEmpty()) {
-                            val links = ChatDbHelper.fetchLinkPreviewsAsync(context, urls).filter { !it.hasError }
-                            if (links.isNotEmpty()) {
-                                val updatedMessageText = DMessageText(data.text, links)
-                                event.chat.content = DMessageContent(DMessageType.TEXT.value, updatedMessageText)
-                                AppDatabase.instance.chatDao().updateData(
-                                    ChatItemDataUpdate(
-                                        event.chat.id,
-                                        event.chat.content
-                                    )
-                                )
-                                chatVM.update(event.chat)
-                                val m = event.chat.toModel()
-                                m.data = m.getContentData()
-                                sendEvent(
-                                    WebSocketEvent(
-                                        EventType.MESSAGE_UPDATED,
-                                        JsonHelper.jsonEncode(
-                                            listOf(m)
-                                        ),
-                                    ),
-                                )
-                            }
-                        }
-                    }
-                }
-
-                is HttpApiEvents.PomodoroStartEvent -> {
-                    pomodoroVM.timeLeft.intValue = event.timeLeft
-                    pomodoroVM.startSession()
-                }
-
-                is HttpApiEvents.PomodoroPauseEvent -> {
-                    pomodoroVM.pauseSession()
-                }
-
-                is HttpApiEvents.PomodoroStopEvent -> {
-                    pomodoroVM.resetTimer()
-                }
-
-                is HttpApiEvents.DownloadTaskDoneEvent -> {
-                    scope.launch(Dispatchers.IO) {
-                        val messageId = event.downloadTask.messageId
-                        val chat = AppDatabase.instance.chatDao().getById(messageId)
-                        if (chat != null) {
-                            chatVM.update(chat)
-                            val m = chat.toModel()
-                            m.data = m.getContentData()
-                            sendEvent(
-                                WebSocketEvent(
-                                    EventType.MESSAGE_UPDATED,
-                                    JsonHelper.jsonEncode(listOf(m)),
-                                ),
-                            )
-                        }
-                    }
-                }
-
-                is ChannelUpdatedEvent -> {
-                    // ChannelViewModel and ChatViewModel each self-refresh via their own
-                    // ChannelUpdatedEvent listeners. Main.kt only needs to refresh the peer
-                    // list so that the latest-chat preview cache stays accurate.
-                    peerVM.loadPeers()
-                }
-
-                else -> {
-                    // Handle other events if necessary
-                }
-            }
-        }
-    }
+    MainEventCollector(
+        scope, context, chatVM, audioPlaylistVM, pomodoroVM, peerVM,
+        onConfirmDialog = { confirmDialogEvent = it },
+        onLoadingDialog = { loadingDialogEvent = if (it.show) it else null },
+        onToast = { toastState = it },
+        clearToast = { toastState = null },
+    )
 
     AppTheme(useDarkTheme = useDarkTheme) {
         DisposableEffect(useDarkTheme) {
@@ -273,7 +98,6 @@ fun Main(
                 isAppearanceLightStatusBars = !useDarkTheme
                 isAppearanceLightNavigationBars = !useDarkTheme
             }
-
             if (isQPlus() && context.isGestureInteractionMode()) {
                 window.isNavigationBarContrastEnforced = false
             }
@@ -296,165 +120,18 @@ fun Main(
                             onCloseDrawer()
                             mainVM.currentRootTab = tab
                             if (navController.currentDestination?.route != Routing.Root::class.qualifiedName) {
-                                navController.navigate(Routing.Root) {
-                                    popUpTo(Routing.Root) { inclusive = true }
-                                }
+                                navController.navigate(Routing.Root) { popUpTo(Routing.Root) { inclusive = true } }
                             }
                         },
                     )
                 },
             ) {
-            CompositionLocalProvider(LocalOpenDrawer provides onOpenDrawer) {
-            NavHost(
-                modifier = Modifier.background(MaterialTheme.colorScheme.surface),
-                navController = navController,
-                startDestination = Routing.Root,
-            ) {
-                composable<Routing.Root> { RootPage(navController, mainVM, audioPlaylistVM = audioPlaylistVM, notesVM = notesVM, noteTagsVM = noteTagsVM, feedTagsVM = feedTagsVM, pomodoroVM = pomodoroVM) }
-                composable<Routing.Settings> { SettingsPage(navController) }
-                composable<Routing.DarkTheme> { DarkThemePage(navController) }
-                composable<Routing.Language> { LanguagePage(navController) }
-                composable<Routing.BackupRestore> { BackupRestorePage(navController) }
-                composable<Routing.About> { AboutPage(navController) }
-                composable<Routing.WebSettings> { WebSettingsPage(navController, mainVM) }
-                composable<Routing.NotificationSettings> { NotificationSettingsPage(navController) }
-                composable<Routing.Sessions> { SessionsPage(navController) }
-                composable<Routing.WebDev> { WebDevPage(navController) }
-                composable<Routing.WebSecurity> { WebSecurityPage(navController) }
-                composable<Routing.Chat> { backStackEntry ->
-                    val r = backStackEntry.toRoute<Routing.Chat>()
-                    ChatPage(navController, audioPlaylistVM = audioPlaylistVM, chatVM = chatVM, peerVM = peerVM, channelVM = channelVM, r.id)
-                }
-                composable<Routing.ChatInfo> {
-                    ChatInfoPage(navController, chatVM = chatVM, peerVM = peerVM, channelVM = channelVM)
-                }
-                composable<Routing.ScanHistory> { ScanHistoryPage(navController) }
-                composable<Routing.Scan> { ScanPage(navController) }
-                composable<Routing.Feeds> { FeedsPage(navController) }
-                composable<Routing.FeedSettings> { FeedSettingsPage(navController) }
-                composable<Routing.WebLearnMore> { WebLearnMorePage(navController) }
-                composable<Routing.AppDetails> { backStackEntry ->
-                    val r = backStackEntry.toRoute<Routing.AppDetails>()
-                    AppPage(navController, r.id)
-                }
-
-                composable<Routing.FeedEntries> { backStackEntry ->
-                    val r = backStackEntry.toRoute<Routing.FeedEntries>()
-                    FeedEntriesPage(navController, r.feedId, tagsVM = feedTagsVM)
-                }
-
-                composable<Routing.FeedEntry> { backStackEntry ->
-                    val r = backStackEntry.toRoute<Routing.FeedEntry>()
-                    FeedEntryPage(navController, r.id, tagsVM = feedTagsVM)
-                }
-
-                composable<Routing.NotesCreate> { backStackEntry ->
-                    val r = backStackEntry.toRoute<Routing.NotesCreate>()
-                    NotePage(navController, "", r.tagId, notesVM = notesVM, tagsVM = noteTagsVM)
-                }
-
-                composable<Routing.NoteDetail> { backStackEntry ->
-                    val r = backStackEntry.toRoute<Routing.NoteDetail>()
-                    NotePage(navController, r.id, "", notesVM = notesVM, tagsVM = noteTagsVM)
-                }
-
-                composable<Routing.Text> { backStackEntry ->
-                    val r = backStackEntry.toRoute<Routing.Text>()
-                    TextPage(navController, r.title, r.content, r.language)
-                }
-
-                composable<Routing.TextFile> { backStackEntry ->
-                    val r = backStackEntry.toRoute<Routing.TextFile>()
-                    TextFilePage(navController, r.path, r.title, r.mediaId, r.type)
-                }
-
-                composable<Routing.ChatText> { backStackEntry ->
-                    val r = backStackEntry.toRoute<Routing.ChatText>()
-                    ChatTextPage(navController, r.content)
-                }
-
-                composable<Routing.ChatEditText> { backStackEntry ->
-                    val r = backStackEntry.toRoute<Routing.ChatEditText>()
-                    ChatEditTextPage(navController, r.id, r.content, chatVM)
-                }
-
-                composable<Routing.OtherFile> { backStackEntry ->
-                    val r = backStackEntry.toRoute<Routing.OtherFile>()
-                    OtherFilePage(navController, r.path, r.title)
-                }
-
-                composable<Routing.PdfViewer> { backStackEntry ->
-                    val r = backStackEntry.toRoute<Routing.PdfViewer>()
-                    PdfPage(navController, Uri.parse(r.uri))
-                }
-
-                composable<Routing.Files> { backStackEntry ->
-                    val r = backStackEntry.toRoute<Routing.Files>()
-                    FilesPage(navController, audioPlaylistVM, r.folderPath, onOpenDrawer = onOpenDrawer)
-                }
-                
-                composable<Routing.Nearby> { backStackEntry ->
-                    val r = backStackEntry.toRoute<Routing.Nearby>()
-                    NearbyPage(navController, pairDeviceJson = r.pairDeviceJson)
-                }
-            }
-            } // CompositionLocalProvider
-            } // ModalNavigationDrawer
-
-            loadingDialogEvent?.let {
-                Dialog(
-                    onDismissRequest = { },
-                    properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .background(MaterialTheme.colorScheme.background, shape = RoundedCornerShape(8.dp)),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                    }
+                CompositionLocalProvider(LocalOpenDrawer provides onOpenDrawer) {
+                    MainNavGraph(navController, mainVM, audioPlaylistVM, chatVM, peerVM, channelVM, notesVM, feedTagsVM, noteTagsVM, pomodoroVM, onOpenDrawer)
                 }
             }
 
-            confirmDialogEvent?.let {
-                AlertDialog(
-                    onDismissRequest = { confirmDialogEvent = null },
-                    title = { if (it.title.isNotEmpty()) Text(it.title) },
-                    text = { Text(it.message) },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                it.confirmButton.second()
-                                confirmDialogEvent = null
-                            }
-                        ) {
-                            Text(it.confirmButton.first)
-                        }
-                    },
-                    dismissButton = {
-                        if (it.dismissButton != null) {
-                            TextButton(onClick = {
-                                it.dismissButton.second()
-                                confirmDialogEvent = null
-                            }) {
-                                Text(it.dismissButton.first)
-                            }
-                        }
-                    }
-                )
-            }
-
-            toastState?.let { event ->
-                PToast(
-                    message = event.message,
-                    type = event.type,
-                    onDismiss = {
-                        toastState = null
-                        dismissToastJob?.cancel()
-                    }
-                )
-            }
+            MainDialogs(loadingDialogEvent, confirmDialogEvent, { confirmDialogEvent = null }, toastState, { toastState = null })
         }
     }
 }

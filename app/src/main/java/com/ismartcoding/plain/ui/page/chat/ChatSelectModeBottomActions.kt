@@ -8,6 +8,7 @@ import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonDelete
 import com.ismartcoding.plain.ui.base.PBottomAppBar
 import com.ismartcoding.plain.ui.models.ChatViewModel
+import com.ismartcoding.plain.ui.models.delete
 import com.ismartcoding.plain.ui.models.exitSelectMode
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)

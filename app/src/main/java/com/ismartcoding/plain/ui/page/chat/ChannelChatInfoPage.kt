@@ -65,6 +65,7 @@ import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
+import com.ismartcoding.plain.ui.models.clearAllMessages
 import com.ismartcoding.plain.ui.page.chat.components.ChannelMembersDialog
 import com.ismartcoding.plain.ui.page.chat.components.RenameChannelDialog
 import kotlinx.coroutines.Dispatchers

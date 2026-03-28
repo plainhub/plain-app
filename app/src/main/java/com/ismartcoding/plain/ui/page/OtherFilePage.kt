@@ -13,6 +13,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -23,14 +28,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.formatBytes
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.PBlockButton
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.page.appfiles.AppFileDisplayNameHelper
 import java.io.File
 
 @SuppressLint("MissingPermission")
@@ -43,12 +49,17 @@ fun OtherFilePage(
 ) {
     val context = LocalContext.current
     val file = File(path)
+    var displayTitle by remember(path, title) { mutableStateOf(title.ifEmpty { file.name }) }
+
+    LaunchedEffect(path, title) {
+        displayTitle = withIO { AppFileDisplayNameHelper.resolveDisplayNameByPath(path, title) }
+    }
 
     PScaffold(
         topBar = {
             PTopAppBar(
                 navController = navController,
-                title = title.ifEmpty { file.name },
+                title = displayTitle,
                 actions = {
                     PIconButton(
                         icon = R.drawable.share_2,
@@ -79,7 +90,7 @@ fun OtherFilePage(
                         )
                         SelectionContainer {
                             Text(
-                                text = title.ifEmpty { file.name },
+                                text = displayTitle,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
                                     .padding(horizontal = 32.dp),
