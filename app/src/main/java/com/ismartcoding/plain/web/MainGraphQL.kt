@@ -27,6 +27,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
+import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.isRPlus
 import com.ismartcoding.lib.logcat.LogCat
@@ -159,6 +160,9 @@ import com.ismartcoding.plain.web.models.AppFile
 import com.ismartcoding.plain.ui.page.appfiles.AppFileDisplayNameHelper
 import com.ismartcoding.plain.web.models.toExportModel
 import com.ismartcoding.plain.web.models.toModel
+import com.ismartcoding.plain.ai.ImageSearchManager
+import com.ismartcoding.plain.ai.ImageSearchIndexer
+import com.ismartcoding.plain.web.models.buildImageSearchStatus
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -289,8 +293,20 @@ class MainGraphQL(val schema: Schema) {
                     resolver { offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
                         val context = MainApp.instance
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-                        ImageMediaStoreHelper.searchAsync(context, query, limit, offset, sortBy).map {
-                            it.toModel()
+                        val fields = SearchHelper.parse(query)
+                        val textField = fields.find { it.name == "text" }
+                        if (ImageSearchManager.isModelReady() && textField != null && textField.value.isNotBlank()) {
+                            val results = ImageSearchManager.search(textField.value, 500)
+                            val semanticIds = results.map { it.imageId }
+                            val otherQuery = fields.filter { it.name != "text" }
+                                .joinToString(" ") { "${it.name}:${it.value}" }
+                            val allImages = ImageMediaStoreHelper.searchAsync(context, otherQuery, Int.MAX_VALUE, 0, sortBy)
+                            val imageMap = allImages.associateBy { it.id }
+                            semanticIds.mapNotNull { imageMap[it] }
+                                .drop(offset).take(limit)
+                                .map { it.toModel() }
+                        } else {
+                            ImageMediaStoreHelper.searchAsync(context, query, limit, offset, sortBy).map { it.toModel() }
                         }
                     }
                     type<Image> {
@@ -306,12 +322,27 @@ class MainGraphQL(val schema: Schema) {
                     resolver { query: String ->
                         val context = MainApp.instance
                         if (Permission.WRITE_EXTERNAL_STORAGE.enabledAndCanAsync(context)) {
-                            ImageMediaStoreHelper.countAsync(context, query)
+                            val fields = SearchHelper.parse(query)
+                            val textField = fields.find { it.name == "text" }
+                            if (ImageSearchManager.isModelReady() && textField != null && textField.value.isNotBlank()) {
+                                val results = ImageSearchManager.search(textField.value, 500)
+                                val semanticIds = results.map { it.imageId }.toSet()
+                                val otherQuery = fields.filter { it.name != "text" }
+                                    .joinToString(" ") { "${it.name}:${it.value}" }
+                                val allImages = ImageMediaStoreHelper.searchAsync(context, otherQuery, Int.MAX_VALUE, 0, FileSortBy.DATE_DESC)
+                                allImages.count { it.id in semanticIds }
+                            } else {
+                                ImageMediaStoreHelper.countAsync(context, query)
+                            }
                         } else {
                             0
                         }
                     }
                 }
+                query("imageSearchStatus") {
+                    resolver { -> buildImageSearchStatus() }
+                }
+                type<com.ismartcoding.plain.web.models.ImageSearchStatus> {}
                 query("mediaBuckets") {
                     resolver { type: DataType ->
                         val context = MainApp.instance
@@ -1001,6 +1032,31 @@ class MainGraphQL(val schema: Schema) {
                         coIO {
                             AppHelper.relaunch(MainApp.instance)
                         }
+                        true
+                    }
+                }
+                // Image Search mutations
+                mutation("enableImageSearch") {
+                    resolver { ->
+                        coIO { ImageSearchManager.enable() }
+                        true
+                    }
+                }
+                mutation("disableImageSearch") {
+                    resolver { ->
+                        coIO { ImageSearchManager.disable() }
+                        true
+                    }
+                }
+                mutation("startImageIndex") {
+                    resolver { force: Boolean? ->
+                        coIO { ImageSearchIndexer.start(force == true) }
+                        true
+                    }
+                }
+                mutation("cancelImageIndex") {
+                    resolver { ->
+                        ImageSearchIndexer.cancel()
                         true
                     }
                 }

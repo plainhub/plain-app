@@ -5,11 +5,13 @@
 ## Key Rules
 
 - **No DI framework** — Use companion objects, singletons, `SystemServices.kt`. Never add Hilt/Dagger.
+- **No ONNX** — Never use ONNX or ONNX Runtime. Use `ai-edge-torch` (PyTorch → TFLite) for model conversion. Runtime uses LiteRT only.
+- **No Docker** — All scripts must run directly via `python3` / `pip`. Never use Docker for build or conversion steps.
 - **Event bus** — `sendEvent()` / `receiveEvent<T>` from `lib/channel/`. Use for cross-component communication.
 - **Coroutines** — Use `coIO`, `coMain` from `lib/helpers/CoroutinesHelper.kt` for side effects.
 - **State** — `MutableStateFlow` in ViewModels, collected by Compose.
 - **Short paths** — `app/.../plain/` = `app/src/main/java/com/ismartcoding/plain/`, `lib/.../lib/` = `lib/src/main/java/com/ismartcoding/lib/`
-- **Max 150 lines per file** — Split into smaller files when a file reaches 150 lines. It is strictly forbidden to reduce line count by removing blank lines or whitespace — every split must be a genuine logical decomposition.
+- **Max 200 lines per file** — Split into smaller files when a file reaches 200 lines. It is strictly forbidden to reduce line count by removing blank lines or whitespace — every split must be a genuine logical decomposition.
 
 ## Naming Conventions
 

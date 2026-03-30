@@ -73,6 +73,9 @@ lint/intermediates/
 lint/generated/
 lint/outputs/
 lint/tmp/
+
+# AI model files
+ai_models/
 # lint/reports/
 
 # Android Profiling
@@ -86,3 +89,6 @@ google-services.json
 # i18n pipeline temp files
 scripts/i18n-todo.json
 scripts/i18n-translated.json
+
+# AI model files (too large for git)
+ai_models/

@@ -27,6 +27,9 @@ class ChatGroupsRenameMigrationSpec : AutoMigrationSpec
 @RenameColumn(tableName = "chats", fromColumnName = "group_id", toColumnName = "channel_id")
 class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
 
+@DeleteTable(tableName = "image_vectors")
+class ImageVectorsDeletionSpec : AutoMigrationSpec
+
 @Database(
     entities = [
         DChat::class, DSession::class, DTag::class, DTagRelation::class,
@@ -34,8 +37,9 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         DPomodoroItem::class, DPeer::class, DChatChannel::class,
         DBookmark::class, DBookmarkGroup::class,
         DAppFile::class,
+        DImageEmbedding::class,
     ],
-    version = 12,
+    version = 14,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3, spec = BoxesDeletionSpec::class),
@@ -47,6 +51,8 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         AutoMigration(from = 9, to = 10),
         AutoMigration(from = 10, to = 11, spec = ChatsGroupIdToChannelIdSpec::class),
         AutoMigration(from = 11, to = 12),
+        AutoMigration(from = 12, to = 13),
+        AutoMigration(from = 13, to = 14, spec = ImageVectorsDeletionSpec::class),
     ],
     exportSchema = true,
 )
@@ -79,6 +85,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun bookmarkGroupDao(): BookmarkGroupDao
 
     abstract fun appFileDao(): AppFileDao
+
+    abstract fun imageEmbeddingDao(): ImageEmbeddingDao
 
     companion object {
         @Volatile

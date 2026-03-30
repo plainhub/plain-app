@@ -37,6 +37,7 @@ import com.ismartcoding.plain.preferences.UrlTokenPreference
 import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.preferences.getPreferencesAsync
+import com.ismartcoding.plain.ai.ImageSearchManager
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.ui.base.coil.newImageLoader
 import com.ismartcoding.plain.chat.ChatCacheManager
@@ -102,6 +103,7 @@ class MainApp : Application() {
             // Start Nearby service (always listen regardless of discoverable setting)
             sendEvent(StartNearbyServiceEvent())
             HttpServerManager.clientTsInterval()
+            ImageSearchManager.restoreIfEnabled()
             if (AppFeatureType.CHECK_UPDATES.has() && autoCheckUpdate && checkUpdateTime < System.currentTimeMillis() - Constants.ONE_DAY_MS) {
                 AppHelper.checkUpdateAsync(this@MainApp, false)
             }

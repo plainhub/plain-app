@@ -774,3 +774,8 @@ object MdnsHostnamePreference : BasePreference<String>() {
         TempData.mdnsHostname = get(preferences).ifEmpty { default }
     }
 }
+
+object AiImageSearchEnabledPreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("ai_image_search_enabled")
+}

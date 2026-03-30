@@ -385,7 +385,14 @@ class ScreenMirrorWebRtcManager(
 
         val encoderFactory = DefaultVideoEncoderFactory(eglBase!!.eglBaseContext, true, true)
         val decoderFactory = DefaultVideoDecoderFactory(eglBase!!.eglBaseContext)
+        // Skip VPN adapter (ADAPTER_TYPE_VPN = 1 << 3) so that WebRTC binds UDP
+        // sockets directly to Wi-Fi. VPN apps typically tunnel all UDP through the
+        // VPN, making LAN WebRTC unreachable even with the correct ICE candidate IP.
+        val options = PeerConnectionFactory.Options().apply {
+            networkIgnoreMask = 1 shl 3
+        }
         peerConnectionFactory = PeerConnectionFactory.builder()
+            .setOptions(options)
             .setVideoEncoderFactory(encoderFactory)
             .setVideoDecoderFactory(decoderFactory)
             .setAudioDeviceModule(adm)

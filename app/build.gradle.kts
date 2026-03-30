@@ -145,10 +145,6 @@ android {
             dimension = "channel"
             buildConfigField("String", "CHANNEL", "\"GITHUB\"")
         }
-        create("china") {
-            dimension = "channel"
-            buildConfigField("String", "CHANNEL", "\"CHINA\"")
-        }
         create("google") {
             dimension = "channel"
             buildConfigField("String", "CHANNEL", "\"GOOGLE\"")
@@ -191,6 +187,8 @@ play {
 }
 
 dependencies {
+    testImplementation(libs.junit)
+    testImplementation("org.json:json:20231013")
     implementation(project(":lib"))
     implementation(files("$rootDir/lib/libs/PdfiumAndroid-2.0.0-release.aar"))
 
@@ -277,4 +275,8 @@ dependencies {
 
     // WebRTC for screen mirroring
     implementation(libs.stream.webrtc.android)
+
+    // AI Image Search: MediaPipe + LiteRT
+    implementation(libs.mediapipe.tasks.vision)
+    implementation(libs.litert)
 }
