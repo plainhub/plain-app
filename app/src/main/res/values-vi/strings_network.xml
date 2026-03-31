@@ -28,6 +28,8 @@
     <string name="security">Bảo mật</string>
     <string name="url_token">Token URL</string>
     <string name="url_token_tips">Token URL mã hóa dữ liệu trong URL. Nếu nó được thiết lập lại, các URL được mã hóa bằng token cũ sẽ không thể truy cập được nữa.</string>
+    <string name="rotate_url_token_on_restart">Xoay vòng token URL khi khởi động lại</string>
+    <string name="rotate_url_token_on_restart_tips">Khi được bật, một token URL mới sẽ được tạo mỗi khi ứng dụng khởi động. Điều này làm cho tất cả các URL tệp đã tạo trước đó không còn hợp lệ. Được khuyến nghị cho người dùng nâng cao muốn tăng cường bảo mật.</string>
     <string name="http_server_ok">Máy chủ HTTP hoạt động tốt.</string>
     <string name="http_server_error">Máy chủ HTTP không được khởi động. Vui lòng khởi động lại PlainApp và thử lại.</string>
     <string name="relaunch_app">Khởi chạy lại ứng dụng</string>

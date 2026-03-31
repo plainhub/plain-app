@@ -28,6 +28,8 @@
     <string name="security">Güvenlik</string>
     <string name="url_token">URL belirteci</string>
     <string name="url_token_tips">URL belirteci, URL\'lerdeki verileri şifreler. Sıfırlanırsa, eski belirteçle şifrelenmiş URL\'ler erişilemez hale gelir.</string>
+    <string name="rotate_url_token_on_restart">Yeniden başlatmada URL belirtecini döndür</string>
+    <string name="rotate_url_token_on_restart_tips">Etkinleştirildiğinde, uygulama her başlatıldığında yeni bir URL belirteci oluşturulur. Bu, daha önce oluşturulan tüm dosya URL\'lerini geçersiz kılar. Daha güçlü güvenlik isteyen ileri düzey kullanıcılar için önerilir.</string>
     <string name="http_server_ok">HTTP sunucusu iyi çalışıyor.</string>
     <string name="http_server_error">HTTP sunucusu başlatılmadı. PlainApp\'i yeniden başlatın ve tekrar deneyin.</string>
     <string name="relaunch_app">UYGULAMAYI Yeniden Başlat</string>

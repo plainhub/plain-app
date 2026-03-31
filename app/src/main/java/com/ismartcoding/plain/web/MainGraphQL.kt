@@ -1984,14 +1984,25 @@ class MainGraphQL(val schema: Schema) {
                             }
 
                             val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, call.receive())
-                            val requestStr = decryptedBytes?.decodeToString() ?: ""
-                            if (requestStr.isEmpty()) {
+                            val decryptedStr = decryptedBytes?.decodeToString() ?: ""
+                            if (decryptedStr.isEmpty()) {
                                 call.respond(HttpStatusCode.Unauthorized)
                                 return@post
                             }
 
+                            val parsed = ReplayGuard.parse(decryptedStr)
+                            if (parsed == null) {
+                                call.respond(HttpStatusCode.BadRequest)
+                                return@post
+                            }
+                            val err = ReplayGuard.validate(clientId, parsed)
+                            if (err != null) {
+                                call.respond(HttpStatusCode.BadRequest)
+                                return@post
+                            }
+
                             HttpServerManager.clientRequestTs[clientId] = System.currentTimeMillis()
-                            val r = executeGraphqlQL(schema, requestStr, call)
+                            val r = executeGraphqlQL(schema, parsed.body, call)
                             call.respondBytes(CryptoHelper.chaCha20Encrypt(token, r))
                         } else {
                             val authStr = call.request.header("authorization")?.split(" ")

@@ -28,6 +28,8 @@
     <string name="security">Sicurezza</string>
     <string name="url_token">Token URL</string>
     <string name="url_token_tips">Il token URL cifra i dati negli URL. Se viene resettato, gli URL cifrati con il vecchio token diventano inaccessibili.</string>
+    <string name="rotate_url_token_on_restart">Rinnova token URL al riavvio</string>
+    <string name="rotate_url_token_on_restart_tips">Se abilitato, viene generato un nuovo token URL ogni volta che l\'app si avvia. Questo invalida tutti gli URL di file precedentemente generati. Consigliato per gli utenti avanzati che desiderano una maggiore sicurezza.</string>
     <string name="http_server_ok">Server HTTP avviato</string>
     <string name="http_server_error">Il server HTTP non è stato avviato. Riavvia PlainApp e riprova. Assicurati che non ci siano altre applicazioni che occupano le porte HTTP o HTTPS. Se il problema persiste, fornisci ulteriori dettagli sul problema contattando ismartcoding@gmail.com.</string>
     <string name="relaunch_app">Rilancia l\'app</string>

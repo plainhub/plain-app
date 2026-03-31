@@ -176,6 +176,15 @@ object HttpModule {
         routing {
             val config = SPAConfig()
             config.filesPath = "web"
+
+            // Serve index.html with injected server time for anti-replay clock sync
+            get("/") {
+                val html = this::class.java.classLoader?.getResourceAsStream("web/index.html")
+                    ?.bufferedReader()?.readText() ?: ""
+                val injected = html.replace("<head>", "<head><script>window.__SERVER_TIME__=${System.currentTimeMillis()}</script>")
+                call.respondText(injected, ContentType.Text.Html)
+            }
+
             staticResources(config.applicationRoute, config.filesPath, index = config.defaultPage) {
                 cacheControl {
                     arrayListOf(

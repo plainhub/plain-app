@@ -28,6 +28,8 @@
     <string name="security">安全</string>
     <string name="url_token">URL令牌</string>
     <string name="url_token_tips">URL令牌用於加密URL中的數據。如果重置，使用舊令牌加密的URL將不再可訪問。</string>
+    <string name="rotate_url_token_on_restart">重啟時輪換URL令牌</string>
+    <string name="rotate_url_token_on_restart_tips">啟用後，每次應用程式啟動時都會產生新的URL令牌。這將導致所有之前生成的檔案URL失效。建議給希望增強安全性的進階使用者。</string>
     <string name="http_server_ok">HTTP服務運行中</string>
     <string name="http_server_error">HTTP伺服器未啟動。重新啟動PlainApp並重試。</string>
     <string name="relaunch_app">重啟應用</string>

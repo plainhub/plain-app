@@ -28,6 +28,8 @@
     <string name="security">보안</string>
     <string name="url_token">URL 토큰</string>
     <string name="url_token_tips">URL 토큰은 URL에서 데이터를 암호화합니다. 재설정되면 이전의 토큰으로 암호화된 URL에 액세스할 수 없게 됩니다.</string>
+    <string name="rotate_url_token_on_restart">재시작 시 URL 토큰 교체</string>
+    <string name="rotate_url_token_on_restart_tips">활성화하면 앱을 시작할 때마다 새 URL 토큰이 생성됩니다. 이렇게 하면 이전에 생성된 모든 파일 URL이 무효화됩니다. 보안을 강화하고자 하는 고급 사용자에게 권장됩니다.</string>
     <string name="http_server_ok">Http 서버가 정상적으로 실행 중입니다.</string>
     <string name="http_server_error">Http 서버가 시작되지 않았습니다. PlainApp을 다시 시작하고 다시 시도하십시오. HTTP 또는 HTTPS 포트를 다른 앱이 차지하고 있지 않은지 확인하십시오. 문제가 지속되면 ismartcoding@gmail.com으로 문제에 대한 자세한 내용을 제공해 주십시오.</string>
     <string name="relaunch_app">앱 다시 시작</string>
