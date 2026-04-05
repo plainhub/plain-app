@@ -62,6 +62,11 @@ object AuthTwoFactorPreference : BasePreference<Boolean>() {
     override val key = booleanPreferencesKey("auth_two_factor")
 }
 
+object RotateUrlTokenOnRestartPreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("rotate_url_token_on_restart")
+}
+
 object AuthDevTokenPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("auth_dev_token")
@@ -115,6 +120,12 @@ object UrlTokenPreference : BasePreference<String>() {
         context: Context,
         preferences: Preferences,
     ) {
+        val rotateOnRestart = RotateUrlTokenOnRestartPreference.get(preferences)
+        if (rotateOnRestart) {
+            TempData.urlToken = CryptoHelper.generateChaCha20Key()
+            putAsync(context, TempData.urlToken)
+            return
+        }
         TempData.urlToken = get(preferences)
         if (TempData.urlToken.isEmpty()) {
             TempData.urlToken = CryptoHelper.generateChaCha20Key()

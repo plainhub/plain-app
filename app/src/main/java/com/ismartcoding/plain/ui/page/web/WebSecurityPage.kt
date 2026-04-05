@@ -32,8 +32,10 @@ import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
 import com.ismartcoding.plain.preferences.LocalAuthTwoFactor
 import com.ismartcoding.plain.preferences.LocalPassword
 import com.ismartcoding.plain.preferences.LocalPasswordType
+import com.ismartcoding.plain.preferences.LocalRotateUrlTokenOnRestart
 import com.ismartcoding.plain.preferences.PasswordPreference
 import com.ismartcoding.plain.preferences.PasswordTypePreference
+import com.ismartcoding.plain.preferences.RotateUrlTokenOnRestartPreference
 import com.ismartcoding.plain.preferences.UrlTokenPreference
 import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.*
@@ -52,6 +54,7 @@ fun WebSecurityPage(navController: NavHostController) {
         val passwordType = LocalPasswordType.current
         val password = LocalPassword.current
         val authTwoFactor = LocalAuthTwoFactor.current
+        val rotateUrlTokenOnRestart = LocalRotateUrlTokenOnRestart.current
         var urlToken by remember { mutableStateOf(TempData.urlToken) }
         var keyStorePassword by remember { mutableStateOf("") }
         var sslSignature by remember { mutableStateOf("") }
@@ -115,6 +118,16 @@ fun WebSecurityPage(navController: NavHostController) {
                         VerticalSpace(dp = 24.dp); Subtitle(text = stringResource(R.string.url_token))
                         ClipboardCard(label = stringResource(R.string.url_token), urlToken)
                         Tips(text = stringResource(R.string.url_token_tips)); VerticalSpace(dp = 16.dp)
+                        PCard {
+                            PListItem(modifier = Modifier.clickable {
+                                scope.launch(Dispatchers.IO) { RotateUrlTokenOnRestartPreference.putAsync(context, !rotateUrlTokenOnRestart) }
+                            }, title = stringResource(R.string.rotate_url_token_on_restart)) {
+                                PSwitch(activated = rotateUrlTokenOnRestart) {
+                                    scope.launch(Dispatchers.IO) { RotateUrlTokenOnRestartPreference.putAsync(context, it) }
+                                }
+                            }
+                        }
+                        Tips(text = stringResource(R.string.rotate_url_token_on_restart_tips)); VerticalSpace(dp = 16.dp)
                         PBlockButton(text = stringResource(R.string.reset_token), type = ButtonType.DANGER, onClick = {
                             scope.launch(Dispatchers.IO) { UrlTokenPreference.resetAsync(context); urlToken = TempData.urlToken; DialogHelper.showMessage(R.string.the_token_is_reset) }
                         })

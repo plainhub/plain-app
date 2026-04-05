@@ -28,6 +28,8 @@
     <string name="security">Security</string>
     <string name="url_token">URL token</string>
     <string name="url_token_tips">The URL token encrypts data in URLs. If it\'s reset, old token-encrypted URLs become inaccessible.</string>
+    <string name="rotate_url_token_on_restart">Rotate URL token on restart</string>
+    <string name="rotate_url_token_on_restart_tips">When enabled, a new URL token is generated every time the app starts. This invalidates all previously generated file URLs. Recommended for advanced users who want stronger security.</string>
     <string name="http_server_ok">HTTP server is running well.</string>
     <string name="http_server_error">Service failed to start. Please restart the app.</string>
     <string name="relaunch_app">Restart App</string>

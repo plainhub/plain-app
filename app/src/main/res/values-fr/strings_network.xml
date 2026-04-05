@@ -28,6 +28,8 @@
     <string name="security">Sécurité</string>
     <string name="url_token">Jeton d\'URL</string>
     <string name="url_token_tips">Le jeton d\'URL chiffre les données dans les URL. S\'il est réinitialisé, les URL chiffrées avec l\'ancien jeton deviennent inaccessibles.</string>
+    <string name="rotate_url_token_on_restart">Renouveler le jeton URL au redémarrage</string>
+    <string name="rotate_url_token_on_restart_tips">Lorsqu\'il est activé, un nouveau jeton d\'URL est généré à chaque démarrage de l\'application. Cela invalide toutes les URL de fichiers précédemment générées. Recommandé aux utilisateurs avancés souhaitant une sécurité accrue.</string>
     <string name="http_server_ok">Servidor HTTP iniciado</string>
     <string name="http_server_error">Le serveur HTTP n\'est pas démarré. Relancez PlainApp et réessayez. Assurez-vous qu\'aucune autre application n\'occupe les ports HTTP ou HTTPS. Si le problème persiste, veuillez fournir plus de détails sur le problème en contactant ismartcoding@gmail.com.</string>
     <string name="relaunch_app">Relancer l\'application</string>

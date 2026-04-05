@@ -28,6 +28,8 @@
     <string name="security">安全</string>
     <string name="url_token">URL令牌</string>
     <string name="url_token_tips">URL令牌用于加密URL中的数据。如果重置，使用旧令牌加密的URL将不再可访问。</string>
+    <string name="rotate_url_token_on_restart">重启时轮换URL令牌</string>
+    <string name="rotate_url_token_on_restart_tips">启用后，每次应用启动时都会生成新的URL令牌。这将导致所有之前生成的文件URL失效。推荐给希望增强安全性的高级用户。</string>
     <string name="http_server_ok">HTTP服务运行中</string>
     <string name="http_server_error">HTTP服务器未启动。重新启动应用并重试。</string>
     <string name="relaunch_app">重启应用</string>

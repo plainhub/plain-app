@@ -15,6 +15,7 @@ data class WebSettings(
     val authDevToken: String,
     val keepAwake: Boolean,
     val apiPermissions: Set<String>,
+    val rotateUrlTokenOnRestart: Boolean,
 )
 
 val LocalPasswordType = compositionLocalOf { PasswordTypePreference.default }
@@ -23,6 +24,7 @@ val LocalAuthTwoFactor = compositionLocalOf { AuthTwoFactorPreference.default }
 val LocalApiPermissions = compositionLocalOf { ApiPermissionsPreference.default }
 val LocalAuthDevToken = compositionLocalOf { AuthDevTokenPreference.default }
 val LocalKeepAwake = compositionLocalOf { KeepAwakePreference.default }
+val LocalRotateUrlTokenOnRestart = compositionLocalOf { RotateUrlTokenOnRestartPreference.default }
 
 @Composable
 fun WebSettingsProvider(content: @Composable () -> Unit) {
@@ -35,6 +37,7 @@ fun WebSettingsProvider(content: @Composable () -> Unit) {
             authDevToken = AuthDevTokenPreference.default,
             keepAwake = KeepAwakePreference.default,
             apiPermissions = ApiPermissionsPreference.default,
+            rotateUrlTokenOnRestart = RotateUrlTokenOnRestartPreference.default,
         )
     val settings =
         remember {
@@ -46,6 +49,7 @@ fun WebSettingsProvider(content: @Composable () -> Unit) {
                     authDevToken = AuthDevTokenPreference.get(it),
                     keepAwake = KeepAwakePreference.get(it),
                     apiPermissions = ApiPermissionsPreference.get(it),
+                    rotateUrlTokenOnRestart = RotateUrlTokenOnRestartPreference.get(it),
                 )
             }
         }.collectAsStateValue(
@@ -59,6 +63,7 @@ fun WebSettingsProvider(content: @Composable () -> Unit) {
         LocalAuthDevToken provides settings.authDevToken,
         LocalKeepAwake provides settings.keepAwake,
         LocalApiPermissions provides settings.apiPermissions,
+        LocalRotateUrlTokenOnRestart provides settings.rotateUrlTokenOnRestart,
     ) {
         content()
     }
