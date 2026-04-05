@@ -4,11 +4,7 @@ import android.app.Activity
 import android.view.WindowManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.rememberDrawerState
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -31,7 +27,6 @@ import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.events.ConfirmDialogEvent
 import com.ismartcoding.plain.events.LoadingDialogEvent
 import com.ismartcoding.plain.preferences.LocalDarkTheme
-import com.ismartcoding.plain.ui.base.LocalOpenDrawer
 import com.ismartcoding.plain.ui.base.ToastEvent
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.ChannelViewModel
@@ -42,7 +37,6 @@ import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.ui.page.root.components.RootNavigationDrawerContent
 import com.ismartcoding.plain.ui.theme.AppTheme
 import com.ismartcoding.plain.ui.theme.backgroundNormal
 import kotlinx.coroutines.Dispatchers
@@ -106,31 +100,7 @@ fun Main(
         }
 
         Box(modifier = Modifier.background(MaterialTheme.colorScheme.backgroundNormal)) {
-            val drawerState = rememberDrawerState(DrawerValue.Closed)
-            val drawerScope = rememberCoroutineScope()
-            val onOpenDrawer: () -> Unit = { drawerScope.launch { drawerState.open() } }
-            val onCloseDrawer: () -> Unit = { drawerScope.launch { drawerState.close() } }
-            ModalNavigationDrawer(
-                drawerState = drawerState,
-                drawerContent = {
-                    RootNavigationDrawerContent(
-                        navController = navController,
-                        selectedTab = mainVM.currentRootTab,
-                        onCloseDrawer = onCloseDrawer,
-                        onTabSelected = { tab ->
-                            onCloseDrawer()
-                            mainVM.currentRootTab = tab
-                            if (navController.currentDestination?.route != Routing.Root::class.qualifiedName) {
-                                navController.navigate(Routing.Root) { popUpTo(Routing.Root) { inclusive = true } }
-                            }
-                        },
-                    )
-                },
-            ) {
-                CompositionLocalProvider(LocalOpenDrawer provides onOpenDrawer) {
-                    MainNavGraph(navController, mainVM, audioPlaylistVM, chatVM, peerVM, channelVM, notesVM, feedTagsVM, noteTagsVM, pomodoroVM, onOpenDrawer)
-                }
-            }
+            MainNavGraph(navController, mainVM, audioPlaylistVM, chatVM, peerVM, channelVM, notesVM, feedTagsVM, noteTagsVM, pomodoroVM)
 
             MainDialogs(loadingDialogEvent, confirmDialogEvent, { confirmDialogEvent = null }, toastState, { toastState = null })
         }

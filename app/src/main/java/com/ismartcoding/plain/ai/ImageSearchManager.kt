@@ -10,9 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
-import java.net.HttpURLConnection
-import java.net.URL
 
 data class SemanticSearchResult(val imageId: String, val score: Float)
 
@@ -37,7 +34,6 @@ object ImageSearchManager {
     val downloadProgress = _downloadProgress.asStateFlow()
     private val _errorMessage = MutableStateFlow("")
     val errorMessage = _errorMessage.asStateFlow()
-    @Volatile private var downloadCancelled = false
 
     private val modelsDir: File get() = File(MainApp.instance.filesDir, MODEL_DIR_NAME)
 
@@ -48,8 +44,8 @@ object ImageSearchManager {
     fun isModelAvailable(): Boolean {
         val dir = modelsDir
         return File(dir, IMAGE_MODEL).exists() &&
-            File(dir, TEXT_MODEL).exists() &&
-            File(dir, TOKENIZER).exists()
+                File(dir, TEXT_MODEL).exists() &&
+                File(dir, TOKENIZER).exists()
     }
 
     fun totalModelSize(): Long = MODEL_FILES.sumOf { it.size }
@@ -58,22 +54,27 @@ object ImageSearchManager {
         val enabled = AiImageSearchEnabledPreference.getAsync(MainApp.instance)
         if (enabled && isModelAvailable()) {
             loadModels()
+            ImageIndexManager.startup()
         }
     }
 
-    suspend fun enable() = withContext(Dispatchers.IO) {
+    suspend fun enableAsync() {
         if (_status.value == ImageSearchStatus.DOWNLOADING ||
             _status.value == ImageSearchStatus.LOADING
-        ) return@withContext
+        ) {
+            return
+        }
         if (!isModelAvailable()) {
-            download()
-            if (!isModelAvailable()) return@withContext
+            downloadModels()
+            if (!isModelAvailable()) return
         }
         loadModels()
         AiImageSearchEnabledPreference.putAsync(MainApp.instance, true)
+        ImageIndexManager.startup()
     }
 
-    suspend fun disable() = withContext(Dispatchers.IO) {
+    suspend fun disableAsync() {
+        ImageIndexManager.shutdown()
         ImageEmbedHelper.close()
         TextEmbedHelper.close()
         DelegateHelper.closeAll()
@@ -85,10 +86,9 @@ object ImageSearchManager {
     }
 
     fun cancelDownload() {
-        downloadCancelled = true
+        ModelDownloader.cancel()
         _status.value = ImageSearchStatus.UNAVAILABLE
         _downloadProgress.value = 0
-        modelsDir.deleteRecursively()
         emitStatus()
     }
 
@@ -105,28 +105,24 @@ object ImageSearchManager {
             }.sortedByDescending { it.score }.take(limit)
         }
 
-    private suspend fun download() {
+    private suspend fun downloadModels() {
         _status.value = ImageSearchStatus.DOWNLOADING
         _downloadProgress.value = 0
-        downloadCancelled = false
         emitStatus()
-        val dir = modelsDir
-        dir.mkdirs()
-        val totalSize = MODEL_FILES.sumOf { it.size }
-        var downloaded = 0L
-        try {
-            for (f in MODEL_FILES) {
-                if (downloadCancelled) return
-                downloaded = downloadFile(f.url, File(dir, f.filename), downloaded, totalSize)
-            }
-            if (downloadCancelled) return
+        val success = ModelDownloader.download(
+            files = MODEL_FILES,
+            destDir = modelsDir,
+            onProgress = { progress ->
+                _downloadProgress.value = progress
+            },
+            onError = { e ->
+                _status.value = ImageSearchStatus.ERROR
+                _errorMessage.value = e.message ?: "Download failed"
+                emitStatus()
+            },
+        )
+        if (success) {
             _downloadProgress.value = 100
-            emitStatus()
-        } catch (e: Exception) {
-            LogCat.e("Model download failed", e)
-            dir.deleteRecursively()
-            _status.value = ImageSearchStatus.ERROR
-            _errorMessage.value = e.message ?: "Download failed"
             emitStatus()
         }
     }
@@ -150,32 +146,7 @@ object ImageSearchManager {
         }
     }
 
-    private fun downloadFile(
-        url: String, dest: File, startBytes: Long, totalSize: Long,
-    ): Long {
-        var downloaded = startBytes
-        val conn = URL(url).openConnection() as HttpURLConnection
-        conn.connectTimeout = 30_000
-        conn.readTimeout = 30_000
-        conn.instanceFollowRedirects = true
-        conn.inputStream.use { input ->
-            FileOutputStream(dest).use { output ->
-                val buf = ByteArray(8192)
-                var len: Int
-                while (input.read(buf).also { len = it } != -1) {
-                    if (downloadCancelled) { dest.delete(); return downloaded }
-                    output.write(buf, 0, len)
-                    downloaded += len
-                    _downloadProgress.value = (downloaded * 100 / totalSize).toInt().coerceIn(0, 99)
-                }
-            }
-        }
-        return downloaded
-    }
-
     private fun emitStatus() {
         sendEvent(ImageSearchStatusChangedEvent(_status.value, _downloadProgress.value, _errorMessage.value))
     }
-
-    private data class ModelFile(val url: String, val filename: String, val size: Long)
 }

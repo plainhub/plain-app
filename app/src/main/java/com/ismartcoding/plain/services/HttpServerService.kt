@@ -10,30 +10,25 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleService
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.PortHelper
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.Constants
-import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.enums.HttpServerState
-import com.ismartcoding.plain.events.HttpServerStateChangedEvent
-import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.web.MdnsNsdReregistrar
 import com.ismartcoding.plain.web.NsdHelper
-import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.TempData
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Job
 
 class HttpServerService : LifecycleService() {
     private var serverState: HttpServerState = HttpServerState.OFF
     private var mdnsNsdReregistrar: MdnsNsdReregistrar? = null
+    private var serverJob: Job? = null
 
     @SuppressLint("InlinedApi")
     override fun onCreate() {
@@ -52,13 +47,17 @@ class HttpServerService : LifecycleService() {
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                 when (event) {
                     Lifecycle.Event.ON_START -> {
-                        coIO {
+                        serverJob?.cancel()
+                        serverJob = coIO {
                             startHttpServerAsync()
                         }
                     }
 
-                    Lifecycle.Event.ON_STOP -> coIO {
-                        stopHttpServerAsync()
+                    Lifecycle.Event.ON_STOP -> {
+                        serverJob?.cancel()
+                        serverJob = coIO {
+                            stopHttpServerAsync()
+                        }
                     }
 
                     else -> Unit
@@ -111,78 +110,7 @@ class HttpServerService : LifecycleService() {
     }
 
     private suspend fun startHttpServerAsync() {
-        LogCat.d("startHttpServer")
-        serverState = HttpServerState.STARTING
-        sendEvent(HttpServerStateChangedEvent(serverState))
-
-        HttpServerManager.portsInUse.clear()
-        HttpServerManager.httpServerError = ""
-
-        // Stop any previously running server instance and wait for ports to be released
-        HttpServerManager.stopPreviousServer()
-        if (PortHelper.isPortInUse(TempData.httpPort) || PortHelper.isPortInUse(TempData.httpsPort)) {
-            LogCat.d("Ports still in use after stopping previous server, waiting...")
-            HttpServerManager.waitForPortsAvailable(TempData.httpPort, TempData.httpsPort)
-        }
-
-        val maxRetries = 3
-        for (attempt in 1..maxRetries) {
-            try {
-                val server = HttpServerManager.createHttpServerAsync(MainApp.instance)
-                server.start(wait = false)
-                HttpServerManager.server = server
-                break
-            } catch (ex: Exception) {
-                LogCat.e("Server start attempt $attempt/$maxRetries failed: ${ex.message}")
-                // If it's a BindException, the old socket may not be fully released yet
-                if (ex is java.net.BindException || ex.cause is java.net.BindException) {
-                    if (attempt < maxRetries) {
-                        HttpServerManager.stopPreviousServer()
-                        HttpServerManager.waitForPortsAvailable(TempData.httpPort, TempData.httpsPort, maxWaitMs = 3000)
-                    }
-                } else {
-                    break // non-port error, no point retrying
-                }
-            }
-        }
-
-        delay(500) // brief wait for server to fully bind ports
-        val checkResult = HttpServerManager.checkServerAsync()
-        if (checkResult.websocket && checkResult.http) {
-            HttpServerManager.httpServerError = ""
-            HttpServerManager.portsInUse.clear()
-            NsdHelper.registerServices(this, httpPort = TempData.httpPort, httpsPort = TempData.httpsPort)
-            serverState = HttpServerState.ON
-            sendEvent(HttpServerStateChangedEvent(serverState))
-            PNotificationListenerService.toggle(this, Permission.NOTIFICATION_LISTENER.isEnabledAsync(this))
-        } else {
-            if (!checkResult.http) {
-                if (PortHelper.isPortInUse(TempData.httpPort)) {
-                    HttpServerManager.portsInUse.add(TempData.httpPort)
-                }
-
-                if (PortHelper.isPortInUse(TempData.httpsPort)) {
-                    HttpServerManager.portsInUse.add(TempData.httpsPort)
-                }
-            }
-            HttpServerManager.httpServerError = if (HttpServerManager.portsInUse.isNotEmpty()) {
-                LocaleHelper.getStringF(
-                    if (HttpServerManager.portsInUse.size > 1) {
-                        R.string.http_port_conflict_errors
-                    } else {
-                        R.string.http_port_conflict_error
-                    }, "port", HttpServerManager.portsInUse.joinToString(", ")
-                )
-            } else if (HttpServerManager.httpServerError.isNotEmpty()) {
-                LocaleHelper.getString(R.string.http_server_failed) + " (${HttpServerManager.httpServerError})"
-            } else {
-                LocaleHelper.getString(R.string.http_server_failed)
-            }
-
-            serverState = HttpServerState.ERROR
-            sendEvent(HttpServerStateChangedEvent(serverState))
-            PNotificationListenerService.toggle(this, false)
-        }
+        HttpServerStartHelper.startServer(this) { serverState = it }
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
@@ -200,6 +128,8 @@ class HttpServerService : LifecycleService() {
     }
 
     override fun onDestroy() {
+        serverJob?.cancel()
+        serverJob = null
         super.onDestroy()
         mdnsNsdReregistrar?.stop()
         mdnsNsdReregistrar = null

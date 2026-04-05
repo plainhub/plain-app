@@ -144,4 +144,13 @@
     <string name="copied_to_clipboard_format">"%1$s" panoya kopyalandı.</string>
     <string name="unknown_error">Bilinmeyen bir hata oluştu.</string>
     <string name="delete_channel_warning">Bu kanalı silmek aynı zamanda ilgili tüm mesajları silecektir. Bu işlem geri alınamaz.</string>
+    <string name="app_files">Uygulama Dosyaları</string>
+    <string name="app_files_desc">Sohbette paylaşılan dosyalar</string>
+    <string name="no_app_files">Henüz dosya yok</string>
+    <string name="web_settings">Web Ayarları</string>
+    <string name="ui_components">Kullanıcı Arayüzü Bileşenleri</string>
+    <string name="donation_title">PlainApp Geliştirmeyi Destekleyin</string>
+    <string name="buy_me_a_coffee">Bana bir kahve ısmarla</string>
+
+
 </resources>

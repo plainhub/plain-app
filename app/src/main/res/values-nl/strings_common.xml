@@ -144,4 +144,13 @@
     <string name="copied_to_clipboard_format">"%1$s" is gekopieerd naar het klembord.</string>
     <string name="unknown_error">Er is een onbekende fout opgetreden.</string>
     <string name="delete_channel_warning">Het verwijderen van dit kanaal verwijdert ook alle gerelateerde berichten. Deze actie kan niet ongedaan worden gemaakt.</string>
+    <string name="app_files">App-bestanden</string>
+    <string name="app_files_desc">Bestanden gedeeld in chat</string>
+    <string name="no_app_files">Nog geen bestanden</string>
+    <string name="web_settings">Webinstellingen</string>
+    <string name="ui_components">UI-componenten</string>
+    <string name="donation_title">Ondersteuning van PlainApp-ontwikkeling</string>
+    <string name="buy_me_a_coffee">Koop een kopje koffie voor mij</string>
+
+
 </resources>

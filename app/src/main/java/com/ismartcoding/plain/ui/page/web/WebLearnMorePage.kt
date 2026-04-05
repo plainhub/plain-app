@@ -16,7 +16,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.preferences.LocalWeb
 import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.PBlockButton
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -74,9 +74,9 @@ fun WebLearnMorePage(navController: NavHostController, webVM: WebConsoleViewMode
                     item {
                         if (webEnabled) {
                             VerticalSpace(dp = 16.dp)
-                            PBlockButton(text = stringResource(id = R.string.http_server_diagnostics)) {
+                            PFilledButton(text = stringResource(id = R.string.http_server_diagnostics), modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                                 webVM.dig(context)
-                            }
+                            })
                         }
                         BottomSpace(paddingValues)
                     }

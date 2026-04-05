@@ -28,8 +28,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DImage
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.PMiniButton
-import com.ismartcoding.plain.ui.base.PMiniOutlineButton
+import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.page.cast.CastDialog
 import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.components.mediaviewer.PreviewItem
@@ -60,9 +59,9 @@ fun ImagePreviewActions(
                     .background(MaterialTheme.colorScheme.darkMask())
                     .padding(horizontal = 20.dp, vertical = 8.dp),
             ) {
-                PMiniButton(label = stringResource(id = R.string.cast)) { castViewModel.cast(m.path) }
+                POutlinedButton(text = stringResource(id = R.string.cast), small = true, onClick = { castViewModel.cast(m.path) })
                 HorizontalSpace(dp = 20.dp)
-                PMiniOutlineButton(label = stringResource(id = R.string.exit_cast_mode), color = Color.LightGray) { castViewModel.exitCastMode() }
+                POutlinedButton(text = stringResource(id = R.string.exit_cast_mode), small = true, contentColor = Color.LightGray, onClick = { castViewModel.exitCastMode() })
             }
             return
         }

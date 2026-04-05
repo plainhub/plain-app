@@ -144,4 +144,13 @@
     <string name="copied_to_clipboard_format">"%1$s" をクリップボードにコピーしました。</string>
     <string name="unknown_error">不明なエラーが発生しました。</string>
     <string name="delete_channel_warning">このチャンネルを削除すると、関連するメッセージもすべて削除されます。この操作は元に戻せません。</string>
+    <string name="app_files">アプリ ファイル</string>
+    <string name="app_files_desc">チャットで共有されているファイル</string>
+    <string name="no_app_files">ファイルはまだありません</string>
+    <string name="web_settings">Web設定</string>
+    <string name="ui_components">UI コンポーネント</string>
+    <string name="donation_title">PlainApp 開発のサポート</string>
+    <string name="buy_me_a_coffee">コーヒー買ってきて</string>
+
+
 </resources>

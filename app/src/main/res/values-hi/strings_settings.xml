@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">PlainApp</string>
     <string name="app_data">ऐप डेटा</string>
     <string name="developer_mode">डेवलपर मोड</string>
     <string name="local_cache">स्थानीय कैश</string>
@@ -72,4 +71,7 @@
     <string name="auto_check_update">अपडेट स्वचालित रूप से जांचें</string>
     <string name="auto_check_update_desc">ऐप खुलने पर स्वचालित रूप से नए संस्करण की जांच करें</string>
     <string name="donation_desc">Ko-fi पर इस ऐप का समर्थन करें</string>
+    <string name="drag_number_to_reorder_list">सूची को पुनर्व्यवस्थित करने के लिए नंबर खींचें</string>
+    <string name="app_name">प्लेनऐप</string>
+
 </resources>

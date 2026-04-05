@@ -144,4 +144,13 @@
     <string name="copied_to_clipboard_format">"%1$s" கிளிப்போர்டுக்கு நகலெடுக்கப்பட்டது.</string>
     <string name="unknown_error">அறியாத பிழை ஏற்பட்டது.</string>
     <string name="delete_channel_warning">இந்த சேனலை நீக்குவது தொடர்புடைய அனைத்து செய்திகளையும் நீக்கும். இந்த செயலை மாற்ற முடியாது.</string>
+    <string name="app_files">பயன்பாட்டுக் கோப்புகள்</string>
+    <string name="app_files_desc">அரட்டையில் பகிரப்பட்ட கோப்புகள்</string>
+    <string name="no_app_files">இதுவரை கோப்புகள் எதுவும் இல்லை</string>
+    <string name="web_settings">இணைய அமைப்புகள்</string>
+    <string name="ui_components">UI கூறுகள்</string>
+    <string name="donation_title">PlainApp டெவலப்மெண்ட் ஆதரவு</string>
+    <string name="buy_me_a_coffee">எனக்கு ஒரு காபி வாங்கவும்</string>
+
+
 </resources>

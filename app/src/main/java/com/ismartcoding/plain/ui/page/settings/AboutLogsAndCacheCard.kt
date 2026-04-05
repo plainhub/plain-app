@@ -14,7 +14,7 @@ import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
-import com.ismartcoding.plain.ui.base.PMiniOutlineButton
+import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -48,7 +48,7 @@ fun AboutLogsAndCacheCard(
             separatedActions = fileSize > 0L,
             action = {
                 if (fileSize > 0L) {
-                    PMiniOutlineButton(label = stringResource(R.string.clear_logs), click = {
+                    POutlinedButton(text = stringResource(R.string.clear_logs), small = true, onClick = {
                         DialogHelper.confirmToAction(R.string.confirm_to_clear_logs) {
                             val dir = File(DiskLogFormatStrategy.getLogFolder(context))
                             if (dir.exists()) dir.deleteRecursively()
@@ -62,7 +62,7 @@ fun AboutLogsAndCacheCard(
             title = stringResource(R.string.local_cache),
             subtitle = cacheSize.formatBytes(),
             action = {
-                PMiniOutlineButton(label = stringResource(R.string.clear_cache)) {
+                POutlinedButton(text = stringResource(R.string.clear_cache), small = true, onClick = {
                     scope.launch {
                         DialogHelper.showLoading()
                         com.ismartcoding.lib.helpers.CoroutinesHelper.withIO {
@@ -74,7 +74,7 @@ fun AboutLogsAndCacheCard(
                         DialogHelper.showMessage(R.string.local_cache_cleared)
                         onCacheCleared(newSize)
                     }
-                }
+                })
             },
         )
         if (developerMode) {

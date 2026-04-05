@@ -11,7 +11,7 @@
     <string name="instruction_for_use">Gebruiksaanwijzing</string>
     <string name="web_how_to">Stap 1: Sluit uw telefoon en computer aan op hetzelfde draadloze netwerk.\n\nMethode 1: Sluit uw computer en telefoon aan op hetzelfde Wi-Fi-netwerk.\nMethode 2: Schakel de hotspot van uw telefoon in en sluit uw computer aan op de hotspot van de telefoon.\n\nStap 2: Open een webbrowser op uw computer en voer het webadres in dat wordt weergegeven op de startpagina van de app.</string>
     <string name="web_dig">1. De computerbrowser kan de webpagina niet openen.\n\nDe draadloze router heeft mogelijk AP-isolatie ingeschakeld, waardoor communicatie tussen de computer en de telefoon wordt voorkomen. Ga naar de instellingeninterface van de router om de AP-isolatiefunctie uit te schakelen.\n\n2. De computerbrowser geeft een waarschuwing weer nadat u een HTTPS-webpagina-adres hebt ingevoerd: "Uw verbinding is niet privé."\n\nU kunt op "Doorgaan naar x.x.x.x (onveilig)" klikken om door te gaan. Simple gebruikt een zelfondertekend TLS-certificaat om de website te versleutelen.</string>
-    <string name="learn_more">Meer informatie…</string>
+    <string name="learn_more">Meer informatie</string>
     <string name="http_server_state_on">Service draait</string>
     <string name="http_server_state_starting">Service wordt gestart…</string>
     <string name="http_server_state_stopping">Service wordt gestopt…</string>
@@ -63,8 +63,13 @@
     <string name="restart_app_message">Bijna klaar! Tik gewoon op "APP opnieuw starten" om het effect te zien.</string>
     <string name="access_phone_web">Toegang tot je telefoon via een computerbrowser.</string>
     <string name="scan_qrcode_to_access_web">Scan QR-code om toegang te krijgen tot het webadres</string>
-    <string name="phone_web_portal">Telefoonwebportaal</string>
+    <string name="phone_web_portal">Webtoegang</string>
     <string name="phone_web_portal_desc">Open je telefoon via de browser op je computer</string>
+    <string name="web_portal_off">Webtoegang: UIT</string>
+    <string name="web_portal_running">Webtoegang: AAN</string>
+    <string name="web_portal_desc_off">Start service om telefoonbestanden vanaf het bureaublad te beheren.</string>
+    <string name="web_portal_desc_running">Beheer telefoonbestanden vanaf het bureaublad op hetzelfde lokale netwerk.</string>
+    <string name="more_settings">Meer instellingen</string>
     <string name="same_network_hint">Zorg dat je computer en telefoon met hetzelfde netwerk zijn verbonden</string>
     <string name="ready">Gereed</string>
     <string name="permission_settings">Machtigingsinstellingen</string>

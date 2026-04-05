@@ -75,13 +75,13 @@ fun AboutPage(navController: NavHostController, updateViewModel: UpdateViewModel
                             title = stringResource(R.string.android_version), value = MainApp.getAndroidVersion())
                         if (AppFeatureType.CHECK_UPDATES.has()) {
                             PListItem(title = stringResource(R.string.app_version), subtitle = MainApp.getAppVersion(), action = {
-                                PMiniOutlineButton(label = stringResource(R.string.check_update)) {
+                                POutlinedButton(text = stringResource(R.string.check_update), small = true, onClick = {
                                     scope.launch {
                                         DialogHelper.showMessage(getString(R.string.checking_updates))
                                         val r = withIO { SkipVersionPreference.putAsync(context, ""); AppHelper.checkUpdateAsync(context, true) }
                                         if (r != null) { if (r == true) updateViewModel.showDialog() else DialogHelper.showMessage(getString(R.string.is_latest_version)) }
                                     }
-                                }
+                                })
                             })
                             PListItem(title = stringResource(R.string.auto_check_update), subtitle = stringResource(R.string.auto_check_update_desc)) {
                                 PSwitch(activated = autoCheckUpdate) { scope.launch(Dispatchers.IO) { AutoCheckUpdatePreference.putAsync(context, it) } }

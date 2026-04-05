@@ -144,4 +144,13 @@
     <string name="copied_to_clipboard_format">"%1$s" 已複製到剪貼簿。</string>
     <string name="unknown_error">發生未知錯誤。</string>
     <string name="delete_channel_warning">刪除此頻道將同時刪除所有相關訊息。此操作無法復原。</string>
+    <string name="app_files">應用程式檔案</string>
+    <string name="app_files_desc">聊天中共用的檔案</string>
+    <string name="no_app_files">尚未有檔案</string>
+    <string name="web_settings">网页设置</string>
+    <string name="ui_components">UI元件</string>
+    <string name="donation_title">支持PlainApp開發</string>
+    <string name="buy_me_a_coffee">請我喝杯咖啡</string>
+
+
 </resources>

@@ -144,4 +144,13 @@
     <string name="copied_to_clipboard_format">"%1$s" ক্লিপবোর্ডে কপি হয়েছে।</string>
     <string name="unknown_error">অজানা ত্রুটি ঘটেছে।</string>
     <string name="delete_channel_warning">এই চ্যানেল মুছে ফেললে সমস্ত সম্পর্কিত বার্তাও মুছে যাবে। এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।</string>
+    <string name="app_files">অ্যাপ ফাইল</string>
+    <string name="app_files_desc">চ্যাটে শেয়ার করা ফাইল</string>
+    <string name="no_app_files">এখনও কোন ফাইল নেই</string>
+    <string name="web_settings">ওয়েব সেটিংস</string>
+    <string name="ui_components">UI উপাদান</string>
+    <string name="donation_title">সাপোর্ট প্লেইনঅ্যাপ ডেভেলপমেন্ট</string>
+    <string name="buy_me_a_coffee">আমাকে একটি কফি কিনুন</string>
+
+
 </resources>

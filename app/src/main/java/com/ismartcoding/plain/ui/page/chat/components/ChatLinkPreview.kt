@@ -78,7 +78,7 @@ fun ChatLinkPreview(linkPreview: DLinkPreview, modifier: Modifier = Modifier) {
                         Spacer(modifier = Modifier.width(8.dp))
                     }
                     Text(text = linkPreview.siteName?.takeIf { it.isNotEmpty() } ?: linkPreview.url,
-                        style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                        style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp)
                 }
             }

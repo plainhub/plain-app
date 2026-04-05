@@ -74,7 +74,7 @@ internal fun PomodoroTimerSection(pomodoroVM: PomodoroViewModel, scope: Coroutin
                 color = MaterialTheme.colorScheme.onSurface)
             VerticalSpace(dp = 16.dp)
             Text(text = stringResource(R.string.drag_to_adjust_progress),
-                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+                style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
         }
     }
 

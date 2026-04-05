@@ -144,4 +144,13 @@
     <string name="copied_to_clipboard_format">"%1$s"이(가) 클립보드에 복사되었습니다.</string>
     <string name="unknown_error">알 수 없는 오류가 발생했습니다.</string>
     <string name="delete_channel_warning">이 채널을 삭제하면 관련 메시지도 모두 삭제됩니다. 이 작업은 되돌릴 수 없습니다.</string>
+    <string name="app_files">앱 파일</string>
+    <string name="app_files_desc">채팅에 공유된 파일</string>
+    <string name="no_app_files">아직 파일이 없습니다</string>
+    <string name="web_settings">웹 설정</string>
+    <string name="ui_components">UI 구성요소</string>
+    <string name="donation_title">PlainApp 개발 지원</string>
+    <string name="buy_me_a_coffee">커피 사주세요</string>
+
+
 </resources>

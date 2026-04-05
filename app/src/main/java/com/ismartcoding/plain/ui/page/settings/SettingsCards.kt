@@ -99,3 +99,15 @@ internal fun LazyListScope.debugItem() {
         }
     }
 }
+
+@Composable
+internal fun DeveloperSettingsCard(navController: NavHostController) {
+    PCard {
+        PListItem(
+            modifier = Modifier.clickable { navController.navigate(Routing.ComponentShowcase) },
+            title = stringResource(R.string.ui_components),
+            icon = R.drawable.layout_grid,
+            showMore = true,
+        )
+    }
+}

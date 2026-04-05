@@ -144,4 +144,13 @@
     <string name="copied_to_clipboard_format">"%1$s" copiado al portapapeles.</string>
     <string name="unknown_error">Se produjo un error desconocido.</string>
     <string name="delete_channel_warning">Eliminarará todos los mensajes este canal también elimin relacionados. Esta acción no se puede deshacer.</string>
+    <string name="app_files">Archivos de aplicación</string>
+    <string name="app_files_desc">Archivos compartidos en el chat</string>
+    <string name="no_app_files">Aún no hay archivos</string>
+    <string name="web_settings">Configuración web</string>
+    <string name="ui_components">Componentes de la interfaz de usuario</string>
+    <string name="donation_title">Soporte para el desarrollo de PlainApp</string>
+    <string name="buy_me_a_coffee">Cómprame un café</string>
+
+
 </resources>

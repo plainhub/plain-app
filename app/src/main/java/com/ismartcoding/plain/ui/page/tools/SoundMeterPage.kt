@@ -44,7 +44,7 @@ import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SoundMeterPage(navController: NavHostController, onOpenDrawer: () -> Unit = {}) {
+fun SoundMeterPage(navController: NavHostController) {
     val context = LocalContext.current
     var decibelValuesDialogVisible = remember { mutableStateOf(false) }
     val audioRecord = remember { mutableStateOf<AudioRecord?>(null) }
@@ -63,7 +63,7 @@ fun SoundMeterPage(navController: NavHostController, onOpenDrawer: () -> Unit = 
     SoundMeterRecorder(audioRecord, isRunning, decibel, total, count, min, avg, max)
 
     PScaffold(topBar = {
-        PTopAppBar(navController = navController, navigationIcon = { ActionButtonDrawer(onClick = onOpenDrawer) },
+        PTopAppBar(navController = navController,
             title = stringResource(R.string.sound_meter), actions = {
                 PIconButton(icon = R.drawable.info, contentDescription = stringResource(R.string.decibel_values),
                     tint = MaterialTheme.colorScheme.onSurface) { decibelValuesDialogVisible.value = true }
@@ -97,19 +97,19 @@ fun SoundMeterPage(navController: NavHostController, onOpenDrawer: () -> Unit = 
                 Text(text = decibelValueString, color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.fillMaxWidth().height(96.dp).padding(16.dp), textAlign = TextAlign.Center)
                 if (isRunning.value) {
-                    PBlockButton(text = stringResource(R.string.stop), type = ButtonType.SECONDARY) { isRunning.value = false }
+                    PFilledButton(text = stringResource(R.string.stop), type = ButtonType.SECONDARY, modifier = Modifier.padding(horizontal = 16.dp), onClick = { isRunning.value = false })
                 } else {
-                    PBlockButton(text = stringResource(R.string.start)) {
+                    PFilledButton(text = stringResource(R.string.start), onClick = {
                         if (Permission.RECORD_AUDIO.can(context)) isRunning.value = true
                         else sendEvent(RequestPermissionsEvent(Permission.RECORD_AUDIO))
-                    }
+                    })
                 }
                 if (count.intValue > 0) {
                     VerticalSpace(dp = 40.dp)
-                    PBlockButton(text = stringResource(R.string.reset), type = ButtonType.DANGER) {
+                    PFilledButton(text = stringResource(R.string.reset), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                         total.floatValue = 0f; count.intValue = 0; decibel.floatValue = 0f
                         min.floatValue = 0f; max.floatValue = 0f; avg.floatValue = 0f
-                    }
+                    })
                 }
                 BottomSpace(paddingValues)
             }

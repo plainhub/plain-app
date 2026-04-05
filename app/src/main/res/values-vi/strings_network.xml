@@ -11,7 +11,7 @@
     <string name="instruction_for_use">Hướng dẫn sử dụng</string>
     <string name="web_how_to">Bước 1: Kết nối điện thoại và máy tính của bạn với cùng một mạng không dây.\n\nPhương pháp 1: Kết nối máy tính và điện thoại với cùng một mạng Wi-Fi.\nPhương pháp 2: Bật điểm phát Wi-Fi của điện thoại và kết nối máy tính với điểm phát của điện thoại.\n\nBước 2: Mở trình duyệt web trên máy tính của bạn và nhập địa chỉ web được hiển thị trên trang chủ ứng dụng.</string>
     <string name="web_dig">1. Trình duyệt máy tính không thể mở trang web.\n\nBộ định tuyến không dây có thể đã bật cách ly AP, ngăn chặn việc giao tiếp giữa máy tính và điện thoại. Vui lòng vào giao diện cài đặt của bộ định tuyến để vô hiệu hóa chức năng cách ly AP.\n\n2. Trình duyệt máy tính hiển thị cảnh báo sau khi nhập địa chỉ trang web HTTPS: "Kết nối của bạn không riêng tư."\n\nBạn có thể nhấp vào "Tiếp tục đến x.x.x.x (không an toàn)" để tiếp tục. Ứng dụng đơn giản sử dụng một chứng chỉ TLS tự ký để mã hóa trang web.</string>
-    <string name="learn_more">Tìm hiểu thêm…</string>
+    <string name="learn_more">Tìm hiểu thêm</string>
     <string name="http_server_state_on">Dịch vụ đang chạy</string>
     <string name="http_server_state_starting">Đang khởi động dịch vụ…</string>
     <string name="http_server_state_stopping">Đang dừng dịch vụ…</string>
@@ -63,8 +63,13 @@
     <string name="restart_app_message">Gần xong! Chỉ cần nhấn "Khởi động lại ứng dụng" để thực hiện.</string>
     <string name="access_phone_web">Truy cập điện thoại của bạn từ trình duyệt máy tính.</string>
     <string name="scan_qrcode_to_access_web">Quét mã QR để truy cập địa chỉ web</string>
-    <string name="phone_web_portal">Cổng web điện thoại</string>
+    <string name="phone_web_portal">Truy cập Web</string>
     <string name="phone_web_portal_desc">Truy cập điện thoại của bạn từ trình duyệt trên máy tính</string>
+    <string name="web_portal_off">Truy cập Web: TẮT</string>
+    <string name="web_portal_running">Truy cập Web: BẬT</string>
+    <string name="web_portal_desc_off">Bắt đầu dịch vụ để quản lý các tệp điện thoại từ máy tính để bàn.</string>
+    <string name="web_portal_desc_running">Quản lý các tập tin điện thoại từ máy tính để bàn trên cùng một mạng cục bộ.</string>
+    <string name="more_settings">Cài đặt khác</string>
     <string name="same_network_hint">Đảm bảo máy tính và điện thoại của bạn cùng một mạng</string>
     <string name="ready">Sẵn sàng</string>
     <string name="permission_settings">Cài đặt quyền</string>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">PlainApp</string>
     <string name="app_data">Uygulama verileri</string>
     <string name="developer_mode">Geliştirici modu</string>
     <string name="local_cache">Yerel önbellek</string>
@@ -72,4 +71,5 @@
     <string name="auto_check_update">Güncellemeleri otomatik denetle</string>
     <string name="auto_check_update_desc">Uygulama açıldığında otomatik olarak yeni sürümleri denetle</string>
     <string name="donation_desc">Bu uygulamayı Ko-fi üzerinden destekleyin</string>
+    <string name="drag_number_to_reorder_list">Listeyi yeniden sıralamak için numarayı sürükleyin</string>
 </resources>

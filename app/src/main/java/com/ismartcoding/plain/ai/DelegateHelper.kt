@@ -9,7 +9,8 @@ object DelegateHelper {
     private val models = mutableListOf<CompiledModel>()
 
     fun createModel(modelFile: File): CompiledModel {
-        tryGpu(modelFile)?.let { return it }
+        tryAccelerator(modelFile, Accelerator.NPU, "NPU")?.let { return it }
+        tryAccelerator(modelFile, Accelerator.GPU, "GPU")?.let { return it }
         LogCat.d("Using CPU for ${modelFile.name}")
         val model = CompiledModel.create(
             modelFile.absolutePath,
@@ -24,17 +25,19 @@ object DelegateHelper {
         models.clear()
     }
 
-    private fun tryGpu(modelFile: File): CompiledModel? {
+    private fun tryAccelerator(
+        modelFile: File, accelerator: Accelerator, name: String,
+    ): CompiledModel? {
         return try {
             val model = CompiledModel.create(
                 modelFile.absolutePath,
-                CompiledModel.Options(Accelerator.GPU),
+                CompiledModel.Options(accelerator),
             )
             models.add(model)
-            LogCat.d("GPU accelerator enabled for ${modelFile.name}")
+            LogCat.d("$name accelerator enabled for ${modelFile.name}")
             model
         } catch (e: Exception) {
-            LogCat.d("GPU accelerator unavailable: ${e.message}")
+            LogCat.d("$name accelerator unavailable: ${e.message}")
             null
         }
     }

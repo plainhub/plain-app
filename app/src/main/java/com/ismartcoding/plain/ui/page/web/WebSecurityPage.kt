@@ -64,28 +64,44 @@ fun WebSecurityPage(navController: NavHostController) {
             if (editPassword.value != password) editPassword.value = password
             scope.launch(Dispatchers.IO) {
                 keyStorePassword = KeyStorePasswordPreference.getAsync(context)
-                try { sslSignature = HttpServerManager.getSSLSignature(context, keyStorePassword).joinToString(" ") { "%02x".format(it).uppercase() } }
-                catch (ex: Exception) { LogCat.e("Failed to get SSL signature: ${ex.message}"); ex.printStackTrace() }
+                try {
+                    sslSignature = HttpServerManager.getSSLSignature(context, keyStorePassword).joinToString(" ") { "%02x".format(it).uppercase() }
+                } catch (ex: Exception) {
+                    LogCat.e("Failed to get SSL signature: ${ex.message}"); ex.printStackTrace()
+                }
             }
         }
 
-        PScaffold(topBar = { PTopAppBar(navController = navController, title = stringResource(R.string.security)) },
+        PScaffold(
+            topBar = { PTopAppBar(navController = navController, title = stringResource(R.string.security)) },
             content = { paddingValues ->
                 LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
                     item { TopSpace() }
                     item {
                         PCard {
                             PListItem(modifier = Modifier.clickable {
-                                scope.launch(Dispatchers.IO) { PasswordTypePreference.putAsync(context, if (passwordType == PasswordType.NONE.value) PasswordType.FIXED.value else PasswordType.NONE.value) }
+                                scope.launch(Dispatchers.IO) {
+                                    PasswordTypePreference.putAsync(
+                                        context,
+                                        if (passwordType == PasswordType.NONE.value) PasswordType.FIXED.value else PasswordType.NONE.value
+                                    )
+                                }
                             }, title = stringResource(R.string.require_password)) {
                                 PSwitch(activated = passwordType != PasswordType.NONE.value) {
-                                    scope.launch(Dispatchers.IO) { PasswordTypePreference.putAsync(context, if (passwordType == PasswordType.NONE.value) PasswordType.FIXED.value else PasswordType.NONE.value) }
+                                    scope.launch(Dispatchers.IO) {
+                                        PasswordTypePreference.putAsync(
+                                            context,
+                                            if (passwordType == PasswordType.NONE.value) PasswordType.FIXED.value else PasswordType.NONE.value
+                                        )
+                                    }
                                 }
                             }
                             if (passwordType != PasswordType.NONE.value) {
-                                PasswordTextField(value = editPassword.value, isChanged = { editPassword.value != password },
+                                PasswordTextField(
+                                    value = editPassword.value, isChanged = { editPassword.value != password },
                                     onValueChange = { editPassword.value = it }, onConfirm = { scope.launch(Dispatchers.IO) { PasswordPreference.putAsync(context, it) } })
-                                OutlinedButton(modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 16.dp),
+                                OutlinedButton(
+                                    modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 16.dp),
                                     onClick = { scope.launch(Dispatchers.IO) { editPassword.value = HttpServerManager.resetPasswordAsync() } }) {
                                     Text(stringResource(R.string.generate_password))
                                 }
@@ -95,8 +111,10 @@ fun WebSecurityPage(navController: NavHostController) {
                     item {
                         VerticalSpace(dp = 16.dp)
                         PCard {
-                            PListItem(modifier = Modifier.clickable { scope.launch(Dispatchers.IO) { AuthTwoFactorPreference.putAsync(context, !authTwoFactor) } },
-                                title = stringResource(R.string.require_confirmation)) {
+                            PListItem(
+                                modifier = Modifier.clickable { scope.launch(Dispatchers.IO) { AuthTwoFactorPreference.putAsync(context, !authTwoFactor) } },
+                                title = stringResource(R.string.require_confirmation)
+                            ) {
                                 PSwitch(activated = authTwoFactor) { scope.launch(Dispatchers.IO) { AuthTwoFactorPreference.putAsync(context, it) } }
                             }
                         }
@@ -106,7 +124,7 @@ fun WebSecurityPage(navController: NavHostController) {
                         Subtitle(text = stringResource(R.string.https_certificate_signature))
                         ClipboardCard(label = stringResource(R.string.https_certificate_signature), sslSignature)
                         VerticalSpace(dp = 16.dp)
-                        PBlockButton(text = stringResource(R.string.reset_ssl_certificate), type = ButtonType.DANGER, onClick = {
+                        PFilledButton(text = stringResource(R.string.reset_ssl_certificate), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                             scope.launch(Dispatchers.IO) {
                                 DialogHelper.showLoading(); KeyStorePasswordPreference.resetAsync(context)
                                 keyStorePassword = KeyStorePasswordPreference.getAsync(context)
@@ -128,7 +146,7 @@ fun WebSecurityPage(navController: NavHostController) {
                             }
                         }
                         Tips(text = stringResource(R.string.rotate_url_token_on_restart_tips)); VerticalSpace(dp = 16.dp)
-                        PBlockButton(text = stringResource(R.string.reset_token), type = ButtonType.DANGER, onClick = {
+                        PFilledButton(text = stringResource(R.string.reset_token), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                             scope.launch(Dispatchers.IO) { UrlTokenPreference.resetAsync(context); urlToken = TempData.urlToken; DialogHelper.showMessage(R.string.the_token_is_reset) }
                         })
                         BottomSpace(paddingValues)

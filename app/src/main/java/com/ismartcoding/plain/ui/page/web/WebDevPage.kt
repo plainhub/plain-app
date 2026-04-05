@@ -25,7 +25,7 @@ import com.ismartcoding.plain.preferences.LocalAuthDevToken
 import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.ClipboardCard
-import com.ismartcoding.plain.ui.base.PBlockButton
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -86,9 +86,10 @@ fun WebDevPage(navController: NavHostController) {
                             )
                             Tips(text = stringResource(id = R.string.auth_dev_token_tips))
                             VerticalSpace(dp = 24.dp)
-                            PBlockButton(
+                            PFilledButton(
                                 text = stringResource(id = R.string.reset_token),
                                 type = ButtonType.DANGER,
+                                modifier = Modifier.padding(horizontal = 16.dp),
                                 onClick = {
                                     scope.launch(Dispatchers.IO) {
                                         AuthDevTokenPreference.putAsync(context, CryptoHelper.randomPassword(128))

@@ -40,7 +40,7 @@ import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.ActionButtonSort
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.ActionButtonDrawer
+import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PDropdownMenuItem
 import com.ismartcoding.plain.ui.base.PDropdownMenuItemCreateFile
@@ -72,7 +72,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun FilesPage(
     navController: NavHostController, audioPlaylistVM: AudioPlaylistViewModel,
-    folderPath: String = "", onOpenDrawer: () -> Unit = {}, filesVM: FilesViewModel = viewModel(),
+    folderPath: String = "", filesVM: FilesViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -102,7 +102,7 @@ fun FilesPage(
 
     PScaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
         SearchableTopBar(navController = navController, viewModel = filesVM, scrollBehavior = scrollBehavior, title = title, subtitle = subtitle,
-            navigationIcon = { if (filesVM.selectMode.value) NavigationCloseIcon { filesVM.exitSelectMode() } else ActionButtonDrawer(onClick = onOpenDrawer) },
+            navigationIcon = { if (filesVM.selectMode.value) NavigationCloseIcon { filesVM.exitSelectMode() } else NavigationBackIcon { navController.navigateUp() } },
             actions = {
                 if (!filesVM.selectMode.value) {
                     ActionButtonSearch { filesVM.enterSearchMode() }

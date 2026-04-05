@@ -48,7 +48,7 @@ fun NoDataView(
         Text(
             text = message,
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.85f),
             textAlign = TextAlign.Center
         )
         

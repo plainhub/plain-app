@@ -32,7 +32,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.ActionButtonDrawer
+import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PDropdownMenuItemSettings
 import com.ismartcoding.plain.ui.base.PDropdownMenuItemTags
@@ -60,7 +60,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun FeedEntriesPage(
     navController: NavHostController, feedId: String, tagsVM: TagsViewModel,
-    onOpenDrawer: () -> Unit = {}, feedEntriesVM: FeedEntriesViewModel = viewModel(), feedsVM: FeedsViewModel = viewModel(),
+    feedEntriesVM: FeedEntriesViewModel = viewModel(), feedsVM: FeedsViewModel = viewModel(),
 ) {
     val feedsState by feedsVM.itemsFlow.collectAsState()
     val feedsMap = remember(feedsState) { derivedStateOf { feedsState.associateBy { it.id } } }
@@ -101,7 +101,7 @@ fun FeedEntriesPage(
         if (feedEntriesVM.showSearchBar.value) { ListSearchBar(viewModel = feedEntriesVM, onSearch = onSearch); return@PScaffold }
         PTopAppBar(modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { scope.launch { scrollStateMap[pagerState.currentPage]?.scrollToItem(0) } }),
             navController = navController, navigationIcon = {
-                if (feedEntriesVM.selectMode.value) NavigationCloseIcon { feedEntriesVM.exitSelectMode() } else ActionButtonDrawer(onClick = onOpenDrawer)
+                if (feedEntriesVM.selectMode.value) NavigationCloseIcon { feedEntriesVM.exitSelectMode() } else NavigationBackIcon { navController.navigateUp() }
             }, title = pageTitle, scrollBehavior = scrollBehavior, actions = {
                 if (feedEntriesVM.selectMode.value) { PTopRightButton(label = stringResource(if (feedEntriesVM.isAllSelected()) R.string.unselect_all else R.string.select_all), click = { feedEntriesVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp) }
                 else {

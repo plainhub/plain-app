@@ -11,7 +11,7 @@
     <string name="instruction_for_use">Gebrauchsanweisung</string>
     <string name="web_how_to">Schritt 1: Verbinden Sie Ihr Telefon und Ihren Computer mit demselben drahtlosen Netzwerk.\n\nMethode 1: Verbinden Sie Ihren Computer und Ihr Telefon mit demselben WLAN-Netzwerk.\nMethode 2: Schalten Sie den Hotspot Ihres Telefons ein und verbinden Sie Ihren Computer mit dem Hotspot Ihres Telefons.\n\nSchritt 2: Öffnen Sie einen Webbrowser auf Ihrem Computer und geben Sie die auf der APP-Startseite angezeigte Webadresse ein.</string>
     <string name="web_dig">1. Der Computerbrowser kann die Webseite nicht öffnen.\n\nDer drahtlose Router kann die AP-Isolation aktiviert haben, was die Kommunikation zwischen dem Computer und dem Telefon verhindert. Gehen Sie bitte zur Router-Einstellungsschnittstelle, um die AP-Isolationsfunktion zu deaktivieren.\n\n2. Der Computerbrowser zeigt eine Warnung an, nachdem Sie eine HTTPS-Webseitenadresse eingegeben haben: "Ihre Verbindung ist nicht privat."\n\nSie können auf "Fortfahren zu x.x.x.x (unsicher)" klicken, um fortzufahren. Einfach verwendet ein selbstsigniertes TLS-Zertifikat, um die Website zu verschlüsseln.</string>
-    <string name="learn_more">Weitere Informationen…</string>
+    <string name="learn_more">Weitere Informationen</string>
     <string name="http_server_state_on">Dienst läuft</string>
     <string name="http_server_state_starting">Dienst wird gestartet...</string>
     <string name="http_server_state_stopping">Dienst wird gestoppt...</string>
@@ -63,8 +63,13 @@
     <string name="restart_app_message">Fast geschafft! Tippen Sie einfach auf "APP neu starten", um die Änderungen zu übernehmen.</string>
     <string name="access_phone_web">Greifen Sie über einen Computerbrowser auf Ihr Telefon zu.</string>
     <string name="scan_qrcode_to_access_web">Scannen Sie den QR-Code, um auf die Webadresse zuzugreifen</string>
-    <string name="phone_web_portal">Telefon-Webportal</string>
+    <string name="phone_web_portal">Web-Zugriff</string>
     <string name="phone_web_portal_desc">Greifen Sie von einem Computerbrowser auf Ihr Telefon zu</string>
+    <string name="web_portal_off">Web-Zugriff: AUS</string>
+    <string name="web_portal_running">Web-Zugriff: EIN</string>
+    <string name="web_portal_desc_off">Dienst starten, um Telefondateien vom Desktop aus zu verwalten.</string>
+    <string name="web_portal_desc_running">Verwalten Sie Telefondateien vom Desktop im selben lokalen Netzwerk.</string>
+    <string name="more_settings">Weitere Einstellungen</string>
     <string name="same_network_hint">Stellen Sie sicher, dass sich Ihr Computer und Ihr Telefon im selben Netzwerk befinden</string>
     <string name="ready">Bereit</string>
     <string name="permission_settings">Berechtigungseinstellungen</string>

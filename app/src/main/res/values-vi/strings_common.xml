@@ -144,4 +144,13 @@
     <string name="copied_to_clipboard_format">"%1$s" đã được sao chép vào clipboard.</string>
     <string name="unknown_error">Đã xảy ra lỗi không xác định.</string>
     <string name="delete_channel_warning">Xóa kênh này cũng sẽ xóa tất cả tin nhắn liên quan. Hành động này không thể hoàn tác.</string>
+    <string name="app_files">Tệp ứng dụng</string>
+    <string name="app_files_desc">Tệp được chia sẻ trong trò chuyện</string>
+    <string name="no_app_files">Chưa có tệp nào</string>
+    <string name="web_settings">Cài đặt web</string>
+    <string name="ui_components">Thành phần giao diện người dùng</string>
+    <string name="donation_title">Hỗ trợ phát triển PlainApp</string>
+    <string name="buy_me_a_coffee">Mua cho tôi một ly cà phê</string>
+
+
 </resources>

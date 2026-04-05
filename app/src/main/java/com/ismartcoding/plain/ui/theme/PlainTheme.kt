@@ -2,7 +2,6 @@ package com.ismartcoding.plain.ui.theme
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -43,14 +42,6 @@ object PlainTheme {
             )
     }
 }
-
-fun Modifier.largeBlockButton() = this
-    .fillMaxWidth()
-    .height(48.dp)
-    .padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN)
-
-
-fun Typography.buttonTextLarge() = bodyMedium.copy(fontSize = 16.sp)
 
 @Composable
 fun Typography.tipsText() = bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)

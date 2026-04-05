@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">PlainApp</string>
     <string name="app_data">অ্যাপ ডেটা</string>
     <string name="developer_mode">ডেভেলপার মোড</string>
     <string name="local_cache">স্থানীয় ক্যাশ</string>
@@ -72,4 +71,5 @@
     <string name="auto_check_update">স্বয়ংক্রিয় আপডেট পরীক্ষা</string>
     <string name="auto_check_update_desc">অ্যাপ চালু হলে স্বয়ংক্রিয়ভাবে নতুন সংস্করণ খোঁজে</string>
     <string name="donation_desc">Ko-fi-এ এই অ্যাপটি সমর্থন করুন</string>
+    <string name="drag_number_to_reorder_list">তালিকা পুনর্বিন্যাস করতে নম্বর টেনে আনুন</string>
 </resources>

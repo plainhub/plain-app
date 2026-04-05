@@ -31,7 +31,7 @@ import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.helpers.ShareHelper
-import com.ismartcoding.plain.ui.base.PBlockButton
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -120,9 +120,9 @@ fun OtherFilePage(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         VerticalSpace(dp = 64.dp)
-                        PBlockButton(text = stringResource(id = R.string.open_with_other_app)) {
+                        PFilledButton(text = stringResource(id = R.string.open_with_other_app), onClick = {
                             ShareHelper.openPathWith(context, path)
-                        }
+                        })
                     }
                 }
             }

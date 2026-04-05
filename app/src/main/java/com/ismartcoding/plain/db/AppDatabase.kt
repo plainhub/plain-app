@@ -27,9 +27,6 @@ class ChatGroupsRenameMigrationSpec : AutoMigrationSpec
 @RenameColumn(tableName = "chats", fromColumnName = "group_id", toColumnName = "channel_id")
 class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
 
-@DeleteTable(tableName = "image_vectors")
-class ImageVectorsDeletionSpec : AutoMigrationSpec
-
 @Database(
     entities = [
         DChat::class, DSession::class, DTag::class, DTagRelation::class,
@@ -39,7 +36,7 @@ class ImageVectorsDeletionSpec : AutoMigrationSpec
         DAppFile::class,
         DImageEmbedding::class,
     ],
-    version = 14,
+    version = 13,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3, spec = BoxesDeletionSpec::class),
@@ -52,7 +49,6 @@ class ImageVectorsDeletionSpec : AutoMigrationSpec
         AutoMigration(from = 10, to = 11, spec = ChatsGroupIdToChannelIdSpec::class),
         AutoMigration(from = 11, to = 12),
         AutoMigration(from = 12, to = 13),
-        AutoMigration(from = 13, to = 14, spec = ImageVectorsDeletionSpec::class),
     ],
     exportSchema = true,
 )

@@ -27,13 +27,3 @@ fun NavigationCloseIcon(onClick: () -> Unit = {}) {
         onClick()
     }
 }
-
-@Composable
-fun NavigationDrawerOrBackIcon(navController: NavHostController) {
-    val openDrawer = LocalOpenDrawer.current
-    if (openDrawer != null) {
-        ActionButtonDrawer(onClick = openDrawer)
-    } else {
-        NavigationBackIcon { navController.navigateUp() }
-    }
-}

@@ -11,7 +11,7 @@
     <string name="instruction_for_use">使用説明書</string>
     <string name="web_how_to">ステップ1：携帯電話とコンピューターを同じ無線ネットワークに接続します。\n\n方法1：コンピューターと携帯電話を同じWi-Fiネットワークに接続します。\n方法2：携帯電話のホットスポットをオンにして、コンピューターを携帯電話のホットスポットに接続します。\n\nステップ2：コンピューターでウェブブラウザーを開き、アプリのホームページに表示されるウェブアドレスを入力します。</string>
     <string name="web_dig">1. コンピューターブラウザーでウェブページを開くことができません。\n\n無線ルーターにはAP分離が有効になっている可能性があり、コンピューターと電話の間の通信を防いでいます。 ルーターの設定インターフェイスにアクセスして、AP分離機能を無効にしてください。\n\n2. HTTPSウェブページアドレスを入力した後、コンピューターブラウザーに警告が表示されます。「接続がプライベートではありません。」\n\n「x.x.x.x (安全ではない) に進む」をクリックして続行できます。 Simpleは、ウェブサイトを暗号化するために自己署名TLS証明書を使用しています。</string>
-    <string name="learn_more">詳細を見る…</string>
+    <string name="learn_more">詳細を見る</string>
     <string name="http_server_state_on">サービスが実行されています</string>
     <string name="http_server_state_starting">サービスを開始しています...</string>
     <string name="http_server_state_stopping">サービスを停止しています...</string>
@@ -63,8 +63,13 @@
     <string name="restart_app_message">ほとんど完了！効果を確認するには、「アプリを再起動」をタップしてください。</string>
     <string name="access_phone_web">コンピュータのブラウザから携帯電話にアクセスします。</string>
     <string name="scan_qrcode_to_access_web">WebアドレスにアクセスするためにQRコードをスキャンします</string>
-    <string name="phone_web_portal">スマホWebポータル</string>
+    <string name="phone_web_portal">ウェブアクセス</string>
     <string name="phone_web_portal_desc">パソコンのブラウザーからスマホにアクセスします</string>
+    <string name="web_portal_off">ウェブアクセス: オフ</string>
+    <string name="web_portal_running">ウェブアクセス: オン</string>
+    <string name="web_portal_desc_off">デスクトップから電話ファイルを管理するサービスを開始します。</string>
+    <string name="web_portal_desc_running">同じローカルネットワーク上のデスクトップから電話ファイルを管理します。</string>
+    <string name="more_settings">その他の設定</string>
     <string name="same_network_hint">パソコンとスマホが同じネットワークに接続されていることを確認してください</string>
     <string name="ready">準備完了</string>
     <string name="permission_settings">権限設定</string>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">PlainApp</string>
     <string name="app_data">Dados da aplicação</string>
     <string name="developer_mode">Modo de desenvolvedor</string>
     <string name="local_cache">Cache local</string>
@@ -72,4 +71,5 @@
     <string name="auto_check_update">Verificar atualizações automaticamente</string>
     <string name="auto_check_update_desc">Verificar automaticamente novas versões ao iniciar o aplicativo</string>
     <string name="donation_desc">Apoie este aplicativo no Ko-fi</string>
+    <string name="drag_number_to_reorder_list">Arraste o número para reordenar a lista</string>
 </resources>

@@ -2,7 +2,9 @@ package com.ismartcoding.plain.web.models
 
 import com.ismartcoding.plain.ai.ImageSearchManager
 import com.ismartcoding.plain.ai.ImageSearchIndexer
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ImageSearchStatus(
     val status: String,
     val downloadProgress: Int,

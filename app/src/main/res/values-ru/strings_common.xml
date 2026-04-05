@@ -144,4 +144,13 @@
     <string name="copied_to_clipboard_format">"%1$s" скопировано в буфер обмена.</string>
     <string name="unknown_error">Произошла неизвестная ошибка.</string>
     <string name="delete_channel_warning">Удаление этого канала также удалит все связанные сообщения. Это действие нельзя отменить.</string>
+    <string name="app_files">Файлы приложений</string>
+    <string name="app_files_desc">Файлы, которыми поделились в чате</string>
+    <string name="no_app_files">Файлов пока нет</string>
+    <string name="web_settings">Веб-настройки</string>
+    <string name="ui_components">Компоненты пользовательского интерфейса</string>
+    <string name="donation_title">Поддержка разработки PlainApp</string>
+    <string name="buy_me_a_coffee">Купи мне кофе</string>
+
+
 </resources>

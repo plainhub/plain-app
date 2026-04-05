@@ -144,4 +144,13 @@
     <string name="copied_to_clipboard_format">"%1$s" copié dans le presse-papiers.</string>
     <string name="unknown_error">Une erreur inconnue est survenue.</string>
     <string name="delete_channel_warning">Supprimer ce canal supprimera également tous les messages associés. Cette action est irréversible.</string>
+    <string name="app_files">Fichiers d\'application</string>
+    <string name="app_files_desc">Fichiers partagés dans le chat</string>
+    <string name="no_app_files">Aucun fichier pour l\'instant</string>
+    <string name="web_settings">Paramètres Web</string>
+    <string name="ui_components">Composants de l\'interface utilisateur</string>
+    <string name="donation_title">Prise en charge du développement PlainApp</string>
+    <string name="buy_me_a_coffee">Achetez-moi un café</string>
+
+
 </resources>

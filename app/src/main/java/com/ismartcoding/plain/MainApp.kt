@@ -86,7 +86,7 @@ class MainApp : Application() {
             KeyStorePasswordPreference.ensureValueAsync(instance, preferences)
             UrlTokenPreference.ensureValueAsync(instance, preferences)
             SignatureKeyPreference.ensureKeyPairAsync(instance, preferences)
-            MdnsHostnamePreference.ensureValueAsync(preferences)
+            MdnsHostnamePreference.ensureValueAsync(instance, preferences)
 
             DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(preferences)))
             if (TempData.webEnabled && PlugInControlReceiver.isUSBConnected(this@MainApp)) {

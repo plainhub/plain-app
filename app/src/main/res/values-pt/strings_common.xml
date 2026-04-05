@@ -144,4 +144,13 @@
     <string name="copied_to_clipboard_format">"%1$s" copiado para a área de transferência.</string>
     <string name="unknown_error">Ocorreu um erro desconhecido.</string>
     <string name="delete_channel_warning">Excluir este canal também excluirá todas as mensagens relacionadas. Esta ação não pode ser desfeita.</string>
+    <string name="app_files">Arquivos de aplicativos</string>
+    <string name="app_files_desc">Arquivos compartilhados no bate-papo</string>
+    <string name="no_app_files">Nenhum arquivo ainda</string>
+    <string name="web_settings">Configurações da Web</string>
+    <string name="ui_components">Componentes de UI</string>
+    <string name="donation_title">Suporte ao desenvolvimento de PlainApp</string>
+    <string name="buy_me_a_coffee">Compre-me um café</string>
+
+
 </resources>

@@ -144,4 +144,13 @@
     <string name="copied_to_clipboard_format">"%1$s" क्लिपबोर्ड पर कॉपी किया गया।</string>
     <string name="unknown_error">अज्ञात त्रुटि हुई।</string>
     <string name="delete_channel_warning">इस चैनल को हटाने से संबंधित सभी संदेश भी हट जाएंगे। यह क्रिया पूर्ववत नहीं की जा सकती।</string>
+    <string name="app_files">ऐप फ़ाइलें</string>
+    <string name="app_files_desc">चैट में साझा की गई फ़ाइलें</string>
+    <string name="no_app_files">अभी तक कोई फ़ाइल नहीं</string>
+    <string name="web_settings">वेब सेटिंग्स</string>
+    <string name="ui_components">यूआई घटक</string>
+    <string name="donation_title">प्लेनऐप विकास का समर्थन करें</string>
+    <string name="buy_me_a_coffee">मेरे लिए एक कॉफी खरीदें</string>
+
+
 </resources>

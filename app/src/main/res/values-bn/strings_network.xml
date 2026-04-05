@@ -61,8 +61,13 @@
     <string name="restart_app_message">প্রায় সম্পন্ন! কেবল "এপিপি পুনরারম্ভ করুন" ট্যাপ করুন যাতে প্রভাব ফেলতে পারে।</string>
     <string name="access_phone_web">একটি কম্পিউটার ব্রাউজার থেকে আপনার ফোন অ্যাক্সেস করুন।</string>
     <string name="scan_qrcode_to_access_web">ওয়েব ঠিকানা অ্যাক্সেস করতে QR কোড স্ক্যান করুন</string>
-    <string name="phone_web_portal">ফোন ওয়েব পোর্টাল</string>
+    <string name="phone_web_portal">ওয়েব অ্যাক্সেস</string>
     <string name="phone_web_portal_desc">কম্পিউটার ব্রাউজার থেকে আপনার ফোনে প্রবেশ করুন</string>
+    <string name="web_portal_off">ওয়েব অ্যাক্সেস: বন্ধ</string>
+    <string name="web_portal_running">ওয়েব অ্যাক্সেস: চালু</string>
+    <string name="web_portal_desc_off">ডেস্কটপ থেকে ফোন ফাইল পরিচালনা করতে পরিষেবা শুরু করুন৷</string>
+    <string name="web_portal_desc_running">একই স্থানীয় নেটওয়ার্কে ডেস্কটপ থেকে ফোন ফাইল পরিচালনা করুন।</string>
+    <string name="more_settings">আরো সেটিংস</string>
     <string name="same_network_hint">নিশ্চিত করুন আপনার কম্পিউটার ও ফোন একই নেটওয়ার্কে আছে</string>
     <string name="ready">প্রস্তুত</string>
     <string name="permission_settings">অনুমতির সেটিংস</string>

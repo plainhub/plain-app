@@ -30,7 +30,6 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
-import com.ismartcoding.plain.ui.base.ActionButtonDrawer
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -41,7 +40,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PomodoroPage(navController: NavHostController, pomodoroVM: PomodoroViewModel, onOpenDrawer: () -> Unit = {}) {
+fun PomodoroPage(navController: NavHostController, pomodoroVM: PomodoroViewModel) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -57,7 +56,7 @@ fun PomodoroPage(navController: NavHostController, pomodoroVM: PomodoroViewModel
     }
 
     PScaffold(topBar = {
-        PTopAppBar(navController = navController, navigationIcon = { ActionButtonDrawer(onClick = onOpenDrawer) }, title = "", actions = {
+        PTopAppBar(navController = navController, title = "", actions = {
             PIconButton(icon = R.drawable.settings, contentDescription = stringResource(R.string.settings), tint = MaterialTheme.colorScheme.onSurface) { pomodoroVM.showSettings.value = true }
         })
     }) { paddingValues ->
@@ -68,7 +67,7 @@ fun PomodoroPage(navController: NavHostController, pomodoroVM: PomodoroViewModel
                 }
                 VerticalSpace(dp = 8.dp)
                 Text(text = stringResource(R.string.round_counter, pomodoroVM.currentRound.intValue, pomodoroVM.settings.value.pomodorosBeforeLongBreak),
-                    style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                    style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f))
                 VerticalSpace(dp = 32.dp)
             }
             item {
@@ -91,7 +90,7 @@ fun PomodoroPage(navController: NavHostController, pomodoroVM: PomodoroViewModel
                     }
                     VerticalSpace(dp = 16.dp)
                     Text(text = pluralStringResource(R.plurals.n_pomodoros, pomodoroVM.completedCount.intValue, pomodoroVM.completedCount.intValue),
-                        style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                        style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Medium, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                 }
                 BottomSpace(paddingValues)

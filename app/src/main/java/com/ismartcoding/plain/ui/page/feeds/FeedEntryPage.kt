@@ -20,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -50,6 +49,7 @@ import com.ismartcoding.plain.features.feed.FeedEntryHelper
 import com.ismartcoding.plain.features.feed.FeedHelper
 import com.ismartcoding.plain.features.feed.fetchContentAsync
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.markdowntext.MarkdownText
@@ -67,8 +67,6 @@ import com.ismartcoding.plain.ui.models.FeedEntryViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.page.tags.SelectTagsDialog
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import com.ismartcoding.plain.ui.theme.buttonTextLarge
-import com.ismartcoding.plain.ui.theme.largeBlockButton
 import com.ismartcoding.plain.ui.theme.secondaryTextColor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -124,7 +122,7 @@ fun FeedEntryPage(navController: NavHostController, id: String, tagsVM: TagsView
                         item {
                             VerticalSpace(dp = 32.dp)
                             if (feedEntryVM.fetchingContent.value) { Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) { CircularProgressIndicator(modifier = Modifier.size(32.dp), color = MaterialTheme.colorScheme.primary, strokeWidth = 3.dp) } }
-                            else { OutlinedButton(onClick = { scope.launch { feedEntryVM.item.value?.let { mm -> feedEntryVM.fetchingContent.value = true; val r = withIO { mm.fetchContentAsync() }; feedEntryVM.fetchingContent.value = false; if (r.isOk()) feedEntryVM.content.value = mm.content else DialogHelper.showErrorDialog(r.errorMessage()) } } }, modifier = Modifier.largeBlockButton(), enabled = !feedEntryVM.fetchingContent.value) { Text(text = stringResource(id = R.string.load_full_content), style = MaterialTheme.typography.buttonTextLarge()) } }
+                            else { POutlinedButton(text = stringResource(id = R.string.load_full_content), block = true, modifier = Modifier.padding(horizontal = PlainTheme.PAGE_HORIZONTAL_MARGIN), enabled = !feedEntryVM.fetchingContent.value, onClick = { scope.launch { feedEntryVM.item.value?.let { mm -> feedEntryVM.fetchingContent.value = true; val r = withIO { mm.fetchContentAsync() }; feedEntryVM.fetchingContent.value = false; if (r.isOk()) feedEntryVM.content.value = mm.content else DialogHelper.showErrorDialog(r.errorMessage()) } } }) }
                         }
                     }
                     item { BottomSpace(paddingValues) }

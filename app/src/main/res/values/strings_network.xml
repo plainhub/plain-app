@@ -11,7 +11,7 @@
     <string name="instruction_for_use">Instructions for use</string>
     <string name="web_how_to">Step 1: Connect your phone and computer to the same wireless network.\n\nMethod 1: Connect your computer and phone to the same Wi-Fi network.\nMethod 2: Turn on your phone\'s hotspot and connect your computer to the phone\'s hotspot.\n\nStep 2: Open a web browser on your computer and enter the web address displayed on the APP homepage.</string>
     <string name="web_dig">1. The computer browser cannot open web page.\n\nThe wireless router may have AP isolation enabled, preventing communication between the computer and the phone. Please go to the router settings interface to disable the AP isolation function.\n\n2. The computer browser displays a warning after entering an HTTPS web page address: "Your connection is not private."\n\nYou can click "Proceed to x.x.x.x (unsafe)" to continue. Simple uses a self-signed TLS certificate to encrypt the website.</string>
-    <string name="learn_more">Learn more…</string>
+    <string name="learn_more">Learn more</string>
     <string name="http_server_state_on">Service is running</string>
     <string name="http_server_state_starting">Starting service…</string>
     <string name="http_server_state_stopping">Stopping service…</string>
@@ -63,8 +63,14 @@
     <string name="restart_app_message">Almost done! Just tap "Relaunch APP" to take effect.</string>
     <string name="access_phone_web">Access your phone from a computer browser.</string>
     <string name="scan_qrcode_to_access_web">Scan QR code to access web address</string>
-    <string name="phone_web_portal">Phone Web Portal</string>
+    <string name="phone_web_portal">Web Access</string>
     <string name="phone_web_portal_desc">Access your phone from a computer browser</string>
+    <string name="web_portal_off">Web Access: OFF</string>
+    <string name="web_portal_running">Web Access: ON</string>
+    <string name="web_portal_desc_off">Start service to manage phone files from desktop.</string>
+    <string name="web_portal_desc_running">Manage phone files from desktop on the same local network.</string>
+    <string name="more_settings">More settings</string>
+    <string name="web_settings">Web Settings</string>
     <string name="same_network_hint">Make sure your computer and phone are on the same network</string>
     <string name="ready">Ready</string>
     <string name="permission_settings">Permission Settings</string>

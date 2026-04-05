@@ -144,4 +144,13 @@
     <string name="copied_to_clipboard_format">"%1$s" copiato negli appunti.</string>
     <string name="unknown_error">Si è verificato un errore sconosciuto.</string>
     <string name="delete_channel_warning">Eliminando questo canale verranno eliminate anche tutte le messaggistiche correlate. Questa azione non può essere annullata.</string>
+    <string name="app_files">File app</string>
+    <string name="app_files_desc">File condivisi in chat</string>
+    <string name="no_app_files">Nessun file ancora</string>
+    <string name="web_settings">Impostazioni Web</string>
+    <string name="ui_components">Componenti dell\'interfaccia utente</string>
+    <string name="donation_title">Supporto per lo sviluppo di PlainApp</string>
+    <string name="buy_me_a_coffee">Offrimi un caffè</string>
+
+
 </resources>

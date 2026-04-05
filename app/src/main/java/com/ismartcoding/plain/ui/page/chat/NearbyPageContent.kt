@@ -89,7 +89,7 @@ internal fun LazyListScope.nearbyDeviceListItems(
                     Text(
                         text = stringResource(R.string.make_sure_devices_same_network),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(horizontal = 32.dp)
                     )

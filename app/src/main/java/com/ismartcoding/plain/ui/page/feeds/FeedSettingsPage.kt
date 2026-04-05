@@ -19,7 +19,7 @@ import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.features.feed.FeedAutoRefreshInterval
 import com.ismartcoding.plain.helpers.FormatHelper
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.PBlockButton
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -116,7 +116,7 @@ fun FeedSettingsPage(
             }
             item {
                 VerticalSpace(dp = 48.dp)
-                PBlockButton(text = stringResource(id = R.string.clear_feed_items), type = ButtonType.DANGER, onClick = {
+                PFilledButton(text = stringResource(id = R.string.clear_feed_items), type = ButtonType.DANGER, onClick = {
                     feedSettingsVM.showClearFeedsDialog.value = true
                 })
             }

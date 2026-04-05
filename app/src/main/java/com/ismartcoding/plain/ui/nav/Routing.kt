@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 class Routing {
     @Serializable
-    object Root
+    object Home
 
     @Serializable
     object Settings
@@ -23,6 +23,9 @@ class Routing {
 
     @Serializable
     object WebSettings
+
+    @Serializable
+    object CustomFeatures
 
     @Serializable
     object NotificationSettings
@@ -73,6 +76,18 @@ class Routing {
     object Apps
 
     @Serializable
+    object Images
+
+    @Serializable
+    object Videos
+
+    @Serializable
+    object Audio
+
+    @Serializable
+    object ChatList
+
+    @Serializable
     data class OtherFile(val path: String, val title: String)
 
     @Serializable
@@ -119,4 +134,7 @@ class Routing {
 
     @Serializable
     data class Nearby(val pairDeviceJson: String = "")
+
+    @Serializable
+    object ComponentShowcase
 }

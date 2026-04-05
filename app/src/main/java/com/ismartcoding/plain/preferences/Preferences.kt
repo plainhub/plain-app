@@ -680,11 +680,18 @@ object VideoPlaylistPreference : BasePreference<String>() {
     }
 }
 
-object HomeFeaturesPreference : BasePreference<Set<String>>() {
-    override val default = setOf(
-        AppFeatureType.FILES, AppFeatureType.DOCS, AppFeatureType.APPS, AppFeatureType.NOTES, AppFeatureType.FEEDS
-    ).map { it.name }.toSet()
-    override val key = stringSetPreferencesKey("home_features")
+object HomeFeaturesPreference : BasePreference<String>() {
+    private const val SEPARATOR = "|"
+    override val default = listOf(
+        AppFeatureType.IMAGES, AppFeatureType.VIDEOS, AppFeatureType.AUDIO,
+        AppFeatureType.DOCS, AppFeatureType.FILES, AppFeatureType.CHAT,
+    ).joinToString(SEPARATOR) { it.name }
+    override val key = stringPreferencesKey("home_features_v2")
+
+    fun parseList(value: String): List<String> =
+        if (value.isEmpty()) emptyList() else value.split(SEPARATOR).filter { it.isNotBlank() }
+
+    fun formatList(list: List<String>): String = list.joinToString(SEPARATOR)
 }
 
 object NotificationFilterPreference : BasePreference<String>() {
@@ -738,9 +745,11 @@ object NotificationFilterPreference : BasePreference<String>() {
             "allowlist" -> {
                 data.apps.contains(packageName)
             }
+
             "blacklist" -> {
                 !data.apps.contains(packageName)
             }
+
             else -> true
         }
     }
@@ -780,9 +789,18 @@ object MdnsHostnamePreference : BasePreference<String>() {
     override val key = stringPreferencesKey("mdns_hostname")
 
     suspend fun ensureValueAsync(
+        context: Context,
         preferences: Preferences,
     ) {
-        TempData.mdnsHostname = get(preferences).ifEmpty { default }
+        val stored = preferences[key]
+        if (stored.isNullOrEmpty()) {
+            val digits = (10..99).random()
+            val hostname = "plainapp$digits.local"
+            TempData.mdnsHostname = hostname
+            putAsync(context, hostname)
+        } else {
+            TempData.mdnsHostname = stored
+        }
     }
 }
 

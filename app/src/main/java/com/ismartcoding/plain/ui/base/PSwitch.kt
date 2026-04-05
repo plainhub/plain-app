@@ -15,25 +15,22 @@ fun PSwitch(
 ) {
     val isDark = DarkTheme.isDarkTheme(LocalDarkTheme.current)
 
-    // Exact iOS colors
-    val iosGreen = Color(0xFF34C759)  // iOS green for ON state
-    val iosLightTrackGray = Color(0xFFE9E9EA)  // iOS light mode gray track
-    val iosDarkTrackGray = Color(0xFF39393D)   // iOS dark mode gray track
+    val switchBlue = if (isDark) Color(0xFF0A84FF) else Color(0xFF007AFF)
+    val iosLightTrackGray = Color(0xFFE9E9EA)
+    val iosDarkTrackGray = Color(0xFF39393D)
     val iosTrackGray = if (isDark) iosDarkTrackGray else iosLightTrackGray
     val iosThumbWhite = Color.White
 
-    // Disabled colors
     val disabledThumbColor = iosThumbWhite
-    val disabledCheckedTrack = iosGreen.copy(alpha = 0.4f)
+    val disabledCheckedTrack = switchBlue.copy(alpha = 0.4f)
     val disabledUncheckedTrack = iosTrackGray.copy(alpha = if (isDark) 0.3f else 0.5f)
 
     Switch(
         checked = activated,
         enabled = enabled,
         colors = SwitchDefaults.colors(
-            // Enabled states
             checkedThumbColor = iosThumbWhite,
-            checkedTrackColor = iosGreen,
+            checkedTrackColor = switchBlue,
             uncheckedThumbColor = iosThumbWhite,
             uncheckedTrackColor = iosTrackGray,
 

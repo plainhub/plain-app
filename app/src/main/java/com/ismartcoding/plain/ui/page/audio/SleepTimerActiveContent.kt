@@ -46,7 +46,7 @@ internal fun SleepTimerActiveContent(
             Text(
                 text = stringResource(R.string.remaining),
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f),
                 fontWeight = FontWeight.Medium,
             )
         }

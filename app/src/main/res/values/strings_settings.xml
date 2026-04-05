@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">PlainApp</string>
+    <string name="app_name" translatable="false">PlainApp</string>
     <string name="app_data">App data</string>
     <string name="developer_mode">Developer mode</string>
+    <string name="ui_components" translatable="false">UI Components</string>
     <string name="local_cache">Local cache</string>
     <string name="clear_cache">Clear cache</string>
     <string name="local_cache_cleared">Local cache cleared.</string>
@@ -62,8 +63,10 @@
     <string name="sort_by_random">Sort by random</string>
     <string name="app_restored">APP data is restored, you need to force quit this app and start the app again as new.</string>
     <string name="welcome_text">Welcome! You can easily send text, images, and videos to this page and view them on your computer.\nIf you encounter any issues, please feel free to send an email to ismartcoding@gmail.com for assistance or join our Discord discussion at: https://discord.gg/RQWcS6DEEe.</string>
-    <string name="donation">Donation</string>
-    <string name="donation_desc">Support this app on Ko-fi</string>
+    <string name="donation">Donate</string>
+    <string name="donation_desc">PlainApp is free, open-source, and built by one developer. If it saves you time, consider buying a coffee.</string>
+    <string name="donation_title">Support PlainApp Development</string>
+    <string name="buy_me_a_coffee">Buy me a coffee</string>
     <string name="logs">Logs</string>
     <string name="primary_color_hint">Like #666666 or 666666</string>
     <string name="dark_theme">Dark theme</string>
@@ -72,4 +75,5 @@
     <string name="use_device_language">Use device language</string>
     <string name="amoled_dark_theme">AMOLED dark theme</string>
     <string name="customize_home_features">Customize Home Features</string>
+    <string name="drag_number_to_reorder_list">Drag the number to reorder the list</string>
 </resources>

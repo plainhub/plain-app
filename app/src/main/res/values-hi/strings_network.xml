@@ -11,7 +11,7 @@
     <string name="instruction_for_use">उपयोग के निर्देश</string>
     <string name="web_how_to">चरण 1: अपने फोन और कंप्यूटर को समान वायरलेस नेटवर्क से जोड़ें।\n\nविधि 1: अपने कंप्यूटर और फोन को समान वाई-फाई नेटवर्क से जोड़ें।\nविधि 2: अपने फोन का हॉटस्पॉट चालू करें और कंप्यूटर को फोन के हॉटस्पॉट से जोड़ें।\n\nचरण 2: अपने कंप्यूटर पर एक वेब ब्राउज़र खोलें और एपीपी होमपेज पर प्रदर्शित वेब पता दर्ज करें।</string>
     <string name="web_dig">1. कंप्यूटर ब्राउज़र वेब पृष्ठ को नहीं खोल सकता।\n\nवायरलेस राउटर में एपी आइसोलेशन सक्रिय हो सकता है, जिससे कंप्यूटर और फोन के बीच संचार बाधित होता है। कृपया एपी आइसोलेशन कार्य को निष्क्रिय करने के लिए राउटर सेटिंग्स इंटरफेस पर जाएं।\n\n2. कंप्यूटर ब्राउज़र एक HTTPS वेब पृष्ठ पता दर्ज करने के बाद चेतावनी दिखाता है: "आपका कनेक्शन निजी नहीं है।"\n\nआप "आगे बढ़ें x.x.x.x (असुरक्षित)" पर क्लिक करके आगे बढ़ सकते हैं। सिम्पल वेबसाइट को एन्क्रिप्ट करने के लिए एक स्व-साइन किए गए TLS प्रमाणपत्र का उपयोग करता है।</string>
-    <string name="learn_more">अधिक जानें…</string>
+    <string name="learn_more">अधिक जानें</string>
     <string name="http_server_state_on">सेवा चल रही है</string>
     <string name="http_server_state_starting">सेवा शुरू हो रही है...</string>
     <string name="http_server_state_stopping">सेवा बंद हो रही है...</string>
@@ -63,8 +63,13 @@
     <string name="restart_app_message">लगभग हो गया! केवल प्रभावी बनाने के लिए "ऐप फिर से चालना" टैप करें।</string>
     <string name="access_phone_web">कंप्यूटर ब्राउज़र से अपने फ़ोन तक पहुँचें।</string>
     <string name="scan_qrcode_to_access_web">वेब पता तक पहुँचने के लिए QR कोड स्कैन करें</string>
-    <string name="phone_web_portal">फ़ोन वेब पोर्टल</string>
+    <string name="phone_web_portal">वेब एक्सेस</string>
     <string name="phone_web_portal_desc">कंप्यूटर ब्राउज़र से अपने फ़ोन को एक्सेस करें</string>
+    <string name="web_portal_off">वेब एक्सेस: बंद</string>
+    <string name="web_portal_running">वेब एक्सेस: चालू</string>
+    <string name="web_portal_desc_off">डेस्कटॉप से ​​फ़ोन फ़ाइलों को प्रबंधित करने के लिए सेवा प्रारंभ करें।</string>
+    <string name="web_portal_desc_running">उसी स्थानीय नेटवर्क पर डेस्कटॉप से ​​फ़ोन फ़ाइलें प्रबंधित करें।</string>
+    <string name="more_settings">अधिक सेटिंग्स</string>
     <string name="same_network_hint">सुनिश्चित करें कि आपका कंप्यूटर और फ़ोन एक ही नेटवर्क पर हैं</string>
     <string name="ready">तैयार</string>
     <string name="permission_settings">अनुमति सेटिंग्स</string>

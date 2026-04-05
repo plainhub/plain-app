@@ -35,7 +35,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.ActionButtonTags
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.ActionButtonDrawer
+import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.PDraggableElement
 import com.ismartcoding.plain.ui.base.PFilterChip
@@ -63,7 +63,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun NotesPage(navController: NavHostController, notesVM: NotesViewModel, tagsVM: TagsViewModel, onOpenDrawer: () -> Unit = {}) {
+fun NotesPage(navController: NavHostController, notesVM: NotesViewModel, tagsVM: TagsViewModel) {
     val itemsState by notesVM.itemsFlow.collectAsState()
     val tagsState by tagsVM.itemsFlow.collectAsState()
     val tagsMapState by tagsVM.tagsMapFlow.collectAsState()
@@ -95,7 +95,7 @@ fun NotesPage(navController: NavHostController, notesVM: NotesViewModel, tagsVM:
         topBar = {
             if (notesVM.showSearchBar.value) { ListSearchBar(viewModel = notesVM, onSearch = onSearch); return@PScaffold }
             PTopAppBar(modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { scope.launch { scrollStateMap[pagerState.currentPage]?.scrollToItem(0) } }),
-                navController = navController, navigationIcon = { if (notesVM.selectMode.value) NavigationCloseIcon { notesVM.exitSelectMode() } else ActionButtonDrawer(onClick = onOpenDrawer) },
+                navController = navController, navigationIcon = { if (notesVM.selectMode.value) NavigationCloseIcon { notesVM.exitSelectMode() } else NavigationBackIcon { navController.navigateUp() } },
                 title = pageTitle, scrollBehavior = scrollBehavior, actions = {
                     if (notesVM.selectMode.value) { PTopRightButton(label = stringResource(if (notesVM.isAllSelected()) R.string.unselect_all else R.string.select_all), click = { notesVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp) }
                     else { ActionButtonSearch { notesVM.enterSearchMode() }; ActionButtonTags { notesVM.showTagsDialog.value = true } }

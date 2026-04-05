@@ -11,10 +11,10 @@
     <string name="instruction_for_use">使用说明</string>
     <string name="web_how_to">步骤1：将您的手机和电脑连接到同一无线网络。\n\n\u0020\u0020\u0020\u0020方法①：将您的电脑和手机连接到同一Wi-Fi网络。\n\u0020\u0020\u0020\u0020方法②：打开您的手机热点，并将您的电脑连接到手机热点。\n\n步骤2：在您的电脑上打开网络浏览器，并输入在应用主页上显示的网址。</string>
     <string name="web_dig">1. 电脑浏览器无法打开网页。\n\n无线路由器可能已启用AP隔离，阻止电脑与手机之间的通信。 请前往路由器设置界面禁用AP隔离功能。\n\n2. 在输入HTTPS网页地址后，电脑浏览器显示警告：“您的连接不是私密的。”\n\n您可以单击“继续前往x.x.x.x（不安全）”以继续。 PlainApp使用自签名的TLS证书加密网站。</string>
-    <string name="learn_more">了解更多…</string>
+    <string name="learn_more">了解更多</string>
     <string name="http_server_state_on">服务运行中</string>
     <string name="http_server_state_starting">启动服务中…</string>
-    <string name="http_server_state_stopping">停止服务中...</string>
+    <string name="http_server_state_stopping">停止服务中…</string>
     <string name="http_server_state_error">启动失败</string>
     <string name="change_port">更改端口</string>
     <string name="start_service">启动服务</string>
@@ -63,8 +63,13 @@
     <string name="restart_app_message">差一点了！只需点击“重启应用”即可生效。</string>
     <string name="access_phone_web">从电脑浏览器访问您的手机。</string>
     <string name="scan_qrcode_to_access_web">扫描二维码访问网页</string>
-    <string name="phone_web_portal">手机网页</string>
+    <string name="phone_web_portal">网页访问</string>
     <string name="phone_web_portal_desc">在电脑浏览器中访问你的手机</string>
+    <string name="web_portal_off">网页访问已关闭</string>
+    <string name="web_portal_running">网页访问已激活</string>
+    <string name="web_portal_desc_off">启动从桌面管理手机文件的服务。</string>
+    <string name="web_portal_desc_running">在同一本地网络上从桌面管理手机文件。</string>
+    <string name="more_settings">更多设置</string>
     <string name="same_network_hint">请确保你的电脑和手机在同一网络下</string>
     <string name="ready">就绪</string>
     <string name="permission_settings">权限设置</string>

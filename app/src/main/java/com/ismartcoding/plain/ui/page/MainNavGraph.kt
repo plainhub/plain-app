@@ -1,6 +1,13 @@
 package com.ismartcoding.plain.ui.page
 
 import android.net.Uri
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -20,25 +27,36 @@ import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.appfiles.AppFilesPage
 import com.ismartcoding.plain.ui.page.apps.AppPage
+import com.ismartcoding.plain.ui.page.apps.AppsPage
+import com.ismartcoding.plain.ui.page.audio.AudioPage
 import com.ismartcoding.plain.ui.page.chat.ChatEditTextPage
 import com.ismartcoding.plain.ui.page.chat.ChatInfoPage
+import com.ismartcoding.plain.ui.page.chat.ChatListPage
 import com.ismartcoding.plain.ui.page.chat.ChatPage
 import com.ismartcoding.plain.ui.page.chat.ChatTextPage
 import com.ismartcoding.plain.ui.page.chat.NearbyPage
+import com.ismartcoding.plain.ui.page.docs.DocsPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntriesPage
 import com.ismartcoding.plain.ui.page.feeds.FeedEntryPage
 import com.ismartcoding.plain.ui.page.feeds.FeedSettingsPage
 import com.ismartcoding.plain.ui.page.feeds.FeedsPage
 import com.ismartcoding.plain.ui.page.files.FilesPage
+import com.ismartcoding.plain.ui.page.images.ImagesPage
 import com.ismartcoding.plain.ui.page.notes.NotePage
-import com.ismartcoding.plain.ui.page.root.RootPage
+import com.ismartcoding.plain.ui.page.notes.NotesPage
+import com.ismartcoding.plain.ui.page.pomodoro.PomodoroPage
+import com.ismartcoding.plain.ui.page.home.HomePage
+import com.ismartcoding.plain.ui.page.home.HomeFeaturesSelectionPage
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.page.scan.ScanPage
 import com.ismartcoding.plain.ui.page.settings.AboutPage
+import com.ismartcoding.plain.ui.page.tools.SoundMeterPage
+import com.ismartcoding.plain.ui.page.videos.VideosPage
 import com.ismartcoding.plain.ui.page.settings.BackupRestorePage
 import com.ismartcoding.plain.ui.page.settings.DarkThemePage
 import com.ismartcoding.plain.ui.page.settings.LanguagePage
 import com.ismartcoding.plain.ui.page.settings.SettingsPage
+import com.ismartcoding.plain.ui.page.settings.ComponentShowcasePage
 import com.ismartcoding.plain.ui.page.web.NotificationSettingsPage
 import com.ismartcoding.plain.ui.page.web.SessionsPage
 import com.ismartcoding.plain.ui.page.web.WebDevPage
@@ -58,20 +76,53 @@ fun MainNavGraph(
     feedTagsVM: TagsViewModel,
     noteTagsVM: TagsViewModel,
     pomodoroVM: PomodoroViewModel,
-    onOpenDrawer: () -> Unit,
 ) {
     NavHost(
         modifier = Modifier.background(MaterialTheme.colorScheme.surface),
         navController = navController,
-        startDestination = Routing.Root,
+        startDestination = Routing.Home,
+        enterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { it / 5 },
+                animationSpec = tween(300, easing = LinearOutSlowInEasing),
+            ) + fadeIn(animationSpec = tween(150, 50, easing = LinearOutSlowInEasing))
+        },
+        exitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { -it / 5 },
+                animationSpec = tween(300, easing = FastOutLinearInEasing),
+            ) + fadeOut(animationSpec = tween(100, easing = FastOutLinearInEasing))
+        },
+        popEnterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { -it / 5 },
+                animationSpec = tween(300, easing = LinearOutSlowInEasing),
+            ) + fadeIn(animationSpec = tween(150, 50, easing = LinearOutSlowInEasing))
+        },
+        popExitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { it / 5 },
+                animationSpec = tween(300, easing = FastOutLinearInEasing),
+            ) + fadeOut(animationSpec = tween(100, easing = FastOutLinearInEasing))
+        },
     ) {
-        composable<Routing.Root> { RootPage(navController, mainVM, audioPlaylistVM = audioPlaylistVM, notesVM = notesVM, noteTagsVM = noteTagsVM, feedTagsVM = feedTagsVM, pomodoroVM = pomodoroVM) }
+        composable<Routing.Home> { HomePage(navController, mainVM) }
+        composable<Routing.Images> { ImagesPage(navController) }
+        composable<Routing.Videos> { VideosPage(navController) }
+        composable<Routing.Audio> { AudioPage(navController, audioPlaylistVM) }
+        composable<Routing.ChatList> { ChatListPage(navController, mainVM, peerVM = peerVM, channelVM = channelVM) }
+        composable<Routing.Apps> { AppsPage(navController) }
+        composable<Routing.Docs> { DocsPage(navController) }
+        composable<Routing.Notes> { NotesPage(navController, notesVM = notesVM, tagsVM = noteTagsVM) }
+        composable<Routing.SoundMeter> { SoundMeterPage(navController) }
+        composable<Routing.PomodoroTimer> { PomodoroPage(navController, pomodoroVM = pomodoroVM) }
         composable<Routing.Settings> { SettingsPage(navController) }
         composable<Routing.DarkTheme> { DarkThemePage(navController) }
         composable<Routing.Language> { LanguagePage(navController) }
         composable<Routing.BackupRestore> { BackupRestorePage(navController) }
         composable<Routing.About> { AboutPage(navController) }
         composable<Routing.WebSettings> { WebSettingsPage(navController, mainVM) }
+        composable<Routing.CustomFeatures> { HomeFeaturesSelectionPage(navController) }
         composable<Routing.NotificationSettings> { NotificationSettingsPage(navController) }
         composable<Routing.Sessions> { SessionsPage(navController) }
         composable<Routing.WebDev> { WebDevPage(navController) }
@@ -134,7 +185,7 @@ fun MainNavGraph(
         }
         composable<Routing.Files> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.Files>()
-            FilesPage(navController, audioPlaylistVM, r.folderPath, onOpenDrawer = onOpenDrawer)
+            FilesPage(navController, audioPlaylistVM, r.folderPath)
         }
         composable<Routing.AppFiles> {
             AppFilesPage(navController)
@@ -143,5 +194,6 @@ fun MainNavGraph(
             val r = backStackEntry.toRoute<Routing.Nearby>()
             NearbyPage(navController, pairDeviceJson = r.pairDeviceJson)
         }
+        composable<Routing.ComponentShowcase> { ComponentShowcasePage(navController) }
     }
 }

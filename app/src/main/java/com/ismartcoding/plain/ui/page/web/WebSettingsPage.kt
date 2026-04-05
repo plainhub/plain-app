@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -34,20 +33,34 @@ import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.preferences.LocalApiPermissions
 import com.ismartcoding.plain.preferences.LocalKeepAwake
+import com.ismartcoding.plain.preferences.LocalWeb
 import com.ismartcoding.plain.preferences.WebSettingsProvider
-import com.ismartcoding.plain.ui.base.*
+import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
+import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.base.PDropdownMenuItem
+import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.POutlinedButton
+import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.PSwitch
+import com.ismartcoding.plain.ui.base.PTopAppBar
+import com.ismartcoding.plain.ui.base.Subtitle
+import com.ismartcoding.plain.ui.base.Tips
+import com.ismartcoding.plain.ui.base.TopSpace
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.WebConsoleViewModel
 import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.ui.page.home.HomeWeb
 import com.ismartcoding.plain.ui.theme.PlainTheme
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun WebSettingsPage(navController: NavHostController, mainVM: MainViewModel, webVM: WebConsoleViewModel = viewModel()) {
     WebSettingsProvider {
         val context = LocalContext.current
+        val webEnabled = LocalWeb.current
         val keepAwake = LocalKeepAwake.current
         val scope = rememberCoroutineScope()
         val enabledPermissions = LocalApiPermissions.current
@@ -59,8 +72,8 @@ fun WebSettingsPage(navController: NavHostController, mainVM: MainViewModel, web
         WebSettingsEffects(permissionList, shouldIgnoreOptimize, systemAlertWindow, notificationListenerGranted)
 
         PScaffold(topBar = {
-            PTopAppBar(navController = navController, title = stringResource(R.string.permission_settings), actions = {
-                PMiniOutlineButton(label = stringResource(R.string.sessions), click = { navController.navigate(Routing.Sessions) })
+            PTopAppBar(navController = navController, title = stringResource(R.string.web_settings), actions = {
+                POutlinedButton(text = stringResource(R.string.sessions), small = true, onClick = { navController.navigate(Routing.Sessions) })
                 ActionButtonMoreWithMenu { dismiss ->
                     PDropdownMenuItem(leadingIcon = { Icon(painter = painterResource(R.drawable.lock), contentDescription = stringResource(R.string.security)) },
                         onClick = { dismiss(); navController.navigate(Routing.WebSecurity) }, text = { Text(stringResource(R.string.security)) })
@@ -70,7 +83,12 @@ fun WebSettingsPage(navController: NavHostController, mainVM: MainViewModel, web
             })
         }, content = { paddingValues ->
             LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
-                item { TopSpace(); Subtitle(text = stringResource(R.string.permissions)) }
+                item {
+                    TopSpace()
+                    HomeWeb(context, navController, mainVM, webEnabled, showSettingsButton = false, showIpAddresses = true)
+                    VerticalSpace(dp = 16.dp)
+                }
+                item { Subtitle(text = stringResource(R.string.permissions)) }
                 itemsIndexed(permissionList.value) { index, m ->
                     val permission = m.permission
                     PListItem(modifier = PlainTheme.getCardModifier(index = index, size = permissionList.value.size)

@@ -30,6 +30,10 @@ import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.bluetooth.BluetoothFindOneEvent
 import com.ismartcoding.plain.features.bluetooth.BluetoothPermissionResultEvent
 import com.ismartcoding.plain.features.bluetooth.BluetoothUtil
+import com.ismartcoding.plain.ai.ImageSearchManager
+import com.ismartcoding.plain.ai.ImageSearchStatusChangedEvent
+import com.ismartcoding.plain.ai.ImageIndexProgressEvent
+import com.ismartcoding.plain.web.models.buildImageSearchStatus
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
 import com.ismartcoding.plain.chat.discover.NearbyPairManager
@@ -148,6 +152,10 @@ data class StartMmsPollingEvent(
     val launchTimeSec: Long,
     val attachmentPaths: List<String>,
 ) : ChannelEvent()
+
+class EnableImageSearchEvent : ChannelEvent()
+class DisableImageSearchEvent : ChannelEvent()
+class CancelImageDownloadEvent : ChannelEvent()
 
 class FeedStatusEvent(val feedId: String, val status: FeedWorkerStatus) : ChannelEvent()
 
@@ -306,6 +314,36 @@ object AppEvents {
                         NearbyDiscoverManager.stopPeriodicDiscovery()
                     }
 
+                    is ImageSearchStatusChangedEvent -> {
+                        sendEvent(
+                            WebSocketEvent(
+                                EventType.IMAGE_SEARCH_UPDATED,
+                                jsonEncode(buildImageSearchStatus()),
+                            )
+                        )
+                    }
+
+                    is ImageIndexProgressEvent -> {
+                        sendEvent(
+                            WebSocketEvent(
+                                EventType.IMAGE_SEARCH_UPDATED,
+                                jsonEncode(buildImageSearchStatus()),
+                            )
+                        )
+                    }
+
+                    is EnableImageSearchEvent -> {
+                        coIO { ImageSearchManager.enableAsync() }
+                    }
+
+                    is DisableImageSearchEvent -> {
+                        coIO { ImageSearchManager.disableAsync() }
+                    }
+
+                    is CancelImageDownloadEvent -> {
+                        ImageSearchManager.cancelDownload()
+                    }
+
                     is StartMmsPollingEvent -> {
                         coIO {
                             val context = MainApp.instance
@@ -321,7 +359,10 @@ object AppEvents {
                                 if (found) {
                                     TempData.pendingMmsMessages.removeIf { it.id == event.pendingId }
                                     event.attachmentPaths.forEach { path ->
-                                        try { java.io.File(path).delete() } catch (_: Exception) {}
+                                        try {
+                                            java.io.File(path).delete()
+                                        } catch (_: Exception) {
+                                        }
                                     }
                                     sendEvent(WebSocketEvent(EventType.MMS_SENT, jsonEncode(event.pendingId)))
                                     return@coIO

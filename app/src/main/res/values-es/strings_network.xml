@@ -11,7 +11,7 @@
     <string name="instruction_for_use">Instrucciones de uso</string>
     <string name="web_how_to">Paso 1: Conecta tu teléfono y tu computadora a la misma red inalámbrica.\n\nMétodo 1: Conecta tu computadora y tu teléfono a la misma red Wi-Fi.\nMétodo 2: Activa el hotspot de tu teléfono y conecta tu computadora al hotspot del teléfono.\n\nPaso 2: Abre un navegador web en tu computadora e ingresa la dirección web que se muestra en la página de inicio de la aplicación.</string>
     <string name="web_dig">1. El navegador de la computadora no puede abrir la página web.\n\nEs posible que el enrutador inalámbrico tenga habilitado el aislamiento de AP, lo que impide la comunicación entre la computadora y el teléfono. Por favor, vaya a la interfaz de configuración del enrutador para desactivar la función de aislamiento de AP.\n\n2. El navegador de la computadora muestra una advertencia después de ingresar una dirección web de página HTTPS: "Su conexión no es privada."\n\nPuedes hacer clic en "Continuar a x.x.x.x (no seguro)" para continuar. Simple utiliza un certificado TLS autofirmado para cifrar el sitio web.</string>
-    <string name="learn_more">Más información…</string>
+    <string name="learn_more">Más información</string>
     <string name="http_server_state_on">El servicio está en ejecución</string>
     <string name="http_server_state_starting">Iniciando servicio...</string>
     <string name="http_server_state_stopping">Deteniendo servicio...</string>
@@ -63,8 +63,13 @@
     <string name="restart_app_message">¡Casi listo! Solo toque "Volver a lanzar APP" para que surtan efecto los cambios.</string>
     <string name="access_phone_web">Accede a tu teléfono desde el navegador de una computadora.</string>
     <string name="scan_qrcode_to_access_web">Escanea el código QR para acceder a la dirección web</string>
-    <string name="phone_web_portal">Portal web del teléfono</string>
+    <string name="phone_web_portal">Acceso web</string>
     <string name="phone_web_portal_desc">Accede a tu teléfono desde el navegador de una computadora</string>
+    <string name="web_portal_off">Acceso web: APAGADO</string>
+    <string name="web_portal_running">Acceso web: ACTIVADO</string>
+    <string name="web_portal_desc_off">Inicie el servicio para administrar archivos del teléfono desde el escritorio.</string>
+    <string name="web_portal_desc_running">Administre archivos del teléfono desde el escritorio en la misma red local.</string>
+    <string name="more_settings">Más configuraciones</string>
     <string name="same_network_hint">Asegúrate de que tu computadora y tu teléfono estén en la misma red</string>
     <string name="ready">Listo</string>
     <string name="permission_settings">Configuración de permisos</string>

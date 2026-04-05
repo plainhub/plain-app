@@ -22,7 +22,6 @@ import com.ismartcoding.lib.extensions.isAudioFast
 import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.extensions.scanFileByConnection
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
@@ -55,14 +54,12 @@ import android.os.Bundle
 import com.ismartcoding.plain.events.CancelNotificationsEvent
 import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
-import com.ismartcoding.plain.events.EventType
 import com.ismartcoding.plain.events.FetchBookmarkMetadataEvent
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
 import com.ismartcoding.plain.events.HttpApiEvents
 import com.ismartcoding.plain.events.StartMmsPollingEvent
 import com.ismartcoding.plain.events.StartScreenMirrorEvent
 import com.ismartcoding.plain.events.RequestScreenMirrorAudioEvent
-import com.ismartcoding.plain.events.WebSocketEvent
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.BookmarkHelper
@@ -91,7 +88,6 @@ import com.ismartcoding.plain.features.sms.SmsHelper
 import com.ismartcoding.plain.features.sms.MmsHelper
 import com.ismartcoding.plain.features.sms.DMessageAttachment
 import com.ismartcoding.plain.helpers.AppFileStore
-import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.DeviceInfoHelper
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.helpers.NotificationsHelper
@@ -107,7 +103,6 @@ import com.ismartcoding.plain.preferences.AudioPlaylistPreference
 import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.preferences.AuthDevTokenPreference
 import com.ismartcoding.plain.preferences.DeveloperModePreference
-import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.preferences.PomodoroSettingsPreference
 import com.ismartcoding.plain.preferences.ScreenMirrorQualityPreference
@@ -133,7 +128,11 @@ import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.db.ChannelMember
 import com.ismartcoding.plain.db.DChatChannel
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.events.CancelImageDownloadEvent
 import com.ismartcoding.plain.events.ChannelUpdatedEvent
+import com.ismartcoding.plain.events.DisableImageSearchEvent
+import com.ismartcoding.plain.events.EnableImageSearchEvent
+import com.ismartcoding.plain.events.RestartAppEvent
 import com.ismartcoding.plain.web.models.ChatChannel
 import com.ismartcoding.plain.web.models.ChatChannelMember
 import com.ismartcoding.plain.web.models.ChatItem
@@ -156,10 +155,10 @@ import com.ismartcoding.plain.web.models.BookmarkInput
 import com.ismartcoding.plain.web.models.Tag
 import com.ismartcoding.plain.web.models.TempValue
 import com.ismartcoding.plain.web.models.Video
-import com.ismartcoding.plain.web.models.AppFile
 import com.ismartcoding.plain.ui.page.appfiles.AppFileDisplayNameHelper
 import com.ismartcoding.plain.web.models.toExportModel
 import com.ismartcoding.plain.web.models.toModel
+import com.ismartcoding.plain.ai.ImageIndexManager
 import com.ismartcoding.plain.ai.ImageSearchManager
 import com.ismartcoding.plain.ai.ImageSearchIndexer
 import com.ismartcoding.plain.web.models.buildImageSearchStatus
@@ -1029,28 +1028,32 @@ class MainGraphQL(val schema: Schema) {
                 }
                 mutation("relaunchApp") {
                     resolver { ->
-                        coIO {
-                            AppHelper.relaunch(MainApp.instance)
-                        }
+                        sendEvent(RestartAppEvent())
                         true
                     }
                 }
                 // Image Search mutations
                 mutation("enableImageSearch") {
                     resolver { ->
-                        coIO { ImageSearchManager.enable() }
+                        sendEvent(EnableImageSearchEvent())
                         true
                     }
                 }
                 mutation("disableImageSearch") {
                     resolver { ->
-                        coIO { ImageSearchManager.disable() }
+                        sendEvent(DisableImageSearchEvent())
+                        true
+                    }
+                }
+                mutation("cancelImageDownload") {
+                    resolver { ->
+                        sendEvent(CancelImageDownloadEvent())
                         true
                     }
                 }
                 mutation("startImageIndex") {
                     resolver { force: Boolean? ->
-                        coIO { ImageSearchIndexer.start(force == true) }
+                        ImageIndexManager.fullScan(force == true)
                         true
                     }
                 }
@@ -1664,6 +1667,7 @@ class MainGraphQL(val schema: Schema) {
                             DataType.IMAGE -> {
                                 ids = if (hasTrashFeature) ImageMediaStoreHelper.getTrashedIdsAsync(context, query) else ImageMediaStoreHelper.getIdsAsync(context, query)
                                 ImageMediaStoreHelper.deleteRecordsAndFilesByIdsAsync(context, ids, true)
+                                ImageIndexManager.enqueueRemove(ids)
                             }
 
                             else -> {
@@ -1698,6 +1702,7 @@ class MainGraphQL(val schema: Schema) {
                             DataType.IMAGE -> {
                                 ids = ImageMediaStoreHelper.getIdsAsync(context, query)
                                 ImageMediaStoreHelper.trashByIdsAsync(context, ids)
+                                ImageIndexManager.enqueueRemove(ids)
                             }
 
                             else -> {
@@ -1729,6 +1734,7 @@ class MainGraphQL(val schema: Schema) {
                             DataType.IMAGE -> {
                                 ids = ImageMediaStoreHelper.getTrashedIdsAsync(context, query)
                                 ImageMediaStoreHelper.restoreByIdsAsync(context, ids)
+                                ImageIndexManager.enqueueAdd(ids)
                             }
 
                             else -> {

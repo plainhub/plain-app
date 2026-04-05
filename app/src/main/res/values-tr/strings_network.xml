@@ -11,7 +11,7 @@
     <string name="instruction_for_use">Kullanım talimatları</string>
     <string name="web_how_to">Adım 1: Telefonunuzu ve bilgisayarınızı aynı kablosuz ağa bağlayın.\n\nYöntem 1: Bilgisayarınızı ve telefonunuzu aynı Wi-Fi ağına bağlayın.\nYöntem 2: Telefonunuzun hotspot\'unu açın ve bilgisayarınızı telefonun hotspot\'una bağlayın.\n\nAdım 2: Bilgisayarınızda bir web tarayıcısı açın ve UYGULAMA ana sayfasında görüntülenen web adresini girin.</string>
     <string name="web_dig">1. Bilgisayar tarayıcısı web sayfasını açamıyor.\n\nKablosuz yönlendiricide AP izolasyonu etkinleştirilmiş olabilir, bu da bilgisayar ve telefon arasındaki iletişimi engelleyebilir. Lütfen yönlendirici ayarları arayüzüne gidin ve AP izolasyonu işlevini devre dışı bırakın.\n\n2. Bilgisayar tarayıcısı, HTTPS web sayfası adresini girdikten sonra bir uyarı görüntülüyor: "Bağlantınız gizli değil."\n\nDevam etmek için "x.x.x.x adresine devam et (güvenli değil)" seçeneğine tıklayabilirsiniz. Simple, web sitesini şifrelemek için kendi imzalı bir TLS sertifikası kullanır.</string>
-    <string name="learn_more">Daha fazla bilgi…</string>
+    <string name="learn_more">Daha fazla bilgi</string>
     <string name="http_server_state_on">Hizmet çalışıyor</string>
     <string name="http_server_state_starting">Hizmet başlatılıyor…</string>
     <string name="http_server_state_stopping">Hizmet durduruluyor…</string>
@@ -63,8 +63,13 @@
     <string name="restart_app_message">Neredeyse bitti! Etkili olması için "Uygulamayı Yeniden Başlat" düğmesine dokunun.</string>
     <string name="access_phone_web">Telefonunuza bir bilgisayar tarayıcısından erişin.</string>
     <string name="scan_qrcode_to_access_web">Web adresine erişmek için QR kodunu tarayın</string>
-    <string name="phone_web_portal">Telefon Web Portalı</string>
+    <string name="phone_web_portal">Web Erişimi</string>
     <string name="phone_web_portal_desc">Telefonunuza bilgisayar tarayıcısından erişin</string>
+    <string name="web_portal_off">Web Erişimi: KAPALI</string>
+    <string name="web_portal_running">Web Erişimi: AÇIK</string>
+    <string name="web_portal_desc_off">Telefon dosyalarını masaüstünden yönetmek için hizmeti başlatın.</string>
+    <string name="web_portal_desc_running">Telefon dosyalarını aynı yerel ağdaki masaüstünden yönetin.</string>
+    <string name="more_settings">Diğer ayarlar</string>
     <string name="same_network_hint">Bilgisayarınızın ve telefonunuzun aynı ağda olduğundan emin olun</string>
     <string name="ready">Hazır</string>
     <string name="permission_settings">İzin ayarları</string>

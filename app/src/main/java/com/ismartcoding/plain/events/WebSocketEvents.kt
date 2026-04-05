@@ -51,6 +51,7 @@ enum class EventType(val value: Int) {
     DOWNLOAD_PROGRESS(16),
     MMS_SENT(17),
     CHANNELS_UPDATED(18),
+    IMAGE_SEARCH_UPDATED(19),
 }
 
 

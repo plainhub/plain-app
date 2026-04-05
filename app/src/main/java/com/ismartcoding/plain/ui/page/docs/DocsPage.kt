@@ -41,7 +41,7 @@ import com.ismartcoding.plain.preferences.DocSortByPreference
 import com.ismartcoding.plain.ui.base.ActionButtonSearch
 import com.ismartcoding.plain.ui.base.ActionButtonSort
 import com.ismartcoding.plain.ui.base.HorizontalSpace
-import com.ismartcoding.plain.ui.base.ActionButtonDrawer
+import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
 import com.ismartcoding.plain.ui.base.NeedPermissionColumn
 import com.ismartcoding.plain.ui.base.PFilterChip
@@ -67,7 +67,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun DocsPage(navController: NavHostController, onOpenDrawer: () -> Unit = {}, docsVM: DocsViewModel = viewModel()) {
+fun DocsPage(navController: NavHostController, docsVM: DocsViewModel = viewModel()) {
     val context = LocalContext.current
     val itemsState by docsVM.itemsFlow.collectAsState()
     val filteredItemsState by remember { derivedStateOf { itemsState.filter { docsVM.fileType.value.isEmpty() || it.extension == docsVM.fileType.value } } }
@@ -103,7 +103,7 @@ fun DocsPage(navController: NavHostController, onOpenDrawer: () -> Unit = {}, do
     PScaffold(topBar = {
         if (docsVM.showSearchBar.value) { ListSearchBar(viewModel = docsVM, onSearch = onSearch); return@PScaffold }
         PTopAppBar(modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { scope.launch { scrollStateMap[pagerState.currentPage]?.scrollToItem(0) } }),
-            navController = navController, navigationIcon = { if (docsVM.selectMode.value) NavigationCloseIcon { docsVM.exitSelectMode() } else ActionButtonDrawer(onClick = onOpenDrawer) },
+            navController = navController, navigationIcon = { if (docsVM.selectMode.value) NavigationCloseIcon { docsVM.exitSelectMode() } else NavigationBackIcon { navController.navigateUp() } },
             title = pageTitle, scrollBehavior = scrollBehavior, actions = {
                 if (!hasPermission) return@PTopAppBar
                 if (docsVM.selectMode.value) { PTopRightButton(label = stringResource(if (docsVM.isAllSelected()) R.string.unselect_all else R.string.select_all), click = { docsVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp) }

@@ -33,7 +33,7 @@ fun ChatLinkPreviewLoading(url: String, modifier: Modifier = Modifier) {
                 Text(text = stringResource(R.string.loading_link_preview), style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Medium)
                 Spacer(modifier = Modifier.height(2.dp))
-                Text(text = url, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.outline,
+                Text(text = url, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp)
             }
         }
@@ -63,7 +63,7 @@ fun ChatLinkPreviewError(url: String, modifier: Modifier = Modifier) {
             Text(text = stringResource(R.string.link_preview_error), style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onErrorContainer, fontWeight = FontWeight.Medium)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = url, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.outline,
+            Text(text = url, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp)
         }
     }

@@ -153,17 +153,15 @@ ui/
 │   ├── images/        # Image gallery (3 files)
 │   ├── notes/         # Notes editor (4 files)
 │   ├── pomodoro/      # Pomodoro timer (4 files)
-│   ├── root/          # Main tabs & home (15 files)
+│   ├── home/          # Home page & web portal (17 files)
 │   ├── scan/          # QR/barcode scanner (4 files)
-│   ├── settings/      # Settings screens (6 files)
+│   ├── settings/      # Settings screens (7 files)
 │   ├── tags/          # Tag management (3 files)
 │   ├── tools/         # Tools (1 file)
 │   ├── videos/        # Video gallery (3 files)
 │   └── web/           # Web server settings (7 files)
-└── theme/             # Material3 theming (7 files, no subdirectories)
-    # Theme.kt           — AppTheme composable (dark/light color schemes)
-    # ColorSchemeMore.kt  — App-specific color extensions (backgrounds, nav, wave, masks)
-    # ColorSchemeIOS.kt   — iOS system color extensions (green, red, blue, yellow, etc.)
+└── theme/             # Material3 theming (5 files, no subdirectories)
+    # Theme.kt           — AppTheme composable (dark/light color schemes) + all color extensions
     # ColorHelper.kt      — Color utility functions (hex parsing, alwaysLight)
     # PlainTheme.kt       — Dimensions (margins, radius) + Typography extensions
     # Type.kt             — Material3 Typography definition

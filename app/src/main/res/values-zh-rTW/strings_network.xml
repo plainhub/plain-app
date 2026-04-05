@@ -11,7 +11,7 @@
     <string name="instruction_for_use">使用說明</string>
     <string name="web_how_to">步驟1：將您的手機和電腦連接到同一個無線網路。\n\n方法1：將您的電腦和手機連接到同一個Wi-Fi網路。\n方法2：打開您的手機熱點，並將您的電腦連接到手機熱點。\n\n步驟2：在您的電腦上開啟一個網頁瀏覽器，並輸入在應用程式首頁上顯示的網址。</string>
     <string name="web_dig">1. 電腦瀏覽器無法開啟網頁。\n\n無線路由器可能已啟用AP隔離，阻止電腦與手機之間的通訊。 請前往路由器設置界面禁用AP隔離功能。\n\n2. 在輸入HTTPS網頁地址後，電腦瀏覽器顯示警告："您的連線不是私密的。" \n\n您可以點擊"繼續前往x.x.x.x（不安全）"以繼續。 Simple使用自簽名的TLS憑證加密網站。</string>
-    <string name="learn_more">進一步了解…</string>
+    <string name="learn_more">進一步了解</string>
     <string name="http_server_state_on">服務正在運行中</string>
     <string name="http_server_state_starting">正在啟動服務…</string>
     <string name="http_server_state_stopping">正在停止服務…</string>
@@ -63,8 +63,13 @@
     <string name="restart_app_message">差一點了！只需點擊「重新啟動應用程式」即可生效。</string>
     <string name="access_phone_web">從電腦瀏覽器訪問您的手機。</string>
     <string name="scan_qrcode_to_access_web">掃描二維碼訪問網頁</string>
-    <string name="phone_web_portal">手機網頁入口</string>
+    <string name="phone_web_portal">網頁存取</string>
     <string name="phone_web_portal_desc">在電腦瀏覽器中存取你的手機</string>
+    <string name="web_portal_off">網頁存取：關閉</string>
+    <string name="web_portal_running">網頁存取：開啟</string>
+    <string name="web_portal_desc_off">啟動從桌面管理手機檔案的服務。</string>
+    <string name="web_portal_desc_running">在同一本地網路上從桌面管理手機檔案。</string>
+    <string name="more_settings">更多设置</string>
     <string name="same_network_hint">請確認你的電腦與手機位於同一網路</string>
     <string name="ready">就緒</string>
     <string name="permission_settings">權限設定</string>

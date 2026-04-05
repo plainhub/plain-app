@@ -1,63 +1,63 @@
 package com.ismartcoding.plain.ui.components
 
 import android.content.Context
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import com.ismartcoding.plain.R
-import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.preferences.HttpsPreference
-import com.ismartcoding.plain.ui.base.PageIndicator
-import com.ismartcoding.plain.ui.base.Tips
-import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.models.MainViewModel
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import kotlinx.coroutines.launch
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
+import com.ismartcoding.plain.ui.models.MainViewModel
+import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 
-// https://developer.android.com/jetpack/compose/layouts/pager
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WebAddress(
     context: Context,
-    mainVM: MainViewModel
+    mainVM: MainViewModel,
+    isHttps: Boolean,
+    showIpAddresses: Boolean = true,
 ) {
-    val initialPage = if (TempData.webHttps) 1 else 0
-    val pagerState = rememberPagerState(initialPage = initialPage, pageCount = {
-        2
-    })
-    val scope = rememberCoroutineScope()
-    LaunchedEffect(pagerState) {
-        if (initialPage != pagerState.currentPage) {
-            scope.launch {
-                pagerState.animateScrollToPage(initialPage)
+    WebAddressBar(context = context, mainVM = mainVM, isHttps = isHttps, showIpAddresses = showIpAddresses)
+}
+
+@Composable
+fun HttpHttpsSegmentedButton(isHttps: Boolean, onSelect: (Boolean) -> Unit) {
+    val trackColor = MaterialTheme.colorScheme.cardBackgroundNormal
+    val selectedColor = MaterialTheme.colorScheme.primary
+    val unselectedText = MaterialTheme.colorScheme.onSurfaceVariant
+    val selectedText = MaterialTheme.colorScheme.onPrimary
+
+    Row(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(trackColor)
+            .padding(3.dp),
+    ) {
+        listOf(false to "HTTP", true to "HTTPS").forEach { (https, label) ->
+            val selected = isHttps == https
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .background(if (selected) selectedColor else trackColor)
+                    .clickable { onSelect(https) }
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = if (selected) selectedText else unselectedText,
+                )
             }
         }
-        snapshotFlow { pagerState.currentPage }.collect { page ->
-            HttpsPreference.putAsync(context, page == 1)
-        }
     }
-
-    // HTTP/HTTPS address section
-    HorizontalPager(
-        state = pagerState,
-        pageSpacing = 16.dp,
-    ) { page ->
-        Column {
-            val isHttps = page != 0
-            WebAddressBar(context, mainVM, isHttps)
-            Tips(
-                stringResource(R.string.same_network_hint),
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            )
-        }
-    }
-    PageIndicator(pagerState)
 }

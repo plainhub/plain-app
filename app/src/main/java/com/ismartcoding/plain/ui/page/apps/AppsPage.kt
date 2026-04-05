@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun AppsPage(navController: NavHostController, onOpenDrawer: () -> Unit = {}, appsVM: AppsViewModel = viewModel()) {
+fun AppsPage(navController: NavHostController, appsVM: AppsViewModel = viewModel()) {
     val context = LocalContext.current
     val itemsState by appsVM.itemsFlow.collectAsState()
     val scope = rememberCoroutineScope()
@@ -74,7 +74,7 @@ fun AppsPage(navController: NavHostController, onOpenDrawer: () -> Unit = {}, ap
     PScaffold(topBar = {
         if (appsVM.showSearchBar.value) { ListSearchBar(viewModel = appsVM, onSearch = onSearch); return@PScaffold }
         PTopAppBar(modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = { scope.launch { scrollStateMap[pagerState.currentPage]?.scrollToItem(0) } }),
-            navController = navController, navigationIcon = { ActionButtonDrawer(onClick = onOpenDrawer) },
+            navController = navController,
             title = stringResource(id = R.string.apps), scrollBehavior = scrollBehavior, actions = {
                 ActionButtonSearch { appsVM.enterSearchMode() }; ActionButtonSort { appsVM.showSortDialog.value = true }
             })
