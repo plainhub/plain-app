@@ -102,7 +102,9 @@ fun HomeWeb(
             WebState.ERROR -> {
                 HomeWebErrorSection(
                     context = context,
+                    navController,
                     errorMessage = errorMessage,
+                    showSettingsButton = showSettingsButton,
                     onRestartFix = onRestartFix,
                 )
             }

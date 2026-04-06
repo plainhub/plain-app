@@ -164,7 +164,7 @@ object HttpServerManager {
      * Wait for ports to become available after stopping a previous server.
      * Returns true if both ports are free within the timeout.
      */
-    suspend fun waitForPortsAvailable(httpPort: Int, httpsPort: Int, maxWaitMs: Long = 5000): Boolean {
+    suspend fun waitForPortsAvailable(httpPort: Int, httpsPort: Int, maxWaitMs: Long = 3000): Boolean {
         val interval = 200L
         var elapsed = 0L
         while (elapsed < maxWaitMs) {

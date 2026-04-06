@@ -83,6 +83,10 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
                 return@launch
             }
 
+            if (httpServerState == HttpServerState.ERROR) {
+                return@launch
+            }
+
             if (!httpServerState.isProcessing() && httpServerState != HttpServerState.ON) {
                 httpServerState = HttpServerState.STARTING
             }

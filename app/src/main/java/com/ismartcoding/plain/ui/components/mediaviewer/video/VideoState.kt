@@ -57,7 +57,6 @@ class VideoState {
         isSeeking = true
         currentTime = position
         player?.seekTo(position)
-        isSeeking = false
         if (!isPlaying) {
             player?.play()
         }
@@ -105,6 +104,7 @@ class VideoState {
     }
 
     fun updateTime() {
+        if (isSeeking) return
         isPlaying = player?.isPlaying ?: false // Hacky way to update isPlaying
         currentTime = player?.currentPosition?.coerceAtLeast(0L) ?: 0L
         totalTime = player?.duration?.coerceAtLeast(0L) ?: 0L

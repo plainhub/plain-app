@@ -79,7 +79,10 @@ fun MediaVideo(
                 scope.launch {
                     videoState.totalTime = player.duration.coerceAtLeast(0L)
                     videoState.isPlaying = player.isPlaying
-                    if (!videoState.isSeeking) videoState.updateTime()
+                    if (events.contains(Player.EVENT_POSITION_DISCONTINUITY)) {
+                        videoState.isSeeking = false
+                    }
+                    videoState.updateTime()
                     defaultPlayerView.keepScreenOn = player.isPlaying
                 }
             }

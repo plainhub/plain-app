@@ -31,9 +31,10 @@ object HttpServerStartHelper {
         if (PortHelper.isPortInUse(TempData.httpPort) || PortHelper.isPortInUse(TempData.httpsPort)) {
             LogCat.d("Ports still in use after stopping previous server, waiting...")
             HttpServerManager.waitForPortsAvailable(TempData.httpPort, TempData.httpsPort)
+            attemptServerStart(1)
+        } else {
+            attemptServerStart(2)
         }
-
-        attemptServerStart()
 
         delay(500)
         val checkResult = HttpServerManager.checkServerAsync()
@@ -44,8 +45,7 @@ object HttpServerStartHelper {
         }
     }
 
-    private suspend fun attemptServerStart() {
-        val maxRetries = 3
+    private suspend fun attemptServerStart(maxRetries: Int) {
         for (attempt in 1..maxRetries) {
             try {
                 val server = HttpServerManager.createHttpServerAsync(MainApp.instance)

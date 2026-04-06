@@ -83,27 +83,27 @@ fun MainNavGraph(
         startDestination = Routing.Home,
         enterTransition = {
             slideInHorizontally(
-                initialOffsetX = { it / 5 },
+                initialOffsetX = { it },
                 animationSpec = tween(300, easing = LinearOutSlowInEasing),
             ) + fadeIn(animationSpec = tween(150, 50, easing = LinearOutSlowInEasing))
         },
         exitTransition = {
             slideOutHorizontally(
-                targetOffsetX = { -it / 5 },
+                targetOffsetX = { -it / 3 },
                 animationSpec = tween(300, easing = FastOutLinearInEasing),
-            ) + fadeOut(animationSpec = tween(100, easing = FastOutLinearInEasing))
+            ) + fadeOut(animationSpec = tween(150, easing = FastOutLinearInEasing))
         },
         popEnterTransition = {
             slideInHorizontally(
-                initialOffsetX = { -it / 5 },
+                initialOffsetX = { -it / 3 },
                 animationSpec = tween(300, easing = LinearOutSlowInEasing),
             ) + fadeIn(animationSpec = tween(150, 50, easing = LinearOutSlowInEasing))
         },
         popExitTransition = {
             slideOutHorizontally(
-                targetOffsetX = { it / 5 },
+                targetOffsetX = { it },
                 animationSpec = tween(300, easing = FastOutLinearInEasing),
-            ) + fadeOut(animationSpec = tween(100, easing = FastOutLinearInEasing))
+            ) + fadeOut(animationSpec = tween(150, easing = FastOutLinearInEasing))
         },
     ) {
         composable<Routing.Home> { HomePage(navController, mainVM) }
