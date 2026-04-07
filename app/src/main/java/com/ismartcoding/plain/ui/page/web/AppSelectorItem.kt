@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -44,8 +43,7 @@ internal fun AppSelectorItem(
             contentDescription = app.name,
             modifier = Modifier
                 .size(48.dp)
-                .clip(RoundedCornerShape(12.dp)),
-            placeholder = rememberDrawablePainter(appIcon)
+                .clip(RoundedCornerShape(12.dp))
         )
 
         HorizontalSpace(dp = 16.dp)

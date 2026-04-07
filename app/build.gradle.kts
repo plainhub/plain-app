@@ -202,7 +202,6 @@ dependencies {
     implementation(libs.compose.foundation)
     implementation(libs.compose.foundation.layout)
     implementation(libs.compose.material3)
-    implementation(libs.accompanist.drawablepainter)
     // https://developer.android.com/jetpack/androidx/releases/navigation
     implementation(libs.compose.navigation)
 
@@ -270,9 +269,6 @@ dependencies {
     // For cryptography (Ed25519 support on all Android versions)
     implementation(libs.tink.android)
     
-    // JmDNS for mDNS service discovery
-    implementation(libs.jmdns)
-
     // WebRTC for screen mirroring
     implementation(libs.stream.webrtc.android)
 

@@ -9,8 +9,8 @@ import java.net.NetworkInterface
 object NetworkHelper {
     /**
      * Returns true for interface names that are typically VPN tunnels.
-     * These should be excluded when picking a physical LAN address for JmDNS because
-     * mDNS is a link-local protocol and cannot traverse VPN tunnels.
+     * These should be excluded when picking a physical LAN address for local discovery,
+     * because mDNS is a link-local protocol and cannot traverse VPN tunnels.
      */
     fun isVpnInterface(name: String): Boolean {
         return name.startsWith("tun") || name.startsWith("ppp") ||
