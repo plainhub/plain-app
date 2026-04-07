@@ -81,9 +81,9 @@ android {
                 else -> 0
             }
 
-        val vCode = 520
+        val vCode = 523
         versionCode = vCode - singleAbiNum
-        versionName = "3.0.7"
+        versionName = "3.0.8"
 
         ndk {
             //noinspection ChromeOsAbiSupport
@@ -149,6 +149,10 @@ android {
             dimension = "channel"
             buildConfigField("String", "CHANNEL", "\"GOOGLE\"")
         }
+        create("fdroid") {
+            dimension = "channel"
+            buildConfigField("String", "CHANNEL", "\"FDROID\"")
+        }
     }
 
     compileOptions {
@@ -188,7 +192,7 @@ play {
 
 dependencies {
     testImplementation(libs.junit)
-    testImplementation("org.json:json:20231013")
+    testImplementation("org.json:json:20251224")
     implementation(project(":lib"))
 
     implementation(platform(libs.compose.bom))
@@ -217,6 +221,7 @@ dependencies {
     implementation(libs.media3.hls)
 
     implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.exifinterface)
 
     // CameraX
     implementation(libs.camera.core)
@@ -270,7 +275,9 @@ dependencies {
     // WebRTC for screen mirroring
     implementation(libs.webrtc.sdk.android)
 
-    // AI Image Search: MediaPipe + LiteRT
+    // AI Image Search: MediaPipe is open source (included for all flavors).
+    // LiteRT is excluded from fdroid to pass F-Droid FOSS checks.
     implementation(libs.mediapipe.tasks.vision)
-    implementation(libs.litert)
+    "githubImplementation"(libs.litert)
+    "googleImplementation"(libs.litert)
 }

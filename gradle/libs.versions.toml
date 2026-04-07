@@ -4,7 +4,6 @@ bcprovJdk15onVersion="1.70"
 coil="3.4.0"
 coreKtxVersion="1.18.0"
 firebaseCrashlyticsGradleVersion="3.0.6"
-glideVersion="5.0.5"
 googleServicesVersion="4.4.4"
 gradle= "9.0.1"
 cameraCoreVersion = "1.6.0"
@@ -12,6 +11,7 @@ compose = "1.10.6"
 activityComposeVersion = "1.13.0"
 composeBom = "2026.03.01"
 coreSplashscreenVersion = "1.2.0"
+exifinterfaceVersion = "1.4.1"
 coreVersion = "3.5.4"
 datastorePreferencesVersion = "1.2.1"
 firebaseCrashlyticsKtxVersion = "19.4.4"
@@ -60,8 +60,8 @@ coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" 
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 
 androidx-transition = { module = "androidx.transition:transition", version.ref = "transitionVersion" }
+androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterfaceVersion" }
 firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsGradleVersion" }
-glide = { module = "com.github.bumptech.glide:glide", version.ref = "glideVersion" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServicesVersion" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreenVersion" }
@@ -116,7 +116,6 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJsonVersion" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesVersion" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesVersion" }
-ksp = { module = "com.github.bumptech.glide:ksp", version.ref = "glideVersion" }
 
 # ktor client
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }

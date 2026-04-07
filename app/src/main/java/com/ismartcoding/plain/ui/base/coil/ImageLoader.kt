@@ -8,7 +8,6 @@ import coil3.gif.AnimatedImageDecoder
 import coil3.memory.MemoryCache
 import coil3.video.VideoFrameDecoder
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
-import coil3.request.allowRgb565
 import coil3.request.crossfade
 import coil3.svg.SvgDecoder
 import com.ismartcoding.plain.activityManager
@@ -47,6 +46,5 @@ fun newImageLoader(context: PlatformContext): ImageLoader {
                 .build()
         }
         .crossfade(100)
-        .allowRgb565(true)
         .build()
 }

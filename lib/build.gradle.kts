@@ -1,6 +1,5 @@
 plugins {
     id("com.android.library")
-    id("com.google.devtools.ksp")
     kotlin("plugin.serialization") version libs.versions.kotlin
 }
 
@@ -65,9 +64,6 @@ dependencies {
     api(libs.androidx.transition)
 
 //    api(libs.exoplayer)
-    // https://developer.android.com/topic/performance/graphics/load-bitmap
-    api(libs.glide)
-    ksp(libs.ksp)
 
     implementation(libs.bcprov.jdk15on)
     implementation(libs.bcpkix.jdk15on)

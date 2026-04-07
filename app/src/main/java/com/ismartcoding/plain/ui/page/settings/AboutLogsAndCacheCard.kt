@@ -68,7 +68,7 @@ fun AboutLogsAndCacheCard(
                         com.ismartcoding.lib.helpers.CoroutinesHelper.withIO {
                             com.ismartcoding.plain.helpers.AppHelper.clearCacheAsync(context)
                         }
-                        com.bumptech.glide.Glide.get(context).clearMemory()
+                        coil3.SingletonImageLoader.get(context).memoryCache?.clear()
                         val newSize = com.ismartcoding.plain.helpers.AppHelper.getCacheSize(context)
                         DialogHelper.hideLoading()
                         DialogHelper.showMessage(R.string.local_cache_cleared)

@@ -9,11 +9,11 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.util.Size
 import androidx.core.graphics.drawable.toBitmap
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
-import com.bumptech.glide.load.resource.bitmap.Downsampler
-import com.bumptech.glide.request.RequestOptions
+import coil3.BitmapImage
+import coil3.SingletonImageLoader
+import coil3.request.ImageRequest
+import coil3.request.allowHardware
+import coil3.size.Scale
 import com.ismartcoding.lib.androidsvg.SVG
 import com.ismartcoding.lib.extensions.compress
 import com.ismartcoding.lib.extensions.getMediaContentUri
@@ -61,7 +61,7 @@ fun File.newFile(): File {
     return File(newPath())
 }
 
-fun File.getBitmapAsync(
+suspend fun File.getBitmapAsync(
     context: Context,
     width: Int,
     height: Int,
@@ -103,27 +103,15 @@ fun File.getBitmapAsync(
         }
     } else {
         try {
-            // if file size less than 500KB just load it directly
-            if (width == 1024 && height == 1024 && length() < 500 * 1024) {
-                bitmap = Glide.with(context).asBitmap().load(this).submit().get()
-            } else {
-                var options =
-                    RequestOptions()
-                        .set(Downsampler.ALLOW_HARDWARE_CONFIG, true)
-                        .downsample(DownsampleStrategy.CENTER_INSIDE)
-//                    .format(DecodeFormat.PREFER_RGB_565)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .override(width, height)
-                if (centerCrop) {
-                    options = options.centerCrop()
-                }
-                bitmap =
-                    Glide.with(context).asBitmap().load(this)
-                        .apply(options)
-                        .submit().get()
-                // https://stackoverflow.com/questions/58314397/java-lang-illegalstateexception-software-rendering-doesnt-support-hardware-bit
-//            bitmap = d.copy(Bitmap.Config.ARGB_8888, false)
-            }
+            val imageLoader = SingletonImageLoader.get(context)
+            val request = ImageRequest.Builder(context)
+                .data(this)
+                .size(width, height)
+                .scale(if (centerCrop) Scale.FILL else Scale.FIT)
+                .allowHardware(false)
+                .build()
+            val result = imageLoader.execute(request)
+            bitmap = (result.image as? BitmapImage)?.bitmap
         } catch (ex: Exception) {
             LogCat.e(ex.toString())
         }
@@ -131,7 +119,7 @@ fun File.getBitmapAsync(
     return bitmap
 }
 
-fun File.toThumbBytesAsync(
+suspend fun File.toThumbBytesAsync(
     context: Context,
     width: Int,
     height: Int,
