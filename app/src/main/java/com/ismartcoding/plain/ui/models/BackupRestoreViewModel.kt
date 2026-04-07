@@ -15,12 +15,10 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.FileHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.lib.helpers.ZipHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.zeroturnaround.zip.ZipUtil
-import org.zeroturnaround.zip.commons.IOUtils
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
@@ -85,7 +83,13 @@ class BackupRestoreViewModel : ViewModel() {
                 }
                 contentResolver.openInputStream(uri)?.use { stream ->
                     val destFile = File(context.cacheDir, "restore")
-                    ZipUtil.unpack(stream, destFile)
+                    if (destFile.exists()) {
+                        destFile.deleteRecursively()
+                    }
+                    val success = ZipHelper.unzip(stream, destFile)
+                    if (!success) {
+                        throw IllegalStateException("Failed to unzip backup file")
+                    }
 
                     File(destFile.path + "/databases").let {
                         if (it.exists()) it.copyRecursively(File(context.dataDir.path + "/databases"), true)
@@ -135,8 +139,8 @@ class BackupRestoreViewModel : ViewModel() {
             val entry = ZipEntry(dir + file.name)
             entry.time = file.lastModified()
             out.putNextEntry(entry)
-            FileInputStream(file).use { input ->
-                IOUtils.copy(input, out)
+            file.inputStream().use { input ->
+                input.copyTo(out)
             }
             out.closeEntry()
         } catch (e: Exception) {

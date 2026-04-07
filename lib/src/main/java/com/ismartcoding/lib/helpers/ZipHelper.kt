@@ -2,12 +2,15 @@ package com.ismartcoding.lib.helpers
 
 import com.ismartcoding.lib.extensions.*
 import com.ismartcoding.lib.logcat.LogCat
+import java.io.BufferedInputStream
 import java.io.Closeable
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.InputStream
 import java.util.*
 import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
 object ZipHelper {
@@ -86,6 +89,61 @@ object ZipHelper {
                 file.inputStream().copyTo(zip)
             }
             zip.closeEntry()
+        }
+    }
+
+    fun unzip(zipFile: File, targetDir: File): Boolean {
+        return try {
+            zipFile.inputStream().buffered().use { stream ->
+                unzip(stream, targetDir)
+            }
+        } catch (exception: Exception) {
+            LogCat.e(exception.toString())
+            false
+        }
+    }
+
+    fun unzip(stream: InputStream, targetDir: File): Boolean {
+        return try {
+            if (!targetDir.exists() && !targetDir.mkdirs()) {
+                throw IllegalStateException("Unable to create target directory: ${targetDir.path}")
+            }
+
+            val targetPath = targetDir.canonicalPath + File.separator
+            ZipInputStream(BufferedInputStream(stream)).use { zipInput ->
+                var entry = zipInput.nextEntry
+                while (entry != null) {
+                    val output = File(targetDir, entry.name)
+                    val outputPath = output.canonicalPath
+                    if (!outputPath.startsWith(targetPath)) {
+                        throw SecurityException("Zip entry escapes target directory: ${entry.name}")
+                    }
+
+                    if (entry.isDirectory || entry.name.endsWith("/")) {
+                        if (!output.exists() && !output.mkdirs()) {
+                            throw IllegalStateException("Unable to create directory: ${output.path}")
+                        }
+                    } else {
+                        output.parentFile?.let { parent ->
+                            if (!parent.exists() && !parent.mkdirs()) {
+                                throw IllegalStateException("Unable to create directory: ${parent.path}")
+                            }
+                        }
+                        FileOutputStream(output).use { outputStream ->
+                            zipInput.copyTo(outputStream)
+                        }
+                        if (entry.time > 0) {
+                            output.setLastModified(entry.time)
+                        }
+                    }
+                    zipInput.closeEntry()
+                    entry = zipInput.nextEntry
+                }
+            }
+            true
+        } catch (exception: Exception) {
+            LogCat.e(exception.toString())
+            false
         }
     }
 }

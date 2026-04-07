@@ -10,6 +10,7 @@ import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.ZipHelper
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.BottomActionButtons
@@ -25,7 +26,6 @@ import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.exitSelectMode
 import kotlinx.coroutines.launch
-import org.zeroturnaround.zip.ZipUtil
 import java.io.File
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -117,10 +117,16 @@ fun FilesSelectModeBottomActions(
                         if (destFile.exists()) {
                             destPath = destFile.newPath()
                         }
-                        withIO {
-                            ZipUtil.unpack(File(file.path), File(destPath))
-                            MainApp.instance.scanFileByConnection(destPath)
-                            filesVM.loadAsync(context)
+                        val success = withIO {
+                            ZipHelper.unzip(File(file.path), File(destPath))
+                        }
+                        if (success) {
+                            withIO {
+                                MainApp.instance.scanFileByConnection(destPath)
+                                filesVM.loadAsync(context)
+                            }
+                        } else {
+                            DialogHelper.showMessage(R.string.error)
                         }
                         DialogHelper.hideLoading()
                         filesVM.exitSelectMode()

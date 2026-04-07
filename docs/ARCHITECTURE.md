@@ -258,7 +258,7 @@ scripts/update-ui-file-length-violations.sh 150  # Sync docs/ui-file-length-viol
 | GraphQL | KGraphQL 0.19.0 | API schema |
 | Media | Media3/ExoPlayer 1.9.2 | Audio/video playback |
 | Camera | CameraX 1.5.3 | QR scanning |
-| WebRTC | Stream WebRTC Android | Screen mirroring |
+| WebRTC | WebRTC SDK Android | Screen mirroring |
 | Crypto | Tink + Bouncy Castle | E2E encryption |
 | Markdown | Markwon 4.6.2 | Markdown rendering |
 | HTTP | OkHttp 5.3.2 | HTTP client |

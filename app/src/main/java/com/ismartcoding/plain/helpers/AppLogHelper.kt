@@ -5,12 +5,12 @@ import android.content.Intent
 import androidx.core.content.FileProvider
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.helpers.ZipHelper
 import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
-import org.zeroturnaround.zip.ZipUtil
 import java.io.File
 
 object AppLogHelper {
@@ -33,10 +33,14 @@ object AppLogHelper {
             DialogHelper.showLoading()
             val zipFile = File(context.cacheDir.absolutePath + "/logs.zip")
             val folder = DiskLogFormatStrategy.getLogFolder(context)
-            withIO {
-                ZipUtil.pack(File(folder), zipFile)
+            val success = withIO {
+                ZipHelper.zip(listOf(folder), zipFile.absolutePath)
             }
             DialogHelper.hideLoading()
+            if (!success) {
+                DialogHelper.showErrorMessage(LocaleHelper.getString(R.string.error))
+                return@coMain
+            }
             share(context, zipFile)
         }
     }

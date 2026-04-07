@@ -190,7 +190,6 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation("org.json:json:20231013")
     implementation(project(":lib"))
-    implementation(files("$rootDir/lib/libs/PdfiumAndroid-2.0.0-release.aar"))
 
     implementation(platform(libs.compose.bom))
 
@@ -262,7 +261,6 @@ dependencies {
     // https://developer.android.com/jetpack/androidx/releases/datastore
     implementation(libs.androidx.datastore.preferences)
 
-    implementation(libs.zt.zip)
     debugImplementation(libs.leakcanary.android)
     implementation(kotlin("stdlib", libs.versions.kotlin.get()))
     
@@ -270,7 +268,7 @@ dependencies {
     implementation(libs.tink.android)
     
     // WebRTC for screen mirroring
-    implementation(libs.stream.webrtc.android)
+    implementation(libs.webrtc.sdk.android)
 
     // AI Image Search: MediaPipe + LiteRT
     implementation(libs.mediapipe.tasks.vision)

@@ -9,7 +9,6 @@ import androidx.lifecycle.LifecycleService
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isPortrait
 import com.ismartcoding.lib.extensions.parcelable
-import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DScreenMirrorQuality

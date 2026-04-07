@@ -51,16 +51,14 @@ dependencies {
 
 //    api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
-    compileOnly(files("libs/PdfiumAndroid-2.0.0-release.aar"))
-
-    api(libs.gson)
+    api(libs.pdfium.android)
 
     api(libs.kotlinx.coroutines.core)
     api(libs.kotlinx.coroutines.android)
     api(libs.kotlinx.serialization.json)
     api(libs.kotlinx.datetime)
     api(libs.androidx.lifecycle.runtime.ktx)
-    api(libs.androidx.lifecycle.extensions)
+    api(libs.androidx.lifecycle.service)
 
     api(libs.androidx.appcompat)
     api(libs.androidx.core.ktx)
