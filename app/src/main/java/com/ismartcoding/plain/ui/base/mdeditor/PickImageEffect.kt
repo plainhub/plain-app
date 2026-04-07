@@ -6,11 +6,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.extensions.appDir
+import com.ismartcoding.lib.extensions.getFileName
 import com.ismartcoding.lib.extensions.getFilenameFromPath
-import com.ismartcoding.plain.extensions.newPath
-import com.ismartcoding.lib.extensions.queryOpenableFileName
 import com.ismartcoding.plain.enums.PickFileTag
 import com.ismartcoding.plain.events.PickFileResultEvent
+import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.helpers.FileHelper
 import java.io.File
 
@@ -28,17 +28,22 @@ internal fun PickImageEffect(
                     if (event.tag != PickFileTag.EDITOR) {
                         return@collect
                     }
-                    val uri = event.uris.first()
+                    val uri = event.uris.firstOrNull() ?: return@collect
                     try {
-                        val fileName = context.contentResolver.queryOpenableFileName(uri)
+                        val fileName = uri.getFileName(context).ifEmpty {
+                            "image_${System.currentTimeMillis()}.jpg"
+                        }.replace("/", "_")
                         if (fileName.isNotEmpty()) {
-                            val dst = context.appDir() + "/note-images/" + "/$fileName"
-                            val dstFile = File(dst)
+                            val noteImagesDir = File(context.appDir(), "note-images")
+                            if (!noteImagesDir.exists()) {
+                                noteImagesDir.mkdirs()
+                            }
+                            val dstFile = File(noteImagesDir, fileName)
                             val path =
                                 if (dstFile.exists()) {
                                     dstFile.newPath()
                                 } else {
-                                    dst
+                                    dstFile.absolutePath
                                 }
                             FileHelper.copyFile(context, uri, path)
                             imageUrl.value = "app://note-images/${path.getFilenameFromPath()}"

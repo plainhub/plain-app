@@ -9,10 +9,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
 /**
- * Watches network changes and re-registers NSD/JmDNS to keep mDNS discovery accurate across
+ * Watches network changes and re-registers mDNS to keep discovery accurate across
  * VPN/Wi-Fi/cellular transitions.
  */
-class MdnsNsdReregistrar(
+class MdnsReregistrar(
     context: Context,
     private val isActive: () -> Boolean,
     private val hostnameProvider: () -> String,
@@ -92,8 +92,7 @@ class MdnsNsdReregistrar(
         reregisterJob = coIO {
             delay(2000) // debounce network churn (VPN/Wi-Fi toggles can fire multiple callbacks)
 
-            // Keep retries low: each attempt creates JmDNS Timer threads. Excessive retries
-            // under network churn exhaust the OS thread limit (OOM: pthread_create failed).
+            // Keep retries low to avoid churning mDNS registration under unstable networks.
             val maxAttempts = 3
             repeat(maxAttempts) { attemptIndex ->
                 if (!isActive()) return@coIO
@@ -107,18 +106,16 @@ class MdnsNsdReregistrar(
                 val httpsOk = httpsPort in 1..65535
                 if (hostname.isEmpty() || (!httpOk && !httpsOk)) {
                     LogCat.e(
-                        "Skip mDNS/NSD re-register (attempt ${attemptIndex + 1}/$maxAttempts): " +
+                        "Skip mDNS re-register (attempt ${attemptIndex + 1}/$maxAttempts): " +
                             "hostname='$hostname', httpPort=$httpPort, httpsPort=$httpsPort"
                     )
                     return@repeat
                 }
 
-                LogCat.d("Network changed ($reason), re-registering NSD/JmDNS (attempt ${attemptIndex + 1}/$maxAttempts)")
+                LogCat.d("Network changed ($reason), re-registering mDNS (attempt ${attemptIndex + 1}/$maxAttempts)")
 
                 runCatching {
-                    // registerServices() calls unregisterService() internally; do not call it
-                    // separately here — a redundant call would cancel the running unregister job
-                    // and leave stale listeners that produce "listener not registered" errors.
+                    // registerServices() handles stop/start internally.
                     NsdHelper.registerServices(
                         context = appContext,
                         httpPort = if (httpOk) httpPort else null,
@@ -129,7 +126,7 @@ class MdnsNsdReregistrar(
                         if (ok) return@coIO
                     }
                     .onFailure {
-                        LogCat.e("mDNS/NSD re-register failed: ${it.message}")
+                        LogCat.e("mDNS re-register failed: ${it.message}")
                     }
             }
         }

@@ -1,5 +1,7 @@
 package com.ismartcoding.lib.markdown.image.gif;
 
+import android.graphics.ImageDecoder;
+import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
@@ -10,10 +12,9 @@ import com.ismartcoding.lib.markdown.image.MediaDecoder;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.Collection;
 import java.util.Collections;
-
-import pl.droidsonroids.gif.GifDrawable;
 
 /**
  * @since 1.1.0
@@ -58,15 +59,19 @@ public class GifMediaDecoder extends MediaDecoder {
             throw new IllegalStateException("Cannot read GIF input-stream", e);
         }
 
-        final GifDrawable drawable;
+        final Drawable drawable;
         try {
             drawable = newGifDrawable(bytes);
         } catch (IOException e) {
-            throw new IllegalStateException("Exception creating GifDrawable", e);
+            throw new IllegalStateException("Exception creating GIF drawable", e);
         }
 
-        if (!autoPlayGif) {
-            drawable.pause();
+        if (drawable instanceof Animatable animatable) {
+            if (autoPlayGif) {
+                animatable.start();
+            } else {
+                animatable.stop();
+            }
         }
 
         return drawable;
@@ -79,8 +84,8 @@ public class GifMediaDecoder extends MediaDecoder {
     }
 
     @NonNull
-    protected GifDrawable newGifDrawable(@NonNull byte[] bytes) throws IOException {
-        return new GifDrawable(bytes);
+    protected Drawable newGifDrawable(@NonNull byte[] bytes) throws IOException {
+        return ImageDecoder.decodeDrawable(ImageDecoder.createSource(ByteBuffer.wrap(bytes)));
     }
 
     @NonNull

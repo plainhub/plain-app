@@ -1,5 +1,4 @@
 [versions]
-androidGifDrawableVersion="1.2.31"
 appcompatVersion="1.7.1"
 bcprovJdk15onVersion="1.70"
 coil="3.4.0"
@@ -8,7 +7,6 @@ firebaseCrashlyticsGradleVersion="3.0.6"
 glideVersion="5.0.5"
 googleServicesVersion="4.4.4"
 gradle= "9.0.1"
-accompanistDrawablepainterVersion = "0.37.3"
 cameraCoreVersion = "1.6.0"
 compose = "1.10.6"
 activityComposeVersion = "1.13.0"
@@ -41,14 +39,12 @@ workRuntimeKtxVersion = "2.11.2"
 ztZipVersion = "1.17"
 devtoolsKspVersion = "2.3.2"
 tinkAndroidVersion = "1.21.0"
-jmdnsVersion = "3.6.3"
 playPublisherVersion = "4.0.0"
 streamWebrtcVersion = "1.3.10"
 mediapipeVisionVersion = "0.10.33"
 liteRtVersion = "2.1.3"
 
 [libraries]
-android-gif-drawable = { module = "pl.droidsonroids.gif:android-gif-drawable", version.ref = "androidGifDrawableVersion" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
 androidx-lifecycle-extensions = { module = "androidx.lifecycle:lifecycle-extensions", version.ref = "lifecycleExtensionsVersion" }
@@ -70,8 +66,6 @@ firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlyti
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glideVersion" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServicesVersion" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
-accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanistDrawablepainterVersion" }
-
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreenVersion" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferencesVersion" }
 
@@ -166,7 +160,6 @@ leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", ve
 
 zt-zip = { module = "org.zeroturnaround:zt-zip", version.ref = "ztZipVersion" }
 tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "tinkAndroidVersion" }
-jmdns = { module = "org.jmdns:jmdns", version.ref = "jmdnsVersion" }
 stream-webrtc-android = { module = "io.getstream:stream-webrtc-android", version.ref = "streamWebrtcVersion" }
 mediapipe-tasks-vision = { module = "com.google.mediapipe:tasks-vision", version.ref = "mediapipeVisionVersion" }
 litert = { module = "com.google.ai.edge.litert:litert", version.ref = "liteRtVersion" }

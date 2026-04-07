@@ -17,7 +17,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DPackage
 import com.ismartcoding.plain.packageManager
@@ -46,8 +45,7 @@ fun NotificationAppListItem(
         AsyncImage(
             model = appIcon,
             contentDescription = app.name,
-            modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp)),
-            placeholder = rememberDrawablePainter(appIcon)
+            modifier = Modifier.size(40.dp).clip(RoundedCornerShape(8.dp))
         )
         HorizontalSpace(dp = 12.dp)
         Column(modifier = Modifier.weight(1f)) {

@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.navigation.NavHostController
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import coil3.compose.AsyncImage
 import com.ismartcoding.lib.apk.ApkParsers
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
@@ -46,9 +46,9 @@ fun AppPageHeader(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         val icon = packageManager.getApplicationIcon(item.appInfo)
-        Image(
+        AsyncImage(
             modifier = Modifier.padding(bottom = 16.dp).size(56.dp),
-            painter = rememberDrawablePainter(drawable = icon),
+            model = icon,
             contentDescription = item.name,
         )
         SelectionContainer {

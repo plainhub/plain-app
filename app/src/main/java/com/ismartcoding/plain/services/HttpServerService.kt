@@ -18,7 +18,7 @@ import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.web.HttpServerManager
-import com.ismartcoding.plain.web.MdnsNsdReregistrar
+import com.ismartcoding.plain.web.MdnsReregistrar
 import com.ismartcoding.plain.web.NsdHelper
 import com.ismartcoding.plain.TempData
 import io.ktor.client.request.get
@@ -27,7 +27,7 @@ import kotlinx.coroutines.Job
 
 class HttpServerService : LifecycleService() {
     private var serverState: HttpServerState = HttpServerState.OFF
-    private var mdnsNsdReregistrar: MdnsNsdReregistrar? = null
+    private var mdnsReregistrar: MdnsReregistrar? = null
     private var serverJob: Job? = null
 
     @SuppressLint("InlinedApi")
@@ -35,7 +35,7 @@ class HttpServerService : LifecycleService() {
         super.onCreate()
         NotificationHelper.ensureDefaultChannel()
 
-        mdnsNsdReregistrar = MdnsNsdReregistrar(
+        mdnsReregistrar = MdnsReregistrar(
             context = this,
             isActive = { serverState == HttpServerState.ON },
             hostnameProvider = { TempData.mdnsHostname },
@@ -131,9 +131,9 @@ class HttpServerService : LifecycleService() {
         serverJob?.cancel()
         serverJob = null
         super.onDestroy()
-        mdnsNsdReregistrar?.stop()
-        mdnsNsdReregistrar = null
-        // Ensure NSD service is unregistered
+        mdnsReregistrar?.stop()
+        mdnsReregistrar = null
+        // Ensure mDNS responder is stopped
         NsdHelper.unregisterService()
         HttpServerManager.server = null
         stopForeground(STOP_FOREGROUND_REMOVE)
@@ -142,7 +142,7 @@ class HttpServerService : LifecycleService() {
     private suspend fun stopHttpServerAsync() {
         LogCat.d("stopHttpServer")
         try {
-            // Unregister NSD service
+            // Stop mDNS responder
             NsdHelper.unregisterService()
             
             val client = HttpClientManager.httpClient()
