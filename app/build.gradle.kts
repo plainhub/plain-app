@@ -81,9 +81,9 @@ android {
                 else -> 0
             }
 
-        val vCode = 523
+        val vCode = 526
         versionCode = vCode - singleAbiNum
-        versionName = "3.0.8"
+        versionName = "3.0.9"
 
         ndk {
             //noinspection ChromeOsAbiSupport
@@ -192,7 +192,7 @@ play {
 
 dependencies {
     testImplementation(libs.junit)
-    testImplementation("org.json:json:20251224")
+    testImplementation(libs.json)
     implementation(project(":lib"))
 
     implementation(platform(libs.compose.bom))
