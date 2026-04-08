@@ -138,7 +138,7 @@ object ImageSearchManager {
             _errorMessage.value = ""
             emitStatus()
             LogCat.d("MobileCLIP-S2 loaded successfully")
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             LogCat.e("Model load failed", e)
             _status.value = ImageSearchStatus.ERROR
             _errorMessage.value = e.message ?: "Load failed"

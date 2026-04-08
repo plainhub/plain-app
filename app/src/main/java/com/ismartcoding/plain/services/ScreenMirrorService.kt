@@ -9,6 +9,7 @@ import androidx.lifecycle.LifecycleService
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isPortrait
 import com.ismartcoding.lib.extensions.parcelable
+import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.DScreenMirrorQuality
@@ -86,23 +87,37 @@ class ScreenMirrorService : LifecycleService() {
         )
 
         val mMediaProjection = if (resultCode == -1 && resultData != null) {
-            mediaProjectionManager.getMediaProjection(resultCode, resultData)
+            try {
+                mediaProjectionManager.getMediaProjection(resultCode, resultData)
+            } catch (e: Exception) {
+                LogCat.e("getMediaProjection failed: ${e.javaClass.simpleName}: ${e.message}")
+                null
+            }
         } else {
             null
+        }
+
+        if (mMediaProjection == null) {
+            LogCat.e("MediaProjection is null — permission was denied or revoked by OS")
+            stop()
+            return START_NOT_STICKY
         }
 
         orientationEventListener?.enable()
         running = true
 
-        mMediaProjection?.let {
-            webRtcManager.initCapture(it)
-            sendEvent(
-                WebSocketEvent(
-                    EventType.SCREEN_MIRRORING,
-                    ""
-                ),
-            )
+        val captureStarted = webRtcManager.initCapture(mMediaProjection)
+        if (!captureStarted) {
+            LogCat.e("screen mirror: initCapture failed (VirtualDisplay could not be created), stopping service")
+            stop()
+            return START_NOT_STICKY
         }
+        sendEvent(
+            WebSocketEvent(
+                EventType.SCREEN_MIRRORING,
+                ""
+            ),
+        )
 
         return START_NOT_STICKY
     }

@@ -82,7 +82,15 @@ object HttpServerStartHelper {
     private fun handleFailure(
         service: HttpServerService, httpOk: Boolean, onStateChanged: (HttpServerState) -> Unit,
     ) {
-        if (!httpOk) {
+        val serverWasRunning = HttpServerManager.server != null
+
+        // Stop the server before checking ports — otherwise our own running
+        // server is detected as the "occupier", causing a false positive on
+        // every restart (common on rooted ROMs with firewall apps like AFWall+).
+        HttpServerManager.stopPreviousServer()
+
+        if (!httpOk && !serverWasRunning) {
+            // Server never started — check if ports are occupied by another process.
             if (PortHelper.isPortInUse(TempData.httpPort)) HttpServerManager.portsInUse.add(TempData.httpPort)
             if (PortHelper.isPortInUse(TempData.httpsPort)) HttpServerManager.portsInUse.add(TempData.httpsPort)
         }
@@ -92,6 +100,7 @@ object HttpServerStartHelper {
                 else R.string.http_port_conflict_error,
                 "port", HttpServerManager.portsInUse.joinToString(", "),
             )
+            serverWasRunning -> LocaleHelper.getString(R.string.http_server_health_check_failed)
             HttpServerManager.httpServerError.isNotEmpty() ->
                 LocaleHelper.getString(R.string.http_server_failed) + " (${HttpServerManager.httpServerError})"
             else -> LocaleHelper.getString(R.string.http_server_failed)

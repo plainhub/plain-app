@@ -32,6 +32,7 @@
     <string name="rotate_url_token_on_restart_tips">When enabled, a new URL token is generated every time the app starts. This invalidates all previously generated file URLs. Recommended for advanced users who want stronger security.</string>
     <string name="http_server_ok">HTTP server is running well.</string>
     <string name="http_server_error">Service failed to start. Please restart the app.</string>
+    <string name="http_server_health_check_failed">Service started but cannot be reached. A firewall or VPN app may be blocking localhost connections. Please check your network settings and restart the app.</string>
     <string name="relaunch_app">Restart App</string>
     <string name="require_confirmation">Require confirmation</string>
     <string name="web_service_required_for_chat">To receive messages from others, please enable Phone Web Portal.</string>

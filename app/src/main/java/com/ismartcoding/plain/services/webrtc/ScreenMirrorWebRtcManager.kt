@@ -11,6 +11,8 @@ import android.media.AudioPlaybackCaptureConfiguration
 import android.media.AudioRecord
 import android.media.projection.MediaProjection
 import android.os.Build
+import android.util.DisplayMetrics
+import android.view.Display
 import android.view.Surface
 import android.view.WindowManager
 import com.ismartcoding.lib.isUPlus
@@ -86,22 +88,23 @@ class ScreenMirrorWebRtcManager(
      * Creates a [VirtualDisplay] that renders screen content into a WebRTC
      * [VideoTrack].  Must be called exactly once.
      */
-    fun initCapture(projection: MediaProjection) {
+    fun initCapture(projection: MediaProjection): Boolean {
         if (virtualDisplay != null) {
             LogCat.d("webrtc: capture already initialised, skipping")
-            return
+            return true
         }
 
         mediaProjection = projection
         ensurePeerConnectionFactory(projection)
         projection.registerCallback(object : MediaProjection.Callback() {
             override fun onStop() {
-                LogCat.d("webrtc: MediaProjection stopped")
+                LogCat.d("webrtc: MediaProjection stopped by system")
+                releaseAll()
             }
         }, null)
 
-        val egl = eglBase ?: return
-        val factory = peerConnectionFactory ?: return
+        val egl = eglBase ?: return false
+        val factory = peerConnectionFactory ?: return false
 
         surfaceTextureHelper = SurfaceTextureHelper.create("ScreenCaptureThread", egl.eglBaseContext)
         videoSource = factory.createVideoSource(/* isScreencast = */ true)
@@ -113,13 +116,31 @@ class ScreenMirrorWebRtcManager(
         surfaceTextureHelper!!.setTextureSize(width, height)
         displaySurface = Surface(surfaceTextureHelper!!.surfaceTexture)
 
+        // Android 14+ (GrapheneOS): VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR can interfere with
+        // MediaProjection-backed capture on privacy-hardened ROMs — frames may never arrive.
+        // Use 0 (no extra flags) on API 34+; keep AUTO_MIRROR on older OS where it is required.
+        val vdFlags = if (isUPlus()) 0 else DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR
         virtualDisplay = projection.createVirtualDisplay(
             "WebRTC_ScreenCapture",
             width, height, dpi,
-            DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+            vdFlags,
             displaySurface,
             null, null,
         )
+
+        if (virtualDisplay == null) {
+            LogCat.e("webrtc: createVirtualDisplay returned null — OS may have blocked screen capture")
+            // Null out the tracks so handleSignaling("ready") returns early instead of
+            // sending an offer that will never carry video frames.
+            videoTrack = null
+            videoSource?.dispose()
+            videoSource = null
+            surfaceTextureHelper?.dispose()
+            surfaceTextureHelper = null
+            displaySurface?.release()
+            displaySurface = null
+            return false
+        }
 
         // Start forwarding frames: SurfaceTextureHelper → VideoSource
         // Cap at targetFps to prevent encoder overload and latency build-up.
@@ -141,6 +162,7 @@ class ScreenMirrorWebRtcManager(
         audioTrack = factory.createAudioTrack("screen_audio", audioSource)
         audioTrack?.setEnabled(true)
         LogCat.d("webrtc: audio track created, enabled=${audioTrack?.enabled()}")
+        return true
     }
 
     /**
@@ -470,41 +492,47 @@ class ScreenMirrorWebRtcManager(
     /**
      * Get the real physical screen dimensions including system bars.
      *
-     * On Android 12+ we use WindowMetrics which is accurate.
-     * On Android 11 and below, Display.getRealSize() may report dimensions that
-     * include non-renderable areas (e.g. rounded-corner padding or system-bar
-     * offsets) on some devices, causing the VirtualDisplay surface to be larger
-     * than the actual mirrored content and producing black bars on the right /
-     * bottom edges.  Display.Mode.physicalWidth/Height returns the exact pixel
-     * resolution of the active display mode and avoids this mismatch.
+     * Primary: DisplayManager.getDisplay(DEFAULT_DISPLAY).getRealMetrics() — this is reliable
+     * from a Service context and correctly reflects the active display on foldable devices
+     * (e.g. Pixel Fold) where WindowManager.currentWindowMetrics can return the cover-screen
+     * bounds when called from a non-Activity context.
+     *
+     * Fallback: WindowManager-based logic for devices where DisplayManager reports 0×0.
      */
     private fun getRealScreenSize(): Point {
+        val dm = context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+        val display = dm.getDisplay(Display.DEFAULT_DISPLAY)
+        if (display != null) {
+            val metrics = DisplayMetrics()
+            @Suppress("DEPRECATION")
+            display.getRealMetrics(metrics)
+            if (metrics.widthPixels > 0 && metrics.heightPixels > 0) {
+                return Point(metrics.widthPixels, metrics.heightPixels)
+            }
+        }
+
+        // Fallback: WindowManager (may be inaccurate on foldables from Service context)
         val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         return if (isSPlus()) {
             val bounds = wm.currentWindowMetrics.bounds
             Point(bounds.width(), bounds.height())
         } else {
             @Suppress("DEPRECATION")
-            val display = wm.defaultDisplay
-            val mode = display.mode
+            val d = wm.defaultDisplay
+            val mode = d.mode
             var w = mode.physicalWidth
             var h = mode.physicalHeight
             if (w > 0 && h > 0) {
-                // physicalWidth/Height are in the display's natural orientation;
-                // swap for landscape so the VirtualDisplay dimensions match.
                 @Suppress("DEPRECATION")
-                val rotation = display.rotation
+                val rotation = d.rotation
                 if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
-                    val tmp = w
-                    w = h
-                    h = tmp
+                    val tmp = w; w = h; h = tmp
                 }
                 Point(w, h)
             } else {
-                // Fallback for devices that report invalid mode dimensions.
                 val size = Point()
                 @Suppress("DEPRECATION")
-                display.getRealSize(size)
+                d.getRealSize(size)
                 size
             }
         }
