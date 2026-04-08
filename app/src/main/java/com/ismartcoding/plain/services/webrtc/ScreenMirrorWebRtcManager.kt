@@ -1,31 +1,17 @@
 package com.ismartcoding.plain.services.webrtc
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Point
 import android.hardware.display.DisplayManager
 import android.hardware.display.VirtualDisplay
-import android.media.AudioAttributes
-import android.media.AudioFormat
-import android.media.AudioPlaybackCaptureConfiguration
-import android.media.AudioRecord
 import android.media.projection.MediaProjection
-import android.os.Build
-import android.util.DisplayMetrics
-import android.view.Display
 import android.view.Surface
-import android.view.WindowManager
 import com.ismartcoding.lib.isUPlus
-import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.data.DScreenMirrorQuality
-import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.ScreenMirrorMode
 import com.ismartcoding.plain.web.websocket.WebRtcSignalingMessage
 import org.webrtc.AudioSource
 import org.webrtc.AudioTrack
-import org.webrtc.DefaultVideoDecoderFactory
-import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.EglBase
 import org.webrtc.MediaConstraints
 import org.webrtc.PeerConnectionFactory
@@ -33,25 +19,12 @@ import org.webrtc.SurfaceTextureHelper
 import org.webrtc.VideoSource
 import org.webrtc.VideoTrack
 import org.webrtc.audio.JavaAudioDeviceModule
-import kotlin.math.max
-import kotlin.math.min
 
-/**
- * Manages the shared screen-capture resources (MediaProjection, VirtualDisplay,
- * VideoSource, VideoTrack) and a set of [WebRtcPeerSession]s — one per connected
- * web client.
- *
- * [initCapture] is called exactly once from `ScreenMirrorService.onStartCommand()`
- * with the [MediaProjection] obtained from the one-time-use permission intent.
- * Subsequent orientation or quality changes are handled by [VirtualDisplay.resize],
- * which avoids re-creating the MediaProjection.
- */
 class ScreenMirrorWebRtcManager(
     private val context: Context,
     private val getQuality: () -> DScreenMirrorQuality,
     private val getIsPortrait: () -> Boolean,
 ) {
-    // ── Shared capture resources ──────────────────────────────────────────
     private var peerConnectionFactory: PeerConnectionFactory? = null
     private var videoSource: VideoSource? = null
     private var videoTrack: VideoTrack? = null
@@ -62,40 +35,36 @@ class ScreenMirrorWebRtcManager(
     private var audioSwapped = false
     private var surfaceTextureHelper: SurfaceTextureHelper? = null
     private var eglBase: EglBase? = null
-
-    // ── MediaProjection + VirtualDisplay (created once, resized as needed) ─
     private var mediaProjection: MediaProjection? = null
     private var virtualDisplay: VirtualDisplay? = null
     private var displaySurface: Surface? = null
-
-    // ── Per-client peer sessions ──────────────────────────────────────────
     private val peerSessions = mutableMapOf<String, WebRtcPeerSession>()
 
-    // ── Adaptive quality state (AUTO mode) ────────────────────────────────
-    private var adaptiveResolution: Int = 1080
-    private var statsHandler: android.os.Handler? = null
-    private val statsIntervalMs = 3000L
+    internal val adaptiveMonitor = AdaptiveQualityMonitor(
+        getQuality = getQuality,
+        getFirstPeerSession = { peerSessions.values.firstOrNull() },
+        onAdapt = { resChanged ->
+            if (resChanged) resizeVirtualDisplay()
+            peerSessions.values.forEach { it.updateVideoBitrate() }
+        },
+    )
 
-    // ── Frame-rate limiter (isScreencast=true disables adaptOutputFormat) ─
-    private var lastFrameTimeNs = 0L
-    private var targetFps = 20
-    private var minFrameIntervalNs = 1_000_000_000L / targetFps
-
-    // ── Public API ────────────────────────────────────────────────────────
-
-    /**
-     * Initialise capture using the [MediaProjection] obtained from the system.
-     * Creates a [VirtualDisplay] that renders screen content into a WebRTC
-     * [VideoTrack].  Must be called exactly once.
-     */
     fun initCapture(projection: MediaProjection): Boolean {
         if (virtualDisplay != null) {
             LogCat.d("webrtc: capture already initialised, skipping")
             return true
         }
-
         mediaProjection = projection
-        ensurePeerConnectionFactory(projection)
+        eglBase = EglBase.create()
+        val (factory, adm) = createWebRtcFactory(context, eglBase!!, projection,
+            onAudioRecordStart = {
+                if (!audioSwapped) audioSwapped = swapToPlaybackCapture(context, audioDeviceModule, projection)
+            },
+            onAudioRecordStop = { audioSwapped = false },
+        )
+        peerConnectionFactory = factory
+        audioDeviceModule = adm
+
         projection.registerCallback(object : MediaProjection.Callback() {
             override fun onStop() {
                 LogCat.d("webrtc: MediaProjection stopped by system")
@@ -103,563 +72,118 @@ class ScreenMirrorWebRtcManager(
             }
         }, null)
 
-        val egl = eglBase ?: return false
-        val factory = peerConnectionFactory ?: return false
-
-        surfaceTextureHelper = SurfaceTextureHelper.create("ScreenCaptureThread", egl.eglBaseContext)
-        videoSource = factory.createVideoSource(/* isScreencast = */ true)
+        surfaceTextureHelper = SurfaceTextureHelper.create("ScreenCaptureThread", eglBase!!.eglBaseContext)
+        videoSource = factory.createVideoSource(true)
         videoTrack = factory.createVideoTrack("screen_video", videoSource)
 
-        // Create VirtualDisplay → Surface(SurfaceTexture) → SurfaceTextureHelper → VideoSource
-        val (width, height, dpi) = computeCaptureSize()
-
+        val (width, height, dpi) = computeCaptureSize(context, getQuality(), adaptiveMonitor.adaptiveResolution)
+        getIsPortrait()
         surfaceTextureHelper!!.setTextureSize(width, height)
         displaySurface = Surface(surfaceTextureHelper!!.surfaceTexture)
 
-        // Android 14+ (GrapheneOS): VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR can interfere with
-        // MediaProjection-backed capture on privacy-hardened ROMs — frames may never arrive.
-        // Use 0 (no extra flags) on API 34+; keep AUTO_MIRROR on older OS where it is required.
         val vdFlags = if (isUPlus()) 0 else DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR
         virtualDisplay = projection.createVirtualDisplay(
-            "WebRTC_ScreenCapture",
-            width, height, dpi,
-            vdFlags,
-            displaySurface,
-            null, null,
+            "WebRTC_ScreenCapture", width, height, dpi, vdFlags, displaySurface, null, null,
         )
-
         if (virtualDisplay == null) {
-            LogCat.e("webrtc: createVirtualDisplay returned null — OS may have blocked screen capture")
-            // Null out the tracks so handleSignaling("ready") returns early instead of
-            // sending an offer that will never carry video frames.
+            LogCat.e("webrtc: createVirtualDisplay returned null")
             videoTrack = null
-            videoSource?.dispose()
-            videoSource = null
-            surfaceTextureHelper?.dispose()
-            surfaceTextureHelper = null
-            displaySurface?.release()
-            displaySurface = null
+            videoSource?.dispose(); videoSource = null
+            surfaceTextureHelper?.dispose(); surfaceTextureHelper = null
+            displaySurface?.release(); displaySurface = null
             return false
         }
 
-        // Start forwarding frames: SurfaceTextureHelper → VideoSource
-        // Cap at targetFps to prevent encoder overload and latency build-up.
-        // (adaptOutputFormat is a no-op when isScreencast=true, so we drop frames manually.)
         surfaceTextureHelper!!.startListening { frame ->
             val now = System.nanoTime()
-            if (now - lastFrameTimeNs >= minFrameIntervalNs) {
-                lastFrameTimeNs = now
+            if (now - adaptiveMonitor.lastFrameTimeNs >= adaptiveMonitor.minFrameIntervalNs) {
+                adaptiveMonitor.lastFrameTimeNs = now
                 videoSource!!.capturerObserver.onFrameCaptured(frame)
             }
-            // Skipped frames are automatically released by SurfaceTextureHelper
         }
         videoSource!!.capturerObserver.onCapturerStarted(true)
-
         LogCat.d("webrtc: VirtualDisplay created ${width}x${height} dpi=$dpi")
 
-        // Create audio source and track (JavaAudioDeviceModule handles actual capture)
         audioSource = factory.createAudioSource(MediaConstraints())
         audioTrack = factory.createAudioTrack("screen_audio", audioSource)
         audioTrack?.setEnabled(true)
-        LogCat.d("webrtc: audio track created, enabled=${audioTrack?.enabled()}")
         return true
-    }
-
-    /**
-     * Swap the internal mic-based AudioRecord inside WebRtcAudioRecord (via reflection)
-     * with one that captures system audio using AudioPlaybackCaptureConfiguration.
-     * Called on the WebRTC audio recording thread from AudioRecordStateCallback.
-     */
-    @SuppressLint("MissingPermission")
-    private fun swapToPlaybackCapture(projection: MediaProjection) {
-        if (!AppFeatureType.MIRROR_AUDIO.has()) {
-            LogCat.d("webrtc: audio swap skipped, API < Q")
-            return
-        }
-        if (audioSwapped) {
-            LogCat.d("webrtc: audio swap already done")
-            return
-        }
-
-        // Check RECORD_AUDIO permission at runtime (required for AudioPlaybackCapture)
-        if (context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO)
-            != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-            LogCat.e("webrtc: RECORD_AUDIO permission not granted, cannot capture audio")
-            return
-        }
-
-        try {
-            val adm = audioDeviceModule ?: run {
-                LogCat.e("webrtc: audioDeviceModule is null")
-                return
-            }
-
-            // Access JavaAudioDeviceModule.audioInput (WebRtcAudioRecord)
-            LogCat.d("webrtc: audio swap step 1 - accessing audioInput field")
-            val audioInputField = adm.javaClass.getDeclaredField("audioInput")
-            audioInputField.isAccessible = true
-            val audioInput = audioInputField.get(adm) ?: run {
-                LogCat.e("webrtc: audioInput is null")
-                return
-            }
-
-            // Access WebRtcAudioRecord.audioRecord (android.media.AudioRecord)
-            LogCat.d("webrtc: audio swap step 2 - accessing audioRecord field from ${audioInput.javaClass.name}")
-            val audioRecordField = audioInput.javaClass.getDeclaredField("audioRecord")
-            audioRecordField.isAccessible = true
-            val oldRecord = audioRecordField.get(audioInput) as? AudioRecord ?: run {
-                LogCat.e("webrtc: audioRecord is null or not AudioRecord")
-                return
-            }
-
-            // Read params from the existing AudioRecord to match WebRTC's expectations
-            val sampleRate = oldRecord.sampleRate
-            val channelCount = oldRecord.channelCount
-            val channelConfig = if (channelCount == 1) AudioFormat.CHANNEL_IN_MONO else AudioFormat.CHANNEL_IN_STEREO
-            val encoding = oldRecord.audioFormat
-            LogCat.d("webrtc: audio swap step 3 - old record params: rate=$sampleRate ch=$channelCount encoding=$encoding state=${oldRecord.state}")
-
-            // Stop & release the mic-based AudioRecord
-            try { oldRecord.stop() } catch (e: Exception) {
-                LogCat.d("webrtc: old record stop exception (expected): ${e.message}")
-            }
-            oldRecord.release()
-            LogCat.d("webrtc: audio swap step 4 - old record released")
-
-            // Create a new AudioRecord that captures system audio via MediaProjection
-            val playbackConfig = AudioPlaybackCaptureConfiguration.Builder(projection)
-                .addMatchingUsage(AudioAttributes.USAGE_MEDIA)
-                .addMatchingUsage(AudioAttributes.USAGE_GAME)
-                .addMatchingUsage(AudioAttributes.USAGE_UNKNOWN)
-                .build()
-
-            val bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, encoding) * 2
-            LogCat.d("webrtc: audio swap step 5 - creating playback capture AudioRecord (bufSize=$bufferSize)")
-            val newRecord = AudioRecord.Builder()
-                .setAudioPlaybackCaptureConfig(playbackConfig)
-                .setAudioFormat(
-                    AudioFormat.Builder()
-                        .setSampleRate(sampleRate)
-                        .setChannelMask(channelConfig)
-                        .setEncoding(encoding)
-                        .build()
-                )
-                .setBufferSizeInBytes(bufferSize)
-                .build()
-
-            if (newRecord.state != AudioRecord.STATE_INITIALIZED) {
-                LogCat.e("webrtc: Playback-capture AudioRecord failed to initialise (state=${newRecord.state})")
-                newRecord.release()
-                return
-            }
-
-            // Replace the field and start the new AudioRecord
-            audioRecordField.set(audioInput, newRecord)
-            newRecord.startRecording()
-            audioSwapped = true
-
-            LogCat.d("webrtc: audio swap DONE - system audio capture active (rate=$sampleRate ch=$channelCount recordingState=${newRecord.recordingState})")
-        } catch (e: Exception) {
-            LogCat.e("webrtc: Failed to swap to playback capture: ${e.javaClass.simpleName}: ${e.message}")
-            e.printStackTrace()
-        }
-    }
-
-    private fun releaseAudioCapture() {
-        audioTrack = null
-        audioSource?.dispose()
-        audioSource = null
     }
 
     fun handleSignaling(clientId: String, message: WebRtcSignalingMessage) {
         when (message.type) {
             "ready" -> {
-                LogCat.d("webrtc: ready from $clientId")
-                val factory = peerConnectionFactory
-                val track = videoTrack
-                if (factory == null || track == null) {
-                    LogCat.e("webrtc: capturer not initialised, ignoring ready")
-                    return
-                }
-
-                // Tear down any previous session for this client (re-negotiation).
+                LogCat.d("webrtc: ready from $clientId, phoneIp=${message.phoneIp}")
+                val factory = peerConnectionFactory ?: return
+                val track = videoTrack ?: return
                 peerSessions.remove(clientId)?.release()
-
-                val session = WebRtcPeerSession(clientId, factory, track, audioTrack, { computeTargetBitrateKbps() }, { computeStartBitrateKbps() }, { targetFps }, { getQuality().mode })
+                val session = WebRtcPeerSession(
+                    clientId, factory, track, audioTrack,
+                    { computeTargetBitrateKbps(getEffectiveResolution(getQuality(), adaptiveMonitor.adaptiveResolution)) },
+                    { computeStartBitrateKbps(getEffectiveResolution(getQuality(), adaptiveMonitor.adaptiveResolution)) },
+                    { adaptiveMonitor.targetFps }, { getQuality().mode },
+                )
                 peerSessions[clientId] = session
                 session.createPeerConnectionAndOffer()
-
-                if (getQuality().mode == ScreenMirrorMode.AUTO) {
-                    startStatsMonitoring()
-                }
+                if (getQuality().mode == ScreenMirrorMode.AUTO) adaptiveMonitor.start()
             }
-
-            "answer" -> {
-                if (!message.sdp.isNullOrBlank()) {
-                    peerSessions[clientId]?.handleAnswer(message.sdp)
-                }
-            }
-
-            "ice_candidate" -> {
-                if (!message.candidate.isNullOrBlank()) {
-                    peerSessions[clientId]?.handleIceCandidate(message)
-                }
-            }
-
-            else -> {
-                LogCat.d("webrtc: ignore signaling type=${message.type}")
-            }
+            "answer" -> if (!message.sdp.isNullOrBlank()) peerSessions[clientId]?.handleAnswer(message.sdp)
+            "ice_candidate" -> if (!message.candidate.isNullOrBlank()) peerSessions[clientId]?.handleIceCandidate(message)
+            else -> LogCat.d("webrtc: ignore signaling type=${message.type}")
         }
     }
 
     fun onQualityChanged() {
         val quality = getQuality()
         if (quality.mode == ScreenMirrorMode.AUTO) {
-            adaptiveResolution = 1080
-            startStatsMonitoring()
+            adaptiveMonitor.adaptiveResolution = 1080
+            adaptiveMonitor.start()
         } else {
-            stopStatsMonitoring()
+            adaptiveMonitor.stop()
         }
         resizeVirtualDisplay()
         peerSessions.values.forEach { it.updateVideoBitrate() }
     }
 
-    fun onOrientationChanged() {
-        resizeVirtualDisplay()
-    }
+    fun onOrientationChanged() = resizeVirtualDisplay()
 
     fun removeClient(clientId: String) {
         peerSessions.remove(clientId)?.release()
     }
 
     fun releaseAll() {
-        stopStatsMonitoring()
-        peerSessions.values.forEach { it.release() }
-        peerSessions.clear()
-
-        releaseAudioCapture()
-        audioDeviceModule?.release()
-        audioDeviceModule = null
-        audioSwapped = false
-
-        virtualDisplay?.release()
-        virtualDisplay = null
-
-        displaySurface?.release()
-        displaySurface = null
-
+        adaptiveMonitor.stop()
+        peerSessions.values.forEach { it.release() }; peerSessions.clear()
+        audioTrack = null; audioSource?.dispose(); audioSource = null
+        audioDeviceModule?.release(); audioDeviceModule = null; audioSwapped = false
+        virtualDisplay?.release(); virtualDisplay = null
+        displaySurface?.release(); displaySurface = null
         surfaceTextureHelper?.stopListening()
         videoSource?.capturerObserver?.onCapturerStopped()
-
-        mediaProjection?.stop()
-        mediaProjection = null
-
-        surfaceTextureHelper?.dispose()
-        surfaceTextureHelper = null
-
-        videoTrack = null
-        videoSource?.dispose()
-        videoSource = null
-
-        peerConnectionFactory?.dispose()
-        peerConnectionFactory = null
-
-        eglBase?.release()
-        eglBase = null
+        mediaProjection?.stop(); mediaProjection = null
+        surfaceTextureHelper?.dispose(); surfaceTextureHelper = null
+        videoTrack = null; videoSource?.dispose(); videoSource = null
+        peerConnectionFactory?.dispose(); peerConnectionFactory = null
+        eglBase?.release(); eglBase = null
     }
 
-    // ── Private helpers ───────────────────────────────────────────────────
-
-    private fun ensurePeerConnectionFactory(projection: MediaProjection) {
-        if (peerConnectionFactory != null) return
-
-        if (!webrtcInitialized) {
-            // Use applicationContext so that the NetworkMonitorAutoDetect BroadcastReceiver
-            // registered by WebRTC is tied to the app lifetime, not the service context.
-            // This prevents "Service has leaked IntentReceiver" errors on service destruction.
-            PeerConnectionFactory.initialize(
-                PeerConnectionFactory.InitializationOptions.builder(context.applicationContext)
-                    .setEnableInternalTracer(false)
-                    .createInitializationOptions(),
-            )
-            webrtcInitialized = true
-        }
-
-        eglBase = EglBase.create()
-
-        // Create JavaAudioDeviceModule for system audio capture.
-        // Disable HW AEC/NS (not needed for system audio) and register a
-        // state callback to swap the internal mic AudioRecord with one
-        // using AudioPlaybackCaptureConfiguration once recording starts.
-        val adm = JavaAudioDeviceModule.builder(context)
-            .setUseHardwareAcousticEchoCanceler(false)
-            .setUseHardwareNoiseSuppressor(false)
-            .setAudioRecordStateCallback(object : JavaAudioDeviceModule.AudioRecordStateCallback {
-                override fun onWebRtcAudioRecordStart() {
-                    swapToPlaybackCapture(projection)
-                }
-                override fun onWebRtcAudioRecordStop() {
-                    audioSwapped = false
-                }
-            })
-            .createAudioDeviceModule()
-        audioDeviceModule = adm
-
-        val encoderFactory = DefaultVideoEncoderFactory(eglBase!!.eglBaseContext, true, true)
-        val decoderFactory = DefaultVideoDecoderFactory(eglBase!!.eglBaseContext)
-        // Skip VPN adapter (ADAPTER_TYPE_VPN = 1 << 3) so that WebRTC binds UDP
-        // sockets directly to Wi-Fi. VPN apps typically tunnel all UDP through the
-        // VPN, making LAN WebRTC unreachable even with the correct ICE candidate IP.
-        val options = PeerConnectionFactory.Options().apply {
-            networkIgnoreMask = 1 shl 3
-        }
-        peerConnectionFactory = PeerConnectionFactory.builder()
-            .setOptions(options)
-            .setVideoEncoderFactory(encoderFactory)
-            .setVideoDecoderFactory(decoderFactory)
-            .setAudioDeviceModule(adm)
-            .createPeerConnectionFactory()
-
-        // Keep the ADM Java object alive so that our AudioRecordStateCallback
-        // can use reflection to swap the internal AudioRecord later.
-    }
-
-    /**
-     * Resize or recreate the [VirtualDisplay] to match the current quality / orientation.
-     *
-     * Android 14+ (API 34): [MediaProjection.createVirtualDisplay] may only be called once per
-     * [MediaProjection] instance. Re-calling it throws "Don't re-use the resultData…".
-     * We must use [VirtualDisplay.resize] on these versions.
-     *
-     * Android <= 13: [VirtualDisplay.resize] is broken on some Android 11 devices when going
-     * from a smaller size back to a larger one (e.g. SMOOTH → HD), leaving black bars on the
-     * right and bottom edges. Releasing and recreating the VirtualDisplay is the reliable fix.
-     */
     private fun resizeVirtualDisplay() {
         val projection = mediaProjection ?: return
-        val (width, height, dpi) = computeCaptureSize()
-
+        val (w, h, dpi) = computeCaptureSize(context, getQuality(), adaptiveMonitor.adaptiveResolution)
+        getIsPortrait()
         if (isUPlus()) {
-            // Android 14+: createVirtualDisplay is one-shot per MediaProjection — use resize().
-            surfaceTextureHelper?.setTextureSize(width, height)
-            virtualDisplay?.resize(width, height, dpi)
-            LogCat.d("webrtc: VirtualDisplay resized ${width}x${height} dpi=$dpi")
+            surfaceTextureHelper?.setTextureSize(w, h)
+            virtualDisplay?.resize(w, h, dpi)
         } else {
-            // Android <= 13: recreate to avoid black-bar regression on Android 11 devices.
-
-            // Release old VirtualDisplay
-            virtualDisplay?.release()
-            virtualDisplay = null
-
-            // Update SurfaceTexture buffer size
-            surfaceTextureHelper?.setTextureSize(width, height)
-
-            // Recreate Surface to ensure clean state after buffer size change
+            virtualDisplay?.release(); virtualDisplay = null
+            surfaceTextureHelper?.setTextureSize(w, h)
             displaySurface?.release()
             displaySurface = Surface(surfaceTextureHelper!!.surfaceTexture)
-
-            // Create fresh VirtualDisplay with the new dimensions
             virtualDisplay = projection.createVirtualDisplay(
-                "WebRTC_ScreenCapture",
-                width, height, dpi,
-                DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-                displaySurface,
-                null, null,
+                "WebRTC_ScreenCapture", w, h, dpi,
+                DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, displaySurface, null, null,
             )
-
-            LogCat.d("webrtc: VirtualDisplay recreated ${width}x${height} dpi=$dpi")
         }
-    }
-
-    private fun computeCaptureSize(): Triple<Int, Int, Int> {
-        val realSize = getRealScreenSize()
-        val width = realSize.x
-        val height = realSize.y
-
-        val shortSide = min(width, height)
-        val targetShort = getEffectiveResolution()
-        val scale = min(1f, targetShort.toFloat() / shortSide.toFloat())
-
-        val targetWidth = makeEven(max(2, (width * scale).toInt()))
-        val targetHeight = makeEven(max(2, (height * scale).toInt()))
-        val dpi = context.resources.displayMetrics.densityDpi
-
-        getIsPortrait()
-
-        return Triple(targetWidth, targetHeight, dpi)
-    }
-
-    /**
-     * Get the real physical screen dimensions including system bars.
-     *
-     * Primary: DisplayManager.getDisplay(DEFAULT_DISPLAY).getRealMetrics() — this is reliable
-     * from a Service context and correctly reflects the active display on foldable devices
-     * (e.g. Pixel Fold) where WindowManager.currentWindowMetrics can return the cover-screen
-     * bounds when called from a non-Activity context.
-     *
-     * Fallback: WindowManager-based logic for devices where DisplayManager reports 0×0.
-     */
-    private fun getRealScreenSize(): Point {
-        val dm = context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
-        val display = dm.getDisplay(Display.DEFAULT_DISPLAY)
-        if (display != null) {
-            val metrics = DisplayMetrics()
-            @Suppress("DEPRECATION")
-            display.getRealMetrics(metrics)
-            if (metrics.widthPixels > 0 && metrics.heightPixels > 0) {
-                return Point(metrics.widthPixels, metrics.heightPixels)
-            }
-        }
-
-        // Fallback: WindowManager (may be inaccurate on foldables from Service context)
-        val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        return if (isSPlus()) {
-            val bounds = wm.currentWindowMetrics.bounds
-            Point(bounds.width(), bounds.height())
-        } else {
-            @Suppress("DEPRECATION")
-            val d = wm.defaultDisplay
-            val mode = d.mode
-            var w = mode.physicalWidth
-            var h = mode.physicalHeight
-            if (w > 0 && h > 0) {
-                @Suppress("DEPRECATION")
-                val rotation = d.rotation
-                if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
-                    val tmp = w; w = h; h = tmp
-                }
-                Point(w, h)
-            } else {
-                val size = Point()
-                @Suppress("DEPRECATION")
-                d.getRealSize(size)
-                size
-            }
-        }
-    }
-
-    private fun getEffectiveResolution(): Int {
-        val quality = getQuality()
-        return when (quality.mode) {
-            ScreenMirrorMode.AUTO -> adaptiveResolution
-            ScreenMirrorMode.HD -> 1080
-            ScreenMirrorMode.SMOOTH -> 720
-        }
-    }
-
-    /**
-     * Compute target bitrate for screen content.
-     * Professional remote-desktop approach: screen content is mostly static UI/text,
-     * so we use much lower bitrates than video streaming.
-     * H.264/VP8 with high QP is fine for UI — sharp text, infrequent keyframes.
-     */
-    private fun computeTargetBitrateKbps(): Int {
-        val resolution = getEffectiveResolution()
-        return when {
-            resolution >= 1080 -> 4000   // 1080p: 4 Mbps max (was 20 Mbps)
-            resolution >= 720  -> 2000   // 720p:  2 Mbps max (was 10 Mbps)
-            else               -> 1000
-        }
-    }
-
-    /**
-     * Compute initial (starting) bitrate for the congestion controller.
-     * Start conservatively so the first few seconds don't cause bufferbloat.
-     */
-    private fun computeStartBitrateKbps(): Int {
-        val resolution = getEffectiveResolution()
-        return when {
-            resolution >= 1080 -> 3000   // start at 3 Mbps, ramp to 4
-            resolution >= 720  -> 1500   // start at 1.5 Mbps, ramp to 2
-            else               -> 800
-        }
-    }
-
-    fun getTargetFps(): Int = targetFps
-
-    // ── Adaptive stats monitoring (AUTO mode) ─────────────────────────────
-
-    private fun startStatsMonitoring() {
-        stopStatsMonitoring()
-        if (getQuality().mode != ScreenMirrorMode.AUTO) return
-
-        statsHandler = android.os.Handler(android.os.Looper.getMainLooper())
-        statsHandler?.postDelayed(object : Runnable {
-            override fun run() {
-                if (getQuality().mode != ScreenMirrorMode.AUTO) return
-                pollStatsAndAdapt()
-                statsHandler?.postDelayed(this, statsIntervalMs)
-            }
-        }, statsIntervalMs)
-    }
-
-    private fun stopStatsMonitoring() {
-        statsHandler?.removeCallbacksAndMessages(null)
-        statsHandler = null
-    }
-
-    private fun pollStatsAndAdapt() {
-        val session = peerSessions.values.firstOrNull() ?: return
-        session.getStats { availableBitrateKbps, packetLossPercent, rttMs ->
-            val oldResolution = adaptiveResolution
-            val oldFps = targetFps
-
-            // ── Step 1: Aggressive ABR — react to packet loss first ──
-            if (packetLossPercent > 2.0) {
-                // High packet loss: drop fps first (cheaper than resolution change)
-                if (targetFps > 10) {
-                    targetFps = max(10, (targetFps * 0.7).toInt())
-                    minFrameIntervalNs = 1_000_000_000L / targetFps
-                }
-                // If fps already low and still losing packets, drop resolution
-                if (packetLossPercent > 5.0 && adaptiveResolution > 720) {
-                    adaptiveResolution = 720
-                }
-            }
-
-            // ── Step 2: RTT-based degradation ──
-            if (rttMs > 150) {
-                if (targetFps > 15) {
-                    targetFps = 15
-                    minFrameIntervalNs = 1_000_000_000L / targetFps
-                }
-                if (rttMs > 300 && adaptiveResolution > 720) {
-                    adaptiveResolution = 720
-                }
-            }
-
-            // ── Step 3: Bandwidth-based degradation ──
-            if (availableBitrateKbps in 1 until 2000) {
-                if (adaptiveResolution > 720) adaptiveResolution = 720
-                if (targetFps > 15) {
-                    targetFps = 15
-                    minFrameIntervalNs = 1_000_000_000L / targetFps
-                }
-            }
-
-            // ── Step 4: Upgrade when network is healthy ──
-            val isHealthy = availableBitrateKbps > 4000 && packetLossPercent < 1.0 && rttMs < 50
-            if (isHealthy) {
-                if (adaptiveResolution < 1080) adaptiveResolution = 1080
-                if (targetFps < 20) {
-                    targetFps = 20
-                    minFrameIntervalNs = 1_000_000_000L / targetFps
-                }
-            }
-
-            val changed = oldResolution != adaptiveResolution || oldFps != targetFps
-            if (changed) {
-                LogCat.d("webrtc: adaptive ${oldResolution}p@${oldFps}fps → ${adaptiveResolution}p@${targetFps}fps " +
-                    "(bw=${availableBitrateKbps}kbps loss=${String.format("%.1f", packetLossPercent)}% rtt=${String.format("%.0f", rttMs)}ms)")
-                if (oldResolution != adaptiveResolution) resizeVirtualDisplay()
-                peerSessions.values.forEach { it.updateVideoBitrate() }
-            }
-        }
-    }
-
-    private fun makeEven(value: Int): Int = if (value % 2 == 0) value else value - 1
-
-    companion object {
-        private var webrtcInitialized = false
+        LogCat.d("webrtc: VirtualDisplay ${if (isUPlus()) "resized" else "recreated"} ${w}x${h} dpi=$dpi")
     }
 }

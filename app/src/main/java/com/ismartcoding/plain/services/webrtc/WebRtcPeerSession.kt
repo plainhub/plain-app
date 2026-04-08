@@ -19,8 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Manages a single WebRTC peer connection for one client.
- * The shared [VideoTrack] is attached to each session's peer connection independently,
- * so multiple clients can receive the same video stream simultaneously.
+ * TCP candidates are enabled for automatic UDP→TCP fallback.
  */
 class WebRtcPeerSession(
     val clientId: String,
@@ -37,47 +36,13 @@ class WebRtcPeerSession(
     private val remoteDescriptionSet = AtomicBoolean(false)
     private val pendingIceCandidates = mutableListOf<IceCandidate>()
 
-    /**
-     * Creates a new peer connection, attaches the video track, and sends an offer.
-     */
     fun createPeerConnectionAndOffer() {
         releasePeerConnection()
-
         val rtcConfig = PeerConnection.RTCConfiguration(emptyList()).apply {
             sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
+            tcpCandidatePolicy = PeerConnection.TcpCandidatePolicy.ENABLED
         }
-
-        peerConnection = peerConnectionFactory.createPeerConnection(
-            rtcConfig,
-            object : PeerConnection.Observer {
-                override fun onIceCandidate(candidate: IceCandidate) {
-                    sendToClient(
-                        WebRtcSignalingMessage(
-                            type = "ice_candidate",
-                            candidate = candidate.sdp,
-                            sdpMid = candidate.sdpMid,
-                            sdpMLineIndex = candidate.sdpMLineIndex,
-                        ),
-                    )
-                }
-
-                override fun onConnectionChange(newState: PeerConnection.PeerConnectionState) {
-                    LogCat.d("webrtc: [$clientId] connection state: $newState")
-                }
-
-                override fun onSignalingChange(newState: PeerConnection.SignalingState) = Unit
-                override fun onIceConnectionChange(newState: PeerConnection.IceConnectionState) = Unit
-                override fun onIceConnectionReceivingChange(receiving: Boolean) = Unit
-                override fun onIceGatheringChange(newState: PeerConnection.IceGatheringState) = Unit
-                override fun onIceCandidatesRemoved(candidates: Array<IceCandidate>) = Unit
-                override fun onAddStream(stream: org.webrtc.MediaStream) = Unit
-                override fun onRemoveStream(stream: org.webrtc.MediaStream) = Unit
-                override fun onDataChannel(dc: org.webrtc.DataChannel) = Unit
-                override fun onRenegotiationNeeded() = Unit
-                override fun onTrack(transceiver: org.webrtc.RtpTransceiver) = Unit
-            },
-        )
-
+        peerConnection = peerConnectionFactory.createPeerConnection(rtcConfig, createObserver())
         videoSender = peerConnection?.addTrack(videoTrack, listOf("screen_stream"))
         audioTrack?.let { peerConnection?.addTrack(it, listOf("screen_stream")) }
         updateVideoBitrate()
@@ -86,32 +51,25 @@ class WebRtcPeerSession(
 
     fun handleAnswer(sdp: String) {
         val pc = peerConnection ?: return
-
         if (pc.signalingState() != PeerConnection.SignalingState.HAVE_LOCAL_OFFER) {
             LogCat.d("webrtc: [$clientId] ignoring stale answer (signalingState=${pc.signalingState()})")
             return
         }
-
         remoteDescriptionSet.set(false)
         pendingIceCandidates.clear()
-
-        val answer = SessionDescription(SessionDescription.Type.ANSWER, sdp)
         pc.setRemoteDescription(object : SimpleSdpObserver() {
             override fun onSetSuccess() {
                 remoteDescriptionSet.set(true)
                 drainPendingIceCandidates()
             }
-        }, answer)
+        }, SessionDescription(SessionDescription.Type.ANSWER, sdp))
     }
 
     fun handleIceCandidate(message: WebRtcSignalingMessage) {
         val pc = peerConnection ?: return
         val candidate = IceCandidate(message.sdpMid, message.sdpMLineIndex ?: 0, message.candidate)
-        if (remoteDescriptionSet.get()) {
-            pc.addIceCandidate(candidate)
-        } else {
-            pendingIceCandidates.add(candidate)
-        }
+        if (remoteDescriptionSet.get()) pc.addIceCandidate(candidate)
+        else pendingIceCandidates.add(candidate)
     }
 
     fun updateVideoBitrate() {
@@ -119,35 +77,16 @@ class WebRtcPeerSession(
         val params = sender.parameters
         val encodings = params.encodings
         if (encodings.isEmpty()) return
-
         val maxKbps = computeTargetBitrateKbps()
         val startKbps = computeStartBitrateKbps()
-        val fps = getTargetFps()
-        val mode = getMode()
         val encoding = encodings[0]
         encoding.maxBitrateBps = maxKbps * 1000
-        encoding.maxFramerate = fps
-
-        when (mode) {
-            ScreenMirrorMode.SMOOTH -> {
-                // SMOOTH 720p: start at 1.5 Mbps, max 2 Mbps.
-                // For screen content at 720p, 2 Mbps is more than enough for
-                // crisp text/UI. Use MAINTAIN_RESOLUTION so text stays sharp
-                // and fps drops gracefully under pressure (screen content is
-                // mostly static, lower fps is barely noticeable).
-                encoding.minBitrateBps = startKbps * 800
-                params.degradationPreference = RtpParameters.DegradationPreference.MAINTAIN_RESOLUTION
-            }
-            else -> {
-                // HD / AUTO: professional remote-desktop strategy.
-                // Prioritize resolution (text clarity) over framerate.
-                // Screen content is mostly static UI — dropping from 20 to 10 fps
-                // is acceptable, but dropping resolution makes text unreadable.
-                // Start conservatively to avoid initial bufferbloat.
-                encoding.minBitrateBps = startKbps * 500
-                params.degradationPreference = RtpParameters.DegradationPreference.MAINTAIN_RESOLUTION
-            }
+        encoding.maxFramerate = getTargetFps()
+        when (getMode()) {
+            ScreenMirrorMode.SMOOTH -> encoding.minBitrateBps = startKbps * 800
+            else -> encoding.minBitrateBps = startKbps * 500
         }
+        params.degradationPreference = RtpParameters.DegradationPreference.MAINTAIN_RESOLUTION
         sender.parameters = params
     }
 
@@ -158,56 +97,59 @@ class WebRtcPeerSession(
             var packetsLost = 0L
             var packetsSent = 0L
             var rtt = 0.0
-
             for (stats in report.statsMap.values) {
                 when (stats.type) {
-                    "candidate-pair" -> {
-                        if (stats.members["state"] == "succeeded") {
-                            (stats.members["availableOutgoingBitrate"] as? Number)?.let {
-                                availableBitrate = (it.toDouble() / 1000).toLong()
-                            }
-                            (stats.members["currentRoundTripTime"] as? Number)?.let {
-                                rtt = it.toDouble() * 1000
-                            }
+                    "candidate-pair" -> if (stats.members["state"] == "succeeded") {
+                        (stats.members["availableOutgoingBitrate"] as? Number)?.let {
+                            availableBitrate = (it.toDouble() / 1000).toLong()
+                        }
+                        (stats.members["currentRoundTripTime"] as? Number)?.let {
+                            rtt = it.toDouble() * 1000
                         }
                     }
-                    "outbound-rtp" -> {
-                        if (stats.members["kind"] == "video") {
-                            (stats.members["packetsSent"] as? Number)?.let {
-                                packetsSent = it.toLong()
-                            }
-                        }
+                    "outbound-rtp" -> if (stats.members["kind"] == "video") {
+                        (stats.members["packetsSent"] as? Number)?.let { packetsSent = it.toLong() }
                     }
-                    "remote-inbound-rtp" -> {
-                        if (stats.members["kind"] == "video") {
-                            (stats.members["packetsLost"] as? Number)?.let {
-                                packetsLost = it.toLong()
-                            }
-                        }
+                    "remote-inbound-rtp" -> if (stats.members["kind"] == "video") {
+                        (stats.members["packetsLost"] as? Number)?.let { packetsLost = it.toLong() }
                     }
                 }
             }
-
-            val lossPercent = if (packetsSent > 0) {
-                (packetsLost.toDouble() / (packetsSent + packetsLost) * 100)
-            } else 0.0
-
+            val lossPercent = if (packetsSent > 0) (packetsLost.toDouble() / (packetsSent + packetsLost) * 100) else 0.0
             callback(availableBitrate, lossPercent, rtt)
         }
     }
 
-    fun release() {
-        releasePeerConnection()
-    }
+    fun release() = releasePeerConnection()
 
     private fun releasePeerConnection() {
         remoteDescriptionSet.set(false)
         pendingIceCandidates.clear()
-
-        peerConnection?.close()
-        peerConnection = null
-
+        peerConnection?.close(); peerConnection = null
         videoSender = null
+    }
+
+    private fun createObserver() = object : PeerConnection.Observer {
+        override fun onIceCandidate(candidate: IceCandidate) {
+            LogCat.d("webrtc: [$clientId] ICE candidate: ${candidate.sdp}")
+            sendToClient(WebRtcSignalingMessage(
+                type = "ice_candidate", candidate = candidate.sdp,
+                sdpMid = candidate.sdpMid, sdpMLineIndex = candidate.sdpMLineIndex,
+            ))
+        }
+        override fun onConnectionChange(newState: PeerConnection.PeerConnectionState) {
+            LogCat.d("webrtc: [$clientId] connection state: $newState")
+        }
+        override fun onSignalingChange(s: PeerConnection.SignalingState) = Unit
+        override fun onIceConnectionChange(s: PeerConnection.IceConnectionState) = Unit
+        override fun onIceConnectionReceivingChange(r: Boolean) = Unit
+        override fun onIceGatheringChange(s: PeerConnection.IceGatheringState) = Unit
+        override fun onIceCandidatesRemoved(c: Array<IceCandidate>) = Unit
+        override fun onAddStream(s: org.webrtc.MediaStream) = Unit
+        override fun onRemoveStream(s: org.webrtc.MediaStream) = Unit
+        override fun onDataChannel(dc: org.webrtc.DataChannel) = Unit
+        override fun onRenegotiationNeeded() = Unit
+        override fun onTrack(t: org.webrtc.RtpTransceiver) = Unit
     }
 
     private fun createOffer() {
@@ -216,12 +158,7 @@ class WebRtcPeerSession(
             override fun onCreateSuccess(description: SessionDescription) {
                 pc.setLocalDescription(object : SimpleSdpObserver() {
                     override fun onSetSuccess() {
-                        sendToClient(
-                            WebRtcSignalingMessage(
-                                type = "offer",
-                                sdp = description.description,
-                            ),
-                        )
+                        sendToClient(WebRtcSignalingMessage(type = "offer", sdp = description.description))
                     }
                 }, description)
             }
@@ -242,18 +179,6 @@ class WebRtcPeerSession(
             } catch (ex: Exception) {
                 LogCat.e("webrtc: failed to send signaling (${message.type}) to $clientId: ${ex.message}")
             }
-        }
-    }
-
-    private open class SimpleSdpObserver : org.webrtc.SdpObserver {
-        override fun onCreateSuccess(description: SessionDescription) = Unit
-        override fun onSetSuccess() = Unit
-        override fun onCreateFailure(error: String) {
-            LogCat.e("webrtc: sdp create failed: $error")
-        }
-
-        override fun onSetFailure(error: String) {
-            LogCat.e("webrtc: sdp set failed: $error")
         }
     }
 }
