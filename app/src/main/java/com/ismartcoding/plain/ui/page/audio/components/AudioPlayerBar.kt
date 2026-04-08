@@ -14,7 +14,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.ismartcoding.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.features.AudioPlayer
@@ -71,7 +70,7 @@ fun AudioPlayerBar(audioPlaylistVM: AudioPlaylistViewModel, castVM: CastViewMode
     ) {
         AudioPlayerBarCard(
             title = title, artist = artist, progress = progress, duration = duration,
-            isPlaying = isPlaying, isGestureMode = context.isGestureInteractionMode(),
+            isPlaying = isPlaying,
             onClickContent = { showPlayer = true }, onClickPlaylist = { showPlaylist = true }
         )
     }

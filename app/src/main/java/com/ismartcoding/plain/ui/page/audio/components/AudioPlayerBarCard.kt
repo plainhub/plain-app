@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -43,13 +44,13 @@ fun AudioPlayerBarCard(
     progress: Float,
     duration: Float,
     isPlaying: Boolean,
-    isGestureMode: Boolean,
     onClickContent: () -> Unit,
     onClickPlaylist: () -> Unit,
 ) {
     ElevatedCard(
         modifier = Modifier
-            .padding(start = 12.dp, end = 12.dp, bottom = if (isGestureMode) 16.dp else 8.dp)
+            .navigationBarsPadding()
+            .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
             .fillMaxWidth(),
         shape = RoundedCornerShape(PlainTheme.CARD_RADIUS),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp),

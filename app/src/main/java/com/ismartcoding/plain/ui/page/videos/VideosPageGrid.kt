@@ -75,6 +75,7 @@ internal fun VideosPageGrid(
                                 .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) { VideoGridCellsPerRowPreference.putAsync(context, it) },
                             horizontalArrangement = Arrangement.spacedBy(2.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             val isGroupMode = videosVM.sortBy.value == FileSortBy.TAKEN_AT_DESC
+                                && videosVM.queryText.value.isEmpty()
                             if (isGroupMode) {
                                 val groupedItems = groupMediaByDate(itemsState) { it.takenAt ?: it.createdAt }
                                 groupedItems.forEach { group ->

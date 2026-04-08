@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CardDefaults
@@ -20,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.ismartcoding.lib.extensions.isGestureInteractionMode
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.data.DPlaylistAudio
 import com.ismartcoding.plain.features.media.CastPlayer
@@ -66,11 +66,10 @@ fun AudioCastPlayerBar(
         exit = slideOutVertically { it },
         modifier = modifier,
     ) {
-        val isGestureMode = context.isGestureInteractionMode()
-
         ElevatedCard(
             modifier = Modifier
-                .padding(start = 12.dp, end = 12.dp, bottom = if (isGestureMode) 16.dp else 8.dp)
+                .navigationBarsPadding()
+                .padding(start = 12.dp, end = 12.dp, bottom = 8.dp)
                 .fillMaxWidth(),
             shape = RoundedCornerShape(PlainTheme.CARD_RADIUS),
             elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp),

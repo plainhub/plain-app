@@ -75,6 +75,8 @@ internal fun ImagesPageGrid(
                                 .pinchZoomGrid(cellsPerRow = cellsPerRow, hapticFeedback = hapticFeedback, scope = scope) { ImageGridCellsPerRowPreference.putAsync(context, it) },
                             horizontalArrangement = Arrangement.spacedBy(2.dp), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                             val isGroupMode = imagesVM.sortBy.value == FileSortBy.TAKEN_AT_DESC
+                                && imagesVM.queryText.value.isEmpty()
+                                && !imagesVM.useAiSearch.value
                             if (isGroupMode) {
                                 val groupedItems = groupMediaByDate(itemsState) { it.takenAt ?: it.createdAt }
                                 groupedItems.forEach { group ->

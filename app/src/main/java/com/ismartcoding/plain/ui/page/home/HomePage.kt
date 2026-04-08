@@ -94,7 +94,7 @@ fun HomePage(
             }
         }
         item {
-            HomeWeb(context, navController, mainVM, webEnabled)
+            HomeWeb(context, navController, mainVM, webEnabled, showIpAddresses = true)
             VerticalSpace(dp = 24.dp)
         }
         item {
