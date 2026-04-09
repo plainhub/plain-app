@@ -61,7 +61,7 @@ fun rememberVideoPlayer(context: Context, playerInstance: ExoPlayer.() -> Unit =
                     .setContentType(AUDIO_CONTENT_TYPE_MOVIE)
                     .setUsage(C.USAGE_MEDIA)
                     .build(),
-                true,
+                false, // VideoAudioFocusManager handles focus manually with AUDIOFOCUS_GAIN_TRANSIENT
             )
             .apply {
                 val cache = VideoPlayerCacheManager.getCache()

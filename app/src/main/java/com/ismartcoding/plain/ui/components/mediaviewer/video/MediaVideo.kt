@@ -25,6 +25,8 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.PlayerView
+import android.content.Context
+import android.media.AudioManager
 import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.plain.ui.components.mediaviewer.*
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
@@ -71,6 +73,8 @@ fun MediaVideo(
         if (model.intrinsicSize != IntSize.Zero) { vSize = model.intrinsicSize; videoSpecified = true }
     }
 
+    val audioManager = remember(context) { context.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
+    val focusManager = remember(audioManager) { VideoAudioFocusManager(audioManager) }
     val defaultPlayerView = remember { PlayerView(context) }
     var mediaSession = remember<MediaSession?> { null }
     val player = rememberVideoPlayer(context, playerInstance = {
@@ -93,7 +97,7 @@ fun MediaVideo(
 
     LaunchedEffect(player, pagerState.settledPage, videoState.isPreviewerOpen) {
         if (!videoState.isPreviewerOpen || pagerState.settledPage != page) {
-            // stop() releases audio focus so background music can resume
+            focusManager.abandonFocus()
             player.stop()
             return@LaunchedEffect
         }
@@ -106,12 +110,14 @@ fun MediaVideo(
             val uri = it.toUri(context)
             MediaItem.Builder().apply { setUri(uri); setMediaMetadata(it.mediaMetadata); setMimeType(it.mimeType); setDrmConfiguration(null) }.build()
         }
-        player.setMediaItems(exoPlayerMediaItems); player.prepare(); player.play()
+        player.setMediaItems(exoPlayerMediaItems); player.prepare()
+        focusManager.requestFocus(player)
+        player.play()
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            // Release audio focus and clean up the player so music can resume
+            focusManager.abandonFocus() // unregisters listener before player.release() — safe, no callbacks after this
             player.stop()
             player.release()
             mediaSession?.release()

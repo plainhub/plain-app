@@ -52,11 +52,11 @@ object TimeAgoHelper {
                     timeAgo.append(MainApp.instance.getString(periodKey, years))
                 }
 
-                Periods.X_MINUTES_FUTURE -> timeAgo.append(MainApp.instance.getString(periodKey, abs(dim.toFloat())))
+                Periods.X_MINUTES_FUTURE -> timeAgo.append(MainApp.instance.getString(periodKey, abs(dim)))
                 Periods.X_HOURS_FUTURE -> {
                     val hours1 = abs((dim / 60f).roundToLong())
                     val yHoursText = if (hours1.toInt() == 24)
-                        R.string.timeago_oneday_future
+                        MainApp.instance.getString(R.string.timeago_oneday_future)
                     else
                         handlePeriodKeyAsPlural(
                             R.string.timeago_aboutanhour_future,
@@ -84,7 +84,7 @@ object TimeAgoHelper {
                 Periods.X_MONTHS_FUTURE -> {
                     val months1 = abs((dim / 43200f).roundToLong())
                     val yMonthsText = if (months1.toInt() == 12)
-                        R.string.timeago_aboutayear_future
+                        MainApp.instance.getString(R.string.timeago_aboutayear_future)
                     else
                         handlePeriodKeyAsPlural(
                             R.string.timeago_aboutamonth_future, periodKey, months1.toInt()

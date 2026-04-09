@@ -294,19 +294,16 @@ class MainGraphQL(val schema: Schema) {
                         Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
                         val fields = SearchHelper.parse(query)
                         val textField = fields.find { it.name == "text" }
-                        if (ImageSearchManager.isModelReady() && textField != null && textField.value.isNotBlank()) {
-                            val results = ImageSearchManager.search(textField.value, 500)
-                            val semanticIds = results.map { it.imageId }
-                            val otherQuery = fields.filter { it.name != "text" }
-                                .joinToString(" ") { "${it.name}:${it.value}" }
-                            val allImages = ImageMediaStoreHelper.searchAsync(context, otherQuery, Int.MAX_VALUE, 0, sortBy)
-                            val imageMap = allImages.associateBy { it.id }
-                            semanticIds.mapNotNull { imageMap[it] }
-                                .drop(offset).take(limit)
-                                .map { it.toModel() }
-                        } else {
-                            ImageMediaStoreHelper.searchAsync(context, query, limit, offset, sortBy).map { it.toModel() }
-                        }
+                        val queryText = textField?.value ?: ""
+                        val combined = com.ismartcoding.plain.features.media.ImageSearchHelper.searchCombinedAsync(
+                            context = context,
+                            queryText = queryText,
+                            extraQuery = query,
+                            limit = limit,
+                            offset = offset,
+                            sortBy = sortBy
+                        )
+                        combined.map { it.toModel() }
                     }
                     type<Image> {
                         dataProperty("tags") {
@@ -323,16 +320,12 @@ class MainGraphQL(val schema: Schema) {
                         if (Permission.WRITE_EXTERNAL_STORAGE.enabledAndCanAsync(context)) {
                             val fields = SearchHelper.parse(query)
                             val textField = fields.find { it.name == "text" }
-                            if (ImageSearchManager.isModelReady() && textField != null && textField.value.isNotBlank()) {
-                                val results = ImageSearchManager.search(textField.value, 500)
-                                val semanticIds = results.map { it.imageId }.toSet()
-                                val otherQuery = fields.filter { it.name != "text" }
-                                    .joinToString(" ") { "${it.name}:${it.value}" }
-                                val allImages = ImageMediaStoreHelper.searchAsync(context, otherQuery, Int.MAX_VALUE, 0, FileSortBy.DATE_DESC)
-                                allImages.count { it.id in semanticIds }
-                            } else {
-                                ImageMediaStoreHelper.countAsync(context, query)
-                            }
+                            val queryText = textField?.value ?: ""
+                            com.ismartcoding.plain.features.media.ImageSearchHelper.countCombinedAsync(
+                                context = context,
+                                queryText = queryText,
+                                extraQuery = query
+                            )
                         } else {
                             0
                         }

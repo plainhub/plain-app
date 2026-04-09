@@ -24,26 +24,26 @@ class ImagesViewModel : BaseMediaViewModel<DImage>() {
 
     suspend fun loadWithAiSearchAsync(context: Context, tagsVM: TagsViewModel) {
         val query = queryText.value.trim()
-        if (query.isNotEmpty() && ImageSearchManager.isModelReady()) {
-            useAiSearch.value = true
-            val results = ImageSearchManager.search(query)
-            if (results.isNotEmpty()) {
-                val ids = results.map { it.imageId }
-                val idsQuery = "ids:${ids.joinToString(",")} trash:false"
-                offset.intValue = 0
-                val items = ImageMediaStoreHelper.searchAsync(context, idsQuery, ids.size, 0, sortBy.value)
-                val idOrder = ids.withIndex().associate { it.value to it.index }
-                _itemsFlow.value = items.sortedBy { idOrder[it.id] ?: Int.MAX_VALUE }.toMutableStateList()
-                tagsVM.loadAsync(_itemsFlow.value.map { it.id }.toSet())
-                total.intValue = items.size
-                totalTrash.intValue = 0
-                noMore.value = true
-                showLoading.value = false
-                return
-            }
+        val combined = com.ismartcoding.plain.features.media.ImageSearchHelper.searchCombinedAsync(
+            context = context,
+            queryText = query,
+            extraQuery = getQuery(),
+            limit = limit.intValue,
+            offset = 0,
+            sortBy = sortBy.value
+        )
+        useAiSearch.value = query.isNotEmpty() && com.ismartcoding.plain.ai.ImageSearchManager.isModelReady()
+        offset.intValue = 0
+        _itemsFlow.value = combined.toMutableStateList()
+        tagsVM.loadAsync(_itemsFlow.value.map { it.id }.toSet())
+        total.intValue = combined.size
+        totalTrash.intValue = 0
+        noMore.value = true
+        showLoading.value = false
+        if (combined.isEmpty()) {
+            useAiSearch.value = false
+            loadAsync(context, tagsVM)
         }
-        useAiSearch.value = false
-        loadAsync(context, tagsVM)
     }
 
     fun delete(context: Context, tagsVM: TagsViewModel, ids: Set<String>) {

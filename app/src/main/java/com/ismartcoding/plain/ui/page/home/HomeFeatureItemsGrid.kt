@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -36,7 +36,7 @@ import com.ismartcoding.plain.preferences.HomeFeaturesPreference
 import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableItem
-import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyStaggeredGridState
+import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyGridState
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import kotlinx.coroutines.Dispatchers
@@ -71,10 +71,10 @@ fun HomeFeatureItemsGrid(navController: NavHostController) {
     val rowCount = (items.size + 1) / 2
     val gridHeight = if (rowCount > 0) (rowCount * 72 + (rowCount - 1) * 12).dp else 0.dp
 
-    val gridState = rememberLazyStaggeredGridState()
-    val reorderableState = rememberReorderableLazyStaggeredGridState(gridState) { from, to ->
-        val fromKey = from.key as? String ?: return@rememberReorderableLazyStaggeredGridState
-        val toKey = to.key as? String ?: return@rememberReorderableLazyStaggeredGridState
+    val gridState = rememberLazyGridState()
+    val reorderableState = rememberReorderableLazyGridState(gridState) { from, to ->
+        val fromKey = from.key as? String ?: return@rememberReorderableLazyGridState
+        val toKey = to.key as? String ?: return@rememberReorderableLazyGridState
         val fromIdx = enabledIds.indexOf(fromKey)
         val toIdx = enabledIds.indexOf(toKey)
         if (fromIdx >= 0 && toIdx >= 0) {
@@ -82,11 +82,11 @@ fun HomeFeatureItemsGrid(navController: NavHostController) {
         }
     }
 
-    LazyVerticalStaggeredGrid(
-        columns = StaggeredGridCells.Fixed(2),
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
         state = gridState,
         modifier = Modifier.fillMaxWidth().height(gridHeight),
-        verticalItemSpacing = 12.dp,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         userScrollEnabled = false,
     ) {

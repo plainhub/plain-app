@@ -76,7 +76,7 @@ fun ImagesPage(
         if (AppFeatureType.MEDIA_TRASH.has()) baseTabs.add(VTabData(LocaleHelper.getString(R.string.trash), "trash", imagesVM.totalTrash.intValue))
         baseTabs.addAll(tagsState.map { VTabData(it.name, it.id, it.count) }); baseTabs
     }
-    val topRefreshLayoutState = rememberRefreshLayoutState { scope.launch { withIO { imagesVM.loadAsync(context, tagsVM); mediaFoldersVM.loadAsync(context) }; setRefreshState(RefreshContentState.Finished) } }
+    val topRefreshLayoutState = rememberRefreshLayoutState { scope.launch { withIO { imagesVM.loadWithAiSearchAsync(context, tagsVM); mediaFoldersVM.loadAsync(context) }; setRefreshState(RefreshContentState.Finished) } }
 
     BackHandler(enabled = previewerState.visible || dragSelectState.selectMode || castVM.castMode.value || imagesVM.showSearchBar.value) {
         when {

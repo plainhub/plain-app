@@ -41,7 +41,12 @@ object ImageMediaStoreHelper : BaseMediaContentHelper() {
         val where = ContentWhere()
         filterFields.forEach {
             if (it.name == "text") {
-                where.add("${MediaStore.Images.Media.TITLE} LIKE ?", "%${it.value}%")
+                val v = "%${it.value}%"
+                where.add(
+                    "(${MediaStore.Images.Media.TITLE} LIKE ? OR ${MediaStore.Images.Media.DATA} LIKE ?)",
+                    v,
+                )
+                where.args.add(v)
             } else if (it.name == "bucket_id") {
                 where.addEqual(MediaStore.Images.Media.BUCKET_ID, it.value)
             } else if (it.name == "trash") {
