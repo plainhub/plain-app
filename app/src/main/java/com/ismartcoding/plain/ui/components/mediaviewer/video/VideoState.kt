@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 class VideoState {
     var isPlaying by mutableStateOf(false)
     var isMuted by mutableStateOf(false)
+    var isPreviewerOpen by mutableStateOf(false)
     var currentTime by mutableLongStateOf(0L)
     var totalTime by mutableLongStateOf(0L)
     var bufferedPercentage by mutableIntStateOf(0)

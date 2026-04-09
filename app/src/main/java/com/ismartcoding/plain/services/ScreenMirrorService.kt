@@ -6,6 +6,7 @@ import android.content.pm.ServiceInfo
 import android.view.OrientationEventListener
 import androidx.core.app.ServiceCompat
 import androidx.lifecycle.LifecycleService
+import android.media.projection.MediaProjection
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.isPortrait
 import com.ismartcoding.lib.extensions.parcelable
@@ -61,15 +62,10 @@ class ScreenMirrorService : LifecycleService() {
         startId: Int,
     ): Int {
         super.onStartCommand(intent, flags, startId)
-        var resultCode = 0
-        var resultData: Intent? = null
 
-        if (intent != null) {
-            resultCode = intent.getIntExtra("code", -1)
-            resultData = intent.parcelable("data")
-        }
+        val resultCode = intent?.getIntExtra("code", -1) ?: -1
+        val resultData: Intent? = intent?.parcelable("data")
 
-        // Must start FGS with mediaProjection type BEFORE calling getMediaProjection() on Android 14+
         if (notificationId == 0) {
             notificationId = NotificationHelper.generateId()
         }
@@ -79,22 +75,37 @@ class ScreenMirrorService : LifecycleService() {
                 Constants.ACTION_STOP_SCREEN_MIRROR,
                 getString(R.string.screen_mirror_service_is_running),
             )
-        ServiceCompat.startForeground(
-            this,
-            notificationId,
-            notification,
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION,
-        )
 
-        val mMediaProjection = if (resultCode == -1 && resultData != null) {
+        // On AOSP/Pixel: the consent dialog already sets the project_media AppOp, so
+        // startForeground succeeds immediately and we call getMediaProjection() after.
+        // On Android 16 OEM devices (Honor/Oppo/Samsung/Xiaomi): the consent dialog does NOT set
+        // the AppOp, so startForeground throws SecurityException. We recover by calling
+        // getMediaProjection() first (which sets the AppOp) and then retrying startForeground.
+        var mMediaProjection: MediaProjection? = null
+        try {
+            ServiceCompat.startForeground(this, notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
+        } catch (se: SecurityException) {
+            LogCat.e("screen mirror: startForeground failed (OEM AppOp fix): ${se.message}")
+            if (resultCode == -1 && resultData != null) {
+                mMediaProjection = runCatching { mediaProjectionManager.getMediaProjection(resultCode, resultData) }.getOrNull()
+            }
+            if (mMediaProjection == null) { stop(); return START_NOT_STICKY }
             try {
-                mediaProjectionManager.getMediaProjection(resultCode, resultData)
-            } catch (e: Exception) {
-                LogCat.e("getMediaProjection failed: ${e.javaClass.simpleName}: ${e.message}")
+                ServiceCompat.startForeground(this, notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION)
+            } catch (se2: SecurityException) {
+                LogCat.e("screen mirror: startForeground still failed after AppOp fix: ${se2.message}")
+                stop()
+                return START_NOT_STICKY
+            }
+        }
+
+        // AOSP/Pixel path: getMediaProjection must be called AFTER startForeground so the system
+        // can bind it to the running FGS (making it the "current" projection for createVirtualDisplay).
+        if (mMediaProjection == null && resultCode == -1 && resultData != null) {
+            mMediaProjection = runCatching { mediaProjectionManager.getMediaProjection(resultCode, resultData) }.getOrElse {
+                LogCat.e("screen mirror: getMediaProjection failed: ${it.message}")
                 null
             }
-        } else {
-            null
         }
 
         if (mMediaProjection == null) {

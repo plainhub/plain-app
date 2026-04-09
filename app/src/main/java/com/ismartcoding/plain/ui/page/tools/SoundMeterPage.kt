@@ -99,7 +99,7 @@ fun SoundMeterPage(navController: NavHostController) {
                 if (isRunning.value) {
                     PFilledButton(text = stringResource(R.string.stop), type = ButtonType.SECONDARY, modifier = Modifier.padding(horizontal = 16.dp), onClick = { isRunning.value = false })
                 } else {
-                    PFilledButton(text = stringResource(R.string.start), onClick = {
+                    PFilledButton(text = stringResource(R.string.start), modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                         if (Permission.RECORD_AUDIO.can(context)) isRunning.value = true
                         else sendEvent(RequestPermissionsEvent(Permission.RECORD_AUDIO))
                     })

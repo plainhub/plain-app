@@ -8,7 +8,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.pdfviewer.PDFView
 import com.ismartcoding.lib.pdfviewer.listener.OnPageErrorListener
-import com.ismartcoding.lib.pdfviewer.scroll.DefaultScrollHandle
 import com.ismartcoding.lib.pdfviewer.util.FitPolicy
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.preferences.LocalDarkTheme
@@ -28,7 +27,7 @@ fun PdfView(
             v.fromUri(uri)
                 .defaultPage(0)
                 .enableAnnotationRendering(true)
-                .scrollHandle(DefaultScrollHandle(context))
+                .scrollHandle(MinimalScrollHandle(factoryContext))
                 .spacing(10)
                 .onPageError(object : OnPageErrorListener {
                     override fun onPageError(

@@ -81,7 +81,8 @@ class MainActivity : AppCompatActivity() {
 
     internal val screenCapture = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null && ScreenMirrorService.instance == null) {
-            ContextCompat.startForegroundService(this, Intent(this, ScreenMirrorService::class.java).putExtra("code", result.resultCode).putExtra("data", result.data))
+            ContextCompat.startForegroundService(this, Intent(this, ScreenMirrorService::class.java)
+                .putExtra("code", result.resultCode).putExtra("data", result.data))
         }
     }
     internal val recordAudioForMirror = registerForActivityResult(ActivityResultContracts.RequestPermission()) { _ ->

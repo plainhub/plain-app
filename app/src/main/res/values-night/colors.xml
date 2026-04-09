@@ -3,4 +3,5 @@
     <color name="canvas">#212529</color>
     <color name="primary">#FEFEFE</color>
     <color name="launcher_background">#FFFFFF</color>
+    <color name="scrollbar_primary">#0A84FF</color>
 </resources>

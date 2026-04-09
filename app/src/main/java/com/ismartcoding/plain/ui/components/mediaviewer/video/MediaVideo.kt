@@ -91,8 +91,12 @@ fun MediaVideo(
 
     scope.launch { viewerAlpha.animateTo(1F, DEFAULT_CROSS_FADE_ANIMATE_SPEC); onMounted() }
 
-    LaunchedEffect(player, pagerState.currentPage) {
-        if (pagerState.currentPage != page) return@LaunchedEffect
+    LaunchedEffect(player, pagerState.settledPage, videoState.isPreviewerOpen) {
+        if (!videoState.isPreviewerOpen || pagerState.settledPage != page) {
+            // stop() releases audio focus so background music can resume
+            player.stop()
+            return@LaunchedEffect
+        }
         videoState.initData(player)
         mediaSession?.release()
         mediaSession = MediaSession.Builder(appContext, ForwardingPlayer(player))
@@ -105,7 +109,15 @@ fun MediaVideo(
         player.setMediaItems(exoPlayerMediaItems); player.prepare(); player.play()
     }
 
-    DisposableEffect(Unit) { onDispose { mediaSession?.release(); mediaSession = null } }
+    DisposableEffect(Unit) {
+        onDispose {
+            // Release audio focus and clean up the player so music can resume
+            player.stop()
+            player.release()
+            mediaSession?.release()
+            mediaSession = null
+        }
+    }
 
     Box(
         modifier = modifier.fillMaxSize()

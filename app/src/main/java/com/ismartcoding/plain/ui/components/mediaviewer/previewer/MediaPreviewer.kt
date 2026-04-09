@@ -59,6 +59,9 @@ fun MediaPreviewer(
     LaunchedEffect(key1 = state.animateContainerVisibleState, key2 = state.animateContainerVisibleState.currentState) {
         state.onAnimateContainerStateChanged()
     }
+    LaunchedEffect(state.visible) {
+        state.videoState.isPreviewerOpen = state.visible
+    }
 
     AnimatedVisibility(modifier = Modifier.fillMaxSize(), visibleState = state.animateContainerVisibleState,
         enter = DEFAULT_PREVIEWER_ENTER_TRANSITION, exit = DEFAULT_PREVIEWER_EXIT_TRANSITION) {
