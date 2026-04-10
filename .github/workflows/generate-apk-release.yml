@@ -82,6 +82,8 @@ jobs:
     outputs:
       default_report: ${{ steps.scan.outputs.default_report }}
       armv7_report: ${{ steps.scan.outputs.armv7_report }}
+      default_status: ${{ steps.scan.outputs.default_status }}
+      armv7_status: ${{ steps.scan.outputs.armv7_status }}
     steps:
       - name: Download APKs
         uses: actions/download-artifact@v4
@@ -94,6 +96,8 @@ jobs:
           VT_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
           VERSION: ${{ needs.build.outputs.version_name }}
         run: |
+          RESULT_URL=""
+          RESULT_STATUS=""
           upload_and_poll() {
             local file="$1"
             local sha256
@@ -107,7 +111,8 @@ jobs:
                 --url https://www.virustotal.com/api/v3/files/upload_url \
                 --header "x-apikey: $VT_API_KEY" | jq -r '.data')
               if [ -z "$upload_url" ] || [ "$upload_url" = "null" ]; then
-                echo "https://www.virustotal.com/gui/file/$sha256/detection"
+                RESULT_URL="https://www.virustotal.com/gui/file/$sha256/detection"
+                RESULT_STATUS="⬜ N/A"
                 return
               fi
             fi
@@ -117,23 +122,46 @@ jobs:
               --header "x-apikey: $VT_API_KEY" \
               --form "file=@$file" | jq -r '.data.id')
             if [ -z "$analysis_id" ] || [ "$analysis_id" = "null" ]; then
-              echo "https://www.virustotal.com/gui/file/$sha256/detection"
+              RESULT_URL="https://www.virustotal.com/gui/file/$sha256/detection"
+              RESULT_STATUS="⬜ N/A"
               return
             fi
+            local last_response=""
             for i in $(seq 1 30); do
               sleep 20
-              local status
-              status=$(curl -sS \
+              last_response=$(curl -sS \
                 --url "https://www.virustotal.com/api/v3/analyses/$analysis_id" \
-                --header "x-apikey: $VT_API_KEY" | jq -r '.data.attributes.status')
-              [ "$status" = "completed" ] && break
+                --header "x-apikey: $VT_API_KEY")
+              local poll_status
+              poll_status=$(echo "$last_response" | jq -r '.data.attributes.status')
+              [ "$poll_status" = "completed" ] && break
             done
-            echo "https://www.virustotal.com/gui/file/$sha256/detection"
+            local malicious suspicious undetected harmless total detected
+            malicious=$(echo "$last_response" | jq -r '.data.attributes.stats.malicious // 0')
+            suspicious=$(echo "$last_response" | jq -r '.data.attributes.stats.suspicious // 0')
+            undetected=$(echo "$last_response" | jq -r '.data.attributes.stats.undetected // 0')
+            harmless=$(echo "$last_response" | jq -r '.data.attributes.stats.harmless // 0')
+            total=$((malicious + suspicious + undetected + harmless))
+            detected=$((malicious + suspicious))
+            if [ "$detected" -eq 0 ]; then
+              RESULT_STATUS="✅ ${detected}/${total} Clean"
+            else
+              RESULT_STATUS="⚠️ ${detected}/${total} Detected"
+            fi
+            RESULT_URL="https://www.virustotal.com/gui/file/$sha256/detection"
           }
-          DEFAULT_REPORT=$(upload_and_poll "PlainApp-${VERSION}-default.apk")
-          ARMV7_REPORT=$(upload_and_poll "PlainApp-${VERSION}-armeabi-v7a.apk")
-          echo "default_report=$DEFAULT_REPORT" >> $GITHUB_OUTPUT
-          echo "armv7_report=$ARMV7_REPORT" >> $GITHUB_OUTPUT
+          upload_and_poll "PlainApp-${VERSION}-default.apk"
+          DEFAULT_REPORT="$RESULT_URL"
+          DEFAULT_STATUS="$RESULT_STATUS"
+          upload_and_poll "PlainApp-${VERSION}-armeabi-v7a.apk"
+          ARMV7_REPORT="$RESULT_URL"
+          ARMV7_STATUS="$RESULT_STATUS"
+          {
+            echo "default_report=$DEFAULT_REPORT"
+            echo "armv7_report=$ARMV7_REPORT"
+            echo "default_status=$DEFAULT_STATUS"
+            echo "armv7_status=$ARMV7_STATUS"
+          } >> $GITHUB_OUTPUT
 
   release:
     needs: [build, provenance, virustotal]
@@ -162,10 +190,10 @@ jobs:
             ## Security
 
             ### VirusTotal Scan
-            | APK | Scan Report |
-            |-----|-------------|
-            | `PlainApp-${{ needs.build.outputs.version_name }}-default.apk` | [View Report](${{ needs.virustotal.outputs.default_report }}) |
-            | `PlainApp-${{ needs.build.outputs.version_name }}-armeabi-v7a.apk` | [View Report](${{ needs.virustotal.outputs.armv7_report }}) |
+            | APK | Status | Scan Report |
+            |-----|--------|-------------|
+            | `PlainApp-${{ needs.build.outputs.version_name }}-default.apk` | ${{ needs.virustotal.outputs.default_status }} | [View Report](${{ needs.virustotal.outputs.default_report }}) |
+            | `PlainApp-${{ needs.build.outputs.version_name }}-armeabi-v7a.apk` | ${{ needs.virustotal.outputs.armv7_status }} | [View Report](${{ needs.virustotal.outputs.armv7_report }}) |
 
             ### SLSA Provenance (Level 3)
             The `.intoto.jsonl` file attached to this release is a signed SLSA provenance document.

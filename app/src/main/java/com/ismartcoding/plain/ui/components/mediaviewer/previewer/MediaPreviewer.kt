@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DTag
@@ -111,12 +112,14 @@ fun MediaPreviewer(
 @Composable
 private fun SpeedBoostIndicator(state: MediaPreviewerState) {
     AnimatedVisibility(visible = state.videoState.isSpeedBoostActive,
-        modifier = Modifier.statusBarsPadding().padding(top = 16.dp), enter = fadeIn(tween(150)), exit = fadeOut(tween(150))) {
-        Row(modifier = Modifier.background(color = Color.Black.copy(alpha = 0.6f),
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)).padding(horizontal = 16.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically) {
-            Icon(painter = painterResource(R.drawable.double_arrow_right), contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
-            Text(text = " 2x", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+        modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(top = 16.dp), enter = fadeIn(tween(150)), exit = fadeOut(tween(150))) {
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Row(modifier = Modifier.background(color = Color.Black.copy(alpha = 0.6f),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp)).padding(horizontal = 16.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                Icon(painter = painterResource(R.drawable.double_arrow_right), contentDescription = null, tint = Color.White, modifier = Modifier.size(20.dp))
+                Text(text = " 2x", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+            }
         }
     }
 }
