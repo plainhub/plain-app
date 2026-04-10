@@ -22,3 +22,9 @@
 
 # Restore some Source file names and restore approximate line numbers in the stack traces,
 # otherwise the stack traces are pretty useless
+
+# WebRTC / jni_zero: JniInit is loaded by native code at runtime via System.loadLibrary().
+# R8 cannot see this reference through static analysis, so it must be kept explicitly.
+-keep class org.jni_zero.JniInit { *; }
+-keep class org.jni_zero.** { *; }
+-keep class org.webrtc.** { *; }

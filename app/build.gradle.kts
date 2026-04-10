@@ -81,9 +81,9 @@ android {
                 else -> 0
             }
 
-        val vCode = 532
+        val vCode = 535
         versionCode = vCode - singleAbiNum
-        versionName = "3.0.11"
+        versionName = "3.0.12"
 
         ndk {
             //noinspection ChromeOsAbiSupport
@@ -122,8 +122,8 @@ android {
             configure<CrashlyticsExtension> {
                 mappingFileUploadEnabled = false
             }
-            buildConfigField("String", "CHANNEL", "\"\"")
-//            setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
+            buildConfigField("String", "CHANNEL", "\"GITHUB\"")
+            setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
         }
         release {
             signingConfig = signingConfigs.getByName("release")
@@ -135,7 +135,7 @@ android {
             configure<CrashlyticsExtension> {
                 mappingFileUploadEnabled = true
             }
-//            setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
+            setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
         }
     }
 
@@ -268,10 +268,10 @@ dependencies {
 
     debugImplementation(libs.leakcanary.android)
     implementation(kotlin("stdlib", libs.versions.kotlin.get()))
-    
+
     // For cryptography (Ed25519 support on all Android versions)
     implementation(libs.tink.android)
-    
+
     // WebRTC for screen mirroring
     implementation(libs.webrtc.sdk.android)
 
