@@ -1,10 +1,10 @@
-name: Generated APK
+name: Release
 
 on:
   workflow_dispatch:
 
 permissions:
-  contents: read   # default; jobs that need more grant it at job level
+  contents: read   # jobs that need more declare it at job level
 
 jobs:
   build:
@@ -14,14 +14,15 @@ jobs:
     env:
       ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
     outputs:
-      version_name: ${{ steps.version.outputs.version_name }}
+      version_name: ${{ steps.meta.outputs.version_name }}
       hashes: ${{ steps.hashes.outputs.hashes }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Set version name
-        id: version
+        id: meta
         run: |
           VER=$(grep versionName ./app/build.gradle.kts | awk -F '"' '{print $2}')
           echo "version_name=$VER" >> $GITHUB_OUTPUT
@@ -32,8 +33,7 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Change wrapper permissions
-        run: chmod +x ./gradlew
+      - run: chmod +x ./gradlew
 
       - name: Restore keystore
         run: echo "${{ secrets.KEYSTORE_B64 }}" | base64 --decode > ./app/release.jks
@@ -43,28 +43,38 @@ jobs:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: printf '%s' "$GOOGLE_SERVICES_JSON" > ./app/google-services.json
 
-      - name: Build APKs
+      # APK build must run first: build-aab.sh strips Play Store restricted
+      # permissions from AndroidManifest.xml, which must not affect APK output.
+      - name: Build APKs (arm64-v8a + armeabi-v7a)
         run: bash build-apk.sh
 
-      - name: Compute SHA-256 hashes for SLSA
+      # build-aab.sh patches the manifest, builds the AAB, and writes play-config.json.
+      # publishGoogleReleaseBundle uploads the AAB to Play Store internal track.
+      - name: Build AAB and publish to Play Store
+        run: bash build-aab.sh && ./gradlew publishGoogleReleaseBundle
+
+      - name: Compute SHA-256 hashes
         id: hashes
         run: |
-          VERSION="${{ steps.version.outputs.version_name }}"
+          VERSION="${{ steps.meta.outputs.version_name }}"
           echo "hashes=$(sha256sum \
             "PlainApp-${VERSION}-default.apk" \
             "PlainApp-${VERSION}-armeabi-v7a.apk" \
+            "PlainApp-${VERSION}.aab" \
             | base64 -w0)" >> $GITHUB_OUTPUT
 
-      - name: Upload APKs as build artifacts
+      - name: Upload release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: apks
+          name: release-artifacts
           path: |
-            PlainApp-${{ steps.version.outputs.version_name }}-default.apk
-            PlainApp-${{ steps.version.outputs.version_name }}-armeabi-v7a.apk
+            PlainApp-${{ steps.meta.outputs.version_name }}-default.apk
+            PlainApp-${{ steps.meta.outputs.version_name }}-armeabi-v7a.apk
+            PlainApp-${{ steps.meta.outputs.version_name }}.aab
           if-no-files-found: error
           retention-days: 1
 
+  # SLSA Level 3 provenance covers all three release artifacts.
   provenance:
     needs: build
     permissions:
@@ -76,38 +86,36 @@ jobs:
       base64-subjects: ${{ needs.build.outputs.hashes }}
       upload-assets: false
 
+  # Scans all three artifacts concurrently to minimise wall-clock time.
   virustotal:
     needs: build
     runs-on: ubuntu-latest
     permissions: {}
     outputs:
       default_report: ${{ steps.scan.outputs.default_report }}
-      armv7_report: ${{ steps.scan.outputs.armv7_report }}
       default_status: ${{ steps.scan.outputs.default_status }}
-      armv7_status: ${{ steps.scan.outputs.armv7_status }}
+      armv7_report:   ${{ steps.scan.outputs.armv7_report }}
+      armv7_status:   ${{ steps.scan.outputs.armv7_status }}
+      aab_report:     ${{ steps.scan.outputs.aab_report }}
+      aab_status:     ${{ steps.scan.outputs.aab_status }}
     steps:
-      - name: Download APKs
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
-          name: apks
+          name: release-artifacts
 
-      - name: Upload to VirusTotal and get report links
+      - name: Scan with VirusTotal
         id: scan
         env:
           VT_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
           VERSION: ${{ needs.build.outputs.version_name }}
         run: |
-          # Scans both APKs in parallel; results written to temp files to avoid
-          # race conditions between background subshells.
           upload_and_poll() {
-            local file="$1"
-            local outprefix="$2"
-            local sha256
+            local file="$1" outprefix="$2"
+            local sha256 size_bytes upload_url analysis_id last_response poll_status
+            local malicious suspicious undetected harmless total detected result_status
             sha256=$(sha256sum "$file" | awk '{print $1}')
-            local size_bytes
             size_bytes=$(stat -c%s "$file")
-            local upload_url="https://www.virustotal.com/api/v3/files"
-            # Files > 32 MB require a dedicated large-file upload URL
+            upload_url="https://www.virustotal.com/api/v3/files"
             if [ "$size_bytes" -gt 33554432 ]; then
               upload_url=$(curl -sS --request GET \
                 --url https://www.virustotal.com/api/v3/files/upload_url \
@@ -118,7 +126,6 @@ jobs:
                 return
               fi
             fi
-            local analysis_id
             analysis_id=$(curl -sS --request POST \
               --url "$upload_url" \
               --header "x-apikey: $VT_API_KEY" \
@@ -128,49 +135,38 @@ jobs:
               printf '%s' "⬜ N/A" > "${outprefix}.status"
               return
             fi
-            local last_response=""
+            last_response=""
             for i in $(seq 1 30); do
               sleep 20
               last_response=$(curl -sS \
                 --url "https://www.virustotal.com/api/v3/analyses/$analysis_id" \
                 --header "x-apikey: $VT_API_KEY")
-              local poll_status
               poll_status=$(echo "$last_response" | jq -r '.data.attributes.status')
               [ "$poll_status" = "completed" ] && break
             done
-            local malicious suspicious undetected harmless total detected
-            malicious=$(echo "$last_response" | jq -r '.data.attributes.stats.malicious // 0')
-            suspicious=$(echo "$last_response" | jq -r '.data.attributes.stats.suspicious // 0')
-            undetected=$(echo "$last_response" | jq -r '.data.attributes.stats.undetected // 0')
-            harmless=$(echo "$last_response" | jq -r '.data.attributes.stats.harmless // 0')
+            malicious=$(echo  "$last_response" | jq -r '.data.attributes.stats.malicious   // 0')
+            suspicious=$(echo "$last_response" | jq -r '.data.attributes.stats.suspicious  // 0')
+            undetected=$(echo "$last_response" | jq -r '.data.attributes.stats.undetected  // 0')
+            harmless=$(echo   "$last_response" | jq -r '.data.attributes.stats.harmless    // 0')
             total=$((malicious + suspicious + undetected + harmless))
             detected=$((malicious + suspicious))
-            local result_status
-            if [ "$detected" -eq 0 ]; then
-              result_status="✅ ${detected}/${total} Clean"
-            else
-              result_status="⚠️ ${detected}/${total} Detected"
-            fi
+            [ "$detected" -eq 0 ] \
+              && result_status="✅ ${detected}/${total} Clean" \
+              || result_status="⚠️ ${detected}/${total} Detected"
             printf '%s' "https://www.virustotal.com/gui/file/$sha256/detection" > "${outprefix}.url"
             printf '%s' "$result_status" > "${outprefix}.status"
           }
-          # Launch both scans in parallel
-          upload_and_poll "PlainApp-${VERSION}-default.apk" /tmp/vt_default &
-          PID_DEFAULT=$!
-          upload_and_poll "PlainApp-${VERSION}-armeabi-v7a.apk" /tmp/vt_armv7 &
-          PID_ARMV7=$!
-          # Wait for both to finish
-          wait $PID_DEFAULT
-          wait $PID_ARMV7
-          DEFAULT_REPORT=$(cat /tmp/vt_default.url)
-          DEFAULT_STATUS=$(cat /tmp/vt_default.status)
-          ARMV7_REPORT=$(cat /tmp/vt_armv7.url)
-          ARMV7_STATUS=$(cat /tmp/vt_armv7.status)
+          upload_and_poll "PlainApp-${VERSION}-default.apk"     /tmp/vt_default &
+          upload_and_poll "PlainApp-${VERSION}-armeabi-v7a.apk" /tmp/vt_armv7   &
+          upload_and_poll "PlainApp-${VERSION}.aab"              /tmp/vt_aab     &
+          wait
           {
-            echo "default_report=$DEFAULT_REPORT"
-            echo "armv7_report=$ARMV7_REPORT"
-            echo "default_status=$DEFAULT_STATUS"
-            echo "armv7_status=$ARMV7_STATUS"
+            echo "default_report=$(cat /tmp/vt_default.url)"
+            echo "default_status=$(cat /tmp/vt_default.status)"
+            echo "armv7_report=$(cat /tmp/vt_armv7.url)"
+            echo "armv7_status=$(cat /tmp/vt_armv7.status)"
+            echo "aab_report=$(cat /tmp/vt_aab.url)"
+            echo "aab_status=$(cat /tmp/vt_aab.status)"
           } >> $GITHUB_OUTPUT
 
   release:
@@ -179,13 +175,11 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download APKs
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
-          name: apks
+          name: release-artifacts
 
-      - name: Download SLSA provenance
-        uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v4
         with:
           name: ${{ needs.provenance.outputs.provenance-name }}
 
@@ -200,13 +194,14 @@ jobs:
             ## Security
 
             ### VirusTotal Scan
-            | APK | Status | Scan Report |
-            |-----|--------|-------------|
+            | File | Status | Scan Report |
+            |------|--------|-------------|
             | `PlainApp-${{ needs.build.outputs.version_name }}-default.apk` | ${{ needs.virustotal.outputs.default_status }} | [View Report](${{ needs.virustotal.outputs.default_report }}) |
             | `PlainApp-${{ needs.build.outputs.version_name }}-armeabi-v7a.apk` | ${{ needs.virustotal.outputs.armv7_status }} | [View Report](${{ needs.virustotal.outputs.armv7_report }}) |
+            | `PlainApp-${{ needs.build.outputs.version_name }}.aab` | ${{ needs.virustotal.outputs.aab_status }} | [View Report](${{ needs.virustotal.outputs.aab_report }}) |
 
             ### SLSA Provenance (Level 3)
-            The `.intoto.jsonl` file attached to this release is a signed SLSA provenance document.
+            The `.intoto.jsonl` file is a signed SLSA provenance document covering all release artifacts (APKs + AAB).
             Verify with [slsa-verifier](https://github.com/slsa-framework/slsa-verifier):
             ```sh
             slsa-verifier verify-artifact PlainApp-${{ needs.build.outputs.version_name }}-default.apk \
@@ -215,5 +210,4 @@ jobs:
             ```
           draft: true
           prerelease: false
-          artifacts: "PlainApp-${{ needs.build.outputs.version_name }}-default.apk,PlainApp-${{ needs.build.outputs.version_name }}-armeabi-v7a.apk,${{ needs.provenance.outputs.provenance-name }}"
-
+          artifacts: "PlainApp-${{ needs.build.outputs.version_name }}-default.apk,PlainApp-${{ needs.build.outputs.version_name }}-armeabi-v7a.apk,PlainApp-${{ needs.build.outputs.version_name }}.aab,${{ needs.provenance.outputs.provenance-name }}"
