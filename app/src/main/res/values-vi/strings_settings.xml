@@ -28,7 +28,6 @@
     <string name="privacy_policy">Chính sách bảo mật</string>
     <string name="terms_of_use">Điều khoản sử dụng</string>
     <string name="version_name_with_code">Phiên bản {{ version_name }} ({{ version_code }})</string>
-    <string name="optimized_batter_usage_warning">Tối ưu hóa pin đang hoạt động. Để đảm bảo hiệu suất không gián đoạn, vui lòng xem xét tắt tối ưu hóa pin đặc biệt cho ứng dụng này.</string>
     <string name="dark">Tối</string>
     <string name="sort">Sắp xếp</string>
     <string name="language">Ngôn ngữ</string>

@@ -49,7 +49,6 @@ import com.ismartcoding.plain.ui.page.home.HomePage
 import com.ismartcoding.plain.ui.page.home.HomeFeaturesSelectionPage
 import com.ismartcoding.plain.ui.page.scan.ScanHistoryPage
 import com.ismartcoding.plain.ui.page.scan.ScanPage
-import com.ismartcoding.plain.ui.page.settings.AboutPage
 import com.ismartcoding.plain.ui.page.tools.SoundMeterPage
 import com.ismartcoding.plain.ui.page.videos.VideosPage
 import com.ismartcoding.plain.ui.page.settings.BackupRestorePage
@@ -120,7 +119,6 @@ fun MainNavGraph(
         composable<Routing.DarkTheme> { DarkThemePage(navController) }
         composable<Routing.Language> { LanguagePage(navController) }
         composable<Routing.BackupRestore> { BackupRestorePage(navController) }
-        composable<Routing.About> { AboutPage(navController) }
         composable<Routing.WebSettings> { WebSettingsPage(navController, mainVM) }
         composable<Routing.CustomFeatures> { HomeFeaturesSelectionPage(navController) }
         composable<Routing.NotificationSettings> { NotificationSettingsPage(navController) }

@@ -217,6 +217,11 @@ object KeepScreenOnPreference : BasePreference<Boolean>() {
     override val key = booleanPreferencesKey("keep_screen_on")
 }
 
+object KeepAwakePreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("keep_awake")
+}
+
 object SystemScreenTimeoutPreference : BasePreference<Int>() {
     override val default = 0
     override val key = intPreferencesKey("system_screen_timeout")
@@ -789,8 +794,13 @@ object MdnsHostnamePreference : BasePreference<String>() {
     ) {
         val stored = preferences[key]
         if (stored.isNullOrEmpty()) {
-            val digits = (10..99).random()
-            val hostname = "plainapp$digits.local"
+            val allowedChars = ('a'..'z').filter { it !in listOf('i', 'l', 'o', 'v') }
+            val randomString = (1..2)
+                .map { allowedChars.random() }
+                .joinToString("")
+
+            val hostname = "$randomString.local"
+
             TempData.mdnsHostname = hostname
             putAsync(context, hostname)
         } else {

@@ -19,9 +19,6 @@ class Routing {
     object BackupRestore
 
     @Serializable
-    object About
-
-    @Serializable
     object WebSettings
 
     @Serializable

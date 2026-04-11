@@ -32,6 +32,7 @@ import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.packageManager
 import com.ismartcoding.plain.powerManager
 import com.ismartcoding.plain.preferences.LocalApiPermissions
+import com.ismartcoding.plain.preferences.LocalKeepAwake
 import com.ismartcoding.plain.preferences.LocalWeb
 import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
@@ -60,6 +61,7 @@ fun WebSettingsPage(navController: NavHostController, mainVM: MainViewModel, web
     WebSettingsProvider {
         val context = LocalContext.current
         val webEnabled = LocalWeb.current
+        val keepAwake = LocalKeepAwake.current
         val scope = rememberCoroutineScope()
         val enabledPermissions = LocalApiPermissions.current
         val permissionList = remember { mutableStateOf(Permissions.getWebList(context)) }
@@ -129,11 +131,19 @@ fun WebSettingsPage(navController: NavHostController, mainVM: MainViewModel, web
                 item {
                     VerticalSpace(dp = 16.dp); Subtitle(text = stringResource(R.string.performance))
                     PCard {
+                        PListItem(modifier = Modifier.clickable { webVM.enableKeepAwake(context, !keepAwake) }, title = stringResource(R.string.keep_awake)) {
+                            PSwitch(activated = keepAwake) { enable -> webVM.enableKeepAwake(context, enable) }
+                        }
+                    }
+                    Tips(stringResource(R.string.keep_awake_tips))
+                    VerticalSpace(dp = 16.dp)
+                    PCard {
                         PListItem(modifier = Modifier.clickable {
                             if (shouldIgnoreOptimize.value) webVM.requestIgnoreBatteryOptimization()
                             else { val intent = Intent(); intent.action = Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS; context.startActivity(intent) }
                         }, title = stringResource(if (shouldIgnoreOptimize.value) R.string.disable_battery_optimization else R.string.battery_optimization_disabled), showMore = true)
                     }
+                    Tips(stringResource(R.string.battery_optimization_tips))
                 }
                 item { BottomSpace(paddingValues) }
             }

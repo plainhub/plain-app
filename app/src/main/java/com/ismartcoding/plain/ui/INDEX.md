@@ -65,7 +65,7 @@ ui/
 | audio/ | 10 | AudioPlayerPage, AudioPlaylistPage, SleepTimerPage + 6 components |
 | files/ | 7 | FilesPage + breadcrumb, list content/item, paste bar components |
 | web/ | 7 | WebSettingsPage, WebSecurityPage, WebDevPage, SessionsPage, NotificationSettingsPage |
-| settings/ | 6 | SettingsPage, AboutPage, BackupRestorePage, DarkThemePage, LanguagePage, UpdateDialog |
+| settings/ | 6 | SettingsPage, BackupRestorePage, DarkThemePage, LanguagePage, UpdateDialog |
 | notes/ | 4 | NotePage, NotesPage + bottom sheet |
 | pomodoro/ | 4 | PomodoroPage, PomodoroSettingsDialog |
 | scan/ | 4 | ScanPage, ScanHistoryPage + 2 components |

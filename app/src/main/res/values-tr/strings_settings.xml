@@ -28,7 +28,6 @@
     <string name="privacy_policy">Gizlilik politikası</string>
     <string name="terms_of_use">Kullanım şartları</string>
     <string name="version_name_with_code">Sürüm {{ version_name }} ({{ version_code }})</string>
-    <string name="optimized_batter_usage_warning">Optimize edilmiş pil kullanımı şu anda etkin. Kesintisiz performans sağlamak için, lütfen özellikle bu uygulama için pil optimizasyonunu devre dışı bırakmayı düşünün.</string>
     <string name="dark">Karanlık</string>
     <string name="sort">Sırala</string>
     <string name="language">Dil</string>

@@ -28,7 +28,6 @@
     <string name="privacy_policy">Datenschutzrichtlinie</string>
     <string name="terms_of_use">Nutzungsbedingungen</string>
     <string name="version_name_with_code">Version {{version_name}} ({{version_code}})</string>
-    <string name="optimized_batter_usage_warning">Optimierte Batterienutzung ist derzeit aktiv. Um eine unterbrechungsfreie Leistung zu gewährleisten, erwägen Sie bitte, die Batterieoptimierung speziell für diese App zu deaktivieren.</string>
     <string name="dark">Dunkel</string>
     <string name="sort">Sortieren</string>
     <string name="language">Sprache</string>

@@ -26,13 +26,13 @@
     <string name="performance">Performance</string>
     <string name="disable_battery_optimization">Disable battery optimization</string>
     <string name="battery_optimization_disabled">Battery optimization is disabled</string>
+    <string name="battery_optimization_tips">Turn off battery optimization to keep the web access working when the screen is off.</string>
     <string name="keep_awake">Keep awake</string>
-    <string name="keep_awake_tips">By default, when connected to USB charging, the phone remains awake. Enabling this option keeps the phone awake even when not connected to USB charging, potentially resulting in increased battery consumption.</string>
+    <string name="keep_awake_tips">Keep web access always online (uses more battery). Turn this on if it stops working when your phone sleeps.</string>
     <string name="generate_password">Generate password</string>
     <string name="privacy_policy">Privacy policy</string>
     <string name="terms_of_use">Terms of use</string>
     <string name="version_name_with_code">Version {{ version_name }} ({{ version_code }})</string>
-    <string name="optimized_batter_usage_warning">Optimized battery usage is currently active. To ensure uninterrupted performance, please consider disabling battery optimization specifically for this app.</string>
     <string name="dark">Dark</string>
     <string name="sort">Sort</string>
     <string name="language">Language</string>

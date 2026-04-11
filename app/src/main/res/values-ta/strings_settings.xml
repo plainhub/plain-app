@@ -28,7 +28,6 @@
     <string name="privacy_policy">தனியுரிமை கொள்கை</string>
     <string name="terms_of_use">பயன்பாடு விதிகள்</string>
     <string name="version_name_with_code">பதிப்பு {{version_name}} ({{version_code}})</string>
-    <string name="optimized_batter_usage_warning">செயலில் பருவத்தை சீராக பயன்படுத்துவது தற்போது செயல்படுகின்றது. விரைவாக பரிசோதனை முடக்குவதற்கு, இந்த பயன்பாடுகளுக்கு குழுவியாக பருவத்தை சீராக பயன்படுத்துவதை பார்க்கவும்.</string>
     <string name="dark">கருப்பு</string>
     <string name="sort">வகைப்படு</string>
     <string name="language">மொழி</string>

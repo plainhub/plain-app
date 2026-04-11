@@ -28,7 +28,6 @@
     <string name="privacy_policy">개인 정보 보호 정책</string>
     <string name="terms_of_use">이용 약관</string>
     <string name="version_name_with_code">버전 {{version_name}} ({{version_code}})</string>
-    <string name="optimized_batter_usage_warning">최적화된 배터리 사용이 현재 활성화되어 있습니다. 중단없는 성능을 보장하기 위해 이 앱에 대한 배터리 최적화를 비활성화하는 것을 고려해보십시오.</string>
     <string name="dark">다크</string>
     <string name="sort">정렬</string>
     <string name="language">언어</string>

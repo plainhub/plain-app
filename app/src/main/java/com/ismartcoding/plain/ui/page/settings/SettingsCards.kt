@@ -74,15 +74,6 @@ internal fun SettingsCardItems(navController: NavHostController) {
             icon = R.drawable.database_backup,
             showMore = true,
         )
-        PListItem(
-            modifier = Modifier.clickable {
-                navController.navigate(Routing.About)
-            },
-            title = stringResource(R.string.about),
-            subtitle = stringResource(R.string.about_desc),
-            icon = R.drawable.lightbulb,
-            showMore = true,
-        )
     }
 }
 

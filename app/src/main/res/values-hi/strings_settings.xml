@@ -28,7 +28,6 @@
     <string name="privacy_policy">गोपनीयता नीति</string>
     <string name="terms_of_use">उपयोग की शर्तें</string>
     <string name="version_name_with_code">संस्करण {{version_name}} ({{version_code}})</string>
-    <string name="optimized_batter_usage_warning">अद्यतित बैटरी उपयोग सतर्कता वर्तमान में सक्रिय है। अविघातित प्रदर्शन सुनिश्चित करने के लिए, कृपया इस एप्लिकेशन के लिए विशेष रूप से बैटरी अनुकूलन को अक्षम करने का विचार करें।</string>
     <string name="dark">डार्क</string>
     <string name="sort">क्रमबद्ध करें</string>
     <string name="language">भाषा</string>

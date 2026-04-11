@@ -28,7 +28,6 @@
     <string name="privacy_policy">隱私政策</string>
     <string name="terms_of_use">使用條款</string>
     <string name="version_name_with_code">版本 {{version_name}} ({{version_code}})</string>
-    <string name="optimized_batter_usage_warning">優化電池使用目前已啟用。為確保不中斷效能，請考慮為此應用停用電池優化。</string>
     <string name="dark">黑暗</string>
     <string name="sort">排序</string>
     <string name="language">語言</string>

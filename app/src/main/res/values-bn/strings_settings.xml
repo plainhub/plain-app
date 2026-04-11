@@ -28,7 +28,6 @@
     <string name="privacy_policy">গোপনীয়তা নীতি</string>
     <string name="terms_of_use">ব্যবহারের শর্তাবলী</string>
     <string name="version_name_with_code">সংস্করণ {{version_name}} ({{version_code}})</string>
-    <string name="optimized_batter_usage_warning">অপটিমাইজড ব্যাটারি ব্যবহার সক্রিয় আছে। অবিরত কাজের জন্য, এই অ্যাপ এর জন্য ব্যাটারি অপটিমাইজেশন অক্ষম করতে বিবেচনা করুন।</string>
     <string name="dark">অন্ধকার</string>
     <string name="sort">ক্রম</string>
     <string name="language">ভাষা</string>

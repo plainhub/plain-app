@@ -28,7 +28,6 @@
     <string name="privacy_policy">プライバシーポリシー</string>
     <string name="terms_of_use">利用規約</string>
     <string name="version_name_with_code">バージョン {{version_name}} ({{version_code}})</string>
-    <string name="optimized_batter_usage_warning">最適化されたバッテリー使用が現在有効です。中断のないパフォーマンスを確保するために、このアプリケーションのために特にバッテリーオプティマイゼーションを無効にすることを検討してください。</string>
     <string name="dark">ダーク</string>
     <string name="sort">ソート</string>
     <string name="language">言語</string>

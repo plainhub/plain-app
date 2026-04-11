@@ -28,7 +28,6 @@
     <string name="privacy_policy">Политика конфиденциальности</string>
     <string name="terms_of_use">Условия использования</string>
     <string name="version_name_with_code">Версия {{version_name}} ({{version_code}})</string>
-    <string name="optimized_batter_usage_warning">Оптимизированное использование батареи в настоящее время активно. Для обеспечения бесперебойной работы рекомендуется отключить оптимизацию батареи именно для этого приложения.</string>
     <string name="dark">Тёмная</string>
     <string name="sort">Сортировка</string>
     <string name="language">Язык</string>

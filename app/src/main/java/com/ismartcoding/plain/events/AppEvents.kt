@@ -130,6 +130,7 @@ class IgnoreBatteryOptimizationEvent : ChannelEvent()
 class PowerConnectedEvent : ChannelEvent()
 class PowerDisconnectedEvent : ChannelEvent()
 class WebRequestReceivedEvent : ChannelEvent()
+data class KeepAwakeChangedEvent(val enabled: Boolean) : ChannelEvent()
 
 class IgnoreBatteryOptimizationResultEvent : ChannelEvent()
 

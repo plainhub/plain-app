@@ -28,7 +28,6 @@
     <string name="privacy_policy">Política de privacidad</string>
     <string name="terms_of_use">Términos de uso</string>
     <string name="version_name_with_code">Versión {{version_name}} ({{version_code}})</string>
-    <string name="optimized_batter_usage_warning">La optimización de la batería está actualmente activa. Para garantizar un rendimiento ininterrumpido, considere desactivar la optimización de la batería específicamente para esta aplicación.</string>
     <string name="dark">Oscuro</string>
     <string name="sort">Ordenar</string>
     <string name="language">Idioma</string>

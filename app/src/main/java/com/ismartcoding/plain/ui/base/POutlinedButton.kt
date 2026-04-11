@@ -45,7 +45,7 @@ fun POutlinedButton(
     val borderColor = resolvedColor.copy(alpha = 0.5f)
     val height = if (small) 32.dp else 40.dp
     val shape = if (small) RoundedCornerShape(32.dp) else RoundedCornerShape(40.dp)
-    val padding = if (small) PaddingValues(horizontal = 8.dp) else PaddingValues(horizontal = 12.dp)
+    val padding = PaddingValues(horizontal = 12.dp)
 
     OutlinedButton(
         onClick = onClick,
