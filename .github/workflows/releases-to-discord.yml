@@ -5,19 +5,27 @@ on:
     types: [published]
   workflow_dispatch: {}
 
+permissions: {}
+
 jobs:
   notify-discord:
     runs-on: ubuntu-latest
     steps:
       - name: Determine Release Info
         id: release-info
+        # Pass github.event values via env to prevent expression injection
+        env:
+          GH_RELEASE_NAME: ${{ github.event.release.name }}
+          GH_RELEASE_URL: ${{ github.event.release.html_url }}
+          GH_RELEASE_TIMESTAMP: ${{ github.event.release.published_at }}
+          GH_RELEASE_BODY: ${{ github.event.release.body }}
         run: |
           if [ "${{ github.event.release.tag_name != '' }}" = "true" ]; then
             echo "Using release event payload"
-            echo "RELEASE_NAME=${{ github.event.release.name }}" >> $GITHUB_ENV
-            echo "RELEASE_URL=${{ github.event.release.html_url }}" >> $GITHUB_ENV
-            echo "RELEASE_TIMESTAMP=${{ github.event.release.published_at }}" >> $GITHUB_ENV
-            CLEAN_BODY=$(echo "${{ github.event.release.body }}" | tr -d '\r')
+            echo "RELEASE_NAME=$GH_RELEASE_NAME" >> $GITHUB_ENV
+            echo "RELEASE_URL=$GH_RELEASE_URL" >> $GITHUB_ENV
+            echo "RELEASE_TIMESTAMP=$GH_RELEASE_TIMESTAMP" >> $GITHUB_ENV
+            CLEAN_BODY=$(printf '%s' "$GH_RELEASE_BODY" | tr -d '\r')
             echo "RELEASE_BODY<<EOF" >> $GITHUB_ENV
             echo "$CLEAN_BODY" >> $GITHUB_ENV
             echo "EOF" >> $GITHUB_ENV

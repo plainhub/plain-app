@@ -4,13 +4,13 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  id-token: write  # Required for SLSA provenance signing
-  actions: read    # Required for SLSA provenance
+  contents: read   # default; jobs that need more grant it at job level
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
       ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
@@ -79,6 +79,7 @@ jobs:
   virustotal:
     needs: build
     runs-on: ubuntu-latest
+    permissions: {}
     outputs:
       default_report: ${{ steps.scan.outputs.default_report }}
       armv7_report: ${{ steps.scan.outputs.armv7_report }}
@@ -96,10 +97,11 @@ jobs:
           VT_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
           VERSION: ${{ needs.build.outputs.version_name }}
         run: |
-          RESULT_URL=""
-          RESULT_STATUS=""
+          # Scans both APKs in parallel; results written to temp files to avoid
+          # race conditions between background subshells.
           upload_and_poll() {
             local file="$1"
+            local outprefix="$2"
             local sha256
             sha256=$(sha256sum "$file" | awk '{print $1}')
             local size_bytes
@@ -111,8 +113,8 @@ jobs:
                 --url https://www.virustotal.com/api/v3/files/upload_url \
                 --header "x-apikey: $VT_API_KEY" | jq -r '.data')
               if [ -z "$upload_url" ] || [ "$upload_url" = "null" ]; then
-                RESULT_URL="https://www.virustotal.com/gui/file/$sha256/detection"
-                RESULT_STATUS="⬜ N/A"
+                printf '%s' "https://www.virustotal.com/gui/file/$sha256/detection" > "${outprefix}.url"
+                printf '%s' "⬜ N/A" > "${outprefix}.status"
                 return
               fi
             fi
@@ -122,8 +124,8 @@ jobs:
               --header "x-apikey: $VT_API_KEY" \
               --form "file=@$file" | jq -r '.data.id')
             if [ -z "$analysis_id" ] || [ "$analysis_id" = "null" ]; then
-              RESULT_URL="https://www.virustotal.com/gui/file/$sha256/detection"
-              RESULT_STATUS="⬜ N/A"
+              printf '%s' "https://www.virustotal.com/gui/file/$sha256/detection" > "${outprefix}.url"
+              printf '%s' "⬜ N/A" > "${outprefix}.status"
               return
             fi
             local last_response=""
@@ -143,19 +145,27 @@ jobs:
             harmless=$(echo "$last_response" | jq -r '.data.attributes.stats.harmless // 0')
             total=$((malicious + suspicious + undetected + harmless))
             detected=$((malicious + suspicious))
+            local result_status
             if [ "$detected" -eq 0 ]; then
-              RESULT_STATUS="✅ ${detected}/${total} Clean"
+              result_status="✅ ${detected}/${total} Clean"
             else
-              RESULT_STATUS="⚠️ ${detected}/${total} Detected"
+              result_status="⚠️ ${detected}/${total} Detected"
             fi
-            RESULT_URL="https://www.virustotal.com/gui/file/$sha256/detection"
+            printf '%s' "https://www.virustotal.com/gui/file/$sha256/detection" > "${outprefix}.url"
+            printf '%s' "$result_status" > "${outprefix}.status"
           }
-          upload_and_poll "PlainApp-${VERSION}-default.apk"
-          DEFAULT_REPORT="$RESULT_URL"
-          DEFAULT_STATUS="$RESULT_STATUS"
-          upload_and_poll "PlainApp-${VERSION}-armeabi-v7a.apk"
-          ARMV7_REPORT="$RESULT_URL"
-          ARMV7_STATUS="$RESULT_STATUS"
+          # Launch both scans in parallel
+          upload_and_poll "PlainApp-${VERSION}-default.apk" /tmp/vt_default &
+          PID_DEFAULT=$!
+          upload_and_poll "PlainApp-${VERSION}-armeabi-v7a.apk" /tmp/vt_armv7 &
+          PID_ARMV7=$!
+          # Wait for both to finish
+          wait $PID_DEFAULT
+          wait $PID_ARMV7
+          DEFAULT_REPORT=$(cat /tmp/vt_default.url)
+          DEFAULT_STATUS=$(cat /tmp/vt_default.status)
+          ARMV7_REPORT=$(cat /tmp/vt_armv7.url)
+          ARMV7_STATUS=$(cat /tmp/vt_armv7.status)
           {
             echo "default_report=$DEFAULT_REPORT"
             echo "armv7_report=$ARMV7_REPORT"
