@@ -18,6 +18,10 @@ class ServiceStopBroadcastReceiver : BroadcastReceiver() {
         intent: Intent,
     ) {
         when (intent.action) {
+            Constants.ACTION_START_HTTP_SERVER -> {
+                coIO { WebPreference.putAsync(context, true) }
+                ContextCompat.startForegroundService(context, Intent(context, HttpServerService::class.java))
+            }
             Constants.ACTION_STOP_HTTP_SERVER -> coIO {
                 WebPreference.putAsync(context, false)
                 HttpServerManager.stopServiceAsync(context)

@@ -217,6 +217,7 @@
             android:name=".receivers.ServiceStopBroadcastReceiver"
             android:exported="true">
             <intent-filter>
+                <action android:name="${applicationId}.action.START_HTTP_SERVER" />
                 <action android:name="${applicationId}.action.STOP_HTTP_SERVER" />
                 <action android:name="${applicationId}.action.STOP_SCREEN_MIRROR" />
                 <action android:name="${applicationId}.action.REPOST_HTTP_NOTIFICATION" />

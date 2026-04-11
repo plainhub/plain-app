@@ -23,6 +23,7 @@ class MdnsReregistrar(
 
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var reregisterJob: Job? = null
+    private var hotspotWatcher: MdnsHotspotWatcher? = null
 
     fun start() {
         if (networkCallback != null) return
@@ -71,11 +72,16 @@ class MdnsReregistrar(
                 LogCat.e("Failed to register network callback: ${it.message}")
                 networkCallback = null
             }
+
+        hotspotWatcher = MdnsHotspotWatcher(appContext) { schedule("hotspotStateChanged") }.also { it.start() }
     }
 
     fun stop() {
         reregisterJob?.cancel()
         reregisterJob = null
+
+        hotspotWatcher?.stop()
+        hotspotWatcher = null
 
         val callback = networkCallback ?: return
         networkCallback = null

@@ -14,6 +14,7 @@ object Constants {
     const val MAX_MESSAGE_LENGTH = 2048 // Maximum length of a message in the chat
     const val TEXT_FILE_SUMMARY_LENGTH = 250
     const val AUTHORITY = "${BuildConfig.APPLICATION_ID}.provider"
+    const val ACTION_START_HTTP_SERVER = "${BuildConfig.APPLICATION_ID}.action.START_HTTP_SERVER"
     const val ACTION_STOP_HTTP_SERVER = "${BuildConfig.APPLICATION_ID}.action.STOP_HTTP_SERVER"
     const val ACTION_STOP_SCREEN_MIRROR = "${BuildConfig.APPLICATION_ID}.action.STOP_SCREEN_MIRROR"
     const val ACTION_PEER_CHAT_REPLY = "${BuildConfig.APPLICATION_ID}.action.PEER_CHAT_REPLY"

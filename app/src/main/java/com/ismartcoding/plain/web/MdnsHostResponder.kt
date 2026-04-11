@@ -2,9 +2,9 @@ package com.ismartcoding.plain.web
 
 import android.content.Context
 import android.net.wifi.WifiManager
-import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.lib.logcat.LogCat
 import java.net.DatagramPacket
+import java.net.DatagramSocket
 import java.net.Inet4Address
 import java.net.InetAddress
 import java.net.InetSocketAddress
@@ -13,117 +13,124 @@ import java.net.NetworkInterface
 import java.net.SocketTimeoutException
 
 /**
- * Lightweight mDNS responder for hostname-to-IPv4 resolution (A record).
- * Keeps local hostname pingable (e.g. plainapp.local) without external libs.
+ * Lightweight mDNS responder — single receive socket, per-packet unicast reply.
+ *
+ * RECEIVE: One MulticastSocket bound to 0.0.0.0:5353 joins 224.0.0.251 on every
+ * valid LAN interface (wlan0 Wi-Fi, ap0/wlan1 hotspot, both when active).
+ * A single socket avoids the Linux SO_REUSEPORT limitation.
+ *
+ * SEND: For each query the candidate interface list is re-fetched fresh (never
+ * cached), then a throwaway DatagramSocket bound to localIp:0 sends a unicast
+ * reply to the querier's source IP. Binding to a specific local IP forces the
+ * kernel to route the packet via the interface that owns localIp — no
+ * IP_MULTICAST_IF mutation on the shared receive socket is needed.
+ *
+ * Restart lifecycle: MdnsReregistrar (ConnectivityManager) + MdnsHotspotWatcher
+ * (WIFI_AP_STATE_CHANGED) recreate the socket whenever the active interface set
+ * changes, keeping receive memberships current.
  */
 object MdnsHostResponder {
     private const val MDNS_GROUP = "224.0.0.251"
     private const val MDNS_PORT = 5353
 
-    @Volatile
-    private var hostname = "plainapp.local"
+    @Volatile private var hostname = "plainapp.local"
 
-    @Volatile
-    private var worker: Thread? = null
-
-    @Volatile
+    private val stateLock = Any()
     private var socket: MulticastSocket? = null
-
-    @Volatile
+    private var worker: Thread? = null
     private var multicastLock: WifiManager.MulticastLock? = null
 
     fun start(context: Context, mdnsHostname: String): Boolean {
         val normalized = normalizeHostname(mdnsHostname)
         if (normalized.isEmpty()) {
-            LogCat.e("mDNS responder start skipped: empty hostname")
+            LogCat.e("mDNS start skipped: empty hostname")
             return false
         }
-
         stop()
         hostname = normalized
 
-        val group = InetAddress.getByName(MDNS_GROUP)
-        val lock = acquireMulticastLock(context)
+        val candidates = candidateInterfaces()
+        if (candidates.isEmpty()) {
+            LogCat.e("mDNS: no candidate interfaces found")
+            return false
+        }
 
-        return runCatching {
-            val s = MulticastSocket(null).apply {
-                reuseAddress = true
-                soTimeout = 1000
-                bind(InetSocketAddress(MDNS_PORT))
-                timeToLive = 255
-                joinGroup(group)
+        val multicastGroup = InetAddress.getByName(MDNS_GROUP)
+        val groupSockAddr = InetSocketAddress(multicastGroup, MDNS_PORT)
+        synchronized(stateLock) {
+            val lock = acquireMulticastLock(context)
+            val s = runCatching {
+                MulticastSocket(null).apply {
+                    reuseAddress = true
+                    soTimeout = 1000
+                    bind(InetSocketAddress(MDNS_PORT))
+                    for ((iface, ip) in candidates) {
+                        runCatching { joinGroup(groupSockAddr, iface) }
+                            .onSuccess { LogCat.d("mDNS joined ${iface.name} (${ip.hostAddress})") }
+                            .onFailure { LogCat.e("mDNS joinGroup ${iface.name}: ${it.message}") }
+                    }
+                }
+            }.getOrElse {
+                lock?.let { l -> runCatching { l.release() } }
+                LogCat.e("mDNS socket create failed: ${it.message}")
+                return false
             }
             socket = s
             multicastLock = lock
-
-            worker = Thread {
-                runLoop(s, group)
-            }.apply {
+            worker = Thread { runLoop(s) }.apply {
                 name = "plain-mdns-responder"
                 isDaemon = true
                 start()
             }
-            LogCat.d("mDNS responder started for $hostname")
-            true
-        }.getOrElse {
-            lock?.let { l -> runCatching { l.release() } }
-            LogCat.e("Failed to start mDNS responder: ${it.message}")
-            false
         }
+        LogCat.d("mDNS responder started for $hostname on ${candidates.size} interface(s)")
+        return true
     }
 
     fun stop() {
-        val t = worker
-        worker = null
-
-        val s = socket
-        socket = null
-        runCatching { s?.close() }
-
-        runCatching { t?.join(300) }
-
-        multicastLock?.let { lock ->
-            runCatching {
-                if (lock.isHeld) lock.release()
-            }
+        synchronized(stateLock) {
+            val t = worker; worker = null
+            val s = socket; socket = null
+            runCatching { s?.close() }
+            runCatching { t?.join(300) }
+            multicastLock?.let { ml -> runCatching { if (ml.isHeld) ml.release() } }
+            multicastLock = null
         }
-        multicastLock = null
     }
 
-    private fun runLoop(socket: MulticastSocket, group: InetAddress) {
-        val buffer = ByteArray(1500)
-        while (Thread.currentThread().isAlive) {
-            val packet = DatagramPacket(buffer, buffer.size)
+    private fun runLoop(s: MulticastSocket) {
+        val buf = ByteArray(1500)
+        while (!s.isClosed) {
+            val packet = DatagramPacket(buf, buf.size)
             try {
-                socket.receive(packet)
+                s.receive(packet)
+                val senderIp = packet.address as? Inet4Address ?: continue
+                val fresh = candidateInterfaces()
+                if (fresh.isEmpty()) continue
+                val (_, localIp) = findResponseIface(senderIp, fresh)
                 val response = MdnsPacketCodec.buildResponseIfMatch(
                     query = packet.data.copyOf(packet.length),
                     hostname = hostname,
-                    ips = getResponderIps(),
-                )
-                if (response != null) {
-                    socket.send(DatagramPacket(response, response.size, group, MDNS_PORT))
-                }
+                    ips = listOf(localIp),
+                ) ?: continue
+                sendUnicast(response, localIp, senderIp)
             } catch (_: SocketTimeoutException) {
-                // timeout keeps the thread responsive to stop()
+                // expected — keeps thread responsive to socket close
             } catch (_: Exception) {
-                if (worker == null) break
+                if (s.isClosed) break
             }
         }
     }
 
-    private fun getResponderIps(): List<Inet4Address> {
-        return NetworkHelper.getDeviceIP4s()
-            .mapNotNull { ip -> runCatching { InetAddress.getByName(ip) }.getOrNull() }
-            .filterIsInstance<Inet4Address>()
-            .filter { ip ->
-                val ni = runCatching { NetworkInterface.getByInetAddress(ip) }.getOrNull()
-                ni != null && !NetworkHelper.isVpnInterface(ni.name) && !ip.isLoopbackAddress
+    internal fun sendUnicast(response: ByteArray, localIp: Inet4Address, dest: Inet4Address) {
+        runCatching {
+            DatagramSocket(InetSocketAddress(localIp, 0)).use { ds ->
+                ds.send(DatagramPacket(response, response.size, dest, MDNS_PORT))
             }
-            .distinctBy { it.hostAddress }
+        }.onFailure { LogCat.e("mDNS send to ${dest.hostAddress}: ${it.message}") }
     }
 
-    private fun normalizeHostname(value: String): String {
+    internal fun normalizeHostname(value: String): String {
         val trimmed = value.trim().trim('.').lowercase()
         if (trimmed.isEmpty()) return ""
         return if (trimmed.endsWith(".local")) trimmed else "$trimmed.local"

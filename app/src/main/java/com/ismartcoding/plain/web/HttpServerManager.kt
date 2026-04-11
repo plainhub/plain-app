@@ -320,19 +320,18 @@ object HttpServerManager {
         // When there are active sessions/clients we update frequently, otherwise we back off.
         val activeIntervalMs = 5_000L
         val idleIntervalMs = 60_000L
-        val activeWindowMs = 5_000L
-
+        var lastSyncTs = 0L
         clientTsJob = coIO {
             while (kotlinx.coroutines.currentCoroutineContext().isActive) {
-                val now = System.currentTimeMillis()
                 val updates =
                     clientRequestTs
-                        .filter { it.value + activeWindowMs > now }
+                        .filter { it.value > lastSyncTs }
                         .map { SessionClientTsUpdate(it.key, Instant.fromEpochMilliseconds(it.value)) }
-
                 if (updates.isNotEmpty()) {
+                    val maxTsInThisBatch = updates.maxOf { it.updatedAt.toEpochMilliseconds() }
                     runCatching {
                         AppDatabase.instance.sessionDao().updateTs(updates)
+                        lastSyncTs = maxTsInThisBatch
                     }.onFailure {
                         LogCat.e("Failed to update client session timestamps: ${it.message}")
                     }
