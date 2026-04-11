@@ -13,7 +13,7 @@ import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
-import com.ismartcoding.plain.events.AcquireWakeLockEvent
+import com.ismartcoding.plain.events.PowerConnectedEvent
 import com.ismartcoding.plain.events.AppEvents
 import com.ismartcoding.plain.events.StartNearbyServiceEvent
 import com.ismartcoding.plain.helpers.AppHelper
@@ -90,7 +90,7 @@ class MainApp : Application() {
 
             DarkThemePreference.setDarkMode(DarkTheme.parse(DarkThemePreference.get(preferences)))
             if (TempData.webEnabled && PlugInControlReceiver.isUSBConnected(this@MainApp)) {
-                sendEvent(AcquireWakeLockEvent())
+                sendEvent(PowerConnectedEvent())
             }
             if (PasswordPreference.get(preferences).isEmpty()) {
                 HttpServerManager.resetPasswordAsync()

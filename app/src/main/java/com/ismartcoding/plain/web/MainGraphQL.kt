@@ -53,6 +53,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.ismartcoding.plain.events.CancelNotificationsEvent
 import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
+import com.ismartcoding.plain.events.WebRequestReceivedEvent
 import com.ismartcoding.plain.events.DeleteChatItemViewEvent
 import com.ismartcoding.plain.events.FetchBookmarkMetadataEvent
 import com.ismartcoding.plain.events.FetchLinkPreviewsEvent
@@ -2057,6 +2058,7 @@ class MainGraphQL(val schema: Schema) {
                             }
 
                             HttpServerManager.clientRequestTs[clientId] = System.currentTimeMillis()
+                            sendEvent(WebRequestReceivedEvent())
                             val r = executeGraphqlQL(schema, parsed.body, call)
                             call.respondBytes(CryptoHelper.chaCha20Encrypt(token, r))
                         } else {
@@ -2073,6 +2075,7 @@ class MainGraphQL(val schema: Schema) {
                             val requestStr = call.receiveText()
                             LogCat.d("[Request] $requestStr")
                             HttpServerManager.clientRequestTs[clientId] = System.currentTimeMillis() // record the api request time
+                            sendEvent(WebRequestReceivedEvent())
                             val r = executeGraphqlQL(schema, requestStr, call)
                             call.respondText(r, contentType = ContentType.Application.Json)
                         }

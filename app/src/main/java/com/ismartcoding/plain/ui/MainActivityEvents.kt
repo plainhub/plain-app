@@ -7,8 +7,6 @@ import android.provider.Settings
 import androidx.lifecycle.lifecycleScope
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.getSystemScreenTimeout
-import com.ismartcoding.lib.extensions.setSystemScreenTimeout
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
@@ -30,11 +28,8 @@ import com.ismartcoding.plain.events.RestartAppEvent
 import com.ismartcoding.plain.events.StartScreenMirrorEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.locale.LocaleHelper
-import com.ismartcoding.plain.helpers.ScreenHelper
 import com.ismartcoding.plain.mediaProjectionManager
 import com.ismartcoding.plain.preferences.ApiPermissionsPreference
-import com.ismartcoding.plain.preferences.KeepScreenOnPreference
-import com.ismartcoding.plain.preferences.SystemScreenTimeoutPreference
 import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.services.PNotificationListenerService
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -59,17 +54,7 @@ internal fun MainActivity.initEvents() {
                     }
                 }
                 is PermissionsResultEvent -> {
-                    if (event.map.containsKey(Permission.WRITE_SETTINGS.toSysPermission()) && Permission.WRITE_SETTINGS.can(this@initEvents)) {
-                        val enable = !KeepScreenOnPreference.getAsync(this@initEvents)
-                        ScreenHelper.saveOn(this@initEvents, enable)
-                        if (enable) {
-                            ScreenHelper.saveTimeout(this@initEvents, contentResolver.getSystemScreenTimeout())
-                            contentResolver.setSystemScreenTimeout(Int.MAX_VALUE)
-                        } else {
-                            val t = SystemScreenTimeoutPreference.getAsync(this@initEvents)
-                            contentResolver.setSystemScreenTimeout(if (t > 0) t else 5000 * 60)
-                        }
-                    }
+                    // handled by individual feature flows
                 }
                 is StartScreenMirrorEvent -> {
                     try {

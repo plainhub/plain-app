@@ -142,6 +142,7 @@ object NotificationHelper {
             setSilent(true)
             setWhen(System.currentTimeMillis())
             setAutoCancel(false)
+            setOngoing(true)
             if (isSPlus()) {
                 // https://issuetracker.google.com/issues/229000935
                 foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE

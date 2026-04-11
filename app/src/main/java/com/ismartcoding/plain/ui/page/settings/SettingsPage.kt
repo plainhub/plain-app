@@ -86,7 +86,6 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                         DeveloperSettingsCard(navController)
                     }
                 }
-                debugItem()
                 item {
                     BottomSpace(paddingValues)
                 }

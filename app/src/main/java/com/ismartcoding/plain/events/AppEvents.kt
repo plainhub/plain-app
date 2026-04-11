@@ -3,7 +3,6 @@ package com.ismartcoding.plain.events
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
-import android.os.PowerManager
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.ChannelEvent
 import com.ismartcoding.lib.channel.sendEvent
@@ -11,7 +10,6 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
-import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DNearbyDevice
@@ -38,9 +36,6 @@ import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
 import com.ismartcoding.plain.chat.discover.NearbyPairManager
 import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.preferences.KeepAwakePreference
-import com.ismartcoding.plain.powerManager
-import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.ui.models.FolderOption
 import com.ismartcoding.plain.web.AuthRequest
@@ -132,8 +127,9 @@ class ActionEvent(val source: ActionSourceType, val action: ActionType, val ids:
 class AudioActionEvent(val action: AudioAction) : ChannelEvent()
 
 class IgnoreBatteryOptimizationEvent : ChannelEvent()
-class AcquireWakeLockEvent : ChannelEvent()
-class ReleaseWakeLockEvent : ChannelEvent()
+class PowerConnectedEvent : ChannelEvent()
+class PowerDisconnectedEvent : ChannelEvent()
+class WebRequestReceivedEvent : ChannelEvent()
 
 class IgnoreBatteryOptimizationResultEvent : ChannelEvent()
 
@@ -170,8 +166,6 @@ class StopNearbyDiscoveryEvent : ChannelEvent()
 object AppEvents {
     private lateinit var mediaPlayer: MediaPlayer
     private var sleepTimerJob: Job? = null
-
-    val wakeLock: PowerManager.WakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "${BuildConfig.APPLICATION_ID}:http_server")
 
     fun register() {
         mediaPlayer = MediaPlayer()
@@ -243,24 +237,6 @@ object AppEvents {
                         }
                     }
 
-                    is AcquireWakeLockEvent -> {
-                        coIO {
-                            LogCat.d("AcquireWakeLockEvent")
-                            if (!wakeLock.isHeld) {
-                                wakeLock.acquire()
-                            }
-                        }
-                    }
-
-                    is ReleaseWakeLockEvent -> {
-                        coIO {
-                            LogCat.d("ReleaseWakeLockEvent")
-                            if (wakeLock.isHeld) {
-                                wakeLock.release()
-                            }
-                        }
-                    }
-
                     is PermissionsResultEvent -> {
                         coMain {
                             if (event.map.containsKey(Permission.POST_NOTIFICATIONS.toSysPermission())) {
@@ -276,10 +252,6 @@ object AppEvents {
                         var retry = 3
                         val context = MainApp.instance
                         coIO {
-                            val keepAwake = KeepAwakePreference.getAsync(context)
-                            if (keepAwake || PlugInControlReceiver.isUSBConnected(context)) {
-                                sendEvent(AcquireWakeLockEvent())
-                            }
                             while (retry > 0) {
                                 try {
                                     androidx.core.content.ContextCompat.startForegroundService(

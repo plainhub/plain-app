@@ -5,27 +5,20 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.events.AcquireWakeLockEvent
-import com.ismartcoding.plain.events.ReleaseWakeLockEvent
-import com.ismartcoding.plain.preferences.KeepAwakePreference
+import com.ismartcoding.plain.events.PowerConnectedEvent
+import com.ismartcoding.plain.events.PowerDisconnectedEvent
 
 class PlugInControlReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val action = intent.action
         if (action == Intent.ACTION_POWER_CONNECTED) {
             LogCat.d("PlugInControlReceiver: ACTION_POWER_CONNECTED")
-            sendEvent(AcquireWakeLockEvent())
+            sendEvent(PowerConnectedEvent())
         } else if (action == Intent.ACTION_POWER_DISCONNECTED) {
             LogCat.d("PlugInControlReceiver: ACTION_POWER_DISCONNECTED")
-            coIO {
-                val keepAwake = KeepAwakePreference.getAsync(context)
-                if (!keepAwake) {
-                    sendEvent(ReleaseWakeLockEvent())
-                }
-            }
+            sendEvent(PowerDisconnectedEvent())
         }
     }
 

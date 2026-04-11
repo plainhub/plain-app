@@ -29,12 +29,14 @@ class HttpServerService : LifecycleService() {
     private var serverState: HttpServerState = HttpServerState.OFF
     private var mdnsReregistrar: MdnsReregistrar? = null
     private var serverJob: Job? = null
+    private var lockManager: HttpServerLockManager? = null
 
     @SuppressLint("InlinedApi")
     override fun onCreate() {
         super.onCreate()
         NotificationHelper.ensureDefaultChannel()
 
+        lockManager = HttpServerLockManager(this)
         mdnsReregistrar = MdnsReregistrar(
             context = this,
             isActive = { serverState == HttpServerState.ON },
@@ -47,6 +49,7 @@ class HttpServerService : LifecycleService() {
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                 when (event) {
                     Lifecycle.Event.ON_START -> {
+                        lockManager?.start()
                         serverJob?.cancel()
                         serverJob = coIO {
                             startHttpServerAsync()
@@ -54,6 +57,7 @@ class HttpServerService : LifecycleService() {
                     }
 
                     Lifecycle.Event.ON_STOP -> {
+                        lockManager?.stop()
                         serverJob?.cancel()
                         serverJob = coIO {
                             stopHttpServerAsync()
@@ -131,6 +135,8 @@ class HttpServerService : LifecycleService() {
         serverJob?.cancel()
         serverJob = null
         super.onDestroy()
+        lockManager?.stop()
+        lockManager = null
         mdnsReregistrar?.stop()
         mdnsReregistrar = null
         // Ensure mDNS responder is stopped

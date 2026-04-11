@@ -86,20 +86,6 @@ internal fun SettingsCardItems(navController: NavHostController) {
     }
 }
 
-internal fun LazyListScope.debugItem() {
-    if (BuildConfig.DEBUG) {
-        item {
-            VerticalSpace(16.dp)
-            PCard {
-                PListItem(
-                    title = "WAKE LOCK",
-                    value = AppEvents.wakeLock.isHeld.getText(),
-                )
-            }
-        }
-    }
-}
-
 @Composable
 internal fun DeveloperSettingsCard(navController: NavHostController) {
     PCard {

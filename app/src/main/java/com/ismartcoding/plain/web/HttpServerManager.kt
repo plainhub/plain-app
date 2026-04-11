@@ -23,7 +23,6 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.SessionClientTsUpdate
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.events.HttpServerStateChangedEvent
-import com.ismartcoding.plain.events.ReleaseWakeLockEvent
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.preferences.KeyStorePasswordPreference
@@ -140,9 +139,6 @@ object HttpServerManager {
         context.stopService(Intent(context, HttpServerService::class.java))
         // Ensure notification listener is disabled when server is stopped explicitly
         com.ismartcoding.plain.services.PNotificationListenerService.toggle(context, false)
-
-        // Web server is off; don't keep holding the http_server wakelock.
-        sendEvent(ReleaseWakeLockEvent())
         httpServerError = ""
         portsInUse.clear()
         server = null
