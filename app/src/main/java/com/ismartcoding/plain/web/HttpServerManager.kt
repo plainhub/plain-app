@@ -62,6 +62,7 @@ object HttpServerManager {
     val tokenCache = mutableMapOf<String, ByteArray>() // cache the session token, format: <client_id>:<token>
     val clientIpCache = mutableMapOf<String, String>() // format: <client_id>:<client_ip>
     val wsSessions = Collections.synchronizedSet<WebSocketSession>(LinkedHashSet())
+    val wsSessionCount = kotlinx.coroutines.flow.MutableStateFlow(0)
     val clientRequestTs = mutableMapOf<String, Long>()
     var httpServerError: String = ""
     val portsInUse = mutableSetOf<Int>()
@@ -348,8 +349,8 @@ object HttpServerManager {
         clientIp: String,
     ) {
         val token = CryptoHelper.generateChaCha20Key()
+        val r = event.request
         SessionList.addOrUpdateAsync(event.clientId) {
-            val r = event.request
             it.clientIP = clientIp
             it.osName = r.osName
             it.osVersion = r.osVersion
@@ -358,6 +359,7 @@ object HttpServerManager {
             it.token = token
         }
         HttpServerManager.loadTokenCache()
+        NotificationHelper.sendWebLoginNotification(MainApp.instance, r.browserName, r.browserVersion, r.osName, r.osVersion, clientIp)
         event.session.send(
             CryptoHelper.chaCha20Encrypt(
                 HttpServerManager.passwordToToken(),

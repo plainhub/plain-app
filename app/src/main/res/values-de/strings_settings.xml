@@ -22,8 +22,9 @@
     <string name="performance">Leistung</string>
     <string name="disable_battery_optimization">Akkuoptimierung deaktivieren</string>
     <string name="battery_optimization_disabled">Akkuoptimierung ist deaktiviert</string>
+    <string name="battery_optimization_tips">Deaktiviere die Akkuoptimierung, damit der Webzugang auch bei ausgeschaltetem Bildschirm funktioniert.</string>
     <string name="keep_awake">Wach halten</string>
-    <string name="keep_awake_tips">Standardmäßig bleibt das Telefon wach, wenn es an das USB-Ladegerät angeschlossen ist. Durch Aktivieren dieser Option bleibt das Telefon auch dann wach, wenn es nicht an das USB-Ladegerät angeschlossen ist, was möglicherweise zu erhöhtem Batterieverbrauch führt.</string>
+    <string name="keep_awake_tips">Hält den Webzugang dauerhaft online (mehr Akkuverbrauch). Aktiviere dies, wenn der Webzugang nach dem Schlafmodus deines Telefons nicht mehr funktioniert.</string>
     <string name="generate_password">Passwort generieren</string>
     <string name="privacy_policy">Datenschutzrichtlinie</string>
     <string name="terms_of_use">Nutzungsbedingungen</string>
@@ -32,8 +33,6 @@
     <string name="sort">Sortieren</string>
     <string name="language">Sprache</string>
     <string name="language_desc">Englisch, Chinesisch und mehr</string>
-    <string name="about">Über</string>
-    <string name="about_desc">Clientname, Version, Protokolle, Spende</string>
     <string name="backup_restore">Sichern &amp; wiederherstellen</string>
     <string name="backup">Sichern</string>
     <string name="backup_desc">Sichere oder stelle PlainApp-Daten wieder her</string>
@@ -71,4 +70,6 @@
     <string name="auto_check_update_desc">Beim App-Start automatisch nach neuen Versionen suchen</string>
     <string name="donation_desc">Unterstütze diese App auf Ko-fi</string>
     <string name="drag_number_to_reorder_list">Ziehen Sie die Nummer, um die Liste neu zu ordnen</string>
+    <string name="web_client_connected">Web-Client verbunden</string>
+    <string name="clients_online">%1$d Client(s) online</string>
 </resources>

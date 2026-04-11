@@ -57,7 +57,8 @@
     <string name="enter_this_address_tips">Enter the above address in your computer\'s browser, ensuring that your phone and computer are on the same local network.</string>
     <string name="mdns_hostname">mDNS Hostname</string>
     <string name="mdns_hostname_invalid">Hostname must end with .local</string>
-    <string name="last_visit_at">Last visit at</string>
+    <string name="last_active">Last active: %1$s</string>
+    <string name="revoke_session">Revoke this session</string>
     <string name="restart_app_title">Restart app</string>
     <string name="http_server_failed">Service failed to start. Please restart the app.</string>
     <string name="http_server_stopped">The HTTP server has been intentionally stopped. To restart it, please tap the "Relaunch APP" button.</string>

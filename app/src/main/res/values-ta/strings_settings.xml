@@ -22,8 +22,9 @@
     <string name="performance">செயல்பாடு</string>
     <string name="disable_battery_optimization">பேட்டரி ஒப்டிமைசேஷனை முடக்கு</string>
     <string name="battery_optimization_disabled">பேட்டரி ஒப்டிமைசேஷன் முடக்கப்பட்டுள்ளது</string>
+    <string name="battery_optimization_tips">திரை அணைக்கப்படும்போது வலை அணுகல் செயல்படுவதை உறுதி செய்ய பேட்டரி மேம்படுத்தலை முடக்கவும்.</string>
     <string name="keep_awake">எழில்கள் செய்யுங்கள்</string>
-    <string name="keep_awake_tips">இயல்புப் படிப்பின்னர், USB சார்ஜிங்கு இணைந்திருந்தால், தொலைபேசி எழில் இருக்கின்றது. இந்த விருப்பத்தை இயல்பாக்கும் மூலம், USB சார்ஜிங்கு இணைந்திருந்தால் இல்லாவிட்டாலும் தொலைபேசி எழில் இருக்கும், அதன் விருப்பத்தின் மூலம் பேட்டரி பயன்படுத்தல் அதிகரிக்க முடியும்.</string>
+    <string name="keep_awake_tips">வலை அணுகலை எப்போதும் இணையத்தில் வைத்திருக்கிறது (அதிக பேட்டரி பயன்பாடு). உங்கள் தொலைபேசி தூங்கும்போது அது செயல்படாவிட்டால் இதை இயக்கவும்.</string>
     <string name="generate_password">கடவுச்சொல் உருவாக்கு</string>
     <string name="privacy_policy">தனியுரிமை கொள்கை</string>
     <string name="terms_of_use">பயன்பாடு விதிகள்</string>
@@ -32,8 +33,6 @@
     <string name="sort">வகைப்படு</string>
     <string name="language">மொழி</string>
     <string name="language_desc">ஆங்கிலம், சீனம் மற்றும் பல</string>
-    <string name="about">பற்றி</string>
-    <string name="about_desc">İstemci adı, sürüm, günlükler, bağış</string>
     <string name="backup_restore">காப்பு &amp; மீட்டமை</string>
     <string name="backup">காப்பு</string>
     <string name="backup_desc">எளிதாக்குக அல்லது மீட்டமைக்க ப்ளேனப் தரவை</string>
@@ -71,4 +70,6 @@
     <string name="auto_check_update_desc">பயன்பாடு திறக்கும்போது புதிய பதிப்புகளை தானியங்கியாக சரிபார்க்கவும்</string>
     <string name="donation_desc">Ko-fi இல் இந்த பயன்பாட்டை ஆதரிக்கவும்</string>
     <string name="drag_number_to_reorder_list">பட்டியலை மறுவரிசைப்படுத்த எண்ணை இழுக்கவும்</string>
+    <string name="web_client_connected">வலை கிளையன்ட் இணைந்தது</string>
+    <string name="clients_online">%1$d கிளையன்ட்(கள்) ஆன்லைன்</string>
 </resources>

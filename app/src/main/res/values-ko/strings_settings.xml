@@ -22,8 +22,9 @@
     <string name="performance">성능</string>
     <string name="disable_battery_optimization">배터리 최적화 비활성화</string>
     <string name="battery_optimization_disabled">배터리 최적화가 비활성화되었습니다</string>
+    <string name="battery_optimization_tips">화면이 꺼졌을 때 웹 액세스가 계속 작동하도록 배터리 최적화를 비활성화하세요.</string>
     <string name="keep_awake">깨어 있게 유지</string>
-    <string name="keep_awake_tips">기본적으로 USB 충전에 연결되어 있을 때 전화기가 계속해서 깨어 있습니다. 이 옵션을 활성화하면 USB 충전에 연결되어 있지 않을 때에도 전화기를 계속해서 깨어 있게 유지할 수 있으며, 배터리 소비량이 증가할 수 있습니다.</string>
+    <string name="keep_awake_tips">웹 액세스를 항상 온라인 상태로 유지합니다(배터리 소모 증가). 휴대폰이 잠들면 웹 액세스가 중단될 경우 이 옵션을 켜세요.</string>
     <string name="generate_password">비밀번호 생성</string>
     <string name="privacy_policy">개인 정보 보호 정책</string>
     <string name="terms_of_use">이용 약관</string>
@@ -32,8 +33,6 @@
     <string name="sort">정렬</string>
     <string name="language">언어</string>
     <string name="language_desc">영어, 중국어 등</string>
-    <string name="about">정보</string>
-    <string name="about_desc">클라이언트 이름, 버전, 로그, 기부</string>
     <string name="backup_restore">백업 및 복원</string>
     <string name="backup">백업</string>
     <string name="backup_desc">PlainApp 데이터 백업 또는 복원</string>
@@ -71,4 +70,6 @@
     <string name="auto_check_update_desc">앱 실행 시 자동으로 새 버전 확인</string>
     <string name="donation_desc">Ko-fi에서 이 앱을 지원하세요</string>
     <string name="drag_number_to_reorder_list">번호를 드래그하여 목록 순서 변경</string>
+    <string name="web_client_connected">웹 클라이언트 연결됨</string>
+    <string name="clients_online">%1$d 클라이언트 온라인</string>
 </resources>

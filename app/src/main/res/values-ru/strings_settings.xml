@@ -22,8 +22,9 @@
     <string name="performance">Производительность</string>
     <string name="disable_battery_optimization">Отключить оптимизацию батареи</string>
     <string name="battery_optimization_disabled">Оптимизация батареи отключена</string>
+    <string name="battery_optimization_tips">Отключите оптимизацию батареи, чтобы веб-доступ работал при выключенном экране.</string>
     <string name="keep_awake">Держать активным</string>
-    <string name="keep_awake_tips">По умолчанию, когда подключено к USB-зарядке, телефон остается активным. Включение этой опции сохраняет активность телефона даже при отсутствии подключения к USB-зарядке, что может привести к увеличению расхода заряда батареи.</string>
+    <string name="keep_awake_tips">Поддерживает веб-доступ в режиме онлайн (увеличенный расход батареи). Включите это, если доступ перестаёт работать после перехода телефона в режим ожидания.</string>
     <string name="generate_password">Сгенерировать пароль</string>
     <string name="privacy_policy">Политика конфиденциальности</string>
     <string name="terms_of_use">Условия использования</string>
@@ -32,8 +33,6 @@
     <string name="sort">Сортировка</string>
     <string name="language">Язык</string>
     <string name="language_desc">Английский, китайский и другие</string>
-    <string name="about">О приложении</string>
-    <string name="about_desc">Имя клиента, версия, журналы, пожертвование</string>
     <string name="backup_restore">Резервное копирование и восстановление</string>
     <string name="backup">Резервное копирование</string>
     <string name="backup_desc">Создание резервной копии или восстановление данных PlainApp</string>
@@ -71,4 +70,6 @@
     <string name="auto_check_update_desc">Автоматически проверять наличие новых версий при запуске приложения</string>
     <string name="donation_desc">Поддержите это приложение на Ko-fi</string>
     <string name="drag_number_to_reorder_list">Перетащите номер, чтобы изменить порядок списка</string>
+    <string name="web_client_connected">Веб-клиент подключен</string>
+    <string name="clients_online">%1$d клиент(а/ов) онлайн</string>
 </resources>

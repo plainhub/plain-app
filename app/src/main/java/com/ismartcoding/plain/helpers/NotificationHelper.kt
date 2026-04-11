@@ -117,6 +117,22 @@ object NotificationHelper {
         NotificationManagerCompat.from(context).notify(notificationId, notification)
     }
 
+    fun sendWebLoginNotification(context: Context, browserName: String, browserVersion: String, osName: String, osVersion: String, clientIp: String) {
+        if (!Permission.POST_NOTIFICATIONS.can(context)) return
+        ensureDefaultChannel()
+        val browserDisplay = browserName.replaceFirstChar { it.uppercase() } + " " + browserVersion
+        val description = listOf(clientIp, browserDisplay, "$osName $osVersion").filter { it.isNotBlank() }.joinToString(" · ")
+        val notification = NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.notification)
+            .setContentTitle(getString(R.string.web_client_connected))
+            .setContentText(description)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .setContentIntent(createContentIntent(context))
+            .build()
+        NotificationManagerCompat.from(context).notify(generateId(), notification)
+    }
+
     fun createServiceNotification(
         context: Context,
         action: String,
@@ -132,6 +148,17 @@ object NotificationHelper {
                 },
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
             )
+        // Android 14+ allows FGS notifications to be swiped away (OS-enforced policy).
+        // When dismissed, the deleteIntent restarts onStartCommand to re-post the notification.
+        val repostPendingIntent =
+            PendingIntent.getBroadcast(
+                context,
+                1,
+                Intent(context, ServiceStopBroadcastReceiver::class.java).apply {
+                    this.action = Constants.ACTION_REPOST_HTTP_NOTIFICATION
+                },
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            )
 
         return NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_ID).apply {
             setSmallIcon(R.drawable.notification)
@@ -143,6 +170,7 @@ object NotificationHelper {
             setWhen(System.currentTimeMillis())
             setAutoCancel(false)
             setOngoing(true)
+            setDeleteIntent(repostPendingIntent)
             if (isSPlus()) {
                 // https://issuetracker.google.com/issues/229000935
                 foregroundServiceBehavior = NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE

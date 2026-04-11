@@ -22,8 +22,9 @@
     <string name="performance">性能</string>
     <string name="disable_battery_optimization">禁用电池优化</string>
     <string name="battery_optimization_disabled">电池优化已禁用</string>
+    <string name="battery_optimization_tips">关闭电池优化以确保屏幕关闭时网页访问仍能正常工作。</string>
     <string name="keep_awake">保持唤醒</string>
-    <string name="keep_awake_tips">默认情况下，连接USB充电时，手机会保持唤醒状态。启用此选项可使手机即使未连接USB充电，也保持唤醒状态，可能会增加电池消耗。</string>
+    <string name="keep_awake_tips">保持网页访问始终在线（耗电更多）。如果手机休眠后网页访问停止工作，请打开此选项。</string>
     <string name="generate_password">生成密码</string>
     <string name="privacy_policy">隐私政策</string>
     <string name="terms_of_use">用户协议</string>
@@ -36,8 +37,6 @@
     <string name="name_desc">名称(从Z到A)</string>
     <string name="ip_address_asc">IP地址(0到9)</string>
     <string name="last_active_desc">活跃时间</string>
-    <string name="about">关于</string>
-    <string name="about_desc">客户端名称、版本、日志、捐赠</string>
     <string name="backup_restore">备份与恢复</string>
     <string name="backup">备份</string>
     <string name="backup_desc">备份或者恢复PlainApp应用数据</string>
@@ -71,4 +70,6 @@
     <string name="auto_check_update_desc">应用启动时自动检查新版本</string>
     <string name="donation_desc">在 Ko-fi 上支持此应用</string>
     <string name="drag_number_to_reorder_list">拖动数字以重新排列列表</string>
+    <string name="web_client_connected">Web 客户端已连接</string>
+    <string name="clients_online">%1$d 个客户端在线</string>
 </resources>

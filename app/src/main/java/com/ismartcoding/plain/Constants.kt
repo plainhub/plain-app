@@ -17,4 +17,6 @@ object Constants {
     const val ACTION_STOP_HTTP_SERVER = "${BuildConfig.APPLICATION_ID}.action.STOP_HTTP_SERVER"
     const val ACTION_STOP_SCREEN_MIRROR = "${BuildConfig.APPLICATION_ID}.action.STOP_SCREEN_MIRROR"
     const val ACTION_PEER_CHAT_REPLY = "${BuildConfig.APPLICATION_ID}.action.PEER_CHAT_REPLY"
+    // On Android 14+ FGS notifications can be swiped away (OS policy). We re-post via deleteIntent.
+    const val ACTION_REPOST_HTTP_NOTIFICATION = "${BuildConfig.APPLICATION_ID}.action.REPOST_HTTP_NOTIFICATION"
 }

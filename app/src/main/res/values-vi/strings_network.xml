@@ -56,7 +56,6 @@
     <string name="enter_this_address_tips">Nhập địa chỉ trên vào trình duyệt của máy tính của bạn, đảm bảo rằng điện thoại và máy tính của bạn đang kết nối với cùng một mạng cục bộ.</string>
     <string name="mdns_hostname">Tên máy chủ mDNS</string>
     <string name="mdns_hostname_invalid">Tên máy chủ phải kết thúc bằng .local</string>
-    <string name="last_visit_at">Lần ghé thăm cuối cùng tại</string>
     <string name="restart_app_title">Khởi động lại ứng dụng</string>
     <string name="http_server_failed">Khởi động máy chủ HTTP thất bại. Để khởi động lại, vui lòng nhấn vào nút "Khởi động lại ứng dụng".</string>
     <string name="http_server_stopped">Máy chủ HTTP đã bị dừng một cách có chủ ý. Để khởi động lại, vui lòng nhấn vào nút "Khởi động lại ứng dụng".</string>
@@ -77,4 +76,6 @@
     <string name="home_web_easy_hint">Nhấn để bắt đầu</string>
     <string name="home_web_easy_loading">Vui lòng chờ…</string>
     <string name="home_web_easy_failed_title">Không thể khởi động</string>
+    <string name="last_active">Lần cuối hoạt động: %1$s</string>
+    <string name="revoke_session">Thu hồi phiên này</string>
 </resources>

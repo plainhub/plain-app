@@ -56,7 +56,6 @@
     <string name="enter_this_address_tips">உங்கள் கணினியின் உலாவியில் மேலே குறிப்பிட்ட முகவரியை உள்ளிடுக, உங்கள் போன் மற்றும் கணினியை ஒரே உள்ளாக்க வலிமையானதாக உறுதிப்படுத்துங்கள்.</string>
     <string name="mdns_hostname">mDNS ஹோஸ்ட்நேம்</string>
     <string name="mdns_hostname_invalid">ஹோஸ்ட்நேம் .local உடன் முடிவடைய வேண்டும்</string>
-    <string name="last_visit_at">கடைசி பரிந்துரை</string>
     <string name="restart_app_title">ஆப்லிகேஷனை மீளமை</string>
     <string name="http_server_failed">HTTP சர்வர் தொடங்க முடியவில்லை. அதை மீண்டும் ஆரம்பிக்க தயவுசெய்து "பராமரிக்க APP" பொத்தானை தட்டவும்.</string>
     <string name="http_server_stopped">HTTP சர்வர் உள்நிறுக்கப்பட்டுள்ளது. அதை மீண்டும் ஆரம்பிக்க தயவுசெய்து "பராமரிக்க APP" பொத்தானை தட்டவும்.</string>
@@ -77,4 +76,6 @@
     <string name="home_web_easy_hint">தொடங்கத் தட்டவும்</string>
     <string name="home_web_easy_loading">தயவு செய்து காத்திருக்கவும்…</string>
     <string name="home_web_easy_failed_title">தொடங்க முடியவில்லை</string>
+    <string name="last_active">கடைசியாக செயலில்: %1$s</string>
+    <string name="revoke_session">இந்த அமர்வை திரும்பப் பெறு</string>
 </resources>

@@ -56,7 +56,6 @@
     <string name="enter_this_address_tips">Geben Sie die obige Adresse in den Browser Ihres Computers ein und stellen Sie sicher, dass Ihr Telefon und Ihr Computer im selben lokalen Netzwerk sind.</string>
     <string name="mdns_hostname">mDNS-Hostname</string>
     <string name="mdns_hostname_invalid">Hostname muss mit .local enden</string>
-    <string name="last_visit_at">Zuletzt besucht um</string>
     <string name="restart_app_title">App neu starten</string>
     <string name="http_server_failed">Der HTTP-Server konnte nicht gestartet werden. Um ihn neu zu starten, tippen Sie bitte auf die Schaltfläche "APP neu starten".</string>
     <string name="http_server_stopped">Der HTTP-Server wurde absichtlich gestoppt. Um ihn neu zu starten, tippen Sie bitte auf die Schaltfläche "APP neu starten".</string>
@@ -77,4 +76,6 @@
     <string name="home_web_easy_hint">Zum Starten tippen</string>
     <string name="home_web_easy_loading">Bitte warten…</string>
     <string name="home_web_easy_failed_title">Konnte nicht gestartet werden</string>
+    <string name="last_active">Zuletzt aktiv: %1$s</string>
+    <string name="revoke_session">Diese Sitzung widerrufen</string>
 </resources>

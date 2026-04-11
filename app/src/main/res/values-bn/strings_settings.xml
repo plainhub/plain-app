@@ -22,8 +22,9 @@
     <string name="performance">কার্যক্ষমতা</string>
     <string name="disable_battery_optimization">ব্যাটারি অপ্টিমাইজেশন নিষ্ক্রিয় করুন</string>
     <string name="battery_optimization_disabled">ব্যাটারি অপ্টিমাইজেশন নিষ্ক্রিয় করা হয়েছে</string>
+    <string name="battery_optimization_tips">স্ক্রিন বন্ধ থাকলেও ওয়েব অ্যাক্সেস চালু রাখতে ব্যাটারি অপ্টিমাইজেশন বন্ধ করুন।</string>
     <string name="keep_awake">জাগরিত রাখুন</string>
-    <string name="keep_awake_tips">ডিফল্টভাবে, ইউএসবি চার্জিং সংযোগ করা হলে, ফোনটি জাগ্রত থাকে। এই অপশনটি চালু করা ফোনটি ইউএসবি চার্জিং সংযোগ না থাকলেও জাগ্রত রাখে, যাতে ব্যাটারি ব্যবহার বৃদ্ধি করা হতে পারে।</string>
+    <string name="keep_awake_tips">ওয়েব অ্যাক্সেস সবসময় অনলাইন রাখে (বেশি ব্যাটারি ব্যবহার করে)। আপনার ফোন ঘুমিয়ে গেলে যদি এটি কাজ বন্ধ করে দেয় তাহলে এটি চালু করুন।</string>
     <string name="generate_password">পাসওয়ার্ড তৈরি করুন</string>
     <string name="privacy_policy">গোপনীয়তা নীতি</string>
     <string name="terms_of_use">ব্যবহারের শর্তাবলী</string>
@@ -32,8 +33,6 @@
     <string name="sort">ক্রম</string>
     <string name="language">ভাষা</string>
     <string name="language_desc">ইংরেজি, চীনা এবং আরো</string>
-    <string name="about">সম্পর্কে</string>
-    <string name="about_desc">ক্লায়েন্টের নাম, সংস্করণ, লগ, অনুদান</string>
     <string name="backup_restore">ব্যাকআপ এবং পুনরুদ্ধার</string>
     <string name="backup">ব্যাকআপ</string>
     <string name="backup_desc">প্লেনঅ্যাপ ডেটা ব্যাকআপ বা পুনরুদ্ধার করুন</string>
@@ -71,4 +70,6 @@
     <string name="auto_check_update_desc">অ্যাপ চালু হলে স্বয়ংক্রিয়ভাবে নতুন সংস্করণ খোঁজে</string>
     <string name="donation_desc">Ko-fi-এ এই অ্যাপটি সমর্থন করুন</string>
     <string name="drag_number_to_reorder_list">তালিকা পুনর্বিন্যাস করতে নম্বর টেনে আনুন</string>
+    <string name="web_client_connected">ওয়েব ক্লায়েন্ট সংযুক্ত হয়েছে</string>
+    <string name="clients_online">%1$d ক্লায়েন্ট অনলাইন</string>
 </resources>

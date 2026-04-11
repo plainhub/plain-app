@@ -56,7 +56,6 @@
     <string name="enter_this_address_tips">Ingrese la dirección anterior en el navegador de su computadora, asegurándose de que su teléfono y su computadora estén en la misma red local.</string>
     <string name="mdns_hostname">Nombre de host mDNS</string>
     <string name="mdns_hostname_invalid">El nombre de host debe terminar con .local</string>
-    <string name="last_visit_at">Última visita a las</string>
     <string name="restart_app_title">Reiniciar la aplicación</string>
     <string name="http_server_failed">Falló el inicio del servidor HTTP. Para reiniciarlo, toque el botón "Volver a lanzar APP".</string>
     <string name="http_server_stopped">El servidor HTTP ha sido detenido intencionalmente. Para reiniciarlo, toque el botón "Volver a lanzar APP".</string>
@@ -77,4 +76,6 @@
     <string name="home_web_easy_hint">Toca para iniciar</string>
     <string name="home_web_easy_loading">Espera…</string>
     <string name="home_web_easy_failed_title">No se pudo iniciar</string>
+    <string name="last_active">Último activo: %1$s</string>
+    <string name="revoke_session">Revocar esta sesión</string>
 </resources>

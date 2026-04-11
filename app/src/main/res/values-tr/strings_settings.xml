@@ -22,8 +22,9 @@
     <string name="performance">Performans</string>
     <string name="disable_battery_optimization">Pil optimizasyonunu devre dışı bırak</string>
     <string name="battery_optimization_disabled">Pil optimizasyonu devre dışı bırakıldı</string>
+    <string name="battery_optimization_tips">Ekran kapalıyken web erişiminin çalışmaya devam etmesi için pil optimizasyonunu devre dışı bırakın.</string>
     <string name="keep_awake">Uyanık tut</string>
-    <string name="keep_awake_tips">Varsayılan olarak, USB şarjına bağlandığında telefon uyanık kalır. Bu seçeneğin etkinleştirilmesi, USB şarjına bağlı olmadığında bile telefonu uyanık tutar, bu da pil tüketiminin artmasına neden olabilir.</string>
+    <string name="keep_awake_tips">Web erişimini her zaman çevrimiçi tutar (daha fazla pil tüketimi). Telefonunuz uyku moduna geçtiğinde çalışmayı durdurursa bunu açın.</string>
     <string name="generate_password">Şifre oluştur</string>
     <string name="privacy_policy">Gizlilik politikası</string>
     <string name="terms_of_use">Kullanım şartları</string>
@@ -32,8 +33,6 @@
     <string name="sort">Sırala</string>
     <string name="language">Dil</string>
     <string name="language_desc">İngilizce, Çince ve daha fazlası</string>
-    <string name="about">Hakkında</string>
-    <string name="about_desc">İstemci adı, sürüm, günlükler, bağış</string>
     <string name="backup_restore">Yedekleme ve geri yükleme</string>
     <string name="backup">Yedekle</string>
     <string name="backup_desc">PlainApp verilerini yedekle veya geri yükle</string>
@@ -71,4 +70,6 @@
     <string name="auto_check_update_desc">Uygulama açıldığında otomatik olarak yeni sürümleri denetle</string>
     <string name="donation_desc">Bu uygulamayı Ko-fi üzerinden destekleyin</string>
     <string name="drag_number_to_reorder_list">Listeyi yeniden sıralamak için numarayı sürükleyin</string>
+    <string name="web_client_connected">Web istemcisi bağlandı</string>
+    <string name="clients_online">%1$d istemci çevrimiçi</string>
 </resources>

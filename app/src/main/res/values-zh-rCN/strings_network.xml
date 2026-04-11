@@ -56,7 +56,6 @@
     <string name="enter_this_address_tips">在电脑浏览器中输入以上地址，需确保手机和电脑在同一局域网中。</string>
     <string name="mdns_hostname">mDNS主机名</string>
     <string name="mdns_hostname_invalid">主机名必须以.local结尾</string>
-    <string name="last_visit_at">最后访问时间</string>
     <string name="restart_app_title">重启应用</string>
     <string name="http_server_failed">HTTP 服务器启动失败。要重新启动，请点击“重启应用”按钮。</string>
     <string name="http_server_stopped">HTTP 服务器已经被故意停止。要重新启动，请点击“重启应用”按钮。</string>
@@ -77,4 +76,6 @@
     <string name="home_web_easy_hint">点击开始</string>
     <string name="home_web_easy_loading">请稍候…</string>
     <string name="home_web_easy_failed_title">无法启动</string>
+    <string name="last_active">最后活跃：%1$s</string>
+    <string name="revoke_session">撤销此会话</string>
 </resources>

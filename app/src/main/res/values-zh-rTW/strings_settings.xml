@@ -22,8 +22,9 @@
     <string name="performance">性能</string>
     <string name="disable_battery_optimization">停用電池優化</string>
     <string name="battery_optimization_disabled">電池優化已停用</string>
+    <string name="battery_optimization_tips">關閉電池優化以確保螢幕關閉時網頁存取仍能正常運作。</string>
     <string name="keep_awake">保持喚醒</string>
-    <string name="keep_awake_tips">預設情況下，連接USB充電時，手機會保持喚醒狀態。啟用此選項可使手機即使未連接USB充電，也保持喚醒狀態，可能會增加電池消耗。</string>
+    <string name="keep_awake_tips">保持網頁存取始終在線（耗電較多）。若手機休眠後網頁存取停止運作，請開啟此選項。</string>
     <string name="generate_password">生成密碼</string>
     <string name="privacy_policy">隱私政策</string>
     <string name="terms_of_use">使用條款</string>
@@ -36,8 +37,6 @@
     <string name="name_desc">名稱(從Z到A)</string>
     <string name="ip_address_asc">IP地址(0到9)</string>
     <string name="last_active_desc">活躍時間</string>
-    <string name="about">關於</string>
-    <string name="about_desc">客戶端名稱、版本、日誌、捐贈</string>
     <string name="backup_restore">備份與恢復</string>
     <string name="backup">備份</string>
     <string name="backup_desc">備份或者恢復簡樸應用數據</string>
@@ -71,4 +70,6 @@
     <string name="auto_check_update_desc">應用程式啟動時自動檢查新版本</string>
     <string name="donation_desc">在 Ko-fi 上支持此應用程式</string>
     <string name="drag_number_to_reorder_list">拖動數字以重新排列列表</string>
+    <string name="web_client_connected">Web 用戶端已連接</string>
+    <string name="clients_online">%1$d 個用戶端在線</string>
 </resources>

@@ -22,8 +22,9 @@
     <string name="performance">Prestatie</string>
     <string name="disable_battery_optimization">Batterijoptimalisatie uitschakelen</string>
     <string name="battery_optimization_disabled">Batterijoptimalisatie is uitgeschakeld</string>
+    <string name="battery_optimization_tips">Schakel batterijoptimalisatie uit zodat de webtoegang werkt als het scherm is uitgeschakeld.</string>
     <string name="keep_awake">Wakker houden</string>
-    <string name="keep_awake_tips">Standaard blijft de telefoon wakker wanneer deze is aangesloten op USB-opladen. Door deze optie in te schakelen, blijft de telefoon wakker, zelfs wanneer deze niet is aangesloten op USB-opladen, wat mogelijk resulteert in een verhoogd batterijverbruik.</string>
+    <string name="keep_awake_tips">Houdt de webtoegang altijd online (meer batterijverbruik). Zet dit aan als het stopt met werken wanneer uw telefoon in de slaapstand gaat.</string>
     <string name="generate_password">Genereer wachtwoord</string>
     <string name="privacy_policy">Privacybeleid</string>
     <string name="terms_of_use">Gebruiksvoorwaarden</string>
@@ -32,8 +33,6 @@
     <string name="sort">Sorteren</string>
     <string name="language">Taal</string>
     <string name="language_desc">Engels, Chinees en meer</string>
-    <string name="about">Over</string>
-    <string name="about_desc">Clientnaam, versie, logboeken, donatie</string>
     <string name="backup_restore">Back-up &amp; herstellen</string>
     <string name="backup">Back-up</string>
     <string name="backup_desc">Back-up maken of PlainApp-gegevens herstellen</string>
@@ -71,4 +70,6 @@
     <string name="auto_check_update_desc">Automatisch controleren op nieuwe versies bij het openen van de app</string>
     <string name="donation_desc">Ondersteun deze app op Ko-fi</string>
     <string name="drag_number_to_reorder_list">Sleep het nummer om de lijst te herordenen</string>
+    <string name="web_client_connected">Webclient verbonden</string>
+    <string name="clients_online">%1$d client(s) online</string>
 </resources>

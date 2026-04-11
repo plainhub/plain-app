@@ -211,6 +211,7 @@ object HttpModule {
                     it.session.close()
                 }
                 HttpServerManager.wsSessions.clear()
+                HttpServerManager.wsSessionCount.value = 0
                 val latch = CompletableDeferred<Nothing>()
                 val application = call.application
                 val environment = application.environment
@@ -933,6 +934,7 @@ object HttpModule {
                                         if (decryptedBytes != null) {
                                             LogCat.d("ws: add session ${session.id}, ts: ${decryptedBytes.decodeToString()}")
                                             HttpServerManager.wsSessions.add(session)
+                                            HttpServerManager.wsSessionCount.value = HttpServerManager.wsSessions.size
                                         } else {
                                             LogCat.d("ws: invalid_request")
                                             close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "invalid_request"))
@@ -952,6 +954,7 @@ object HttpModule {
                 } finally {
                     LogCat.d("ws: remove session ${session.id}")
                     HttpServerManager.wsSessions.removeIf { it.id == session.id }
+                    HttpServerManager.wsSessionCount.value = HttpServerManager.wsSessions.size
                 }
             }
         }

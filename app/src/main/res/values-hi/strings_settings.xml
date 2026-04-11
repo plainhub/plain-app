@@ -22,8 +22,9 @@
     <string name="performance">प्रदर्शन</string>
     <string name="disable_battery_optimization">बैटरी अनुकूलन निष्क्रिय करें</string>
     <string name="battery_optimization_disabled">बैटरी अनुकूलन निष्क्रिय किया गया है</string>
+    <string name="battery_optimization_tips">स्क्रीन बंद होने पर वेब एक्सेस को काम करते रहने के लिए बैटरी ऑप्टिमाइज़ेशन बंद करें।</string>
     <string name="keep_awake">जागरूक रखें</string>
-    <string name="keep_awake_tips">डिफ़ॉल्ट रूप से, जब USB चार्जिंग से कनेक्ट किया जाता है, तो फोन जागरूक रहता है। इस विकल्प को सक्षम करने से फोन जागरूक रहता है, यहाँ तक कि USB चार्जिंग से कनेक्ट न होने पर भी, बैटरी की अधिक खपत के संभावित होने की संभावना है।</string>
+    <string name="keep_awake_tips">वेब एक्सेस को हमेशा ऑनलाइन रखता है (अधिक बैटरी उपयोग)। यदि आपका फोन सोने के बाद यह काम करना बंद कर दे तो इसे चालू करें।</string>
     <string name="generate_password">पासवर्ड बनाएं</string>
     <string name="privacy_policy">गोपनीयता नीति</string>
     <string name="terms_of_use">उपयोग की शर्तें</string>
@@ -32,8 +33,6 @@
     <string name="sort">क्रमबद्ध करें</string>
     <string name="language">भाषा</string>
     <string name="language_desc">अंग्रेजी, चीनी और अधिक</string>
-    <string name="about">हमारे बारे में</string>
-    <string name="about_desc">क्लाइंट नाम, संस्करण, लॉग, दान</string>
     <string name="backup_restore">बैकअप और पुनर्स्थापित करें</string>
     <string name="backup">बैकअप</string>
     <string name="backup_desc">PlainApp डेटा का बैकअप और पुनर्स्थापित करें</string>
@@ -73,4 +72,6 @@
     <string name="drag_number_to_reorder_list">सूची को पुनर्व्यवस्थित करने के लिए नंबर खींचें</string>
     <string name="app_name">प्लेनऐप</string>
 
+    <string name="web_client_connected">वेब क्लाइंट कनेक्ट हुआ</string>
+    <string name="clients_online">%1$d क्लाइंट ऑनलाइन</string>
 </resources>

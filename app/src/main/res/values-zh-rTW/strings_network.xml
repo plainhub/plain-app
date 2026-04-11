@@ -56,7 +56,6 @@
     <string name="enter_this_address_tips">在電腦瀏覽器中輸入上述地址，請確保您的手機和電腦位於同一局域網中。</string>
     <string name="mdns_hostname">mDNS主機名</string>
     <string name="mdns_hostname_invalid">主機名必須以.local結尾</string>
-    <string name="last_visit_at">最後訪問時間</string>
     <string name="restart_app_title">重啟應用</string>
     <string name="http_server_failed">HTTP 伺服器啟動失敗。若要重新啟動，請點擊「重新啟動應用程式」按鈕。</string>
     <string name="http_server_stopped">HTTP 伺服器已被故意停止。若要重新啟動，請點擊「重新啟動應用程式」按鈕。</string>
@@ -77,4 +76,6 @@
     <string name="home_web_easy_hint">點一下開始</string>
     <string name="home_web_easy_loading">請稍候…</string>
     <string name="home_web_easy_failed_title">無法啟動</string>
+    <string name="last_active">最後活躍：%1$s</string>
+    <string name="revoke_session">撤銷此工作階段</string>
 </resources>

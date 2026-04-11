@@ -56,7 +56,6 @@
     <string name="enter_this_address_tips">अपने कंप्यूटर के ब्राउज़र में ऊपर दिए गए पते को डालें, यह सुनिश्चित करें कि आपका फोन और कंप्यूटर एक ही स्थानीय नेटवर्क में हैं।</string>
     <string name="mdns_hostname">mDNS होस्टनाम</string>
     <string name="mdns_hostname_invalid">होस्टनाम का अंत .local से होना चाहिए</string>
-    <string name="last_visit_at">आखिरी बार दौरा किया गया</string>
     <string name="restart_app_title">ऐप पुनः शुरू करें</string>
     <string name="http_server_failed">HTTP सर्वर चालना असफल हुआ। इसे पुनरारंभ करने के लिए, कृपया "ऐप फिर से चालना" बटन पर टैप करें।</string>
     <string name="http_server_stopped">HTTP सर्वर को इच्छापूर्वक बंद किया गया है। इसे पुनरारंभ करने के लिए, कृपया "ऐप फिर से चालना" बटन पर टैप करें।</string>
@@ -77,4 +76,6 @@
     <string name="home_web_easy_hint">शुरू करने के लिए टैप करें</string>
     <string name="home_web_easy_loading">कृपया प्रतीक्षा करें…</string>
     <string name="home_web_easy_failed_title">शुरू नहीं हो सका</string>
+    <string name="last_active">अंतिम सक्रिय: %1$s</string>
+    <string name="revoke_session">इस सत्र को रद्द करें</string>
 </resources>

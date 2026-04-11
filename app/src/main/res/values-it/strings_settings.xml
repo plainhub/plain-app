@@ -22,8 +22,9 @@
     <string name="performance">Prestazioni</string>
     <string name="disable_battery_optimization">Disattiva ottimizzazione batteria</string>
     <string name="battery_optimization_disabled">L\'ottimizzazione della batteria è disattivata</string>
+    <string name="battery_optimization_tips">Disattiva l\'ottimizzazione della batteria per mantenere l\'accesso web attivo quando lo schermo è spento.</string>
     <string name="keep_awake">Mantieni sveglio</string>
-    <string name="keep_awake_tips">Per impostazione predefinita, quando collegato alla ricarica USB, il telefono rimane attivo. Abilitando questa opzione il telefono rimane attivo anche quando non è collegato alla ricarica USB, potenzialmente aumentando il consumo della batteria.</string>
+    <string name="keep_awake_tips">Mantiene l\'accesso web sempre online (maggior consumo della batteria). Attivalo se smette di funzionare quando il telefono va in standby.</string>
     <string name="generate_password">Genera password</string>
     <string name="privacy_policy">Informativa sulla privacy</string>
     <string name="terms_of_use">Termini di utilizzo</string>
@@ -32,8 +33,6 @@
     <string name="sort">Ordina</string>
     <string name="language">Lingua</string>
     <string name="language_desc">Inglese, cinese e altro</string>
-    <string name="about">Informazioni</string>
-    <string name="about_desc">Nome del client, versione, log, donazione</string>
     <string name="backup_restore">Backup e ripristino</string>
     <string name="backup">Backup</string>
     <string name="backup_desc">Effettua il backup o ripristina i dati di PlainApp</string>
@@ -71,4 +70,6 @@
     <string name="auto_check_update_desc">Controlla automaticamente le nuove versioni all\'avvio dell\'app</string>
     <string name="donation_desc">Supporta questa app su Ko-fi</string>
     <string name="drag_number_to_reorder_list">Trascina il numero per riordinare l\'elenco</string>
+    <string name="web_client_connected">Client web connesso</string>
+    <string name="clients_online">%1$d client online</string>
 </resources>

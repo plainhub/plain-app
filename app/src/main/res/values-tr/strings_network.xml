@@ -56,7 +56,6 @@
     <string name="enter_this_address_tips">Yukarıdaki adresi bilgisayarınızın tarayıcısına girin, telefonunuzun ve bilgisayarınızın aynı yerel ağda olduğundan emin olun.</string>
     <string name="mdns_hostname">mDNS ana bilgisayar adı</string>
     <string name="mdns_hostname_invalid">Ana bilgisayar adı .local ile bitmelidir</string>
-    <string name="last_visit_at">Son ziyaret</string>
     <string name="restart_app_title">Uygulamayı yeniden başlat</string>
     <string name="http_server_failed">HTTP sunucusu başlatılamadı. Yeniden başlatmak için lütfen "Uygulamayı Yeniden Başlat" düğmesine dokunun.</string>
     <string name="http_server_stopped">HTTP sunucusu kasıtlı olarak durduruldu. Yeniden başlatmak için lütfen "Uygulamayı Yeniden Başlat" düğmesine dokunun.</string>
@@ -77,4 +76,6 @@
     <string name="home_web_easy_hint">Başlamak için dokunun</string>
     <string name="home_web_easy_loading">Lütfen bekleyin…</string>
     <string name="home_web_easy_failed_title">Başlatılamadı</string>
+    <string name="last_active">Son aktif: %1$s</string>
+    <string name="revoke_session">Bu oturumu iptal et</string>
 </resources>

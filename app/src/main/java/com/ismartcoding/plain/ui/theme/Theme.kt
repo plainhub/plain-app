@@ -119,6 +119,18 @@ val ColorScheme.circleBackground: Color
     @Composable @ReadOnlyComposable
     get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF2C2C2E) else Color(0xFFFFFFFF)
 
+val ColorScheme.greenDot: Color
+    @Composable @ReadOnlyComposable
+    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF66BB6A) else Color(0xFF4CAF50)
+
+val ColorScheme.greenText: Color
+    @Composable @ReadOnlyComposable
+    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFFA5D6A7) else Color(0xFF2E7D32)
+
+val ColorScheme.greenPill: Color
+    @Composable @ReadOnlyComposable
+    get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0x4D1B5E20) else Color(0xFFE8F5E9)
+
 val ColorScheme.secondaryTextColor: Color
     @Composable @ReadOnlyComposable
     get() = if (DarkTheme.isDarkTheme(LocalDarkTheme.current)) Color(0xFF8D8D93) else Color(0xFF8E8E93)

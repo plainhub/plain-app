@@ -56,7 +56,6 @@
     <string name="enter_this_address_tips">Inserisci l\'indirizzo sopra nel browser del tuo computer, assicurandoti che il telefono e il computer siano sulla stessa rete locale.</string>
     <string name="mdns_hostname">Nome host mDNS</string>
     <string name="mdns_hostname_invalid">Il nome host deve terminare con .local</string>
-    <string name="last_visit_at">Ultima visita il</string>
     <string name="restart_app_title">Riavvia app</string>
     <string name="http_server_failed">Impossibile avviare il server HTTP. Per riavviarlo, tocca il pulsante "Rilancia APP".</string>
     <string name="http_server_stopped">Il server HTTP è stato fermato intenzionalmente. Per riavviarlo, tocca il pulsante "Rilancia APP".</string>
@@ -77,4 +76,6 @@
     <string name="home_web_easy_hint">Tocca per avviare</string>
     <string name="home_web_easy_loading">Attendi…</string>
     <string name="home_web_easy_failed_title">Impossibile avviare</string>
+    <string name="last_active">Ultimo attivo: %1$s</string>
+    <string name="revoke_session">Revoca questa sessione</string>
 </resources>

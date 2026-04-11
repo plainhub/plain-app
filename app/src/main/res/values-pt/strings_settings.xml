@@ -22,8 +22,9 @@
     <string name="performance">Desempenho</string>
     <string name="disable_battery_optimization">Desativar otimização da bateria</string>
     <string name="battery_optimization_disabled">A otimização da bateria está desativada</string>
+    <string name="battery_optimization_tips">Desative a otimização de bateria para manter o acesso à web funcionando quando a tela estiver desligada.</string>
     <string name="keep_awake">Manter acordado</string>
-    <string name="keep_awake_tips">Por padrão, quando conectado ao carregamento USB, o telefone permanece acordado. Habilitar esta opção mantém o telefone acordado mesmo quando não conectado ao carregamento USB, potencialmente resultando em aumento do consumo da bateria.</string>
+    <string name="keep_awake_tips">Mantém o acesso à web sempre online (mais consumo de bateria). Ative isso se parar de funcionar quando seu telefone entrar em modo de suspensão.</string>
     <string name="generate_password">Gerar senha</string>
     <string name="privacy_policy">Política de Privacidade</string>
     <string name="terms_of_use">Termos de Uso</string>
@@ -32,8 +33,6 @@
     <string name="sort">Ordenar</string>
     <string name="language">Idioma</string>
     <string name="language_desc">Inglês, Chinês e mais</string>
-    <string name="about">Sobre</string>
-    <string name="about_desc">Nome do cliente, versão, registros, doação</string>
     <string name="backup_restore">Backup &amp; restauração</string>
     <string name="backup">Backup</string>
     <string name="backup_desc">Fazer backup ou restaurar dados do PlainApp</string>
@@ -71,4 +70,6 @@
     <string name="auto_check_update_desc">Verificar automaticamente novas versões ao iniciar o aplicativo</string>
     <string name="donation_desc">Apoie este aplicativo no Ko-fi</string>
     <string name="drag_number_to_reorder_list">Arraste o número para reordenar a lista</string>
+    <string name="web_client_connected">Cliente web conectado</string>
+    <string name="clients_online">%1$d cliente(s) online</string>
 </resources>

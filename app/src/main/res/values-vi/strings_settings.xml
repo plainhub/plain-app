@@ -22,8 +22,9 @@
     <string name="performance">Hiệu suất</string>
     <string name="disable_battery_optimization">Vô hiệu hóa tối ưu hóa pin</string>
     <string name="battery_optimization_disabled">Tối ưu hóa pin đã được vô hiệu hóa</string>
+    <string name="battery_optimization_tips">Tắt tối ưu hóa pin để giữ cho quyền truy cập web hoạt động khi màn hình tắt.</string>
     <string name="keep_awake">Giữ tỉnh táo</string>
-    <string name="keep_awake_tips">Theo mặc định, khi kết nối với sạc USB, điện thoại sẽ luôn hoạt động. Bật tùy chọn này giữ cho điện thoại luôn tỉnh táo ngay cả khi không kết nối với sạc USB, có thể dẫn đến tiêu thụ pin tăng.</string>
+    <string name="keep_awake_tips">Duy trì quyền truy cập web luôn trực tuyến (tốn nhiều pin hơn). Bật tùy chọn này nếu nó ngừng hoạt động khi điện thoại của bạn ở trạng thái ngủ.</string>
     <string name="generate_password">Tạo mật khẩu</string>
     <string name="privacy_policy">Chính sách bảo mật</string>
     <string name="terms_of_use">Điều khoản sử dụng</string>
@@ -32,8 +33,6 @@
     <string name="sort">Sắp xếp</string>
     <string name="language">Ngôn ngữ</string>
     <string name="language_desc">Tiếng Anh, Tiếng Trung và nhiều hơn nữa</string>
-    <string name="about">Về</string>
-    <string name="about_desc">Tên khách hàng, phiên bản, nhật ký, quyên góp</string>
     <string name="backup_restore">Sao lưu &amp; khôi phục</string>
     <string name="backup">Sao lưu</string>
     <string name="backup_desc">Sao lưu hoặc khôi phục dữ liệu PlainApp</string>
@@ -71,4 +70,6 @@
     <string name="auto_check_update_desc">Tự động kiểm tra phiên bản mới khi khởi động ứng dụng</string>
     <string name="donation_desc">Hỗ trợ ứng dụng này trên Ko-fi</string>
     <string name="drag_number_to_reorder_list">Kéo số để sắp xếp lại danh sách</string>
+    <string name="web_client_connected">Máy khách web đã kết nối</string>
+    <string name="clients_online">%1$d máy khách trực tuyến</string>
 </resources>

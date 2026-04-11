@@ -56,7 +56,6 @@
     <string name="enter_this_address_tips">Entrez l\'adresse ci-dessus dans le navigateur de votre ordinateur, en vous assurant que votre téléphone et votre ordinateur sont sur le même réseau local.</string>
     <string name="mdns_hostname">Nom d\'hôte mDNS</string>
     <string name="mdns_hostname_invalid">Le nom d\'hôte doit se terminer par .local</string>
-    <string name="last_visit_at">Dernière visite le</string>
     <string name="restart_app_title">Redémarrer l\'application</string>
     <string name="http_server_failed">Échec du démarrage du serveur HTTP. Pour le redémarrer, veuillez appuyer sur le bouton "Relancer l'application".</string>
     <string name="http_server_stopped">Le serveur HTTP a été intentionnellement arrêté. Pour le redémarrer, veuillez appuyer sur le bouton "Relancer l'application".</string>
@@ -77,4 +76,6 @@
     <string name="home_web_easy_hint">Appuyez pour démarrer</string>
     <string name="home_web_easy_loading">Veuillez patienter…</string>
     <string name="home_web_easy_failed_title">Impossible de démarrer</string>
+    <string name="last_active">Dernier actif : %1$s</string>
+    <string name="revoke_session">Révoquer cette session</string>
 </resources>

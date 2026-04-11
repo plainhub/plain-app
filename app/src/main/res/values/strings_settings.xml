@@ -37,8 +37,6 @@
     <string name="sort">Sort</string>
     <string name="language">Language</string>
     <string name="language_desc">English, Chinese and more</string>
-    <string name="about">About</string>
-    <string name="about_desc">Client name, version, logs</string>
     <string name="backup_restore">Backup &amp; restore</string>
     <string name="backup">Backup</string>
     <string name="backup_desc">Backup or restore PlainApp data</string>
@@ -76,4 +74,6 @@
     <string name="amoled_dark_theme">AMOLED dark theme</string>
     <string name="customize_home_features">Customize Home Features</string>
     <string name="drag_number_to_reorder_list">Drag the number to reorder the list</string>
+    <string name="web_client_connected">Web client connected</string>
+    <string name="clients_online">%1$d client(s) online</string>
 </resources>

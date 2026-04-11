@@ -31,9 +31,9 @@ class HttpServerService : LifecycleService() {
     private var serverJob: Job? = null
     private var lockManager: HttpServerLockManager? = null
 
-    @SuppressLint("InlinedApi")
     override fun onCreate() {
         super.onCreate()
+        instance = this
         NotificationHelper.ensureDefaultChannel()
 
         lockManager = HttpServerLockManager(this)
@@ -132,6 +132,7 @@ class HttpServerService : LifecycleService() {
     }
 
     override fun onDestroy() {
+        instance = null
         serverJob?.cancel()
         serverJob = null
         super.onDestroy()
@@ -170,5 +171,12 @@ class HttpServerService : LifecycleService() {
         PNotificationListenerService.toggle(this, false)
 
         serverState = HttpServerState.OFF
+    }
+
+    companion object {
+        @Volatile
+        var instance: HttpServerService? = null
+
+        fun isRunning(): Boolean = instance != null
     }
 }

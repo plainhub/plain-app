@@ -56,7 +56,6 @@
     <string name="enter_this_address_tips">上記のアドレスをコンピューターのブラウザに入力して、電話とコンピューターが同じローカルネットワークにあることを確認してください。</string>
     <string name="mdns_hostname">mDNSホスト名</string>
     <string name="mdns_hostname_invalid">ホスト名は.localで終わる必要があります</string>
-    <string name="last_visit_at">前回の訪問時刻</string>
     <string name="restart_app_title">アプリを再起動</string>
     <string name="http_server_failed">HTTPサーバーの起動に失敗しました。再起動するには、「アプリを再起動」ボタンをタップしてください。</string>
     <string name="http_server_stopped">HTTPサーバーは意図的に停止されました。再起動するには、「アプリを再起動」ボタンをタップしてください。</string>
@@ -77,4 +76,6 @@
     <string name="home_web_easy_hint">タップして開始</string>
     <string name="home_web_easy_loading">しばらくお待ちください…</string>
     <string name="home_web_easy_failed_title">開始できませんでした</string>
+    <string name="last_active">最終アクティブ：%1$s</string>
+    <string name="revoke_session">このセッションを取り消す</string>
 </resources>

@@ -22,8 +22,9 @@
     <string name="performance">Rendimiento</string>
     <string name="disable_battery_optimization">Desactivar optimización de batería</string>
     <string name="battery_optimization_disabled">La optimización de batería está desactivada</string>
+    <string name="battery_optimization_tips">Desactiva la optimización de batería para que el acceso web siga funcionando cuando la pantalla esté apagada.</string>
     <string name="keep_awake">Mantener despierto</string>
-    <string name="keep_awake_tips">Por defecto, cuando está conectado a la carga USB, el teléfono permanece despierto. Habilitar esta opción mantiene el teléfono despierto incluso cuando no está conectado a la carga USB, lo que puede resultar en un aumento del consumo de batería.</string>
+    <string name="keep_awake_tips">Mantiene el acceso web siempre en línea (más consumo de batería). Activa esto si deja de funcionar cuando tu teléfono entra en reposo.</string>
     <string name="generate_password">Generar contraseña</string>
     <string name="privacy_policy">Política de privacidad</string>
     <string name="terms_of_use">Términos de uso</string>
@@ -32,8 +33,6 @@
     <string name="sort">Ordenar</string>
     <string name="language">Idioma</string>
     <string name="language_desc">Inglés, Chino y más</string>
-    <string name="about">Acerca de</string>
-    <string name="about_desc">Nombre del cliente, versión, registros, donación</string>
     <string name="backup_restore">Copia de seguridad y restauración</string>
     <string name="backup">Copia de seguridad</string>
     <string name="backup_desc">Realiza copias de seguridad o restaura los datos de PlainApp</string>
@@ -71,4 +70,6 @@
     <string name="auto_check_update_desc">Buscar nuevas versiones automáticamente al abrir la aplicación</string>
     <string name="donation_desc">Apoya esta aplicación en Ko-fi</string>
     <string name="drag_number_to_reorder_list">Arrastra el número para reordenar la lista</string>
+    <string name="web_client_connected">Cliente web conectado</string>
+    <string name="clients_online">%1$d cliente(s) en línea</string>
 </resources>

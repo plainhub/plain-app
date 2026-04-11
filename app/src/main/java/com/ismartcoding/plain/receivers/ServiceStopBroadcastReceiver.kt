@@ -3,10 +3,12 @@ package com.ismartcoding.plain.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import androidx.core.content.ContextCompat
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.preferences.WebPreference
+import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.services.ScreenMirrorService
 import com.ismartcoding.plain.web.HttpServerManager
 
@@ -15,13 +17,20 @@ class ServiceStopBroadcastReceiver : BroadcastReceiver() {
         context: Context,
         intent: Intent,
     ) {
-        coIO {
-            if (intent.action == Constants.ACTION_STOP_HTTP_SERVER) {
+        when (intent.action) {
+            Constants.ACTION_STOP_HTTP_SERVER -> coIO {
                 WebPreference.putAsync(context, false)
                 HttpServerManager.stopServiceAsync(context)
-            } else if (intent.action == Constants.ACTION_STOP_SCREEN_MIRROR) {
+            }
+            Constants.ACTION_STOP_SCREEN_MIRROR -> {
                 ScreenMirrorService.instance?.stop()
                 ScreenMirrorService.instance = null
+            }
+            // Android 14+ allows FGS notifications to be swiped. Re-post via onStartCommand.
+            Constants.ACTION_REPOST_HTTP_NOTIFICATION -> {
+                if (HttpServerService.isRunning()) {
+                    ContextCompat.startForegroundService(context, Intent(context, HttpServerService::class.java))
+                }
             }
         }
     }

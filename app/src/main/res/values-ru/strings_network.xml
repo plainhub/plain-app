@@ -56,7 +56,6 @@
     <string name="enter_this_address_tips">Введите вышеуказанный адрес в браузер вашего компьютера, убедившись, что ваш телефон и компьютер находятся в одной локальной сети.</string>
     <string name="mdns_hostname">Имя хоста mDNS</string>
     <string name="mdns_hostname_invalid">Имя хоста должно заканчиваться на .local</string>
-    <string name="last_visit_at">Последнее посещение в</string>
     <string name="restart_app_title">Перезапустить приложение</string>
     <string name="http_server_failed">Не удалось запустить HTTP-сервер. Чтобы перезапустить его, нажмите кнопку "Перезапустить приложение".</string>
     <string name="http_server_stopped">HTTP-сервер был намеренно остановлен. Чтобы перезапустить его, нажмите кнопку "Перезапустить приложение".</string>
@@ -77,4 +76,6 @@
     <string name="home_web_easy_hint">Нажмите, чтобы начать</string>
     <string name="home_web_easy_loading">Пожалуйста, подождите…</string>
     <string name="home_web_easy_failed_title">Не удалось запустить</string>
+    <string name="last_active">Последняя активность: %1$s</string>
+    <string name="revoke_session">Отозвать этот сеанс</string>
 </resources>

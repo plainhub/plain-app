@@ -54,7 +54,6 @@
     <string name="enter_this_address_tips">আপনার কম্পিউটারের ব্রাউজারে উপরের ঠিকানা লিখুন, নিশ্চিত করুন যে আপনার ফোন এবং কম্পিউটারটি একই স্থানীয় নেটওয়ার্কে আছে।</string>
     <string name="mdns_hostname">mDNS হোস্টনেম</string>
     <string name="mdns_hostname_invalid">হোস্টনেম অবশ্যই .local দিয়ে শেষ হতে হবে</string>
-    <string name="last_visit_at">শেষ দেখা</string>
     <string name="restart_app_title">অ্যাপ পুনরায় চালু করুন</string>
     <string name="http_server_failed">HTTP সার্ভার চালু করা ব্যর্থ। এটি পুনরায় চালাতে, "আবার এপিপি পুনরারম্ভ করুন" বোতামে ট্যাপ করুন।</string>
     <string name="http_server_stopped">HTTP সার্ভারটি ইচ্ছাকৃতভাবে বন্ধ হয়েছে। এটি পুনরায় চালাতে, "আবার এপিপি পুনরারম্ভ করুন" বোতামে ট্যাপ করুন।</string>
@@ -75,4 +74,6 @@
     <string name="home_web_easy_hint">শুরু করতে ট্যাপ করুন</string>
     <string name="home_web_easy_loading">অনুগ্রহ করে অপেক্ষা করুন…</string>
     <string name="home_web_easy_failed_title">শুরু করা যায়নি</string>
+    <string name="last_active">সর্বশেষ সক্রিয়: %1$s</string>
+    <string name="revoke_session">এই সেশন প্রত্যাহার করুন</string>
 </resources>

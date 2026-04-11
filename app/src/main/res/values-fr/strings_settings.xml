@@ -22,8 +22,9 @@
     <string name="performance">Performance</string>
     <string name="disable_battery_optimization">Désactiver l\'optimisation de la batterie</string>
     <string name="battery_optimization_disabled">L\'optimisation de la batterie est désactivée</string>
+    <string name="battery_optimization_tips">Désactivez l\'optimisation de la batterie pour que l\'accès web fonctionne lorsque l\'écran est éteint.</string>
     <string name="keep_awake">Garder éveillé</string>
-    <string name="keep_awake_tips">Par défaut, lorsque connecté au chargement USB, le téléphone reste éveillé. Activer cette option maintient le téléphone éveillé même lorsqu\'il n\'est pas connecté au chargement USB, ce qui peut entraîner une augmentation de la consommation de batterie.</string>
+    <string name="keep_awake_tips">Maintient l\'accès web toujours en ligne (plus de batterie). Activez ceci si l\'accès web cesse de fonctionner lorsque votre téléphone se met en veille.</string>
     <string name="generate_password">Générer un mot de passe</string>
     <string name="privacy_policy">Politique de confidentialité</string>
     <string name="terms_of_use">Conditions d\'utilisation</string>
@@ -32,8 +33,6 @@
     <string name="sort">Trier</string>
     <string name="language">Langue</string>
     <string name="language_desc">Anglais, chinois et plus</string>
-    <string name="about">À propos</string>
-    <string name="about_desc">Nom du client, version, journaux, don</string>
     <string name="backup_restore">Sauvegarde et restauration</string>
     <string name="backup">Sauvegarder</string>
     <string name="backup_desc">Sauvegarder ou restaurer les données de PlainApp</string>
@@ -71,4 +70,6 @@
     <string name="auto_check_update_desc">Rechercher automatiquement les nouvelles versions au démarrage de l\'application</string>
     <string name="donation_desc">Soutenez cette application sur Ko-fi</string>
     <string name="drag_number_to_reorder_list">Faites glisser le numéro pour réorganiser la liste</string>
+    <string name="web_client_connected">Client web connecté</string>
+    <string name="clients_online">%1$d client(s) en ligne</string>
 </resources>
