@@ -20,9 +20,17 @@ internal fun candidateInterfaces(): List<Pair<NetworkInterface, Inet4Address>> {
     runCatching {
         val ifaces = NetworkInterface.getNetworkInterfaces() ?: return result
         for (iface in ifaces.asSequence()) {
-            if (!iface.isUp || iface.isLoopback || !iface.supportsMulticast()) continue
+            if (!iface.isUp || iface.isLoopback) continue
             if (NetworkHelper.isVpnInterface(iface.name)) continue
             if (isMobileDataInterface(iface.name)) continue
+            // Samsung's Wi-Fi driver sometimes omits IFF_MULTICAST on wlan0/ap0, causing
+            // supportsMulticast() to return false even though the interface is perfectly
+            // capable of multicast. Accept any interface with a Wi-Fi/Ethernet-like name
+            // regardless of the flag, since those are always LAN interfaces.
+            val isLanLike = iface.name.startsWith("wlan") || iface.name.startsWith("ap") ||
+                iface.name.startsWith("eth") || iface.name.startsWith("swlan") ||
+                iface.name.startsWith("wl") || iface.name.startsWith("p2p")
+            if (!iface.supportsMulticast() && !isLanLike) continue
             val ip = iface.inetAddresses.asSequence()
                 .filterIsInstance<Inet4Address>()
                 .firstOrNull { !it.isLoopbackAddress } ?: continue

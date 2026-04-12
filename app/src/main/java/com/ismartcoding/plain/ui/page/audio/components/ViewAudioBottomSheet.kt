@@ -74,7 +74,6 @@ fun ViewAudioBottomSheet(
                     dragSelectState = dragSelectState,
                     context = context,
                     onDismiss = onDismiss,
-                    castVM = castVM,
                 )
             }
             if (!audioVM.trash.value) {
