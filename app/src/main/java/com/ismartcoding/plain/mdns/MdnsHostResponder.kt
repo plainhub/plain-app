@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.web
+package com.ismartcoding.plain.mdns
 
 import android.content.Context
 import android.net.wifi.WifiManager
@@ -9,7 +9,6 @@ import java.net.Inet4Address
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.MulticastSocket
-import java.net.NetworkInterface
 import java.net.SocketTimeoutException
 
 /**

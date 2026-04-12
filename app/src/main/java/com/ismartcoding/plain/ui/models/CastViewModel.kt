@@ -7,9 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.lib.upnp.UPnPController
-import com.ismartcoding.lib.upnp.UPnPDevice
-import com.ismartcoding.lib.upnp.UPnPDiscovery
+import com.ismartcoding.plain.features.dlna.common.DlnaDevice
+import com.ismartcoding.plain.features.dlna.sender.DlnaTransportController
+import com.ismartcoding.plain.features.dlna.sender.DlnaDeviceScanner
 import com.ismartcoding.plain.data.IMedia
 import com.ismartcoding.plain.features.media.CastPlayer
 import io.ktor.client.HttpClient
@@ -26,8 +26,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.Job
 
 class CastViewModel : ViewModel() {
-    private val _itemsFlow = MutableStateFlow(mutableStateListOf<UPnPDevice>())
-    val itemsFlow: StateFlow<List<UPnPDevice>> get() = _itemsFlow
+    private val _itemsFlow = MutableStateFlow(mutableStateListOf<DlnaDevice>())
+    val itemsFlow: StateFlow<List<DlnaDevice>> get() = _itemsFlow
     var castMode = mutableStateOf(false)
     var showCastDialog = mutableStateOf(false)
     val isLoading = mutableStateOf(false)
@@ -39,7 +39,7 @@ class CastViewModel : ViewModel() {
         showCastDialog.value = true
     }
 
-    fun selectDevice(device: UPnPDevice) {
+    fun selectDevice(device: DlnaDevice) {
         CastPlayer.currentDevice = device
     }
 
@@ -47,12 +47,12 @@ class CastViewModel : ViewModel() {
         castMode.value = false
         val device = CastPlayer.currentDevice ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            UPnPController.stopAVTransportAsync(device)
+            DlnaTransportController.stopAVTransportAsync(device)
             CastPlayer.isPlaying.value = false
             
             // 清理投屏状态
             if (CastPlayer.sid.isNotEmpty()) {
-                UPnPController.unsubscribeEvent(device, CastPlayer.sid)
+                DlnaTransportController.unsubscribeEvent(device, CastPlayer.sid)
                 CastPlayer.sid = ""
             }
             CastPlayer.supportsCallback.value = false
@@ -70,7 +70,7 @@ class CastViewModel : ViewModel() {
     fun cast(item: IMedia) = castItem(item)
 
     suspend fun searchAsync(context: Context) {
-        UPnPDiscovery.search(context).flowOn(Dispatchers.IO).buffer().collect { device ->
+        DlnaDeviceScanner.search(context).flowOn(Dispatchers.IO).buffer().collect { device ->
             try {
                 val client = HttpClient(CIO)
                 val response = withIO { client.get(device.location) }
@@ -89,7 +89,7 @@ class CastViewModel : ViewModel() {
         }
     }
 
-    private fun addDevice(device: UPnPDevice) {
+    private fun addDevice(device: DlnaDevice) {
         if (!_itemsFlow.value.any { it.hostAddress == device.hostAddress }) {
             _itemsFlow.value.add(device)
         }
@@ -98,7 +98,7 @@ class CastViewModel : ViewModel() {
     fun playCast() {
         val device = CastPlayer.currentDevice ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            UPnPController.playAVTransportAsync(device)
+            DlnaTransportController.playAVTransportAsync(device)
             CastPlayer.isPlaying.value = true
         }
     }
@@ -106,7 +106,7 @@ class CastViewModel : ViewModel() {
     fun pauseCast() {
         val device = CastPlayer.currentDevice ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            UPnPController.pauseAVTransportAsync(device)
+            DlnaTransportController.pauseAVTransportAsync(device)
             CastPlayer.isPlaying.value = false
         }
     }

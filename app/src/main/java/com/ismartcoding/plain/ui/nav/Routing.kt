@@ -134,4 +134,7 @@ class Routing {
 
     @Serializable
     object ComponentShowcase
+
+    @Serializable
+    object DlnaReceiver
 }

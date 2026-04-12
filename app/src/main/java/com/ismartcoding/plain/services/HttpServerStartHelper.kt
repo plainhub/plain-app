@@ -11,7 +11,7 @@ import com.ismartcoding.plain.events.HttpServerStateChangedEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.web.HttpServerManager
-import com.ismartcoding.plain.web.NsdHelper
+import com.ismartcoding.plain.mdns.NsdHelper
 import kotlinx.coroutines.delay
 
 /**

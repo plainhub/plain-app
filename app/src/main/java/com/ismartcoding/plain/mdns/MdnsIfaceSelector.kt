@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.web
+package com.ismartcoding.plain.mdns
 
 import com.ismartcoding.lib.helpers.NetworkHelper
 import java.net.Inet4Address

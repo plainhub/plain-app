@@ -28,6 +28,7 @@ import com.ismartcoding.plain.ui.components.FileRenameDialog
 import com.ismartcoding.plain.ui.components.TagSelector
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioViewModel
+import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 
 
@@ -39,6 +40,7 @@ fun ViewAudioBottomSheet(
     tagsMapState: Map<String, List<DTagRelation>>,
     tagsState: List<DTag>,
     dragSelectState: DragSelectState,
+    castVM: CastViewModel? = null,
 ) {
     val m = audioVM.selectedItem.value ?: return
     val context = LocalContext.current
@@ -72,6 +74,7 @@ fun ViewAudioBottomSheet(
                     dragSelectState = dragSelectState,
                     context = context,
                     onDismiss = onDismiss,
+                    castVM = castVM,
                 )
             }
             if (!audioVM.trash.value) {

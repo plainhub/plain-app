@@ -1,14 +1,14 @@
 package com.ismartcoding.plain.features.media
 
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.lib.upnp.UPnPDevice
+import com.ismartcoding.plain.features.dlna.common.DlnaDevice
 import com.ismartcoding.plain.data.IMedia
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 object CastPlayer {
-    var currentDevice: UPnPDevice? = null
+    var currentDevice: DlnaDevice? = null
 
     private val _items = MutableStateFlow<List<IMedia>>(emptyList())
     val items: StateFlow<List<IMedia>> = _items.asStateFlow()

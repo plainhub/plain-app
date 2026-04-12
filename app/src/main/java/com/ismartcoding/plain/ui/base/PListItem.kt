@@ -39,6 +39,7 @@ fun PListItem(
     subtitle: String? = null,
     value: String? = null,
     icon: Int? = null,
+    start: (@Composable () -> Unit)? = null,
     separatedActions: Boolean = false,
     showMore: Boolean = false,
     action: (@Composable () -> Unit)? = null,
@@ -56,7 +57,9 @@ fun PListItem(
                     .padding(16.dp, 8.dp, 8.dp, 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (icon != null) {
+            if (start != null) {
+                Box(Modifier.padding(end = 16.dp)) { start() }
+            } else if (icon != null) {
                 Image(
                     modifier =
                         Modifier

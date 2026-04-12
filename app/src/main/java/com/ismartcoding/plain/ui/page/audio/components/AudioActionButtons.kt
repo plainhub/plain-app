@@ -7,6 +7,7 @@ import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.features.media.AudioMediaStoreHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
+import com.ismartcoding.plain.ui.base.IconTextCastButton
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
 import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
 import com.ismartcoding.plain.ui.base.IconTextRenameButton
@@ -17,6 +18,7 @@ import com.ismartcoding.plain.ui.base.IconTextTrashButton
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.AudioViewModel
+import com.ismartcoding.plain.ui.models.CastViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 
 @Composable
@@ -27,6 +29,7 @@ internal fun AudioActionButtons(
     dragSelectState: DragSelectState,
     context: android.content.Context,
     onDismiss: () -> Unit,
+    castVM: CastViewModel? = null,
 ) {
     ActionButtons {
         if (!audioVM.showSearchBar.value) {
@@ -39,6 +42,12 @@ internal fun AudioActionButtons(
         IconTextShareButton {
             ShareHelper.shareUris(context, listOf(AudioMediaStoreHelper.getItemUri(m.id)))
             onDismiss()
+        }
+        if (castVM != null && !m.path.isUrl()) {
+            IconTextCastButton {
+                castVM.showCastDialog.value = true
+                onDismiss()
+            }
         }
         if (!m.path.isUrl()) {
             IconTextOpenWithButton {

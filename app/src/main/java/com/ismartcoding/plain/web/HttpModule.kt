@@ -22,7 +22,7 @@ import com.ismartcoding.lib.helpers.JsonHelper
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.ZipHelper
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.lib.upnp.UPnPController
+import com.ismartcoding.plain.features.dlna.sender.DlnaTransportController
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
@@ -608,7 +608,7 @@ object HttpModule {
                                     val current = castItems[index]
                                     if (current.path != currentUri) {
                                         LogCat.d(current.path)
-                                        UPnPController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(current.path))
+                                        DlnaTransportController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(current.path))
                                         CastPlayer.setCurrentUri(current.path)
                                         CastPlayer.isPlaying.value = true
                                     }

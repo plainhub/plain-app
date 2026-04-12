@@ -58,3 +58,8 @@ fun IconTextToTopButton(click: () -> Unit) {
 fun IconTextToBottomButton(click: () -> Unit) {
     PIconTextActionButton(R.drawable.arrow_down_to_line, text = stringResource(R.string.jump_to_bottom), click = click)
 }
+
+@Composable
+fun IconTextCastButton(click: () -> Unit) {
+    PIconTextActionButton(R.drawable.cast, text = stringResource(R.string.cast), click = click)
+}

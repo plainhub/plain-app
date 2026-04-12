@@ -77,6 +77,7 @@ fun MediaVideo(
     val focusManager = remember(audioManager) { VideoAudioFocusManager(audioManager) }
     val defaultPlayerView = remember { PlayerView(context) }
     var mediaSession = remember<MediaSession?> { null }
+    var firstFrameRendered by remember { mutableStateOf(false) }
     val player = rememberVideoPlayer(context, playerInstance = {
         addListener(object : Player.Listener {
             override fun onEvents(player: Player, events: Player.Events) {
@@ -86,6 +87,9 @@ fun MediaVideo(
                     if (events.contains(Player.EVENT_POSITION_DISCONTINUITY)) {
                         videoState.isSeeking = false
                     }
+                    if (events.contains(Player.EVENT_RENDERED_FIRST_FRAME)) {
+                        firstFrameRendered = true
+                    }
                     videoState.updateTime()
                     defaultPlayerView.keepScreenOn = player.isPlaying
                 }
@@ -93,7 +97,12 @@ fun MediaVideo(
         })
     })
 
-    scope.launch { viewerAlpha.animateTo(1F, DEFAULT_CROSS_FADE_ANIMATE_SPEC); onMounted() }
+    LaunchedEffect(firstFrameRendered) {
+        if (firstFrameRendered) {
+            viewerAlpha.snapTo(1F)
+            onMounted()
+        }
+    }
 
     LaunchedEffect(player, pagerState.settledPage, videoState.isPreviewerOpen) {
         if (!videoState.isPreviewerOpen || pagerState.settledPage != page) {

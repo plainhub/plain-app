@@ -1,5 +1,6 @@
-package com.ismartcoding.lib.helpers
+package com.ismartcoding.lib.tests
 
+import com.ismartcoding.lib.helpers.SearchHelper
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

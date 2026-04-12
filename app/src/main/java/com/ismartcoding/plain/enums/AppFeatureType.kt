@@ -26,7 +26,8 @@ enum class AppFeatureType {
     NOTIFICATIONS,
     CHECK_UPDATES,
     MIRROR_AUDIO,
-    MEDIA_TRASH;
+    MEDIA_TRASH,
+    DLNA_RECEIVER;
 
     fun has(): Boolean {
         return when (this) {

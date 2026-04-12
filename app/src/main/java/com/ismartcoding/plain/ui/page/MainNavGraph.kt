@@ -61,6 +61,7 @@ import com.ismartcoding.plain.ui.page.web.SessionsPage
 import com.ismartcoding.plain.ui.page.web.WebDevPage
 import com.ismartcoding.plain.ui.page.web.WebLearnMorePage
 import com.ismartcoding.plain.ui.page.web.WebSecurityPage
+import com.ismartcoding.plain.ui.page.dlna.DlnaReceiverPage
 import com.ismartcoding.plain.ui.page.web.WebSettingsPage
 
 @Composable
@@ -193,5 +194,6 @@ fun MainNavGraph(
             NearbyPage(navController, pairDeviceJson = r.pairDeviceJson)
         }
         composable<Routing.ComponentShowcase> { ComponentShowcasePage(navController) }
+        composable<Routing.DlnaReceiver> { DlnaReceiverPage(navController) }
     }
 }

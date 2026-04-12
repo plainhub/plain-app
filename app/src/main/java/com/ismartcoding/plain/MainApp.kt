@@ -38,6 +38,7 @@ import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.preferences.getPreferencesAsync
 import com.ismartcoding.plain.ai.ImageSearchManager
+import com.ismartcoding.plain.features.dlna.receiver.DlnaRenderer
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
 import com.ismartcoding.plain.ui.base.coil.newImageLoader
 import com.ismartcoding.plain.chat.ChatCacheManager

@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.web
+package com.ismartcoding.plain.mdns
 
 import java.io.ByteArrayOutputStream
 import java.net.Inet4Address

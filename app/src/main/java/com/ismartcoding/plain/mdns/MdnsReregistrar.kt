@@ -1,10 +1,14 @@
-package com.ismartcoding.plain.web
+package com.ismartcoding.plain.mdns
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.net.LinkProperties
+import android.net.Network
+import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.logcat.LogCat
+import com.ismartcoding.plain.mdns.NsdHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
@@ -35,24 +39,24 @@ class MdnsReregistrar(
         }
 
         networkCallback = object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: android.net.Network) {
+            override fun onAvailable(network: Network) {
                 schedule("onAvailable")
             }
 
-            override fun onLost(network: android.net.Network) {
+            override fun onLost(network: Network) {
                 schedule("onLost")
             }
 
             override fun onCapabilitiesChanged(
-                network: android.net.Network,
-                networkCapabilities: android.net.NetworkCapabilities,
+                network: Network,
+                networkCapabilities: NetworkCapabilities,
             ) {
                 schedule("onCapabilitiesChanged")
             }
 
             override fun onLinkPropertiesChanged(
-                network: android.net.Network,
-                linkProperties: android.net.LinkProperties,
+                network: Network,
+                linkProperties: LinkProperties,
             ) {
                 schedule("onLinkPropertiesChanged")
             }

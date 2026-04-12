@@ -1,11 +1,11 @@
-package com.ismartcoding.lib.upnp
+package com.ismartcoding.plain.features.dlna.common
 
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.XmlHelper
 import kotlinx.serialization.Serializable
 import java.net.URL
 
-class UPnPDevice(
+class DlnaDevice(
     val hostAddress: String,
     val header: String,
 ) {
@@ -17,37 +17,29 @@ class UPnPDevice(
     private var descriptionXML: String = ""
     var description: DescriptionModel? = null
 
-    fun isAVTransport(): Boolean {
-        return description?.device?.serviceList?.any { it.serviceType == "urn:schemas-upnp-org:service:AVTransport:1" } == true
-    }
+    fun isAVTransport(): Boolean =
+        description?.device?.serviceList?.any { it.serviceType == DlnaSoap.AVT_SERVICE_TYPE } == true
 
     fun update(xml: String) {
         descriptionXML = xml
         description = XmlHelper.decodeXml(xml)
     }
 
-    fun getAVTransportService(): DeviceService? {
-        return description?.device?.serviceList?.find { it.serviceId == "urn:upnp-org:serviceId:AVTransport" }
-    }
+    fun getAVTransportService(): DeviceService? =
+        description?.device?.serviceList?.find { it.serviceId == "urn:upnp-org:serviceId:AVTransport" }
 
     fun getBaseUrl(): String {
         val url = URL(location)
-        return url.protocol.toString() + "://" + url.host + ":" + url.port
+        return "${url.protocol}://${url.host}:${url.port}"
     }
 
     override fun toString(): String {
         var str = ""
-        description?.device?.let { d ->
-            str = jsonEncode(d)
-        }
-
+        description?.device?.let { d -> str = jsonEncode(d) }
         return str
     }
 
-    private fun parseHeader(
-        mSearchAnswer: String,
-        whatSearch: String,
-    ): String {
+    private fun parseHeader(mSearchAnswer: String, whatSearch: String): String {
         var result = ""
         var searchLinePos = mSearchAnswer.indexOf(whatSearch)
         if (searchLinePos != -1) {
@@ -73,10 +65,7 @@ class UPnPDevice(
         val serviceList: List<DeviceService> = listOf()
     }
 
-    data class DescriptionModel(
-        val device: Device,
-        val URLBase: String,
-    )
+    data class DescriptionModel(val device: Device, val URLBase: String)
 
     @Serializable
     data class DeviceService(

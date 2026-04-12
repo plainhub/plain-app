@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.web
+package com.ismartcoding.plain.mdns
 
 import android.content.BroadcastReceiver
 import android.content.Context

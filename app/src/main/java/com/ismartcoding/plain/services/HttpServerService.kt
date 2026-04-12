@@ -8,7 +8,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleService
-import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
@@ -18,8 +17,8 @@ import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.web.HttpServerManager
-import com.ismartcoding.plain.web.MdnsReregistrar
-import com.ismartcoding.plain.web.NsdHelper
+import com.ismartcoding.plain.mdns.MdnsReregistrar
+import com.ismartcoding.plain.mdns.NsdHelper
 import com.ismartcoding.plain.TempData
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode

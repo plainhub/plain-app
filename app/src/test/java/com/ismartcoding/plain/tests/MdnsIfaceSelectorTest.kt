@@ -1,5 +1,8 @@
-package com.ismartcoding.plain.web
+package com.ismartcoding.plain.tests
 
+import com.ismartcoding.plain.mdns.findResponseIface
+import com.ismartcoding.plain.mdns.ipToInt
+import com.ismartcoding.plain.mdns.isMobileDataInterface
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

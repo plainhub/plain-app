@@ -120,7 +120,7 @@ fun AudioPage(
         tagsMapState.mapValues { entry -> entry.value.mapNotNull { relation -> tagsState.find { it.id == relation.tagId } } }
     }
 
-    ViewAudioBottomSheet(audioVM = audioVM, tagsVM = tagsVM, tagsMapState = tagsMapState, tagsState = tagsState, dragSelectState = dragSelectState)
+    ViewAudioBottomSheet(audioVM = audioVM, tagsVM = tagsVM, tagsMapState = tagsMapState, tagsState = tagsState, dragSelectState = dragSelectState, castVM = castVM)
     MediaFoldersBottomSheet(audioVM, mediaFoldersVM, tagsVM)
     if (audioVM.showTagsDialog.value) { TagsBottomSheet(tagsVM) { audioVM.showTagsDialog.value = false } }
     CastDialog(castVM)

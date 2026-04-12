@@ -55,6 +55,9 @@ data class FeatureItem(
                     FeatureItem(AppFeatureType.POMODORO_TIMER, R.string.pomodoro_timer, R.drawable.timer) {
                         navController.navigate(Routing.PomodoroTimer)
                     },
+                    FeatureItem(AppFeatureType.DLNA_RECEIVER, R.string.dlna_receiver, R.drawable.cast) {
+                        navController.navigate(Routing.DlnaReceiver)
+                    },
                 )
             )
 

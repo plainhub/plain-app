@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.ui.models
 
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.lib.upnp.UPnPController
+import com.ismartcoding.plain.features.dlna.sender.DlnaTransportController
 import com.ismartcoding.plain.data.IMedia
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.helpers.UrlHelper
@@ -16,10 +16,11 @@ internal fun CastViewModel.castPath(path: String) {
         isLoading.value = true
         CastPlayer.setCurrentUri(path)
         try {
-            UPnPController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(path))
+            DlnaTransportController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(path))
+            DlnaTransportController.playAVTransportAsync(device)
             CastPlayer.isPlaying.value = true
             if (CastPlayer.sid.isNotEmpty()) {
-                UPnPController.unsubscribeEvent(device, CastPlayer.sid)
+                DlnaTransportController.unsubscribeEvent(device, CastPlayer.sid)
                 CastPlayer.sid = ""
             }
             trySubscribeEvent()
@@ -42,10 +43,11 @@ internal fun CastViewModel.castItem(item: IMedia) {
             CastPlayer.addItem(item)
         }
         try {
-            UPnPController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(item.path))
+            DlnaTransportController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(item.path))
+            DlnaTransportController.playAVTransportAsync(device)
             CastPlayer.isPlaying.value = true
             if (CastPlayer.sid.isNotEmpty()) {
-                UPnPController.unsubscribeEvent(device, CastPlayer.sid)
+                DlnaTransportController.unsubscribeEvent(device, CastPlayer.sid)
                 CastPlayer.sid = ""
             }
             trySubscribeEvent()
@@ -60,7 +62,7 @@ internal fun CastViewModel.castItem(item: IMedia) {
 internal suspend fun CastViewModel.trySubscribeEvent() {
     val device = CastPlayer.currentDevice ?: return
     try {
-        val sid = UPnPController.subscribeEvent(device, UrlHelper.getCastCallbackUrl())
+        val sid = DlnaTransportController.subscribeEvent(device, UrlHelper.getCastCallbackUrl())
         if (sid.isNotEmpty()) {
             CastPlayer.sid = sid
             CastPlayer.supportsCallback.value = true
@@ -83,7 +85,7 @@ internal fun CastViewModel.startPositionUpdater() {
         while (CastPlayer.currentUri.value.isNotEmpty() && CastPlayer.supportsCallback.value) {
             try {
                 if (CastPlayer.isPlaying.value) {
-                    val positionInfo = UPnPController.getPositionInfoAsync(device)
+                    val positionInfo = DlnaTransportController.getPositionInfoAsync(device)
                     CastPlayer.updatePositionInfo(positionInfo.relTime, positionInfo.trackDuration)
                 }
             } catch (e: Exception) {
