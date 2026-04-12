@@ -45,10 +45,9 @@ internal fun isMobileDataInterface(name: String): Boolean =
     name.startsWith("rmnet") || name.startsWith("ccmni")
 
 /**
- * Returns the local interface whose subnet contains [senderIp], or the first candidate
- * as a fallback. Setting `socket.networkInterface` to the returned interface before
- * each send ensures the reply egresses via the physical path the query arrived on
- * (fixes "reply goes out via mobile-data rmnet instead of wlan/ap0" bug).
+ * Returns the local interface and IP whose subnet contains [senderIp], or the
+ * first candidate as a fallback. The returned IP is embedded in the DNS A record
+ * so the querier knows which address to connect to.
  */
 internal fun findResponseIface(
     senderIp: Inet4Address,

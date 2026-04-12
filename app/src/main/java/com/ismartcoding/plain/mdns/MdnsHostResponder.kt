@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.wifi.WifiManager
 import com.ismartcoding.lib.logcat.LogCat
 import java.net.DatagramPacket
-import java.net.DatagramSocket
 import java.net.Inet4Address
 import java.net.Inet6Address
 import java.net.InetAddress
@@ -13,17 +12,16 @@ import java.net.MulticastSocket
 import java.net.SocketTimeoutException
 
 /**
- * Lightweight mDNS responder — single receive socket, per-packet unicast reply.
+ * Lightweight mDNS responder — single receive socket, direct unicast reply.
  *
- * RECEIVE: One MulticastSocket bound to 0.0.0.0:5353 joins 224.0.0.251 on every
- * valid LAN interface (wlan0 Wi-Fi, ap0/wlan1 hotspot, both when active).
+ * RECEIVE: One MulticastSocket bound to 0.0.0.0:5353 (IPv4 wildcard; see bind
+ * comment for why explicit) joins 224.0.0.251 on every valid LAN interface.
  * A single socket avoids the Linux SO_REUSEPORT limitation.
  *
- * SEND: For each query the candidate interface list is re-fetched fresh (never
- * cached), then a throwaway DatagramSocket bound to localIp:0 sends a unicast
- * reply to the querier's source IP. Binding to a specific local IP forces the
- * kernel to route the packet via the interface that owns localIp — no
- * IP_MULTICAST_IF mutation on the shared receive socket is needed.
+ * SEND: Replies are sent back via the same MulticastSocket so the source port is
+ * always 5353. RFC 6762 §6.7 requires this — resolvers on macOS/Windows/iOS
+ * silently discard mDNS responses whose source port ≠ 5353. candidateInterfaces()
+ * is re-fetched per packet to select the correct local IP for the A record.
  *
  * Restart lifecycle: MdnsReregistrar (ConnectivityManager) + MdnsHotspotWatcher
  * (WIFI_AP_STATE_CHANGED) recreate the socket whenever the active interface set
@@ -75,6 +73,14 @@ object MdnsHostResponder {
                             .onSuccess { joinCount++; LogCat.d("mDNS joined ${iface.name} (${ip.hostAddress})") }
                             .onFailure { LogCat.e("mDNS joinGroup ${iface.name}: ${it.message}") }
                     }
+                    // Safety fallback: some kernels reject IP_ADD_MEMBERSHIP with an interface
+                    // index. joinGroup(InetAddress) lets the OS pick the default interface and
+                    // suffices for single-interface (non-hotspot) devices.
+                    if (joinCount == 0) {
+                        runCatching { joinGroup(multicastGroup) }
+                            .onSuccess { joinCount++; LogCat.d("mDNS joined multicast group (default interface fallback)") }
+                            .onFailure { LogCat.e("mDNS joinGroup default fallback failed: ${it.message}") }
+                    }
                     if (joinCount == 0) {
                         LogCat.e("mDNS: no interface joined multicast group — responder will not receive queries")
                     }
@@ -124,21 +130,18 @@ object MdnsHostResponder {
                     hostname = hostname,
                     ips = listOf(localIp),
                 ) ?: continue
-                sendUnicast(response, localIp, senderIp)
+                // Reply via the receive socket so source port = 5353 (RFC 6762 §6.7).
+                // A throwaway socket bound to :0 uses a random source port which many
+                // mDNS resolvers (macOS, Windows, Android) silently reject.
+                runCatching {
+                    s.send(DatagramPacket(response, response.size, senderIp, MDNS_PORT))
+                }.onFailure { LogCat.e("mDNS send to ${senderIp.hostAddress}: ${it.message}") }
             } catch (_: SocketTimeoutException) {
                 // expected — keeps thread responsive to socket close
             } catch (_: Exception) {
                 if (s.isClosed) break
             }
         }
-    }
-
-    internal fun sendUnicast(response: ByteArray, localIp: Inet4Address, dest: Inet4Address) {
-        runCatching {
-            DatagramSocket(InetSocketAddress(localIp, 0)).use { ds ->
-                ds.send(DatagramPacket(response, response.size, dest, MDNS_PORT))
-            }
-        }.onFailure { LogCat.e("mDNS send to ${dest.hostAddress}: ${it.message}") }
     }
 
     /**

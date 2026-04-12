@@ -95,8 +95,12 @@ internal class HttpServerLockManager(private val context: Context) {
     }
 
     private fun acquireLocksOnly() {
-        if (!wakeLock.isHeld) { wakeLock.acquire(); LogCat.d("WakeLock acquired") }
-        if (!wifiLock.isHeld) { wifiLock.acquire(); LogCat.d("WifiLock acquired") }
+        runCatching {
+            if (!wakeLock.isHeld) { wakeLock.acquire(); LogCat.d("WakeLock acquired") }
+        }.onFailure { LogCat.e("WakeLock acquire failed: ${it.message}") }
+        runCatching {
+            if (!wifiLock.isHeld) { wifiLock.acquire(); LogCat.d("WifiLock acquired") }
+        }.onFailure { LogCat.e("WifiLock acquire failed: ${it.message}") }
     }
 
     private fun acquireLocks() {

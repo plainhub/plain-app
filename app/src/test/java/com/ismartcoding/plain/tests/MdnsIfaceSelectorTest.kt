@@ -14,14 +14,14 @@ import java.net.InetSocketAddress
 import java.net.NetworkInterface
 
 /**
- * Tests for MdnsIfaceSelector utilities and the sendUnicast send path.
+ * Tests for MdnsIfaceSelector utilities (candidateInterfaces helpers, subnet arithmetic).
  * Kept separate from MdnsHostResponderTest to respect the 150-line file limit.
  */
 class MdnsIfaceSelectorTest {
 
-    // ── sendUnicast — loopback delivery ───────────────────────────────────────
+    // ── DatagramSocket loopback delivery (sanity: kernel UDP works) ───────────
 
-    @Test fun `sendUnicast DatagramSocket delivers bytes to loopback`() {
+    @Test fun `DatagramSocket delivers bytes to loopback`() {
         val loopback = ip4("127.0.0.1")
         val payload = byteArrayOf(0xDE.toByte(), 0xAD.toByte(), 0xBE.toByte(), 0xEF.toByte())
 

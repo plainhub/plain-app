@@ -109,8 +109,31 @@ class MdnsHostResponderTest {
         assertTrue("IP bytes should appear in the DNS response payload", found)
     }
 
-    private fun ip4(addr: String) = InetAddress.getByName(addr) as Inet4Address
+    @Test fun `response packet with QR bit set yields null — no reply loop`() {
+        val q = mdnsQuery("plainapp.local", 1).copyOf()
+        q[2] = 0x84.toByte() // set QR=1 (response), AA=1 — simulate an incoming response
+        assertNull(MdnsPacketCodec.buildResponseIfMatch(q, "plainapp.local", listOf(ip4("192.168.1.1"))))
+    }
 
+    // ── extractInet4Address ───────────────────────────────────────────────────
+
+    @Test fun `extractInet4Address — plain IPv4 returned as-is`() {
+        val ip = ip4("192.168.1.5")
+        assertEquals(ip, MdnsHostResponder.extractInet4Address(ip))
+    }
+
+    @Test fun `extractInet4Address — IPv4-mapped IPv6 unwrapped`() {
+        val mapped = InetAddress.getByName("::ffff:192.168.1.5")
+        val result = MdnsHostResponder.extractInet4Address(mapped)
+        assertNotNull("Expected unwrapped Inet4Address", result)
+        assertEquals("192.168.1.5", result!!.hostAddress)
+    }
+
+    @Test fun `extractInet4Address — pure IPv6 returns null`() {
+        assertNull(MdnsHostResponder.extractInet4Address(InetAddress.getByName("2001:db8::1")))
+    }
+
+    private fun ip4(addr: String) = InetAddress.getByName(addr) as Inet4Address
     private fun mdnsQuery(name: String, type: Int): ByteArray {
         val out = ByteArrayOutputStream()
         out.write(byteArrayOf(0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0))
