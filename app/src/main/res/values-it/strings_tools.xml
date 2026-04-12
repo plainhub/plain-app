@@ -4,7 +4,7 @@
     <string name="select_sound">Seleziona suono</string>
     <string name="sound_meter">Misuratore di suono</string>
     <string name="pomodoro_timer">Timer Pomodoro</string>
-    <string name="dlna_receiver">Ricevitore DLNA</string>
+    <string name="dlna_receiver">Streaming wireless</string>
     <string name="dlna_receiver_description">Quando attivato, PlainApp sulla stessa rete Wi-Fi può trasmettere video e musica su questo dispositivo</string>
     <string name="dlna_receiver_active">Attivo, in attesa di trasmissione…</string>
     <string name="dlna_receiver_waiting_title">In attesa di trasmissione</string>

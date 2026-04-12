@@ -12,6 +12,8 @@
     <string name="add_videos_to_playlist">Пожалуйста, сначала добавьте видео в плейлист.</string>
     <string name="video_playlist_no_data">Плейлист используется для автоматического воспроизведения нескольких видео подряд.</string>
     <string name="cast">Транслировать</string>
+    <string name="cast_dialog_hint">Нажмите на устройство, чтобы войти в режим трансляции. Медиа будет воспроизведено на этом устройстве.</string>
+    <string name="cast_dialog_wireless_cast_tip">Откройте Беспроводную трансляцию на другом телефоне, чтобы оно появилось здесь.</string>
     <string name="images">Изображения</string>
     <string name="video">Видео</string>
     <string name="audios">Аудио</string>

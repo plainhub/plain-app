@@ -12,6 +12,8 @@
     <string name="add_videos_to_playlist">Please add videos to the playlist first.</string>
     <string name="video_playlist_no_data">The playlist is used to automatically cast multiple videos in sequence.</string>
     <string name="cast">Cast</string>
+    <string name="cast_dialog_hint">Tap a device to enter Cast Mode. Your media will play on that device.</string>
+    <string name="cast_dialog_wireless_cast_tip">On another phone, open Wireless Cast to make it appear here.</string>
     <string name="image">Image</string>
     <string name="images">Images</string>
     <string name="video">Video</string>

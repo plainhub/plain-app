@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="sound_meter">Schallpegelmesser</string>
     <string name="pomodoro_timer">Pomodoro-Timer</string>
-    <string name="dlna_receiver">DLNA-Empfänger</string>
+    <string name="dlna_receiver">Kabelloses Streaming</string>
     <string name="dlna_receiver_description">Wenn aktiviert, kann PlainApp im selben WLAN-Netzwerk Video und Musik auf dieses Gerät übertragen</string>
     <string name="dlna_receiver_active">Aktiv, warte auf Übertragung…</string>
     <string name="dlna_receiver_waiting_title">Warte auf Übertragung</string>

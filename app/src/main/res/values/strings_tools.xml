@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="sound_meter">Sound meter</string>
     <string name="pomodoro_timer">Pomodoro timer</string>
-    <string name="dlna_receiver">DLNA Receiver</string>
+    <string name="dlna_receiver">Wireless Cast</string>
     <string name="dlna_receiver_description">When enabled, PlainApp on the same Wi-Fi network can cast video and music to this device</string>
     <string name="dlna_receiver_active">Active, waiting for cast…</string>
     <string name="dlna_receiver_waiting_title">Waiting for Cast</string>

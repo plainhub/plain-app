@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="sound_meter">分贝仪</string>
     <string name="pomodoro_timer">番茄时钟</string>
-    <string name="dlna_receiver">DLNA 投屏接收器</string>
+    <string name="dlna_receiver">无线投屏</string>
     <string name="dlna_receiver_description">开启后，同一 Wi-Fi 网络上的 PlainApp 可以将视频、音乐投屏到本设备</string>
     <string name="dlna_receiver_active">已开启，等待投屏中…</string>
     <string name="dlna_receiver_waiting_title">等待投屏</string>

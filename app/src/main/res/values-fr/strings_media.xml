@@ -12,6 +12,8 @@
     <string name="add_videos_to_playlist">Veuillez d\'abord ajouter des vidéos à la liste de lecture.</string>
     <string name="video_playlist_no_data">La liste de lecture est utilisée pour diffuser automatiquement plusieurs vidéos en séquence.</string>
     <string name="cast">Diffuser</string>
+    <string name="cast_dialog_hint">Appuyez sur un appareil pour entrer en mode de diffusion. Les médias seront lus sur cet appareil.</string>
+    <string name="cast_dialog_wireless_cast_tip">Sur un autre téléphone, ouvre Diffusion sans fil pour le faire apparaître ici.</string>
     <string name="images">Images</string>
     <string name="video">Vidéo</string>
     <string name="audios">Audio</string>

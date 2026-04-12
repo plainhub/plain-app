@@ -12,6 +12,8 @@
     <string name="add_videos_to_playlist">最初にビデオをプレイリストに追加してください。</string>
     <string name="video_playlist_no_data">プレイリストは、複数のビデオを自動的に連続してキャストするために使用されます。</string>
     <string name="cast">キャスト</string>
+    <string name="cast_dialog_hint">キャストモードに入るにはデバイスをタップしてください。メディアはそのデバイスで再生されます。</string>
+    <string name="cast_dialog_wireless_cast_tip">別のスマホで「ワイヤレスキャスト」を開くと、ここに表示されます。</string>
     <string name="images">画像</string>
     <string name="video">ビデオ</string>
     <string name="audios">オーディオ</string>

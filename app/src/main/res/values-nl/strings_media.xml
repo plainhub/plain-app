@@ -12,6 +12,8 @@
     <string name="add_videos_to_playlist">Voeg eerst video\'s toe aan de afspeellijst.</string>
     <string name="video_playlist_no_data">De afspeellijst wordt gebruikt om automatisch meerdere video\'s na elkaar af te spelen.</string>
     <string name="cast">Casten</string>
+    <string name="cast_dialog_hint">Tik op een apparaat om de Cast-modus te starten. Media wordt op dat apparaat afgespeeld.</string>
+    <string name="cast_dialog_wireless_cast_tip">Open Draadloos streamen op een ander telefoon om het hier te laten verschijnen.</string>
     <string name="images">Afbeeldingen</string>
     <string name="video">Video</string>
     <string name="audios">Audio</string>

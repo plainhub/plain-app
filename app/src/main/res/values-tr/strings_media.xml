@@ -12,6 +12,8 @@
     <string name="add_videos_to_playlist">Lütfen önce çalma listesine video ekleyin.</string>
     <string name="video_playlist_no_data">Çalma listesi, birden çok videoyu sırayla otomatik olarak yayınlamak için kullanılır.</string>
     <string name="cast">Yayınla</string>
+    <string name="cast_dialog_hint">Yayın Moduna girmek için bir cihaza dokunun. Medya o cihazda oynatılacaktır.</string>
+    <string name="cast_dialog_wireless_cast_tip">Burada görünmesi için başka bir telefonda Kablosuz Yayın’ı açın.</string>
     <string name="images">Resimler</string>
     <string name="video">Video</string>
     <string name="audios">Ses Dosyaları</string>

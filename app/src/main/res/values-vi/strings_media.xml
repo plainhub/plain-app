@@ -12,6 +12,8 @@
     <string name="add_videos_to_playlist">Vui lòng thêm video vào danh sách phát trước.</string>
     <string name="video_playlist_no_data">Danh sách phát được sử dụng để tự động phát nhiều video liên tiếp.</string>
     <string name="cast">Phát</string>
+    <string name="cast_dialog_hint">Nhấn vào thiết bị để vào Chế độ Cast. Phương tiện sẽ phát trên thiết bị đó.</string>
+    <string name="cast_dialog_wireless_cast_tip">Trên điện thoại khác, mở Phát không dây để nó xuất hiện ở đây.</string>
     <string name="images">Hình ảnh</string>
     <string name="video">Video</string>
     <string name="audios">Âm thanh</string>

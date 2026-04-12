@@ -4,7 +4,7 @@
     <string name="select_sound">ध्वनि चुनें</string>
     <string name="sound_meter">ध्वनि मीटर</string>
     <string name="pomodoro_timer">पोमोडोरो टाइमर</string>
-    <string name="dlna_receiver">DLNA रिसीवर</string>
+    <string name="dlna_receiver">वायरलेस कास्ट</string>
     <string name="dlna_receiver_description">जब सक्षम होता है, तो उसी Wi-Fi नेटवर्क पर PlainApp इस डिवाइस पर वीडियो और संगीत स्ट्रीम कर सकता है</string>
     <string name="dlna_receiver_active">सक्रिय, स्ट्रीमिंग की प्रतीक्षा…</string>
     <string name="dlna_receiver_waiting_title">स्ट्रीमिंग की प्रतीक्षा</string>

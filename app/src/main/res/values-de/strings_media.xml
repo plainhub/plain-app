@@ -12,6 +12,8 @@
     <string name="add_videos_to_playlist">Bitte füge zuerst Videos zur Wiedergabeliste hinzu.</string>
     <string name="video_playlist_no_data">Die Wiedergabeliste wird verwendet, um automatisch mehrere Videos nacheinander abzuspielen.</string>
     <string name="cast">Übertragen</string>
+    <string name="cast_dialog_hint">Tippe auf ein Gerät, um den Cast-Modus zu starten. Medien werden auf diesem Gerät abgespielt.</string>
+    <string name="cast_dialog_wireless_cast_tip">Auf einem anderen Telefon Wireless Cast öffnen, damit es hier erscheint.</string>
     <string name="images">Bilder</string>
     <string name="video">Video</string>
     <string name="audios">Audio</string>

@@ -12,6 +12,8 @@
     <string name="add_videos_to_playlist">請先添加影片到播放列表。</string>
     <string name="video_playlist_no_data">播放列表用於按順序自動投屏多個影片。</string>
     <string name="cast">投屏</string>
+    <string name="cast_dialog_hint">點選裝置即可進入投影模式，所選媒體將在對方裝置上播放。</string>
+    <string name="cast_dialog_wireless_cast_tip">在另一支手機上開啟「無線投影」，讓它出現在清單中。</string>
     <string name="images">圖片</string>
     <string name="video">影片</string>
     <string name="audios">音訊</string>

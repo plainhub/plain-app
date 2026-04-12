@@ -4,7 +4,7 @@
     <string name="select_sound">Geluid selecteren</string>
     <string name="sound_meter">Geluidsmeter</string>
     <string name="pomodoro_timer">Pomodoro Timer</string>
-    <string name="dlna_receiver">DLNA-ontvanger</string>
+    <string name="dlna_receiver">Draadloos streamen</string>
     <string name="dlna_receiver_description">Wanneer ingeschakeld, kan PlainApp op hetzelfde Wi-Fi-netwerk video en muziek naar dit apparaat streamen</string>
     <string name="dlna_receiver_active">Actief, wachten op stream…</string>
     <string name="dlna_receiver_waiting_title">Wachten op stream</string>

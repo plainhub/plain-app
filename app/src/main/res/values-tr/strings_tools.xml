@@ -4,7 +4,7 @@
     <string name="select_sound">Ses seç</string>
     <string name="sound_meter">Ses ölçer</string>
     <string name="pomodoro_timer">Pomodoro Zamanlayıcısı</string>
-    <string name="dlna_receiver">DLNA Alıcı</string>
+    <string name="dlna_receiver">Kablosuz Yayın</string>
     <string name="dlna_receiver_description">Etkinleştirildiğinde, aynı Wi-Fi ağındaki PlainApp bu cihaza video ve müzik yayınlayabilir</string>
     <string name="dlna_receiver_active">Aktif, yayın bekleniyor…</string>
     <string name="dlna_receiver_waiting_title">Yayın Bekleniyor</string>

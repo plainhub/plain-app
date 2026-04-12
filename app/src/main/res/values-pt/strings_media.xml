@@ -12,6 +12,8 @@
     <string name="add_videos_to_playlist">Por favor, adicione vídeos à playlist primeiro.</string>
     <string name="video_playlist_no_data">A playlist é usada para transmitir automaticamente vários vídeos em sequência.</string>
     <string name="cast">Transmitir</string>
+    <string name="cast_dialog_hint">Toque em um dispositivo para entrar no modo de transmissão. A mídia será reproduzida nesse dispositivo.</string>
+    <string name="cast_dialog_wireless_cast_tip">Em outro telefone, abra Transmissão sem fio para aparecer aqui.</string>
     <string name="images">Imagens</string>
     <string name="video">Vídeo</string>
     <string name="audios">Áudio</string>

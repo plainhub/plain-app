@@ -4,7 +4,7 @@
     <string name="select_sound">Chọn âm thanh</string>
     <string name="sound_meter">Dụng cụ đo âm thanh</string>
     <string name="pomodoro_timer">Bộ hẹn giờ Pomodoro</string>
-    <string name="dlna_receiver">Bộ nhận DLNA</string>
+    <string name="dlna_receiver">Phát không dây</string>
     <string name="dlna_receiver_description">Khi được bật, PlainApp trên cùng mạng Wi-Fi có thể phát video và nhạc đến thiết bị này</string>
     <string name="dlna_receiver_active">Đang hoạt động, chờ chiếu…</string>
     <string name="dlna_receiver_waiting_title">Chờ chiếu</string>

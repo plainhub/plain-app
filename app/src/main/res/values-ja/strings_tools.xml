@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="sound_meter">音量メーター</string>
     <string name="pomodoro_timer">ポモドーロタイマー</string>
-    <string name="dlna_receiver">DLNAレシーバー</string>
+    <string name="dlna_receiver">ワイヤレスキャスト</string>
     <string name="dlna_receiver_description">有効にすると、同じWi-FiネットワークのPlainAppがこのデバイスにビデオや音楽をキャストできます</string>
     <string name="dlna_receiver_active">有効、キャスト待機中…</string>
     <string name="dlna_receiver_waiting_title">キャスト待機中</string>

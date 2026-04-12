@@ -4,7 +4,7 @@
     <string name="select_sound">選擇音效</string>
     <string name="sound_meter">分貝儀</string>
     <string name="pomodoro_timer">番茄計時器</string>
-    <string name="dlna_receiver">DLNA 投影接收器</string>
+    <string name="dlna_receiver">無線投影</string>
     <string name="dlna_receiver_description">啟用後，同一 Wi-Fi 網路上的 PlainApp 可以將影片、音樂投影到本裝置</string>
     <string name="dlna_receiver_active">已啟用，等待投影中…</string>
     <string name="dlna_receiver_waiting_title">等待投影</string>

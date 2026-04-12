@@ -12,6 +12,8 @@
     <string name="add_videos_to_playlist">Aggiungi prima dei video alla playlist.</string>
     <string name="video_playlist_no_data">La playlist viene utilizzata per riprodurre automaticamente più video in sequenza.</string>
     <string name="cast">Trasmetti</string>
+    <string name="cast_dialog_hint">Tocca un dispositivo per entrare in modalità Cast. I media verranno riprodotti su quel dispositivo.</string>
+    <string name="cast_dialog_wireless_cast_tip">Su un altro telefono, apri Streaming wireless per farlo apparire qui.</string>
     <string name="images">Immagini</string>
     <string name="video">Video</string>
     <string name="audios">Audio</string>

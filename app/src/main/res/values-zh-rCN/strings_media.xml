@@ -12,6 +12,8 @@
     <string name="add_videos_to_playlist">请先添加视频到播放列表。</string>
     <string name="video_playlist_no_data">播放列表用于按顺序自动投屏多个视频。</string>
     <string name="cast">投屏</string>
+    <string name="cast_dialog_hint">点击设备即可进入投屏模式，所选媒体将在对方设备上播放。</string>
+    <string name="cast_dialog_wireless_cast_tip">在另一台手机上打开“无线投屏”，让它出现在列表中。</string>
     <string name="image">图片</string>
     <string name="images">图片</string>
     <string name="video">视频</string>

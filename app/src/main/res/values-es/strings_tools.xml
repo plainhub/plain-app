@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="sound_meter">Medidor de sonido</string>
     <string name="pomodoro_timer">Temporizador Pomodoro</string>
-    <string name="dlna_receiver">Receptor DLNA</string>
+    <string name="dlna_receiver">Emisión inalámbrica</string>
     <string name="dlna_receiver_description">Cuando está activado, PlainApp en la misma red Wi-Fi puede transmitir vídeo y música a este dispositivo</string>
     <string name="dlna_receiver_active">Activo, esperando transmisión…</string>
     <string name="dlna_receiver_waiting_title">Esperando transmisión</string>

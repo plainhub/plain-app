@@ -4,7 +4,7 @@
     <string name="select_sound">ஒலியைத் தேர்ந்தெடுக்கவும்</string>
     <string name="sound_meter">ஒலிக்குக் கோளி</string>
     <string name="pomodoro_timer">பொமடோரோ நேரமிடி</string>
-    <string name="dlna_receiver">DLNA பெறுநர்</string>
+    <string name="dlna_receiver">வயர்லெஸ் கேஸ்ட்</string>
     <string name="dlna_receiver_description">இயக்கப்படும்போது, அதே Wi-Fi நெட்வொர்க்கில் உள்ள PlainApp இந்த சாதனத்தில் வீடியோ மற்றும் இசையை ஸ்ட்ரீம் செய்யலாம்</string>
     <string name="dlna_receiver_active">செயலில், ஸ்ட்ரீமிங் காத்திருக்கிறது…</string>
     <string name="dlna_receiver_waiting_title">ஸ்ட்ரீமிங் காத்திருக்கிறது</string>

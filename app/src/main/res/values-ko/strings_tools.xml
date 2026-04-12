@@ -4,7 +4,7 @@
     <string name="select_sound">사운드 선택</string>
     <string name="sound_meter">음향 미터</string>
     <string name="pomodoro_timer">포모도로 타이머</string>
-    <string name="dlna_receiver">DLNA 수신기</string>
+    <string name="dlna_receiver">무선 캐스트</string>
     <string name="dlna_receiver_description">활성화하면 같은 Wi-Fi 네트워크의 PlainApp이 이 기기로 동영상과 음악을 전송할 수 있습니다</string>
     <string name="dlna_receiver_active">활성, 전송 대기 중…</string>
     <string name="dlna_receiver_waiting_title">전송 대기 중</string>
