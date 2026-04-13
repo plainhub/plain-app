@@ -10,8 +10,6 @@
     <string name="two_factor_auth_tips">Beim Einloggen auf der Webseite wird in der App ein Bestätigungsfenster für zusätzliche Sicherheit angezeigt.</string>
     <string name="instruction_for_use">Gebrauchsanweisung</string>
     <string name="web_how_to">Schritt 1: Verbinden Sie Ihr Telefon und Ihren Computer mit demselben drahtlosen Netzwerk.\n\nMethode 1: Verbinden Sie Ihren Computer und Ihr Telefon mit demselben WLAN-Netzwerk.\nMethode 2: Schalten Sie den Hotspot Ihres Telefons ein und verbinden Sie Ihren Computer mit dem Hotspot Ihres Telefons.\n\nSchritt 2: Öffnen Sie einen Webbrowser auf Ihrem Computer und geben Sie die auf der APP-Startseite angezeigte Webadresse ein.</string>
-    <string name="web_dig">1. Der Computerbrowser kann die Webseite nicht öffnen.\n\nDer drahtlose Router kann die AP-Isolation aktiviert haben, was die Kommunikation zwischen dem Computer und dem Telefon verhindert. Gehen Sie bitte zur Router-Einstellungsschnittstelle, um die AP-Isolationsfunktion zu deaktivieren.\n\n2. Der Computerbrowser zeigt eine Warnung an, nachdem Sie eine HTTPS-Webseitenadresse eingegeben haben: "Ihre Verbindung ist nicht privat."\n\nSie können auf "Fortfahren zu x.x.x.x (unsicher)" klicken, um fortzufahren. Einfach verwendet ein selbstsigniertes TLS-Zertifikat, um die Website zu verschlüsseln.</string>
-    <string name="learn_more">Weitere Informationen</string>
     <string name="http_server_state_on">Dienst läuft</string>
     <string name="http_server_state_starting">Dienst wird gestartet...</string>
     <string name="http_server_state_stopping">Dienst wird gestoppt...</string>
@@ -31,7 +29,7 @@
     <string name="rotate_url_token_on_restart">URL-Token bei Neustart erneuern</string>
     <string name="rotate_url_token_on_restart_tips">Wenn aktiviert, wird bei jedem App-Start ein neues URL-Token generiert. Dadurch werden alle zuvor erstellten Datei-URLs ungültig. Empfohlen für fortgeschrittene Benutzer, die mehr Sicherheit wünschen.</string>
     <string name="http_server_ok">HTTP-Server läuft</string>
-    <string name="http_server_error">Der HTTP-Server ist nicht gestartet. Starten Sie die PlainApp erneut und versuchen Sie es erneut. Stellen Sie sicher, dass keine anderen Apps die HTTP- oder HTTPS-Ports belegen. Wenn das Problem weiterhin besteht, geben Sie bitte weitere Details zum Problem an, indem Sie ismartcoding@gmail.com kontaktieren.</string>
+    <string name="http_server_error">Der HTTP-Server ist nicht gestartet. Starten Sie die PlainApp erneut und versuchen Sie es erneut. Stellen Sie sicher, dass keine anderen Apps die HTTP- oder HTTPS-Ports belegen. Wenn das Problem weiterhin besteht, geben Sie bitte weitere Details zum Problem an, indem Sie support@plainapp.app kontaktieren.</string>
     <string name="relaunch_app">App neu starten</string>
     <string name="require_confirmation">Bestätigung erforderlich</string>
     <string name="web_service_required_for_chat">Um Nachrichten von anderen zu erhalten, aktivieren Sie bitte das Telefon-Webportal.</string>
@@ -78,4 +76,6 @@
     <string name="home_web_easy_failed_title">Konnte nicht gestartet werden</string>
     <string name="last_active">Zuletzt aktiv: %1$s</string>
     <string name="revoke_session">Diese Sitzung widerrufen</string>
+    <string name="how_to_use">Verwendung</string>
+    <string name="developer_options">Entwickleroptionen</string>
 </resources>

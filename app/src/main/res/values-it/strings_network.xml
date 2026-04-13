@@ -10,8 +10,6 @@
     <string name="two_factor_auth_tips">Quando fai il login sulla pagina web, mostreremo una finestra di conferma nell\'app per una maggiore sicurezza.</string>
     <string name="instruction_for_use">Istruzioni per l\'uso</string>
     <string name="web_how_to">Passaggio 1: Collega il tuo telefono e il tuo computer alla stessa rete wireless.\n\nMetodo 1: Collega il tuo computer e il tuo telefono alla stessa rete Wi-Fi.\nMetodo 2: Attiva l\'hotspot del tuo telefono e collega il tuo computer all\'hotspot del telefono.\n\nPassaggio 2: Apri un browser web sul tuo computer e inserisci l\'indirizzo web visualizzato sulla homepage dell\'app.</string>
-    <string name="web_dig">1. Il browser del computer non riesce ad aprire la pagina web.\n\nIl router wireless potrebbe avere l\'isolamento AP abilitato, impedendo la comunicazione tra il computer e il telefono. Si prega di andare all\'interfaccia delle impostazioni del router per disabilitare la funzione di isolamento AP.\n\n2. Il browser del computer visualizza un avviso dopo aver inserito un indirizzo di pagina web HTTPS: "La tua connessione non è privata."\n\nPuoi fare clic su "Procedi su x.x.x.x (non sicuro)" per continuare. Simple utilizza un certificato TLS autenticato per crittografare il sito web.</string>
-    <string name="learn_more">Ulteriori informazioni</string>
     <string name="http_server_state_on">Servizio in esecuzione</string>
     <string name="http_server_state_starting">Avvio del servizio...</string>
     <string name="http_server_state_stopping">Arresto del servizio...</string>
@@ -31,7 +29,7 @@
     <string name="rotate_url_token_on_restart">Rinnova token URL al riavvio</string>
     <string name="rotate_url_token_on_restart_tips">Se abilitato, viene generato un nuovo token URL ogni volta che l\'app si avvia. Questo invalida tutti gli URL di file precedentemente generati. Consigliato per gli utenti avanzati che desiderano una maggiore sicurezza.</string>
     <string name="http_server_ok">Server HTTP avviato</string>
-    <string name="http_server_error">Il server HTTP non è stato avviato. Riavvia PlainApp e riprova. Assicurati che non ci siano altre applicazioni che occupano le porte HTTP o HTTPS. Se il problema persiste, fornisci ulteriori dettagli sul problema contattando ismartcoding@gmail.com.</string>
+    <string name="http_server_error">Il server HTTP non è stato avviato. Riavvia PlainApp e riprova. Assicurati che non ci siano altre applicazioni che occupano le porte HTTP o HTTPS. Se il problema persiste, fornisci ulteriori dettagli sul problema contattando support@plainapp.app.</string>
     <string name="relaunch_app">Rilancia l\'app</string>
     <string name="require_confirmation">Richiedi conferma</string>
     <string name="web_service_required_for_chat">Per ricevere messaggi da altri, abilita il Portale Web del telefono.</string>
@@ -78,4 +76,6 @@
     <string name="home_web_easy_failed_title">Impossibile avviare</string>
     <string name="last_active">Ultimo attivo: %1$s</string>
     <string name="revoke_session">Revoca questa sessione</string>
+    <string name="how_to_use">Come si usa</string>
+    <string name="developer_options">Opzioni sviluppatore</string>
 </resources>

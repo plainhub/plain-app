@@ -54,13 +54,7 @@ fun TagsBottomSheet(
     ) {
         Column {
             PBottomSheetTopAppBar(
-                titleContent = {
-                    Text(
-                        text = stringResource(R.string.tags),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                },
+                title = stringResource(R.string.tags),
                 actions = {
                     ActionButtonRefresh(
                         loading = tagsVM.showLoading.value,

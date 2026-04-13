@@ -48,12 +48,14 @@ fun <T : IData> MediaTopBar(
     var isSortMenuOpen by remember { mutableStateOf(false) }
 
     val title = getMediaPageTitle(mediaVM.dataType, castVM, bucket = bucketsMap[mediaVM.bucketId.value], dragSelectState, mediaVM.tag, mediaVM.trash)
+    val containerColor = if (castVM.castMode.value) MaterialTheme.colorScheme.secondaryContainer else null
 
     SearchableTopBar(
         navController = navController,
         viewModel = mediaVM,
         scrollBehavior = scrollBehavior,
         title = title,
+        containerColor = containerColor,
         scrollToTop = scrollToTop,
         navigationIcon = {
             if (dragSelectState.selectMode) {

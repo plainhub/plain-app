@@ -10,8 +10,6 @@
     <string name="two_factor_auth_tips">在網頁登入時，我們將於應用程式中顯示確認彈出視窗，以增加安全性。</string>
     <string name="instruction_for_use">使用說明</string>
     <string name="web_how_to">步驟1：將您的手機和電腦連接到同一個無線網路。\n\n方法1：將您的電腦和手機連接到同一個Wi-Fi網路。\n方法2：打開您的手機熱點，並將您的電腦連接到手機熱點。\n\n步驟2：在您的電腦上開啟一個網頁瀏覽器，並輸入在應用程式首頁上顯示的網址。</string>
-    <string name="web_dig">1. 電腦瀏覽器無法開啟網頁。\n\n無線路由器可能已啟用AP隔離，阻止電腦與手機之間的通訊。 請前往路由器設置界面禁用AP隔離功能。\n\n2. 在輸入HTTPS網頁地址後，電腦瀏覽器顯示警告："您的連線不是私密的。" \n\n您可以點擊"繼續前往x.x.x.x（不安全）"以繼續。 Simple使用自簽名的TLS憑證加密網站。</string>
-    <string name="learn_more">進一步了解</string>
     <string name="http_server_state_on">服務正在運行中</string>
     <string name="http_server_state_starting">正在啟動服務…</string>
     <string name="http_server_state_stopping">正在停止服務…</string>
@@ -78,4 +76,6 @@
     <string name="home_web_easy_failed_title">無法啟動</string>
     <string name="last_active">最後活躍：%1$s</string>
     <string name="revoke_session">撤銷此工作階段</string>
+    <string name="how_to_use">使用方式</string>
+    <string name="developer_options">開發者選項</string>
 </resources>

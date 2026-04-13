@@ -68,4 +68,14 @@
         <item>130 dB : Détonation de fusil, Marteau-piqueur</item>
         <item>140 dB : Avion militaire à réaction, Feux d\'artifice</item>
     </string-array>
+    <string name="dlna_cast_request_title">Demande de diffusion</string>
+    <string name="dlna_cast_request_desc">L\'appareil %1$s souhaite diffuser sur cet appareil</string>
+    <string name="dlna_cast_accept">Accepter</string>
+    <string name="dlna_cast_reject">Refuser</string>
+    <string name="dlna_cast_remember_choice">Mémoriser le choix, ne plus demander</string>
+    <string name="dlna_cast_history">Règles de diffusion</string>
+    <string name="dlna_cast_accepted">Accepté</string>
+    <string name="dlna_cast_rejected">Refusé</string>
+    <string name="dlna_receiver_start_error">Impossible de démarrer le récepteur.</string>
+    <string name="retry">Réessayer</string>
 </resources>

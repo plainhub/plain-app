@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.components.WebAddress
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.theme.red
@@ -50,9 +49,7 @@ import com.ismartcoding.plain.web.HttpServerManager
 fun HomeWebSuccessSection(
     context: Context,
     navController: NavHostController,
-    mainVM: MainViewModel,
-    showSettingsButton: Boolean = true,
-    showIpAddresses: Boolean = false,
+    mainVM: MainViewModel
 ) {
     val onlineCount by HttpServerManager.wsSessionCount.collectAsState()
 
@@ -108,7 +105,7 @@ fun HomeWebSuccessSection(
             }
         }
         VerticalSpace(16.dp)
-        HomeWebAddressSection(context, navController, mainVM, showSettingsButton = showSettingsButton, showIpAddresses = showIpAddresses)
+        HomeWebAddressSection(context, navController, mainVM)
     }
 }
 

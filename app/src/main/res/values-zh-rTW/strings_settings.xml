@@ -56,7 +56,7 @@
     <string name="name">名稱</string>
     <string name="sort_by_random">隨機排序</string>
     <string name="app_restored">應用數據已經恢復，您需要重啟應用。</string>
-    <string name="welcome_text">歡迎使用！您可以輕鬆地將文本、圖片和影片發送到本頁面，並在您的電腦上查看。\n如果您遇到問題，請發送郵件至ismartcoding@gmail.com尋求幫助，或者加入Discord討論: https://discord.gg/RQWcS6DEEe。</string>
+    <string name="welcome_text">歡迎使用！您可以輕鬆地將文本、圖片和影片發送到本頁面，並在您的電腦上查看。\n如果您遇到問題，請發送郵件至support@plainapp.app尋求幫助，或者加入Discord討論: https://discord.gg/RQWcS6DEEe。</string>
     <string name="donation">捐贈</string>
     <string name="logs">日誌</string>
     <string name="primary_color_hint">例如 #666666 或 666666</string>

@@ -22,6 +22,7 @@ import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.nav.Routing
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.TempData
 import kotlinx.coroutines.launch
 
 @Composable
@@ -80,11 +81,24 @@ internal fun SettingsCardItems(navController: NavHostController) {
 @Composable
 internal fun DeveloperSettingsCard(navController: NavHostController) {
     PCard {
+        PListItem(title = stringResource(R.string.client_id), value = TempData.clientId)
+        PListItem(
+            modifier = Modifier.clickable { navController.navigate(Routing.WebDev) },
+            title = stringResource(R.string.developer_options),
+            icon = R.drawable.code,
+            showMore = true,
+        )
         PListItem(
             modifier = Modifier.clickable { navController.navigate(Routing.ComponentShowcase) },
             title = stringResource(R.string.ui_components),
             icon = R.drawable.layout_grid,
             showMore = true,
+        )
+        PListItem(
+            modifier = Modifier.clickable { throw RuntimeException("Test crash triggered from Developer Options") },
+            title = stringResource(R.string.simulate_crash),
+            subtitle = stringResource(R.string.simulate_crash_desc),
+            icon = R.drawable.circle_alert,
         )
     }
 }

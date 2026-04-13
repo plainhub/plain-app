@@ -68,4 +68,14 @@
         <item>130 dB: 霰弹枪声，手提钻机</item>
         <item>140 dB: 军用喷气飞机声音，烟花</item>
     </string-array>
+    <string name="dlna_cast_request_title">投屏请求</string>
+    <string name="dlna_cast_request_desc">设备 %1$s 请求投屏到本设备</string>
+    <string name="dlna_cast_accept">接受</string>
+    <string name="dlna_cast_reject">拒绝</string>
+    <string name="dlna_cast_remember_choice">记住此选择，不再询问</string>
+    <string name="dlna_cast_history">投屏规则</string>
+    <string name="dlna_cast_accepted">已接受</string>
+    <string name="dlna_cast_rejected">已拒绝</string>
+    <string name="dlna_receiver_start_error">启动接收器失败。</string>
+    <string name="retry">重试</string>
 </resources>

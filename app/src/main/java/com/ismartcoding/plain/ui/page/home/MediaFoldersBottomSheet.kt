@@ -75,13 +75,7 @@ fun <T : IData> MediaFoldersBottomSheet(
     ) {
         Column {
             PBottomSheetTopAppBar(
-                titleContent = {
-                    Text(
-                        text = stringResource(R.string.folders),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                },
+                title = stringResource(R.string.folders),
                 actions = {
                     ActionButtonRefresh(
                         loading = mediaFoldersVM.showLoading.value,

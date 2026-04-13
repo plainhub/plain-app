@@ -68,4 +68,14 @@
         <item>130 dB: Schrotflintenschuss, Presslufthammer</item>
         <item>140 dB: Militärjet, Feuerwerk</item>
     </string-array>
+    <string name="dlna_cast_request_title">Cast-Anfrage</string>
+    <string name="dlna_cast_request_desc">Gerät %1$s möchte auf dieses Gerät übertragen</string>
+    <string name="dlna_cast_accept">Akzeptieren</string>
+    <string name="dlna_cast_reject">Ablehnen</string>
+    <string name="dlna_cast_remember_choice">Auswahl merken, nicht mehr fragen</string>
+    <string name="dlna_cast_history">Cast-Regeln</string>
+    <string name="dlna_cast_accepted">Akzeptiert</string>
+    <string name="dlna_cast_rejected">Abgelehnt</string>
+    <string name="dlna_receiver_start_error">Empfänger konnte nicht gestartet werden.</string>
+    <string name="retry">Erneut versuchen</string>
 </resources>

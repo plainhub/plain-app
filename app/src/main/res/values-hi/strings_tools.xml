@@ -68,4 +68,14 @@
         <item>130 dB: शॉटगन ब्लास्ट, जैकहैमर</item>
         <item>140 dB: सैन्य जेट विमान, फ़ायरवर्क्स</item>
     </string-array>
+    <string name="dlna_cast_request_title">Cast अनुरोध</string>
+    <string name="dlna_cast_request_desc">डिवाइस %1$s इस डिवाइस पर Cast करना चाहता है</string>
+    <string name="dlna_cast_accept">स्वीकार करें</string>
+    <string name="dlna_cast_reject">अस्वीकार करें</string>
+    <string name="dlna_cast_remember_choice">चुनाव याद रखें, दोबारा न पूछें</string>
+    <string name="dlna_cast_history">Cast नियम</string>
+    <string name="dlna_cast_accepted">स्वीकृत</string>
+    <string name="dlna_cast_rejected">अस्वीकृत</string>
+    <string name="dlna_receiver_start_error">रिसीवर शुरू नहीं हो सका।</string>
+    <string name="retry">पुनः प्रयास करें</string>
 </resources>

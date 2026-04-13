@@ -12,8 +12,8 @@
     <string name="add_videos_to_playlist">먼저 비디오를 재생 목록에 추가하세요.</string>
     <string name="video_playlist_no_data">재생 목록은 여러 비디오를 순차적으로 자동으로 캐스트하는 데 사용됩니다.</string>
     <string name="cast">캐스트</string>
-    <string name="cast_dialog_hint">캐스트 모드로 진입하려면 기기를 탭 하세요. 미디어가 해당 기기에서 재생됩니다.</string>
-    <string name="cast_dialog_wireless_cast_tip">다른 폰에서 무선 캐스트를 열면 여기에 표시됩니다.</string>
+    <string name="cast_dialog_hint">캐스트 모드로 전환할 기기를 선택하세요.</string>
+    <string name="cast_dialog_wireless_cast_tip">팁: 대상 화면과 동일한 Wi-Fi에 연결하세요</string>
     <string name="images">이미지</string>
     <string name="video">비디오</string>
     <string name="audios">오디오</string>
@@ -53,7 +53,9 @@
     <string name="items">항목</string>
     <string name="in_playlist">재생 목록에 있음</string>
     <string name="empty_playlist">재생 목록이 비어 있습니다</string>
-    <string name="drag_number_to_reorder">번호를 드래그하여 순서 변경</string>
     <string name="remove_from_playlist">재생 목록에서 제거</string>
     <string name="image">이미지</string>
+    <string name="cast_searching_for_screen">화면 검색 중</string>
+    <string name="cast_select_screen">화면 선택</string>
+    <string name="cast_looking_for_devices">주변 기기 검색 중...</string>
 </resources>

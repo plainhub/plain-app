@@ -10,8 +10,6 @@
     <string name="two_factor_auth_tips">Bij het inloggen op de webpagina tonen we een bevestigingspop-up in de app voor extra beveiliging.</string>
     <string name="instruction_for_use">Gebruiksaanwijzing</string>
     <string name="web_how_to">Stap 1: Sluit uw telefoon en computer aan op hetzelfde draadloze netwerk.\n\nMethode 1: Sluit uw computer en telefoon aan op hetzelfde Wi-Fi-netwerk.\nMethode 2: Schakel de hotspot van uw telefoon in en sluit uw computer aan op de hotspot van de telefoon.\n\nStap 2: Open een webbrowser op uw computer en voer het webadres in dat wordt weergegeven op de startpagina van de app.</string>
-    <string name="web_dig">1. De computerbrowser kan de webpagina niet openen.\n\nDe draadloze router heeft mogelijk AP-isolatie ingeschakeld, waardoor communicatie tussen de computer en de telefoon wordt voorkomen. Ga naar de instellingeninterface van de router om de AP-isolatiefunctie uit te schakelen.\n\n2. De computerbrowser geeft een waarschuwing weer nadat u een HTTPS-webpagina-adres hebt ingevoerd: "Uw verbinding is niet privé."\n\nU kunt op "Doorgaan naar x.x.x.x (onveilig)" klikken om door te gaan. Simple gebruikt een zelfondertekend TLS-certificaat om de website te versleutelen.</string>
-    <string name="learn_more">Meer informatie</string>
     <string name="http_server_state_on">Service draait</string>
     <string name="http_server_state_starting">Service wordt gestart…</string>
     <string name="http_server_state_stopping">Service wordt gestopt…</string>
@@ -31,7 +29,7 @@
     <string name="rotate_url_token_on_restart">URL-token verversen bij herstart</string>
     <string name="rotate_url_token_on_restart_tips">Wanneer ingeschakeld, wordt bij elke opstart van de app een nieuw URL-token aangemaakt. Dit maakt alle eerder gegenereerde bestands-URL\'s ongeldig. Aanbevolen voor gevorderde gebruikers die meer beveiliging willen.</string>
     <string name="http_server_ok">HTTP-server is gestart</string>
-    <string name="http_server_error">De HTTP-server is niet gestart. Start PlainApp opnieuw en probeer het opnieuw. Zorg ervoor dat er geen andere apps zijn die de HTTP- of HTTPS-poorten bezetten. Als het probleem aanhoudt, geef dan meer details over het probleem door contact op te nemen met ismartcoding@gmail.com.</string>
+    <string name="http_server_error">De HTTP-server is niet gestart. Start PlainApp opnieuw en probeer het opnieuw. Zorg ervoor dat er geen andere apps zijn die de HTTP- of HTTPS-poorten bezetten. Als het probleem aanhoudt, geef dan meer details over het probleem door contact op te nemen met support@plainapp.app.</string>
     <string name="relaunch_app">App opnieuw starten</string>
     <string name="require_confirmation">Bevestiging vereisen</string>
     <string name="web_service_required_for_chat">Om berichten van anderen te ontvangen, schakel het telefoonwebportaal in.</string>
@@ -78,4 +76,6 @@
     <string name="home_web_easy_failed_title">Kon niet starten</string>
     <string name="last_active">Laatste actief: %1$s</string>
     <string name="revoke_session">Deze sessie intrekken</string>
+    <string name="how_to_use">Hoe te gebruiken</string>
+    <string name="developer_options">Ontwikkelaarsopties</string>
 </resources>

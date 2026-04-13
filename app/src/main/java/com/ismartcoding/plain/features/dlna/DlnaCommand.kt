@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.features.dlna
 
 sealed class DlnaCommand {
-    data class SetUri(val uri: String, val title: String = "") : DlnaCommand()
+    data class SetUri(val uri: String, val title: String = "", val mediaType: DlnaMediaType = DlnaMediaType.UNKNOWN, val albumArtUri: String = "") : DlnaCommand()
     data object Play : DlnaCommand()
     data object Pause : DlnaCommand()
     data object Stop : DlnaCommand()

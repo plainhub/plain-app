@@ -56,7 +56,7 @@
     <string name="name">名前</string>
     <string name="sort_by_random">ランダムに並べ替え</string>
     <string name="app_restored">アプリのデータが復元されました。新しい状態でアプリを再起動する必要があります。</string>
-    <string name="welcome_text">ようこそ！このページにテキスト、画像、動画を簡単に送信し、コンピュータで表示することができます。\n問題が発生した場合は、お手伝いが必要な場合はismartcoding@gmail.comにメールを送信するか、次のDiscordのディスカッションに参加してください：https://discord.gg/RQWcS6DEEe。</string>
+    <string name="welcome_text">ようこそ！このページにテキスト、画像、動画を簡単に送信し、コンピュータで表示することができます。\n問題が発生した場合は、お手伝いが必要な場合はsupport@plainapp.appにメールを送信するか、次のDiscordのディスカッションに参加してください：https://discord.gg/RQWcS6DEEe。</string>
     <string name="donation">寄付</string>
     <string name="logs">ログ</string>
     <string name="primary_color_hint">#666666のように入力してください</string>

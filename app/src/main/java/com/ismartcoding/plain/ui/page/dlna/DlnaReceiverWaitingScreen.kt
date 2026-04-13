@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
+import com.ismartcoding.plain.ui.base.StepNumber
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.VerticalSpace
 
@@ -62,17 +63,17 @@ fun DlnaReceiverWaitingScreen() {
             PListItem(
                 title = stringResource(R.string.dlna_receiver_step1_title),
                 subtitle = stringResource(R.string.dlna_receiver_step1_desc),
-                start = { DlnaStepNumber(1) },
+                start = { StepNumber(1) },
             )
             PListItem(
                 title = stringResource(R.string.dlna_receiver_step2_title),
                 subtitle = stringResource(R.string.dlna_receiver_step2_desc),
-                start = { DlnaStepNumber(2) },
+                start = { StepNumber(2) },
             )
             PListItem(
                 title = stringResource(R.string.dlna_receiver_step3_title),
                 subtitle = stringResource(R.string.dlna_receiver_step3_desc, deviceName),
-                start = { DlnaStepNumber(3) },
+                start = { StepNumber(3) },
             )
         }
         Tips(text = stringResource(R.string.dlna_receiver_protocol_note))
@@ -108,12 +109,3 @@ private fun DlnaRippleAnimation() {
     }
 }
 
-@Composable
-private fun DlnaStepNumber(num: Int) {
-    val primaryColor = MaterialTheme.colorScheme.primary
-    val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
-    Box(modifier = Modifier.size(28.dp), contentAlignment = Alignment.Center) {
-        Canvas(modifier = Modifier.size(28.dp)) { drawCircle(primaryColor, radius = size.minDimension / 2) }
-        Text(text = num.toString(), style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold, color = onPrimaryColor)
-    }
-}

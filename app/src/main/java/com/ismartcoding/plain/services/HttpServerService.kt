@@ -17,7 +17,7 @@ import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.helpers.NotificationHelper
 import com.ismartcoding.plain.helpers.UrlHelper
 import com.ismartcoding.plain.web.HttpServerManager
-import com.ismartcoding.plain.mdns.MdnsReregistrar
+import com.ismartcoding.plain.mdns.MdnsRegister
 import com.ismartcoding.plain.mdns.NsdHelper
 import com.ismartcoding.plain.TempData
 import io.ktor.client.request.get
@@ -26,7 +26,7 @@ import kotlinx.coroutines.Job
 
 class HttpServerService : LifecycleService() {
     private var serverState: HttpServerState = HttpServerState.OFF
-    private var mdnsReregistrar: MdnsReregistrar? = null
+    private var mdnsRegister: MdnsRegister? = null
     private var serverJob: Job? = null
     private var lockManager: HttpServerLockManager? = null
 
@@ -36,7 +36,7 @@ class HttpServerService : LifecycleService() {
         NotificationHelper.ensureDefaultChannel()
 
         lockManager = HttpServerLockManager(this)
-        mdnsReregistrar = MdnsReregistrar(
+        mdnsRegister = MdnsRegister(
             context = this,
             isActive = { serverState == HttpServerState.ON },
             hostnameProvider = { TempData.mdnsHostname },
@@ -137,8 +137,8 @@ class HttpServerService : LifecycleService() {
         super.onDestroy()
         lockManager?.stop()
         lockManager = null
-        mdnsReregistrar?.stop()
-        mdnsReregistrar = null
+        mdnsRegister?.stop()
+        mdnsRegister = null
         // Ensure mDNS responder is stopped
         NsdHelper.unregisterService()
         HttpServerManager.server = null

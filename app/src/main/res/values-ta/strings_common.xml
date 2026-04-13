@@ -153,4 +153,8 @@
     <string name="buy_me_a_coffee">எனக்கு ஒரு காபி வாங்கவும்</string>
 
 
+    <string name="crash_report_title">ஆப் செயலிழந்தது</string>
+    <string name="crash_report_message">ஆப் எதிர்பாராத விதமாக செயலிழந்தது. நாங்கள் சரிசெய்ய உதவ கிராஷ் அறிக்கையை பகிர விரும்புகிறீர்களா?</string>
+    <string name="crash_include_app_logs">ஆப் பதிவுகளை சேர்க்கவும்</string>
+    <string name="crash_share">பகிரவும்</string>
 </resources>

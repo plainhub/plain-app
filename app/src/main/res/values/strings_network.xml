@@ -10,8 +10,7 @@
     <string name="two_factor_auth_tips">When logging in on the webpage, we\'ll display a confirmation popup in the app for added security.</string>
     <string name="instruction_for_use">Instructions for use</string>
     <string name="web_how_to">Step 1: Connect your phone and computer to the same wireless network.\n\nMethod 1: Connect your computer and phone to the same Wi-Fi network.\nMethod 2: Turn on your phone\'s hotspot and connect your computer to the phone\'s hotspot.\n\nStep 2: Open a web browser on your computer and enter the web address displayed on the APP homepage.</string>
-    <string name="web_dig">1. The computer browser cannot open web page.\n\nThe wireless router may have AP isolation enabled, preventing communication between the computer and the phone. Please go to the router settings interface to disable the AP isolation function.\n\n2. The computer browser displays a warning after entering an HTTPS web page address: "Your connection is not private."\n\nYou can click "Proceed to x.x.x.x (unsafe)" to continue. Simple uses a self-signed TLS certificate to encrypt the website.</string>
-    <string name="learn_more">Learn more</string>
+    <string name="how_to_use">How to use</string>
     <string name="http_server_state_on">Service is running</string>
     <string name="http_server_state_starting">Starting service…</string>
     <string name="http_server_state_stopping">Stopping service…</string>
@@ -80,4 +79,10 @@
     <string name="home_web_easy_hint">Tap to start</string>
     <string name="home_web_easy_loading">Please wait…</string>
     <string name="home_web_easy_failed_title">Could not start</string>
+    <string name="developer_options">Developer options</string>
+    <string name="adb_automation">ADB Automation</string>
+    <string name="adb_token_desc">Use this token with ADB broadcasts to control PlainApp programmatically. Pass it as --es token &lt;value&gt;.</string>
+    <string name="adb_cmd_start">Start HTTP Server</string>
+    <string name="adb_cmd_stop">Stop HTTP Server</string>
+    <string name="enable_adb_token">Enable ADB token</string>
 </resources>

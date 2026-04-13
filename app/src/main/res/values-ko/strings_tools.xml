@@ -68,4 +68,14 @@
         <item>130 dB: 샷건 발사, 공구용 망치</item>
         <item>140 dB: 군용 제트 비행기, 불꽃놀이</item>
     </string-array>
+    <string name="dlna_cast_request_title">캐스트 요청</string>
+    <string name="dlna_cast_request_desc">기기 %1$s이(가) 이 기기로 캐스트하려고 합니다</string>
+    <string name="dlna_cast_accept">허용</string>
+    <string name="dlna_cast_reject">거부</string>
+    <string name="dlna_cast_remember_choice">선택 기억, 다시 묻지 않기</string>
+    <string name="dlna_cast_history">캐스트 규칙</string>
+    <string name="dlna_cast_accepted">허용됨</string>
+    <string name="dlna_cast_rejected">거부됨</string>
+    <string name="dlna_receiver_start_error">수신기를 시작하지 못했습니다.</string>
+    <string name="retry">다시 시도</string>
 </resources>

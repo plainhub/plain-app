@@ -63,49 +63,58 @@ fun AudioCastPlaylistPage(castVM: CastViewModel, onDismissRequest: () -> Unit) {
     }
 
     if (showClearConfirmDialog) {
-        AlertDialog(containerColor = MaterialTheme.colorScheme.surface,
+        AlertDialog(
+            containerColor = MaterialTheme.colorScheme.surface,
             onDismissRequest = { showClearConfirmDialog = false },
             title = { Text(stringResource(R.string.clear_all)) },
             text = { Text(stringResource(R.string.clear_all_confirm)) },
             confirmButton = {
-                TextButton(onClick = { scope.launch(Dispatchers.IO) { CastPlayer.clearItems(); showClearConfirmDialog = false } },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(stringResource(R.string.confirm)) }
+                TextButton(
+                    onClick = { scope.launch(Dispatchers.IO) { CastPlayer.clearItems(); showClearConfirmDialog = false } },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) { Text(stringResource(R.string.confirm)) }
             },
             dismissButton = { TextButton(onClick = { showClearConfirmDialog = false }) { Text(stringResource(R.string.cancel)) } })
     }
 
     PModalBottomSheet(onDismissRequest = onDismissRequest, sheetState = sheetState) {
         Column {
-            PBottomSheetTopAppBar(titleContent = {
-                Text(text = if (castItems.isNotEmpty()) LocaleHelper.getStringF(R.string.playlist_title, "total", castItems.size) else stringResource(R.string.cast_playlist),
-                    style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
-            }, actions = {
-                if (castItems.isNotEmpty()) {
-                    IconButton(onClick = { showClearConfirmDialog = true }) {
-                        Icon(painter = painterResource(R.drawable.delete_forever), contentDescription = "Clear playlist", tint = MaterialTheme.colorScheme.red)
+            PBottomSheetTopAppBar(
+                title = if (castItems.isNotEmpty()) LocaleHelper.getStringF(R.string.playlist_title, "total", castItems.size) else stringResource(R.string.cast_playlist),
+                subtitle = if (castItems.isEmpty()) "" else stringResource(R.string.drag_number_to_reorder_list),
+                actions = {
+                    if (castItems.isNotEmpty()) {
+                        IconButton(onClick = { showClearConfirmDialog = true }) {
+                            Icon(painter = painterResource(R.drawable.delete_forever), contentDescription = "Clear playlist", tint = MaterialTheme.colorScheme.red)
+                        }
                     }
-                }
-            })
+                })
 
             if (castItems.isEmpty()) {
-                Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f), contentAlignment = Alignment.Center) {
                     Text(text = stringResource(R.string.cast_playlist_empty), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.secondaryTextColor)
                 }
             } else {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(text = stringResource(R.string.drag_number_to_reorder), style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.secondaryTextColor, modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 8.dp))
-                    LazyColumn(state = lazyListState, modifier = Modifier.fillMaxWidth().weight(1f), contentPadding = PaddingValues(bottom = 96.dp)) {
-                        itemsIndexed(castItems, { _, item -> item.path }) { index, audio ->
-                            val isPlaying = currentUri == audio.path
-                            ReorderableItem(reorderableLazyListState, key = audio.path) { isDragging ->
-                                Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp).clip(RoundedCornerShape(12.dp))
+                LazyColumn(state = lazyListState, modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f), contentPadding = PaddingValues(bottom = 96.dp)) {
+                    itemsIndexed(castItems, { _, item -> item.path }) { index, audio ->
+                        val isPlaying = currentUri == audio.path
+                        ReorderableItem(reorderableLazyListState, key = audio.path) { isDragging ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 4.dp)
+                                    .clip(RoundedCornerShape(12.dp))
                                     .clickable { castVM.cast(audio) },
-                                    colors = CardDefaults.cardColors(containerColor = if (isPlaying) MaterialTheme.colorScheme.cardBackgroundActive else MaterialTheme.colorScheme.cardBackgroundNormal)) {
-                                    with(this@ReorderableItem) {
-                                        AudioCastPlaylistItemContent(item = audio, index = index, isPlaying = isPlaying,
-                                            isLoading = castVM.isLoading.value && isPlaying, onRemove = { scope.launch(Dispatchers.IO) { CastPlayer.removeItemAt(index) } })
-                                    }
+                                colors = CardDefaults.cardColors(containerColor = if (isPlaying) MaterialTheme.colorScheme.cardBackgroundActive else MaterialTheme.colorScheme.cardBackgroundNormal)
+                            ) {
+                                with(this@ReorderableItem) {
+                                    AudioCastPlaylistItemContent(
+                                        item = audio, index = index, isPlaying = isPlaying,
+                                        isLoading = castVM.isLoading.value && isPlaying, onRemove = { scope.launch(Dispatchers.IO) { CastPlayer.removeItemAt(index) } })
                                 }
                             }
                         }

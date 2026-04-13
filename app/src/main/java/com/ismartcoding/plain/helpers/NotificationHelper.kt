@@ -14,6 +14,7 @@ import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.receivers.PeerChatReplyReceiver
@@ -145,6 +146,7 @@ object NotificationHelper {
                 0,
                 Intent(context, ServiceStopBroadcastReceiver::class.java).apply {
                     this.action = action
+                    putExtra("token", TempData.adbToken)
                 },
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
             )

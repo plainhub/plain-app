@@ -12,8 +12,8 @@
     <string name="add_videos_to_playlist">Пожалуйста, сначала добавьте видео в плейлист.</string>
     <string name="video_playlist_no_data">Плейлист используется для автоматического воспроизведения нескольких видео подряд.</string>
     <string name="cast">Транслировать</string>
-    <string name="cast_dialog_hint">Нажмите на устройство, чтобы войти в режим трансляции. Медиа будет воспроизведено на этом устройстве.</string>
-    <string name="cast_dialog_wireless_cast_tip">Откройте Беспроводную трансляцию на другом телефоне, чтобы оно появилось здесь.</string>
+    <string name="cast_dialog_hint">Выберите устройство для входа в режим трансляции.</string>
+    <string name="cast_dialog_wireless_cast_tip">Совет: подключитесь к тому же Wi-Fi, что и целевой экран</string>
     <string name="images">Изображения</string>
     <string name="video">Видео</string>
     <string name="audios">Аудио</string>
@@ -53,7 +53,9 @@
     <string name="items">Элементы</string>
     <string name="in_playlist">В плейлисте</string>
     <string name="empty_playlist">Ваш плейлист пуст</string>
-    <string name="drag_number_to_reorder">Перетащите номер для изменения порядка</string>
     <string name="remove_from_playlist">Удалить из плейлиста</string>
     <string name="image">Изображение</string>
+    <string name="cast_searching_for_screen">Поиск экрана</string>
+    <string name="cast_select_screen">Выбрать экран</string>
+    <string name="cast_looking_for_devices">Поиск ближайших устройств...</string>
 </resources>

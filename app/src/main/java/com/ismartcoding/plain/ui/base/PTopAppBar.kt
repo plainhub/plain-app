@@ -11,6 +11,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,15 +27,19 @@ fun PTopAppBar(
     },
     title: String,
     subtitle: String = "",
+    containerColor: Color? = null,
+    subtitleColor: Color? = null,
     actions: (@Composable RowScope.() -> Unit)? = null,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
+    val topBarColor = containerColor ?: MaterialTheme.colorScheme.background
+    val topBarSubtitleColor = subtitleColor ?: MaterialTheme.colorScheme.onSurfaceVariant
     TopAppBar(
         title = {
             if (subtitle.isEmpty()) {
                 Text(
                     title,
-                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
+                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 24.sp),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -42,17 +47,17 @@ fun PTopAppBar(
                 Column {
                     Text(
                         text = title,
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
+                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 24.sp),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
                         text = subtitle,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium.copy(fontSize = 16.sp),
+                        color = topBarSubtitleColor,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(top = 2.dp)
+                        modifier = Modifier.padding(top = 4.dp)
                     )
                 }
             }
@@ -61,8 +66,8 @@ fun PTopAppBar(
         actions = { actions?.invoke(this) },
         modifier = modifier,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            scrolledContainerColor = MaterialTheme.colorScheme.background,
+            containerColor = topBarColor,
+            scrolledContainerColor = topBarColor,
         ),
         scrollBehavior = scrollBehavior,
     )

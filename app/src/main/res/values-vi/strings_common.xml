@@ -153,4 +153,8 @@
     <string name="buy_me_a_coffee">Mua cho tôi một ly cà phê</string>
 
 
+    <string name="crash_report_title">Ứng dụng bị lỗi</string>
+    <string name="crash_report_message">Ứng dụng bị lỗi bất ngờ. Bạn có muốn chia sẻ báo cáo lỗi để chúng tôi có thể khắc phục không?</string>
+    <string name="crash_include_app_logs">Bao gồm nhật ký ứng dụng</string>
+    <string name="crash_share">Chia sẻ</string>
 </resources>

@@ -68,4 +68,14 @@
         <item>130 dB: Schot van een geweer, Breekhamer</item>
         <item>140 dB: Militair straalvliegtuig, Vuurwerk</item>
     </string-array>
+    <string name="dlna_cast_request_title">Cast-verzoek</string>
+    <string name="dlna_cast_request_desc">Apparaat %1$s wil naar dit apparaat casten</string>
+    <string name="dlna_cast_accept">Accepteren</string>
+    <string name="dlna_cast_reject">Weigeren</string>
+    <string name="dlna_cast_remember_choice">Keuze onthouden, niet meer vragen</string>
+    <string name="dlna_cast_history">Cast-regels</string>
+    <string name="dlna_cast_accepted">Geaccepteerd</string>
+    <string name="dlna_cast_rejected">Geweigerd</string>
+    <string name="dlna_receiver_start_error">Kan de ontvanger niet starten.</string>
+    <string name="retry">Opnieuw proberen</string>
 </resources>

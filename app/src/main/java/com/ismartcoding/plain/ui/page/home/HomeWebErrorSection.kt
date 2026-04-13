@@ -1,35 +1,23 @@
 package com.ismartcoding.plain.ui.page.home
 
 import android.content.Context
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -46,7 +34,6 @@ fun HomeWebErrorSection(
     context: Context,
     navController: NavHostController,
     errorMessage: String,
-    showSettingsButton: Boolean = true,
     onRestartFix: () -> Unit,
 ) {
     Column {
@@ -98,19 +85,15 @@ fun HomeWebErrorSection(
             }
         }
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             POutlinedButton(stringResource(R.string.troubleshoot), onClick = { WebHelper.open(context, "https://plainapp.app/troubleshooting") })
-            if (showSettingsButton) {
-                PIconTextButton(R.drawable.settings, stringResource(R.string.web_settings)) {
-                    navController.navigate(Routing.WebSettings)
-                }
-            } else {
-                PIconTextButton(R.drawable.info, stringResource(R.string.learn_more)) {
-                    navController.navigate(Routing.WebLearnMore)
-                }
+            PIconTextButton(R.drawable.settings, stringResource(R.string.web_settings)) {
+                navController.navigate(Routing.WebSettings)
             }
         }
     }

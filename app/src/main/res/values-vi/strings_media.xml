@@ -12,8 +12,8 @@
     <string name="add_videos_to_playlist">Vui lòng thêm video vào danh sách phát trước.</string>
     <string name="video_playlist_no_data">Danh sách phát được sử dụng để tự động phát nhiều video liên tiếp.</string>
     <string name="cast">Phát</string>
-    <string name="cast_dialog_hint">Nhấn vào thiết bị để vào Chế độ Cast. Phương tiện sẽ phát trên thiết bị đó.</string>
-    <string name="cast_dialog_wireless_cast_tip">Trên điện thoại khác, mở Phát không dây để nó xuất hiện ở đây.</string>
+    <string name="cast_dialog_hint">Chọn thiết bị để vào chế độ Cast.</string>
+    <string name="cast_dialog_wireless_cast_tip">Mẹo: Kết nối vào cùng Wi-Fi với màn hình đích của bạn</string>
     <string name="images">Hình ảnh</string>
     <string name="video">Video</string>
     <string name="audios">Âm thanh</string>
@@ -53,7 +53,9 @@
     <string name="items">Mục</string>
     <string name="in_playlist">Trong danh sách phát</string>
     <string name="empty_playlist">Danh sách phát của bạn trống</string>
-    <string name="drag_number_to_reorder">Kéo số để sắp xếp lại</string>
     <string name="remove_from_playlist">Xóa khỏi danh sách phát</string>
     <string name="image">Hình ảnh</string>
+    <string name="cast_searching_for_screen">Đang tìm kiếm màn hình</string>
+    <string name="cast_select_screen">Chọn màn hình</string>
+    <string name="cast_looking_for_devices">Đang tìm kiếm thiết bị lân cận...</string>
 </resources>

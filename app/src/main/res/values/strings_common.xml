@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="crash_report_title">App Crashed</string>
+    <string name="crash_report_message">The app crashed unexpectedly. Would you like to share the crash report with us so we can fix it?</string>
+    <string name="crash_include_app_logs">Include app logs</string>
+    <string name="crash_share">Share</string>
     <string name="warning">Warning</string>
     <string name="title">Title</string>
     <string name="flash_fired">Fired</string>

@@ -3,8 +3,6 @@ appcompatVersion="1.7.1"
 bcprovJdk15onVersion="1.70"
 coil="3.4.0"
 coreKtxVersion="1.18.0"
-firebaseCrashlyticsGradleVersion="3.0.6"
-googleServicesVersion="4.4.4"
 gradle= "9.0.1"
 cameraCoreVersion = "1.6.0"
 compose = "1.10.6"
@@ -14,8 +12,7 @@ coreSplashscreenVersion = "1.2.0"
 exifinterfaceVersion = "1.4.2"
 coreVersion = "3.5.4"
 datastorePreferencesVersion = "1.2.1"
-firebaseCrashlyticsKtxVersion = "19.4.4"
-firebaseBomVersion = "34.11.0"
+
 jsonVersion="20251224"
 jsoupVersion="1.22.1"
 junitVersion="4.13.2"
@@ -62,8 +59,6 @@ coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version
 
 androidx-transition = { module = "androidx.transition:transition", version.ref = "transitionVersion" }
 androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterfaceVersion" }
-firebase-crashlytics-gradle = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebaseCrashlyticsGradleVersion" }
-google-services = { module = "com.google.gms:google-services", version.ref = "googleServicesVersion" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreenVersion" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferencesVersion" }
@@ -102,9 +97,6 @@ compose-foundation = { module = "androidx.compose.foundation:foundation", versio
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
 
 
-# firebase
-firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-ktx", version.ref = "firebaseCrashlyticsKtxVersion" }
-firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBomVersion" }
 
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoupVersion" }
 

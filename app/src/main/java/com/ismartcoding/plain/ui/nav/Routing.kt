@@ -31,7 +31,7 @@ class Routing {
     object WebSecurity
 
     @Serializable
-    object WebLearnMore
+    object HowToUse
 
     @Serializable
     data class Text(val title: String, val content: String, val language: String)
@@ -137,4 +137,7 @@ class Routing {
 
     @Serializable
     object DlnaReceiver
+
+    @Serializable
+    object DlnaCastHistory
 }

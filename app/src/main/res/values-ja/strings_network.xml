@@ -10,8 +10,6 @@
     <string name="two_factor_auth_tips">ウェブページにログインする際に、アプリ内で確認ポップアップが表示されます。</string>
     <string name="instruction_for_use">使用説明書</string>
     <string name="web_how_to">ステップ1：携帯電話とコンピューターを同じ無線ネットワークに接続します。\n\n方法1：コンピューターと携帯電話を同じWi-Fiネットワークに接続します。\n方法2：携帯電話のホットスポットをオンにして、コンピューターを携帯電話のホットスポットに接続します。\n\nステップ2：コンピューターでウェブブラウザーを開き、アプリのホームページに表示されるウェブアドレスを入力します。</string>
-    <string name="web_dig">1. コンピューターブラウザーでウェブページを開くことができません。\n\n無線ルーターにはAP分離が有効になっている可能性があり、コンピューターと電話の間の通信を防いでいます。 ルーターの設定インターフェイスにアクセスして、AP分離機能を無効にしてください。\n\n2. HTTPSウェブページアドレスを入力した後、コンピューターブラウザーに警告が表示されます。「接続がプライベートではありません。」\n\n「x.x.x.x (安全ではない) に進む」をクリックして続行できます。 Simpleは、ウェブサイトを暗号化するために自己署名TLS証明書を使用しています。</string>
-    <string name="learn_more">詳細を見る</string>
     <string name="http_server_state_on">サービスが実行されています</string>
     <string name="http_server_state_starting">サービスを開始しています...</string>
     <string name="http_server_state_stopping">サービスを停止しています...</string>
@@ -31,7 +29,7 @@
     <string name="rotate_url_token_on_restart">再起動時にURLトークンを更新</string>
     <string name="rotate_url_token_on_restart_tips">有効にすると、アプリ起動のたびに新しいURLトークンが生成されます。これにより、以前に生成されたすべてのファイルURLが無効になります。セキュリティを強化したい上級ユーザーにお勧めします。</string>
     <string name="http_server_ok">HTTPサーバーが起動しました</string>
-    <string name="http_server_error">HTTPサーバーが起動していません。PlainAppを再起動して、もう一度試してみてください。HTTPまたはHTTPSポートを占有している他のアプリケーションがないことを確認してください。問題が解決しない場合は、ismartcoding@gmail.com に連絡して問題の詳細を提供してください。</string>
+    <string name="http_server_error">HTTPサーバーが起動していません。PlainAppを再起動して、もう一度試してみてください。HTTPまたはHTTPSポートを占有している他のアプリケーションがないことを確認してください。問題が解決しない場合は、support@plainapp.app に連絡して問題の詳細を提供してください。</string>
     <string name="relaunch_app">アプリを再起動</string>
     <string name="require_confirmation">確認が必要</string>
     <string name="web_service_required_for_chat">他の人からメッセージを受信するには、スマホWebポータルを有効にしてください。</string>
@@ -78,4 +76,6 @@
     <string name="home_web_easy_failed_title">開始できませんでした</string>
     <string name="last_active">最終アクティブ：%1$s</string>
     <string name="revoke_session">このセッションを取り消す</string>
+    <string name="how_to_use">使い方</string>
+    <string name="developer_options">開発者オプション</string>
 </resources>

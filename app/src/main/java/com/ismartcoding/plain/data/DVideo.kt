@@ -6,7 +6,7 @@ import kotlin.time.Instant
 @kotlinx.serialization.Serializable
 data class DVideo(
     override var id: String,
-    val title: String,
+    override val title: String,
     override val path: String,
     override val duration: Long,
     val size: Long,

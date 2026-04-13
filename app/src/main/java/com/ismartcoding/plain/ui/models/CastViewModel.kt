@@ -36,7 +36,7 @@ class CastViewModel : ViewModel() {
 
     fun enterCastMode() {
         castMode.value = true
-        showCastDialog.value = true
+        showCastDialog.value = false
     }
 
     fun selectDevice(device: DlnaDevice) {

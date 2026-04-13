@@ -153,4 +153,8 @@
     <string name="buy_me_a_coffee">コーヒー買ってきて</string>
 
 
+    <string name="crash_report_title">アプリがクラッシュしました</string>
+    <string name="crash_report_message">アプリが予期せずクラッシュしました。修正のためにクラッシュレポートを共有していただけますか？</string>
+    <string name="crash_include_app_logs">アプリログを含める</string>
+    <string name="crash_share">共有</string>
 </resources>

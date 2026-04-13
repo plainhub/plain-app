@@ -8,6 +8,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.ui.components.ListSearchBar
@@ -23,6 +24,8 @@ fun <T : IData> SearchableTopBar(
     scrollBehavior: TopAppBarScrollBehavior,
     title: String,
     subtitle: String = "",
+    containerColor: Color? = null,
+    subtitleColor: Color? = null,
     scrollToTop: (() -> Unit)? = null,
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable (RowScope.() -> Unit)? = null,
@@ -58,6 +61,8 @@ fun <T : IData> SearchableTopBar(
         navController = navController,
         title = title,
         subtitle = subtitle,
+        containerColor = containerColor,
+        subtitleColor = subtitleColor,
         scrollBehavior = scrollBehavior,
         navigationIcon = navigationIcon,
         actions = actions

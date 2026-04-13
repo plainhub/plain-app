@@ -153,4 +153,8 @@
     <string name="buy_me_a_coffee">Achetez-moi un café</string>
 
 
+    <string name="crash_report_title">Application plantée</string>
+    <string name="crash_report_message">L\'application a planté de façon inattendue. Souhaitez-vous partager le rapport de plantage pour que nous puissions le corriger ?</string>
+    <string name="crash_include_app_logs">Inclure les journaux de l\'application</string>
+    <string name="crash_share">Partager</string>
 </resources>

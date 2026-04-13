@@ -68,4 +68,14 @@
         <item>130 dB: Disparo de escopeta, Martillo percutor</item>
         <item>140 dB: Avión militar a reacción, Fuegos artificiales</item>
     </string-array>
+    <string name="dlna_cast_request_title">Solicitud de cast</string>
+    <string name="dlna_cast_request_desc">El dispositivo %1$s quiere hacer cast en este dispositivo</string>
+    <string name="dlna_cast_accept">Aceptar</string>
+    <string name="dlna_cast_reject">Rechazar</string>
+    <string name="dlna_cast_remember_choice">Recordar elección, no volver a preguntar</string>
+    <string name="dlna_cast_history">Reglas de cast</string>
+    <string name="dlna_cast_accepted">Aceptado</string>
+    <string name="dlna_cast_rejected">Rechazado</string>
+    <string name="dlna_receiver_start_error">Error al iniciar el receptor.</string>
+    <string name="retry">Reintentar</string>
 </resources>

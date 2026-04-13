@@ -12,8 +12,8 @@
     <string name="add_videos_to_playlist">Voeg eerst video\'s toe aan de afspeellijst.</string>
     <string name="video_playlist_no_data">De afspeellijst wordt gebruikt om automatisch meerdere video\'s na elkaar af te spelen.</string>
     <string name="cast">Casten</string>
-    <string name="cast_dialog_hint">Tik op een apparaat om de Cast-modus te starten. Media wordt op dat apparaat afgespeeld.</string>
-    <string name="cast_dialog_wireless_cast_tip">Open Draadloos streamen op een ander telefoon om het hier te laten verschijnen.</string>
+    <string name="cast_dialog_hint">Kies een apparaat om de Cast-modus in te gaan.</string>
+    <string name="cast_dialog_wireless_cast_tip">Tip: Maak verbinding met hetzelfde Wi-Fi als je doelscherm</string>
     <string name="images">Afbeeldingen</string>
     <string name="video">Video</string>
     <string name="audios">Audio</string>
@@ -53,7 +53,9 @@
     <string name="items">Items</string>
     <string name="in_playlist">In afspeellijst</string>
     <string name="empty_playlist">Je afspeellijst is leeg</string>
-    <string name="drag_number_to_reorder">Sleep het nummer om opnieuw te ordenen</string>
     <string name="remove_from_playlist">Verwijderen uit afspeellijst</string>
     <string name="image">Afbeelding</string>
+    <string name="cast_searching_for_screen">Scherm zoeken</string>
+    <string name="cast_select_screen">Selecteer een scherm</string>
+    <string name="cast_looking_for_devices">Apparaten in de buurt zoeken...</string>
 </resources>

@@ -40,6 +40,8 @@ object TempData {
     val notificationActions = mutableMapOf<String, Array<out Notification.Action>>()
     var audioPlayMode = MediaPlayMode.REPEAT
 
+    var adbToken = "" // in-memory cache of the ADB automation token
+
     var nearbyDiscoverable = false
 
     var audioSleepTimerFutureTime = 0L

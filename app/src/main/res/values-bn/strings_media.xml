@@ -12,8 +12,8 @@
     <string name="add_videos_to_playlist">দয়া করে প্লেলিস্টে প্রথমে ভিডিও যোগ করুন।</string>
     <string name="video_playlist_no_data">প্লেলিস্টটি পূর্বানুমেয় একটি পর্যায়ক্রমে একাধিক ভিডিও স্বয়ংক্রিয়ভাবে প্রসারিত করার জন্য ব্যবহৃত হয়।</string>
     <string name="cast">প্রসারণ করুন</string>
-    <string name="cast_dialog_hint">কাস্ট মোডে প্রবেশ করতে একটি ডিভাইস ট্যাপ করুন। মিডিয়া সেই ডিভাইসে প্লে হবে।</string>
-    <string name="cast_dialog_wireless_cast_tip">এখানে দেখাতে অন্য ফোনে Wireless Cast খুলুন।</string>
+    <string name="cast_dialog_hint">কাস্ট মোডে প্রবেশ করতে একটি ডিভাইস বেছে নিন।</string>
+    <string name="cast_dialog_wireless_cast_tip">টিপ: আপনার টার্গেট স্ক্রিনের মতো একই Wi-Fi-এ সংযুক্ত করুন</string>
     <string name="images">চিত্র</string>
     <string name="video">ভিডিও</string>
     <string name="audios">অডিও</string>
@@ -53,7 +53,9 @@
     <string name="items">আইটেম</string>
     <string name="in_playlist">প্লেলিস্টে</string>
     <string name="empty_playlist">আপনার প্লেলিস্ট খালি</string>
-    <string name="drag_number_to_reorder">প্লেলিস্ট পুনরায় সাজাতে নম্বরটি টানুন</string>
     <string name="remove_from_playlist">প্লেলিস্ট থেকে সরান</string>
     <string name="image">ছবি</string>
+    <string name="cast_searching_for_screen">স্ক্রিন খোঁজা হচ্ছে</string>
+    <string name="cast_select_screen">একটি স্ক্রিন বেছে নিন</string>
+    <string name="cast_looking_for_devices">কাছাকাছি ডিভাইস খোঁজা হচ্ছে...</string>
 </resources>

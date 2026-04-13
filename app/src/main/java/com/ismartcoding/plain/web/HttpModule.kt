@@ -608,7 +608,7 @@ object HttpModule {
                                     val current = castItems[index]
                                     if (current.path != currentUri) {
                                         LogCat.d(current.path)
-                                        DlnaTransportController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(current.path))
+                                        DlnaTransportController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(current.path), current.title)
                                         CastPlayer.setCurrentUri(current.path)
                                         CastPlayer.isPlaying.value = true
                                     }

@@ -6,7 +6,7 @@ import kotlin.time.Instant
 
 data class DAudio(
     override var id: String,
-    val title: String,
+    override val title: String,
     val artist: String,
     override val path: String,
     override val duration: Long,

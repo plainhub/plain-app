@@ -31,8 +31,6 @@ fun HomeWeb(
     navController: NavHostController,
     mainVM: MainViewModel,
     webEnabled: Boolean,
-    showSettingsButton: Boolean = true,
-    showIpAddresses: Boolean = false,
 ) {
     val scope = rememberCoroutineScope()
     val state = mainVM.httpServerState
@@ -104,7 +102,6 @@ fun HomeWeb(
                     context = context,
                     navController,
                     errorMessage = errorMessage,
-                    showSettingsButton = showSettingsButton,
                     onRestartFix = onRestartFix,
                 )
             }
@@ -114,8 +111,6 @@ fun HomeWeb(
                     context = context,
                     navController = navController,
                     mainVM = mainVM,
-                    showSettingsButton = showSettingsButton,
-                    showIpAddresses = showIpAddresses,
                 )
             }
         }

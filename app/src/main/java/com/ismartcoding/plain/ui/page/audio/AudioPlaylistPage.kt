@@ -17,6 +17,7 @@ import com.ismartcoding.plain.features.AudioPlayer
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyListState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
@@ -45,8 +46,10 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
             title = { Text(stringResource(R.string.clear_all)) },
             text = { Text(stringResource(R.string.clear_all_confirm)) },
             confirmButton = {
-                TextButton(onClick = { scope.launch(Dispatchers.IO) { audioPlaylistVM.clearAsync(context); showClearConfirmDialog = false } },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)) { Text(stringResource(R.string.confirm)) }
+                TextButton(
+                    onClick = { scope.launch(Dispatchers.IO) { audioPlaylistVM.clearAsync(context); showClearConfirmDialog = false } },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) { Text(stringResource(R.string.confirm)) }
             },
             dismissButton = { TextButton(onClick = { showClearConfirmDialog = false }) { Text(stringResource(R.string.cancel)) } },
         )
@@ -55,14 +58,10 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
     PModalBottomSheet(onDismissRequest = onDismissRequest, sheetState = sheetState) {
         Column {
             PBottomSheetTopAppBar(
-                titleContent = {
-                    Text(
-                        text = if (audioPlaylistVM.playlistItems.value.isNotEmpty())
-                            LocaleHelper.getStringF(R.string.playlist_title, "total", audioPlaylistVM.playlistItems.value.size)
-                        else stringResource(R.string.playlist),
-                        style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface
-                    )
-                },
+                title = if (audioPlaylistVM.playlistItems.value.isNotEmpty())
+                    LocaleHelper.getStringF(R.string.playlist_title, "total", audioPlaylistVM.playlistItems.value.size)
+                else stringResource(R.string.playlist),
+                subtitle = if (audioPlaylistVM.playlistItems.value.isEmpty()) "" else stringResource(R.string.drag_number_to_reorder_list),
                 actions = {
                     if (audioPlaylistVM.playlistItems.value.isNotEmpty()) {
                         IconButton(onClick = { showClearConfirmDialog = true }) {
@@ -71,21 +70,28 @@ fun AudioPlaylistPage(audioPlaylistVM: AudioPlaylistViewModel, onDismissRequest:
                     }
                 }
             )
+            VerticalSpace(8.dp)
             if (audioPlaylistVM.playlistItems.value.isEmpty()) {
-                Box(modifier = Modifier.fillMaxWidth().weight(1f), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f), contentAlignment = Alignment.Center
+                ) {
                     Text(text = stringResource(R.string.empty_playlist), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.secondaryTextColor)
                 }
             } else {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(text = stringResource(R.string.drag_number_to_reorder), style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.secondaryTextColor, modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 8.dp))
-                    LazyColumn(state = lazyListState, modifier = Modifier.fillMaxWidth().weight(1f), contentPadding = PaddingValues(bottom = 96.dp)) {
-                        itemsIndexed(audioPlaylistVM.playlistItems.value, { _, item -> item.path }) { index, audio ->
-                            val isPlaying = isAudioPlaying && audioPlaylistVM.selectedPath.value == audio.path
-                            ReorderableItem(reorderableLazyListState, key = audio.path) { isDragging ->
-                                AudioPlaylistItemRow(audio = audio, index = index, isPlaying = isPlaying,
-                                    audioPlaylistVM = audioPlaylistVM, scope = scope)
-                            }
+                LazyColumn(
+                    state = lazyListState, modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f), contentPadding = PaddingValues(bottom = 96.dp)
+                ) {
+                    itemsIndexed(audioPlaylistVM.playlistItems.value, { _, item -> item.path }) { index, audio ->
+                        val isPlaying = isAudioPlaying && audioPlaylistVM.selectedPath.value == audio.path
+                        ReorderableItem(reorderableLazyListState, key = audio.path) { isDragging ->
+                            AudioPlaylistItemRow(
+                                audio = audio, index = index, isPlaying = isPlaying,
+                                audioPlaylistVM = audioPlaylistVM, scope = scope
+                            )
                         }
                     }
                 }

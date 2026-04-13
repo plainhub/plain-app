@@ -153,4 +153,8 @@
     <string name="buy_me_a_coffee">Купи мне кофе</string>
 
 
+    <string name="crash_report_title">Приложение завершилось с ошибкой</string>
+    <string name="crash_report_message">Приложение неожиданно завершилось. Хотите поделиться отчётом об ошибке, чтобы мы могли её исправить?</string>
+    <string name="crash_include_app_logs">Включить журналы приложения</string>
+    <string name="crash_share">Поделиться</string>
 </resources>

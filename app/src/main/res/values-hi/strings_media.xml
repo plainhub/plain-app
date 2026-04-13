@@ -12,8 +12,8 @@
     <string name="add_videos_to_playlist">कृपया पहले प्लेलिस्ट में वीडियो जोड़ें।</string>
     <string name="video_playlist_no_data">प्लेलिस्ट का उपयोग स्वचालित रूप से कई वीडियो को एक से क्रम में प्रसारित करने के लिए किया जाता है।</string>
     <string name="cast">कास्ट करें</string>
-    <string name="cast_dialog_hint">कास्ट मोड में प्रवेश करने के लिए एक डिवाइस टैप करें। मीडिया उस डिवाइस पर चलेगा।</string>
-    <string name="cast_dialog_wireless_cast_tip">इसे यहाँ दिखाने के लिए दूसरे फ़ोन पर वायरलेस कास्ट खोलें।</string>
+    <string name="cast_dialog_hint">Cast मोड में प्रवेश करने के लिए एक डिवाइस चुनें।</string>
+    <string name="cast_dialog_wireless_cast_tip">सुझाव: अपनी टार्गेट स्क्रीन के समान Wi-Fi से कनेक्ट करें</string>
     <string name="images">तस्वीरें</string>
     <string name="video">वीडियो</string>
     <string name="audios">ऑडियो</string>
@@ -53,7 +53,9 @@
     <string name="items">आइटम</string>
     <string name="in_playlist">प्लेलिस्ट में</string>
     <string name="empty_playlist">आपकी प्लेलिस्ट खाली है</string>
-    <string name="drag_number_to_reorder">क्रम बदलने के लिए नंबर खींचें</string>
     <string name="remove_from_playlist">प्लेलिस्ट से हटाएं</string>
     <string name="image">छवि</string>
+    <string name="cast_searching_for_screen">स्क्रीन खोज रहा है</string>
+    <string name="cast_select_screen">स्क्रीन चुनें</string>
+    <string name="cast_looking_for_devices">पास के डिवाइस खोज रहा है...</string>
 </resources>

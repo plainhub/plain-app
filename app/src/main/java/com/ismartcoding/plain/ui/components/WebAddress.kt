@@ -20,16 +20,6 @@ import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 
 @Composable
-fun WebAddress(
-    context: Context,
-    mainVM: MainViewModel,
-    isHttps: Boolean,
-    showIpAddresses: Boolean = true,
-) {
-    WebAddressBar(context = context, mainVM = mainVM, isHttps = isHttps, showIpAddresses = showIpAddresses)
-}
-
-@Composable
 fun HttpHttpsSegmentedButton(isHttps: Boolean, onSelect: (Boolean) -> Unit) {
     val trackColor = MaterialTheme.colorScheme.cardBackgroundNormal
     val selectedColor = MaterialTheme.colorScheme.primary
@@ -49,7 +39,7 @@ fun HttpHttpsSegmentedButton(isHttps: Boolean, onSelect: (Boolean) -> Unit) {
                     .clip(RoundedCornerShape(50))
                     .background(if (selected) selectedColor else trackColor)
                     .clickable { onSelect(https) }
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                    .padding(horizontal = 20.dp, vertical = 10.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(

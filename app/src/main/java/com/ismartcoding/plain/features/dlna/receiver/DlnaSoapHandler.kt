@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
 import android.util.Xml
+import com.ismartcoding.plain.features.dlna.DlnaMediaType
 import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
 import com.ismartcoding.plain.features.dlna.common.DlnaSoap
@@ -86,7 +87,57 @@ object DlnaSoapHandler {
     fun extractTitleFromDidlMeta(meta: String): String {
         val start = meta.indexOf("<dc:title>")
         val end = meta.indexOf("</dc:title>")
-        return if (start >= 0 && end > start) meta.substring(start + 10, end) else ""
+        return if (start >= 0 && end > start) {
+            meta.substring(start + 10, end).trim()
+                .replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
+                .replace("&quot;", "\"").replace("&apos;", "'")
+        } else ""
+    }
+
+    fun extractAlbumArtUriFromDidlMeta(meta: String): String {
+        val start = meta.indexOf("<upnp:albumArtURI")
+        if (start < 0) return ""
+        val tagEnd = meta.indexOf('>', start)
+        if (tagEnd < 0) return ""
+        val closeTag = meta.indexOf("</upnp:albumArtURI>", tagEnd)
+        return if (closeTag > tagEnd) meta.substring(tagEnd + 1, closeTag).trim() else ""
+    }
+
+    /**
+     * Strips common media file extensions and URL-decodes percent-encoded characters
+     * so the UI shows a clean track/video name instead of "song.mp3" or "video%20title.mp4".
+     */
+    fun cleanMediaTitle(raw: String): String {
+        val mediaExtensions = setOf(
+            "mp3", "flac", "aac", "ogg", "m4a", "wav", "opus", "wma",
+            "mp4", "mkv", "avi", "mov", "wmv", "flv", "ts", "webm",
+            "jpg", "jpeg", "png", "gif", "webp", "bmp", "heic", "heif",
+        )
+        val decoded = try { java.net.URLDecoder.decode(raw, "UTF-8") } catch (_: Exception) { raw }
+        val ext = decoded.substringAfterLast('.', "").lowercase()
+        return if (ext in mediaExtensions) decoded.substringBeforeLast('.') else decoded
+    }
+
+    fun extractMediaTypeFromDidlMeta(meta: String, fallbackUri: String = ""): DlnaMediaType {
+        val classStart = meta.indexOf("<upnp:class>")
+        val classEnd = meta.indexOf("</upnp:class>")
+        if (classStart >= 0 && classEnd > classStart) {
+            val cls = meta.substring(classStart + 12, classEnd).lowercase()
+            return when {
+                "audioitem" in cls || "musictrack" in cls -> DlnaMediaType.AUDIO
+                "imageitem" in cls || "photo" in cls -> DlnaMediaType.IMAGE
+                "videoitem" in cls -> DlnaMediaType.VIDEO
+                else -> DlnaMediaType.UNKNOWN
+            }
+        }
+        // Fallback: detect from URI extension
+        val ext = fallbackUri.substringAfterLast('.').substringBefore('?').lowercase()
+        return when (ext) {
+            "mp3", "flac", "aac", "ogg", "m4a", "wav", "opus", "wma" -> DlnaMediaType.AUDIO
+            "jpg", "jpeg", "png", "gif", "webp", "bmp", "heic", "heif" -> DlnaMediaType.IMAGE
+            "mp4", "mkv", "avi", "mov", "wmv", "flv", "ts", "webm" -> DlnaMediaType.VIDEO
+            else -> DlnaMediaType.UNKNOWN
+        }
     }
 
     private fun String.xmlEscape() = replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")

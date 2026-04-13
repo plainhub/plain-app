@@ -12,8 +12,8 @@
     <string name="add_videos_to_playlist">Veuillez d\'abord ajouter des vidéos à la liste de lecture.</string>
     <string name="video_playlist_no_data">La liste de lecture est utilisée pour diffuser automatiquement plusieurs vidéos en séquence.</string>
     <string name="cast">Diffuser</string>
-    <string name="cast_dialog_hint">Appuyez sur un appareil pour entrer en mode de diffusion. Les médias seront lus sur cet appareil.</string>
-    <string name="cast_dialog_wireless_cast_tip">Sur un autre téléphone, ouvre Diffusion sans fil pour le faire apparaître ici.</string>
+    <string name="cast_dialog_hint">Choisissez un appareil pour entrer en mode Cast.</string>
+    <string name="cast_dialog_wireless_cast_tip">Astuce : connectez-vous au même Wi-Fi que votre écran cible</string>
     <string name="images">Images</string>
     <string name="video">Vidéo</string>
     <string name="audios">Audio</string>
@@ -53,7 +53,9 @@
     <string name="items">Éléments</string>
     <string name="in_playlist">Dans la liste de lecture</string>
     <string name="empty_playlist">Votre liste de lecture est vide</string>
-    <string name="drag_number_to_reorder">Faites glisser le numéro pour réorganiser la liste</string>
     <string name="remove_from_playlist">Supprimer de la liste</string>
     <string name="image">Image</string>
+    <string name="cast_searching_for_screen">Recherche d\'écran</string>
+    <string name="cast_select_screen">Sélectionner un écran</string>
+    <string name="cast_looking_for_devices">Recherche d\'appareils à proximité...</string>
 </resources>

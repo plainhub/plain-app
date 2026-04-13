@@ -153,4 +153,8 @@
     <string name="buy_me_a_coffee">Koop een kopje koffie voor mij</string>
 
 
+    <string name="crash_report_title">App gecrasht</string>
+    <string name="crash_report_message">De app is onverwacht gecrasht. Wil je het crashrapport met ons delen zodat we het kunnen oplossen?</string>
+    <string name="crash_include_app_logs">App-logboeken opnemen</string>
+    <string name="crash_share">Delen</string>
 </resources>

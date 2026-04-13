@@ -10,8 +10,6 @@
     <string name="two_factor_auth_tips">Khi đăng nhập trên trang web, chúng tôi sẽ hiển thị một cửa sổ thoả thuận trong ứng dụng để tăng cường bảo mật.</string>
     <string name="instruction_for_use">Hướng dẫn sử dụng</string>
     <string name="web_how_to">Bước 1: Kết nối điện thoại và máy tính của bạn với cùng một mạng không dây.\n\nPhương pháp 1: Kết nối máy tính và điện thoại với cùng một mạng Wi-Fi.\nPhương pháp 2: Bật điểm phát Wi-Fi của điện thoại và kết nối máy tính với điểm phát của điện thoại.\n\nBước 2: Mở trình duyệt web trên máy tính của bạn và nhập địa chỉ web được hiển thị trên trang chủ ứng dụng.</string>
-    <string name="web_dig">1. Trình duyệt máy tính không thể mở trang web.\n\nBộ định tuyến không dây có thể đã bật cách ly AP, ngăn chặn việc giao tiếp giữa máy tính và điện thoại. Vui lòng vào giao diện cài đặt của bộ định tuyến để vô hiệu hóa chức năng cách ly AP.\n\n2. Trình duyệt máy tính hiển thị cảnh báo sau khi nhập địa chỉ trang web HTTPS: "Kết nối của bạn không riêng tư."\n\nBạn có thể nhấp vào "Tiếp tục đến x.x.x.x (không an toàn)" để tiếp tục. Ứng dụng đơn giản sử dụng một chứng chỉ TLS tự ký để mã hóa trang web.</string>
-    <string name="learn_more">Tìm hiểu thêm</string>
     <string name="http_server_state_on">Dịch vụ đang chạy</string>
     <string name="http_server_state_starting">Đang khởi động dịch vụ…</string>
     <string name="http_server_state_stopping">Đang dừng dịch vụ…</string>
@@ -78,4 +76,6 @@
     <string name="home_web_easy_failed_title">Không thể khởi động</string>
     <string name="last_active">Lần cuối hoạt động: %1$s</string>
     <string name="revoke_session">Thu hồi phiên này</string>
+    <string name="how_to_use">Cách sử dụng</string>
+    <string name="developer_options">Tùy chọn dành cho nhà phát triển</string>
 </resources>

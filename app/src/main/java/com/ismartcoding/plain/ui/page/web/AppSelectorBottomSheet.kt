@@ -73,13 +73,7 @@ fun AppSelectorBottomSheet(
     ) {
         Column {
             PBottomSheetTopAppBar(
-                titleContent = {
-                    Text(
-                        text = stringResource(R.string.add_app),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                },
+                title = stringResource(R.string.add_app),
                 actions = {
                     PTopRightButton(
                         stringResource(R.string.add) +

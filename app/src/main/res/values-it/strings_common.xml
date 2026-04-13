@@ -153,4 +153,8 @@
     <string name="buy_me_a_coffee">Offrimi un caffè</string>
 
 
+    <string name="crash_report_title">App in crash</string>
+    <string name="crash_report_message">L\'app si è arrestata in modo imprevisto. Vuoi condividere il report del crash per aiutarci a risolverlo?</string>
+    <string name="crash_include_app_logs">Includi log dell\'app</string>
+    <string name="crash_share">Condividi</string>
 </resources>

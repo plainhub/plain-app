@@ -4,12 +4,12 @@ import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.features.dlna.DlnaCommand
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
+import com.ismartcoding.plain.features.dlna.PendingCastRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import java.io.BufferedInputStream
 import java.io.PrintWriter
 import java.net.ServerSocket
 import java.net.Socket
@@ -25,7 +25,7 @@ object DlnaHttpServer {
             LogCat.d("DLNA HTTP server started on port $port")
             while (isActive) {
                 val client = try { serverSocket.accept() } catch (_: Exception) { break }
-                launch { handleClient(client) }
+                launch { handleClient(client, client.inetAddress?.hostAddress.orEmpty()) }
             }
         } catch (e: Exception) {
             LogCat.e("DLNA HTTP server error: ${e.message}")
@@ -34,40 +34,32 @@ object DlnaHttpServer {
         }
     }
 
-    private suspend fun handleClient(socket: Socket) = withContext(Dispatchers.IO) {
+    private suspend fun handleClient(socket: Socket, senderIp: String) = withContext(Dispatchers.IO) {
         try {
             socket.soTimeout = 5_000
-            val reader = BufferedReader(InputStreamReader(socket.inputStream, Charsets.UTF_8))
+            val bis = BufferedInputStream(socket.inputStream)
             val writer = PrintWriter(socket.outputStream, false, Charsets.UTF_8)
-            val requestLine = reader.readLine() ?: return@withContext
+            val requestLine = bis.readHttpLine() ?: return@withContext
             val parts = requestLine.split(" ")
             if (parts.size < 2) return@withContext
             val method = parts[0]
             val path = parts[1]
 
             val headers = mutableMapOf<String, String>()
-            var headerLine = reader.readLine()
+            var headerLine = bis.readHttpLine()
             while (!headerLine.isNullOrEmpty()) {
                 val idx = headerLine.indexOf(':')
                 if (idx > 0) {
                     headers[headerLine.substring(0, idx).trim().lowercase()] =
                         headerLine.substring(idx + 1).trim()
                 }
-                headerLine = reader.readLine()
+                headerLine = bis.readHttpLine()
             }
+            val senderName = resolveSenderName(headers, senderIp)
             val contentLength = headers["content-length"]?.toIntOrNull() ?: 0
-            val body = if (contentLength > 0) {
-                val buf = CharArray(contentLength)
-                var offset = 0
-                while (offset < contentLength) {
-                    val read = reader.read(buf, offset, contentLength - offset)
-                    if (read == -1) break
-                    offset += read
-                }
-                String(buf, 0, offset)
-            } else ""
+            val body = readBodyBytes(bis, contentLength)
 
-            val response = route(method, path, headers, body)
+            val response = route(method, path, headers, body, senderIp, senderName)
             writer.print(response)
             writer.flush()
         } catch (e: Exception) {
@@ -77,7 +69,7 @@ object DlnaHttpServer {
         }
     }
 
-    private suspend fun route(method: String, path: String, headers: Map<String, String>, body: String): String {
+    private suspend fun route(method: String, path: String, headers: Map<String, String>, body: String, senderIp: String = "", senderName: String = ""): String {
         return when {
             path.endsWith("description.xml") -> {
                 val ip = NetworkHelper.getDeviceIP4()
@@ -87,7 +79,7 @@ object DlnaHttpServer {
             }
             path.endsWith("scpd.xml") -> httpOk(DlnaXmlTemplates.scpdXml, "text/xml; charset=\"utf-8\"")
             method == "POST" && (path.endsWith("control") || path.contains("AVTransport")) ->
-                handleSoap(headers, body)
+                handleSoap(headers, body, senderIp, senderName)
             method == "POST" && path.contains("RenderingControl") ->
                 httpOk(DlnaSoapHandler.buildResponse("GetVolume", "<CurrentVolume>100</CurrentVolume>"), "text/xml; charset=\"utf-8\"")
             method == "SUBSCRIBE" -> httpOkSubscribe()
@@ -96,7 +88,7 @@ object DlnaHttpServer {
         }
     }
 
-    private suspend fun handleSoap(headers: Map<String, String>, body: String): String {
+    private suspend fun handleSoap(headers: Map<String, String>, body: String, senderIp: String = "", senderName: String = ""): String {
         val soapAction = headers["soapaction"] ?: return httpInternalError()
         val (action, params) = DlnaSoapHandler.parseSoapAction(soapAction, body)
         LogCat.d("DLNA SOAP action: $action")
@@ -104,25 +96,36 @@ object DlnaHttpServer {
             "SetAVTransportURI" -> {
                 val uri = params["CurrentURI"] ?: ""
                 val meta = params["CurrentURIMetaData"] ?: ""
-                val title = DlnaSoapHandler.extractTitleFromDidlMeta(meta).ifEmpty {
+                val rawTitle = DlnaSoapHandler.extractTitleFromDidlMeta(meta).ifEmpty {
                     uri.substringAfterLast('/').substringBefore('?')
                 }
-                LogCat.d("DLNA SetAVTransportURI uri=$uri title=$title")
+                val title = DlnaSoapHandler.cleanMediaTitle(rawTitle)
+                val mediaType = DlnaSoapHandler.extractMediaTypeFromDidlMeta(meta, uri)
+                val albumArtUri = DlnaSoapHandler.extractAlbumArtUriFromDidlMeta(meta)
+                LogCat.d("DLNA SetAVTransportURI uri=$uri title=$title type=$mediaType")
                 if (uri.isNotEmpty()) {
-                    DlnaRendererState.commandChannel.trySend(DlnaCommand.SetUri(uri, title))
+                    DlnaRendererState.rawPendingCastRequest.value =
+                        PendingCastRequest(senderIp, senderName, uri, title, mediaType, albumArtUri)
+                    DlnaRendererState.pendingPlayQueued.value = false
                 }
                 DlnaSoapHandler.buildResponse("SetAVTransportURI")
             }
             "Play" -> {
                 LogCat.d("DLNA Play")
-                DlnaRendererState.commandChannel.trySend(DlnaCommand.Play)
+                val hasPending = DlnaRendererState.rawPendingCastRequest.value != null ||
+                    DlnaRendererState.pendingCastRequest.value != null
+                if (hasPending) {
+                    DlnaRendererState.pendingPlayQueued.value = true
+                } else {
+                    DlnaRendererState.commandChannel.trySend(DlnaCommand.Play)
+                }
                 DlnaSoapHandler.buildResponse("Play")
             }
             "Pause" -> { DlnaRendererState.commandChannel.trySend(DlnaCommand.Pause); DlnaSoapHandler.buildResponse("Pause") }
             "Stop" -> { DlnaRendererState.commandChannel.trySend(DlnaCommand.Stop); DlnaSoapHandler.buildResponse("Stop") }
             "Seek" -> {
                 val target = params["Target"] ?: ""
-                val posMs = parseTimeToMs(target)
+                val posMs = parseDlnaTimeToMs(target)
                 if (posMs >= 0) DlnaRendererState.commandChannel.trySend(DlnaCommand.Seek(posMs))
                 DlnaSoapHandler.buildResponse("Seek")
             }
@@ -138,26 +141,4 @@ object DlnaHttpServer {
         }
         return httpOk(responseBody, "text/xml; charset=\"utf-8\"")
     }
-
-    private fun parseTimeToMs(time: String): Long {
-        val parts = time.split(":")
-        return if (parts.size >= 3) {
-            val h = parts[0].toLongOrNull() ?: return -1L
-            val m = parts[1].toLongOrNull() ?: return -1L
-            val s = parts[2].split(".")[0].toLongOrNull() ?: return -1L
-            (h * 3600 + m * 60 + s) * 1000
-        } else -1L
-    }
-
-    private fun httpOk(body: String, contentType: String = "text/plain"): String {
-        val bytes = body.toByteArray(Charsets.UTF_8)
-        return "HTTP/1.1 200 OK\r\nContent-Type: $contentType\r\nContent-Length: ${bytes.size}\r\nConnection: close\r\n\r\n$body"
-    }
-
-    private fun httpOkSubscribe(): String =
-        "HTTP/1.1 200 OK\r\nSID: uuid:dlna-plain-sub\r\nTIMEOUT: Second-3600\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
-
-    private fun httpNotFound(): String = "HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
-
-    private fun httpInternalError(): String = "HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
 }

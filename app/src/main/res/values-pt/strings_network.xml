@@ -10,8 +10,6 @@
     <string name="two_factor_auth_tips">Ao fazer login na página da web, exibiremos uma janela de confirmação no aplicativo para segurança adicional.</string>
     <string name="instruction_for_use">Instruções de uso</string>
     <string name="web_how_to">Passo 1: Conecte o seu telefone e computador à mesma rede sem fio.\n\nMétodo 1: Conecte o seu computador e telefone à mesma rede Wi-Fi.\nMétodo 2: Ative o hotspot do seu telefone e conecte o seu computador ao hotspot do telefone.\n\nPasso 2: Abra um navegador da web no seu computador e insira o endereço da web exibido na página inicial do aplicativo.</string>
-    <string name="web_dig">1. O navegador do computador não consegue abrir a página da web.\n\nO roteador sem fio pode ter o isolamento AP ativado, impedindo a comunicação entre o computador e o telefone. Por favor, vá para a interface de configuração do roteador para desativar a função de isolamento AP.\n\n2. O navegador do computador exibe um aviso após inserir um endereço de página da web HTTPS: "Sua conexão não é privada."\n\nVocê pode clicar em "Prosseguir para x.x.x.x (inseguro)" para continuar. O Simple usa um certificado TLS autoassinado para criptografar o site.</string>
-    <string name="learn_more">Saiba mais</string>
     <string name="http_server_state_on">Serviço em execução</string>
     <string name="http_server_state_starting">Iniciando serviço…</string>
     <string name="http_server_state_stopping">Parando serviço…</string>
@@ -31,7 +29,7 @@
     <string name="rotate_url_token_on_restart">Rotacionar token de URL ao reiniciar</string>
     <string name="rotate_url_token_on_restart_tips">Quando ativado, um novo token de URL é gerado toda vez que o aplicativo inicia. Isso invalida todas as URLs de arquivos geradas anteriormente. Recomendado para usuários avançados que desejam maior segurança.</string>
     <string name="http_server_ok">Servidor HTTP iniciado</string>
-    <string name="http_server_error">O servidor HTTP não está iniciado. Reinicie o PlainApp e tente novamente. Certifique-se de que não existem outras aplicações a ocupar as portas HTTP ou HTTPS. Se o problema persistir, forneça mais detalhes sobre o problema ao contactar ismartcoding@gmail.com.</string>
+    <string name="http_server_error">O servidor HTTP não está iniciado. Reinicie o PlainApp e tente novamente. Certifique-se de que não existem outras aplicações a ocupar as portas HTTP ou HTTPS. Se o problema persistir, forneça mais detalhes sobre o problema ao contactar support@plainapp.app.</string>
     <string name="relaunch_app">Reiniciar aplicativo</string>
     <string name="require_confirmation">Exigir confirmação</string>
     <string name="web_service_required_for_chat">Para receber mensagens de outras pessoas, ative o Portal Web do telefone.</string>
@@ -78,4 +76,6 @@
     <string name="home_web_easy_failed_title">Não foi possível iniciar</string>
     <string name="last_active">Última atividade: %1$s</string>
     <string name="revoke_session">Revogar esta sessão</string>
+    <string name="how_to_use">Como usar</string>
+    <string name="developer_options">Opções do desenvolvedor</string>
 </resources>

@@ -68,4 +68,14 @@
         <item>130 dB: শটগান ব্লাস্ট, জ্যাকহামার</item>
         <item>140 dB: সামরিক যেট বিমান, ফায়ারওয়ার্কস</item>
     </string-array>
+    <string name="dlna_cast_request_title">কাস্ট অনুরোধ</string>
+    <string name="dlna_cast_request_desc">ডিভাইস %1$s এই ডিভাইসে কাস্ট করতে চায়</string>
+    <string name="dlna_cast_accept">গ্রহণ করুন</string>
+    <string name="dlna_cast_reject">প্রত্যাখ্যান করুন</string>
+    <string name="dlna_cast_remember_choice">পছন্দ মনে রাখুন, আর জিজ্ঞেস করবেন না</string>
+    <string name="dlna_cast_history">কাস্ট নিয়মাবলী</string>
+    <string name="dlna_cast_accepted">গৃহীত</string>
+    <string name="dlna_cast_rejected">প্রত্যাখ্যাত</string>
+    <string name="dlna_receiver_start_error">রিসিভার শুরু করতে ব্যর্থ হয়েছে।</string>
+    <string name="retry">পুনরায় চেষ্টা করুন</string>
 </resources>

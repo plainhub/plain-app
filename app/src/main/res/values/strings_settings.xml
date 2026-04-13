@@ -3,6 +3,8 @@
     <string name="app_name" translatable="false">PlainApp</string>
     <string name="app_data">App data</string>
     <string name="developer_mode">Developer mode</string>
+    <string name="simulate_crash">Simulate crash</string>
+    <string name="simulate_crash_desc">Trigger a test crash to verify crash report works</string>
     <string name="ui_components" translatable="false">UI Components</string>
     <string name="local_cache">Local cache</string>
     <string name="clear_cache">Clear cache</string>
@@ -60,7 +62,7 @@
     <string name="name">Name</string>
     <string name="sort_by_random">Sort by random</string>
     <string name="app_restored">APP data is restored, you need to force quit this app and start the app again as new.</string>
-    <string name="welcome_text">Welcome! You can easily send text, images, and videos to this page and view them on your computer.\nIf you encounter any issues, please feel free to send an email to ismartcoding@gmail.com for assistance or join our Discord discussion at: https://discord.gg/RQWcS6DEEe.</string>
+    <string name="welcome_text">Welcome! You can easily send text, images, and videos to this page and view them on your computer.\nIf you encounter any issues, please feel free to send an email to support@plainapp.app for assistance or join our Discord discussion at: https://discord.gg/RQWcS6DEEe.</string>
     <string name="donation">Donate</string>
     <string name="donation_desc">PlainApp is free, open-source, and built by one developer. If it saves you time, consider buying a coffee.</string>
     <string name="donation_title">Support PlainApp Development</string>

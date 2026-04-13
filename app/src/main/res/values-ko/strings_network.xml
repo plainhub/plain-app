@@ -10,8 +10,6 @@
     <string name="two_factor_auth_tips">웹 페이지에 로그인 할 때, 추가 보안을 위해 앱에서 확인 팝업을 표시합니다.</string>
     <string name="instruction_for_use">사용 설명서</string>
     <string name="web_how_to">단계 1: 핸드폰과 컴퓨터를 동일한 무선 네트워크에 연결합니다.\n\n방법 1: 컴퓨터와 핸드폰을 동일한 Wi-Fi 네트워크에 연결합니다.\n방법 2: 핸드폰의 핫스팟을 켜고 컴퓨터를 핸드폰의 핫스팟에 연결합니다.\n\n단계 2: 컴퓨터에서 웹 브라우저를 열고 앱 홈페이지에 표시된 웹 주소를 입력합니다.</string>
-    <string name="web_dig">1. 컴퓨터 브라우저가 웹 페이지를 열 수 없습니다.\n\n무선 라우터에서 AP 분리가 활성화되어 있을 수 있으며, 컴퓨터와 핸드폰 간 통신을 방지합니다. AP 분리 기능을 비활성화하려면 라우터 설정 인터페이스로 이동하십시오.\n\n2. HTTPS 웹 페이지 주소를 입력한 후 컴퓨터 브라우저에 경고가 표시됩니다. "연결이 개인적이지 않습니다."를 클릭하여 계속할 수 있습니다. Simple은 웹 사이트를 암호화하기 위해 자체 서명된 TLS 인증서를 사용합니다.</string>
-    <string name="learn_more">더 알아보기</string>
     <string name="http_server_state_on">서비스가 실행 중입니다</string>
     <string name="http_server_state_starting">서비스 시작 중…</string>
     <string name="http_server_state_stopping">서비스 중지 중…</string>
@@ -31,7 +29,7 @@
     <string name="rotate_url_token_on_restart">재시작 시 URL 토큰 교체</string>
     <string name="rotate_url_token_on_restart_tips">활성화하면 앱을 시작할 때마다 새 URL 토큰이 생성됩니다. 이렇게 하면 이전에 생성된 모든 파일 URL이 무효화됩니다. 보안을 강화하고자 하는 고급 사용자에게 권장됩니다.</string>
     <string name="http_server_ok">Http 서버가 정상적으로 실행 중입니다.</string>
-    <string name="http_server_error">Http 서버가 시작되지 않았습니다. PlainApp을 다시 시작하고 다시 시도하십시오. HTTP 또는 HTTPS 포트를 다른 앱이 차지하고 있지 않은지 확인하십시오. 문제가 지속되면 ismartcoding@gmail.com으로 문제에 대한 자세한 내용을 제공해 주십시오.</string>
+    <string name="http_server_error">Http 서버가 시작되지 않았습니다. PlainApp을 다시 시작하고 다시 시도하십시오. HTTP 또는 HTTPS 포트를 다른 앱이 차지하고 있지 않은지 확인하십시오. 문제가 지속되면 support@plainapp.app으로 문제에 대한 자세한 내용을 제공해 주십시오.</string>
     <string name="relaunch_app">앱 다시 시작</string>
     <string name="require_confirmation">확인 필요</string>
     <string name="web_service_required_for_chat">다른 사람의 메시지를 받으려면 폰 웹 포털을 활성화하세요.</string>
@@ -78,4 +76,6 @@
     <string name="home_web_easy_failed_title">시작할 수 없음</string>
     <string name="last_active">마지막 활성: %1$s</string>
     <string name="revoke_session">이 세션 취소</string>
+    <string name="how_to_use">사용 방법</string>
+    <string name="developer_options">개발자 옵션</string>
 </resources>

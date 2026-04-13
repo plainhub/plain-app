@@ -68,4 +68,14 @@
         <item>130 dB: ஷாட்கன் பிளாஸ்ட், ஜாக்க்காமர்</item>
         <item>140 dB: மிலிடரி ஜெட் விமானம், வெடிக்கும்</item>
     </string-array>
+    <string name="dlna_cast_request_title">Cast கோரிக்கை</string>
+    <string name="dlna_cast_request_desc">சாதனம் %1$s இந்த சாதனத்திற்கு cast செய்ய விரும்புகிறது</string>
+    <string name="dlna_cast_accept">ஏற்கவும்</string>
+    <string name="dlna_cast_reject">நிராகரிக்கவும்</string>
+    <string name="dlna_cast_remember_choice">தேர்வை நினைவில் வைத்திரு, மீண்டும் கேட்காதே</string>
+    <string name="dlna_cast_history">Cast விதிகள்</string>
+    <string name="dlna_cast_accepted">ஏற்கப்பட்டது</string>
+    <string name="dlna_cast_rejected">நிராகரிக்கப்பட்டது</string>
+    <string name="dlna_receiver_start_error">பெறுநரை தொடங்க முடியவில்லை.</string>
+    <string name="retry">மீண்டும் முயற்சிக்கவும்</string>
 </resources>

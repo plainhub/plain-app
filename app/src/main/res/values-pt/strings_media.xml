@@ -12,8 +12,8 @@
     <string name="add_videos_to_playlist">Por favor, adicione vídeos à playlist primeiro.</string>
     <string name="video_playlist_no_data">A playlist é usada para transmitir automaticamente vários vídeos em sequência.</string>
     <string name="cast">Transmitir</string>
-    <string name="cast_dialog_hint">Toque em um dispositivo para entrar no modo de transmissão. A mídia será reproduzida nesse dispositivo.</string>
-    <string name="cast_dialog_wireless_cast_tip">Em outro telefone, abra Transmissão sem fio para aparecer aqui.</string>
+    <string name="cast_dialog_hint">Escolha um dispositivo para entrar no modo Cast.</string>
+    <string name="cast_dialog_wireless_cast_tip">Dica: conecte-se ao mesmo Wi-Fi que sua tela de destino</string>
     <string name="images">Imagens</string>
     <string name="video">Vídeo</string>
     <string name="audios">Áudio</string>
@@ -53,7 +53,9 @@
     <string name="items">Itens</string>
     <string name="in_playlist">Na lista de reprodução</string>
     <string name="empty_playlist">Sua lista de reprodução está vazia</string>
-    <string name="drag_number_to_reorder">Arraste o número para reordenar</string>
     <string name="remove_from_playlist">Remover da lista</string>
     <string name="image">Imagem</string>
+    <string name="cast_searching_for_screen">Procurando tela</string>
+    <string name="cast_select_screen">Selecionar uma tela</string>
+    <string name="cast_looking_for_devices">Procurando dispositivos próximos...</string>
 </resources>

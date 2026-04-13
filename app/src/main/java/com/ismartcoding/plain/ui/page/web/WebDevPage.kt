@@ -20,7 +20,9 @@ import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.ButtonType
+import com.ismartcoding.plain.preferences.AdbTokenPreference
 import com.ismartcoding.plain.preferences.AuthDevTokenPreference
+import com.ismartcoding.plain.preferences.LocalAdbToken
 import com.ismartcoding.plain.preferences.LocalAuthDevToken
 import com.ismartcoding.plain.preferences.WebSettingsProvider
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -35,6 +37,7 @@ import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
+import com.ismartcoding.plain.ui.components.showRestartAppDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -45,6 +48,7 @@ fun WebDevPage(navController: NavHostController) {
         val context = LocalContext.current
         val scope = rememberCoroutineScope()
         val devToken = LocalAuthDevToken.current
+        val adbToken = LocalAdbToken.current
         var enable by remember { mutableStateOf(false) }
         val httpPort = TempData.httpPort
         val ip4 = remember { NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" } }
@@ -55,7 +59,7 @@ fun WebDevPage(navController: NavHostController) {
 
         PScaffold(
             topBar = {
-                PTopAppBar(navController = navController, title = stringResource(R.string.testing_token))
+                PTopAppBar(navController = navController, title = stringResource(R.string.developer_options))
             },
             content = { paddingValues ->
                 LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
@@ -97,6 +101,32 @@ fun WebDevPage(navController: NavHostController) {
                                 },
                             )
                         }
+                        VerticalSpace(dp = 24.dp)
+                        Subtitle(text = stringResource(id = R.string.adb_automation))
+                        ClipboardCard(label = stringResource(R.string.token), adbToken)
+                        VerticalSpace(dp = 16.dp)
+                        ClipboardCard(
+                            label = stringResource(R.string.adb_cmd_start),
+                            "adb shell am broadcast -a com.ismartcoding.plain.action.START_HTTP_SERVER -p com.ismartcoding.plain --es token $adbToken"
+                        )
+                        VerticalSpace(dp = 16.dp)
+                        ClipboardCard(
+                            label = stringResource(R.string.adb_cmd_stop),
+                            "adb shell am broadcast -a com.ismartcoding.plain.action.STOP_HTTP_SERVER -p com.ismartcoding.plain --es token $adbToken"
+                        )
+                        Tips(text = stringResource(id = R.string.adb_token_desc))
+                        VerticalSpace(dp = 16.dp)
+                        PFilledButton(
+                            text = stringResource(id = R.string.reset_token),
+                            type = ButtonType.DANGER,
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            onClick = {
+                                scope.launch(Dispatchers.IO) {
+                                    AdbTokenPreference.resetAsync(context)
+                                }
+                                showRestartAppDialog(context)
+                            },
+                        )
                         BottomSpace(paddingValues)
                     }
                 }

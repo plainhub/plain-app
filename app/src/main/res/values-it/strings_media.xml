@@ -12,8 +12,8 @@
     <string name="add_videos_to_playlist">Aggiungi prima dei video alla playlist.</string>
     <string name="video_playlist_no_data">La playlist viene utilizzata per riprodurre automaticamente più video in sequenza.</string>
     <string name="cast">Trasmetti</string>
-    <string name="cast_dialog_hint">Tocca un dispositivo per entrare in modalità Cast. I media verranno riprodotti su quel dispositivo.</string>
-    <string name="cast_dialog_wireless_cast_tip">Su un altro telefono, apri Streaming wireless per farlo apparire qui.</string>
+    <string name="cast_dialog_hint">Scegli un dispositivo per entrare in modalità Cast.</string>
+    <string name="cast_dialog_wireless_cast_tip">Suggerimento: connettiti allo stesso Wi-Fi dello schermo di destinazione</string>
     <string name="images">Immagini</string>
     <string name="video">Video</string>
     <string name="audios">Audio</string>
@@ -53,7 +53,9 @@
     <string name="items">Elementi</string>
     <string name="in_playlist">Nella playlist</string>
     <string name="empty_playlist">La tua playlist è vuota</string>
-    <string name="drag_number_to_reorder">Trascina il numero per riordinare</string>
     <string name="remove_from_playlist">Rimuovi dalla playlist</string>
     <string name="image">Immagine</string>
+    <string name="cast_searching_for_screen">Ricerca schermo</string>
+    <string name="cast_select_screen">Seleziona uno schermo</string>
+    <string name="cast_looking_for_devices">Ricerca dispositivi nelle vicinanze...</string>
 </resources>

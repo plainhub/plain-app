@@ -27,14 +27,14 @@ import com.ismartcoding.plain.ui.models.WebConsoleViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WebLearnMorePage(navController: NavHostController, webVM: WebConsoleViewModel = viewModel()) {
+fun HowToUsePage(navController: NavHostController, webVM: WebConsoleViewModel = viewModel()) {
 
     WebSettingsProvider {
         val webEnabled = LocalWeb.current
         val context = LocalContext.current
         PScaffold(
             topBar = {
-                PTopAppBar(navController = navController, title = stringResource(R.string.phone_web_portal))
+                PTopAppBar(navController = navController, title = stringResource(R.string.how_to_use))
             },
             content = { paddingValues ->
                 LazyColumn(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
@@ -60,16 +60,6 @@ fun WebLearnMorePage(navController: NavHostController, webVM: WebConsoleViewMode
                             )
                         }
                         VerticalSpace(dp = 16.dp)
-                    }
-                    item {
-                        Subtitle(text = stringResource(id = R.string.troubleshoot))
-                        PCard {
-                            Text(
-                                stringResource(id = R.string.web_dig),
-                                modifier = Modifier.padding(16.dp),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                        }
                     }
                     item {
                         if (webEnabled) {

@@ -153,4 +153,8 @@
     <string name="buy_me_a_coffee">আমাকে একটি কফি কিনুন</string>
 
 
+    <string name="crash_report_title">অ্যাপ ক্র্যাশ হয়েছে</string>
+    <string name="crash_report_message">অ্যাপটি অপ্রত্যাশিতভাবে ক্র্যাশ হয়েছে। আমরা এটি ঠিক করতে পারি সে জন্য কি আপনি আমাদের সাথে ক্র্যাশ রিপোর্ট শেয়ার করতে চান?</string>
+    <string name="crash_include_app_logs">অ্যাপ লগ অন্তর্ভুক্ত করুন</string>
+    <string name="crash_share">শেয়ার করুন</string>
 </resources>

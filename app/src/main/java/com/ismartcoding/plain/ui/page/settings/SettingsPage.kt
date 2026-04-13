@@ -102,7 +102,6 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                 item {
                     VerticalSpace(dp = 16.dp)
                     PCard {
-                        if (developerMode) PListItem(title = stringResource(R.string.client_id), value = TempData.clientId)
                         PListItem(
                             modifier = Modifier.combinedClickable(onClick = {}, onDoubleClick = {
                                 developerMode = true
@@ -144,10 +143,14 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                 item {
                     VerticalSpace(dp = 16.dp)
                     PCard {
-                        PListItem(modifier = Modifier.clickable { WebHelper.open(context, UrlHelper.getTermsUrl()) },
-                            title = stringResource(R.string.terms_of_use), showMore = true)
-                        PListItem(modifier = Modifier.clickable { WebHelper.open(context, UrlHelper.getPolicyUrl()) },
-                            title = stringResource(R.string.privacy_policy), showMore = true)
+                        PListItem(
+                            modifier = Modifier.clickable { WebHelper.open(context, UrlHelper.getTermsUrl()) },
+                            title = stringResource(R.string.terms_of_use), showMore = true
+                        )
+                        PListItem(
+                            modifier = Modifier.clickable { WebHelper.open(context, UrlHelper.getPolicyUrl()) },
+                            title = stringResource(R.string.privacy_policy), showMore = true
+                        )
                     }
                 }
                 if (developerMode) {

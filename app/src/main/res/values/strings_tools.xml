@@ -17,6 +17,16 @@
     <string name="dlna_receiver_enable">Enable Cast Receiver</string>
     <string name="dlna_receiver_disable">Disable Cast Receiver</string>
     <string name="dlna_receiver_exit_player">Exit Player</string>
+    <string name="dlna_cast_request_title">Cast Request</string>
+    <string name="dlna_cast_request_desc">Device %1$s wants to cast to this device</string>
+    <string name="dlna_cast_accept">Accept</string>
+    <string name="dlna_cast_reject">Reject</string>
+    <string name="dlna_cast_remember_choice">Remember choice, don\'t ask again</string>
+    <string name="dlna_cast_history">Cast Rules</string>
+    <string name="dlna_cast_accepted">Accepted</string>
+    <string name="dlna_cast_rejected">Rejected</string>
+    <string name="dlna_receiver_start_error">Failed to start receiver.</string>
+    <string name="retry">Retry</string>
     <string name="short_break">Short break</string>
     <string name="long_break">Long break</string>
     <string name="tomatoes_today">Tomatoes today</string>

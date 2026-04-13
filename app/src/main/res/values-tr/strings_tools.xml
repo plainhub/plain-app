@@ -68,4 +68,14 @@
         <item>130 dB: Av tüfeği patlaması, Kırıcı</item>
         <item>140 dB: Askeri jet uçağı, Havai fişek</item>
     </string-array>
+    <string name="dlna_cast_request_title">Cast isteği</string>
+    <string name="dlna_cast_request_desc">%1$s cihazı bu cihaza yayın yapmak istiyor</string>
+    <string name="dlna_cast_accept">Kabul et</string>
+    <string name="dlna_cast_reject">Reddet</string>
+    <string name="dlna_cast_remember_choice">Seçimi hatırla, bir daha sorma</string>
+    <string name="dlna_cast_history">Cast kuralları</string>
+    <string name="dlna_cast_accepted">Kabul edildi</string>
+    <string name="dlna_cast_rejected">Reddedildi</string>
+    <string name="dlna_receiver_start_error">Alıcı başlatılamadı.</string>
+    <string name="retry">Tekrar dene</string>
 </resources>

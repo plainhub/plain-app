@@ -12,8 +12,8 @@
     <string name="add_videos_to_playlist">請先添加影片到播放列表。</string>
     <string name="video_playlist_no_data">播放列表用於按順序自動投屏多個影片。</string>
     <string name="cast">投屏</string>
-    <string name="cast_dialog_hint">點選裝置即可進入投影模式，所選媒體將在對方裝置上播放。</string>
-    <string name="cast_dialog_wireless_cast_tip">在另一支手機上開啟「無線投影」，讓它出現在清單中。</string>
+    <string name="cast_dialog_hint">選擇裝置以進入投影模式。</string>
+    <string name="cast_dialog_wireless_cast_tip">提示：連接與目標螢幕相同的 Wi-Fi</string>
     <string name="images">圖片</string>
     <string name="video">影片</string>
     <string name="audios">音訊</string>
@@ -53,7 +53,9 @@
     <string name="items">項目</string>
     <string name="in_playlist">在播放清單中</string>
     <string name="empty_playlist">您的播放清單為空</string>
-    <string name="drag_number_to_reorder">拖曳編號以重新排序</string>
     <string name="remove_from_playlist">從播放清單中移除</string>
     <string name="image">圖片</string>
+    <string name="cast_searching_for_screen">正在搜尋螢幕</string>
+    <string name="cast_select_screen">選擇螢幕</string>
+    <string name="cast_looking_for_devices">正在搜尋附近裝置...</string>
 </resources>

@@ -72,6 +72,24 @@ object AuthDevTokenPreference : BasePreference<String>() {
     override val key = stringPreferencesKey("auth_dev_token")
 }
 
+object AdbTokenPreference : BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("adb_token")
+
+    suspend fun ensureValueAsync(context: Context, preferences: Preferences) {
+        TempData.adbToken = get(preferences)
+        if (TempData.adbToken.isEmpty()) {
+            TempData.adbToken = CryptoHelper.randomPassword(32)
+            putAsync(context, TempData.adbToken)
+        }
+    }
+
+    suspend fun resetAsync(context: Context) {
+        TempData.adbToken = CryptoHelper.randomPassword(32)
+        putAsync(context, TempData.adbToken)
+    }
+}
+
 object NewVersionPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("new_version")

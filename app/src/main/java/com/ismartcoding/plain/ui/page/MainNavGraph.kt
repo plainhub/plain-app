@@ -59,9 +59,10 @@ import com.ismartcoding.plain.ui.page.settings.ComponentShowcasePage
 import com.ismartcoding.plain.ui.page.web.NotificationSettingsPage
 import com.ismartcoding.plain.ui.page.web.SessionsPage
 import com.ismartcoding.plain.ui.page.web.WebDevPage
-import com.ismartcoding.plain.ui.page.web.WebLearnMorePage
+import com.ismartcoding.plain.ui.page.web.HowToUsePage
 import com.ismartcoding.plain.ui.page.web.WebSecurityPage
 import com.ismartcoding.plain.ui.page.dlna.DlnaReceiverPage
+import com.ismartcoding.plain.ui.page.dlna.DlnaCastHistoryPage
 import com.ismartcoding.plain.ui.page.web.WebSettingsPage
 
 @Composable
@@ -120,7 +121,7 @@ fun MainNavGraph(
         composable<Routing.DarkTheme> { DarkThemePage(navController) }
         composable<Routing.Language> { LanguagePage(navController) }
         composable<Routing.BackupRestore> { BackupRestorePage(navController) }
-        composable<Routing.WebSettings> { WebSettingsPage(navController, mainVM) }
+        composable<Routing.WebSettings> { WebSettingsPage(navController) }
         composable<Routing.CustomFeatures> { HomeFeaturesSelectionPage(navController) }
         composable<Routing.NotificationSettings> { NotificationSettingsPage(navController) }
         composable<Routing.Sessions> { SessionsPage(navController) }
@@ -137,7 +138,7 @@ fun MainNavGraph(
         composable<Routing.Scan> { ScanPage(navController) }
         composable<Routing.Feeds> { FeedsPage(navController) }
         composable<Routing.FeedSettings> { FeedSettingsPage(navController) }
-        composable<Routing.WebLearnMore> { WebLearnMorePage(navController) }
+        composable<Routing.HowToUse> { HowToUsePage(navController) }
         composable<Routing.AppDetails> { backStackEntry ->
             val r = backStackEntry.toRoute<Routing.AppDetails>()
             AppPage(navController, r.id)
@@ -195,5 +196,6 @@ fun MainNavGraph(
         }
         composable<Routing.ComponentShowcase> { ComponentShowcasePage(navController) }
         composable<Routing.DlnaReceiver> { DlnaReceiverPage(navController) }
+        composable<Routing.DlnaCastHistory> { DlnaCastHistoryPage(navController) }
     }
 }

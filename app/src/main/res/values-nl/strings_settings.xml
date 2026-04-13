@@ -56,7 +56,7 @@
     <string name="name">Naam</string>
     <string name="sort_by_random">Willekeurig sorteren</string>
     <string name="app_restored">APP-gegevens zijn hersteld, u moet de app geforceerd afsluiten en de app opnieuw starten als nieuw.</string>
-    <string name="welcome_text">Welkom! U kunt eenvoudig tekst, afbeeldingen en video\'s naar deze pagina sturen en ze op uw computer bekijken.\nAls u problemen ondervindt, aarzel dan niet om een e-mail te sturen naar ismartcoding@gmail.com voor hulp of neem deel aan onze Discord-discussie op: https://discord.gg/RQWcS6DEEe.</string>
+    <string name="welcome_text">Welkom! U kunt eenvoudig tekst, afbeeldingen en video\'s naar deze pagina sturen en ze op uw computer bekijken.\nAls u problemen ondervindt, aarzel dan niet om een e-mail te sturen naar support@plainapp.app voor hulp of neem deel aan onze Discord-discussie op: https://discord.gg/RQWcS6DEEe.</string>
     <string name="donation">Donatie</string>
     <string name="logs">Logboeken</string>
     <string name="primary_color_hint">Zoals #666666 of 666666</string>

@@ -56,7 +56,7 @@
     <string name="name">Tên</string>
     <string name="sort_by_random">Sắp xếp ngẫu nhiên</string>
     <string name="app_restored">Dữ liệu ứng dụng được khôi phục, bạn cần tắt ứng dụng này và khởi động lại ứng dụng như mới.</string>
-    <string name="welcome_text">Chào mừng! Bạn có thể dễ dàng gửi văn bản, hình ảnh và video đến trang này và xem chúng trên máy tính của mình. Nếu bạn gặp bất kỳ vấn đề nào, vui lòng gửi email đến ismartcoding@gmail.com để được hỗ trợ hoặc tham gia trò chuyện Discord của chúng tôi tại: https://discord.gg/RQWcS6DEEe.</string>
+    <string name="welcome_text">Chào mừng! Bạn có thể dễ dàng gửi văn bản, hình ảnh và video đến trang này và xem chúng trên máy tính của mình. Nếu bạn gặp bất kỳ vấn đề nào, vui lòng gửi email đến support@plainapp.app để được hỗ trợ hoặc tham gia trò chuyện Discord của chúng tôi tại: https://discord.gg/RQWcS6DEEe.</string>
     <string name="donation">Quyên góp</string>
     <string name="logs">Nhật ký</string>
     <string name="primary_color_hint">Như #666666 hoặc 666666</string>

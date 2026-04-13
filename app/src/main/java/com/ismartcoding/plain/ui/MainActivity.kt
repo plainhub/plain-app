@@ -53,6 +53,8 @@ import com.ismartcoding.plain.ui.models.ChatViewModel
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
+import com.ismartcoding.plain.CrashHandler
+import com.ismartcoding.plain.ui.page.CrashReportDialog
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.Main
 import com.ismartcoding.plain.ui.page.chat.components.ForwardTarget
@@ -78,6 +80,7 @@ class MainActivity : AppCompatActivity() {
     internal val navControllerState = mutableStateOf<NavHostController?>(null)
     internal var showForwardTargetDialog by mutableStateOf(false)
     internal var pendingFileUris by mutableStateOf<Set<Uri>?>(null)
+    internal var pendingCrashReport by mutableStateOf<String?>(null)
 
     internal val screenCapture = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null && ScreenMirrorService.instance == null) {
@@ -119,6 +122,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch(Dispatchers.IO) { Language.initLocaleAsync(this@MainActivity) }
         WindowCompat.getInsetsController(window, window.decorView).systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         instance = WeakReference(this)
+        pendingCrashReport = CrashHandler.getPendingReport(this)
         try { val f = CursorWindow::class.java.getDeclaredField("sCursorWindowSize"); f.isAccessible = true; f.set(null, 100 * 1024 * 1024) } catch (_: Exception) {}
         BluetoothPermission.init(this); Permissions.init(this); initEvents()
         val powerFilter = IntentFilter().apply { addAction(Intent.ACTION_POWER_CONNECTED); addAction(Intent.ACTION_POWER_DISCONNECTED) }
@@ -133,6 +137,9 @@ class MainActivity : AppCompatActivity() {
                             val route = when (target) { is ForwardTarget.Local -> Routing.Chat("local"); is ForwardTarget.Peer -> Routing.Chat("peer:${target.peer.id}") }
                             navControllerState.value?.navigate(route); coIO { delay(1000); sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris)) }
                         } })
+                }
+                pendingCrashReport?.let { report ->
+                    CrashReportDialog(crashReport = report, onDismiss = { pendingCrashReport = null })
                 }
             }
         }

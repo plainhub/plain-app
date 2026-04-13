@@ -56,7 +56,7 @@
     <string name="name">नाम</string>
     <string name="sort_by_random">यादृच्छिक आधार पर क्रमबद्ध करें</string>
     <string name="app_restored">ऐप डेटा पुनः प्राप्त हो गया है, आपको ऐप को मजबूरी से बंद करना होगा और उसे फिर से नए रूप में शुरू करना होगा।</string>
-    <string name="welcome_text">स्वागत है! आप इस पृष्ठ पर टेक्स्ट, चित्र, और वीडियो आसानी से भेज सकते हैं, और उन्हें अपने कंप्यूटर पर देख सकते हैं।\nअगर आपको कोई समस्या आती है, तो कृपया सहायता के लिए ismartcoding@gmail.com पर एक ईमेल भेजें या हमारे Discord चर्चा में शामिल हों: https://discord.gg/RQWcS6DEEe।</string>
+    <string name="welcome_text">स्वागत है! आप इस पृष्ठ पर टेक्स्ट, चित्र, और वीडियो आसानी से भेज सकते हैं, और उन्हें अपने कंप्यूटर पर देख सकते हैं।\nअगर आपको कोई समस्या आती है, तो कृपया सहायता के लिए support@plainapp.app पर एक ईमेल भेजें या हमारे Discord चर्चा में शामिल हों: https://discord.gg/RQWcS6DEEe।</string>
     <string name="donation">दान</string>
     <string name="logs">लॉग</string>
     <string name="primary_color_hint">#666666 या 666666 की तरह</string>

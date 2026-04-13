@@ -68,4 +68,14 @@
         <item>130 dB: Súng trường, Máy khoan</item>
         <item>140 dB: Máy bay chiến đấu quân sự, Pháo hoa</item>
     </string-array>
+    <string name="dlna_cast_request_title">Yêu cầu Cast</string>
+    <string name="dlna_cast_request_desc">Thiết bị %1$s muốn cast đến thiết bị này</string>
+    <string name="dlna_cast_accept">Chấp nhận</string>
+    <string name="dlna_cast_reject">Từ chối</string>
+    <string name="dlna_cast_remember_choice">Ghi nhớ lựa chọn, không hỏi lại</string>
+    <string name="dlna_cast_history">Quy tắc Cast</string>
+    <string name="dlna_cast_accepted">Đã chấp nhận</string>
+    <string name="dlna_cast_rejected">Đã từ chối</string>
+    <string name="dlna_receiver_start_error">Không thể khởi động bộ thu.</string>
+    <string name="retry">Thử lại</string>
 </resources>

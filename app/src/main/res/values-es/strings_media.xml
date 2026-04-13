@@ -12,8 +12,8 @@
     <string name="add_videos_to_playlist">Por favor, primero agrega videos a la lista de reproducción.</string>
     <string name="video_playlist_no_data">La lista de reproducción se utiliza para reproducir automáticamente varios videos en secuencia.</string>
     <string name="cast">Transmitir</string>
-    <string name="cast_dialog_hint">Toca un dispositivo para entrar en el modo de transmisión. Los medios se reproducirán en ese dispositivo.</string>
-    <string name="cast_dialog_wireless_cast_tip">En otro teléfono, abre Wireless Cast para que aparezca aquí.</string>
+    <string name="cast_dialog_hint">Elige un dispositivo para entrar en el modo Cast.</string>
+    <string name="cast_dialog_wireless_cast_tip">Consejo: conéctate al mismo Wi-Fi que tu pantalla de destino</string>
     <string name="images">Imágenes</string>
     <string name="video">Vídeo</string>
     <string name="audios">Audio</string>
@@ -53,7 +53,9 @@
     <string name="items">Elementos</string>
     <string name="in_playlist">En la lista de reproducción</string>
     <string name="empty_playlist">Tu lista de reproducción está vacía</string>
-    <string name="drag_number_to_reorder">Arrastra el número para reordenar los elementos</string>
     <string name="remove_from_playlist">Eliminar de la lista</string>
     <string name="image">Imagen</string>
+    <string name="cast_searching_for_screen">Buscando pantalla</string>
+    <string name="cast_select_screen">Seleccionar pantalla</string>
+    <string name="cast_looking_for_devices">Buscando dispositivos cercanos...</string>
 </resources>

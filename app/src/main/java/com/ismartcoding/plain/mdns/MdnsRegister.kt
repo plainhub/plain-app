@@ -8,7 +8,6 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.mdns.NsdHelper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
@@ -16,7 +15,7 @@ import kotlinx.coroutines.delay
  * Watches network changes and re-registers mDNS to keep discovery accurate across
  * VPN/Wi-Fi/cellular transitions.
  */
-class MdnsReregistrar(
+class MdnsRegister(
     context: Context,
     private val isActive: () -> Boolean,
     private val hostnameProvider: () -> String,

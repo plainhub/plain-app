@@ -95,7 +95,7 @@ fun HomeFeaturesSelectionPage(navController: NavHostController) {
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.secondaryTextColor,
                         modifier = Modifier.fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+                            .padding(start = 24.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
                     )
                 }
                 itemsIndexed(enabledIds, key = { _, id -> id }) { index, featureId ->

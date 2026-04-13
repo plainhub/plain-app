@@ -153,4 +153,8 @@
     <string name="buy_me_a_coffee">Cómprame un café</string>
 
 
+    <string name="crash_report_title">La app se cerró inesperadamente</string>
+    <string name="crash_report_message">La app se cerró de forma inesperada. ¿Deseas compartir el informe de cierre para que podamos solucionarlo?</string>
+    <string name="crash_include_app_logs">Incluir registros de la app</string>
+    <string name="crash_share">Compartir</string>
 </resources>

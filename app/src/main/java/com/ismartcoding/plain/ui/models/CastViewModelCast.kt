@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.ui.models
 
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.lib.extensions.getFilenameWithoutExtensionFromPath
+import com.ismartcoding.plain.data.DAudio
 import com.ismartcoding.plain.features.dlna.sender.DlnaTransportController
 import com.ismartcoding.plain.data.IMedia
 import com.ismartcoding.plain.features.media.CastPlayer
@@ -16,7 +18,8 @@ internal fun CastViewModel.castPath(path: String) {
         isLoading.value = true
         CastPlayer.setCurrentUri(path)
         try {
-            DlnaTransportController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(path))
+            val title = path.getFilenameWithoutExtensionFromPath()
+            DlnaTransportController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(path), title)
             DlnaTransportController.playAVTransportAsync(device)
             CastPlayer.isPlaying.value = true
             if (CastPlayer.sid.isNotEmpty()) {
@@ -43,7 +46,9 @@ internal fun CastViewModel.castItem(item: IMedia) {
             CastPlayer.addItem(item)
         }
         try {
-            DlnaTransportController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(item.path))
+            val mediaUrl = UrlHelper.getMediaHttpUrl(item.path)
+            val albumArtUri = if (item is DAudio) UrlHelper.getAlbumArtHttpUrl(item.getAlbumUri()).toString() else ""
+            DlnaTransportController.setAVTransportURIAsync(device, mediaUrl, item.title, albumArtUri)
             DlnaTransportController.playAVTransportAsync(device)
             CastPlayer.isPlaying.value = true
             if (CastPlayer.sid.isNotEmpty()) {

@@ -39,7 +39,6 @@ fun HomePage(
     navController: NavHostController,
     mainVM: MainViewModel,
 ) {
-    val scope = rememberCoroutineScope()
     val webEnabled = LocalWeb.current
     val context = LocalContext.current
     var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.can(context)) }
@@ -94,7 +93,7 @@ fun HomePage(
             }
         }
         item {
-            HomeWeb(context, navController, mainVM, webEnabled, showIpAddresses = true)
+            HomeWeb(context, navController, mainVM, webEnabled)
             VerticalSpace(dp = 24.dp)
         }
         item {

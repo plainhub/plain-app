@@ -12,8 +12,8 @@
     <string name="add_videos_to_playlist">தயவுசெய்து முதலில் வீடியோக்களை பாட்டிலுக்கு சேர்க்கவும்.</string>
     <string name="video_playlist_no_data">இந்த பாட்டினுக்கு பல வீடியோக்களை தானாகவே காஸ்ட் செய்ய பயன்படுகின்றது.</string>
     <string name="cast">அறிவிக்க</string>
-    <string name="cast_dialog_hint">Cast Mode-ஐ உள்ளிட சாதனத்தை தடவும். மீடியா அந்த சாதனத்தில் இயங்கும்.</string>
-    <string name="cast_dialog_wireless_cast_tip">இங்கே தோன்ற மற்றோரு போனில் Wireless Cast திறக்கவும்.</string>
+    <string name="cast_dialog_hint">Cast பயன்முறையில் நுழைய ஒரு சாதனத்தை தேர்ந்தெடுக்கவும்.</string>
+    <string name="cast_dialog_wireless_cast_tip">உதவிக்குறிப்பு: உங்கள் இலக்கு திரையின் அதே Wi-Fi உடன் இணைக்கவும்</string>
     <string name="images">படங்கள்</string>
     <string name="video">காணொளி</string>
     <string name="audios">ஒலிகள்</string>
@@ -53,7 +53,9 @@
     <string name="items">உருப்படிகள்</string>
     <string name="in_playlist">பாடல் பட்டியலில் உள்ளது</string>
     <string name="empty_playlist">உங்கள் பாடல் பட்டியல் காலியாக உள்ளது</string>
-    <string name="drag_number_to_reorder">வரிசையை மாற்ற எண்ணை இழுக்கவும்</string>
     <string name="remove_from_playlist">பாடல் பட்டியலிலிருந்து நீக்கு</string>
     <string name="image">படம்</string>
+    <string name="cast_searching_for_screen">திரையை தேடுகிறது</string>
+    <string name="cast_select_screen">ஒரு திரையை தேர்ந்தெடுக்கவும்</string>
+    <string name="cast_looking_for_devices">அருகில் உள்ள சாதனங்களை தேடுகிறது...</string>
 </resources>

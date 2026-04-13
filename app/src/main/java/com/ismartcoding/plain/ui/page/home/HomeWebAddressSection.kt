@@ -26,7 +26,7 @@ import com.ismartcoding.plain.ui.base.PIconTextButton
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.HttpHttpsSegmentedButton
-import com.ismartcoding.plain.ui.components.WebAddress
+import com.ismartcoding.plain.ui.components.WebAddressBar
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import kotlinx.coroutines.launch
@@ -36,8 +36,6 @@ fun HomeWebAddressSection(
     context: Context,
     navController: NavHostController,
     mainVM: MainViewModel,
-    showSettingsButton: Boolean = true,
-    showIpAddresses: Boolean = false,
 ) {
     var isHttps by remember { mutableStateOf(TempData.webHttps) }
     val scope = rememberCoroutineScope()
@@ -51,7 +49,7 @@ fun HomeWebAddressSection(
         )
         VerticalSpace(12.dp)
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-            WebAddress(context = context, mainVM = mainVM, isHttps = isHttps, showIpAddresses = showIpAddresses)
+            WebAddressBar(context = context, mainVM = mainVM, isHttps = isHttps)
             VerticalSpace(12.dp)
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -65,15 +63,9 @@ fun HomeWebAddressSection(
                         scope.launch { HttpsPreference.putAsync(context, https) }
                     },
                 )
-                if (showSettingsButton) {
                     PIconTextButton(R.drawable.settings, stringResource(R.string.web_settings)) {
                         navController.navigate(Routing.WebSettings)
                     }
-                } else {
-                    PIconTextButton(R.drawable.info, stringResource(R.string.learn_more)) {
-                        navController.navigate(Routing.WebLearnMore)
-                    }
-                }
             }
         }
         VerticalSpace(8.dp)

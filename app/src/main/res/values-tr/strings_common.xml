@@ -153,4 +153,8 @@
     <string name="buy_me_a_coffee">Bana bir kahve ısmarla</string>
 
 
+    <string name="crash_report_title">Uygulama çöktü</string>
+    <string name="crash_report_message">Uygulama beklenmedik şekilde çöktü. Düzeltmemiz için kilitlenme raporunu paylaşmak ister misiniz?</string>
+    <string name="crash_include_app_logs">Uygulama günlüklerini dahil et</string>
+    <string name="crash_share">Paylaş</string>
 </resources>

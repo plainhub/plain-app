@@ -68,4 +68,14 @@
         <item>130 dB: 霰彈槍聲，手提鑽機</item>
         <item>140 dB: 軍用噴氣飛機聲音，煙花</item>
     </string-array>
+    <string name="dlna_cast_request_title">投影請求</string>
+    <string name="dlna_cast_request_desc">裝置 %1$s 請求投影到本裝置</string>
+    <string name="dlna_cast_accept">接受</string>
+    <string name="dlna_cast_reject">拒絕</string>
+    <string name="dlna_cast_remember_choice">記住此選擇，不再詢問</string>
+    <string name="dlna_cast_history">投影規則</string>
+    <string name="dlna_cast_accepted">已接受</string>
+    <string name="dlna_cast_rejected">已拒絕</string>
+    <string name="dlna_receiver_start_error">啟動接收器失敗。</string>
+    <string name="retry">重試</string>
 </resources>

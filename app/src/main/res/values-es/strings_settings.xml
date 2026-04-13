@@ -56,7 +56,7 @@
     <string name="name">Nombre</string>
     <string name="sort_by_random">Ordenar aleatoriamente</string>
     <string name="app_restored">Se restauraron los datos de la APLICACIÓN, debes salir forzosamente de esta aplicación y volver a iniciarla como nueva.</string>
-    <string name="welcome_text">¡Bienvenido! Puedes enviar fácilmente texto, imágenes y videos a esta página y verlos en tu computadora.\nSi encuentras algún problema, no dudes en enviar un correo electrónico a ismartcoding@gmail.com para obtener ayuda o unirte a nuestra discusión en Discord en: https://discord.gg/RQWcS6DEEe.</string>
+    <string name="welcome_text">¡Bienvenido! Puedes enviar fácilmente texto, imágenes y videos a esta página y verlos en tu computadora.\nSi encuentras algún problema, no dudes en enviar un correo electrónico a support@plainapp.app para obtener ayuda o unirte a nuestra discusión en Discord en: https://discord.gg/RQWcS6DEEe.</string>
     <string name="donation">Donación</string>
     <string name="logs">Registros</string>
     <string name="primary_color_hint">Como #666666 o 666666</string>

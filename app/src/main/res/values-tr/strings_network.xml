@@ -10,8 +10,6 @@
     <string name="two_factor_auth_tips">Web sayfasında oturum açarken, ek güvenlik için uygulamada bir onay açılır penceresi görüntüleyeceğiz.</string>
     <string name="instruction_for_use">Kullanım talimatları</string>
     <string name="web_how_to">Adım 1: Telefonunuzu ve bilgisayarınızı aynı kablosuz ağa bağlayın.\n\nYöntem 1: Bilgisayarınızı ve telefonunuzu aynı Wi-Fi ağına bağlayın.\nYöntem 2: Telefonunuzun hotspot\'unu açın ve bilgisayarınızı telefonun hotspot\'una bağlayın.\n\nAdım 2: Bilgisayarınızda bir web tarayıcısı açın ve UYGULAMA ana sayfasında görüntülenen web adresini girin.</string>
-    <string name="web_dig">1. Bilgisayar tarayıcısı web sayfasını açamıyor.\n\nKablosuz yönlendiricide AP izolasyonu etkinleştirilmiş olabilir, bu da bilgisayar ve telefon arasındaki iletişimi engelleyebilir. Lütfen yönlendirici ayarları arayüzüne gidin ve AP izolasyonu işlevini devre dışı bırakın.\n\n2. Bilgisayar tarayıcısı, HTTPS web sayfası adresini girdikten sonra bir uyarı görüntülüyor: "Bağlantınız gizli değil."\n\nDevam etmek için "x.x.x.x adresine devam et (güvenli değil)" seçeneğine tıklayabilirsiniz. Simple, web sitesini şifrelemek için kendi imzalı bir TLS sertifikası kullanır.</string>
-    <string name="learn_more">Daha fazla bilgi</string>
     <string name="http_server_state_on">Hizmet çalışıyor</string>
     <string name="http_server_state_starting">Hizmet başlatılıyor…</string>
     <string name="http_server_state_stopping">Hizmet durduruluyor…</string>
@@ -78,4 +76,6 @@
     <string name="home_web_easy_failed_title">Başlatılamadı</string>
     <string name="last_active">Son aktif: %1$s</string>
     <string name="revoke_session">Bu oturumu iptal et</string>
+    <string name="how_to_use">Nasıl kullanılır</string>
+    <string name="developer_options">Geliştirici seçenekleri</string>
 </resources>

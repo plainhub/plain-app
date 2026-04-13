@@ -68,4 +68,14 @@
         <item>130 dB: 散弾銃の発射音、ジャッキーハンマー</item>
         <item>140 dB: 軍用ジェット機、花火</item>
     </string-array>
+    <string name="dlna_cast_request_title">キャストリクエスト</string>
+    <string name="dlna_cast_request_desc">デバイス %1$s がこのデバイスにキャストしようとしています</string>
+    <string name="dlna_cast_accept">許可</string>
+    <string name="dlna_cast_reject">拒否</string>
+    <string name="dlna_cast_remember_choice">この選択を覚えて次回から確認しない</string>
+    <string name="dlna_cast_history">キャストルール</string>
+    <string name="dlna_cast_accepted">許可済み</string>
+    <string name="dlna_cast_rejected">拒否済み</string>
+    <string name="dlna_receiver_start_error">レシーバーの起動に失敗しました。</string>
+    <string name="retry">再試行</string>
 </resources>

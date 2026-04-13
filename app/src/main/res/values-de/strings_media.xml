@@ -12,8 +12,8 @@
     <string name="add_videos_to_playlist">Bitte füge zuerst Videos zur Wiedergabeliste hinzu.</string>
     <string name="video_playlist_no_data">Die Wiedergabeliste wird verwendet, um automatisch mehrere Videos nacheinander abzuspielen.</string>
     <string name="cast">Übertragen</string>
-    <string name="cast_dialog_hint">Tippe auf ein Gerät, um den Cast-Modus zu starten. Medien werden auf diesem Gerät abgespielt.</string>
-    <string name="cast_dialog_wireless_cast_tip">Auf einem anderen Telefon Wireless Cast öffnen, damit es hier erscheint.</string>
+    <string name="cast_dialog_hint">Gerät auswählen, um den Cast-Modus zu starten.</string>
+    <string name="cast_dialog_wireless_cast_tip">Tipp: Mit demselben WLAN wie Ihren Zielbildschirm verbinden</string>
     <string name="images">Bilder</string>
     <string name="video">Video</string>
     <string name="audios">Audio</string>
@@ -53,7 +53,9 @@
     <string name="items">Elemente</string>
     <string name="in_playlist">In der Playlist</string>
     <string name="empty_playlist">Ihre Playlist ist leer</string>
-    <string name="drag_number_to_reorder">Ziehen Sie die Nummer, um die Playlist neu zu ordnen</string>
     <string name="remove_from_playlist">Aus Playlist entfernen</string>
     <string name="image">Bild</string>
+    <string name="cast_searching_for_screen">Suche nach Bildschirm</string>
+    <string name="cast_select_screen">Bildschirm auswählen</string>
+    <string name="cast_looking_for_devices">Suche nach Geräten in der Nähe...</string>
 </resources>

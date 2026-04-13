@@ -17,6 +17,7 @@ import com.ismartcoding.plain.events.PowerConnectedEvent
 import com.ismartcoding.plain.events.AppEvents
 import com.ismartcoding.plain.events.StartNearbyServiceEvent
 import com.ismartcoding.plain.helpers.AppHelper
+import com.ismartcoding.plain.preferences.AdbTokenPreference
 import com.ismartcoding.plain.preferences.AudioPlayModePreference
 import com.ismartcoding.plain.preferences.AutoCheckUpdatePreference
 import com.ismartcoding.plain.preferences.CheckUpdateTimePreference
@@ -52,6 +53,8 @@ class MainApp : Application() {
 
         instance = this
 
+        CrashHandler.install(this)
+
         SingletonImageLoader.setSafe { context ->
             newImageLoader(context)
         }
@@ -79,6 +82,7 @@ class MainApp : Application() {
             TempData.httpPort = HttpPortPreference.get(preferences)
             TempData.httpsPort = HttpsPortPreference.get(preferences)
             TempData.audioPlayMode = AudioPlayModePreference.getValue(preferences)
+            AdbTokenPreference.ensureValueAsync(instance, preferences)
             TempData.nearbyDiscoverable = NearbyDiscoverablePreference.getAsync(instance)
             val checkUpdateTime = CheckUpdateTimePreference.get(preferences)
             val autoCheckUpdate = AutoCheckUpdatePreference.get(preferences)

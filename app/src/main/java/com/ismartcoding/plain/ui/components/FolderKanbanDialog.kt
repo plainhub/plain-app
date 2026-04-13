@@ -56,9 +56,7 @@ fun FolderKanbanDialog(filesVM: FilesViewModel, onDismiss: () -> Unit = {}) {
 
     PModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column {
-            PBottomSheetTopAppBar(titleContent = {
-                Text(text = stringResource(R.string.folders), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
-            })
+            PBottomSheetTopAppBar(title = stringResource(R.string.folders))
             if (options.isNotEmpty()) {
                 LazyColumn(Modifier.fillMaxSize()) {
                     item { TopSpace() }

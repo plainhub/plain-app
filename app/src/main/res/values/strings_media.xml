@@ -9,11 +9,14 @@
     <string name="exit_cast_mode">Exit cast mode</string>
     <string name="rotate">Rotate</string>
     <string name="select_a_device">Select a device</string>
+    <string name="cast_searching_for_screen">Searching for Screen</string>
+    <string name="cast_select_screen">Select a Screen</string>
+    <string name="cast_looking_for_devices">Looking for nearby devices...</string>
     <string name="add_videos_to_playlist">Please add videos to the playlist first.</string>
     <string name="video_playlist_no_data">The playlist is used to automatically cast multiple videos in sequence.</string>
     <string name="cast">Cast</string>
-    <string name="cast_dialog_hint">Tap a device to enter Cast Mode. Your media will play on that device.</string>
-    <string name="cast_dialog_wireless_cast_tip">On another phone, open Wireless Cast to make it appear here.</string>
+    <string name="cast_dialog_hint">Choose a device to enter Cast Mode.</string>
+    <string name="cast_dialog_wireless_cast_tip">Tip: Connect to the same Wi-Fi as your target screen</string>
     <string name="image">Image</string>
     <string name="images">Images</string>
     <string name="video">Video</string>
@@ -54,6 +57,5 @@
     <string name="items">Items</string>
     <string name="in_playlist">In playlist</string>
     <string name="empty_playlist">Your playlist is empty</string>
-    <string name="drag_number_to_reorder">Drag the number to reorder playlist items</string>
     <string name="remove_from_playlist">Remove from playlist</string>
 </resources>

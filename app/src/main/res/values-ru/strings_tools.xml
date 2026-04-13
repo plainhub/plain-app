@@ -68,4 +68,14 @@
         <item>130 дБ: Выстрел из ружья, Пневматический молот</item>
         <item>140 дБ: Военный реактивный истребитель, Фейерверк</item>
     </string-array>
+    <string name="dlna_cast_request_title">Запрос трансляции</string>
+    <string name="dlna_cast_request_desc">Устройство %1$s хочет выполнить трансляцию на это устройство</string>
+    <string name="dlna_cast_accept">Принять</string>
+    <string name="dlna_cast_reject">Отклонить</string>
+    <string name="dlna_cast_remember_choice">Запомнить выбор, больше не спрашивать</string>
+    <string name="dlna_cast_history">Правила трансляции</string>
+    <string name="dlna_cast_accepted">Принято</string>
+    <string name="dlna_cast_rejected">Отклонено</string>
+    <string name="dlna_receiver_start_error">Не удалось запустить приёмник.</string>
+    <string name="retry">Повторить</string>
 </resources>

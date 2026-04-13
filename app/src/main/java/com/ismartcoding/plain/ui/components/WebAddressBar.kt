@@ -30,7 +30,6 @@ fun WebAddressBar(
     context: Context,
     mainVM: MainViewModel,
     isHttps: Boolean,
-    showIpAddresses: Boolean = true,
 ) {
     val port = if (isHttps) TempData.httpsPort else TempData.httpPort
     var portDialogVisible by remember { mutableStateOf(false) }
@@ -38,11 +37,7 @@ fun WebAddressBar(
     var mdnsEditDialogVisible by remember { mutableStateOf(false) }
     var hostname by remember { mutableStateOf(TempData.mdnsHostname) }
     var qrCodeUrl by remember { mutableStateOf("") }
-    val ip4s = if (showIpAddresses) {
-        listOf(hostname) + mainVM.ip4s.ifEmpty { listOf("127.0.0.1") }
-    } else {
-        listOf(hostname)
-    }
+    val ip4s = listOf(hostname) + mainVM.ip4s.ifEmpty { listOf("127.0.0.1") }
     val scope = rememberCoroutineScope()
 
     Column(

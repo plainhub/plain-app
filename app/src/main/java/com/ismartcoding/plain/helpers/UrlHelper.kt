@@ -1,5 +1,6 @@
 package com.ismartcoding.plain.helpers
 
+import android.net.Uri
 import android.util.Base64
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.helpers.CryptoHelper
@@ -15,6 +16,12 @@ object UrlHelper {
         mediaPathMap[id] = path
         val extension = path.getFilenameExtension()
         return "http://${NetworkHelper.getDeviceIP4()}:${TempData.httpPort}/media/$id.$extension"
+    }
+
+    fun getAlbumArtHttpUrl(albumUri: Uri): String {
+        val id = "art_${System.currentTimeMillis()}"
+        mediaPathMap[id] = albumUri.toString()
+        return "http://${NetworkHelper.getDeviceIP4()}:${TempData.httpPort}/media/$id.jpg"
     }
 
     fun getCastCallbackUrl(): String {

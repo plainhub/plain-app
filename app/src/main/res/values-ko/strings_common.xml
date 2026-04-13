@@ -153,4 +153,8 @@
     <string name="buy_me_a_coffee">커피 사주세요</string>
 
 
+    <string name="crash_report_title">앱이 충돌했습니다</string>
+    <string name="crash_report_message">앱이 예기치 않게 충돌했습니다. 문제를 해결할 수 있도록 충돌 보고서를 공유해 주시겠어요?</string>
+    <string name="crash_include_app_logs">앱 로그 포함</string>
+    <string name="crash_share">공유</string>
 </resources>

@@ -1,13 +1,10 @@
 import java.io.FileInputStream
 import java.util.Properties
-import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("com.android.application")
-    id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
     id("kotlin-parcelize")
     id("androidx.room")
     id("com.google.devtools.ksp")
@@ -18,45 +15,6 @@ plugins {
 
 room {
     schemaDirectory("$projectDir/schemas")
-}
-
-// Auto-generate a placeholder google-services.json if the real one is absent.
-// This lets contributors build without Firebase credentials.
-// Replace app/google-services.json with your real file to enable Firebase services.
-val googleServicesFile = file("google-services.json")
-if (!googleServicesFile.exists()) {
-    googleServicesFile.writeText(
-        """
-        {
-          "project_info": {
-            "project_number": "000000000000",
-            "project_id": "placeholder-project",
-            "storage_bucket": "placeholder-project.appspot.com"
-          },
-          "client": [
-            {
-              "client_info": {
-                "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
-                "android_client_info": { "package_name": "com.ismartcoding.plain" }
-              },
-              "oauth_client": [],
-              "api_key": [{ "current_key": "placeholder" }],
-              "services": { "appinvite_service": { "other_platform_oauth_client": [] } }
-            },
-            {
-              "client_info": {
-                "mobilesdk_app_id": "1:000000000000:android:1111111111111111111111",
-                "android_client_info": { "package_name": "com.ismartcoding.plain.debug" }
-              },
-              "oauth_client": [],
-              "api_key": [{ "current_key": "placeholder" }],
-              "services": { "appinvite_service": { "other_platform_oauth_client": [] } }
-            }
-          ],
-          "configuration_version": "1"
-        }
-        """.trimIndent()
-    )
 }
 
 val keystoreProperties = Properties()
@@ -119,9 +77,6 @@ android {
             ndk {
                 debugSymbolLevel = "NONE"
             }
-            configure<CrashlyticsExtension> {
-                mappingFileUploadEnabled = false
-            }
             buildConfigField("String", "CHANNEL", "\"GITHUB\"")
             setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
         }
@@ -131,9 +86,6 @@ android {
             isMinifyEnabled = true
             ndk {
                 debugSymbolLevel = "SYMBOL_TABLE"
-            }
-            configure<CrashlyticsExtension> {
-                mappingFileUploadEnabled = true
             }
             setProguardFiles(listOf(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"))
         }
@@ -207,9 +159,6 @@ dependencies {
     implementation(libs.compose.material3)
     // https://developer.android.com/jetpack/androidx/releases/navigation
     implementation(libs.compose.navigation)
-
-    releaseImplementation(platform(libs.firebase.bom))
-    releaseImplementation(libs.firebase.crashlytics.ktx)
 
     // Media3
     implementation(libs.media3.exoplayer)

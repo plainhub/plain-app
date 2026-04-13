@@ -153,4 +153,8 @@
     <string name="buy_me_a_coffee">请我喝杯咖啡</string>
 
 
+    <string name="crash_report_title">应用崩溃</string>
+    <string name="crash_report_message">应用意外崩溃了。是否将崩溃报告分享给我们以便修复？</string>
+    <string name="crash_include_app_logs">包含应用日志</string>
+    <string name="crash_share">分享</string>
 </resources>

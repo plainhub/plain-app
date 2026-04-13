@@ -12,8 +12,8 @@
     <string name="add_videos_to_playlist">Lütfen önce çalma listesine video ekleyin.</string>
     <string name="video_playlist_no_data">Çalma listesi, birden çok videoyu sırayla otomatik olarak yayınlamak için kullanılır.</string>
     <string name="cast">Yayınla</string>
-    <string name="cast_dialog_hint">Yayın Moduna girmek için bir cihaza dokunun. Medya o cihazda oynatılacaktır.</string>
-    <string name="cast_dialog_wireless_cast_tip">Burada görünmesi için başka bir telefonda Kablosuz Yayın’ı açın.</string>
+    <string name="cast_dialog_hint">Cast moduna girmek için bir cihaz seçin.</string>
+    <string name="cast_dialog_wireless_cast_tip">İpucu: Hedef ekranınızla aynı Wi-Fi\'a bağlanın</string>
     <string name="images">Resimler</string>
     <string name="video">Video</string>
     <string name="audios">Ses Dosyaları</string>
@@ -53,7 +53,9 @@
     <string name="items">Öğeler</string>
     <string name="in_playlist">Çalma listesinde</string>
     <string name="empty_playlist">Çalma listeniz boş</string>
-    <string name="drag_number_to_reorder">Sıralamak için numarayı sürükleyin</string>
     <string name="remove_from_playlist">Çalma listesinden kaldır</string>
     <string name="image">Görüntü</string>
+    <string name="cast_searching_for_screen">Ekran aranıyor</string>
+    <string name="cast_select_screen">Bir ekran seçin</string>
+    <string name="cast_looking_for_devices">Yakın cihazlar aranıyor...</string>
 </resources>

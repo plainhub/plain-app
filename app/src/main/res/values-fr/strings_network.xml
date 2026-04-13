@@ -10,8 +10,6 @@
     <string name="two_factor_auth_tips">Lors de la connexion sur la page web, nous afficherons une fenêtre de confirmation dans l\'application pour plus de sécurité.</string>
     <string name="instruction_for_use">Instructions d\'utilisation</string>
     <string name="web_how_to">Étape 1 : Connectez votre téléphone et votre ordinateur au même réseau sans fil.\n\nMéthode 1 : Connectez votre ordinateur et votre téléphone au même réseau Wi-Fi.\nMéthode 2 : Activez le point d\'accès de votre téléphone et connectez votre ordinateur au point d\'accès de votre téléphone.\n\nÉtape 2 : Ouvrez un navigateur web sur votre ordinateur et saisissez l\'adresse web affichée sur la page d\'accueil de l\'application.</string>
-    <string name="web_dig">1. Le navigateur de l\'ordinateur ne peut pas ouvrir la page web.\n\nLe routeur sans fil peut avoir l\'isolation AP activée, ce qui empêche la communication entre l\'ordinateur et le téléphone. Veuillez accéder à l\'interface de configuration du routeur pour désactiver la fonction d\'isolation AP.\n\n2. Le navigateur de l\'ordinateur affiche un avertissement après avoir saisi une adresse de page web HTTPS : "Votre connexion n\'est pas privée."\n\nVous pouvez cliquer sur "Continuer vers x.x.x.x (non sécurisé)" pour continuer. Simple utilise un certificat TLS auto-signé pour chiffrer le site web.</string>
-    <string name="learn_more">En savoir plus</string>
     <string name="http_server_state_on">Le service est en cours d\'exécution</string>
     <string name="http_server_state_starting">Démarrage du service...</string>
     <string name="http_server_state_stopping">Arrêt du service...</string>
@@ -31,7 +29,7 @@
     <string name="rotate_url_token_on_restart">Renouveler le jeton URL au redémarrage</string>
     <string name="rotate_url_token_on_restart_tips">Lorsqu\'il est activé, un nouveau jeton d\'URL est généré à chaque démarrage de l\'application. Cela invalide toutes les URL de fichiers précédemment générées. Recommandé aux utilisateurs avancés souhaitant une sécurité accrue.</string>
     <string name="http_server_ok">Servidor HTTP iniciado</string>
-    <string name="http_server_error">Le serveur HTTP n\'est pas démarré. Relancez PlainApp et réessayez. Assurez-vous qu\'aucune autre application n\'occupe les ports HTTP ou HTTPS. Si le problème persiste, veuillez fournir plus de détails sur le problème en contactant ismartcoding@gmail.com.</string>
+    <string name="http_server_error">Le serveur HTTP n\'est pas démarré. Relancez PlainApp et réessayez. Assurez-vous qu\'aucune autre application n\'occupe les ports HTTP ou HTTPS. Si le problème persiste, veuillez fournir plus de détails sur le problème en contactant support@plainapp.app.</string>
     <string name="relaunch_app">Relancer l\'application</string>
     <string name="require_confirmation">Nécessite une confirmation</string>
     <string name="web_service_required_for_chat">Pour recevoir des messages d\'autres personnes, veuillez activer le portail Web du téléphone.</string>
@@ -78,4 +76,6 @@
     <string name="home_web_easy_failed_title">Impossible de démarrer</string>
     <string name="last_active">Dernier actif : %1$s</string>
     <string name="revoke_session">Révoquer cette session</string>
+    <string name="how_to_use">Comment utiliser</string>
+    <string name="developer_options">Options développeur</string>
 </resources>

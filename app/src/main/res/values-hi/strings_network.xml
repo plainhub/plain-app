@@ -10,8 +10,6 @@
     <string name="two_factor_auth_tips">वेबपृष्ठ पर लॉगिन करते समय, हम अतिरिक्त सुरक्षा के लिए ऐप में पुष्टि पॉपअप प्रदर्शित करेंगे।</string>
     <string name="instruction_for_use">उपयोग के निर्देश</string>
     <string name="web_how_to">चरण 1: अपने फोन और कंप्यूटर को समान वायरलेस नेटवर्क से जोड़ें।\n\nविधि 1: अपने कंप्यूटर और फोन को समान वाई-फाई नेटवर्क से जोड़ें।\nविधि 2: अपने फोन का हॉटस्पॉट चालू करें और कंप्यूटर को फोन के हॉटस्पॉट से जोड़ें।\n\nचरण 2: अपने कंप्यूटर पर एक वेब ब्राउज़र खोलें और एपीपी होमपेज पर प्रदर्शित वेब पता दर्ज करें।</string>
-    <string name="web_dig">1. कंप्यूटर ब्राउज़र वेब पृष्ठ को नहीं खोल सकता।\n\nवायरलेस राउटर में एपी आइसोलेशन सक्रिय हो सकता है, जिससे कंप्यूटर और फोन के बीच संचार बाधित होता है। कृपया एपी आइसोलेशन कार्य को निष्क्रिय करने के लिए राउटर सेटिंग्स इंटरफेस पर जाएं।\n\n2. कंप्यूटर ब्राउज़र एक HTTPS वेब पृष्ठ पता दर्ज करने के बाद चेतावनी दिखाता है: "आपका कनेक्शन निजी नहीं है।"\n\nआप "आगे बढ़ें x.x.x.x (असुरक्षित)" पर क्लिक करके आगे बढ़ सकते हैं। सिम्पल वेबसाइट को एन्क्रिप्ट करने के लिए एक स्व-साइन किए गए TLS प्रमाणपत्र का उपयोग करता है।</string>
-    <string name="learn_more">अधिक जानें</string>
     <string name="http_server_state_on">सेवा चल रही है</string>
     <string name="http_server_state_starting">सेवा शुरू हो रही है...</string>
     <string name="http_server_state_stopping">सेवा बंद हो रही है...</string>
@@ -31,7 +29,7 @@
     <string name="rotate_url_token_on_restart">पुनः आरंभ पर URL टोकन बदलें</string>
     <string name="rotate_url_token_on_restart_tips">सक्षम होने पर, हर बार ऐप प्रारंभ होने पर एक नया URL टोकन बनाया जाता है। यह पहले बनाए गए सभी फ़ाइल URL को अमान्य कर देता है। उन उन्नत उपयोगकर्ताओं के लिए अनुशंसित जो अधिक सुरक्षा चाहते हैं।</string>
     <string name="http_server_ok">एचटीटीपी सर्वर शुरू हो गया है</string>
-    <string name="http_server_error">HTTP सर्वर शुरू नहीं हुआ है। PlainApp को फिर से चालने का प्रयास करें और पुन: प्रयास करें। सुनिश्चित करें कि HTTP या HTTPS पोर्ट पर कोई अन्य एप्लिकेशन नहीं है। यदि समस्या बरकरार रहती है, तो कृपया ismartcoding@gmail.com पर समस्या के बारे में अधिक विवरण प्रदान करें।</string>
+    <string name="http_server_error">HTTP सर्वर शुरू नहीं हुआ है। PlainApp को फिर से चालने का प्रयास करें और पुन: प्रयास करें। सुनिश्चित करें कि HTTP या HTTPS पोर्ट पर कोई अन्य एप्लिकेशन नहीं है। यदि समस्या बरकरार रहती है, तो कृपया support@plainapp.app पर समस्या के बारे में अधिक विवरण प्रदान करें।</string>
     <string name="relaunch_app">ऐप फिर से चालू करें</string>
     <string name="require_confirmation">पुष्टिकरण की आवश्यकता है</string>
     <string name="web_service_required_for_chat">दूसरों से संदेश प्राप्त करने के लिए, कृपया फ़ोन वेब पोर्टल सक्षम करें।</string>
@@ -78,4 +76,6 @@
     <string name="home_web_easy_failed_title">शुरू नहीं हो सका</string>
     <string name="last_active">अंतिम सक्रिय: %1$s</string>
     <string name="revoke_session">इस सत्र को रद्द करें</string>
+    <string name="how_to_use">उपयोग कैसे करें</string>
+    <string name="developer_options">डेवलपर विकल्प</string>
 </resources>
