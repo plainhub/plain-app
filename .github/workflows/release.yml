@@ -53,9 +53,9 @@ jobs:
         run: |
           VERSION="${{ steps.meta.outputs.version_name }}"
           echo "hashes=$(sha256sum \
-            "PlainApp-${VERSION}-default.apk" \
-            "PlainApp-${VERSION}-armeabi-v7a.apk" \
-            "PlainApp-${VERSION}.aab" \
+            "PlainApp-${VERSION}-Universal-Recommended.apk" \
+            "PlainApp-${VERSION}-Old-Android-32bit.apk" \
+            "PlainApp-${VERSION}-Google-Play.aab" \
             | base64 -w0)" >> $GITHUB_OUTPUT
 
       - name: Upload release artifacts
@@ -63,9 +63,9 @@ jobs:
         with:
           name: release-artifacts
           path: |
-            PlainApp-${{ steps.meta.outputs.version_name }}-default.apk
-            PlainApp-${{ steps.meta.outputs.version_name }}-armeabi-v7a.apk
-            PlainApp-${{ steps.meta.outputs.version_name }}.aab
+            PlainApp-${{ steps.meta.outputs.version_name }}-Universal-Recommended.apk
+            PlainApp-${{ steps.meta.outputs.version_name }}-Old-Android-32bit.apk
+            PlainApp-${{ steps.meta.outputs.version_name }}-Google-Play.aab
           if-no-files-found: error
           retention-days: 1
 
@@ -151,9 +151,9 @@ jobs:
             printf '%s' "https://www.virustotal.com/gui/file/$sha256/detection" > "${outprefix}.url"
             printf '%s' "$result_status" > "${outprefix}.status"
           }
-          upload_and_poll "PlainApp-${VERSION}-default.apk"     /tmp/vt_default &
-          upload_and_poll "PlainApp-${VERSION}-armeabi-v7a.apk" /tmp/vt_armv7   &
-          upload_and_poll "PlainApp-${VERSION}.aab"              /tmp/vt_aab     &
+          upload_and_poll "PlainApp-${VERSION}-Universal-Recommended.apk"     /tmp/vt_default &
+          upload_and_poll "PlainApp-${VERSION}-Old-Android-32bit.apk" /tmp/vt_armv7   &
+          upload_and_poll "PlainApp-${VERSION}-Google-Play.aab"              /tmp/vt_aab     &
           wait
           {
             echo "default_report=$(cat /tmp/vt_default.url)"
@@ -191,18 +191,18 @@ jobs:
             ### VirusTotal Scan
             | File | Status | Scan Report |
             |------|--------|-------------|
-            | `PlainApp-${{ needs.build.outputs.version_name }}-default.apk` | ${{ needs.virustotal.outputs.default_status }} | [View Report](${{ needs.virustotal.outputs.default_report }}) |
-            | `PlainApp-${{ needs.build.outputs.version_name }}-armeabi-v7a.apk` | ${{ needs.virustotal.outputs.armv7_status }} | [View Report](${{ needs.virustotal.outputs.armv7_report }}) |
-            | `PlainApp-${{ needs.build.outputs.version_name }}.aab` | ${{ needs.virustotal.outputs.aab_status }} | [View Report](${{ needs.virustotal.outputs.aab_report }}) |
+            | `PlainApp-${{ needs.build.outputs.version_name }}-Universal-Recommended.apk` | ${{ needs.virustotal.outputs.default_status }} | [View Report](${{ needs.virustotal.outputs.default_report }}) |
+            | `PlainApp-${{ needs.build.outputs.version_name }}-Old-Android-32bit.apk` | ${{ needs.virustotal.outputs.armv7_status }} | [View Report](${{ needs.virustotal.outputs.armv7_report }}) |
+            | `PlainApp-${{ needs.build.outputs.version_name }}-Google-Play.aab` | ${{ needs.virustotal.outputs.aab_status }} | [View Report](${{ needs.virustotal.outputs.aab_report }}) |
 
             ### SLSA Provenance (Level 3)
             The `.intoto.jsonl` file is a signed SLSA provenance document covering all release artifacts (APKs + AAB).
             Verify with [slsa-verifier](https://github.com/slsa-framework/slsa-verifier):
             ```sh
-            slsa-verifier verify-artifact PlainApp-${{ needs.build.outputs.version_name }}-default.apk \
+            slsa-verifier verify-artifact PlainApp-${{ needs.build.outputs.version_name }}-Universal-Recommended.apk \
               --provenance-path ${{ needs.provenance.outputs.provenance-name }} \
               --source-uri github.com/${{ github.repository }}
             ```
           draft: true
           prerelease: false
-          artifacts: "PlainApp-${{ needs.build.outputs.version_name }}-default.apk,PlainApp-${{ needs.build.outputs.version_name }}-armeabi-v7a.apk,PlainApp-${{ needs.build.outputs.version_name }}.aab,${{ needs.provenance.outputs.provenance-name }}"
+          artifacts: "PlainApp-${{ needs.build.outputs.version_name }}-Universal-Recommended.apk,PlainApp-${{ needs.build.outputs.version_name }}-Old-Android-32bit.apk,PlainApp-${{ needs.build.outputs.version_name }}-Google-Play.aab,${{ needs.provenance.outputs.provenance-name }}"

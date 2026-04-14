@@ -115,9 +115,12 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                                 POutlinedButton(text = stringResource(R.string.check_update), small = true, onClick = {
                                     scope.launch {
                                         DialogHelper.showMessage(getString(R.string.checking_updates))
-                                        val r = withIO { SkipVersionPreference.putAsync(context, ""); AppHelper.checkUpdateAsync(context, true) }
+                                        val r = withIO {
+                                            SkipVersionPreference.putAsync(context, "")
+                                            AppHelper.checkUpdateAsync(context, true)
+                                        }
                                         if (r != null) {
-                                            if (r == true) updateViewModel.showDialog()
+                                            if (r) updateViewModel.showDialog()
                                             else DialogHelper.showMessage(getString(R.string.is_latest_version))
                                         }
                                     }

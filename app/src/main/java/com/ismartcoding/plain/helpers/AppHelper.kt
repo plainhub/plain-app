@@ -75,7 +75,7 @@ object AppHelper {
                 NewVersionPreference.putAsync(context, latestVersion.toString())
                 NewVersionLogPreference.putAsync(context, latest.body)
                 NewVersionPublishDatePreference.putAsync(context, latest.publishedAt.ifEmpty { latest.createdAt })
-                val apk = latest.assets.firstOrNull()
+                val apk = latest.assets.firstOrNull { it.name.endsWith("-Universal-Recommended.apk") }
                 NewVersionSizePreference.putAsync(context, apk?.size ?: 0)
                 NewVersionDownloadUrlPreference.putAsync(context, apk?.browserDownloadUrl ?: "")
                 true

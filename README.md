@@ -43,7 +43,6 @@ PlainApp is also a capable standalone app — not just a server:
 - **Sound Meter** — measure ambient noise levels in real time
 
 ### 🔒 Privacy & Security
-- No Firebase, no third-party SDKs — zero analytics, no crash reporting to external servers
 - Zero data sent to any third-party server
 - All traffic between phone and browser is encrypted (TLS + XChaCha20-Poly1305)
 - No account registration required

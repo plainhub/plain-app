@@ -37,5 +37,5 @@ EOF
 
 ./gradlew :app:bundleRelease || err_and_exit "build failed"
 
-BUILD_FILE="PlainApp-$(getVersionName).aab"
+BUILD_FILE="PlainApp-$(getVersionName)-Google-Play.aab"
 mv ./app/build/outputs/bundle/googleRelease/app-google-release.aab $BUILD_FILE
