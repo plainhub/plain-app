@@ -38,11 +38,6 @@ jobs:
       - name: Restore keystore
         run: echo "${{ secrets.KEYSTORE_B64 }}" | base64 --decode > ./app/release.jks
 
-      - name: Restore google-services.json
-        env:
-          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: printf '%s' "$GOOGLE_SERVICES_JSON" > ./app/google-services.json
-
       # APK build must run first: build-aab.sh strips Play Store restricted
       # permissions from AndroidManifest.xml, which must not affect APK output.
       - name: Build APKs (arm64-v8a + armeabi-v7a)
