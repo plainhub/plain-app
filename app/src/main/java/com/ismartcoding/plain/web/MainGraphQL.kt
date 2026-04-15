@@ -2,6 +2,7 @@ package com.ismartcoding.plain.web
 
 import android.os.Build
 import android.os.Environment
+import android.provider.MediaStore
 import com.apurebase.kgraphql.GraphQLError
 import com.apurebase.kgraphql.GraphqlRequest
 import com.apurebase.kgraphql.KGraphQL
@@ -44,6 +45,7 @@ import com.ismartcoding.plain.db.DMessageStatusData
 import com.ismartcoding.plain.db.DMessageType
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DataType
+import com.ismartcoding.plain.enums.FileType
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.enums.ScreenMirrorControlAction
 import com.ismartcoding.plain.enums.ScreenMirrorMode
@@ -122,6 +124,9 @@ import com.ismartcoding.plain.web.models.ActionResult
 import com.ismartcoding.plain.web.models.App
 import com.ismartcoding.plain.web.models.Audio
 import com.ismartcoding.plain.web.models.Call
+import com.ismartcoding.plain.web.models.Doc
+import com.ismartcoding.plain.web.models.DocExtGroup
+import com.ismartcoding.plain.web.models.toDocModel
 import com.ismartcoding.plain.chat.PeerChatHelper
 import com.ismartcoding.plain.chat.ChannelChatHelper
 import com.ismartcoding.plain.chat.ChannelSystemMessageSender
@@ -416,6 +421,7 @@ class MainGraphQL(val schema: Schema) {
                         }
                     }
                 }
+                addDocQueries()
                 query("contacts") {
                     configure {
                         executor = Executor.DataLoaderPrepared
@@ -1982,6 +1988,7 @@ class MainGraphQL(val schema: Schema) {
                 enum<PomodoroState>()
                 enum<ScreenMirrorMode>()
                 enum<ScreenMirrorControlAction>()
+                type<DocExtGroup>()
                 stringScalar<kotlin.time.Instant> {
                     deserialize = { value: String -> kotlin.time.Instant.parse(value) }
                     serialize = kotlin.time.Instant::toString

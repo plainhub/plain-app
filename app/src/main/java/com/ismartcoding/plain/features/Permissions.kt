@@ -44,7 +44,6 @@ enum class Permission {
     WRITE_CALL_LOG,
     CALL_PHONE,
     POST_NOTIFICATIONS,
-    WRITE_SETTINGS,
     CAMERA,
     SYSTEM_ALERT_WINDOW,
     RECORD_AUDIO,
@@ -84,10 +83,6 @@ enum class Permission {
         return when {
             this == WRITE_EXTERNAL_STORAGE -> {
                 FileHelper.hasStoragePermission(context)
-            }
-
-            this == WRITE_SETTINGS -> {
-                Settings.System.canWrite(context)
             }
 
             this == QUERY_ALL_PACKAGES -> {
@@ -184,18 +179,6 @@ enum class Permission {
                 } else {
                     DialogHelper.showMessage("Cannot open app settings to grant storage access.")
                 }
-            }
-        } else if (this == WRITE_SETTINGS) {
-            val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
-            intent.addCategory(Intent.CATEGORY_DEFAULT)
-            intent.data = Uri.parse("package:${context.packageName}")
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            if (intent.resolveActivity(packageManager) != null) {
-                intentLauncher?.launch(intent)
-            } else {
-                DialogHelper.showMessage(
-                    "ActivityNotFoundException: No Activity found to handle Intent act=android.settings.action.MANAGE_WRITE_SETTINGS",
-                )
             }
         } else if (this == NOTIFICATION_LISTENER) {
             val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
@@ -338,7 +321,6 @@ object Permissions {
             Permission.CAMERA,
             Permission.WRITE_EXTERNAL_STORAGE,
             Permission.CALL_PHONE,
-            Permission.WRITE_SETTINGS,
             Permission.READ_CALL_LOG,
             Permission.WRITE_CALL_LOG,
             Permission.READ_CONTACTS,
@@ -363,7 +345,6 @@ object Permissions {
         }
 
         setOf(
-            Permission.WRITE_SETTINGS,
             Permission.WRITE_EXTERNAL_STORAGE,
             Permission.SYSTEM_ALERT_WINDOW,
             Permission.POST_NOTIFICATIONS,

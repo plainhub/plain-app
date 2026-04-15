@@ -55,7 +55,6 @@
 | NotificationHelper.kt | Create notifications, channels (Android 8+), remote input, stop action |
 | NotificationsHelper.kt | Notification filtering: allowlist/blacklist per app |
 | ShareHelper.kt | Android share intent, MIME detection, FileProvider |
-| ScreenHelper.kt | Keep screen on toggle via WRITE_SETTINGS |
 
 ## Crypto & Security
 | File | Purpose |

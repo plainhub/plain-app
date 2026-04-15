@@ -120,7 +120,7 @@ fun OtherFilePage(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         VerticalSpace(dp = 64.dp)
-                        PFilledButton(text = stringResource(id = R.string.open_with_other_app), onClick = {
+                        PFilledButton(text = stringResource(id = R.string.open_with_other_app), modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                             ShareHelper.openPathWith(context, path)
                         })
                     }
