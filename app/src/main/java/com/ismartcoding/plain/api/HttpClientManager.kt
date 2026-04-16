@@ -18,6 +18,7 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.http.headers
 import okhttp3.OkHttpClient
+import okhttp3.Protocol
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -51,7 +52,14 @@ object HttpClientManager {
             }
         }
 
-    fun downloadClient() = HttpClient(CIO)
+    fun downloadClient(): OkHttpClient =
+        OkHttpClient.Builder()
+            // Force HTTP/1.1 — GitHub's CDN returns "Required SETTINGS preface not received"
+            // when OkHttp attempts an HTTP/2 upgrade handshake.
+            .protocols(listOf(Protocol.HTTP_1_1))
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(120, TimeUnit.SECONDS)
+            .build()
 
     fun httpClient() =
         HttpClient(CIO) {

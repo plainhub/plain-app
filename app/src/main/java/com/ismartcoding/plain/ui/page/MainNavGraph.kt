@@ -12,6 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,6 +25,7 @@ import com.ismartcoding.plain.ui.models.NotesViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
+import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.appfiles.AppFilesPage
 import com.ismartcoding.plain.ui.page.apps.AppPage
@@ -78,6 +80,7 @@ fun MainNavGraph(
     noteTagsVM: TagsViewModel,
     pomodoroVM: PomodoroViewModel,
 ) {
+    val updateVM: UpdateViewModel = viewModel()
     NavHost(
         modifier = Modifier.background(MaterialTheme.colorScheme.surface),
         navController = navController,
@@ -107,7 +110,7 @@ fun MainNavGraph(
             ) + fadeOut(animationSpec = tween(150, easing = FastOutLinearInEasing))
         },
     ) {
-        composable<Routing.Home> { HomePage(navController, mainVM) }
+        composable<Routing.Home> { HomePage(navController, mainVM, updateVM) }
         composable<Routing.Images> { ImagesPage(navController) }
         composable<Routing.Videos> { VideosPage(navController) }
         composable<Routing.Audio> { AudioPage(navController, audioPlaylistVM) }
@@ -117,7 +120,7 @@ fun MainNavGraph(
         composable<Routing.Notes> { NotesPage(navController, notesVM = notesVM, tagsVM = noteTagsVM) }
         composable<Routing.SoundMeter> { SoundMeterPage(navController) }
         composable<Routing.PomodoroTimer> { PomodoroPage(navController, pomodoroVM = pomodoroVM) }
-        composable<Routing.Settings> { SettingsPage(navController) }
+        composable<Routing.Settings> { SettingsPage(navController, updateVM) }
         composable<Routing.DarkTheme> { DarkThemePage(navController) }
         composable<Routing.Language> { LanguagePage(navController) }
         composable<Routing.BackupRestore> { BackupRestorePage(navController) }

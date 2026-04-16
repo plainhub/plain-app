@@ -35,7 +35,7 @@ object QrCodeBitmapHelper {
         BitmapFactory.decodeFileDescriptor(context.contentResolver.openFileDescriptor(imageUri, "r")?.fileDescriptor, null, options)
 
         // Calculate the sample size based on the desired maximum bitmap size
-        options.inSampleSize = BitmapHelper.calculateInSampleSize(options, MAX_BITMAP_SIZE, MAX_BITMAP_SIZE)
+        options.inSampleSize = calcInSampleSize(options.outWidth, options.outHeight, MAX_BITMAP_SIZE)
 
         // Reset the options to load the bitmap
         options.inJustDecodeBounds = false
@@ -121,5 +121,14 @@ object QrCodeBitmapHelper {
             bitmap.recycle()
         }
         return rotatedBitmap
+    }
+
+    /** Largest power-of-2 so decoded size is at least [maxPx] on both dimensions. */
+    private fun calcInSampleSize(srcW: Int, srcH: Int, maxPx: Int): Int {
+        var size = 1
+        while ((srcW / (size * 2)) >= maxPx && (srcH / (size * 2)) >= maxPx) {
+            size *= 2
+        }
+        return size
     }
 }

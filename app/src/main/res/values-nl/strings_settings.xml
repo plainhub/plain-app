@@ -72,4 +72,7 @@
     <string name="drag_number_to_reorder_list">Sleep het nummer om de lijst te herordenen</string>
     <string name="web_client_connected">Webclient verbonden</string>
     <string name="clients_online">%1$d client(s) online</string>
+    <string name="downloading_update">Downloaden… %1$s%%</string>
+    <string name="download_update_failed">Download mislukt</string>
+    <string name="download_on_github">Downloaden via GitHub</string>
 </resources>

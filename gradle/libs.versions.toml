@@ -39,6 +39,9 @@ webrtcSdkAndroidVersion = "144.7559.01"
 mediapipeVisionVersion = "0.10.33"
 liteRtVersion = "2.1.3"
 pdfiumAndroidVersion = "1.9.5-beta01"
+androidxTestRunner = "1.6.2"
+androidxTestRules = "1.6.1"
+androidxTestExtJunit = "1.2.1"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
@@ -72,6 +75,9 @@ camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = 
 # media3
 json = { module = "org.json:json", version.ref = "jsonVersion" }
 junit = { module = "junit:junit", version.ref = "junitVersion" }
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRunner" }
+androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidxTestRules" }
+androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestExtJunit" }
 media3-cast = { module = "androidx.media3:media3-cast", version.ref = "media3" }
 media3-datasource = { module = "androidx.media3:media3-datasource", version.ref = "media3" }
 media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }

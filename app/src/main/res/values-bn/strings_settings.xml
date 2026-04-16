@@ -72,4 +72,7 @@
     <string name="drag_number_to_reorder_list">তালিকা পুনর্বিন্যাস করতে নম্বর টেনে আনুন</string>
     <string name="web_client_connected">ওয়েব ক্লায়েন্ট সংযুক্ত হয়েছে</string>
     <string name="clients_online">%1$d ক্লায়েন্ট অনলাইন</string>
+    <string name="downloading_update">ডাউনলোড হচ্ছে… %1$s%%</string>
+    <string name="download_update_failed">ডাউনলোড ব্যর্থ হয়েছে</string>
+    <string name="download_on_github">GitHub থেকে ডাউনলোড করুন</string>
 </resources>

@@ -72,4 +72,7 @@
     <string name="drag_number_to_reorder_list">Arraste o número para reordenar a lista</string>
     <string name="web_client_connected">Cliente web conectado</string>
     <string name="clients_online">%1$d cliente(s) online</string>
+    <string name="downloading_update">Baixando… %1$s%%</string>
+    <string name="download_update_failed">Falha no download</string>
+    <string name="download_on_github">Baixar no GitHub</string>
 </resources>

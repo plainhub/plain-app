@@ -1,9 +1,7 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
-import android.os.Build
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.features.dlna.common.DlnaSoap
-import com.ismartcoding.plain.helpers.PhoneHelper
 
 /** Static XML templates for the DLNA receiver's HTTP server. */
 object DlnaXmlTemplates {

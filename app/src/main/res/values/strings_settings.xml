@@ -22,6 +22,9 @@
     <string name="get_new_updates">Found update for %1$s!</string>
     <string name="get_new_updates_desc">Upgrade now, experience new features!</string>
     <string name="skip_this_version">Skip This Version</string>
+    <string name="downloading_update">Downloading… %1$s%%</string>
+    <string name="download_update_failed">Download failed</string>
+    <string name="download_on_github">Download on GitHub</string>
     <string name="attention">Attention</string>
     <string name="recommendation">Recommendation</string>
     <string name="usb_connect_recommendation">Connecting the USB charging cable ensures that the phone remains awake, thus avoiding any interception or restriction of its functions by the system.</string>

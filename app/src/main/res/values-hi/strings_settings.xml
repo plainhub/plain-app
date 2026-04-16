@@ -74,4 +74,7 @@
 
     <string name="web_client_connected">वेब क्लाइंट कनेक्ट हुआ</string>
     <string name="clients_online">%1$d क्लाइंट ऑनलाइन</string>
+    <string name="downloading_update">डाउनलोड हो रहा है… %1$s%%</string>
+    <string name="download_update_failed">डाउनलोड विफल हुआ</string>
+    <string name="download_on_github">GitHub पर डाउनलोड करें</string>
 </resources>

@@ -38,7 +38,7 @@ import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.extensions.newFile
-import com.ismartcoding.plain.extensions.toThumbBytesAsync
+import com.ismartcoding.plain.thumbnail.ThumbnailGenerator
 import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.media.AudioMediaStoreHelper
@@ -107,10 +107,12 @@ import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readBytes
+import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import io.ktor.websocket.send
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
@@ -120,11 +122,19 @@ import java.io.IOException
 import java.util.Date
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
+import androidx.core.net.toUri
 
 object HttpModule {
     // Limit concurrent zip operations to 1 to prevent resource exhaustion
     // when the web UI triggers multiple download requests (e.g. double-click).
     private val zipSemaphore = Semaphore(1)
+
+    @Serializable
+    private data class FileIdParams(
+        val path: String = "",
+        val mediaId: String = "",
+        val name: String = "",
+    )
 
     @SuppressLint("SuspiciousIndentation")
     val module: Application.() -> Unit = {
@@ -296,9 +306,9 @@ object HttpModule {
                     var dirPath: String
                     var jsonName = ""
                     if (decryptedId.startsWith("{")) {
-                        val json = JSONObject(decryptedId)
-                        dirPath = json.optString("path")
-                        jsonName = json.optString("name")
+                        val params = jsonDecode<FileIdParams>(decryptedId)
+                        dirPath = params.path
+                        jsonName = params.name
                     } else {
                         dirPath = decryptedId
                     }
@@ -425,23 +435,27 @@ object HttpModule {
                     call.respond(HttpStatusCode.BadRequest)
                     return@get
                 }
+                val t0 = System.currentTimeMillis()
+
                 try {
                     val context = MainApp.instance
                     val decryptedId = UrlHelper.decrypt(id).getFinalPath(context)
+                    val t1 = System.currentTimeMillis()
+
                     var path: String
                     var mediaId = ""
                     var jsonName = ""
                     if (decryptedId.startsWith("{")) {
-                        val json = JSONObject(decryptedId)
-                        path = json.optString("path").getFinalPath(context)
-                        mediaId = json.optString("mediaId")
-                        jsonName = json.optString("name")
+                        val params = jsonDecode<FileIdParams>(decryptedId)
+                        path = params.path.getFinalPath(context)
+                        mediaId = params.mediaId
+                        jsonName = params.name
                     } else {
                         path = decryptedId
                     }
 
                     if (path.startsWith("content://")) {
-                        val uri = Uri.parse(path)
+                        val uri = path.toUri()
                         val mimeType = context.contentResolver.getType(uri).orEmpty()
                         if (mimeType.equals("video/3gpp", true) || mimeType.equals("video/3gp", true) || path.endsWith(".3gp", true)) {
                             val mp4Bytes = withIO { Mp4Helper.convert3gpToMp4(context, uri) }
@@ -453,7 +467,7 @@ object HttpModule {
 
                         val bytes = withIO { context.contentResolver.openInputStream(uri)?.buffered()?.use { it.readBytes() } }
                         if (bytes != null) {
-                            if (!mimeType.isNullOrEmpty()) {
+                            if (mimeType.isNotEmpty()) {
                                 call.respondBytes(bytes, ContentType.parse(mimeType))
                             } else {
                                 call.respondBytes(bytes, ContentType.Application.OctetStream)
@@ -511,10 +525,13 @@ object HttpModule {
                         val centerCrop = q["cc"]?.toBooleanStrictOrNull() != false
                         // get video/image thumbnail
                         if (w != null && h != null) {
-                            val bytes = withIO { file.toThumbBytesAsync(MainApp.instance, w, h, centerCrop, mediaId) }
+
+                            val bytes = withIO { ThumbnailGenerator.toThumbBytesAsync(MainApp.instance, file, w, h, centerCrop, mediaId) }
                             if (bytes != null) {
                                 call.respondBytes(bytes)
                             }
+                            val t2 = System.currentTimeMillis()
+                            LogCat.d("testtest: ${t1-t0}ms, ${t2 - t1}ms")
                             return@get
                         }
                         val header = ByteArray(12)

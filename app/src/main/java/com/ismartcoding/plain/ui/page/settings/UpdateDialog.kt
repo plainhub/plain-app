@@ -20,19 +20,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.toVersion
+import com.ismartcoding.plain.events.DownloadUpdateEvent
 import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.preferences.LocalNewVersion
-import com.ismartcoding.plain.preferences.LocalNewVersionDownloadUrl
 import com.ismartcoding.plain.preferences.LocalNewVersionLog
 import com.ismartcoding.plain.preferences.LocalNewVersionPublishDate
 import com.ismartcoding.plain.preferences.LocalNewVersionSize
 import com.ismartcoding.plain.preferences.SkipVersionPreference
 import com.ismartcoding.plain.ui.base.VerticalSpace
-import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import kotlinx.coroutines.launch
 import kotlin.time.Instant
@@ -45,7 +45,6 @@ fun UpdateDialog(updateVM: UpdateViewModel) {
     val newVersionPublishDate = LocalNewVersionPublishDate.current
     val newVersionLog = LocalNewVersionLog.current
     val newVersionSize = LocalNewVersionSize.current
-    val newVersionDownloadUrl = LocalNewVersionDownloadUrl.current
     val scope = rememberCoroutineScope()
 
     if (updateVM.updateDialogVisible.value) {
@@ -84,12 +83,12 @@ fun UpdateDialog(updateVM: UpdateViewModel) {
             confirmButton = {
                 Button(
                     onClick = {
-                        WebHelper.open(context, newVersionDownloadUrl)
+                        updateVM.hideDialog()
+                        updateVM.startDownload()
+                        sendEvent(DownloadUpdateEvent())
                     }
                 ) {
-                    Text(
-                        text = stringResource(R.string.update)
-                    )
+                    Text(text = stringResource(R.string.update))
                 }
             },
             dismissButton = {

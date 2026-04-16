@@ -5,6 +5,7 @@ import android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND
 import android.app.ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import android.os.Handler
 import android.os.Looper
@@ -74,8 +75,21 @@ object AppHelper {
             if (latestVersion.whetherNeedUpdate(currentVersion, skipVersion)) {
                 NewVersionPreference.putAsync(context, latestVersion.toString())
                 NewVersionLogPreference.putAsync(context, latest.body)
-                NewVersionPublishDatePreference.putAsync(context, latest.publishedAt.ifEmpty { latest.createdAt })
-                val apk = latest.assets.firstOrNull { it.name.endsWith("-Universal-Recommended.apk") }
+                NewVersionPublishDatePreference.putAsync(
+                    context,
+                    latest.publishedAt.ifEmpty { latest.createdAt })
+                val only32BitDevice = Build.SUPPORTED_64_BIT_ABIS.isEmpty()
+                val apk = if (only32BitDevice) {
+                    latest.assets.firstOrNull {
+                        it.name.endsWith("-Old-Android-32bit.apk")
+                    }
+                } else {
+                    latest.assets.firstOrNull {
+                        it.name.endsWith("-Universal-Recommended.apk") || it.name.endsWith(
+                            "-default.apk"
+                        )
+                    }
+                }
                 NewVersionSizePreference.putAsync(context, apk?.size ?: 0)
                 NewVersionDownloadUrlPreference.putAsync(context, apk?.browserDownloadUrl ?: "")
                 true
@@ -92,7 +106,11 @@ object AppHelper {
     }
 
     fun getCacheSize(context: Context): Long {
-        return calculateDirectorySize(context.cacheDir) + calculateDirectorySize(context.filesDir.resolve("image_cache"))
+        return calculateDirectorySize(context.cacheDir) + calculateDirectorySize(
+            context.filesDir.resolve(
+                "image_cache"
+            )
+        )
     }
 
     private fun calculateDirectorySize(directory: File): Long {

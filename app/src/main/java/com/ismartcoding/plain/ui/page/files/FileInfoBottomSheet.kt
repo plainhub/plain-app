@@ -92,7 +92,9 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
                 }
                 VerticalSpace(dp = 16.dp)
                 PCard {
-                    PListItem(title = stringResource(id = R.string.file_size), value = file.size.formatBytes())
+                    if (!file.isDir) {
+                        PListItem(title = stringResource(id = R.string.file_size), value = file.size.formatBytes())
+                    }
                     PListItem(title = stringResource(id = R.string.type), value = if (file.isDir) stringResource(id = R.string.folder) else file.path.getMimeType())
                     file.createdAt?.let {
                         PListItem(title = stringResource(id = R.string.created_at), value = it.formatDateTime())
