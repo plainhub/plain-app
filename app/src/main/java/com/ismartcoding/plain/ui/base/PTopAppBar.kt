@@ -39,7 +39,7 @@ fun PTopAppBar(
             if (subtitle.isEmpty()) {
                 Text(
                     title,
-                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 24.sp),
+                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -47,7 +47,7 @@ fun PTopAppBar(
                 Column {
                     Text(
                         text = title,
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 24.sp),
+                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )

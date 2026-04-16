@@ -26,6 +26,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.preferences.HomeFeaturesPreference
 import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.preferences.dataStore
+import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableItem
@@ -117,6 +118,9 @@ fun HomeFeaturesSelectionPage(navController: NavHostController) {
                         feature = feature,
                         onEnable = { persist(enabledIds + feature.type.name) },
                     )
+                }
+                item {
+                    BottomSpace()
                 }
             }
         },

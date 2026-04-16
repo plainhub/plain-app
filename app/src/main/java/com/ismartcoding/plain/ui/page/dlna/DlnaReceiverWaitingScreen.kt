@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.StepNumber
@@ -35,7 +36,7 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 
 @Composable
 fun DlnaReceiverWaitingScreen() {
-    val deviceName = Build.MODEL
+    val deviceName = TempData.deviceName
     Column(
         modifier = Modifier.fillMaxWidth(),
     ) {

@@ -31,7 +31,7 @@ fun PBottomSheetTopAppBar(
         if (subtitle.isEmpty()) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge.copy(fontSize = 24.sp),
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f),
@@ -40,7 +40,7 @@ fun PBottomSheetTopAppBar(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 24.sp),
+                    style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )

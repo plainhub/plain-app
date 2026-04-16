@@ -1,7 +1,9 @@
 package com.ismartcoding.plain.features.dlna.receiver
 
 import android.os.Build
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.features.dlna.common.DlnaSoap
+import com.ismartcoding.plain.helpers.PhoneHelper
 
 /** Static XML templates for the DLNA receiver's HTTP server. */
 object DlnaXmlTemplates {
@@ -12,7 +14,7 @@ object DlnaXmlTemplates {
   <URLBase>http://$ip:$port</URLBase>
   <device>
     <deviceType>urn:schemas-upnp-org:device:MediaRenderer:1</deviceType>
-    <friendlyName>Plain (${Build.MODEL})</friendlyName>
+    <friendlyName>Plain (${TempData.deviceName})</friendlyName>
     <manufacturer>PlainApp</manufacturer>
     <modelName>PlainApp MediaRenderer</modelName>
     <modelNumber>1</modelNumber>
