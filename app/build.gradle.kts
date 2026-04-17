@@ -41,7 +41,7 @@ android {
 
         val vCode = 547
         versionCode = vCode - singleAbiNum
-        versionName = "3.0.16"
+        versionName = "3.0.15"
 
         ndk {
             //noinspection ChromeOsAbiSupport
@@ -145,6 +145,10 @@ play {
 dependencies {
     testImplementation(libs.junit)
     testImplementation(libs.json)
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.test.ext.junit)
     implementation(project(":lib"))
 
     implementation(platform(libs.compose.bom))

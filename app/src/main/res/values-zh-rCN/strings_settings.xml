@@ -72,4 +72,7 @@
     <string name="drag_number_to_reorder_list">拖动数字以重新排列列表</string>
     <string name="web_client_connected">Web 客户端已连接</string>
     <string name="clients_online">%1$d 个客户端在线</string>
+    <string name="downloading_update">下载中… %1$s%%</string>
+    <string name="download_update_failed">下载失败</string>
+    <string name="download_on_github">在 GitHub 下载</string>
 </resources>

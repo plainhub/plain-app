@@ -31,20 +31,27 @@ import com.ismartcoding.plain.features.bluetooth.BluetoothUtil
 import com.ismartcoding.plain.ai.ImageSearchManager
 import com.ismartcoding.plain.ai.ImageSearchStatusChangedEvent
 import com.ismartcoding.plain.ai.ImageIndexProgressEvent
+import com.ismartcoding.plain.api.HttpClientManager
 import com.ismartcoding.plain.web.models.buildImageSearchStatus
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
 import com.ismartcoding.plain.chat.discover.NearbyPairManager
 import com.ismartcoding.plain.db.DPeer
+import com.ismartcoding.plain.preferences.NewVersionDownloadUrlPreference
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.ui.models.FolderOption
 import com.ismartcoding.plain.web.AuthRequest
 import com.ismartcoding.plain.web.models.toModel
 import com.ismartcoding.plain.web.websocket.WebSocketHelper
 import io.ktor.server.websocket.DefaultWebSocketServerSession
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withTimeoutOrNull
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.io.File
 
 data class NearbyDeviceFoundEvent(val device: DNearbyDevice) : ChannelEvent()
 
@@ -154,6 +161,12 @@ class EnableImageSearchEvent : ChannelEvent()
 class DisableImageSearchEvent : ChannelEvent()
 class CancelImageDownloadEvent : ChannelEvent()
 
+class DownloadUpdateEvent : ChannelEvent()
+class CancelUpdateDownloadEvent : ChannelEvent()
+class UpdateDownloadProgressEvent(val progress: Int) : ChannelEvent()
+class UpdateDownloadCompleteEvent(val filePath: String) : ChannelEvent()
+class UpdateDownloadFailedEvent : ChannelEvent()
+
 class FeedStatusEvent(val feedId: String, val status: FeedWorkerStatus) : ChannelEvent()
 
 class SleepTimerEvent(val durationMs: Long) : ChannelEvent()
@@ -167,6 +180,8 @@ class StopNearbyDiscoveryEvent : ChannelEvent()
 object AppEvents {
     private lateinit var mediaPlayer: MediaPlayer
     private var sleepTimerJob: Job? = null
+    private var downloadJob: Job? = null
+    private val downloadHttpClient by lazy { HttpClientManager.downloadClient() }
 
     fun register() {
         mediaPlayer = MediaPlayer()
@@ -342,6 +357,57 @@ object AppEvents {
                                 }
                             }
                         }
+                    }
+
+                    is DownloadUpdateEvent -> {
+                        downloadJob?.cancel()
+                        downloadJob = coIO {
+                            val context = MainApp.instance
+                            val url = NewVersionDownloadUrlPreference.getAsync(context)
+                            if (url.isEmpty()) {
+                                sendEvent(UpdateDownloadFailedEvent())
+                                return@coIO
+                            }
+                            val outputFile = File(context.cacheDir, "plain-update.apk")
+                            val call = downloadHttpClient.newCall(Request.Builder().url(url).build())
+                            try {
+                                val response = call.execute()
+                                val body = response.body
+                                val contentLength = body.contentLength()
+                                var downloaded = 0L
+                                val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                                body.source().use { source ->
+                                    outputFile.outputStream().use { output ->
+                                        while (true) {
+                                            ensureActive()
+                                            val read = source.read(buffer)
+                                            if (read == -1) break
+                                            output.write(buffer, 0, read)
+                                            downloaded += read
+                                            val progress = if (contentLength > 0) {
+                                                ((downloaded * 100) / contentLength).toInt().coerceIn(0, 99)
+                                            } else 0
+                                            sendEvent(UpdateDownloadProgressEvent(progress))
+                                        }
+                                    }
+                                }
+                                sendEvent(UpdateDownloadCompleteEvent(outputFile.absolutePath))
+                            } catch (e: CancellationException) {
+                                call.cancel()
+                                outputFile.delete()
+                                throw e
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                LogCat.e("APK download failed: $url, ${e.message}")
+                                outputFile.delete()
+                                sendEvent(UpdateDownloadFailedEvent())
+                            }
+                        }
+                    }
+
+                    is CancelUpdateDownloadEvent -> {
+                        downloadJob?.cancel()
+                        downloadJob = null
                     }
                 }
             }

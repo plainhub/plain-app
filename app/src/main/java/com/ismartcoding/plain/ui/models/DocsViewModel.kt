@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.ui.models
 
 import android.content.Context
-import android.provider.MediaStore
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -13,11 +12,10 @@ import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import com.ismartcoding.lib.extensions.scanFileByConnection
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.enums.FileType
 import com.ismartcoding.plain.features.file.DFile
-import com.ismartcoding.plain.features.media.FileMediaStoreHelper
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.features.media.DocsHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -51,27 +49,24 @@ class DocsViewModel(private val savedStateHandle: SavedStateHandle) :
     override var selectMode = mutableStateOf(false)
     override val selectedIds = mutableStateListOf<String>()
 
-    fun moreAsync(context: Context) {
-        val query = getQuery()
+    suspend fun moreAsync(context: Context) {
+        val query = buildQuery()
         offset.value += limit.intValue
-        val items = FileMediaStoreHelper.getAllByFileTypeAsync(context, MediaStore.VOLUME_EXTERNAL_PRIMARY, FileType.DOCUMENT, sortBy.value)
-            .filter { query.isEmpty() || it.name.contains(query) }.drop(offset.intValue).take(limit.intValue)
+        val items = DocsHelper.searchAsync(context, query, limit.intValue, offset.intValue, sortBy.value)
         _itemsFlow.value.addAll(items)
         showLoading.value = false
         noMore.value = items.size < limit.intValue
     }
 
-    fun loadAsync(context: Context) {
-        val query = getQuery()
+    suspend fun loadAsync(context: Context) {
+        val query = buildQuery()
         offset.intValue = 0
-        val items = FileMediaStoreHelper.getAllByFileTypeAsync(context, MediaStore.VOLUME_EXTERNAL_PRIMARY, FileType.DOCUMENT, sortBy.value)
-            .filter { query.isEmpty() || it.name.contains(query) }
-        _itemsFlow.value = items.take(limit.intValue).toMutableStateList()
-        total.intValue = items.size
-        noMore.value = _itemsFlow.value.size < limit.intValue
-        val extensions = items
-            .groupBy { it.extension }.map { VTabData(it.key.uppercase(), it.key, it.value.size) }
-            .sortedBy { it.title }
+        val items = DocsHelper.searchAsync(context, query, limit.intValue, 0, sortBy.value)
+        _itemsFlow.value = items.toMutableStateList()
+        noMore.value = items.size < limit.intValue
+        val extGroups = DocsHelper.getDocExtGroupsAsync(context, query)
+        total.intValue = extGroups.sumOf { it.second }
+        val extensions = extGroups.map { VTabData(it.first, it.first.lowercase(), it.second) }
         tabs.value = listOf(VTabData(getString(R.string.all), "", total.intValue), *extensions.toTypedArray())
         showLoading.value = false
     }
@@ -90,7 +85,8 @@ class DocsViewModel(private val savedStateHandle: SavedStateHandle) :
         }
     }
 
-    private fun getQuery(): String {
-        return queryText.value
+    private fun buildQuery(): String {
+        val text = queryText.value.trim()
+        return if (text.isEmpty()) "" else "text:$text"
     }
 }

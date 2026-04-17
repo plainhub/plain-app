@@ -21,6 +21,7 @@ import com.ismartcoding.plain.features.media.FileMediaStoreHelper
 import com.ismartcoding.plain.preferences.LastFilePathPreference
 import com.ismartcoding.plain.preferences.ShowHiddenFilesPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.helpers.FilePathValidator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -115,7 +116,11 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
     fun deleteFiles(paths: Set<String>) {
         viewModelScope.launch {
             DialogHelper.showLoading()
-            withIO { paths.forEach { File(it).deleteRecursively() }; MainApp.instance.scanFileByConnection(paths.toTypedArray()) }
+            withIO {
+                FilePathValidator.requireAllSafe(paths.toList())
+                paths.forEach { File(it).deleteRecursively() }
+                MainApp.instance.scanFileByConnection(paths.toTypedArray())
+            }
             DialogHelper.hideLoading()
             _itemsFlow.update { it.toMutableStateList().apply { removeIf { i -> paths.contains(i.path) } } }
         }

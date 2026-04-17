@@ -8,10 +8,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.lib.extensions.formatBytes
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PListItem
 import com.ismartcoding.plain.ui.base.POutlinedButton
@@ -65,11 +67,11 @@ fun AboutLogsAndCacheCard(
                 POutlinedButton(text = stringResource(R.string.clear_cache), small = true, onClick = {
                     scope.launch {
                         DialogHelper.showLoading()
-                        com.ismartcoding.lib.helpers.CoroutinesHelper.withIO {
-                            com.ismartcoding.plain.helpers.AppHelper.clearCacheAsync(context)
+                        withIO {
+                            AppHelper.clearCacheAsync(context)
                         }
                         coil3.SingletonImageLoader.get(context).memoryCache?.clear()
-                        val newSize = com.ismartcoding.plain.helpers.AppHelper.getCacheSize(context)
+                        val newSize = AppHelper.getCacheSize(context)
                         DialogHelper.hideLoading()
                         DialogHelper.showMessage(R.string.local_cache_cleared)
                         onCacheCleared(newSize)

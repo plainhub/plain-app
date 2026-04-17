@@ -72,4 +72,7 @@
     <string name="drag_number_to_reorder_list">பட்டியலை மறுவரிசைப்படுத்த எண்ணை இழுக்கவும்</string>
     <string name="web_client_connected">வலை கிளையன்ட் இணைந்தது</string>
     <string name="clients_online">%1$d கிளையன்ட்(கள்) ஆன்லைன்</string>
+    <string name="downloading_update">பதிவிறக்கப்படுகிறது… %1$s%%</string>
+    <string name="download_update_failed">பதிவிறக்கம் தோல்வியடைந்தது</string>
+    <string name="download_on_github">GitHub-ல் பதிவிறக்கவும்</string>
 </resources>

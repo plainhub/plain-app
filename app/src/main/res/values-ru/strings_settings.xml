@@ -72,4 +72,7 @@
     <string name="drag_number_to_reorder_list">Перетащите номер, чтобы изменить порядок списка</string>
     <string name="web_client_connected">Веб-клиент подключен</string>
     <string name="clients_online">%1$d клиент(а/ов) онлайн</string>
+    <string name="downloading_update">Загрузка… %1$s%%</string>
+    <string name="download_update_failed">Ошибка загрузки</string>
+    <string name="download_on_github">Скачать на GitHub</string>
 </resources>

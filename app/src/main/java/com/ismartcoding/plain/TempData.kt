@@ -33,7 +33,7 @@ object TempData {
     var deviceName = ""
     var httpPort: Int = 8080
     var httpsPort: Int = 8443
-    var urlToken = "" // use to encrypt or decrypt params in url
+    var urlToken = ByteArray(0) // use to encrypt or decrypt params in url (kept as raw bytes to avoid base64 decode on every encrypt/decrypt)
     var mdnsHostname = "plainapp.local" // mDNS hostname for local network discovery
     val notifications = mutableListOf<DNotification>()
     // Stores notification actions (including RemoteInput reply actions) keyed by notification id

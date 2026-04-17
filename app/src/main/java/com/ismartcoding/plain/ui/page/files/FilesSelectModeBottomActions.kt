@@ -13,6 +13,7 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.newPath
 import com.ismartcoding.plain.helpers.ShareHelper
+import com.ismartcoding.plain.helpers.FilePathValidator
 import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonCopy
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonCut
@@ -72,6 +73,7 @@ fun FilesSelectModeBottomActions(
                         val paths = filesVM.selectedIds.toSet()
                         DialogHelper.showLoading()
                         withIO {
+                            FilePathValidator.requireAllSafe(paths.toList())
                             paths.forEach { File(it).deleteRecursively() }
                             MainApp.instance.scanFileByConnection(paths.toTypedArray())
                             filesVM.loadAsync(context)

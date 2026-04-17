@@ -72,4 +72,7 @@
     <string name="drag_number_to_reorder_list">Kéo số để sắp xếp lại danh sách</string>
     <string name="web_client_connected">Máy khách web đã kết nối</string>
     <string name="clients_online">%1$d máy khách trực tuyến</string>
+    <string name="downloading_update">Đang tải… %1$s%%</string>
+    <string name="download_update_failed">Tải xuống thất bại</string>
+    <string name="download_on_github">Tải xuống trên GitHub</string>
 </resources>

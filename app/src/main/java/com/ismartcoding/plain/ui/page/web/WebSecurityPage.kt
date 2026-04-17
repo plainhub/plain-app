@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import android.util.Base64
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.Constants
@@ -55,7 +56,7 @@ fun WebSecurityPage(navController: NavHostController) {
         val password = LocalPassword.current
         val authTwoFactor = LocalAuthTwoFactor.current
         val rotateUrlTokenOnRestart = LocalRotateUrlTokenOnRestart.current
-        var urlToken by remember { mutableStateOf(TempData.urlToken) }
+        var urlToken by remember { mutableStateOf(Base64.encodeToString(TempData.urlToken, Base64.NO_WRAP)) }
         var keyStorePassword by remember { mutableStateOf("") }
         var sslSignature by remember { mutableStateOf("") }
         val editPassword = remember { mutableStateOf("") }
@@ -147,7 +148,7 @@ fun WebSecurityPage(navController: NavHostController) {
                         }
                         Tips(text = stringResource(R.string.rotate_url_token_on_restart_tips)); VerticalSpace(dp = 16.dp)
                         PFilledButton(text = stringResource(R.string.reset_token), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
-                            scope.launch(Dispatchers.IO) { UrlTokenPreference.resetAsync(context); urlToken = TempData.urlToken; DialogHelper.showMessage(R.string.the_token_is_reset) }
+                            scope.launch(Dispatchers.IO) { UrlTokenPreference.resetAsync(context); urlToken = Base64.encodeToString(TempData.urlToken, Base64.NO_WRAP); DialogHelper.showMessage(R.string.the_token_is_reset) }
                         })
                         BottomSpace(paddingValues)
                     }

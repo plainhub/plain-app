@@ -72,4 +72,7 @@
     <string name="drag_number_to_reorder_list">Listeyi yeniden sıralamak için numarayı sürükleyin</string>
     <string name="web_client_connected">Web istemcisi bağlandı</string>
     <string name="clients_online">%1$d istemci çevrimiçi</string>
+    <string name="downloading_update">İndiriliyor… %1$s%%</string>
+    <string name="download_update_failed">İndirme başarısız oldu</string>
+    <string name="download_on_github">GitHub dan indir</string>
 </resources>

@@ -72,4 +72,7 @@
     <string name="drag_number_to_reorder_list">拖動數字以重新排列列表</string>
     <string name="web_client_connected">Web 用戶端已連接</string>
     <string name="clients_online">%1$d 個用戶端在線</string>
+    <string name="downloading_update">下載中… %1$s%%</string>
+    <string name="download_update_failed">下載失敗</string>
+    <string name="download_on_github">在 GitHub 下載</string>
 </resources>

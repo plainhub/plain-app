@@ -2,6 +2,7 @@ package com.ismartcoding.plain.preferences
 
 import android.content.Context
 import android.os.LocaleList
+import android.util.Base64
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -140,20 +141,25 @@ object UrlTokenPreference : BasePreference<String>() {
     ) {
         val rotateOnRestart = RotateUrlTokenOnRestartPreference.get(preferences)
         if (rotateOnRestart) {
-            TempData.urlToken = CryptoHelper.generateChaCha20Key()
-            putAsync(context, TempData.urlToken)
+            val keyStr = CryptoHelper.generateChaCha20Key()
+            TempData.urlToken = Base64.decode(keyStr, Base64.NO_WRAP)
+            putAsync(context, keyStr)
             return
         }
-        TempData.urlToken = get(preferences)
-        if (TempData.urlToken.isEmpty()) {
-            TempData.urlToken = CryptoHelper.generateChaCha20Key()
-            putAsync(context, TempData.urlToken)
+        val keyStr = get(preferences)
+        if (keyStr.isEmpty()) {
+            val newKeyStr = CryptoHelper.generateChaCha20Key()
+            TempData.urlToken = Base64.decode(newKeyStr, Base64.NO_WRAP)
+            putAsync(context, newKeyStr)
+        } else {
+            TempData.urlToken = Base64.decode(keyStr, Base64.NO_WRAP)
         }
     }
 
     suspend fun resetAsync(context: Context) {
-        TempData.urlToken = CryptoHelper.generateChaCha20Key()
-        putAsync(context, TempData.urlToken)
+        val keyStr = CryptoHelper.generateChaCha20Key()
+        TempData.urlToken = Base64.decode(keyStr, Base64.NO_WRAP)
+        putAsync(context, keyStr)
     }
 }
 

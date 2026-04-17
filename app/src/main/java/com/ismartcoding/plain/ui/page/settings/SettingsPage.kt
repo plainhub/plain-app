@@ -58,7 +58,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewModel = viewModel()) {
+fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewModel) {
     val currentVersion = Version(BuildConfig.VERSION_NAME)
     val newVersion = LocalNewVersion.current.toVersion()
     val skipVersion = LocalSkipVersion.current.toVersion()
