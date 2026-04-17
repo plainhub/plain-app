@@ -73,16 +73,15 @@ object MdnsHostResponder {
                             .onSuccess { joinCount++; LogCat.d("mDNS joined ${iface.name} (${ip.hostAddress})") }
                             .onFailure { LogCat.e("mDNS joinGroup ${iface.name}: ${it.message}") }
                     }
-                    // Safety fallback: some kernels reject IP_ADD_MEMBERSHIP with an interface
-                    // index. joinGroup(InetAddress) lets the OS pick the default interface and
-                    // suffices for single-interface (non-hotspot) devices.
+                    // Fallback: some kernels reject IP_ADD_MEMBERSHIP with an explicit
+                    // interface index (EINVAL). Use the default-interface form as last resort.
                     if (joinCount == 0) {
                         runCatching { joinGroup(multicastGroup) }
-                            .onSuccess { joinCount++; LogCat.d("mDNS joined multicast group (default interface fallback)") }
+                            .onSuccess { joinCount++; LogCat.d("mDNS joined multicast group (default interface)") }
                             .onFailure { LogCat.e("mDNS joinGroup default fallback failed: ${it.message}") }
                     }
                     if (joinCount == 0) {
-                        LogCat.e("mDNS: no interface joined multicast group — responder will not receive queries")
+                        LogCat.e("mDNS: failed to join multicast group on any interface")
                     }
                 }
             }.getOrElse {
@@ -135,6 +134,7 @@ object MdnsHostResponder {
                 // mDNS resolvers (macOS, Windows, Android) silently reject.
                 runCatching {
                     s.send(DatagramPacket(response, response.size, senderIp, MDNS_PORT))
+                    LogCat.d("mDNS reply $hostname → ${localIp.hostAddress} to ${senderIp.hostAddress}")
                 }.onFailure { LogCat.e("mDNS send to ${senderIp.hostAddress}: ${it.message}") }
             } catch (_: SocketTimeoutException) {
                 // expected — keeps thread responsive to socket close

@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.Network
-import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.logcat.LogCat
@@ -28,6 +27,9 @@ class MdnsRegister(
     private var reregisterJob: Job? = null
     private var hotspotWatcher: MdnsHotspotWatcher? = null
 
+    /** Snapshot of the interfaces at last successful registration ("wlan0:192.168.1.5"). */
+    @Volatile private var lastRegisteredIfaces: Set<String> = emptySet()
+
     fun start() {
         if (networkCallback != null) return
 
@@ -46,12 +48,10 @@ class MdnsRegister(
                 schedule("onLost")
             }
 
-            override fun onCapabilitiesChanged(
-                network: Network,
-                networkCapabilities: NetworkCapabilities,
-            ) {
-                schedule("onCapabilitiesChanged")
-            }
+            // onCapabilitiesChanged is intentionally omitted: it fires for signal-
+            // strength changes, bandwidth estimate updates, and validation state —
+            // none of which affect the interface/IP set.  On some Samsung/MediaTek
+            // devices it fires every few seconds, causing pointless mDNS restarts.
 
             override fun onLinkPropertiesChanged(
                 network: Network,
@@ -82,6 +82,7 @@ class MdnsRegister(
     fun stop() {
         reregisterJob?.cancel()
         reregisterJob = null
+        lastRegisteredIfaces = emptySet()
 
         hotspotWatcher?.stop()
         hotspotWatcher = null
@@ -99,45 +100,32 @@ class MdnsRegister(
 
         reregisterJob?.cancel()
         reregisterJob = coIO {
-            delay(2000) // debounce network churn (VPN/Wi-Fi toggles can fire multiple callbacks)
+            delay(2000) // debounce network churn
+            if (!isActive()) return@coIO
 
-            // Keep retries low to avoid churning mDNS registration under unstable networks.
-            val maxAttempts = 3
-            repeat(maxAttempts) { attemptIndex ->
-                if (!isActive()) return@coIO
-                if (attemptIndex > 0) delay(3000)
+            // Compare current interface set with last registration — skip if unchanged.
+            val currentIfaces = candidateInterfaces()
+                .map { (iface, ip) -> "${iface.name}:${ip.hostAddress}" }
+                .toSet()
+            if (currentIfaces == lastRegisteredIfaces) return@coIO
 
-                val hostname = hostnameProvider().trim()
-                val httpPort = httpPortProvider()
-                val httpsPort = httpsPortProvider()
+            val hostname = hostnameProvider().trim()
+            val httpPort = httpPortProvider()
+            val httpsPort = httpsPortProvider()
+            val httpOk = httpPort in 1..65535
+            val httpsOk = httpsPort in 1..65535
+            if (hostname.isEmpty() || (!httpOk && !httpsOk)) return@coIO
 
-                val httpOk = httpPort in 1..65535
-                val httpsOk = httpsPort in 1..65535
-                if (hostname.isEmpty() || (!httpOk && !httpsOk)) {
-                    LogCat.e(
-                        "Skip mDNS re-register (attempt ${attemptIndex + 1}/$maxAttempts): " +
-                            "hostname='$hostname', httpPort=$httpPort, httpsPort=$httpsPort"
-                    )
-                    return@repeat
-                }
-
-                LogCat.d("Network changed ($reason), re-registering mDNS (attempt ${attemptIndex + 1}/$maxAttempts)")
-
-                runCatching {
-                    // registerServices() handles stop/start internally.
-                    NsdHelper.registerServices(
-                        context = appContext,
-                        httpPort = if (httpOk) httpPort else null,
-                        httpsPort = if (httpsOk) httpsPort else null,
-                    )
-                }
-                    .onSuccess { ok ->
-                        if (ok) return@coIO
-                    }
-                    .onFailure {
-                        LogCat.e("mDNS re-register failed: ${it.message}")
-                    }
+            LogCat.d("mDNS re-register ($reason): $currentIfaces")
+            runCatching {
+                NsdHelper.registerServices(
+                    context = appContext,
+                    httpPort = if (httpOk) httpPort else null,
+                    httpsPort = if (httpsOk) httpsPort else null,
+                )
             }
+                .onSuccess { ok -> if (ok) lastRegisteredIfaces = currentIfaces }
+                .onFailure { LogCat.e("mDNS re-register failed: ${it.message}") }
         }
     }
 }
