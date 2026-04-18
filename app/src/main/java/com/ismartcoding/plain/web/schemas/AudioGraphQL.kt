@@ -29,9 +29,7 @@ fun SchemaBuilder.addAudioSchema() {
         resolver { offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
             val context = MainApp.instance
             Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-            AudioMediaStoreHelper.searchAsync(context, query, limit, offset, sortBy).map {
-                it.toModel()
-            }
+            AudioMediaStoreHelper.searchAsync(context, query, limit, offset, sortBy).map { it.toModel() }
         }
         type<Audio> {
             dataProperty("tags") {

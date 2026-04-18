@@ -53,6 +53,8 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
                 where.addEqual(MediaStore.Video.Media.BUCKET_ID, it.value)
             } else if (it.name == "trash") {
                 where.trash = it.value.toBooleanStrictOrNull()
+            } else if (it.name == "excluded_dir") {
+                where.addNotStartsWith(MediaStore.Video.Media.DATA, it.value)
             }
         }
         return where

@@ -51,6 +51,8 @@ object ImageMediaStoreHelper : BaseMediaContentHelper() {
                 where.addEqual(MediaStore.Images.Media.BUCKET_ID, it.value)
             } else if (it.name == "trash") {
                 where.trash = it.value.toBooleanStrictOrNull()
+            } else if (it.name == "excluded_dir") {
+                where.addNotStartsWith(MediaStore.Images.Media.DATA, it.value)
             }
         }
         return where

@@ -29,9 +29,7 @@ fun SchemaBuilder.addVideoMediaSchema() {
         resolver { offset: Int, limit: Int, query: String, sortBy: FileSortBy ->
             val context = MainApp.instance
             Permission.WRITE_EXTERNAL_STORAGE.checkAsync(context)
-            VideoMediaStoreHelper.searchAsync(context, query, limit, offset, sortBy).map {
-                it.toModel()
-            }
+            VideoMediaStoreHelper.searchAsync(context, query, limit, offset, sortBy).map { it.toModel() }
         }
         type<Video> {
             dataProperty("tags") {

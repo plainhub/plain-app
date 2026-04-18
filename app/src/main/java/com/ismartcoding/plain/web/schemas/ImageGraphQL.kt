@@ -31,15 +31,14 @@ fun SchemaBuilder.addImageSchema() {
             val fields = SearchHelper.parse(query)
             val textField = fields.find { it.name == "text" }
             val queryText = textField?.value ?: ""
-            val combined = ImageSearchHelper.searchCombinedAsync(
+            ImageSearchHelper.searchCombinedAsync(
                 context = context,
                 queryText = queryText,
                 extraQuery = query,
                 limit = limit,
                 offset = offset,
                 sortBy = sortBy
-            )
-            combined.map { it.toModel() }
+            ).map { it.toModel() }
         }
         type<Image> {
             dataProperty("tags") {

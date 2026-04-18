@@ -68,6 +68,10 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
                 "trash" -> {
                     where.trash = it.value.toBooleanStrictOrNull()
                 }
+
+                "excluded_dir" -> {
+                    where.addNotStartsWith(MediaStore.Audio.Media.DATA, it.value)
+                }
             }
         }
         return where
