@@ -23,6 +23,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.toVersion
 import com.ismartcoding.plain.events.CancelUpdateDownloadEvent
+import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.preferences.LocalNewVersion
 import com.ismartcoding.plain.preferences.LocalSkipVersion
 import com.ismartcoding.plain.ui.base.PBanner
@@ -31,6 +32,7 @@ import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.data.Version
+import java.io.File
 
 private const val GITHUB_RELEASES_URL = "https://github.com/plainhub/plain-app/releases/latest"
 
@@ -42,6 +44,8 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
     val isDownloading = updateVM.isDownloading.value
     val downloadProgress = updateVM.downloadProgress.intValue
     val downloadFailed = updateVM.downloadFailed.value
+    val isDownloadComplete = updateVM.isDownloadComplete.value
+    val downloadedFilePath = updateVM.downloadedFilePath.value
     val context = LocalContext.current
 
     val needsUpdate = newVersion.whetherNeedUpdate(currentVersion, skipVersion)
@@ -54,6 +58,14 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
                 updateVM.cancelDownload()
                 sendEvent(CancelUpdateDownloadEvent())
             },
+        )
+
+        isDownloadComplete -> DownloadCompleteBanner(
+            onInstall = {
+                updateVM.resetDownload()
+                PackageHelper.install(context, File(downloadedFilePath))
+            },
+            onDismiss = { updateVM.resetDownload() },
         )
 
         downloadFailed -> DownloadFailedBanner(
@@ -112,6 +124,25 @@ private fun DownloadProgressBanner(
             )
         }
     }
+}
+
+@Composable
+private fun DownloadCompleteBanner(
+    onInstall: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    PBanner(
+        title = stringResource(R.string.update_downloaded),
+        icon = R.drawable.lightbulb,
+        action = {
+            POutlinedButton(
+                text = stringResource(R.string.install_update),
+                small = true,
+                onClick = onInstall,
+            )
+        },
+        onClick = onDismiss,
+    )
 }
 
 @Composable

@@ -26,7 +26,6 @@ import com.ismartcoding.plain.events.UpdateDownloadCompleteEvent
 import com.ismartcoding.plain.events.UpdateDownloadFailedEvent
 import com.ismartcoding.plain.events.UpdateDownloadProgressEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
-import com.ismartcoding.plain.features.PackageHelper
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.preferences.LocalWeb
 import com.ismartcoding.plain.ui.base.AlertType
@@ -38,7 +37,6 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.page.settings.UpdateDialog
-import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,8 +68,7 @@ fun HomePage(
                 }
 
                 is UpdateDownloadCompleteEvent -> {
-                    updateVM.onDownloadComplete()
-                    PackageHelper.install(context, File(event.filePath))
+                    updateVM.onDownloadComplete(event.filePath)
                 }
 
                 is UpdateDownloadFailedEvent -> {

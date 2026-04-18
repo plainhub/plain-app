@@ -2,21 +2,31 @@ package com.ismartcoding.plain.thumbnail
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Build
+import android.graphics.Matrix
+import androidx.exifinterface.media.ExifInterface
 
 /**
  * Fast single-pass image decode using the Glide-style density trick.
  *
  * Strategy:
  *  1. inJustDecodeBounds — read source dimensions, no pixel allocation.
- *  2. inSampleSize — coarse power-of-2 subsample so the native decoder loads
- *     only a fraction of the source pixels.
- *  3. inDensity / inTargetDensity — precise fractional scale applied *inside*
+ *  2. Read EXIF orientation once (all 8 variants: rotate + flip combinations).
+ *  3. inSampleSize — coarse power-of-2 subsample. For 90°/270° rotated images
+ *     the requested width/height are swapped before computing the sample size,
+ *     because raw pixels are stored with transposed axes.
+ *  4. inDensity / inTargetDensity — precise fractional scale applied *inside*
  *     the native decoder (libjpeg-turbo folds this into its IDCT stage for
  *     JPEG), eliminating a second Bitmap allocation from createScaledBitmap().
- *  4. Conditional sharpening — only for small outputs (≤ SHARPEN_THRESHOLD px)
+ *  5. Apply EXIF transform matrix (rotate + optional flip) to the decoded bitmap
+ *     BEFORE the center-crop step so the crop operates on the correct orientation.
+ *  6. Conditional sharpening — only for small outputs (≤ SHARPEN_THRESHOLD px)
  *     where the JVM pixel loop is cheap (< 10 ms). Large outputs (e.g. 1024 px
  *     lightbox) skip sharpening to avoid the ~150 ms overhead.
+ *
+ * EXIF note:
+ *  BitmapFactory.decodeFile() never auto-rotates by EXIF, regardless of Android
+ *  version. Only ImageDecoder (API 28+) and ContentResolver.loadThumbnail()
+ *  handle EXIF automatically. For the BitmapFactory path we must apply it manually.
  *
  * Returns null if BitmapFactory cannot decode the file (unsupported format).
  * Callers should fall back to Coil for formats like embedded audio art.
@@ -36,8 +46,21 @@ fun decodeSampledBitmapFromFile(
     val srcH = opts.outHeight
     if (srcW <= 0 || srcH <= 0) return null
 
+    // Read EXIF orientation once — BitmapFactory ignores it.
+    val exifOrient = readExifOrientation(path)
+
+    // For orientations that involve a 90°/270° rotation, the raw pixel axes are
+    // transposed relative to the final image. Swap reqW/reqH when computing
+    // inSampleSize so we preserve enough pixels in both final dimensions.
+    val swapDims = exifOrient == ExifInterface.ORIENTATION_ROTATE_90 ||
+            exifOrient == ExifInterface.ORIENTATION_ROTATE_270 ||
+            exifOrient == ExifInterface.ORIENTATION_TRANSPOSE ||
+            exifOrient == ExifInterface.ORIENTATION_TRANSVERSE
+    val logicalReqW = if (swapDims) reqHeight else reqWidth
+    val logicalReqH = if (swapDims) reqWidth else reqHeight
+
     // Coarse inSampleSize: largest power-of-2 so decoded size ≥ target
-    val sampleSize = calcInSampleSize(srcW, srcH, reqWidth, reqHeight, centerCrop)
+    val sampleSize = calcInSampleSize(srcW, srcH, logicalReqW, logicalReqH, centerCrop)
 
     // Dimensions after coarse subsample
     val sampledW = (srcW + sampleSize - 1) / sampleSize
@@ -46,9 +69,9 @@ fun decodeSampledBitmapFromFile(
     // Density-based fractional scale: BitmapFactory performs this in native
     // code during decode — no createScaledBitmap() needed.
     val scaleFactor = if (centerCrop) {
-        maxOf(reqWidth.toFloat() / sampledW, reqHeight.toFloat() / sampledH)
+        maxOf(logicalReqW.toFloat() / sampledW, logicalReqH.toFloat() / sampledH)
     } else {
-        minOf(reqWidth.toFloat() / sampledW, reqHeight.toFloat() / sampledH)
+        minOf(logicalReqW.toFloat() / sampledW, logicalReqH.toFloat() / sampledH)
     }.coerceAtMost(1f) // never upscale in density pass
 
     // Pass 2 — decode with both subsample + scale in one native call
@@ -64,8 +87,12 @@ fun decodeSampledBitmapFromFile(
 
     val decoded = BitmapFactory.decodeFile(path, opts) ?: return null
 
+    // Apply EXIF orientation (rotate + optional flip) BEFORE crop so the crop
+    // operates on the correctly-oriented image.
+    val oriented = applyExifOrientation(decoded, exifOrient)
+
     // Crop (centerCrop) or return as-is (FIT)
-    val result = if (centerCrop) cropCenter(decoded, reqWidth, reqHeight) else decoded
+    val result = if (centerCrop) cropCenter(oriented, reqWidth, reqHeight) else oriented
 
     // Sharpen only small thumbnails — pixel loop cost scales with pixel count:
     // 200×200 = 40 K px ≈ 5 ms OK; 1024×1024 = 1 M px ≈ 150 ms too slow.
@@ -74,6 +101,55 @@ fun decodeSampledBitmapFromFile(
     } else {
         result
     }
+}
+
+/**
+ * Read the raw EXIF orientation tag from the file.
+ * Returns [ExifInterface.ORIENTATION_NORMAL] (1) on any error.
+ */
+internal fun readExifOrientation(path: String): Int = try {
+    ExifInterface(path).getAttributeInt(
+        ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL
+    )
+} catch (_: Exception) { ExifInterface.ORIENTATION_NORMAL }
+
+/**
+ * Apply the full EXIF orientation transform (rotate + optional flip) to [bitmap].
+ *
+ * Handles all 8 EXIF orientation values per the TIFF/EXIF specification:
+ *
+ *  Value | Name               | Transform needed to display correctly
+ *  ------|--------------------|--------------------------------------
+ *    1   | NORMAL             | none
+ *    2   | FLIP_HORIZONTAL    | flip X
+ *    3   | ROTATE_180         | rotate 180°
+ *    4   | FLIP_VERTICAL      | flip Y
+ *    5   | TRANSPOSE          | rotate 90° CW + flip X
+ *    6   | ROTATE_90          | rotate 90° CW
+ *    7   | TRANSVERSE         | rotate 270° CW + flip X
+ *    8   | ROTATE_270         | rotate 270° CW
+ *
+ * The original [bitmap] is recycled if a new one is created.
+ * Returns [bitmap] unchanged for NORMAL / UNDEFINED.
+ */
+internal fun applyExifOrientation(bitmap: Bitmap, orient: Int): Bitmap {
+    val m = Matrix()
+    when (orient) {
+        ExifInterface.ORIENTATION_NORMAL,
+        ExifInterface.ORIENTATION_UNDEFINED -> return bitmap
+
+        ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> m.postScale(-1f, 1f)
+        ExifInterface.ORIENTATION_ROTATE_180 -> m.postRotate(180f)
+        ExifInterface.ORIENTATION_FLIP_VERTICAL -> m.postScale(1f, -1f)
+        ExifInterface.ORIENTATION_TRANSPOSE -> { m.postRotate(90f); m.preScale(-1f, 1f) }
+        ExifInterface.ORIENTATION_ROTATE_90 -> m.postRotate(90f)
+        ExifInterface.ORIENTATION_TRANSVERSE -> { m.postRotate(270f); m.preScale(-1f, 1f) }
+        ExifInterface.ORIENTATION_ROTATE_270 -> m.postRotate(270f)
+        else -> return bitmap
+    }
+    val result = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, m, true)
+    if (result !== bitmap) bitmap.recycle()
+    return result
 }
 
 /**
