@@ -107,6 +107,18 @@ class MdnsRegister(
             val currentIfaces = candidateInterfaces()
                 .map { (iface, ip) -> "${iface.name}:${ip.hostAddress}" }
                 .toSet()
+
+            // Network gone — tear down responder and reset so the next
+            // network-up event triggers a fresh registration.
+            if (currentIfaces.isEmpty()) {
+                if (lastRegisteredIfaces.isNotEmpty()) {
+                    LogCat.d("mDNS teardown ($reason): no interfaces, clearing registration state")
+                    NsdHelper.unregisterService()
+                    lastRegisteredIfaces = emptySet()
+                }
+                return@coIO
+            }
+
             if (currentIfaces == lastRegisteredIfaces) return@coIO
 
             val hostname = hostnameProvider().trim()
@@ -124,8 +136,18 @@ class MdnsRegister(
                     httpsPort = if (httpsOk) httpsPort else null,
                 )
             }
-                .onSuccess { ok -> if (ok) lastRegisteredIfaces = currentIfaces }
-                .onFailure { LogCat.e("mDNS re-register failed: ${it.message}") }
+                .onSuccess { ok ->
+                    if (ok) {
+                        lastRegisteredIfaces = currentIfaces
+                    } else {
+                        LogCat.e("mDNS re-register returned false, resetting registration state")
+                        lastRegisteredIfaces = emptySet()
+                    }
+                }
+                .onFailure {
+                    LogCat.e("mDNS re-register failed: ${it.message}")
+                    lastRegisteredIfaces = emptySet()
+                }
         }
     }
 }

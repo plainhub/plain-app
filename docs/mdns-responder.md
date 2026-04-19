@@ -185,7 +185,35 @@ joins fail. Sufficient for single-interface (non-hotspot) devices.
 
 **Fix:** Wrap in `runCatching`; log failure but don't crash.
 
-### 6. `onCapabilitiesChanged` causes excessive mDNS restarts
+### 6. `lastRegisteredIfaces` not reset on failed re-register — stale state prevents recovery
+
+**Symptom:** Phone leaves WiFi (e.g. user goes out). `onLost` fires → `schedule()` calls
+`NsdHelper.registerServices()` which first calls `unregisterService()` (destroying the
+running responder), then `MdnsHostResponder.start()` fails because there are no interfaces.
+`registerServices()` returns `false`, but `lastRegisteredIfaces` is NOT reset — it still
+holds the old interface set (e.g. `{wlan0:192.168.123.24}`). When the phone reconnects to
+the same WiFi with the same IP, `candidateInterfaces()` returns `{wlan0:192.168.123.24}`
+which equals `lastRegisteredIfaces` → the re-register is **skipped**. The responder was
+already destroyed during the `onLost` handling, so mDNS is permanently dead until the app
+is restarted.
+
+**Fix (two parts):**
+1. When `currentIfaces` is empty (network gone), call `NsdHelper.unregisterService()`
+   directly and reset `lastRegisteredIfaces = emptySet()` without going through
+   `registerServices()` (which has the destructive side-effect of tearing down the
+   responder before checking if interfaces exist).
+2. When `registerServices()` returns `false` or throws, reset `lastRegisteredIfaces =
+   emptySet()` so the next network-up event always triggers a fresh registration attempt.
+
+**Log pattern (before fix):**
+```
+mDNS re-register (onLost): []
+mDNS: no candidate interfaces found
+Network change (onLinkPropertiesChanged) — restarting multicast listener
+<no "mDNS re-register" log — skipped because lastRegisteredIfaces matched>
+```
+
+### 7. `onCapabilitiesChanged` causes excessive mDNS restarts
 
 **Symptom:** On some Samsung/MediaTek devices, `onCapabilitiesChanged` fires every
 few seconds (signal strength, bandwidth estimates). Each callback triggers an mDNS

@@ -435,13 +435,9 @@ object HttpModule {
                     call.respond(HttpStatusCode.BadRequest)
                     return@get
                 }
-                val t0 = System.currentTimeMillis()
-
                 try {
                     val context = MainApp.instance
                     val decryptedId = UrlHelper.decrypt(id).getFinalPath(context)
-                    val t1 = System.currentTimeMillis()
-
                     var path: String
                     var mediaId = ""
                     var jsonName = ""
@@ -525,13 +521,10 @@ object HttpModule {
                         val centerCrop = q["cc"]?.toBooleanStrictOrNull() != false
                         // get video/image thumbnail
                         if (w != null && h != null) {
-
                             val bytes = withIO { ThumbnailGenerator.toThumbBytesAsync(MainApp.instance, file, w, h, centerCrop, mediaId) }
                             if (bytes != null) {
                                 call.respondBytes(bytes)
                             }
-                            val t2 = System.currentTimeMillis()
-                            LogCat.d("testtest: ${t1-t0}ms, ${t2 - t1}ms")
                             return@get
                         }
                         val header = ByteArray(12)
