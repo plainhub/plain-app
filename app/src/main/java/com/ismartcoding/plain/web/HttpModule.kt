@@ -521,7 +521,7 @@ object HttpModule {
                         val centerCrop = q["cc"]?.toBooleanStrictOrNull() != false
                         // get video/image thumbnail
                         if (w != null && h != null) {
-                            val bytes = withIO { ThumbnailGenerator.toThumbBytesAsync(MainApp.instance, file, w, h, centerCrop, mediaId) }
+                            val bytes = withIO { ThumbnailGenerator.toThumbBytesAsync(MainApp.instance, file, w, h, centerCrop, mediaId, fileName) }
                             if (bytes != null) {
                                 call.respondBytes(bytes)
                             }
@@ -635,7 +635,6 @@ object HttpModule {
                         }
                     }
 
-                    // 尝试解析播放位置信息
                     if (xml.contains("RelTime val=") && xml.contains("TrackDuration val=")) {
                         withIO {
                             try {
@@ -819,18 +818,34 @@ object HttpModule {
                                         val chunkDir = File(MainApp.instance.filesDir, "upload_tmp/${chunkInfo.fileId}")
                                         chunkDir.mkdirs()
 
-                                        // Write chunk atomically and sync to disk
+                                        // Write chunk atomically: temp file → sync → rename
+                                        // This prevents partial files from appearing when a retry
+                                        // races with the original request or the process is interrupted.
                                         val chunkFile = File(chunkDir, "chunk_${chunkInfo.index}")
-                                        FileOutputStream(chunkFile).use { fos ->
-                                            fos.write(bytes)
-                                            fos.fd.sync()
-                                        }
-                                        savedSize = chunkFile.length()
+                                        val tempFile = File(chunkDir, ".tmp_chunk_${chunkInfo.index}_${System.nanoTime()}")
+                                        try {
+                                            FileOutputStream(tempFile).use { fos ->
+                                                fos.write(bytes)
+                                                fos.fd.sync()
+                                                savedSize = fos.channel.position()
+                                            }
 
-                                        // Final verification: file on disk matches what we wrote
-                                        if (savedSize != bytes.size.toLong()) {
-                                            chunkFile.delete()
-                                            throw IOException("Chunk ${chunkInfo.index} disk verify failed: wrote ${bytes.size}, on disk $savedSize")
+                                            // Final verification against what was actually written
+                                            if (savedSize != bytes.size.toLong()) {
+                                                tempFile.delete()
+                                                throw IOException("Chunk ${chunkInfo.index} disk verify failed: wrote ${bytes.size}, flushed $savedSize")
+                                            }
+
+                                            // Atomic rename to final chunk file
+                                            if (chunkFile.exists()) chunkFile.delete()
+                                            if (!tempFile.renameTo(chunkFile)) {
+                                                // Fallback: copy + delete
+                                                tempFile.copyTo(chunkFile, overwrite = true)
+                                                tempFile.delete()
+                                            }
+                                        } catch (e: Exception) {
+                                            tempFile.delete()
+                                            throw e
                                         }
                                     }
 

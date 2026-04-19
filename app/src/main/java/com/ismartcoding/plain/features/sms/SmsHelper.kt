@@ -12,14 +12,19 @@ import com.ismartcoding.lib.data.enums.SortDirection
 import com.ismartcoding.lib.extensions.find
 import com.ismartcoding.lib.extensions.getIntValue
 import com.ismartcoding.lib.extensions.getPagingCursorWithSql
-import com.ismartcoding.lib.extensions.getSearchCursorWithSql
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.lib.extensions.getTimeValue
 import com.ismartcoding.lib.extensions.map
 import com.ismartcoding.lib.extensions.queryCursor
+import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.db.DArchivedConversation
+import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.plain.helpers.QueryHelper
 import com.ismartcoding.plain.smsManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import java.util.Locale
 
 object SmsHelper {
@@ -58,26 +63,29 @@ object SmsHelper {
         )
     }
 
-    private suspend fun buildWhereAsync(query: String): ContentWhere {
+    private fun buildWhere(
+        conditions: List<FilterField>,
+        archivedRecords: List<DArchivedConversation>,
+    ): ContentWhere {
         val where = ContentWhere()
-        if (query.isNotEmpty()) {
-            QueryHelper.parseAsync(query).forEach {
-                when (it.name) {
-                    "text" -> {
-                        where.add("${Telephony.Sms.BODY} LIKE ?", "%${it.value}%")
-                    }
+        conditions.forEach {
+            when (it.name) {
+                "text" -> where.add("${Telephony.Sms.BODY} LIKE ?", "%${it.value}%")
+                "ids" -> where.addIn(BaseColumns._ID, it.value.split(","))
+                "type" -> where.add("${Telephony.Sms.TYPE} = ?", it.value)
+                "thread_id" -> where.add("${Telephony.Sms.THREAD_ID} = ?", it.value)
+            }
+        }
 
-                    "ids" -> {
-                        where.addIn(BaseColumns._ID, it.value.split(","))
-                    }
-
-                    "type" -> {
-                        where.add("${Telephony.Sms.TYPE} = ?", it.value)
-                    }
-
-                    "thread_id" -> {
-                        where.add("${Telephony.Sms.THREAD_ID} = ?", it.value)
-                    }
+        val threadIdCondition = conditions.firstOrNull { it.name == "thread_id" }
+        val isArchived = conditions.any { it.name == "archived" && it.value == "1" }
+        if (threadIdCondition != null) {
+            val archivedConversation = archivedRecords.firstOrNull { it.conversationId == threadIdCondition.value }
+            if (archivedConversation != null) {
+                if (isArchived) {
+                    where.add("${Telephony.Sms.DATE} <= ?", archivedConversation.conversationDate.toString())
+                } else {
+                    where.add("${Telephony.Sms.DATE} > ?", archivedConversation.conversationDate.toString())
                 }
             }
         }
@@ -117,12 +125,13 @@ object SmsHelper {
         offset: Int,
     ): List<DMessage> {
         val conditions = QueryHelper.parseAsync(query)
+        val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
         val threadId = conditions.firstOrNull { it.name == "thread_id" }?.value ?: ""
         if (threadId.isNotEmpty()) {
-            return searchByThreadAsync(context, threadId, limit, offset)
+            return searchByThreadAsync(context, threadId, conditions, archivedRecords, limit, offset)
         }
 
-        val where = buildWhereAsync(query)
+        val where = buildWhere(conditions, archivedRecords)
         val hasTextOrIdsFilter = conditions.any { it.name == "text" || it.name == "ids" }
 
         // When filtering by text/ids (SMS-specific columns), skip MMS, use normal paging
@@ -186,22 +195,47 @@ object SmsHelper {
             .take(limit)
     }
 
-    private suspend fun searchByThreadAsync(
+    private fun searchByThreadAsync(
         context: Context,
         threadId: String,
+        conditions: List<FilterField>,
+        archivedRecords: List<DArchivedConversation>,
         limit: Int,
         offset: Int,
     ): List<DMessage> {
-        // Limit each sub-query to offset+limit so we never load an entire thread
-        // into memory.  After merging + sorting we apply the real offset/limit.
         val fetchCap = offset + limit
+
+        val isArchived = conditions.any { it.name == "archived" && it.value == "1" }
+        val archivedConversation = archivedRecords.firstOrNull { it.conversationId == threadId }
+        val smsDateFilter = if (archivedConversation != null) {
+            if (isArchived) {
+                " AND ${Telephony.Sms.DATE} <= ?"
+            } else {
+                " AND ${Telephony.Sms.DATE} > ?"
+            }
+        } else ""
+        val mmsDateFilter = if (archivedConversation != null) {
+            val dateCol = Telephony.Mms.DATE
+            if (isArchived) {
+                " AND $dateCol <= ?"
+            } else {
+                " AND $dateCol > ?"
+            }
+        } else ""
+        val dateArgs = if (archivedConversation != null) {
+            arrayOf(threadId, archivedConversation.conversationDate.toString())
+        } else arrayOf(threadId)
+        // MMS DATE is in seconds, SMS DATE is in milliseconds
+        val mmsDateArgs = if (archivedConversation != null) {
+            arrayOf(threadId, (archivedConversation.conversationDate / 1000).toString())
+        } else arrayOf(threadId)
 
         // Query SMS and MMS separately — this is reliable across all devices.
         val smsItems = context.contentResolver.queryCursor(
             smsUri,
             getProjection(),
-            "${Telephony.Sms.THREAD_ID} = ?",
-            arrayOf(threadId),
+            "${Telephony.Sms.THREAD_ID} = ?$smsDateFilter",
+            dateArgs,
             "${Telephony.Sms.DATE} DESC LIMIT $fetchCap"
         )?.map { cursor, cache ->
             cursorToSmsMessage(cursor, cache)
@@ -213,8 +247,8 @@ object SmsHelper {
                 Telephony.Mms._ID, Telephony.Mms.DATE, Telephony.Mms.THREAD_ID,
                 Telephony.Mms.MESSAGE_BOX, Telephony.Mms.READ, Telephony.Mms.SUBSCRIPTION_ID,
             ),
-            "${Telephony.Mms.THREAD_ID} = ? AND $MMS_CONTENT_FILTER",
-            arrayOf(threadId),
+            "${Telephony.Mms.THREAD_ID} = ? AND $MMS_CONTENT_FILTER$mmsDateFilter",
+            mmsDateArgs,
             "${Telephony.Mms.DATE} DESC LIMIT $fetchCap"
         )?.map { cursor, cache ->
             val rawMmsId = cursor.getStringValue(Telephony.Mms._ID, cache)
@@ -367,18 +401,37 @@ object SmsHelper {
         return Pair(body, attachments)
     }
 
+    data class SmsCounts(val total: Int, val inbox: Int, val sent: Int, val drafts: Int)
+
+    suspend fun countAllAsync(context: Context): SmsCounts = coroutineScope {
+        val totalSms = async(Dispatchers.IO) { queryCount(context, smsUri, null, null) }
+        val totalMms = async(Dispatchers.IO) { queryCount(context, mmsUri, MMS_CONTENT_FILTER, null) }
+        val inboxSms = async(Dispatchers.IO) { queryCount(context, smsUri, "${Telephony.Sms.TYPE} = ?", arrayOf("1")) }
+        val inboxMms = async(Dispatchers.IO) { queryCount(context, mmsUri, "${Telephony.Mms.MESSAGE_BOX} = ? AND $MMS_CONTENT_FILTER", arrayOf("1")) }
+        val sentSms = async(Dispatchers.IO) { queryCount(context, smsUri, "${Telephony.Sms.TYPE} = ?", arrayOf("2")) }
+        val sentMms = async(Dispatchers.IO) { queryCount(context, mmsUri, "${Telephony.Mms.MESSAGE_BOX} = ? AND $MMS_CONTENT_FILTER", arrayOf("2")) }
+        val draftsSms = async(Dispatchers.IO) { queryCount(context, smsUri, "${Telephony.Sms.TYPE} = ?", arrayOf("3")) }
+        val draftsMms = async(Dispatchers.IO) { queryCount(context, mmsUri, "${Telephony.Mms.MESSAGE_BOX} = ? AND $MMS_CONTENT_FILTER", arrayOf("3")) }
+        SmsCounts(
+            total = totalSms.await() + totalMms.await(),
+            inbox = inboxSms.await() + inboxMms.await(),
+            sent = sentSms.await() + sentMms.await(),
+            drafts = draftsSms.await() + draftsMms.await(),
+        )
+    }
+
     suspend fun countAsync(context: Context, query: String): Int {
         val conditions = QueryHelper.parseAsync(query)
+        val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
         val threadId = conditions.firstOrNull { it.name == "thread_id" }?.value ?: ""
 
-        // For thread_id queries, count via mms-sms union to be consistent with searchByThreadAsync
         if (threadId.isNotEmpty()) {
-            return countByThread(context, threadId)
+            return countByThread(context, threadId, conditions, archivedRecords)
         }
 
-        val where = buildWhereAsync(query)
+        val where = buildWhere(conditions, archivedRecords)
 
-        // Count SMS
+        // Count SMS (date filter for archived conversations applied in buildWhereAsync)
         val smsCount = queryCount(context, smsUri, where.toSelection(), where.args.toTypedArray())
 
         // Count MMS (only when no text/ids filter which are SMS-specific)
@@ -395,14 +448,31 @@ object SmsHelper {
         return smsCount + mmsCount
     }
 
-    private fun countByThread(context: Context, threadId: String): Int {
-        val smsCount = queryCount(context, smsUri, "${Telephony.Sms.THREAD_ID} = ?", arrayOf(threadId))
-        val mmsCount = queryCount(context, mmsUri, "${Telephony.Mms.THREAD_ID} = ? AND $MMS_CONTENT_FILTER", arrayOf(threadId))
+    private fun countByThread(
+        context: Context,
+        threadId: String,
+        conditions: List<FilterField>,
+        archivedRecords: List<DArchivedConversation>,
+    ): Int {
+        val isArchived = conditions.any { it.name == "archived" && it.value == "1" }
+        val archivedConversation = archivedRecords.firstOrNull { it.conversationId == threadId }
+        val smsDateFilter = if (archivedConversation != null) {
+            if (isArchived) " AND ${Telephony.Sms.DATE} <= ?" else " AND ${Telephony.Sms.DATE} > ?"
+        } else ""
+        val mmsDateFilter = if (archivedConversation != null) {
+            if (isArchived) " AND ${Telephony.Mms.DATE} <= ?" else " AND ${Telephony.Mms.DATE} > ?"
+        } else ""
+        val dateArgs = if (archivedConversation != null) arrayOf(threadId, archivedConversation.conversationDate.toString()) else arrayOf(threadId)
+        val mmsDateArgs = if (archivedConversation != null) arrayOf(threadId, (archivedConversation.conversationDate / 1000).toString()) else arrayOf(threadId)
+        val smsCount = queryCount(context, smsUri, "${Telephony.Sms.THREAD_ID} = ?$smsDateFilter", dateArgs)
+        val mmsCount = queryCount(context, mmsUri, "${Telephony.Mms.THREAD_ID} = ? AND $MMS_CONTENT_FILTER$mmsDateFilter", mmsDateArgs)
         return smsCount + mmsCount
     }
 
     suspend fun getIdsAsync(context: Context, query: String): Set<String> {
-        val where = buildWhereAsync(query)
+        val conditions = QueryHelper.parseAsync(query)
+        val archivedRecords = AppDatabase.instance.archivedConversationDao().getAll()
+        val where = buildWhere(conditions, archivedRecords)
         return context.contentResolver.queryCursor(
             smsUri,
             arrayOf(BaseColumns._ID),

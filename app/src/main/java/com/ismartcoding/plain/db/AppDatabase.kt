@@ -35,8 +35,9 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         DBookmark::class, DBookmarkGroup::class,
         DAppFile::class,
         DImageEmbedding::class,
+        DArchivedConversation::class,
     ],
-    version = 13,
+    version = 14,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3, spec = BoxesDeletionSpec::class),
@@ -49,6 +50,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         AutoMigration(from = 10, to = 11, spec = ChatsGroupIdToChannelIdSpec::class),
         AutoMigration(from = 11, to = 12),
         AutoMigration(from = 12, to = 13),
+        AutoMigration(from = 13, to = 14),
     ],
     exportSchema = true,
 )
@@ -83,6 +85,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun appFileDao(): AppFileDao
 
     abstract fun imageEmbeddingDao(): ImageEmbeddingDao
+
+    abstract fun archivedConversationDao(): ArchivedConversationDao
 
     companion object {
         @Volatile

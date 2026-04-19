@@ -15,6 +15,8 @@ import com.ismartcoding.plain.features.sms.DMessageAttachment
 import com.ismartcoding.plain.features.sms.MmsHelper
 import com.ismartcoding.plain.features.sms.SmsConversationHelper
 import com.ismartcoding.plain.features.sms.SmsHelper
+import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.db.DArchivedConversation
 import com.ismartcoding.plain.helpers.AppFileStore
 import com.ismartcoding.plain.web.loaders.TagsLoader
 import com.ismartcoding.plain.web.models.Message
@@ -62,6 +64,33 @@ fun SchemaBuilder.addSmsSchema() {
             } else {
                 0
             }
+        }
+    }
+    query("archivedConversations") {
+        resolver { ->
+            Permission.READ_SMS.checkAsync(MainApp.instance)
+            SmsConversationHelper.getArchivedConversations(MainApp.instance).map { it.toModel() }
+        }
+    }
+    query("smsAllCounts") {
+        resolver { ->
+            if (Permission.READ_SMS.enabledAndCanAsync(MainApp.instance)) {
+                SmsHelper.countAllAsync(MainApp.instance)
+            } else {
+                SmsHelper.SmsCounts(0, 0, 0, 0)
+            }
+        }
+    }
+    mutation("archiveConversation") {
+        resolver { id: String, date: Long ->
+            AppDatabase.instance.archivedConversationDao().insert(DArchivedConversation(conversationId = id, conversationDate = date))
+            true
+        }
+    }
+    mutation("unarchiveConversation") {
+        resolver { id: String ->
+            AppDatabase.instance.archivedConversationDao().delete(id)
+            true
         }
     }
     mutation("sendSms") {

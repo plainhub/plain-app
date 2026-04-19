@@ -19,6 +19,7 @@ fun SchemaBuilder.addFileUploadSchema() {
             if (!chunkDir.exists()) return@resolver emptyList<String>()
 
             chunkDir.listFiles()
+                ?.filter { it.name.startsWith("chunk_") } // Exclude temp files (.tmp_chunk_*)
                 ?.mapNotNull { file ->
                     val index = file.name.removePrefix("chunk_").toIntOrNull()
                     if (index != null) "${index}:${file.length()}" else null

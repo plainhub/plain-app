@@ -55,8 +55,10 @@ object ThumbnailGenerator {
         height: Int,
         centerCrop: Boolean = true,
         mediaId: String = "",
+        fileName: String = "",
     ): Bitmap? {
-        if (file.path.endsWith(".svg", true)) {
+        val effectiveName = fileName.ifEmpty { file.name }
+        if (effectiveName.endsWith(".svg", true)) {
             return try {
                 val svg = SVG.getFromString(file.readText())
                 val picture = svg.renderToPicture(width, height)
@@ -73,11 +75,11 @@ object ThumbnailGenerator {
         // Covers images, videos, and audio. For images/audio we only attempt this when
         // mediaId is known (path lookup would require a full content-resolver scan).
         if (isQPlus()) {
-            val isMedia = file.path.isVideoFast() || file.path.isImageFast() || file.path.isAudioFast()
+            val isMedia = effectiveName.isVideoFast() || effectiveName.isImageFast() || effectiveName.isAudioFast()
             if (isMedia) {
                 val contentUri = when {
                     mediaId.isNotEmpty() -> file.path.pathToMediaStoreUri(mediaId)
-                    file.path.isVideoFast() -> context.contentResolver.getMediaContentUri(file.path)
+                    effectiveName.isVideoFast() -> context.contentResolver.getMediaContentUri(file.path)
                     else -> null  // images/audio without mediaId: skip to BitmapFactory
                 }
                 if (contentUri != null) {
@@ -91,7 +93,21 @@ object ThumbnailGenerator {
             }
         }
 
-        if (file.path.isPartialSupportVideo()) {
+        if (effectiveName.isPartialSupportVideo()) {
+            return try {
+                if (isQPlus()) {
+                    ThumbnailUtils.createVideoThumbnail(file, Size(width, height), null)
+                } else {
+                    @Suppress("DEPRECATION")
+                    ThumbnailUtils.createVideoThumbnail(file.absolutePath, MediaStore.Video.Thumbnails.MICRO_KIND)
+                }
+            } catch (ex: Exception) {
+                LogCat.e(ex.toString())
+                null
+            }
+        }
+
+        if (effectiveName.isVideoFast()) {
             return try {
                 if (isQPlus()) {
                     ThumbnailUtils.createVideoThumbnail(file, Size(width, height), null)
@@ -143,11 +159,12 @@ object ThumbnailGenerator {
         height: Int,
         centerCrop: Boolean,
         mediaId: String,
+        fileName: String = "",
     ): ByteArray? {
         // Priority 1: Android system thumbnail (MediaStore already manages its own cache layer).
         // Return immediately without touching our disk cache.
         if (mediaId.isNotEmpty() && width <= 512) {
-            val bitmap = getBitmapAsync(context, file, width, height, centerCrop, mediaId)
+            val bitmap = getBitmapAsync(context, file, width, height, centerCrop, mediaId, fileName)
             if (bitmap != null) {
                 val stream = ByteArrayOutputStream()
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 85, stream)
@@ -160,7 +177,7 @@ object ThumbnailGenerator {
         ThumbnailCache.get(context, file.absolutePath, width, height, centerCrop)?.let { return it }
 
         // Priority 3: Self-generate, then cache the result
-        val bitmap = getBitmapAsync(context, file, width, height, centerCrop) ?: return null
+        val bitmap = getBitmapAsync(context, file, width, height, centerCrop, fileName = fileName) ?: return null
         val stream = ByteArrayOutputStream()
         // JPEG is ~4-8× faster to encode than WebP, adequate quality for thumbnails
         bitmap.compress(Bitmap.CompressFormat.JPEG, 85, stream)
