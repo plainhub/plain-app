@@ -839,9 +839,23 @@ object HttpModule {
                                             // Atomic rename to final chunk file
                                             if (chunkFile.exists()) chunkFile.delete()
                                             if (!tempFile.renameTo(chunkFile)) {
-                                                // Fallback: copy + delete
-                                                tempFile.copyTo(chunkFile, overwrite = true)
-                                                tempFile.delete()
+                                                // renameTo can move the file but still return false
+                                                // on some Android file systems. Only use copyTo
+                                                // fallback when the source file still exists.
+                                                if (tempFile.exists()) {
+                                                    tempFile.copyTo(chunkFile, overwrite = true)
+                                                    tempFile.delete()
+                                                } else if (!chunkFile.exists()) {
+                                                    throw IOException("Failed to save chunk ${chunkInfo.index}: rename failed and source file is missing")
+                                                }
+                                            }
+
+                                            // Post-rename verification: ensure the final chunk
+                                            // file has the correct size.
+                                            val finalSize = chunkFile.length()
+                                            if (finalSize != bytes.size.toLong()) {
+                                                chunkFile.delete()
+                                                throw IOException("Chunk ${chunkInfo.index} final size mismatch: expected ${bytes.size}, saved $finalSize")
                                             }
                                         } catch (e: Exception) {
                                             tempFile.delete()

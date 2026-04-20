@@ -28,6 +28,15 @@ fun SchemaBuilder.addFileUploadSchema() {
                 ?: emptyList()
         }
     }
+    mutation("deleteChunks") {
+        resolver { fileId: String ->
+            val chunkDir = File(uploadTmpDir, fileId)
+            if (chunkDir.exists()) {
+                chunkDir.deleteRecursively()
+            }
+            true
+        }
+    }
     mutation("mergeChunks") {
         resolver { fileId: String, totalChunks: Int, path: String, replace: Boolean, isAppFile: Boolean ->
             val chunkDir = File(uploadTmpDir, fileId)
@@ -98,9 +107,14 @@ fun SchemaBuilder.addFileUploadSchema() {
                     outputFile.delete()
                 }
                 if (!tempMergeFile.renameTo(outputFile)) {
-                    // Fallback: copy + delete if rename fails (e.g. cross-filesystem)
-                    tempMergeFile.copyTo(outputFile, overwrite = true)
-                    tempMergeFile.delete()
+                    // renameTo can move the file but still return false on some
+                    // Android file systems. Only use copyTo when source still exists.
+                    if (tempMergeFile.exists()) {
+                        tempMergeFile.copyTo(outputFile, overwrite = true)
+                        tempMergeFile.delete()
+                    } else if (!outputFile.exists()) {
+                        throw GraphQLError("Failed to save merged file: rename failed and source file is missing")
+                    }
                 }
             } catch (e: Exception) {
                 tempMergeFile.delete()

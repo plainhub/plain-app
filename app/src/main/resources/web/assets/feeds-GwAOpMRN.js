@@ -1,0 +1,1 @@
+import{H as d,a4 as a,I as o}from"./index-Citox2r3.js";const l=e=>({viewAll:()=>{a(e,"/feeds")},viewFeed:s=>{const u=d([{name:"feed_id",op:"",value:s.id}]);a(e,`/feeds?q=${o(u)}`)},viewToday:()=>{const s=d([{name:"today",op:"",value:"true"}]);a(e,`/feeds?q=${o(s)}`)}});export{l as u};

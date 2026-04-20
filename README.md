@@ -104,7 +104,7 @@ Your donation is highly appreciated. Thank you!
   </tr>
   <tr>
     <td><img src="screenshots/app-audio.png" alt="audio"/></td>
-    <td><img src="screenshots/app-images.jpg" alt="images"/></td>
+    <td><img src="screenshots/app-images.webp" alt="images"/></td>
     <td><img src="screenshots/app-videos.jpg" alt="videos"/></td>
     <td><img src="screenshots/app-rss.jpg" alt="rss"/></td>
   </tr>
