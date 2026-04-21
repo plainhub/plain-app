@@ -202,7 +202,6 @@ object HttpModule {
                         CacheControl.NoStore(CacheControl.Visibility.Public),
                     )
                 }
-                default(config.defaultPage)
             }
 
             get("/health_check") {
@@ -805,35 +804,27 @@ object HttpModule {
                                             throw IllegalArgumentException("fileId or index is missing or invalid")
                                         }
 
-                                        // Read entire chunk into memory first (chunks are small)
-                                        // This avoids streaming issues with ByteReadChannel.copyTo under concurrent load
-                                        val bytes = part.provider().toByteArray()
-
-                                        // Verify received size matches expected
-                                        if (chunkInfo.size > 0 && bytes.size.toLong() != chunkInfo.size) {
-                                            throw IOException("Chunk ${chunkInfo.index} size mismatch: expected ${chunkInfo.size}, received ${bytes.size}")
-                                        }
-
                                         // Create directory in cache dir using file_id as directory name
                                         val chunkDir = File(MainApp.instance.filesDir, "upload_tmp/${chunkInfo.fileId}")
                                         chunkDir.mkdirs()
 
-                                        // Write chunk atomically: temp file → sync → rename
-                                        // This prevents partial files from appearing when a retry
-                                        // races with the original request or the process is interrupted.
+                                        // Stream chunk directly to disk — never load the entire 5 MB
+                                        // chunk as a byte array.  With 3 parallel workers, toByteArray()
+                                        // caused ~30 MB of simultaneous heap allocations which triggered
+                                        // OOM kills on Huawei/EMUI devices mid-transfer.
                                         val chunkFile = File(chunkDir, "chunk_${chunkInfo.index}")
                                         val tempFile = File(chunkDir, ".tmp_chunk_${chunkInfo.index}_${System.nanoTime()}")
                                         try {
                                             FileOutputStream(tempFile).use { fos ->
-                                                fos.write(bytes)
+                                                part.provider().copyTo(fos)
                                                 fos.fd.sync()
                                                 savedSize = fos.channel.position()
                                             }
 
-                                            // Final verification against what was actually written
-                                            if (savedSize != bytes.size.toLong()) {
+                                            // Verify received size matches expected
+                                            if (chunkInfo.size > 0 && savedSize != chunkInfo.size) {
                                                 tempFile.delete()
-                                                throw IOException("Chunk ${chunkInfo.index} disk verify failed: wrote ${bytes.size}, flushed $savedSize")
+                                                throw IOException("Chunk ${chunkInfo.index} size mismatch: expected ${chunkInfo.size}, received $savedSize")
                                             }
 
                                             // Atomic rename to final chunk file
@@ -853,9 +844,9 @@ object HttpModule {
                                             // Post-rename verification: ensure the final chunk
                                             // file has the correct size.
                                             val finalSize = chunkFile.length()
-                                            if (finalSize != bytes.size.toLong()) {
+                                            if (chunkInfo.size > 0 && finalSize != chunkInfo.size) {
                                                 chunkFile.delete()
-                                                throw IOException("Chunk ${chunkInfo.index} final size mismatch: expected ${bytes.size}, saved $finalSize")
+                                                throw IOException("Chunk ${chunkInfo.index} final size mismatch: expected ${chunkInfo.size}, saved $finalSize")
                                             }
                                         } catch (e: Exception) {
                                             tempFile.delete()
@@ -916,6 +907,26 @@ object HttpModule {
                 } else {
                     call.respond(HttpStatusCode.NoContent)
                 }
+            }
+
+            // SPA fallback: serves injected index.html for SPA routes; real static files are served directly from classpath
+            get("{path...}") {
+                val path = call.parameters.getAll("path")?.joinToString("/") ?: ""
+                if (path.contains('.')) {
+                    // Has a file extension — try to serve from classpath first
+                    val stream = this::class.java.classLoader?.getResourceAsStream("web/$path")
+                    if (stream != null) {
+                        val bytes = stream.use { it.readBytes() }
+                        call.respondBytes(bytes, path.getContentType())
+                    } else {
+                        call.respond(HttpStatusCode.NotFound)
+                    }
+                    return@get
+                }
+                val html = this::class.java.classLoader?.getResourceAsStream("web/index.html")
+                    ?.bufferedReader()?.readText() ?: ""
+                val injected = html.replace("<head>", "<head><script>window.__SERVER_TIME__=${System.currentTimeMillis()}</script>")
+                call.respondText(injected, ContentType.Text.Html)
             }
 
             webSocket("/") {
