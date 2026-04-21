@@ -20,6 +20,8 @@ data class ChatItem(
     val updatedAt: Instant,
     @Transient private val _content: DMessageContent? = null,
     @Contextual var data: ChatItemContent? = null,
+    val status: String = "",
+    val statusData: String = "",
 ) {
     fun getContentData(): ChatItemContent? {
         return when (_content?.value) {
@@ -69,5 +71,5 @@ sealed class ChatItemContent {
 }
 
 fun DChat.toModel(): ChatItem {
-    return ChatItem(ID(id), fromId, toId, channelId, content.toJSONString(), createdAt, updatedAt, content)
+    return ChatItem(ID(id), fromId, toId, channelId, content.toJSONString(), createdAt, updatedAt, content, status = status, statusData = statusData)
 }

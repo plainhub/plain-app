@@ -6,6 +6,7 @@ import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DChat
 import com.ismartcoding.plain.db.DLinkPreview
 import com.ismartcoding.plain.db.DMessageContent
+import com.ismartcoding.plain.db.DMessageDeliveryResult
 import com.ismartcoding.plain.db.DMessageFiles
 import com.ismartcoding.plain.db.DMessageImages
 import com.ismartcoding.plain.db.DMessageStatusData
@@ -54,6 +55,36 @@ object ChatDbHelper {
         }
         val json = if (statusData != null && statusData.total > 0) jsonEncode(statusData) else ""
         AppDatabase.instance.chatDao().updateStatusAndData(id, status, json)
+    }
+
+    /**
+     * Deliver [item] to a peer, update the DB, and reflect the result in [item.status]/[item.statusData].
+     */
+    suspend fun deliverToPeerAsync(item: DChat, peer: DPeer) {
+        val error = PeerChatHelper.sendToPeerAsync(peer, item.content)
+        val statusData = if (error == null) {
+            DMessageStatusData()
+        } else {
+            DMessageStatusData(listOf(DMessageDeliveryResult(peerId = peer.id, peerName = peer.name, error = error)))
+        }
+        updateStatusAndDataAsync(item.id, statusData)
+        item.status = if (error == null) "sent" else "failed"
+        item.statusData = if (error == null) "" else jsonEncode(statusData)
+    }
+
+    /**
+     * Deliver [item] to its channel, update the DB, and reflect the result in [item.status].
+     */
+    suspend fun deliverToChannelAsync(item: DChat) {
+        val channel = AppDatabase.instance.chatChannelDao().getById(item.channelId) ?: return
+        val statusData = ChannelChatHelper.sendAsync(channel, item.content)
+        updateStatusAndDataAsync(item.id, statusData)
+        item.status = when {
+            statusData == null -> "failed"
+            statusData.total == 0 || statusData.allDelivered -> "sent"
+            statusData.allFailed -> "failed"
+            else -> "partial"
+        }
     }
 
     suspend fun fetchLinkPreviewsAsync(context: Context, urls: List<String>): List<DLinkPreview> {
