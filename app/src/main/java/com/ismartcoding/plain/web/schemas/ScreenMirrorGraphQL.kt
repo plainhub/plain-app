@@ -1,8 +1,8 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.apurebase.kgraphql.Context
-import com.apurebase.kgraphql.GraphQLError
-import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.lib.kgraphql.Context
+import com.ismartcoding.lib.kgraphql.GraphQLError
+import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.DScreenMirrorQuality

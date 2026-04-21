@@ -1,13 +1,13 @@
 package com.ismartcoding.plain.web
 
 import android.util.Base64
-import com.apurebase.kgraphql.Context
-import com.apurebase.kgraphql.GraphqlRequest
-import com.apurebase.kgraphql.KGraphQL
-import com.apurebase.kgraphql.context
-import com.apurebase.kgraphql.schema.Schema
-import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
-import com.apurebase.kgraphql.schema.dsl.SchemaConfigurationDSL
+import com.ismartcoding.lib.kgraphql.Context
+import com.ismartcoding.lib.kgraphql.GraphqlRequest
+import com.ismartcoding.lib.kgraphql.KGraphQL
+import com.ismartcoding.lib.kgraphql.context
+import com.ismartcoding.lib.kgraphql.schema.Schema
+import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaConfigurationDSL
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JsonHelper

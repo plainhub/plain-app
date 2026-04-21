@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.apurebase.kgraphql.GraphQLError
-import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.lib.kgraphql.GraphQLError
+import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.apk.ApkParsers
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp

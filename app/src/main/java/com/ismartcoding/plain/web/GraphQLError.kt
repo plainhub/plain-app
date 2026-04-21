@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.web
 
-import com.apurebase.kgraphql.GraphQLError
+import com.ismartcoding.lib.kgraphql.GraphQLError
 import kotlinx.serialization.json.addJsonObject
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject

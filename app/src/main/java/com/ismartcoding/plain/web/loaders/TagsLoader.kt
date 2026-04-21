@@ -4,7 +4,7 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.web.models.Tag
 import com.ismartcoding.plain.web.models.toModel
-import nidomiro.kdataloader.ExecutionResult
+import com.ismartcoding.lib.kdataloader.ExecutionResult
 
 object TagsLoader {
     fun load(

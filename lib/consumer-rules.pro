@@ -1,4 +1,4 @@
--keep class com.apurebase.kgraphql.** { *; }
+-keep class com.ismartcoding.lib.kgraphql.** { *; }
 -keep class org.bouncycastle.jcajce.provider.** { *; }
 -keep class org.bouncycastle.jce.provider.** { *; }
 -keep class com.ismartcoding.plain.** { *; }

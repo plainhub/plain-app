@@ -13,10 +13,11 @@ exifinterfaceVersion = "1.4.2"
 coreVersion = "3.5.4"
 datastorePreferencesVersion = "1.2.1"
 
+jacksonVersion="2.18.3"
+caffeineVersion="3.2.0"
 jsonVersion="20251224"
 jsoupVersion="1.22.1"
 junitVersion="4.13.2"
-kgraphql = "0.19.0"
 kotlin ="2.3.20"
 kotlinxDatetimeVersion="0.7.1"
 kotlinxSerializationJsonVersion="1.11.0"
@@ -78,7 +79,6 @@ junit = { module = "junit:junit", version.ref = "junitVersion" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRunner" }
 androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidxTestRules" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestExtJunit" }
-media3-cast = { module = "androidx.media3:media3-cast", version.ref = "media3" }
 media3-datasource = { module = "androidx.media3:media3-datasource", version.ref = "media3" }
 media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 media3-session = { module = "androidx.media3:media3-session", version.ref = "media3" }
@@ -105,10 +105,9 @@ compose-material3 = { module = "androidx.compose.material3:material3", version.r
 
 
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoupVersion" }
-
-# graphql
-kgraphql-ktor = { module = "com.apurebase:kgraphql-ktor", version.ref = "kgraphql" }
-kgraphql = { module = "com.apurebase:kgraphql", version.ref = "kgraphql" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jacksonVersion" }
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jacksonVersion" }
+caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeineVersion" }
 
 # kotlin
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
