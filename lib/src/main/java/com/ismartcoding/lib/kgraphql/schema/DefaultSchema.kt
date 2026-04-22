@@ -45,7 +45,7 @@ class DefaultSchema(
         operationName: String?,
     ): String = coroutineScope {
         val parsedVariables = variables
-            ?.let { VariablesJson.Defined(configuration.objectMapper, variables) }
+            ?.let { VariablesJson.Defined(variables, configuration.scalarDeserializers) }
             ?: VariablesJson.Empty()
 
         if (!configuration.introspection && request.isIntrospection()) {

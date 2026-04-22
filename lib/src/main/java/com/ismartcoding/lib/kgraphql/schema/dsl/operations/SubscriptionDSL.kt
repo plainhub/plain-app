@@ -6,7 +6,10 @@ import com.ismartcoding.lib.kgraphql.schema.Subscriber
 import com.ismartcoding.lib.kgraphql.schema.Subscription
 import com.ismartcoding.lib.kgraphql.schema.model.FunctionWrapper
 import com.ismartcoding.lib.kgraphql.schema.model.SubscriptionDef
-import com.fasterxml.jackson.databind.ObjectWriter
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.starProjectedType
@@ -48,24 +51,27 @@ fun <T : Any> subscribe(subscription: String, publisher: Publisher, output: T, f
     if (!(publisher as FunctionWrapper<*>).kFunction.returnType.isSubtypeOf(output::class.starProjectedType))  
         throw SchemaException("Subscription return type must be the same as the publisher's")
     val subscriber = object : Subscriber {
-        override fun setObjectWriter(objectWriter: ObjectWriter) {
-            this.objectWriter = objectWriter
-        }
-
-        private var args = emptyArray<String>()
-        private lateinit var objectWriter: ObjectWriter
         override fun setArgs(args: Array<String>) {
             this.args = args
         }
 
+        private var args = emptyArray<String>()
+
         override fun onNext(item: Any?) {
-            val response = mutableMapOf<String, Any?>()
-            val result = mutableMapOf<String, Any?>()
-            response["data"] = result
-            args.forEach {
-                result[it] = getFieldValue(item!!, it)
+            val result = buildJsonObject {
+                args.forEach { fieldName ->
+                    val value = getFieldValue(item!!, fieldName)
+                    put(fieldName, when (value) {
+                        null -> JsonNull
+                        is String -> JsonPrimitive(value)
+                        is Number -> JsonPrimitive(value)
+                        is Boolean -> JsonPrimitive(value)
+                        else -> JsonPrimitive(value.toString())
+                    })
+                }
             }
-            function(objectWriter.writeValueAsString(response))
+            val response = buildJsonObject { put("data", result) }
+            function(response.toString())
         }
 
         override fun onComplete() {

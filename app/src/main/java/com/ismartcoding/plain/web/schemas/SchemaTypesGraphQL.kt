@@ -20,7 +20,6 @@ fun SchemaBuilder.addSchemaTypes() {
     enum<PomodoroState>()
     enum<ScreenMirrorMode>()
     enum<ScreenMirrorControlAction>()
-    type<DocExtGroup>()
     stringScalar<Instant> {
         deserialize = { value: String -> Instant.parse(value) }
         serialize = Instant::toString

@@ -13,7 +13,6 @@ exifinterfaceVersion = "1.4.2"
 coreVersion = "3.5.4"
 datastorePreferencesVersion = "1.2.1"
 
-jacksonVersion="2.21.2"
 jsonVersion="20251224"
 jsoupVersion="1.22.1"
 junitVersion="4.13.2"
@@ -104,8 +103,6 @@ compose-material3 = { module = "androidx.compose.material3:material3", version.r
 
 
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoupVersion" }
-jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jacksonVersion" }
-jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jacksonVersion" }
 
 # kotlin
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }

@@ -11,11 +11,13 @@ import com.ismartcoding.lib.kgraphql.schema.model.EnumValueDef
 import com.ismartcoding.lib.kgraphql.schema.model.MutableSchemaDefinition
 import com.ismartcoding.lib.kgraphql.schema.model.TypeDef
 import com.ismartcoding.lib.kgraphql.schema.structure.SchemaCompilation
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
-import com.fasterxml.jackson.databind.module.SimpleModule
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.boolean
+import kotlinx.serialization.json.double
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.long
 import kotlin.reflect.KClass
 
 /**
@@ -218,13 +220,18 @@ class SchemaBuilder internal constructor() {
 }
 
 inline fun <T: Any, reified Raw: Any> SchemaConfigurationDSL.appendMapper(scalar: ScalarDSL<T, Raw>, kClass: KClass<T>) {
-    objectMapper.registerModule(SimpleModule().addDeserializer(kClass.java, object : UsesDeserializer<T>() {
-        override fun deserialize(p: JsonParser, ctxt: DeserializationContext?): T? {
-            return scalar.deserialize?.invoke(p.readValueAs(Raw::class.java))
+    scalarDeserializers[kClass] = { element ->
+        val primitive = element as? JsonPrimitive
+            ?: throw IllegalStateException("Expected JSON primitive for scalar $kClass")
+        @Suppress("UNCHECKED_CAST")
+        val raw: Raw = when (Raw::class) {
+            String::class -> primitive.content as Raw
+            Int::class -> primitive.int as Raw
+            Long::class -> primitive.long as Raw
+            Double::class -> primitive.double as Raw
+            Boolean::class -> primitive.boolean as Raw
+            else -> throw IllegalStateException("Unsupported raw type ${Raw::class} for scalar $kClass")
         }
-    }))
-}
-
-open class UsesDeserializer<T>(vc: Class<*>? = null) : StdDeserializer<T>(vc) {
-    override fun deserialize(p: JsonParser, ctxt: DeserializationContext?): T? = TODO("Implement")
+        scalar.deserialize?.invoke(raw)
+    }
 }

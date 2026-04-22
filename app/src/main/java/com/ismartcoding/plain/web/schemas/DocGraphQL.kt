@@ -10,6 +10,8 @@ import com.ismartcoding.plain.web.models.DocExtGroup
 import com.ismartcoding.plain.web.models.toDocModel
 
 fun SchemaBuilder.addDocQueries() {
+    type<DocExtGroup>()
+
     query("docs") {
         configure {
             executor = Executor.DataLoaderPrepared

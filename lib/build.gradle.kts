@@ -85,9 +85,6 @@ dependencies {
     // Google Tink for cryptography (Ed25519 support on all Android versions)
     api(libs.tink.android)
 
-    implementation(libs.jackson.databind)
-    implementation(libs.jackson.module.kotlin)
-
     api(libs.ktor.server.core)
     api(libs.ktor.server.netty)
     api(libs.ktor.server.websockets)

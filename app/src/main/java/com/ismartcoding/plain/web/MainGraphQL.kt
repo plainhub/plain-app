@@ -102,7 +102,7 @@ class MainGraphQL(val schema: Schema) {
             val request = Json.decodeFromString(GraphqlRequest.serializer(), query)
             return schema.execute(
                 request.query,
-                request.variables.toString(),
+                request.variables?.toString(),
                 context { +call },
             )
         }

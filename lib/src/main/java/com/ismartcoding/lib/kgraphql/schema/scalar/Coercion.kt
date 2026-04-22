@@ -2,7 +2,6 @@ package com.ismartcoding.lib.kgraphql.schema.scalar
 
 import com.ismartcoding.lib.kgraphql.ExecutionException
 import com.ismartcoding.lib.kgraphql.dropQuotes
-import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.ismartcoding.lib.kgraphql.schema.execution.Execution
 import com.ismartcoding.lib.kgraphql.schema.model.ast.ValueNode
 import com.ismartcoding.lib.kgraphql.schema.model.ast.ValueNode.*
@@ -11,8 +10,6 @@ import com.ismartcoding.lib.kgraphql.schema.builtin.*
 import com.ismartcoding.lib.kgraphql.schema.structure.Type
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
-
-private typealias JsonValueNode = com.fasterxml.jackson.databind.node.ValueNode
 
 @Suppress("UNCHECKED_CAST")
 // TODO: Re-structure scalars, as it's a bit too complicated now.
@@ -47,29 +44,6 @@ fun <T : Any> deserializeScalar(scalar: Type.Scalar<T>, value : ValueNode): T {
             originalError = e
         )
     }
-}
-
-@Suppress("UNCHECKED_CAST")
-fun <T> serializeScalar(jsonNodeFactory: JsonNodeFactory, scalar: Type.Scalar<*>, value: T, executionNode: Execution): JsonValueNode = when(scalar.coercion){
-    is StringScalarCoercion<*> -> {
-        jsonNodeFactory.textNode((scalar.coercion as StringScalarCoercion<T>).serialize(value))
-    }
-    is ShortScalarCoercion<*> -> {
-        jsonNodeFactory.numberNode((scalar.coercion as ShortScalarCoercion<T>).serialize(value))
-    }
-    is IntScalarCoercion<*> -> {
-        jsonNodeFactory.numberNode((scalar.coercion as IntScalarCoercion<T>).serialize(value))
-    }
-    is DoubleScalarCoercion<*> -> {
-        jsonNodeFactory.numberNode((scalar.coercion as DoubleScalarCoercion<T>).serialize(value))
-    }
-    is LongScalarCoercion<*> -> {
-        jsonNodeFactory.numberNode((scalar.coercion as LongScalarCoercion<T>).serialize(value))
-    }
-    is BooleanScalarCoercion<*> -> {
-        jsonNodeFactory.booleanNode((scalar.coercion as BooleanScalarCoercion<T>).serialize(value))
-    }
-    else -> throw ExecutionException("Unsupported coercion for scalar type ${scalar.name}", executionNode)
 }
 
 @Suppress("UNCHECKED_CAST")

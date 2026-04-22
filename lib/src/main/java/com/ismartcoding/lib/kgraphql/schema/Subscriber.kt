@@ -1,7 +1,5 @@
 package com.ismartcoding.lib.kgraphql.schema
 
-import com.fasterxml.jackson.databind.ObjectWriter
-
 interface Subscriber {
     fun onSubscribe(subscription: Subscription)
 
@@ -12,6 +10,4 @@ interface Subscriber {
     fun onError(throwable: Throwable)
 
     fun onComplete()
-
-    fun setObjectWriter(objectWriter: ObjectWriter)
 }

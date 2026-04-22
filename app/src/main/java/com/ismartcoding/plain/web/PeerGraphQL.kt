@@ -196,7 +196,7 @@ class PeerGraphQL(val schema: Schema) {
             call: ApplicationCall
         ): String {
             val request = Json.decodeFromString(GraphqlRequest.serializer(), query)
-            return schema.execute(request.query, request.variables.toString(), context {
+            return schema.execute(request.query, request.variables?.toString(), context {
                 +call
             })
         }

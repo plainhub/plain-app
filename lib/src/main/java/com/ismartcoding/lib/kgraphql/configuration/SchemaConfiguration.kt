@@ -2,16 +2,15 @@ package com.ismartcoding.lib.kgraphql.configuration
 
 import com.ismartcoding.lib.kgraphql.schema.execution.Executor
 import com.ismartcoding.lib.kgraphql.schema.execution.GenericTypeResolver
-import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.serialization.json.JsonElement
 import kotlin.reflect.KClass
 
 data class SchemaConfiguration(
         //document parser caching mechanisms
         val useCachingDocumentParser: Boolean,
         val documentParserCacheMaximumSize: Long,
-        //jackson features
-        val objectMapper: ObjectMapper,
+        val scalarDeserializers: Map<KClass<*>, (JsonElement) -> Any?>,
         val useDefaultPrettyPrinter: Boolean,
         //execution
         val coroutineDispatcher: CoroutineDispatcher,

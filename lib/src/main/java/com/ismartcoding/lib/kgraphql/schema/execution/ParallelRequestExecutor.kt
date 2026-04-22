@@ -13,11 +13,8 @@ import com.ismartcoding.lib.kgraphql.schema.structure.Field
 import com.ismartcoding.lib.kgraphql.schema.structure.InputValue
 import com.ismartcoding.lib.kgraphql.schema.structure.Type
 import com.ismartcoding.lib.kgraphql.toMapAsync
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.JsonNodeFactory
-import com.fasterxml.jackson.databind.node.NullNode
-import com.fasterxml.jackson.databind.node.ObjectNode
 import kotlinx.coroutines.*
+import kotlinx.serialization.json.*
 import com.ismartcoding.lib.kdataloader.DataLoader
 import kotlin.reflect.KProperty1
 
@@ -32,23 +29,15 @@ class ParallelRequestExecutor(val schema: DefaultSchema) : RequestExecutor {
 
     private val argumentsHandler = ArgumentsHandler(schema)
 
-    private val jsonNodeFactory = JsonNodeFactory.instance
-
     private val dispatcher = schema.configuration.coroutineDispatcher
 
-
-    private val objectWriter = schema.configuration.objectMapper.writer().let {
-        if (schema.configuration.useDefaultPrettyPrinter) {
-            it.withDefaultPrettyPrinter()
-        } else {
-            it
-        }
+    private val json = if (schema.configuration.useDefaultPrettyPrinter) {
+        Json { prettyPrint = true }
+    } else {
+        Json
     }
 
     override suspend fun suspendExecute(plan: ExecutionPlan, variables: VariablesJson, context: Context): String = coroutineScope {
-        val root = jsonNodeFactory.objectNode()
-        val data = root.putObject("data")
-
         val resultMap = plan.toMapAsync(dispatcher) {
             val ctx = ExecutionContext(Variables(schema, variables, it.variables), context)
             if (determineInclude(ctx, it)) writeOperation(
@@ -59,17 +48,18 @@ class ParallelRequestExecutor(val schema: DefaultSchema) : RequestExecutor {
             ) else null
         }
 
+        val dataMap = mutableMapOf<String, JsonElement>()
         for (operation in plan) {
             if (resultMap[operation] != null) { // Remove all by skip/include directives
-                data.set<JsonNode>(operation.aliasOrKey, resultMap[operation])
+                dataMap[operation.aliasOrKey] = resultMap[operation]!!
             }
         }
 
-        @Suppress("BlockingMethodInNonBlockingContext")
-        objectWriter.writeValueAsString(root)
+        val root = buildJsonObject { put("data", JsonObject(dataMap)) }
+        json.encodeToString(JsonElement.serializer(), root)
     }
 
-    private suspend fun <T> writeOperation(isSubscription: Boolean, ctx: ExecutionContext, node: Execution.Node, operation: FunctionWrapper<T>): JsonNode {
+    private suspend fun <T> writeOperation(isSubscription: Boolean, ctx: ExecutionContext, node: Execution.Node, operation: FunctionWrapper<T>): JsonElement {
         node.field.checkAccess(null, ctx.requestContext)
         val operationResult: T? = operation.invoke(
             isSubscription = isSubscription,
@@ -85,7 +75,7 @@ class ParallelRequestExecutor(val schema: DefaultSchema) : RequestExecutor {
         return createNode(ctx, operationResult, node, node.field.returnType)
     }
 
-    private suspend fun <T> createUnionOperationNode(ctx: ExecutionContext, parent: T, node: Execution.Union, unionProperty: Field.Union<T>): JsonNode {
+    private suspend fun <T> createUnionOperationNode(ctx: ExecutionContext, parent: T, node: Execution.Union, unionProperty: Field.Union<T>): JsonElement {
         node.field.checkAccess(parent, ctx.requestContext)
 
         val operationResult: Any? = unionProperty.invoke(
@@ -110,7 +100,7 @@ class ParallelRequestExecutor(val schema: DefaultSchema) : RequestExecutor {
         return createNode(ctx, operationResult, node, returnType ?: unionProperty.returnType)
     }
 
-    private suspend fun <T> createNode(ctx: ExecutionContext, value: T?, node: Execution.Node, returnType: Type): JsonNode {
+    private suspend fun <T> createNode(ctx: ExecutionContext, value: T?, node: Execution.Node, returnType: Type): JsonElement {
         if (value == null) {
             return createNullNode(node, returnType)
         }
@@ -130,20 +120,17 @@ class ParallelRequestExecutor(val schema: DefaultSchema) : RequestExecutor {
                     val valuesMap = values.toMapAsync(dispatcher) {
                         createNode(ctx, it, node, returnType.unwrapList())
                     }
-                    values.fold(jsonNodeFactory.arrayNode(values.size)) { array, v ->
-                        array.add(valuesMap[v])
-                    }
+                    JsonArray(values.map { valuesMap[it] ?: JsonNull })
                 } else {
                     throw ExecutionException("Invalid collection value for non collection property", node)
                 }
             }
-            value is String -> jsonNodeFactory.textNode(value)
-            value is Int -> jsonNodeFactory.numberNode(value)
-            value is Float -> jsonNodeFactory.numberNode(value)
-            value is Double -> jsonNodeFactory.numberNode(value)
-            value is Boolean -> jsonNodeFactory.booleanNode(value)
-            value is Long -> jsonNodeFactory.numberNode(value)
-            //big decimal etc?
+            value is String -> JsonPrimitive(value)
+            value is Int -> JsonPrimitive(value)
+            value is Float -> JsonPrimitive(value)
+            value is Double -> JsonPrimitive(value)
+            value is Boolean -> JsonPrimitive(value)
+            value is Long -> JsonPrimitive(value)
 
             node.children.isNotEmpty() -> {
                 createObjectNode(ctx, value, node, returnType)
@@ -155,42 +142,44 @@ class ParallelRequestExecutor(val schema: DefaultSchema) : RequestExecutor {
         }
     }
 
-    private fun <T> createSimpleValueNode(returnType: Type, value: T, node: Execution.Node): JsonNode {
+    private fun <T> createSimpleValueNode(returnType: Type, value: T, node: Execution.Node): JsonElement {
         return when (val unwrapped = returnType.unwrapped()) {
             is Type.Scalar<*> -> {
-                serializeScalar(jsonNodeFactory, unwrapped, value, node)
+                serializeScalar(unwrapped, value, node)
             }
             is Type.Enum<*> -> {
-                jsonNodeFactory.textNode(value.toString())
+                JsonPrimitive(value.toString())
             }
             is TypeDef.Object<*> -> throw ExecutionException("Cannot handle object return type, schema structure exception", node)
             else -> throw ExecutionException("Invalid Type:  ${returnType.name}", node)
         }
     }
 
-    private fun createNullNode(node: Execution.Node, returnType: Type): NullNode {
+    private fun createNullNode(node: Execution.Node, returnType: Type): JsonNull {
         if (returnType !is Type.NonNull) {
-            return jsonNodeFactory.nullNode()
+            return JsonNull
         } else {
             throw ExecutionException("null result for non-nullable operation ${node.field}", node)
         }
     }
 
-    private suspend fun <T> createObjectNode(ctx: ExecutionContext, value: T, node: Execution.Node, type: Type): ObjectNode {
-        val objectNode = jsonNodeFactory.objectNode()
+    private suspend fun <T> createObjectNode(ctx: ExecutionContext, value: T, node: Execution.Node, type: Type): JsonObject {
+        val map = mutableMapOf<String, JsonElement>()
         for (child in node.children) {
             when (child) {
-                is Execution.Fragment -> objectNode.setAll<JsonNode>(handleFragment(ctx, value, child))
+                is Execution.Fragment -> {
+                    handleFragment(ctx, value, child).forEach { (k, v) -> map[k] = v }
+                }
                 else -> {
-                    val (key, jsonNode) = handleProperty(ctx, value, child, type, node.children.size)
-                    objectNode.merge(key, jsonNode)
+                    val (key, jsonElement) = handleProperty(ctx, value, child, type, node.children.size)
+                    map.merge(key, jsonElement)
                 }
             }
         }
-        return objectNode
+        return JsonObject(map)
     }
 
-    private suspend fun <T> handleProperty(ctx: ExecutionContext, value: T, child: Execution, type: Type, childrenSize: Int): Pair<String, JsonNode?> {
+    private suspend fun <T> handleProperty(ctx: ExecutionContext, value: T, child: Execution, type: Type, childrenSize: Int): Pair<String, JsonElement?> {
         when (child) {
             //Union is subclass of Node so check it first
             is Execution.Union -> {
@@ -213,7 +202,7 @@ class ParallelRequestExecutor(val schema: DefaultSchema) : RequestExecutor {
         }
     }
 
-    private suspend fun <T> handleFragment(ctx: ExecutionContext, value: T, container: Execution.Fragment): Map<String, JsonNode?> {
+    private suspend fun <T> handleFragment(ctx: ExecutionContext, value: T, container: Execution.Fragment): Map<String, JsonElement> {
         val expectedType = container.condition.type
         val include = determineInclude(ctx, container)
 
@@ -240,7 +229,7 @@ class ParallelRequestExecutor(val schema: DefaultSchema) : RequestExecutor {
         return emptyMap()
     }
 
-    private suspend fun <T> createPropertyNode(ctx: ExecutionContext, parentValue: T, node: Execution.Node, field: Field, parentTimes: Int): JsonNode? {
+    private suspend fun <T> createPropertyNode(ctx: ExecutionContext, parentValue: T, node: Execution.Node, field: Field, parentTimes: Int): JsonElement? {
         val include = determineInclude(ctx, node)
         node.field.checkAccess(parentValue, ctx.requestContext)
 
@@ -281,7 +270,7 @@ class ParallelRequestExecutor(val schema: DefaultSchema) : RequestExecutor {
         }
     }
 
-    private suspend fun <T> handleDataProperty(ctx: ExecutionContext, parentValue: T, node: Execution.Node, field: Field.DataLoader<*, *, *>): JsonNode {
+    private suspend fun <T> handleDataProperty(ctx: ExecutionContext, parentValue: T, node: Execution.Node, field: Field.DataLoader<*, *, *>): JsonElement {
         val preparedValue = field.kql.prepare.invoke(
             funName = field.name,
             receiver = parentValue,
@@ -299,7 +288,7 @@ class ParallelRequestExecutor(val schema: DefaultSchema) : RequestExecutor {
         return createNode(ctx, value.await(), node, field.returnType)
     }
 
-    private suspend fun <T> handleFunctionProperty(ctx: ExecutionContext, parentValue: T, node: Execution.Node, field: Field.Function<*, *>): JsonNode {
+    private suspend fun <T> handleFunctionProperty(ctx: ExecutionContext, parentValue: T, node: Execution.Node, field: Field.Function<*, *>): JsonElement {
         val result = field.invoke(
             funName = field.name,
             receiver = parentValue,
@@ -343,7 +332,7 @@ class ParallelRequestExecutor(val schema: DefaultSchema) : RequestExecutor {
                 hasReceiver -> invoke(receiver, *transformedArgs.toTypedArray())
                 isSubscription -> {
                     val subscriptionArgs = children.map { (it as Execution.Node).aliasOrKey }
-                    invoke(transformedArgs, subscriptionArgs, objectWriter)
+                    invoke(transformedArgs, subscriptionArgs)
                 }
                 else -> invoke(*transformedArgs.toTypedArray())
             }
@@ -355,3 +344,5 @@ class ParallelRequestExecutor(val schema: DefaultSchema) : RequestExecutor {
     }
 
 }
+
+

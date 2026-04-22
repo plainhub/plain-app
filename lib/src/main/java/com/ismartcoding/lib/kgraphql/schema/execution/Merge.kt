@@ -1,36 +1,41 @@
 package com.ismartcoding.lib.kgraphql.schema.execution
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ObjectNode
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
 
-fun MutableMap<String, JsonNode?>.merge(key: String, node: JsonNode?): MutableMap<String, JsonNode?> {
-    merge(key, node, this::get, this::set)
+fun MutableMap<String, JsonElement>.merge(key: String, node: JsonElement?): MutableMap<String, JsonElement> {
+    mergeEntry(key, node, this::get) { k, v -> this[k] = v }
     return this
 }
 
-fun ObjectNode.merge(other: ObjectNode) {
-    other.fields().forEach {
-        merge(it.key, it.value)
-    }
-}
-
-fun ObjectNode.merge(key: String, node: JsonNode?) {
-    merge(key, node, this::get, this::set)
-}
-
-fun merge(key: String, node: JsonNode?, get: (String) -> JsonNode?, set: (String, JsonNode?) -> Any?) {
+private fun mergeEntry(
+    key: String,
+    node: JsonElement?,
+    get: (String) -> JsonElement?,
+    set: (String, JsonElement) -> Unit
+) {
+    val safeNode = node ?: JsonNull
     val existingNode = get(key)
     if (existingNode != null) {
         when {
-            node == null -> throw IllegalStateException("trying to merge null with non-null for $key")
-            node is ObjectNode -> {
-                check(existingNode is ObjectNode) { "trying to merge object with simple node for $key" }
-                existingNode.merge(node)
+            safeNode is JsonNull -> throw IllegalStateException("trying to merge null with non-null for $key")
+            safeNode is JsonObject && existingNode is JsonObject -> {
+                set(key, mergeObjects(existingNode, safeNode))
             }
-            existingNode is ObjectNode -> throw IllegalStateException("trying to merge simple node with object node for $key")
-            node != existingNode -> throw IllegalStateException("trying to merge different simple nodes for $key")
+            safeNode is JsonObject -> throw IllegalStateException("trying to merge object with simple node for $key")
+            existingNode is JsonObject -> throw IllegalStateException("trying to merge simple node with object node for $key")
+            safeNode != existingNode -> throw IllegalStateException("trying to merge different simple nodes for $key")
         }
     } else {
-        set(key, node)
+        set(key, safeNode)
     }
+}
+
+private fun mergeObjects(existing: JsonObject, incoming: JsonObject): JsonObject {
+    val result = existing.toMutableMap()
+    incoming.forEach { (k, v) ->
+        mergeEntry(k, v, result::get) { key, value -> result[key] = value }
+    }
+    return JsonObject(result)
 }
