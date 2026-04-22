@@ -3,7 +3,6 @@ package com.ismartcoding.lib.kgraphql.schema
 import com.ismartcoding.lib.kgraphql.Context
 import com.ismartcoding.lib.kgraphql.GraphQLError
 import com.ismartcoding.lib.kgraphql.configuration.SchemaConfiguration
-import com.ismartcoding.lib.kgraphql.request.CachingDocumentParser
 import com.ismartcoding.lib.kgraphql.request.Parser
 import com.ismartcoding.lib.kgraphql.request.VariablesJson
 import com.ismartcoding.lib.kgraphql.schema.execution.*
@@ -37,8 +36,6 @@ class DefaultSchema(
     }
 
     private val requestInterpreter: RequestInterpreter = RequestInterpreter(model)
-
-    private val cacheParser: CachingDocumentParser by lazy { CachingDocumentParser(configuration.documentParserCacheMaximumSize) }
 
     override suspend fun execute(
         request: String,

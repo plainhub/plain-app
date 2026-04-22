@@ -13,8 +13,7 @@ exifinterfaceVersion = "1.4.2"
 coreVersion = "3.5.4"
 datastorePreferencesVersion = "1.2.1"
 
-jacksonVersion="2.18.3"
-caffeineVersion="3.2.0"
+jacksonVersion="2.21.2"
 jsonVersion="20251224"
 jsoupVersion="1.22.1"
 junitVersion="4.13.2"
@@ -38,11 +37,11 @@ tinkAndroidVersion = "1.21.0"
 playPublisherVersion = "4.0.0"
 webrtcSdkAndroidVersion = "144.7559.01"
 mediapipeVisionVersion = "0.10.33"
-liteRtVersion = "2.1.3"
+liteRtVersion = "2.1.4"
 pdfiumAndroidVersion = "1.9.5-beta01"
-androidxTestRunner = "1.6.2"
-androidxTestRules = "1.6.1"
-androidxTestExtJunit = "1.2.1"
+androidxTestRunner = "1.7.0"
+androidxTestRules = "1.7.0"
+androidxTestExtJunit = "1.3.0"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
@@ -107,7 +106,6 @@ compose-material3 = { module = "androidx.compose.material3:material3", version.r
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoupVersion" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jacksonVersion" }
 jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jacksonVersion" }
-caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeineVersion" }
 
 # kotlin
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }

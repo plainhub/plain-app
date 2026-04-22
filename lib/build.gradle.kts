@@ -87,7 +87,6 @@ dependencies {
 
     implementation(libs.jackson.databind)
     implementation(libs.jackson.module.kotlin)
-    implementation(libs.caffeine)
 
     api(libs.ktor.server.core)
     api(libs.ktor.server.netty)
