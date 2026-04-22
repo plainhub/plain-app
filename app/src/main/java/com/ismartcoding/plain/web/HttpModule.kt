@@ -1,7 +1,6 @@
 package com.ismartcoding.plain.web
 
 import android.annotation.SuppressLint
-import com.ismartcoding.lib.extensions.getContentType
 import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
@@ -23,7 +22,6 @@ import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.application.ApplicationStopPreparing
 import io.ktor.server.application.call
 import io.ktor.server.application.install
-import io.ktor.server.http.content.SPAConfig
 import io.ktor.server.http.content.staticResources
 import io.ktor.server.plugins.autohead.AutoHeadResponse
 import io.ktor.server.plugins.cachingheaders.CachingHeaders
@@ -35,7 +33,6 @@ import io.ktor.server.plugins.origin
 import io.ktor.server.plugins.partialcontent.PartialContent
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
-import io.ktor.server.response.respondBytes
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -100,26 +97,30 @@ object HttpModule {
         }
 
         routing {
-            val config = SPAConfig()
-            config.filesPath = "web"
-
-            // Serve index.html with injected server time for anti-replay clock sync
-            get("/") {
-                val html = this::class.java.classLoader?.getResourceAsStream("web/index.html")
-                    ?.bufferedReader()?.readText() ?: ""
-                val injected = html.replace(
-                    "<head>",
-                    "<head><script>window.__SERVER_TIME__=${System.currentTimeMillis()}</script>"
-                )
-                call.respondText(injected, ContentType.Text.Html)
-            }
-
-            staticResources(config.applicationRoute, config.filesPath, index = config.defaultPage) {
+            // SPA: serve all resources from classpath "web/", inject __SERVER_TIME__ into index.html
+            // for every non-file path (no extension) so the Vue SPA can boot with a clock-sync value.
+            staticResources("/", "web", index = null) {
                 cacheControl {
                     arrayListOf(
                         CacheControl.NoCache(CacheControl.Visibility.Public),
                         CacheControl.NoStore(CacheControl.Visibility.Public),
                     )
+                }
+                fallback { requestedPath, call ->
+                    if (requestedPath.contains('.')) {
+                        // Real static asset that doesn't exist → 404
+                        call.respond(HttpStatusCode.NotFound)
+                    } else {
+                        // SPA route (no extension) → serve index.html with injected server time
+                        val classLoader = call.application.environment.classLoader
+                        val html = classLoader.getResourceAsStream("web/index.html")
+                            ?.bufferedReader()?.readText() ?: ""
+                        val injected = html.replace(
+                            "<head>",
+                            "<head><script>window.__SERVER_TIME__=${System.currentTimeMillis()}</script>"
+                        )
+                        call.respondText(injected, ContentType.Text.Html)
+                    }
                 }
             }
 
@@ -192,29 +193,6 @@ object HttpModule {
                 } else {
                     call.respond(HttpStatusCode.NoContent)
                 }
-            }
-
-            // SPA fallback: serves injected index.html for SPA routes; real static files are served directly from classpath
-            get("{path...}") {
-                val path = call.parameters.getAll("path")?.joinToString("/") ?: ""
-                if (path.contains('.')) {
-                    // Has a file extension — try to serve from classpath first
-                    val stream = this::class.java.classLoader?.getResourceAsStream("web/$path")
-                    if (stream != null) {
-                        val bytes = stream.use { it.readBytes() }
-                        call.respondBytes(bytes, path.getContentType())
-                    } else {
-                        call.respond(HttpStatusCode.NotFound)
-                    }
-                    return@get
-                }
-                val html = this::class.java.classLoader?.getResourceAsStream("web/index.html")
-                    ?.bufferedReader()?.readText() ?: ""
-                val injected = html.replace(
-                    "<head>",
-                    "<head><script>window.__SERVER_TIME__=${System.currentTimeMillis()}</script>"
-                )
-                call.respondText(injected, ContentType.Text.Html)
             }
 
             addWebSocket()
