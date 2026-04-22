@@ -87,13 +87,19 @@ fun FilesPage(
     FilesPageDialogs(filesVM, context, scope)
 
     val title = when {
-        filesVM.selectMode.value -> LocaleHelper.getStringF(R.string.x_selected, "count", filesVM.selectedIds.size)
+        filesVM.selectMode.value -> LocaleHelper.getStringF(
+            R.string.x_selected,
+            "count",
+            filesVM.selectedIds.size
+        )
+
         filesVM.type == FilesType.RECENTS -> stringResource(R.string.recents)
         filesVM.selectedPath != filesVM.rootPath -> filesVM.selectedPath.getFilenameFromPath()
         else -> stringResource(R.string.files)
     }
     val subtitle = if (!filesVM.selectMode.value) {
-        val fc = itemsState.count { it.isDir }; val flc = itemsState.count { !it.isDir }
+        val fc = itemsState.count { it.isDir };
+        val flc = itemsState.count { !it.isDir }
         val sl = mutableListOf<String>()
         if (fc > 0) sl.add(LocaleHelper.getQuantityString(R.plurals.x_folders, fc))
         if (flc > 0) sl.add(LocaleHelper.getQuantityString(R.plurals.x_files, flc))
@@ -101,7 +107,12 @@ fun FilesPage(
     } else ""
 
     PScaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection), topBar = {
-        SearchableTopBar(navController = navController, viewModel = filesVM, scrollBehavior = scrollBehavior, title = title, subtitle = subtitle,
+        SearchableTopBar(
+            navController = navController,
+            viewModel = filesVM,
+            scrollBehavior = scrollBehavior,
+            title = title,
+            subtitle = subtitle,
             navigationIcon = { if (filesVM.selectMode.value) NavigationCloseIcon { filesVM.exitSelectMode() } else NavigationBackIcon { navController.navigateUp() } },
             actions = {
                 if (!filesVM.selectMode.value) {
@@ -110,30 +121,91 @@ fun FilesPage(
                     ActionButtonSort { filesVM.showSortDialog.value = true }
                     ActionButtonMoreWithMenu { dismiss ->
                         var showHiddenFiles by remember { mutableStateOf(false) }
-                        LaunchedEffect(Unit) { showHiddenFiles = withContext(Dispatchers.IO) { ShowHiddenFilesPreference.getAsync(context) } }
-                        PDropdownMenuItem(text = { Text(stringResource(R.string.show_hidden_files)) },
-                            leadingIcon = { Checkbox(checked = showHiddenFiles, onCheckedChange = null) },
-                            onClick = { dismiss(); scope.launch(Dispatchers.IO) { val nv = !showHiddenFiles; ShowHiddenFilesPreference.putAsync(context, nv); showHiddenFiles = nv; filesVM.loadAsync(context) } })
-                        PDropdownMenuItemCreateFolder { dismiss(); filesVM.showCreateFolderDialog.value = true }
-                        PDropdownMenuItemCreateFile { dismiss(); filesVM.showCreateFileDialog.value = true }
+                        LaunchedEffect(Unit) {
+                            showHiddenFiles = withContext(Dispatchers.IO) {
+                                ShowHiddenFilesPreference.getAsync(context)
+                            }
+                        }
+                        PDropdownMenuItem(
+                            text = { Text(stringResource(R.string.show_hidden_files)) },
+                            leadingIcon = {
+                                Checkbox(
+                                    checked = showHiddenFiles,
+                                    onCheckedChange = null
+                                )
+                            },
+                            onClick = {
+                                dismiss()
+                                scope.launch(Dispatchers.IO) {
+                                    val nv = !showHiddenFiles
+                                    ShowHiddenFilesPreference.putAsync(
+                                        context,
+                                        nv
+                                    )
+                                    showHiddenFiles = nv; filesVM.loadAsync(context)
+                                }
+                            })
+                        PDropdownMenuItemCreateFolder {
+                            dismiss()
+                            filesVM.showCreateFolderDialog.value = true
+                        }
+                        PDropdownMenuItemCreateFile {
+                            dismiss()
+                            filesVM.showCreateFileDialog.value = true
+                        }
                     }
-                } else { PTopRightButton(label = stringResource(if (filesVM.isAllSelected()) R.string.unselect_all else R.string.select_all), click = { filesVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp) }
+                } else {
+                    PTopRightButton(
+                        label = stringResource(if (filesVM.isAllSelected()) R.string.unselect_all else R.string.select_all),
+                        click = { filesVM.toggleSelectAll() }); HorizontalSpace(dp = 8.dp)
+                }
             },
-            onSearchAction = { q -> filesVM.queryText.value = q; scope.launch(Dispatchers.IO) { filesVM.loadAsync(context) } })
+            onSearchAction = { q ->
+                filesVM.queryText.value = q; scope.launch(Dispatchers.IO) {
+                filesVM.loadAsync(
+                    context
+                )
+            }
+            })
     }, bottomBar = {
-        AnimatedVisibility(visible = filesVM.showBottomActions(), enter = slideInVertically { it } + fadeIn(), exit = slideOutVertically { it } + fadeOut()) {
-            FilesSelectModeBottomActions(filesVM = filesVM, onShowPasteBar = { filesVM.showPasteBar.value = it })
+        AnimatedVisibility(
+            visible = filesVM.showBottomActions(),
+            enter = slideInVertically { it } + fadeIn(),
+            exit = slideOutVertically { it } + fadeOut()) {
+            FilesSelectModeBottomActions(
+                filesVM = filesVM,
+                onShowPasteBar = { filesVM.showPasteBar.value = it })
         }
-        AnimatedVisibility(visible = filesVM.showPasteBar.value, enter = slideInVertically { it } + fadeIn(), exit = slideOutVertically { it } + fadeOut()) {
-            FilePasteBar(filesVM = filesVM, coroutineScope = scope, onPasteComplete = { scope.launch(Dispatchers.IO) { filesVM.loadAsync(context) } })
+        AnimatedVisibility(
+            visible = filesVM.showPasteBar.value,
+            enter = slideInVertically { it } + fadeIn(),
+            exit = slideOutVertically { it } + fadeOut()) {
+            FilePasteBar(
+                filesVM = filesVM,
+                coroutineScope = scope,
+                onPasteComplete = { scope.launch(Dispatchers.IO) { filesVM.loadAsync(context) } })
         }
     }) { paddingValues ->
-        Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
             if (Permission.WRITE_EXTERNAL_STORAGE.can(context) && filesVM.type != FilesType.RECENTS) {
-                BreadcrumbView(breadcrumbs = filesVM.breadcrumbs, selectedIndex = filesVM.selectedBreadcrumbIndex.value, onItemClick = { filesVM.navigateToDirectory(context, it.path) })
+                BreadcrumbView(
+                    breadcrumbs = filesVM.breadcrumbs,
+                    selectedIndex = filesVM.selectedBreadcrumbIndex.value,
+                    onItemClick = { filesVM.navigateToDirectory(context, it.path) })
             }
             PullToRefresh(refreshLayoutState = topRefreshLayoutState) {
-                FileListContent(navController = navController, filesVM = filesVM, files = itemsState, loadFiles = { _, _ -> scope.launch(Dispatchers.IO) { filesVM.loadAsync(context) } }, previewerState = previewerState, audioPlaylistVM = audioPlaylistVM)
+                FileListContent(
+                    navController = navController,
+                    filesVM = filesVM,
+                    files = itemsState,
+                    loadFiles = { _, _ -> scope.launch(Dispatchers.IO) { filesVM.loadAsync(context) } },
+                    previewerState = previewerState,
+                    audioPlaylistVM = audioPlaylistVM
+                )
             }
         }
     }

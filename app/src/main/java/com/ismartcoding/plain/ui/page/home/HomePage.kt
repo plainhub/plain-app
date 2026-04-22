@@ -20,6 +20,7 @@ import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.events.UpdateDownloadCompleteEvent
@@ -33,6 +34,7 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PScaffold
+import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
@@ -85,10 +87,10 @@ fun HomePage(
     ) { paddingValues ->
         LazyColumn(
             Modifier
-                .fillMaxSize()
                 .padding(top = paddingValues.calculateTopPadding()),
         ) {
             item {
+                TopSpace()
                 if (webEnabled) {
                     if (mainVM.isVPNConnected) {
                         PAlert(
@@ -103,7 +105,7 @@ fun HomePage(
                         ) {
                             PFilledButton(
                                 text = stringResource(R.string.grant_permission),
-                                small = true,
+                                buttonSize = ButtonSize.SMALL,
                                 onClick = {
                                     sendEvent(RequestPermissionsEvent(Permission.SYSTEM_ALERT_WINDOW))
                                 },
@@ -115,7 +117,6 @@ fun HomePage(
             item {
                 if (AppFeatureType.CHECK_UPDATES.has()) {
                     UpdateBanner(updateVM)
-                    VerticalSpace(dp = 16.dp)
                 }
             }
             item {

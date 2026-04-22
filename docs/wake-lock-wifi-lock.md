@@ -22,7 +22,7 @@ Both locks are acquired when `HttpServerService` starts and released when it sto
 
 ### 2. Keep Awake Preference
 - User-controlled toggle in **Settings → Web Console → Keep Awake**.
-- Stored in `KeepAwakePreference` (DataStore boolean, default `false`).
+- Stored in `KeepAwakePreference` (DataStore boolean, default `true`).
 - When enabled (`KeepAwakeChangedEvent(enabled = true)`): inactivity timer is cancelled; locks held indefinitely (same as USB).
 - When disabled (`KeepAwakeChangedEvent(enabled = false)`): `lastActivityMs` reset to now; timer starts.
 

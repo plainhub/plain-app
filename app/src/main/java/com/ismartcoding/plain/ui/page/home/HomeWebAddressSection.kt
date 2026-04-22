@@ -23,10 +23,12 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.preferences.HttpsPreference
 import com.ismartcoding.plain.ui.base.PIconTextButton
+import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.HttpHttpsSegmentedButton
 import com.ismartcoding.plain.ui.components.WebAddressBar
+import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.nav.Routing
 import kotlinx.coroutines.launch
@@ -36,6 +38,7 @@ fun HomeWebAddressSection(
     context: Context,
     navController: NavHostController,
     mainVM: MainViewModel,
+    isError: Boolean
 ) {
     var isHttps by remember { mutableStateOf(TempData.webHttps) }
     val scope = rememberCoroutineScope()
@@ -63,9 +66,21 @@ fun HomeWebAddressSection(
                         scope.launch { HttpsPreference.putAsync(context, https) }
                     },
                 )
+                if (isError) {
+                    POutlinedButton(
+                        stringResource(R.string.troubleshoot),
+                        onClick = {
+                            WebHelper.open(
+                                context,
+                                "https://plainapp.app/troubleshooting"
+                            )
+                        },
+                    )
+                } else {
                     PIconTextButton(R.drawable.settings, stringResource(R.string.web_settings)) {
                         navController.navigate(Routing.WebSettings)
                     }
+                }
             }
         }
         VerticalSpace(8.dp)

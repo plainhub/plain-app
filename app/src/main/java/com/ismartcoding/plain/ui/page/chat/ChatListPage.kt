@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.preferences.LocalWeb
 import com.ismartcoding.plain.preferences.NearbyDiscoverablePreference
@@ -82,7 +83,7 @@ fun ChatListPage(
     PullToRefresh(modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding()), refreshLayoutState = refreshState) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item { TopSpace() }
-            item { if (!webEnabled) PAlert(description = stringResource(id = R.string.web_service_required_for_chat), AlertType.WARNING) { PFilledButton(text = stringResource(R.string.enable_web_service), small = true, onClick = { mainVM.enableHttpServer(context, true) }) } }
+            item { if (!webEnabled) PAlert(description = stringResource(id = R.string.web_service_required_for_chat), AlertType.WARNING) { PFilledButton(text = stringResource(R.string.enable_web_service), buttonSize = ButtonSize.SMALL, onClick = { mainVM.enableHttpServer(context, true) }) } }
             item { PCard { PListItem(title = stringResource(R.string.make_discoverable), subtitle = stringResource(R.string.make_discoverable_desc), icon = R.drawable.wifi, action = { PSwitch(activated = isDiscoverable) { peerVM.updateDiscoverable(context, it) } }) } }
             item { VerticalSpace(dp = 16.dp) }
             item { PeerListItem(title = stringResource(R.string.local_chat), desc = stringResource(R.string.local_chat_desc), icon = R.drawable.bot, latestChat = peerVM.getLatestChat("local"), modifier = PlainTheme.getCardModifier(), onClick = { navController.navigate(Routing.Chat("local")) }) }

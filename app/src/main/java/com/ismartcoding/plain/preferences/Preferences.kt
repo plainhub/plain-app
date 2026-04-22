@@ -242,7 +242,7 @@ object KeepScreenOnPreference : BasePreference<Boolean>() {
 }
 
 object KeepAwakePreference : BasePreference<Boolean>() {
-    override val default = false
+    override val default = true
     override val key = booleanPreferencesKey("keep_awake")
 }
 
