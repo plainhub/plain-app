@@ -6,6 +6,7 @@ import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.FolderOption
 import android.content.Context
+import com.ismartcoding.lib.extensions.appDir
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -19,7 +20,7 @@ suspend fun buildFolderOptions(
     fileTransferAssistantText: String,
 ): List<FolderOption> = withContext(Dispatchers.IO) {
     val internalStoragePath = FileSystemHelper.getInternalStoragePath()
-    val externalFilesDirPath = FileSystemHelper.getExternalFilesDirPath(context)
+    val externalFilesDirPath = context.appDir()
     val sdCardPath = FileSystemHelper.getSDCardPath(context)
     val usbPaths = FileSystemHelper.getUsbDiskPaths()
     val favoriteFolders = FavoriteFoldersPreference.getValueAsync(context)

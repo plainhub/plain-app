@@ -2,6 +2,7 @@ package com.ismartcoding.plain.helpers
 
 import android.content.Context
 import android.webkit.MimeTypeMap
+import com.ismartcoding.lib.extensions.appDir
 import com.ismartcoding.lib.extensions.getFilenameExtension
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.db.AppDatabase
@@ -30,7 +31,7 @@ object AppFileStore {
      * Returns the absolute path whether or not the file currently exists.
      */
     fun realPathFromId(context: Context, fileId: String): String {
-        val base = context.getExternalFilesDir(null)!!.absolutePath
+        val base = context.appDir()
         return "$base/${fileId.substring(0, 2)}/${fileId.substring(2, 4)}/$fileId"
     }
 
@@ -151,7 +152,7 @@ object AppFileStore {
     // ── Internals ───────────────────────────────────────────────────────────
 
     private fun destFile(context: Context, fileId: String): File {
-        val base = context.getExternalFilesDir(null)!!.absolutePath
+        val base = context.appDir()
         return File("$base/${fileId.substring(0, 2)}/${fileId.substring(2, 4)}/$fileId")
     }
 
