@@ -36,6 +36,8 @@ import com.ismartcoding.plain.web.models.buildImageSearchStatus
 import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
 import com.ismartcoding.plain.chat.discover.NearbyPairManager
+import com.ismartcoding.plain.chat.ChatDbHelper
+import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DPeer
 import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.services.HttpServerService
@@ -176,6 +178,8 @@ class CancelSleepTimerEvent : ChannelEvent()
 class StartNearbyServiceEvent : ChannelEvent()
 class StartNearbyDiscoveryEvent : ChannelEvent()
 class StopNearbyDiscoveryEvent : ChannelEvent()
+
+class RetryChatItemEvent(val id: String) : ChannelEvent()
 
 object AppEvents {
     private lateinit var mediaPlayer: MediaPlayer
@@ -410,6 +414,20 @@ object AppEvents {
                         downloadJob?.cancel()
                         downloadJob = null
                         coIO { UpdateInfoPreference.updateAsync(MainApp.instance) { it.copy(downloadedApkPath = "") } }
+                    }
+
+                    is RetryChatItemEvent -> {
+                        coIO {
+                            val item = ChatDbHelper.getAsync(event.id) ?: return@coIO
+                            val isPeer = item.toId.isNotEmpty() && item.channelId.isEmpty()
+                            val peer: DPeer? = if (isPeer) AppDatabase.instance.peerDao().getById(item.toId) else null
+                            if (isPeer && peer != null) {
+                                ChatDbHelper.deliverToPeerAsync(item, peer)
+                            } else if (item.channelId.isNotEmpty()) {
+                                ChatDbHelper.deliverToChannelAsync(item)
+                            }
+                            sendEvent(HttpApiEvents.MessageUpdatedEvent(item.id))
+                        }
                     }
                 }
             }

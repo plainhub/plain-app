@@ -7,6 +7,7 @@ import android.os.storage.StorageManager
 import android.provider.MediaStore
 import android.text.TextUtils
 import com.ismartcoding.lib.helpers.FilterField
+import com.ismartcoding.lib.extensions.appDir
 import com.ismartcoding.plain.extensions.getDirectChildrenCount
 import com.ismartcoding.plain.extensions.normalizeComparison
 import com.ismartcoding.plain.extensions.parseSizeToBytes
@@ -85,10 +86,6 @@ object FileSystemHelper {
 
     fun getInternalStorageName(): String {
         return getString(R.string.internal_storage)
-    }
-
-    fun getExternalFilesDirPath(context: Context): String {
-        return context.getExternalFilesDir(null)!!.absolutePath
     }
 
     fun getSDCardPath(context: Context): String {

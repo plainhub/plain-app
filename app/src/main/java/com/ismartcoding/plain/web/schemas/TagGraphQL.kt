@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.TagRelationStub

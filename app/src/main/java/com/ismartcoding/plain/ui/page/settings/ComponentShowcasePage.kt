@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -110,7 +111,7 @@ private fun ShowcaseButtons() {
         PFilledButton(text = "Filled Danger", type = ButtonType.DANGER, onClick = {})
         POutlinedButton(text = "Outlined Block", block = true, onClick = {})
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            PFilledButton(text = "Small Filled", small = true, onClick = {})
+            PFilledButton(text = "Small Filled", buttonSize = ButtonSize.SMALL, onClick = {})
             POutlinedButton(text = "Small Outlined", small = true, onClick = {})
         }
     }

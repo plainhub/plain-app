@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.models
 
 import android.content.Context
 import androidx.lifecycle.viewModelScope
+import com.ismartcoding.lib.extensions.appDir
 import com.ismartcoding.lib.extensions.getFilenameFromPath
 import com.ismartcoding.lib.extensions.getParentPath
 import com.ismartcoding.plain.MainApp
@@ -47,7 +48,7 @@ internal suspend fun FilesViewModel.loadLastPathAsyncInternal(context: Context) 
 
 internal fun FilesViewModel.inferFileTypeFromRootInternal(context: Context, rootPath: String): FilesType {
     val internalStoragePath = FileSystemHelper.getInternalStoragePath()
-    val appDataPath = FileSystemHelper.getExternalFilesDirPath(context)
+    val appDataPath = context.appDir()
     val sdCardPath = FileSystemHelper.getSDCardPath(context)
     val usbPaths = FileSystemHelper.getUsbDiskPaths()
     return when {

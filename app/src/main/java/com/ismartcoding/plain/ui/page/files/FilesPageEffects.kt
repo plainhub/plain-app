@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import com.ismartcoding.lib.channel.Channel
+import com.ismartcoding.lib.extensions.appDir
 import com.ismartcoding.plain.enums.ActionSourceType
 import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.events.ActionEvent
@@ -48,7 +49,7 @@ internal fun FilesPageEffects(
             if (folderPath.isNotEmpty()) {
                 val targetDir = File(folderPath)
                 if (targetDir.exists()) {
-                    val appDataPath = FileSystemHelper.getExternalFilesDirPath(context)
+                    val appDataPath = context.appDir()
                     val type = if (folderPath.startsWith(appDataPath)) FilesType.APP else FilesType.INTERNAL_STORAGE
                     val rootPath = when (type) { FilesType.APP -> appDataPath; else -> FileSystemHelper.getInternalStoragePath() }
                     filesVM.initSelectedPath(rootPath, type, folderPath, folderPath)

@@ -1,6 +1,7 @@
 package com.ismartcoding.plain.web.loaders
 
 import android.content.Context
+import com.ismartcoding.lib.extensions.appDir
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.web.models.StorageMount
 
@@ -71,7 +72,7 @@ object MountsLoader {
             )
         }
 
-        val appPath = FileSystemHelper.getExternalFilesDirPath(context)
+        val appPath = context.appDir()
         if (appPath.isNotEmpty()) {
             mounts.add(
                 buildMount(

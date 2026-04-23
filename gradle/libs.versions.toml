@@ -16,7 +16,6 @@ datastorePreferencesVersion = "1.2.1"
 jsonVersion="20251224"
 jsoupVersion="1.22.1"
 junitVersion="4.13.2"
-kgraphql = "0.19.0"
 kotlin ="2.3.20"
 kotlinxDatetimeVersion="0.7.1"
 kotlinxSerializationJsonVersion="1.11.0"
@@ -37,11 +36,11 @@ tinkAndroidVersion = "1.21.0"
 playPublisherVersion = "4.0.0"
 webrtcSdkAndroidVersion = "144.7559.01"
 mediapipeVisionVersion = "0.10.33"
-liteRtVersion = "2.1.3"
+liteRtVersion = "2.1.4"
 pdfiumAndroidVersion = "1.9.5-beta01"
-androidxTestRunner = "1.6.2"
-androidxTestRules = "1.6.1"
-androidxTestExtJunit = "1.2.1"
+androidxTestRunner = "1.7.0"
+androidxTestRules = "1.7.0"
+androidxTestExtJunit = "1.3.0"
 
 [libraries]
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
@@ -78,7 +77,6 @@ junit = { module = "junit:junit", version.ref = "junitVersion" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRunner" }
 androidx-test-rules = { module = "androidx.test:rules", version.ref = "androidxTestRules" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestExtJunit" }
-media3-cast = { module = "androidx.media3:media3-cast", version.ref = "media3" }
 media3-datasource = { module = "androidx.media3:media3-datasource", version.ref = "media3" }
 media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 media3-session = { module = "androidx.media3:media3-session", version.ref = "media3" }
@@ -105,10 +103,6 @@ compose-material3 = { module = "androidx.compose.material3:material3", version.r
 
 
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoupVersion" }
-
-# graphql
-kgraphql-ktor = { module = "com.apurebase:kgraphql-ktor", version.ref = "kgraphql" }
-kgraphql = { module = "com.apurebase:kgraphql", version.ref = "kgraphql" }
 
 # kotlin
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }

@@ -39,13 +39,13 @@ fun POutlinedButton(
 ) {
     val resolvedColor = contentColor ?: when (type) {
         ButtonType.PRIMARY -> MaterialTheme.colorScheme.primary
-        ButtonType.SECONDARY -> MaterialTheme.colorScheme.secondary
+        ButtonType.TERTIARY -> MaterialTheme.colorScheme.tertiary
         ButtonType.DANGER -> MaterialTheme.colorScheme.red
     }
     val borderColor = resolvedColor.copy(alpha = 0.5f)
     val height = if (small) 32.dp else 40.dp
     val shape = if (small) RoundedCornerShape(32.dp) else RoundedCornerShape(40.dp)
-    val padding = PaddingValues(horizontal = 12.dp)
+    val padding = PaddingValues(horizontal = 16.dp)
 
     OutlinedButton(
         onClick = onClick,

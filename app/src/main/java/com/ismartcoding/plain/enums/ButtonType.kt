@@ -12,8 +12,8 @@ import com.ismartcoding.plain.ui.theme.red
 
 enum class ButtonType {
     PRIMARY,
-    SECONDARY,
-    DANGER;
+    DANGER,
+    TERTIARY;
 
     @Composable
     fun getColors(): ButtonColors {
@@ -22,36 +22,18 @@ enum class ButtonType {
                 ButtonDefaults.buttonColors()
             }
 
-            SECONDARY -> {
-                ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary,
-                )
-            }
-
             DANGER -> {
                 ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.red,
                     contentColor = Color.White,
                 )
             }
-        }
-    }
 
-
-    @Composable
-    fun getBorder(): BorderStroke? {
-        return when(this) {
-            PRIMARY -> {
-                null
-            }
-
-            SECONDARY -> {
-                BorderStroke(1.dp, MaterialTheme.colorScheme.secondary)
-            }
-
-            DANGER -> {
-                null
+            TERTIARY -> {
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary,
+                )
             }
         }
     }

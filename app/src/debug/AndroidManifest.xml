@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <!--
+            Registers the LeakCanary known-leak initialiser.
+            ContentProviders run before Application.onCreate(), so the
+            config is in place before any watcher fires.
+        -->
+        <provider
+            android:name=".debug.LeakCanaryKnownLeaks"
+            android:authorities="${applicationId}.leakcanary_known_leaks"
+            android:exported="false" />
+    </application>
+</manifest>

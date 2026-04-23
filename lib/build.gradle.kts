@@ -45,7 +45,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     api(libs.androidx.appcompat)
 
-
+    implementation(kotlin("reflect"))
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
 //    api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
@@ -84,6 +84,20 @@ dependencies {
     
     // Google Tink for cryptography (Ed25519 support on all Android versions)
     api(libs.tink.android)
+
+    api(libs.ktor.server.core)
+    api(libs.ktor.server.netty)
+    api(libs.ktor.server.websockets)
+    api(libs.ktor.server.compression)
+    api(libs.ktor.server.content.negotiation)
+    api(libs.ktor.network.tls.certificates)
+    api(libs.ktor.serialization.kotlinx.json)
+    api(libs.ktor.server.caching.headers)
+    api(libs.ktor.server.cors)
+    api(libs.ktor.server.forwarded.header)
+    api(libs.ktor.server.partial.content)
+    api(libs.ktor.server.auto.head.response)
+    api(libs.ktor.server.conditional.headers)
 
     testImplementation(libs.junit)
 }

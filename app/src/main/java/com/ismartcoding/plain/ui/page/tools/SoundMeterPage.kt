@@ -97,7 +97,7 @@ fun SoundMeterPage(navController: NavHostController) {
                 Text(text = decibelValueString, color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.fillMaxWidth().height(96.dp).padding(16.dp), textAlign = TextAlign.Center)
                 if (isRunning.value) {
-                    PFilledButton(text = stringResource(R.string.stop), type = ButtonType.SECONDARY, modifier = Modifier.padding(horizontal = 16.dp), onClick = { isRunning.value = false })
+                    PFilledButton(text = stringResource(R.string.stop), modifier = Modifier.padding(horizontal = 16.dp), onClick = { isRunning.value = false })
                 } else {
                     PFilledButton(text = stringResource(R.string.start), modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                         if (Permission.RECORD_AUDIO.can(context)) isRunning.value = true

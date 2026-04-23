@@ -1,81 +1,27 @@
 package com.ismartcoding.plain.web
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
-import android.os.Build
-import android.webkit.MimeTypeMap
-import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.extensions.compress
-import com.ismartcoding.lib.extensions.getContentType
-import com.ismartcoding.lib.extensions.getFinalPath
-import com.ismartcoding.lib.extensions.getMimeType
-import com.ismartcoding.lib.extensions.isImageFast
-import com.ismartcoding.lib.extensions.isUrl
-import com.ismartcoding.lib.extensions.scanFileByConnection
-import com.ismartcoding.lib.extensions.urlEncode
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.CryptoHelper
-import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
-import com.ismartcoding.lib.helpers.ZipHelper
 import com.ismartcoding.lib.logcat.LogCat
-import com.ismartcoding.plain.features.dlna.sender.DlnaTransportController
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.api.HttpClientManager
-import okhttp3.Request
-import com.ismartcoding.plain.data.DownloadFileItem
-import com.ismartcoding.plain.data.DownloadFileItemWrap
-import com.ismartcoding.plain.data.UploadChunkInfo
-import com.ismartcoding.plain.data.UploadInfo
-import com.ismartcoding.plain.db.AppDatabase
-import com.ismartcoding.plain.enums.DataType
-import com.ismartcoding.plain.enums.ImageType
 import com.ismartcoding.plain.enums.PasswordType
-import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
-import com.ismartcoding.plain.extensions.newFile
-import com.ismartcoding.plain.thumbnail.ThumbnailGenerator
-import com.ismartcoding.plain.features.PackageHelper
-import com.ismartcoding.plain.features.file.FileSortBy
-import com.ismartcoding.plain.features.media.AudioMediaStoreHelper
-import com.ismartcoding.plain.features.media.CastPlayer
-import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
-import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
-import com.ismartcoding.plain.helpers.ImageHelper
-import com.ismartcoding.plain.helpers.Mp4Helper
-import com.ismartcoding.plain.helpers.AppFileStore
-import com.ismartcoding.plain.helpers.TempHelper
-import com.ismartcoding.plain.helpers.UrlHelper
-import com.ismartcoding.plain.ui.page.appfiles.AppFileDisplayNameHelper
-import com.ismartcoding.plain.preferences.AuthTwoFactorPreference
-import com.ismartcoding.plain.preferences.PasswordPreference
 import com.ismartcoding.plain.preferences.PasswordTypePreference
-import com.ismartcoding.plain.web.websocket.WebSocketSession
-import io.ktor.client.request.get
-import io.ktor.client.statement.readRawBytes
+import com.ismartcoding.plain.web.routes.addDLNA
+import com.ismartcoding.plain.web.routes.addFiles
+import com.ismartcoding.plain.web.routes.addUploads
+import com.ismartcoding.plain.web.routes.addZip
 import io.ktor.http.CacheControl
 import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.CachingOptions
-import io.ktor.http.content.EntityTagVersion
-import io.ktor.http.content.LastModifiedVersion
-import io.ktor.http.content.PartData
-import io.ktor.http.content.forEachPart
-import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCallPipeline
 import io.ktor.server.application.ApplicationStopPreparing
 import io.ktor.server.application.call
 import io.ktor.server.application.install
-import io.ktor.server.http.content.LocalFileContent
-import io.ktor.server.http.content.SPAConfig
 import io.ktor.server.http.content.staticResources
 import io.ktor.server.plugins.autohead.AutoHeadResponse
 import io.ktor.server.plugins.cachingheaders.CachingHeaders
@@ -85,56 +31,22 @@ import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.forwardedheaders.ForwardedHeaders
 import io.ktor.server.plugins.origin
 import io.ktor.server.plugins.partialcontent.PartialContent
-import io.ktor.server.request.header
 import io.ktor.server.request.receive
-import io.ktor.server.request.receiveMultipart
-import io.ktor.server.request.receiveText
-import io.ktor.server.response.header
 import io.ktor.server.response.respond
-import io.ktor.server.response.respondBytes
-import io.ktor.server.response.respondFile
-import io.ktor.server.response.respondOutputStream
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
-import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.websocket.WebSockets
-import io.ktor.server.websocket.webSocket
-import io.ktor.utils.io.jvm.javaio.copyTo
-import io.ktor.utils.io.toByteArray
-import io.ktor.websocket.CloseReason
-import io.ktor.websocket.Frame
 import io.ktor.websocket.close
-import io.ktor.websocket.readBytes
-import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
-import io.ktor.websocket.send
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.json.JSONObject
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.util.Date
-import java.util.zip.ZipEntry
-import java.util.zip.ZipOutputStream
-import androidx.core.net.toUri
 
 object HttpModule {
     // Limit concurrent zip operations to 1 to prevent resource exhaustion
     // when the web UI triggers multiple download requests (e.g. double-click).
-    private val zipSemaphore = Semaphore(1)
 
-    @Serializable
-    private data class FileIdParams(
-        val path: String = "",
-        val mediaId: String = "",
-        val name: String = "",
-    )
 
     @SuppressLint("SuspiciousIndentation")
     val module: Application.() -> Unit = {
@@ -181,26 +93,34 @@ object HttpModule {
                 call.respond(HttpStatusCode.NotFound)
                 return@intercept finish()
             }
+            call.response.headers.append("X-Server-Time", System.currentTimeMillis().toString())
         }
 
         routing {
-            val config = SPAConfig()
-            config.filesPath = "web"
-
-            // Serve index.html with injected server time for anti-replay clock sync
-            get("/") {
-                val html = this::class.java.classLoader?.getResourceAsStream("web/index.html")
-                    ?.bufferedReader()?.readText() ?: ""
-                val injected = html.replace("<head>", "<head><script>window.__SERVER_TIME__=${System.currentTimeMillis()}</script>")
-                call.respondText(injected, ContentType.Text.Html)
-            }
-
-            staticResources(config.applicationRoute, config.filesPath, index = config.defaultPage) {
+            // SPA: serve all resources from classpath "web/", inject __SERVER_TIME__ into index.html
+            // for every non-file path (no extension) so the Vue SPA can boot with a clock-sync value.
+            staticResources("/", "web", index = null) {
                 cacheControl {
                     arrayListOf(
                         CacheControl.NoCache(CacheControl.Visibility.Public),
                         CacheControl.NoStore(CacheControl.Visibility.Public),
                     )
+                }
+                fallback { requestedPath, call ->
+                    if (requestedPath.contains('.')) {
+                        // Real static asset that doesn't exist → 404
+                        call.respond(HttpStatusCode.NotFound)
+                    } else {
+                        // SPA route (no extension) → serve index.html with injected server time
+                        val classLoader = call.application.environment.classLoader
+                        val html = classLoader.getResourceAsStream("web/index.html")
+                            ?.bufferedReader()?.readText() ?: ""
+                        val injected = html.replace(
+                            "<head>",
+                            "<head><script>window.__SERVER_TIME__=${System.currentTimeMillis()}</script>"
+                        )
+                        call.respondText(injected, ContentType.Text.Html)
+                    }
                 }
             }
 
@@ -237,644 +157,10 @@ object HttpModule {
                 }
             }
 
-            get("/media/{id}") {
-                val id = call.parameters["id"]?.split(".")?.get(0) ?: ""
-                if (id.isEmpty()) {
-                    call.respond(HttpStatusCode.BadRequest)
-                    return@get
-                }
-                try {
-                    val path = UrlHelper.getMediaPath(id)
-                    if (path.isEmpty()) {
-                        call.respond(HttpStatusCode.BadRequest)
-                        return@get
-                    }
-
-                    if (path.isUrl()) {
-                        try {
-                            val client = HttpClientManager.browserClient()
-                            val r = client.get(path)
-                            call.respondBytes(r.readRawBytes(), r.contentType() ?: ContentType.Application.OctetStream)
-                        } catch (e: IOException) {
-                            call.respondText("Failed to fetch data from URL: $path", status = HttpStatusCode.InternalServerError)
-                        }
-                    } else if (path.startsWith("content://")) {
-                        val bytes = MainApp.instance.contentResolver.openInputStream(Uri.parse(path))?.buffered()?.use { it.readBytes() }
-                        call.respondBytes(bytes!!)
-                    } else if (path.isImageFast()) {
-                        call.respondFile(File(path))
-                    } else {
-                        val file = File(path)
-                        call.response.run {
-                            header("realTimeInfo.dlna.org", "DLNA.ORG_TLAG=*")
-                            header("contentFeatures.dlna.org", "")
-                            header("transferMode.dlna.org", "Streaming")
-                            header("Connection", "keep-alive")
-                            header(
-                                "Server",
-                                "DLNADOC/1.50 UPnP/1.0 Plain/1.0 Android/" + Build.VERSION.RELEASE,
-                            )
-
-                            EntityTagVersion(file.lastModified().hashCode().toString())
-                            LastModifiedVersion(Date(file.lastModified()))
-                            status(HttpStatusCode.PartialContent) // some TV os only accepts 206
-                        }
-                        call.respondFile(file)
-                    }
-                } catch (ex: Exception) {
-                    // ex.printStackTrace()
-                    call.respondText("File is expired or does not exist. $ex", status = HttpStatusCode.Forbidden)
-                }
-            }
-
-            get("/zip/dir") {
-                val q = call.request.queryParameters
-                val id = q["id"] ?: ""
-                if (id.isEmpty()) {
-                    call.respond(HttpStatusCode.BadRequest)
-                    return@get
-                }
-
-                if (!zipSemaphore.tryAcquire()) {
-                    call.respond(HttpStatusCode.TooManyRequests)
-                    return@get
-                }
-
-                try {
-                    val decryptedId = UrlHelper.decrypt(id)
-                    var dirPath: String
-                    var jsonName = ""
-                    if (decryptedId.startsWith("{")) {
-                        val params = jsonDecode<FileIdParams>(decryptedId)
-                        dirPath = params.path
-                        jsonName = params.name
-                    } else {
-                        dirPath = decryptedId
-                    }
-                    val folder = File(dirPath)
-                    if (!folder.exists() || !folder.isDirectory) {
-                        call.respond(HttpStatusCode.NotFound)
-                        return@get
-                    }
-
-                    val fileName = (jsonName.ifEmpty { "${folder.name}.zip" }).urlEncode().replace("+", "%20")
-                    call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
-                    call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
-                    call.respondOutputStream(ContentType.Application.Zip) {
-                        ZipOutputStream(this).use { zip ->
-                            ZipHelper.zipFolderToStreamAsync(folder, zip)
-                        }
-                    }
-                } finally {
-                    zipSemaphore.release()
-                }
-            }
-
-            get("/zip/files") {
-                val query = call.request.queryParameters
-                val id = query["id"] ?: ""
-                if (id.isEmpty()) {
-                    call.respond(HttpStatusCode.BadRequest)
-                    return@get
-                }
-
-                if (!zipSemaphore.tryAcquire()) {
-                    call.respond(HttpStatusCode.TooManyRequests)
-                    return@get
-                }
-
-                try {
-                    val json = JSONObject(UrlHelper.decrypt(id))
-                    var paths: List<DownloadFileItem> = arrayListOf()
-                    val type = json.optString("type")
-                    if (type.isEmpty()) {
-                        call.respond(HttpStatusCode.BadRequest)
-                        return@get
-                    }
-
-                    val q = json.optString("query")
-                    val context = MainApp.instance
-                    when (type) {
-                        DataType.PACKAGE.name -> {
-                            paths = PackageHelper.searchAsync(q, Int.MAX_VALUE, 0, FileSortBy.NAME_ASC).map { DownloadFileItem(it.path, "${it.name.replace(" ", "")}-${it.id}.apk") }
-                        }
-
-                        DataType.VIDEO.name -> {
-                            paths = VideoMediaStoreHelper.searchAsync(context, q, Int.MAX_VALUE, 0, FileSortBy.DATE_DESC).map { DownloadFileItem(it.path, "") }
-                        }
-
-                        DataType.AUDIO.name -> {
-                            paths = AudioMediaStoreHelper.searchAsync(context, q, Int.MAX_VALUE, 0, FileSortBy.DATE_DESC).map { DownloadFileItem(it.path, "") }
-                        }
-
-                        DataType.IMAGE.name -> {
-                            paths = ImageMediaStoreHelper.searchAsync(context, q, Int.MAX_VALUE, 0, FileSortBy.DATE_DESC).map { DownloadFileItem(it.path, "") }
-                        }
-
-                        DataType.APP_FILE.name -> {
-                            val appFileDao = AppDatabase.instance.appFileDao()
-                            val chatDao = AppDatabase.instance.chatDao()
-                            val ids = q.removePrefix("ids:").split(",").filter { it.isNotEmpty() }
-                            val appFiles = if (ids.isNotEmpty()) appFileDao.getByIds(ids) else appFileDao.getAll()
-                            val nameMap = AppFileDisplayNameHelper.buildNameMap(chatDao.getAll())
-                            paths = appFiles.map { file ->
-                                val displayName = AppFileDisplayNameHelper.resolveDisplayName(file, nameMap)
-                                DownloadFileItem("fid:${file.id}".getFinalPath(context), displayName)
-                            }
-                        }
-
-                        DataType.FILE.name -> {
-                            val tmpId = json.optString("id")
-                            val value = TempHelper.getValue(tmpId)
-                            TempHelper.clearValue(tmpId)
-                            if (value.isEmpty()) {
-                                call.respond(HttpStatusCode.NotFound)
-                                return@get
-                            }
-
-                            paths = jsonDecode<List<DownloadFileItem>>(value)
-                        }
-                    }
-
-                    val items = paths.map { DownloadFileItemWrap(File(it.path), it.name) }.filter { it.file.exists() }
-                    val dirs = items.filter { it.file.isDirectory }
-                    val fileName = (json.optString("name").ifEmpty { "download.zip" }).urlEncode().replace("+", "%20")
-                    call.response.header("Content-Disposition", "attachment;filename=\"${fileName}\";filename*=utf-8''\"${fileName}\"")
-                    call.response.header(HttpHeaders.ContentType, ContentType.Application.Zip.toString())
-                    call.respondOutputStream(ContentType.Application.Zip) {
-                        ZipOutputStream(this).use { zip ->
-                            items.forEach { item ->
-                                if (dirs.any { item.file.absolutePath != it.file.absolutePath && item.file.absolutePath.startsWith(it.file.absolutePath) }) {
-                                } else {
-                                    val filePath = item.name.ifEmpty { item.file.name }
-                                    if (item.file.isDirectory) {
-                                        zip.putNextEntry(ZipEntry("$filePath/"))
-                                        ZipHelper.zipFolderToStreamAsync(item.file, zip, filePath)
-                                    } else {
-                                        zip.putNextEntry(ZipEntry(filePath))
-                                        item.file.inputStream().copyTo(zip)
-                                    }
-                                    zip.closeEntry()
-                                }
-                            }
-                        }
-                    }
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                    call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
-                } finally {
-                    zipSemaphore.release()
-                }
-            }
-
-            get("/fs") {
-                val q = call.request.queryParameters
-                val id = q["id"] ?: ""
-                if (id.isEmpty()) {
-                    call.respond(HttpStatusCode.BadRequest)
-                    return@get
-                }
-                try {
-                    val context = MainApp.instance
-                    val decryptedId = UrlHelper.decrypt(id).getFinalPath(context)
-                    var path: String
-                    var mediaId = ""
-                    var jsonName = ""
-                    if (decryptedId.startsWith("{")) {
-                        val params = jsonDecode<FileIdParams>(decryptedId)
-                        path = params.path.getFinalPath(context)
-                        mediaId = params.mediaId
-                        jsonName = params.name
-                    } else {
-                        path = decryptedId
-                    }
-
-                    if (path.startsWith("content://")) {
-                        val uri = path.toUri()
-                        val mimeType = context.contentResolver.getType(uri).orEmpty()
-                        if (mimeType.equals("video/3gpp", true) || mimeType.equals("video/3gp", true) || path.endsWith(".3gp", true)) {
-                            val mp4Bytes = withIO { Mp4Helper.convert3gpToMp4(context, uri) }
-                            if (mp4Bytes != null) {
-                                call.respondBytes(mp4Bytes, ContentType.parse("video/mp4"))
-                                return@get
-                            }
-                        }
-
-                        val bytes = withIO { context.contentResolver.openInputStream(uri)?.buffered()?.use { it.readBytes() } }
-                        if (bytes != null) {
-                            if (mimeType.isNotEmpty()) {
-                                call.respondBytes(bytes, ContentType.parse(mimeType))
-                            } else {
-                                call.respondBytes(bytes, ContentType.Application.OctetStream)
-                            }
-                        } else {
-                            call.respond(HttpStatusCode.NotFound)
-                        }
-                    } else if (path.startsWith("pkgicon://")) {
-                        val packageName = path.substring(10)
-                        val bitmap = PackageHelper.getIcon(packageName)
-                        val bytes = withIO {
-                            ByteArrayOutputStream().use {
-                                bitmap.compress(80, it)
-                                it.toByteArray()
-                            }
-                        }
-                        call.respond(bytes)
-                    } else {
-                        val file = File(path)
-                        if (!file.exists()) {
-                            call.respond(HttpStatusCode.NotFound)
-                            return@get
-                        }
-                        if (file.isDirectory) {
-                            call.respond(HttpStatusCode.BadRequest)
-                            return@get
-                        }
-
-                        call.response.header("Access-Control-Expose-Headers", "Content-Disposition")
-                        val fileName = (jsonName.ifEmpty { file.name }).urlEncode().replace("+", "%20")
-                        if (q["dl"] == "1") {
-                            call.response.header(
-                                "Content-Disposition",
-                                "attachment; filename=\"${fileName}\"; filename*=utf-8''${fileName}"
-                            )
-                            call.respondFile(file)
-                            return@get
-                        } else {
-                            call.response.header(
-                                "Content-Disposition",
-                                "inline; filename=\"${fileName}\"; filename*=utf-8''${fileName}"
-                            )
-                        }
-
-                        if (fileName.isImageFast()) {
-                            val imageType = ImageHelper.getImageType(path, fileName)
-                            if (imageType.isApplicableAnimated() || imageType == ImageType.SVG) {
-                                call.respond(LocalFileContent(file, fileName.getContentType()))
-                                return@get
-                            }
-                        }
-
-                        val w = q["w"]?.toIntOrNull()
-                        val h = q["h"]?.toIntOrNull()
-                        val centerCrop = q["cc"]?.toBooleanStrictOrNull() != false
-                        // get video/image thumbnail
-                        if (w != null && h != null) {
-                            val bytes = withIO { ThumbnailGenerator.toThumbBytesAsync(MainApp.instance, file, w, h, centerCrop, mediaId, fileName) }
-                            if (bytes != null) {
-                                call.respondBytes(bytes)
-                            }
-                            return@get
-                        }
-                        val header = ByteArray(12)
-                        val headerSize = file.inputStream().use { it.read(header) }
-                        val isHeif = headerSize >= 12 &&
-                                header[4] == 0x66.toByte() && // 'f'
-                                header[5] == 0x74.toByte() && // 't'
-                                header[6] == 0x79.toByte() && // 'y'
-                                header[7] == 0x70.toByte() && // 'p'
-                                String(header.copyOfRange(8, 12)) in listOf("heic", "heix", "hevc", "hevx", "avif")
-
-                        if (isHeif) {
-                            val bytes = file.readBytes()
-                            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                            val output = ByteArrayOutputStream()
-                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, output)
-                            call.respondBytes(output.toByteArray(), ContentType.Image.PNG)
-                        } else {
-                            call.respond(LocalFileContent(file, fileName.getContentType()))
-                        }
-                    }
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                    call.respondText("File is expired or does not exist. $ex", status = HttpStatusCode.Forbidden)
-                }
-            }
-
-            get("/proxyfs") {
-                val q = call.request.queryParameters
-                val id = q["id"] ?: ""
-                if (id.isEmpty()) {
-                    call.respond(HttpStatusCode.BadRequest)
-                    return@get
-                }
-
-                try {
-                    val peerUrl = UrlHelper.decrypt(id)
-                    if (peerUrl.isEmpty() || !peerUrl.startsWith("http")) {
-                        call.respond(HttpStatusCode.BadRequest, "Invalid peer URL")
-                        return@get
-                    }
-
-                    val client = HttpClientManager.createUnsafeOkHttpClient()
-                    val request = Request.Builder().url(peerUrl).build()
-
-                    val response = withIO { client.newCall(request).execute() }
-
-                    call.response.status(HttpStatusCode.fromValue(response.code))
-
-                    for ((name, value) in response.headers) {
-                        if (!name.equals("Transfer-Encoding", true) &&
-                            !name.equals("Connection", true)
-                        ) {
-                            call.response.headers.append(name, value)
-                        }
-                    }
-
-                    val body = response.body ?: run {
-                        call.respond(HttpStatusCode.NotFound)
-                        return@get
-                    }
-
-                    call.respondOutputStream {
-                        body.byteStream().use { input ->
-                            input.copyTo(this)
-                        }
-                    }
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                    call.respond(HttpStatusCode.InternalServerError, ex.message ?: "")
-                }
-            }
-
-            route("/callback/cast", HttpMethod("NOTIFY")) {
-                handle {
-                    val xml = call.receiveText()
-                    LogCat.d(xml)
-                    // the TV could send the callback twice in short time, the second one should be ignore if it has AVTransportURIMetaData field.
-                    if (xml.contains("TransportState val=\"STOPPED\"") && !xml.contains("AVTransportURIMetaData")) {
-                        withIO {
-                            CastPlayer.isPlaying.value = false
-                            val castItems = CastPlayer.items.value
-                            if (castItems.isNotEmpty()) {
-                                CastPlayer.currentDevice?.let { device ->
-                                    val currentUri = CastPlayer.currentUri.value
-                                    var index = castItems.indexOfFirst { it.path == currentUri }
-                                    index++
-                                    if (index > castItems.size - 1) {
-                                        index = 0
-                                    }
-                                    val current = castItems[index]
-                                    if (current.path != currentUri) {
-                                        LogCat.d(current.path)
-                                        DlnaTransportController.setAVTransportURIAsync(device, UrlHelper.getMediaHttpUrl(current.path), current.title)
-                                        CastPlayer.setCurrentUri(current.path)
-                                        CastPlayer.isPlaying.value = true
-                                    }
-                                }
-                            }
-                        }
-                    } else if (xml.contains("TransportState val=\"PLAYING\"")) {
-                        withIO {
-                            CastPlayer.isPlaying.value = true
-                        }
-                    } else if (xml.contains("TransportState val=\"PAUSED_PLAYBACK\"")) {
-                        withIO {
-                            CastPlayer.isPlaying.value = false
-                        }
-                    }
-
-                    if (xml.contains("RelTime val=") && xml.contains("TrackDuration val=")) {
-                        withIO {
-                            try {
-                                val relTimeMatch = Regex("RelTime val=\"([^\"]+)\"").find(xml)
-                                val durationMatch = Regex("TrackDuration val=\"([^\"]+)\"").find(xml)
-
-                                if (relTimeMatch != null && durationMatch != null) {
-                                    val relTime = relTimeMatch.groupValues[1]
-                                    val trackDuration = durationMatch.groupValues[1]
-                                    CastPlayer.updatePositionInfo(relTime, trackDuration)
-                                }
-                            } catch (e: Exception) {
-                                // 解析失败，忽略
-                            }
-                        }
-                    }
-                    call.respond(HttpStatusCode.OK)
-                }
-            }
-
-            post("/upload") {
-                val clientId = call.request.header("c-id") ?: ""
-                if (clientId.isEmpty()) {
-                    call.respond(HttpStatusCode.BadRequest, "c-id header is missing")
-                    return@post
-                }
-
-                val token = HttpServerManager.tokenCache[clientId]
-                if (token == null) {
-                    call.respond(HttpStatusCode.Unauthorized)
-                    return@post
-                }
-                try {
-                    lateinit var info: UploadInfo
-                    var fileName = ""
-                    call.receiveMultipart(formFieldLimit = Long.MAX_VALUE).forEachPart { part ->
-                        when (part) {
-                            is PartData.FileItem -> {
-                                when (part.name) {
-                                    "info" -> {
-                                        var requestStr = ""
-                                        val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, part.provider().toByteArray())
-                                        if (decryptedBytes != null) {
-                                            requestStr = decryptedBytes.decodeToString()
-                                        }
-                                        if (requestStr.isEmpty()) {
-                                            throw IllegalStateException("Unauthorized")
-                                        }
-
-                                        info = jsonDecode<UploadInfo>(requestStr)
-                                    }
-
-                                    "file" -> {
-                                        // Strip any path components from the filename to prevent
-                                        // directory traversal and duplicate-folder bugs (some browsers
-                                        // include webkitRelativePath in the Content-Disposition filename).
-                                        fileName = File(part.originalFileName as String).name
-                                        if (info.isAppFile) {
-                                            // Import into content-addressable chat file store for deduplication
-                                            val tempFile = File(MainApp.instance.cacheDir, "chat_upload_${System.currentTimeMillis()}_${Thread.currentThread().id}")
-                                            tempFile.parentFile?.mkdirs()
-                                            FileOutputStream(tempFile).use { fos ->
-                                                part.provider().copyTo(fos)
-                                                fos.fd.sync()
-                                            }
-                                            if (info.size > 0 && tempFile.length() != info.size) {
-                                                val actual = tempFile.length()
-                                                tempFile.delete()
-                                                throw IOException("Size mismatch: expected ${info.size}, got $actual")
-                                            }
-                                            val dFile = AppFileStore.importFile(MainApp.instance, tempFile, part.contentType?.toString() ?: "", deleteSrc = true)
-                                            fileName = dFile.id // SHA-256 hash — client forms fid:{hash}
-                                        } else {
-                                            if (info.dir.isEmpty() || fileName.isEmpty()) {
-                                                throw IllegalArgumentException("dir or fileName is empty")
-                                            }
-                                            var destFile = File("${info.dir}/$fileName")
-                                            if (destFile.exists()) {
-                                                if (info.replace) {
-                                                    destFile.delete()
-                                                } else {
-                                                    destFile = destFile.newFile()
-                                                    fileName = destFile.name
-                                                }
-                                            }
-                                            LogCat.d("Upload: ${info.dir}, ${destFile.absolutePath}")
-                                            destFile.parentFile?.mkdirs()
-
-                                            // Write to a temp file first, then rename atomically.
-                                            // This prevents the file from appearing in listings with a partial size.
-                                            val tempFile = File(destFile.parentFile, ".upload_tmp_${System.currentTimeMillis()}_${Thread.currentThread().id}")
-                                            try {
-                                                FileOutputStream(tempFile).use { fos ->
-                                                    part.provider().copyTo(fos)
-                                                    fos.fd.sync()
-                                                }
-                                                if (info.size > 0 && tempFile.length() != info.size) {
-                                                    val actual = tempFile.length()
-                                                    tempFile.delete()
-                                                    throw IOException("Size mismatch: expected ${info.size}, got $actual")
-                                                }
-                                                if (!tempFile.renameTo(destFile)) {
-                                                    tempFile.copyTo(destFile, overwrite = true)
-                                                    tempFile.delete()
-                                                }
-                                            } catch (e: Exception) {
-                                                tempFile.delete()
-                                                throw e
-                                            }
-                                            MainApp.instance.scanFileByConnection(destFile, null)
-                                        }
-                                    }
-
-                                    else -> {}
-                                }
-                            }
-
-                            else -> {
-                            }
-                        }
-                        part.dispose()
-                    }
-                    call.respond(HttpStatusCode.Created, fileName)
-                } catch (ex: IllegalStateException) {
-                    call.respond(HttpStatusCode.Unauthorized)
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                    call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
-                }
-            }
-
-            post("/upload_chunk") {
-                val clientId = call.request.header("c-id") ?: ""
-                if (clientId.isEmpty()) {
-                    call.respond(HttpStatusCode.BadRequest, "c-id header is missing")
-                    return@post
-                }
-
-                val token = HttpServerManager.tokenCache[clientId]
-                if (token == null) {
-                    call.respond(HttpStatusCode.Unauthorized)
-                    return@post
-                }
-
-                try {
-                    lateinit var chunkInfo: UploadChunkInfo
-                    var savedSize = 0L
-
-                    call.receiveMultipart(formFieldLimit = Long.MAX_VALUE).forEachPart { part ->
-                        when (part) {
-                            is PartData.FileItem -> {
-                                when (part.name) {
-                                    "info" -> {
-                                        var requestStr = ""
-                                        val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, part.provider().toByteArray())
-                                        if (decryptedBytes != null) {
-                                            requestStr = decryptedBytes.decodeToString()
-                                        }
-                                        if (requestStr.isEmpty()) {
-                                            throw IllegalStateException("Unauthorized")
-                                        }
-
-                                        chunkInfo = jsonDecode<UploadChunkInfo>(requestStr)
-                                    }
-
-                                    "file" -> {
-                                        if (chunkInfo.fileId.isEmpty() || chunkInfo.index < 0) {
-                                            throw IllegalArgumentException("fileId or index is missing or invalid")
-                                        }
-
-                                        // Create directory in cache dir using file_id as directory name
-                                        val chunkDir = File(MainApp.instance.filesDir, "upload_tmp/${chunkInfo.fileId}")
-                                        chunkDir.mkdirs()
-
-                                        // Stream chunk directly to disk — never load the entire 5 MB
-                                        // chunk as a byte array.  With 3 parallel workers, toByteArray()
-                                        // caused ~30 MB of simultaneous heap allocations which triggered
-                                        // OOM kills on Huawei/EMUI devices mid-transfer.
-                                        val chunkFile = File(chunkDir, "chunk_${chunkInfo.index}")
-                                        val tempFile = File(chunkDir, ".tmp_chunk_${chunkInfo.index}_${System.nanoTime()}")
-                                        try {
-                                            FileOutputStream(tempFile).use { fos ->
-                                                part.provider().copyTo(fos)
-                                                fos.fd.sync()
-                                                savedSize = fos.channel.position()
-                                            }
-
-                                            // Verify received size matches expected
-                                            if (chunkInfo.size > 0 && savedSize != chunkInfo.size) {
-                                                tempFile.delete()
-                                                throw IOException("Chunk ${chunkInfo.index} size mismatch: expected ${chunkInfo.size}, received $savedSize")
-                                            }
-
-                                            // Atomic rename to final chunk file
-                                            if (chunkFile.exists()) chunkFile.delete()
-                                            if (!tempFile.renameTo(chunkFile)) {
-                                                // renameTo can move the file but still return false
-                                                // on some Android file systems. Only use copyTo
-                                                // fallback when the source file still exists.
-                                                if (tempFile.exists()) {
-                                                    tempFile.copyTo(chunkFile, overwrite = true)
-                                                    tempFile.delete()
-                                                } else if (!chunkFile.exists()) {
-                                                    throw IOException("Failed to save chunk ${chunkInfo.index}: rename failed and source file is missing")
-                                                }
-                                            }
-
-                                            // Post-rename verification: ensure the final chunk
-                                            // file has the correct size.
-                                            val finalSize = chunkFile.length()
-                                            if (chunkInfo.size > 0 && finalSize != chunkInfo.size) {
-                                                chunkFile.delete()
-                                                throw IOException("Chunk ${chunkInfo.index} final size mismatch: expected ${chunkInfo.size}, saved $finalSize")
-                                            }
-                                        } catch (e: Exception) {
-                                            tempFile.delete()
-                                            throw e
-                                        }
-                                    }
-
-                                    else -> {}
-                                }
-                            }
-
-                            else -> {}
-                        }
-                        part.dispose()
-                    }
-
-                    if (savedSize > 0) {
-                        call.respond(HttpStatusCode.Created, "${chunkInfo.index}:$savedSize")
-                    } else {
-                        call.respond(HttpStatusCode.BadRequest, "chunk upload failed")
-                    }
-                } catch (ex: IllegalStateException) {
-                    call.respond(HttpStatusCode.Unauthorized)
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                    call.respond(HttpStatusCode.BadRequest, ex.message ?: "")
-                }
-            }
+            addDLNA()
+            addZip()
+            addFiles()
+            addUploads()
 
             // this api is to fix the websocket takes 10s to get remoteAddress on some phones.
             post("/init") {
@@ -909,104 +195,7 @@ object HttpModule {
                 }
             }
 
-            // SPA fallback: serves injected index.html for SPA routes; real static files are served directly from classpath
-            get("{path...}") {
-                val path = call.parameters.getAll("path")?.joinToString("/") ?: ""
-                if (path.contains('.')) {
-                    // Has a file extension — try to serve from classpath first
-                    val stream = this::class.java.classLoader?.getResourceAsStream("web/$path")
-                    if (stream != null) {
-                        val bytes = stream.use { it.readBytes() }
-                        call.respondBytes(bytes, path.getContentType())
-                    } else {
-                        call.respond(HttpStatusCode.NotFound)
-                    }
-                    return@get
-                }
-                val html = this::class.java.classLoader?.getResourceAsStream("web/index.html")
-                    ?.bufferedReader()?.readText() ?: ""
-                val injected = html.replace("<head>", "<head><script>window.__SERVER_TIME__=${System.currentTimeMillis()}</script>")
-                call.respondText(injected, ContentType.Text.Html)
-            }
-
-            webSocket("/") {
-                val q = call.request.queryParameters
-                if (q["test"] == "1") {
-                    close(CloseReason(CloseReason.Codes.NORMAL, BuildConfig.APPLICATION_ID))
-                    return@webSocket
-                }
-                val clientId = q["cid"] ?: ""
-                if (clientId.isEmpty()) {
-                    LogCat.e("ws: `cid` is missing")
-                    close(CloseReason(CloseReason.Codes.VIOLATED_POLICY, "`cid` is missing"))
-                    return@webSocket
-                }
-
-                val session = WebSocketSession(System.currentTimeMillis(), clientId, this)
-                try {
-                    for (frame in incoming) {
-                        when (frame) {
-                            is Frame.Binary -> {
-                                if (q["auth"] == "1") {
-                                    val clientIp = HttpServerManager.getClientIpForLogin(clientId, call.request.origin.remoteAddress)
-                                    val rateLimitKey = clientIp.ifEmpty { "cid:$clientId" }
-                                    if (!HttpServerManager.tryAcquireLoginAttempt(rateLimitKey)) {
-                                        LogCat.e("ws: too_many_login_attempts, key=$rateLimitKey")
-                                        close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "too_many_login_attempts"))
-                                        return@webSocket
-                                    }
-
-                                    var r: AuthRequest? = null
-                                    val hash = CryptoHelper.sha512(PasswordPreference.getAsync(MainApp.instance).toByteArray())
-                                    val token = HttpServerManager.hashToToken(hash)
-                                    val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, frame.readBytes())
-                                    if (decryptedBytes != null) {
-                                        r = jsonDecode<AuthRequest>(decryptedBytes.decodeToString())
-                                    }
-                                    if (r?.password == hash) {
-                                        val event = ConfirmToAcceptLoginEvent(this, clientId, r)
-                                        if (AuthTwoFactorPreference.getAsync(MainApp.instance)) {
-                                            send(CryptoHelper.chaCha20Encrypt(token, JsonHelper.jsonEncode(AuthResponse(AuthStatus.PENDING))))
-                                            sendEvent(event)
-                                        } else {
-                                            coIO {
-                                                HttpServerManager.respondTokenAsync(event, clientIp)
-                                            }
-                                        }
-                                    } else {
-                                        LogCat.e("ws: invalid_password")
-                                        close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "invalid_password"))
-                                    }
-                                } else {
-                                    val token = HttpServerManager.tokenCache[clientId]
-                                    if (token != null) {
-                                        val decryptedBytes = CryptoHelper.chaCha20Decrypt(token, frame.readBytes())
-                                        if (decryptedBytes != null) {
-                                            LogCat.d("ws: add session ${session.id}, ts: ${decryptedBytes.decodeToString()}")
-                                            HttpServerManager.wsSessions.add(session)
-                                            HttpServerManager.wsSessionCount.value = HttpServerManager.wsSessions.distinctBy { it.clientId }.size
-                                        } else {
-                                            LogCat.d("ws: invalid_request")
-                                            close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "invalid_request"))
-                                        }
-                                    } else {
-                                        LogCat.d("ws: invalid_request")
-                                        close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "invalid_request"))
-                                    }
-                                }
-                            }
-
-                            else -> {}
-                        }
-                    }
-                } catch (ex: Exception) {
-                    LogCat.e("ws: $ex")
-                } finally {
-                    LogCat.d("ws: remove session ${session.id}")
-                    HttpServerManager.wsSessions.removeIf { it.id == session.id }
-                    HttpServerManager.wsSessionCount.value = HttpServerManager.wsSessions.distinctBy { it.clientId }.size
-                }
-            }
+            addWebSocket()
         }
         install(MainGraphQL) {
             init()

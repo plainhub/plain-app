@@ -2,6 +2,7 @@ package com.ismartcoding.plain.features
 
 import android.content.Context
 import android.os.Environment
+import com.ismartcoding.lib.extensions.appDir
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.LogCat
@@ -267,7 +268,7 @@ object BookmarkHelper {
         try {
             if (path.startsWith("app://")) {
                 val rel = path.removePrefix("app://")
-                val dir = context.getExternalFilesDir(null) ?: return
+                val dir = File(context.appDir())
                 File(dir.parent ?: return, rel).delete()
             }
         } catch (e: Exception) {

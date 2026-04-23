@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
-import com.apurebase.kgraphql.schema.execution.Executor
+import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.lib.kgraphql.schema.execution.Executor
 import com.ismartcoding.lib.extensions.cut
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.plain.enums.DataType

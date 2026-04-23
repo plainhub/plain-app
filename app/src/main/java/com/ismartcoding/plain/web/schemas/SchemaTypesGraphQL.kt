@@ -1,6 +1,6 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.enums.ScreenMirrorControlAction
@@ -20,7 +20,6 @@ fun SchemaBuilder.addSchemaTypes() {
     enum<PomodoroState>()
     enum<ScreenMirrorMode>()
     enum<ScreenMirrorControlAction>()
-    type<DocExtGroup>()
     stringScalar<Instant> {
         deserialize = { value: String -> Instant.parse(value) }
         serialize = Instant::toString

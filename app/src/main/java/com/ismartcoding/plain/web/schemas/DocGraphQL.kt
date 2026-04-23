@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
-import com.apurebase.kgraphql.schema.execution.Executor
+import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.lib.kgraphql.schema.execution.Executor
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.file.FileSortBy
@@ -10,6 +10,8 @@ import com.ismartcoding.plain.web.models.DocExtGroup
 import com.ismartcoding.plain.web.models.toDocModel
 
 fun SchemaBuilder.addDocQueries() {
+    type<DocExtGroup>()
+
     query("docs") {
         configure {
             executor = Executor.DataLoaderPrepared

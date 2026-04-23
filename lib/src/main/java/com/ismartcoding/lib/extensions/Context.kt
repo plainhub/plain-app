@@ -100,5 +100,5 @@ fun Context.isTV(): Boolean {
 }
 
 fun Context.appDir(): String {
-    return getExternalFilesDir(null)?.path?.removeSuffix("/") ?: ""
+    return getExternalFilesDir(null)?.absolutePath ?: filesDir.absolutePath
 }

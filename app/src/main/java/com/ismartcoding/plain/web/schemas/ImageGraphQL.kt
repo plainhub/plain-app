@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
-import com.apurebase.kgraphql.schema.execution.Executor
+import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.lib.kgraphql.schema.execution.Executor
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.SearchHelper
 import com.ismartcoding.plain.MainApp

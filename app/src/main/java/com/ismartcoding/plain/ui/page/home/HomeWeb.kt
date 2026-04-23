@@ -23,7 +23,7 @@ import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.launch
 
-private enum class WebState { ENTRY, LOADING, ERROR, SUCCESS }
+enum class WebState { OFF, ERROR, ON }
 
 @Composable
 fun HomeWeb(
@@ -50,12 +50,14 @@ fun HomeWeb(
         scope.launch {
             withIO {
                 if (HttpServerManager.portsInUse.contains(TempData.httpPort)) {
-                    val nextHttp = HttpServerManager.httpPorts.filter { it != TempData.httpPort }.random()
+                    val nextHttp =
+                        HttpServerManager.httpPorts.filter { it != TempData.httpPort }.random()
                     HttpPortPreference.putAsync(context, nextHttp)
                     TempData.httpPort = nextHttp
                 }
                 if (HttpServerManager.portsInUse.contains(TempData.httpsPort)) {
-                    val nextHttps = HttpServerManager.httpsPorts.filter { it != TempData.httpsPort }.random()
+                    val nextHttps =
+                        HttpServerManager.httpsPorts.filter { it != TempData.httpsPort }.random()
                     HttpsPortPreference.putAsync(context, nextHttps)
                     TempData.httpsPort = nextHttps
                 }
@@ -65,55 +67,33 @@ fun HomeWeb(
     }
 
     val webState = when {
-        showSuccess -> WebState.SUCCESS
-        showLoading -> WebState.LOADING
+        showSuccess -> WebState.ON
         showError -> WebState.ERROR
-        else -> WebState.ENTRY
+        else -> WebState.OFF
     }
 
     AnimatedContent(
         targetState = webState,
         transitionSpec = {
             fadeIn(tween(300)) togetherWith fadeOut(tween(200)) using
-                SizeTransform(clip = false, sizeAnimationSpec = { _, _ -> tween(300) })
+                    SizeTransform(clip = false, sizeAnimationSpec = { _, _ -> tween(300) })
         },
         label = "web_state",
     ) { target ->
-        when (target) {
-            WebState.ENTRY -> {
-                HomeWebEntrySection(
-                    onRun = {
-                        if (!webEnabled && !state.isProcessing()) {
-                            mainVM.enableHttpServer(context, true)
-                        }
-                    },
-                )
-            }
-
-            WebState.LOADING -> {
-                HomeWebEntrySection(
-                    onRun = {},
-                    isLoading = true,
-                )
-            }
-
-            WebState.ERROR -> {
-                HomeWebErrorSection(
-                    context = context,
-                    navController,
-                    errorMessage = errorMessage,
-                    onRestartFix = onRestartFix,
-                )
-            }
-
-            WebState.SUCCESS -> {
-                HomeWebSuccessSection(
-                    context = context,
-                    navController = navController,
-                    mainVM = mainVM,
-                )
-            }
-        }
+        HomeWebMainSection(
+            context = context,
+            navController = navController,
+            mainVM = mainVM,
+            webState = target,
+            isLoading = showLoading,
+            onRun = {
+                if (!webEnabled && !state.isProcessing()) {
+                    mainVM.enableHttpServer(context, true)
+                }
+            },
+            errorMessage = errorMessage,
+            onRestartFix = onRestartFix,
+        )
     }
 }
 

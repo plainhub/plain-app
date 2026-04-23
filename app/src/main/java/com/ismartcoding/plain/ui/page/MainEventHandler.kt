@@ -108,6 +108,18 @@ fun MainEventCollector(
                     }
                 }
 
+                is HttpApiEvents.MessageUpdatedEvent -> {
+                    scope.launch(Dispatchers.IO) {
+                        val chat = AppDatabase.instance.chatDao().getById(event.id)
+                        if (chat != null) {
+                            chatVM.update(chat)
+                            val m = chat.toModel()
+                            m.data = m.getContentData()
+                            sendEvent(WebSocketEvent(EventType.MESSAGE_UPDATED, JsonHelper.jsonEncode(listOf(m))))
+                        }
+                    }
+                }
+
                 is ChannelUpdatedEvent -> peerVM.loadPeers()
                 else -> {}
             }

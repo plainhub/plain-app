@@ -6,6 +6,7 @@ import android.os.Environment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.extensions.appDir
 import com.ismartcoding.lib.extensions.queryOpenableFileName
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
@@ -98,7 +99,7 @@ class BackupRestoreViewModel : ViewModel() {
                         if (it.exists()) it.copyRecursively(context.filesDir, true)
                     }
                     File(destFile.path + "/external/files").let {
-                        if (it.exists()) it.copyRecursively(context.getExternalFilesDir(null)!!, true)
+                        if (it.exists()) it.copyRecursively(File(context.appDir()), true)
                     }
                     destFile.deleteRecursively()
                 }
@@ -118,7 +119,7 @@ class BackupRestoreViewModel : ViewModel() {
         val items = listOf(
             ExportItem("/", File(context.dataDir.path + "/databases")),
             ExportItem("/", context.filesDir),
-            ExportItem("/external/", context.getExternalFilesDir(null)!!),
+            ExportItem("/external/", File(context.appDir())),
         )
         for (item in items) {
             appendFile(out, item.dir, item.file)

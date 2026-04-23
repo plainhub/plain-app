@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.web.schemas
 
 import android.webkit.MimeTypeMap
-import com.apurebase.kgraphql.GraphQLError
-import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
-import com.apurebase.kgraphql.schema.execution.Executor
+import com.ismartcoding.lib.kgraphql.GraphQLError
+import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.lib.kgraphql.schema.execution.Executor
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.plain.DPendingMms
 import com.ismartcoding.plain.MainApp

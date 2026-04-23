@@ -1,9 +1,9 @@
 package com.ismartcoding.plain.web.schemas
 
-import com.apurebase.kgraphql.schema.dsl.SchemaBuilder
-import com.apurebase.kgraphql.schema.execution.Executor
-import com.apurebase.kgraphql.schema.execution.Execution
-import com.apurebase.kgraphql.helpers.getFields
+import com.ismartcoding.lib.kgraphql.schema.dsl.SchemaBuilder
+import com.ismartcoding.lib.kgraphql.schema.execution.Executor
+import com.ismartcoding.lib.kgraphql.schema.execution.Execution
+import com.ismartcoding.lib.kgraphql.helpers.getFields
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.enums.DataType

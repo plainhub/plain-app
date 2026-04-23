@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.Channel
+import com.ismartcoding.lib.extensions.appDir
 import com.ismartcoding.lib.extensions.queryOpenableFile
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.R
@@ -46,7 +47,7 @@ fun PomodoroSettingsDialog(
                         val file = context.contentResolver.queryOpenableFile(event.uris.first())
                         if (file != null) {
                             originalFileName = file.displayName
-                            val audioDir = File(context.getExternalFilesDir(null), "audio")
+                            val audioDir = File(context.appDir(), "audio")
                             if (!audioDir.exists()) audioDir.mkdirs()
                             val dstFile = File(audioDir, "pomodoro_sound.mp3")
                             FileHelper.copyFile(context, event.uris.first(), dstFile.absolutePath)
