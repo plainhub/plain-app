@@ -16,6 +16,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.extensions.sorted
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.QueryHelper
+import com.ismartcoding.plain.helpers.RootHelper
 import com.ismartcoding.plain.storageManager
 import com.ismartcoding.plain.storageStatsManager
 import kotlin.time.Instant
@@ -216,15 +217,21 @@ object FileSystemHelper {
         sortBy: FileSortBy,
     ): List<DFile> {
         val pathFile = File(dir)
+        if (!pathFile.isDirectory) return emptyList()
+
+        val listFiles = pathFile.listFiles()
+        // listFiles() returns null when permission is denied (e.g. Android/data on Android 11+).
+        // On rooted devices, fall back to a root shell listing.
+        if (listFiles == null && RootHelper.isRooted()) {
+            return RootHelper.listFiles(dir, showHidden).sorted(sortBy)
+        }
+
         val files = ArrayList<DFile>()
-        if (pathFile.exists() && pathFile.isDirectory) {
-            val listFiles = pathFile.listFiles()
-            listFiles?.forEach { file ->
-                if (!showHidden && file.isHidden) {
-                    return@forEach
-                }
-                files.add(convertFile(file, showHidden))
+        listFiles?.forEach { file ->
+            if (!showHidden && file.isHidden) {
+                return@forEach
             }
+            files.add(convertFile(file, showHidden))
         }
 
         return files.sorted(sortBy)

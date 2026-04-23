@@ -78,4 +78,9 @@
     <string name="revoke_session">Thu hồi phiên này</string>
     <string name="how_to_use">Cách sử dụng</string>
     <string name="developer_options">Tùy chọn dành cho nhà phát triển</string>
+    <string name="adb_automation">Tự động hóa ADB</string>
+    <string name="adb_token_desc">Sử dụng mã thông báo này với các lệnh ADB để điều khiển PlainApp theo chương trình. Truyền vào dưới dạng --es token &lt;value&gt;.</string>
+    <string name="adb_cmd_start">Khởi động máy chủ HTTP</string>
+    <string name="adb_cmd_stop">Dừng máy chủ HTTP</string>
+    <string name="enable_adb_token">Bật mã thông báo ADB</string>
 </resources>

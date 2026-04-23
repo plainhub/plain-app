@@ -13,6 +13,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,19 +22,24 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.channel.sendEvent
+import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.data.Version
 import com.ismartcoding.plain.data.toVersion
 import com.ismartcoding.plain.events.CancelUpdateDownloadEvent
+import com.ismartcoding.plain.events.DownloadUpdateEvent
 import com.ismartcoding.plain.features.PackageHelper
+import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.preferences.LocalNewVersion
 import com.ismartcoding.plain.preferences.LocalSkipVersion
 import com.ismartcoding.plain.ui.base.PBanner
-import com.ismartcoding.plain.ui.base.POutlinedButton
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.UpdateViewModel
-import com.ismartcoding.plain.BuildConfig
-import com.ismartcoding.plain.data.Version
 import java.io.File
+import kotlin.system.exitProcess
+import kotlinx.coroutines.launch
 
 private const val GITHUB_RELEASES_URL = "https://github.com/plainhub/plain-app/releases/latest"
 
@@ -47,8 +54,22 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
     val isDownloadComplete = updateVM.isDownloadComplete.value
     val downloadedFilePath = updateVM.downloadedFilePath.value
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     val needsUpdate = newVersion.whetherNeedUpdate(currentVersion, skipVersion)
+
+    LaunchedEffect(Unit) {
+        val path = withIO { UpdateInfoPreference.getValueAsync(context).downloadedApkPath }
+        if (path.isNotEmpty()) {
+            if (File(path).exists() && newVersion.whetherNeedUpdate(currentVersion, skipVersion)
+                && !updateVM.isDownloading.value && !updateVM.isDownloadComplete.value
+            ) {
+                updateVM.onDownloadComplete(path)
+            } else {
+                withIO { UpdateInfoPreference.updateAsync(context) { it.copy(downloadedApkPath = "") } }
+            }
+        }
+    }
 
     when {
         isDownloading -> DownloadProgressBanner(
@@ -62,14 +83,21 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
 
         isDownloadComplete -> DownloadCompleteBanner(
             onInstall = {
-                updateVM.resetDownload()
                 PackageHelper.install(context, File(downloadedFilePath))
+                exitProcess(0)
             },
-            onDismiss = { updateVM.resetDownload() },
+            onDismiss = {
+                scope.launch { withIO { UpdateInfoPreference.updateAsync(context) { it.copy(downloadedApkPath = "") } } }
+                updateVM.resetDownload()
+            },
         )
 
         downloadFailed -> DownloadFailedBanner(
             onGitHub = { WebHelper.open(context, GITHUB_RELEASES_URL) },
+            onRetry = {
+                updateVM.startDownload()
+                sendEvent(DownloadUpdateEvent())
+            },
             onDismiss = { updateVM.resetDownload() },
         )
 
@@ -135,7 +163,7 @@ private fun DownloadCompleteBanner(
         title = stringResource(R.string.update_downloaded),
         icon = R.drawable.lightbulb,
         action = {
-            POutlinedButton(
+            PFilledButton(
                 text = stringResource(R.string.install_update),
                 small = true,
                 onClick = onInstall,
@@ -148,6 +176,7 @@ private fun DownloadCompleteBanner(
 @Composable
 private fun DownloadFailedBanner(
     onGitHub: () -> Unit,
+    onRetry: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     PBanner(
@@ -156,11 +185,18 @@ private fun DownloadFailedBanner(
         contentColor = MaterialTheme.colorScheme.onErrorContainer,
         icon = R.drawable.lightbulb,
         action = {
-            POutlinedButton(
-                text = stringResource(R.string.download_on_github),
-                small = true,
-                onClick = onGitHub,
-            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                PFilledButton(
+                    text = stringResource(R.string.try_again),
+                    small = true,
+                    onClick = onRetry,
+                )
+                PFilledButton(
+                    text = stringResource(R.string.download_on_github),
+                    small = true,
+                    onClick = onGitHub,
+                )
+            }
         },
         onClick = onDismiss,
     )

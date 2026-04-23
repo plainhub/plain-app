@@ -78,4 +78,9 @@
     <string name="revoke_session">இந்த அமர்வை திரும்பப் பெறு</string>
     <string name="how_to_use">எப்படி பயன்படுத்துவது</string>
     <string name="developer_options">டெவலப்பர் விருப்பங்கள்</string>
+    <string name="adb_automation">ADB தானியக்கம்</string>
+    <string name="adb_token_desc">PlainApp-ஐ நிரலாக்க முறையில் கட்டுப்படுத்த ADB ஒளிபரப்புகளுடன் இந்த டோக்கனைப் பயன்படுத்தவும். இதை --es token &lt;value&gt; என கடந்து செல்லுங்கள்.</string>
+    <string name="adb_cmd_start">HTTP சேவையகத்தை தொடங்கு</string>
+    <string name="adb_cmd_stop">HTTP சேவையகத்தை நிறுத்து</string>
+    <string name="enable_adb_token">ADB டோக்கன் இயக்கு</string>
 </resources>

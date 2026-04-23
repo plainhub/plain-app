@@ -23,6 +23,7 @@ import com.ismartcoding.plain.data.NotificationFilterData
 import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.data.DFavoriteFolder
 import com.ismartcoding.plain.data.FilePathData
+import com.ismartcoding.plain.data.DUpdateInfo
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.Language
@@ -91,44 +92,29 @@ object AdbTokenPreference : BasePreference<String>() {
     }
 }
 
-object NewVersionPreference : BasePreference<String>() {
+object UpdateInfoPreference : BasePreference<String>() {
     override val default = ""
-    override val key = stringPreferencesKey("new_version")
-}
+    override val key = stringPreferencesKey("update_info")
 
-object CheckUpdateTimePreference : BasePreference<Long>() {
-    override val default = 0L
-    override val key = longPreferencesKey("check_update_time")
-}
+    fun getValue(preferences: Preferences): DUpdateInfo {
+        val str = get(preferences)
+        if (str.isEmpty()) return DUpdateInfo()
+        return try { jsonDecode(str) } catch (_: Exception) { DUpdateInfo() }
+    }
 
-object SkipVersionPreference : BasePreference<String>() {
-    override val default = ""
-    override val key = stringPreferencesKey("skip_version")
-}
+    suspend fun getValueAsync(context: Context): DUpdateInfo {
+        val str = getAsync(context)
+        if (str.isEmpty()) return DUpdateInfo()
+        return try { jsonDecode(str) } catch (_: Exception) { DUpdateInfo() }
+    }
 
-object NewVersionPublishDatePreference : BasePreference<String>() {
-    override val default = ""
-    override val key = stringPreferencesKey("new_version_publish_date")
-}
+    suspend fun putAsync(context: Context, value: DUpdateInfo) {
+        putAsync(context, jsonEncode(value))
+    }
 
-object NewVersionLogPreference : BasePreference<String>() {
-    override val default = ""
-    override val key = stringPreferencesKey("new_version_log")
-}
-
-object NewVersionDownloadUrlPreference : BasePreference<String>() {
-    override val default = ""
-    override val key = stringPreferencesKey("new_version_download_url")
-}
-
-object NewVersionSizePreference : BasePreference<Long>() {
-    override val default = 0L
-    override val key = longPreferencesKey("new_version_size")
-}
-
-object AutoCheckUpdatePreference : BasePreference<Boolean>() {
-    override val default = true
-    override val key = booleanPreferencesKey("auto_check_update")
+    suspend fun updateAsync(context: Context, block: (DUpdateInfo) -> DUpdateInfo) {
+        putAsync(context, block(getValueAsync(context)))
+    }
 }
 
 object UrlTokenPreference : BasePreference<String>() {

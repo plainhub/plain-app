@@ -5,6 +5,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import com.ismartcoding.plain.data.DUpdateInfo
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import kotlinx.coroutines.flow.map
 import java.util.Locale
@@ -18,13 +19,7 @@ data class Settings(
     val web: Boolean,
     val keepScreenOn: Boolean,
     val systemScreenTimeout: Int,
-    val newVersion: String,
-    val skipVersion: String,
-    val newVersionPublishDate: String,
-    val newVersionLog: String,
-    val newVersionSize: Long,
-    val newVersionDownloadUrl: String,
-    val autoCheckUpdate: Boolean,
+    val updateInfo: DUpdateInfo,
 )
 
 val LocalThemeIndex = compositionLocalOf { ThemeIndexPreference.default }
@@ -35,62 +30,45 @@ val LocalLocale = compositionLocalOf<Locale?> { null }
 val LocalWeb = compositionLocalOf { WebPreference.default }
 val LocalKeepScreenOn = compositionLocalOf { KeepScreenOnPreference.default }
 val LocalSystemScreenTimeout = compositionLocalOf { SystemScreenTimeoutPreference.default }
+val LocalUpdateInfo = compositionLocalOf { DUpdateInfo() }
 
-// Version
-val LocalNewVersion = compositionLocalOf { NewVersionPreference.default }
-val LocalSkipVersion = compositionLocalOf { SkipVersionPreference.default }
-val LocalNewVersionPublishDate = compositionLocalOf { NewVersionPublishDatePreference.default }
-val LocalNewVersionLog = compositionLocalOf { NewVersionLogPreference.default }
-val LocalNewVersionSize = compositionLocalOf { NewVersionSizePreference.default }
-val LocalNewVersionDownloadUrl = compositionLocalOf { NewVersionDownloadUrlPreference.default }
-val LocalAutoCheckUpdate = compositionLocalOf { AutoCheckUpdatePreference.default }
-
+// Convenience accessors for individual update fields
+val LocalNewVersion = compositionLocalOf { "" }
+val LocalSkipVersion = compositionLocalOf { "" }
+val LocalNewVersionPublishDate = compositionLocalOf { "" }
+val LocalNewVersionLog = compositionLocalOf { "" }
+val LocalNewVersionSize = compositionLocalOf { 0L }
+val LocalAutoCheckUpdate = compositionLocalOf { true }
 
 @Composable
 fun SettingsProvider(content: @Composable () -> Unit) {
     val context = LocalContext.current
-    val defaultSettings =
-        Settings(
-            themeIndex = ThemeIndexPreference.default,
-            customPrimaryColor = CustomPrimaryColorPreference.default,
-            darkTheme = DarkThemePreference.default,
-            amoledDarkTheme = AmoledDarkThemePreference.default,
-            locale = null,
-            web = WebPreference.default,
-            keepScreenOn = KeepScreenOnPreference.default,
-            systemScreenTimeout = SystemScreenTimeoutPreference.default,
-            newVersion = NewVersionPreference.default,
-            skipVersion = SkipVersionPreference.default,
-            newVersionPublishDate = NewVersionPublishDatePreference.default,
-            newVersionLog = NewVersionLogPreference.default,
-            newVersionSize = NewVersionSizePreference.default,
-            newVersionDownloadUrl = NewVersionDownloadUrlPreference.default,
-            autoCheckUpdate = AutoCheckUpdatePreference.default,
-        )
-    val settings =
-        remember {
-            context.dataStore.dataFlow.map {
-                Settings(
-                    themeIndex = ThemeIndexPreference.get(it),
-                    customPrimaryColor = CustomPrimaryColorPreference.get(it),
-                    darkTheme = DarkThemePreference.get(it),
-                    amoledDarkTheme = AmoledDarkThemePreference.get(it),
-                    locale = LanguagePreference.getLocale(it),
-                    web = WebPreference.get(it),
-                    keepScreenOn = KeepScreenOnPreference.get(it),
-                    systemScreenTimeout = SystemScreenTimeoutPreference.get(it),
-                      newVersion = NewVersionPreference.get(it),
-                    skipVersion = SkipVersionPreference.get(it),
-                    newVersionPublishDate = NewVersionPublishDatePreference.get(it),
-                    newVersionLog = NewVersionLogPreference.get(it),
-                    newVersionSize = NewVersionSizePreference.get(it),
-                    newVersionDownloadUrl = NewVersionDownloadUrlPreference.get(it),
-                    autoCheckUpdate = AutoCheckUpdatePreference.get(it),
-                )
-            }
-        }.collectAsStateValue(
-            initial = defaultSettings,
-        )
+    val defaultSettings = Settings(
+        themeIndex = ThemeIndexPreference.default,
+        customPrimaryColor = CustomPrimaryColorPreference.default,
+        darkTheme = DarkThemePreference.default,
+        amoledDarkTheme = AmoledDarkThemePreference.default,
+        locale = null,
+        web = WebPreference.default,
+        keepScreenOn = KeepScreenOnPreference.default,
+        systemScreenTimeout = SystemScreenTimeoutPreference.default,
+        updateInfo = DUpdateInfo(),
+    )
+    val settings = remember {
+        context.dataStore.dataFlow.map {
+            Settings(
+                themeIndex = ThemeIndexPreference.get(it),
+                customPrimaryColor = CustomPrimaryColorPreference.get(it),
+                darkTheme = DarkThemePreference.get(it),
+                amoledDarkTheme = AmoledDarkThemePreference.get(it),
+                locale = LanguagePreference.getLocale(it),
+                web = WebPreference.get(it),
+                keepScreenOn = KeepScreenOnPreference.get(it),
+                systemScreenTimeout = SystemScreenTimeoutPreference.get(it),
+                updateInfo = UpdateInfoPreference.getValue(it),
+            )
+        }
+    }.collectAsStateValue(initial = defaultSettings)
 
     CompositionLocalProvider(
         LocalThemeIndex provides settings.themeIndex,
@@ -101,13 +79,13 @@ fun SettingsProvider(content: @Composable () -> Unit) {
         LocalWeb provides settings.web,
         LocalKeepScreenOn provides settings.keepScreenOn,
         LocalSystemScreenTimeout provides settings.systemScreenTimeout,
-        LocalNewVersion provides settings.newVersion,
-        LocalSkipVersion provides settings.skipVersion,
-        LocalNewVersionPublishDate provides settings.newVersionPublishDate,
-        LocalNewVersionLog provides settings.newVersionLog,
-        LocalNewVersionSize provides settings.newVersionSize,
-        LocalNewVersionDownloadUrl provides settings.newVersionDownloadUrl,
-        LocalAutoCheckUpdate provides settings.autoCheckUpdate,
+        LocalUpdateInfo provides settings.updateInfo,
+        LocalNewVersion provides settings.updateInfo.newVersion,
+        LocalSkipVersion provides settings.updateInfo.skipVersion,
+        LocalNewVersionPublishDate provides settings.updateInfo.publishDate,
+        LocalNewVersionLog provides settings.updateInfo.log,
+        LocalNewVersionSize provides settings.updateInfo.size,
+        LocalAutoCheckUpdate provides settings.updateInfo.autoCheckUpdate,
     ) {
         content()
     }

@@ -78,4 +78,9 @@
     <string name="revoke_session">撤销此会话</string>
     <string name="how_to_use">使用方法</string>
     <string name="developer_options">开发者选项</string>
+    <string name="adb_automation">ADB 自动化</string>
+    <string name="adb_token_desc">将此令牌与 ADB 广播配合使用，以编程方式控制 PlainApp。以 --es token &lt;value&gt; 形式传递。</string>
+    <string name="adb_cmd_start">启动 HTTP 服务器</string>
+    <string name="adb_cmd_stop">停止 HTTP 服务器</string>
+    <string name="enable_adb_token">启用 ADB 令牌</string>
 </resources>

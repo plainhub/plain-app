@@ -78,4 +78,9 @@
     <string name="revoke_session">このセッションを取り消す</string>
     <string name="how_to_use">使い方</string>
     <string name="developer_options">開発者オプション</string>
+    <string name="adb_automation">ADB 自動化</string>
+    <string name="adb_token_desc">このトークンを ADB ブロードキャストと組み合わせて、PlainApp をプログラムで制御します。--es token &lt;value&gt; の形式で渡してください。</string>
+    <string name="adb_cmd_start">HTTP サーバーを開始</string>
+    <string name="adb_cmd_stop">HTTP サーバーを停止</string>
+    <string name="enable_adb_token">ADB トークンを有効化</string>
 </resources>

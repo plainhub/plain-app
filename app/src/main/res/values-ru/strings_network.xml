@@ -78,4 +78,9 @@
     <string name="revoke_session">Отозвать этот сеанс</string>
     <string name="how_to_use">Как пользоваться</string>
     <string name="developer_options">Параметры разработчика</string>
+    <string name="adb_automation">ADB Автоматизация</string>
+    <string name="adb_token_desc">Используйте этот токен с ADB-трансляциями для программного управления PlainApp. Передайте его как --es token &lt;value&gt;.</string>
+    <string name="adb_cmd_start">Запустить HTTP-сервер</string>
+    <string name="adb_cmd_stop">Остановить HTTP-сервер</string>
+    <string name="enable_adb_token">Включить ADB-токен</string>
 </resources>

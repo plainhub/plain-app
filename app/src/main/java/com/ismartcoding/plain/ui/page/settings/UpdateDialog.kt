@@ -31,7 +31,7 @@ import com.ismartcoding.plain.preferences.LocalNewVersion
 import com.ismartcoding.plain.preferences.LocalNewVersionLog
 import com.ismartcoding.plain.preferences.LocalNewVersionPublishDate
 import com.ismartcoding.plain.preferences.LocalNewVersionSize
-import com.ismartcoding.plain.preferences.SkipVersionPreference
+import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import kotlinx.coroutines.launch
@@ -95,7 +95,7 @@ fun UpdateDialog(updateVM: UpdateViewModel) {
                 TextButton(
                     onClick = {
                         scope.launch {
-                            withIO { SkipVersionPreference.putAsync(context, newVersion.toString()) }
+                            withIO { UpdateInfoPreference.updateAsync(context) { it.copy(skipVersion = newVersion.toString()) } }
                             updateVM.hideDialog()
                         }
                     }

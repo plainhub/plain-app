@@ -78,4 +78,9 @@
     <string name="revoke_session">Diese Sitzung widerrufen</string>
     <string name="how_to_use">Verwendung</string>
     <string name="developer_options">Entwickleroptionen</string>
+    <string name="adb_automation">ADB-Automatisierung</string>
+    <string name="adb_token_desc">Verwende dieses Token mit ADB-Broadcasts, um PlainApp programmgesteuert zu steuern. Übergib es als --es token &lt;value&gt;.</string>
+    <string name="adb_cmd_start">HTTP-Server starten</string>
+    <string name="adb_cmd_stop">HTTP-Server stoppen</string>
+    <string name="enable_adb_token">ADB-Token aktivieren</string>
 </resources>

@@ -37,7 +37,7 @@ import com.ismartcoding.plain.features.feed.FeedWorkerStatus
 import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
 import com.ismartcoding.plain.chat.discover.NearbyPairManager
 import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.preferences.NewVersionDownloadUrlPreference
+import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.ui.models.FolderOption
 import com.ismartcoding.plain.web.AuthRequest
@@ -363,7 +363,7 @@ object AppEvents {
                         downloadJob?.cancel()
                         downloadJob = coIO {
                             val context = MainApp.instance
-                            val url = NewVersionDownloadUrlPreference.getAsync(context)
+                            val url = UpdateInfoPreference.getValueAsync(context).downloadUrl
                             if (url.isEmpty()) {
                                 sendEvent(UpdateDownloadFailedEvent())
                                 return@coIO
@@ -391,6 +391,7 @@ object AppEvents {
                                         }
                                     }
                                 }
+                                UpdateInfoPreference.updateAsync(context) { it.copy(downloadedApkPath = outputFile.absolutePath) }
                                 sendEvent(UpdateDownloadCompleteEvent(outputFile.absolutePath))
                             } catch (e: CancellationException) {
                                 call.cancel()
@@ -408,6 +409,7 @@ object AppEvents {
                     is CancelUpdateDownloadEvent -> {
                         downloadJob?.cancel()
                         downloadJob = null
+                        coIO { UpdateInfoPreference.updateAsync(MainApp.instance) { it.copy(downloadedApkPath = "") } }
                     }
                 }
             }

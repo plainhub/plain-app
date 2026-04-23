@@ -78,4 +78,9 @@
     <string name="revoke_session">इस सत्र को रद्द करें</string>
     <string name="how_to_use">उपयोग कैसे करें</string>
     <string name="developer_options">डेवलपर विकल्प</string>
+    <string name="adb_automation">ADB ऑटोमेशन</string>
+    <string name="adb_token_desc">PlainApp को प्रोग्रामेटिक रूप से नियंत्रित करने के लिए ADB ब्रॉडकास्ट के साथ इस टोकन का उपयोग करें। इसे --es token &lt;value&gt; के रूप में पास करें।</string>
+    <string name="adb_cmd_start">HTTP सर्वर शुरू करें</string>
+    <string name="adb_cmd_stop">HTTP सर्वर बंद करें</string>
+    <string name="enable_adb_token">ADB टोकन सक्षम करें</string>
 </resources>

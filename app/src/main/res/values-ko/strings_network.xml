@@ -78,4 +78,9 @@
     <string name="revoke_session">이 세션 취소</string>
     <string name="how_to_use">사용 방법</string>
     <string name="developer_options">개발자 옵션</string>
+    <string name="adb_automation">ADB 자동화</string>
+    <string name="adb_token_desc">이 토큰을 ADB 브로드캐스트와 함께 사용하여 PlainApp을 프로그래밍 방식으로 제어하세요. --es token &lt;value&gt; 형식으로 전달하세요.</string>
+    <string name="adb_cmd_start">HTTP 서버 시작</string>
+    <string name="adb_cmd_stop">HTTP 서버 중지</string>
+    <string name="enable_adb_token">ADB 토큰 사용</string>
 </resources>

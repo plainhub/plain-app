@@ -78,4 +78,9 @@
     <string name="revoke_session">Revocar esta sesión</string>
     <string name="how_to_use">Cómo usar</string>
     <string name="developer_options">Opciones de desarrollador</string>
+    <string name="adb_automation">Automatización ADB</string>
+    <string name="adb_token_desc">Usa este token con transmisiones ADB para controlar PlainApp mediante programación. Pásalo como --es token &lt;value&gt;.</string>
+    <string name="adb_cmd_start">Iniciar servidor HTTP</string>
+    <string name="adb_cmd_stop">Detener servidor HTTP</string>
+    <string name="enable_adb_token">Habilitar token ADB</string>
 </resources>

@@ -78,4 +78,9 @@
     <string name="revoke_session">Bu oturumu iptal et</string>
     <string name="how_to_use">Nasıl kullanılır</string>
     <string name="developer_options">Geliştirici seçenekleri</string>
+    <string name="adb_automation">ADB Otomasyonu</string>
+    <string name="adb_token_desc">PlainApp\'i programlı olarak kontrol etmek için bu jetonu ADB yayınlarıyla kullanın. --es token &lt;value&gt; olarak geçirin.</string>
+    <string name="adb_cmd_start">HTTP Sunucusunu Başlat</string>
+    <string name="adb_cmd_stop">HTTP Sunucusunu Durdur</string>
+    <string name="enable_adb_token">ADB jetonunu etkinleştir</string>
 </resources>

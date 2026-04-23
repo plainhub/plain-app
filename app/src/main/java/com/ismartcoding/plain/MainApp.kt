@@ -19,8 +19,7 @@ import com.ismartcoding.plain.events.StartNearbyServiceEvent
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.preferences.AdbTokenPreference
 import com.ismartcoding.plain.preferences.AudioPlayModePreference
-import com.ismartcoding.plain.preferences.AutoCheckUpdatePreference
-import com.ismartcoding.plain.preferences.CheckUpdateTimePreference
+import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.preferences.ClientIdPreference
 import com.ismartcoding.plain.preferences.DeviceNamePreference
 import com.ismartcoding.plain.preferences.DarkThemePreference
@@ -84,8 +83,9 @@ class MainApp : Application() {
             TempData.audioPlayMode = AudioPlayModePreference.getValue(preferences)
             AdbTokenPreference.ensureValueAsync(instance, preferences)
             TempData.nearbyDiscoverable = NearbyDiscoverablePreference.getAsync(instance)
-            val checkUpdateTime = CheckUpdateTimePreference.get(preferences)
-            val autoCheckUpdate = AutoCheckUpdatePreference.get(preferences)
+            val updateInfo = UpdateInfoPreference.getValueAsync(instance)
+            val checkUpdateTime = updateInfo.checkUpdateTime
+            val autoCheckUpdate = updateInfo.autoCheckUpdate
             ClientIdPreference.ensureValueAsync(instance, preferences)
             TempData.deviceName = DeviceNamePreference.get(preferences).ifEmpty { PhoneHelper.getDeviceName(instance) }
             KeyStorePasswordPreference.ensureValueAsync(instance, preferences)

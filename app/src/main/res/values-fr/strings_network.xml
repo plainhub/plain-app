@@ -78,4 +78,9 @@
     <string name="revoke_session">Révoquer cette session</string>
     <string name="how_to_use">Comment utiliser</string>
     <string name="developer_options">Options développeur</string>
+    <string name="adb_automation">Automatisation ADB</string>
+    <string name="adb_token_desc">Utilisez ce jeton avec les broadcasts ADB pour contrôler PlainApp par programmation. Passez-le sous la forme --es token &lt;value&gt;.</string>
+    <string name="adb_cmd_start">Démarrer le serveur HTTP</string>
+    <string name="adb_cmd_stop">Arrêter le serveur HTTP</string>
+    <string name="enable_adb_token">Activer le jeton ADB</string>
 </resources>

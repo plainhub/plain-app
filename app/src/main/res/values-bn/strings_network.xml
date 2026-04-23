@@ -76,4 +76,9 @@
     <string name="revoke_session">এই সেশন প্রত্যাহার করুন</string>
     <string name="how_to_use">ব্যবহারের নির্দেশনা</string>
     <string name="developer_options">ডেভেলপার বিকল্পসমূহ</string>
+    <string name="adb_automation">ADB অটোমেশন</string>
+    <string name="adb_token_desc">PlainApp প্রোগ্রামগতভাবে নিয়ন্ত্রণ করতে ADB ব্রডকাস্টের সাথে এই টোকেনটি ব্যবহার করুন। এটি --es token &lt;value&gt; হিসেবে পাস করুন।</string>
+    <string name="adb_cmd_start">HTTP সার্ভার শুরু করুন</string>
+    <string name="adb_cmd_stop">HTTP সার্ভার বন্ধ করুন</string>
+    <string name="enable_adb_token">ADB টোকেন সক্ষম করুন</string>
 </resources>

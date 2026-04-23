@@ -32,12 +32,11 @@ import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.AppLogHelper
 import com.ismartcoding.plain.helpers.UrlHelper
-import com.ismartcoding.plain.preferences.AutoCheckUpdatePreference
+import com.ismartcoding.plain.preferences.UpdateInfoPreference
 import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.preferences.LocalAutoCheckUpdate
 import com.ismartcoding.plain.preferences.LocalNewVersion
 import com.ismartcoding.plain.preferences.LocalSkipVersion
-import com.ismartcoding.plain.preferences.SkipVersionPreference
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PBanner
 import com.ismartcoding.plain.ui.base.PCard
@@ -116,7 +115,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                                     scope.launch {
                                         DialogHelper.showMessage(getString(R.string.checking_updates))
                                         val r = withIO {
-                                            SkipVersionPreference.putAsync(context, "")
+                                            UpdateInfoPreference.updateAsync(context) { it.copy(skipVersion = "") }
                                             AppHelper.checkUpdateAsync(context, true)
                                         }
                                         if (r != null) {
@@ -127,7 +126,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                                 })
                             })
                             PListItem(title = stringResource(R.string.auto_check_update), subtitle = stringResource(R.string.auto_check_update_desc)) {
-                                PSwitch(activated = autoCheckUpdate) { scope.launch(Dispatchers.IO) { AutoCheckUpdatePreference.putAsync(context, it) } }
+                                PSwitch(activated = autoCheckUpdate) { newValue -> scope.launch(Dispatchers.IO) { UpdateInfoPreference.updateAsync(context) { it.copy(autoCheckUpdate = newValue) } } }
                             }
                         } else {
                             PListItem(title = stringResource(R.string.app_version), value = MainApp.getAppVersion())
