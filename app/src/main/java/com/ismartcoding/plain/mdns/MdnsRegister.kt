@@ -98,19 +98,30 @@ class MdnsRegister(
     private fun schedule(reason: String) {
         if (!isActive()) return
 
+        // Fast-path: if LAN interfaces haven't changed and mDNS is already registered,
+        // don't cancel an in-flight debounce job.  This prevents cellular
+        // onLinkPropertiesChanged storms (DNS updates, CLAT/NAT64 changes) from
+        // continuously resetting the debounce timer and blocking re-registration.
+        val currentIfaces = candidateInterfaces()
+            .map { (iface, ip) -> "${iface.name}:${ip.hostAddress}" }
+            .toSet()
+        if (currentIfaces.isNotEmpty() && currentIfaces == lastRegisteredIfaces && reregisterJob?.isActive == true) {
+            return
+        }
+
         reregisterJob?.cancel()
         reregisterJob = coIO {
             delay(2000) // debounce network churn
             if (!isActive()) return@coIO
 
-            // Compare current interface set with last registration — skip if unchanged.
-            val currentIfaces = candidateInterfaces()
+            // Re-fetch — interfaces may have changed since fast-path check above.
+            val freshIfaces = candidateInterfaces()
                 .map { (iface, ip) -> "${iface.name}:${ip.hostAddress}" }
                 .toSet()
 
             // Network gone — tear down responder and reset so the next
             // network-up event triggers a fresh registration.
-            if (currentIfaces.isEmpty()) {
+            if (freshIfaces.isEmpty()) {
                 if (lastRegisteredIfaces.isNotEmpty()) {
                     LogCat.d("mDNS teardown ($reason): no interfaces, clearing registration state")
                     NsdHelper.unregisterService()
@@ -119,7 +130,7 @@ class MdnsRegister(
                 return@coIO
             }
 
-            if (currentIfaces == lastRegisteredIfaces) return@coIO
+            if (freshIfaces == lastRegisteredIfaces) return@coIO
 
             val hostname = hostnameProvider().trim()
             val httpPort = httpPortProvider()
@@ -128,7 +139,7 @@ class MdnsRegister(
             val httpsOk = httpsPort in 1..65535
             if (hostname.isEmpty() || (!httpOk && !httpsOk)) return@coIO
 
-            LogCat.d("mDNS re-register ($reason): $currentIfaces")
+            LogCat.d("mDNS re-register ($reason): $freshIfaces")
             runCatching {
                 NsdHelper.registerServices(
                     context = appContext,
@@ -138,7 +149,7 @@ class MdnsRegister(
             }
                 .onSuccess { ok ->
                     if (ok) {
-                        lastRegisteredIfaces = currentIfaces
+                        lastRegisteredIfaces = freshIfaces
                     } else {
                         LogCat.e("mDNS re-register returned false, resetting registration state")
                         lastRegisteredIfaces = emptySet()
