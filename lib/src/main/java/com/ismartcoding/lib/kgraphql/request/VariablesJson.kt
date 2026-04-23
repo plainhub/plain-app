@@ -17,6 +17,7 @@ import kotlinx.serialization.json.float
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.long
+import kotlinx.serialization.serializer
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.jvm.jvmErasure
@@ -78,8 +79,13 @@ interface VariablesJson {
                 }
                 else -> {
                     val deserializer = scalarDeserializers[kClass]
-                        ?: throw ExecutionException("No deserializer registered for type $kClass")
-                    deserializer(element) as T
+                    if (deserializer != null) {
+                        deserializer(element) as T
+                    } else if (element is JsonObject) {
+                        Json.decodeFromJsonElement(serializer(kType), element) as T
+                    } else {
+                        throw ExecutionException("No deserializer registered for type $kClass")
+                    }
                 }
             }
         }

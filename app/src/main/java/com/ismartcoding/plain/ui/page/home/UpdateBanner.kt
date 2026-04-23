@@ -27,6 +27,7 @@ import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.data.Version
 import com.ismartcoding.plain.data.toVersion
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.events.CancelUpdateDownloadEvent
 import com.ismartcoding.plain.events.DownloadUpdateEvent
 import com.ismartcoding.plain.features.PackageHelper
@@ -35,6 +36,7 @@ import com.ismartcoding.plain.preferences.LocalNewVersion
 import com.ismartcoding.plain.preferences.LocalSkipVersion
 import com.ismartcoding.plain.ui.base.PBanner
 import com.ismartcoding.plain.ui.base.PFilledButton
+import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.WebHelper
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import java.io.File
@@ -72,40 +74,52 @@ fun UpdateBanner(updateVM: UpdateViewModel) {
     }
 
     when {
-        isDownloading -> DownloadProgressBanner(
-            newVersion = newVersion.toString(),
-            progress = downloadProgress,
-            onCancel = {
-                updateVM.cancelDownload()
-                sendEvent(CancelUpdateDownloadEvent())
-            },
-        )
+        isDownloading -> {
+            DownloadProgressBanner(
+                newVersion = newVersion.toString(),
+                progress = downloadProgress,
+                onCancel = {
+                    updateVM.cancelDownload()
+                    sendEvent(CancelUpdateDownloadEvent())
+                },
+            )
+            VerticalSpace(dp = 12.dp)
+        }
 
-        isDownloadComplete -> DownloadCompleteBanner(
-            onInstall = {
-                PackageHelper.install(context, File(downloadedFilePath))
-                exitProcess(0)
-            },
-            onDismiss = {
-                scope.launch { withIO { UpdateInfoPreference.updateAsync(context) { it.copy(downloadedApkPath = "") } } }
-                updateVM.resetDownload()
-            },
-        )
+        isDownloadComplete -> {
+            DownloadCompleteBanner(
+                onInstall = {
+                    PackageHelper.install(context, File(downloadedFilePath))
+                    exitProcess(0)
+                },
+                onDismiss = {
+                    scope.launch { withIO { UpdateInfoPreference.updateAsync(context) { it.copy(downloadedApkPath = "") } } }
+                    updateVM.resetDownload()
+                },
+            )
+            VerticalSpace(dp = 12.dp)
+        }
 
-        downloadFailed -> DownloadFailedBanner(
-            onGitHub = { WebHelper.open(context, GITHUB_RELEASES_URL) },
-            onRetry = {
-                updateVM.startDownload()
-                sendEvent(DownloadUpdateEvent())
-            },
-            onDismiss = { updateVM.resetDownload() },
-        )
+        downloadFailed -> {
+            DownloadFailedBanner(
+                onGitHub = { WebHelper.open(context, GITHUB_RELEASES_URL) },
+                onRetry = {
+                    updateVM.startDownload()
+                    sendEvent(DownloadUpdateEvent())
+                },
+                onDismiss = { updateVM.resetDownload() },
+            )
+            VerticalSpace(dp = 12.dp)
+        }
 
-        needsUpdate -> PBanner(
-            title = stringResource(R.string.get_new_updates, newVersion.toString()),
-            desc = stringResource(R.string.get_new_updates_desc),
-            icon = R.drawable.lightbulb,
-        ) { updateVM.showDialog() }
+        needsUpdate -> {
+            PBanner(
+                title = stringResource(R.string.get_new_updates, newVersion.toString()),
+                desc = stringResource(R.string.get_new_updates_desc),
+                icon = R.drawable.lightbulb,
+            ) { updateVM.showDialog() }
+            VerticalSpace(dp = 12.dp)
+        }
     }
 }
 
@@ -165,7 +179,7 @@ private fun DownloadCompleteBanner(
         action = {
             PFilledButton(
                 text = stringResource(R.string.install_update),
-                small = true,
+                buttonSize = ButtonSize.SMALL,
                 onClick = onInstall,
             )
         },
@@ -188,12 +202,12 @@ private fun DownloadFailedBanner(
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 PFilledButton(
                     text = stringResource(R.string.try_again),
-                    small = true,
+                    buttonSize = ButtonSize.SMALL,
                     onClick = onRetry,
                 )
                 PFilledButton(
                     text = stringResource(R.string.download_on_github),
-                    small = true,
+                    buttonSize = ButtonSize.SMALL,
                     onClick = onGitHub,
                 )
             }

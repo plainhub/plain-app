@@ -3,93 +3,134 @@ package com.ismartcoding.plain.helpers
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.features.file.DFile
 import kotlin.time.Instant
-import java.util.concurrent.TimeUnit
+import java.io.DataOutputStream
 
 /**
  * Helper for performing file operations on rooted devices.
- * On Android 11+, directories like Android/data are inaccessible via the normal File API
- * even with MANAGE_EXTERNAL_STORAGE. On rooted devices, we fall back to su shell commands.
+ *
+ * Key challenges on Android 11+:
+ * - /storage/emulated/0/Android/data is blocked by FUSE even with MANAGE_EXTERNAL_STORAGE.
+ * - Root shells access the real underlying path (/data/media/0/...) instead of the FUSE path.
+ * - su execution via stdin is more reliable than `su -c` argument passing.
  */
 object RootHelper {
     @Volatile
     private var rootAvailable: Boolean? = null
 
+    // Matches /storage/emulated/<userId>/...
+    private val EMULATED_RE = Regex("^/storage/emulated/(\\d+)(.*?)/?$")
+    // Matches /data/media/<userId>/...
+    private val MEDIA_RE = Regex("^/data/media/(\\d+)(.*?)/?$")
+
     fun isRooted(): Boolean {
-        return rootAvailable ?: run {
-            val result = checkRoot()
-            rootAvailable = result
-            result
+        return rootAvailable ?: synchronized(this) {
+            rootAvailable ?: run {
+                val result = checkRoot()
+                rootAvailable = result
+                result
+            }
         }
     }
 
     private fun checkRoot(): Boolean {
         return try {
-            val proc = Runtime.getRuntime().exec(arrayOf("su", "-c", "id"))
-            val exited = proc.waitFor(3, TimeUnit.SECONDS)
-            if (!exited) {
-                proc.destroy()
-                return false
-            }
-            val output = proc.inputStream.bufferedReader().readText()
-            proc.errorStream.bufferedReader().readText() // drain stderr
-            output.contains("uid=0")
+            exec("id").contains("uid=0")
         } catch (e: Exception) {
             LogCat.d("RootHelper: root check failed: ${e.message}")
             false
         }
     }
 
+    /**
+     * Executes [command] in a root shell via stdin.
+     * Uses the stdin approach (`su` + write to stdin) which works with all major
+     * root implementations (Magisk, KernelSU, APatch) and avoids argument-quoting issues.
+     * Reads stdout in a separate thread to prevent pipe-buffer deadlock.
+     */
     private fun exec(command: String): String {
+        var proc: Process? = null
         return try {
-            val proc = Runtime.getRuntime().exec(arrayOf("su", "-c", command))
-            val exited = proc.waitFor(15, TimeUnit.SECONDS)
-            if (!exited) {
-                proc.destroy()
-                return ""
+            proc = Runtime.getRuntime().exec("su")
+            var output = ""
+            // Read stdout in a background thread to avoid deadlock when the pipe buffer fills.
+            val readerThread = Thread {
+                output = proc.inputStream.bufferedReader().readText()
             }
-            val output = proc.inputStream.bufferedReader().readText()
-            proc.errorStream.bufferedReader().readText() // drain stderr
+            readerThread.start()
+            val stdin = DataOutputStream(proc.outputStream)
+            stdin.writeBytes("$command\nexit\n")
+            stdin.flush()
+            stdin.close()
+            readerThread.join(15_000)
             output
         } catch (e: Exception) {
             LogCat.d("RootHelper: exec failed: ${e.message}")
             ""
+        } finally {
+            try { proc?.destroy() } catch (_: Exception) {}
         }
     }
 
     /**
-     * Lists files in [dir] using root shell when normal File.listFiles() is blocked
-     * (e.g. Android/data on Android 11+).
-     * Uses stat to get type, size, and mtime in one command.
-     * Children count is not populated to avoid extra subprocess calls.
+     * Translates a FUSE path (/storage/emulated/N/...) to the real underlying path
+     * (/data/media/N/...) that root shells can access on Android 11+.
+     */
+    private fun toRealPath(path: String): String {
+        val m = EMULATED_RE.matchEntire(path.trimEnd('/')) ?: return path
+        return "/data/media/${m.groupValues[1]}${m.groupValues[2]}"
+    }
+
+    /**
+     * Translates a real path (/data/media/N/...) back to the FUSE path
+     * (/storage/emulated/N/...) used by the rest of the app.
+     */
+    private fun fromRealPath(path: String): String {
+        val m = MEDIA_RE.matchEntire(path) ?: return path
+        return "/storage/emulated/${m.groupValues[1]}${m.groupValues[2]}"
+    }
+
+    /**
+     * Lists files in [dir] using a root shell.
+     * Translates FUSE paths to real paths for the shell command, then maps results back.
      */
     fun listFiles(dir: String, showHidden: Boolean): List<DFile> {
-        val safeDir = dir.replace("'", "\\'")
-        // stat -c '%n|%F|%s|%Y': full path | type | size | epoch seconds
-        // Non-hidden files: glob '*' (excludes dot-files)
-        // Hidden files: additionally glob '.?*' (excludes '.' and '..')
-        val cmd = if (showHidden) {
-            "stat -c '%n|%F|%s|%Y' '$safeDir'/* '$safeDir'/.?* 2>/dev/null"
-        } else {
-            "stat -c '%n|%F|%s|%Y' '$safeDir'/* 2>/dev/null"
+        val realDir = toRealPath(dir)
+        // Escape double-quotes in path for the shell
+        val safeDir = realDir.replace("\"", "\\\"")
+        // stat -c: %n=path, %F=file type, %s=size, %Y=mtime epoch seconds
+        // Use double-quotes around the path so word-splitting is safe.
+        // The /* and /.[!.]* globs are outside the quotes so the shell expands them.
+        // 2>/dev/null silences "no match" errors when globs don't expand.
+        val cmd = buildString {
+            append("stat -c '%n|%F|%s|%Y' \"$safeDir\"/* 2>/dev/null")
+            if (showHidden) {
+                // .[!.]* matches .hidden but not . or ..
+                // ..?* matches ..hidden-style names
+                append("; stat -c '%n|%F|%s|%Y' \"$safeDir\"/.[!.]* \"$safeDir\"/..?* 2>/dev/null")
+            }
         }
         val output = exec(cmd)
         if (output.isBlank()) return emptyList()
 
+        val seen = mutableSetOf<String>()
         return output.lines()
             .filter { it.contains('|') }
             .mapNotNull { line ->
                 val parts = line.split("|", limit = 4)
                 if (parts.size < 4) return@mapNotNull null
-                val fullPath = parts[0].trim()
+                val rawPath = parts[0].trim()
+                val name = rawPath.substringAfterLast('/')
+                if (name.isEmpty() || name == "." || name == "..") return@mapNotNull null
+                if (!seen.add(rawPath)) return@mapNotNull null // deduplicate
                 val typeName = parts[1]
                 val size = parts[2].toLongOrNull() ?: 0L
                 val epochSeconds = parts[3].trim().toLongOrNull() ?: 0L
-                val name = fullPath.substringAfterLast('/')
-                if (name.isEmpty() || name == "." || name == "..") return@mapNotNull null
+                // Map real path back to FUSE path for app-internal use
+                val displayPath = fromRealPath(rawPath)
                 val isDir = typeName.contains("directory")
                 DFile(
                     name = name,
-                    path = fullPath,
+                    path = displayPath,
                     permission = "",
                     createdAt = null,
                     updatedAt = Instant.fromEpochMilliseconds(epochSeconds * 1000L),

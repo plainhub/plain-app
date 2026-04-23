@@ -214,21 +214,15 @@ object FileSystemHelper {
         sortBy: FileSortBy,
     ): List<DFile> {
         val pathFile = File(dir)
-        if (!pathFile.isDirectory) return emptyList()
-
-        val listFiles = pathFile.listFiles()
-        // listFiles() returns null when permission is denied (e.g. Android/data on Android 11+).
-        // On rooted devices, fall back to a root shell listing.
-        if (listFiles == null && RootHelper.isRooted()) {
-            return RootHelper.listFiles(dir, showHidden).sorted(sortBy)
-        }
-
         val files = ArrayList<DFile>()
-        listFiles?.forEach { file ->
-            if (!showHidden && file.isHidden) {
-                return@forEach
+        if (pathFile.exists() && pathFile.isDirectory) {
+            val listFiles = pathFile.listFiles()
+            listFiles?.forEach { file ->
+                if (!showHidden && file.isHidden) {
+                    return@forEach
+                }
+                files.add(convertFile(file, showHidden))
             }
-            files.add(convertFile(file, showHidden))
         }
 
         return files.sorted(sortBy)
