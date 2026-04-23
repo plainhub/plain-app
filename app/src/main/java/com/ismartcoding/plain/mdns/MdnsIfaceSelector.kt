@@ -29,7 +29,8 @@ internal fun candidateInterfaces(): List<Pair<NetworkInterface, Inet4Address>> {
             // regardless of the flag, since those are always LAN interfaces.
             val isLanLike = iface.name.startsWith("wlan") || iface.name.startsWith("ap") ||
                 iface.name.startsWith("eth") || iface.name.startsWith("swlan") ||
-                iface.name.startsWith("wl") || iface.name.startsWith("p2p")
+                iface.name.startsWith("wl") || iface.name.startsWith("p2p") ||
+                iface.name.startsWith("wifi") // Android 17+ may use wifi0/wifi_sta0 naming
             if (!iface.supportsMulticast() && !isLanLike) continue
             val ip = iface.inetAddresses.asSequence()
                 .filterIsInstance<Inet4Address>()
@@ -42,7 +43,9 @@ internal fun candidateInterfaces(): List<Pair<NetworkInterface, Inet4Address>> {
 
 /** Returns true for mobile-data-only bearer interface names (never LAN). */
 internal fun isMobileDataInterface(name: String): Boolean =
-    name.startsWith("rmnet") || name.startsWith("ccmni")
+    name.startsWith("rmnet") || name.startsWith("ccmni") ||
+        name.startsWith("v4-rmnet") || name.startsWith("v6-rmnet") ||
+        name.startsWith("clat") || name.startsWith("v4-ccmni")
 
 /**
  * Returns the local interface and IP whose subnet contains [senderIp], or the

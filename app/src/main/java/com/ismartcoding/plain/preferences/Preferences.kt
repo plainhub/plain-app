@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.ismartcoding.lib.helpers.CryptoHelper
@@ -15,15 +14,14 @@ import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.helpers.PhoneHelper
-import com.ismartcoding.plain.data.DPlaylistAudio
-import com.ismartcoding.plain.data.DScreenMirrorQuality
-import com.ismartcoding.plain.data.DVideo
-import com.ismartcoding.plain.data.NotificationFilterData
-import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.data.DFavoriteFolder
-import com.ismartcoding.plain.data.FilePathData
+import com.ismartcoding.plain.data.DPlaylistAudio
+import com.ismartcoding.plain.data.DPomodoroSettings
+import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.data.DUpdateInfo
+import com.ismartcoding.plain.data.DVideo
+import com.ismartcoding.plain.data.FilePathData
+import com.ismartcoding.plain.data.NotificationFilterData
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.enums.Language
@@ -31,6 +29,7 @@ import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.enums.PasswordType
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.helpers.PhoneHelper
 import java.util.Locale
 
 
@@ -207,19 +206,9 @@ object DarkThemePreference : BasePreference<Int>() {
     }
 }
 
-object CustomPrimaryColorPreference : BasePreference<String>() {
-    override val default = ""
-    override val key = stringPreferencesKey("custom_primary_color")
-}
-
 object AmoledDarkThemePreference : BasePreference<Boolean>() {
     override val default = false
     override val key = booleanPreferencesKey("amoled_dark_theme")
-}
-
-object ThemeIndexPreference : BasePreference<Int>() {
-    override val default = 5
-    override val key = intPreferencesKey("theme_index")
 }
 
 object KeepScreenOnPreference : BasePreference<Boolean>() {
@@ -230,11 +219,6 @@ object KeepScreenOnPreference : BasePreference<Boolean>() {
 object KeepAwakePreference : BasePreference<Boolean>() {
     override val default = true
     override val key = booleanPreferencesKey("keep_awake")
-}
-
-object SystemScreenTimeoutPreference : BasePreference<Int>() {
-    override val default = 0
-    override val key = intPreferencesKey("system_screen_timeout")
 }
 
 object LanguagePreference : BasePreference<String>() {
