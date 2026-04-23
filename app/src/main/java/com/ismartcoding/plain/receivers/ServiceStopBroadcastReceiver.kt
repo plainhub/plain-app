@@ -3,6 +3,7 @@ package com.ismartcoding.plain.receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Binder
 import androidx.core.content.ContextCompat
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.plain.BuildConfig
@@ -29,8 +30,13 @@ class ServiceStopBroadcastReceiver : BroadcastReceiver() {
             }
 
             Constants.ACTION_STOP_HTTP_SERVER -> coIO {
-                val storedToken = AdbTokenPreference.getAsync(context)
-                if (intent.getStringExtra("token") != storedToken) return@coIO
+                val callerUid = Binder.getCallingUid()
+                val appUid = context.applicationInfo.uid
+                if (callerUid != appUid) {
+                    // External caller (ADB, third-party app) — require token
+                    val storedToken = AdbTokenPreference.getAsync(context)
+                    if (intent.getStringExtra("token") != storedToken) return@coIO
+                }
                 WebPreference.putAsync(context, false)
                 HttpServerManager.stopServiceAsync(context)
             }
