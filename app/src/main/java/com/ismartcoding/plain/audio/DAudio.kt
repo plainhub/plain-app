@@ -1,7 +1,10 @@
-package com.ismartcoding.plain.data
+package com.ismartcoding.plain.audio
 
 import android.net.Uri
 import com.ismartcoding.lib.extensions.formatDuration
+import com.ismartcoding.plain.audio.DPlaylistAudio
+import com.ismartcoding.plain.data.IData
+import com.ismartcoding.plain.data.IMedia
 import kotlin.time.Instant
 
 data class DAudio(

@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.plain.data.DAudio
-import com.ismartcoding.plain.data.DPlaylistAudio
-import com.ismartcoding.plain.features.AudioPlayer
+import com.ismartcoding.plain.audio.DAudio
+import com.ismartcoding.plain.audio.DPlaylistAudio
+import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.events.ClearAudioPlaylistEvent
 import com.ismartcoding.plain.preferences.AudioPlayingPreference
 import com.ismartcoding.plain.preferences.AudioPlaylistPreference

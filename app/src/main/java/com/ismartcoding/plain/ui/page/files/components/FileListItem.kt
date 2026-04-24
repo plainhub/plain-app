@@ -38,7 +38,8 @@ import com.ismartcoding.lib.extensions.isImageFast
 import com.ismartcoding.lib.extensions.isVideoFast
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.AudioPlayer
+import com.ismartcoding.plain.audio.AudioPlayer
+import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -73,7 +74,7 @@ fun FileListItem(
     LaunchedEffect(isCurrentlyPlaying) {
         if (isCurrentlyPlaying && isAudio) {
             scope.launch { withIO {
-                val audio = com.ismartcoding.plain.data.DPlaylistAudio.fromPath(context, file.path)
+                val audio = DPlaylistAudio.fromPath(context, file.path)
                 duration = audio.duration.toFloat()
             } }
         }

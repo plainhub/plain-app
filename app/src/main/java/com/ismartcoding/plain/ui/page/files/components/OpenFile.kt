@@ -12,8 +12,8 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.DPlaylistAudio
-import com.ismartcoding.plain.features.AudioPlayer
+import com.ismartcoding.plain.audio.DPlaylistAudio
+import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.ShareHelper

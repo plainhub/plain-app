@@ -15,7 +15,7 @@ import com.ismartcoding.lib.helpers.JsonHelper.jsonEncode
 import com.ismartcoding.lib.helpers.StringHelper
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.DFavoriteFolder
-import com.ismartcoding.plain.data.DPlaylistAudio
+import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.data.DPomodoroSettings
 import com.ismartcoding.plain.data.DScreenMirrorQuality
 import com.ismartcoding.plain.data.DUpdateInfo
@@ -806,4 +806,9 @@ object MdnsHostnamePreference : BasePreference<String>() {
 object AiImageSearchEnabledPreference : BasePreference<Boolean>() {
     override val default = false
     override val key = booleanPreferencesKey("ai_image_search_enabled")
+}
+
+object DocTabsModePreference : BasePreference<Boolean>() {
+    override val default = false // false = ext groups mode, true = tags mode
+    override val key = booleanPreferencesKey("doc_tabs_mode")
 }

@@ -23,12 +23,13 @@ import com.ismartcoding.plain.web.schemas.addChatChannelSchema
 import com.ismartcoding.plain.web.schemas.addChatMessageSchema
 import com.ismartcoding.plain.web.schemas.addChatQuerySchema
 import com.ismartcoding.plain.web.schemas.addContactSchema
-import com.ismartcoding.plain.web.schemas.addDocQueries
+import com.ismartcoding.plain.web.schemas.addDocSchema
 import com.ismartcoding.plain.web.schemas.addFeedSchema
 import com.ismartcoding.plain.web.schemas.addFileMutationSchema
 import com.ismartcoding.plain.web.schemas.addFileQuerySchema
 import com.ismartcoding.plain.web.schemas.addFileUploadSchema
 import com.ismartcoding.plain.web.schemas.addImageSchema
+import com.ismartcoding.plain.web.schemas.addMediaSchema
 import com.ismartcoding.plain.web.schemas.addNoteSchema
 import com.ismartcoding.plain.web.schemas.addNotificationSchema
 import com.ismartcoding.plain.web.schemas.addPackageSchema
@@ -37,7 +38,7 @@ import com.ismartcoding.plain.web.schemas.addSchemaTypes
 import com.ismartcoding.plain.web.schemas.addScreenMirrorSchema
 import com.ismartcoding.plain.web.schemas.addSmsSchema
 import com.ismartcoding.plain.web.schemas.addTagSchema
-import com.ismartcoding.plain.web.schemas.addVideoMediaSchema
+import com.ismartcoding.plain.web.schemas.addVideoSchema
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
@@ -68,8 +69,9 @@ class MainGraphQL(val schema: Schema) {
                 addSmsSchema()
                 addImageSchema()
                 addAudioSchema()
-                addVideoMediaSchema()
-                addDocQueries()
+                addVideoSchema()
+                addMediaSchema()
+                addDocSchema()
                 addContactSchema()
                 addCallSchema()
                 addPackageSchema()

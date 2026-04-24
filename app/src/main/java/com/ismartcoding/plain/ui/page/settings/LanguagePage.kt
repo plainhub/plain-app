@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.Language
+import com.ismartcoding.plain.extensions.getElegantDisplayName
 import com.ismartcoding.plain.preferences.LanguagePreference
 import com.ismartcoding.plain.preferences.LocalLocale
 import com.ismartcoding.plain.ui.base.BottomSpace
@@ -56,7 +57,7 @@ fun LanguagePage(navController: NavHostController) {
                                     LanguagePreference.putAsync(context, item)
                                 }
                             },
-                        title = item?.getDisplayName(item) ?: stringResource(id = R.string.use_device_language),
+                        title = item?.getElegantDisplayName() ?: stringResource(id = R.string.use_device_language),
                     ) {
                         RadioButton(selected = (item == null && language == null) || (item?.language == language?.language && item?.country == language?.country), onClick = {
                             scope.launch(Dispatchers.IO) {

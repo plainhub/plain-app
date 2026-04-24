@@ -24,7 +24,7 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.enums.AppFeatureType
-import com.ismartcoding.plain.features.AudioPlayer
+import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.preferences.AudioSortByPreference
 import com.ismartcoding.plain.ui.base.AnimatedBottomAction
@@ -97,7 +97,8 @@ fun AudioPage(
             dragSelectState.selectMode -> dragSelectState.exitSelectMode()
             castVM.castMode.value -> castVM.exitCastMode()
             audioVM.showSearchBar.value && (!audioVM.searchActive.value || audioVM.queryText.value.isEmpty()) -> {
-                audioVM.exitSearchMode(); audioVM.showLoading.value = true
+                audioVM.exitSearchMode()
+                audioVM.showLoading.value = true
                 scope.launch(Dispatchers.IO) { audioVM.loadAsync(context, tagsVM) }
             }
         }
@@ -108,9 +109,17 @@ fun AudioPage(
     LaunchedEffect(pagerState.currentPage) {
         val tab = tabs.getOrNull(pagerState.currentPage) ?: return@LaunchedEffect
         when (tab.value) {
-            "all" -> { audioVM.trash.value = false; audioVM.tag.value = null }
-            "trash" -> { audioVM.trash.value = true; audioVM.tag.value = null }
-            else -> { audioVM.trash.value = false; audioVM.tag.value = tagsState.find { it.id == tab.value } }
+            "all" -> {
+                audioVM.trash.value = false; audioVM.tag.value = null
+            }
+
+            "trash" -> {
+                audioVM.trash.value = true; audioVM.tag.value = null
+            }
+
+            else -> {
+                audioVM.trash.value = false; audioVM.tag.value = tagsState.find { it.id == tab.value }
+            }
         }
         scope.launch { scrollBehavior.reset(); audioVM.scrollStateMap[pagerState.currentPage]?.scrollToItem(0) ?: scrollState.scrollToItem(0) }
         scope.launch(Dispatchers.IO) { audioVM.loadAsync(context, tagsVM) }
@@ -122,7 +131,9 @@ fun AudioPage(
 
     ViewAudioBottomSheet(audioVM = audioVM, tagsVM = tagsVM, tagsMapState = tagsMapState, tagsState = tagsState, dragSelectState = dragSelectState, castVM = castVM)
     MediaFoldersBottomSheet(audioVM, mediaFoldersVM, tagsVM)
-    if (audioVM.showTagsDialog.value) { TagsBottomSheet(tagsVM) { audioVM.showTagsDialog.value = false } }
+    if (audioVM.showTagsDialog.value) {
+        TagsBottomSheet(tagsVM) { audioVM.showTagsDialog.value = false }
+    }
     CastDialog(castVM)
 
     PScaffold(
@@ -139,9 +150,17 @@ fun AudioPage(
                 scrollToTop = { scope.launch { audioVM.scrollStateMap[pagerState.currentPage]?.scrollToItem(0) } },
                 defaultNavigationIcon = { NavigationBackIcon { navController.popBackStack() } },
                 onSortSelected = { _, sortBy ->
-                    scope.launch(Dispatchers.IO) { AudioSortByPreference.putAsync(context, sortBy); audioVM.sortBy.value = sortBy; audioVM.loadAsync(context, tagsVM) }
+                    scope.launch(Dispatchers.IO) {
+                        AudioSortByPreference.putAsync(context, sortBy)
+                        audioVM.sortBy.value = sortBy
+                        audioVM.loadAsync(context, tagsVM)
+                    }
                 },
-                onSearchAction = { ctx, tv -> scope.launch(Dispatchers.IO) { audioVM.loadAsync(ctx, tv) } },
+                onSearchAction = { ctx, tv ->
+                    scope.launch(Dispatchers.IO) {
+                        audioVM.loadAsync(ctx, tv)
+                    }
+                },
             )
         },
         bottomBar = {
@@ -150,22 +169,30 @@ fun AudioPage(
             }
         },
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = paddingValues.calculateTopPadding())
+        ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                if (!audioVM.hasPermission.value) { NeedPermissionColumn(R.drawable.music, AppFeatureType.FILES.getPermission()!!); return@Column }
+                if (!audioVM.hasPermission.value) {
+                    NeedPermissionColumn(R.drawable.music, AppFeatureType.FILES.getPermission()!!); return@Column
+                }
                 if (!dragSelectState.selectMode) {
                     PScrollableTabRow(selectedTabIndex = pagerState.currentPage, modifier = Modifier.fillMaxWidth()) {
                         tabs.forEachIndexed { index, s ->
-                            PFilterChip(modifier = Modifier.padding(start = if (index == 0) 0.dp else 8.dp),
+                            PFilterChip(
+                                modifier = Modifier.padding(start = if (index == 0) 0.dp else 8.dp),
                                 selected = pagerState.currentPage == index,
                                 onClick = { scope.launch { pagerState.scrollToPage(index) } },
                                 label = { Text(if (index == 0) s.title + " (" + s.count + ")" else if (audioVM.bucketId.value.isNotEmpty() || audioVM.queryText.value.isNotEmpty()) s.title else "${s.title} (${s.count})") })
                         }
                     }
                 }
-                if (pagerState.pageCount == 0) { NoDataColumn(loading = audioVM.showLoading.value, search = audioVM.showSearchBar.value); return@Column }
-                AudioPageList(pagerState, scrollBehavior, dragSelectState, itemsState, audioVM, audioPlaylistVM,
-                    tagsVM, castVM, audioTagsMap, isAudioPlaying, topRefreshLayoutState, paddingValues)
+                AudioPageList(
+                    pagerState, scrollBehavior, dragSelectState, itemsState, audioVM, audioPlaylistVM,
+                    tagsVM, castVM, audioTagsMap, isAudioPlaying, topRefreshLayoutState, paddingValues
+                )
             }
             AudioPlayerBar(audioPlaylistVM, castVM, modifier = Modifier.align(Alignment.BottomCenter), dragSelectState = audioState.dragSelectState)
             AudioCastPlayerBar(castVM = castVM, modifier = Modifier.align(Alignment.BottomCenter), dragSelectState = audioState.dragSelectState)

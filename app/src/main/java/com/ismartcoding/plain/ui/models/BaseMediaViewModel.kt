@@ -40,7 +40,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
 
     abstract val dataType: DataType
 
-    private fun getTotalQuery(): String {
+    internal open fun getTotalQuery(): String {
         var query = "${queryText.value} trash:false"
         if (bucketId.value.isNotEmpty()) {
             query += " bucket_id:${bucketId.value}"
@@ -56,7 +56,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
         return query
     }
 
-    internal fun getQuery(): String {
+    internal open fun getQuery(): String {
         var query = "${queryText.value} trash:${trash.value}"
         if (tag.value != null) {
             val tagId = tag.value!!.id
@@ -69,7 +69,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
         return query
     }
 
-    suspend fun moreAsync(context: Context, tagsViewModel: TagsViewModel) {
+    suspend fun moreAsync(context: Context, tagsVM: TagsViewModel) {
         offset.intValue += limit.intValue
         val items = searchMediaAsync(context, getQuery())
         _itemsFlow.update {
@@ -77,15 +77,15 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
             mutableList.addAll(items)
             mutableList
         }
-        tagsViewModel.loadMoreAsync(items.map { it.id }.toSet())
+        tagsVM.loadMoreAsync(items.map { it.id }.toSet())
         noMore.value = items.size < limit.intValue
         showLoading.value = false
     }
 
-    suspend fun loadAsync(context: Context, tagsViewModel: TagsViewModel) {
+    open suspend fun loadAsync(context: Context, tagsVM: TagsViewModel) {
         offset.intValue = 0
         _itemsFlow.value = searchMediaAsync(context, getQuery()).toMutableStateList()
-        tagsViewModel.loadAsync(_itemsFlow.value.map { it.id }.toSet())
+        tagsVM.loadAsync(_itemsFlow.value.map { it.id }.toSet())
         total.intValue = countMediaAsync(context, getTotalQuery())
         totalTrash.intValue = countMediaAsync(context, getTrashQuery())
         noMore.value = _itemsFlow.value.size < limit.intValue

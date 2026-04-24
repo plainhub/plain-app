@@ -14,8 +14,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.DPlaylistAudio
-import com.ismartcoding.plain.features.AudioPlayer
+import com.ismartcoding.plain.audio.DPlaylistAudio
+import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PIconButton

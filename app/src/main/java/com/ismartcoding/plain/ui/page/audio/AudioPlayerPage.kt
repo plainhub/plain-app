@@ -29,8 +29,8 @@ import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.data.DPlaylistAudio
-import com.ismartcoding.plain.features.AudioPlayer
+import com.ismartcoding.plain.audio.DPlaylistAudio
+import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.base.WaveSlider

@@ -1,7 +1,7 @@
 package com.ismartcoding.plain.web.models
 
-import com.ismartcoding.plain.data.DAudio
-import com.ismartcoding.plain.data.DPlaylistAudio
+import com.ismartcoding.plain.audio.DAudio
+import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.helpers.FileHelper
 import kotlin.time.Instant
 

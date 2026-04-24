@@ -30,6 +30,7 @@ import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.CrashHandler
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.helpers.AppLogHelper
 import java.io.File
 
 @Composable
@@ -63,14 +64,7 @@ fun CrashReportDialog(crashReport: String, onDismiss: () -> Unit) {
         confirmButton = {
             TextButton(onClick = {
                 val appVersion = MainApp.getAppVersion()
-                val deviceInfo = buildString {
-                    appendLine("--- Device Info ---")
-                    appendLine("App: PlainApp $appVersion")
-                    appendLine("Device: ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}")
-                    appendLine("Android: ${android.os.Build.VERSION.RELEASE} (API ${android.os.Build.VERSION.SDK_INT})")
-                    appendLine("Brand: ${android.os.Build.BRAND}")
-                    appendLine("Product: ${android.os.Build.PRODUCT}")
-                }
+                val deviceInfo = AppLogHelper.buildDeviceInfoText()
                 val bodyText = buildString {
                     append(deviceInfo)
                     appendLine()
@@ -116,7 +110,6 @@ fun CrashReportDialog(crashReport: String, onDismiss: () -> Unit) {
                     }
                 }
                 context.startActivity(Intent.createChooser(intent, null))
-                onDismiss()
             }) {
                 Text(stringResource(R.string.crash_share))
             }

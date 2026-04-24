@@ -14,6 +14,7 @@ enum class DataType(val value: Int) {
     PACKAGE(21),
     FILE(22),
     APP_FILE(23),
+    DOC(24),
     ; // starts from 21, not used for tag
 
     companion object {

@@ -8,6 +8,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.ZipHelper
 import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.plain.Constants
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -51,12 +52,25 @@ object AppLogHelper {
     ) {
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = "*/*"
-        intent.putExtra(Intent.EXTRA_SUBJECT, LocaleHelper.getString(R.string.share_logs))
+        val appVersion = MainApp.getAppVersion()
+        intent.putExtra(Intent.EXTRA_SUBJECT, LocaleHelper.getString(R.string.share_logs) + " - PlainApp $appVersion")
         intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(Constants.SUPPORT_EMAIL))
-        intent.putExtra(Intent.EXTRA_TEXT, "")
+        intent.putExtra(Intent.EXTRA_TEXT, buildDeviceInfoText())
         intent.putExtra(Intent.EXTRA_STREAM, FileProvider.getUriForFile(context, Constants.AUTHORITY, file))
         val chooserIntent = Intent.createChooser(intent, LocaleHelper.getString(R.string.share_logs))
         chooserIntent.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, ShareHelper.getExcludeComponentNames(context).toTypedArray())
         context.startActivity(chooserIntent)
+    }
+
+    fun buildDeviceInfoText(): String {
+        val appVersion = MainApp.getAppVersion()
+        return buildString {
+            appendLine("--- Device Info ---")
+            appendLine("App: PlainApp $appVersion")
+            appendLine("Device: ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}")
+            appendLine("Android: ${android.os.Build.VERSION.RELEASE} (API ${android.os.Build.VERSION.SDK_INT})")
+            appendLine("Brand: ${android.os.Build.BRAND}")
+            appendLine("Product: ${android.os.Build.PRODUCT}")
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.features
+package com.ismartcoding.plain.audio
 
 import android.content.ComponentName
 import android.content.Context
@@ -7,13 +7,11 @@ import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import com.google.common.util.concurrent.MoreExecutors
 import com.ismartcoding.lib.channel.sendEvent
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
-import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
-import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
+import com.ismartcoding.lib.helpers.CoroutinesHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
-import com.ismartcoding.plain.data.DPlaylistAudio
+import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.enums.MediaPlayMode
 import com.ismartcoding.plain.events.AudioActionEvent
@@ -60,7 +58,7 @@ object AudioPlayer {
 
     fun ensurePlayer(context: Context, callback: suspend () -> Unit = {}) {
         if (player != null) {
-            coMain {
+            CoroutinesHelper.coMain {
                 callback()
             }
             return
@@ -72,7 +70,7 @@ object AudioPlayer {
                 it.addListener(playerListener)
                 _isPlayingFlow.value = it.isPlaying
             }
-            coMain {
+            CoroutinesHelper.coMain {
                 callback()
             }
         }, MoreExecutors.directExecutor())
@@ -82,9 +80,9 @@ object AudioPlayer {
         context: Context,
         playlistAudio: DPlaylistAudio
     ) {
-        coMain {
+        CoroutinesHelper.coMain {
             TempData.audioPlayPosition = 0
-            withIO { AudioPlaylistPreference.addAsync(context, listOf(playlistAudio)) }
+            CoroutinesHelper.withIO { AudioPlaylistPreference.addAsync(context, listOf(playlistAudio)) }
             ensurePlayer(context) {
                 doPlay(playlistAudio)
             }
@@ -95,7 +93,7 @@ object AudioPlayer {
         context: Context,
         playlistAudio: DPlaylistAudio
     ) {
-        coMain {
+        CoroutinesHelper.coMain {
             TempData.audioPlayPosition = 0
             ensurePlayer(context) {
                 doPlay(playlistAudio)
@@ -104,7 +102,7 @@ object AudioPlayer {
     }
 
     fun play() {
-        coMain {
+        CoroutinesHelper.coMain {
             val current = player?.currentMediaItem
             if (current != null) {
                 player?.seekTo(TempData.audioPlayPosition)
@@ -112,7 +110,7 @@ object AudioPlayer {
                 return@coMain
             }
 
-            val context = MainApp.instance
+            val context = MainApp.Companion.instance
             val playlistAudio = ensureCurrentPlaylistAudio()
             try {
                 if (playlistAudio != null) {
@@ -123,7 +121,7 @@ object AudioPlayer {
             } catch (e: Exception) {
                 LogCat.e(e.toString())
                 if (playlistAudio != null) {
-                    withIO { AudioPlaylistPreference.deleteAsync(context, setOf(playlistAudio.path)) }
+                    CoroutinesHelper.withIO { AudioPlaylistPreference.deleteAsync(context, setOf(playlistAudio.path)) }
                 }
                 setChangedNotify(AudioAction.NOT_FOUND)
             }
@@ -131,18 +129,18 @@ object AudioPlayer {
     }
 
     private suspend fun ensureCurrentPlaylistAudio(): DPlaylistAudio? {
-        val context = MainApp.instance
-        val path = withIO { AudioPlayingPreference.getValueAsync(context) }
+        val context = MainApp.Companion.instance
+        val path = CoroutinesHelper.withIO { AudioPlayingPreference.getValueAsync(context) }
         if (path.isEmpty()) {
             return null
         }
-        val playlistAudio = withIO { DPlaylistAudio.fromPath(context, path) }
-        withIO { AudioPlaylistPreference.addAsync(context, listOf(playlistAudio)) }
+        val playlistAudio = CoroutinesHelper.withIO { DPlaylistAudio.Companion.fromPath(context, path) }
+        CoroutinesHelper.withIO { AudioPlaylistPreference.addAsync(context, listOf(playlistAudio)) }
         return playlistAudio
     }
 
     fun seekTo(progress: Long) {
-        coMain {
+        CoroutinesHelper.coMain {
             val seekPosition = progress * 1000
             TempData.audioPlayPosition = seekPosition
             val currentPlayer = player
@@ -163,14 +161,14 @@ object AudioPlayer {
     }
 
     private fun skipTo(isNext: Boolean) {
-        val context = MainApp.instance
-        coIO {
+        val context = MainApp.Companion.instance
+        CoroutinesHelper.coIO {
             var audio: DPlaylistAudio
             var playerAudioList = AudioPlaylistPreference.getValueAsync(context)
             val playingPath = AudioPlayingPreference.getValueAsync(context)
             if (playerAudioList.isEmpty()) {
                 if (playingPath.isNotEmpty()) {
-                    audio = DPlaylistAudio.fromPath(context, playingPath)
+                    audio = DPlaylistAudio.Companion.fromPath(context, playingPath)
                     AudioPlaylistPreference.addAsync(context, listOf(audio))
                     playerAudioList = listOf(audio)
                 } else {
@@ -201,7 +199,7 @@ object AudioPlayer {
             }
 
             LogCat.d("skipTo: ${audio.path}")
-            coMain {
+            CoroutinesHelper.coMain {
                 ensurePlayer(context) {
                     TempData.audioPlayPosition = 0
                     doPlay(audio)
@@ -211,14 +209,14 @@ object AudioPlayer {
     }
 
     fun pause() {
-        coMain {
+        CoroutinesHelper.coMain {
             TempData.audioPlayPosition = player?.currentPosition ?: 0
             player?.pause()
         }
     }
 
     fun clear() {
-        coMain {
+        CoroutinesHelper.coMain {
             if (player?.isPlaying == true) {
                 player?.pause()
             }

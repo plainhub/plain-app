@@ -24,6 +24,7 @@ internal fun getMediaPageTitle(
         DataType.IMAGE -> R.string.images
         DataType.VIDEO -> R.string.videos
         DataType.AUDIO -> R.string.audios
+        DataType.DOC -> R.string.docs
         else -> R.string.files
     }
 
@@ -32,10 +33,6 @@ internal fun getMediaPageTitle(
         stringResource(id = R.string.cast_mode) + " - " + CastPlayer.currentDevice?.description?.device?.friendlyName
     } else if (dragSelectState.selectMode) {
         LocaleHelper.getStringF(R.string.x_selected, "count", dragSelectState.selectedIds.size)
-    } else if (tag.value != null) {
-        mediaName + " - " + tag.value!!.name
-    } else if (trash.value) {
-        stringResource(id = resourceId) + " - " + stringResource(id = R.string.trash)
     } else {
         mediaName
     }
