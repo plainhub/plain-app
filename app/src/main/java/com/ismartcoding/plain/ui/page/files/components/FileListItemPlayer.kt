@@ -23,7 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.AudioPlayer
+import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.ui.base.HorizontalSpace
 import com.ismartcoding.plain.ui.base.PlayerSlider
 import androidx.compose.material3.Text

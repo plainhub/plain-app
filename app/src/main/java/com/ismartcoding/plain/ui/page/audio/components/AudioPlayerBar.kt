@@ -15,8 +15,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
-import com.ismartcoding.plain.data.DPlaylistAudio
-import com.ismartcoding.plain.features.AudioPlayer
+import com.ismartcoding.plain.audio.DPlaylistAudio
+import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.ui.base.dragselect.DragSelectState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel
 import com.ismartcoding.plain.ui.models.CastViewModel

@@ -9,7 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.material3.MaterialTheme
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.data.DAudio
+import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.data.IMedia
 import com.ismartcoding.plain.features.media.CastPlayer
 import com.ismartcoding.plain.ui.base.PIconButton

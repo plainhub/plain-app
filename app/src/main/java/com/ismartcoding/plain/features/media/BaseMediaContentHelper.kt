@@ -18,6 +18,7 @@ import com.ismartcoding.lib.extensions.getPagingCursor
 import com.ismartcoding.lib.extensions.getSearchCursor
 import com.ismartcoding.lib.extensions.getStringValue
 import com.ismartcoding.lib.extensions.map
+import com.ismartcoding.lib.extensions.toSortName
 import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.lib.pinyin.Pinyin
@@ -54,28 +55,25 @@ abstract class BaseMediaContentHelper {
 
     private suspend fun buildWheres(query: String): List<ContentWhere> {
         val fields = QueryHelper.parseAsync(query)
-        if (fields.isNotEmpty()) {
-            val wheres = mutableListOf<ContentWhere>()
-            val where = buildBaseWhere(fields)
-            val idsField = fields.find { it.name == "ids" }
-            if (idsField != null) {
-                val ids = idsField.value.split(",")
-                if (ids.isNotEmpty()) {
-                    ids.chunked(2000).forEach { cIds ->
-                        val w = where.copy()
-                        w.addIn(BaseColumns._ID, cIds)
-                        wheres.add(w)
-                    }
-                } else {
-                    wheres.add(where)
+        val wheres = mutableListOf<ContentWhere>()
+        val where = buildBaseWhere(fields)
+        val idsField = fields.find { it.name == "ids" }
+        if (idsField != null) {
+            val ids = idsField.value.split(",")
+            if (ids.isNotEmpty()) {
+                ids.chunked(2000).forEach { cIds ->
+                    val w = where.copy()
+                    w.addIn(BaseColumns._ID, cIds)
+                    wheres.add(w)
                 }
             } else {
                 wheres.add(where)
             }
-            return wheres
+        } else {
+            wheres.add(where)
         }
 
-        return listOf(ContentWhere()) // query all
+        return wheres.ifEmpty { listOf(ContentWhere()) }
     }
 
     suspend fun getPagingCursorAsync(
@@ -254,6 +252,6 @@ abstract class BaseMediaContentHelper {
             }
         }
 
-        return bucketMap.values.sortedBy { Pinyin.toPinyin(it.name).lowercase() }
+        return bucketMap.values.sortedBy { it.name.toSortName() }
     }
 }

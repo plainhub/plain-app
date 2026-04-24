@@ -1,8 +1,11 @@
 package com.ismartcoding.plain.data
 
+import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.db.DTagRelation
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class TagRelationStub(
     var key: String = "",
     var title: String = "",

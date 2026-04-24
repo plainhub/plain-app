@@ -6,6 +6,7 @@ import android.provider.MediaStore
 import android.telephony.PhoneNumberUtils
 import com.ismartcoding.lib.Constants
 import com.ismartcoding.lib.isQPlus
+import com.ismartcoding.lib.pinyin.Pinyin
 import io.ktor.http.ContentType
 import java.io.File
 import java.net.URL
@@ -873,4 +874,8 @@ fun String.isEmail(): Boolean {
 
 fun String.isPhone(): Boolean {
     return android.util.Patterns.PHONE.matcher(this).matches()
+}
+
+fun String.toSortName(): String {
+    return Pinyin.toPinyin(this).lowercase()
 }

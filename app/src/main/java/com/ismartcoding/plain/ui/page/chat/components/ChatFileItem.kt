@@ -17,10 +17,10 @@ import com.ismartcoding.lib.extensions.isAudioFast
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.chat.download.DownloadQueue
 import com.ismartcoding.plain.chat.download.DownloadTask
-import com.ismartcoding.plain.data.DPlaylistAudio
+import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.db.DMessageFile
 import com.ismartcoding.plain.db.DPeer
-import com.ismartcoding.plain.features.AudioPlayer
+import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.rememberTransformItemState
 import com.ismartcoding.plain.ui.models.AudioPlaylistViewModel

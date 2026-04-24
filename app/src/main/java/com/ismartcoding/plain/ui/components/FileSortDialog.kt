@@ -9,11 +9,11 @@ import com.ismartcoding.plain.ui.base.RadioDialog
 import com.ismartcoding.plain.ui.base.RadioDialogOption
 
 @Composable
-fun FileSortDialog(sortBy: MutableState<FileSortBy>, onSelected: (FileSortBy) -> Unit, onDismiss: () -> Unit = {}) {
+fun FileSortDialog(sortBy: MutableState<FileSortBy>, entries: List<FileSortBy> = FileSortBy.entries, onSelected: (FileSortBy) -> Unit, onDismiss: () -> Unit = {}) {
     RadioDialog(
         title = stringResource(R.string.sort),
         options =
-        FileSortBy.entries.map {
+        entries.map {
             RadioDialogOption(
                 text = stringResource(id = it.getTextId()),
                 selected = it == sortBy.value,

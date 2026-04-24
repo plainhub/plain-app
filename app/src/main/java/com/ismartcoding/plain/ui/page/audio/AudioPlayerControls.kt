@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.ui.page.audio
 
-import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -24,7 +23,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.enums.MediaPlayMode
-import com.ismartcoding.plain.features.AudioPlayer
+import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.preferences.AudioPlayModePreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

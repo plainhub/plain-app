@@ -45,7 +45,7 @@ internal class HttpServerLockManager(private val context: Context) {
     )
 
     @Volatile private var lastActivityMs: Long = System.currentTimeMillis()
-    @Volatile private var keepAwake: Boolean = false
+    @Volatile private var keepAwake: Boolean = true
 
     private var inactivityJob: Job? = null
     private var eventJob: Job? = null

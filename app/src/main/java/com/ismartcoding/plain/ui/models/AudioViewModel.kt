@@ -5,10 +5,10 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.viewModelScope
-import com.ismartcoding.plain.data.DAudio
+import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
-import com.ismartcoding.plain.features.media.AudioMediaStoreHelper
+import com.ismartcoding.plain.audio.AudioMediaStoreHelper
 import com.ismartcoding.plain.preferences.AudioPlaylistPreference
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import kotlinx.coroutines.Dispatchers
@@ -28,11 +28,6 @@ class AudioViewModel : BaseMediaViewModel<DAudio>() {
             AudioPlaylistPreference.deleteAsync(context, pathes)
             loadAsync(context, tagsVM)
             DialogHelper.hideLoading()
-            _itemsFlow.update {
-                it.toMutableStateList().apply {
-                    removeIf { i -> ids.contains(i.id) }
-                }
-            }
         }
     }
 }

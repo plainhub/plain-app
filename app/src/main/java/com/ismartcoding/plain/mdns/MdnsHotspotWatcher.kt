@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import com.ismartcoding.lib.isTPlus
 import com.ismartcoding.lib.logcat.LogCat
 
 /**
@@ -40,7 +41,7 @@ internal class MdnsHotspotWatcher(
         }
         val filter = IntentFilter(apStateChangedAction)
         runCatching {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (isTPlus()) {
                 context.registerReceiver(r, filter, Context.RECEIVER_NOT_EXPORTED)
             } else {
                 @Suppress("UnspecifiedRegisterReceiverFlag")

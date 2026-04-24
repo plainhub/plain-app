@@ -2,7 +2,7 @@ package com.ismartcoding.plain.ui.models
 
 import androidx.lifecycle.viewModelScope
 import com.ismartcoding.lib.extensions.getFilenameWithoutExtensionFromPath
-import com.ismartcoding.plain.data.DAudio
+import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.features.dlna.sender.DlnaTransportController
 import com.ismartcoding.plain.data.IMedia
 import com.ismartcoding.plain.features.media.CastPlayer

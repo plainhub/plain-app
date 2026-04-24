@@ -13,9 +13,8 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.db.DTag
 import com.ismartcoding.plain.enums.AppFeatureType
-import com.ismartcoding.plain.features.media.AudioMediaStoreHelper
+import com.ismartcoding.plain.audio.AudioMediaStoreHelper
 import com.ismartcoding.plain.helpers.ShareHelper
-import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomActionButtons
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonDelete
 import com.ismartcoding.plain.ui.base.IconTextSmallButtonLabel
@@ -32,6 +31,7 @@ import com.ismartcoding.plain.ui.models.AudioViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.page.tags.BatchSelectTagsDialog
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.collectAsState
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -49,7 +49,7 @@ fun AudioFilesSelectModeBottomActions(
 
     if (showSelectTagsDialog) {
         val selectedIds = dragSelectState.selectedIds
-        val selectedItems = audioVM.itemsFlow.value.filter { selectedIds.contains(it.id) }
+        val selectedItems = audioVM.itemsFlow.collectAsState().value.filter { selectedIds.contains(it.id) }
         BatchSelectTagsDialog(tagsVM, tagsState, selectedItems, removeFromTags) {
             showSelectTagsDialog = false
             dragSelectState.exitSelectMode()
@@ -58,27 +58,29 @@ fun AudioFilesSelectModeBottomActions(
 
     PBottomAppBar {
         BottomActionButtons {
-            IconTextSmallButtonLabel {
-                showSelectTagsDialog = true
-                removeFromTags = false
-            }
-            IconTextSmallButtonLabelOff {
-                showSelectTagsDialog = true
-                removeFromTags = true
-            }
-            IconTextSmallButtonPlaylistAdd {
-                scope.launch {
-                    val selectedIds = dragSelectState.selectedIds
-                    val selectedItems = audioVM.itemsFlow.value.filter { selectedIds.contains(it.id) }
-                    withIO {
-                        audioPlaylistVM.addAsync(context, selectedItems)
-                    }
-                    dragSelectState.exitSelectMode()
-                    DialogHelper.showMessage(R.string.added_to_playlist)
+            if (!audioVM.trash.value) {
+                IconTextSmallButtonLabel {
+                    showSelectTagsDialog = true
+                    removeFromTags = false
                 }
-            }
-            IconTextSmallButtonShare {
-                ShareHelper.shareUris(context, dragSelectState.selectedIds.map { AudioMediaStoreHelper.getItemUri(it) })
+                IconTextSmallButtonLabelOff {
+                    showSelectTagsDialog = true
+                    removeFromTags = true
+                }
+                IconTextSmallButtonPlaylistAdd {
+                    scope.launch {
+                        val selectedIds = dragSelectState.selectedIds
+                        val selectedItems = audioVM.itemsFlow.value.filter { selectedIds.contains(it.id) }
+                        withIO {
+                            audioPlaylistVM.addAsync(context, selectedItems)
+                        }
+                        dragSelectState.exitSelectMode()
+                        DialogHelper.showMessage(R.string.added_to_playlist)
+                    }
+                }
+                IconTextSmallButtonShare {
+                    ShareHelper.shareUris(context, dragSelectState.selectedIds.map { AudioMediaStoreHelper.getItemUri(it) })
+                }
             }
             if (AppFeatureType.MEDIA_TRASH.has()) {
                 if (audioVM.trash.value) {

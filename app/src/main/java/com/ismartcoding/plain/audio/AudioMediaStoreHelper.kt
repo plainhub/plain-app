@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.features.media
+package com.ismartcoding.plain.audio
 
 import android.content.Context
 import android.net.Uri
@@ -10,10 +10,11 @@ import com.ismartcoding.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.lib.extensions.map
 import com.ismartcoding.lib.helpers.FilterField
 import com.ismartcoding.lib.isQPlus
-import com.ismartcoding.plain.data.DAudio
+import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.data.TagRelationStub
 import com.ismartcoding.plain.enums.MediaType
 import com.ismartcoding.plain.features.file.FileSortBy
+import com.ismartcoding.plain.features.media.BaseMediaContentHelper
 
 object AudioMediaStoreHelper : BaseMediaContentHelper() {
     override val uriExternal: Uri = if (isQPlus()) MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL) else MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
@@ -33,9 +34,7 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
         )
 
         if (isQPlus()) {
-            projection.add(
-                MediaStore.Audio.Media.BUCKET_ID,
-            )
+            projection.add(MediaStore.Audio.Media.BUCKET_ID)
         }
 
         return projection.toTypedArray()

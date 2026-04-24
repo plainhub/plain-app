@@ -36,7 +36,7 @@ import com.ismartcoding.plain.events.ExportFileResultEvent
 import com.ismartcoding.plain.events.IgnoreBatteryOptimizationResultEvent
 import com.ismartcoding.plain.events.PickFileResultEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
-import com.ismartcoding.plain.features.AudioPlayer
+import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.bluetooth.BluetoothPermission

@@ -1,4 +1,4 @@
-package com.ismartcoding.plain.data
+package com.ismartcoding.plain.audio
 
 import android.content.Context
 import android.media.MediaMetadataRetriever
@@ -6,32 +6,31 @@ import android.os.Parcelable
 import androidx.annotation.OptIn
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import androidx.media3.common.MediaMetadata.MEDIA_TYPE_MUSIC
 import androidx.media3.common.util.UnstableApi
 import com.ismartcoding.lib.extensions.formatDuration
 import com.ismartcoding.lib.extensions.getFilenameWithoutExtensionFromPath
 import com.ismartcoding.lib.extensions.pathToUri
 import com.ismartcoding.plain.R
-import com.ismartcoding.plain.features.locale.LocaleHelper.getString
+import com.ismartcoding.plain.features.locale.LocaleHelper
 import kotlinx.parcelize.Parcelize
-import java.io.Serializable
+import kotlinx.serialization.Serializable
 
 @OptIn(UnstableApi::class)
 @Parcelize
-@kotlinx.serialization.Serializable
+@Serializable
 data class DPlaylistAudio(
     val title: String,
     val path: String,
     val artist: String,
     val duration: Long,
-) : Parcelable, Serializable {
+) : Parcelable, java.io.Serializable {
 
     fun toMediaItem(): MediaItem {
         val mediaMetadata = MediaMetadata.Builder()
             .setTitle(title)
             .setSubtitle(artist)
             .setArtist(artist)
-            .setMediaType(MEDIA_TYPE_MUSIC)
+            .setMediaType(MediaMetadata.MEDIA_TYPE_MUSIC)
             .build()
 
         return MediaItem.Builder()
@@ -54,8 +53,8 @@ data class DPlaylistAudio(
             val retriever = MediaMetadataRetriever()
             var title = path.getFilenameWithoutExtensionFromPath()
             var duration = 0L
-            var artist = getString(R.string.unknown)
-            
+            var artist = LocaleHelper.getString(R.string.unknown)
+
             try {
                 retriever.setDataSource(context, path.pathToUri())
                 val keyTitle = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) ?: ""

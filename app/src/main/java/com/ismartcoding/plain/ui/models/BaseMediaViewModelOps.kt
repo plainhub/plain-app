@@ -6,7 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.ismartcoding.plain.data.IData
 import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.TagHelper
-import com.ismartcoding.plain.features.media.AudioMediaStoreHelper
+import com.ismartcoding.plain.audio.AudioMediaStoreHelper
+import com.ismartcoding.plain.docs.DocMediaStoreHelper
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -22,6 +23,7 @@ internal fun <T : IData> BaseMediaViewModel<T>.trashItems(
         TagHelper.deleteTagRelationByKeys(ids, dataType)
         when (dataType) {
             DataType.AUDIO -> AudioMediaStoreHelper.trashByIdsAsync(context, ids)
+            DataType.DOC -> DocMediaStoreHelper.trashByIdsAsync(context, ids)
             DataType.IMAGE -> ImageMediaStoreHelper.trashByIdsAsync(context, ids)
             DataType.VIDEO -> VideoMediaStoreHelper.trashByIdsAsync(context, ids)
             else -> {}
@@ -41,6 +43,7 @@ internal fun <T : IData> BaseMediaViewModel<T>.restoreItems(
         DialogHelper.showLoading()
         when (dataType) {
             DataType.AUDIO -> AudioMediaStoreHelper.restoreByIdsAsync(context, ids)
+            DataType.DOC -> DocMediaStoreHelper.restoreByIdsAsync(context, ids)
             DataType.IMAGE -> ImageMediaStoreHelper.restoreByIdsAsync(context, ids)
             DataType.VIDEO -> VideoMediaStoreHelper.restoreByIdsAsync(context, ids)
             else -> {}
@@ -58,6 +61,7 @@ internal suspend fun <T : IData> BaseMediaViewModel<T>.countMediaAsync(
 ): Int {
     return when (dataType) {
         DataType.AUDIO -> AudioMediaStoreHelper.countAsync(context, query)
+        DataType.DOC -> DocMediaStoreHelper.countAsync(context, query)
         DataType.IMAGE -> ImageMediaStoreHelper.countAsync(context, query)
         DataType.VIDEO -> VideoMediaStoreHelper.countAsync(context, query)
         else -> 0
@@ -70,6 +74,7 @@ internal suspend fun <T : IData> BaseMediaViewModel<T>.searchMediaAsync(
 ): List<T> {
     return when (dataType) {
         DataType.AUDIO -> AudioMediaStoreHelper.searchAsync(context, query, limit.intValue, offset.intValue, sortBy.value)
+        DataType.DOC -> DocMediaStoreHelper.searchAsync(context, query, limit.intValue, offset.intValue, sortBy.value)
         DataType.IMAGE -> ImageMediaStoreHelper.searchAsync(context, query, limit.intValue, offset.intValue, sortBy.value)
         DataType.VIDEO -> VideoMediaStoreHelper.searchAsync(context, query, limit.intValue, offset.intValue, sortBy.value)
         else -> emptyList()

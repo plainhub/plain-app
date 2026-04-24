@@ -8,9 +8,10 @@ import com.ismartcoding.plain.enums.DataType
 import com.ismartcoding.plain.features.NoteHelper
 import com.ismartcoding.plain.features.TagHelper
 import com.ismartcoding.plain.features.feed.FeedEntryHelper
-import com.ismartcoding.plain.features.media.AudioMediaStoreHelper
+import com.ismartcoding.plain.audio.AudioMediaStoreHelper
 import com.ismartcoding.plain.features.media.CallMediaStoreHelper
 import com.ismartcoding.plain.features.media.ContactMediaStoreHelper
+import com.ismartcoding.plain.docs.DocMediaStoreHelper
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.features.sms.SmsHelper
@@ -94,6 +95,10 @@ fun SchemaBuilder.addTagSchema() {
                     items = CallMediaStoreHelper.getIdsAsync(context, query).map { TagRelationStub(it) }
                 }
 
+                DataType.DOC -> {
+                    items = DocMediaStoreHelper.getTagRelationStubsAsync(context, query)
+                }
+
                 else -> {}
             }
 
@@ -161,6 +166,10 @@ fun SchemaBuilder.addTagSchema() {
 
                 DataType.CALL -> {
                     ids = CallMediaStoreHelper.getIdsAsync(context, query)
+                }
+
+                DataType.DOC -> {
+                    ids = DocMediaStoreHelper.getIdsAsync(context, query)
                 }
 
                 else -> {}
