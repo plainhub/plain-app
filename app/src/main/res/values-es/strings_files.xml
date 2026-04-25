@@ -47,4 +47,7 @@
     <string name="cannot_copy_folder_into_itself">No se puede copiar una carpeta dentro de sí misma o de una subcarpeta.</string>
     <string name="file_save_to">Archivo guardado en {{path}}</string>
     <string name="group_by_taken_at">Agrupar por fecha de captura</string>
+    <string name="view_mode">Modo de visualización</string>
+    <string name="browse_by_tags">Explorar por etiquetas</string>
+    <string name="browse_by_file_type">Explorar por tipo de archivo</string>
 </resources>

@@ -47,6 +47,9 @@
     <string name="file_picker_not_available">No file picker app is available on this device. Please install a file manager app.</string>
     <string name="cannot_move_folder_into_itself">Cannot move a folder into itself or its subfolder.</string>
     <string name="cannot_copy_folder_into_itself">Cannot copy a folder into itself or its subfolder.</string>
+    <string name="view_mode">View Mode</string>
+    <string name="browse_by_tags">Browse by tags</string>
+    <string name="browse_by_file_type">Browse by file type</string>
     <string name="app_files">App Files</string>
     <string name="app_files_desc">Files shared in chat</string>
     <string name="no_app_files">No files yet</string>

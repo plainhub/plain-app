@@ -47,4 +47,7 @@
     <string name="cannot_copy_folder_into_itself">Kan een map niet naar zichzelf of een submap kopiëren.</string>
     <string name="file_save_to">Bestand opgeslagen naar {{path}}</string>
     <string name="group_by_taken_at">Groepeeren op tijdstip</string>
+    <string name="view_mode">Weergavemodus</string>
+    <string name="browse_by_tags">Bladeren op tags</string>
+    <string name="browse_by_file_type">Bladeren op bestandstype</string>
 </resources>

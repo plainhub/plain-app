@@ -47,4 +47,7 @@
     <string name="cannot_copy_folder_into_itself">Ein Ordner kann nicht in sich selbst oder in einen Unterordner kopiert werden.</string>
     <string name="file_save_to">Datei gespeichert unter {{path}}</string>
     <string name="group_by_taken_at">Nach Aufnahmezeit gruppieren</string>
+    <string name="view_mode">Ansichtsmodus</string>
+    <string name="browse_by_tags">Nach Tags durchsuchen</string>
+    <string name="browse_by_file_type">Nach Dateityp durchsuchen</string>
 </resources>

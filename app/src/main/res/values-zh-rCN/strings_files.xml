@@ -45,6 +45,9 @@
     <string name="file_picker_not_available">此设备上没有可用的文件选择器应用。请安装文件管理器应用。</string>
     <string name="cannot_move_folder_into_itself">无法将文件夹移动到其自身或其子文件夹中。</string>
     <string name="cannot_copy_folder_into_itself">无法将文件夹复制到其自身或其子文件夹中。</string>
+    <string name="view_mode">浏览方式</string>
+    <string name="browse_by_tags">按标签</string>
+    <string name="browse_by_file_type">按文件类型</string>
     <string name="file_save_to">文件已保存到 {{path}}</string>
     <string name="group_by_taken_at">按拍摄时间分组</string>
 </resources>

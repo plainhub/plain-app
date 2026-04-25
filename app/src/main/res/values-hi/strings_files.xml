@@ -47,4 +47,7 @@
     <string name="cannot_copy_folder_into_itself">किसी फ़ोल्डर को उसके भीतर या उसकी उपफ़ोल्डर में कॉपी नहीं किया जा सकता।</string>
     <string name="file_save_to">फ़ाइल {{path}} में सहेजी गई</string>
     <string name="group_by_taken_at">लिए जाने के समय के अनुसार समूह बनाएं</string>
+    <string name="view_mode">देखने का मोड</string>
+    <string name="browse_by_tags">टैग के अनुसार ब्राउज़ करें</string>
+    <string name="browse_by_file_type">फ़ाइल प्रकार के अनुसार ब्राउज़ करें</string>
 </resources>

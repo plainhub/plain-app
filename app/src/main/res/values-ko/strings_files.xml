@@ -47,4 +47,7 @@
     <string name="cannot_copy_folder_into_itself">폴더를 자기 자신 또는 하위 폴더로 복사할 수 없습니다.</string>
     <string name="file_save_to">파일이 {{path}}에 저장되었습니다</string>
     <string name="group_by_taken_at">촬영 시간으로 그룹화</string>
+    <string name="view_mode">보기 모드</string>
+    <string name="browse_by_tags">태그별로 탐색</string>
+    <string name="browse_by_file_type">파일 형식별로 탐색</string>
 </resources>

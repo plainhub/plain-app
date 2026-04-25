@@ -47,4 +47,7 @@
     <string name="cannot_copy_folder_into_itself">Нельзя скопировать папку в саму себя или в её подпапку.</string>
     <string name="file_save_to">Файл сохранён в {{path}}</string>
     <string name="group_by_taken_at">Группировать по времени съёмки</string>
+    <string name="view_mode">Режим просмотра</string>
+    <string name="browse_by_tags">Обзор по тегам</string>
+    <string name="browse_by_file_type">Обзор по типу файла</string>
 </resources>

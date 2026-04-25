@@ -33,6 +33,7 @@ abstract class BaseMediaViewModel<T : IData> : ISearchableViewModel<T>, ViewMode
     var selectedItem = mutableStateOf<T?>(null)
     val showRenameDialog = mutableStateOf(false)
     val showTagsDialog = mutableStateOf(false)
+    val showSortAndBrowseDialog = mutableStateOf(false)
 
     override val showSearchBar = mutableStateOf(false)
     override val searchActive = mutableStateOf(false)
