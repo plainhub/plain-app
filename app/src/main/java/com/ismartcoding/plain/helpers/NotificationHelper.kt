@@ -25,6 +25,7 @@ import com.ismartcoding.plain.ui.MainActivity
 object NotificationHelper {
     private fun createContentIntent(context: Context): PendingIntent {
         val intent = Intent(context, MainActivity::class.java).apply {
+            `package` = context.packageName
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         }
         return PendingIntent.getActivity(
@@ -75,6 +76,7 @@ object NotificationHelper {
         val notificationId = ("peer_chat_$peerId").hashCode()
 
         val replyIntent = Intent(context, PeerChatReplyReceiver::class.java).apply {
+            `package` = context.packageName
             action = Constants.ACTION_PEER_CHAT_REPLY
             putExtra(PeerChatReplyReceiver.EXTRA_PEER_ID, peerId)
         }
@@ -82,7 +84,7 @@ object NotificationHelper {
             context,
             notificationId,
             replyIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
         val remoteInput = RemoteInput.Builder(PeerChatReplyReceiver.KEY_TEXT_REPLY)
@@ -138,6 +140,7 @@ object NotificationHelper {
                 context,
                 0,
                 Intent(context, ServiceStopBroadcastReceiver::class.java).apply {
+                    `package` = context.packageName
                     this.action = action
                 },
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
@@ -149,6 +152,7 @@ object NotificationHelper {
                 context,
                 1,
                 Intent(context, ServiceStopBroadcastReceiver::class.java).apply {
+                    `package` = context.packageName
                     this.action = Constants.ACTION_REPOST_HTTP_NOTIFICATION
                 },
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,

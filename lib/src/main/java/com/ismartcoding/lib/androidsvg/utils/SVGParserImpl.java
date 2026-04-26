@@ -69,8 +69,6 @@ class SVGParserImpl implements SVGParser
 
    private static final String  XML_STYLESHEET_PROCESSING_INSTRUCTION = "xml-stylesheet";
 
-   private static final Pattern PATTERN_BLOCK_COMMENTS = Pattern.compile("/\\*.*?\\*/");
-
    // <?xml-stylesheet> attribute names and values
    public static final String  XML_STYLESHEET_ATTR_TYPE = "type";
    public static final String  XML_STYLESHEET_ATTR_ALTERNATE = "alternate";
@@ -2627,7 +2625,7 @@ class SVGParserImpl implements SVGParser
     */
    private static void  parseStyle(SvgElementBase obj, String style)
    {
-      CSSTextScanner  scan = new CSSTextScanner(PATTERN_BLOCK_COMMENTS.matcher(style).replaceAll(""));  // regex strips block comments
+      CSSTextScanner  scan = new CSSTextScanner(style);
 
       while (!scan.empty())
       {

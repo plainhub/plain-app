@@ -121,6 +121,7 @@ class AudioPlayerService : MediaLibraryService() {
         val s = MediaLibrarySession.Builder(this, forwardingPlayer, object : MediaLibrarySession.Callback {
         }).setId(packageName)
         val sessionIntent = Intent(this, MainActivity::class.java).apply {
+            `package` = packageName
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         }
         s.setSessionActivity(

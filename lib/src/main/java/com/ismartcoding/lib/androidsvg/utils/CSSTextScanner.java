@@ -6,11 +6,12 @@ import java.util.regex.Pattern;
 
 public class CSSTextScanner extends TextScanner
 {
-   static final Pattern PATTERN_BLOCK_COMMENTS = Pattern.compile("(?s)/\\*.*?\\*/");
+   // Match closed CSS block comments using unrolled-loop pattern to prevent exponential backtracking.
+   static final Pattern PATTERN_BLOCK_COMMENTS = Pattern.compile("/\\*[^*]*(?:\\*(?!/)[^*]*)*\\*/");
 
    public CSSTextScanner(String input)
    {
-      super(PATTERN_BLOCK_COMMENTS.matcher(input).replaceAll(""));  // strip all block comments
+      super(PATTERN_BLOCK_COMMENTS.matcher(input).replaceAll(""));
    }
 
    /*
