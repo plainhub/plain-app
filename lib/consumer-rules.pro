@@ -120,6 +120,7 @@
 -dontwarn com.google.re2j.Pattern
 -dontwarn io.netty.pkitesting.CertificateBuilder$Algorithm
 -dontwarn io.netty.pkitesting.CertificateBuilder
+-dontwarn io.netty.internal.tcnative.SSLCredential
 -dontwarn io.netty.pkitesting.X509Bundle
 -dontwarn jdk.jfr.Category
 -dontwarn jdk.jfr.DataAmount
@@ -130,3 +131,5 @@
 -dontwarn jdk.jfr.Label
 -dontwarn jdk.jfr.MemoryAddress
 -dontwarn jdk.jfr.Name
+-dontwarn javax.naming.ldap.LdapName
+-dontwarn javax.naming.ldap.Rdn

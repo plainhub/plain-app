@@ -49,6 +49,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -810,12 +811,20 @@ class SVGParserImpl implements SVGParser
          // Invoke the SAX XML parser on the input.
          SAXParserFactory  spf = SAXParserFactory.newInstance();
 
-        // Disable external entity resolving
-        spf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        spf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+         // Harden parser against XXE and external resource resolution.
+         spf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+         spf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+         spf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+         spf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+         spf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+         spf.setXIncludeAware(false);
+         spf.setNamespaceAware(true);
 
          SAXParser sp = spf.newSAXParser();
          XMLReader xr = sp.getXMLReader();
+         xr.setFeature("http://xml.org/sax/features/external-general-entities", false);
+         xr.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+         xr.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 
          SAXHandler  handler = new SAXHandler();
          xr.setContentHandler(handler);
