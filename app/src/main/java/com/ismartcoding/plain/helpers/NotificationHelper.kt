@@ -1,11 +1,13 @@
 package com.ismartcoding.plain.helpers
 
+import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.RemoteInput
@@ -22,25 +24,15 @@ import com.ismartcoding.plain.ui.MainActivity
 
 object NotificationHelper {
     private fun createContentIntent(context: Context): PendingIntent {
-        val launchIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-        return if (launchIntent != null) {
-            launchIntent.flags =
-                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
-            PendingIntent.getActivity(
-                context,
-                0,
-                launchIntent,
-                PendingIntent.FLAG_IMMUTABLE,
-            )
-        } else {
-            val fallbackIntent = Intent(context, MainActivity::class.java)
-            PendingIntent.getActivity(
-                context,
-                0,
-                fallbackIntent,
-                PendingIntent.FLAG_IMMUTABLE,
-            )
+        val intent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         }
+        return PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE,
+        )
     }
 
     fun generateId(): Int {
@@ -75,6 +67,7 @@ object NotificationHelper {
         }
     }
 
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     fun sendPeerMessageNotification(context: Context, peerId: String, peerName: String, messageText: String) {
         if (!Permission.POST_NOTIFICATIONS.can(context)) return
         ensureChatChannel()
@@ -117,6 +110,7 @@ object NotificationHelper {
         NotificationManagerCompat.from(context).notify(notificationId, notification)
     }
 
+    @RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
     fun sendWebLoginNotification(context: Context, browserName: String, browserVersion: String, osName: String, osVersion: String, clientIp: String) {
         if (!Permission.POST_NOTIFICATIONS.can(context)) return
         ensureDefaultChannel()

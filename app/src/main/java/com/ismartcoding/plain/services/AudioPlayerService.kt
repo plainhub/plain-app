@@ -26,6 +26,7 @@ import com.ismartcoding.plain.enums.AudioAction
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.enums.AudioServiceAction
 import com.ismartcoding.plain.enums.MediaPlayMode
+import com.ismartcoding.plain.ui.MainActivity
 
 @OptIn(UnstableApi::class)
 class AudioPlayerService : MediaLibraryService() {
@@ -119,13 +120,17 @@ class AudioPlayerService : MediaLibraryService() {
         }
         val s = MediaLibrarySession.Builder(this, forwardingPlayer, object : MediaLibrarySession.Callback {
         }).setId(packageName)
-        packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
-            s.setSessionActivity(
-                PendingIntent.getActivity(
-                    this, 0, sessionIntent, PendingIntent.FLAG_IMMUTABLE
-                )
-            )
+        val sessionIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED
         }
+        s.setSessionActivity(
+            PendingIntent.getActivity(
+                this,
+                0,
+                sessionIntent,
+                PendingIntent.FLAG_IMMUTABLE,
+            ),
+        )
         session = s.build()
     }
 
