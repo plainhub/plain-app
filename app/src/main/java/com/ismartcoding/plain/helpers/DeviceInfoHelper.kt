@@ -6,8 +6,6 @@ import android.os.Build
 import android.os.SystemClock
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
-import android.telephony.TelephonyManager
-import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.lib.isQPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.activityManager
@@ -15,13 +13,12 @@ import com.ismartcoding.plain.data.DDeviceInfo
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.subscriptionManager
 import com.ismartcoding.plain.telephonyManager
-import com.ismartcoding.plain.web.models.DPhoneNumber
 import kotlin.time.Instant
 
 
 object DeviceInfoHelper {
     @SuppressLint("HardwareIds")
-    fun getDeviceInfo(context: Context, readPhoneNumber: Boolean): DDeviceInfo {
+    fun getDeviceInfo(context: Context): DDeviceInfo {
         val deviceInfo = DDeviceInfo()
         deviceInfo.deviceName = PhoneHelper.getDeviceName(context)
         deviceInfo.releaseBuildVersion = Build.VERSION.RELEASE
@@ -52,27 +49,7 @@ object DeviceInfoHelper {
         deviceInfo.screenHeight = android.util.DisplayMetrics().heightPixels
         deviceInfo.screenWidth = android.util.DisplayMetrics().widthPixels
         deviceInfo.uptime = SystemClock.elapsedRealtime()
-        if (readPhoneNumber) {
-            deviceInfo.phoneNumbers = getPhoneNumbers(context)
-        }
         return deviceInfo
-    }
-
-    @SuppressLint("MissingPermission", "HardwareIds")
-    fun getPhoneNumbers(context: Context): List<DPhoneNumber> {
-        if (Permission.READ_PHONE_STATE.can(context) && Permission.READ_PHONE_NUMBERS.can(context)) {
-            val sims = mutableListOf<DPhoneNumber>()
-            try {
-                getActiveSimCards(context).forEach {
-                    sims.add(DPhoneNumber(it.subscriptionId, it.displayName.toString(), it.number))
-                }
-            } catch (ex: Exception) {
-                LogCat.e(ex.toString())
-            }
-            return sims
-        }
-
-        return listOf()
     }
 
     @SuppressLint("MissingPermission")

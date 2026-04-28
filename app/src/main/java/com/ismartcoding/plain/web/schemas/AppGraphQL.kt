@@ -33,9 +33,7 @@ fun SchemaBuilder.addAppSchema() {
     query("deviceInfo") {
         resolver { ->
             val context = MainApp.instance
-            val apiPermissions = ApiPermissionsPreference.getAsync(context)
-            val readPhoneNumber = apiPermissions.contains(Permission.READ_PHONE_NUMBERS.toString())
-            DeviceInfoHelper.getDeviceInfo(context, readPhoneNumber).toModel()
+            DeviceInfoHelper.getDeviceInfo(context).toModel()
         }
     }
     query("battery") {

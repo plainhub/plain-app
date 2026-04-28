@@ -35,14 +35,7 @@ class DeviceInfo {
     var glEsVersion: String = ""
     var screenHeight: Int = 0
     var screenWidth: Int = 0
-    var phoneNumbers: List<PhoneNumber> = listOf()
 }
-
-data class PhoneNumber(
-    val id: Int, // Slot Number
-    val name: String, // SIM Provider
-    val number: String, // Number
-)
 
 fun DDeviceInfo.toModel(): DeviceInfo {
     val model = DeviceInfo()
@@ -75,6 +68,5 @@ fun DDeviceInfo.toModel(): DeviceInfo {
     model.screenDensity = this.screenDensity
     model.screenHeight = this.screenHeight
     model.screenWidth = this.screenWidth
-    model.phoneNumbers = this.phoneNumbers.map { PhoneNumber(it.id, it.name, it.number) }
     return model
 }

@@ -1,29 +1,31 @@
 package com.ismartcoding.plain.features.call
 
 import android.annotation.SuppressLint
-import android.net.Uri
-import com.ismartcoding.lib.extensions.telecomManager
+import android.os.Build
+import android.telephony.SubscriptionManager
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.DSim
+import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.subscriptionManager
 
 @SuppressLint("MissingPermission")
 object SimHelper {
     fun getAll(): List<DSim> {
         val context = MainApp.instance
-        val accounts = mutableListOf<DSim>()
-        context.telecomManager.callCapablePhoneAccounts.forEach { account ->
-            val phoneAccount = context.telecomManager.getPhoneAccount(account)
-            val label = phoneAccount.label.toString()
-            var address = phoneAccount.address.toString()
-            if (address.startsWith("tel:") && address.substringAfter("tel:").isNotEmpty()) {
-                address = Uri.decode(address.substringAfter("tel:"))
-            }
-            accounts.add(DSim(phoneAccount.accountHandle.id, label, address))
+        if (!Permission.READ_PHONE_STATE.can(context)) return emptyList()
+        val subs = subscriptionManager.activeSubscriptionInfoList ?: return emptyList()
+        return subs.map { info ->
+            DSim(
+                id = info.subscriptionId.toString(),
+                label = info.displayName?.toString() ?: info.carrierName?.toString() ?: "SIM ${info.simSlotIndex + 1}",
+                number = info.number ?: "",
+                subscriptionId = info.subscriptionId,
+            )
         }
-        return accounts
     }
 
     fun hasMultiSims(): Boolean {
-        return MainApp.instance.telecomManager.callCapablePhoneAccounts.size > 1
+        if (!Permission.READ_PHONE_STATE.can(MainApp.instance)) return false
+        return (subscriptionManager.activeSubscriptionInfoList?.size ?: 0) > 1
     }
 }

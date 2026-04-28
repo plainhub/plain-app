@@ -94,10 +94,11 @@ fun SchemaBuilder.addSmsSchema() {
         }
     }
     mutation("sendSms") {
-        resolver { number: String, body: String ->
+        resolver { number: String, body: String, subscriptionId: Int ->
             Permission.SEND_SMS.checkAsync(MainApp.instance)
+            val simId = if (subscriptionId >= 0) subscriptionId else null
             try {
-                SmsHelper.sendText(number, body)
+                SmsHelper.sendText(number, body, simId)
             } catch (e: Exception) {
                 e.printStackTrace()
                 throw GraphQLError(e.message ?: "Invalid SMS input")

@@ -27,7 +27,8 @@ fun Cursor.getStringValue(
 fun Cursor.getIntValue(
     key: String,
     cache: MutableMap<String, Int>,
-): Int = getIntOrNull(getColumnIndex(key, cache)) ?: 0
+    defaultValue: Int = 0
+): Int = getIntOrNull(getColumnIndex(key, cache)) ?: defaultValue
 
 fun Cursor.getLongValue(
     key: String,

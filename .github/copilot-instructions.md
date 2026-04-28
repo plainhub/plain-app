@@ -11,7 +11,7 @@
 - **Coroutines** — Use `coIO`, `coMain` from `lib/helpers/CoroutinesHelper.kt` for side effects.
 - **State** — `MutableStateFlow` in ViewModels, collected by Compose.
 - **Short paths** — `app/.../plain/` = `app/src/main/java/com/ismartcoding/plain/`, `lib/.../lib/` = `lib/src/main/java/com/ismartcoding/lib/`
-- **Max 200 lines per file** — Split into smaller files when a file reaches 200 lines. It is strictly forbidden to reduce line count by removing blank lines or whitespace — every split must be a genuine logical decomposition.
+- **Max 400 lines per file** — Split into smaller files when a file reaches 400 lines. It is strictly forbidden to reduce line count by removing blank lines or whitespace — every split must be a genuine logical decomposition.
 - **`app_name` is never translated** — The string `app_name` must keep `translatable="false"`. Never add `app_name` to locale `strings*.xml` files.
 - **More icon consistency** — Always use `R.drawable.ellipsis_vertical` (⋮) for "more" actions in top bars, never `R.drawable.ellipsis` (…). Keep icon style consistent across all pages.
 - **No `coIO` in GraphQL resolvers** — Never call `coIO { }` inside a GraphQL resolver. Detached fire-and-forget coroutines launched from a resolver are not tied to any lifecycle and can crash the server thread. Instead, emit a domain event with `sendEvent(MyEvent())` and handle the async work in `AppEvents.register()` where the coroutine is properly managed. Pattern: GraphQL resolver → `sendEvent(XxxEvent())` → `AppEvents` handles with `coIO { ... }`.

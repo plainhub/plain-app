@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.data
 
-import com.ismartcoding.plain.web.models.DPhoneNumber
 import kotlin.time.Instant
 import com.ismartcoding.plain.helpers.TimeHelper
 
@@ -34,6 +33,5 @@ class DDeviceInfo {
     var glEsVersion: String = ""
     var screenHeight: Int = 0
     var screenWidth: Int = 0
-    var phoneNumbers: List<DPhoneNumber> = listOf()
 }
 

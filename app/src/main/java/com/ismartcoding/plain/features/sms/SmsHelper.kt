@@ -1,10 +1,13 @@
 package com.ismartcoding.plain.features.sms
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.provider.BaseColumns
 import android.provider.Telephony
+import android.telephony.SmsManager
 import androidx.core.net.toUri
 import com.ismartcoding.lib.content.ContentWhere
 import com.ismartcoding.lib.data.SortBy
@@ -17,6 +20,7 @@ import com.ismartcoding.lib.extensions.getTimeSecondsValue
 import com.ismartcoding.lib.extensions.getTimeValue
 import com.ismartcoding.lib.extensions.map
 import com.ismartcoding.lib.extensions.queryCursor
+import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.db.AppDatabase
 import com.ismartcoding.plain.db.DArchivedConversation
 import com.ismartcoding.lib.helpers.FilterField
@@ -40,12 +44,18 @@ object SmsHelper {
     // 128 = m-send-req (outgoing), 130 = m-retrieve-conf (incoming with content)
     private const val MMS_CONTENT_FILTER = "m_type IN (128, 130)"
 
-    fun sendText(to: String, message: String) {
-        val parts = smsManager.divideMessage(message)
-        if (parts.size > 1) {
-            smsManager.sendMultipartTextMessage(to, null, ArrayList(parts), null, null)
+    fun sendText(to: String, message: String, subscriptionId: Int? = null) {
+        val manager: SmsManager = if (subscriptionId != null && subscriptionId >= 0) {
+            @Suppress("DEPRECATION")
+            SmsManager.getSmsManagerForSubscriptionId(subscriptionId)
         } else {
-            smsManager.sendTextMessage(to, null, message, null, null)
+            smsManager
+        }
+        val parts = manager.divideMessage(message)
+        if (parts.size > 1) {
+            manager.sendMultipartTextMessage(to, null, ArrayList(parts), null, null)
+        } else {
+            manager.sendTextMessage(to, null, message, null, null)
         }
     }
 
@@ -103,7 +113,7 @@ object SmsHelper {
             cursor.getIntValue(Telephony.Sms.READ, cache) == 1,
             cursor.getStringValue(Telephony.Sms.THREAD_ID, cache),
             cursor.getIntValue(Telephony.Sms.TYPE, cache),
-            cursor.getIntValue(Telephony.Sms.SUBSCRIPTION_ID, cache),
+            cursor.getIntValue(Telephony.Sms.SUBSCRIPTION_ID, cache, -1),
         )
     }
 
@@ -183,7 +193,7 @@ object SmsHelper {
                 read = cursor.getIntValue(Telephony.Mms.READ, cache) == 1,
                 threadId = cursor.getStringValue(Telephony.Mms.THREAD_ID, cache),
                 type = cursor.getIntValue(Telephony.Mms.MESSAGE_BOX, cache),
-                subscriptionId = cursor.getIntValue(Telephony.Mms.SUBSCRIPTION_ID, cache),
+                subscriptionId = cursor.getIntValue(Telephony.Mms.SUBSCRIPTION_ID, cache, -1),
                 isMms = true,
                 attachments = bodyAndAttachments.second,
             )
@@ -262,7 +272,7 @@ object SmsHelper {
                 read = cursor.getIntValue(Telephony.Mms.READ, cache) == 1,
                 threadId = cursor.getStringValue(Telephony.Mms.THREAD_ID, cache),
                 type = cursor.getIntValue(Telephony.Mms.MESSAGE_BOX, cache),
-                subscriptionId = cursor.getIntValue(Telephony.Mms.SUBSCRIPTION_ID, cache),
+                subscriptionId = cursor.getIntValue(Telephony.Mms.SUBSCRIPTION_ID, cache, -1),
                 isMms = true,
                 attachments = bodyAndAttachments.second,
             )
