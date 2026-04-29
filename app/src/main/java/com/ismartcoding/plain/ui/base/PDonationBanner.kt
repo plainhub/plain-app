@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
@@ -18,13 +19,20 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.ismartcoding.plain.R
 
 @Composable
@@ -32,6 +40,21 @@ fun PDonationBanner(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val locale = context.resources.configuration.locales.get(0)
+    val isZhCN = locale.language == "zh" && locale.country == "CN"
+    var showWeChatDialog by remember { mutableStateOf(false) }
+
+    if (showWeChatDialog) {
+        WeChatDonateDialog { showWeChatDialog = false }
+    }
+
+    val effectiveOnClick: () -> Unit = if (isZhCN) {
+        { showWeChatDialog = true }
+    } else {
+        onClick
+    }
+
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
@@ -41,16 +64,47 @@ fun PDonationBanner(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
         ),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
-        onClick = onClick,
+        onClick = effectiveOnClick,
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
             DonationLabel()
             Spacer(Modifier.height(16.dp))
             DonationTexts()
             Spacer(Modifier.height(20.dp))
-            DonationButton(onClick)
+            DonationButton(effectiveOnClick)
         }
     }
+}
+
+@Composable
+private fun WeChatDonateDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("微信赞赏") },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                AsyncImage(
+                    model = "file:///android_asset/donate_wechat.webp",
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    text = "请用微信扫码",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("关闭")
+            }
+        },
+    )
 }
 
 @Composable

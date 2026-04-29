@@ -3,6 +3,13 @@ package com.ismartcoding.plain.ui.page.scan
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +38,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -123,6 +133,7 @@ fun ScanPage(navController: NavHostController) {
     }, content = { paddingValues ->
         Box(modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding())) {
             if (hasCamPermission) ScanCameraView(lifecycleOwner, cameraDetecting, onCameraProvider = { cameraProvider = it }, onScanResult = { handleScanResult(it) })
+            if (hasCamPermission) ScanOverlay()
             Row(modifier = Modifier.fillMaxWidth().padding(start = 24.dp, end = 24.dp, bottom = 64.dp).align(Alignment.BottomCenter), horizontalArrangement = Arrangement.End) {
                 Box(modifier = Modifier.size(56.dp).clip(CircleShape).background(MaterialTheme.colorScheme.darkMask(0.2f)).clickable { sendEvent(PickFileEvent(PickFileTag.SCAN, PickFileType.IMAGE, multiple = false)) }, contentAlignment = Alignment.Center) {
                     Icon(painter = painterResource(R.drawable.image), contentDescription = stringResource(R.string.images), tint = Color.White)
@@ -137,5 +148,65 @@ private fun addScanResult(context: Context, scope: CoroutineScope, value: String
         val results = withIO { ScanHistoryPreference.getValueAsync(context).toMutableList() }
         results.removeIf { it == value }; results.add(0, value)
         withIO { ScanHistoryPreference.putAsync(context, results) }
+    }
+}
+
+@Composable
+private fun ScanOverlay(modifier: Modifier = Modifier) {
+    val infiniteTransition = rememberInfiniteTransition(label = "scan")
+    val scanProgress by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "scan_line",
+    )
+    Canvas(modifier = modifier.fillMaxSize()) {
+        val boxSize = minOf(size.width, size.height) * 0.65f
+        val left = (size.width - boxSize) / 2f
+        val top = (size.height - boxSize) / 2f
+
+        // Dark overlay around scan area
+        drawRect(color = Color.Black.copy(alpha = 0.5f), topLeft = Offset(0f, 0f), size = Size(size.width, top))
+        drawRect(color = Color.Black.copy(alpha = 0.5f), topLeft = Offset(0f, top + boxSize), size = Size(size.width, size.height - top - boxSize))
+        drawRect(color = Color.Black.copy(alpha = 0.5f), topLeft = Offset(0f, top), size = Size(left, boxSize))
+        drawRect(color = Color.Black.copy(alpha = 0.5f), topLeft = Offset(left + boxSize, top), size = Size(size.width - left - boxSize, boxSize))
+
+        // Corner decorations
+        val cornerLen = 40.dp.toPx()
+        val cornerStroke = 3.dp.toPx()
+        val white = Color.White
+        // top-left
+        drawLine(white, Offset(left, top), Offset(left + cornerLen, top), cornerStroke)
+        drawLine(white, Offset(left, top), Offset(left, top + cornerLen), cornerStroke)
+        // top-right
+        drawLine(white, Offset(left + boxSize, top), Offset(left + boxSize - cornerLen, top), cornerStroke)
+        drawLine(white, Offset(left + boxSize, top), Offset(left + boxSize, top + cornerLen), cornerStroke)
+        // bottom-left
+        drawLine(white, Offset(left, top + boxSize), Offset(left + cornerLen, top + boxSize), cornerStroke)
+        drawLine(white, Offset(left, top + boxSize), Offset(left, top + boxSize - cornerLen), cornerStroke)
+        // bottom-right
+        drawLine(white, Offset(left + boxSize, top + boxSize), Offset(left + boxSize - cornerLen, top + boxSize), cornerStroke)
+        drawLine(white, Offset(left + boxSize, top + boxSize), Offset(left + boxSize, top + boxSize - cornerLen), cornerStroke)
+
+        // Animated scan line
+        val lineY = top + boxSize * scanProgress
+        drawRect(
+            brush = Brush.horizontalGradient(
+                colors = listOf(
+                    Color.Transparent,
+                    Color(0xFF00E676).copy(alpha = 0.9f),
+                    Color(0xFF00E676),
+                    Color(0xFF00E676).copy(alpha = 0.9f),
+                    Color.Transparent,
+                ),
+                startX = left,
+                endX = left + boxSize,
+            ),
+            topLeft = Offset(left, lineY - 1.5.dp.toPx()),
+            size = Size(boxSize, 3.dp.toPx()),
+        )
     }
 }
