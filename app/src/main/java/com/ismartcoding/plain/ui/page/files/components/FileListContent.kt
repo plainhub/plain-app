@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.features.file.DFile
+import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.components.NoDataView
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
@@ -70,12 +71,17 @@ fun FileListContent(
                         } else {
                             if (file.isDir) {
                                 filesVM.navigateToDirectory(context, file.path)
+                            } else if (!ZipBrowserHelper.isZipPath(file.path) && file.extension.lowercase() == "zip") {
+                                // Enter the zip as a virtual directory
+                                filesVM.navigateToDirectory(context, ZipBrowserHelper.joinPath(file.path, ""))
                             } else {
                                 openFile(context, files, file, navController, previewerState, itemState, audioPlaylistVM)
                             }
                         }
                     },
                     onLongClick = {
+                        // Disable select-mode for entries inside a zip archive (read-only)
+                        if (ZipBrowserHelper.isZipPath(file.path)) return@FileListItem
                         if (!filesVM.selectMode.value) {
                             filesVM.selectedFile.value = file
                         } else {

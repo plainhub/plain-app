@@ -7,12 +7,15 @@ import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.ui.base.ActionButtons
+import com.ismartcoding.plain.ui.base.IconTextCopyButton
+import com.ismartcoding.plain.ui.base.IconTextCutButton
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
 import com.ismartcoding.plain.ui.base.IconTextFavoriteButton
 import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
 import com.ismartcoding.plain.ui.base.IconTextRenameButton
 import com.ismartcoding.plain.ui.base.IconTextSelectButton
 import com.ismartcoding.plain.ui.base.IconTextShareButton
+import com.ismartcoding.plain.ui.base.IconTextZipButton
 import com.ismartcoding.plain.ui.helpers.DialogHelper
 import com.ismartcoding.plain.ui.models.FilesViewModel
 import com.ismartcoding.plain.ui.models.enterSelectMode
@@ -31,6 +34,7 @@ internal fun FileInfoActionButtons(
     context: android.content.Context,
     scope: CoroutineScope,
     onDismiss: () -> Unit,
+    onShowPasteBar: (Boolean) -> Unit,
 ) {
     ActionButtons {
         if (!filesVM.showSearchBar.value) {
@@ -39,6 +43,14 @@ internal fun FileInfoActionButtons(
                 filesVM.select(file.path)
                 onDismiss()
             }
+        }
+
+        IconTextCutButton {
+            performCutFiles(filesVM, listOf(file), onShowPasteBar) { onDismiss() }
+        }
+
+        IconTextCopyButton {
+            performCopyFiles(filesVM, listOf(file), onShowPasteBar) { onDismiss() }
         }
 
         if (file.isDir) {
@@ -56,6 +68,11 @@ internal fun FileInfoActionButtons(
                 ShareHelper.openPathWith(context, file.path)
             }
         }
+        if (!file.isDir) {
+            IconTextZipButton {
+                performZipFiles(scope, context, filesVM, listOf(file)) { onDismiss() }
+            }
+        }
         IconTextRenameButton {
             showRenameDialog.value = true
         }
@@ -67,3 +84,4 @@ internal fun FileInfoActionButtons(
         }
     }
 }
+

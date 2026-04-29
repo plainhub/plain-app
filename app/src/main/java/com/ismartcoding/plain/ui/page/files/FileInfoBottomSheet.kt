@@ -79,6 +79,7 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
                     },
                     showRenameDialog = filesVM.showRenameDialog,
                     context = context, scope = scope, onDismiss = onDismiss,
+                    onShowPasteBar = { filesVM.showPasteBar.value = it },
                 )
                 VerticalSpace(dp = 24.dp)
                 PCard {

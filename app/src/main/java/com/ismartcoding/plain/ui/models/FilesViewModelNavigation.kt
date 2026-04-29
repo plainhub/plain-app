@@ -9,6 +9,7 @@ import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.FilePathData
 import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.features.file.FileSystemHelper
+import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import com.ismartcoding.plain.preferences.LastFilePathPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,7 +19,7 @@ internal fun FilesViewModel.navigateToDirectoryInternal(context: Context, newPat
     if (selectedPath != newPath) {
         navigationHistoryInternal.add(selectedPath)
         selectedPath = newPath
-        getAndUpdateSelectedIndexInternal()
+        rebuildBreadcrumbsInternal(newPath)
         viewModelScope.launch(Dispatchers.IO) {
             isLoading.value = true
             updateItemsInternal(emptyList())
@@ -30,7 +31,7 @@ internal fun FilesViewModel.navigateToDirectoryInternal(context: Context, newPat
 internal fun FilesViewModel.navigateBackInternal(): Boolean {
     return if (navigationHistoryInternal.isNotEmpty()) {
         selectedPath = navigationHistoryInternal.removeLastOrNull() ?: selectedPath
-        getAndUpdateSelectedIndexInternal()
+        rebuildBreadcrumbsInternal(selectedPath)
         true
     } else false
 }
@@ -63,13 +64,48 @@ internal fun FilesViewModel.inferFileTypeFromRootInternal(context: Context, root
 internal fun FilesViewModel.rebuildBreadcrumbsInternal(targetPath: String) {
     breadcrumbs.clear()
     breadcrumbs.add(BreadcrumbItem(getRootDisplayName(), rootPath))
-    if (targetPath != rootPath) {
-        val relativePath = targetPath.removePrefix(rootPath).trim('/')
+    if (targetPath == rootPath) {
+        selectedBreadcrumbIndex.value = 0
+        return
+    }
+    if (ZipBrowserHelper.isZipPath(targetPath)) {
+        // Build filesystem breadcrumbs up to the zip file
+        val zipFilePath = ZipBrowserHelper.getZipFilePath(targetPath)
+        val relativeToRoot = zipFilePath.removePrefix(rootPath).trimStart('/')
+        if (relativeToRoot.isNotEmpty()) {
+            var currentPath = rootPath
+            relativeToRoot.split("/").forEach { segment ->
+                if (segment.isNotEmpty()) {
+                    currentPath += "/$segment"
+                    // Zip file breadcrumb navigates to the zip root
+                    val bcPath = if (currentPath == zipFilePath) {
+                        ZipBrowserHelper.joinPath(zipFilePath, "")
+                    } else {
+                        currentPath
+                    }
+                    breadcrumbs.add(BreadcrumbItem(segment, bcPath))
+                }
+            }
+        }
+        // Build breadcrumbs for each internal directory component
+        val internalPath = ZipBrowserHelper.getInternalPath(targetPath)
+        val segments = internalPath.trimEnd('/').split("/").filter { it.isNotEmpty() }
+        var currentInternalPath = ZipBrowserHelper.joinPath(zipFilePath, "")
+        segments.forEach { segment ->
+            val prevInternal = ZipBrowserHelper.getInternalPath(currentInternalPath)
+            val newInternal = if (prevInternal.isEmpty()) "$segment/" else "$prevInternal$segment/"
+            currentInternalPath = ZipBrowserHelper.joinPath(zipFilePath, newInternal)
+            breadcrumbs.add(BreadcrumbItem(segment, currentInternalPath))
+        }
+    } else {
+        val relativePath = targetPath.removePrefix(rootPath).trimStart('/')
         if (relativePath.isNotEmpty()) {
             var currentPath = rootPath
             relativePath.split("/").forEach { segment ->
-                currentPath += "/$segment"
-                breadcrumbs.add(BreadcrumbItem(segment, currentPath))
+                if (segment.isNotEmpty()) {
+                    currentPath += "/$segment"
+                    breadcrumbs.add(BreadcrumbItem(segment, currentPath))
+                }
             }
         }
     }

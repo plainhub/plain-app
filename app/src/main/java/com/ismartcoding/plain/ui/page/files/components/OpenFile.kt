@@ -16,6 +16,7 @@ import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.features.Permissions
 import com.ismartcoding.plain.features.file.DFile
+import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.TransformItemState
@@ -36,6 +37,43 @@ fun openFile(
     itemState: TransformItemState,
     audioPlaylistVM: AudioPlaylistViewModel? = null,
 ) {
+    // For files inside a zip archive, extract to the cache dir first, then open normally.
+    if (ZipBrowserHelper.isZipPath(file.path)) {
+        coMain {
+            DialogHelper.showLoading()
+            val tempFile = withIO { ZipBrowserHelper.extractEntryToCache(context, file.path) }
+            DialogHelper.hideLoading()
+            if (tempFile == null) {
+                DialogHelper.showMessage(R.string.error)
+                return@coMain
+            }
+            val tempPath = tempFile.absolutePath
+            val extracted = file.copy(path = tempPath)
+            when {
+                tempPath.isImageFast() || tempPath.isVideoFast() -> {
+                    // itemState is registered via TransformImageView (using the cached path)
+                    // so we can use openTransform for the zoom-from-thumbnail animation.
+                    withIO {
+                        MediaPreviewData.setDataAsync(
+                            context, itemState,
+                            listOf(extracted).map { it.toPreviewItem() },
+                            extracted.toPreviewItem(),
+                        )
+                    }
+                    previewerState.openTransform(
+                        index = 0,
+                        itemState = itemState,
+                    )
+                }
+                else -> {
+                    // audio, text, PDF — real temp path works normally
+                    openFile(context, listOf(extracted), extracted, navController, previewerState, itemState, audioPlaylistVM)
+                }
+            }
+        }
+        return
+    }
+
     val path = file.path
 
     when {

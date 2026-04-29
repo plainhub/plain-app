@@ -64,6 +64,7 @@ import com.ismartcoding.plain.ui.models.toggleSelectAll
 import com.ismartcoding.plain.ui.page.files.components.BreadcrumbView
 import com.ismartcoding.plain.ui.page.files.components.FileListContent
 import com.ismartcoding.plain.ui.page.files.components.FilePasteBar
+import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -94,6 +95,7 @@ fun FilesPage(
         )
 
         filesVM.type == FilesType.RECENTS -> stringResource(R.string.recents)
+        ZipBrowserHelper.isZipPath(filesVM.selectedPath) -> ZipBrowserHelper.getDisplayName(filesVM.selectedPath)
         filesVM.selectedPath != filesVM.rootPath -> filesVM.selectedPath.getFilenameFromPath()
         else -> stringResource(R.string.files)
     }
@@ -145,13 +147,15 @@ fun FilesPage(
                                     showHiddenFiles = nv; filesVM.loadAsync(context)
                                 }
                             })
-                        PDropdownMenuItemCreateFolder {
-                            dismiss()
-                            filesVM.showCreateFolderDialog.value = true
-                        }
-                        PDropdownMenuItemCreateFile {
-                            dismiss()
-                            filesVM.showCreateFileDialog.value = true
+                        if (!ZipBrowserHelper.isZipPath(filesVM.selectedPath)) {
+                            PDropdownMenuItemCreateFolder {
+                                dismiss()
+                                filesVM.showCreateFolderDialog.value = true
+                            }
+                            PDropdownMenuItemCreateFile {
+                                dismiss()
+                                filesVM.showCreateFileDialog.value = true
+                            }
                         }
                     }
                 } else {
@@ -169,7 +173,7 @@ fun FilesPage(
             })
     }, bottomBar = {
         AnimatedVisibility(
-            visible = filesVM.showBottomActions(),
+            visible = filesVM.showBottomActions() && !ZipBrowserHelper.isZipPath(filesVM.selectedPath),
             enter = slideInVertically { it } + fadeIn(),
             exit = slideOutVertically { it } + fadeOut()) {
             FilesSelectModeBottomActions(
@@ -177,7 +181,7 @@ fun FilesPage(
                 onShowPasteBar = { filesVM.showPasteBar.value = it })
         }
         AnimatedVisibility(
-            visible = filesVM.showPasteBar.value,
+            visible = filesVM.showPasteBar.value && !ZipBrowserHelper.isZipPath(filesVM.selectedPath),
             enter = slideInVertically { it } + fadeIn(),
             exit = slideOutVertically { it } + fadeOut()) {
             FilePasteBar(

@@ -51,18 +51,10 @@ fun FilesSelectModeBottomActions(
     PBottomAppBar {
         BottomActionButtons {
             IconTextSmallButtonCut {
-                filesVM.cutFiles.clear()
-                filesVM.cutFiles.addAll(selectedFiles.map { it.copy() })
-                filesVM.copyFiles.clear()
-                onShowPasteBar(true)
-                filesVM.exitSelectMode()
+                performCutFiles(filesVM, selectedFiles, onShowPasteBar) { filesVM.exitSelectMode() }
             }
             IconTextSmallButtonCopy {
-                filesVM.copyFiles.clear()
-                filesVM.copyFiles.addAll(selectedFiles.map { it.copy() })
-                filesVM.cutFiles.clear()
-                onShowPasteBar(true)
-                filesVM.exitSelectMode()
+                performCopyFiles(filesVM, selectedFiles, onShowPasteBar) { filesVM.exitSelectMode() }
             }
             IconTextSmallButtonShare {
                 ShareHelper.sharePaths(context, filesVM.selectedIds.toSet())
@@ -84,30 +76,7 @@ fun FilesSelectModeBottomActions(
                 }
             }
             IconTextSmallButtonZip {
-                if (selectedFiles.isNotEmpty()) {
-                    scope.launch {
-                        DialogHelper.showLoading()
-                        val file = selectedFiles[0]
-                        val destFile = File(file.path + ".zip")
-                        var destPath = destFile.path
-                        if (destFile.exists()) {
-                            destPath = destFile.newPath()
-                        }
-                        val success = withIO {
-                            try {
-                                ZipHelper.zip(selectedFiles.map { it.path }, destPath)
-                            } catch (e: Exception) {
-                                DialogHelper.showErrorMessage(e.message ?: e.toString())
-                                false
-                            }
-                        }
-                        if (success) {
-                            withIO { filesVM.loadAsync(context) }
-                        }
-                        DialogHelper.hideLoading()
-                        filesVM.exitSelectMode()
-                    }
-                }
+                performZipFiles(scope, context, filesVM, selectedFiles) { filesVM.exitSelectMode() }
             }
             if (selectedFiles.size == 1 && selectedFiles[0].path.endsWith(".zip")) {
                 IconTextSmallButtonUnzip {

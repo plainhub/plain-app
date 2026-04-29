@@ -3,8 +3,10 @@ package com.ismartcoding.plain.ui.page
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -13,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -25,7 +28,6 @@ import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.base.AceEditor
 import com.ismartcoding.plain.ui.base.NavigationBackIcon
 import com.ismartcoding.plain.ui.base.NavigationCloseIcon
-import com.ismartcoding.plain.ui.base.NoDataColumn
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PTopAppBar
 import com.ismartcoding.plain.ui.components.EditorData
@@ -104,24 +106,32 @@ fun TextFilePage(
             )
         },
         content = { paddingValues ->
-            Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
-                if (textFileVM.isDataLoading.value || !textFileVM.isEditorReady.value) {
-                    NoDataColumn(loading = true)
-                }
-                if (textFileVM.isDataLoading.value) {
-                    return@PScaffold
-                }
-                AceEditor(
-                    textFileVM, scope,
-                    EditorData(
-                        language = path.pathToAceMode(),
-                        wrapContent = textFileVM.wrapContent.value,
-                        isDarkTheme = isDarkTheme,
-                        readOnly = textFileVM.readOnly.value,
-                        gotoEnd = type == TextFileType.APP_LOG.name,
-                        content = textFileVM.content.value
+            // Use Box so the WebView renders in the background while the spinner
+            // overlays it — avoids a layout-shift freeze when the spinner hides.
+            Box(modifier = Modifier
+                .padding(top = paddingValues.calculateTopPadding())
+                .fillMaxSize()) {
+                if (!textFileVM.isDataLoading.value) {
+                    AceEditor(
+                        textFileVM, scope,
+                        EditorData(
+                            language = path.pathToAceMode(),
+                            wrapContent = textFileVM.wrapContent.value,
+                            isDarkTheme = isDarkTheme,
+                            readOnly = textFileVM.readOnly.value,
+                            gotoEnd = type == TextFileType.APP_LOG.name,
+                            content = textFileVM.content.value
+                        )
                     )
-                )
+                }
+                if (textFileVM.isDataLoading.value || !textFileVM.isEditorReady.value) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
             }
         },
     )

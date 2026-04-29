@@ -41,6 +41,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.audio.AudioPlayer
 import com.ismartcoding.plain.audio.DPlaylistAudio
 import com.ismartcoding.plain.features.file.DFile
+import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.MediaPreviewerState
@@ -132,14 +133,39 @@ fun FileListItem(
 private fun FileListItemThumbnail(
     file: DFile, itemState: TransformItemState, previewerState: MediaPreviewerState, context: android.content.Context,
 ) {
+    val isMedia = file.path.isImageFast() || file.path.isVideoFast()
+    val isZipEntry = ZipBrowserHelper.isZipPath(file.path)
+
+    // For zip entries that are images/videos, extract to cache asynchronously so
+    // we can show a real thumbnail instead of a generic icon.
+    var zipCachedPath by remember(file.path) { mutableStateOf<String?>(null) }
+    if (isMedia && isZipEntry) {
+        LaunchedEffect(file.path) {
+            zipCachedPath = withIO { ZipBrowserHelper.extractEntryToCache(context, file.path)?.absolutePath }
+        }
+    }
+
     Box(modifier = Modifier.size(40.dp), contentAlignment = Alignment.Center) {
-        if (file.path.isImageFast() || file.path.isVideoFast()) {
-            TransformImageView(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(4.dp)),
-                path = file.path, fileName = file.name, key = file.path,
-                itemState = itemState, previewerState = previewerState, widthPx = context.dp2px(48))
-        } else {
-            AsyncImage(model = if (file.isDir) AppHelper.getFileIconPath("folder") else AppHelper.getFileIconPath(file.path.getFilenameExtension()),
-                modifier = Modifier.size(48.dp), alignment = Alignment.Center, contentDescription = file.path)
+        when {
+            isMedia && !isZipEntry -> {
+                // Regular file — use TransformImageView for the zoom-into-preview animation.
+                TransformImageView(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(4.dp)),
+                    path = file.path, fileName = file.name, key = file.path,
+                    itemState = itemState, previewerState = previewerState, widthPx = context.dp2px(48))
+            }
+            isMedia && zipCachedPath != null -> {
+                // Zip entry extracted — use TransformImageView so itemState is registered
+                // and openTransform() can animate from the thumbnail position.
+                TransformImageView(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(4.dp)),
+                    path = zipCachedPath!!, fileName = file.name, key = file.path,
+                    itemState = itemState, previewerState = previewerState, widthPx = context.dp2px(48))
+            }
+            else -> {
+                AsyncImage(
+                    model = if (file.isDir) AppHelper.getFileIconPath("folder") else AppHelper.getFileIconPath(file.path.getFilenameExtension()),
+                    modifier = Modifier.size(48.dp), alignment = Alignment.Center, contentDescription = file.path,
+                )
+            }
         }
     }
 }

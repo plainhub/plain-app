@@ -63,3 +63,18 @@ fun IconTextToBottomButton(click: () -> Unit) {
 fun IconTextCastButton(click: () -> Unit) {
     PIconTextActionButton(R.drawable.cast, text = stringResource(R.string.cast), click = click)
 }
+
+@Composable
+fun IconTextCutButton(click: () -> Unit) {
+    PIconTextActionButton(R.drawable.scissors, text = stringResource(R.string.cut), click = click)
+}
+
+@Composable
+fun IconTextCopyButton(click: () -> Unit) {
+    PIconTextActionButton(R.drawable.copy, text = stringResource(R.string.copy), click = click)
+}
+
+@Composable
+fun IconTextZipButton(click: () -> Unit) {
+    PIconTextActionButton(R.drawable.package2, text = stringResource(R.string.compress), click = click)
+}

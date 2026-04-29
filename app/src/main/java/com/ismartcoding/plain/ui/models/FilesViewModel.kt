@@ -16,6 +16,7 @@ import com.ismartcoding.plain.enums.FilesType
 import com.ismartcoding.plain.features.file.DFile
 import com.ismartcoding.plain.features.file.FileSortBy
 import com.ismartcoding.plain.features.file.FileSystemHelper
+import com.ismartcoding.plain.features.file.ZipBrowserHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.FileMediaStoreHelper
 import com.ismartcoding.plain.preferences.LastFilePathPreference
@@ -102,12 +103,11 @@ class FilesViewModel : ISearchableViewModel<DFile>, ISelectableViewModel<DFile>,
         isLoading.value = true
         val showHiddenFiles = ShowHiddenFilesPreference.getAsync(context)
         val query = getQuery()
-        val files = if (showSearchBar.value && query.isNotEmpty()) {
-            FileSystemHelper.search(query, selectedPath, showHiddenFiles)
-        } else if (type == FilesType.RECENTS) {
-            FileMediaStoreHelper.getRecentFilesAsync(context)
-        } else {
-            FileSystemHelper.getFilesList(selectedPath, showHiddenFiles, sortBy.value)
+        val files = when {
+            ZipBrowserHelper.isZipPath(selectedPath) -> ZipBrowserHelper.listEntries(selectedPath, sortBy.value)
+            showSearchBar.value && query.isNotEmpty() -> FileSystemHelper.search(query, selectedPath, showHiddenFiles)
+            type == FilesType.RECENTS -> FileMediaStoreHelper.getRecentFilesAsync(context)
+            else -> FileSystemHelper.getFilesList(selectedPath, showHiddenFiles, sortBy.value)
         }
         _itemsFlow.value = files
         isLoading.value = false
