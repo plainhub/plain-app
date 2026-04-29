@@ -148,4 +148,7 @@
     <string name="copied_to_clipboard_format">"%1$s" copied to clipboard.</string>
     <string name="unknown_error">Unknown error occurred.</string>
     <string name="delete_channel_warning">Deleting this channel will also delete all related messages. This action cannot be undone.</string>
+    <string name="stay_online_mode">Stay Online Mode</string>
+    <string name="stay_online_mode_oled_saving">OLED power saving</string>
+    <string name="stay_online_mode_tap_to_exit">Tap anywhere to exit</string>
 </resources>

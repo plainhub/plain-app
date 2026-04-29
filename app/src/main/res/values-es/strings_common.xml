@@ -157,4 +157,7 @@
     <string name="crash_report_message">La app se cerró de forma inesperada. ¿Deseas compartir el informe de cierre para que podamos solucionarlo?</string>
     <string name="crash_include_app_logs">Incluir registros de la app</string>
     <string name="crash_share">Compartir</string>
+    <string name="stay_online_mode">Modo siempre en línea</string>
+    <string name="stay_online_mode_oled_saving">Ahorro OLED</string>
+    <string name="stay_online_mode_tap_to_exit">Toca para salir</string>
 </resources>

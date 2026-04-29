@@ -34,7 +34,6 @@
     <string name="finish_last_audio">Terminer le dernier audio</string>
     <string name="start">Démarrer</string>
     <string name="stop">Arrêter</string>
-    <string name="keep_screen_on">Garder l\'écran allumé</string>
     <string name="cast_mode">Mode de diffusion</string>
     <string name="casting">Diffusion</string>
     <string name="cast_playlist">Liste de diffusion</string>
@@ -42,7 +41,6 @@
     <string name="add_to_cast_queue">Ajouter à la liste de diffusion</string>
     <string name="remove_from_cast_queue">Supprimer de la liste de diffusion</string>
     <string name="my_phone">Mon téléphone</string>
-    <string name="keep_screen_on_confirm">Vous avez choisi de diffuser plusieurs éléments. Pour assurer une lecture fluide, nous maintiendrons l\'écran de votre téléphone allumé pendant le processus de diffusion. Vous pouvez annuler cela à tout moment depuis le menu de l\'écran principal.</string>
     <string name="pdf_open_error">Échec de l\'ouverture du fichier PDF.</string>
     <string name="audio_play_error">Échec de la lecture du fichier audio.</string>
     <string name="clear_all">Tout effacer</string>

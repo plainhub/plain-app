@@ -34,7 +34,6 @@
     <string name="finish_last_audio">Termina ultimo audio</string>
     <string name="start">Avvia</string>
     <string name="stop">Interrompi</string>
-    <string name="keep_screen_on">Mantieni schermo attivo</string>
     <string name="cast_mode">Modalità Cast</string>
     <string name="casting">Trasmissione</string>
     <string name="cast_playlist">Playlist Cast</string>
@@ -42,7 +41,6 @@
     <string name="add_to_cast_queue">Aggiungi alla coda Cast</string>
     <string name="remove_from_cast_queue">Rimuovi dalla coda Cast</string>
     <string name="my_phone">Il mio telefono</string>
-    <string name="keep_screen_on_confirm">Hai scelto di inviare più elementi. Per garantire una riproduzione fluida, manterremo il tuo schermo del telefono acceso durante il processo di invio. Puoi annullare questa opzione in qualsiasi momento dal menu principale.</string>
     <string name="pdf_open_error">Impossibile aprire il file PDF.</string>
     <string name="audio_play_error">Impossibile riprodurre il file audio.</string>
     <string name="clear_all">Cancella tutto</string>

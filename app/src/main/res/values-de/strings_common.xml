@@ -157,4 +157,7 @@
     <string name="crash_report_message">Die App ist unerwartet abgestürzt. Möchten Sie uns den Absturzbericht mitteilen, damit wir es beheben können?</string>
     <string name="crash_include_app_logs">App-Protokolle einschließen</string>
     <string name="crash_share">Teilen</string>
+    <string name="stay_online_mode">Online-Bleib-Modus</string>
+    <string name="stay_online_mode_oled_saving">OLED Energiesparen</string>
+    <string name="stay_online_mode_tap_to_exit">Zum Beenden tippen</string>
 </resources>

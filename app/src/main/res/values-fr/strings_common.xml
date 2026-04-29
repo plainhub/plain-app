@@ -157,4 +157,7 @@
     <string name="crash_report_message">L\'application a planté de façon inattendue. Souhaitez-vous partager le rapport de plantage pour que nous puissions le corriger ?</string>
     <string name="crash_include_app_logs">Inclure les journaux de l\'application</string>
     <string name="crash_share">Partager</string>
+    <string name="stay_online_mode">Mode toujours en ligne</string>
+    <string name="stay_online_mode_oled_saving">Économie OLED</string>
+    <string name="stay_online_mode_tap_to_exit">Appuyez pour quitter</string>
 </resources>

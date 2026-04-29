@@ -157,4 +157,7 @@
     <string name="crash_report_message">Uygulama beklenmedik şekilde çöktü. Düzeltmemiz için kilitlenme raporunu paylaşmak ister misiniz?</string>
     <string name="crash_include_app_logs">Uygulama günlüklerini dahil et</string>
     <string name="crash_share">Paylaş</string>
+    <string name="stay_online_mode">Çevrimiçi Kal Modu</string>
+    <string name="stay_online_mode_oled_saving">OLED enerji tasarrufu</string>
+    <string name="stay_online_mode_tap_to_exit">Çıkmak için dokunun</string>
 </resources>

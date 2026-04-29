@@ -34,7 +34,6 @@
     <string name="finish_last_audio">Son sesi bitir</string>
     <string name="start">Başlat</string>
     <string name="stop">Durdur</string>
-    <string name="keep_screen_on">Ekranı açık tut</string>
     <string name="cast_mode">Yayın modu</string>
     <string name="casting">Yayınla</string>
     <string name="cast_playlist">Yayın listesi</string>
@@ -42,7 +41,6 @@
     <string name="add_to_cast_queue">Yayın kuyruğuna ekle</string>
     <string name="remove_from_cast_queue">Yayın kuyruğundan kaldır</string>
     <string name="my_phone">Telefonum</string>
-    <string name="keep_screen_on_confirm">Birden fazla öğeyi yayınlamayı seçtiniz. Sorunsuz oynatmayı sağlamak için, yayın işlemi sırasında telefon ekranınızı açık tutacağız. Bunu ana ekran menüsünden istediğiniz zaman iptal edebilirsiniz.</string>
     <string name="pdf_open_error">PDF dosyası açılamadı.</string>
     <string name="audio_play_error">Ses dosyası çalınamadı.</string>
     <string name="clear_all">Tümünü temizle</string>

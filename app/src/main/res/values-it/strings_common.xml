@@ -157,4 +157,7 @@
     <string name="crash_report_message">L\'app si è arrestata in modo imprevisto. Vuoi condividere il report del crash per aiutarci a risolverlo?</string>
     <string name="crash_include_app_logs">Includi log dell\'app</string>
     <string name="crash_share">Condividi</string>
+    <string name="stay_online_mode">Modalità sempre online</string>
+    <string name="stay_online_mode_oled_saving">Risparmio OLED</string>
+    <string name="stay_online_mode_tap_to_exit">Tocca per uscire</string>
 </resources>

@@ -34,7 +34,6 @@
     <string name="finish_last_audio">Laatste audio afspelen</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
-    <string name="keep_screen_on">Scherm aan houden</string>
     <string name="cast_mode">Cast-modus</string>
     <string name="casting">Casten</string>
     <string name="cast_playlist">Cast-afspeellijst</string>
@@ -42,7 +41,6 @@
     <string name="add_to_cast_queue">Toevoegen aan cast-wachtrij</string>
     <string name="remove_from_cast_queue">Verwijderen uit cast-wachtrij</string>
     <string name="my_phone">Mijn telefoon</string>
-    <string name="keep_screen_on_confirm">Je hebt ervoor gekozen om meerdere items te casten. Om een soepele weergave te garanderen, houden we het scherm van je telefoon aan tijdens het casten. Je kunt dit op elk moment annuleren via het hoofdmenu.</string>
     <string name="pdf_open_error">Kan PDF-bestand niet openen.</string>
     <string name="audio_play_error">Kan audiobestand niet afspelen.</string>
     <string name="clear_all">Alles wissen</string>

@@ -34,7 +34,6 @@
     <string name="finish_last_audio">마지막 오디오 완료</string>
     <string name="start">시작</string>
     <string name="stop">정지</string>
-    <string name="keep_screen_on">화면 켜짐 유지</string>
     <string name="cast_mode">캐스트 모드</string>
     <string name="casting">캐스트</string>
     <string name="cast_playlist">캐스트 재생 목록</string>
@@ -42,7 +41,6 @@
     <string name="add_to_cast_queue">캐스트 큐에 추가</string>
     <string name="remove_from_cast_queue">캐스트 큐에서 제거</string>
     <string name="my_phone">내 폰</string>
-    <string name="keep_screen_on_confirm">여러 항목을 캐스트하려고 선택했습니다. 원활한 재생을 보장하기 위해 캐스팅 프로세스 중에 전화 화면을 켜놓겠습니다. 주 화면 메뉴에서 언제든지 이를 취소할 수 있습니다.</string>
     <string name="pdf_open_error">PDF 파일을 열 수 없습니다.</string>
     <string name="audio_play_error">오디오 파일을 재생할 수 없습니다.</string>
     <string name="clear_all">모두 지우기</string>

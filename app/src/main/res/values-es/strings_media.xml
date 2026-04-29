@@ -34,7 +34,6 @@
     <string name="finish_last_audio">Finalizar último audio</string>
     <string name="start">Iniciar</string>
     <string name="stop">Detener</string>
-    <string name="keep_screen_on">Mantener pantalla encendida</string>
     <string name="cast_mode">Modo de transmisión</string>
     <string name="casting">Transmitiendo</string>
     <string name="cast_playlist">Lista de reproducción de transmisión</string>
@@ -42,7 +41,6 @@
     <string name="add_to_cast_queue">Agregar a la lista de reproducción de transmisión</string>
     <string name="remove_from_cast_queue">Eliminar de la lista de reproducción de transmisión</string>
     <string name="my_phone">Mi teléfono</string>
-    <string name="keep_screen_on_confirm">Ha elegido transmitir varios elementos. Para garantizar una reproducción fluida, mantendremos la pantalla de su teléfono encendida durante el proceso de transmisión. Puede cancelar esto en cualquier momento desde el menú de la pantalla principal.</string>
     <string name="pdf_open_error">No se pudo abrir el archivo PDF.</string>
     <string name="audio_play_error">No se pudo reproducir el archivo de audio.</string>
     <string name="clear_all">Borrar todo</string>

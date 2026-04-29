@@ -1,10 +1,8 @@
 package com.ismartcoding.plain.ui.page.home
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,7 +15,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,19 +29,13 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.helpers.PhoneHelper
-import com.ismartcoding.plain.helpers.ScreenHelper
-import com.ismartcoding.plain.preferences.LocalKeepScreenOn
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
 import com.ismartcoding.plain.ui.components.DeviceRenameDialog
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBarHome(navController: NavHostController) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val keepScreenOn = LocalKeepScreenOn.current
     var showRenameDialog by remember { mutableStateOf(false) }
     var deviceName by remember { mutableStateOf("") }
 
@@ -87,12 +78,6 @@ fun TopBarHome(navController: NavHostController) {
             ActionButtonMoreWithMenu { dismiss ->
                 HomeQuickMenuItems(
                     navController = navController,
-                    keepScreenOn = keepScreenOn,
-                    onKeepScreenOnClick = {
-                        scope.launch(Dispatchers.IO) {
-                            ScreenHelper.keepScreenOnAsync(context, !keepScreenOn)
-                        }
-                    },
                     onDismiss = { dismiss() },
                 )
             }

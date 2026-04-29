@@ -38,7 +38,6 @@
     <string name="finish_last_audio">Finish last audio</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
-    <string name="keep_screen_on">Keep screen on</string>
     <string name="cast_mode">Cast mode</string>
     <string name="casting">Casting</string>
     <string name="cast_playlist">Cast Playlist</string>
@@ -46,7 +45,6 @@
     <string name="add_to_cast_queue">Add to cast queue</string>
     <string name="remove_from_cast_queue">Remove from cast queue</string>
     <string name="my_phone">My phone</string>
-    <string name="keep_screen_on_confirm">You have chosen to cast multiple items. To ensure smooth playback, we will keep your phone screen on during the casting process. You can cancel this at any time from the main screen menu.</string>
     <string name="pdf_open_error">Failed to open PDF file.</string>
     <string name="audio_play_error">Failed to play audio file.</string>
     <string name="clear_all">Clear All</string>

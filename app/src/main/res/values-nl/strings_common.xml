@@ -157,4 +157,7 @@
     <string name="crash_report_message">De app is onverwacht gecrasht. Wil je het crashrapport met ons delen zodat we het kunnen oplossen?</string>
     <string name="crash_include_app_logs">App-logboeken opnemen</string>
     <string name="crash_share">Delen</string>
+    <string name="stay_online_mode">Online-blijfmodus</string>
+    <string name="stay_online_mode_oled_saving">OLED energiebesparing</string>
+    <string name="stay_online_mode_tap_to_exit">Tik om af te sluiten</string>
 </resources>

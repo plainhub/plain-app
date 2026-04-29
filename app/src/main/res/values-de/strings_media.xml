@@ -34,7 +34,6 @@
     <string name="finish_last_audio">Letztes Audio beenden</string>
     <string name="start">Starten</string>
     <string name="stop">Stoppen</string>
-    <string name="keep_screen_on">Bildschirm eingeschaltet lassen</string>
     <string name="cast_mode">Gussmodus</string>
     <string name="casting">Übertragen</string>
     <string name="cast_playlist">Übertragungsliste</string>
@@ -42,7 +41,6 @@
     <string name="add_to_cast_queue">Zur Übertragungsliste hinzufügen</string>
     <string name="remove_from_cast_queue">Von Übertragungsliste entfernen</string>
     <string name="my_phone">Mein Handy</string>
-    <string name="keep_screen_on_confirm">Sie haben sich dafür entschieden, mehrere Elemente zu übertragen. Um reibungslose Wiedergabe zu gewährleisten, wird der Bildschirm während des Übertragungsvorgangs eingeschaltet. Sie können dies jederzeit im Hauptmenü abbrechen.</string>
     <string name="pdf_open_error">PDF-Datei konnte nicht geöffnet werden.</string>
     <string name="audio_play_error">Audiodatei konnte nicht abgespielt werden.</string>
     <string name="clear_all">Alles löschen</string>

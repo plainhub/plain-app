@@ -35,7 +35,6 @@
     <string name="finish_last_audio">播放完最后一个音频</string>
     <string name="start">开始</string>
     <string name="stop">停止</string>
-    <string name="keep_screen_on">保持屏幕常亮</string>
     <string name="cast_mode">投屏模式</string>
     <string name="casting">投屏中</string>
     <string name="cast_playlist">投屏播放列表</string>
@@ -43,7 +42,6 @@
     <string name="add_to_cast_queue">添加到投屏队列</string>
     <string name="remove_from_cast_queue">从投屏队列移除</string>
     <string name="my_phone">我的手机</string>
-    <string name="keep_screen_on_confirm">您选择了投射多个{{type}}。为确保平稳播放，我们将在投射过程中保持您的手机屏幕开启。您可以随时从主屏幕菜单中取消此操作。</string>
     <string name="pdf_open_error">无法打开 PDF 文件。</string>
     <string name="audio_play_error">无法播放音频文件。</string>
     <string name="clear_all">全部清除</string>

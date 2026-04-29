@@ -34,7 +34,6 @@
     <string name="finish_last_audio">Kết thúc âm thanh trước</string>
     <string name="start">Bắt đầu</string>
     <string name="stop">Dừng</string>
-    <string name="keep_screen_on">Giữ màn hình sáng</string>
     <string name="cast_mode">Chế độ đút</string>
     <string name="casting">Đút</string>
     <string name="cast_playlist">Danh sách phát đút</string>
@@ -42,7 +41,6 @@
     <string name="add_to_cast_queue">Thêm vào hàng đợi đút</string>
     <string name="remove_from_cast_queue">Xóa khỏi hàng đợi đút</string>
     <string name="my_phone">Điện thoại của tôi</string>
-    <string name="keep_screen_on_confirm">Bạn đã chọn đút nhiều mục. Để đảm bảo phát mượt, chúng tôi sẽ giữ màn hình điện thoại của bạn luôn sáng trong quá trình đút. Bạn có thể hủy bỏ bất kỳ lúc nào từ menu chính màn hình.</string>
     <string name="pdf_open_error">Không thể mở tệp PDF.</string>
     <string name="audio_play_error">Không thể phát tệp âm thanh.</string>
     <string name="clear_all">Xóa tất cả</string>

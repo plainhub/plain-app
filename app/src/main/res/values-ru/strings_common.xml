@@ -157,4 +157,7 @@
     <string name="crash_report_message">Приложение неожиданно завершилось. Хотите поделиться отчётом об ошибке, чтобы мы могли её исправить?</string>
     <string name="crash_include_app_logs">Включить журналы приложения</string>
     <string name="crash_share">Поделиться</string>
+    <string name="stay_online_mode">Режим онлайн</string>
+    <string name="stay_online_mode_oled_saving">Экономия OLED</string>
+    <string name="stay_online_mode_tap_to_exit">Нажмите для выхода</string>
 </resources>

@@ -15,7 +15,6 @@ data class Settings(
     val amoledDarkTheme: Boolean,
     val locale: Locale?,
     val web: Boolean,
-    val keepScreenOn: Boolean,
     val updateInfo: DUpdateInfo,
 )
 
@@ -23,7 +22,6 @@ val LocalDarkTheme = compositionLocalOf { DarkThemePreference.default }
 val LocalAmoledDarkTheme = compositionLocalOf { AmoledDarkThemePreference.default }
 val LocalLocale = compositionLocalOf<Locale?> { null }
 val LocalWeb = compositionLocalOf { WebPreference.default }
-val LocalKeepScreenOn = compositionLocalOf { KeepScreenOnPreference.default }
 val LocalUpdateInfo = compositionLocalOf { DUpdateInfo() }
 
 // Convenience accessors for individual update fields
@@ -42,7 +40,6 @@ fun SettingsProvider(content: @Composable () -> Unit) {
         amoledDarkTheme = AmoledDarkThemePreference.default,
         locale = null,
         web = WebPreference.default,
-        keepScreenOn = KeepScreenOnPreference.default,
         updateInfo = DUpdateInfo(),
     )
     val settings = remember {
@@ -52,7 +49,6 @@ fun SettingsProvider(content: @Composable () -> Unit) {
                 amoledDarkTheme = AmoledDarkThemePreference.get(it),
                 locale = LanguagePreference.getLocale(it),
                 web = WebPreference.get(it),
-                keepScreenOn = KeepScreenOnPreference.get(it),
                 updateInfo = UpdateInfoPreference.getValue(it),
             )
         }
@@ -63,7 +59,6 @@ fun SettingsProvider(content: @Composable () -> Unit) {
         LocalAmoledDarkTheme provides settings.amoledDarkTheme,
         LocalLocale provides settings.locale,
         LocalWeb provides settings.web,
-        LocalKeepScreenOn provides settings.keepScreenOn,
         LocalUpdateInfo provides settings.updateInfo,
         LocalNewVersion provides settings.updateInfo.newVersion,
         LocalSkipVersion provides settings.updateInfo.skipVersion,

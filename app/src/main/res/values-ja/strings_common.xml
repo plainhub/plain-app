@@ -157,4 +157,7 @@
     <string name="crash_report_message">アプリが予期せずクラッシュしました。修正のためにクラッシュレポートを共有していただけますか？</string>
     <string name="crash_include_app_logs">アプリログを含める</string>
     <string name="crash_share">共有</string>
+    <string name="stay_online_mode">オンライン維持モード</string>
+    <string name="stay_online_mode_oled_saving">OLED省電力</string>
+    <string name="stay_online_mode_tap_to_exit">タップして終了</string>
 </resources>

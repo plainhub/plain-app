@@ -157,4 +157,7 @@
     <string name="crash_report_message">应用意外崩溃了。是否将崩溃报告分享给我们以便修复？</string>
     <string name="crash_include_app_logs">包含应用日志</string>
     <string name="crash_share">分享</string>
+    <string name="stay_online_mode">防断连模式</string>
+    <string name="stay_online_mode_oled_saving">OLED 省电中</string>
+    <string name="stay_online_mode_tap_to_exit">点击任意位置退出</string>
 </resources>

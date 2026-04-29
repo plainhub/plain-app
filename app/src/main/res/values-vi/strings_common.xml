@@ -157,4 +157,7 @@
     <string name="crash_report_message">Ứng dụng bị lỗi bất ngờ. Bạn có muốn chia sẻ báo cáo lỗi để chúng tôi có thể khắc phục không?</string>
     <string name="crash_include_app_logs">Bao gồm nhật ký ứng dụng</string>
     <string name="crash_share">Chia sẻ</string>
+    <string name="stay_online_mode">Chế độ luôn trực tuyến</string>
+    <string name="stay_online_mode_oled_saving">Tiết kiệm pin OLED</string>
+    <string name="stay_online_mode_tap_to_exit">Nhấn bất cứ đâu để thoát</string>
 </resources>

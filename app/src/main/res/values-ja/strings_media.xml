@@ -34,7 +34,6 @@
     <string name="finish_last_audio">最後のオーディオを終了</string>
     <string name="start">開始</string>
     <string name="stop">停止</string>
-    <string name="keep_screen_on">画面を常にオンにする</string>
     <string name="cast_mode">キャストモード</string>
     <string name="casting">キャスト</string>
     <string name="cast_playlist">キャストプレイリスト</string>
@@ -42,7 +41,6 @@
     <string name="add_to_cast_queue">キャストキューに追加</string>
     <string name="remove_from_cast_queue">キャストキューから削除</string>
     <string name="my_phone">マイフォン</string>
-    <string name="keep_screen_on_confirm">複数のアイテムをキャストすることを選択しました。キャストプロセス中にスマートフォンの画面をオンにしてスムーズな再生を確保します。キャストプロセスをメイン画面のメニューからいつでもキャンセルできます。</string>
     <string name="pdf_open_error">PDFファイルを開けませんでした。</string>
     <string name="audio_play_error">音声ファイルを再生できませんでした。</string>
     <string name="clear_all">すべてクリア</string>

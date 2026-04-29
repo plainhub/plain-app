@@ -157,4 +157,7 @@
     <string name="crash_report_message">앱이 예기치 않게 충돌했습니다. 문제를 해결할 수 있도록 충돌 보고서를 공유해 주시겠어요?</string>
     <string name="crash_include_app_logs">앱 로그 포함</string>
     <string name="crash_share">공유</string>
+    <string name="stay_online_mode">온라인 유지 모드</string>
+    <string name="stay_online_mode_oled_saving">OLED 절전</string>
+    <string name="stay_online_mode_tap_to_exit">탭하여 종료</string>
 </resources>

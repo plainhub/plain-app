@@ -34,7 +34,6 @@
     <string name="finish_last_audio">கடைசி ஒலி முடிக்க</string>
     <string name="start">தொடங்கு</string>
     <string name="stop">நிறுத்து</string>
-    <string name="keep_screen_on">திரையை நிரப்பிடு</string>
     <string name="cast_mode">பரிசு முறை</string>
     <string name="casting">பரிசு</string>
     <string name="cast_playlist">பரிசு பட்டியல்</string>
@@ -42,7 +41,6 @@
     <string name="add_to_cast_queue">பரிசு கட்டத்திற்கு சேர்</string>
     <string name="remove_from_cast_queue">பரிசு கட்டத்திலிருந்து நீக்கு</string>
     <string name="my_phone">என் போன்</string>
-    <string name="keep_screen_on_confirm">நீங்கள் பல பொருட்களை பரிசு செய்ய விரும்பினால். உள்ளிடமாகவே கிளிக் செய்து உங்கள் போனின் திரையை பரிசு செய்வோம் என்று உறுதிப்படுத்தினால், பரிசு போதும் உங்கள் போனின் திரையை பாதுகாக்கவும். நீங்கள் இதை எந்த நேரத்திலும் முக்கிய தடவை மெனூவிலிருந்து ரத்து செய்யலாம்.</string>
     <string name="pdf_open_error">PDF கோப்பைத் திறக்க முடியவில்லை.</string>
     <string name="audio_play_error">ஆடியோ கோப்பை இயக்க முடியவில்லை.</string>
     <string name="clear_all">அனைத்தையும் நீக்கு</string>

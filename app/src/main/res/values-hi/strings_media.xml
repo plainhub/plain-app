@@ -34,7 +34,6 @@
     <string name="finish_last_audio">आखिरी ऑडियो समाप्त करें</string>
     <string name="start">शुरू करें</string>
     <string name="stop">रोकें</string>
-    <string name="keep_screen_on">स्क्रीन चालित रखें</string>
     <string name="cast_mode">कास्ट मोड</string>
     <string name="casting">कास्टिंग</string>
     <string name="cast_playlist">कास्ट प्लेलिस्ट</string>
@@ -42,7 +41,6 @@
     <string name="add_to_cast_queue">कास्ट किउ में जोड़ें</string>
     <string name="remove_from_cast_queue">कास्ट किउ से हटाएं</string>
     <string name="my_phone">मेरा फोन</string>
-    <string name="keep_screen_on_confirm">आपने कई आइटम कास्ट करने का चयन किया है। सुनिश्चित करने के लिए कि प्लेबैक सहज हो, हम कास्टिंग प्रक्रिया के दौरान आपके फोन की स्क्रीन को चालित रखेंगे। आप इसे मुख्य स्क्रीन मेनू से किसी भी समय रद्द कर सकते हैं।</string>
     <string name="pdf_open_error">PDF फ़ाइल खोलने में विफल।</string>
     <string name="audio_play_error">ऑडियो फ़ाइल चलाने में विफल।</string>
     <string name="clear_all">सब साफ करें</string>

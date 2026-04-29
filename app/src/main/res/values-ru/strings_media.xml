@@ -34,7 +34,6 @@
     <string name="finish_last_audio">Завершить последний аудиофайл</string>
     <string name="start">Начать</string>
     <string name="stop">Остановить</string>
-    <string name="keep_screen_on">Не выключать экран</string>
     <string name="cast_mode">Режим передачи</string>
     <string name="casting">Передача</string>
     <string name="cast_playlist">Плейлист передачи</string>
@@ -42,7 +41,6 @@
     <string name="add_to_cast_queue">Добавить в очередь передачи</string>
     <string name="remove_from_cast_queue">Удалить из очереди передачи</string>
     <string name="my_phone">Мой телефон</string>
-    <string name="keep_screen_on_confirm">Вы выбрали передачу нескольких элементов. Чтобы обеспечить плавное воспроизведение, мы будем удерживать экран вашего телефона включенным во время передачи. Вы можете отменить это в любое время из меню главного экрана.</string>
     <string name="pdf_open_error">Не удалось открыть PDF-файл.</string>
     <string name="audio_play_error">Не удалось воспроизвести аудиофайл.</string>
     <string name="clear_all">Очистить всё</string>
