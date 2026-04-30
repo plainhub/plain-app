@@ -31,11 +31,23 @@ object AppLogHelper {
 
     fun export(context: Context) {
         coMain {
+            val logFolder = DiskLogFormatStrategy.getLogFolder(context)
+            val logFolderFile = File(logFolder)
+            val crashReportFile = File(context.filesDir, "crash_report.txt")
+
+            if (!logFolderFile.exists() && !crashReportFile.exists()) {
+                DialogHelper.showMessage(R.string.no_logs_error)
+                return@coMain
+            }
+
             DialogHelper.showLoading()
             val zipFile = File(context.cacheDir.absolutePath + "/logs.zip")
-            val folder = DiskLogFormatStrategy.getLogFolder(context)
+            val sourcePaths = buildList {
+                if (logFolderFile.exists()) add(logFolder)
+                if (crashReportFile.exists()) add(crashReportFile.absolutePath)
+            }
             val success = withIO {
-                ZipHelper.zip(listOf(folder), zipFile.absolutePath)
+                ZipHelper.zip(sourcePaths, zipFile.absolutePath)
             }
             DialogHelper.hideLoading()
             if (!success) {

@@ -68,7 +68,7 @@
     <string name="customize_home_features">Personalizza le funzionalità della home</string>
     <string name="auto_check_update">Controlla aggiornamenti automaticamente</string>
     <string name="auto_check_update_desc">Controlla automaticamente le nuove versioni all\'avvio dell\'app</string>
-    <string name="donation_desc">Supporta questa app su Ko-fi</string>
+    <string name="donation_desc">PlainApp è gratuita, open source e sviluppata da un solo sviluppatore. Se ti fa risparmiare tempo, considera di offrirmi un caffè.</string>
     <string name="drag_number_to_reorder_list">Trascina il numero per riordinare l\'elenco</string>
     <string name="web_client_connected">Client web connesso</string>
     <string name="clients_online">%1$d client online</string>

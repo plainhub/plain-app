@@ -68,7 +68,7 @@
     <string name="customize_home_features">होम फीचर्स कॉस्टमाइज करें</string>
     <string name="auto_check_update">अपडेट स्वचालित रूप से जांचें</string>
     <string name="auto_check_update_desc">ऐप खुलने पर स्वचालित रूप से नए संस्करण की जांच करें</string>
-    <string name="donation_desc">Ko-fi पर इस ऐप का समर्थन करें</string>
+    <string name="donation_desc">PlainApp मुफ़्त, ओपन-सोर्स है और एक ही डेवलपर द्वारा बनाया गया है। अगर इसने आपका समय बचाया है, तो एक कप कॉफ़ी खिलाने पर विचार करें।</string>
     <string name="drag_number_to_reorder_list">सूची को पुनर्व्यवस्थित करने के लिए नंबर खींचें</string>
     <string name="app_name">प्लेनऐप</string>
 

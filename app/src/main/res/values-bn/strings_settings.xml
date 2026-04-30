@@ -68,7 +68,7 @@
     <string name="customize_home_features">হোম ফিচার কাস্টমাইজ করুন</string>
     <string name="auto_check_update">স্বয়ংক্রিয় আপডেট পরীক্ষা</string>
     <string name="auto_check_update_desc">অ্যাপ চালু হলে স্বয়ংক্রিয়ভাবে নতুন সংস্করণ খোঁজে</string>
-    <string name="donation_desc">Ko-fi-এ এই অ্যাপটি সমর্থন করুন</string>
+    <string name="donation_desc">PlainApp বিনামূল্যে, ওপেন-সোর্স এবং একজন ডেভেলপার দ্বারা তৈরি। যদি এটি আপনার সময় বাঁচায়, তাহলে একটি কফি কেনার কথা ভাবুন।</string>
     <string name="drag_number_to_reorder_list">তালিকা পুনর্বিন্যাস করতে নম্বর টেনে আনুন</string>
     <string name="web_client_connected">ওয়েব ক্লায়েন্ট সংযুক্ত হয়েছে</string>
     <string name="clients_online">%1$d ক্লায়েন্ট অনলাইন</string>

@@ -68,7 +68,7 @@
     <string name="customize_home_features">自定義首頁功能</string>
     <string name="auto_check_update">自動檢查更新</string>
     <string name="auto_check_update_desc">應用程式啟動時自動檢查新版本</string>
-    <string name="donation_desc">在 Ko-fi 上支持此應用程式</string>
+    <string name="donation_desc">PlainApp 免費、開源，由一位獨立開發者打造。如果它幫你節省了時間，歡迎請作者喝杯咖啡。</string>
     <string name="drag_number_to_reorder_list">拖動數字以重新排列列表</string>
     <string name="web_client_connected">Web 用戶端已連接</string>
     <string name="clients_online">%1$d 個用戶端在線</string>

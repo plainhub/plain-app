@@ -68,7 +68,7 @@
     <string name="customize_home_features">ホーム機能をカスタマイズ</string>
     <string name="auto_check_update">自動でアップデートを確認</string>
     <string name="auto_check_update_desc">アプリ起動時に自動で新しいバージョンを確認する</string>
-    <string name="donation_desc">Ko-fiでこのアプリを поддержать</string>
+    <string name="donation_desc">PlainApp は無料のオープンソースアプリで、一人の開発者が作っています。使って役に立ったと思ったら、コーヒー一杯をご支援いただけると嬉しいです。</string>
     <string name="drag_number_to_reorder_list">番号をドラッグしてリストを並べ替え</string>
     <string name="web_client_connected">ウェブクライアントが接続しました</string>
     <string name="clients_online">%1$d クライアントがオンライン</string>

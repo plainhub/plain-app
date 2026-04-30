@@ -68,7 +68,7 @@
     <string name="customize_home_features">முகப்பு செயல்பாடுகளை மாற்று</string>
     <string name="auto_check_update">தானியங்கு புதுப்பிப்பு சரிபார்ப்பு</string>
     <string name="auto_check_update_desc">பயன்பாடு திறக்கும்போது புதிய பதிப்புகளை தானியங்கியாக சரிபார்க்கவும்</string>
-    <string name="donation_desc">Ko-fi இல் இந்த பயன்பாட்டை ஆதரிக்கவும்</string>
+    <string name="donation_desc">PlainApp இலவசமானது, திறந்த மூலமானது மற்றும் ஒரே ஒரு டெவலப்பரால் உருவாக்கப்பட்டது. இது உங்கள் நேரத்தை மிச்சப்படுத்தினால், ஒரு காபி வாங்கிக் கொடுங்கள்.</string>
     <string name="drag_number_to_reorder_list">பட்டியலை மறுவரிசைப்படுத்த எண்ணை இழுக்கவும்</string>
     <string name="web_client_connected">வலை கிளையன்ட் இணைந்தது</string>
     <string name="clients_online">%1$d கிளையன்ட்(கள்) ஆன்லைன்</string>

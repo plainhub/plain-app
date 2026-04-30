@@ -28,6 +28,7 @@ import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.data.Version
 import com.ismartcoding.plain.data.toVersion
 import com.ismartcoding.plain.enums.AppFeatureType
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.helpers.AppLogHelper
@@ -41,8 +42,8 @@ import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PBanner
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PDonationBanner
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
-import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.PTopAppBar
@@ -111,7 +112,7 @@ fun SettingsPage(navController: NavHostController, updateViewModel: UpdateViewMo
                         )
                         if (AppFeatureType.CHECK_UPDATES.has()) {
                             PListItem(title = stringResource(R.string.app_version), subtitle = MainApp.getAppVersion(), action = {
-                                POutlinedButton(text = stringResource(R.string.check_update), small = true, onClick = {
+                                PFilledButton(text = stringResource(R.string.check_update), buttonSize = ButtonSize.SMALL, onClick = {
                                     scope.launch {
                                         DialogHelper.showMessage(getString(R.string.checking_updates))
                                         val r = withIO {

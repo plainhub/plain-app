@@ -68,7 +68,7 @@
     <string name="customize_home_features">홈 기능 사용자 정의</string>
     <string name="auto_check_update">자동 업데이트 확인</string>
     <string name="auto_check_update_desc">앱 실행 시 자동으로 새 버전 확인</string>
-    <string name="donation_desc">Ko-fi에서 이 앱을 지원하세요</string>
+    <string name="donation_desc">PlainApp은 무료 오픈소스 앱으로, 한 명의 개발자가 만들었습니다. 도움이 되셨다면 커피 한 잔 사주시는 건 어떨까요?</string>
     <string name="drag_number_to_reorder_list">번호를 드래그하여 목록 순서 변경</string>
     <string name="web_client_connected">웹 클라이언트 연결됨</string>
     <string name="clients_online">%1$d 클라이언트 온라인</string>

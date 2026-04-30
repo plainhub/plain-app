@@ -68,7 +68,7 @@
     <string name="customize_home_features">Настроить функции дома</string>
     <string name="auto_check_update">Автоматическая проверка обновлений</string>
     <string name="auto_check_update_desc">Автоматически проверять наличие новых версий при запуске приложения</string>
-    <string name="donation_desc">Поддержите это приложение на Ko-fi</string>
+    <string name="donation_desc">PlainApp — бесплатное приложение с открытым исходным кодом, созданное одним разработчиком. Если оно экономит ваше время, рассмотрите возможность угостить меня кофе.</string>
     <string name="drag_number_to_reorder_list">Перетащите номер, чтобы изменить порядок списка</string>
     <string name="web_client_connected">Веб-клиент подключен</string>
     <string name="clients_online">%1$d клиент(а/ов) онлайн</string>

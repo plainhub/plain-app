@@ -68,7 +68,7 @@
     <string name="customize_home_features">Personalizar as funcionalidades da home</string>
     <string name="auto_check_update">Verificar atualizações automaticamente</string>
     <string name="auto_check_update_desc">Verificar automaticamente novas versões ao iniciar o aplicativo</string>
-    <string name="donation_desc">Apoie este aplicativo no Ko-fi</string>
+    <string name="donation_desc">PlainApp é gratuito, de código aberto e desenvolvido por um único desenvolvedor. Se economiza o seu tempo, considere pagar um café.</string>
     <string name="drag_number_to_reorder_list">Arraste o número para reordenar a lista</string>
     <string name="web_client_connected">Cliente web conectado</string>
     <string name="clients_online">%1$d cliente(s) online</string>

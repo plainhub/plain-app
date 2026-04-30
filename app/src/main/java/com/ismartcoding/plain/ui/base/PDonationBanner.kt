@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.features.locale.LocaleHelper
 
 @Composable
 fun PDonationBanner(
@@ -41,7 +42,7 @@ fun PDonationBanner(
     onClick: () -> Unit,
 ) {
     val context = LocalContext.current
-    val locale = context.resources.configuration.locales.get(0)
+    val locale = LocaleHelper.currentLocale()
     val isZhCN = locale.language == "zh" && locale.country == "CN"
     var showWeChatDialog by remember { mutableStateOf(false) }
 
@@ -68,8 +69,8 @@ fun PDonationBanner(
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
             DonationLabel()
-            Spacer(Modifier.height(16.dp))
-            DonationTexts()
+                Spacer(Modifier.height(16.dp))
+                DonationTexts()
             Spacer(Modifier.height(20.dp))
             DonationButton(effectiveOnClick)
         }

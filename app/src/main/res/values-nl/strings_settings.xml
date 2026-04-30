@@ -68,7 +68,7 @@
     <string name="customize_home_features">Home-functies aanpassen</string>
     <string name="auto_check_update">Automatisch controleren op updates</string>
     <string name="auto_check_update_desc">Automatisch controleren op nieuwe versies bij het openen van de app</string>
-    <string name="donation_desc">Ondersteun deze app op Ko-fi</string>
+    <string name="donation_desc">PlainApp is gratis, open source en gebouwd door één ontwikkelaar. Als het je tijd bespaart, overweeg dan een koffie te kopen.</string>
     <string name="drag_number_to_reorder_list">Sleep het nummer om de lijst te herordenen</string>
     <string name="web_client_connected">Webclient verbonden</string>
     <string name="clients_online">%1$d client(s) online</string>

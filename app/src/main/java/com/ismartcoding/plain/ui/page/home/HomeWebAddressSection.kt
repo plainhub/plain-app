@@ -32,9 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.preferences.HttpsPreference
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PIconTextButton
-import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.Tips
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.components.WebAddressBar
@@ -113,8 +114,9 @@ fun HomeWebAddressSection(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 if (isError) {
-                    POutlinedButton(
+                    PFilledButton(
                         stringResource(R.string.troubleshoot),
+                        buttonSize = ButtonSize.SMALL,
                         onClick = {
                             WebHelper.open(
                                 context,

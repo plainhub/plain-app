@@ -68,7 +68,7 @@
     <string name="customize_home_features">Startseitenfunktionen anpassen</string>
     <string name="auto_check_update">Automatisch nach Updates suchen</string>
     <string name="auto_check_update_desc">Beim App-Start automatisch nach neuen Versionen suchen</string>
-    <string name="donation_desc">Unterstütze diese App auf Ko-fi</string>
+    <string name="donation_desc">PlainApp ist kostenlos, Open Source und wird von einem einzigen Entwickler betrieben. Wenn es dir Zeit spart, freue ich mich über einen Kaffee.</string>
     <string name="drag_number_to_reorder_list">Ziehen Sie die Nummer, um die Liste neu zu ordnen</string>
     <string name="web_client_connected">Web-Client verbunden</string>
     <string name="clients_online">%1$d Client(s) online</string>

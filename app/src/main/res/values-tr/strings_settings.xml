@@ -68,7 +68,7 @@
     <string name="customize_home_features">Ana sayfa özelliklerini özelleştir</string>
     <string name="auto_check_update">Güncellemeleri otomatik denetle</string>
     <string name="auto_check_update_desc">Uygulama açıldığında otomatik olarak yeni sürümleri denetle</string>
-    <string name="donation_desc">Bu uygulamayı Ko-fi üzerinden destekleyin</string>
+    <string name="donation_desc">PlainApp ücretsiz, açık kaynaklı ve tek bir geliştirici tarafından geliştirilmiştir. Zaman kazandırıyorsa bir kahve ısmarlayabilirsiniz.</string>
     <string name="drag_number_to_reorder_list">Listeyi yeniden sıralamak için numarayı sürükleyin</string>
     <string name="web_client_connected">Web istemcisi bağlandı</string>
     <string name="clients_online">%1$d istemci çevrimiçi</string>

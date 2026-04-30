@@ -68,7 +68,7 @@
     <string name="customize_home_features">Tùy chỉnh các tính năng trang chủ</string>
     <string name="auto_check_update">Tự động kiểm tra cập nhật</string>
     <string name="auto_check_update_desc">Tự động kiểm tra phiên bản mới khi khởi động ứng dụng</string>
-    <string name="donation_desc">Hỗ trợ ứng dụng này trên Ko-fi</string>
+    <string name="donation_desc">PlainApp miễn phí, mã nguồn mở và được xây dựng bởi một nhà phát triển. Nếu nó giúp bạn tiết kiệm thời gian, hãy mua cho tôi một ly cà phê.</string>
     <string name="drag_number_to_reorder_list">Kéo số để sắp xếp lại danh sách</string>
     <string name="web_client_connected">Máy khách web đã kết nối</string>
     <string name="clients_online">%1$d máy khách trực tuyến</string>

@@ -1,8 +1,9 @@
 package com.ismartcoding.plain.ui.page.settings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -11,12 +12,15 @@ import com.ismartcoding.lib.extensions.formatBytes
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.logcat.DiskLogFormatStrategy
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.TextFileType
 import com.ismartcoding.plain.features.locale.LocaleHelper.getString
 import com.ismartcoding.plain.helpers.AppHelper
+import com.ismartcoding.plain.helpers.AppLogHelper
+import com.ismartcoding.plain.preferences.DeveloperModePreference
 import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PListItem
-import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.helpers.DialogHelper
@@ -47,16 +51,21 @@ fun AboutLogsAndCacheCard(
             },
             title = stringResource(R.string.logs),
             subtitle = fileSize.formatBytes(),
-            separatedActions = fileSize > 0L,
+            separatedActions = true,
             action = {
-                if (fileSize > 0L) {
-                    POutlinedButton(text = stringResource(R.string.clear_logs), small = true, onClick = {
-                        DialogHelper.confirmToAction(R.string.confirm_to_clear_logs) {
-                            val dir = File(DiskLogFormatStrategy.getLogFolder(context))
-                            if (dir.exists()) dir.deleteRecursively()
-                            onFileSizeCleared()
-                        }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    PFilledButton(text = stringResource(R.string.share), buttonSize = ButtonSize.SMALL, onClick = {
+                        AppLogHelper.export(context)
                     })
+                    if (fileSize > 0L) {
+                        PFilledButton(text = stringResource(R.string.clear_logs), buttonSize = ButtonSize.SMALL, onClick = {
+                            DialogHelper.confirmToAction(R.string.confirm_to_clear_logs) {
+                                val dir = File(DiskLogFormatStrategy.getLogFolder(context))
+                                if (dir.exists()) dir.deleteRecursively()
+                                onFileSizeCleared()
+                            }
+                        })
+                    }
                 }
             },
         )
@@ -64,7 +73,7 @@ fun AboutLogsAndCacheCard(
             title = stringResource(R.string.local_cache),
             subtitle = cacheSize.formatBytes(),
             action = {
-                POutlinedButton(text = stringResource(R.string.clear_cache), small = true, onClick = {
+                PFilledButton(text = stringResource(R.string.clear_cache), buttonSize = ButtonSize.SMALL, onClick = {
                     scope.launch {
                         DialogHelper.showLoading()
                         withIO {
@@ -84,7 +93,7 @@ fun AboutLogsAndCacheCard(
                 PSwitch(activated = developerMode) {
                     onDeveloperModeChanged(it)
                     scope.launch(Dispatchers.IO) {
-                        com.ismartcoding.plain.preferences.DeveloperModePreference.putAsync(context, it)
+                        DeveloperModePreference.putAsync(context, it)
                     }
                 }
             }
