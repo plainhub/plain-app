@@ -61,6 +61,7 @@ class MainApp : Application() {
         LogCat.addLogAdapter(DiskLogAdapter(DiskLogFormatStrategy.getInstance(this)))
 
         AppEvents.register()
+        HttpServerManager.warmUp()
 
         // https://stackoverflow.com/questions/77683434/the-getnextentry-method-of-zipinputstream-throws-a-zipexception-invalid-zip-ent
         if (isUPlus()) {

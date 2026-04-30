@@ -9,14 +9,12 @@ import com.ismartcoding.lib.helpers.CryptoHelper
 import com.ismartcoding.lib.helpers.JksHelper
 import com.ismartcoding.lib.helpers.PortHelper
 import com.ismartcoding.lib.helpers.JsonHelper
-import com.ismartcoding.lib.helpers.NetworkHelper
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.api.HttpClientManager
-import com.ismartcoding.plain.data.HttpServerCheckResult
 import com.ismartcoding.plain.enums.HttpServerState
 import com.ismartcoding.plain.preferences.PasswordPreference
 import com.ismartcoding.plain.db.AppDatabase
@@ -30,7 +28,6 @@ import com.ismartcoding.plain.services.HttpServerService
 import com.ismartcoding.plain.web.websocket.WebSocketSession
 import io.ktor.client.plugins.websocket.ws
 import io.ktor.client.request.get
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.engine.applicationEnvironment
@@ -40,7 +37,6 @@ import io.ktor.server.engine.sslConnector
 import io.ktor.server.netty.Netty
 import io.ktor.server.netty.NettyApplicationEngine
 import io.ktor.websocket.send
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -52,10 +48,8 @@ import java.io.FileOutputStream
 import java.security.KeyStore
 import java.security.cert.X509Certificate
 import java.util.Collections
-import java.util.Timer
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.collections.set
-import kotlin.concurrent.timerTask
 
 object HttpServerManager {
     private const val SSL_KEY_ALIAS = Constants.SSL_NAME
@@ -148,7 +142,7 @@ object HttpServerManager {
 
     fun stopPreviousServer() {
         try {
-            server?.stop(1000, 2000)
+            server?.stop(0, 500)
             LogCat.d("Previous server instance stopped")
         } catch (e: Exception) {
             LogCat.e("Error stopping previous server: ${e.message}")
@@ -178,39 +172,38 @@ object HttpServerManager {
         return false
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    suspend fun checkServerAsync(): HttpServerCheckResult {
+    fun warmUp() {
+        coIO {
+            try {
+                val s = embeddedServer(Netty, port = 0) {}
+                s.start(wait = false)
+                s.stop(0, 0)
+                LogCat.d("Netty warm-up complete")
+            } catch (_: Exception) {}
+        }
+    }
+
+    suspend fun checkServerAsync(): Boolean {
         return withTimeoutOrNull(9000) {
-            var websocket = false
-            var http = false
-            var retry = 2
             val client = HttpClientManager.httpClient()
-            while (retry-- > 0) {
+            val deadline = System.currentTimeMillis() + 8500L
+            var websocket = false
+            while (!websocket && System.currentTimeMillis() < deadline) {
                 try {
                     client.ws(urlString = UrlHelper.getWsTestUrl()) {
-                        val reason = this.closeReason.await()
+                        val reason = closeReason.await()
                         LogCat.d("closeReason: $reason")
                         if (reason?.message == BuildConfig.APPLICATION_ID) {
                             websocket = true
                         }
                     }
-                    retry = 0
                 } catch (ex: Exception) {
-                    delay(500)
+                    delay(300)
                     LogCat.e("WebSocket check failed: ${ex.message}")
                 }
             }
-
-            try {
-                val r = client.get(UrlHelper.getHealthCheckUrl())
-                http = r.bodyAsText() == BuildConfig.APPLICATION_ID
-            } catch (ex: Exception) {
-                ex.printStackTrace()
-                LogCat.e(ex.toString())
-            }
-
-            HttpServerCheckResult(websocket, http)
-        } ?: HttpServerCheckResult(false, false)
+            websocket
+        } ?: false
     }
 
     private suspend fun passwordToToken(): ByteArray {
@@ -290,10 +283,11 @@ object HttpServerManager {
         return embeddedServer(Netty, environment, configure = {
             runningLimit = 1000
             tcpKeepAlive = true
+            enableHttp2 = false
+
             connector {
                 port = httpPort
             }
-            enableHttp2 = false
             sslConnector(
                 keyStore = getSSLKeyStore(context, password),
                 keyAlias = SSL_KEY_ALIAS,
@@ -301,9 +295,6 @@ object HttpServerManager {
                 privateKeyPassword = { passwordArray },
             ) {
                 port = httpsPort
-            }
-            channelPipelineConfig = {
-                addLast("cancellationDetector", AbortableRequestHandler())
             }
         }, HttpModule.module)
     }

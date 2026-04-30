@@ -14,7 +14,6 @@ import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.mdns.NsdHelper
 import io.ktor.server.engine.EmbeddedServer
 import io.ktor.server.netty.NettyApplicationEngine
-import kotlinx.coroutines.delay
 
 /**
  * Handles the HTTP server start sequence with retry logic and port conflict handling.
@@ -38,12 +37,11 @@ object HttpServerStartHelper {
             attemptServerStart(2)
         }
 
-        delay(500)
-        val checkResult = HttpServerManager.checkServerAsync()
-        if (checkResult.websocket && checkResult.http) {
+        val serverUp = HttpServerManager.checkServerAsync()
+        if (serverUp) {
             handleSuccess(service, onStateChanged)
         } else {
-            handleFailure(service, checkResult.http, onStateChanged)
+            handleFailure(service, onStateChanged)
         }
     }
 
@@ -86,7 +84,7 @@ object HttpServerStartHelper {
     }
 
     private fun handleFailure(
-        service: HttpServerService, httpOk: Boolean, onStateChanged: (HttpServerState) -> Unit,
+        service: HttpServerService, onStateChanged: (HttpServerState) -> Unit,
     ) {
         val serverWasRunning = HttpServerManager.server != null
 
@@ -95,7 +93,7 @@ object HttpServerStartHelper {
         // every restart (common on rooted ROMs with firewall apps like AFWall+).
         HttpServerManager.stopPreviousServer()
 
-        if (!httpOk && !serverWasRunning) {
+        if (!serverWasRunning) {
             // Server never started — check if ports are occupied by another process.
             if (PortHelper.isPortInUse(TempData.httpPort)) HttpServerManager.portsInUse.add(TempData.httpPort)
             if (PortHelper.isPortInUse(TempData.httpsPort)) HttpServerManager.portsInUse.add(TempData.httpsPort)

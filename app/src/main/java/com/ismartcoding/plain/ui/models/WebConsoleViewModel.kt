@@ -23,9 +23,9 @@ class WebConsoleViewModel : ViewModel() {
         viewModelScope.launch {
             DialogHelper.showLoading()
             val errorMessage = context.getString(R.string.http_server_error)
-            val r = withIO { HttpServerManager.checkServerAsync() }
+            val serverUp = withIO { HttpServerManager.checkServerAsync() }
             DialogHelper.hideLoading()
-            if (!r.websocket || !r.http) {
+            if (!serverUp) {
                 AlertDialog.Builder(context)
                     .setTitle(context.getString(R.string.error))
                     .setMessage(errorMessage)

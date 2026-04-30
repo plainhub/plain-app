@@ -94,8 +94,10 @@ object CallMediaStoreHelper : BaseContentHelper() {
     fun call(
         context: Context,
         number: String,
+        showDialer: Boolean,
     ) {
-        val intent = Intent(Intent.ACTION_DIAL)
+        val action = if (showDialer) Intent.ACTION_DIAL else Intent.ACTION_CALL
+        val intent = Intent(action)
         intent.data = Uri.parse("tel:$number")
         context.startActivity(intent)
     }

@@ -91,8 +91,8 @@ class MainViewModel(savedStateHandle: SavedStateHandle) : ViewModel() {
                 httpServerState = HttpServerState.STARTING
             }
 
-            val check = withIO { HttpServerManager.checkServerAsync() }
-            if (check.http && check.websocket) {
+            val serverUp = withIO { HttpServerManager.checkServerAsync() }
+            if (serverUp) {
                 httpServerError = ""
                 httpServerState = HttpServerState.ON
             } else {

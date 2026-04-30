@@ -48,9 +48,9 @@ fun SchemaBuilder.addCallSchema() {
         }
     }
     mutation("call") {
-        resolver { number: String ->
+        resolver { number: String, showDialer: Boolean ->
             Permission.CALL_PHONE.checkAsync(MainApp.instance)
-            CallMediaStoreHelper.call(MainActivity.instance.get()!!, number)
+            CallMediaStoreHelper.call(MainActivity.instance.get()!!, number, showDialer)
             true
         }
     }

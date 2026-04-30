@@ -67,8 +67,8 @@ class QSTileService : TileService() {
             try {
                 // First check if webEnabled is true in TempData
                 if (TempData.webEnabled) {
-                    val checkResult = HttpServerManager.checkServerAsync()
-                    if (checkResult.websocket && checkResult.http) {
+                    val serverUp = HttpServerManager.checkServerAsync()
+                    if (serverUp) {
                         withContext(Dispatchers.Main.immediate) {
                             serviceRef.get()?.setState(Tile.STATE_ACTIVE)
                         }
