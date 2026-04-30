@@ -169,7 +169,7 @@ class ApkMetaTranslator(resourceTable: ResourceTable, locale: Locale?) : XmlStre
                 apkMetaBuilder.addPermissions(permission)
             }
 
-            else -> xmlNodeStartTag.name?.let { LogCat.d("Unexpected value: $it") }
+            else -> {} // unrecognized tags are intentionally ignored
         }
         tagStack[depth++] = xmlNodeStartTag.name
     }

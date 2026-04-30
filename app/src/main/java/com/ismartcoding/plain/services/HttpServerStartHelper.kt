@@ -12,6 +12,8 @@ import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.mdns.NsdHelper
+import io.ktor.server.engine.EmbeddedServer
+import io.ktor.server.netty.NettyApplicationEngine
 import kotlinx.coroutines.delay
 
 /**
@@ -47,12 +49,16 @@ object HttpServerStartHelper {
 
     private suspend fun attemptServerStart(maxRetries: Int) {
         for (attempt in 1..maxRetries) {
+            var newServer: EmbeddedServer<NettyApplicationEngine, NettyApplicationEngine.Configuration>? = null
             try {
-                val server = HttpServerManager.createHttpServerAsync(MainApp.instance)
-                server.start(wait = false)
-                HttpServerManager.server = server
+                newServer = HttpServerManager.createHttpServerAsync(MainApp.instance)
+                newServer.start(wait = false)
+                HttpServerManager.server = newServer
                 break
             } catch (ex: Exception) {
+                // The engine may have partially started (thread pools created) before
+                // throwing — always stop it to prevent thread/memory leaks on each failed attempt.
+                try { newServer?.stop(0, 0) } catch (_: Exception) {}
                 LogCat.e("Server start attempt $attempt/$maxRetries failed: ${ex.message}")
                 if (ex is java.net.BindException || ex.cause is java.net.BindException) {
                     if (attempt < maxRetries) {

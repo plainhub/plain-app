@@ -23,12 +23,15 @@ import com.ismartcoding.plain.TempData
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 
 class HttpServerService : LifecycleService() {
     private var serverState: HttpServerState = HttpServerState.OFF
     private var mdnsRegister: MdnsRegister? = null
     private var serverJob: Job? = null
     private var lockManager: HttpServerLockManager? = null
+    // true when this instance was created by START_STICKY (system restart), not by user
+    private var isStickyRestart: Boolean = false
 
     override fun onCreate() {
         super.onCreate()
@@ -48,9 +51,19 @@ class HttpServerService : LifecycleService() {
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                 when (event) {
                     Lifecycle.Event.ON_START -> {
+                        if (serverState == HttpServerState.STARTING || serverState == HttpServerState.ON) return
                         lockManager?.start()
                         serverJob?.cancel()
                         serverJob = coIO {
+                            if (isStickyRestart) {
+                                // Give previous Ktor instance time to release its TCP ports
+                                // before we try to bind again. Without this, the rapid
+                                // START_STICKY kill/restart cycle on OnePlus/ColorOS causes
+                                // a port-in-use loop that overwhelms the system.
+                                LogCat.d("START_STICKY restart — waiting 5s for port release")
+                                delay(5_000)
+                                isStickyRestart = false
+                            }
                             startHttpServerAsync()
                         }
                     }
@@ -71,6 +84,9 @@ class HttpServerService : LifecycleService() {
     
     @SuppressLint("InlinedApi")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // intent == null means the system restarted this service via START_STICKY after killing it.
+        // In that case we flag it so the startup coroutine can delay before binding ports.
+        if (intent == null) isStickyRestart = true
         super.onStartCommand(intent, flags, startId)
         
         try {

@@ -39,10 +39,10 @@ internal class HttpServerLockManager(private val context: Context) {
         PowerManager.PARTIAL_WAKE_LOCK,
         "${BuildConfig.APPLICATION_ID}:http_server",
     )
-    private val wifiLock: WifiManager.WifiLock = wifiManager.createWifiLock(
-        WifiManager.WIFI_MODE_FULL_HIGH_PERF,
-        "${BuildConfig.APPLICATION_ID}:http_server",
-    )
+//    private val wifiLock: WifiManager.WifiLock = wifiManager.createWifiLock(
+//        WifiManager.WIFI_MODE_FULL_HIGH_PERF,
+//        "${BuildConfig.APPLICATION_ID}:http_server",
+//    )
 
     @Volatile private var lastActivityMs: Long = System.currentTimeMillis()
     @Volatile private var keepAwake: Boolean = true
@@ -98,9 +98,9 @@ internal class HttpServerLockManager(private val context: Context) {
         runCatching {
             if (!wakeLock.isHeld) { wakeLock.acquire(); LogCat.d("WakeLock acquired") }
         }.onFailure { LogCat.e("WakeLock acquire failed: ${it.message}") }
-        runCatching {
-            if (!wifiLock.isHeld) { wifiLock.acquire(); LogCat.d("WifiLock acquired") }
-        }.onFailure { LogCat.e("WifiLock acquire failed: ${it.message}") }
+//        runCatching {
+//            if (!wifiLock.isHeld) { wifiLock.acquire(); LogCat.d("WifiLock acquired") }
+//        }.onFailure { LogCat.e("WifiLock acquire failed: ${it.message}") }
     }
 
     private fun acquireLocks() {
@@ -112,7 +112,7 @@ internal class HttpServerLockManager(private val context: Context) {
         inactivityJob?.cancel()
         inactivityJob = null
         if (wakeLock.isHeld) { wakeLock.release(); LogCat.d("WakeLock released") }
-        if (wifiLock.isHeld) { wifiLock.release(); LogCat.d("WifiLock released") }
+//        if (wifiLock.isHeld) { wifiLock.release(); LogCat.d("WifiLock released") }
     }
 
     /**
