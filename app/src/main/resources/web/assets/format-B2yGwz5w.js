@@ -1,1 +1,0 @@
-import{bf as e}from"./index-CikOtzcl.js";function o(a){let f="";e(a.firstName)||e(a.lastName)?f=`${a.lastName}${a.middleName}${a.firstName}`:f=[a.firstName,a.middleName,a.lastName].filter(r=>r).join(" ");const n=a.suffix?`, ${a.suffix}`:"",s=`${a.prefix} ${f} ${n}`.trim();return s||(a.emails.length?a.emails[0].value:"")}export{o as g};
