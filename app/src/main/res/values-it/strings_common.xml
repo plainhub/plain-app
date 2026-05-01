@@ -160,4 +160,8 @@
     <string name="stay_online_mode">Modalità sempre online</string>
     <string name="stay_online_mode_oled_saving">Risparmio OLED</string>
     <string name="stay_online_mode_tap_to_exit">Tocca per uscire</string>
+    <string name="add_to_home">Aggiungi alla schermata principale</string>
+    <string name="shortcut_added_to_home">Collegamento aggiunto alla schermata principale</string>
+    <string name="shortcut_not_supported">Il launcher non supporta i collegamenti</string>
+    <string name="shortcut_label_hint">Nota: alcuni launcher (es. MIUI) potrebbero non aggiungere correttamente i collegamenti.</string>
 </resources>

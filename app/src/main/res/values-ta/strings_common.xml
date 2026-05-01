@@ -160,4 +160,8 @@
     <string name="stay_online_mode">ஆன்லைன் நிலை பயன்முறை</string>
     <string name="stay_online_mode_oled_saving">OLED மின் சேமிப்பு</string>
     <string name="stay_online_mode_tap_to_exit">வெளியேற எங்கும் தட்டவும்</string>
+    <string name="add_to_home">முகப்புத் திரையில் சேர்க்கவும்</string>
+    <string name="shortcut_added_to_home">முகப்புத் திரையில் குறுக்குவழி சேர்க்கப்பட்டது</string>
+    <string name="shortcut_not_supported">உங்கள் தொடக்கி குறுக்குவழிகளை சேர்க்க ஆதரிக்கவில்லை</string>
+    <string name="shortcut_label_hint">குறிப்பு: சில தொடக்கிகள் (எ.கா. MIUI) முகப்புத் திரையில் குறுக்குவழிகளை சேர்க்க முடியாமல் போகலாம்.</string>
 </resources>

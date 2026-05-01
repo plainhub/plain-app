@@ -160,4 +160,8 @@
     <string name="stay_online_mode">ऑनलाइन रहने का मोड</string>
     <string name="stay_online_mode_oled_saving">OLED ऊर्जा बचत</string>
     <string name="stay_online_mode_tap_to_exit">बाहर निकलने के लिए कहीं भी टैप करें</string>
+    <string name="add_to_home">होम स्क्रीन पर जोड़ें</string>
+    <string name="shortcut_added_to_home">होम स्क्रीन पर शॉर्टकट जोड़ा गया</string>
+    <string name="shortcut_not_supported">आपका लॉन्चर शॉर्टकट जोड़ने का समर्थन नहीं करता</string>
+    <string name="shortcut_label_hint">नोट: कुछ लॉन्चर (जैसे MIUI) होम स्क्रीन पर शॉर्टकट जोड़ने में विफल हो सकते हैं।</string>
 </resources>

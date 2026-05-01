@@ -1,12 +1,19 @@
 package com.ismartcoding.plain.ui.page.audio.components
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.ismartcoding.lib.extensions.isUrl
 import com.ismartcoding.plain.audio.DAudio
 import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.audio.AudioMediaStoreHelper
 import com.ismartcoding.plain.helpers.ShareHelper
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.ui.base.ActionButtons
+import com.ismartcoding.plain.ui.base.IconTextAddToHomeButton
+import com.ismartcoding.plain.ui.components.AddToHomeDialog
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
 import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
 import com.ismartcoding.plain.ui.base.IconTextRenameButton
@@ -28,6 +35,7 @@ internal fun AudioActionButtons(
     context: android.content.Context,
     onDismiss: () -> Unit,
 ) {
+    var showAddToHomeDialog by remember { mutableStateOf(false) }
     ActionButtons {
         if (!audioVM.showSearchBar.value) {
             IconTextSelectButton {
@@ -44,6 +52,9 @@ internal fun AudioActionButtons(
             if (!m.path.isUrl()) {
                 IconTextOpenWithButton {
                     ShareHelper.openPathWith(context, m.path)
+                }
+                IconTextAddToHomeButton {
+                    showAddToHomeDialog = true
                 }
             }
             IconTextRenameButton {
@@ -76,5 +87,11 @@ internal fun AudioActionButtons(
                 }
             }
         }
+    }
+    if (showAddToHomeDialog) {
+        AddToHomeDialog(path = m.path, iconRes = R.drawable.music, onDismiss = {
+            showAddToHomeDialog = false
+            onDismiss()
+        })
     }
 }

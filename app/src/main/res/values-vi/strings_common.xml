@@ -160,4 +160,8 @@
     <string name="stay_online_mode">Chế độ luôn trực tuyến</string>
     <string name="stay_online_mode_oled_saving">Tiết kiệm pin OLED</string>
     <string name="stay_online_mode_tap_to_exit">Nhấn bất cứ đâu để thoát</string>
+    <string name="add_to_home">Thêm vào màn hình chính</string>
+    <string name="shortcut_added_to_home">Đã thêm lối tắt vào màn hình chính</string>
+    <string name="shortcut_not_supported">Trình khởi chạy của bạn không hỗ trợ thêm lối tắt</string>
+    <string name="shortcut_label_hint">Lưu ý: Một số trình khởi chạy (như MIUI) có thể không thêm lối tắt vào màn hình chính thành công.</string>
 </resources>

@@ -160,4 +160,8 @@
     <string name="stay_online_mode">Modo sempre online</string>
     <string name="stay_online_mode_oled_saving">Economia OLED</string>
     <string name="stay_online_mode_tap_to_exit">Toque para sair</string>
+    <string name="add_to_home">Adicionar à tela inicial</string>
+    <string name="shortcut_added_to_home">Atalho adicionado à tela inicial</string>
+    <string name="shortcut_not_supported">Seu launcher não suporta adicionar atalhos</string>
+    <string name="shortcut_label_hint">Nota: alguns launchers (ex. MIUI) podem não adicionar atalhos com êxito.</string>
 </resources>

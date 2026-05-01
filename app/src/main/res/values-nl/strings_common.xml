@@ -160,4 +160,8 @@
     <string name="stay_online_mode">Online-blijfmodus</string>
     <string name="stay_online_mode_oled_saving">OLED energiebesparing</string>
     <string name="stay_online_mode_tap_to_exit">Tik om af te sluiten</string>
+    <string name="add_to_home">Toevoegen aan startscherm</string>
+    <string name="shortcut_added_to_home">Snelkoppeling toegevoegd aan startscherm</string>
+    <string name="shortcut_not_supported">Uw launcher ondersteunt geen snelkoppelingen</string>
+    <string name="shortcut_label_hint">Opmerking: sommige launchers (bijv. MIUI) ondersteunen mogelijk geen snelkoppelingen.</string>
 </resources>

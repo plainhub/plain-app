@@ -3,6 +3,10 @@ package com.ismartcoding.plain.ui.page.videos
 import android.content.ClipData
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.ismartcoding.lib.extensions.isUrl
@@ -16,6 +20,8 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
+import com.ismartcoding.plain.ui.base.IconTextAddToHomeButton
+import com.ismartcoding.plain.ui.components.AddToHomeDialog
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
 import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
 import com.ismartcoding.plain.ui.base.IconTextRenameButton
@@ -41,6 +47,7 @@ internal fun VideoActionButtons(
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
+    var showAddToHomeDialog by remember { mutableStateOf(false) }
     ActionButtons {
         if (!videosVM.showSearchBar.value) {
             IconTextSelectButton {
@@ -56,6 +63,11 @@ internal fun VideoActionButtons(
         if (!m.path.isUrl()) {
             IconTextOpenWithButton {
                 ShareHelper.openPathWith(context, m.path)
+            }
+        }
+        if (!m.path.isUrl() && !videosVM.trash.value) {
+            IconTextAddToHomeButton {
+                showAddToHomeDialog = true
             }
         }
         IconTextRenameButton {
@@ -87,6 +99,12 @@ internal fun VideoActionButtons(
                 }
             }
         }
+    }
+    if (showAddToHomeDialog) {
+        AddToHomeDialog(path = m.path, iconRes = R.drawable.video, onDismiss = {
+            showAddToHomeDialog = false
+            onDismiss()
+        })
     }
 }
 

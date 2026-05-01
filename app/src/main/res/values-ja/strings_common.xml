@@ -160,4 +160,8 @@
     <string name="stay_online_mode">オンライン維持モード</string>
     <string name="stay_online_mode_oled_saving">OLED省電力</string>
     <string name="stay_online_mode_tap_to_exit">タップして終了</string>
+    <string name="add_to_home">ホーム画面に追加</string>
+    <string name="shortcut_added_to_home">ショートカットをホーム画面に追加しました</string>
+    <string name="shortcut_not_supported">ランチャーがショートカットの追加をサポートしていません</string>
+    <string name="shortcut_label_hint">注意：一部のランチャー（MIUIなど）ではホーム画面へのショートカット追加が失敗する場合があります。</string>
 </resources>

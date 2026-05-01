@@ -3,6 +3,10 @@ package com.ismartcoding.plain.ui.page.images
 import android.content.ClipData
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
@@ -11,6 +15,8 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
+import com.ismartcoding.plain.ui.base.IconTextAddToHomeButton
+import com.ismartcoding.plain.ui.components.AddToHomeDialog
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
 import com.ismartcoding.plain.ui.base.IconTextOpenWithButton
 import com.ismartcoding.plain.ui.base.IconTextRenameButton
@@ -40,7 +46,7 @@ internal fun ViewImageActionButtons(
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
-
+    var showAddToHomeDialog by remember { mutableStateOf(false) }
     ActionButtons {
         if (!imagesVM.showSearchBar.value) {
             IconTextSelectButton {
@@ -61,6 +67,11 @@ internal fun ViewImageActionButtons(
         if (!m.path.isUrl()) {
             IconTextOpenWithButton {
                 ShareHelper.openPathWith(context, m.path)
+            }
+        }
+        if (!m.path.isUrl() && !imagesVM.trash.value) {
+            IconTextAddToHomeButton {
+                showAddToHomeDialog = true
             }
         }
         IconTextRenameButton {
@@ -92,6 +103,12 @@ internal fun ViewImageActionButtons(
                 }
             }
         }
+    }
+    if (showAddToHomeDialog) {
+        AddToHomeDialog(path = m.path, iconRes = R.drawable.image, onDismiss = {
+            showAddToHomeDialog = false
+            onDismiss()
+        })
     }
 }
 

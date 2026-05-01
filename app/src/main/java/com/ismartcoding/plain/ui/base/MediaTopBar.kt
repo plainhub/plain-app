@@ -117,6 +117,7 @@ fun <T : IData> MediaTopBar(
             context = context,
             mediaVM = mediaVM,
             tagsVM = tagsVM,
+            sortByEntries = if (setOf(DataType.IMAGE, DataType.VIDEO).contains(mediaVM.dataType)) FileSortBy.entries else FileSortBy.entries.filter { it != FileSortBy.TAKEN_AT_DESC },
             onSortSelected = { sortBy -> onSortSelected(context, sortBy) },
             onDismiss = { mediaVM.showSortAndBrowseDialog.value = false },
         )

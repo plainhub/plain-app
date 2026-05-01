@@ -160,4 +160,8 @@
     <string name="stay_online_mode">온라인 유지 모드</string>
     <string name="stay_online_mode_oled_saving">OLED 절전</string>
     <string name="stay_online_mode_tap_to_exit">탭하여 종료</string>
+    <string name="add_to_home">홈 화면에 추가</string>
+    <string name="shortcut_added_to_home">바로가기가 홈 화면에 추가되었습니다</string>
+    <string name="shortcut_not_supported">런처가 바로가기 추가를 지원하지 않습니다</string>
+    <string name="shortcut_label_hint">참고: 일부 런처(예: MIUI)에서는 홈 화면에 바로가기를 추가하지 못할 수 있습니다.</string>
 </resources>

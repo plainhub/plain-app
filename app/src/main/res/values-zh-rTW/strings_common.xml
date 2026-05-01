@@ -160,4 +160,8 @@
     <string name="stay_online_mode">防斷線模式</string>
     <string name="stay_online_mode_oled_saving">OLED 省電中</string>
     <string name="stay_online_mode_tap_to_exit">點擊任意位置退出</string>
+    <string name="add_to_home">添加到主螢幕</string>
+    <string name="shortcut_added_to_home">捷徑已添加到主螢幕</string>
+    <string name="shortcut_not_supported">您的桌面不支援添加捷徑</string>
+    <string name="shortcut_label_hint">注意：部分手機（如 MIUI）可能無法成功添加捷徑到主螢幕。</string>
 </resources>

@@ -65,6 +65,7 @@ import com.ismartcoding.plain.ui.page.web.HowToUsePage
 import com.ismartcoding.plain.ui.page.web.WebSecurityPage
 import com.ismartcoding.plain.ui.page.dlna.DlnaReceiverPage
 import com.ismartcoding.plain.ui.page.dlna.DlnaCastHistoryPage
+import com.ismartcoding.plain.ui.page.media.PlayMediaPage
 import com.ismartcoding.plain.ui.page.web.WebSettingsPage
 
 @Composable
@@ -200,5 +201,9 @@ fun MainNavGraph(
         composable<Routing.ComponentShowcase> { ComponentShowcasePage(navController) }
         composable<Routing.DlnaReceiver> { DlnaReceiverPage(navController) }
         composable<Routing.DlnaCastHistory> { DlnaCastHistoryPage(navController) }
+        composable<Routing.PlayMedia> { backStackEntry ->
+            val r = backStackEntry.toRoute<Routing.PlayMedia>()
+            PlayMediaPage(navController, r.path, audioPlaylistVM)
+        }
     }
 }

@@ -1,6 +1,8 @@
 package com.ismartcoding.plain.ui.base
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -19,6 +21,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
 
 @Composable
@@ -30,6 +33,7 @@ fun TextFieldDialog(
     icon: ImageVector? = null,
     value: String = "",
     placeholder: String = "",
+    description: String = "",
     isPassword: Boolean = false,
     errorText: String = "",
     dismissText: String = stringResource(R.string.cancel),
@@ -68,30 +72,40 @@ fun TextFieldDialog(
             )
         },
         text = {
-            ClipboardTextField(
-                modifier = modifier,
-                readOnly = readOnly,
-                value = currentValue,
-                singleLine = singleLine,
-                onValueChange = { 
-                    currentValue = it
-                    showValidationError = false
-                    onValueChange(it)
-                },
-                placeholder = placeholder,
-                isPassword = isPassword,
-                errorText = displayErrorText,
-                keyboardOptions = keyboardOptions,
-                focusManager = focusManager,
-                requestFocus = true,
-                onConfirm = { 
-                    if (validator(it)) {
-                        onConfirm(it)
-                    } else {
-                        showValidationError = true
-                    }
-                },
-            )
+            Column {
+                if (description.isNotEmpty()) {
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                    )
+                }
+                ClipboardTextField(
+                    modifier = modifier,
+                    readOnly = readOnly,
+                    value = currentValue,
+                    singleLine = singleLine,
+                    onValueChange = { 
+                        currentValue = it
+                        showValidationError = false
+                        onValueChange(it)
+                    },
+                    placeholder = placeholder,
+                    isPassword = isPassword,
+                    errorText = displayErrorText,
+                    keyboardOptions = keyboardOptions,
+                    focusManager = focusManager,
+                    requestFocus = true,
+                    onConfirm = { 
+                        if (validator(it)) {
+                            onConfirm(it)
+                        } else {
+                            showValidationError = true
+                        }
+                    },
+                )
+            }
         },
         confirmButton = {
             Button(

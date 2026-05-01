@@ -20,4 +20,6 @@ object Constants {
     const val ACTION_PEER_CHAT_REPLY = "${BuildConfig.APPLICATION_ID}.action.PEER_CHAT_REPLY"
     // On Android 14+ FGS notifications can be swiped away (OS policy). We re-post via deleteIntent.
     const val ACTION_REPOST_HTTP_NOTIFICATION = "${BuildConfig.APPLICATION_ID}.action.REPOST_HTTP_NOTIFICATION"
+    const val ACTION_PLAY_MEDIA = "${BuildConfig.APPLICATION_ID}.action.PLAY_MEDIA"
+    const val EXTRA_MEDIA_PATH = "media_path"
 }

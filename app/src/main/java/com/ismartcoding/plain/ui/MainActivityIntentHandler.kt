@@ -9,6 +9,7 @@ import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coMain
 import com.ismartcoding.lib.helpers.CoroutinesHelper.withIO
 import com.ismartcoding.lib.helpers.JsonHelper
+import com.ismartcoding.plain.Constants
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.chat.ChatDbHelper
 import com.ismartcoding.plain.db.DMessageContent
@@ -78,5 +79,8 @@ internal fun MainActivity.handleIntent(intent: Intent) {
                 showForwardTargetDialog = true
             }
         }
+    } else if (intent.action == Constants.ACTION_PLAY_MEDIA) {
+        val path = intent.getStringExtra(Constants.EXTRA_MEDIA_PATH) ?: return
+        navControllerState.value?.navigate(Routing.PlayMedia(path))
     }
 }

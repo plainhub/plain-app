@@ -160,4 +160,8 @@
     <string name="stay_online_mode">Modo siempre en línea</string>
     <string name="stay_online_mode_oled_saving">Ahorro OLED</string>
     <string name="stay_online_mode_tap_to_exit">Toca para salir</string>
+    <string name="add_to_home">Añadir a la pantalla principal</string>
+    <string name="shortcut_added_to_home">Acceso directo añadido a la pantalla principal</string>
+    <string name="shortcut_not_supported">Tu lanzador no admite añadir accesos directos</string>
+    <string name="shortcut_label_hint">Nota: Algunos lanzadores (p. ej. MIUI) podrían no añadir accesos directos correctamente.</string>
 </resources>

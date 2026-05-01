@@ -160,4 +160,8 @@
     <string name="stay_online_mode">Mode toujours en ligne</string>
     <string name="stay_online_mode_oled_saving">Économie OLED</string>
     <string name="stay_online_mode_tap_to_exit">Appuyez pour quitter</string>
+    <string name="add_to_home">Ajouter à l\'écran d\'accueil</string>
+    <string name="shortcut_added_to_home">Raccourci ajouté à l\'écran d\'accueil</string>
+    <string name="shortcut_not_supported">Votre lanceur ne prend pas en charge les raccourcis</string>
+    <string name="shortcut_label_hint">Remarque : Certains lanceurs (p. ex. MIUI) pourraient ne pas ajouter les raccourcis avec succès.</string>
 </resources>

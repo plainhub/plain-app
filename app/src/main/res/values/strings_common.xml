@@ -106,6 +106,10 @@
     <string name="added">Added</string>
     <string name="paste">Paste</string>
     <string name="added_to_playlist">Added to playlist</string>
+    <string name="add_to_home">Add to home</string>
+    <string name="shortcut_added_to_home">Shortcut added to home</string>
+    <string name="shortcut_not_supported">Your launcher does not support adding shortcuts</string>
+    <string name="shortcut_label_hint">Note: Some launchers (e.g. MIUI) may not successfully add shortcuts to the home screen.</string>
     <string name="on">On</string>
     <string name="off">Off</string>
     <string name="reset">Reset</string>

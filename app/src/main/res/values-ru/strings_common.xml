@@ -160,4 +160,8 @@
     <string name="stay_online_mode">Режим онлайн</string>
     <string name="stay_online_mode_oled_saving">Экономия OLED</string>
     <string name="stay_online_mode_tap_to_exit">Нажмите для выхода</string>
+    <string name="add_to_home">Добавить на главный экран</string>
+    <string name="shortcut_added_to_home">Ярлык добавлен на главный экран</string>
+    <string name="shortcut_not_supported">Ваш лаунчер не поддерживает добавление ярлыков</string>
+    <string name="shortcut_label_hint">Примечание: некоторые лаунчеры (например, MIUI) могут не поддерживать добавление ярлыков на главный экран.</string>
 </resources>

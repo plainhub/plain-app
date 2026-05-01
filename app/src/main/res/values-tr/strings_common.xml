@@ -160,4 +160,8 @@
     <string name="stay_online_mode">Çevrimiçi Kal Modu</string>
     <string name="stay_online_mode_oled_saving">OLED enerji tasarrufu</string>
     <string name="stay_online_mode_tap_to_exit">Çıkmak için dokunun</string>
+    <string name="add_to_home">Ana ekrana ekle</string>
+    <string name="shortcut_added_to_home">Kısayol ana ekrana eklendi</string>
+    <string name="shortcut_not_supported">Başlatıcınız kısayol eklemeyi desteklemiyor</string>
+    <string name="shortcut_label_hint">Not: Bazı başlatıcılar (ör. MIUI) kısayolları ana ekrana eklemeyi desteklemeyebilir.</string>
 </resources>

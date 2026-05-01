@@ -78,3 +78,8 @@ fun IconTextCopyButton(click: () -> Unit) {
 fun IconTextZipButton(click: () -> Unit) {
     PIconTextActionButton(R.drawable.package2, text = stringResource(R.string.compress), click = click)
 }
+
+@Composable
+fun IconTextAddToHomeButton(click: () -> Unit) {
+    PIconTextActionButton(R.drawable.smartphone, text = stringResource(R.string.add_to_home), click = click)
+}

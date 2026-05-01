@@ -34,7 +34,7 @@ fun <T : IData> SortAndBrowseDialog(
     context: Context,
     mediaVM: BaseMediaViewModel<T>,
     tagsVM: TagsViewModel,
-    sortByEntries: List<FileSortBy> = FileSortBy.entries.filter { it != FileSortBy.TAKEN_AT_DESC },
+    sortByEntries: List<FileSortBy>,
     onSortSelected: (FileSortBy) -> Unit = {},
     onDismiss: () -> Unit = {},
 ) {

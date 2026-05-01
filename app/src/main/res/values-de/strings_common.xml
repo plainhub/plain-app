@@ -160,4 +160,8 @@
     <string name="stay_online_mode">Online-Bleib-Modus</string>
     <string name="stay_online_mode_oled_saving">OLED Energiesparen</string>
     <string name="stay_online_mode_tap_to_exit">Zum Beenden tippen</string>
+    <string name="add_to_home">Zum Startbildschirm hinzufügen</string>
+    <string name="shortcut_added_to_home">Verknüpfung zum Startbildschirm hinzugefügt</string>
+    <string name="shortcut_not_supported">Ihr Launcher unterstützt keine Verknüpfungen</string>
+    <string name="shortcut_label_hint">Hinweis: Einige Launcher (z. B. MIUI) unterstützen möglicherweise das Hinzufügen von Verknüpfungen nicht.</string>
 </resources>

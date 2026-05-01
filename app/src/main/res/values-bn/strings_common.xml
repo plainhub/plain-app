@@ -160,4 +160,8 @@
     <string name="stay_online_mode">স্টে অনলাইন মোড</string>
     <string name="stay_online_mode_oled_saving">OLED বিদ্যুৎ সাশ্রয়</string>
     <string name="stay_online_mode_tap_to_exit">প্রস্থান করতে যেকোনো জায়গায় ট্যাপ করুন</string>
+    <string name="add_to_home">হোম স্ক্রিনে যোগ করুন</string>
+    <string name="shortcut_added_to_home">হোম স্ক্রিনে শর্টকাট যোগ করা হয়েছে</string>
+    <string name="shortcut_not_supported">আপনার লঞ্চার শর্টকাট যোগ করা সমর্থন করে না</string>
+    <string name="shortcut_label_hint">দ্রষ্টব্য: কিছু লঞ্চার (যেমন MIUI) হোম স্ক্রিনে শর্টকাট যোগ করতে ব্যর্থ হতে পারে।</string>
 </resources>
