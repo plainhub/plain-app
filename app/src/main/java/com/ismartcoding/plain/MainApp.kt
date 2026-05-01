@@ -44,7 +44,9 @@ import com.ismartcoding.plain.ui.base.coil.newImageLoader
 import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
+import com.ismartcoding.plain.db.AppDatabase
 import dalvik.system.ZipPathValidator
+import kotlin.time.Duration.Companion.days
 
 class MainApp : Application() {
     override fun onCreate() {
@@ -110,6 +112,10 @@ class MainApp : Application() {
             sendEvent(StartNearbyServiceEvent())
             HttpServerManager.clientTsInterval()
             ImageSearchManager.restoreIfEnabled()
+            val thirtyDaysAgo = (kotlin.time.Clock.System.now() - 30.days).toString()
+            AppDatabase.instance.videoPlayProgressDao().getRecentProgress(thirtyDaysAgo).forEach {
+                TempData.videoPlayProgressMap[it.mediaId] = it.duration
+            }
             if (AppFeatureType.CHECK_UPDATES.has() && autoCheckUpdate && checkUpdateTime < System.currentTimeMillis() - Constants.ONE_DAY_MS) {
                 AppHelper.checkUpdateAsync(this@MainApp, false)
             }

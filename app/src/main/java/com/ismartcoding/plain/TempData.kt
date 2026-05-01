@@ -46,6 +46,8 @@ object TempData {
 
     var audioSleepTimerFutureTime = 0L
     var audioPlayPosition = 0L // audio play position in milliseconds
+    // mediaId -> playback position in milliseconds; pre-loaded from DB on startup as cache
+    val videoPlayProgressMap = mutableMapOf<String, Long>()
 
     /**
      * MMS messages that have been launched in the default SMS app but not yet

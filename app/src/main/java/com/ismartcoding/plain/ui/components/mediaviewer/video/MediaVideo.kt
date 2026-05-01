@@ -28,6 +28,11 @@ import androidx.media3.ui.PlayerView
 import android.content.Context
 import android.media.AudioManager
 import com.ismartcoding.lib.extensions.pathToUri
+import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
+import com.ismartcoding.plain.TempData
+import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.db.DVideoPlayProgress
+import com.ismartcoding.plain.helpers.TimeHelper
 import com.ismartcoding.plain.ui.components.mediaviewer.*
 import com.ismartcoding.plain.ui.components.mediaviewer.previewer.DEFAULT_CROSS_FADE_ANIMATE_SPEC
 import kotlinx.coroutines.launch
@@ -70,17 +75,21 @@ fun MediaVideo(
                 }
             }
         }
-        if (model.intrinsicSize != IntSize.Zero) { vSize = model.intrinsicSize; videoSpecified = true }
+        if (model.intrinsicSize != IntSize.Zero) {
+            vSize = model.intrinsicSize; videoSpecified = true
+        }
     }
 
     val audioManager = remember(context) { context.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
     val focusManager = remember(audioManager) { VideoAudioFocusManager(audioManager) }
+    val progressDao = remember { AppDatabase.instance.videoPlayProgressDao() }
     val defaultPlayerView = remember { PlayerView(context) }
     var mediaSession = remember<MediaSession?> { null }
     var firstFrameRendered by remember { mutableStateOf(false) }
     val player = rememberVideoPlayer(context, playerInstance = {
         addListener(object : Player.Listener {
             override fun onEvents(player: Player, events: Player.Events) {
+                if (!videoState.isPreviewerOpen || pagerState.settledPage != page) return
                 scope.launch {
                     videoState.totalTime = player.duration.coerceAtLeast(0L)
                     videoState.isPlaying = player.isPlaying
@@ -106,6 +115,12 @@ fun MediaVideo(
 
     LaunchedEffect(player, pagerState.settledPage, videoState.isPreviewerOpen) {
         if (!videoState.isPreviewerOpen || pagerState.settledPage != page) {
+            if (model.mediaId.isNotEmpty() && player.currentPosition > 0) {
+                val mediaId = model.mediaId
+                val pos = player.currentPosition
+                TempData.videoPlayProgressMap[mediaId] = pos
+                coIO { progressDao.upsert(DVideoPlayProgress(mediaId, pos, TimeHelper.now())) }
+            }
             focusManager.abandonFocus()
             player.stop()
             return@LaunchedEffect
@@ -115,17 +130,35 @@ fun MediaVideo(
         mediaSession = MediaSession.Builder(appContext, ForwardingPlayer(player))
             .setId("VideoPlayerMediaSession_" + UUID.randomUUID().toString().lowercase().split("-").first())
             .build()
+        val savedPos = if (model.mediaId.isNotEmpty()) TempData.videoPlayProgressMap[model.mediaId] else null
+        val expectedTotalMs = ((model.data as? com.ismartcoding.plain.data.DVideo)?.duration ?: 0L) * 1000
+        if (expectedTotalMs > 0L) {
+            videoState.totalTime = expectedTotalMs
+        }
+        if (savedPos != null && savedPos > 0L) {
+            videoState.currentTime = savedPos
+        }
         val exoPlayerMediaItems = listOf(VideoPlayerMediaItem.StorageMediaItem(storageUri = model.path.pathToUri())).map {
             val uri = it.toUri(context)
             MediaItem.Builder().apply { setUri(uri); setMediaMetadata(it.mediaMetadata); setMimeType(it.mimeType); setDrmConfiguration(null) }.build()
         }
-        player.setMediaItems(exoPlayerMediaItems); player.prepare()
+        player.setMediaItems(exoPlayerMediaItems)
+        if (savedPos != null && savedPos > 0) {
+            player.seekTo(savedPos)
+        }
+        player.prepare()
         focusManager.requestFocus(player)
         player.play()
     }
 
     DisposableEffect(Unit) {
         onDispose {
+            val mediaId = model.mediaId
+            val pos = player.currentPosition
+            if (mediaId.isNotEmpty() && pos > 0) {
+                TempData.videoPlayProgressMap[mediaId] = pos
+                coIO { progressDao.upsert(DVideoPlayProgress(mediaId, pos, TimeHelper.now())) }
+            }
             focusManager.abandonFocus() // unregisters listener before player.release() — safe, no callbacks after this
             player.stop()
             player.release()
@@ -135,7 +168,8 @@ fun MediaVideo(
     }
 
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
             .graphicsLayer { clip = boundClip; alpha = viewerAlpha.value }
             .onSizeChanged { bSize = it }
             .pointerInput(Unit) {
@@ -157,13 +191,17 @@ fun MediaVideo(
         contentAlignment = Alignment.Center,
     ) {
         val videoModifier = Modifier.graphicsLayer {
-            if (videoSpecified) { scaleX = scale; scaleY = scale; translationX = offsetX; translationY = offsetY; rotationZ = rotation }
+            if (videoSpecified) {
+                scaleX = scale; scaleY = scale; translationX = offsetX; translationY = offsetY; rotationZ = rotation
+            }
         }
         VideoPlayer(
-            modifier = videoModifier.align(Alignment.Center).size(
-                LocalDensity.current.run { sizing.displaySize.width.toDp() },
-                LocalDensity.current.run { sizing.displaySize.height.toDp() }
-            ),
+            modifier = videoModifier
+                .align(Alignment.Center)
+                .size(
+                    LocalDensity.current.run { sizing.displaySize.width.toDp() },
+                    LocalDensity.current.run { sizing.displaySize.height.toDp() }
+                ),
             player = player, playerView = defaultPlayerView, videoState = videoState,
         )
     }

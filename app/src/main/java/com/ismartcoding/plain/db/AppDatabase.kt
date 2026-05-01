@@ -36,8 +36,9 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         DAppFile::class,
         DImageEmbedding::class,
         DArchivedConversation::class,
+        DVideoPlayProgress::class,
     ],
-    version = 14,
+    version = 15,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3, spec = BoxesDeletionSpec::class),
@@ -51,6 +52,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         AutoMigration(from = 11, to = 12),
         AutoMigration(from = 12, to = 13),
         AutoMigration(from = 13, to = 14),
+        AutoMigration(from = 14, to = 15),
     ],
     exportSchema = true,
 )
@@ -87,6 +89,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun imageEmbeddingDao(): ImageEmbeddingDao
 
     abstract fun archivedConversationDao(): ArchivedConversationDao
+
+    abstract fun videoPlayProgressDao(): VideoPlayProgressDao
 
     companion object {
         @Volatile

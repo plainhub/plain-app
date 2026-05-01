@@ -111,13 +111,14 @@ fun VideoPreviewActions(context: Context, castViewModel: CastViewModel, m: Previ
 
 @Composable
 fun VideoButtons2(videoState: VideoState, scope: CoroutineScope) {
+    val sliderProgress = if (videoState.totalTime <= 0L) 0f else (videoState.currentTime.toFloat() / videoState.totalTime.toFloat()).coerceIn(0f, 1f)
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
         IconButton(modifier = Modifier.size(40.dp), onClick = { videoState.togglePlay() }) {
             Image(modifier = Modifier.size(32.dp), painter = painterResource(if (videoState.isPlaying) R.drawable.pause else R.drawable.play_arrow), colorFilter = ColorFilter.tint(Color.White), contentDescription = stringResource(if (videoState.isPlaying) R.string.pause else R.string.play))
         }
         Text(modifier = Modifier.width(52.dp), text = videoState.currentTime.formatMinSec(), fontWeight = FontWeight.Medium, style = MaterialTheme.typography.bodyMedium, color = Color.White, textAlign = TextAlign.Center)
         Box(modifier = Modifier.weight(1f).padding(horizontal = 4.dp)) {
-            PlayerSlider(modifier = Modifier.fillMaxWidth().height(20.dp), progress = videoState.currentTime.toFloat() / videoState.totalTime.toFloat(), bufferedProgress = videoState.bufferedPercentage / 100f, onProgressChange = { videoState.seekTo((it * videoState.totalTime).toLong()) })
+            PlayerSlider(modifier = Modifier.fillMaxWidth().height(20.dp), progress = sliderProgress, bufferedProgress = videoState.bufferedPercentage / 100f, onProgressChange = { videoState.seekTo((it * videoState.totalTime).toLong()) })
         }
         Text(modifier = Modifier.width(52.dp), text = videoState.totalTime.formatMinSec(), fontWeight = FontWeight.Medium, style = MaterialTheme.typography.bodyMedium, color = Color.White, textAlign = TextAlign.Center)
         IconButton(modifier = Modifier.size(40.dp), onClick = { videoState.isFullscreenMode = !videoState.isFullscreenMode }) {
