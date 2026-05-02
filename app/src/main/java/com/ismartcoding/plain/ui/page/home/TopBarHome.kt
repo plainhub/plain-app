@@ -30,7 +30,10 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.helpers.PhoneHelper
 import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
+import com.ismartcoding.plain.ui.base.ActionButtonSettings
+import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.components.DeviceRenameDialog
+import com.ismartcoding.plain.ui.nav.Routing
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,6 +78,9 @@ fun TopBarHome(navController: NavHostController) {
             }
         },
         actions = {
+            ActionButtonSettings(
+                onClick = { navController.navigate(Routing.Settings) },
+            )
             ActionButtonMoreWithMenu { dismiss ->
                 HomeQuickMenuItems(
                     navController = navController,

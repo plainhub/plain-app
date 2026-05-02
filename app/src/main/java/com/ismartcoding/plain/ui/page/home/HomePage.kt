@@ -23,9 +23,6 @@ import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.events.PermissionsResultEvent
 import com.ismartcoding.plain.events.RequestPermissionsEvent
-import com.ismartcoding.plain.events.UpdateDownloadCompleteEvent
-import com.ismartcoding.plain.events.UpdateDownloadFailedEvent
-import com.ismartcoding.plain.events.UpdateDownloadProgressEvent
 import com.ismartcoding.plain.events.WindowFocusChangedEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.preferences.LocalWeb
@@ -38,6 +35,7 @@ import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
+import com.ismartcoding.plain.ui.models.consumeUpdateDownloadEvent
 import com.ismartcoding.plain.ui.page.settings.UpdateDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,6 +51,10 @@ fun HomePage(
 
     LaunchedEffect(Unit) {
         Channel.sharedFlow.collect { event ->
+            if (updateVM.consumeUpdateDownloadEvent(event)) {
+                return@collect
+            }
+
             when (event) {
                 is PermissionsResultEvent -> {
                     systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.can(context)
@@ -63,18 +65,6 @@ fun HomePage(
                     mainVM.ip4s = NetworkHelper.getDeviceIP4s().filter { it.isNotEmpty() }
                     mainVM.ip4 = NetworkHelper.getDeviceIP4().ifEmpty { "127.0.0.1" }
                     systemAlertWindow = Permission.SYSTEM_ALERT_WINDOW.can(context)
-                }
-
-                is UpdateDownloadProgressEvent -> {
-                    updateVM.onDownloadProgress(event.progress)
-                }
-
-                is UpdateDownloadCompleteEvent -> {
-                    updateVM.onDownloadComplete(event.filePath)
-                }
-
-                is UpdateDownloadFailedEvent -> {
-                    updateVM.onDownloadFailed()
                 }
             }
         }

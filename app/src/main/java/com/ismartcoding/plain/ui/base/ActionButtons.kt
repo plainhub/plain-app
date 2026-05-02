@@ -69,6 +69,12 @@ fun ActionButtonAdd(onClick: () -> Unit) {
 }
 
 @Composable
+fun ActionButtonSettings(onClick: () -> Unit) {
+    PIconButton(icon = R.drawable.settings, contentDescription = stringResource(R.string.settings),
+        tint = MaterialTheme.colorScheme.onSurface, click = onClick)
+}
+
+@Composable
 fun ActionButtonRefresh(onClick: () -> Unit, loading: Boolean = false) {
     val infiniteTransition = rememberInfiniteTransition(label = "refresh_rotation")
     val rotation by infiniteTransition.animateFloat(

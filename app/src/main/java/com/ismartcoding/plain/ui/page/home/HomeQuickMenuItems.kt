@@ -26,16 +26,6 @@ fun HomeQuickMenuItems(
         },
     )
     PDropdownMenuItem(
-        text = { Text(stringResource(R.string.settings)) },
-        leadingIcon = {
-            Icon(painterResource(R.drawable.settings), contentDescription = null)
-        },
-        onClick = {
-            onDismiss()
-            navController.navigate(Routing.Settings)
-        },
-    )
-    PDropdownMenuItem(
         text = { Text(stringResource(R.string.customize_home_features)) },
         leadingIcon = {
             Icon(painterResource(R.drawable.tune), contentDescription = null)
