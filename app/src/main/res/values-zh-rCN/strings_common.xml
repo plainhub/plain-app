@@ -74,7 +74,6 @@
     <string name="select_tags">选择标签</string>
     <string name="input_required">这个字段必填</string>
     <string name="enable">启用</string>
-    <string name="enable_testing_token">启用测试令牌</string>
     <string name="invalid_value">输入有误</string>
     <string name="resume">继续</string>
     <string name="permission_required">需要权限</string>

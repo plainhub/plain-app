@@ -66,6 +66,17 @@ fun ActionButtonCast(onClick: () -> Unit) {
 }
 
 @Composable
+fun ActionButtonInfo(contentDescription: String, onClick: () -> Unit) {
+    PIconButton(
+        icon = R.drawable.info,
+        contentDescription = contentDescription,
+        tint = MaterialTheme.colorScheme.onSurface,
+        click = onClick,
+    )
+}
+
+
+@Composable
 fun IconTextFavoriteButton(
     isFavorite: Boolean = false,
     onClick: () -> Unit

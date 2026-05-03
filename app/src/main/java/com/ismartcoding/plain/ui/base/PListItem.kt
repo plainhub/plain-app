@@ -36,7 +36,7 @@ fun PListItem(
     modifier: Modifier = Modifier,
     enable: Boolean = true,
     title: String,
-    subtitle: String? = null,
+    subtitle: String = "",
     value: String? = null,
     icon: Int? = null,
     start: (@Composable () -> Unit)? = null,
@@ -79,10 +79,10 @@ fun PListItem(
                     text = title,
                     style = MaterialTheme.typography.listItemTitle(),
                 )
-                subtitle?.let {
+                if (subtitle.isNotEmpty()) {
                     VerticalSpace(dp = 8.dp)
                     Text(
-                        text = it,
+                        text = subtitle,
                         style = MaterialTheme.typography.listItemSubtitle(),
                         overflow = TextOverflow.Visible
                     )
@@ -100,11 +100,7 @@ fun PListItem(
 
             if (value != null || action != null) {
                 Box(Modifier.padding(start = 16.dp)) {
-                    if (action != null) {
-                        Box(Modifier.padding(end = 8.dp)) {
-                            action.invoke()
-                        }
-                    }
+                    action?.invoke()
                     value?.let {
                         Box(Modifier.padding(end = if (showMore) 0.dp else 8.dp, top = 8.dp, bottom = 8.dp)) {
                             SelectionContainer {

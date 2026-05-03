@@ -75,7 +75,6 @@
     <string name="scan_history">Scan geschiedenis</string>
     <string name="input_required">Dit veld is verplicht</string>
     <string name="enable">Inschakelen</string>
-    <string name="enable_testing_token">Testtoken inschakelen</string>
     <string name="invalid_value">Ongeldige waarde</string>
     <string name="resume">Hervatten</string>
     <string name="permission_required">Toestemming Vereist</string>

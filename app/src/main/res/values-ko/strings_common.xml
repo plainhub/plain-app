@@ -75,7 +75,6 @@
     <string name="scan_history">스캔 기록</string>
     <string name="input_required">이 필드는 필수입니다</string>
     <string name="enable">활성화</string>
-    <string name="enable_testing_token">테스트 토큰 활성화</string>
     <string name="invalid_value">잘못된 값</string>
     <string name="resume">계속하기</string>
     <string name="permission_required">권한 필요</string>

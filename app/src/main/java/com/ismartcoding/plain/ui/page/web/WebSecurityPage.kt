@@ -123,7 +123,7 @@ fun WebSecurityPage(navController: NavHostController) {
                     }
                     item {
                         Subtitle(text = stringResource(R.string.https_certificate_signature))
-                        ClipboardCard(label = stringResource(R.string.https_certificate_signature), sslSignature)
+                        ClipboardCard(label = stringResource(R.string.https_certificate_signature), text = sslSignature)
                         VerticalSpace(dp = 16.dp)
                         PFilledButton(text = stringResource(R.string.reset_ssl_certificate), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                             scope.launch(Dispatchers.IO) {
@@ -135,7 +135,7 @@ fun WebSecurityPage(navController: NavHostController) {
                             }
                         })
                         VerticalSpace(dp = 24.dp); Subtitle(text = stringResource(R.string.url_token))
-                        ClipboardCard(label = stringResource(R.string.url_token), urlToken)
+                        ClipboardCard(label = stringResource(R.string.url_token), text = urlToken)
                         Tips(text = stringResource(R.string.url_token_tips)); VerticalSpace(dp = 16.dp)
                         PCard {
                             PListItem(modifier = Modifier.clickable {
@@ -148,7 +148,9 @@ fun WebSecurityPage(navController: NavHostController) {
                         }
                         Tips(text = stringResource(R.string.rotate_url_token_on_restart_tips)); VerticalSpace(dp = 16.dp)
                         PFilledButton(text = stringResource(R.string.reset_token), type = ButtonType.DANGER, modifier = Modifier.padding(horizontal = 16.dp), onClick = {
-                            scope.launch(Dispatchers.IO) { UrlTokenPreference.resetAsync(context); urlToken = Base64.encodeToString(TempData.urlToken, Base64.NO_WRAP); DialogHelper.showMessage(R.string.the_token_is_reset) }
+                            scope.launch(Dispatchers.IO) {
+                                UrlTokenPreference.resetAsync(context); urlToken = Base64.encodeToString(TempData.urlToken, Base64.NO_WRAP); DialogHelper.showMessage(R.string.the_token_is_reset)
+                            }
                         })
                         BottomSpace(paddingValues)
                     }

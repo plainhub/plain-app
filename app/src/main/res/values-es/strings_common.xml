@@ -74,7 +74,6 @@
     <string name="scan_history">Historial de escaneo</string>
     <string name="input_required">Este campo es obligatorio</string>
     <string name="enable">Activar</string>
-    <string name="enable_testing_token">Activar token de pruebas</string>
     <string name="invalid_value">Valor no válido</string>
     <string name="resume">Reanudar</string>
     <string name="permission_required">Permiso requerido</string>

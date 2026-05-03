@@ -34,6 +34,7 @@ import com.ismartcoding.plain.ui.models.ImagesViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.lib.extensions.isUrl
 import androidx.compose.ui.res.stringResource
+import com.ismartcoding.plain.ui.base.CopyIconButton
 
 @Composable
 internal fun ViewImageActionButtons(
@@ -118,11 +119,7 @@ internal fun ViewImagePathCard(
 ) {
     PCard {
         PListItem(title = m.path, action = {
-            PIconButton(icon = R.drawable.copy, contentDescription = stringResource(id = R.string.copy_path), click = {
-                val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.file_path), m.path)
-                clipboardManager.setPrimaryClip(clip)
-                DialogHelper.showTextCopiedMessage(m.path)
-            })
+            CopyIconButton(text = m.path, clipLabel = stringResource(R.string.file_path))
         })
     }
 }

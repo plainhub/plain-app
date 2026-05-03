@@ -13,8 +13,8 @@ import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.chat.ChatCacheManager
+import com.ismartcoding.plain.db.DSession
 import com.ismartcoding.plain.events.WebRequestReceivedEvent
-import com.ismartcoding.plain.preferences.AuthDevTokenPreference
 import com.ismartcoding.plain.web.schemas.addAppSchema
 import com.ismartcoding.plain.web.schemas.addAudioSchema
 import com.ismartcoding.plain.web.schemas.addBookmarkSchema
@@ -158,9 +158,22 @@ class MainGraphQL(val schema: Schema) {
                             val r = executeGraphqlQL(schema, parsed.body, call)
                             call.respondBytes(CryptoHelper.chaCha20Encrypt(token, r))
                         } else {
+                            if (clientId.isEmpty()) {
+                                call.respondText(
+                                    """{"errors":[{"message":"Unauthorized"}]}""",
+                                    contentType = ContentType.Application.Json,
+                                )
+                                return@post
+                            }
                             val authStr = call.request.header("authorization")?.split(" ")
-                            val token = AuthDevTokenPreference.getAsync(MainApp.instance)
-                            if (token.isEmpty() || authStr?.get(1) != token) {
+                            val bearerToken = authStr?.getOrNull(1) ?: ""
+                            val session = SessionList.getByClientIdAsync(clientId)
+                            if (
+                                bearerToken.isEmpty() ||
+                                session == null ||
+                                session.type != DSession.TYPE_CUSTOM ||
+                                session.token != bearerToken
+                            ) {
                                 call.respondText(
                                     """{"errors":[{"message":"Unauthorized"}]}""",
                                     contentType = ContentType.Application.Json,

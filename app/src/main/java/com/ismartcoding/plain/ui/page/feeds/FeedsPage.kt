@@ -63,7 +63,7 @@ fun FeedsPage(navController: NavHostController, feedsVM: FeedsViewModel = viewMo
     BackHandler(enabled = feedsVM.selectMode.value) { feedsVM.exitSelectMode() }
     AddFeedDialog(feedsVM); EditFeedDialog(feedsVM); ViewFeedBottomSheet(feedsVM)
     val pageTitle = if (feedsVM.selectMode.value) LocaleHelper.getStringF(R.string.x_selected, "count", feedsVM.selectedIds.size)
-        else LocaleHelper.getStringF(R.string.subscriptions_title, "count", itemsState.size)
+    else LocaleHelper.getStringF(R.string.subscriptions_title, "count", itemsState.size)
 
     PScaffold(
         topBar = {
@@ -75,10 +75,12 @@ fun FeedsPage(navController: NavHostController, feedsVM: FeedsViewModel = viewMo
                     HorizontalSpace(dp = 8.dp)
                 } else {
                     ActionButtonMoreWithMenu { dismiss ->
-                        PDropdownMenuItem(text = { Text(stringResource(R.string.import_opml_file)) },
+                        PDropdownMenuItem(
+                            text = { Text(stringResource(R.string.import_opml_file)) },
                             leadingIcon = { Icon(painter = painterResource(R.drawable.upload), contentDescription = stringResource(R.string.import_opml_file)) },
                             onClick = { dismiss(); sendEvent(PickFileEvent(PickFileTag.FEED, PickFileType.FILE, false)) })
-                        PDropdownMenuItem(text = { Text(stringResource(R.string.export_opml_file)) },
+                        PDropdownMenuItem(
+                            text = { Text(stringResource(R.string.export_opml_file)) },
                             leadingIcon = { Icon(painter = painterResource(R.drawable.download), contentDescription = stringResource(R.string.export_opml_file)) },
                             onClick = { dismiss(); sendEvent(ExportFileEvent(ExportFileType.OPML, "feeds_" + Date().formatName() + ".opml")) })
                     }
@@ -88,8 +90,15 @@ fun FeedsPage(navController: NavHostController, feedsVM: FeedsViewModel = viewMo
         bottomBar = {
             AnimatedVisibility(visible = feedsVM.showBottomActions(), enter = slideInVertically { it }, exit = slideOutVertically { it }) { FeedsSelectModeBottomActions(feedsVM) }
         },
-        floatingActionButton = if (feedsVM.selectMode.value) null else { { PDraggableElement { FloatingActionButton(onClick = { feedsVM.showAddDialog() }) {
-            Icon(painter = painterResource(R.drawable.plus), stringResource(R.string.add)) } } } },
+        floatingActionButton = if (feedsVM.selectMode.value) null else {
+            {
+                PDraggableElement {
+                    FloatingActionButton(onClick = { feedsVM.showAddDialog() }) {
+                        Icon(painter = painterResource(R.drawable.plus), stringResource(R.string.add))
+                    }
+                }
+            }
+        },
     ) { paddingValues ->
         PullToRefresh(modifier = Modifier.padding(top = paddingValues.calculateTopPadding()), refreshLayoutState = topRefreshLayoutState) {
             AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
@@ -104,7 +113,9 @@ fun FeedsPage(navController: NavHostController, feedsVM: FeedsViewModel = viewMo
                         }
                         item { VerticalSpace(dp = paddingValues.calculateBottomPadding()) }
                     }
-                } else { NoDataColumn(loading = feedsVM.showLoading.value) }
+                } else {
+                    NoDataColumn(loading = feedsVM.showLoading.value)
+                }
             }
         }
     }

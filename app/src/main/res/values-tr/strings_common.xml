@@ -75,7 +75,6 @@
     <string name="scan_history">Tarama geçmişi</string>
     <string name="input_required">Bu alan gereklidir</string>
     <string name="enable">Etkinleştir</string>
-    <string name="enable_testing_token">Test belirtecini etkinleştir</string>
     <string name="invalid_value">Geçersiz değer</string>
     <string name="resume">Devam et</string>
     <string name="permission_required">İzin gerekli</string>

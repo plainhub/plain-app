@@ -74,7 +74,6 @@
     <string name="scan_history">Scan-Verlauf</string>
     <string name="input_required">Dieses Feld ist erforderlich</string>
     <string name="enable">Aktivieren</string>
-    <string name="enable_testing_token">Test-Token aktivieren</string>
     <string name="invalid_value">Ungültiger Wert</string>
     <string name="resume">Fortsetzen</string>
     <string name="permission_required">Berechtigung erforderlich</string>

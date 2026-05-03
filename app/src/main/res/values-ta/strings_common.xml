@@ -75,7 +75,6 @@
     <string name="scan_history">ஸ்கேன் வரலாறு</string>
     <string name="input_required">இந்த புலம் தேவை</string>
     <string name="enable">இயக்கு</string>
-    <string name="enable_testing_token">சோதனை டோக்கனை இயக்கு</string>
     <string name="invalid_value">தவறான மதிப்பு</string>
     <string name="resume">தொடர்</string>
     <string name="permission_required">அனுமதி தேவை</string>

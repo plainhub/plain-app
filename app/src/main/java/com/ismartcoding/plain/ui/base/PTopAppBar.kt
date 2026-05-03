@@ -63,7 +63,10 @@ fun PTopAppBar(
             }
         },
         navigationIcon = { navigationIcon?.invoke() },
-        actions = { actions?.invoke(this) },
+        actions = {
+            actions?.invoke(this)
+            HorizontalSpace(8.dp)
+        },
         modifier = modifier,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = topBarColor,

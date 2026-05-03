@@ -70,8 +70,8 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
                     TopSpace()
                     PCard {
                         PListItem(
-                            modifier = Modifier.clickable { navController.navigate(Routing.Sessions) },
-                            icon = R.drawable.devices, title = stringResource(R.string.sessions), showMore = true
+                            modifier = Modifier.clickable { navController.navigate(Routing.Connections) },
+                            icon = R.drawable.devices, title = stringResource(R.string.connections), showMore = true
                         )
                         PListItem(
                             modifier = Modifier.clickable { navController.navigate(Routing.WebSecurity) },

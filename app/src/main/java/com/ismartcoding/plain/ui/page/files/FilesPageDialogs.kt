@@ -38,9 +38,10 @@ internal fun FilesPageDialogs(
             onConfirm = { name ->
                 scope.launch {
                     DialogHelper.showLoading()
-                    withIO { FileSystemHelper.createDirectory(filesVM.selectedPath + "/" + name) }
-                    DialogHelper.hideLoading()
-                    withIO { filesVM.loadAsync(context) }
+                        val error = withIO { runCatching { FileSystemHelper.createDirectory(filesVM.selectedPath + "/" + name) }.exceptionOrNull() }
+                        DialogHelper.hideLoading()
+                        if (error != null) { DialogHelper.showMessage(error); return@launch }
+                        withIO { filesVM.loadAsync(context) }
                     filesVM.showCreateFolderDialog.value = false
                 }
             }
@@ -57,9 +58,10 @@ internal fun FilesPageDialogs(
             onConfirm = { name ->
                 scope.launch {
                     DialogHelper.showLoading()
-                    withIO { FileSystemHelper.createFile(filesVM.selectedPath + "/" + name) }
-                    DialogHelper.hideLoading()
-                    withIO { filesVM.loadAsync(context) }
+                        val error = withIO { runCatching { FileSystemHelper.createFile(filesVM.selectedPath + "/" + name) }.exceptionOrNull() }
+                        DialogHelper.hideLoading()
+                        if (error != null) { DialogHelper.showMessage(error); return@launch }
+                        withIO { filesVM.loadAsync(context) }
                     filesVM.showCreateFileDialog.value = false
                 }
             }

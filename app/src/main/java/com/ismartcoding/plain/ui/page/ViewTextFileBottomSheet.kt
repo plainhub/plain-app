@@ -20,6 +20,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.CopyIconButton
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
 import com.ismartcoding.plain.ui.base.IconTextShareButton
 import com.ismartcoding.plain.ui.base.IconTextToBottomButton
@@ -87,11 +88,7 @@ fun ViewTextFileBottomSheet(
         if (m != null) {
             PCard {
                 PListItem(title = m.path, action = {
-                    PIconButton(icon = R.drawable.copy, contentDescription = stringResource(id = R.string.copy_path), click = {
-                        val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.file_path), m.path)
-                        clipboardManager.setPrimaryClip(clip)
-                        DialogHelper.showTextCopiedMessage(m.path)
-                    })
+                    CopyIconButton(text = m.path, clipLabel = stringResource(R.string.file_path))
                 })
             }
             VerticalSpace(dp = 16.dp)

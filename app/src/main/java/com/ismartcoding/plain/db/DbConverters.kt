@@ -34,7 +34,7 @@ class DateConverter {
         if (date == null) {
             return null
         }
-        return Instant.parse(date)
+        return kotlin.time.Instant.parse(date)
     }
 }
 

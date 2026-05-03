@@ -38,7 +38,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         DArchivedConversation::class,
         DVideoPlayProgress::class,
     ],
-    version = 15,
+    version = 16,
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3, spec = BoxesDeletionSpec::class),
@@ -53,6 +53,7 @@ class ChatsGroupIdToChannelIdSpec : AutoMigrationSpec
         AutoMigration(from = 12, to = 13),
         AutoMigration(from = 13, to = 14),
         AutoMigration(from = 14, to = 15),
+        AutoMigration(from = 15, to = 16),
     ],
     exportSchema = true,
 )

@@ -19,6 +19,7 @@ import com.ismartcoding.plain.extensions.formatDateTime
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.CopyIconButton
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
 import com.ismartcoding.plain.ui.base.IconTextSelectButton
 import com.ismartcoding.plain.ui.base.PCard
@@ -89,11 +90,7 @@ fun ViewFeedEntryBottomSheet(
                     PListItem(modifier = Modifier.clickable {
                         WebHelper.open(context, m.url)
                     }, title = m.url, separatedActions = true, action = {
-                        PIconButton(icon = R.drawable.copy, contentDescription = stringResource(id = R.string.copy_link), click = {
-                            val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.link), m.url)
-                            clipboardManager.setPrimaryClip(clip)
-                            DialogHelper.showTextCopiedMessage(m.url)
-                        })
+                        CopyIconButton(text = m.url, clipLabel = stringResource(R.string.link))
                     })
                 }
                 VerticalSpace(dp = 16.dp)

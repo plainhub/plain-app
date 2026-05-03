@@ -75,7 +75,6 @@
     <string name="scan_history">Cronologia scansione</string>
     <string name="input_required">Questo campo è obbligatorio</string>
     <string name="enable">Abilita</string>
-    <string name="enable_testing_token">Abilita token di test</string>
     <string name="invalid_value">Valore non valido</string>
     <string name="resume">Riprendi</string>
     <string name="permission_required">Permesso Richiesto</string>

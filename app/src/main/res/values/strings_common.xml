@@ -78,7 +78,6 @@
     <string name="scan_history">Scan history</string>
     <string name="input_required">This field is required</string>
     <string name="enable">Enable</string>
-    <string name="enable_testing_token">Enable testing token</string>
     <string name="invalid_value">Invalid value</string>
     <string name="resume">Resume</string>
     <string name="permission_required">Permission required</string>

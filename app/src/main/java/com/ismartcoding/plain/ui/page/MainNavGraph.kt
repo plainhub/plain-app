@@ -59,8 +59,8 @@ import com.ismartcoding.plain.ui.page.settings.LanguagePage
 import com.ismartcoding.plain.ui.page.settings.SettingsPage
 import com.ismartcoding.plain.ui.page.settings.ComponentShowcasePage
 import com.ismartcoding.plain.ui.page.web.NotificationSettingsPage
-import com.ismartcoding.plain.ui.page.web.SessionsPage
-import com.ismartcoding.plain.ui.page.web.WebDevPage
+import com.ismartcoding.plain.ui.page.connections.ConnectionsPage
+import com.ismartcoding.plain.ui.page.devoptions.WebDevPage
 import com.ismartcoding.plain.ui.page.web.HowToUsePage
 import com.ismartcoding.plain.ui.page.web.WebSecurityPage
 import com.ismartcoding.plain.ui.page.dlna.DlnaReceiverPage
@@ -128,7 +128,7 @@ fun MainNavGraph(
         composable<Routing.WebSettings> { WebSettingsPage(navController) }
         composable<Routing.CustomFeatures> { HomeFeaturesSelectionPage(navController) }
         composable<Routing.NotificationSettings> { NotificationSettingsPage(navController) }
-        composable<Routing.Sessions> { SessionsPage(navController) }
+        composable<Routing.Connections> { ConnectionsPage(navController) }
         composable<Routing.WebDev> { WebDevPage(navController) }
         composable<Routing.WebSecurity> { WebSecurityPage(navController) }
         composable<Routing.Chat> { backStackEntry ->

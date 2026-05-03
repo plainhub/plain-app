@@ -23,6 +23,7 @@ import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.preferences.FavoriteFoldersPreference
 import com.ismartcoding.plain.data.DFavoriteFolder
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.CopyIconButton
 import com.ismartcoding.plain.ui.base.PCard
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PListItem
@@ -84,11 +85,7 @@ fun FileInfoBottomSheet(filesVM: FilesViewModel) {
                 VerticalSpace(dp = 24.dp)
                 PCard {
                     PListItem(title = file.path, action = {
-                        PIconButton(icon = R.drawable.copy, contentDescription = stringResource(id = R.string.copy_path), click = {
-                            val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.file_path), file.path)
-                            clipboardManager.setPrimaryClip(clip)
-                            DialogHelper.showTextCopiedMessage(file.path)
-                        })
+                        CopyIconButton(text = file.path, clipLabel = stringResource(R.string.file_path))
                     })
                 }
                 VerticalSpace(dp = 16.dp)

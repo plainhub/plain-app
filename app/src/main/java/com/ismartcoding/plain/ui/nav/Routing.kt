@@ -37,7 +37,7 @@ class Routing {
     data class Text(val title: String, val content: String, val language: String)
 
     @Serializable
-    object Sessions
+    object Connections
 
     @Serializable
     object WebDev

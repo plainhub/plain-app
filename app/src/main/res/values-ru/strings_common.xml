@@ -74,7 +74,6 @@
     <string name="scan_history">История сканирования</string>
     <string name="input_required">Это поле обязательно</string>
     <string name="enable">Включить</string>
-    <string name="enable_testing_token">Включить тестовый токен</string>
     <string name="invalid_value">Недопустимое значение</string>
     <string name="resume">Продолжить</string>
     <string name="permission_required">Требуется разрешение</string>

@@ -217,7 +217,9 @@ object HttpServerManager {
     suspend fun loadTokenCache() {
         tokenCache.clear()
         SessionList.getItemsAsync().forEach {
-            tokenCache[it.clientId] = Base64.decode(it.token, Base64.NO_WRAP)
+            if (it.token.isNotEmpty()) {
+                tokenCache[it.clientId] = Base64.decode(it.token, Base64.NO_WRAP)
+            }
         }
     }
 
@@ -319,7 +321,7 @@ object HttpServerManager {
                         .filter { it.value > lastSyncTs }
                         .map { SessionClientTsUpdate(it.key, Instant.fromEpochMilliseconds(it.value)) }
                 if (updates.isNotEmpty()) {
-                    val maxTsInThisBatch = updates.maxOf { it.updatedAt.toEpochMilliseconds() }
+                    val maxTsInThisBatch = updates.maxOf { it.lastActiveAt.toEpochMilliseconds() }
                     runCatching {
                         AppDatabase.instance.sessionDao().updateTs(updates)
                         lastSyncTs = maxTsInThisBatch

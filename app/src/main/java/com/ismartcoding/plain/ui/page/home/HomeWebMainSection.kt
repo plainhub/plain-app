@@ -129,7 +129,7 @@ fun HomeWebMainSection(
                     VerticalSpace(16.dp)
                     OnlineSessionsIndicator(
                         count = onlineCount,
-                        onClick = { navController.navigate(Routing.Sessions) })
+                        onClick = { navController.navigate(Routing.Connections) })
                 }
             }
         }

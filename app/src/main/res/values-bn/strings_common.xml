@@ -75,7 +75,6 @@
     <string name="scan_history">স্ক্যান ইতিহাস</string>
     <string name="input_required">এই ক্ষেত্রটি আবশ্যক</string>
     <string name="enable">সক্ষম করুন</string>
-    <string name="enable_testing_token">পরীক্ষার টোকেন সক্ষম করুন</string>
     <string name="invalid_value">অকার্যকর মান</string>
     <string name="resume">পুনরায় শুরু করুন</string>
     <string name="permission_required">অনুমতি প্রয়োজন</string>

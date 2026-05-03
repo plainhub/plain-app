@@ -75,7 +75,6 @@
     <string name="scan_history">स्कैन इतिहास</string>
     <string name="input_required">यह फ़ील्ड आवश्यक है</string>
     <string name="enable">सक्षम करें</string>
-    <string name="enable_testing_token">परीक्षण टोकन सक्षम करें</string>
     <string name="invalid_value">अमान्य मूल्य</string>
     <string name="resume">फिर से शुरू करें</string>
     <string name="permission_required">अनुमति आवश्यक</string>

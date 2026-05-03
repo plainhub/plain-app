@@ -9,6 +9,7 @@ import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.CopyIconButton
 import com.ismartcoding.plain.ui.base.PBottomSheetTopAppBar
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.PModalBottomSheet
@@ -29,15 +30,7 @@ fun QrScanResultBottomSheet(
         },
     ) {
         PBottomSheetTopAppBar(title = stringResource(id = R.string.scan_result)) {
-            PIconButton(
-                icon = R.drawable.copy,
-                contentDescription = stringResource(android.R.string.copy),
-                tint = androidx.compose.material3.MaterialTheme.colorScheme.onSurface,
-            ) {
-                val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.scan_result), value)
-                clipboardManager.setPrimaryClip(clip)
-                DialogHelper.showTextCopiedMessage(value)
-            }
+            CopyIconButton(text = value, clipLabel = stringResource(R.string.scan_result))
         }
         TopSpace()
         ScanResult(context, text = value)

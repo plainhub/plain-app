@@ -74,7 +74,6 @@
     <string name="scan_history">スキャン履歴</string>
     <string name="input_required">この項目は必須です</string>
     <string name="enable">有効</string>
-    <string name="enable_testing_token">テストトークンを有効にする</string>
     <string name="invalid_value">無効な値</string>
     <string name="resume">再開</string>
     <string name="permission_required">許可が必要です</string>

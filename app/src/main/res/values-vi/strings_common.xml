@@ -75,7 +75,6 @@
     <string name="scan_history">Lịch sử quét</string>
     <string name="input_required">Trường này là bắt buộc</string>
     <string name="enable">Bật</string>
-    <string name="enable_testing_token">Bật token kiểm thử</string>
     <string name="invalid_value">Giá trị không hợp lệ</string>
     <string name="resume">Tiếp tục</string>
     <string name="permission_required">Yêu cầu quyền</string>

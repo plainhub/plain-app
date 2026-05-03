@@ -75,7 +75,6 @@
     <string name="scan_history">Histórico de varredura</string>
     <string name="input_required">Este campo é obrigatório</string>
     <string name="enable">Ativar</string>
-    <string name="enable_testing_token">Ativar token de teste</string>
     <string name="invalid_value">Valor inválido</string>
     <string name="resume">Retomar</string>
     <string name="permission_required">Permissão necessária</string>

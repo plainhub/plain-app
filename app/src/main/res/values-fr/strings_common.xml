@@ -74,7 +74,6 @@
     <string name="scan_history">Historique de scan</string>
     <string name="input_required">Ce champ est obligatoire</string>
     <string name="enable">Activer</string>
-    <string name="enable_testing_token">Activer le jeton de test</string>
     <string name="invalid_value">Valeur invalide</string>
     <string name="resume">Reprendre</string>
     <string name="permission_required">Permission Requise</string>

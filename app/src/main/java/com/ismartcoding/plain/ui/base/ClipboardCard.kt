@@ -10,20 +10,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.clipboardManager
 import com.ismartcoding.plain.ui.helpers.DialogHelper
+import com.ismartcoding.plain.ui.theme.PlainTheme
 
 @Composable
 fun ClipboardCard(
+    horizontal: Dp = PlainTheme.PAGE_HORIZONTAL_MARGIN,
     label: String,
     text: String,
 ) {
-    PCard {
+    PCard(horizontal) {
         Row(
-            modifier =
-            Modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
                     val clip = ClipData.newPlainText(label, text)

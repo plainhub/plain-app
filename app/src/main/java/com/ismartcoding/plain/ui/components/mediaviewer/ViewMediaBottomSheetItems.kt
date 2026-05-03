@@ -14,6 +14,7 @@ import com.ismartcoding.plain.features.media.ImageMediaStoreHelper
 import com.ismartcoding.plain.features.media.VideoMediaStoreHelper
 import com.ismartcoding.plain.helpers.ShareHelper
 import com.ismartcoding.plain.ui.base.ActionButtons
+import com.ismartcoding.plain.ui.base.CopyIconButton
 import com.ismartcoding.plain.ui.base.IconTextDeleteButton
 import com.ismartcoding.plain.ui.base.IconTextRenameButton
 import com.ismartcoding.plain.ui.base.IconTextScanQrCodeButton
@@ -63,11 +64,7 @@ internal fun ViewMediaActionButtons(
 internal fun ViewMediaPathCard(m: PreviewItem) {
     PCard {
         PListItem(title = m.path, action = {
-            PIconButton(icon = R.drawable.copy, contentDescription = stringResource(id = R.string.copy_path), click = {
-                val clip = ClipData.newPlainText(LocaleHelper.getString(R.string.file_path), m.path)
-                clipboardManager.setPrimaryClip(clip)
-                DialogHelper.showTextCopiedMessage(m.path)
-            })
+            CopyIconButton(text = m.path, clipLabel = stringResource(R.string.file_path))
         })
     }
 }
