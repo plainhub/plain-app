@@ -10,6 +10,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.BufferedInputStream
+import java.io.OutputStreamWriter
 import java.io.PrintWriter
 import java.net.ServerSocket
 import java.net.Socket
@@ -38,7 +39,7 @@ object DlnaHttpServer {
         try {
             socket.soTimeout = 5_000
             val bis = BufferedInputStream(socket.inputStream)
-            val writer = PrintWriter(socket.outputStream, false, Charsets.UTF_8)
+            val writer = PrintWriter(OutputStreamWriter(socket.outputStream, Charsets.UTF_8), false)
             val requestLine = bis.readHttpLine() ?: return@withContext
             val parts = requestLine.split(" ")
             if (parts.size < 2) return@withContext
