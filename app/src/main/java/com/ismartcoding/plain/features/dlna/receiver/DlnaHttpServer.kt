@@ -18,12 +18,9 @@ import java.net.Socket
 /** Lightweight HTTP server that handles UPnP/DLNA AVTransport SOAP requests. */
 object DlnaHttpServer {
 
-    suspend fun run(port: Int) = withContext(Dispatchers.IO) {
-        var serverSocket: ServerSocket? = null
+    suspend fun run(serverSocket: ServerSocket) = withContext(Dispatchers.IO) {
         try {
-            serverSocket = ServerSocket(port)
-            serverSocket.reuseAddress = true
-            LogCat.d("DLNA HTTP server started on port $port")
+            LogCat.d("DLNA HTTP server started on port ${serverSocket.localPort}")
             while (isActive) {
                 val client = try { serverSocket.accept() } catch (_: Exception) { break }
                 launch { handleClient(client, client.inetAddress?.hostAddress.orEmpty()) }
@@ -31,7 +28,7 @@ object DlnaHttpServer {
         } catch (e: Exception) {
             LogCat.e("DLNA HTTP server error: ${e.message}")
         } finally {
-            serverSocket?.close()
+            serverSocket.close()
         }
     }
 

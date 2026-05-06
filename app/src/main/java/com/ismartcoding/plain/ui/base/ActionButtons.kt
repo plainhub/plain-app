@@ -69,6 +69,12 @@ fun ActionButtonAdd(onClick: () -> Unit) {
 }
 
 @Composable
+fun ActionButtonScan(onClick: () -> Unit) {
+    PIconButton(icon = R.drawable.scan_qr_code, contentDescription = stringResource(R.string.scan_qrcode),
+        tint = MaterialTheme.colorScheme.onSurface, click = onClick)
+}
+
+@Composable
 fun ActionButtonSettings(onClick: () -> Unit) {
     PIconButton(icon = R.drawable.settings, contentDescription = stringResource(R.string.settings),
         tint = MaterialTheme.colorScheme.onSurface, click = onClick)

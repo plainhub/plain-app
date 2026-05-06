@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.features.dlna.DlnaMediaType
 import com.ismartcoding.plain.features.dlna.DlnaPlaybackState
 import com.ismartcoding.plain.features.dlna.DlnaRendererState
@@ -37,6 +38,7 @@ import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
 import com.ismartcoding.plain.ui.base.PAlert
 import com.ismartcoding.plain.ui.base.PBanner
+import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.base.POutlinedButton
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -62,6 +64,7 @@ fun DlnaReceiverPage(
     val playbackState by DlnaRendererState.playbackState.collectAsState()
     val pendingCastRequest by DlnaRendererState.pendingCastRequest.collectAsState()
     val startError by DlnaRendererState.startError.collectAsState()
+    val isRetrying by vm.isRetrying.collectAsState()
     val hasMedia = mediaUri.isNotEmpty() && playbackState != DlnaPlaybackState.NO_MEDIA_PRESENT
 
     pendingCastRequest?.let { pending ->
@@ -139,11 +142,13 @@ fun DlnaReceiverPage(
             if (startError.isNotEmpty()) {
                 item {
                     PAlert(
-                        description = stringResource(R.string.dlna_receiver_start_error),
+                        description = startError,
                         type = AlertType.ERROR,
                         actions = {
-                            POutlinedButton(
+                            PFilledButton(
                                 stringResource(R.string.retry),
+                                buttonSize = ButtonSize.SMALL,
+                                isLoading = isRetrying,
                                 onClick = { vm.retryReceiver(context) }
                             )
                         },

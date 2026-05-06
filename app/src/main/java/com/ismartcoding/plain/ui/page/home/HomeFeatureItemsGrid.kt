@@ -32,12 +32,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.ismartcoding.plain.R
 import com.ismartcoding.plain.preferences.HomeFeaturesPreference
 import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.ui.base.reorderable.ReorderableItem
 import com.ismartcoding.plain.ui.base.reorderable.rememberReorderableLazyGridState
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
+import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
@@ -68,7 +70,7 @@ fun HomeFeatureItemsGrid(navController: NavHostController) {
         enabledIds.mapNotNull { typeName -> allFeatureItems.find { it.type.name == typeName } }
     }
 
-    val rowCount = (items.size + 1) / 2
+    val rowCount = (items.size + 2) / 2
     val gridHeight = if (rowCount > 0) (rowCount * 72 + (rowCount - 1) * 12).dp else 0.dp
 
     val gridState = rememberLazyGridState()
@@ -92,36 +94,57 @@ fun HomeFeatureItemsGrid(navController: NavHostController) {
     ) {
         items(items, key = { it.type.name }) { item ->
             ReorderableItem(reorderableState, key = item.type.name, animateItemModifier = Modifier) { _ ->
-                Surface(
-                    modifier = Modifier
-                        .height(72.dp)
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .longPressDraggableHandle()
-                        .clickable { item.click() },
-                    color = MaterialTheme.colorScheme.cardBackgroundNormal,
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        Icon(
-                            painter = painterResource(item.iconRes),
-                            contentDescription = stringResource(item.titleRes),
-                            modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
-                        Text(
-                            text = stringResource(item.titleRes),
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                }
+                HomeFeatureGridCell(
+                    iconRes = item.iconRes,
+                    titleRes = item.titleRes,
+                    modifier = Modifier.longPressDraggableHandle(),
+                    onClick = { item.click() },
+                )
             }
+        }
+        item {
+            HomeFeatureGridCell(
+                iconRes = R.drawable.plus,
+                titleRes = R.string.more,
+                onClick = { navController.navigate(Routing.CustomFeatures) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun HomeFeatureGridCell(
+    iconRes: Int,
+    titleRes: Int,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Surface(
+        modifier = modifier
+            .height(72.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .clickable { onClick() },
+        color = MaterialTheme.colorScheme.cardBackgroundNormal,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Icon(
+                painter = painterResource(iconRes),
+                contentDescription = stringResource(titleRes),
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                text = stringResource(titleRes),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }

@@ -13,10 +13,13 @@ import com.ismartcoding.plain.preferences.DlnaDeniedSendersPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class DlnaReceiverViewModel : ViewModel() {
+
+    val isRetrying = MutableStateFlow(false)
 
     private var commandJob: Job? = null
     private var positionJob: Job? = null
@@ -40,10 +43,15 @@ class DlnaReceiverViewModel : ViewModel() {
     }
 
     fun retryReceiver(context: Context) {
-        DlnaRenderer.stop()
-        DlnaRenderer.start(context)
-        startCommandProcessing()
-        startRuleCheck(context)
+        viewModelScope.launch {
+            isRetrying.value = true
+            DlnaRenderer.stop()
+            DlnaRenderer.start(context)
+            startCommandProcessing()
+            startRuleCheck(context)
+            delay(300)
+            isRetrying.value = false
+        }
     }
 
     private fun startRuleCheck(context: Context) {

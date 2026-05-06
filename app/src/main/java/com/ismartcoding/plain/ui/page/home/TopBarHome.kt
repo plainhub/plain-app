@@ -21,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,9 +28,8 @@ import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.helpers.PhoneHelper
-import com.ismartcoding.plain.ui.base.ActionButtonMoreWithMenu
+import com.ismartcoding.plain.ui.base.ActionButtonScan
 import com.ismartcoding.plain.ui.base.ActionButtonSettings
-import com.ismartcoding.plain.ui.base.PIconButton
 import com.ismartcoding.plain.ui.components.DeviceRenameDialog
 import com.ismartcoding.plain.ui.nav.Routing
 
@@ -81,11 +79,8 @@ fun TopBarHome(navController: NavHostController) {
             ActionButtonSettings(
                 onClick = { navController.navigate(Routing.Settings) },
             )
-            ActionButtonMoreWithMenu { dismiss ->
-                HomeQuickMenuItems(
-                    navController = navController,
-                    onDismiss = { dismiss() },
-                )
+            ActionButtonScan {
+                navController.navigate(Routing.Scan)
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
