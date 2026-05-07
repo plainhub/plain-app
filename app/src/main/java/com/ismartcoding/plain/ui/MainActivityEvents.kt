@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavDestination.Companion.hasRoute
 import com.ismartcoding.lib.channel.Channel
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.helpers.CoroutinesHelper.coIO
@@ -26,7 +27,10 @@ import com.ismartcoding.plain.events.RequestPermissionsEvent
 import com.ismartcoding.plain.events.RequestScreenMirrorAudioEvent
 import com.ismartcoding.plain.events.RestartAppEvent
 import com.ismartcoding.plain.events.StartScreenMirrorEvent
+import com.ismartcoding.plain.events.OpenAccessibilitySettingsEvent
+import com.ismartcoding.plain.events.OpenWebSettingsEvent
 import com.ismartcoding.plain.features.Permission
+import com.ismartcoding.plain.helpers.AppHelper
 import com.ismartcoding.plain.features.locale.LocaleHelper
 import com.ismartcoding.plain.mediaProjectionManager
 import com.ismartcoding.plain.preferences.ApiPermissionsPreference
@@ -78,6 +82,28 @@ internal fun MainActivity.initEvents() {
                 is RestartAppEvent -> {
                     startActivity(Intent(this@initEvents, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK })
                     Runtime.getRuntime().exit(0)
+                }
+                is OpenAccessibilitySettingsEvent -> {
+                    try {
+                        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(intent)
+                    } catch (e: Exception) { LogCat.e("Error opening accessibility settings: ${e.message}") }
+                }
+                is OpenWebSettingsEvent -> {
+                    try {
+                        val nav = navControllerState.value
+                        val alreadyThere = nav?.currentBackStackEntry?.destination?.hasRoute<Routing.WebSettings>() == true
+                        if (AppHelper.foregrounded()) {
+                            if (!alreadyThere) nav?.navigate(Routing.WebSettings)
+                        } else {
+                            val intent = Intent(this@initEvents, MainActivity::class.java).apply {
+                                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                                putExtra("navigate_to_web_settings", true)
+                            }
+                            startActivity(intent)
+                        }
+                    } catch (e: Exception) { LogCat.e("Error navigating to WebSettings: ${e.message}") }
                 }
                 is PickFileEvent -> handlePickFileEvent(event)
                 is ExportFileEvent -> handleExportFileEvent(event)

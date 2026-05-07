@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui
 
 import android.content.Intent
 import android.net.Uri
+import androidx.navigation.NavDestination.Companion.hasRoute
 import com.ismartcoding.lib.channel.sendEvent
 import com.ismartcoding.lib.extensions.parcelable
 import com.ismartcoding.lib.extensions.parcelableArrayList
@@ -36,6 +37,12 @@ internal fun MainActivity.handleIntent(intent: Intent) {
             WebPreference.putAsync(this@handleIntent, true)
             sendEvent(StartHttpServerEvent())
         }
+    }
+
+    if (intent.getBooleanExtra("navigate_to_web_settings", false)) {
+        val nav = navControllerState.value
+        val alreadyThere = nav?.currentBackStackEntry?.destination?.hasRoute(Routing.WebSettings::class) == true
+        if (!alreadyThere) nav?.navigate(Routing.WebSettings)
     }
 
     if (intent.action == Intent.ACTION_VIEW) {

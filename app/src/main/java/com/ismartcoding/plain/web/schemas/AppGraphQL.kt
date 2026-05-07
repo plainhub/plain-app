@@ -13,6 +13,8 @@ import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.events.RestartAppEvent
+import com.ismartcoding.plain.events.OpenAccessibilitySettingsEvent
+import com.ismartcoding.plain.events.OpenWebSettingsEvent
 import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.file.FileSystemHelper
 import com.ismartcoding.plain.helpers.DeviceInfoHelper
@@ -82,6 +84,18 @@ fun SchemaBuilder.addAppSchema() {
     mutation("relaunchApp") {
         resolver { ->
             sendEvent(RestartAppEvent())
+            true
+        }
+    }
+    mutation("openAccessibilitySettings") {
+        resolver { ->
+            sendEvent(OpenAccessibilitySettingsEvent())
+            true
+        }
+    }
+    mutation("openWebSettings") {
+        resolver { ->
+            sendEvent(OpenWebSettingsEvent())
             true
         }
     }

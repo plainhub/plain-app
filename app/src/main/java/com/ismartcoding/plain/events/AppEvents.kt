@@ -76,6 +76,10 @@ class RequestScreenMirrorAudioEvent : ChannelEvent()
 
 class RestartAppEvent : ChannelEvent()
 
+class OpenAccessibilitySettingsEvent : ChannelEvent()
+
+class OpenWebSettingsEvent : ChannelEvent()
+
 class FetchLinkPreviewsEvent(val chat: DChat) : ChannelEvent()
 
 class FetchBookmarkMetadataEvent(val bookmarkId: String, val url: String) : ChannelEvent()
