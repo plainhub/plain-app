@@ -98,7 +98,7 @@ Your donation is highly appreciated. Thank you!
 <table>
   <tr>
     <td><img src="screenshots/app-files.png" alt="files"/></td>
-    <td><img src="screenshots/app-home.png" alt="home"/></td>
+    <td><img src="screenshots/app-home.webp" alt="home"/></td>
     <td><img src="screenshots/app-music-player.jpg" alt="music player"/></td>
     <td><img src="screenshots/app-chat.png" alt="chat"/></td>
   </tr>
@@ -114,7 +114,7 @@ Your donation is highly appreciated. Thank you!
 
 <table>
   <tr>
-    <td colspan="2"><img src="screenshots/web-home.png" alt="home" width="100%"/></td>
+    <td colspan="2"><img src="screenshots/web-home.webp" alt="home" width="100%"/></td>
     <td colspan="2"><img src="screenshots/web-images.png" alt="images" width="100%"/></td>
   </tr>
   <tr>

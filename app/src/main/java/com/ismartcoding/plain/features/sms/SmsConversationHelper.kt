@@ -351,18 +351,21 @@ object SmsConversationHelper {
             return getMatchedThreadIdsAsync(context, query).count { !activeArchivedIds.contains(it) }
         }
 
-        // Count all conversations properly, minus truly archived ones
+        // Count all conversations properly, minus truly archived ones.
+        // Note: avoid using "COUNT(*) as count" projection because some vendors
+        // (e.g. vivo) rewrite the projection in their MmsSmsProvider and inject
+        // extra columns like "snippet_financial_info as snippet", which corrupts
+        // aggregate expressions and produces a SQLite syntax error
+        // (near "as": syntax error). Use a plain projection and read cursor.count.
         var count = 0
         context.contentResolver.queryCursor(
             conversationsUri,
-            arrayOf("COUNT(*) as count"),
+            arrayOf(BaseColumns._ID),
             null,
             null,
             null
         )?.use { cursor ->
-            if (cursor.moveToFirst()) {
-                count = cursor.getInt(0)
-            }
+            count = cursor.count
         }
 
         return count - activeArchivedIds.size
