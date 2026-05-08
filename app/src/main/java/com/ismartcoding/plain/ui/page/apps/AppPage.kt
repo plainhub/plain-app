@@ -60,7 +60,11 @@ fun AppPage(navController: NavHostController, id: String) {
             PTopAppBar(navController = navController, title = item?.name ?: "", actions = {
                 if (isShareable) {
                     PIconButton(icon = R.drawable.share_2, contentDescription = stringResource(R.string.share),
-                        tint = MaterialTheme.colorScheme.onSurface) { ShareHelper.shareFile(context, File(item?.path ?: "")) }
+                        tint = MaterialTheme.colorScheme.onSurface) {
+                        item?.let { pkg ->
+                            ShareHelper.shareFile(context, File(pkg.path), displayName = "${pkg.name.replace(" ", "")}-${pkg.id}.apk")
+                        }
+                    }
                 }
             })
         },

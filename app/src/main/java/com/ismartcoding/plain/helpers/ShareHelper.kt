@@ -105,7 +105,7 @@ object ShareHelper {
     }
 
     fun getExcludeComponentNames(context: Context): List<ComponentName> {
-        return listOf(ComponentName(context, MainActivity::class.java))
+        return emptyList()
     }
 
     private fun createFileIntent(
