@@ -8,6 +8,7 @@ import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.BuildConfig
 import com.ismartcoding.plain.MainApp
+import com.ismartcoding.plain.TempData
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.preferences.AuthTwoFactorPreference
 import com.ismartcoding.plain.preferences.PasswordPreference
@@ -75,7 +76,7 @@ fun Route.addWebSocket() {
                                     send(
                                         CryptoHelper.chaCha20Encrypt(
                                             token,
-                                            JsonHelper.jsonEncode(AuthResponse(AuthStatus.PENDING))
+                                            JsonHelper.jsonEncode(AuthResponse(TempData.clientId, AuthStatus.PENDING))
                                         )
                                     )
                                     sendEvent(event)

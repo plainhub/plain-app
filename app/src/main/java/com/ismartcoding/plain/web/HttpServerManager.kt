@@ -357,6 +357,7 @@ object HttpServerManager {
                 HttpServerManager.passwordToToken(),
                 JsonHelper.jsonEncode(
                     AuthResponse(
+                        TempData.clientId,
                         AuthStatus.COMPLETED,
                         token,
                     ),

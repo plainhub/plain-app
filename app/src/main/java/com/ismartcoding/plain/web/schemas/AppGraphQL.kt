@@ -52,6 +52,7 @@ fun SchemaBuilder.addAppSchema() {
                 grantedPermissions.add(Permission.RECORD_AUDIO)
             }
             App(
+                clientId = TempData.clientId,
                 usbConnected = PlugInControlReceiver.isUSBConnected(context),
                 urlToken = Base64.encodeToString(TempData.urlToken, Base64.NO_WRAP),
                 httpPort = TempData.httpPort,

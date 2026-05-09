@@ -4,6 +4,7 @@ import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.enums.MediaPlayMode
 
 data class App(
+    val clientId: String,
     val usbConnected: Boolean,
     val urlToken: String,
     val httpPort: Int,

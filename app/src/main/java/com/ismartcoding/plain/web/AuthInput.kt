@@ -13,7 +13,7 @@ data class AuthRequest(
 )
 
 @Serializable
-data class AuthResponse(val status: AuthStatus, val token: String = "")
+data class AuthResponse(val clientId: String, val status: AuthStatus, val token: String = "")
 
 enum class AuthStatus {
     PENDING,
