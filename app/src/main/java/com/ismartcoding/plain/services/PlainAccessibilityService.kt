@@ -6,15 +6,13 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Path
 import android.graphics.Point
-import android.os.Build
 import android.provider.Settings
-import android.view.WindowManager
 import android.view.accessibility.AccessibilityEvent
-import com.ismartcoding.lib.isSPlus
 import com.ismartcoding.lib.logcat.LogCat
 import com.ismartcoding.plain.MainApp
 import com.ismartcoding.plain.data.ScreenMirrorControlInput
 import com.ismartcoding.plain.enums.ScreenMirrorControlAction
+import com.ismartcoding.plain.services.webrtc.getRealScreenSize as getMirrorRealScreenSize
 
 /**
  * Accessibility Service for injecting touch/gesture events during screen mirror remote control.
@@ -171,16 +169,7 @@ class PlainAccessibilityService : AccessibilityService() {
          * bar, causing coordinate mapping errors for screen mirror touch control.
          */
         private fun getRealScreenSize(context: Context): Point {
-            val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-            return if (isSPlus()) {
-                val bounds = wm.currentWindowMetrics.bounds
-                Point(bounds.width(), bounds.height())
-            } else {
-                val size = Point()
-                @Suppress("DEPRECATION")
-                wm.defaultDisplay.getRealSize(size)
-                size
-            }
+            return getMirrorRealScreenSize(context)
         }
 
         /**

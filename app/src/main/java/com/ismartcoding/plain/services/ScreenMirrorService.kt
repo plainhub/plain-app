@@ -49,6 +49,7 @@ class ScreenMirrorService : LifecycleService() {
                     val newIsPortrait = isPortrait()
                     if (isPortrait != newIsPortrait) {
                         isPortrait = newIsPortrait
+                        PlainAccessibilityService.invalidateScreenSizeCache()
                         webRtcManager.onOrientationChanged()
                     }
                 }
