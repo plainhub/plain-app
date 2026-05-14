@@ -49,6 +49,10 @@
     <string name="os">İS</string>
     <string name="browser">Tarayıcı</string>
     <string name="reject">Reddet</string>
+    <string name="allow_web_access">Web erişimine izin ver</string>
+    <string name="allow_web_access_desc">Telefon verilerinize web tarayıcısından erişime izin verin</string>
+    <string name="allow_desktop_access">Masaüstü erişimine izin ver</string>
+    <string name="allow_desktop_access_desc">Telefon verilerinize masaüstü uygulamasından erişime izin verin</string>
     <string name="chat_input_hint">Aklınızdan ne geçiyor?</string>
     <string name="client_id">İstemci Kimliği</string>
     <string name="online">Çevrimiçi</string>
@@ -111,6 +115,7 @@
     <string name="channel_kicked_notice">Bu kanaldan kaldırıldınız ve artık mesaj gönderemezsiniz.</string>
     <string name="channel_invite">Kanal daveti</string>
     <string name="channel_invite_message">%1$s sizi "%2$s" kanalına davet ediyor</string>
+    <string name="inviter">Davet eden</string>
     <string name="decline">Reddet</string>
     <string name="pending_invite">Bekleyen davet</string>
     <string name="pending_members">Bekleyen üyeler</string>

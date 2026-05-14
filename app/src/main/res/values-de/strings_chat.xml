@@ -49,6 +49,10 @@
     <string name="os">Betriebssystem</string>
     <string name="browser">Browser</string>
     <string name="reject">Ablehnen</string>
+    <string name="allow_web_access">Web-Zugriff erlauben</string>
+    <string name="allow_web_access_desc">Erlaube den Zugriff auf deine Telefondaten über einen Webbrowser</string>
+    <string name="allow_desktop_access">Desktop-Zugriff erlauben</string>
+    <string name="allow_desktop_access_desc">Erlaube den Zugriff auf deine Telefondaten über die Desktop-App</string>
     <string name="chat_input_hint">Was beschäftigt dich?</string>
     <string name="client_id">Client-ID</string>
     <string name="online">Online</string>
@@ -111,6 +115,7 @@
     <string name="channel_kicked_notice">Sie wurden aus diesem Kanal entfernt und können keine Nachrichten mehr senden.</string>
     <string name="channel_invite">Kanal-Einladung</string>
     <string name="channel_invite_message">%1$s hat Sie eingeladen, dem Kanal "%2$s" beizutreten</string>
+    <string name="inviter">Einladender</string>
     <string name="decline">Ablehnen</string>
     <string name="pending_invite">Ausstehende Einladung</string>
     <string name="pending_members">Ausstehende Mitglieder</string>

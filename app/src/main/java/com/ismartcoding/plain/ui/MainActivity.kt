@@ -13,7 +13,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
@@ -54,11 +53,23 @@ import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.CrashHandler
+import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
+import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
+import com.ismartcoding.plain.events.PairingRequestReceivedEvent
+import com.ismartcoding.plain.events.PairingResponseEvent
+import com.ismartcoding.plain.ui.models.acceptChannelInvite
+import com.ismartcoding.plain.ui.models.declineChannelInvite
+import com.ismartcoding.plain.ui.page.ChannelInvitePage
 import com.ismartcoding.plain.ui.page.CrashReportDialog
+import com.ismartcoding.plain.ui.page.LoginRequestPage
+import com.ismartcoding.plain.ui.page.PairingRequestPage
 import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.Main
+import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.ui.page.chat.components.ForwardTarget
 import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
+import io.ktor.websocket.CloseReason
+import io.ktor.websocket.close
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -68,9 +79,9 @@ class MainActivity : AppCompatActivity() {
     internal var pickFileType = PickFileType.IMAGE
     internal var pickFileTag = PickFileTag.SEND_MESSAGE
     internal var exportFileType = ExportFileType.OPML
-    internal var requestToConnectDialog: AlertDialog? = null
-    internal var pairingRequestDialog: AlertDialog? = null
-    internal var channelInviteDialog: AlertDialog? = null
+    internal var pendingLoginEvent by mutableStateOf<ConfirmToAcceptLoginEvent?>(null)
+    internal var pendingPairingEvent by mutableStateOf<PairingRequestReceivedEvent?>(null)
+    internal var pendingChannelInviteEvent by mutableStateOf<ChannelInviteReceivedEvent?>(null)
     internal val mainVM: MainViewModel by viewModels()
     internal val audioPlaylistVM: AudioPlaylistViewModel by viewModels()
     val pomodoroVM: PomodoroViewModel by viewModels()
@@ -84,13 +95,18 @@ class MainActivity : AppCompatActivity() {
 
     internal val screenCapture = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null && ScreenMirrorService.instance == null) {
-            ContextCompat.startForegroundService(this, Intent(this, ScreenMirrorService::class.java)
-                .putExtra("code", result.resultCode).putExtra("data", result.data))
+            ContextCompat.startForegroundService(
+                this, Intent(this, ScreenMirrorService::class.java)
+                    .putExtra("code", result.resultCode).putExtra("data", result.data)
+            )
         }
     }
     internal val recordAudioForMirror = registerForActivityResult(ActivityResultContracts.RequestPermission()) { _ ->
-        try { screenCapture.launch(com.ismartcoding.plain.mediaProjectionManager.createScreenCaptureIntent()) }
-        catch (e: IllegalStateException) { LogCat.e("Error launching screen capture: ${e.message}") }
+        try {
+            screenCapture.launch(com.ismartcoding.plain.mediaProjectionManager.createScreenCaptureIntent())
+        } catch (e: IllegalStateException) {
+            LogCat.e("Error launching screen capture: ${e.message}")
+        }
     }
     internal val recordAudioForMirrorLate = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) sendScreenMirrorAudioStatus(true)
@@ -99,7 +115,8 @@ class MainActivity : AppCompatActivity() {
     }
     internal val appDetailsSettingsForAudioLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { sendScreenMirrorAudioStatus(Permission.RECORD_AUDIO.can(this)) }
     internal val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri -> if (uri != null) sendEvent(PickFileResultEvent(pickFileTag, pickFileType, setOf(uri))) }
-    internal val pickMultipleMedia = registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uris -> if (uris.isNotEmpty()) sendEvent(PickFileResultEvent(pickFileTag, pickFileType, uris.toSet())) }
+    internal val pickMultipleMedia =
+        registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uris -> if (uris.isNotEmpty()) sendEvent(PickFileResultEvent(pickFileTag, pickFileType, uris.toSet())) }
     internal val pickFileActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val uris = result.data?.let { FilePickHelper.getUris(it) } ?: emptySet()
         if (uris.isNotEmpty()) sendEvent(PickFileResultEvent(pickFileTag, pickFileType, uris))
@@ -113,7 +130,9 @@ class MainActivity : AppCompatActivity() {
     private val plugInReceiver = PlugInControlReceiver()
     private val networkStateReceiver = NetworkStateReceiver()
 
-    override fun onWindowFocusChanged(hasFocus: Boolean) { sendEvent(WindowFocusChangedEvent(hasFocus)) }
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        sendEvent(WindowFocusChangedEvent(hasFocus))
+    }
 
     @SuppressLint("ClickableViewAccessibility", "DiscouragedPrivateApi")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -123,33 +142,118 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.getInsetsController(window, window.decorView).systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         instance = WeakReference(this)
         pendingCrashReport = CrashHandler.getPendingReport(this)
-        try { val f = CursorWindow::class.java.getDeclaredField("sCursorWindowSize"); f.isAccessible = true; f.set(null, 100 * 1024 * 1024) } catch (_: Exception) {}
+        try {
+            val f = CursorWindow::class.java.getDeclaredField("sCursorWindowSize"); f.isAccessible = true; f.set(null, 100 * 1024 * 1024)
+        } catch (_: Exception) {
+        }
         BluetoothPermission.init(this); Permissions.init(this); initEvents()
         val powerFilter = IntentFilter().apply { addAction(Intent.ACTION_POWER_CONNECTED); addAction(Intent.ACTION_POWER_DISCONNECTED) }
-        if (isTPlus()) { registerReceiver(plugInReceiver, powerFilter, RECEIVER_NOT_EXPORTED); registerReceiver(networkStateReceiver, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION), RECEIVER_NOT_EXPORTED) }
-        else { registerReceiver(plugInReceiver, powerFilter); registerReceiver(networkStateReceiver, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION)) }
+        if (isTPlus()) {
+            registerReceiver(plugInReceiver, powerFilter, RECEIVER_NOT_EXPORTED); registerReceiver(networkStateReceiver, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION), RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(plugInReceiver, powerFilter); registerReceiver(networkStateReceiver, IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION))
+        }
         setContent {
             SettingsProvider {
                 Main(navControllerState, onLaunched = { handleIntent(intent) }, mainVM, audioPlaylistVM, pomodoroVM, chatVM = chatVM, peerVM = peerVM, channelVM = channelVM)
                 if (showForwardTargetDialog) {
-                    ForwardTargetDialog(peerVM = peerVM, onDismiss = { showForwardTargetDialog = false; pendingFileUris = null },
-                        onTargetSelected = { target -> pendingFileUris?.let { uris ->
-                            val route = when (target) { is ForwardTarget.Local -> Routing.Chat("local"); is ForwardTarget.Peer -> Routing.Chat("peer:${target.peer.id}") }
-                            navControllerState.value?.navigate(route); coIO { delay(1000); sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris)) }
-                        } })
+                    ForwardTargetDialog(
+                        peerVM = peerVM, onDismiss = { showForwardTargetDialog = false; pendingFileUris = null },
+                        onTargetSelected = { target ->
+                            pendingFileUris?.let { uris ->
+                                val route = when (target) {
+                                    is ForwardTarget.Local -> Routing.Chat("local"); is ForwardTarget.Peer -> Routing.Chat("peer:${target.peer.id}")
+                                }
+                                navControllerState.value?.navigate(route); coIO { delay(1000); sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris)) }
+                            }
+                        })
                 }
                 pendingCrashReport?.let { report ->
                     CrashReportDialog(crashReport = report, onDismiss = { pendingCrashReport = null })
                 }
+                pendingLoginEvent?.let { event ->
+                    val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
+                    LoginRequestPage(
+                        clientIp = clientIp,
+                        request = event.request,
+                        onDeny = {
+                            pendingLoginEvent = null
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                event.session.close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "rejected"))
+                            }
+                        },
+                        onAllow = {
+                            pendingLoginEvent = null
+                            lifecycleScope.launch(Dispatchers.IO) { HttpServerManager.respondTokenAsync(event, clientIp) }
+                        },
+                    )
+                }
+                pendingPairingEvent?.let { event ->
+                    PairingRequestPage(
+                        event = event,
+                        onDeny = {
+                            pendingPairingEvent = null
+                            sendEvent(PairingResponseEvent(event.request, event.fromIp, false))
+                        },
+                        onAllow = {
+                            pendingPairingEvent = null
+                            sendEvent(PairingResponseEvent(event.request, event.fromIp, true))
+                        },
+                    )
+                }
+                pendingChannelInviteEvent?.let { event ->
+                    ChannelInvitePage(
+                        event = event,
+                        onDecline = {
+                            pendingChannelInviteEvent = null
+                            channelVM.declineChannelInvite(this@MainActivity, event.channelId)
+                        },
+                        onAccept = {
+                            pendingChannelInviteEvent = null
+                            channelVM.acceptChannelInvite(event.channelId)
+                        },
+                    )
+                }
             }
         }
         AudioPlayer.ensurePlayer(this)
-        coIO { try { if (WebPreference.getAsync(this@MainActivity)) mainVM.enableHttpServer(this@MainActivity, true); doWhenReadyAsync() } catch (ex: Exception) { LogCat.e(ex.toString()) } }
+        coIO {
+            try {
+                if (WebPreference.getAsync(this@MainActivity)) mainVM.enableHttpServer(this@MainActivity, true); doWhenReadyAsync()
+            } catch (ex: Exception) {
+                LogCat.e(ex.toString())
+            }
+        }
     }
 
-    override fun onDestroy() { super.onDestroy(); Permissions.release(); unregisterReceiver(plugInReceiver); unregisterReceiver(networkStateReceiver) }
-    override fun onConfigurationChanged(newConfig: Configuration) { super.onConfigurationChanged(newConfig); PlainAccessibilityService.invalidateScreenSizeCache(); lifecycleScope.launch(Dispatchers.IO) { Language.initLocaleAsync(this@MainActivity) } }
-    override fun onNewIntent(intent: Intent) { super.onNewIntent(intent); handleIntent(intent) }
+    override fun onDestroy() {
+        super.onDestroy(); Permissions.release(); unregisterReceiver(plugInReceiver); unregisterReceiver(networkStateReceiver)
+    }
 
-    companion object { lateinit var instance: WeakReference<MainActivity> }
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig); PlainAccessibilityService.invalidateScreenSizeCache(); lifecycleScope.launch(Dispatchers.IO) { Language.initLocaleAsync(this@MainActivity) }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent); handleIntent(intent)
+    }
+
+    fun openNew() {
+        try {
+            val intent = Intent(this, MainActivity::class.java).apply {
+                addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                            Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                            Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                )
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            LogCat.e("Error bringing MainActivity to foreground: ${e.message}")
+        }
+    }
+
+    companion object {
+        lateinit var instance: WeakReference<MainActivity>
+    }
 }

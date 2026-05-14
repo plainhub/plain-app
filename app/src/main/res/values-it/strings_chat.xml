@@ -49,6 +49,10 @@
     <string name="os">Sistema operativo</string>
     <string name="browser">Browser</string>
     <string name="reject">Rifiuta</string>
+    <string name="allow_web_access">Consenti accesso web</string>
+    <string name="allow_web_access_desc">Consenti l\'accesso ai dati del tuo telefono da un browser web</string>
+    <string name="allow_desktop_access">Consenti accesso desktop</string>
+    <string name="allow_desktop_access_desc">Consenti l\'accesso ai dati del tuo telefono dall\'app desktop</string>
     <string name="chat_input_hint">Cosa ti frulla per la testa?</string>
     <string name="client_id">ID cliente</string>
     <string name="online">Online</string>
@@ -111,6 +115,7 @@
     <string name="channel_kicked_notice">Sei stato rimosso da questo canale e non puoi più inviare messaggi.</string>
     <string name="channel_invite">Invito al canale</string>
     <string name="channel_invite_message">%1$s ti ha invitato a unirti al canale "%2$s"</string>
+    <string name="inviter">Mittente dell\'invito</string>
     <string name="decline">Rifiuta</string>
     <string name="pending_invite">Invito in sospeso</string>
     <string name="pending_members">Membri in sospeso</string>

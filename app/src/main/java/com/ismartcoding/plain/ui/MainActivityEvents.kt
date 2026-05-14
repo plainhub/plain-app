@@ -57,39 +57,54 @@ internal fun MainActivity.initEvents() {
                         }
                     }
                 }
+
                 is PermissionsResultEvent -> {
                     // handled by individual feature flows
                 }
+
                 is StartScreenMirrorEvent -> {
                     try {
                         if (event.audio && !Permission.RECORD_AUDIO.can(this@initEvents)) recordAudioForMirror.launch(android.Manifest.permission.RECORD_AUDIO)
                         else screenCapture.launch(mediaProjectionManager.createScreenCaptureIntent())
-                    } catch (e: IllegalStateException) { LogCat.e("Error launching screen capture: ${e.message}") }
+                    } catch (e: IllegalStateException) {
+                        LogCat.e("Error launching screen capture: ${e.message}")
+                    }
                 }
+
                 is RequestScreenMirrorAudioEvent -> {
                     try {
                         if (Permission.RECORD_AUDIO.can(this@initEvents)) sendScreenMirrorAudioStatus(true)
                         else recordAudioForMirrorLate.launch(android.Manifest.permission.RECORD_AUDIO)
-                    } catch (e: IllegalStateException) { LogCat.e("Error requesting RECORD_AUDIO: ${e.message}") }
+                    } catch (e: IllegalStateException) {
+                        LogCat.e("Error requesting RECORD_AUDIO: ${e.message}")
+                    }
                 }
+
                 is IgnoreBatteryOptimizationEvent -> {
                     try {
                         ignoreBatteryOptimizationActivityLauncher.launch(Intent().apply {
                             action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS; data = Uri.parse("package:$packageName")
                         })
-                    } catch (e: IllegalStateException) { LogCat.e("Error launching battery optimization: ${e.message}") }
+                    } catch (e: IllegalStateException) {
+                        LogCat.e("Error launching battery optimization: ${e.message}")
+                    }
                 }
+
                 is RestartAppEvent -> {
                     startActivity(Intent(this@initEvents, MainActivity::class.java).apply { flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK })
                     Runtime.getRuntime().exit(0)
                 }
+
                 is OpenAccessibilitySettingsEvent -> {
                     try {
                         val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(intent)
-                    } catch (e: Exception) { LogCat.e("Error opening accessibility settings: ${e.message}") }
+                    } catch (e: Exception) {
+                        LogCat.e("Error opening accessibility settings: ${e.message}")
+                    }
                 }
+
                 is OpenWebSettingsEvent -> {
                     try {
                         val nav = navControllerState.value
@@ -103,18 +118,29 @@ internal fun MainActivity.initEvents() {
                             }
                             startActivity(intent)
                         }
-                    } catch (e: Exception) { LogCat.e("Error navigating to WebSettings: ${e.message}") }
+                    } catch (e: Exception) {
+                        LogCat.e("Error navigating to WebSettings: ${e.message}")
+                    }
                 }
+
                 is PickFileEvent -> handlePickFileEvent(event)
                 is ExportFileEvent -> handleExportFileEvent(event)
-                is ConfirmToAcceptLoginEvent -> handleConfirmToAcceptLogin(event)
-                is PairingRequestReceivedEvent -> handlePairingRequest(event)
-                is ChannelInviteReceivedEvent -> handleChannelInvite(event)
-                is PairingCancelledEvent -> {
-                    try {
-                        if (pairingRequestDialog?.isShowing == true) { pairingRequestDialog?.dismiss(); pairingRequestDialog = null }
-                    } catch (e: Exception) { LogCat.e("Error closing pairing dialog: ${e.message}"); pairingRequestDialog = null }
+                is ConfirmToAcceptLoginEvent -> {
+                    pendingLoginEvent = event
+                    openNew()
                 }
+
+                is PairingRequestReceivedEvent -> {
+                    pendingPairingEvent = event
+                    openNew()
+                }
+
+                is ChannelInviteReceivedEvent -> {
+                    pendingChannelInviteEvent = event
+                    openNew()
+                }
+
+                is PairingCancelledEvent -> pendingPairingEvent = null
                 is PairingSuccessEvent -> {
                     withIO { peerVM.loadPeers() }
                     navControllerState.value?.navigate(Routing.Chat("peer:${event.deviceId}")) { popUpTo<Routing.Nearby> { inclusive = true } }

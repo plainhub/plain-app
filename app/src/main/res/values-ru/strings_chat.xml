@@ -49,6 +49,10 @@
     <string name="os">ОС</string>
     <string name="browser">Браузер</string>
     <string name="reject">Отклонить</string>
+    <string name="allow_web_access">Разрешить веб-доступ</string>
+    <string name="allow_web_access_desc">Разрешить доступ к данным телефона из веб-браузера</string>
+    <string name="allow_desktop_access">Разрешить доступ с ПК</string>
+    <string name="allow_desktop_access_desc">Разрешить доступ к данным телефона из настольного приложения</string>
     <string name="chat_input_hint">Что у вас на уме?</string>
     <string name="client_id">Идентификатор клиента</string>
     <string name="online">Онлайн</string>
@@ -111,6 +115,7 @@
     <string name="channel_kicked_notice">Вы были удалены из этого канала и больше не можете отправлять сообщения.</string>
     <string name="channel_invite">Приглашение в канал</string>
     <string name="channel_invite_message">%1$s пригласил вас присоединиться к каналу "%2$s"</string>
+    <string name="inviter">Приглашающий</string>
     <string name="decline">Отклонить</string>
     <string name="pending_invite">Ожидающее приглашение</string>
     <string name="pending_members">Ожидающие участники</string>

@@ -49,6 +49,10 @@
     <string name="os">ஓ.எஸ்</string>
     <string name="browser">உலாவர</string>
     <string name="reject">நிராகரி</string>
+    <string name="allow_web_access">இணைய அணுகலை அனுமதி</string>
+    <string name="allow_web_access_desc">வலை உலாவியிலிருந்து உங்கள் தொலைபேசி தரவை அணுக அனுமதிக்கவும்</string>
+    <string name="allow_desktop_access">டெஸ்க்டாப் அணுகலை அனுமதி</string>
+    <string name="allow_desktop_access_desc">டெஸ்க்டாப் ஆப்பிலிருந்து உங்கள் தொலைபேசி தரவை அணுக அனுமதிக்கவும்</string>
     <string name="chat_input_hint">உங்கள் நினைவில் என்ன?</string>
     <string name="client_id">வாடிக்கையாளர் ஐடி</string>
     <string name="online">இணையான</string>
@@ -111,6 +115,7 @@
     <string name="channel_kicked_notice">இந்த சேனலில் இருந்து நீக்கப்பட்டீர்கள், மீண்டும் செய்திகள் அனுப்ப முடியாது.</string>
     <string name="channel_invite">சேனல் அழைப்பு</string>
     <string name="channel_invite_message">%1$s உங்களை "%2$s" சேனலில் சேர அழைக்கிறார்</string>
+    <string name="inviter">அழைப்பாளர்</string>
     <string name="decline">மறு</string>
     <string name="pending_invite">நிலுவையில் உள்ள அழைப்பு</string>
     <string name="pending_members">நிலுவையில் உள்ள உறுப்பினர்கள்</string>

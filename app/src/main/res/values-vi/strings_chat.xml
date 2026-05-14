@@ -49,6 +49,10 @@
     <string name="os">Hệ điều hành</string>
     <string name="browser">Trình duyệt</string>
     <string name="reject">Từ chối</string>
+    <string name="allow_web_access">Cho phép truy cập web</string>
+    <string name="allow_web_access_desc">Cho phép truy cập dữ liệu điện thoại từ trình duyệt web</string>
+    <string name="allow_desktop_access">Cho phép truy cập máy tính</string>
+    <string name="allow_desktop_access_desc">Cho phép truy cập dữ liệu điện thoại từ ứng dụng máy tính</string>
     <string name="chat_input_hint">Bạn đang nghĩ gì?</string>
     <string name="client_id">ID Khách hàng</string>
     <string name="online">Trực tuyến</string>
@@ -111,6 +115,7 @@
     <string name="channel_kicked_notice">Bạn đã bị xóa khỏi kênh này và không thể gửi tin nhắn.</string>
     <string name="channel_invite">Mời kênh</string>
     <string name="channel_invite_message">%1$s mời bạn tham gia kênh "%2$s"</string>
+    <string name="inviter">Người mời</string>
     <string name="decline">Từ chối</string>
     <string name="pending_invite">Lời mời đang chờ</string>
     <string name="pending_members">Thành viên đang chờ</string>

@@ -49,6 +49,10 @@
     <string name="os">OS</string>
     <string name="browser">Browser</string>
     <string name="reject">Reject</string>
+    <string name="allow_web_access">Allow Web Access</string>
+    <string name="allow_web_access_desc">Allow access to your phone data from a web browser</string>
+    <string name="allow_desktop_access">Allow Desktop Access</string>
+    <string name="allow_desktop_access_desc">Allow access to your phone data from the desktop app</string>
     <string name="chat_input_hint">What\'s on your mind?</string>
     <string name="client_id">Client ID</string>
     <string name="peer_id">ID</string>
@@ -96,6 +100,7 @@
     <string name="channel_kicked_notice">You were removed from this channel and can no longer send messages.</string>
     <string name="channel_invite">Channel Invite</string>
     <string name="channel_invite_message">%1$s invited you to join channel \"%2$s\"</string>
+    <string name="inviter">Inviter</string>
     <string name="decline">Decline</string>
     <string name="pending_invite">Pending invite</string>
     <string name="pending_members">Pending Members</string>

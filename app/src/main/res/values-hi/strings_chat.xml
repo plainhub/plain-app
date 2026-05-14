@@ -49,6 +49,10 @@
     <string name="os">ऑपरेटिंग सिस्टम</string>
     <string name="browser">ब्राउज़र</string>
     <string name="reject">अस्वीकार करें</string>
+    <string name="allow_web_access">वेब एक्सेस की अनुमति दें</string>
+    <string name="allow_web_access_desc">वेब ब्राउज़र से अपने फ़ोन डेटा तक पहुँच की अनुमति दें</string>
+    <string name="allow_desktop_access">डेस्कटॉप एक्सेस की अनुमति दें</string>
+    <string name="allow_desktop_access_desc">डेस्कटॉप ऐप से अपने फ़ोन डेटा तक पहुँच की अनुमति दें</string>
     <string name="chat_input_hint">आपके मन में क्या है?</string>
     <string name="client_id">क्लाइंट आईडी</string>
     <string name="online">ऑनलाइन</string>
@@ -111,6 +115,7 @@
     <string name="channel_kicked_notice">आपको इस चैनल से हटा दिया गया है और संदेश नहीं भेज सकते।</string>
     <string name="channel_invite">चैनल आमंत्रण</string>
     <string name="channel_invite_message">%1$s ने आपको "%2$s" चैनल में शामिल होने के लिए आमंत्रित किया है</string>
+    <string name="inviter">आमंत्रणकर्ता</string>
     <string name="decline">अस्वीकार करें</string>
     <string name="pending_invite">लंबित आमंत्रण</string>
     <string name="pending_members">लंबित सदस्य</string>

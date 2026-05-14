@@ -49,6 +49,10 @@
     <string name="os">Sistema Operacional</string>
     <string name="browser">Navegador</string>
     <string name="reject">Rejeitar</string>
+    <string name="allow_web_access">Permitir acesso web</string>
+    <string name="allow_web_access_desc">Permitir acesso aos dados do seu telefone a partir de um navegador web</string>
+    <string name="allow_desktop_access">Permitir acesso desktop</string>
+    <string name="allow_desktop_access_desc">Permitir acesso aos dados do seu telefone a partir do aplicativo desktop</string>
     <string name="chat_input_hint">No que você está pensando?</string>
     <string name="client_id">ID do Cliente</string>
     <string name="online">Online</string>
@@ -111,6 +115,7 @@
     <string name="channel_kicked_notice">Você foi removido deste canal e não pode mais enviar mensagens.</string>
     <string name="channel_invite">Convite de canal</string>
     <string name="channel_invite_message">%1$s convidou você para entrar no canal "%2$s"</string>
+    <string name="inviter">Convidador</string>
     <string name="decline">Recusar</string>
     <string name="pending_invite">Convite pendente</string>
     <string name="pending_members">Membros pendentes</string>

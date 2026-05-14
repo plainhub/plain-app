@@ -49,6 +49,10 @@
     <string name="os">OS</string>
     <string name="browser">ブラウザ</string>
     <string name="reject">拒否</string>
+    <string name="allow_web_access">Webアクセスを許可</string>
+    <string name="allow_web_access_desc">Webブラウザからスマホのデータへのアクセスを許可する</string>
+    <string name="allow_desktop_access">デスクトップアクセスを許可</string>
+    <string name="allow_desktop_access_desc">デスクトップアプリからスマホのデータへのアクセスを許可する</string>
     <string name="chat_input_hint">何を考えていますか？</string>
     <string name="client_id">クライアントID</string>
     <string name="online">オンライン</string>
@@ -111,6 +115,7 @@
     <string name="channel_kicked_notice">このチャンネルから削除されたため、メッセージを送信できません。</string>
     <string name="channel_invite">チャンネル招待</string>
     <string name="channel_invite_message">%1$sさんがあなたをチャンネル"%2$s"に招待しています</string>
+    <string name="inviter">招待者</string>
     <string name="decline">断る</string>
     <string name="pending_invite">保留中の招待</string>
     <string name="pending_members">保留中のメンバー</string>

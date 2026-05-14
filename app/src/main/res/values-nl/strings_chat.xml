@@ -49,6 +49,10 @@
     <string name="os">Besturingssysteem</string>
     <string name="browser">Browser</string>
     <string name="reject">Afwijzen</string>
+    <string name="allow_web_access">Webtoegang toestaan</string>
+    <string name="allow_web_access_desc">Toegang tot uw telefoongegevens via een webbrowser toestaan</string>
+    <string name="allow_desktop_access">Desktoptoegang toestaan</string>
+    <string name="allow_desktop_access_desc">Toegang tot uw telefoongegevens via de desktop-app toestaan</string>
     <string name="chat_input_hint">Waar denk je aan?</string>
     <string name="client_id">Client-ID</string>
     <string name="online">Online</string>
@@ -111,6 +115,7 @@
     <string name="channel_kicked_notice">U bent uit dit kanaal verwijderd en kunt geen berichten meer verzenden.</string>
     <string name="channel_invite">Kanaaluitnodiging</string>
     <string name="channel_invite_message">%1$s nodigt u uit om deel te nemen aan kanaal "%2$s"</string>
+    <string name="inviter">Uitnodiger</string>
     <string name="decline">Afwijzen</string>
     <string name="pending_invite">Openstaande uitnodiging</string>
     <string name="pending_members">Openstaande leden</string>

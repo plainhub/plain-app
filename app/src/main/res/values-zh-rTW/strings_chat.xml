@@ -38,6 +38,10 @@
     <string name="browser">瀏覽器</string>
     <string name="accept">允許</string>
     <string name="reject">拒絕</string>
+    <string name="allow_web_access">允許網頁存取</string>
+    <string name="allow_web_access_desc">允許從網頁瀏覽器存取您的手機資料</string>
+    <string name="allow_desktop_access">允許桌面應用程式存取</string>
+    <string name="allow_desktop_access_desc">允許從桌面應用程式存取您的手機資料</string>
     <string name="invalid_password">密碼錯誤</string>
     <string name="empty_password">密碼不為空</string>
     <string name="unknown_ip">未知IP</string>
@@ -111,6 +115,7 @@
     <string name="channel_kicked_notice">你已被踢出此頻道，無法再發送訊息。</string>
     <string name="channel_invite">頻道邀請</string>
     <string name="channel_invite_message">%1$s 邀請你加入頻道 "%2$s"</string>
+    <string name="inviter">邀請者</string>
     <string name="decline">拒絕</string>
     <string name="pending_invite">待處理的邀請</string>
     <string name="pending_members">待處理成員</string>

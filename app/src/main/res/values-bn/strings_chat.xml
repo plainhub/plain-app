@@ -49,6 +49,10 @@
     <string name="os">অপারেটিং সিস্টেম</string>
     <string name="browser">ব্রাউজার</string>
     <string name="reject">প্রত্যাখ্যান করুন</string>
+    <string name="allow_web_access">ওয়েব অ্যাক্সেস অনুমতি দিন</string>
+    <string name="allow_web_access_desc">একটি ওয়েব ব্রাউজার থেকে আপনার ফোনের ডেটা অ্যাক্সেস করার অনুমতি দিন</string>
+    <string name="allow_desktop_access">ডেস্কটপ অ্যাক্সেস অনুমতি দিন</string>
+    <string name="allow_desktop_access_desc">ডেস্কটপ অ্যাপ থেকে আপনার ফোনের ডেটা অ্যাক্সেস করার অনুমতি দিন</string>
     <string name="chat_input_hint">আপনার মন্তব্য কি?</string>
     <string name="client_id">ক্লায়েন্ট আইডি</string>
     <string name="online">অনলাইন</string>
@@ -111,6 +115,7 @@
     <string name="channel_kicked_notice">আপনাকে এই চ্যানেল থেকে সরিয়ে দেওয়া হয়েছে এবং আর বার্তা পাঠাতে পারবেন না।</string>
     <string name="channel_invite">চ্যানেল আমন্ত্রণ</string>
     <string name="channel_invite_message">%1$s আপনাকে "%2$s" চ্যানেলে যোগ দিতে আমন্ত্রণ জানিয়েছে</string>
+    <string name="inviter">আমন্ত্রণকারী</string>
     <string name="decline">প্রত্যাখ্যান করুন</string>
     <string name="pending_invite">মুলতুবি আমন্ত্রণ</string>
     <string name="pending_members">মুলতুবি সদস্য</string>
