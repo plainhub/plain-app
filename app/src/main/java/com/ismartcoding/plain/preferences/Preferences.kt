@@ -807,3 +807,8 @@ object DocTabsModePreference : BasePreference<Boolean>() {
     override val default = false // false = ext groups mode, true = tags mode
     override val key = booleanPreferencesKey("doc_tabs_mode")
 }
+
+object WebMainSectionCollapsedPreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("web_main_section_collapsed")
+}

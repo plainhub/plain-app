@@ -72,6 +72,8 @@
     <string name="web_portal_running">Acceso web: ACTIVADO</string>
     <string name="web_portal_desc_off">Inicie el servicio para administrar archivos del teléfono desde el escritorio.</string>
     <string name="web_portal_desc_running">Administre archivos del teléfono desde el escritorio en la misma red local.</string>
+    <string name="collapse_section">Contraer</string>
+    <string name="expand_section">Expandir</string>
     <string name="more_settings">Más configuraciones</string>
     <string name="same_network_hint">Asegúrate de que tu computadora y tu teléfono estén en la misma red</string>
     <string name="ready">Listo</string>

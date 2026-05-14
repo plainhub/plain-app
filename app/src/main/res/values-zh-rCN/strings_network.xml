@@ -72,6 +72,8 @@
     <string name="web_portal_running">网页访问已激活</string>
     <string name="web_portal_desc_off">启动从桌面管理手机文件的服务。</string>
     <string name="web_portal_desc_running">在同一本地网络上从桌面管理手机文件。</string>
+    <string name="collapse_section">折叠</string>
+    <string name="expand_section">展开</string>
     <string name="more_settings">更多设置</string>
     <string name="same_network_hint">请确保你的电脑和手机在同一网络下</string>
     <string name="ready">就绪</string>

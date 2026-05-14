@@ -72,6 +72,8 @@
     <string name="web_portal_running">Accesso web: ATTIVATO</string>
     <string name="web_portal_desc_off">Avvia il servizio per gestire i file del telefono dal desktop.</string>
     <string name="web_portal_desc_running">Gestisci i file del telefono dal desktop sulla stessa rete locale.</string>
+    <string name="collapse_section">Comprimi</string>
+    <string name="expand_section">Espandi</string>
     <string name="more_settings">Altre impostazioni</string>
     <string name="same_network_hint">Assicurati che il computer e il telefono siano sulla stessa rete</string>
     <string name="ready">Pronto</string>

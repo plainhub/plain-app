@@ -72,6 +72,8 @@
     <string name="web_portal_running">Web-Zugriff: EIN</string>
     <string name="web_portal_desc_off">Dienst starten, um Telefondateien vom Desktop aus zu verwalten.</string>
     <string name="web_portal_desc_running">Verwalten Sie Telefondateien vom Desktop im selben lokalen Netzwerk.</string>
+    <string name="collapse_section">Reduzieren</string>
+    <string name="expand_section">Erweitern</string>
     <string name="more_settings">Weitere Einstellungen</string>
     <string name="same_network_hint">Stellen Sie sicher, dass sich Ihr Computer und Ihr Telefon im selben Netzwerk befinden</string>
     <string name="ready">Bereit</string>

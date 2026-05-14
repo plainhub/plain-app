@@ -72,6 +72,8 @@
     <string name="web_portal_running">Webtoegang: AAN</string>
     <string name="web_portal_desc_off">Start service om telefoonbestanden vanaf het bureaublad te beheren.</string>
     <string name="web_portal_desc_running">Beheer telefoonbestanden vanaf het bureaublad op hetzelfde lokale netwerk.</string>
+    <string name="collapse_section">Inklappen</string>
+    <string name="expand_section">Uitklappen</string>
     <string name="more_settings">Meer instellingen</string>
     <string name="same_network_hint">Zorg dat je computer en telefoon met hetzelfde netwerk zijn verbonden</string>
     <string name="ready">Gereed</string>

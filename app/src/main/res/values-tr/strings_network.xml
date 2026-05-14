@@ -72,6 +72,8 @@
     <string name="web_portal_running">Web Erişimi: AÇIK</string>
     <string name="web_portal_desc_off">Telefon dosyalarını masaüstünden yönetmek için hizmeti başlatın.</string>
     <string name="web_portal_desc_running">Telefon dosyalarını aynı yerel ağdaki masaüstünden yönetin.</string>
+    <string name="collapse_section">Daralt</string>
+    <string name="expand_section">Genişlet</string>
     <string name="more_settings">Diğer ayarlar</string>
     <string name="same_network_hint">Bilgisayarınızın ve telefonunuzun aynı ağda olduğundan emin olun</string>
     <string name="ready">Hazır</string>

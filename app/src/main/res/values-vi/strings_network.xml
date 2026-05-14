@@ -72,6 +72,8 @@
     <string name="web_portal_running">Truy cập Web: BẬT</string>
     <string name="web_portal_desc_off">Bắt đầu dịch vụ để quản lý các tệp điện thoại từ máy tính để bàn.</string>
     <string name="web_portal_desc_running">Quản lý các tập tin điện thoại từ máy tính để bàn trên cùng một mạng cục bộ.</string>
+    <string name="collapse_section">Thu gọn</string>
+    <string name="expand_section">Mở rộng</string>
     <string name="more_settings">Cài đặt khác</string>
     <string name="same_network_hint">Đảm bảo máy tính và điện thoại của bạn cùng một mạng</string>
     <string name="ready">Sẵn sàng</string>

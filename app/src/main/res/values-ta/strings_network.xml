@@ -72,6 +72,8 @@
     <string name="web_portal_running">இணைய அணுகல்: இயக்கம்</string>
     <string name="web_portal_desc_off">டெஸ்க்டாப்பில் இருந்து ஃபோன் கோப்புகளை நிர்வகிக்க சேவையைத் தொடங்கவும்.</string>
     <string name="web_portal_desc_running">அதே உள்ளூர் நெட்வொர்க்கில் டெஸ்க்டாப்பில் இருந்து ஃபோன் கோப்புகளை நிர்வகிக்கவும்.</string>
+    <string name="collapse_section">சுருக்கு</string>
+    <string name="expand_section">விரிவாக்கு</string>
     <string name="more_settings">மேலும் அமைப்புகள்</string>
     <string name="same_network_hint">உங்கள் கணினியும் தொலைபேசியும் ஒரே நெட்வொர்க்கில் உள்ளதா என்பதை உறுதிப்படுத்துங்கள்</string>
     <string name="ready">தயார்</string>

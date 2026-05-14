@@ -76,6 +76,8 @@
     <string name="web_portal_running">Web Access: ON</string>
     <string name="web_portal_desc_off">Start service to manage phone files from desktop.</string>
     <string name="web_portal_desc_running">Manage phone files from desktop on the same local network.</string>
+    <string name="collapse_section">Collapse</string>
+    <string name="expand_section">Expand</string>
     <string name="more_settings">More settings</string>
     <string name="web_settings">Web Settings</string>
     <string name="same_network_hint">Make sure your computer and phone are on the same network</string>

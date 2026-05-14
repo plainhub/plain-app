@@ -72,6 +72,8 @@
     <string name="web_portal_running">網頁存取：開啟</string>
     <string name="web_portal_desc_off">啟動從桌面管理手機檔案的服務。</string>
     <string name="web_portal_desc_running">在同一本地網路上從桌面管理手機檔案。</string>
+    <string name="collapse_section">折疊</string>
+    <string name="expand_section">展開</string>
     <string name="more_settings">更多设置</string>
     <string name="same_network_hint">請確認你的電腦與手機位於同一網路</string>
     <string name="ready">就緒</string>

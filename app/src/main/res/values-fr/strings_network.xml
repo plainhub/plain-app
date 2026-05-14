@@ -72,6 +72,8 @@
     <string name="web_portal_running">Accès web : ACTIVÉ</string>
     <string name="web_portal_desc_off">Démarrez le service pour gérer les fichiers du téléphone à partir du bureau.</string>
     <string name="web_portal_desc_running">Gérez les fichiers du téléphone depuis le bureau sur le même réseau local.</string>
+    <string name="collapse_section">Réduire</string>
+    <string name="expand_section">Développer</string>
     <string name="more_settings">Plus de paramètres</string>
     <string name="same_network_hint">Assurez-vous que votre ordinateur et votre téléphone sont sur le même réseau</string>
     <string name="ready">Prêt</string>

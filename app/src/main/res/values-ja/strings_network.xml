@@ -72,6 +72,8 @@
     <string name="web_portal_running">ウェブアクセス: オン</string>
     <string name="web_portal_desc_off">デスクトップから電話ファイルを管理するサービスを開始します。</string>
     <string name="web_portal_desc_running">同じローカルネットワーク上のデスクトップから電話ファイルを管理します。</string>
+    <string name="collapse_section">折りたたむ</string>
+    <string name="expand_section">展開する</string>
     <string name="more_settings">その他の設定</string>
     <string name="same_network_hint">パソコンとスマホが同じネットワークに接続されていることを確認してください</string>
     <string name="ready">準備完了</string>

@@ -72,6 +72,8 @@
     <string name="web_portal_running">वेब एक्सेस: चालू</string>
     <string name="web_portal_desc_off">डेस्कटॉप से ​​फ़ोन फ़ाइलों को प्रबंधित करने के लिए सेवा प्रारंभ करें।</string>
     <string name="web_portal_desc_running">उसी स्थानीय नेटवर्क पर डेस्कटॉप से ​​फ़ोन फ़ाइलें प्रबंधित करें।</string>
+    <string name="collapse_section">संकुचित करें</string>
+    <string name="expand_section">विस्तार करें</string>
     <string name="more_settings">अधिक सेटिंग्स</string>
     <string name="same_network_hint">सुनिश्चित करें कि आपका कंप्यूटर और फ़ोन एक ही नेटवर्क पर हैं</string>
     <string name="ready">तैयार</string>

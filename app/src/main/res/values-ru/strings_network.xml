@@ -72,6 +72,8 @@
     <string name="web_portal_running">Веб-доступ: ВКЛ</string>
     <string name="web_portal_desc_off">Запустите службу для управления файлами телефона с рабочего стола.</string>
     <string name="web_portal_desc_running">Управляйте файлами телефона с рабочего стола в той же локальной сети.</string>
+    <string name="collapse_section">Свернуть</string>
+    <string name="expand_section">Развернуть</string>
     <string name="more_settings">Дополнительные настройки</string>
     <string name="same_network_hint">Убедитесь, что компьютер и телефон подключены к одной сети</string>
     <string name="ready">Готово</string>

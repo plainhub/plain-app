@@ -70,6 +70,8 @@
     <string name="web_portal_running">ওয়েব অ্যাক্সেস: চালু</string>
     <string name="web_portal_desc_off">ডেস্কটপ থেকে ফোন ফাইল পরিচালনা করতে পরিষেবা শুরু করুন৷</string>
     <string name="web_portal_desc_running">একই স্থানীয় নেটওয়ার্কে ডেস্কটপ থেকে ফোন ফাইল পরিচালনা করুন।</string>
+    <string name="collapse_section">সংকুচিত করুন</string>
+    <string name="expand_section">প্রসারিত করুন</string>
     <string name="more_settings">আরো সেটিংস</string>
     <string name="same_network_hint">নিশ্চিত করুন আপনার কম্পিউটার ও ফোন একই নেটওয়ার্কে আছে</string>
     <string name="ready">প্রস্তুত</string>
