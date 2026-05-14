@@ -71,15 +71,24 @@ fun Route.addFiles() {
                     }
                 }
 
-                val bytes = withIO { context.contentResolver.openInputStream(uri)?.buffered()?.use { it.readBytes() } }
-                if (bytes != null) {
-                    if (mimeType.isNotEmpty()) {
-                        call.respondBytes(bytes, ContentType.parse(mimeType))
-                    } else {
-                        call.respondBytes(bytes, ContentType.Application.OctetStream)
-                    }
-                } else {
+                val input = withIO { context.contentResolver.openInputStream(uri)?.buffered() }
+                if (input == null) {
                     call.respond(HttpStatusCode.NotFound)
+                    return@get
+                }
+                val contentType = if (mimeType.isNotEmpty()) ContentType.parse(mimeType) else ContentType.Application.OctetStream
+                if (q["dl"] == "1") {
+                    val fileName = (jsonName.ifEmpty { uri.lastPathSegment.orEmpty() }).urlEncode().replace("+", "%20")
+                    if (fileName.isNotEmpty()) {
+                        call.response.header("Access-Control-Expose-Headers", "Content-Disposition")
+                        call.response.header(
+                            "Content-Disposition",
+                            "attachment; filename=\"${fileName}\"; filename*=utf-8''${fileName}"
+                        )
+                    }
+                }
+                call.respondOutputStream(contentType) {
+                    input.use { it.copyTo(this) }
                 }
             } else if (path.startsWith("pkgicon://")) {
                 val packageName = path.substring(10)
@@ -147,11 +156,18 @@ fun Route.addFiles() {
                         String(header.copyOfRange(8, 12)) in listOf("heic", "heix", "hevc", "hevx", "avif")
 
                 if (isHeif) {
-                    val bytes = file.readBytes()
-                    val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                    val output = ByteArrayOutputStream()
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, output)
-                    call.respondBytes(output.toByteArray(), ContentType.Image.PNG)
+                    val bitmap = withIO { BitmapFactory.decodeFile(path) }
+                    if (bitmap == null) {
+                        call.respond(HttpStatusCode.NotFound)
+                        return@get
+                    }
+                    call.respondOutputStream(ContentType.Image.PNG) {
+                        try {
+                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, this)
+                        } finally {
+                            bitmap.recycle()
+                        }
+                    }
                 } else {
                     call.respond(LocalFileContent(file, fileName.getContentType()))
                 }
