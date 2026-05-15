@@ -46,7 +46,7 @@ fun PeerDeliveryStatusDialog(
             }
         },
         dismissButton = {
-            OutlinedButton(onClick = onDismiss) {
+            Button(onClick = onDismiss) {
                 Text(text = stringResource(R.string.close))
             }
         },

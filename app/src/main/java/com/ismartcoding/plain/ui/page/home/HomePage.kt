@@ -34,6 +34,7 @@ import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.MainViewModel
+import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.models.consumeUpdateDownloadEvent
 import com.ismartcoding.plain.ui.page.settings.UpdateDialog
@@ -44,6 +45,7 @@ fun HomePage(
     navController: NavHostController,
     mainVM: MainViewModel,
     updateVM: UpdateViewModel,
+    peerVM: PeerViewModel,
 ) {
     val webEnabled = LocalWeb.current
     val context = LocalContext.current
@@ -73,7 +75,7 @@ fun HomePage(
     UpdateDialog(updateVM)
 
     PScaffold(
-        topBar = { TopBarHome(navController) },
+        topBar = { TopBarHome(navController, peerVM) },
     ) { paddingValues ->
         LazyColumn(
             Modifier

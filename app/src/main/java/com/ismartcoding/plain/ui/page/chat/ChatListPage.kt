@@ -80,41 +80,88 @@ fun ChatListPage(
     PScaffold(
         topBar = { TopBarChat(navController, channelVM, onNavigateBack = { navController.popBackStack() }) },
     ) { paddingValues ->
-    PullToRefresh(modifier = Modifier.fillMaxSize().padding(top = paddingValues.calculateTopPadding()), refreshLayoutState = refreshState) {
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            item { TopSpace() }
-            item { if (!webEnabled) PAlert(description = stringResource(id = R.string.web_service_required_for_chat), AlertType.WARNING) { PFilledButton(text = stringResource(R.string.enable_web_service), buttonSize = ButtonSize.SMALL, onClick = { mainVM.enableHttpServer(context, true) }) } }
-            item { PCard { PListItem(title = stringResource(R.string.make_discoverable), subtitle = stringResource(R.string.make_discoverable_desc), icon = R.drawable.wifi, action = { PSwitch(activated = isDiscoverable) { peerVM.updateDiscoverable(context, it) } }) } }
-            item { VerticalSpace(dp = 16.dp) }
-            item { PeerListItem(title = stringResource(R.string.local_chat), desc = stringResource(R.string.local_chat_desc), icon = R.drawable.bot, latestChat = peerVM.getLatestChat("local"), modifier = PlainTheme.getCardModifier(), onClick = { navController.navigate(Routing.Chat("local")) }) }
-            if (channels.isNotEmpty()) {
-                item { VerticalSpace(dp = 16.dp); Subtitle(stringResource(R.string.channels)) }
-                items(items = channels.toList(), key = { it.id }) { channel ->
-                    ChannelListItem(name = channel.name, onClick = { navController.navigate(Routing.Chat("channel:${channel.id}")) }, modifier = PlainTheme.getCardModifier())
-                    VerticalSpace(8.dp)
+        PullToRefresh(modifier = Modifier
+            .fillMaxSize()
+            .padding(top = paddingValues.calculateTopPadding()), refreshLayoutState = refreshState) {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                item { TopSpace() }
+                item {
+                    if (!webEnabled) PAlert(
+                        description = stringResource(id = R.string.web_service_required_for_chat),
+                        AlertType.WARNING
+                    ) { PFilledButton(text = stringResource(R.string.enable_web_service), buttonSize = ButtonSize.SMALL, onClick = { mainVM.enableHttpServer(context, true) }) }
                 }
-            }
-            if (pairedPeers.isNotEmpty()) {
-                item { VerticalSpace(dp = 8.dp); Subtitle(stringResource(R.string.paired_devices)) }
-                items(items = pairedPeers.toList(), key = { it.id }) { peer ->
-                    PeerListItem(title = peer.name, desc = peer.getBestIp(), icon = DeviceType.fromValue(peer.deviceType).getIcon(), online = peerVM.getPeerOnlineStatus(peer.id), latestChat = peerVM.getLatestChat(peer.id), peerId = peer.id, onDelete = { peerVM.removePeer(context, it) }, onClick = { navController.navigate(Routing.Chat("peer:${peer.id}")) }, modifier = PlainTheme.getCardModifier())
-                    VerticalSpace(8.dp)
+                item {
+                    PeerListItem(
+                        title = stringResource(R.string.local_chat),
+                        desc = stringResource(R.string.local_chat_desc),
+                        icon = R.drawable.bot,
+                        latestChat = peerVM.getLatestChat("local"),
+                        modifier = PlainTheme.getCardModifier(),
+                        onClick = { navController.navigate(Routing.Chat("local")) })
                 }
-            }
-            if (unpairedPeers.isNotEmpty()) {
-                item { VerticalSpace(dp = 8.dp); Subtitle(stringResource(R.string.unpaired_devices)) }
-                items(items = unpairedPeers.toList(), key = { it.id }) { peer ->
-                    PeerListItem(title = peer.name, desc = peer.ip, icon = DeviceType.fromValue(peer.deviceType).getIcon(), online = peerVM.getPeerOnlineStatus(peer.id), latestChat = peerVM.getLatestChat(peer.id), peerId = peer.id, onDelete = { peerVM.removePeer(context, it) }, onClick = { navController.navigate(Routing.Chat("peer:${peer.id}")) }, modifier = PlainTheme.getCardModifier())
-                    VerticalSpace(8.dp)
+                if (channels.isNotEmpty()) {
+                    item { VerticalSpace(dp = 16.dp); Subtitle(stringResource(R.string.channels)) }
+                    items(items = channels.toList(), key = { it.id }) { channel ->
+                        ChannelListItem(name = channel.name, onClick = { navController.navigate(Routing.Chat("channel:${channel.id}")) }, modifier = PlainTheme.getCardModifier())
+                        VerticalSpace(8.dp)
+                    }
                 }
+                if (pairedPeers.isNotEmpty()) {
+                    item { VerticalSpace(dp = 8.dp); Subtitle(stringResource(R.string.paired_devices)) }
+                    items(items = pairedPeers.toList(), key = { it.id }) { peer ->
+                        PeerListItem(
+                            title = peer.name,
+                            desc = peer.getBestIp(),
+                            icon = DeviceType.fromValue(peer.deviceType).getIcon(),
+                            online = peerVM.getPeerOnlineStatus(peer.id),
+                            latestChat = peerVM.getLatestChat(peer.id),
+                            peerId = peer.id,
+                            onDelete = { peerVM.removePeer(context, it) },
+                            onClick = { navController.navigate(Routing.Chat("peer:${peer.id}")) },
+                            modifier = PlainTheme.getCardModifier()
+                        )
+                        VerticalSpace(8.dp)
+                    }
+                }
+                if (unpairedPeers.isNotEmpty()) {
+                    item { VerticalSpace(dp = 8.dp); Subtitle(stringResource(R.string.unpaired_devices)) }
+                    items(items = unpairedPeers.toList(), key = { it.id }) { peer ->
+                        PeerListItem(
+                            title = peer.name,
+                            desc = peer.ip,
+                            icon = DeviceType.fromValue(peer.deviceType).getIcon(),
+                            online = peerVM.getPeerOnlineStatus(peer.id),
+                            latestChat = peerVM.getLatestChat(peer.id),
+                            peerId = peer.id,
+                            onDelete = { peerVM.removePeer(context, it) },
+                            onClick = { navController.navigate(Routing.Chat("peer:${peer.id}")) },
+                            modifier = PlainTheme.getCardModifier()
+                        )
+                        VerticalSpace(8.dp)
+                    }
+                }
+                item { BottomSpace(paddingValues) }
             }
-            item { BottomSpace(paddingValues) }
         }
-    }
 
-    if (showCreateChannelDialog) { CreateChannelDialog(onDismiss = { showCreateChannelDialog = false }, onConfirm = { showCreateChannelDialog = false; channelVM.createChannel(it) }) }
-    if (renameChannelId != null) { RenameChannelDialog(currentName = renameChannelName, onDismiss = { renameChannelId = null }, onConfirm = { val id = renameChannelId!!; renameChannelId = null; channelVM.renameChannel(id, it) }) }
-    val managedChannel = manageMembersChannelId?.let { id -> channels.find { it.id == id } }
-    if (managedChannel != null) { ChannelMembersDialog(channel = managedChannel, pairedPeers = peerVM.pairedPeers.toList(), onAddMember = { channelVM.addChannelMember(managedChannel.id, it) }, onRemoveMember = { channelVM.removeChannelMember(managedChannel.id, it) }, onDismiss = { manageMembersChannelId = null }) }
+        if (showCreateChannelDialog) {
+            CreateChannelDialog(onDismiss = { showCreateChannelDialog = false }, onConfirm = { showCreateChannelDialog = false; channelVM.createChannel(it) })
+        }
+        if (renameChannelId != null) {
+            RenameChannelDialog(
+                currentName = renameChannelName,
+                onDismiss = { renameChannelId = null },
+                onConfirm = { val id = renameChannelId!!; renameChannelId = null; channelVM.renameChannel(id, it) })
+        }
+        val managedChannel = manageMembersChannelId?.let { id -> channels.find { it.id == id } }
+        if (managedChannel != null) {
+            ChannelMembersDialog(
+                channel = managedChannel,
+                pairedPeers = peerVM.pairedPeers.toList(),
+                onAddMember = { channelVM.addChannelMember(managedChannel.id, it) },
+                onRemoveMember = { channelVM.removeChannelMember(managedChannel.id, it) },
+                onDismiss = { manageMembersChannelId = null })
+        }
     }
 }
