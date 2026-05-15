@@ -20,7 +20,6 @@ import com.ismartcoding.plain.enums.DeviceType
 import com.ismartcoding.plain.preferences.HomeSectionCollapsedPreference
 import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.preferences.dataStore
-import com.ismartcoding.plain.ui.base.PDivider
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.models.ChannelViewModel
@@ -113,9 +112,6 @@ fun HomeChatWidget(
                         latestChat = row.latestChat,
                         onClick = { navController.navigate(row.route) },
                     )
-                    if (index < rows.size - 1) {
-                        PDivider()
-                    }
                 }
             }
         }

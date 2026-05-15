@@ -24,9 +24,7 @@ import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
-import com.ismartcoding.plain.ui.base.PDivider
 import com.ismartcoding.plain.ui.base.PAlert
-import com.ismartcoding.plain.ui.base.PDividerFull
 import com.ismartcoding.plain.ui.base.PFilledButton
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
@@ -115,9 +113,6 @@ fun ChatListPage(
                             },
                             modifier = PlainTheme.getCardModifier(index, channels.size)
                         )
-                        if (index < channels.size - 1) {
-                            PDividerFull()
-                        }
                     }
                 }
                 val allPeers = pairedPeers.toList() + unpairedPeers.toList()
@@ -138,9 +133,6 @@ fun ChatListPage(
                             onClick = { navController.navigate(Routing.Chat("peer:${peer.id}")) },
                             modifier = PlainTheme.getCardModifier(index, allPeers.size)
                         )
-                        if (index < allPeers.size - 1) {
-                            PDividerFull()
-                        }
                     }
                 }
                 item { BottomSpace(paddingValues) }

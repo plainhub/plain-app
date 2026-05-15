@@ -92,6 +92,10 @@ fun StayOnlineModeOverlay(onExit: () -> Unit) {
         SideEffect {
             val dialogWindow = (dialogView.parent as? DialogWindowProvider)?.window
             if (dialogWindow != null) {
+                dialogWindow.setLayout(
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                )
                 WindowCompat.setDecorFitsSystemWindows(dialogWindow, false)
                 WindowInsetsControllerCompat(dialogWindow, dialogWindow.decorView).apply {
                     hide(WindowInsetsCompat.Type.systemBars())
