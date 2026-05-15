@@ -3,7 +3,7 @@ package com.ismartcoding.plain.ui.page.chat
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,12 +24,10 @@ import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.ui.base.AlertType
 import com.ismartcoding.plain.ui.base.BottomSpace
+import com.ismartcoding.plain.ui.base.PDivider
 import com.ismartcoding.plain.ui.base.PAlert
-import com.ismartcoding.plain.ui.base.PCard
+import com.ismartcoding.plain.ui.base.PDividerFull
 import com.ismartcoding.plain.ui.base.PFilledButton
-import com.ismartcoding.plain.ui.base.PListItem
-import com.ismartcoding.plain.ui.base.POutlinedButton
-import com.ismartcoding.plain.ui.base.PSwitch
 import com.ismartcoding.plain.ui.base.Subtitle
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
@@ -47,7 +45,6 @@ import com.ismartcoding.plain.ui.nav.Routing
 import com.ismartcoding.plain.ui.page.chat.components.CreateChannelDialog
 import com.ismartcoding.plain.ui.page.chat.components.ChannelMembersDialog
 import com.ismartcoding.plain.ui.page.chat.components.RenameChannelDialog
-import com.ismartcoding.plain.ui.page.chat.components.ChannelListItem
 import com.ismartcoding.plain.ui.page.chat.components.PeerListItem
 import com.ismartcoding.plain.ui.page.chat.TopBarChat
 import com.ismartcoding.plain.ui.base.PScaffold
@@ -80,9 +77,11 @@ fun ChatListPage(
     PScaffold(
         topBar = { TopBarChat(navController, channelVM, onNavigateBack = { navController.popBackStack() }) },
     ) { paddingValues ->
-        PullToRefresh(modifier = Modifier
-            .fillMaxSize()
-            .padding(top = paddingValues.calculateTopPadding()), refreshLayoutState = refreshState) {
+        PullToRefresh(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = paddingValues.calculateTopPadding()), refreshLayoutState = refreshState
+        ) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item { TopSpace() }
                 item {
@@ -101,44 +100,47 @@ fun ChatListPage(
                         onClick = { navController.navigate(Routing.Chat("local")) })
                 }
                 if (channels.isNotEmpty()) {
-                    item { VerticalSpace(dp = 16.dp); Subtitle(stringResource(R.string.channels)) }
-                    items(items = channels.toList(), key = { it.id }) { channel ->
-                        ChannelListItem(name = channel.name, onClick = { navController.navigate(Routing.Chat("channel:${channel.id}")) }, modifier = PlainTheme.getCardModifier())
-                        VerticalSpace(8.dp)
+                    item {
+                        VerticalSpace(dp = 16.dp)
+                        Subtitle(stringResource(R.string.channels))
+                    }
+                    itemsIndexed(items = channels.toList(), key = { _, i -> i.id }) { index, channel ->
+                        PeerListItem(
+                            title = channel.name,
+                            desc = stringResource(R.string.channels),
+                            icon = R.drawable.hash,
+                            latestChat = peerVM.getLatestChat(channel.id),
+                            onClick = {
+                                navController.navigate(Routing.Chat("channel:${channel.id}"))
+                            },
+                            modifier = PlainTheme.getCardModifier(index, channels.size)
+                        )
+                        if (index < channels.size - 1) {
+                            PDividerFull()
+                        }
                     }
                 }
-                if (pairedPeers.isNotEmpty()) {
-                    item { VerticalSpace(dp = 8.dp); Subtitle(stringResource(R.string.paired_devices)) }
-                    items(items = pairedPeers.toList(), key = { it.id }) { peer ->
+                val allPeers = pairedPeers.toList() + unpairedPeers.toList()
+                if (allPeers.isNotEmpty()) {
+                    item {
+                        VerticalSpace(dp = 16.dp)
+                        Subtitle(stringResource(R.string.nearby_devices))
+                    }
+                    itemsIndexed(items = allPeers, key = { _, i -> i.id }) { index, peer ->
                         PeerListItem(
                             title = peer.name,
-                            desc = peer.getBestIp(),
+                            desc = if (peer.isPaired()) peer.getBestIp() else peer.ip,
                             icon = DeviceType.fromValue(peer.deviceType).getIcon(),
                             online = peerVM.getPeerOnlineStatus(peer.id),
                             latestChat = peerVM.getLatestChat(peer.id),
                             peerId = peer.id,
                             onDelete = { peerVM.removePeer(context, it) },
                             onClick = { navController.navigate(Routing.Chat("peer:${peer.id}")) },
-                            modifier = PlainTheme.getCardModifier()
+                            modifier = PlainTheme.getCardModifier(index, allPeers.size)
                         )
-                        VerticalSpace(8.dp)
-                    }
-                }
-                if (unpairedPeers.isNotEmpty()) {
-                    item { VerticalSpace(dp = 8.dp); Subtitle(stringResource(R.string.unpaired_devices)) }
-                    items(items = unpairedPeers.toList(), key = { it.id }) { peer ->
-                        PeerListItem(
-                            title = peer.name,
-                            desc = peer.ip,
-                            icon = DeviceType.fromValue(peer.deviceType).getIcon(),
-                            online = peerVM.getPeerOnlineStatus(peer.id),
-                            latestChat = peerVM.getLatestChat(peer.id),
-                            peerId = peer.id,
-                            onDelete = { peerVM.removePeer(context, it) },
-                            onClick = { navController.navigate(Routing.Chat("peer:${peer.id}")) },
-                            modifier = PlainTheme.getCardModifier()
-                        )
-                        VerticalSpace(8.dp)
+                        if (index < allPeers.size - 1) {
+                            PDividerFull()
+                        }
                     }
                 }
                 item { BottomSpace(paddingValues) }

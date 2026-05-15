@@ -2,9 +2,7 @@ package com.ismartcoding.plain.ui.page.home
 
 import android.content.Context
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -14,18 +12,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.enums.ButtonSize
 import com.ismartcoding.plain.enums.ButtonType
-import com.ismartcoding.plain.preferences.WebMainSectionCollapsedPreference
+import com.ismartcoding.plain.preferences.HomeSectionCollapsedPreference
 import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.ui.base.PFilledButton
@@ -34,11 +29,11 @@ import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.extensions.collectAsStateValue
 import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.nav.Routing
+import com.ismartcoding.plain.ui.theme.PlainTheme
 import com.ismartcoding.plain.ui.theme.blue
 import com.ismartcoding.plain.ui.theme.cardBackgroundNormal
 import com.ismartcoding.plain.web.HttpServerManager
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeWebMainSection(
@@ -52,108 +47,86 @@ fun HomeWebMainSection(
     onRun: (() -> Unit)? = null,
 ) {
     val onlineCount by HttpServerManager.wsSessionCount.collectAsState()
-    val scope = rememberCoroutineScope()
     val collapsed = remember {
-        context.dataStore.dataFlow.map { WebMainSectionCollapsedPreference.get(it) }
-    }.collectAsStateValue(initial = WebMainSectionCollapsedPreference.default)
+        context.dataStore.dataFlow.map { HomeSectionCollapsedPreference.get(it, AppFeatureType.WEB_PORTAL) }
+    }.collectAsStateValue(initial = false)
 
     Column {
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
-            shape = RoundedCornerShape(28.dp),
+            shape = RoundedCornerShape(PlainTheme.CARD_RADIUS),
             color = MaterialTheme.colorScheme.cardBackgroundNormal,
         ) {
-            Column(
-                modifier = Modifier.padding(
-                    top = 16.dp,
-                    start = 24.dp,
-                    end = 24.dp,
-                    bottom = if (webState == WebState.ON && collapsed) 16.dp else 24.dp
+            Column {
+                HomeSectionClickableHeader(
+                    title = when (webState) {
+                        WebState.OFF -> stringResource(R.string.web_portal_off)
+                        WebState.ERROR -> stringResource(R.string.home_web_easy_failed_title)
+                        else -> stringResource(R.string.web_portal_running)
+                    },
+                    onClick = { navController.navigate(Routing.WebSettings) },
+                    trailingContent = {
+                        if (webState != WebState.ON) {
+                            PIconButton(
+                                icon = R.drawable.tune,
+                                contentDescription = stringResource(R.string.web_settings),
+                                tint = MaterialTheme.colorScheme.blue,
+                                click = { navController.navigate(Routing.WebSettings) })
+                        } else {
+                            HomeSectionCollapseButton(
+                                collapsed = collapsed,
+                                featureType = AppFeatureType.WEB_PORTAL,
+                            )
+                        }
+                    },
                 )
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = when (webState) {
-                            WebState.OFF -> stringResource(R.string.web_portal_off)
-                            WebState.ERROR -> stringResource(R.string.home_web_easy_failed_title)
-                            else -> stringResource(R.string.web_portal_running)
-                        },
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.SemiBold, lineHeight = 36.sp,
-                        ),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.weight(1f),
-                    )
-                    if (webState != WebState.ON) {
-                        PIconButton(
-                            icon = R.drawable.tune,
-                            contentDescription = stringResource(R.string.web_settings),
-                            tint = MaterialTheme.colorScheme.blue,
-                            click = { navController.navigate(Routing.WebSettings) })
-                    } else {
-                        PIconButton(
-                            icon = if (collapsed) R.drawable.chevron_down else R.drawable.chevron_up,
-                            contentDescription = if (collapsed) stringResource(R.string.expand_section) else stringResource(R.string.collapse_section),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            click = {
-                                scope.launch {
-                                    WebMainSectionCollapsedPreference.putAsync(context, !collapsed)
-                                }
-                            },
-                        )
-                    }
-                }
                 if (webState != WebState.ON || !collapsed) {
-                    VerticalSpace(12.dp)
-                    Text(
-                        text = when (webState) {
-                            WebState.OFF -> stringResource(R.string.web_portal_desc_off)
-                            WebState.ERROR -> errorMessage
-                            else -> stringResource(R.string.web_portal_desc_running)
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    VerticalSpace(24.dp)
-                    when (webState) {
-                        WebState.OFF -> PFilledButton(
-                            text = stringResource(R.string.start_service),
-                            onClick = onRun ?: {},
-                            buttonSize = ButtonSize.LARGE,
-                            isLoading = isLoading,
-                        )
-
-                        WebState.ERROR -> PFilledButton(
-                            text = stringResource(R.string.relaunch_app),
-                            onClick = onRestartFix,
-                            type = ButtonType.TERTIARY,
-                            buttonSize = ButtonSize.LARGE,
-                        )
-
-                        else -> PFilledButton(
-                            text = stringResource(R.string.stop_service),
-                            onClick = {
-                                mainVM.enableHttpServer(
-                                    context,
-                                    false
-                                )
+                    Column(modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 24.dp)) {
+                        Text(
+                            text = when (webState) {
+                                WebState.OFF -> stringResource(R.string.web_portal_desc_off)
+                                WebState.ERROR -> errorMessage
+                                else -> stringResource(R.string.web_portal_desc_running)
                             },
-                            type = ButtonType.DANGER,
-                            buttonSize = ButtonSize.LARGE,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                    }
-                    if (webState == WebState.ON && onlineCount > 0) {
-                        VerticalSpace(16.dp)
-                        OnlineSessionsIndicator(
-                            count = onlineCount,
-                            onClick = { navController.navigate(Routing.Connections) })
+                        VerticalSpace(24.dp)
+                        when (webState) {
+                            WebState.OFF -> PFilledButton(
+                                text = stringResource(R.string.start_service),
+                                onClick = onRun ?: {},
+                                buttonSize = ButtonSize.LARGE,
+                                isLoading = isLoading,
+                            )
+
+                            WebState.ERROR -> PFilledButton(
+                                text = stringResource(R.string.relaunch_app),
+                                onClick = onRestartFix,
+                                type = ButtonType.TERTIARY,
+                                buttonSize = ButtonSize.LARGE,
+                            )
+
+                            else -> PFilledButton(
+                                text = stringResource(R.string.stop_service),
+                                onClick = {
+                                    mainVM.enableHttpServer(
+                                        context,
+                                        false
+                                    )
+                                },
+                                type = ButtonType.DANGER,
+                                buttonSize = ButtonSize.LARGE,
+                            )
+                        }
+                        if (webState == WebState.ON && onlineCount > 0) {
+                            VerticalSpace(16.dp)
+                            OnlineSessionsIndicator(
+                                count = onlineCount,
+                                onClick = { navController.navigate(Routing.Connections) })
+                        }
                     }
                 }
             }
@@ -164,5 +137,3 @@ fun HomeWebMainSection(
         }
     }
 }
-
-

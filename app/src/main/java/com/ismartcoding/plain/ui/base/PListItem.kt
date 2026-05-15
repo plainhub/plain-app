@@ -40,6 +40,7 @@ fun PListItem(
     value: String? = null,
     icon: Int? = null,
     start: (@Composable () -> Unit)? = null,
+    titleTrailing: (@Composable () -> Unit)? = null,
     separatedActions: Boolean = false,
     showMore: Boolean = false,
     action: (@Composable () -> Unit)? = null,
@@ -54,12 +55,13 @@ fun PListItem(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp, 8.dp, 8.dp, 8.dp),
+                    .padding(0.dp, 8.dp, 8.dp, 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (start != null) {
-                Box(Modifier.padding(end = 16.dp)) { start() }
+                start()
             } else if (icon != null) {
+                HorizontalSpace(16.dp)
                 Image(
                     modifier =
                         Modifier
@@ -69,16 +71,32 @@ fun PListItem(
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
                     contentDescription = title,
                 )
+            } else {
+                HorizontalSpace(16.dp)
             }
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .padding(vertical = 8.dp)
             ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.listItemTitle(),
-                )
+                if (titleTrailing != null) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.listItemTitle(),
+                            modifier = Modifier.weight(1f),
+                        )
+                        titleTrailing()
+                    }
+                } else {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.listItemTitle(),
+                    )
+                }
                 if (subtitle.isNotEmpty()) {
                     VerticalSpace(dp = 8.dp)
                     Text(
@@ -121,7 +139,7 @@ fun PListItem(
                         Modifier
                             .size(24.dp),
                     contentDescription = title,
-                    tint = MaterialTheme.colorScheme.onSurface,
+                    tint = MaterialTheme.colorScheme.outline,
                 )
             }
         }

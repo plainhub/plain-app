@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="relative_time_now">Gerade eben</string>
+    <string name="relative_time_minutes_short">%1$s Min.</string>
+    <string name="relative_time_hours_short">%1$s Std.</string>
+    <string name="relative_time_days_short">%1$s T.</string>
+    <string name="relative_time_weeks_short">%1$s Wo.</string>
+    <string name="relative_time_months_short">%1$s Mon.</string>
+    <string name="relative_time_years_short">%1$s J.</string>
+    <string name="relative_time_minutes_long">Vor %1$s Minuten</string>
+    <string name="relative_time_hours_long">Vor %1$s Stunden</string>
+    <string name="relative_time_days_long">Vor %1$s Tagen</string>
+    <string name="relative_time_weeks_long">Vor %1$s Wochen</string>
+    <string name="relative_time_months_long">Vor %1$s Monaten</string>
+    <string name="relative_time_years_long">Vor %1$s Jahren</string>
+</resources>

@@ -111,7 +111,7 @@ fun MainNavGraph(
             ) + fadeOut(animationSpec = tween(150, easing = FastOutLinearInEasing))
         },
     ) {
-        composable<Routing.Home> { HomePage(navController, mainVM, updateVM, peerVM) }
+        composable<Routing.Home> { HomePage(navController, mainVM, updateVM, peerVM, channelVM) }
         composable<Routing.Images> { ImagesPage(navController) }
         composable<Routing.Videos> { VideosPage(navController) }
         composable<Routing.Audio> { AudioPage(navController, audioPlaylistVM) }

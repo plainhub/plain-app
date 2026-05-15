@@ -9,6 +9,7 @@ import com.ismartcoding.plain.features.Permission
 import com.ismartcoding.plain.features.Permissions
 
 enum class AppFeatureType {
+    WEB_PORTAL,
     DOCS,
     NOTES,
     FEEDS,

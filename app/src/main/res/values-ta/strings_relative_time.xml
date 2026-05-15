@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="relative_time_now">இப்போதுதான்</string>
+    <string name="relative_time_minutes_short">%1$s நிமி</string>
+    <string name="relative_time_hours_short">%1$s மணி</string>
+    <string name="relative_time_days_short">%1$s நாள்</string>
+    <string name="relative_time_weeks_short">%1$s வாரம்</string>
+    <string name="relative_time_months_short">%1$s மாதம்</string>
+    <string name="relative_time_years_short">%1$s ஆண்டு</string>
+    <string name="relative_time_minutes_long">%1$s நிமிடங்கள் முன்பு</string>
+    <string name="relative_time_hours_long">%1$s மணி நேரம் முன்பு</string>
+    <string name="relative_time_days_long">%1$s நாட்கள் முன்பு</string>
+    <string name="relative_time_weeks_long">%1$s வாரங்கள் முன்பு</string>
+    <string name="relative_time_months_long">%1$s மாதங்கள் முன்பு</string>
+    <string name="relative_time_years_long">%1$s ஆண்டுகள் முன்பு</string>
+</resources>

@@ -34,6 +34,7 @@ import com.ismartcoding.plain.ui.base.PScaffold
 import com.ismartcoding.plain.ui.base.TopSpace
 import com.ismartcoding.plain.ui.base.VerticalSpace
 import com.ismartcoding.plain.ui.models.MainViewModel
+import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.models.consumeUpdateDownloadEvent
@@ -46,12 +47,14 @@ fun HomePage(
     mainVM: MainViewModel,
     updateVM: UpdateViewModel,
     peerVM: PeerViewModel,
+    channelVM: ChannelViewModel,
 ) {
     val webEnabled = LocalWeb.current
     val context = LocalContext.current
     var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.can(context)) }
 
     LaunchedEffect(Unit) {
+        peerVM.loadPeers()
         Channel.sharedFlow.collect { event ->
             if (updateVM.consumeUpdateDownloadEvent(event)) {
                 return@collect
@@ -113,10 +116,10 @@ fun HomePage(
             }
             item {
                 HomeWeb(context, navController, mainVM, webEnabled)
-                VerticalSpace(dp = 24.dp)
+                VerticalSpace(dp = 16.dp)
             }
             item {
-                HomeShortcutGrid(navController = navController)
+                HomeShortcutGrid(navController = navController, peerVM = peerVM, channelVM = channelVM)
                 VerticalSpace(dp = 16.dp)
             }
             item {
@@ -125,4 +128,3 @@ fun HomePage(
         }
     }
 }
-

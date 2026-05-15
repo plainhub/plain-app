@@ -2,6 +2,7 @@ package com.ismartcoding.plain.ui.models
 
 import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -25,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 class PeerViewModel : ViewModel() {
     val pairedPeers = mutableStateListOf<DPeer>()
     val unpairedPeers = mutableStateListOf<DPeer>()
-    internal val latestChatCacheInternal = mutableMapOf<String, DChat>()
+    internal val latestChatCacheInternal = mutableStateMapOf<String, DChat>()
     val onlineMap = mutableStateOf<Map<String, kotlin.time.Instant>>(emptyMap())
     private var eventJob: Job? = null
 

@@ -3,6 +3,7 @@ package com.ismartcoding.plain.ui.page.chat.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -31,9 +32,7 @@ internal fun PeerIconWithStatus(
 ) {
     Box(
         modifier = Modifier
-            .padding(end = 8.dp)
-            .size(40.dp)
-            .padding(2.dp),
+            .size(56.dp),
         contentAlignment = Alignment.Center
     ) {
         Icon(
@@ -46,6 +45,8 @@ internal fun PeerIconWithStatus(
             Box(
                 modifier = Modifier
                     .size(10.dp)
+                    .align(Alignment.BottomEnd)
+                    .offset(x = (-10).dp, y = (-10).dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(1.dp)
@@ -54,7 +55,6 @@ internal fun PeerIconWithStatus(
                         if (online) MaterialTheme.colorScheme.green
                         else MaterialTheme.colorScheme.grey
                     )
-                    .align(Alignment.BottomEnd)
             )
         }
     }

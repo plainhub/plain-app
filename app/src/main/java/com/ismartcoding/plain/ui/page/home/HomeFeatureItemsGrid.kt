@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.ismartcoding.plain.R
+import com.ismartcoding.plain.enums.AppFeatureType
 import com.ismartcoding.plain.preferences.HomeFeaturesPreference
 import com.ismartcoding.plain.preferences.dataFlow
 import com.ismartcoding.plain.preferences.dataStore
@@ -67,7 +68,9 @@ fun HomeFeatureItemsGrid(navController: NavHostController) {
 
     val allFeatureItems = remember { FeatureItem.getList(navController) }
     val items = remember(enabledIds) {
-        enabledIds.mapNotNull { typeName -> allFeatureItems.find { it.type.name == typeName } }
+        enabledIds
+            .filter { it != AppFeatureType.CHAT.name }
+            .mapNotNull { typeName -> allFeatureItems.find { it.type.name == typeName } }
     }
 
     val rowCount = (items.size + 2) / 2

@@ -808,7 +808,43 @@ object DocTabsModePreference : BasePreference<Boolean>() {
     override val key = booleanPreferencesKey("doc_tabs_mode")
 }
 
-object WebMainSectionCollapsedPreference : BasePreference<Boolean>() {
-    override val default = false
-    override val key = booleanPreferencesKey("web_main_section_collapsed")
+object HomeSectionCollapsedPreference : BasePreference<String>() {
+    override val default = ""
+    override val key = stringPreferencesKey("home_section_collapsed")
+
+    fun get(preferences: Preferences, feature: AppFeatureType): Boolean {
+        return parseMap(get(preferences))[feature] ?: false
+    }
+
+    suspend fun putAsync(
+        context: Context,
+        feature: AppFeatureType,
+        collapsed: Boolean,
+    ) {
+        val updated = getValueAsync(context).toMutableMap()
+        updated[feature] = collapsed
+        putAsync(context, formatMap(updated))
+    }
+
+    suspend fun getValueAsync(context: Context): Map<AppFeatureType, Boolean> {
+        return parseMap(getAsync(context))
+    }
+
+    private fun parseMap(value: String): Map<AppFeatureType, Boolean> {
+        if (value.isEmpty()) {
+            return emptyMap()
+        }
+
+        return try {
+            jsonDecode<Map<String, Boolean>>(value).mapNotNull { (key, collapsed) ->
+                runCatching { AppFeatureType.valueOf(key) }.getOrNull()?.let { it to collapsed }
+            }.toMap()
+        } catch (_: Exception) {
+            emptyMap()
+        }
+    }
+
+    private fun formatMap(value: Map<AppFeatureType, Boolean>): String {
+        return jsonEncode(value.mapKeys { it.key.name })
+    }
 }
