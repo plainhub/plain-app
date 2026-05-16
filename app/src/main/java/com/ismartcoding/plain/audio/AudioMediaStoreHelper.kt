@@ -35,6 +35,7 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
 
         if (isQPlus()) {
             projection.add(MediaStore.Audio.Media.BUCKET_ID)
+            projection.add(MediaStore.Audio.Media.IS_FAVORITE)
         }
 
         return projection.toTypedArray()
@@ -96,7 +97,8 @@ object AudioMediaStoreHelper : BaseMediaContentHelper() {
                 cursor.getStringValue(MediaStore.Audio.Media.BUCKET_ID, cache)
             } else ""
             val albumId = cursor.getStringValue(MediaStore.Audio.Media.ALBUM_ID, cache)
-            DAudio(id, title, artist, path, duration, size, bucketId, albumId, createdAt, updatedAt)
+            val isFavorite = if (isQPlus()) cursor.getIntValue(MediaStore.Audio.Media.IS_FAVORITE, cache) == 1 else false
+            DAudio(id, title, artist, path, duration, size, bucketId, albumId, createdAt, updatedAt, isFavorite)
         } ?: emptyList()
     }
 

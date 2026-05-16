@@ -13,8 +13,9 @@ data class Video(
     val createdAt: Instant,
     val updatedAt: Instant,
     val takenAt: Instant?,
+    val isFavorite: Boolean,
 )
 
 fun DVideo.toModel(): Video {
-    return Video(ID(id), title, path, duration, size, bucketId, createdAt, updatedAt, takenAt)
+    return Video(ID(id), title, path, duration, size, bucketId, createdAt, updatedAt, takenAt, isFavorite)
 }

@@ -16,6 +16,7 @@ data class DImage(
     val createdAt: Instant,
     val updatedAt: Instant,
     val takenAt: Instant?,
+    val isFavorite: Boolean = false,
 ) : IData {
     fun getRotatedSize(): IntSize {
         if (rotation == 90 || rotation == 270) {

@@ -18,6 +18,7 @@ data class DAudio(
     val albumId: String,
     val createdAt: Instant,
     val updatedAt: Instant,
+    val isFavorite: Boolean = false,
 ) : IMedia, IData {
     fun toPlaylistAudio(): DPlaylistAudio {
         return DPlaylistAudio(title, path, artist, duration)

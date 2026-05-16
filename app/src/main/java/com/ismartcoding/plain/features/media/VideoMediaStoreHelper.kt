@@ -38,6 +38,7 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
         )
         if (isQPlus()) {
             projection.add(MediaStore.Video.Media.ORIENTATION)
+            projection.add(MediaStore.Video.Media.IS_FAVORITE)
         }
 
         return projection.toTypedArray()
@@ -81,7 +82,8 @@ object VideoMediaStoreHelper : BaseMediaContentHelper() {
             val bucketId = cursor.getStringValue(MediaStore.Video.Media.BUCKET_ID, cache)
             val dateTakenMs = cursor.getLongValue(MediaStore.Video.Media.DATE_TAKEN, cache)
             val takenAt = if (dateTakenMs > 0) Instant.fromEpochMilliseconds(dateTakenMs) else null
-            DVideo(id, title, path, duration, size, width, height, rotation, bucketId, createdAt, updatedAt, takenAt)
+            val isFavorite = if (isQPlus()) cursor.getIntValue(MediaStore.Video.Media.IS_FAVORITE, cache) == 1 else false
+            DVideo(id, title, path, duration, size, width, height, rotation, bucketId, createdAt, updatedAt, takenAt, isFavorite)
         } ?: emptyList()
     }
 

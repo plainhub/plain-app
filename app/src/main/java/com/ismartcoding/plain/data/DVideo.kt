@@ -17,6 +17,7 @@ data class DVideo(
     val createdAt: Instant,
     val updatedAt: Instant,
     val takenAt: Instant?,
+    val isFavorite: Boolean = false,
 ) : IMedia, IData {
 
     fun getRotatedSize(): IntSize {

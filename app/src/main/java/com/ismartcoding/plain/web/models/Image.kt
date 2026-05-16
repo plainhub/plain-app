@@ -12,8 +12,9 @@ data class Image(
     val createdAt: Instant,
     val updatedAt: Instant,
     val takenAt: Instant?,
+    val isFavorite: Boolean,
 )
 
 fun DImage.toModel(): Image {
-    return Image(ID(id), title, path, size, bucketId, createdAt, updatedAt, takenAt)
+    return Image(ID(id), title, path, size, bucketId, createdAt, updatedAt, takenAt, isFavorite)
 }

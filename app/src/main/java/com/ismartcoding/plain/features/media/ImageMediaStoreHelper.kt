@@ -22,7 +22,7 @@ object ImageMediaStoreHelper : BaseMediaContentHelper() {
     override val mediaType: MediaType = MediaType.IMAGE
 
     override fun getProjection(): Array<String> {
-        return arrayOf(
+        val projection = mutableListOf(
             MediaStore.Images.Media._ID,
             MediaStore.Images.Media.TITLE,
             MediaStore.Images.Media.DATA,
@@ -35,6 +35,10 @@ object ImageMediaStoreHelper : BaseMediaContentHelper() {
             MediaStore.Images.Media.ORIENTATION,
             MediaStore.Images.Media.BUCKET_ID,
         )
+        if (isQPlus()) {
+            projection.add(MediaStore.Images.Media.IS_FAVORITE)
+        }
+        return projection.toTypedArray()
     }
 
     override fun buildBaseWhere(filterFields: List<FilterField>): ContentWhere {
@@ -78,7 +82,8 @@ object ImageMediaStoreHelper : BaseMediaContentHelper() {
             val rotation = cursor.getIntValue(MediaStore.Images.Media.ORIENTATION, cache)
             val path = cursor.getStringValue(MediaStore.Images.Media.DATA, cache)
             val bucketId = cursor.getStringValue(MediaStore.Images.Media.BUCKET_ID, cache)
-            DImage(id, title, path, size, width, height, rotation, bucketId, createdAt, updatedAt, takenAt)
+            val isFavorite = if (isQPlus()) cursor.getIntValue(MediaStore.Images.Media.IS_FAVORITE, cache) == 1 else false
+            DImage(id, title, path, size, width, height, rotation, bucketId, createdAt, updatedAt, takenAt, isFavorite)
         } ?: emptyList()
     }
 

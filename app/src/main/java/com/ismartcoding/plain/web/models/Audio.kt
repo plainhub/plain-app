@@ -16,6 +16,7 @@ data class Audio(
     val albumFileId: String,
     val createdAt: Instant,
     val updatedAt: Instant,
+    val isFavorite: Boolean,
 )
 
 data class PlaylistAudio(
@@ -26,7 +27,7 @@ data class PlaylistAudio(
 )
 
 fun DAudio.toModel(): Audio {
-    return Audio(ID(id), title, artist, path, duration, size, bucketId, FileHelper.getFileId(getAlbumUri().toString()), createdAt, updatedAt)
+    return Audio(ID(id), title, artist, path, duration, size, bucketId, FileHelper.getFileId(getAlbumUri().toString()), createdAt, updatedAt, isFavorite)
 }
 
 fun DPlaylistAudio.toModel(): PlaylistAudio {
