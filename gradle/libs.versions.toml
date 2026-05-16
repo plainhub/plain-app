@@ -6,6 +6,7 @@ coreKtxVersion="1.18.0"
 gradle= "9.2.0"
 cameraCoreVersion = "1.6.0"
 compose = "1.10.6"
+composeMultiplatform = "1.10.0"
 activityComposeVersion = "1.13.0"
 composeBom = "2026.03.01"
 coreSplashscreenVersion = "1.2.0"
@@ -157,4 +158,5 @@ pdfium-android = { module = "io.github.oothp:pdfium-android", version.ref = "pdf
 [plugins]
 devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "devtoolsKspVersion" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 play-publisher = { id = "com.github.triplet.play", version.ref = "playPublisherVersion" }
