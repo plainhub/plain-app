@@ -25,7 +25,6 @@ import io.ktor.server.http.content.LocalFileContent
 import io.ktor.server.response.header
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondBytes
-import io.ktor.server.response.respondFile
 import io.ktor.server.response.respondOutputStream
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.Route
@@ -36,6 +35,8 @@ import java.io.File
 import kotlin.text.isEmpty
 import kotlin.text.toBooleanStrictOrNull
 import kotlin.text.toIntOrNull
+
+private const val FILE_DOWNLOAD_BUFFER_SIZE = 64 * 1024
 
 fun Route.addFiles() {
     get("/fs") {
@@ -118,7 +119,12 @@ fun Route.addFiles() {
                         "Content-Disposition",
                         "attachment; filename=\"${fileName}\"; filename*=utf-8''${fileName}"
                     )
-                    call.respondFile(file)
+                    call.response.header("Content-Length", file.length().toString())
+                    call.respondOutputStream(fileName.getContentType()) {
+                        file.inputStream().use { input ->
+                            input.copyTo(this, FILE_DOWNLOAD_BUFFER_SIZE)
+                        }
+                    }
                     return@get
                 } else {
                     call.response.header(
