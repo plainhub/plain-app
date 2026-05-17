@@ -78,7 +78,8 @@ fun Route.addUploads() {
                                         throw IOException("Size mismatch: expected ${info.size}, got $actual")
                                     }
                                     val dFile = AppFileStore.importFile(MainApp.instance, tempFile, part.contentType?.toString() ?: "", deleteSrc = true)
-                                    fileName = dFile.id // SHA-256 hash — client forms fid:{hash}
+                                    val fidSuffix = java.io.File(dFile.realPath).name  // "{hash}.{ext}"
+                                    fileName = fidSuffix // client forms fid:{fidSuffix}
                                 } else {
                                     if (info.dir.isEmpty() || fileName.isEmpty()) {
                                         throw IllegalArgumentException("dir or fileName is empty")

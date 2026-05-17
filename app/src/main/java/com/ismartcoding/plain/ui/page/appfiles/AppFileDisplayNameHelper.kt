@@ -35,7 +35,8 @@ object AppFileDisplayNameHelper {
 
     suspend fun resolveDisplayNameByPath(path: String, title: String): String {
         if (title.isNotEmpty()) return title
-        val fileId = File(path).name
+        // File may be stored as "{hash}.{ext}" or legacy "{hash}"; strip extension to get DB id
+        val fileId = File(path).nameWithoutExtension
         val appFile = AppDatabase.instance.appFileDao().getById(fileId)
             ?: return fileId
         val nameMap = buildNameMap(AppDatabase.instance.chatDao().getAll())
@@ -45,7 +46,9 @@ object AppFileDisplayNameHelper {
     private fun bindItems(items: List<DMessageFile>, map: MutableMap<String, String>) {
         items.forEach { item ->
             if (item.isFidFile() && item.fileName.isNotEmpty()) {
-                map.putIfAbsent(item.localFileId(), item.fileName)
+                // localFileId() may be "{hash}.{ext}" or legacy "{hash}"; use bare hash for map key
+                val hash = item.localFileId().substringBefore(".")
+                map.putIfAbsent(hash, item.fileName)
             }
         }
     }

@@ -125,9 +125,10 @@ fun SchemaBuilder.addFileUploadSchema() {
 
             chunkDir.deleteRecursively()
             if (isAppFile) {
-                // Import into content-addressable store; returns SHA-256 hash
+                // Import into content-addressable store; returns "{hash}.{ext}" as fid suffix
                 val dFile = AppFileStore.importFile(MainApp.instance, outputFile, "", deleteSrc = true)
-                "${dFile.id}:$mergedSize"
+                val fidSuffix = java.io.File(dFile.realPath).name  // "{hash}.{ext}"
+                "${fidSuffix}:$mergedSize"
             } else {
                 MainApp.instance.scanFileByConnection(outputFile, null)
                 // Return base filename (consistent with /upload) + merged size

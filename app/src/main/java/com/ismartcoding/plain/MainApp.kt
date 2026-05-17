@@ -37,6 +37,7 @@ import com.ismartcoding.plain.preferences.UrlTokenPreference
 import com.ismartcoding.plain.preferences.WebPreference
 import com.ismartcoding.plain.preferences.dataStore
 import com.ismartcoding.plain.preferences.getPreferencesAsync
+import com.ismartcoding.plain.preferences.FidUriExtMigratedPreference
 import com.ismartcoding.plain.ai.ImageSearchManager
 import com.ismartcoding.plain.features.dlna.receiver.DlnaRenderer
 import com.ismartcoding.plain.receivers.PlugInControlReceiver
@@ -45,6 +46,7 @@ import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.workers.FeedFetchWorker
 import com.ismartcoding.plain.db.AppDatabase
+import com.ismartcoding.plain.helpers.ChatFidUriMigration
 import dalvik.system.ZipPathValidator
 import kotlin.time.Duration.Companion.days
 
@@ -105,6 +107,10 @@ class MainApp : Application() {
             }
             HttpServerManager.loadTokenCache()
             ChatCacheManager.loadKeyCacheAsync()
+            if (!FidUriExtMigratedPreference.get(preferences)) {
+                ChatFidUriMigration.run(this@MainApp)
+                FidUriExtMigratedPreference.putAsync(this@MainApp, true)
+            }
             if (FeedAutoRefreshPreference.get(preferences)) {
                 FeedFetchWorker.startRepeatWorkerAsync(instance)
             }

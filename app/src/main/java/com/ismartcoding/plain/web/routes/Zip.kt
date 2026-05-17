@@ -1,6 +1,5 @@
 package com.ismartcoding.plain.web.routes
 
-import com.ismartcoding.lib.extensions.getFinalPath
 import com.ismartcoding.lib.extensions.urlEncode
 import com.ismartcoding.lib.helpers.JsonHelper.jsonDecode
 import com.ismartcoding.lib.helpers.ZipHelper
@@ -129,7 +128,7 @@ fun Route.addZip() {
                     val nameMap = AppFileDisplayNameHelper.buildNameMap(chatDao.getAll())
                     paths = appFiles.map { file ->
                         val displayName = AppFileDisplayNameHelper.resolveDisplayName(file, nameMap)
-                        DownloadFileItem("fid:${file.id}".getFinalPath(context), displayName)
+                        DownloadFileItem(file.realPath, displayName)
                     }
                 }
 

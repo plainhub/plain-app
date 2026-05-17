@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import java.io.File
 
+
 object ChatFileSaveHelper {
     /**
      * Import a file from a content-resolver [uri] into the content-addressable
@@ -21,7 +22,7 @@ object ChatFileSaveHelper {
         try {
             FileHelper.copyFile(context, uri, tempFile.absolutePath)
             val dFile = AppFileStore.importFile(context, tempFile, mimeType, deleteSrc = true)
-            return AppFileStore.toFidUri(dFile.id)
+            return AppFileStore.toFidUri(dFile.id, AppFileStore.extFromMime(dFile.mimeType))
         } finally {
             // Guard: if importFile did not consume (due to error path), clean up
             if (tempFile.exists()) tempFile.delete()
@@ -41,6 +42,6 @@ object ChatFileSaveHelper {
         mimeType: String = "",
     ): String {
         val dFile = AppFileStore.importFile(context, srcFile, mimeType, deleteSrc = true)
-        return AppFileStore.toFidUri(dFile.id)
+        return AppFileStore.toFidUri(dFile.id, AppFileStore.extFromMime(dFile.mimeType))
     }
 }

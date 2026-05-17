@@ -808,6 +808,11 @@ object DocTabsModePreference : BasePreference<Boolean>() {
     override val key = booleanPreferencesKey("doc_tabs_mode")
 }
 
+object FidUriExtMigratedPreference : BasePreference<Boolean>() {
+    override val default = false
+    override val key = booleanPreferencesKey("fid_uri_ext_migrated")
+}
+
 object HomeSectionCollapsedPreference : BasePreference<String>() {
     override val default = ""
     override val key = stringPreferencesKey("home_section_collapsed")
