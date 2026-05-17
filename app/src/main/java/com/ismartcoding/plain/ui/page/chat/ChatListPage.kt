@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -55,13 +54,9 @@ fun ChatListPage(
     channelVM: ChannelViewModel,
 ) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val pairedPeers = peerVM.pairedPeers
     val unpairedPeers = peerVM.unpairedPeers
     val webEnabled = LocalWeb.current
-    val isAppInForeground = remember { mutableStateOf(true) }
-    val isScreenOn = remember { mutableStateOf(true) }
-    val isPageVisible = remember { mutableStateOf(true) }
     val isDiscoverable = remember { context.dataStore.dataFlow.map { NearbyDiscoverablePreference.get(it) } }.collectAsStateValue(initial = NearbyDiscoverablePreference.default)
     val refreshState = rememberRefreshLayoutState { peerVM.loadPeers(); setRefreshState(RefreshContentState.Finished) }
     var showCreateChannelDialog by channelVM.showCreateChannelDialog
@@ -70,7 +65,7 @@ fun ChatListPage(
     var manageMembersChannelId by channelVM.manageMembersChannelId
     val channels = channelVM.channels.collectAsStateValue()
 
-    ChatListPageEffects(peerVM, scope, isAppInForeground, isPageVisible, isScreenOn)
+    ChatPresenceEffects(peerVM)
 
     PScaffold(
         topBar = { TopBarChat(navController, channelVM, onNavigateBack = { navController.popBackStack() }) },

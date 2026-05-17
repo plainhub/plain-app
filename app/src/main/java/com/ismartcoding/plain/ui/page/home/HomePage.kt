@@ -38,6 +38,7 @@ import com.ismartcoding.plain.ui.models.ChannelViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.UpdateViewModel
 import com.ismartcoding.plain.ui.models.consumeUpdateDownloadEvent
+import com.ismartcoding.plain.ui.page.chat.ChatPresenceEffects
 import com.ismartcoding.plain.ui.page.settings.UpdateDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,8 +54,9 @@ fun HomePage(
     val context = LocalContext.current
     var systemAlertWindow by remember { mutableStateOf(Permission.SYSTEM_ALERT_WINDOW.can(context)) }
 
+    ChatPresenceEffects(peerVM)
+
     LaunchedEffect(Unit) {
-        peerVM.loadPeers()
         Channel.sharedFlow.collect { event ->
             if (updateVM.consumeUpdateDownloadEvent(event)) {
                 return@collect

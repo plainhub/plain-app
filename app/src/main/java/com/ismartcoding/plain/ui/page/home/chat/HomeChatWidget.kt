@@ -59,7 +59,6 @@ fun HomeChatWidget(
         route = Routing.Chat("local"),
     )
     val peerRows = peerVM.pairedPeers
-        .filter { peerVM.isPeerOnline(it.id) }
         .map { peer ->
             val latestChat = peerVM.getLatestChat(peer.id)
             ChatRow(

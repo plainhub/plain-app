@@ -6,7 +6,9 @@ import android.content.IntentFilter
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -15,20 +17,19 @@ import com.ismartcoding.plain.chat.ChatCacheManager
 import com.ismartcoding.plain.chat.PeerGraphQLClient
 import com.ismartcoding.plain.chat.discover.NearbyDiscoverManager
 import com.ismartcoding.plain.ui.models.PeerViewModel
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 @Composable
-internal fun ChatListPageEffects(
-    peerVM: PeerViewModel, scope: CoroutineScope,
-    isAppInForeground: MutableState<Boolean>, isPageVisible: MutableState<Boolean>,
-    isScreenOn: MutableState<Boolean>,
-) {
+internal fun ChatPresenceEffects(peerVM: PeerViewModel) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val scope = rememberCoroutineScope()
+    val isAppInForeground = remember { mutableStateOf(true) }
+    val isPageVisible = remember { mutableStateOf(true) }
+    val isScreenOn = remember { mutableStateOf(true) }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
