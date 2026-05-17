@@ -37,7 +37,6 @@ import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.ui.models.TagsViewModel
 import com.ismartcoding.plain.ui.nav.Routing
-import com.ismartcoding.plain.ui.theme.AppTheme
 import com.ismartcoding.plain.ui.theme.backgroundNormal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -86,24 +85,22 @@ fun Main(
         clearToast = { toastState = null },
     )
 
-    AppTheme(useDarkTheme = useDarkTheme) {
-        DisposableEffect(useDarkTheme) {
-            val window = (view.context as Activity).window
-            WindowCompat.getInsetsController(window, window.decorView).apply {
-                isAppearanceLightStatusBars = !useDarkTheme
-                isAppearanceLightNavigationBars = !useDarkTheme
-            }
-            if (isQPlus() && context.isGestureInteractionMode()) {
-                window.isNavigationBarContrastEnforced = false
-            }
-            onDispose { }
+    DisposableEffect(useDarkTheme) {
+        val window = (view.context as Activity).window
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            isAppearanceLightStatusBars = !useDarkTheme
+            isAppearanceLightNavigationBars = !useDarkTheme
         }
-
-        Box(modifier = Modifier.background(MaterialTheme.colorScheme.backgroundNormal)) {
-            MainNavGraph(navController, mainVM, audioPlaylistVM, chatVM, peerVM, channelVM, notesVM, feedTagsVM, noteTagsVM, pomodoroVM)
-
-            MainDialogs(loadingDialogEvent, confirmDialogEvent, { confirmDialogEvent = null }, toastState, { toastState = null })
+        if (isQPlus() && context.isGestureInteractionMode()) {
+            window.isNavigationBarContrastEnforced = false
         }
+        onDispose { }
+    }
+
+    Box(modifier = Modifier.background(MaterialTheme.colorScheme.backgroundNormal)) {
+        MainNavGraph(navController, mainVM, audioPlaylistVM, chatVM, peerVM, channelVM, notesVM, feedTagsVM, noteTagsVM, pomodoroVM)
+
+        MainDialogs(loadingDialogEvent, confirmDialogEvent, { confirmDialogEvent = null }, toastState, { toastState = null })
     }
 }
 

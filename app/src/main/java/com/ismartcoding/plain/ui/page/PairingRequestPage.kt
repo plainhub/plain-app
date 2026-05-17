@@ -66,7 +66,9 @@ fun PairingRequestPage(
         item {
             Text(
                 text = stringResource(R.string.pairing_request),
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurface,
+                ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             )

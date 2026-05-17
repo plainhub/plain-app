@@ -64,7 +64,9 @@ fun ChannelInvitePage(
         item {
             Text(
                 text = stringResource(R.string.channel_invite),
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurface,
+                ),
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             )

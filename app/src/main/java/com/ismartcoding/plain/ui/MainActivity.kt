@@ -53,10 +53,12 @@ import com.ismartcoding.plain.ui.models.MainViewModel
 import com.ismartcoding.plain.ui.models.PeerViewModel
 import com.ismartcoding.plain.ui.models.PomodoroViewModel
 import com.ismartcoding.plain.CrashHandler
+import com.ismartcoding.plain.enums.DarkTheme
 import com.ismartcoding.plain.events.ChannelInviteReceivedEvent
 import com.ismartcoding.plain.events.ConfirmToAcceptLoginEvent
 import com.ismartcoding.plain.events.PairingRequestReceivedEvent
 import com.ismartcoding.plain.events.PairingResponseEvent
+import com.ismartcoding.plain.preferences.LocalDarkTheme
 import com.ismartcoding.plain.ui.models.acceptChannelInvite
 import com.ismartcoding.plain.ui.models.declineChannelInvite
 import com.ismartcoding.plain.ui.page.ChannelInvitePage
@@ -68,6 +70,7 @@ import com.ismartcoding.plain.ui.page.Main
 import com.ismartcoding.plain.web.HttpServerManager
 import com.ismartcoding.plain.ui.page.chat.components.ForwardTarget
 import com.ismartcoding.plain.ui.page.chat.components.ForwardTargetDialog
+import com.ismartcoding.plain.ui.theme.AppTheme
 import io.ktor.websocket.CloseReason
 import io.ktor.websocket.close
 import kotlinx.coroutines.Dispatchers
@@ -155,64 +158,66 @@ class MainActivity : AppCompatActivity() {
         }
         setContent {
             SettingsProvider {
-                Main(navControllerState, onLaunched = { handleIntent(intent) }, mainVM, audioPlaylistVM, pomodoroVM, chatVM = chatVM, peerVM = peerVM, channelVM = channelVM)
-                if (showForwardTargetDialog) {
-                    ForwardTargetDialog(
-                        peerVM = peerVM, onDismiss = { showForwardTargetDialog = false; pendingFileUris = null },
-                        onTargetSelected = { target ->
-                            pendingFileUris?.let { uris ->
-                                val route = when (target) {
-                                    is ForwardTarget.Local -> Routing.Chat("local"); is ForwardTarget.Peer -> Routing.Chat("peer:${target.peer.id}")
+                AppTheme(useDarkTheme = DarkTheme.isDarkTheme(LocalDarkTheme.current)) {
+                    Main(navControllerState, onLaunched = { handleIntent(intent) }, mainVM, audioPlaylistVM, pomodoroVM, chatVM = chatVM, peerVM = peerVM, channelVM = channelVM)
+                    if (showForwardTargetDialog) {
+                        ForwardTargetDialog(
+                            peerVM = peerVM, onDismiss = { showForwardTargetDialog = false; pendingFileUris = null },
+                            onTargetSelected = { target ->
+                                pendingFileUris?.let { uris ->
+                                    val route = when (target) {
+                                        is ForwardTarget.Local -> Routing.Chat("local"); is ForwardTarget.Peer -> Routing.Chat("peer:${target.peer.id}")
+                                    }
+                                    navControllerState.value?.navigate(route); coIO { delay(1000); sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris)) }
                                 }
-                                navControllerState.value?.navigate(route); coIO { delay(1000); sendEvent(PickFileResultEvent(PickFileTag.SEND_MESSAGE, PickFileType.FILE, uris)) }
-                            }
-                        })
-                }
-                pendingCrashReport?.let { report ->
-                    CrashReportDialog(crashReport = report, onDismiss = { pendingCrashReport = null })
-                }
-                pendingLoginEvent?.let { event ->
-                    val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
-                    LoginRequestPage(
-                        clientIp = clientIp,
-                        request = event.request,
-                        onDeny = {
-                            pendingLoginEvent = null
-                            lifecycleScope.launch(Dispatchers.IO) {
-                                event.session.close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "rejected"))
-                            }
-                        },
-                        onAllow = {
-                            pendingLoginEvent = null
-                            lifecycleScope.launch(Dispatchers.IO) { HttpServerManager.respondTokenAsync(event, clientIp) }
-                        },
-                    )
-                }
-                pendingPairingEvent?.let { event ->
-                    PairingRequestPage(
-                        event = event,
-                        onDeny = {
-                            pendingPairingEvent = null
-                            sendEvent(PairingResponseEvent(event.request, event.fromIp, false))
-                        },
-                        onAllow = {
-                            pendingPairingEvent = null
-                            sendEvent(PairingResponseEvent(event.request, event.fromIp, true))
-                        },
-                    )
-                }
-                pendingChannelInviteEvent?.let { event ->
-                    ChannelInvitePage(
-                        event = event,
-                        onDecline = {
-                            pendingChannelInviteEvent = null
-                            channelVM.declineChannelInvite(this@MainActivity, event.channelId)
-                        },
-                        onAccept = {
-                            pendingChannelInviteEvent = null
-                            channelVM.acceptChannelInvite(event.channelId)
-                        },
-                    )
+                            })
+                    }
+                    pendingCrashReport?.let { report ->
+                        CrashReportDialog(crashReport = report, onDismiss = { pendingCrashReport = null })
+                    }
+                    pendingLoginEvent?.let { event ->
+                        val clientIp = HttpServerManager.clientIpCache[event.clientId] ?: ""
+                        LoginRequestPage(
+                            clientIp = clientIp,
+                            request = event.request,
+                            onDeny = {
+                                pendingLoginEvent = null
+                                lifecycleScope.launch(Dispatchers.IO) {
+                                    event.session.close(CloseReason(CloseReason.Codes.TRY_AGAIN_LATER, "rejected"))
+                                }
+                            },
+                            onAllow = {
+                                pendingLoginEvent = null
+                                lifecycleScope.launch(Dispatchers.IO) { HttpServerManager.respondTokenAsync(event, clientIp) }
+                            },
+                        )
+                    }
+                    pendingPairingEvent?.let { event ->
+                        PairingRequestPage(
+                            event = event,
+                            onDeny = {
+                                pendingPairingEvent = null
+                                sendEvent(PairingResponseEvent(event.request, event.fromIp, false))
+                            },
+                            onAllow = {
+                                pendingPairingEvent = null
+                                sendEvent(PairingResponseEvent(event.request, event.fromIp, true))
+                            },
+                        )
+                    }
+                    pendingChannelInviteEvent?.let { event ->
+                        ChannelInvitePage(
+                            event = event,
+                            onDecline = {
+                                pendingChannelInviteEvent = null
+                                channelVM.declineChannelInvite(this@MainActivity, event.channelId)
+                            },
+                            onAccept = {
+                                pendingChannelInviteEvent = null
+                                channelVM.acceptChannelInvite(event.channelId)
+                            },
+                        )
+                    }
                 }
             }
         }
