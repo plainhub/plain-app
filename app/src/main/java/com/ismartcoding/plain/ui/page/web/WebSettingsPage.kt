@@ -107,14 +107,15 @@ fun WebSettingsPage(navController: NavHostController, webVM: WebConsoleViewModel
                         PCard {
                             val m = PermissionItem.create(context, R.drawable.bell, Permission.NOTIFICATION_LISTENER)
                             val permission = m.permission
+                            val enabled = notificationListenerGranted.value && enabledPermissions.contains(permission.name)
                             PListItem(
-                                modifier = Modifier.clickable { togglePermission(scope, context, m, !enabledPermissions.contains(permission.name)) },
+                                modifier = Modifier.clickable { togglePermission(scope, context, m, !enabled) },
                                 icon = m.icon, title = permission.getText(),
                                 subtitle = stringResource(if (notificationListenerGranted.value) R.string.system_permission_granted else R.string.system_permission_not_granted)
                             ) {
-                                PSwitch(activated = enabledPermissions.contains(permission.name)) { enable -> togglePermission(scope, context, m, enable) }
+                                PSwitch(activated = enabled) { enable -> togglePermission(scope, context, m, enable) }
                             }
-                            if (enabledPermissions.contains(permission.name)) {
+                            if (enabled) {
                                 PListItem(
                                     modifier = Modifier.clickable { navController.navigate(Routing.NotificationSettings) },
                                     icon = R.drawable.settings, title = stringResource(R.string.notification_filter_settings),
