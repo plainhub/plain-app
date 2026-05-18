@@ -35,9 +35,9 @@ cat > ./local.properties <<EOF
 sdk.dir=/Users/$USER/Library/Android/sdk
 EOF
 
-# Build default APK (arm64-v8a)
+# Build arm64-v8a APK (64-bit, for modern devices)
 ./gradlew assembleGithubRelease || err_and_exit "assembleGithubRelease failed"
-BUILD_FILE="PlainApp-$(getVersionName)-Universal-Recommended.apk"
+BUILD_FILE="PlainApp-$(getVersionName)-64bit-Universal-Recommended.apk"
 mv ./app/build/outputs/apk/github/release/app-github-release.apk ./$BUILD_FILE
 
 # Build armeabi-v7a APK

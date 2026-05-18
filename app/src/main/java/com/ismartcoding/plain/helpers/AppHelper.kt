@@ -75,9 +75,7 @@ object AppHelper {
                     }
                 } else {
                     latest.assets.firstOrNull {
-                        it.name.endsWith("-Universal-Recommended.apk") || it.name.endsWith(
-                            "-default.apk"
-                        )
+                        it.name.contains("Recommended")
                     }
                 }
                 UpdateInfoPreference.updateAsync(context) {

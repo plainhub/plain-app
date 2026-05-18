@@ -1,48 +1,64 @@
 # Copilot Instructions for PlainApp
+Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
 
-> **Start here**: Read `docs/ARCHITECTURE.md` for full project structure, directory map, and naming conventions.
+**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
 
-## Key Rules
+## 1. Think Before Coding
 
-- **No DI framework** — Use companion objects, singletons, `SystemServices.kt`. Never add Hilt/Dagger.
-- **No ONNX** — Never use ONNX or ONNX Runtime. Use `ai-edge-torch` (PyTorch → TFLite) for model conversion. Runtime uses LiteRT only.
-- **No Docker** — All scripts must run directly via `python3` / `pip`. Never use Docker for build or conversion steps.
-- **Event bus** — `sendEvent()` / `receiveEvent<T>` from `lib/channel/`. Use for cross-component communication.
-- **Coroutines** — Use `coIO`, `coMain` from `lib/helpers/CoroutinesHelper.kt` for side effects.
-- **State** — `MutableStateFlow` in ViewModels, collected by Compose.
-- **Short paths** — `app/.../plain/` = `app/src/main/java/com/ismartcoding/plain/`, `lib/.../lib/` = `lib/src/main/java/com/ismartcoding/lib/`
-- **Max 400 lines per file** — Split into smaller files when a file reaches 400 lines. It is strictly forbidden to reduce line count by removing blank lines or whitespace — every split must be a genuine logical decomposition.
-- **`app_name` is never translated** — The string `app_name` must keep `translatable="false"`. Never add `app_name` to locale `strings*.xml` files.
-- **More icon consistency** — Always use `R.drawable.ellipsis_vertical` (⋮) for "more" actions in top bars, never `R.drawable.ellipsis` (…). Keep icon style consistent across all pages.
-- **No `coIO` in GraphQL resolvers** — Never call `coIO { }` inside a GraphQL resolver. Detached fire-and-forget coroutines launched from a resolver are not tied to any lifecycle and can crash the server thread. Instead, emit a domain event with `sendEvent(MyEvent())` and handle the async work in `AppEvents.register()` where the coroutine is properly managed. Pattern: GraphQL resolver → `sendEvent(XxxEvent())` → `AppEvents` handles with `coIO { ... }`.
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
 
-## Naming Conventions
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
 
-| Prefix/Suffix | Meaning | Example |
-|---------------|---------|---------|
-| `D` prefix | Data/DB entity | `DChat`, `DAudio`, `DNote` |
-| `V` prefix | View data class | `VChat`, `VPackage` |
-| `P` prefix | Reusable Compose component | `PAlert`, `PCard`, `PSwitch` |
-| `*Helper.kt` | Stateless utility | `NoteHelper`, `TagHelper` |
-| `*ViewModel.kt` | ViewModel | `ChatViewModel`, `AudioViewModel` |
-| `*Page.kt` | Full screen composable | `ChatPage`, `NotesPage` |
+## 2. Simplicity First
 
-## Build Commands
+**Minimum code that solves the problem. Nothing speculative.**
 
-```bash
-./gradlew :app:assembleGithubDebug     # GitHub debug APK
-./gradlew :app:assembleGoogleRelease   # Google Play release
-./gradlew test                         # Unit tests
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+## 3. Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it - don't delete it.
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: Every changed line should trace directly to the user's request.
+
+## 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
 ```
 
-## i18n
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
-String resources are split by feature: `app/src/main/res/values/strings_{feature}.xml`. 16 locales under `values-{locale}/`.
+---
 
-**Sync translations** ("同步翻译"):
-```bash
-node scripts/i18n-find-untranslated.mjs   # detect missing keys
-node scripts/i18n-translate-todo.mjs       # translate via Google Translate
-node scripts/i18n-apply-todo.mjs           # apply to locale files
-node scripts/i18n-find-untranslated.mjs    # verify: "Total: 0 missing, 0 untranslated"
-```
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
